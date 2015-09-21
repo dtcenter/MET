@@ -75,7 +75,7 @@ struct PHISTData {
 struct ORANKData {
    int total, index;
    ConcatString obs_sid, obs_qc;
-   double obs_lat, obs_lon, obs_lvl, obs_elv, obs, pit, ens_mean;
+   double obs_lat, obs_lon, obs_lvl, obs_elv, obs, pit, ens_mean, climo;
    int rank, n_ens_vld, n_ens;
    NumArray ens_na;
 };

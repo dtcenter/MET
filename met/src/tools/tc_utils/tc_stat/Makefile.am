@@ -18,22 +18,25 @@ tc_stat_SOURCES = tc_stat.cc \
 tc_stat_CPPFLAGS = ${MET_CPPFLAGS}
 tc_stat_LDFLAGS = ${MET_LDFLAGS}
 tc_stat_LDADD = -lvx_stat_out \
-	-lvx_config \
+	-lvx_statistics \
+	-lvx_gsl_prob \
+	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
+	-lvx_data2d \
 	-lvx_analysis_util \
 	-lvx_tc_util \
 	-lvx_nc_util \
-	-lvx_statistics \
-	-lvx_gsl_prob \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
 	-lvx_color \
 	-lvx_log \
-	-lm \
-	-lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = tc_stat_conf_info.h \
 	tc_stat_files.h \

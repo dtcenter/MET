@@ -38,6 +38,7 @@
 //   012    11/12/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output files.
 //   013    03/02/15  Halley Gotway  Add automated regridding.
+//   014    09/11/15  Halley Gotway  Add climatology to config file.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,12 +72,15 @@ static void process_ensemble      ();
 static void process_vx            ();
 
 static void process_point_vx      ();
+static void process_point_climo   ();
 static void process_point_obs     (int);
 static int  process_point_ens     (int, int);
 static void process_point_scores  ();
 
 static void process_grid_vx       ();
-static void process_grid_scores   (DataPlane *&, DataPlane &, DataPlane &,
+static void process_grid_scores   (DataPlane *&,
+                                   DataPlane &, DataPlane &,
+                                   DataPlane &, DataPlane &,
                                    DataPlane &, PairDataEnsemble &);
 
 static void clear_counts(const DataPlane &, int);
@@ -609,6 +613,9 @@ void process_point_vx() {
       conf_info.vx_pd[i].set_end_ut(obs_valid_end_ut);
    }
 
+   // Process the climatology fields
+   process_point_climo();
+
    // Process each point observation NetCDF file
    for(i=0; i<point_obs_file_list.n_elements(); i++) {
       process_point_obs(i);
@@ -639,6 +646,34 @@ void process_point_vx() {
 
    // Compute the scores and write them out
    process_point_scores();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_point_climo() {
+   int i;
+   DataPlaneArray cmn_dpa, csd_dpa;
+
+   // Loop through each of the fields to be verified and extract
+   // the climatology fields for verification
+   for(i=0; i<conf_info.get_n_vx(); i++) {
+
+      // Read climatology mean fields
+      cmn_dpa = read_climo_data_plane_array(
+                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   i, ens_valid_ut, grid);
+
+      // Read standard deviation fields
+      csd_dpa = read_climo_data_plane_array(
+                   conf_info.conf.lookup_dictionary(conf_key_climo_stdev_field, false),
+                   i, ens_valid_ut, grid);
+
+      // Store climatology information
+      conf_info.vx_pd[i].set_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_pd[i].set_climo_sd_dpa(csd_dpa);
+   } // end for i
 
    return;
 }
@@ -1058,7 +1093,8 @@ void process_grid_vx() {
    DataPlane *fcst_dp = (DataPlane *) 0;
    DataPlane *fcst_dp_smooth = (DataPlane *) 0;
    DataPlane  obs_dp, obs_dp_smooth;
-   DataPlane  mn_dp, mn_dp_smooth;
+   DataPlane  emn_dp, emn_dp_smooth;
+   DataPlane  cmn_dp, csd_dp;
    PairDataEnsemble pd;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1113,7 +1149,8 @@ void process_grid_vx() {
             }
 
             // Read the gridded data from the current ensemble file
-            found = ens_mtddf->data_plane(*conf_info.vx_pd[i].fcst_info, fcst_dp[j]);
+            found = ens_mtddf->data_plane(*conf_info.vx_pd[i].fcst_info,
+                                          fcst_dp[j]);
 
             // Count the number of missing files
             if(!found) {
@@ -1144,6 +1181,25 @@ void process_grid_vx() {
             exit(1);
          }
       } // end for j
+
+      // Read climatology data
+      cmn_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                  i, ens_valid_ut, grid);
+
+      mlog << Debug(3)
+           << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
+           << " climatology mean field(s) for forecast "
+           << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n";
+
+      csd_dp = read_climo_data_plane(
+                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                  i, ens_valid_ut, grid);
+
+      mlog << Debug(3)
+           << "Found " << (csd_dp.nx() == 0 ? 0 : 1)
+           << " climatology standard deviation field(s) for forecast "
+           << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n";
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
@@ -1238,7 +1294,7 @@ void process_grid_vx() {
          }
 
          // Read the gridded data from the mean file
-         if(!ens_mtddf->data_plane(*info, mn_dp)) {
+         if(!ens_mtddf->data_plane(*info, emn_dp)) {
             mlog << Error << "\nprocess_grid_vx() -> "
                  << "Trouble reading field " << info->magic_str()
                  << " from file " << mn_file << "\n\n";
@@ -1265,7 +1321,7 @@ void process_grid_vx() {
          shc.set_interp_mthd(conf_info.interp_mthd[j]);
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 
-         // If requested in the config file, smooth the forecast fields
+         // If requested in the config file, smooth the forecast field
          for(k=0; k<ens_file_list.n_elements(); k++) {
          
             if(conf_info.interp_field == FieldType_Fcst ||
@@ -1274,20 +1330,17 @@ void process_grid_vx() {
                             conf_info.interp_mthd[j],
                             conf_info.interp_wdth[j],
                             conf_info.interp_thresh);
-
                if(conf_info.ens_ssvar_flag) {
-                  smooth_field(mn_dp, mn_dp_smooth,
+                  smooth_field(emn_dp, emn_dp_smooth,
                                conf_info.interp_mthd[j],
                                conf_info.interp_wdth[j],
                                conf_info.interp_thresh);
                }
-
-
             }
             // Do not smooth the forecast field
             else {
                fcst_dp_smooth[k] = fcst_dp[k];
-               if(conf_info.ens_ssvar_flag) mn_dp_smooth = mn_dp;
+               if(conf_info.ens_ssvar_flag) emn_dp_smooth = emn_dp;
             }
          } // end for k
 
@@ -1316,7 +1369,7 @@ void process_grid_vx() {
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
-                                mn_dp_smooth,
+                                emn_dp_smooth, cmn_dp, csd_dp,
                                 conf_info.mask_dp[k], pd);
 
             mlog << Debug(2)
@@ -1407,10 +1460,16 @@ void process_grid_vx() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
-                         DataPlane &mn_dp,
-                         DataPlane &mask_dp, PairDataEnsemble &pd) {
+        DataPlane &emn_dp, DataPlane &cmn_dp, DataPlane &csd_dp,
+        DataPlane &mask_dp, PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
-   double v;
+   double v, cmn, csd;
+
+   // Climatology flags
+   bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
+                    cmn_dp.ny() == obs_dp.ny());
+   bool csd_flag = (csd_dp.nx() == obs_dp.nx() &&
+                    csd_dp.ny() == obs_dp.ny());
 
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
@@ -1418,18 +1477,21 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 
          // Skip any grid points containing bad data values or where the
          // verification masking region is turned off
-         if(is_bad_data(obs_dp.get(x, y)) || !mask_dp.s_is_on(x, y) ) continue;
+         if(is_bad_data(obs_dp.get(x, y)) || !mask_dp.s_is_on(x, y)) continue;
 
+         // Get current climatology value
+         cmn = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
+         csd = (csd_flag ? csd_dp.get(x, y) : bad_data_double);
+         
          // Add the observation point
-         pd.add_obs(x, y, obs_dp.get(x, y));
-
+         pd.add_obs(x, y, obs_dp.get(x, y), cmn, csd);
       } // end for y
    } // end for x
 
    // Loop through the mean field, adding all the points
-   for(x=0; x<mn_dp.nx(); x++)
-      for(y=0; y<mn_dp.ny(); y++)
-         pd.mn_na.add(mn_dp.get(x, y));
+   for(x=0; x<emn_dp.nx(); x++)
+      for(y=0; y<emn_dp.ny(); y++)
+         pd.mn_na.add(emn_dp.get(x, y));
 
    // Loop through the observation points
    for(i=0; i<pd.n_obs; i++) {

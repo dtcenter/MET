@@ -535,9 +535,7 @@ void process_scores() {
    DataPlane fcst_dp_thresh, obs_dp_thresh;
 
    // Climatology mean and standard deviations
-   DataPlane cmn_dp,        csd_dp;
-   DataPlane cmn_dp_smooth, csd_dp_smooth;
-   DataPlane cmn_dp_thresh, csd_dp_thresh;
+   DataPlane cmn_dp, csd_dp;
 
    // Forecast, observation, and climatology pairs
    NumArray f_na, o_na, cmn_na, csd_na;
@@ -546,8 +544,9 @@ void process_scores() {
    NumArray fthr_na, othr_na;
    
    // Objects to handle vector winds
-   DataPlane fu_dp, ou_dp, cmnu_dp, csdu_dp;
-   DataPlane fu_dp_smooth, ou_dp_smooth, cmnu_dp_smooth, csdu_dp_smooth;
+   DataPlane fu_dp, ou_dp;
+   DataPlane fu_dp_smooth, ou_dp_smooth;
+   DataPlane cmnu_dp, csdu_dp;
    NumArray fu_na, ou_na, cmnu_na, csdu_na;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
@@ -724,19 +723,10 @@ void process_scores() {
          shc.set_interp_mthd(conf_info.interp_mthd[j]);
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 
-         // If requested in the config file, smooth the forecast
-         // and climatology fields
+         // If requested in the config file, smooth the forecast field
          if(conf_info.interp_field == FieldType_Fcst ||
             conf_info.interp_field == FieldType_Both) {
             smooth_field(fcst_dp, fcst_dp_smooth,
-                         conf_info.interp_mthd[j],
-                         conf_info.interp_wdth[j],
-                         conf_info.interp_thresh);
-            smooth_field(cmn_dp, cmn_dp_smooth,
-                         conf_info.interp_mthd[j],
-                         conf_info.interp_wdth[j],
-                         conf_info.interp_thresh);
-            smooth_field(csd_dp, csd_dp_smooth,
                          conf_info.interp_mthd[j],
                          conf_info.interp_wdth[j],
                          conf_info.interp_thresh);
@@ -744,8 +734,6 @@ void process_scores() {
          // Do not smooth the forecast field
          else {
             fcst_dp_smooth = fcst_dp;
-            cmn_dp_smooth  = cmn_dp;
-            csd_dp_smooth  = csd_dp;
          }
 
          // If requested in the config file, smooth the observation field
@@ -774,8 +762,8 @@ void process_scores() {
             // Apply the current mask to the current fields
             apply_mask(fcst_dp_smooth, mask_dp, f_na);
             apply_mask(obs_dp_smooth,  mask_dp, o_na);
-            apply_mask(cmn_dp_smooth,  mask_dp, cmn_na);
-            apply_mask(csd_dp_smooth,  mask_dp, csd_na);
+            apply_mask(cmn_dp,         mask_dp, cmn_na);
+            apply_mask(csd_dp,         mask_dp, csd_na);
 
             // Set the mask name
             shc.set_mask(conf_info.mask_name[k]);
@@ -962,20 +950,10 @@ void process_scores() {
                                conf_info.interp_mthd[j],
                                conf_info.interp_wdth[j],
                                conf_info.interp_thresh);
-                  smooth_field(cmnu_dp, cmnu_dp_smooth,
-                               conf_info.interp_mthd[j],
-                               conf_info.interp_wdth[j],
-                               conf_info.interp_thresh);
-                  smooth_field(csdu_dp, csdu_dp_smooth,
-                               conf_info.interp_mthd[j],
-                               conf_info.interp_wdth[j],
-                               conf_info.interp_thresh);
                }
                // Do not smooth the forecast field
                else {
-                  fu_dp_smooth   = fu_dp;
-                  cmnu_dp_smooth = cmnu_dp;
-                  csdu_dp_smooth = csdu_dp;
+                  fu_dp_smooth = fu_dp;
                }
 
                // If requested in the config file, smooth the observation
@@ -995,8 +973,8 @@ void process_scores() {
                // Apply the current mask to the U-wind fields
                apply_mask(fu_dp_smooth,   mask_dp, fu_na);
                apply_mask(ou_dp_smooth,   mask_dp, ou_na);
-               apply_mask(cmnu_dp_smooth, mask_dp, cmnu_na);
-               apply_mask(csdu_dp_smooth, mask_dp, csdu_na);
+               apply_mask(cmnu_dp,        mask_dp, cmnu_na);
+               apply_mask(csdu_dp,        mask_dp, csdu_na);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na, cmnu_na, cmn_na);
@@ -1098,8 +1076,7 @@ void process_scores() {
          // the config file
          if(!(conf_info.nc_info.all_false())) {
             write_nc(conf_info.nc_info, 
-                     fcst_dp_smooth, obs_dp_smooth,
-                     cmn_dp_smooth, csd_dp_smooth, i,
+                     fcst_dp_smooth, obs_dp_smooth, cmn_dp, csd_dp, i,
                      conf_info.interp_mthd[j],
                      conf_info.interp_wdth[j]);
          }
@@ -1750,8 +1727,8 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       if(conf_info.fcst_info[i_vx]->p_flag()) diff_flag = false;
 
       // Skip empty climatology mean and standard deviation
-      if(cmn_dp.nx() == 0 && cmn_dp.ny() == 0) cmn_flag = false;
-      if(csd_dp.nx() == 0 && csd_dp.ny() == 0) csd_flag = false;
+      cmn_flag = (cmn_dp.nx() == 0 && cmn_dp.ny() == 0);
+      csd_flag = (csd_dp.nx() == 0 && csd_dp.ny() == 0);
 
       // Add the forecast variable
       if(fcst_flag) {

@@ -363,6 +363,8 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
       col++;
    }
 
+   at.set_entry(r, c+4+n_rank, rhist_columns[5]);
+
    return;
 }
 
@@ -436,6 +438,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 
    at.set_entry(r, c+12+n_ens, orank_columns[13]);
    at.set_entry(r, c+13+n_ens, orank_columns[14]);
+   at.set_entry(r, c+14+n_ens, orank_columns[15]);
    
    return;
 }
@@ -2822,6 +2825,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    // Dump out the RHIST line:
    //    TOTAL,   CRPS,   IGN,
    //    N_RANKS, [RANK_] (for each bin)
+   //    CRPSS
    //
    at.set_entry(r, c+0,  // Total Number of Ranked Observations
       nint(pd_ptr->rhist_na.sum()));
@@ -2844,6 +2848,9 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
          nint(pd_ptr->rhist_na[i]));
       col++;
    }
+
+   at.set_entry(r, col,  // Continuous Ranked Probability Skill Score
+      pd_ptr->crpss());
 
    return;
 }
@@ -2895,7 +2902,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //    OBS_ELV,     OBS,         PIT,
    //    RANK,        N_ENS_VLD,   N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,      ENS_MEAN
+   //    OBS_QC,      ENS_MEAN,    CLIMO
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);
@@ -2950,6 +2957,10 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    // Ensemble mean values
    at.set_entry(r, c+13+pd_ptr->n_ens, 
       pd_ptr->mn_na[i]);
+
+   // Climatology value
+   at.set_entry(r, c+14+pd_ptr->n_ens, 
+      pd_ptr->cmn_na[i]);
 
    return;
 }

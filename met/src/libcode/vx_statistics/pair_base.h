@@ -99,12 +99,12 @@ class PairBase {
       bool add_obs(const char *, double, double, double, double,
                    unixtime, double, double, double, const char *,
                    double, double);
-      void add_obs(double, double, double);
+      void add_obs(double, double, double, double, double);
 
       void set_obs(int, const char *, double, double, double, double,
                    unixtime, double, double, double, const char *,
                    double, double);
-      void set_obs(int, double, double, double);
+      void set_obs(int, double, double, double, double, double);
 
       void print_duplicate_report();
 };
