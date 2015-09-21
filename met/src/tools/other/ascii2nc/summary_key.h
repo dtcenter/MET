@@ -31,7 +31,7 @@ public:
 	     const string &station_id,
 	     const double lat, const double lon, const double elev,
 	     const int grib_code,
-	     const double height_m);
+	     const double height_m, const double pressure_level);
   
   virtual ~SummaryKey();
 
@@ -74,7 +74,11 @@ public:
   {
     return _height;
   }
-  
+
+  double getPressureLevel() const
+  {
+    return _pressureLevel;
+  }
 
   ///////////////
   // Operators //
@@ -113,6 +117,11 @@ public:
 
     if (_height != other._height)
       return _height < other._height;
+
+    // Pressure Level
+
+    if (_pressureLevel != other._pressureLevel)
+      return _pressureLevel < other._pressureLevel;
     
     // Grib code
 
@@ -132,6 +141,7 @@ protected:
   double _elevation;
   int _gribCode;
   double _height;
+  double _pressureLevel;
 
 };
 

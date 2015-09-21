@@ -28,6 +28,8 @@ using namespace std;
 
 #include "aeronet_handler.h"
 
+static const char *AERONET_NA_STR = "N/A";
+
 const int AeronetHandler::NUM_HDR_COLS = 7;
 const int AeronetHandler::NUM_OBS_COLS = 45;
 
@@ -208,6 +210,8 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 	//}
 	
 	double dlevel = atoi(level.c_str());
+
+	if(strcmp(data_line[k], AERONET_NA_STR) == 0) continue;
 
 	_addObservations(Observation(header_type, _stationId,
 					 valid_time,

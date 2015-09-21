@@ -284,7 +284,8 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
                                curr_obs->getLongitude(),
                                curr_obs->getElevation(),
                                curr_obs->getGribCode(),
-                               curr_obs->getHeight());
+                               curr_obs->getHeight(),
+                               curr_obs->getPressureLevel());
 
       // If this is a new key, create a new NumArray
 
@@ -326,7 +327,7 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
                                                                 curr_values->first.getElevation(),
                                                                 "",
                                                                 curr_values->first.getGribCode(),
-                                                                FILL_VALUE,
+                                                                curr_values->first.getPressureLevel(),
                                                                 curr_values->first.getHeight(),
                                                                 calc->calcSummary(*curr_values->second)));
 

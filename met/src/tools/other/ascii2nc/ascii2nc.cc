@@ -38,6 +38,7 @@
 //                                     options to filter spatially.
 //   012    07-23-14  Halley Gotway  Add message_type_map configuration
 //                                     file option.
+//   013    09-21-15  Prestopnik     Add Aeronet observations.
 //                                    
 ////////////////////////////////////////////////////////////////////////
 
@@ -74,6 +75,7 @@ using namespace std;
 #include "met_handler.h"
 #include "surfrad_handler.h"
 #include "wwsis_handler.h"
+#include "aeronet_handler.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +93,8 @@ enum ASCIIFormat {
    ASCIIFormat_MET,
    ASCIIFormat_Little_R,
    ASCIIFormat_SurfRad,
-   ASCIIFormat_WWSIS
+   ASCIIFormat_WWSIS,
+   ASCIIFormat_Aeronet
 };
 static ASCIIFormat ascii_format = ASCIIFormat_None;
 
@@ -257,9 +260,14 @@ FileHandler *create_file_handler(const ASCIIFormat format,
   
   case ASCIIFormat_WWSIS:
   {
-    return (FileHandler *)new SurfradHandler(program_name);
+    return (FileHandler *)new WwsisHandler(program_name);
   }
-  
+
+  case ASCIIFormat_Aeronet:
+  {
+    return (FileHandler *)new AeronetHandler(program_name);
+  }
+
   case ASCIIFormat_None:
   {
     return determine_ascii_format(ascii_filename);
@@ -347,6 +355,20 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
   delete wwsis_file;
   
   //
+  // See if this is a Aeronet file.
+  //
+  f_in.rewind();
+  AeronetHandler *aeronet_file = new AeronetHandler(program_name);
+  
+  if (aeronet_file->isFileType(f_in))
+  {
+    f_in.close();
+    return (FileHandler *)aeronet_file;
+  }
+  
+  delete aeronet_file;
+  
+  //
   // If we get here, we didn't recognize the file contents.
   //
   
@@ -383,8 +405,9 @@ void usage() {
         << "\t\t\"-format ASCII_format\" may be set to \""
         << MetHandler::getFormatString() << "\", \""
         << LittleRHandler::getFormatString() << "\", \""
-        << SurfradHandler::getFormatString() << "\" or \""
-        << WwsisHandler::getFormatString() << "\" (optional).\n"
+        << SurfradHandler::getFormatString() << "\", \""
+        << WwsisHandler::getFormatString() << "\", or \""
+        << AeronetHandler::getFormatString() << "\" (optional).\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
@@ -435,6 +458,9 @@ void set_format(const StringArray & a) {
   }
   else if(WwsisHandler::getFormatString() == a[0]) {
     ascii_format = ASCIIFormat_WWSIS;
+  }
+  else if(AeronetHandler::getFormatString() == a[0]) {
+    ascii_format = ASCIIFormat_Aeronet;
   }
   else {
     mlog << Error << "\nset_format() -> "
