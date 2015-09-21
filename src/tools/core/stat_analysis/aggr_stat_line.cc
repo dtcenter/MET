@@ -2383,9 +2383,10 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          }
 
          //
-         // Store the observation, ensemble mean, and ensemble member values
+         // Store the observation, ensemble mean, climatology,
+         // and ensemble member values
          //
-         m[key].ens_pd.add_obs(0.0, 0.0, cur.obs);
+         m[key].ens_pd.add_obs(0.0, 0.0, cur.obs, cur.climo, bad_data_double);
          m[key].ens_pd.mn_na.add(cur.ens_mean);
          for(i=0; i<m[key].ens_pd.n_ens; i++) {
             m[key].ens_pd.add_ens(i, cur.ens_na[i]);

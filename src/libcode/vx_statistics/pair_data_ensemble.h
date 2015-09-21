@@ -89,6 +89,7 @@ class PairDataEnsemble : public PairBase {
       void compute_stats();
       void compute_ssvar();
 
+      double crpss() const;
 };
 
 ////////////////////////////////////////////////////////////////////////

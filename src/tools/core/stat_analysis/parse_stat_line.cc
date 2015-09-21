@@ -401,6 +401,14 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
       o_data.ens_mean = bad_data_double;
    }
 
+   // Parse CLIMO, if present
+   if(l.n_items() > orank_climo_offset(o_data.n_ens)) {
+      o_data.climo= atof(l.get_item(orank_climo_offset(o_data.n_ens)));
+   }
+   else {
+      o_data.climo = bad_data_double;
+   }
+
    return;
 }
 

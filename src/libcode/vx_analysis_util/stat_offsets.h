@@ -563,6 +563,7 @@ static const int orank_n_ens_offset      = nhc + 11;
 inline int orank_ens_offset(int i)      { return(nhc + 12 + i); } // i is the 0-based ensemble member index
 inline int orank_obs_qc_offset(int n)   { return(nhc + 12 + n); } // n is the number of ensemble members
 inline int orank_ens_mean_offset(int n) { return(nhc + 13 + n); } // n is the number of ensemble members
+inline int orank_climo_offset(int n)    { return(nhc + 14 + n); } // n is the number of ensemble members
 
 //
 // SSVAR Line Type offsets

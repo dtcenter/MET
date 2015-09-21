@@ -466,6 +466,40 @@ void PairDataEnsemble::compute_ssvar() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+double PairDataEnsemble::crpss() const {
+   int i, n;
+   double crps, ref, crpss, ccbar, oobar, cobar;
+
+   // Get the average ensemble CRPS value
+   crps = crps_na.mean();
+
+   // Check for bad data
+   if(is_bad_data(crps) ||
+      cmn_na.n_elements() != o_na.n_elements() ||
+      cmn_na.n_elements() == 0) return(bad_data_double);
+
+   // Compute the climatology MSE relative to the observations
+   ccbar = oobar = cobar;
+   n = o_na.n_elements();
+   for(i=0; i<n; i++) {
+      if(is_bad_data(cmn_na[i])) return(bad_data_double);
+      ccbar += cmn_na[i]*cmn_na[i];
+      oobar += o_na[i]*o_na[i];
+      cobar += (cmn_na[i] - o_na[i])*(cmn_na[i] - o_na[i]);
+   }
+   ccbar /= n;
+   oobar /= n;
+   cobar /= n;
+   ref = ccbar + oobar - 2.0*cobar;
+
+   // Compute skill score
+   crpss = (is_eq(ref, 0.0) ? bad_data_double : (ref - crps)/ref);
+
+   return(crpss);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class VxPairDataEnsemble
 //
