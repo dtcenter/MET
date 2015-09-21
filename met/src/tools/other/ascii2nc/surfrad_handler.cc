@@ -170,7 +170,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[9],
 					 DW_PSP_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[8])));
      
      // upwelling global solar (Watts m^-2)
@@ -181,7 +181,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[11],
 					 UW_PSP_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[10])));
      
      // direct solar (Watts m^-2)
@@ -192,7 +192,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[13],
 					 DIRECT_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[12])));
      
      // downwelling diffuse solar (Watts m^-2)
@@ -203,7 +203,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[15],
 					 DIFFUSE_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[14])));
      
      // downwelling thermal infrared (Watts m^-2)
@@ -214,7 +214,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[17],
 					 DW_PIR_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[16])));
      
      // downwelling PIR case temp (K)
@@ -225,7 +225,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[19],
 					 DW_CASETEMP_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 _tempKtoC(atof(data_line[18]))));
      
      // downwelling PIR dome temp (K)
@@ -236,7 +236,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[21],
 					 DW_DOMETEMP_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 _tempKtoC(atof(data_line[20]))));
      
      // upwelling thermal infrared (Watts m^-2)
@@ -247,7 +247,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[23],
 					 UW_PIR_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[22])));
      
      // upwelling PIR case temp (K)
@@ -258,7 +258,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[25],
 					 UW_CASETEMP_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 _tempKtoC(atof(data_line[24]))));
      
      // upwelling PIR dome temp (K)
@@ -269,7 +269,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[27],
 					 UW_DOMETEMP_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 _tempKtoC(atof(data_line[26]))));
      
      // global UVB (milliWatts m^-2)
@@ -280,7 +280,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[29],
 					 UVB_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[28])));
      
      // photosynthetically active radiation (Watts m^-2)
@@ -291,7 +291,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[31],
 					 PAR_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[30])));
      
      // net solar (dw_psp - uw_psp) (Watts m^-2)
@@ -302,7 +302,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[33],
 					 NETSOLAR_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[32])));
      
      // net infrared (dw_pir - uw_pir) (Watts m^-2)
@@ -313,7 +313,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[35],
 					 NETIR_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[34])));
      
      // net radiation (netsolar + netir) (Watts m^-2)
@@ -324,7 +324,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[37],
 					 TOTALNET_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[36])));
      
      // 10-meter air temperature (C)
@@ -335,7 +335,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[39],
 					 TEMP_GRIB_CODE,
-					 pressure, 10.0,
+					 bad_data_double, 10.0,
 					 atof(data_line[38])));
      
      // relative humidity (%)
@@ -346,7 +346,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[41],
 					 RH_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[40])));
      
      // wind speed (ms^-1)
@@ -357,7 +357,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[43],
 					 WINDSPD_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[42])));
      
      // wind direction (degrees, clockwise from north)
@@ -368,7 +368,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[45],
 					 WINDDIR_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 atof(data_line[44])));
      
      // station pressure (mb)
@@ -379,7 +379,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 data_line[47],
 					 PRESSURE_GRIB_CODE,
-					 pressure, 0.0,
+					 bad_data_double, 0.0,
 					 pressure));
    } // end while
 
