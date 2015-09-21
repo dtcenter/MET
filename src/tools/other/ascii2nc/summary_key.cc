@@ -30,14 +30,15 @@ SummaryKey::SummaryKey(const string &header_type,
 		       const string &station_id,
 		       const double lat, const double lon, const double elev,
 		       const int grib_code,
-		       const double height) :
+		       const double height, const double pressure_level) :
   _headerType(header_type),
   _stationId(station_id),
   _latitude(lat),
   _longitude(lon),
   _elevation(elev),
   _gribCode(grib_code),
-  _height(height)
+  _height(height),
+  _pressureLevel(pressure_level)
 {
 }
 
