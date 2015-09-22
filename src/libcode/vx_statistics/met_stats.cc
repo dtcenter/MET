@@ -1082,15 +1082,6 @@ void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
    subset_pairs(in_f_na, fthresh, in_o_na, othresh, in_c_na,
                 logic, f_na, o_na, c_na);
    
-   mlog << Debug(3)
-        << "Found " << f_na.n_elements()
-        << " pairs for forecast filtering threshold "
-        << fthresh.get_str()
-        << ", observation filtering threshold "
-        << othresh.get_str() << ", and field logic "
-        << setlogic_to_string(logic)
-        << ".\n";
-
    // Check for no matched pairs to process
    if(f_na.n_elements() == 0) return;
 
@@ -1494,14 +1485,14 @@ void VL1L2Info::set(const NumArray &uf_na, const NumArray &vf_na,
       }
    } // end for i
 
-   // Compute means
    mlog << Debug(3)
-        << "Found " << vcount
+        << "Using " << vcount << " of " << uf_na.n_elements()
         << " vector pairs for forecast wind speed threshold "
         << fthresh.get_str() << ", observation wind speed threshold "
         << othresh.get_str() << ", and field logic "
         << setlogic_to_string(logic) << ".\n";
 
+   // Compute means
    if(vcount == 0) {
       // Set to bad data
       ufbar   = bad_data_double;
@@ -3612,6 +3603,12 @@ void subset_pairs(const NumArray &f_na, const SingleThresh &ft,
          if(cflag) cc_na.add(c_na[i]);
       }
    }
+
+   mlog << Debug(3)
+        << "Using " << ff_na.n_elements() << " of " << f_na.n_elements()
+        << " pairs for forecast filtering threshold " << ft.get_str()
+        << ", observation filtering threshold " << ot.get_str()
+        << ", and field logic " << setlogic_to_string(type) << ".\n";
 
    return;
 }
