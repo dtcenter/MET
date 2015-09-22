@@ -12,10 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_data2d_factory.a
 libvx_data2d_factory_a_SOURCES = \
-              is_met_nc_file.cc is_met_nc_file.h \
-              is_nccf_file.cc is_nccf_file.h \
               is_netcdf_file.cc is_netcdf_file.h \
-              is_pinterp_file.cc is_pinterp_file.h \
               is_grib_file.cc is_grib_file.h \
               is_bufr_file.cc is_bufr_file.h \
               var_info_factory.cc var_info_factory.h \

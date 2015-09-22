@@ -27,14 +27,23 @@ using namespace std;
 
 #include "is_netcdf_file.h"
 
+#include "vx_nc_util.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static const char netcdf_magic  [] = "CDF";
+static const int  netcdf_magic_len = strlen(netcdf_magic);
 
-static const int netcdf_magic_len  = strlen(netcdf_magic);
+static const char nccf_att_name[]  = "Conventions";
+static const char nccf_att_value[] = "CF-";
 
+static const char ncmet_att_version[]    = "MET_version";
+static const char ncmet_att_projection[] = "Projection";
+
+static const char ncpinterp_att_name[]  = "TITLE";
+static const char ncpinterp_att_value[] = "ON PRES LEVELS";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -43,29 +52,27 @@ bool is_netcdf_file(const char * filename)
 
 {
 
-if ( !filename || !(*filename) )  return ( false );
+   if ( !filename || !(*filename) )  return ( false );
 
-int fd = -1;
-int n_read;
-char buf[netcdf_magic_len];
+   int fd = -1;
+   int n_read;
+   char buf[netcdf_magic_len];
 
+   if ( (fd = open(filename, O_RDONLY)) < 0 )  return ( false );
 
-if ( (fd = open(filename, O_RDONLY)) < 0 )  return ( false );
+   n_read = read(fd, buf, netcdf_magic_len);
 
-n_read = read(fd, buf, netcdf_magic_len);
+   close(fd);  fd = -1;
 
-close(fd);  fd = -1;
+   if ( n_read != netcdf_magic_len )  return ( false );
 
-if ( n_read != netcdf_magic_len )  return ( false );
-
-if ( strncmp(buf, netcdf_magic, netcdf_magic_len) == 0 )  return ( true );
-
+   if ( strncmp(buf, netcdf_magic, netcdf_magic_len) == 0 )  return ( true );
 
    //
    //  done
    //
 
-return ( false );
+   return ( false );
 
 }
 
@@ -73,3 +80,59 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool is_nccf_file(const char * filename)
+{
+
+   ConcatString att_val;
+   
+   NcFile nc_file(filename);
+
+   if (!nc_file.is_valid()) return ( false );
+
+   if (!get_file_att(&nc_file, nccf_att_name, att_val)) return ( false );
+
+   return (att_val == nccf_att_value);
+
+}  
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_ncmet_file(const char * filename)
+{
+
+   ConcatString att_val;
+
+   NcFile nc_file(filename);
+
+   if (!nc_file.is_valid()) return ( false );
+ 
+   return (get_file_att(&nc_file, ncmet_att_version,    att_val) ||
+           get_file_att(&nc_file, ncmet_att_projection, att_val));
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_ncpinterp_file(const char * filename)
+{
+
+   ConcatString att_val;
+
+   NcFile nc_file(filename);
+
+   if (!nc_file.is_valid()) return ( false );
+
+   // Get the global attribute
+   if (!get_file_att(&nc_file, ncpinterp_att_name, att_val)) return ( false );
+
+   // Check the attribute value for the target string
+   return (strstr(att_val, ncpinterp_att_value));
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
