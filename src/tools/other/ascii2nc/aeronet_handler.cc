@@ -193,11 +193,11 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 	string hdr_field = hdr_tokens[k];
 	int found_aot = hdr_field.find(aot);
 	//int found_angstrom = hdr_field.find(angstrom);
-	string level = "";
+	string height = "";
 
 	if (found_aot != string::npos)
 	{
-	  level = hdr_field.substr((found_aot + 4), hdr_field.size() - 1);
+	  height = hdr_field.substr((found_aot + 4), hdr_field.size() - 1);
 	}
 	
 	//if (found_angstrom != string::npos)
@@ -205,11 +205,12 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 	//  int found_dash = hdr_field.find("-");
 	//  if (found_dash != string::npos)
 	//  {
-	//    level = hdr_field.substr(0, found_dash);
+	//    height = hdr_field.substr(0, found_dash);
 	//  }
 	//}
 	
-	double dlevel = atoi(level.c_str());
+	double dlevel = bad_data_double;
+	double dheight = atoi(height.c_str());
 
 	if(strcmp(data_line[k], AERONET_NA_STR) == 0) continue;
 
@@ -219,7 +220,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 					 _stationAlt,
 					 "NA",
 					 AOT_GRIB_CODE,
-					 dlevel, 0.0,
+					 dlevel, dheight,
 					 atof(data_line[k])));			     
       }
     }
