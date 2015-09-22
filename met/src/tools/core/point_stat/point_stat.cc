@@ -1335,15 +1335,6 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
                    pd_ptr->cmn_na, conf_info.cnt_logic[i_vx],
                    f_na, o_na, c_na);
 
-      mlog << Debug(3)
-           << "Found " << f_na.n_elements()
-           << " pairs for forecast filtering threshold "
-           << cnt_info[i].fthresh.get_str()
-           << ", observation filtering threshold "
-           << cnt_info[i].othresh.get_str() << ", and field logic "
-           << setlogic_to_string(conf_info.cnt_logic[i_vx])
-           << ".\n";
-
       //
       // Check for no matched pairs to process
       //

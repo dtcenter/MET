@@ -1352,15 +1352,6 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
                    c_na, cnt_info[i].logic,
                    ff_na, oo_na, cc_na);
 
-      mlog << Debug(3)
-           << "Found " << ff_na.n_elements()
-           << " pairs for forecast filtering threshold "
-           << cnt_info[i].fthresh.get_str()
-           << ", observation filtering threshold "
-           << cnt_info[i].othresh.get_str() << ", and field logic "
-           << setlogic_to_string(cnt_info[i].logic)
-           << ".\n";
-
       //
       // Check for no matched pairs to process
       //
