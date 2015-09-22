@@ -29,10 +29,10 @@ listNcDiffAttrExcl = c("FileOrigins");
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #  Testing System Utilities
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-strNcDiffExec = "/usr/local/bin/ncdiff";
-strNcDumpExec = "/usr/local/netcdf/bin/ncdump";
-strDiffExec   = "/usr/bin/diff";
-strEgrepExec  = "/bin/egrep";
+strNcDiffExec = system("which ncdiff", intern=T);
+strNcDumpExec = system("which ncdump", intern=T);
+strDiffExec   = system("which diff",   intern=T);
+strEgrepExec  = system("which egrep",  intern=T);
 strModeConv   = paste(strDirTest, "/perl/mode_conv.pl", sep="");
 strTcstConv   = paste(strDirTest, "/perl/tcst_conv.pl", sep="");
 
