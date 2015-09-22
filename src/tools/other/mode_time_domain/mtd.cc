@@ -298,7 +298,9 @@ PairAtt3DArray pa;
 PairAtt3D p;
 MtdIntFile fo, oo;
 
-cout << "\n\n  calculating pair atts\n\n";
+cout << "\n\n  calculating pair atts ... (Nf = "
+     << (fcst_obj.n_objects()) << ", No = "
+     << (obs_obj.n_objects()) << ")\n\n";
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
