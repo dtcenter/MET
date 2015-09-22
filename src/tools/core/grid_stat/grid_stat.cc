@@ -1701,7 +1701,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       if(conf_info.fcst_info[i_vx]->p_flag()) diff_flag = false;
 
       // Skip empty climatology mean
-      cmn_flag = (cmn_dp.nx() == 0 && cmn_dp.ny() == 0);
+      if(cmn_dp.nx() == 0 && cmn_dp.ny() == 0) cmn_flag = false;
 
       // Add the forecast variable
       if(fcst_flag) {
