@@ -252,15 +252,16 @@ void get_att(NcFile * ncfile, NcAtt * & att, const char * name)
 
 {
 
-att = ncfile->get_att(name);
+if ( !has_att(ncfile, name) ) {
 
-if ( !att )  {
-
-   mlog << Error << "\nget_att() -> \"" << name << "\" attribute not found.\n\n";
+   mlog << Error << "\nget_att() -> "
+        << "global NetCDF attribute \"" << name << "\" not found.\n\n";
 
    exit ( 1 );
 
 }
+
+att = ncfile->get_att(name);
 
 return;
 
