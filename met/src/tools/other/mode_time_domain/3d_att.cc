@@ -1091,9 +1091,8 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-   // 0-based
 
-SingleAtt3D calc_3d_single_atts(const Object & obj, const MtdFloatFile & raw, const char * model, int obj_number)
+SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, const char * model)
 
 {
 
@@ -1107,16 +1106,10 @@ float * values = (float *) 0;
 const int   * i = 0;
 const float * r = 0;
 Mtd_3D_Moments moments;
-MtdIntFile sel;
-const int num_plus_1 = obj_number + 1;
-const int n3 = (obj.nx())*(obj.ny())*(obj.nt());
+const int n3 = (mask.nx())*(mask.ny())*(mask.nt());
 
 
-a.ObjectNumber = num_plus_1;
-
-sel = obj.select(num_plus_1);
-
-moments = sel.calc_3d_moments();
+moments = mask.calc_3d_moments();
 
 if ( moments.N == 0 )  {
 
@@ -1138,9 +1131,9 @@ raw.xy_to_latlon(a.Xbar, a.Ybar, lat, lon);
 a.Centroid_Lat = lat;
 a.Centroid_Lon = lon;
 
-a.Volume = obj.volume(obj_number);
+a.Volume = mask.volume(0);
 
-sel.calc_3d_bbox(a.Xmin, a.Xmax, a.Ymin, a.Ymax, a.Tmin, a.Tmax);
+mask.calc_3d_bbox(a.Xmin, a.Xmax, a.Ymin, a.Ymax, a.Tmin, a.Tmax);
 
 bbox_volume =  (a.Xmax - a.Xmin - 1.0)
               *(a.Ymax - a.Ymin - 1.0)
@@ -1185,7 +1178,7 @@ if ( !values )  {
 
 n = 0;
 
-i = sel.data();
+i = mask.data();
 r = raw.data();
 
 for (j=0; j<n3; ++j)  {
@@ -1369,7 +1362,7 @@ num = 0.0;
 den = 0.0;
 
    //
-   //  We don't have to use "is_eq" to check whether each weight is
+   //  We don't need to use "is_eq" to check whether each weight is
    //     nonzero, because the MtdConfigInfo::read_config() function has
    //     already done that.  That same function has already tested that
    //     the weights are not all zero.

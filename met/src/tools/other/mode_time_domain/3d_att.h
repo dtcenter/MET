@@ -37,7 +37,7 @@ static const char ymd_hms_format [] = "%04d%02d%02d_%02d%02d%02d";
 
 class SingleAtt3D {
 
-      friend SingleAtt3D calc_3d_single_atts(const Object & obj, const Raw & raw, const char * model, int obj_number);
+      friend SingleAtt3D calc_3d_single_atts(const Object & mask, const Raw & raw, const char * model, int obj_number);
 
    public:
 
@@ -46,7 +46,7 @@ class SingleAtt3D {
       void assign(const SingleAtt3D &);
 
 
-      int ObjectNumber;   //  one-based
+      int ObjectNumber;   //  1-based
 
       int Volume;
 
@@ -89,7 +89,7 @@ class SingleAtt3D {
          //  set stuff
          //
 
-      void set_object_number (int);   //  one-based
+      void set_object_number (int);   //  1-based
 
       void set_volume (int);
 
@@ -117,7 +117,7 @@ class SingleAtt3D {
          //  get stuff
          //
 
-      int object_number () const;   //  one-based
+      int object_number () const;   //  1-based
 
       bool is_fcst () const;
       bool is_obs  () const;
@@ -243,8 +243,8 @@ class PairAtt3D {
 
       void assign(const PairAtt3D &);
 
-      int FcstObjectNumber;   //  one-based
-      int ObsObjectNumber;    //  one-based
+      int FcstObjectNumber;   //  1-based
+      int ObsObjectNumber;    //  1-based
 
       int IntersectionVol;
       // int UnionVol;
@@ -285,8 +285,8 @@ class PairAtt3D {
          //  set stuff
          //
 
-      void set_fcst_obj_number (int);   //  one-based
-      void set_obs_obj_number  (int);   //  one-based
+      void set_fcst_obj_number (int);   //  1-based
+      void set_obs_obj_number  (int);   //  1-based
 
       void set_intersection_volume (int);
       void set_union_volume        (int);
@@ -309,8 +309,8 @@ class PairAtt3D {
          //  get stuff
          //
 
-      int fcst_obj_number() const;   //  one-based
-      int  obs_obj_number() const;   //  one-based
+      int fcst_obj_number() const;   //  1-based
+      int  obs_obj_number() const;   //  1-based
 
       int intersection_vol () const;
       int union_vol        () const;
@@ -366,7 +366,7 @@ inline double PairAtt3D::total_interest () const { return ( TotalInterest ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt3D calc_3d_single_atts(const Object & obj, const Raw & raw, const char * model, int obj_number);   //  0 based 
+extern SingleAtt3D calc_3d_single_atts(const Object & mask, const Raw & raw, const char * model);
 
 extern PairAtt3D   calc_3d_pair_atts(const Object      & _fcst_obj, 
                                      const Object      & _obs_obj, 

@@ -70,24 +70,24 @@ class MM_Engine {
           //    has the given fcst or obs object number
           //
 
-      int composite_with_fcst (const int) const;   //  zero-based (both input and output)
-      int composite_with_obs  (const int) const;   //  zero-based (both input and output)
+      int composite_with_fcst (const int) const;   //  0-based (both input and output)
+      int composite_with_obs  (const int) const;   //  0-based (both input and output)
 
          //
          //  do stuff
          //
 
-         //  Note: all object numbers are zero-based
+         //  Note: all object numbers are 0-based
 
       void do_match_merge();
 
       int n_composites() const;
 
-      int map_fcst_id_to_composite (const int id) const;      //  zero-based
-      int map_obs_id_to_composite  (const int id) const;      //  zero-based
+      int map_fcst_id_to_composite (const int id) const;      //  0-based
+      int map_obs_id_to_composite  (const int id) const;      //  0-based
 
-      IntArray fcst_composite(int _composite_number) const;   //  zero-based
-      IntArray  obs_composite(int _composite_number) const;   //  zero-based
+      IntArray fcst_composite(int _composite_number) const;   //  0-based
+      IntArray  obs_composite(int _composite_number) const;   //  0-based
 
 };
 
