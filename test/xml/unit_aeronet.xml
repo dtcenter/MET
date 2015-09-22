@@ -26,11 +26,11 @@
       &DATA_DIR_OBS;/aeronet/150918_150918_Table_Mountain.lev15 \
       &DATA_DIR_OBS;/aeronet/150918_150918_DRAGON_DenverLaCasa.lev15 \
       -config &CONFIG_DIR;/Ascii2NcConfig_aeronet \
-      &OUTPUT_DIR;/ascii2nc/150918_150918_Boulder.lev15.nc \
+      &OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc \
       -v 1
     </param>   
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/150918_150918_Boulder.lev15.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc</point_nc>
     </output>
   </test>
 
@@ -40,11 +40,11 @@
       &DATA_DIR_OBS;/aeronet/150901_150930_Table_Mountain.lev15 \
       &DATA_DIR_OBS;/aeronet/150901_150930_DRAGON_DenverLaCasa.lev15 \
       -config &CONFIG_DIR;/Ascii2NcConfig_aeronet \
-      &OUTPUT_DIR;/ascii2nc/150901_150930_Boulder.lev15.nc \
+      &OUTPUT_DIR;/aeronet/150901_150930_Boulder.lev15.nc \
       -v 1
     </param>   
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/150901_150930_Boulder.lev15.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/aeronet/150901_150930_Boulder.lev15.nc</point_nc>
     </output>
   </test>
 
@@ -59,12 +59,12 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/ngac/ngac.t00z.a2df18 \
-      &OUTPUT_DIR;/ascii2nc/150918_150918_Boulder.lev15.nc \
+      &OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc \
       &CONFIG_DIR;/PointStatConfig_aeronet \
-      -outdir &OUTPUT_DIR;/point_stat -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
+      -outdir &OUTPUT_DIR;/aeronet -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_f18_NGAC_AERONET_daily_180000L_20150917_180000V.stat</stat>
+      <stat>&OUTPUT_DIR;/aeronet/point_stat_GRIB2_f18_NGAC_AERONET_daily_180000L_20150917_180000V.stat</stat>
     </output>
   </test>
 
@@ -75,12 +75,12 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/ngac/ngac.t00z.a2df18 \
-      &OUTPUT_DIR;/ascii2nc/150901_150930_Boulder.lev15.nc \
+      &OUTPUT_DIR;/aeronet/150901_150930_Boulder.lev15.nc \
       &CONFIG_DIR;/PointStatConfig_aeronet \
-      -outdir &OUTPUT_DIR;/point_stat -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
+      -outdir &OUTPUT_DIR;/aeronet -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_f18_NGAC_AERONET_monthly_180000L_20150917_180000V.stat</stat>
+      <stat>&OUTPUT_DIR;/aeronet/point_stat_GRIB2_f18_NGAC_AERONET_monthly_180000L_20150917_180000V.stat</stat>
     </output>
   </test>
 
@@ -91,12 +91,12 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/ngac/ngac.t00z.a2df21 \
-      &OUTPUT_DIR;/ascii2nc/150918_150918_Boulder.lev15.nc \
+      &OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc \
       &CONFIG_DIR;/PointStatConfig_aeronet \
-      -outdir &OUTPUT_DIR;/point_stat -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
+      -outdir &OUTPUT_DIR;/aeronet -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_f21_NGAC_AERONET_daily_210000L_20150917_210000V.stat</stat>
+      <stat>&OUTPUT_DIR;/aeronet/point_stat_GRIB2_f21_NGAC_AERONET_daily_210000L_20150917_210000V.stat</stat>
     </output>
   </test>
 
@@ -107,12 +107,12 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/ngac/ngac.t00z.a2df21 \
-      &OUTPUT_DIR;/ascii2nc/150901_150930_Boulder.lev15.nc \
+      &OUTPUT_DIR;/aeronet/150901_150930_Boulder.lev15.nc \
       &CONFIG_DIR;/PointStatConfig_aeronet \
-      -outdir &OUTPUT_DIR;/point_stat -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
+      -outdir &OUTPUT_DIR;/aeronet -obs_valid_beg 20150918_000000 -obs_valid_end 20150918_235959 -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_f21_NGAC_AERONET_monthly_210000L_20150917_210000V.stat</stat>
+      <stat>&OUTPUT_DIR;/aeronet/point_stat_GRIB2_f21_NGAC_AERONET_monthly_210000L_20150917_210000V.stat</stat>
     </output>
   </test>
 
