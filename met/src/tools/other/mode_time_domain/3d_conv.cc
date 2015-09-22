@@ -154,9 +154,9 @@ const double scale = 1.0/(3*trp1*trp1);
 conv_radius = R;
 
 
-cerr << "\n\n"
-     << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
-     << "\n\n";
+// cerr << "\n\n"
+//      << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
+//      << "\n\n";
 
 min_conv_value = 0.0;
 max_conv_value = 0.0;

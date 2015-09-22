@@ -955,6 +955,7 @@ void PairAtt3D::write_txt(AsciiTable & table, const int row) const
 
 {
 
+int k;
 char junk[512];
 int c = n_header_3d_cols;
 const char * format = 0;
@@ -1010,17 +1011,21 @@ table.set_entry(row, c++, junk);
 
    //  start time delta
 
-sprintf(junk, format_int, StartTimeDelta);
+k = nint(StartTimeDelta);
+
+sprintf(junk, format_int, k);
 
 table.set_entry(row, c++, junk);
 
    //  end time delta
 
-sprintf(junk, format_int, EndTimeDelta);
+k = nint(EndTimeDelta);
+
+sprintf(junk, format_int, k);
 
 table.set_entry(row, c++, junk);
 
-   //  intersection volumet
+   //  intersection volume
 
 sprintf(junk, format_int, IntersectionVol);
 
