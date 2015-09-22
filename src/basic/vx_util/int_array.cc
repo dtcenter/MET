@@ -316,7 +316,7 @@ return ( e[n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-int IntArray::has(int k) const
+bool IntArray::has(int k) const
 
 {
 
@@ -324,11 +324,11 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j] == k )  return ( 1 );
+   if ( e[j] == k )  return ( true );
 
 }
 
-return ( 0 );
+return ( false );
 
 }
 
@@ -336,7 +336,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-int IntArray::has(int k, int & index) const
+bool IntArray::has(int k, int & index) const
 
 {
 
@@ -346,11 +346,11 @@ index = -1;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j] == k )  { index = j;  return ( 1 ); }
+   if ( e[j] == k )  { index = j;  return ( true ); }
 
 }
 
-return ( 0 );
+return ( false );
 
 }
 
@@ -500,6 +500,26 @@ for(j=0; j<Nelements; j++) {
 }
 
 return(max_v);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void IntArray::increment(const int k)
+
+{
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   e[j] += k;
+
+}
+
+return;
 
 }
 

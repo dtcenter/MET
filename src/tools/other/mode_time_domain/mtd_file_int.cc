@@ -1510,6 +1510,67 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
+MtdIntFile MtdIntFile::select(const IntArray & a) const   //  1-based
+
+{
+
+if ( (a.min() < 0) || (a.max() > Nobjects) )  {
+
+   cerr << "\n\n  MtdIntFile::select(const IntArray &) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+int j;
+int v;
+int V[2];
+MtdIntFile s;
+const int n3 = Nx*Ny*Nt;
+bool * yesno = new bool [ 1 + Nobjects ];
+
+yesno[0] = false;
+
+for (j=1; j<=Nobjects; ++j)  {
+
+   yesno[j] = a.has(j);
+
+}
+
+
+s = *this;
+
+s.set_to_zeroes();
+
+int * in  =   Data;
+int * out = s.Data;
+
+v = 0;
+
+for (j=0; j<n3; ++j)  {
+
+   if ( yesno[*in] )  { *out = 1;  ++v; }
+
+   ++in;
+   ++out;
+
+}
+
+
+V[0] = v;
+
+s.set_volumes(1, V);
+
+if ( yesno )  { delete [] yesno;  yesno = 0; }
+
+return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int MtdIntFile::x_left(const int y) const
 
 {

@@ -250,48 +250,56 @@ e.set_size(fcst_obj.n_objects(), obs_obj.n_objects());
    //
 
 SingleAtt3D att;
-SingleAtt3DArray fcst_att, obs_att;
-// MtdIntFile s;
+SingleAtt3DArray fcst_single_att, obs_single_att;
+Object mask;
 
 cout << "calculating fcst single atts\n" << flush;
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
-   att = calc_3d_single_atts(fcst_obj, fcst_raw, config.model, j);
+   mask = fcst_obj.select(j + 1);   //  1-based
+
+   att = calc_3d_single_atts(mask, fcst_raw, config.model);
+
+   att.set_object_number(j + 1);   //  1-based
 
    att.set_fcst();
 
    att.set_simple();
 
-   fcst_att.add(att);
+   fcst_single_att.add(att);
 
 }
 
-// fcst_att.dump(cout);
+// fcst_single_att.dump(cout);
 
 cout << "calculating obs single atts\n" << flush;
 
 for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
-   att = calc_3d_single_atts(obs_obj, obs_raw, config.model, j);
+   mask = obs_obj.select(j + 1);   //  1-based
+
+   att = calc_3d_single_atts(mask, obs_raw, config.model);
+
+   att.set_object_number(j + 1);   //  1-based
 
    att.set_obs();
 
    att.set_simple();
 
-   obs_att.add(att);
+   obs_single_att.add(att);
 
 }
 
 
    //
-   //  write single simple attributes
+   //  write simple single attributes
    //
 
-do_3d_single_txt_output(fcst_att, obs_att, config, "s.txt");
+do_3d_single_txt_output(fcst_single_att, obs_single_att, config, "s.txt");
 
    //
-   //  get pair attributes
+   //  get simple pair attributes
    //
 
 PairAtt3DArray pa;
@@ -300,7 +308,7 @@ MtdIntFile fo, oo;
 
 cout << "\n\n  calculating pair atts ... (Nf = "
      << (fcst_obj.n_objects()) << ", No = "
-     << (obs_obj.n_objects()) << ")\n\n";
+     << (obs_obj.n_objects())  << ")\n\n";
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
@@ -310,8 +318,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       oo = obs_obj.select(k + 1);
 
-
-      p = calc_3d_pair_atts(fo, oo, fcst_att[j], obs_att[k]);
+      p = calc_3d_pair_atts(fo, oo, fcst_single_att[j], obs_single_att[k]);
 
       p.set_total_interest(e.calc(p));
 
@@ -335,6 +342,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
 do_3d_pair_txt_output(pa, config, "p.txt");
 
+
    //
    //  create graph
    //
@@ -355,8 +363,9 @@ if ( debug )  e.partition_dump(cout);
 
 
 IntArray a;
+const int n_clusters = e.part.n_elements();
 
-for (j=0; j<(e.part.n_elements()); ++j)  {
+for (j=0; j<n_clusters; ++j)  {
 
    cout << "Fcst objects in composite " << j << ":  ";
 
@@ -373,6 +382,131 @@ for (j=0; j<(e.part.n_elements()); ++j)  {
    cout << '\n';
 
 }
+
+   //
+   //  get single cluster attributes
+   //
+
+SingleAtt3DArray fcst_cluster_att, obs_cluster_att;
+
+
+cout << "calculating fcst cluster atts\n" << flush;
+
+for (j=0; j<n_clusters; ++j)  {
+
+   a = e.fcst_composite(j);   //  0-based
+
+   if ( a.n_elements() <= 1 )  continue;
+
+   a.increment(1);
+
+   mask = fcst_obj.select(a);   //  1-based
+
+   att = calc_3d_single_atts(mask, fcst_raw, config.model);
+
+   att.set_object_number(j + 1);   //  1-based
+
+   att.set_fcst();
+
+   att.set_cluster();
+
+   fcst_cluster_att.add(att);
+
+}
+
+fcst_cluster_att.dump(cout);
+
+cout << "calculating obs cluster atts\n" << flush;
+
+for (j=0; j<n_clusters; ++j)  {
+
+   a = e.obs_composite(j);   //  0-based
+
+   if ( a.n_elements() <= 1 )  continue;
+
+   a.increment(1);
+
+   mask = obs_obj.select(a);   //  1-based
+
+   att = calc_3d_single_atts(mask, obs_raw, config.model);
+
+   att.set_object_number(j + 1);   //  1-based
+
+   att.set_obs();
+
+   att.set_cluster();
+
+   obs_cluster_att.add(att);
+
+}
+
+obs_cluster_att.dump(cout);
+
+   //
+   //  write cluster single attributes
+   //
+
+do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, "cs.txt");
+
+
+   //
+   //  get cluster pair attributes
+   //
+
+IntArray b;
+
+cout << "\n\n  calculating cluster pair atts ... (Nf = "
+     << n_clusters << ", No = "
+     << n_clusters << ")\n\n";
+
+for (j=0; j<n_clusters; ++j)  {
+
+   a = e.fcst_composite(j);   //  0-based
+
+   if ( a.n_elements() == 0 )  continue;
+
+   a.increment(1);
+   
+   fo = fcst_obj.select(a);   //  1-based
+
+   for (k=0; k<n_clusters; ++k)  {
+
+      b = e.obs_composite(k);   //  0-based
+
+      if ( b.n_elements() == 0 )  continue;
+
+      if ( (a.n_elements() <= 1) && (b.n_elements() <=1) )  continue;
+
+      b.increment(1);
+
+      oo = obs_obj.select(b);   //  1-based
+
+      p = calc_3d_pair_atts(fo, oo, fcst_cluster_att[j], obs_cluster_att[k]);
+
+      // p.set_total_interest(e.calc(p));
+      p.set_total_interest(-1.0);
+
+      cout << "   (F_" << j << ", O_" << k << ")   "
+           << p.total_interest() << '\n' << flush;
+
+      pa.add(p);
+
+   }
+
+   cout.put('\n');
+
+}
+
+
+// if ( debug )  pa.dump(cout);
+
+   //
+   //  write cluster pair attributes
+   //
+
+do_3d_pair_txt_output(pa, config, "cp.txt");
+
+
 
    //
    //  netcdf output

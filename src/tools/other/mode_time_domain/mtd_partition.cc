@@ -707,7 +707,7 @@ const EquivalenceClass * Mtd_Partition::operator()(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   cerr << "\n\n  Mtd_Partition::operator()(int) const -> range chekc error\n\n";
+   cerr << "\n\n  Mtd_Partition::operator()(int) const -> range check error\n\n";
 
    exit ( 1 );
 

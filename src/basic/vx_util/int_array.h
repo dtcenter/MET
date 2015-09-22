@@ -65,12 +65,14 @@ class IntArray {
 
       int operator[](int) const;
 
-      int has(int) const;
-      int has(int, int & index) const;
+      bool has(int) const;
+      bool has(int, int & index) const;
 
       void add(int);
       void add(const IntArray &);
       void add_css_sec(const char *);
+
+      void increment(const int);   //  adds a constant value to all elements
 
       int n_elements() const;
 
