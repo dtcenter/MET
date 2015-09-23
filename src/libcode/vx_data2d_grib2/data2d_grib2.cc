@@ -742,6 +742,15 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
          exit(1);
    }
 
+   //  switch radius of the earth for internal consistency
+   if( !is_eq(r_km, grib_earth_radius_km) ) {
+      mlog << Debug(4)
+           << "Switching the GRIB2 radius of the earth value of "
+           << r_km << " km to the GRIB1 value of " << grib_earth_radius_km
+           << " km.\n";       
+      r_km = grib_earth_radius_km;
+   }
+
    //  lat/long
    if( 0 == gfld->igdtnum ){
 
