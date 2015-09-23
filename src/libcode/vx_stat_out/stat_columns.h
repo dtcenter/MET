@@ -161,7 +161,7 @@ static const char * pstd_columns [] = {
    "BASER_NCL",   "BASER_NCU",   "RELIABILITY",
    "RESOLUTION",  "UNCERTAINTY", "ROC_AUC",
    "BRIER",       "BRIER_NCL",   "BRIER_NCU",
-   "BSS",         "THRESH_"
+   "THRESH_",     "BSS"
 };
 
 static const char * pjc_columns [] = {

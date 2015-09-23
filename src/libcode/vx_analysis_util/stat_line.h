@@ -120,10 +120,10 @@ extern int determine_column_offset(const STATLine &, const char *,
 extern int get_column_offset      (const char **, int, const char *);
 extern int get_mctc_column_offset (const char *, int);
 extern int get_pct_column_offset  (const char *);
-extern int get_pstd_column_offset (const char *);
+extern int get_pstd_column_offset (const char *, const STATLine &);
 extern int get_pjc_column_offset  (const char *);
 extern int get_prc_column_offset  (const char *);
-extern int get_rhist_column_offset(const char *);
+extern int get_rhist_column_offset(const char *, const STATLine &);
 extern int get_phist_column_offset(const char *);
 extern int get_orank_column_offset(const char *, const STATLine &);
 

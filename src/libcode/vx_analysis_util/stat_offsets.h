@@ -505,6 +505,7 @@ static const int pstd_brier_offset       = nhc + 9;
 static const int pstd_brier_ncl_offset   = nhc + 10;
 static const int pstd_brier_ncu_offset   = nhc + 11;
 inline int pstd_thresh_offset(int i)     { return(nhc + 12 + i); }
+inline int pstd_bss_offset(int n)        { return(nhc + 12 + n); }
 
 //
 // PJC Line Type offsets
@@ -536,6 +537,7 @@ static const int rhist_crps_offset       = nhc + 1;
 static const int rhist_ign_offset        = nhc + 2;
 static const int rhist_n_rank_offset     = nhc + 3;
 inline int rhist_rank_offset(int i)      { return(nhc + 4 + i); }
+inline int rhist_crpss_offset(int n)     { return(nhc + 4 + n); }
 
 //
 // PHIST Line Type offsets

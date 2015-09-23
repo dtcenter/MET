@@ -878,7 +878,7 @@ switch(L.type()) {
       break;
 
    case stat_pstd:
-      offset = get_pstd_column_offset(c);
+      offset = get_pstd_column_offset(c, L);
       break;
 
    case stat_pjc:
@@ -910,7 +910,7 @@ switch(L.type()) {
       break;
 
    case stat_rhist:
-      offset = get_rhist_column_offset(c);
+      offset = get_rhist_column_offset(c, L);
       break;
 
    case stat_phist:
@@ -1098,8 +1098,8 @@ int get_pct_column_offset(const char *col_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_pstd_column_offset(const char *col_name) {
-   int i;
+int get_pstd_column_offset(const char *col_name, const STATLine &L) {
+   int i, n;
    int offset = bad_data_int;
 
    //
@@ -1118,7 +1118,8 @@ int get_pstd_column_offset(const char *col_name) {
    //    BASER_NCL,   BASER_NCU,   RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
-   //    [THRESH] (for each threshold)
+   //    [THRESH] (for each threshold),
+   //    BSS
    //
 
    //
@@ -1146,6 +1147,14 @@ int get_pstd_column_offset(const char *col_name) {
          i      = parse_thresh_index(col_name);
          offset = n_header_columns + 12 + (i-1);
       }
+   }
+
+   //
+   // Check for the BSS special case after the variable columns
+   //
+   if(strcasecmp(col_name, "BSS") == 0) {
+      n      = atoi(L.get_item(get_rhist_column_offset("N_THRESH", L)));
+      offset = pstd_bss_offset(n);
    }
 
    return(offset);
@@ -1317,8 +1326,8 @@ int get_prc_column_offset(const char *col_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_rhist_column_offset(const char *col_name) {
-   int i;
+int get_rhist_column_offset(const char *col_name, const STATLine &L) {
+   int i, n;
    int offset = bad_data_int;
 
    //
@@ -1334,7 +1343,8 @@ int get_rhist_column_offset(const char *col_name) {
    //
    // If not found, search the rhist columns:
    //    TOTAL,  CRPS,  IGN,
-   //    N_RANK, [RANK_] (for possible ranks, n_ens+1)
+   //    N_RANK, [RANK_] (for possible ranks, n_ens+1),
+   //    CRPSS
    //
 
    //
@@ -1361,6 +1371,14 @@ int get_rhist_column_offset(const char *col_name) {
          i      = parse_thresh_index(col_name);
          offset = n_header_columns + 4 + (i-1);
       }
+   }
+   
+   //
+   // Check for the CRPSS special case after the variable columns
+   //
+   if(strcasecmp(col_name, "CRPSS") == 0) {
+      n      = atoi(L.get_item(get_rhist_column_offset("N_RANK", L)));
+      offset = rhist_crpss_offset(n);
    }
 
    return(offset);
@@ -1419,7 +1437,7 @@ int get_phist_column_offset(const char *col_name) {
 ////////////////////////////////////////////////////////////////////////
 
 int get_orank_column_offset(const char *col_name, const STATLine &L) {
-   int i, n_ens;
+   int i, n;
    int offset = bad_data_int;
 
    //
@@ -1439,7 +1457,7 @@ int get_orank_column_offset(const char *col_name, const STATLine &L) {
    //    OBS_ELV,     OBS,         PIT,
    //    RANK,        N_ENS_VLD,   N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,      ENS_MEAN
+   //    OBS_QC,      ENS_MEAN,    CLIMO
    //
    
    //
@@ -1472,16 +1490,24 @@ int get_orank_column_offset(const char *col_name, const STATLine &L) {
    // Check for the OBS_QC special case after the variable columns
    //
    if(strcasecmp(col_name, "OBS_QC") == 0) {
-      n_ens  = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
-      offset = orank_obs_qc_offset(n_ens);
+      n      = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
+      offset = orank_obs_qc_offset(n);
    }
 
    //
    // Check for the ENS_MEAN special case after the variable columns
    //
    if(strcasecmp(col_name, "ENS_MEAN") == 0) {
-      n_ens  = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
-      offset = orank_ens_mean_offset(n_ens);
+      n      = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
+      offset = orank_ens_mean_offset(n);
+   }
+   
+   //
+   // Check for the CLIMO special case after the variable columns
+   //
+   if(strcasecmp(col_name, "CLIMO") == 0) {
+      n      = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
+      offset = orank_climo_offset(n);
    }
 
    return(offset);
