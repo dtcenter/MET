@@ -21,6 +21,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
+#include "vx_cal.h"
 #include "vx_util.h"
 #include "write_netcdf.h"
 #include "grid_output.h"
@@ -144,32 +145,28 @@ void write_netcdf_var_times(NcVar *var, const DataPlane &dp) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void write_netcdf_var_times(NcVar *var, const unixtime init_ut,
-                            const unixtime valid_ut, const int accum_sec) {
-   char time_str[max_str_len];
+                            const unixtime valid_ut, const int accum_sec)
+
+{
+
+char time_str[max_str_len];
+ConcatString s;
 
    // Init time
    unix_to_yyyymmdd_hhmmss(init_ut, time_str);
    var->add_att("init_time", time_str);
-   if(labs(init_ut) > max_netcdf_int) {
-      mlog << Warning << "\nwrite_netcdf_var_times() -> "
-           << "can't write \"init_time_ut\" (" << init_ut
-           << ") variable attribute due to integer overflow.\n\n";
-   }
-   else {
-      var->add_att("init_time_ut", (long int) init_ut);
-   }
+
+   s = unixtime_to_string(init_ut);
+
+   var->add_att("init_time_ut", s.text());
 
    // Valid time
    unix_to_yyyymmdd_hhmmss(valid_ut, time_str);
    var->add_att("valid_time", time_str);
-   if(labs(valid_ut) > max_netcdf_int) {
-      mlog << Warning << "\nwrite_netcdf_var_times() -> "
-           << "can't write \"valid_time_ut\" (" << valid_ut
-           << ") variable attribute due to integer overflow.\n\n";
-   }
-   else {
-      var->add_att("valid_time_ut", (long int) valid_ut);
-   }
+
+   s = unixtime_to_string(valid_ut);
+
+   var->add_att("valid_time_ut", s.text());
 
    // Accumulation time
    if(accum_sec > 0) {

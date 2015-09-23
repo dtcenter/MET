@@ -32,6 +32,11 @@ inline int is_bad_data(int a)  {
    else                              return(0);
 }
 
+inline int is_bad_data(long long a)  {
+   if(a == bad_data_ll || isnan(a)) return(1);
+   else                             return(0);
+}
+
 inline int is_bad_data(double a) {
    if(fabs(a - bad_data_double) < default_tol || isnan(a)) return(1);
    else                                                    return(0);

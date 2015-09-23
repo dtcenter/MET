@@ -27,6 +27,7 @@
 extern void do_mtd_nc_output(const MtdNcOutInfo &, const MM_Engine &, 
                              const MtdFloatFile & fcst_raw, const MtdFloatFile & obs_raw, 
                              const MtdIntFile   & fcst_obj, const MtdIntFile   & obs_obj, 
+                             const MtdConfigInfo & config, 
                              const char * output_filename);
 
 

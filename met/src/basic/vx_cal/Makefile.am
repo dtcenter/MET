@@ -23,6 +23,7 @@ libvx_cal_a_SOURCES = date_to_mjd.cc \
               time_array.cc time_array.h \
               time_strings.cc \
               unix_to_mdyhms.cc \
+              unix_string.cc \
               vx_cal.h
 libvx_cal_a_CPPFLAGS = ${MET_CPPFLAGS}
 

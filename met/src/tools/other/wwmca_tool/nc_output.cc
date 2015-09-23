@@ -18,6 +18,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
+#include "vx_cal.h"
 
 #include "wwmca_ref.h"
 
@@ -128,13 +129,16 @@ data_var->add_att("level",      (const char *) s);
 
 data_var->add_att("_FillValue",  fill_value);
 
+
 unix_to_mdyhms(issue_time, month, day, year, hour, minute, second);
 
 sprintf(junk, "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
 
 data_var->add_att("init_time",  junk);
 
-data_var->add_att("init_time_ut",  (long) issue_time);
+s = unixtime_to_string(issue_time);
+
+data_var->add_att("init_time_ut",  s.text());
 
 
 unix_to_mdyhms(valid_time, month, day, year, hour, minute, second);
@@ -143,7 +147,10 @@ sprintf(junk, "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, secon
 
 data_var->add_att("valid_time",  junk);
 
-data_var->add_att("valid_time_ut",  (long) valid_time);
+s = unixtime_to_string(valid_time);
+
+data_var->add_att("valid_time_ut",  s.text());
+
 
 data_var->add_att("accum_time",  "1 hour");
 

@@ -81,6 +81,10 @@ extern bool get_att_str(const NcVarInfo &, const ConcatString &, ConcatString &)
 
 extern bool get_att_int(const NcVarInfo &, const ConcatString &, int &);
 
+   //  unixtimes could be ints or strings
+
+extern bool get_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &);
+
 
 ////////////////////////////////////////////////////////////////////////
 
