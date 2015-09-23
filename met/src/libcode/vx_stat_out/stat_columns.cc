@@ -225,6 +225,8 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
    }
+   
+   at.set_entry(r, col, pstd_columns[13]);
 
    return;
 }
@@ -2426,7 +2428,8 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //    BASER_NCL,   BASER_NCU,   RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
-   //    BSS,         [THRESH] (for each threshold)
+   //    [THRESH] (for each threshold),
+   //    BSS
    //
    at.set_entry(r, c+0,  // Total count
       pct_info.pct.n());
@@ -2464,19 +2467,19 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    at.set_entry(r, c+11, // BRIER_NCU
       pct_info.brier.v_ncu[alpha_i]);
 
-   at.set_entry(r, c+12,  // BSS
-      pct_info.bss);
-
    //
    // Write THRESH_i for each probability threshold
    //
-   for(i=0, col=c+13; i<=pct_info.pct.nrows(); i++) {
+   for(i=0, col=c+12; i<=pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
       col++;
    }
 
+   at.set_entry(r, col,   // BSS
+      pct_info.bss);
+   
    return;
 }
 
