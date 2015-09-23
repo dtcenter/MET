@@ -91,9 +91,9 @@ bool is_nccf_file(const char * filename)
 
    if (!get_file_att(&nc_file, nccf_att_name, att_val)) return ( false );
 
-   return (att_val == nccf_att_value);
+   return (strncmp(att_val, nccf_att_value, strlen(nccf_att_value)) == 0);
 
-}  
+}
 
 
 ////////////////////////////////////////////////////////////////////////
