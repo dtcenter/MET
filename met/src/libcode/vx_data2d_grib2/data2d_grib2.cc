@@ -746,8 +746,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
    if( !is_eq(r_km, grib_earth_radius_km) ) {
       mlog << Debug(4)
            << "Switching the GRIB2 radius of the earth value of "
-           << r_km << " km to the GRIB1 value of " << grib_earth_radius_km
-           << " km.\n";       
+           << r_km << " km to " << grib_earth_radius_km
+           << " km for internal consistency.\n";       
       r_km = grib_earth_radius_km;
    }
 
