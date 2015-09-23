@@ -96,8 +96,9 @@ void MM_Engine::clear()
 
 {
 
-// N_Fcst_Composites = 0;
-// N_Obs_Composites  = 0;
+N_Composites = 0;
+
+if ( comp_to_eq )  { delete [] comp_to_eq;  comp_to_eq = 0; }
 
 calc.clear();
 
@@ -120,8 +121,16 @@ void MM_Engine::assign(const MM_Engine & e)
 
 clear();
 
-// N_Fcst_Composites = e.N_Fcst_Composites;
-// N_Obs_Composites  = e.N_Obs_Composites;
+N_Composites = e.N_Composites;
+
+if ( e.comp_to_eq )  {
+
+   comp_to_eq = new int [N_Composites];
+
+   memcpy(comp_to_eq, e.comp_to_eq, N_Composites*sizeof(int));
+
+}
+
 
 calc = e.calc;
 
@@ -171,7 +180,7 @@ void MM_Engine::do_match_merge()
 
 {
 
-int j, k;
+int j, k, m, n;
 int f_i, o_i;
 
 
@@ -212,14 +221,13 @@ for (j=0; j<(graph.n_fcst()); ++j)  {
    //  get number of fcst and obs composites
    //
 
-/*
-int m;
+
 bool has_fcst = false;
 bool has_obs  = false;
 const EquivalenceClass * eq = 0;
 
 
-N_Fcst_Composites = N_Obs_Composites = 0;
+N_Composites = 0;
 
 for (j=0; j<(part.n_elements()); ++j)  {
 
@@ -227,24 +235,41 @@ for (j=0; j<(part.n_elements()); ++j)  {
 
    eq = part(j);
 
-   for (k=0; k<eq->n_elements(); ++k)  {
+   if ( eq->n_elements() <= 1 )  continue;
 
-      m = eq->element(k);
-
-      if ( m < graph.n_fcst() )  has_fcst = true;
-      else                       has_obs  = true;
-
-   }   //  for k
-
-   if ( has_fcst )  ++N_Fcst_Composites;
-   if ( has_obs  )  ++N_Obs_Composites;
+   ++N_Composites;
 
 }   //  for j
-*/
+
+if ( N_Composites > 0 )  comp_to_eq = new int [N_Composites];
+
+n = 0;
+
+for (j=0; j<(part.n_elements()); ++j)  {
+
+   eq = part(j);
+   
+   if ( eq->n_elements() <= 1 )  continue;
+
+   comp_to_eq[n++] = j;
+
+}
+
+cout << "Composites ...\n";
+
+for (j=0; j<N_Composites; ++j)  {
+
+   cout << ' ' << comp_to_eq[j];
+
+}
+
+cout << '\n';
 
    //
    //  done
    //
+
+cout.flush();
 
 return;
 
@@ -272,16 +297,20 @@ int MM_Engine::composite_with_fcst (const int k) const
 
 {
 
-int j, fcst_num, index;
+int j, m, fcst_num, index;
+const EquivalenceClass * eq = 0;
 
 fcst_num = k;
 
-for (j=0; j<(part.n_elements()); ++j)  {
+for (j=0; j<N_Composites; ++j)  {
 
-   if ( part.has(fcst_num, index) )  return ( index );
+   m = comp_to_eq[j];
 
-}   //  for j
+   eq = part(m);
 
+   if ( eq->has(fcst_num) )  return ( j );
+
+}
 
 return ( -1 );
 
@@ -295,16 +324,20 @@ int MM_Engine::composite_with_obs (const int k) const
 
 {
 
-int j, obs_num, index;
+int j, m, obs_num, index;
+const EquivalenceClass * eq = 0;
 
 obs_num = k + graph.n_fcst();
 
-for (j=0; j<(part.n_elements()); ++j)  {
+for (j=0; j<N_Composites; ++j)  {
 
-   if ( part.has(obs_num, index) )  return ( index );
+   m = comp_to_eq[j];
 
-}   //  for j
+   eq = part(m);
 
+   if ( eq->has(obs_num) )  return ( j );
+
+}
 
 return ( -1 );
 
@@ -320,7 +353,7 @@ IntArray MM_Engine::fcst_composite(const int _composite_number) const
 
 int j, k;
 IntArray a;
-const EquivalenceClass * eq = part(_composite_number);   //  this does range checking
+const EquivalenceClass * eq = part(comp_to_eq[_composite_number]);   //  this does range checking
 
 for (j=0; j<(eq->n_elements()); ++j)  {
 
@@ -344,7 +377,7 @@ IntArray MM_Engine::obs_composite(const int _composite_number) const
 
 int j, k;
 IntArray a;
-const EquivalenceClass * eq = part(_composite_number);   //  this does range checking
+const EquivalenceClass * eq = part(comp_to_eq[_composite_number]);   //  this does range checking
 
 for (j=0; j<(eq->n_elements()); ++j)  {
 

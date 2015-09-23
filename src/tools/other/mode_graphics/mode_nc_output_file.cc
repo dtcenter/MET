@@ -20,6 +20,7 @@ using namespace std;
 #include <cmath>
 
 #include "mode_nc_output_file.h"
+#include "nc_var_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -164,6 +165,7 @@ bool ModeNcOutputFile::open(const char * _filename)
 // int value;
 NcDim * dim = (NcDim *) 0;
 NcAtt * att = (NcAtt *) 0;
+ConcatString s;
 
 
 close();
@@ -255,13 +257,46 @@ read_netcdf_grid(f, *_Grid);
 
 att = FcstRaw->get_att("init_time_ut");
 
-InitTime = att->as_nclong(0);
+switch ( att->type() )  {
 
-// cout << "\n\n  InitTime = " << InitTime << "\n\n" << flush;
+   case ncInt:
+      InitTime = att->as_nclong(0);
+      break;
+
+   case ncChar:
+      s = att->as_string(0);
+      InitTime = string_to_unixtime(s);
+      break;
+
+   default:
+      mlog << Error
+           << "ModeNcOutputFile::open(const char *) -> init time should be an integer or a string!\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
 
 att = FcstRaw->get_att("valid_time_ut");
 
-ValidTime = att->as_nclong(0);
+switch ( att->type() )  {
+
+   case ncInt:
+      ValidTime = att->as_nclong(0);
+      break;
+
+   case ncChar:
+      s = att->as_string(0);
+      ValidTime = string_to_unixtime(s);
+      break;
+
+   default:
+      mlog << Error
+           << "ModeNcOutputFile::open(const char *) -> valid time should be an integer or a string!\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
 
 // att = FcstRaw->get_att("accum_time_sec");
 // 

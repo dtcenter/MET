@@ -28,8 +28,10 @@ class MM_Engine {
 
       void assign(const MM_Engine &);
 
-      // int N_Fcst_Composites;
-      // int N_Obs_Composites;
+      int N_Composites;
+      int N_Obs_Composites;
+
+      int * comp_to_eq;   //  allocated, 0-based, both ways
 
 
    public:
@@ -62,8 +64,7 @@ class MM_Engine {
       int n_fcst_simples()    const;
       int n_obs_simples()     const;
 
-      // int n_fcst_composites() const;
-      // int n_obs_composites()  const;
+      int n_composites() const;
 
           //
           //  return the index of the composite (ie, equivalence class) that
@@ -81,8 +82,6 @@ class MM_Engine {
 
       void do_match_merge();
 
-      int n_composites() const;
-
       int map_fcst_id_to_composite (const int id) const;      //  0-based
       int map_obs_id_to_composite  (const int id) const;      //  0-based
 
@@ -95,13 +94,10 @@ class MM_Engine {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int MM_Engine::n_fcst_simples () const { return ( graph.n_fcst () ); }
-inline int MM_Engine::n_obs_simples  () const { return ( graph.n_obs  () ); }
+inline int MM_Engine::n_fcst_simples     () const { return ( graph.n_fcst () ); }
+inline int MM_Engine::n_obs_simples      () const { return ( graph.n_obs  () ); }
 
-inline int MM_Engine::n_composites   () const { return ( part.n_elements() ); }
-
-// inline int MM_Engine::n_fcst_composites  () const { return ( N_Fcst_Composites ); }
-// inline int MM_Engine::n_obs_composites   () const { return ( N_Obs_Composites ); }
+inline int MM_Engine::n_composites       () const { return ( N_Composites ); }
 
 
 ////////////////////////////////////////////////////////////////////////

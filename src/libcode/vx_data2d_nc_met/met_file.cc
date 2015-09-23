@@ -140,8 +140,9 @@ bool MetNcFile::open(const char * filename)
 
 {
 
-int j, k, init_int, valid_int;
+int j, k;
 const char * c = (const char *) 0;
+long long ill, vll;
 NcVar * v   = (NcVar *) 0;
 
 
@@ -216,11 +217,12 @@ for (j=0; j<Nvars; ++j)  {
    get_att_str( Var[j], level_att_name,      Var[j].level_att     );
    get_att_str( Var[j], units_att_name,      Var[j].units_att     );
    get_att_int( Var[j], accum_time_att_name, Var[j].AccumTime     );
-   get_att_int( Var[j], init_time_att_name,  init_int             );
-   get_att_int( Var[j], valid_time_att_name, valid_int            );
 
-   if ( !is_bad_data(init_int)  )  InitTime  = (unixtime) init_int;
-   if ( !is_bad_data(valid_int) )  ValidTime = (unixtime) valid_int;
+   get_att_unixtime( Var[j], init_time_att_name,  ill);
+   get_att_unixtime( Var[j], valid_time_att_name, vll);
+
+   if ( !is_bad_data(ill) )   InitTime = ill;
+   if ( !is_bad_data(vll) )  ValidTime = vll;
 
    for (k=0; k<(Var[j].Ndims); ++k)  {
 

@@ -24,6 +24,7 @@ using namespace std;
 #include "nc_var_info.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -350,6 +351,70 @@ for (j=0; j<n; ++j)  {
    //
 
 return ( found );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool get_att_unixtime(const NcVarInfo &info, const ConcatString &att_name, unixtime &att_value)
+
+{
+
+int j, n;
+NcAtt * att = (NcAtt *) 0;
+bool found = false;
+
+n = info.var->num_atts();
+
+att_value = (unixtime) bad_data_int;
+
+for (j=0; j<n; ++j)  {
+
+   att = info.var->get_att(j);
+
+   if ( strcmp(att_name, att->name()) == 0 )  {
+
+      found = true;
+
+      break;
+
+   }
+
+}
+
+if ( !found )  return ( false );
+
+   // Check the type
+
+ConcatString s;
+
+switch ( att->type() )  {
+
+   case ncInt:
+      att_value = (unixtime) (att->as_int(0));
+      break;
+
+   case ncChar:
+      s = att->as_string(0);
+      att_value = string_to_unixtime(s);
+      break;
+
+   default:
+         mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
+              << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
+         exit ( 1 );
+      break;
+
+}   //  switch
+
+
+   //
+   //  done
+   //
+
+return ( true );
 
 }
 

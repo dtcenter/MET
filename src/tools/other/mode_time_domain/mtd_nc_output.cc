@@ -12,6 +12,8 @@ using namespace std;
 
 #include "mtd_nc_output.h"
 
+#include "write_netcdf.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -36,6 +38,7 @@ static void do_cluster_id (NcFile & out, const MtdIntFile   &  id, const bool is
 void do_mtd_nc_output(const MtdNcOutInfo &  nc_info, const MM_Engine    & e, 
                       const MtdFloatFile & fcst_raw, const MtdFloatFile & obs_raw,
                       const MtdIntFile   & fcst_obj, const MtdIntFile   & obs_obj,
+                      const MtdConfigInfo & config, 
                       const char * output_filename)
 
 {
@@ -73,6 +76,8 @@ nt_dim = out.get_dim(nt_dim_name);
    //
    //  global attributes
    //
+
+write_netcdf_global(&out, output_filename, "MTD", config.model, config.obtype);
 
 write_nc_grid(out, fcst_raw.grid());
 
@@ -143,6 +148,9 @@ out.add_var(lon_name, ncFloat, ny_dim, nx_dim);
 NcVar * lat_var = out.get_var(lat_name);
 NcVar * lon_var = out.get_var(lon_name);
 
+lat_var->add_att("long_name", "Latitude");
+lon_var->add_att("long_name", "Longitude");
+
 float * lat_data = new float [nx*ny];
 float * lon_data = new float [nx*ny];
 
@@ -198,12 +206,20 @@ void do_raw(NcFile & out, const MtdFloatFile & raw, const bool is_fcst)
 const int nx = raw.nx();
 const int ny = raw.ny();
 const int nt = raw.nt();
+ConcatString s;
 
 const char * const name = ( is_fcst ? fcst_raw_name : obs_raw_name );
 
 out.add_var(name, ncFloat, nt_dim, ny_dim, nx_dim);
 
 NcVar * var = out.get_var(name);
+
+if ( is_fcst )  s = "Forecast Raw Data";
+else            s = "Observed Raw Data";
+
+var->add_att("long_name", s.text());
+
+var->add_att("_FillValue", bad_data_float);
 
 var->set_cur(0, 0, 0);
 
@@ -229,12 +245,21 @@ void do_object_id (NcFile & out, const MtdIntFile & id, const bool is_fcst)
 const int nx = id.nx();
 const int ny = id.ny();
 const int nt = id.nt();
+ConcatString s;
+
 
 const char * const name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
 
 out.add_var(name, ncInt, nt_dim, ny_dim, nx_dim);
 
 NcVar * var = out.get_var(name);
+
+if ( is_fcst )  s = "Forecast Object ID";
+else            s = "Observed Object ID";
+
+var->add_att("long_name", s.text());
+
+var->add_att("_FillValue", bad_data_int);
 
 var->set_cur(0, 0, 0);
 
@@ -265,6 +290,7 @@ const int * ip = id.data();
 int * out_data = 0;
 int * op = 0;
 int * remap = 0;
+ConcatString s;
 
 const int n3 = nx*ny*nt;
 
@@ -276,6 +302,13 @@ const char * const name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
 out.add_var(name, ncInt, nt_dim, ny_dim, nx_dim);
 
 NcVar * var = out.get_var(name);
+
+if ( is_fcst )  s = "Forecast Cluster ID";
+else            s = "Observed Cluster ID";
+
+var->add_att("long_name", s.text());
+
+var->add_att("_FillValue", bad_data_int);
 
    //
    //  create mapping array
