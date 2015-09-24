@@ -1391,7 +1391,7 @@ for (c=0; c<Ncols; ++c)  {
 
       n = rc_to_n(r, c);
 
-      len = strlen(e[n]);
+      len = (e[n] == (char *) 0 ? 0 : strlen(e[n]));
 
       k = max_right - right[r];
 
@@ -1655,8 +1655,8 @@ void n_figures(const char * text, int & left, int & right)
 {
 
 int j;
-int N = strlen(text);
 char c;
+int N = (text == (char *) 0 ? 0 : strlen(text));
 
    //
    //  I wasn't able to find a string library function
