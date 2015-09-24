@@ -75,7 +75,7 @@ for (r=0; r<Nr; ++r)  {
 
 }
 
-table.line_up_decimal_points();
+// table.line_up_decimal_points();
 
 cout << '\n';
 cout << table;

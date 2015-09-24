@@ -1431,6 +1431,8 @@ ostream & operator<<(ostream & out, AsciiTable & t)
 
 {
 
+t.line_up_decimal_points();
+
 int j, r, c, n;
 int rmax;
 const int indent = t.table_indent();
@@ -1652,14 +1654,14 @@ void n_figures(const char * text, int & left, int & right)
 
 {
 
-   //
-   //  I wasn't able to find a string library function
-   //   that did quite what I wanted here
-   //
-
 int j;
 int N = strlen(text);
 char c;
+
+   //
+   //  I wasn't able to find a string library function
+   //     that did quite what I wanted here
+   //
 
 for (j=0; j<N; ++j)  {
 
