@@ -23,6 +23,14 @@ using namespace std;
 
 #include "ascii_table.h"
 #include "comma_string.h"
+#include "fix_float.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char radix_marker = '.';   //  some counties use ','
+static const char exp_char     = 'e';
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,6 +39,8 @@ using namespace std;
 static void do_blank_line(ostream & out, bool FillBlank, int width);
 
 static bool all_blanks(const char *);
+
+static void n_figures(const char * text, int & left, int & right);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -994,6 +1004,8 @@ else  {
 
 }
 
+fix_float(junk);
+
 if ( DoCommaString )  {
 
    char * p = (char *) 0;
@@ -1283,6 +1295,130 @@ return ( H );
 ////////////////////////////////////////////////////////////////////////
 
 
+void AsciiTable::pad_entry_right(const int r, const int c, const int n, const char fill_char)
+
+{
+
+if ( n < 0 )  {
+
+   mlog << Error
+        << "bad pad value ... " << n << "\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( n == 0 )  return;
+
+int j, k;
+
+k = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
+                     //    so we don't need to do that here
+
+if ( !(e[k]) )  return;
+
+ConcatString s = e[k];
+
+for (j=0; j<n; ++j)  s << fill_char;
+
+set_entry(r, c, s.text());
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void AsciiTable::line_up_decimal_points()
+
+{
+
+int r, c, n, k, w, len;
+int max_left, max_right;
+int w_old, w_new;
+int * left = 0;
+int * right = 0;
+// const char fill_char = '*';
+const char fill_char = ' ';
+
+left  = new int [Nrows];
+right = new int [Nrows];
+
+for (c=0; c<Ncols; ++c)  {
+
+   w_old = ColWidth[c];
+
+      //  get the pad size for that column
+
+   for (r=0; r<Nrows; ++r)  {
+
+      n = rc_to_n(r, c);
+
+      n_figures(e[n], left[r], right[r]);
+
+   }
+
+   max_left  = left  [0];
+   max_right = right [0];
+
+   for (r=1; r<Nrows; ++r)  {   //  r starts at one, here
+
+      if ( left  [r] > max_left  )  max_left  =  left[r];
+      if ( right [r] > max_right )  max_right = right[r];
+
+   }
+
+   w_new = max_left + max_right;
+
+   if ( w_new < w_old )  w_new = w_old;
+
+/*
+   cout << "\n"
+        << "col       = " << c         << '\n'
+        << "max_left  = " << max_left  << '\n'
+        << "max_right = " << max_right << '\n'
+        << "w_old     = " << w_old     << "\n"
+        << "w_new     = " << w_new     << "\n\n";
+*/
+
+      //
+      //  pad each entry in that column
+      //
+
+   for (r=0; r<Nrows; ++r)  {
+
+      n = rc_to_n(r, c);
+
+      len = strlen(e[n]);
+
+      k = max_right - right[r];
+
+      // k = w_new - len - 1;
+
+      if ( k > 0 )  pad_entry_right(r, c, k, fill_char);
+
+   }
+
+}   //  for c
+
+
+   //
+   //  done
+   //
+
+if ( left  )  { delete [] left;   left  = 0; }
+if ( right )  { delete [] right;  right = 0; }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
@@ -1503,6 +1639,42 @@ for ( i=0; i<at_from.ncols() && i<at_to.ncols(); i++ )  {
    at_to.set_entry ( r_to, i, at_from(r_from, i) );
 
 }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void n_figures(const char * text, int & left, int & right)
+
+{
+
+   //
+   //  I wasn't able to find a string library function
+   //   that did quite what I wanted here
+   //
+
+int j;
+int N = strlen(text);
+char c;
+
+for (j=0; j<N; ++j)  {
+
+   c = text[j];
+
+   if ( (c == radix_marker) || (c == exp_char) )  break;
+
+}
+
+left  = j + 1;
+right = N - left;
+
+// cout << "text = \"" << text  << "\"\n";
+// cout << "L    = "   << left  << "\n";
+// cout << "R    = "   << right << "\n\n";
 
 return;
 

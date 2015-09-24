@@ -12,10 +12,11 @@
 
 // static const char         nx_dim_name [] = "Nx";
 // static const char         ny_dim_name [] = "Ny";
+// static const char         nt_dim_name [] = "Nt";
 static const char         nx_dim_name [] = "lon";
 static const char         ny_dim_name [] = "lat";
+static const char         nt_dim_name [] = "time";
 
-static const char         nt_dim_name [] = "Nt";
 static const char       nobj_dim_name [] = "Nobjects";
 
 static const char     data_field_name [] = "MtdData";

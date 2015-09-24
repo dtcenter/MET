@@ -270,6 +270,14 @@ class AsciiTable {
 
       virtual bool row_is_blank(int r) const;
 
+         //  add some pad characters on the right side of an entry, 
+         //    eg, to line up the decimal points
+
+      virtual void pad_entry_right(const int r, const int c, const int n, const char = ' ');
+
+      virtual void line_up_decimal_points();
+
+
 
          //
          //  retrieve individual entries

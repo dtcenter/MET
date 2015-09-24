@@ -12,7 +12,8 @@ include ${top_srcdir}/Make-include
 
 noinst_PROGRAMS = test_command_line \
 	test_data_plane \
-	test_add_rows
+	test_add_rows   \
+	test_table_float
 
 test_command_line_SOURCES = test_command_line.cc
 test_command_line_CPPFLAGS = ${MET_CPPFLAGS}
@@ -31,5 +32,12 @@ test_add_rows_SOURCES = test_add_rows.cc
 test_add_rows_CPPFLAGS = ${MET_CPPFLAGS}
 test_add_rows_LDFLAGS = -L. ${MET_LDFLAGS}
 test_add_rows_LDADD = -lvx_util \
+	-lvx_cal \
+	-lvx_log
+
+test_table_float_SOURCES = test_table_float.cc
+test_table_float_CPPFLAGS = ${MET_CPPFLAGS}
+test_table_float_LDFLAGS = -L. ${MET_LDFLAGS}
+test_table_float_LDADD = -lvx_util \
 	-lvx_cal \
 	-lvx_log
