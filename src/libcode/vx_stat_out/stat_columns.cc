@@ -3105,27 +3105,14 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+34, // Root Mean Squared Error
       cnt_info.rmse.v);
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void justify_stat_cols(AsciiTable &at) {
-   int i;
-   
-   // Check for minimum number of columns
-   if(at.ncols() < n_header_columns) {
-      mlog << Error << "\njustify_stat_cols() -> "
-           << "AsciiTable object has fewer columns ("
-           << at.ncols() << ") than the number of STAT header columns ("
-           << n_header_columns << ").\n\n";
-      throw(1);
-   }
-   
-   // Left-justify header columns and right-justify data columns
-   for(i=0; i<at.ncols(); i++) {
-      if(i < n_header_columns) at.set_column_just(i, LeftJust);
-      else                     at.set_column_just(i, RightJust);
-   }
+
+   justify_met_at(at, n_header_columns);
 
    return;
 }
