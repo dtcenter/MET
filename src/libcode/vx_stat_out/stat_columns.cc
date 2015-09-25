@@ -3121,21 +3121,10 @@ void justify_stat_cols(AsciiTable &at) {
       throw(1);
    }
    
-   // Left-justify all the columns
-   at.set_table_just(LeftJust);
-   
-   // Loop through and right-justify some columns
+   // Left-justify header columns and right-justify data columns
    for(i=0; i<at.ncols(); i++) {
-      
-      // Right-justify data columns and a handful of header columns
-      if(i >= n_header_columns                      ||
-         strcmp(hdr_columns[i], "INTERP_PNTS") == 0 ||
-         strcmp(hdr_columns[i], "FCST_THRESH") == 0 ||
-         strcmp(hdr_columns[i], "OBS_THRESH" ) == 0 ||
-         strcmp(hdr_columns[i], "COV_THRESH" ) == 0 ||
-         strcmp(hdr_columns[i], "ALPHA"      ) == 0) {
-         at.set_column_just(i, RightJust);
-      }
+      if(i < n_header_columns) at.set_column_just(i, LeftJust);
+      else                     at.set_column_just(i, RightJust);
    }
 
    return;
