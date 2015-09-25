@@ -61,6 +61,8 @@ class MetConfig : public Dictionary {
          //  get stuff
          //
 
+      int output_precision();
+
       StringArray filename() const;
 
       bool debug() const;

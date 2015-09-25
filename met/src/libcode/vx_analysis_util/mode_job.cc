@@ -124,6 +124,8 @@ void BasicModeAnalysisJob::clear()
 
 {
 
+precision = default_precision;
+   
 atts.clear();
 
 columns.clear();
@@ -156,6 +158,8 @@ void BasicModeAnalysisJob::assign_basic_job(const BasicModeAnalysisJob & a)
 {
 
 clear();
+
+precision = a.precision;
 
 atts = a.atts;
 
@@ -261,8 +265,6 @@ int status;
 
 for (j=0; j<n_mode_columns; ++j)  {
 
-   // status = strcmp(lc_mode_columns[j], name);
-
    status = strcasecmp(lc_mode_columns[j], name);   //  case-insensitive comparison
 
    if ( status == 0 )  {
@@ -328,7 +330,7 @@ if ( n_dump == 0 )  {
    dump_at.set_size(dump_mode_buffer_rows,
                     n_mode_hdr_columns + n_mode_obj_columns);
    justify_mode_cols(dump_at);
-   dump_at.set_precision(default_precision);
+   dump_at.set_precision(get_precision());
    dump_at.set_bad_data_value(bad_data_double);
    dump_at.set_bad_data_str(na_str);
    dump_at.set_delete_trailing_blank_rows(1);

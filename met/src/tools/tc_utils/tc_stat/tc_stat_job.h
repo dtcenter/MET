@@ -159,7 +159,10 @@ class TCStatJob {
       void init_from_scratch();
 
       void assign(const TCStatJob &);
-      
+
+      // Output file precision
+      int Precision;
+
    public:
 
       TCStatJob();
@@ -170,6 +173,12 @@ class TCStatJob {
       void clear();
 
       void dump(ostream &, int depth = 0) const;
+
+      //////////////////////////////////////////////////////////////////
+      
+      void set_precision (int);
+
+      int  get_precision () const;
 
       //////////////////////////////////////////////////////////////////
       
@@ -202,7 +211,7 @@ class TCStatJob {
       void subset_track_pair(TrackPairInfo &, TCLineCounts &);
 
       //////////////////////////////////////////////////////////////////
-      
+
       // Interface with the input data files for this job
       TCStatFiles TCSTFiles;
 
@@ -286,6 +295,11 @@ class TCStatJob {
       int  LandfallBeg;
       int  LandfallEnd;
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline void TCStatJob::set_precision (int p)  { Precision = p; return; }
+inline int  TCStatJob::get_precision () const { return(Precision);     }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -124,7 +124,7 @@ int main(int argc, char * argv []) {
       conf.read(replace_path(config_const_filename));
       conf.read(default_config_file);
       conf.read(config_file);
-
+      
       //
       // Sanity check the command line and config file options
       //
@@ -135,6 +135,7 @@ int main(int argc, char * argv []) {
       //
       default_job.clear();
       set_job_from_config(conf, default_job);
+      default_job.set_precision(conf.output_precision());
 
       //
       // Write out the default job

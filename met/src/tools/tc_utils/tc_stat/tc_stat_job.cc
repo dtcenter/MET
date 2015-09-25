@@ -39,7 +39,7 @@ static const char *TCStatJobType_RIRWStr    = "rirw";
 // Functions for parsing command line options
 extern void parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
 extern void parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
-extern void setup_table        (AsciiTable &, int);
+extern void setup_table        (AsciiTable &, int, int);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -185,8 +185,10 @@ void TCStatJob::init_from_scratch() {
 
 void TCStatJob::clear() {
 
-   JobType = NoTCStatJobType;
+   Precision = default_precision;
 
+   JobType = NoTCStatJobType;
+   
    AModel.clear();
    BModel.clear();
    StormId.clear();
@@ -246,6 +248,8 @@ void TCStatJob::clear() {
 void TCStatJob::assign(const TCStatJob & j) {
 
    clear();
+
+   Precision = j.Precision;
 
    JobType = j.JobType;
 
@@ -906,7 +910,7 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi, ofstream *out) {
 
    // Setup the output AsciiTable
    justify_tc_stat_cols(out_at);
-   out_at.set_precision(default_precision);
+   out_at.set_precision(get_precision());
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
    out_at.set_delete_trailing_blank_rows(1);
@@ -945,7 +949,7 @@ ConcatString TCStatJob::serialize() const {
 
    // Initialize the jobstring
    s.clear();
-   s.set_precision(default_precision);
+   s.set_precision(get_precision());
 
    if(JobType != NoTCStatJobType)
       s << "-job " << tcstatjobtype_to_string(JobType) << " ";
@@ -1749,7 +1753,7 @@ void TCStatJobSummary::do_output(ostream &out) {
       if(i < CaseColumn.n_elements()) out_at.set_column_just(i, LeftJust);
       else                            out_at.set_column_just(i, RightJust);
    }
-   out_at.set_precision(default_precision);
+   out_at.set_precision(get_precision());
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
    out_at.set_delete_trailing_blank_rows(1);
@@ -2419,7 +2423,7 @@ ConcatString TCStatJobRIRW::serialize() const {
    int i;
 
    // Initialize the jobstring
-   s.set_precision(default_precision);
+   s.set_precision(get_precision());
 
    // Call the parent
    s = TCStatJob::serialize();
@@ -2754,7 +2758,7 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
                    9 + CaseColumn.n_elements() + n_ctc_columns);   
-   setup_table(out_at, 9 + CaseColumn.n_elements());
+   setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
    
    // Initialize row and column indices
    r = c = 0;
@@ -2828,7 +2832,7 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
                    9 + CaseColumn.n_elements() + n_cts_columns);   
-   setup_table(out_at, 9 + CaseColumn.n_elements());
+   setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
    
    // Initialize row and column indices
    r = c = 0;
@@ -2916,7 +2920,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    // Format the output table
    out_at.set_size(r + 1,
                    9 + CaseColumn.n_elements() + 15);
-   setup_table(out_at, 9 + CaseColumn.n_elements());
+   setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
 
    // Initialize row and column indices
    r = c = 0;
@@ -3001,7 +3005,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_table(AsciiTable &at, int n_hdr_cols) {
+void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
    int i;
 
    // Left-justify header columns and right-justify data columns
@@ -3012,7 +3016,7 @@ void setup_table(AsciiTable &at, int n_hdr_cols) {
    at.set_column_just(0, RightJust);
 
    // Set the precision
-   at.set_precision(default_precision);
+   at.set_precision(prec);
 
    // Set the bad data value
    at.set_bad_data_value(bad_data_double);

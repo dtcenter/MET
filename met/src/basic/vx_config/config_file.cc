@@ -236,6 +236,22 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+int MetConfig::output_precision()
+
+{
+
+int n = lookup_int(conf_key_output_precision, false);
+
+if ( !LastLookupStatus )  n = default_precision;
+
+return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool MetConfig::read(const char * name)
 
 {
