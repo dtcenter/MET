@@ -1342,6 +1342,7 @@ int * left = 0;
 int * right = 0;
 // const char fill_char = '*';
 const char fill_char = ' ';
+const int r_start = 1;   //  skip the header row
 
 left  = new int [Nrows];
 right = new int [Nrows];
@@ -1352,7 +1353,7 @@ for (c=0; c<Ncols; ++c)  {
 
       //  get the pad size for that column
 
-   for (r=0; r<Nrows; ++r)  {
+   for (r=r_start; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
@@ -1360,10 +1361,10 @@ for (c=0; c<Ncols; ++c)  {
 
    }
 
-   max_left  = left  [0];
-   max_right = right [0];
+   max_left  = left  [r_start];
+   max_right = right [r_start];
 
-   for (r=1; r<Nrows; ++r)  {   //  r starts at one, here
+   for (r=r_start+1; r<Nrows; ++r)  {   //  r starts at one, here
 
       if ( left  [r] > max_left  )  max_left  =  left[r];
       if ( right [r] > max_right )  max_right = right[r];
@@ -1387,7 +1388,7 @@ for (c=0; c<Ncols; ++c)  {
       //  pad each entry in that column
       //
 
-   for (r=0; r<Nrows; ++r)  {
+   for (r=r_start; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
@@ -1685,4 +1686,31 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+void justify_met_at(AsciiTable &at, const int n_hdr_cols) {
+   int i;
+
+   // Check for minimum number of columns
+   if(at.ncols() < n_hdr_cols) {
+      mlog << Error << "\njustify_met_at() -> "
+           << "AsciiTable object has fewer columns ("
+           << at.ncols() << ") than the number of header columns ("
+           << n_hdr_cols << ").\n\n";
+      exit(1);
+   }
+
+   // Left-justify header columns and right-justify data columns
+   for(i=0; i<at.ncols(); i++) {
+      if(i < n_hdr_cols) at.set_column_just(i, LeftJust);
+      else               at.set_column_just(i, RightJust);
+   }
+
+   // Left-justify the header row
+   at.set_row_just(0, LeftJust);
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
 

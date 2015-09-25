@@ -353,6 +353,8 @@ extern void justified_item(const char * text, const int field_width, const Ascii
 
 extern void copy_ascii_table_row(const AsciiTable &at_from, const int r_from, AsciiTable &at_to, const int r_to);
 
+extern void justify_met_at(AsciiTable &at, const int n_hdr_cols);
+
 ////////////////////////////////////////////////////////////////////////
 
 

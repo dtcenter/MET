@@ -3387,32 +3387,8 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const int n,
 ////////////////////////////////////////////////////////////////////////
 
 void justify_mode_cols(AsciiTable &at) {
-   int i;
-   
-   // Check for minimum number of columns
-   if(at.ncols() < n_mode_hdr_columns) {
-      mlog << Error << "\njustify_mode_cols() -> "
-           << "AsciiTable object has fewer columns ("
-           << at.ncols() << ") than the number of MODE header columns ("
-           << n_mode_hdr_columns << ").\n\n";
-      throw(1);
-   }
-   
-   // Left-justify all the columns
-   at.set_table_just(LeftJust);
-   
-   // Loop through and right-justify some columns
-   for(i=0; i<at.ncols(); i++) {
-      
-      // Right-justify data columns and a handful of header columns
-      if(i >= n_mode_hdr_columns                      ||
-         strcmp(mode_hdr_columns[i], "FCST_RAD") == 0 ||
-         strcmp(mode_hdr_columns[i], "FCST_THR") == 0 ||
-         strcmp(mode_hdr_columns[i], "OBS_RAD" ) == 0 ||
-         strcmp(mode_hdr_columns[i], "OBS_THR" ) == 0) {
-         at.set_column_just(i, RightJust);
-      }
-   }
+
+   justify_met_at(at, n_mode_hdr_columns);
 
    return;
 }
