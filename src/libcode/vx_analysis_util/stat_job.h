@@ -111,6 +111,9 @@ class STATAnalysisJob {
 
       void assign(const STATAnalysisJob &);
 
+      // Output file precision
+      int precision;
+
    public:
 
       STATAnalysisJob();
@@ -122,6 +125,11 @@ class STATAnalysisJob {
 
       void dump(ostream &, int depth = 0) const;
 
+      //////////////////////////////////////////////////////////////////
+      
+      void set_precision(int);
+      int  get_precision() const;
+      
       int  is_keeper(const STATLine &) const;
 
       void parse_job_command(const char *);
@@ -309,6 +317,11 @@ class STATAnalysisJob {
       int is_in_mask_grid(double, double) const;
       int is_in_mask_poly(double, double) const;
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline void STATAnalysisJob::set_precision (int p)  { precision = p; return; }
+inline int  STATAnalysisJob::get_precision () const { return(precision);     }
 
 ////////////////////////////////////////////////////////////////////////
 

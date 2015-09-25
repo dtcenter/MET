@@ -47,13 +47,19 @@ class BasicModeAnalysisJob {
 
       virtual void assign_basic_job(const BasicModeAnalysisJob &);
 
+      // Output file precision
+      int precision;
+
    public:
 
       BasicModeAnalysisJob();
       virtual ~BasicModeAnalysisJob();
       BasicModeAnalysisJob(const BasicModeAnalysisJob &);
       BasicModeAnalysisJob & operator=(const BasicModeAnalysisJob &);
-
+      
+      void set_precision (int);
+      int  get_precision () const;
+      
       virtual void clear();
 
       virtual void dump(ostream &, int depth = 0) const;
@@ -87,6 +93,14 @@ class BasicModeAnalysisJob {
       virtual void dump_mode_line(const ModeLine &);
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline void BasicModeAnalysisJob::set_precision (int p)  { precision = p; return; }
+
+inline int  BasicModeAnalysisJob::get_precision () const { return(precision);     }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -177,7 +177,7 @@ void process_jobs() {
    // If no config file, do a single job
    if(config_file.empty()) n_jobs = 1;
    else                    n_jobs = conf_info.Jobs.n_elements();
-     
+
    // Loop through the jobs
    for(i=0; i<n_jobs; i++) {
 
@@ -201,7 +201,10 @@ void process_jobs() {
 
       // Set the job output file stream
       cur_job->JobOut = tc_stat_out;
-      
+
+      // Set the output precision
+      cur_job->set_precision(conf_info.Conf.output_precision());
+
       // Serialize the current job
       mlog << Debug(2)
            << "\nProcessing Job " << i+1 << ": "

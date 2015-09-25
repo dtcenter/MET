@@ -156,6 +156,8 @@ if ( config_filename.length() > 0 )  {
    config.read(default_config_file);
    config.read(config_filename);
 
+   job->set_precision(config.output_precision());
+   
    config_to_att(config, config_atts);
 
    job->atts.augment(config_atts);

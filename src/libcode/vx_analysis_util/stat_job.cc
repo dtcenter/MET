@@ -105,6 +105,8 @@ void STATAnalysisJob::init_from_scratch() {
 
 void STATAnalysisJob::clear() {
 
+   precision = default_precision;
+
    job_type = no_stat_job_type;
 
    model.clear();
@@ -209,6 +211,8 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    clear();
 
+   precision            = aj.precision;
+   
    job_type             = aj.job_type;
 
    model                = aj.model;
@@ -1538,7 +1542,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    //
    stat_at.set_size(n_row, n_col);
    justify_stat_cols(stat_at);
-   stat_at.set_precision(default_precision);
+   stat_at.set_precision(precision);
    stat_at.set_bad_data_value(bad_data_double);
    stat_at.set_bad_data_str(na_str);
    stat_at.set_delete_trailing_blank_rows(1);
@@ -1628,7 +1632,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
       //
       dump_at.set_size(dump_stat_buffer_rows, dump_stat_buffer_cols);
       justify_stat_cols(dump_at);
-      dump_at.set_precision(default_precision);
+      dump_at.set_precision(precision);
       dump_at.set_bad_data_value(bad_data_double);
       dump_at.set_bad_data_str(na_str);
       dump_at.set_delete_trailing_blank_rows(1);

@@ -121,7 +121,7 @@ extern void write_job_ramp_cols(const STATAnalysisJob &, AsciiTable &,
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void setup_table    (AsciiTable &, int);
+extern void setup_table    (AsciiTable &, int, int);
 extern void write_table    (AsciiTable &,  ofstream *);
 extern void write_jobstring(const ConcatString &, ofstream *);
 extern void write_line     (const ConcatString &, ofstream *);

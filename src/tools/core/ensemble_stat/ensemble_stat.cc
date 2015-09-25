@@ -1747,7 +1747,7 @@ void setup_table(AsciiTable &at) {
    justify_stat_cols(at);
 
    // Set the precision
-   at.set_precision(default_precision);
+   at.set_precision(conf_info.conf.output_precision());
 
    // Set the bad data value
    at.set_bad_data_value(bad_data_double);
