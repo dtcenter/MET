@@ -7,6 +7,9 @@
 // Warning message results in tool exiting.
 exit_on_warning = FALSE;
 
+// Precision for output statistics written by the MET tools.
+output_precision = 5;
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Defintion of constants used throughout MET configuration files.

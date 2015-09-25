@@ -93,6 +93,21 @@ MET tool stating the location of the parsing error.
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// The "exit_on_warning" entry in ConfigConstants may be set to true or false.
+// If set totrue and a MET tool encounters a warning, it will immediately exit
+// with bad status after writing the warning message.
+//
+exit_on_warning = FALSE;
+
+//
+// The "output_precision" entry in ConfigConstants defines the precision
+// (number of significant decimal places) to be written to the ASCII output
+// files.  Setting this option in the config file of one of the tools will
+// override the default value set in ConfigConstants.
+//
+output_precision = 5;
+
+//
 // The "model" entry specifies a name for the model being verified.  This name
 // is written to the MODEL column of the ASCII output generated.  If you're
 // verifying multiple models, you should choose descriptive model names (no 
