@@ -1,0 +1,6625 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+The MODE Tool
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Paragraph*
+This chapter provides a description of the Method for Object-Based Diagnostic
+ Evaluation (MODE) tool, which was developed at the Research Applications
+ Laboratory, NCAR/Boulder, USA.
+ More information about MODE can be found in Davis et al.
+ (2006a,b) and Brown et al.
+ (2007).
+\end_layout
+
+\begin_layout Paragraph*
+MODE was developed in response to a need for verification methods that can
+ provide diagnostic information that is more directly useful and meaningful
+ than the information that can be obtained from traditional verification
+ approaches, especially in application to high-resolution NWP output.
+ The MODE approach was originally developed for application to spatial precipita
+tion forecasts, but it can also be applied to other fields with coherent
+ spatial structures (e.g., clouds, convection).
+\end_layout
+
+\begin_layout Paragraph*
+MODE is only one of a number of different approaches that have been developed
+ in recent years to meet these needs.
+ In the future, we expect that the MET package will include additional methods.
+ References for many of these methods are provided at 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.rap.ucar.edu/projects/icp/index.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph*
+MODE may be used in a generalized way to compare any two fields.
+ For simplicity, field1 may be thought of in this chapter as "the forecast,"
+ while field2 may be thought of as "the observation", which is usually a
+ gridded analysis of some sort.
+ The convention of field1/field2 is also used in Table 8-2.
+ MODE resolves objects in both the forecast and observed fields.
+ These objects mimic what humans would call "regions of interest".
+ Object attributes are calculated and compared, and are used to associate
+ ("merge") objects within a single field, as well as to "match" objects
+ between the forecast and observed fields.
+ Finally, summary statistics describing the objects and object pairs are
+ produced.
+ These statistics can be used to identify correlations and differences among
+ the objects, leading to insights concerning forecast strengths and weaknesses.
+\end_layout
+
+\begin_layout Section
+Scientific and statistical aspects
+\end_layout
+
+\begin_layout Paragraph*
+The methods used by the MODE tool to identify and match forecast and observed
+ objects are briefly described in this section.
+ 
+\end_layout
+
+\begin_layout Subsection
+Resolving objects
+\end_layout
+
+\begin_layout Paragraph*
+The process used for resolving objects in a raw data field is called 
+\shape italic
+convolution thresholding
+\shape default
+.
+ The raw data field is first convolved with a simple filter function as
+ follows:
+\end_layout
+
+\begin_layout Paragraph*
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$C(x,y)=
+\backslash
+sum 
+\backslash
+phi (u,v)f(x-u)(y-v).$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+In this formula, 
+\emph on
+f
+\emph default
+ is the raw data field, 
+\begin_inset Formula $\phi$
+\end_inset
+
+ is the filter function, and 
+\emph on
+C
+\emph default
+ is the resulting convolved field.
+ The variables (
+\emph on
+x, y
+\emph default
+) and (
+\emph on
+u, v
+\emph default
+) are grid coordinates.
+ The filter function 
+\begin_inset Formula $\phi$
+\end_inset
+
+ is a simple circular filter determined by a radius of influence 
+\emph on
+R
+\emph default
+, and a height 
+\emph on
+H
+\emph default
+: 
+\end_layout
+
+\begin_layout Paragraph*
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+phi (x,y)=H$
+\end_layout
+
+\end_inset
+
+ if 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$x^2+y^2
+\backslash
+le R^2$
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+phi (x,y)=0$
+\end_layout
+
+\end_inset
+
+ otherwise.
+\end_layout
+
+\begin_layout Paragraph*
+The parameters 
+\emph on
+R
+\emph default
+ and 
+\emph on
+H
+\emph default
+ are not independent.
+ They are related by the requirement that the integral of 
+\begin_inset Formula $\phi$
+\end_inset
+
+ over the grid be unity: 
+\end_layout
+
+\begin_layout Paragraph*
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\backslash
+pi R^2H=1.$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Thus, the radius of influence 
+\emph on
+R
+\emph default
+ is the only tunable parameter in the convolution process.
+ Once 
+\emph on
+R
+\emph default
+ is chosen, 
+\emph on
+H
+\emph default
+ is determined by the above equation.
+\end_layout
+
+\begin_layout Paragraph*
+Once the convolved field, 
+\emph on
+C
+\emph default
+, is in hand, it is thresholded to create a mask field, 
+\emph on
+M
+\emph default
+: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$M(x,y)=1$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+if 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$C(x,y)
+\backslash
+ge T$
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$M (x,y)=H$
+\end_layout
+
+\end_inset
+
+ otherwise.
+\end_layout
+
+\begin_layout Paragraph*
+The objects are the connected regions where 
+\emph on
+M = 1
+\emph default
+.
+ Finally, the raw data are restored to object interiors to obtain the object
+ field, 
+\emph on
+F
+\emph default
+:
+\end_layout
+
+\begin_layout Paragraph*
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$F(x,y)=M(x,y)f(x,y).$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Thus, two parameters - the radius of influence, 
+\emph on
+R
+\emph default
+, and the threshold, 
+\emph on
+T
+\emph default
+ - control the entire process of resolving objects in the raw data field.
+\end_layout
+
+\begin_layout Paragraph*
+An example of the steps involved in resolving objects is shown in Fig 8-1.
+ Figure 8-1a shows a "raw" precipitation field, where the vertical coordinate
+ represents the precipitation amount.
+ Part b shows the convolved field, and part c shows the masked field obtained
+ after the threshold is applied.
+ Finally, Fig.
+ 8-1d shows the objects once the original precipitation values have been
+ restored to the interiors of the objects.
+\end_layout
+
+\begin_layout Standard
+Fig
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Tara, this image is a gif, and tex complains about it.
+ It seems to want a png.
+\end_layout
+
+\end_inset
+
+ure 8-1: Example of an application of the MODE object identification process
+ to a model precipitation field.
+\end_layout
+
+\begin_layout Subsection
+Attributes
+\end_layout
+
+\begin_layout Paragraph*
+Object attributes are defined both for single objects and for object pairs.
+ One of the objects in a pair is from the forecast field and the other is
+ taken from the observed field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+Area is simply a count of the number of grid squares an object occupies.
+ If desired, a true area (say, in 
+\begin_inset Formula $km^{2}$
+\end_inset
+
+) can be obtained by adding up the true areas of all the grid squares inside
+ an object, but in practice this is deemed not to be necessary.
+\end_layout
+
+\begin_layout Paragraph*
+Moments are used in the calculation of several object attributes.
+ If we define 
+\begin_inset Formula $\xi(x,y)$
+\end_inset
+
+to be 1 for points (
+\emph on
+x, y
+\emph default
+) inside our object, and zero for points outside, then the first-order moments,
+ 
+\begin_inset Formula $S_{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $S{}_{y}$
+\end_inset
+
+, are defined as 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$S_x=
+\backslash
+sum_{x,y} x 
+\backslash
+xi (x,y) 
+\backslash
+hbox{ and }S_y=
+\backslash
+sum_{x,y} y 
+\backslash
+xi (x,y).$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Higher order moments are similarly defined and are used in the calculation
+ of some of the other attributes.
+ For example, the centroid is a kind of geometric center of an object, and
+ can be calculated from first moments.
+ It allows one to assign a single point location to what may be a large,
+ extended object.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+Axis Angle, denoted by 
+\begin_inset Formula $\theta$
+\end_inset
+
+, is calculated from the second-order moments.
+ It gives information on the orientation or "tilt" of an object.
+ Curvature is another attribute that uses moments in its calculation, specifical
+ly, third-order moments.
+\end_layout
+
+\begin_layout Paragraph*
+Aspect Ratio is computed by fitting a rectangle around an object.
+ The rectangle is aligned so that it has the same axis angle as the object,
+ and the length and width are chosen so as to just enclose the object.
+ We make no claim that the rectangle so obtained is the smallest possible
+ rectangle enclosing the given object.
+ However, this rectangle is much easier to calculate than a smallest enclosing
+ rectangle and serves our purposes just as well.
+ Once the rectangle is determined, the aspect ratio of the object is defined
+ to be the width of the rectangle divided by its length.
+\end_layout
+
+\begin_layout Paragraph*
+Another object attribute defined by MODE is complexity.
+ Complexity is defined by comparing the area of an object to the area of
+ its convex hull.
+\end_layout
+
+\begin_layout Paragraph*
+All the attributes discussed so far are defined for single objects.
+ Once these are determined, they can be used to calculate attributes for
+ pairs of objects.
+ One example is centroid difference.
+ This measure is simply the (vector) difference between the centroids of
+ the two objects.
+ Another example is angle difference, the difference between the axis angles.
+\end_layout
+
+\begin_layout Paragraph*
+Several area measures are also used for pair attributes.
+ Union Area is the total area that is in either one (or both) of the two
+ objects.
+ Intersection Area is the area that is inside both objects simultaneously.
+ Symmetric Difference is the area inside at least one object, but not inside
+ both.
+\end_layout
+
+\begin_layout Subsection
+Fuzzy logic
+\end_layout
+
+\begin_layout Paragraph*
+Once object attributes 
+\begin_inset Formula $\alpha_{1},\alpha_{2},\ldots,\alpha_{n}$
+\end_inset
+
+are estimated, some of them are used as input to a fuzzy logic engine that
+ performs the matching and merging steps.
+ Merging refers to grouping together objects in a single field, while matching
+ refers to grouping together objects in different fields, typically the
+ forecast and observed fields.
+ Interest maps, 
+\begin_inset Formula $I_{i}$
+\end_inset
+
+, are applied to the individual attributes, 
+\begin_inset Formula $\alpha_{i}$
+\end_inset
+
+, to convert them into interest values, which range from zero (representing
+ no interest) to one (high interest).
+ For example, the default interest map for centroid difference is one for
+ small distances, and falls to zero as the distance increases.
+ For other attributes (e.g., intersection area), low values indicate low interest,
+ and high values indicate more interest.
+\end_layout
+
+\begin_layout Paragraph*
+The next step is to define confidence maps, 
+\begin_inset Formula $C_{i}$
+\end_inset
+
+, for each attribute.
+ These maps (again with values ranging from zero to one) reflect how confident
+ we are in the calculated value of an attribute.
+ The confidence maps generally are functions of the entire attribute vector
+ 
+\begin_inset Formula $\alpha_{1},\alpha_{2},\ldots,\alpha_{n}$
+\end_inset
+
+, in contrast to the interest maps, where each 
+\begin_inset Formula $I_{i}$
+\end_inset
+
+ is a function only of 
+\begin_inset Formula $\alpha_{i}$
+\end_inset
+
+.
+ To see why this is necessary, imagine an electronic anemometer that outputs
+ a stream of numerical values of wind speed and direction.
+ It is typically the case for such devices that when the wind speed becomes
+ small enough, the wind direction is poorly resolved.
+ The wind must be at least strong enough to overcome friction and turn the
+ anemometer.
+ Thus, in this case, our confidence in one attribute (wind direction) is
+ dependent on the value of another attribute (wind speed).
+ In MODE, all of the confidence maps except the map for axis angle are set
+ to a constant value of 1.
+ The axis angle confidence map is a function of aspect ratio, with values
+ near one having low confidence, and values far from one having high confidence.
+\end_layout
+
+\begin_layout Paragraph*
+Next, scalar weights, 
+\emph on
+w
+\emph default
+
+\begin_inset Formula $_{i}$
+\end_inset
+
+, are assigned to each attribute, representing an empirical judgment regarding
+ the relative importance of the various attributes.
+ As an example, in initial applications of MODE, centroid distance was weighted
+ more heavily than other attributes, because the location of storm systems
+ close to each other in space seemed to be a strong indication (stronger
+ than that given by any other attribute) that they were related.
+\end_layout
+
+\begin_layout Paragraph*
+Finally, all these ingredients are collected into a single number called
+ the total interest, 
+\emph on
+T
+\emph default
+, given by 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$T(
+\backslash
+alpha)={{
+\backslash
+sum_iw_iC_i(
+\backslash
+alpha)I_i(
+\backslash
+alpha_i)}
+\backslash
+over{
+\backslash
+sum_i w_iC_i(
+\backslash
+alpha)}}.$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+This total interest value is then thresholded, and pairs of objects that
+ have total interest values above the threshold are merged (if they are
+ in the same field) or matched (if they are in different fields).
+\end_layout
+
+\begin_layout Paragraph*
+Another merging method is available in MODE, which can be used instead of,
+ or along with, the fuzzy logic based merging just described.
+ Recall that the convolved field was thresholded to produce the mask field.
+ A second (lower) threshold can be specified so that objects that are separated
+ at the higher threshold but joined at the lower threshold are merged.
+\end_layout
+
+\begin_layout Subsection
+Summary statistics
+\end_layout
+
+\begin_layout Paragraph*
+Once MODE has been run, summary statistics are written to an output file.
+ These files contain information about all single and cluster objects and
+ their attributes.
+ Total interest for object pairs is also output, as are percentiles of intensity
+ inside the objects.
+ The output file is in a simple flat ASCII tabular format (with one header
+ line) and thus should be easily readable by just about any programming
+ language, scripting language, or statistics package.
+ Refer to Section 8.3.3 for lists of the statistics included in the MODE output
+ files.
+ Example scripts will be posted on the MET website in the future.
+\end_layout
+
+\begin_layout Section
+Practical information
+\end_layout
+
+\begin_layout Paragraph*
+This section contains a description of how MODE can be configured and run.
+ The MODE tool is used to perform a features-based verification of gridded
+ model data using gridded observations.
+ The input gridded model and observation datasets must be in one of the
+ MET supported gridded file formats.
+ In both cases, the input model and observation dataset must be on a common
+ grid.
+ The gridded analysis data may be based on observations, such as Stage II
+ or Stage IV data for verifying accumulated precipitation, or a model analysis
+ field may be used.
+ However, users are cautioned that it is generally unwise to verify model
+ output using an analysis field produced by the same model.
+\end_layout
+
+\begin_layout Paragraph*
+MODE provides the capability to select a single model variable/level from
+ which to derive objects to be analyzed.
+ MODE was developed and tested using accumulated precipitation.
+ However, the code has been generalized to allow the use of any gridded
+ model and observation field.
+ Based on the options specified in the configuration file, MODE will define
+ a set of simple objects in the model and observation fields.
+ It will then compute an interest value for each pair of objects across
+ the fields using a fuzzy engine approach.
+ Those interest values are thresholded, and any pairs of objects above the
+ threshold will be matched/merged.
+ Through the configuration file, MODE offers a wide range of flexibility
+ in how the objects are defined, processed, matched, and merged.
+ 
+\end_layout
+
+\begin_layout Subsection
+mode usage
+\end_layout
+
+\begin_layout Paragraph*
+The usage statement for the MODE tool is listed below:
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+Usage:
+\series default
+ mode
+\end_layout
+
+\begin_layout LyX-Code
+fcst_file
+\end_layout
+
+\begin_layout LyX-Code
+obs_file
+\end_layout
+
+\begin_layout LyX-Code
+config_file
+\end_layout
+
+\begin_layout LyX-Code
+[-config_merge merge_config_file]
+\end_layout
+
+\begin_layout LyX-Code
+[-outdir path]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file] 
+\end_layout
+
+\begin_layout LyX-Code
+[-v level] 
+\end_layout
+
+\begin_layout Paragraph*
+The MODE tool has three required arguments and can accept several optional
+ arguments.
+\end_layout
+
+\begin_layout Paragraph*
+Required arguments for mode
+\end_layout
+
+\begin_layout Paragraph*
+1.
+ The fcst_file argument indicates the gridded file containing the model
+ field to be verified.
+\end_layout
+
+\begin_layout Paragraph*
+2.
+ The obs_file argument indicates the gridded file containing the gridded
+ observations to be used for the verification of the model.
+\end_layout
+
+\begin_layout Paragraph*
+3.
+ The config_file argument indicates the name of the configuration file to
+ be used.
+ The contents of the configuration file are discussed below.
+\end_layout
+
+\begin_layout Paragraph*
+Optional arguments for mode
+\end_layout
+
+\begin_layout Paragraph*
+4.
+ The -config_merge merge_config_file argument indicates the name of a second
+ configuration file to be used when performing fuzzy engine merging by comparing
+ the model or observation field to itself.
+ The MODE tool provides the capability of performing merging within a single
+ field by comparing the field to itself.
+ Interest values are computed for each object and all of its neighbors.
+ If an object and its neighbor have an interest value above some threshold,
+ they are merged.
+ The merge_config_file controls the settings of the fuzzy engine used to
+ perform this merging step.
+ If a merge_config_file is not provided, the configuration specified by
+ the config_file in the previous argument will be used.
+\end_layout
+
+\begin_layout Paragraph*
+5.
+ The -outdir path indicates the directory where output files should be written.
+\end_layout
+
+\begin_layout Paragraph*
+6.
+ The -log file option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+7.
+ The -v level option indicates the desired level of verbosity.
+ The contents of "level" will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity above 1 will increase the amount of logging.
+\end_layout
+
+\begin_layout Paragraph*
+An example of the MODE calling sequence is listed below:
+\end_layout
+
+\begin_layout Paragraph*
+Example 1
+\end_layout
+
+\begin_layout Paragraph*
+mode sample_fcst.grb
+\end_layout
+
+\begin_layout Paragraph*
+sample_obs.grb
+\end_layout
+
+\begin_layout Paragraph*
+MODEConfig_grb
+\end_layout
+
+\begin_layout Paragraph*
+In Example 1, the MODE tool will verify the model data in the sample_fcst.grb
+ GRIB file using the observations in the sample_obs.grb GRIB file applying
+ the configuration options specified in the MODEConfig_grb file.
+\end_layout
+
+\begin_layout Paragraph*
+A second example of the MODE calling sequence is presented below:
+\end_layout
+
+\begin_layout Paragraph*
+Example 2
+\end_layout
+
+\begin_layout Paragraph*
+mode sample_fcst.nc
+\end_layout
+
+\begin_layout Paragraph*
+sample_obs.nc
+\end_layout
+
+\begin_layout Paragraph*
+MODEConfig_nc
+\end_layout
+
+\begin_layout Paragraph*
+In Example 2, the MODE tool will verify the model data in the sample_fcst.nc
+ NetCDF output of pcp_combine using the observations in the sample_obs.nc
+ NetCDF output of pcp_combine, using the configuration options specified
+ in the MODEConfig file.
+ Since the model and observation files contain only a single field of accumulate
+d precipitation, the MODEConfig_nc file should specify that accumulated
+ precipitation be verified.
+\end_layout
+
+\begin_layout Subsection
+mode configuration file
+\end_layout
+
+\begin_layout Paragraph*
+The default configuration file for the MODE tool, MODEConfig_default, can
+ be found in the installed share/met/config directory.
+ Another version of the configuration file is provided in scripts/config.
+ We encourage users to make a copy of the configuration files prior to modifying
+ their contents.
+ Descriptions of MODEConfig_default and the required variables for any mode
+ configuration file are also provided below.
+ While the configuration file contains many entries, most users will only
+ need to change a few for their use.
+ Specific options are described in the following subsections.
+\end_layout
+
+\begin_layout Paragraph*
+Note that environment variables may be used when editing configuration files,
+ as described in the section 3.5.2 for the PB2NC tool.
+\end_layout
+
+\begin_layout Subsubsection*
+model = "WRF";
+\end_layout
+
+\begin_layout Paragraph*
+The model variable contains a short text string identifying the name to
+ be assigned to the model being verified.
+ This text string is written out as a header column of the ASCII output
+ so that verification statistics from multiple models may be differentiated.
+ The value listed above is simply set to "WRF".
+\end_layout
+
+\begin_layout Subsubsection*
+grid_res = 4;
+\end_layout
+
+\begin_layout Paragraph*
+The grid_res variable is the nominal spacing for each grid square in kilometers.
+ The variable is not used directly in the code, but subsequent variables
+ in the configuration file are defined in terms of it.
+ Therefore, setting this appropriately will help ensure that appropriate
+ default values are used for these variables.
+\end_layout
+
+\begin_layout Subsubsection*
+fcst = {
+\end_layout
+
+\begin_layout Subsubsection*
+field = {
+\end_layout
+
+\begin_layout Subsubsection*
+name = "APCP";
+\end_layout
+
+\begin_layout Subsubsection*
+level = "A03";
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Subsubsection*
+raw_thresh = NA;
+\end_layout
+
+\begin_layout Subsubsection*
+conv_radius = 60.0/grid_res; // in grid squares
+\end_layout
+
+\begin_layout Subsubsection*
+conv_thresh = >=5.0;
+\end_layout
+
+\begin_layout Subsubsection*
+vld_thresh = 0.5;
+\end_layout
+
+\begin_layout Subsubsection*
+area_thresh = NA;
+\end_layout
+
+\begin_layout Subsubsection*
+inten_perc_value = 100;
+\end_layout
+
+\begin_layout Subsubsection*
+inten_perc_thresh = NA;
+\end_layout
+
+\begin_layout Subsubsection*
+merge_thresh = >=1.25;
+\end_layout
+
+\begin_layout Subsubsection*
+merge_flag = THRESH;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Subsubsection*
+obs = fcst; 
+\end_layout
+
+\begin_layout Paragraph*
+The field variables in the forecast and observation dictionaries specify
+ the model variable and observation variable, respectively, and correspond
+ to the vertical level to be verified.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The raw_thresh variable is used to threshold the raw forecast and / or observati
+on fields.
+ Prior to defining objects, it is recommended that the raw fields should
+ be made to look similar to each other.
+ For example, if the model only predicts values for a variable above some
+ threshold, the observations should be thresholded at that same level.
+ The thresholds can be specified using symbols.
+ By default, no raw field thresholded is applied.
+\end_layout
+
+\begin_layout Paragraph*
+The conv_radius variable defines the radius of the circular convolution
+ applied to smooth the raw fields.
+ The radii are specified in terms of grid units.
+ The default convolution radii are defined in terms of the previously defined
+ grid_res variable.
+\end_layout
+
+\begin_layout Paragraph*
+The conv_thresh variable specifies the threshold values to be applied to
+ the convolved field to define objects.
+ By default, objects are defined using a convolution threshold of 5.0.
+\end_layout
+
+\begin_layout Paragraph*
+The vld_thresh variable must be set between 0 and 1.
+ When performing the circular convolution step if the proportion of bad
+ data values in the convolution area is greater than or equal to this threshold,
+ the resulting convolved value will be bad data.
+ If the proportion is less than this threshold, the convolution will be
+ performed on only the valid data.
+ By default, the vld_thresh is set to 0.5.
+\end_layout
+
+\begin_layout Paragraph*
+The area_thresh variable specifies the area threshold values to be applied
+ to the defined objects.
+ The area of an object is simply a count of the number of grid squares that
+ comprise it.
+ A user may, for example, want to only consider objects that meet some minimum
+ size criteria.
+ By default, all objects are retained since no area threshold is applied.
+\end_layout
+
+\begin_layout Paragraph*
+The inten_perc_value and inten_perc_thresh variables specify the intensity
+ threshold values to be applied to the defined objects.
+ For each object defined, the intensity values within the object are sorted,
+ and the requested intensity percentile value is computed.
+ By default, the maximum value is computed since the intensity percentiles
+ are set to 100.
+ Any objects with an intensity percentile that does not meet the corresponding
+ intensity percentile threshold specified will be discarded.
+ A user may, for example, want to only consider objects that meet some maximum
+ intensity criteria.
+ By default, no intensity percentile threshold is applied.
+\end_layout
+
+\begin_layout Paragraph*
+The merge_thresh variables are used to define larger objects for use in
+ merging the original objects.
+ These variables define the threshold value used in the double thresholding
+ merging technique.
+ Note that in order to use this merging technique, it must be requested
+ for both the forecast and observation fields.
+ These thresholds should be chosen to define larger objects that fully contain
+ the originally defined objects.
+ For example, for objects defined as >=5.0, a merge threshold of >=2.5 will
+ define larger objects that fully contain the original objects.
+ Any two original objects contained within the same larger object will be
+ merged.
+ By default, the merge thresholds are set to be greater than or equal to
+ 1.25.
+\end_layout
+
+\begin_layout Paragraph*
+The merge_flag variable controls what type of merging techniques will be
+ applied to the objects defined in each field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* NONE indicates that no merging should be applied.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* THRESH indicates that the double thresholding merging technique should
+ be applied.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* ENGINE indicates that objects in each field should be merged by comparing
+ the objects to themselves using a fuzzy engine approach.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* BOTH indicates that both techniques should be used.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+By default, the double thresholding merging technique is applied.
+\end_layout
+
+\begin_layout Subsubsection*
+mask_missing_flag = NONE;
+\end_layout
+
+\begin_layout Paragraph*
+The mask_missing_flag variable specifies how missing data in the raw model
+ and observation fields will be treated.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* NONE indicates no additional processing is to be done.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* FCST indicates missing data in the observation field should be used to
+ mask the forecast field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* OBS indicates missing data in the forecast field should be used to mask
+ the observation field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* BOTH indicates masking should be performed in both directions (i.e., mask
+ the forecast field with the observation field and vice-versa).
+\end_layout
+
+\begin_layout Paragraph*
+Prior to defining objects, it is recommended that the raw fields be made
+ to look similar to each other by assigning a value of BOTH to this parameter.
+ However, by default no masking is performed.
+\end_layout
+
+\begin_layout Subsubsection*
+match_flag = MERGE_BOTH;
+\end_layout
+
+\begin_layout Paragraph*
+The match_flag variable controls how matching will be performed when comparing
+ objects from the forecast field to objects from the observation field.
+ An interest value is computed for each possible pair of forecast/observation
+ objects.
+ The interest values are then thresholded to define which objects match.
+ If two objects in one field happen to match the same object in the other
+ field, then those two objects could be merged.
+ The match_flag controls what type of merging is allowed in this context.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* NONE indicates that no matching should be performed between the fields
+ at all.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* MERGE_BOTH indicates that additional merging is allowed in both fields.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* MERGE_FCST indicates that additional merging is allowed only in the forecast
+ field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* NO_MERGE indicates that no additional merging is allowed in either field,
+ meaning that each object will match at most one object in the other field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+By default, additional merging is allowed in both fields.
+\end_layout
+
+\begin_layout Subsubsection*
+max_centroid_dist = 800/grid_res;
+\end_layout
+
+\begin_layout Paragraph*
+Computing the attributes for all possible pairs of objects can take some
+ time depending on the numbers of objects.
+ The max_centroid_dist variable is used to specify how far apart objects
+ should be in order to conclude that they have no chance of matching.
+ No pairwise attributes are computed for pairs of objects whose centroids
+ are farther away than this distance, defined in terms of grid units.
+ Setting this variable to a reasonable value will improve the execution
+ time of the MODE tool.
+ By default, the maximum centroid distance is defined in terms of the previously
+ defined grid_res variable.
+\end_layout
+
+\begin_layout Subsubsection*
+mask = {
+\end_layout
+
+\begin_layout Subsubsection*
+grid = "";
+\end_layout
+
+\begin_layout Subsubsection*
+grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
+\end_layout
+
+\begin_layout Subsubsection*
+poly = "";
+\end_layout
+
+\begin_layout Subsubsection*
+poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Paragraph*
+The grid variable specifies a pre-defined NCEP grid with which to mask the
+ raw forecast and observation fields.
+ The predefined grids are specified as "GNNN" where NNN is the three digit
+ designation for the grid.
+ By default, no masking grid is applied.
+ A list of the set of pre-defined masks included with the MODE tool is presented
+ in Appendix B.
+\end_layout
+
+\begin_layout Paragraph*
+The grid_flag variable specifies how the grid should be applied.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* NONE indicates that the masking grid should not be applied.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* FCST indicates that the masking grid should be applied to the forecast
+ field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* OBS indicates that the masking grid should be applied to the observation
+ field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* BOTH indicates that the masking grid should be applied to both fields.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+By default, the masking grid is not applied.
+\end_layout
+
+\begin_layout Paragraph*
+Similar to the grid variable above, the poly variable is the name of a file
+ that defines a verification masking region.
+ These masking regions may be specified in two ways: as a lat/lon polygon
+ or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
+ or Gen-Circle_Mask tools.
+\end_layout
+
+\begin_layout Paragraph*
+Several masking polygons used by NCEP are predefined in the installed share/met/
+poly directory.
+ Creating a new polygon is as simple as creating a text file with a name
+ for the polygon followed by the lat/lon points which define its boundary.
+ Adding a new masking polygon requires no code changes and no recompiling.
+ Internally, the lat/lon polygon points are converted into x/y values in
+ the grid.
+\end_layout
+
+\begin_layout Paragraph*
+Alternatively, any gridded data file that MET can read may be used to define
+ a verification masking region.
+ Users must specify a description of the field to be used from the input
+ file and, optionally, may specify a threshold to be applied to that field.
+ Any grid point where the resulting field is 0, the mask is turned off.
+ Any grid point where it is non-zero, the mask is turned on.
+\end_layout
+
+\begin_layout Paragraph*
+Similar to the grid_flag variable above, the poly_flag variable specifies
+ how the masking polygon should be applied.
+\end_layout
+
+\begin_layout Paragraph*
+* NONE indicates the masking polygon should be applied to neither field.
+\end_layout
+
+\begin_layout Paragraph*
+* FCST indicates the masking polygon should be applied to the forecast field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* OBS indicates the masking polygon should be applied to the observation
+ field.
+\end_layout
+
+\begin_layout Paragraph*
+* BOTH indicates that the masking polygon should be applied to both fields.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+By default, the masking polygon is not applied.
+\end_layout
+
+\begin_layout Subsubsection*
+weight = {
+\end_layout
+
+\begin_layout Subsubsection*
+centroid_dist = 2.0;
+\end_layout
+
+\begin_layout Subsubsection*
+boundary_dist = 4.0;
+\end_layout
+
+\begin_layout Subsubsection*
+convex_hull_dist = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+angle_diff = 1.0;
+\end_layout
+
+\begin_layout Subsubsection*
+area_ratio = 1.0;
+\end_layout
+
+\begin_layout Subsubsection*
+int_area_ratio = 2.0;
+\end_layout
+
+\begin_layout Subsubsection*
+complexity_ratio = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+inten_perc_ratio = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+inten_perc_value = 50;
+\end_layout
+
+\begin_layout Subsubsection*
+} 
+\end_layout
+
+\begin_layout Paragraph*
+The weight variables listed above control how much weight is assigned to
+ each pairwise attribute when computing a total interest value for object
+ pairs.
+ The weights listed above correspond to the centroid distance between the
+ objects, the boundary distance (or minimum distance), the convex hull distance
+ (or minimum distance between the convex hulls of the objects), the orientation
+ angle difference, the object area ratio, the intersection divided by the
+ union area ratio, the complexity ratio, and the intensity ratio.
+ The weights need not sum to any particular value.
+ When the total interest value is computed, the weighted sum is normalized
+ by the sum of the weights listed above.
+\end_layout
+
+\begin_layout Paragraph*
+The inten_perc_value variable corresponds to the inten_perc_ratio.
+ The inten_perc_value should be set between 0 and 100 to define which percentile
+ of intensity should be compared for pairs of objects.
+ By default, the 50th percentile, or median value, is chosen.
+\end_layout
+
+\begin_layout Subsubsection*
+interest_function = {
+\end_layout
+
+\begin_layout Subsubsection*
+centroid_dist = (
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.0, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 60.0/grid_res, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 600.0/grid_res, 0.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+);
+\end_layout
+
+\begin_layout Subsubsection*
+boundary_dist = (
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.0, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 400.0/grid_res, 0.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+);
+\end_layout
+
+\begin_layout Subsubsection*
+convex_hull_dist = (
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.0, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 400.0/grid_res, 0.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+);
+\end_layout
+
+\begin_layout Subsubsection*
+angle_diff = (
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.0, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 30.0, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 90.0, 0.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+);
+\end_layout
+
+\begin_layout Subsubsection*
+corner = 0.8;
+\end_layout
+
+\begin_layout Subsubsection*
+ratio_if = (
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.0, 0.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( corner, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 1.0, 1.0 )
+\end_layout
+
+\begin_layout Subsubsection*
+);
+\end_layout
+
+\begin_layout Subsubsection*
+area_ratio = ratio_if;
+\end_layout
+
+\begin_layout Subsubsection*
+int_area_ratio = (
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.00, 0.00 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.10, 0.50 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 0.25, 1.00 )
+\end_layout
+
+\begin_layout Subsubsection*
+( 1.00, 1.00 )
+\end_layout
+
+\begin_layout Subsubsection*
+);
+\end_layout
+
+\begin_layout Subsubsection*
+complexity_ratio = ratio_if;
+\end_layout
+
+\begin_layout Subsubsection*
+inten_perc_ratio = ratio_if;
+\end_layout
+
+\begin_layout Subsubsection*
+}
+\end_layout
+
+\begin_layout Paragraph*
+The set of interest function variables listed above define which values
+ are of interest for each pairwise attribute measured.
+ The interest functions may be defined as a piecewise linear function or
+ as an algebraic expression.
+ A piecewise linear function is defined by specifying the corner points
+ of its graph.
+ An algebraic function may be defined in terms of several built-in mathematical
+ functions.
+ See the documentation for the configuration file language on the MET User's
+ website (http://www.dtcenter.org/met/users) for more details.
+ By default, many of these functions are defined in terms of the previously
+ defined grid_res variable.
+\end_layout
+
+\begin_layout Subsubsection*
+total_interest_thresh = 0.7;
+\end_layout
+
+\begin_layout Paragraph*
+The total_interest_thresh variable should be set between 0 and 1.
+ This threshold is applied to the total interest values computed for each
+ pair of objects.
+ Object pairs that have an interest value that is above this threshold will
+ be matched, while those with an interest value that is below this threshold
+ will remain unmatched.
+ Increasing the threshold will decrease the number of matches while decreasing
+ the threshold will increase the number of matches.
+ By default, the total interest threshold is set to 0.7.
+\end_layout
+
+\begin_layout Subsubsection*
+print_interest_thresh = 0.0;
+\end_layout
+
+\begin_layout Paragraph*
+The print_interest_thresh variable determines which pairs of object attributes
+ will be written to the output object attribute ASCII file.
+ The user may choose to set the print_interest_thresh to the same value
+ as the total_interest_thresh, meaning that only object pairs that actually
+ match are written to the output file.
+ By default, the print interest threshold is set to zero, meaning that all
+ object pair attributes will be written as long as the distance between
+ the object centroids is less than the max_centroid_dist variable.
+\end_layout
+
+\begin_layout Subsubsection*
+met_data_dir = "MET_BASE";
+\end_layout
+
+\begin_layout Paragraph*
+The MODE tool uses several static data files when generating plots.
+ If it cannot find the data it needs in the expected directory, it will
+ error out.
+ The met_data_dir variable may be set to the installed share/met directory
+ to find the static data files.
+\end_layout
+
+\begin_layout Subsubsection*
+fcst_raw_plot = {
+\end_layout
+
+\begin_layout Subsubsection*
+color_table = "MET_BASE/colortables/met_default.ctable";
+\end_layout
+
+\begin_layout Subsubsection*
+plot_min = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+plot_max = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+colorbar_spacing = 1;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Subsubsection*
+obs_raw_plot = {
+\end_layout
+
+\begin_layout Subsubsection*
+color_table = "MET_BASE/colortables/met_default.ctable";
+\end_layout
+
+\begin_layout Subsubsection*
+plot_min = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+plot_max = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+colorbar_spacing = 1;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Subsubsection*
+object_plot = {
+\end_layout
+
+\begin_layout Subsubsection*
+color_table = "MET_BASE/colortables/mode_obj.ctable";
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Paragraph*
+The color_table variables indicate which color table files are to be used
+ when generating the output PostScript plot.
+ The forecast and observation raw field are plotted using values in the
+ fcst_raw group and obs_raw group, while the objects identified are plotted
+ using the values in the object_plot group.
+ By default, these variables point to color tables in the MET distribution.
+ Users are free to create their own color tables following the format in
+ the examples.
+ Note that the range defined for the default raw color table is 0 to 1.
+ By convention, when a color table is defined with a range of 0 to 1, it
+ will be scaled to match the actual range of the data present in raw field.
+\end_layout
+
+\begin_layout Paragraph*
+The plot_min and plot_max variables indicate the min and max data values
+ to be plotted for the forecast and observation fields.
+ If set to non-zero values, the forecast and observation raw color tables
+ specified above will be rescaled to match the specified range.
+\end_layout
+
+\begin_layout Paragraph*
+The MODE tool generates a color bar to represent the contents of the colortable
+ that was used to plot a field of data.
+ The number of entries in the color bar matches the number of entries in
+ the color table.
+ The values defined for each color in the color table are also plotted next
+ to the color bar.
+ The colorbar_spacing variable is used to define the frequency with which
+ the color table values should be plotted.
+ Setting this variable to 1, as shown above, indicates that every color
+ table value should be plotted.
+ Setting it to an integer, n > 1, indicates that only every nth color table
+ value should be plotted.
+\end_layout
+
+\begin_layout Subsubsection*
+zero_border_size = 1;
+\end_layout
+
+\begin_layout Paragraph*
+The MODE tool is not able to define objects that touch the edge of the grid.
+ After the convolution step is performed the outer columns and rows of data
+ are zeroed out to enable MODE to identify objects.
+ The zero_border_size variable specifies how many outer columns and rows
+ of data should be set to bad data.
+\end_layout
+
+\begin_layout Subsubsection*
+plot_valid_flag = FALSE;
+\end_layout
+
+\begin_layout Paragraph*
+When applied, the plot_valid_flag variable indicates that only the region
+ containing valid data after masking is applied should be plotted.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* FALSE indicates the entire domain should be plotted.
+\end_layout
+
+\begin_layout Paragraph*
+* TRUE indicates only the region containing valid data after masking should
+ be plotted.
+\end_layout
+
+\begin_layout Paragraph*
+The default value of this flag is FALSE.
+\end_layout
+
+\begin_layout Subsubsection*
+plot_gcarc_flag = FALSE;
+\end_layout
+
+\begin_layout Paragraph*
+When applied, the plot_gcarc_flag variable indicates that the edges of polylines
+ should be plotted using great circle arcs as opposed to straight lines
+ in the grid.
+ The default value of this flag is FALSE.
+\end_layout
+
+\begin_layout Subsubsection*
+ps_plot_flag = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+ct_stats_flag = TRUE;
+\end_layout
+
+\begin_layout Paragraph*
+These flags can be set to TRUE or FALSE to produce additional output, in
+ the form of postscript plots (ps_plot_flag) or contingency table counts
+ and statistics (ct_stats_flag).
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+nc_pairs_flag = {
+\end_layout
+
+\begin_layout Subsubsection*
+latlon = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+raw = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+object_raw = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+object_id = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+cluster_id = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+polylines = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Paragraph*
+Each component of the pairs information in the NetCDF file can be turned
+ on or off.
+ The old syntax is still supported: TRUE means accept the defaults, FALSE
+ means no netcdf output is generated.
+ Netcdf output can also be turned off by setting all the individual dictionary
+ flags to false.
+\end_layout
+
+\begin_layout Subsubsection*
+shift_right = 0;
+\end_layout
+
+\begin_layout Paragraph*
+When MODE is run on global grids, this parameter specifies how many grid
+ squares to shift the grid to the right.
+ MODE does not currently connect objects from one side of a global grid
+ to the other, potentially causing objects straddling that longitude to
+ be cut in half.
+ Shifting the grid by some amount enables the user to control where that
+ longitude cut line occurs.
+\end_layout
+
+\begin_layout Subsubsection*
+output_prefix = "";
+\end_layout
+
+\begin_layout Paragraph*
+This option specifies a string to be used in the output file name.
+ It can be useful for keeping results for different models or variables
+ from overwriting each other.
+\end_layout
+
+\begin_layout Subsubsection*
+version = "v5.1";
+\end_layout
+
+\begin_layout Paragraph*
+The version indicates the version of the MODE configuration file used.
+ Future versions of MET may include changes to MODE and the MODE configuration
+ file.
+ This value should not be modified.
+\end_layout
+
+\begin_layout Subsection
+MODE output
+\end_layout
+
+\begin_layout Paragraph*
+MODE produces output in ASCII, NetCDF, and PostScript formats.
+\end_layout
+
+\begin_layout Paragraph*
+The MODE tool creates two ASCII output files.
+ The first ASCII file contains contingency table counts and statistics for
+ comparing the forecast and observation fields.
+ This file consists of 4 lines.
+ The first is a header line containing column names.
+ The second line contains data comparing the two raw fields after any masking
+ of bad data or based on a grid or lat/lon polygon has been applied.
+ The third contains data comparing the two fields after any raw thresholds
+ have been applied.
+ The fourth, and last, line contains data comparing the derived object fields
+ scored using traditional measures.
+ This file uses the following naming convention: 
+\end_layout
+
+\begin_layout Paragraph*
+mode_PREFIX_FCST_VAR_LVL_vs_ OBS_VAR_LVL_HHMMSSL_YYYYMMDD_HHMMSSV_ HHMMSSA_cts.tx
+t where PREFIX indicates the user-defined output prefix, FCST_VAR_LVL is
+ the forecast variable and vertical level being used, OBS_VAR_LVL is the
+ observation variable and vertical level being used, HHMMSSL indicates the
+ forecast lead time, YYYYMMDD_HHMMSSV indicates the forecast valid time,
+ and HHMMSSA indicates the accumulation period.
+ The cts string stands for contingency table statistics.
+ The generation of this file can be disabled using the ct_stats_flag option
+ in the configuration file.
+ This CTS output file differs somewhat from the CTS output of the Point-Stat
+ and Grid-Stat tools.
+ The columns of this output file are summarized in table 8-1.
+\end_layout
+
+\begin_layout Standard
+Table 8-1.
+ Format of CTS output file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="37" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MODE ASCII CONTINGENCY TABLE OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MODE CTS Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VERSION
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Version number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MODEL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string designating model name
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_LEAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast lead time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VALID
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast valid start time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_ACCUM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast accumulation time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_LEAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation lead time in HHMMSS format; 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+linebreak
+\end_layout
+
+\end_inset
+
+when field2 is actually an observation, this should be "000000"
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VALID
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation valid start time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_ACCUM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation accumulation time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_RAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast convolution radius in grid squares
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_THR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast convolution threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_RAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation convolution radius in grid squares
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_THR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation convolution threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast variable 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_LEV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast vertical level
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation variable 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_LEV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation vertical level
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FIELD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Field type for this line:* RAW for the raw input fields* FILTER for the
+ raw fields after applying the raw thresholds* OBJECT for the resolved object
+ fields
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of matched pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+19
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FY_OY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast yes and observation yes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FY_ON
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast yes and observation no
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FN_OY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast no and observation yes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FN_ON
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast no and observation no
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BASER
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Base rate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FMEAN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast mean
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ACC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Accuracy
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FBIAS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Frequency Bias
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PODY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Probability of detecting yes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PODN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Probability of detecting no
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+POFD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Probability of false detection
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+False alarm ratio
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CSI
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Critical Success Index
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GSS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gilbert Skill Score
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HK
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hanssen-Kuipers Discriminant
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+34
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HSS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Heidke Skill Score
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+35
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ODDS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Odds Ratio 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The second ASCII file the MODE tool generates contains all of the attributes
+ for simple objects, the merged cluster objects, and pairs of objects.
+ Each line in this file contains the same number of columns, though those
+ columns not applicable to a given line contain fill data.
+ The first row of every MODE object attribute file is a header containing
+ the column names.
+ The number of lines in this file depends on the number of objects defined.
+ This file contains lines of 6 types that are indicated by the contents
+ of the "object_id" column.
+ The "object_id" can take the following 6 forms: FNNN, ONNN, FNNN_ONNN,
+ CFNNN, CONNN, CFNNN_CONNN.
+ In each case, NNN is a three-digit number indicating the object index.
+ While all lines have the first 18 header columns in common, these 6 forms
+ for "object_id" can be divided into two types - one for single objects
+ and one for pairs of objects.
+ The single object lines (FNNN, ONNN, CFNNN, and CONNN) contain valid data
+ in columns 19-39 and fill data in columns 40-51.
+ The object pair lines (FNNN_ONNN and CFNNN_CONNN) contain valid data in
+ columns 40-51 and fill data in columns 19-39.
+ These object identifiers are described in Table 8-2.
+ 
+\end_layout
+
+\begin_layout Standard
+Table 8-2.
+ Object identifier descriptions for MODE object attribute output files.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Object identifier (object_id)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Valid Data Columns
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description of valid data
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FNNN, ONNN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-18,19-39
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Attributes for simple forecast, observation objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FNNN_ONNN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-18, 40-51
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Attributes for pairs of simple forecast and observation objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CFNNN, CONNN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-18,19-39
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Attributes for merged cluster objects in forecast, observation fields
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CFNNN_CONNN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-18, 40-51
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Attributes for pairs of forecast and observation cluster objects 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+A note on terminology: a cluster (referred to as "composite" in earlier
+ versions) object need not necessarily consist of more than one simple object.
+ A cluster object is by definition any set of one or more objects in one
+ field which match a set of one or more objects in the other field.
+ When a single simple forecast object matches a single simple observation
+ object, they are each considered to be cluster objects as well.
+\end_layout
+
+\begin_layout Paragraph*
+The contents of the columns in this ASCII file are summarized in Table 8-3.
+\end_layout
+
+\begin_layout Standard
+Table 8-3.
+ Format of MODE object attribute output files.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="46" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Column 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MODE Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VERSION
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Version number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MODEL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string designating model name
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_LEAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast lead time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VALID
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast valid start time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_ACCUM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast accumulation time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_LEAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation lead time in HHMMSS format; when field2 is actually an observation,
+ this should be "000000"
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VALID
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation valid start time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_ACCUM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation accumulation time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_RAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast convolution radius in grid squares
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_THR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast convolution threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_RAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation convolution radius in grid squares
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_THR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation convolution threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast variable 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_LEV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast vertical level
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation variable 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_LEV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation vertical level
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBJECT_ID
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Object numbered from 1 to the number of objects in each field
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBJECT_CAT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Object category indicating to which cluster object it belongs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+19-20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CENTROID_X, _Y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Location of the centroid (in grid units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21-22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CENTROID_LAT, _LON
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Location of the centroid (in lat/lon degrees)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AXIS_ANG
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Object axis angle (in degrees)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LENGTH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Length of the enclosing rectangle (in grid units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+WIDTH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Width of the enclosing rectangle (in grid units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AREA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Object area (in grid squares)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AREA_FILTER
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Area of the object containing non-zero data in the filtered field (in grid
+ squares)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AREA_THRESH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Area of the object containing data values in the filtered field that meet
+ the object definition threshold criteria (in grid squares)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CURVATURE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Radius of curvature of the object defined in terms of third order moments
+ (in grid units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30-31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CURVATURE_X, _Y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Center of curvature (in grid coordinates)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+COMPLEXITY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of the difference between the area of an object and the area of its
+ convex hull divided by the area of the complex hull (unitless)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33-37
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_10, _25, _50, _75, _90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10th, 25th, 50th, 75th, and 90th percentiles of intensity of the filtered
+ field within the object (various units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+38
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_NN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The percentile of intensity chosen for use in the percentile intensity ratio
+ (column 50; variable units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+39
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTENSITY_SUM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sum of the intensities of the filtered field within the object (variable
+ units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+40
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CENTROID_DIST
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Distance between two objects centroids (in grid units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+41
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BOUNDARY_DIST
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum distance between the boundaries of two objects (in grid units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+42
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CONVEX_HULL_DIST
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum distance between the convex hulls of two objects (in grid units)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+43
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ANGLE_DIFF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Difference between the axis angles of two objects (in degrees)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+44
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AREA_RATIO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of the areas of two objects defined as the lesser of the forecast
+ area divided by the observation area or its reciprocal (unitless)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+45
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTERSECTION_AREA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Intersection area of two objects (in grid squares)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+46
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+UNION_AREA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Union area of two objects (in grid squares)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+47
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SYMMETRIC_DIFF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Symmetric difference of two objects (in grid squares)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+48
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTERSECTION_OVER_AREA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of intersection area to union area (unitless)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+49
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+COMPLEXITY_RATIO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of complexities of two objects defined as the lesser of the forecast
+ complexity divided by the observation complexity or its reciprocal (unitless)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+50
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PERCENTILE_INTENSITY_RATIO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of the nth percentile (column 37) of intensity of the two objects
+ defined as the lesser of the forecast intensity divided by the observation
+ intensity or its reciprocal (unitless)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+51
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTEREST
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total interest value computed for a pair of simple objects (unitless) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The MODE tool creates a NetCDF output file containing the object fields
+ that are defined.
+ The NetCDF file contains gridded fields including indices for the simple
+ forecast objects, indices for the simple observation objects, indices for
+ the matched cluster forecast objects, and indices for the matched cluster
+ observation objects.
+ The NetCDF file also contains lat/lon and x/y data for the vertices of
+ the polygons for the boundaries of the simple forecast and observation
+ objects.
+ The generation of this file can be disabled using the nc_pairs_flag configurati
+on file option.
+\end_layout
+
+\begin_layout Paragraph*
+The dimensions and variables included in the mode NetCDF files are described
+ in Tables 8-4 and 8-5.
+\end_layout
+
+\begin_layout Standard
+Table 8-4.
+ NetCDF dimensions for MODE output.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="16" columns="2">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mode NetCDF OUTPUT FILE DIMENSIONS
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NetCDF Dimension
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension of the latitude (i.e.
+ Number of grid points in the North-South direction)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension of the longitude (i.e.
+ Number of grid points in the East-West direction)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+fcst_thresh_length 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of thresholds applied to the forecast
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+obs_thresh_length
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of thresholds applied to the observations
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+fcst_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of simple forecast objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+fcst_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of points used to define the boundaries of all of the simple forecast
+ objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of points used to define the hull of all of the simple forecast objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of simple observation objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of points used to define the boundaries of all of the simple observation
+ objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of points used to define the hull of all of the simple observation
+ objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast clusters
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of points used to define the hull of all of the cluster forecast
+ objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of observed clusters
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of points used to define the hull of all of the cluster observation
+ objects 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Table 8-5.
+ Variables contained in MODE NetCDF output.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="55" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mode NetCDF OUTPUT FILE VARIABLES
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NetCDF Variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Latitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Longitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_raw
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast raw values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_obj_raw
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Object Raw Values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_obj_id
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Simple forecast object id number for each grid point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_id
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Cluster forecast object id number for each grid point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_raw
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Raw Values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_obj_raw
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Object Raw Values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_obj_id
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Simple observation object id number for each grid point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_id
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Cluster observation object id number for each grid point
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_conv_radius
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast convolution radius
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_conv_radius
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation convolution radius
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_conv_threshold
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast convolution threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_conv_threshold
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation convolution threshold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n_fcst_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of simple forecast objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n_obs_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of simple observation objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n_clus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of cluster objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy_start
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Boundary Starting Index
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy_npts
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Forecast Simple Boundary Points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy_lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Boundary PoLatitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy_lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Boundary PoLongitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Boundary PoX-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Boundary PoY-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull_start
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Convex Hull Starting Index
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull_npts
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Forecast Simple Convex Hull Points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull_lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Convex Hull Point Latitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull_lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Convex Hull Point Longitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Convex Hull Po nt X-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Simple Convex Hull Point Y-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy_start
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Boundary Starting Index
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy_npts
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Observation Simple Boundary Points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy_lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Boundary Point Latitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy_lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Boundary Point Longitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Boundary Point X-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_bdy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Boundary Point Y-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull_start
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Convex Hull Starting Index
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull_npts
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Observation Simple Convex Hull Points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull_lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Convex Hull Point Latitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull_lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Convex Hull Point Longitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Convex Hull Point X-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_simp_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Simple Convex Hull Point Y-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull_start
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Cluster Convex Hull Starting Index
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull_npts
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Forecast Cluster Convex Hull Points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull_lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Cluster Convex Hull Point Latitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull_lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Cluster Convex Hull Point Longitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Cluster Convex Hull Point X-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fcst_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast Cluster Convex Hull Point Y-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull_start
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Cluster Convex Hull Starting Index
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull_npts
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Observation Cluster Convex Hull Points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull_lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Cluster Convex Hull Point Latitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull_lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Cluster Convex Hull Point Longitude
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull_x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Cluster Convex Hull Point X-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull_y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_clus_hull
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation Cluster Convex Hull Point Y-Coordinate 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Lastly, the MODE tool creates a PostScript plot summarizing the features-based
+ approach used in the verification.
+ The PostScript plot is generated using internal libraries and does not
+ depend on an external plotting package.
+ The generation of this PostScript output can be disabled using the ps_plot_flag
+ configuration file option.
+\end_layout
+
+\begin_layout Paragraph*
+The PostScript plot will contain 5 summary pages at a minimum, but the number
+ of pages will depend on the merging options chosen.
+ Additional pages will be created if merging is performed using the double
+ thresholding or fuzzy engine merging techniques for the forecast and/or
+ observation fields.
+ Examples of the PostScript plots can be obtained by running the example
+ cases provided with the MET tarball.
+\end_layout
+
+\begin_layout Paragraph*
+The first page of PostScript output contains a great deal of summary information.
+ Six tiles of images provide thumbnail images of the raw fields, matched/merged
+ object fields, and object index fields for the forecast and observation
+ grids.
+ In the matched/merged object fields, matching colors of objects across
+ fields indicate that the corresponding objects match, while within a single
+ field, black outlines indicate merging.
+ Note that objects that are colored royal blue are unmatched.
+ Along the bottom of the page, the criteria used for object definition and
+ matching/merging are listed.
+ Along the right side of the page, total interest values for pairs of simple
+ objects are listed in sorted order.
+ The numbers in this list correspond to the object indices shown in the
+ object index plots.
+\end_layout
+
+\begin_layout Paragraph*
+The second and third pages of the PostScript output file display enlargements
+ of the forecast and observation raw and object fields, respectively.
+ The fourth page displays the forecast object with the outlines of the observati
+on objects overlaid, and vice versa.
+ The fifth page contains summary information about the pairs of matched
+ cluster objects.
+\end_layout
+
+\begin_layout Paragraph*
+If the double threshold merging or the fuzzy engine merging techniques have
+ been applied, the output from those steps is summarized on additional pages.
+\end_layout
+
+\end_body
+\end_document

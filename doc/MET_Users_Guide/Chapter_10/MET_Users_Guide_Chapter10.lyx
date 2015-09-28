@@ -1,0 +1,3412 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+The Stat-Analysis Tool
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat,
+ Ensemble-Stat and Wavelet-Stat tools by providing summary statistical informati
+on and a way to filter their STAT output files.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool requires STAT output from Point-Stat, Grid-Stat,
+ and/or Wavelet-Stat.
+ See Sections 4.3.3, 5.3.3, 7.3.3, or 9.3.3 respectively, for information on the
+ STAT output format of the Point-Stat, Grid-Stat, Ensemble-Stat, and Wavelet-Sta
+t tools.
+\end_layout
+
+\begin_layout Section
+Scientific and statistical aspects
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool (i) aggregates results over a user-specified time;
+ (ii) stratifies statistics based on time of day, model initialization time,
+ lead-time, model run identifier, output filename, or wavelet decomposition
+ scale; and (iii) computes specific verification indices such as the GO
+ Index
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+The GO Index is a summary measure for NWP models that is used by the Air
+ Force Weather Agency.
+ It combines verification statistics for several forecast variables and
+ lead times.
+ 
+\end_layout
+
+\end_inset
+
+ and wind direction statistics.
+ Future functionality may include information about time-trends and/or calculati
+ons based on climatology (e.g., anomaly correlation).
+ This section summarizes the capabilities of the Stat-Analysis tool and
+ describes how the GO Index, wind direction, summary statistics, and aggregated
+ statistics are computed.
+\end_layout
+
+\begin_layout Subsection
+Filter STAT lines
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool can be used to simply filter out specific STAT lines
+ based on user-specified search criteria.
+ All of the STAT lines that are retained from one or many files are written
+ to a single output file.
+\end_layout
+
+\begin_layout Subsection
+Summary statistics for columns
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analy
+\begin_inset space \space{}
+\end_inset
+
+sis tool can be used to produce summary information for a single column
+ of data.
+ After the user specifies the line type, column of interest, and any other
+ relevant search criteria, summary information is produced from values in
+ that column of data.
+ The summary statistics produced are: mean, standard deviation, minimum,
+ maximum, and the 10th, 25th, 50th, 75th, and 90th percentiles.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Confidence intervals are computed for the mean and standard deviation of
+ the column of data.
+ For the mean, the confidence interval is computed two ways - based on an
+ assumption of normality and also using the bootstrap method.
+ For the standard deviation, the confidence interval is computed using the
+ bootstrap method.
+ In this application of the bootstrap method, the values in the column of
+ data being summarized are resampled, and for each replicated sample, the
+ mean and standard deviation are computed.
+\end_layout
+
+\begin_layout Subsection
+Aggregated values from multiple STAT lines
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool can be used to create aggregated values from multiple
+ STAT lines of the same type.
+ The user may specify the specific line type of interest and any other relevant
+ search criteria.
+ The Stat-Analysis tool then creates sums of each of the values in all lines
+ matching the search criteria.
+ The aggregated data are output as the same line type as the user specified.
+ The STAT line types which may be aggregated in this way are the contingency
+ table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2,
+ and VAL1L2), and other (ISC, RHIST, PHIST, NBRCNT, SSVAR) line types.
+\end_layout
+
+\begin_layout Subsection
+Aggregate STAT lines and produce aggregated statistics
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool can be used to aggregate multiple STAT lines of the
+ same type together and produce relevant statistics from the aggregated
+ line.
+ This may be done in the same manner listed above in 8.2.3.
+ However, rather than writing out the aggregated STAT line itself, the relevant
+ statistics generated from that aggregated line are provided in the output.
+ Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or
+ NBRCTC) has been aggregated, a contingency table statistics (CTS, PSTD,
+ MCTS, or NBRCTS) line type will be written out.
+ If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, a continuous
+ statistics (CNT) line type will be written out.
+ For ensembles, the ORANK line type can ba accumulated into RHIST or PHIST
+ output.
+ If the matched pair line type (MPR) has been aggregated, the user may choose
+ the line type to be output (FHO, CTC, CTS, CNT, MCTC, MCTS, WDIR, SL1L2,
+ SAL1L2, PCT, PSTD, PJC, or PRC).
+ Only wind vector statistics are produced from the vector partial sums line
+ types (VL1L2 or VAL1L2).
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+When aggregating the matched pair line type (MPR) and computing an output
+ contingency table statistics (CTS) or continuous statistics (CNT) line
+ type, the bootstrapping method is applied for computing confidence intervals.
+ The bootstrapping method is applied here in the same way that it is applied
+ in the statistics tools.
+ For a set of n matched forecast-observation pairs, the matched pairs are
+ resampled with replacement many times.
+ For each replicated sample, the corresponding statistics are computed.
+ The confidence intervals are derived from the statistics computed for each
+ replicated sample.
+\end_layout
+
+\begin_layout Subsection
+Skill Score Index, including GO Index
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool can be used to calculate the skill score indices
+ by weighting scores for different meteorological fields at different pressure
+ levels and for different lead times.
+ Specifically, the GO Index can be computed.
+ The GO index is a weighted average of the RMSE values for wind speed, dewpoint
+ temperature, temperature, height, and pressure at several levels in the
+ atmosphere.
+ The variables, levels, and lead times included in the index are shown in
+ Table 10-1.
+ The partial sums (SL1L2 lines in the STAT output) for each of these variables
+ at each level and lead time must have been computed in a previous step.
+ The STAT analysis tool then uses the weights in Table 10-1 to compute values
+ for the GO Index.
+ For a general skill score index, the user can specify the weights and variables
+ to use in the calculations.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Variables, levels, and weights used to compute the GO Index.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="14" columns="6">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="2cm">
+<column alignment="center" valignment="top" width="2.5cm">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0pt">
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Variable
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Level
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Weights by Lead time
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12 h
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24 h
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+36 h
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+48 h
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Wind speed
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+250 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+400 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+850 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surfance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dewpoint temperature
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+400 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+700 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+850 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Temperature
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+400 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Surface
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Height
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+400 hPa
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pressure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean sea level
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Wind Direction Statistics
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Stat-Analysis tool can be used to calculate the error statistics for
+ the wind direction.
+ The vector partial sums (VL1L2) or matched pairs (MPR) for the UGRD and
+ VGRD must have been computed in a previous step, i.e.
+ by Point-Stat or Grid-Stat tools.
+ This job computes an average forecast wind direction and an average observed
+ wind direction along with their difference.
+ The output is in degrees.
+ In Point-Stat and Grid-Stat, the UGRD and VGRD can be verified using thresholds
+ on their values or on the calculated wind speed.
+ If thresholds have been applied, the wind direction statistics are calculated
+ for each threshold.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The first step in verifying wind direction is running the Grid-Stat and/or
+ Point-Stat tools to verify each forecast of interest and generate the VL1L2
+ or MPR line(s).
+ When running these tools, please note:
+\end_layout
+
+\begin_layout Description
+1.
+ To generate VL1L2 or MPR lines, the user must request the verification
+ of the U-component of the wind followed by the V-component, both at the
+ same vertical level.
+\end_layout
+
+\begin_layout Description
+2.
+ To generate VL1L2 or MPR lines, the user must set the "output_flag" to
+ indicate that the VL1L2 or MPR line should be computed and written out.
+\end_layout
+
+\begin_layout Description
+3.
+ The user may select one or more spatial verification regions over which
+ to accumulate the statistics.
+\end_layout
+
+\begin_layout Description
+4.
+ The user may select one or more wind speed thresholds to be applied to
+ the U and V wind components when computing the VL1L2 lines.
+ It may be useful to investigate the performance of wind forecasts using
+ multiple wind speed thresholds.
+ For MPR line types, the wind speed threshold can be applied when computing
+ the MPR lines, or the MPR output may be filtered afterwards by the Stat-Analysi
+s tool.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Once the appropriate lines have been generated for each verification time
+ of interest, the user may run the STAT-Analysis tool to analyze them.
+ The STAT-Analysis job "aggregate_stat", along with the "-output_line_type
+ WDIR" option, reads all of the input lines and computes statistics about
+ the wind direction.
+ When running this job the user is encouraged to use the many STAT-Analysis
+ options to filter the input lines down to the set of lines of interest.
+ The output of the wind direction analysis job consists of two lines with
+ wind direction statistics computed in two slightly different ways.
+ The two output lines begin with "ROW_MEAN_WDIR" and "AGGR_WDIR", and the
+ computations are described below:
+\end_layout
+
+\begin_layout Description
+1.
+ For the "ROW_MEAN_WDIR" line, each of the input VL1L2 lines is treated
+ separately and given equal weight.
+ The mean forecast wind direction, mean observation wind direction, and
+ the associated error are computed for each of these lines.
+ Then the means are computed across all of these forecast wind directions,
+ observation wind directions, and their errors.
+\end_layout
+
+\begin_layout Description
+2.
+ For the "AGGR_WDIR" line, the input VL1L2 lines are first aggregated into
+ a single line of partial sums where the weight for each line is determined
+ by the number of points it represents.
+ From this aggregated line, the mean forecast wind direction, observation
+ wind direction, and the associated error are computed and written out.
+\end_layout
+
+\begin_layout Section
+Practical information
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The following sections describe the usage statement, required arguments
+ and optional arguments for the Stat-Analysis tool.
+\end_layout
+
+\begin_layout Subsection
+stat_analysis usage
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The usage statement for the Stat-Analysis tool is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: stat_analysis
+\end_layout
+
+\begin_layout LyX-Code
+-lookin path
+\end_layout
+
+\begin_layout LyX-Code
+[-out name]
+\end_layout
+
+\begin_layout LyX-Code
+[-tmp_dir path]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout LyX-Code
+[-config config_file] | [JOB COMMAND LINE]
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+Stat_analysis
+\emph default
+ has some required arguments and also accepts optional ones.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+In the usage statement for the STAT analysis tool, some additional terminology
+ is introduced.
+ In the STAT analysis tool, the term "job" refers to a set of tasks to be
+ performed after applying user-specified options (i.e., "filters").
+ The filters are used to pare down a collection of output from 
+\emph on
+grid_stat, point_stat
+\emph default
+, or 
+\emph on
+wavelet_stat
+\emph default
+ to only those lines that are desired for the analysis.
+ The job and its filters together comprise the "job command line".
+ The "job command line" may be specified either on the command line to run
+ a single analysis job or within the configuration file to run multiple
+ analysis jobs at the same time.
+ If jobs are specified in both the configuration file and the command line,
+ only the jobs indicated in the configuration file will be run.
+ The various jobs types are described in Table 10-2 and the filtering options
+ are described in section 10.3.2.
+\end_layout
+
+\begin_layout Paragraph
+Required arguments for 
+\emph on
+stat_analysis
+\end_layout
+
+\begin_layout Description
+1.
+ The 
+\emph on
+-lookin
+\emph default
+ 
+\series bold
+path
+\series default
+ specifies the name of a specific STAT file (any file ending in .stat) or
+ the name of a directory where the Stat-Analysis tool will search for STAT
+ files.
+ This option may be used multiple times to specify multiple locations.
+\end_layout
+
+\begin_layout Description
+2.
+ Either a configuration file must be specified with the 
+\emph on
+-config
+\emph default
+ option, or a "
+\emph on
+JOB COMMAND LINE
+\emph default
+" must be denoted.
+ The "
+\emph on
+JOB COMMAND LINE
+\emph default
+" is described in section 8.3.2,
+\end_layout
+
+\begin_layout Description
+Optional 
+\series bold
+arguments for 
+\emph on
+stat_analysis
+\end_layout
+
+\begin_layout Description
+3.
+ The 
+\emph on
+-config
+\emph default
+ 
+\series bold
+config_file
+\series default
+ specifies the configuration file to be used.
+ The contents of the configuration file are discussed below.
+\end_layout
+
+\begin_layout Description
+4.
+ The 
+\emph on
+-out
+\emph default
+ 
+\series bold
+name
+\series default
+ option indicates the filename to which output data should be written.
+ If this option is not used, the output is directed to standard output.
+\end_layout
+
+\begin_layout Description
+5.
+ The 
+\emph on
+-tmp_dir
+\emph default
+ 
+\series bold
+path
+\series default
+ option selects the directory for writing out temporary files.
+ 
+\end_layout
+
+\begin_layout Description
+6.
+ The 
+\emph on
+-log
+\emph default
+ 
+\series bold
+file
+\series default
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+7.
+ The 
+\emph on
+-v
+\emph default
+ 
+\series bold
+level
+\series default
+ indicates the desired level of verbosity.
+ The contents of "level" will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+An example of the 
+\emph on
+stat_analysis
+\emph default
+ calling sequence is shown below.
+\end_layout
+
+\begin_layout LyX-Code
+stat_analysis -lookin ../out/point_stat 
+\end_layout
+
+\begin_layout LyX-Code
+-config STATAnalysisConfig
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+In this example, the stat analysis tool will search for valid STAT lines
+ located in the 
+\emph on
+../out/point_stat
+\emph default
+ directory that meet the options specified in the configuration file, 
+\emph on
+config/STATAnalysisConfig
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+
+\emph on
+stat_analysis
+\emph default
+ configuration file
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The default configuration file for the stat analysis tool named 
+\emph on
+STATAnalysisConfig_default
+\emph default
+ can be found in the installed 
+\emph on
+share/met/config
+\emph default
+ directory.
+ The version used for the example run in Chapter 2 is also available in
+ 
+\emph on
+scripts/config
+\emph default
+.
+ Like the other configuration files described in this document, it is recommende
+d that users make a copy of these files prior to modifying their contents.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Most of the user-specified parameters listed in the STAT analysis configuration
+ file are used to filter the ASCII statistical output from 
+\emph on
+grid_stat, point_stat, wavelet_stat
+\emph default
+, or 
+\emph on
+ensemble_stat
+\emph default
+ down to a desired subset of lines over which statistics are to be computed.
+ Only output that meet all of the parameters specified in the STAT analysis
+ configuration file will be retained.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Note that the options specified in the first section of the configuration
+ file below, prior to the joblist, will be applied to every job specified
+ in the joblist.
+ However, if an individual job specifies a particular option that was specified
+ above, it will be applied for that job.
+ For example, if the 
+\emph on
+model
+\emph default
+[] option is set at the top to ["Run 1", "Run2"], but a job in the joblist
+ sets the 
+\emph on
+-model
+\emph default
+ option as "Run1", that job will be performed only on "Run1" data.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Also note that environment variables may be used when editing configuration
+ files, as described in the section 3.5.2 for the PB2NC tool.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+model = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of model names to be used for
+ all analyses performed.
+ The names must be in double quotation marks.
+ If multiple models are listed, the analyses will be performed on their
+ union.
+ These selections may be further refined by using the "-
+\emph on
+model
+\emph default
+" option within the job command lines.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+fcst_lead = [];
+\end_layout
+
+\begin_layout LyX-Code
+obs_lead = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of forecast and observation
+ lead times in HH[MMSS] format to be used for any analyses to be performed.
+ If multiple times are listed, the analyses will be performed on their union.
+ These selections may be further refined by using the "-
+\emph on
+fcst_lead
+\emph default
+" and "-
+\emph on
+obs_lead
+\emph default
+" options within the job command lines.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+fcst_valid_beg = "";
+\end_layout
+
+\begin_layout LyX-Code
+fcst_valid_end = "";
+\end_layout
+
+\begin_layout LyX-Code
+fcst_valid_hour = "";
+\end_layout
+
+\begin_layout LyX-Code
+obs_valid_beg = "";
+\end_layout
+
+\begin_layout LyX-Code
+obs_valid_end = "" 
+\end_layout
+
+\begin_layout LyX-Code
+obs_valid_hour = "";
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify the beginning, ending, and instantaneous valid times
+ in YYYYMMDD[_HH[MMSS]] format to be used for all analyses performed.
+ If multiple valid times fall within the valid time window, the analyses
+ will be performed on their union.
+ These selections may be further refined by using the "-
+\emph on
+fcst_valid_beg
+\emph default
+", "-
+\emph on
+fcst_valid_end
+\emph default
+", "-
+\emph on
+obs_valid_beg
+\emph default
+", "-
+\emph on
+obs_valid_end
+\emph default
+", 
+\begin_inset Quotes eld
+\end_inset
+
+
+\emph on
+fcst_valid_hour
+\emph default
+" and "-
+\emph on
+obs_valid_hour
+\emph default
+" options within the job command line.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+fcst_init_beg = "";
+\end_layout
+
+\begin_layout LyX-Code
+fcst_init_end = "";
+\end_layout
+
+\begin_layout LyX-Code
+fcst_init_hour = "";
+\end_layout
+
+\begin_layout LyX-Code
+obs_init_beg = "";
+\end_layout
+
+\begin_layout LyX-Code
+obs_init_end = "";
+\end_layout
+
+\begin_layout LyX-Code
+obs_init_hour = "";
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify the beginning, ending, or exact model initialization
+ times in YYYYMMDD[_HH[MMSS]] format to be used for all analyses performed.
+ If multiple init times fall within the init time window, the analyses will
+ be performed on their union.
+ These selections may be further refined by using the 
+\emph on
+"-fcst_init_beg", "-fcst_init_end", "-obs_init_beg", "-obs_init_end", fcst_init_
+hour"
+\emph default
+ and 
+\emph on
+"-obs_init_hour"
+\emph default
+ options within the job command line.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+fcst_var = [];
+\end_layout
+
+\begin_layout LyX-Code
+obs_var = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of forecast and observation
+ variable types to be used for any analyses to be performed.
+ If multiple variable types are listed, the analyses will be performed on
+ their union.
+ These selections may be further refined by using the "
+\emph on
+-fcst_var
+\emph default
+" and "
+\emph on
+-obs_var
+\emph default
+" options within the job command lines.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+fcst_lev = [];
+\end_layout
+
+\begin_layout LyX-Code
+obs_lev = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of forecast and observation
+ level types to be used for any analyses to be performed.
+ If multiple level types are listed, the analyses will be performed on their
+ union.
+ These selections may be further refined by using the "-
+\emph on
+fcst_lev
+\emph default
+" and "-
+\emph on
+obs_lev
+\emph default
+" options within the job command lines.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+obtype = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of observation types to be used
+ for all analyses.
+ If multiple observation types are listed, the analyses will be performed
+ on their union.
+ These selections may be further refined by using the "-
+\emph on
+obtype
+\emph default
+" option within the job command line.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+vx_mask = [ ];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of verification masking regions
+ to be used for all analyses.
+ If multiple verification masking regions are listed, the analyses will
+ be performed on their union.
+ These selections may be further refined by using the "-
+\emph on
+vx_mask
+\emph default
+" option within the job command line.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+interp_mthd = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of interpolation methods to
+ be used for all analyses.
+ If multiple interpolation methods are listed, the analyses will be performed
+ on their union.
+ These selections may be further refined by using the "-
+\emph on
+interp_mthd
+\emph default
+" option within the job command line.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+interp_pnts = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of interpolation points to be
+ used for all analyses.
+ If multiple interpolation points are listed, the analyses will be performed
+ on their union.
+ These selections may be further refined by using the "-
+\emph on
+interp_pnts
+\emph default
+" option within the job command line.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+fcst_thresh = [];
+\end_layout
+
+\begin_layout LyX-Code
+obs_thresh = [];
+\end_layout
+
+\begin_layout LyX-Code
+cov_thresh = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify comma-separated lists of forecast, observation, and
+ coverage thresholds to be used for any analyses to be performed.
+ If multiple thresholds are listed, the analyses will be performed on their
+ union.
+ These selections may be further refined by using the "
+\emph on
+-fcst_thresh", "-obs_thresh"
+\emph default
+, and 
+\emph on
+"-cov_thresh"
+\emph default
+ options within the job command lines.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+alpha = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list alpha confidence values to be
+ used for all analyses.
+ If alpha values are listed, the analyses will be performed on their union.
+ These selections may be further refined by using the "
+\emph on
+-alpha
+\emph default
+" option within the job command line.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+line_type = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify a comma-separated list of line types to be used for
+ all analyses.
+ If multiple line types are listed, the analyses will be performed on their
+ union.
+ These selections may be further refined by using the "-
+\emph on
+line_type
+\emph default
+" option within the job command line.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+column = [];
+\end_layout
+
+\begin_layout LyX-Code
+weight = [];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The column and weight fields are used to define a skill score index.
+ The computation of a single value will be computed from each column and
+ weight value specified.
+ The GO Index is a specific example of a skill score index.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+jobs = [
+\end_layout
+
+\begin_layout LyX-Code
+"-job filter -dump_row ./filter_job.stat"
+\end_layout
+
+\begin_layout LyX-Code
+];
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user may specify one or more analysis jobs to be performed on the STAT
+ lines that remain after applying the filtering parameters listed above.
+ Each entry in the joblist contains the task and additional filtering options
+ for a single analysis to be performed.
+ The format for an analysis job is as follows:
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+-job job_name
+\emph default
+ REQUIRED and OPTIONAL ARGUMENTS
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+All possible tasks for 
+\emph on
+job_name
+\emph default
+ are listed in Table 10-2.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Description of components of the job command lines for the STAT analysis
+ tool.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="left" valignment="top" width="8cm">
+<column alignment="left" valignment="top" width="3cm">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Job Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Job commandDescription
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Required Arguments
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+filter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Filters out the statistics lines based on applying options* (See note below
+ table)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-dump_row
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+summary
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Computes the mean, standard deviation, and percentiles (min, 10th, 25th,
+ 50th, 75th, 90th, and max)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-line_type
+\end_layout
+
+\begin_layout Plain Layout
+-column
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+aggregate
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Aggregates the statistics output, computing the statistic specified for
+ the entire collection of valid lines
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-line_type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+aggregate_stat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Aggregates the statistics output, and converts the input line type to the
+ output line type specified
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-line_type
+\end_layout
+
+\begin_layout Plain Layout
+-out_line_type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+go_index
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Calculates the GO Index as described in section 8.1.1.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-fcst_init_begin
+\end_layout
+
+\begin_layout Plain Layout
+-fcst_init_end
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+*Job command FILTERING options can be used when the -line_type has been
+ set to a single value.
+ These options take two arguments, the name of the data column to be used
+ and the min, max, or exact value for that column.
+ If multiple column eq/min/max/str options are listed, the job will be performed
+ on their intersection:
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+"-column_min col_name value"
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+"-column_max col_name value"
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+"-column_eq col_name value"
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+"-column_str col_name string" separate multiple filtering strings with commas
+\end_layout
+
+\begin_layout LyX-Code
+out_alpha = 0.05;
+\end_layout
+
+\begin_layout LyX-Code
+boot = {
+\end_layout
+
+\begin_layout LyX-Code
+interval = PCTILE;
+\end_layout
+
+\begin_layout LyX-Code
+rep_prop = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+n_rep = 1000;
+\end_layout
+
+\begin_layout LyX-Code
+rng = "mt19937";
+\end_layout
+
+\begin_layout LyX-Code
+seed = "";
+\end_layout
+
+\begin_layout LyX-Code
+};
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+interval
+\series medium
+ variable indicates what method should be used for computing bootstrap confidenc
+e intervals.
+ A value of BCA indicates that the highly accurate but computationally intensive
+ BCa (bias-corrected percentile) method should be used.
+ A value of PCTILE indicates that the somewhat less accurate but efficient
+ percentile method should be used.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+rep_prop
+\series medium
+ variable must be set to a value between 0 and 1.
+ When computing bootstrap confidence intervals over n sets of matched pairs,
+ the size of the subsample, m, may be chosen less than or equal to the size
+ of the sample, n.
+ This variable defines the size of m as a proportion relative to the size
+ of n.
+ A value of 1, as shown above, indicates that the size of the subsample,
+ m, should be equal to the size of the sample, n.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+n_rep
+\series medium
+ variable defines the number of subsamples that should be taken when computing
+ bootstrap confidence intervals.
+ This variable should be set large enough so that when confidence intervals
+ are computed multiple times for the same set of data, the intervals do
+ not change much.
+ Setting this variable to zero disables the computation of bootstrap confidence
+ intervals which may be necessary to run in realtime or near-realtime over
+ large domains.
+ Setting this variable to 1000, as shown above, indicates that bootstrap
+ confidence interval should be computed over 1000 subsamples of the matched
+ pairs.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+rng
+\series medium
+ variable defines the random number generator to be used in the computation
+ of bootstrap confidence intervals.
+ Subsamples are chosen at random from the full set of matched pairs.
+ The randomness is determined by the random number generator specified.
+ Users should refer to detailed documentation of the GNU Scientific Library
+ for a listing of the random number generators available for use.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+seed
+\series medium
+ variable may be set to a specific value to make the computation of bootstrap
+ confidence intervals fully repeatable.
+ When left empty, as shown above, the random number generator seed is chosen
+ automatically which will lead to slightly different bootstrap confidence
+ intervals being computed each time the data is run.
+ Specifying a value here ensures that the bootstrap confidence intervals
+ will be computed the same over multiple runs of the same data.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+rank_corr_flag = TRUE;
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+rank_corr_flag
+\series medium
+ variable may be set to 
+\series default
+TRUE
+\series medium
+ or 
+\series default
+FALSE
+\series medium
+ to indicate whether or not Kendall's Tau and Spearman's Rank correlation
+ coefficients should be computed.
+ The computation of these rank correlation coefficients is very slow when
+ run over many matched pairs.
+ By default, this flag is turned on, as shown above, but setting it to 
+\series default
+FALSE
+\series medium
+ should improve the runtime performance.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+vif_flag = FALSE;
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The variance inflation factor (VIF) flag indicates whether to apply a first
+ order variance inflation when calculating normal confidence intervals for
+ an aggregated time series of contingency table counts or partial sums.
+ The VIF adjusts the variance estimate for the lower effective sample size
+ caused by autocorrelation of the statistics through time.
+ A value of FALSE will not compute confidence intervals using the VIF.
+ A value of 
+\series default
+TRUE
+\series medium
+ will include the VIF, resulting in a slightly wider normal confidence interval.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+tmp_dir = "/tmp";
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This parameter indicates the directory where the stat analysis tool should
+ write temporary files.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+version = "v5.1";
+\end_layout
+
+\begin_layout Paragraph
+version 
+\series medium
+indicates the version number for the contents of this configuration file.
+ The value should generally not be modified.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Stat-Analysis tool output
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The output generated by the Stat-Analysis tool contains statistics produced
+ by the analysis.
+ It also records information about the analysis job that produced the output
+ for each line.
+ Generally, the output is printed to the screen.
+ However, it can be redirected to an output file using the "
+\emph on
+-out
+\emph default
+" option.
+ The format of output from each STAT job command is described below.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The "-by column" job command option may be used to run the same job multiple
+ times on unique subsets of data.
+ Specify the "-by column" option one or more times to define a search key,
+ and that job will be run once for each unique search key found.
+ For example, use "-by VX_MASK" to run the same job for multiple masking
+ regions, and output will be generated for each unique masking region found.
+ Use "-by VX_MASK -by FCST_LEAD" to generate output for each unique combination
+ of masking region and lead time.
+\end_layout
+
+\begin_layout Paragraph
+Job: filter
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This job command finds and filters STAT lines down to those meeting criteria
+ specified by the filter's options.
+ The filtered STAT lines are written to a file specified by the "-
+\emph on
+dump_row
+\emph default
+" option.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The output of this job is the same STAT format described in sections 4.3.3,
+ 5.3.3, and 9.3.3.
+\end_layout
+
+\begin_layout Paragraph
+Job: summary
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This job produces summary statistics for the column name and line type specified
+ by the "-
+\emph on
+column
+\emph default
+" and "-
+\emph on
+line_type
+\emph default
+" options.
+ The output of this job type consists of three lines.
+ The first line contains "
+\emph on
+JOB_LIST
+\emph default
+", followed by a colon, then the filtering and job definition parameters
+ used for this job.
+ The second line contains "
+\emph on
+COL_NAME
+\emph default
+", followed by a colon, then the column names for the data in the next line.
+ The third line contains the word "
+\emph on
+SUMMARY
+\emph default
+", followed by a colon, then the total, mean with confidence intervals,
+ standard deviation with confidence intervals, minimum value, percentiles
+ (10th, 25th, 50th, 75th, and 90th) and the maximum value.
+ The output columns are shown in Table 10-3 below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Columnar output of "summary" job output from the Stat-Analysis tool.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="10cm">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Paragraph
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+SUMMARY
+\emph default
+: (job type)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3-7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean including normal and bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8-10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Standard deviation including bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10th percentile
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25th percentile
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Median (50th percentile)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+75th percentile
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+90th percentile
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Job: aggregate
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This job aggregates output from the STAT line type specified using the "-
+\emph on
+line_type
+\emph default
+" argument.
+ The output of this job type is in the same format as the line type specified
+ (see Sections 4.3.3, 5.3.3, and 9.3.3).
+ Again the output consists of three lines.
+ The first line contains "
+\emph on
+JOB_LIST
+\emph default
+", as described above.
+ The second line contains "
+\emph on
+COL_NAME
+\emph default
+", followed by a colon, then the column names for the line type selected.
+ The third line contains the name of the line type selected followed by
+ the statistics for that line type.
+\end_layout
+
+\begin_layout Paragraph
+Job: aggregate_stat
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This job is similar to the "
+\emph on
+aggregate
+\emph default
+" job listed above, however the format of its output is determined by the
+ "-
+\emph on
+out_line_type
+\emph default
+" argument.
+ Again the output consists of three lines for "
+\emph on
+JOB_LIST", "COL_NAME
+\emph default
+", and the name of the output STAT line, as described above.
+ Valid combinations of the "
+\emph on
+-line_type
+\emph default
+" and "-
+\emph on
+out_line_type
+\emph default
+" arguments are listed in Table 8-4 below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Valid combinations of "-line_type" and "-out_line_type" arguments for the
+ "aggregate_stat" job.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="10cm">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Input Line Type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Output Line Type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FHO or CTC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CTS
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MCTC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MCTS
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SL1L2 or SAL1L2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CNT
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VL1L2 or VAL1L2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+WDIR (wind direction)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PCT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PSTD, PJC, PRC
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NBRCTC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NBRCTS
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ORANK
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RHIST, PHIST
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MPR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CNT, SL1L2, SAL1L2, WDIR
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MPR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC
+\end_layout
+
+\begin_layout Plain Layout
+(must specify "-
+\emph on
+out_fcst_thresh
+\emph default
+" and "-
+\emph on
+out_obs_thresh
+\emph default
+" arguments)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Job: go_index
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The output from this job consists of three lines, the first two of which
+ contain "
+\emph on
+JOB_LIST
+\emph default
+" and "
+\emph on
+COL_NAME
+\emph default
+", as described above.
+ The third line contains "
+\emph on
+GO_INDEX
+\emph default
+" followed by a colon and then the value computed for the GO Index.
+ 
+\end_layout
+
+\end_body
+\end_document
