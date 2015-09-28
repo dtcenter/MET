@@ -52,8 +52,13 @@ class MercatorGrid : public GridRep {
 
       ConcatString Name;
 
+      bool full_world;
+
       double Lat_LL_radians;
       double Lon_LL_radians;
+
+      double Lon_LL_degrees;
+      double Lon_UR_degrees;
 
       double Lat_UR_radians;
       double Lon_UR_radians;
