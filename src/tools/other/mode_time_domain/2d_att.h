@@ -28,7 +28,7 @@ typedef MtdIntFile Object;
 
 class SingleAtt2D {
 
-      friend SingleAtt2D calc_single_atts(const Object & mask_3d, const int obj_number);
+      friend SingleAtt2D calc_single_atts(const Object & mask_2d, const int obj_number);   //  1-based
 
    public:
 
@@ -37,6 +37,8 @@ class SingleAtt2D {
       void assign(const SingleAtt2D &);
 
       int ObjectNumber;
+
+      int ClusterNumber;
 
       int Area;
 
@@ -65,7 +67,8 @@ class SingleAtt2D {
          //  set stuff
          //
 
-      void set_object_number (int);
+      void set_object_number  (int);
+      void set_cluster_number (int);
 
       void set_area (int);
 
@@ -82,7 +85,8 @@ class SingleAtt2D {
          //  get stuff
          //
 
-      int object_number () const;
+      int object_number  () const;
+      int cluster_number () const;
 
       int area () const;
 
@@ -115,9 +119,12 @@ class SingleAtt2D {
 
 inline int SingleAtt2D::object_number() const { return ( ObjectNumber ); }
 
+inline int SingleAtt2D::cluster_number() const { return ( ClusterNumber ); }
+
 inline int SingleAtt2D::time_index() const { return ( TimeIndex ); }
 
-inline void SingleAtt2D::set_object_number(int _n) { ObjectNumber = _n;  return; }
+inline void SingleAtt2D::set_object_number  (int _n) { ObjectNumber  = _n;  return; }
+inline void SingleAtt2D::set_cluster_number (int _n) { ClusterNumber = _n;  return; }
 
 inline int SingleAtt2D::area() const { return ( Area ); }
 
@@ -141,7 +148,7 @@ inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern SingleAtt2D calc_2d_single_atts(const Object & mask_2d, const int obj_number);   //  0 based 
+extern SingleAtt2D calc_2d_single_atts(const Object & mask_2d, const int obj_number);   //  1-based 
 
 
 ////////////////////////////////////////////////////////////////////////

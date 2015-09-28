@@ -255,21 +255,23 @@ for (j=0; j<(part.n_elements()); ++j)  {
 
 }
 
-cout << "Composites ...\n";
+if ( mlog.verbosity_level() > 5 )  {
 
-for (j=0; j<N_Composites; ++j)  {
+   mlog << Debug(6) << "Composites ...\n";
 
-   cout << ' ' << comp_to_eq[j];
+   for (j=0; j<N_Composites; ++j)  {
+
+      mlog << Debug(6) << ' ' << comp_to_eq[j];
+
+   }
+
+   mlog << Debug(6) << '\n';
 
 }
-
-cout << '\n';
 
    //
    //  done
    //
-
-cout.flush();
 
 return;
 

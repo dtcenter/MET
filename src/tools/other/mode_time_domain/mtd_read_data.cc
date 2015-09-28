@@ -47,7 +47,8 @@ valid_times = new unixtime [filenames.n()];
 
 for (j=0; j<(filenames.n()); ++j)  {
 
-   cout << "mtd_read_data() -> processing file \"" << filenames[j] << "\"\n" << flush;
+   mlog << Debug(2) 
+        << "mtd_read_data() -> processing file \"" << filenames[j] << "\"\n";
 
    data_2d_file = factory.new_met_2d_data_file(filenames[j]);
 

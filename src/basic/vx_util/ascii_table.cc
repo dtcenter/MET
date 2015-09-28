@@ -1364,7 +1364,7 @@ for (c=0; c<Ncols; ++c)  {
    max_left  = left  [r_start];
    max_right = right [r_start];
 
-   for (r=r_start+1; r<Nrows; ++r)  {   //  r starts at one, here
+   for (r=r_start+1; r<Nrows; ++r)  {
 
       if ( left  [r] > max_left  )  max_left  =  left[r];
       if ( right [r] > max_right )  max_right = right[r];

@@ -47,6 +47,7 @@ class SingleAtt3D {
 
 
       int ObjectNumber;   //  1-based
+      int ClusterNumber;  //  1-based
 
       int Volume;
 
@@ -89,7 +90,8 @@ class SingleAtt3D {
          //  set stuff
          //
 
-      void set_object_number (int);   //  1-based
+      void set_object_number  (int);   //  1-based
+      void set_cluster_number (int);   //  1-based
 
       void set_volume (int);
 
@@ -117,7 +119,8 @@ class SingleAtt3D {
          //  get stuff
          //
 
-      int object_number () const;   //  1-based
+      int  object_number () const;   //  1-based
+      int cluster_number () const;   //  1-based
 
       bool is_fcst () const;
       bool is_obs  () const;
@@ -180,7 +183,8 @@ class SingleAtt3D {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int SingleAtt3D::object_number() const { return ( ObjectNumber ); }
+inline int SingleAtt3D::object_number  () const { return ( ObjectNumber  ); }
+inline int SingleAtt3D::cluster_number () const { return ( ClusterNumber ); }
 
 inline bool SingleAtt3D::is_fcst () const { return (   IsFcst ); }
 inline bool SingleAtt3D::is_obs  () const { return ( ! IsFcst ); }
@@ -188,7 +192,8 @@ inline bool SingleAtt3D::is_obs  () const { return ( ! IsFcst ); }
 inline bool SingleAtt3D::is_simple  () const { return (   IsSimple ); }
 inline bool SingleAtt3D::is_cluster () const { return ( ! IsSimple ); }
 
-inline void SingleAtt3D::set_object_number(int _n) { ObjectNumber = _n;  return; }
+inline void SingleAtt3D::set_object_number  (int _n) { ObjectNumber  = _n;  return; }
+inline void SingleAtt3D::set_cluster_number (int _n) { ClusterNumber = _n;  return; }
 
 inline int SingleAtt3D::volume() const { return ( Volume ); }
 

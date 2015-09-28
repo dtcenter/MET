@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const bool verbose = true;
+static const bool verbose = false; 
 
 static const bool do_ppms = false;
 
@@ -258,7 +258,7 @@ for (t=0; t<Nt; ++t)  {
 
 time_stop = time(0);
 
-cout << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n" << flush;
+// cout << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n" << flush;
 
 
 if ( verbose )  {
@@ -820,7 +820,7 @@ for (x=0; x<nx; ++x)  {
 
 }
 
-cout << "writing image file \"" << filename << "\"\n";
+// cout << "writing image file \"" << filename << "\"\n";
 
 if ( ! image.write(filename) )  {
 
@@ -873,7 +873,7 @@ for (x=0; x<nx; ++x)  {
 
 }
 
-cout << "writing image file \"" << filename << "\"\n";
+// cout << "writing image file \"" << filename << "\"\n";
 
 if ( ! image.write(filename) )  {
 
