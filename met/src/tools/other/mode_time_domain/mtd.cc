@@ -26,6 +26,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include "vx_data2d_factory.h"
 #include "mtd_config_info.h"
 #include "mtd_file.h"
 #include "interest_calc.h"
@@ -101,7 +102,21 @@ default_config_filename = replace_path(default_config_path);
 
 config.read_config(default_config_filename, local_config_filename);
 
-config.process_config(FileType_NcMet, FileType_NcMet);
+   //
+   //  determine the input file types
+   //    - check the config file for the file_type
+   //    - check the first data file
+   //
+
+GrdFileType ftype, otype;
+
+ftype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
+otype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
+
+if(ftype == FileType_None) ftype = grd_file_type(fcst_filenames[0]);
+if(otype == FileType_None) otype = grd_file_type(obs_filenames[0]);
+
+config.process_config(ftype, otype);
 
 
 int j, k;
@@ -215,7 +230,7 @@ SingleAtt3D att_3;
 SingleAtt3DArray fcst_single_att, obs_single_att;
 Object mask;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "calculating fcst single atts\n";
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
@@ -432,7 +447,7 @@ if ( mlog.verbosity_level() > 5 )  {
 SingleAtt3DArray fcst_cluster_att, obs_cluster_att;
 
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "calculating fcst cluster atts\n";
 
 for (j=0; j<n_clusters; ++j)  {
@@ -457,7 +472,7 @@ for (j=0; j<n_clusters; ++j)  {
 
 if ( mlog.verbosity_level() > 5 )  fcst_cluster_att.dump(cout);
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "calculating obs cluster atts\n";
 
 for (j=0; j<n_clusters; ++j)  {
@@ -501,7 +516,7 @@ do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
 PairAtt3DArray pa_cluster;
 IntArray b;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "calculating cluster pair atts\n";
 
 for (j=0; j<n_clusters; ++j)  {
@@ -509,7 +524,7 @@ for (j=0; j<n_clusters; ++j)  {
    a = e.fcst_composite(j);   //  0-based
 
    a.increment(1);
-   
+
    fo = fcst_obj.select(a);   //  1-based
 
    for (k=0; k<n_clusters; ++k)  {

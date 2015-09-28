@@ -47,10 +47,10 @@ valid_times = new unixtime [filenames.n()];
 
 for (j=0; j<(filenames.n()); ++j)  {
 
-   mlog << Debug(2) 
+   mlog << Debug(2)
         << "mtd_read_data() -> processing file \"" << filenames[j] << "\"\n";
 
-   data_2d_file = factory.new_met_2d_data_file(filenames[j]);
+   data_2d_file = factory.new_met_2d_data_file(filenames[j], varinfo.file_type());
 
    if ( ! data_2d_file->data_plane(varinfo, plane) )  {
 
