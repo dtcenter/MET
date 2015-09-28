@@ -79,7 +79,7 @@ static void process_point_scores  ();
 
 static void process_grid_vx       ();
 static void process_grid_scores   (DataPlane *&, DataPlane &,
-                                   DataPlane &,  DataPlane &, 
+                                   DataPlane &,  DataPlane &,
                                    DataPlane &,  PairDataEnsemble &);
 
 static void clear_counts(const DataPlane &, int);
@@ -150,7 +150,6 @@ void process_command_line(int argc, char **argv)
 
    int i;
    struct stat results;
-   GrdFileType etype, otype;
    CommandLine cline;
    ConcatString default_config_file;
 
@@ -189,7 +188,7 @@ void process_command_line(int argc, char **argv)
    // parse the command line
    //
    cline.parse();
-   
+
    //
    // Check for error. There should be either a number followed by that
    // number of filenames or a single filename and a config filename.
@@ -211,13 +210,13 @@ void process_command_line(int argc, char **argv)
 
    }
    else {
-     
+
       //
       // More than two arguments. Check that the first is an integer
       // followed by that number of filenames and a config filename.
       //
       if(is_integer(cline[0]) == 1) {
-        
+
          n_ens = atoi(cline[0]);
 
          if(n_ens <= 0) {
@@ -269,7 +268,7 @@ void process_command_line(int argc, char **argv)
 
    // Read the config files
    conf_info.read_config(default_config_file, config_file);
-   
+
    // Get the ensemble file type from config, if present
    etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
 
@@ -288,7 +287,7 @@ void process_command_line(int argc, char **argv)
    if(point_obs_flag)      otype = FileType_Gb1;
    else if(!grid_obs_flag) otype = FileType_None;
    else {
-     
+
       // Get the observation file type from config, if present
       otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
@@ -299,18 +298,18 @@ void process_command_line(int argc, char **argv)
               << grid_obs_file_list[0] << "\"\n\n";
          exit(1);
       }
-      
+
       // Store the gridded observation file type
       otype = obs_mtddf->file_type();
    }
-   
+
    // Process the configuration
    conf_info.process_config(etype, otype);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.regrid_info, &(ens_mtddf->grid()),
                         (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
-   
+
    // Set the model name
    shc.set_model(conf_info.model);
 
@@ -444,15 +443,15 @@ void process_ensemble() {
 
             // Deallocate the data file pointer, if necessary
             if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
-           
+
             // Read the current ensemble file
-            if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j]))) {
+            if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j], etype))) {
                mlog << Error << "\nprocess_ensemble() -> "
                     << "Trouble reading ensemble file \""
                     << ens_file_list[j] << "\"\n\n";
                exit(1);
             }
-           
+
             // Read the gridded data from the current ensemble file
             found = ens_mtddf->data_plane(*conf_info.ens_info[i], ens_dp);
 
@@ -465,7 +464,7 @@ void process_ensemble() {
                n_miss++;
                continue;
             }
-            else {              
+            else {
                n_vld++;
             }
 
@@ -591,7 +590,7 @@ void process_vx() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-      
+
 void process_point_vx() {
    int i, n_miss, miss_flag;
    double t;
@@ -880,7 +879,7 @@ int process_point_ens(int i_ens, int n_miss) {
       if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
 
       // Read the current ensemble file
-      if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file))) {
+      if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file, etype))) {
          mlog << Error << "\nprocess_point_ens() -> "
               << "Trouble reading " << file_type << " file \""
               << ens_file << "\"\n\n";
@@ -991,7 +990,7 @@ void process_point_scores() {
                shc.set_interp_wdth(conf_info.interp_wdth[l]);
 
                pd_ptr = &conf_info.vx_pd[i].pd[j][k][l];
-               
+
                // Compute the ranks for the observations
                pd_ptr->compute_rank(rng_ptr);
 
@@ -1094,7 +1093,7 @@ void process_grid_vx() {
 
    // Set the obtype column
    shc.set_obtype(conf_info.obtype);
-   
+
    // Allocate space to store the forecast fields
    fcst_dp        = new DataPlane [n_ens];
    fcst_dp_smooth = new DataPlane [n_ens];
@@ -1134,7 +1133,7 @@ void process_grid_vx() {
             if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
 
             // Read the current ensemble file
-            if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j]))) {
+            if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j], etype))) {
                mlog << Error << "\nprocess_grid_vx() -> "
                     << "Trouble reading ensemble file \""
                     << ens_file_list[j] << "\"\n\n";
@@ -1199,7 +1198,7 @@ void process_grid_vx() {
          if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
 
          // Read the current gridded observation file
-         if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[j]))) {
+         if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[j], otype))) {
             mlog << Error << "\nprocess_grid_vx() -> "
                  << "Trouble reading gridded observation file \""
                  << grid_obs_file_list[j] << "\"\n\n";
@@ -1307,7 +1306,7 @@ void process_grid_vx() {
 
          // If requested in the config file, smooth the forecast field
          for(k=0; k<ens_file_list.n_elements(); k++) {
-         
+
             if(conf_info.interp_field == FieldType_Fcst ||
                conf_info.interp_field == FieldType_Both) {
                smooth_field(fcst_dp[k], fcst_dp_smooth[k],
@@ -1463,7 +1462,7 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 
          // Get current climatology value
          cmn = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
-         
+
          // Add the observation point
          pd.add_obs(x, y, obs_dp.get(x, y), cmn, bad_data_double);
       } // end for y
@@ -1497,7 +1496,7 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
          pd.add_ens(j-n_miss, v);
       } // end for j
    } // end for i
-   
+
    if(pd.n_obs > 0) {
       // Compute the ranks for the observations
       pd.compute_rank(rng_ptr);
@@ -1619,7 +1618,7 @@ void setup_txt_files() {
 
    // Get the maximum number of valid ensemble members
    max_n_ens_vld = n_ens_vld.max();
-   
+
    // Check to see if the text files have already been set up
    if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
 
@@ -1634,7 +1633,7 @@ void setup_txt_files() {
 
    // Compute the number of PHIST bins
    n_bin  = ceil(1.0 / conf_info.ens_phist_bin_size.min());
-   
+
    // Get the maximum number of data columns
    max_col =  max(get_n_orank_columns(max_n_ens_vld+1),
                   get_n_rhist_columns(max_n_ens_vld));
@@ -1650,7 +1649,7 @@ void setup_txt_files() {
 
    // Create the output STAT file
    open_txt_file(stat_out, stat_file);
-   
+
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
    setup_table(stat_at);
@@ -1983,7 +1982,7 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
                << conf_info.ens_info[i_vx]->name() << "_"
                << type_str;
    }
-   
+
    // Add the variable attributes
    add_var_att(i_vx, ens_var, false, dp, name_str, long_name_str);
 
@@ -2017,7 +2016,7 @@ void write_ens_var_int(int i_vx, int *ens_data, DataPlane &dp,
    name_str << cs_erase
             << conf_info.ens_info[i_vx]->name() << "_"
             << type_str;
-   
+
    // Add the variable attributes
    add_var_att(i_vx, ens_var, true, dp, name_str, long_name_str);
 
@@ -2060,7 +2059,7 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
 
    // Loop over all the pairs
    for(i=0; i<pd.n_obs; i++) {
-     
+
       n = DefaultTO.two_to_one(grid.nx(), grid.ny(),
                                nint(pd.x_na[i]), nint(pd.y_na[i]));
 
@@ -2402,7 +2401,7 @@ void set_logfile(const StringArray & a)
    ConcatString filename;
 
    filename = a[0];
-   
+
    mlog.open_log_file(filename);
 }
 

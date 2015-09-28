@@ -99,6 +99,7 @@ static IntArray     n_ens_vld;     // Number of members with valid data for each
 static int          n_rank;        // Number of ranks = max(n_ens_vld) + 1
 static StringArray  ens_file_list;
 static IntArray     ens_file_vld;
+static GrdFileType  etype = FileType_None;
 
 static ConcatString ens_ssvar_mean;  // Mean data file to use for spread/skill analysis
 
@@ -109,7 +110,8 @@ static int          grid_obs_flag = 0;
 static StringArray  point_obs_file_list;
 static int          point_obs_flag = 0;
 
-static int          vx_flag    = 0;
+static GrdFileType  otype   = FileType_None;
+static int          vx_flag = 0;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;
