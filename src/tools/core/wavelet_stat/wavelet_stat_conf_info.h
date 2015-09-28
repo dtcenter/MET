@@ -42,8 +42,6 @@ static const STATLineType txt_file_type[n_txt] = {
 
 struct WaveletStatNcOutInfo {
 
-   bool do_latlon;
-
    bool do_raw;
 
    bool do_diff;
