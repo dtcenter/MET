@@ -114,6 +114,8 @@ void SingleAtt3D::clear()
 
 ObjectNumber = 0;
 
+ClusterNumber = 0;
+
 Volume = 0;
 
 Xbar = Ybar = Tbar = 0;
@@ -155,6 +157,8 @@ void SingleAtt3D::assign(const SingleAtt3D & a)
 clear();
 
 ObjectNumber = a.ObjectNumber;
+
+ClusterNumber = a.ClusterNumber;
 
 Volume = a.Volume;
 
@@ -245,8 +249,9 @@ void SingleAtt3D::dump(ostream & out, int depth) const
 
 Indent prefix;
 
-out << prefix << "ObjectNumber     = " << ObjectNumber << "\n";
-out << prefix << "Volume           = " << Volume       << "\n";
+out << prefix << "ObjectNumber     = " << ObjectNumber  << "\n";
+out << prefix << "ClusterNumber    = " << ClusterNumber << "\n";
+out << prefix << "Volume           = " << Volume        << "\n";
 out << prefix << "IsFcst           = " << bool_to_string(IsFcst) << "\n";
 out << prefix << "IsSimple         = " << bool_to_string(IsSimple) << "\n";
 out << prefix << "Centroid         = " << '(' << Xbar << ", " << Ybar << ", " << Tbar << ")\n";

@@ -316,7 +316,7 @@ var->add_att("_FillValue", bad_data_int);
 
 const int n_clusters = e.n_composites();
 
-cout << "\n\n  " << n_clusters << " clusters\n\n";
+// cout << "\n\n  " << n_clusters << " clusters\n\n";
 
 remap = new int [n_clusters + 1];
 
@@ -329,7 +329,7 @@ for (j=1; j<=n_clusters; ++j)  {
 
    remap[j] = 1 + k;
 
-   cout << "remap[" << j << "] = " << remap[j] << '\n';
+   // cout << "remap[" << j << "] = " << remap[j] << '\n';
 
 }
 

@@ -18,6 +18,7 @@ using namespace std;
 #include "3d_att.h"
 #include "3d_txt_header.h"
 #include "3d_single_columns.h"
+#include "2d_columns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -260,7 +261,7 @@ for (j=0; j<n_header_3d_cols; ++j)  {
 
 }
 
-for (j=0; j<n_att_3d_pair_cols; ++j)  {
+for (j=0; j<n_2d_cols; ++j)  {
 
    table.set_entry(r, c++, att_2d_cols[j]);
 

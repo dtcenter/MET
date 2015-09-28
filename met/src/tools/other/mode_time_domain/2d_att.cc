@@ -112,6 +112,8 @@ void SingleAtt2D::clear()
 
 ObjectNumber = 0;
 
+ClusterNumber = 0;
+
 Area = 0;
 
 Xbar = Ybar = 0.0;
@@ -139,6 +141,8 @@ void SingleAtt2D::assign(const SingleAtt2D & a)
 clear();
 
 ObjectNumber = a.ObjectNumber;
+
+ClusterNumber = a.ClusterNumber;
 
 Area = a.Area;
 
@@ -184,9 +188,11 @@ void SingleAtt2D::dump(ostream & out, int depth) const
 
 Indent prefix;
 
-out << prefix << "Area       = " << Area << "\n";
-out << prefix << "Centroid   = " << '(' << Xbar << ", " << Ybar << ")\n";
-out << prefix << "AxisAngle  = " << AxisAngle << "\n";
+out << prefix << "ObjectNumber  = " << ObjectNumber  << "\n";
+out << prefix << "ClusterNumber = " << ClusterNumber << "\n";
+out << prefix << "Area          = " << Area << "\n";
+out << prefix << "Centroid      = " << '(' << Xbar << ", " << Ybar << ")\n";
+out << prefix << "AxisAngle     = " << AxisAngle     << "\n";
 
    //
    //  done
@@ -299,6 +305,8 @@ a.Ybar = (moments.Sy)/(moments.N);
 mask_2d.grid().xy_to_latlon(a.Xbar, a.Ybar, a.CentroidLat, a.CentroidLon);
 
 a.Area = mask_2d.volume(0);
+
+moments.centralize();
 
 a.AxisAngle = moments.calc_2D_axis_plane_angle();
 
