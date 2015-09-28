@@ -27,6 +27,7 @@ config_DATA = \
 	Makefile.am \
 	MODEAnalysisConfig_default \
 	MODEConfig_default \
+	MTDConfig_default \
 	PB2NCConfig_default \
 	PointStatConfig_default \
 	README \
