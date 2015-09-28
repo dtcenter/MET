@@ -184,12 +184,20 @@ bool NcCfFile::open(const char * filepath)
   NcVar *valid_time_var = _ncFile->get_var("time");
   if (valid_time_var == 0)
   {
+
+    mlog << Debug(4) << "NcCfFile::open() -> "
+         << "could not extract valid time from the "
+         << "\"time\" variable.\n";
+
     // Time not in file, get from file name
     if ((ut = get_valid_time_from_file_path(filepath)) == 0)
     {
+       mlog << Debug(4) << "NcCfFile::open() -> "
+            << "could not extract valid time from file name.\n";
+    }
+    if( ut == 0 ) {
        mlog << Warning << "\nNcCfFile::open() -> "
-            << "could not extract valid time from file name\n"
-            << "Using valid time of 0\n\n";
+            << "could not determine the valid time, using 0.\n\n";
     }
     ValidTime.add(ut);
   }
@@ -213,7 +221,7 @@ bool NcCfFile::open(const char * filepath)
       }
       else
       {
-         mlog << Debug(4) << "\nNcCfFile::open() -> "
+         mlog << Debug(4) << "NcCfFile::open() -> "
               << "parsing units for the time variable \"" << units << "\"\n";
          parse_cf_time_string(units, ut, sec_per_unit);
       }
@@ -238,12 +246,16 @@ bool NcCfFile::open(const char * filepath)
   NcVar *init_time_var = _ncFile->get_var("forecast_reference_time");
   if (init_time_var == 0)
   {
-    // Time not in file, get from file name
 
+    mlog << Debug(4) << "NcCfFile::open() -> "
+         << "could not extract init time from the "
+         << "\"forecast_reference_time\" variable.\n";
+
+    // Time not in file, get from file name
     if ((InitTime = get_init_time_from_file_path(filepath)) == 0)
     {
-      mlog << Warning << "\nNcCfFile::open() -> "
-           << "could not extract init time from file name\n\n";
+      mlog << Debug(4) << "NcCfFile::open() -> "
+           << "could not extract init time from file name.\n";
     }
   }
   else
@@ -885,7 +897,12 @@ bool NcCfFile::getData(const char *var_name,
  
   //  if unset, set the init time to the valid time
   unixtime init_ut = InitTime;
-  if(init_ut == 0 && valid_ut != 0) init_ut = valid_ut;
+  if(init_ut == 0 && valid_ut != 0) {
+     mlog << Debug(4) << "NcCfFile::getData() -> "
+          << "setting the unset init time to the valid time of "
+          << unix_to_yyyymmdd_hhmmss(valid_ut) << ".\n";
+     init_ut = valid_ut;
+  }
 
   plane.set_init(init_ut);
   plane.set_valid(valid_ut);
