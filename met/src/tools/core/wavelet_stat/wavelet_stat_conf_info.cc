@@ -456,7 +456,6 @@ if ( type != DictionaryType )  {
 
 Dictionary * d = e->dict_value();
 
-nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
 nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
 nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
 
@@ -709,7 +708,7 @@ bool WaveletStatNcOutInfo::all_false() const
 
 {
 
-bool status = do_latlon || do_raw || do_diff;
+bool status = do_raw || do_diff;
 
 return ( !status );
 
@@ -723,7 +722,6 @@ void WaveletStatNcOutInfo::set_all_false()
 
 {
 
-do_latlon = false;
 do_raw    = false;
 do_diff   = false;
 
@@ -739,7 +737,6 @@ void WaveletStatNcOutInfo::set_all_true()
 
 {
 
-do_latlon = true;
 do_raw    = true;
 do_diff   = true;
 

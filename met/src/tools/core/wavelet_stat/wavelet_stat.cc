@@ -354,7 +354,7 @@ void process_scores() {
          conf_info.mask_missing_flag == FieldType_Both)
          mask_bad_data(fcst_dp, obs_dp);
 
-      // Mask out the missing data between fields      
+      // Mask out the missing data between fields
       if(conf_info.mask_missing_flag == FieldType_Obs ||
          conf_info.mask_missing_flag == FieldType_Both)
          mask_bad_data(obs_dp, fcst_dp);
@@ -412,7 +412,7 @@ void process_scores() {
 
             // Write out the ISC statistics
             for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
-              
+
                // Store the tile definition parameters
                isc_info[j][k].tile_dim = conf_info.get_tile_dim();
                isc_info[j][k].tile_xll = nint(conf_info.tile_xll[j]);
@@ -648,7 +648,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
          !x_ll_var->put(&x, 1)) {
 
          mlog << Error << "\nsetup_nc_file() -> "
-              << "error with the x_ll-var->put"
+              << "error with the x_ll_var->put"
               << "\n\n";
          exit(1);
       }
@@ -658,7 +658,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
          !y_ll_var->put(&y, 1)) {
 
          mlog << Error << "\nsetup_nc_file() -> "
-              << "error with the y_ll-var->put"
+              << "error with the y_ll_var->put"
               << "\n\n";
          exit(1);
       }
@@ -1078,7 +1078,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
          // Write the decomposed fields for this scale to NetCDF
          if ( ! (conf_info.nc_info.all_false()) ) {
-            write_nc_wav(conf_info.nc_info, 
+            write_nc_wav(conf_info.nc_info,
                          f_scl, o_scl, n, i_gc, i_tile, j,
                          isc_info[i].fthresh,
                          isc_info[i].othresh);
@@ -1865,7 +1865,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    double fcst_min, fcst_max, obs_min, obs_max;
    fcst_dp.data_range(fcst_min, fcst_max);
    obs_dp.data_range(obs_min, obs_max);
-   
+
    if     (!is_bad_data(fcst_min) && !is_bad_data(obs_min)) raw_plot_min = min(fcst_min, obs_min);
    else if(!is_bad_data(fcst_min) &&  is_bad_data(obs_min)) raw_plot_min = fcst_min;
    else if( is_bad_data(fcst_min) && !is_bad_data(obs_min)) raw_plot_min = obs_min;
