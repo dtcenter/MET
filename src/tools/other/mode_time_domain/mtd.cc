@@ -3,7 +3,17 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char default_config_path [] = "MET_BASE/config/MTDConfig_default";
+static const char default_config_path          [] = "MET_BASE/config/MTDConfig_default";
+
+static const char txt_2d_suffix                [] = "2d.txt";
+static const char txt_3d_single_simple_suffix  [] = "3d_ss.txt";
+static const char txt_3d_pair_simple_suffix    [] = "3d_ps.txt";
+static const char txt_3d_single_cluster_suffix [] = "3d_cs.txt";
+static const char txt_3d_pair_cluster_suffix   [] = "3d_ps.txt";
+
+static const char nc_suffix                    [] = "obj.nc";
+
+static const char default_prefix               [] = "mtd";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -122,6 +132,23 @@ if ( fcst_raw.delta_t() != obs_raw.delta_t() )  {
 config.delta_t_seconds = fcst_raw.delta_t();
 
    //
+   //  make the output file prefix
+   //
+
+ConcatString prefix;
+int year, month, day, hour, minute, second;
+char junk[256];
+
+if ( config.output_prefix.nonempty() )  prefix << config.output_prefix << '_';
+else                                    prefix << default_prefix       << '_';
+
+unix_to_mdyhms(obs_raw.start_time(), month, day, year, hour, minute, second);
+
+snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d%02d%02dV", year, month, day, hour, minute, second);
+
+prefix << junk;
+
+   //
    //  set up the total interest calculator
    //
 
@@ -232,7 +259,9 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
    //  write simple single attributes
    //
 
-do_3d_single_txt_output(fcst_single_att, obs_single_att, config, "s.txt");
+path << cs_erase << prefix << '_' << txt_3d_single_simple_suffix;
+
+do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path);
 
    //
    //  get simple pair attributes
@@ -274,7 +303,9 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
    //  write simple pair attributes
    //
 
-do_3d_pair_txt_output(pa_simple, config, "p.txt");
+path << cs_erase << prefix << '_' << txt_3d_pair_simple_suffix;
+
+do_3d_pair_txt_output(pa_simple, config, path);
 
    //
    //  calculate 2d attributes
@@ -342,7 +373,9 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
    //  write 2d attributes for each simple object for each time slice
    //
 
-do_2d_txt_output(fcst_att_2d, obs_att_2d, config, "2d.txt");
+path << cs_erase << prefix << '_' << txt_2d_suffix;
+
+do_2d_txt_output(fcst_att_2d, obs_att_2d, config, path);
 
    //
    //  create graph
@@ -366,7 +399,7 @@ if ( mlog.verbosity_level() > 5 )  e.partition_dump(cout);
 IntArray a;
 const int n_clusters = e.n_composites();
 
-mlog << Debug(2) << "N clusters = " << n_clusters << '\n';
+// mlog << Debug(2) << "N clusters = " << n_clusters << '\n';
 
 if ( mlog.verbosity_level() > 5 )  {
 
@@ -390,8 +423,7 @@ if ( mlog.verbosity_level() > 5 )  {
 
 }   //  if
 
-mlog << Debug(2) 
-     << "N composites = " << e.n_composites() << "\n";
+// mlog << Debug(2) << "N composites = " << e.n_composites() << "\n";
 
    //
    //  get single cluster attributes
@@ -457,7 +489,9 @@ for (j=0; j<n_clusters; ++j)  {
    //  write cluster single attributes
    //
 
-do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, "cs.txt");
+path << cs_erase << prefix << '_' << txt_3d_single_cluster_suffix;
+
+do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
 
 
    //
@@ -507,13 +541,17 @@ for (j=0; j<n_clusters; ++j)  {
    //  write cluster pair attributes
    //
 
-do_3d_pair_txt_output(pa_cluster, config, "cp.txt");
+path << cs_erase << prefix << '_' << txt_3d_pair_cluster_suffix;
+
+do_3d_pair_txt_output(pa_cluster, config, path);
 
    //
    //  netcdf output
    //
 
-do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, "c.nc");
+path << cs_erase << prefix << '_' << nc_suffix;
+
+do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
 
 
    //

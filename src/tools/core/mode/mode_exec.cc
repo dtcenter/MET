@@ -44,6 +44,12 @@ static const char * default_config_filename = "MET_BASE/config/MODEConfig_defaul
 ///////////////////////////////////////////////////////////////////////
 
 
+static void nc_add_string(NcFile *, const char * text, const char * var_name, const char * dim_name);
+
+
+///////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class ModeExecutive
    //
@@ -723,6 +729,7 @@ if ( info.all_false() )  return;
 
    int n, x, y;
    ConcatString out_file;
+   ConcatString s;
    const ConcatString fcst_thresh = engine.conf_info.fcst_conv_thresh.get_str(5);
    const ConcatString  obs_thresh = engine.conf_info.obs_conv_thresh.get_str(5);
 
@@ -842,6 +849,21 @@ if ( info.all_false() )  return;
          exit(1);
 
    }
+
+      //
+      //  fcst and obs values for variable, level and units
+      //
+
+   nc_add_string(f_out, engine.conf_info.fcst_info->name(),       "fcst_variable", "fcst_variable_length");
+   nc_add_string(f_out, engine.conf_info.obs_info->name(),         "obs_variable",  "obs_variable_length");
+
+   nc_add_string(f_out, engine.conf_info.fcst_info->level_name(), "fcst_level",    "fcst_level_length");
+   nc_add_string(f_out, engine.conf_info.obs_info->level_name(),   "obs_level",     "obs_level_length");
+
+   nc_add_string(f_out, engine.conf_info.fcst_info->units(),      "fcst_units",    "fcst_units_length");
+   nc_add_string(f_out, engine.conf_info.obs_info->units(),        "obs_units",     "obs_units_length");
+
+
   
    // Add forecast variable attributes
 
@@ -1586,3 +1608,49 @@ void ModeExecutive::write_ct_stats()
 ///////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Code for misc functions
+   //
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void nc_add_string(NcFile * f, const char * text, const char * var_name, const char * dim_name)
+
+{
+
+NcDim * dim = 0;
+NcVar * var = 0;
+const int N = strlen(text);
+
+
+f->add_dim(dim_name, N);
+
+dim = f->get_dim(dim_name);
+
+f->add_var(var_name, ncChar, dim);
+
+var = f->get_var(var_name);
+
+var->set_cur((long) 0);
+
+if ( ! var->put(text, N) )  {
+
+   mlog << Error
+        << " nc_add_string() -> unable to add string variable \"" << text << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////
