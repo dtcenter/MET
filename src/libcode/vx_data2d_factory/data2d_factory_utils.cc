@@ -58,14 +58,15 @@ GrdFileType grd_file_type(const char * filename)
 
 {
 
-GrdFileType type = FileType_None;
+GrdFileType suffix_type = FileType_None;
+GrdFileType data_type   = FileType_None;
 
    //
    //  first check to see if this file exists
    //
 
 if ( ! file_exists(filename) )  {
-  
+
    mlog << Error << "\ngrd_file_type() -> "
         << "file does not exist \"" << filename << "\"\n\n";
    exit(1);
@@ -76,27 +77,36 @@ if ( ! file_exists(filename) )  {
    //  try to get the file type from the filename suffix
    //
 
-type = file_type_by_suffix(filename);
-
-if ( type != FileType_None )  return ( type );
+suffix_type = file_type_by_suffix(filename);
 
    //
-   //  suffix failed, so look inside the file
+   //  look inside the file
    //
 
-     if ( is_grib1_file     (filename) ) type = FileType_Gb1;
-else if ( is_grib2_file     (filename) ) type = FileType_Gb2;
-else if ( is_ncpinterp_file (filename) ) type = FileType_NcPinterp;
-else if ( is_nccf_file      (filename) ) type = FileType_NcCF;
-else if ( is_ncmet_file     (filename) ) type = FileType_NcMet;
-else if ( is_bufr_file      (filename) ) type = FileType_Bufr;
-else                                     type = FileType_None;
+     if ( is_grib1_file     (filename) ) data_type = FileType_Gb1;
+else if ( is_grib2_file     (filename) ) data_type = FileType_Gb2;
+else if ( is_ncpinterp_file (filename) ) data_type = FileType_NcPinterp;
+else if ( is_nccf_file      (filename) ) data_type = FileType_NcCF;
+else if ( is_ncmet_file     (filename) ) data_type = FileType_NcMet;
+else if ( is_bufr_file      (filename) ) data_type = FileType_Bufr;
+else                                     data_type = FileType_None;
 
    //
-   //  done
+   //  print warning for inconsistent types
    //
 
-return ( type );
+if ( suffix_type != FileType_None && suffix_type != data_type )  {
+
+   mlog << Warning << "\ngrd_file_type() -> "
+        << "the file type indicated by the suffix \""
+        << grdfiletype_to_string(suffix_type)
+        << "\" does not match the file type indicated by the data \""
+        << grdfiletype_to_string(data_type) << "\".\n\n";
+
+}
+
+if ( suffix_type != FileType_None )  return ( suffix_type );
+else                                 return ( data_type   );
 
 }
 
