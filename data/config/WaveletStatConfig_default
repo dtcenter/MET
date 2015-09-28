@@ -92,10 +92,9 @@ output_flag = {
 //
 
 nc_pairs_flag   = {
-
+   latlon = TRUE;
    raw    = TRUE;
    diff   = TRUE;
-
 };
 
 ps_plot_flag  = TRUE;
