@@ -43,7 +43,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
    // Switch on file type and instantiate the appropriate class.
    // The Met2dDataFile object is allocated and needs to be deleted by caller.
    //
-   
+
    switch(type) {
 
       case FileType_Gb1:
@@ -69,9 +69,9 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type) {
          break;
 
       case FileType_NcCF:
-	mtddf = new MetNcCFDataFile;
-	break;
-	
+         mtddf = new MetNcCFDataFile;
+         break;
+
       case FileType_HdfEos:
 
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
