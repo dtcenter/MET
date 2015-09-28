@@ -38,8 +38,8 @@ static double merc_der_func(double lat_rad);
 
 static double merc_inv_func(double r);
 
-static double merc_lon_to_u(double lon_rad);
-static double merc_u_to_lon(double u);
+static double merc_lon_to_u(bool full_world, double lon_min, double lon_rad);
+static double merc_u_to_lon(bool full_world, double lon_min, double u);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -87,26 +87,48 @@ double lur;   //  upper-right longitude
 clear();
 
 lll = data.lon_ll;
+
+if ( fabs(lll) < 0.001 )  lll = 0.0;
+
 lur = data.lon_ur;
 
-   //
-   //  reduce lll and lur to the range -180 ... 180
-   //
+if ( fabs(lur) < 0.001 )  lur = 0.0;
 
-lll -= 360.0*floor((lll + 180.0)/360.0);
-lur -= 360.0*floor((lur + 180.0)/360.0);
+if ( (lll == 0.0) && (lur == 0.0) )  {
 
-   //
-   //  make sure that lur >= lll
-   //
+   lll = 359.9999;
+   lur =      0.0;
 
-lur += 360.0*floor((lll - lur)/360.0);
+   full_world = true;
+
+} else {
+
+      //
+      //  reduce lll and lur to the range -180 ... 180
+      //
+
+   lll -= 360.0*floor((lll + 180.0)/360.0);
+   lur -= 360.0*floor((lur + 180.0)/360.0);
+
+      //
+      //  make sure that lur >= lll
+      //
+
+   lur += 360.0*floor((lll - lur)/360.0);
+
+}
 
    //
    //  test for full-world grid
    //
 
-if ( fabs(lur - lll) < 1.0e-2 )  lur = lll + 360.0;
+if ( fabs(lur - lll) < 1.0e-2 )  {
+
+   lur = lll + 359.9999;
+
+   full_world = true;
+
+}
 
    //
    //  calculate stuff
@@ -117,6 +139,9 @@ Lon_LL_radians = lll/deg_per_rad;
 
 Lat_UR_radians = (data.lat_ur)/deg_per_rad;
 Lon_UR_radians = lur/deg_per_rad;
+
+Lon_LL_degrees = lll;
+Lon_UR_degrees = lur;
 
 Nx = data.nx;
 Ny = data.ny;
@@ -130,8 +155,8 @@ Name = data.name;
 double u_first, u_last;
 double v_first, v_last;
 
-u_first = merc_lon_to_u(Lon_LL_radians);
-u_last  = merc_lon_to_u(Lon_UR_radians);
+u_first = -Lon_LL_radians;
+u_last  = -Lon_UR_radians;
 
 Mx = (Nx - 1.0)/(u_last - u_first);
 
@@ -150,6 +175,8 @@ Data = data;
    //  Done
    //
 
+dump(cout);
+
 }
 
 
@@ -160,8 +187,13 @@ void MercatorGrid::clear()
 
 {
 
+full_world = false;
+
 Lat_LL_radians = 0.0;
 Lon_LL_radians = 0.0;
+
+Lon_LL_degrees = 0.0;
+Lon_UR_degrees = 0.0;
 
 Lat_UR_radians = 0.0;
 Lon_UR_radians = 0.0;
@@ -220,9 +252,9 @@ lat_rad = lat/deg_per_rad;
 lon_rad = lon/deg_per_rad;
 
 // lon_rad += twopi*floor((Lon_LL_radians - lon_rad)/twopi);
-   lon_rad -= twopi*floor((lon_rad - Lon_LL_radians + pi)/twopi);
+// lon_rad -= twopi*floor((lon_rad - Lon_LL_radians + pi)/twopi);
 
-u = merc_lon_to_u(lon_rad);
+u = merc_lon_to_u(full_world, Lon_UR_radians, lon_rad);
 
 v = merc_func(lat_rad);
 
@@ -246,7 +278,7 @@ double u, v;
 
 xy_to_uv(x, y, u, v);
 
-lon_rad = merc_u_to_lon(u);
+lon_rad = merc_u_to_lon(full_world, Lon_UR_radians, u);
 
 lat_rad = merc_inv_func(v);
 
@@ -254,7 +286,7 @@ lat = deg_per_rad*lat_rad;
 
 lon = deg_per_rad*lon_rad;
 
-lon += 360.0*floor((180.0 - lon)/360.0);   //  reduce lon to range (-180, 180]
+// lon += 360.0*floor((180.0 - lon)/360.0);   //  reduce lon to range (-180, 180]
 
 return;
 
@@ -362,6 +394,8 @@ out << prefix << "By         = " << By << "\n";
 
 out << prefix << "Nx         = " << Nx << "\n";
 out << prefix << "Ny         = " << Ny << "\n";
+
+out << prefix << "full_world = " << full_world << "\n";
 
    //
    //  done
@@ -548,11 +582,13 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-double merc_lon_to_u(double lon_rad)
+double merc_lon_to_u(bool full_world, double lon_min, double lon_rad)
 
 {
 
 double u;
+
+if ( full_world )  lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
 
 u = -lon_rad;
 
@@ -564,13 +600,15 @@ return ( u );
 ////////////////////////////////////////////////////////////////////////
 
 
-double merc_u_to_lon(double u)
+double merc_u_to_lon(bool full_world, double lon_min, double u)
 
 {
 
 double lon_rad;
 
 lon_rad = -u;
+
+if ( full_world )  lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
 
 return ( lon_rad );
 
