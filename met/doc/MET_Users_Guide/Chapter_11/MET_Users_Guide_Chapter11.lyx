@@ -1,0 +1,2542 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+The MODE-Analysis Tool
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+MODE output files can be quite large; currently, these files contain 51
+ columns.
+ This means that it is very difficult - effectively impossible - to interpret
+ the results by simply browsing the files.
+ Furthermore, for particular applications some data fields in the MODE output
+ files may not be of interest.
+ Because of these and similar considerations, the MET development team believed
+ a tool providing basic summary statistics and filtering capabilities for
+ these files would be helpful for many users.
+ The MODE analysis tool provides these capabilities.
+ Users who are not proficient at writing scripts can use the tool directly,
+ and even those using their own scripts can use this tool as a filter, to
+ extract only the MODE output lines that are relevant for their application.
+\end_layout
+
+\begin_layout Section
+Scientific and statistical aspects
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The MODE-Analysis tool operates in two modes, called "summary" and "by case".
+ In summary mode, the user provides (on the command line or via a configuration
+ file) information regarding which fields (columns) are of interest, as
+ well as matching criteria that determine which lines in each file are used
+ and which are ignored.
+ For example, a user may be interested in forecast object areas, but only
+ if the object was matched, and only if the object centroid is inside a
+ particular region.
+ The summary statistics generated (for each field) are the minimum, maximum,
+ mean, standard deviation, and the 10th, 25th, 50th, 75th and 90th percentiles.
+ In addition, the user may specify a "dump" file: the individual MODE lines
+ used to produce the statistics will be written to this file.
+ This option provides the user with a filtering capability.
+ The dump file will consist only of lines that match the specified criteria.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The other option for operating the analysis tool is "by case".
+ Given initial and final values for forecast lead time, the tool will output,
+ for each valid time in the interval, the matched area, unmatched area,
+ and the number of forecast and observed objects that were matched or unmatched.
+ For the areas, the user can specify forecast or observed objects, and also
+ simple or cluster objects.
+ A dump file may also be specified in this mode.
+\end_layout
+
+\begin_layout Section
+Practical information
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The MODE-Analysis tool reads lines from MODE output files and applies filtering
+ and computes basic statistics on the object attribute values.
+ For each job type, filter parameters can be set to determine which MODE
+ output lines are used.
+ The following sections describe the 
+\emph on
+mode_analysis
+\emph default
+ usage statement, required arguments, and optional arguments.
+\end_layout
+
+\begin_layout Subsection
+mode_analysis usage
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The usage statement for the MODE-Analysis tool is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: mode_analysis
+\end_layout
+
+\begin_layout LyX-Code
+-lookin path
+\end_layout
+
+\begin_layout LyX-Code
+-summary | -bycase
+\end_layout
+
+\begin_layout LyX-Code
+[-column name]
+\end_layout
+
+\begin_layout LyX-Code
+[-dump_row filename]
+\end_layout
+
+\begin_layout LyX-Code
+[-out filename]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout LyX-Code
+[-help]
+\end_layout
+
+\begin_layout LyX-Code
+[MODE FILE LIST]
+\end_layout
+
+\begin_layout LyX-Code
+[-config config_file] | [MODE LINE OPTIONS]
+\end_layout
+
+\begin_layout Paragraph
+Required arguments for 
+\emph on
+mode_analysis
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The MODE-Analysis tool requires specification of a "job type" and a filename
+ or directory indicated by the -
+\emph on
+lookin
+\emph default
+ option.
+ The -
+\emph on
+lookin
+\emph default
+ option may be called multiple times.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The MODE-Analysis tool can perform two basic types of jobs, which are identified
+ as follows: 
+\end_layout
+
+\begin_layout LyX-Code
+-summary
+\end_layout
+
+\begin_layout LyX-Code
+-bycase
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Exactly one of these job types must be specified.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Specifying "-
+\emph on
+summary
+\emph default
+" will produce summary statistics for the MODE output column specified.
+ For this job type, a column name (or column number) must be specified using
+ the "-
+\emph on
+column
+\emph default
+" option.
+ Column names are not case sensitive.
+ The column names are the same as described in Section 8.3.3 of Chapter 8.
+ More information about this option is provided in subsequent sections.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Specifying "-
+\emph on
+bycase
+\emph default
+" will produce a table of metrics for each case undergoing analysis.
+ Any columns specified are ignored for this option.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The output for each of these jobs types is described in later sections.
+\end_layout
+
+\begin_layout Paragraph
+Optional arguments for 
+\emph on
+mode_analysis
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\emph on
+mode_analysis
+\emph default
+ options are described in the following section.
+ These are divided into sub-sections describing the analysis options and
+ mode line options.
+\end_layout
+
+\begin_layout Paragraph
+Analysis options
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The general analysis options described below provide a way for the user
+ to indicate configuration files to be used, where to write lines used to
+ perform the analysis, and over which fields to generate statistics.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-config
+\emph on
+ filename
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This option gives the name of a configuration file to be read.
+ The contents of the configuration file are described in Section 8.3.3.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-dump_row
+\emph on
+ filename
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Any MODE lines kept from the input files are written to
+\series default
+ filename.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+column
+\emph on
+ column
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Specifies which columns in the MODE output files to generate statistics
+ for.
+ Fields may be indicated by name (case insensitive) or column number (beginning
+ at one).
+ This option can be repeated to specify multiple columns.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+MODE line options
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+MODE line options are used to create filters that determine which of the
+ MODE output lines that are read in, are kept.
+ The MODE line options are numerous.
+ They fall into seven categories: toggles, multiple set string options,
+ multiple set integer options, integer max/min options, date/time max/min
+ options, floating-point max/min options, and miscellaneous options.
+ These options are described in subsequent sections.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+Toggles
+\emph default
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The MODE line options described in this section are shown in pairs.
+ These toggles represent parameters that can have only one (or none) of
+ two values.
+ Any of these toggles may be left unspecified.
+ However, if neither option for each toggle is indicated, the analysis will
+ produce results that combine data from both toggles.
+ This may produce unintended results.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst / -obs
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This toggle indicates whether forecast or observed lines should be used
+ for analysis.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-single / -pair
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This toggle indicates whether single object or object pair lines should
+ be used.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-simple / -cluster
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This toggle indicates whether simple object or cluster object lines should
+ be used.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-matched / -unmatched
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This toggle indicates whether matched or unmatched object lines should be
+ used.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Multiple-set string options 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The following options set various string attributes.
+ They can be set multiple times on the command line but must be separated
+ by spaces.
+ Each of these options must be indicated as a string.
+ String values that include spaces may be used by enclosing the string in
+ quotation marks.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-model
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This option specifies which model to use; 
+\series default
+value
+\series medium
+ must be a string.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst_thr
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-obs_thr
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These two options specify thresholds for forecast and observation objects
+ to be used in the analysis, respectively.
+ 
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst_var
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-obs_var
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options indicate the names of variables to be used in the analysis
+ for forecast and observed fields.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst_lev 
+\emph on
+value
+\end_layout
+
+\begin_layout LyX-Code
+-obs_lev
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options indicate vertical levels for forecast and observed fields
+ to be used in the analysis.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Multiple-set integer options 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The following options set various integer attributes.
+ They can be set multiple times on the command line but must be separated
+ by spaces.
+ Each of the following options may only be indicated as an integer.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst_lead 
+\emph on
+value
+\end_layout
+
+\begin_layout LyX-Code
+-obs_lead
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options are integers of the form HH[MMSS] specifying an (hour-minute-secon
+d) lead time.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst_init
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-obs_init
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options are integers of the form HH[MMSS] specifying an (hour-minute-secon
+d) model initialization time of day.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst_accum
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-obs_accum
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options are integers of the form HHMMSS specifying an (hour-minute-second)
+ accumulation time.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-fcst_rad
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-obs_rad
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options indicate the convolution radius used for forecast or observed
+ objects, respectively.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Integer max/min options 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options set limits on various integer attributes.
+ Leaving a maximum value unset means no upper limit is imposed on the value
+ of the attribute.
+ The option works similarly for minimum values.
+ 
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-area_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-area_max
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options are used to indicate minimum/maximum values for the area attribute
+ to be used in the analysis.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-area_filter_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-area_filter_max
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options are used to indicate minimum/maximum values accepted for the
+ area filter.
+ The area filter refers to the number of non-zero values of the raw data
+ found within the object.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-area_thresh_min 
+\emph on
+value
+\end_layout
+
+\begin_layout LyX-Code
+-area_thresh_max
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options are used to indicate minimum/maximum values accepted for the
+ area thresh.
+ The area thresh refers to the number of values of the raw data found within
+ the object that meet the object definition threshold criteria used.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-intersection_area_min 
+\emph on
+value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intersection_area_ma
+\emph on
+x value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options refer to the minimum/maximum values accepted for the intersection
+ area attribute.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-union_area_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-union_area_max
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options refer to the minimum/maximum union area values accepted for
+ analysis.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-symmetric_diff_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+-symmetric_diff_max
+\emph on
+ value
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options refer to the minimum/maximum values for symmetric difference
+ for objects to be used in the analysis.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Date/time max/min options 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options set limits on various date/time attributes.
+ The values can be specified in one of three ways: 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+First, the options may be indicated by a string of the form YYYYMMDD_HHMMSS.
+ This specifies a complete calendar date and time.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Second, they may be indicated by a string of the form YYYYMMDD_HH.
+ Here, the minutes and seconds are assumed to be zero.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The third way of indicating date/time attributes is by a string of the form
+ YYYYMMDD.
+ Here, hours, minutes and seconds are assumed to be zero.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+fcst_valid_min 
+\emph on
+yyyymmdd[_hh[mmss]]
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+fcst_valid_max
+\emph on
+ yyyymmdd[_hh[mmss]]
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options indicate minimum/maximum values for the forecast valid time.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+obs_valid_min
+\emph on
+ yyyymmdd[_hh[mmss]]
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+obs_valid_max
+\emph on
+ yyyymmdd[_hh[mmss]]
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These two options indicate minimum/maximum values for observation valid
+ time.
+\end_layout
+
+\begin_layout Paragraph
+Floating-point max/min options 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Setting limits on various floating-point attributes.
+ One may specify these as integers (i.e., without a decimal point), if desired.
+ The following pairs of options indicate minimum and maximum values for
+ each MODE attribute that can be described as a floating-point number.
+ Please refer to Chapter 6 for a description of these attributes as needed.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-centroid_x_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_x_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_y_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_y_max 
+\emph on
+value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_lat_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_lat_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_lon_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_lon_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+axis_ang_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+axis_ang_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+length_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+length_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+width_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+width_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+curvature_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+curvature_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+curvature_x_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+curvature_x_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+curvature_y_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+curvature_y_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+complexity_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+complexity_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_10_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_10_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_25_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_25_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_50_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_50_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_75_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_75_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_90_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_90_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_user_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_user_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_sum_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intensity_sum_max 
+\emph on
+value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_dist_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+centroid_dist_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+boundary_dist_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+boundary_dist_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+convex_hull_dist_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+convex_hull_dist_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+angle_diff_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+angle_diff_max 
+\emph on
+value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+area_ratio_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+area_ratio_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intersection_over_area_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+intersection_over_area_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+complexity_ratio_min 
+\emph on
+value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+complexity_ratio_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+percentile_intensity_ratio_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+percentile_intensity_ratio_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+interest_min
+\emph on
+ value
+\end_layout
+
+\begin_layout LyX-Code
+
+\emph on
+-
+\emph default
+interest_max
+\emph on
+ value
+\emph default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Miscellaneous options
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These options are used to indicate parameters that did not fall into any
+ of the previous categories.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+\emph on
+-
+\emph default
+mask_poly
+\emph on
+ filename
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This option indicates the name of a polygon mask file to be used for filtering.
+ The format for these files is the same as that of the polyline files for
+ the other MET tools.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+-help
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This option prints the usage message.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\emph on
+mode_analysis
+\emph default
+ configuration file
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+To use the MODE analysis tool, the user must un-comment the options in the
+ configuration file to apply them and comment out unwanted options.
+ The options in the configuration file for 
+\emph on
+mode_analysis
+\emph default
+ are the same as the MODE line options described in Section 9.3.1.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The parameters that are set in the configuration file either add to or override
+ parameters that are set on the command line.
+ For the "set string" and "set integer type" options enclosed in brackets,
+ the values specified in the conftiguration file are added to any values
+ set on the command line.
+ For the toggle and min/max type options, the values specified in the configurat
+ion file override those set on the command line.
+\end_layout
+
+\begin_layout Subsection
+MODE-Analysis tool output
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The output of the MODE Analysis tool is a self-describing tabular format
+ written to standard output.
+ The length and contents of the table vary depending on whether 
+\emph on
+-summary
+\emph default
+ or -
+\emph on
+bycase
+\emph default
+ is selected.
+ The contents also change for -summary depending on the fields selected
+ by the user for output.
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,645 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter*
+Foreword: A note to MET users
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This user's guide is provided as an aid to users of the Model Evaluation
+ Tools (MET).
+ MET is a set of verification tools developed by the Developmental Testbed
+ Center (DTC) for use by the numerical weather prediction community - and
+ especially users and developers of the Weather Research and Forecasting
+ (WRF) model - to help them assess and evaluate the performance of numerical
+ weather predictions.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+It is important to note here that MET is an evolving software package.
+ Previous releases of MET have occurred each year since 2008.
+ This documentation describes the 5.1 release from 2014.
+ Intermediate releases may include bug fixes.
+ In the future, MET will also be able to accept new modules contributed
+ by the community.
+ A protocol will be established to determine the maturity of new verification
+ methods that are contributed and to coordinate the inclusion of new modules
+ in future versions.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This user's guide was prepared by the developers of the MET, including John
+ Halley Gotway, Randy Bullock, Nancy Rehak, Julie Prestopnik, Paul Oldenburg,
+ Anne Holmes, Tara Jensen, Lacey Holland, Barbara Brown, Tressa Fowler,
+ David Ahijevych, Eric Gilleland and Bonny Strong.
+\end_layout
+
+\begin_layout Section*
+New for MET v5.1
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Users will notice major upgrades for METv5.1.
+ A list of these and other upgrades is included below.
+ 
+\end_layout
+
+\begin_layout Subsection*
+Major Upgrades:
+\end_layout
+
+\begin_layout Description
+1.
+ METv5.1 includes a major overhaul of the build process, the addition of
+ two new tools, and several enhancements to existing tools.
+ The build and installation process is now done using autoconf by running
+ the "configure" script followed by "make install" and "make test".
+ 
+\end_layout
+
+\begin_layout Description
+2.
+ The new gen_circle_mask tool generates a verification masking region similar
+ to the gen_poly_mask tool.
+ It draws a circle of configurable radius around one or more lat/lon locations.
+ It may be useful in defining areas close to radar locations or the area
+ around a hurricane.
+ 
+\end_layout
+
+\begin_layout Description
+3.
+ The new plot_mode_field tool reads one or more MODE NetCDF output files
+ and creates PNG images to display the data.
+\end_layout
+
+\begin_layout Subsection*
+Enhancements to Existing Tools:
+\end_layout
+
+\begin_layout Itemize
+Distributed latest set of bug fixes for METv4.1.
+\end_layout
+
+\begin_layout Itemize
+Changes to existing logic:
+\end_layout
+
+\begin_layout Itemize
+Fixed bug in STAT-Analysis when aggregating FSS values across multiple cases.
+\end_layout
+
+\begin_layout Itemize
+Fixed bug in MODE where object intensity percentiles were only being computed
+ over values greater than zero, rather than the full range.
+\end_layout
+
+\begin_layout Itemize
+Fixed bug in pcp_combine -varname option that was preventing the use of
+ underscores in the output variable name.
+\end_layout
+
+\begin_layout Itemize
+Enhanced TC-Pairs to refine interpretation of zeros as bad data in many
+ of the input ATCF columns.
+\end_layout
+
+\begin_layout Itemize
+Enhanced MADIS2NC by adding support for mesonet datasets.
+\end_layout
+
+\begin_layout Itemize
+Refined logic in TC-Pairs when computing consensus tracks by ensuring that
+ the required members are present at each lead time.
+\end_layout
+
+\begin_layout Itemize
+Major overhaul of the TC-Dland tool to compute global distances to land
+ rather than being limited to the Atlantic and Eastern Pacific basins.
+ Added a global 1/10th degree distance to land data file to the release.
+\end_layout
+
+\begin_layout Itemize
+Enhanced STAT-Analysis by adding support for an aggregate_stat job type
+ conversion of MPR to WDIR that reads UGRD and VGRD matched pair lines and
+ computes aggregated wind direction errors.
+ Added
+\end_layout
+
+\begin_layout Itemize
+-out_fcst_wind_thresh and -out_obs_wind_thresh options to filter the U/V
+ pairs by wind speed prior to computing wind direction errors.
+\end_layout
+
+\begin_layout Itemize
+Added new output statistics:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Enhanced the SL1L2 and SAL1L2 line types from Point-Stat and Grid-Stat by
+ adding the mean absolute error (MAE), enabling MAE to be aggregated across
+ multiple cases.
+\end_layout
+
+\begin_layout Itemize
+Enhanced the CNT line type from Point-Stat and Grid-Stat by adding the inter-qua
+rtile range of the error (EIQR) and the median absolute deviation (MAD).
+\end_layout
+
+\begin_layout Itemize
+Enhanced the CTS line type from Point-Stat and Grid-Stat by adding the log
+ odds ratio (LODDS), odds ratio skill score (ORSS), extreme dependency score
+ (EDS), symmetric EDS (SEDS), extreme dependency index (EDI), symmetric
+ EDI (SEDI), and the bias-adjusted Gilbert skill score (BAGSS).
+\end_layout
+
+\begin_layout Itemize
+Enhanced the NBRCNT line type from Grid-Stat by adding the asymptotic fractions
+ skill score (AFSS), uniform fractions skill score (UFSS), and the forecast
+ and observation rates (F_RATE and O_RATE).
+\end_layout
+
+\begin_layout Itemize
+Enhanced the MPR line type from Point-Stat and the ORANK line type from
+ Ensemble-Stat by adding the observation quality flag value.
+\end_layout
+
+\begin_layout Itemize
+Enhanced Ensemble-Stat by adding the probability integral transform histogram
+ (PHIST) line type.
+\end_layout
+
+\begin_layout Itemize
+Enhanced STAT-Analysis to aggregate and recompute all the new statistics
+ listed above.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Added new command line and configuration options:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Enhanced Point-Stat and Ensemble-Stat by adding a station id exclusion,
+ sid_exc, option to the configuration file to easily discard specific stations
+ known to contain bad data.
+ See METv5.1/data/config/README for details.
+\end_layout
+
+\begin_layout Itemize
+Enhanced ASCII2NC and MADIS2NC by adding the -mask_poly and -mask_grid command
+ line options to filter the point observations spatially.
+\end_layout
+
+\begin_layout Itemize
+Enhanced STAT-Analysis to support comma-separated lists of values on the
+ command line rather than using the same command line switch multiple times.
+\end_layout
+
+\begin_layout Itemize
+Enhanced the configuration files for MODE, Grid-Stat, and Wavelet-Stat to
+ allow the user to select which fields should be included in the gridded
+ NetCDF output.
+\end_layout
+
+\begin_layout Itemize
+See METv5.1/data/config/README for details.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Enhanced ASCII2NC by adding a message_type_map entry to the configuration
+ file which defines a mapping of input little_R report types to output message
+ types.
+ Previously this mapping had been hard coded and any changes required recompilin
+g.
+\end_layout
+
+\begin_layout Itemize
+Enhanced MODE by adding a shift_right entry to configuration file to shift
+ a global grid by some number of grid points.
+ This enables the user to define the location of the longitude cut line
+ for global grids.
+\end_layout
+
+\begin_layout Itemize
+Enhanced TC-Pairs by refining the interp12 configuration option.
+ See METv5.1/data/config/README-TC for details.
+\end_layout
+
+\begin_layout Itemize
+Enhanced TC-Stat by adding an event_equal_lead configuration option to list
+ specific lead times that must be present for a track to be included in
+ the event equalization logic.
+\end_layout
+
+\begin_layout Itemize
+Enhanced TC-Stat by refining the rapid intensification criteria in the rapid_int
+en section of the configuration file.
+ See METv5.1/data/config/README_TC for details.
+\end_layout
+
+\begin_layout Itemize
+Improved input and output behavior:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Enhanced support for reading TRMM NetCDF data from these sources:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+target "http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42.shtml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+target "http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42_daily.shtml"
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Enhanced MET's handling of NetCDF files by reading and applying the FillValue
+ and/or missing_value variable attributes when parsing gridded data.
+\end_layout
+
+\begin_layout Itemize
+Enhanced STAT-Analysis and MODE-Analysis to include column headers in the
+ output file specified with the -dump_row option.
+\end_layout
+
+\begin_layout Itemize
+Enhanced the NetCDF output of MODE by adding convex hull polyline points.
+\end_layout
+
+\begin_layout Itemize
+Add the model name as a global attribute to the NetCDF output of Grid-Stat,
+ Wavelet-Stat, Ensemble-Stat, MODE, and Series-Analysis.
+\end_layout
+
+\begin_layout Itemize
+Reduced the file size of the PostScript files generated by the MET tools
+ by adding zlib compression.
+\end_layout
+
+\begin_layout Itemize
+Enhanced the MODE PostScript files by placing the data into tables.
+\end_layout
+
+\begin_layout Itemize
+Right-justify all numeric output columns in the ASCII output of MET.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Update the GRIB1 and GRIB2 table definitions:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.nco.ncep.noaa.gov/pmb/docs/on388"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml"
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Chapter*
+TERMS OF USE
+\end_layout
+
+\begin_layout Section*
+IMPORTANT!
+\end_layout
+
+\begin_layout Paragraph
+USE OF THIS SOFTWARE IS SUBJECT TO THE FOLLOWING TERMS AND CONDITIONS:
+\end_layout
+
+\begin_layout Standard
+1.
+ 
+\series bold
+License
+\series default
+.
+ Subject to these terms and conditions, University Corporation for Atmospheric
+ Research (UCAR) grants you a non-exclusive, royalty-free license to use,
+ create derivative works, publish, distribute, disseminate, transfer, modify,
+ revise and copy the Model Evaluation Tools (MET) software, in both object
+ and source code (the 
+\begin_inset Quotes eld
+\end_inset
+
+Software
+\begin_inset Quotes erd
+\end_inset
+
+).
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You shall not sell, license or transfer for a fee the Software, or any work
+ that in any manner contains the Software.
+\end_layout
+
+\begin_layout Description
+2.
+ 
+\series bold
+Disclaimer of Warranty on Software.
+
+\series default
+ Use of the Software is at your sole risk.
+ The Software is provided "AS IS" and without warranty of any kind and UCAR
+ EXPRESSLY DISCLAIMS ALL WARRANTIES AND/OR CONDITIONS OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES OR CONDITIONS
+ OF TITLE, NON-INFRINGEMENT OF A THIRD PARTY'S INTELLECTUAL PROPERTY, MERCHANTAB
+ILITY OR SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ THE PARTIES EXPRESSLY DISCLAIM THAT THE UNIFORM COMPUTER INFORMATION TRANSACTIO
+NS ACT (UCITA) APPLIES TO OR GOVERNS THIS AGREEMENT.
+ No oral or written information or advice given by UCAR or a UCAR authorized
+ representative shall create a warranty or in any way increase the scope
+ of this warranty.
+ Should the Software prove defective, you (and neither UCAR nor any UCAR
+ representative) assume the cost of all necessary correction.
+ 
+\end_layout
+
+\begin_layout Description
+3.
+ 
+\series bold
+Limitation of Liability.
+
+\series default
+ UNDER NO CIRCUMSTANCES, INCLUDING NEGLIGENCE, SHALL UCAR BE LIABLE FOR
+ ANY DIRECT, INCIDENTAL, SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES INCLUDING
+ LOST REVENUE, PROFIT OR DATA, WHETHER IN AN ACTION IN CONTRACT OR TORT
+ ARISING OUT OF OR RELATING TO THE USE OF OR INABILITY TO USE THE SOFTWARE,
+ EVEN IF UCAR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+ 
+\end_layout
+
+\begin_layout Description
+4.
+ 
+\series bold
+Compliance with Law.
+
+\series default
+ All Software and any technical data delivered under this Agreement are
+ subject to U.S.
+ export control laws and may be subject to export or import regulations
+ in other countries.
+ You agree to comply strictly with all applicable laws and regulations in
+ connection with use and distribution of the Software, including export
+ control laws, and you acknowledge that you have responsibility to obtain
+ any required license to export, re-export, or import as may be required.
+\end_layout
+
+\begin_layout Description
+5.
+ 
+\series bold
+No Endorsement/No Support
+\series default
+.
+ The names UCAR/NCAR, National Center for Atmospheric Research and the Universit
+y Corporation for Atmospheric Research may not be used in any advertising
+ or publicity to endorse or promote any products or commercial entity unless
+ specific written permission is obtained from UCAR.
+ The Software is provided without any support or maintenance, and without
+ any obligation to provide you with modifications, improvements, enhancements,
+ or updates of the Software.
+\end_layout
+
+\begin_layout Description
+6.
+ 
+\series bold
+Controlling Law and Severability
+\series default
+.
+ This Agreement shall be governed by the laws of the United States and the
+ State of Colorado.
+ If for any reason a court of competent jurisdiction finds any provision,
+ or portion thereof, to be unenforceable, the remainder of this Agreement
+ shall continue in full force and effect.
+ This Agreement shall not be governed by the United Nations Convention on
+ Contracts for the International Sale of Goods, the application of which
+ is hereby expressly excluded.
+\end_layout
+
+\begin_layout Description
+7.
+ 
+\series bold
+Termination.
+
+\series default
+ Your rights under this Agreement will terminate automatically without notice
+ from UCAR if you fail to comply with any term(s) of this Agreement.
+ You may terminate this Agreement at any time by destroying the Software
+ and any related documentation and any complete or partial copies thereof.
+ Upon termination, all rights granted under this Agreement shall terminate.
+ The following provisions shall survive termination: Sections 2, 3, 6 and
+ 9.
+ 
+\end_layout
+
+\begin_layout Description
+8.
+ 
+\series bold
+Complete Agreement
+\series default
+.
+ This Agreement constitutes the entire agreement between the parties with
+ respect to the use of the Software and supersedes all prior or contemporaneous
+ understandings regarding such subject matter.
+ No amendment to or modification of this Agreement will be binding unless
+ in writing and signed by UCAR.
+ 
+\end_layout
+
+\begin_layout Standard
+9.
+ 
+\series bold
+Notices and Additional Terms
+\series default
+.
+ Copyright in Software is held by UCAR.
+ You must include, with each copy of the Software and associated documentation,
+ a copy of this Agreement and the following notice:
+\end_layout
+
+\begin_layout Subparagraph
+
+\series medium
+\begin_inset Quotes eld
+\end_inset
+
+The source of this material is the Research Applications Laboratory at the
+ National Center for Atmospheric Research, a program of the University Corporati
+on for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with
+ the National Science Foundation; ©2007 University Corporation for Atmospheric
+ Research.
+ All Rights Reserved." 
+\end_layout
+
+\begin_layout Paragraph
+The following notice shall be displayed on any scholarly works associated
+ with, related to or derived from the Software: 
+\end_layout
+
+\begin_layout Subparagraph
+
+\series medium
+"Model Evaluation Tools (MET) was developed at the National Center for Atmospher
+ic Research (NCAR) through grants from the National Science Foundation (NSF),
+ the National Oceanic and Atmospheric Administration (NOAA), the United
+ States Air Force (AF), and the United States Department of Energy (DOE).
+ NCAR is sponsored by the United States National Science Foundation." 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+By using or downloading the Software, you agree to be bound by the terms
+ and conditions of this Agreement.
+ 
+\end_layout
+
+\begin_layout Chapter*
+
+\series medium
+Acknowledgments
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+We thank the the National Science Foundation (NSF), the National Oceanic
+ and Atmospheric Administration (NOAA), the United States Air Force (AF),
+ and the United States Department of Energy (DOE) for their support of this
+ work.
+ Thanks also go to the staff at the Developmental Testbed Center for their
+ help, advice, and many types of support.
+ We are grateful to the individuals who participated in MET planning workshops
+ in February 2007, April 2008, August 2009, and November 2010; the ideas
+ generated at those workshops will help MET grow in future years.
+ Finally, we would like to specifically thank the verification advisory
+ group (Mike Baldwin, Matthew Sittel, Elizabeth Ebert, Geoff DiMego, Chris
+ Davis, and Jason Knievel) for their guidance and other contributions.
+ The DTC is sponsored by the National Oceanic and Atmospheric Administration
+ (NOAA), the United States Air Force, and the National Science Foundation
+ (NSF).
+ NCAR is sponsored by the National Science Foundation (NSF).
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,3322 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+The Wavelet-Stat Tool
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Paragraph*
+The Wavelet-Stat tool decomposes two-dimensional forecasts and observations
+ according to intensity and scale.
+ This chapter provides a description of the MET Wavelet-Stat Tool, which
+ enables users to apply the Intensity-Scale verification technique described
+ by Casati et al.
+ (2004).
+\end_layout
+
+\begin_layout Paragraph*
+The Intensity-Scale technique is one of the recently developed verification
+ approaches that focus on verification of forecasts defined over spatial
+ domains.
+ Spatial verification approaches, as opposed to point-by-point verification
+ approaches, aim to account for the presence of features and for the coherent
+ spatial structure characterizing meteorological fields.
+ Since these approaches account for the intrinsic spatial correlation existing
+ between nearby grid-points, they do not suffer from point-by-point comparison
+ related verification issues, such as double penalties.
+ Spatial verification approaches aim to account for the observation and
+ forecast time-space uncertainties, and aim to provide feedback on the forecast
+ error in physical terms.
+\end_layout
+
+\begin_layout Paragraph*
+The Intensity-Scale verification technique, as most of the spatial verification
+ approaches, compares a forecast field to an observation field.
+ To apply the Intensity-Scale verification approach, observations need to
+ be defined over the same spatial domain of the forecast to be verified.
+\end_layout
+
+\begin_layout Paragraph*
+Within the spatial verification approaches, the Intensity-Scale technique
+ belongs to the scale-decomposition (or scale-separation) verification approache
+s.
+ The scale-decomposition approaches enable users to perform the verification
+ on different spatial scales.
+ Weather phenomena on different scales (e.g.
+ frontal systems versus convective showers) are often driven by different
+ physical processes.
+ Verification on different spatial scales can therefore provide deeper insights
+ into model performance at simulating these different processes.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The spatial scale components are obtained usually by applying a single band
+ spatial filter to the forecast and observation fields (e.g.
+ Fourier, Wavelets).
+ The scale-decomposition approaches measure error, bias and skill of the
+ forecast on each different scale component.
+ The scale-decomposition approaches therefore provide feedback on the scale
+ dependency of the error and skill, on the no-skill to skill transition
+ scale, and on the capability of the forecast of reproducing the observed
+ scale structure.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The Intensity-Scale technique evaluates the forecast skill as a function
+ of the intensity values and of the spatial scale of the error.
+ The scale components are obtained by applying a two dimensional Haar wavelet
+ filter.
+ Note that wavelets, because of their locality, are suitable for representing
+ discontinuous fields characterized by few sparse non-zero features, such
+ as precipitation.
+ Moreover, the technique is based on a categorical approach, which is a
+ robust and resistant approach, suitable for non-normally distributed variables,
+ such as precipitation.
+ The intensity-scale technique was specifically designed to cope with the
+ difficult characteristics of precipitation fields, and for the verification
+ of spatial precipitation forecasts.
+ However, the intensity-scale technique can also be applied to verify other
+ variables, such as cloud fraction.
+ 
+\end_layout
+
+\begin_layout Section
+Scientific and statistical aspects
+\end_layout
+
+\begin_layout Subsection
+The method
+\end_layout
+
+\begin_layout Paragraph*
+Casati et al (2004) applied the Intensity-Scale verification to preprocessed
+ and re-calibrated (unbiased) data.
+ The preprocessing was aimed to mainly normalize the data, and defined categoric
+al thresholds so that each categorical bin had a similar sample size.
+ The recalibration was performed to eliminate the forecast bias.
+ Preprocessing and recalibration are not strictly necessary for the application
+ of the Intensity-Scale technique.
+ The MET Intensity-Scale Tool does not perform either, and applies the Intensity
+-Scale approach to biased forecasts, for categorical thresholds defined
+ by the user.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The Intensity Scale approach can be summarized in the following 5 steps:
+\end_layout
+
+\begin_layout Paragraph*
+1.
+ For each threshold, the forecast and observation fields are transformed
+ into binary fields: where the grid-point precipitation value meets the
+ threshold criteria it is assigned 1, where the threshold criteria are not
+ met it is assigned 0.
+ Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Insert Chapter numberX.1
+\end_layout
+
+\end_inset
+
+ illustrates an example of a forecast and observation fields, and their
+ corresponding binary fields for a threshold of 1mm/h.
+ This case shows an intense storm of the scale of 160 km displaced almost
+ its entire length.
+ The displacement error is clearly visible from the binary field difference
+ and the contingency table image obtained for the same threshold (Table
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Insert Chapter number X.
+\end_layout
+
+\end_inset
+
+1).
+\end_layout
+
+\begin_layout Standard
+Table 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+-1: 
+\emph on
+2x2
+\emph default
+ contingency table in terms of counts.
+ The 
+\emph on
+n
+\begin_inset script subscript
+
+\begin_layout Plain Layout
+
+\emph on
+ij
+\end_layout
+
+\end_inset
+
+
+\emph default
+ values in the table represent the counts in each forecast-observation category,
+ where 
+\emph on
+i
+\emph default
+ represents the forecast and 
+\emph on
+j
+\emph default
+ represents the observations.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="4">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+o = 1 (e.g., 
+\begin_inset Quotes eld
+\end_inset
+
+Yes
+\begin_inset Quotes erd
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+o = 0 (e.g., 
+\begin_inset Quotes eld
+\end_inset
+
+No
+\begin_inset Quotes erd
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+f = 1 (e.g., 
+\begin_inset Quotes eld
+\end_inset
+
+Yes
+\begin_inset Quotes erd
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hits=
+\emph on
+a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+False Alarms = 
+\emph on
+b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+a+b
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+f = 0 (e.g., 
+\begin_inset Quotes eld
+\end_inset
+
+No
+\begin_inset Quotes erd
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Misses=
+\emph on
+c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Correct rejections = 
+\emph on
+d
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+c+d
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+a+c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+b+d
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+a+b+c+d
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Wavelet_Fig1.png
+	lyxscale 70
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.1: NIMROD 3h lead-time forecast and corresponding verifying analysis field
+ (precipitation rate in mm/h, valid the 05/29/99 at 15:00 UTC); forecast
+ and analysis binary fields obtained for a threshold of 1mm/h, the binary
+ field difference has their corresponding Contingency Table Image (see Table
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.1).
+ The forecast shows a storm of 160 km displaced almost its entire length.
+\end_layout
+
+\begin_layout Paragraph*
+2.
+ The binary forecast and observation fields obtained from the thresholding
+ are then decomposed into the sum of components on different scales, by
+ using a 2D Haar wavelet filter (
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Fig Insert Chapter numberX.2
+\end_layout
+
+\end_inset
+
+).
+ Note that the scale components are fields, and their sum adds up to the
+ original binary field.
+ For a forecast defined over square domain of 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-points, the scale components are 
+\emph on
+n+1
+\emph default
+: 
+\emph on
+n
+\emph default
+ mother wavelet components + the largest father wavelet (or scale-function)
+ component.
+ The 
+\emph on
+n
+\emph default
+ mother wavelet components have resolution equal to 
+\emph on
+1, 2, 4, ...
+ 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n-1
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-points.
+ The largest father wavelet component is a constant field over the 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-point domain with value equal to the field mean.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename image064.png
+	lyxscale 70
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename image065.png
+	lyxscale 70
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.2: NIMROD binary forecast (top) and binary analysis (bottom) spatial scale
+ components obtained by a 2D Haar wavelet transform (th=1 mm/h).
+ Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160,
+ 320, 640 km resolution); scale 9 refer to the largest father wavelet component
+ (1280 km resolution).
+\end_layout
+
+\begin_layout Paragraph*
+Note that the wavelet transform is a linear operator: this implies that
+ the difference of the spatial scale components of the binary forecast and
+ observation fields (Fig 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.2) are equal to the spatial scale components of the difference of the binary
+ forecast and observation fields (Fig.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.3), and these scale components also add up to the original binary field
+ difference (Fig.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.1).
+ The intensity-scale technique considers thus the spatial scale of the error.
+ For the case illustrated (Fig 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.1 and Fig 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.3) note the large error associated at the scale of 160 km, due the storm,
+ 160km displaced almost its entire length.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename image068.png
+	lyxscale 70
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.3: NIMROD binary field difference spatial scale components obtained by a
+ 2D Haar wavelet transform (th=1 mm/h).
+ Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160,
+ 320, 640 km resolution); scale 9 refers to the largest father wavelet component
+ (1280 km resolution).
+ Note the large error at the scale 6 = 160 km, due to the storm, 160 km
+ displaced almost of its entire length.
+\end_layout
+
+\begin_layout Paragraph*
+Note also that the means of the binary forecast and observation fields (i.e.
+ their largest father wavelet components) are equal to the proportion of
+ forecast and observed events above the threshold,
+\emph on
+ (a+b)/n
+\emph default
+ and 
+\emph on
+(a+c)/n
+\emph default
+, evaluated from the contingency table counts (Table 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.1) obtained from the original forecast and observation fields by thresholding
+ with the same threshold used to obtain the binary forecast and observation
+ fields.
+ This relation is intuitive when observing forecast and observation binary
+ fields and their corresponding contingency table image (Fig 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.1).
+ The comparison of the largest father wavelet component of binary forecast
+ and observation fields therefore provides feedback on the whole field bias.
+\end_layout
+
+\begin_layout Paragraph*
+3.
+ For each threshold (
+\emph on
+t
+\emph default
+) and for each scale component (
+\emph on
+j
+\emph default
+) of the binary forecast and observation, the Mean Squared Error (MSE) is
+ then evaluated (Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.4).
+ The error is usually large for small thresholds, and decreases as the threshold
+ increases.
+ This behavior is partially artificial, and occurs because the smaller the
+ threshold the more events will exceed it, and therefore the larger would
+ be the error, since the error tends to be proportional to the amount of
+ events in the binary fields.
+ The artificial effect can be diminished by normalization: because of the
+ wavelet orthogonal properties, the sum of the MSE of the scale components
+ is equal to the MSE of the original binary fields: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox {MSE}(t) = j 
+\backslash
+hbox{MSE}(t,j)$
+\end_layout
+
+\end_inset
+
+.
+ Therefore, the percentage that the MSE for each scale contributes to the
+ total MSE may be computed: for a given threshold, 
+\emph on
+t
+\emph default
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox {MSE
+\backslash
+%}(t,j) = 
+\backslash
+hbox {MSE}(t,j)/ 
+\backslash
+hbox{MSE}(t)$
+\end_layout
+
+\end_inset
+
+.
+ The MSE% does not exhibit the threshold dependency, and usually shows small
+ errors on large scales and large errors on small scales, with the largest
+ error associated to the smallest scale and highest threshold.
+ For the NIMROD case illustrated note the large error at 160 km and between
+ the thresholds of and 4 mm/h, due to the storm, 160km displaced almost
+ its entire length.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename image071.png
+	lyxscale 70
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename image072.png
+	lyxscale 70
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.4: MSE and MSE % for the NIMROD binary forecast and analysis spatial scale
+ components.
+ In the MSE%, note the large error associated to the scale 6 = 160 km, for
+ the thresholds ½ to 4 mm/h, associated to the displaced storm.
+\end_layout
+
+\begin_layout Paragraph*
+Note that the MSE of the original binary fields is equal to the proportion
+ of the counts of misses (
+\emph on
+c/n
+\emph default
+) and false alarms (
+\emph on
+b/n
+\emph default
+) for the contingency table (Table 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+-1) obtained from the original forecast and observation fields by thresholding
+ with the same threshold used to obtain the binary forecast and observation
+ fields: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox {MSE}(t)=(b+c)/n$
+\end_layout
+
+\end_inset
+
+.
+ This relation is intuitive when comparing the forecast and observation
+ binary field difference and their corresponding contingency table image
+ (Fig 8.1).
+\end_layout
+
+\begin_layout Paragraph*
+4.
+ The MSE for the random binary forecast and observation fields is estimated
+ by 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox{MSE}(t) 
+\backslash
+hbox{random}=
+\backslash
+hbox {FBI}*
+\backslash
+hbox{Br}*(1-
+\backslash
+hbox{Br}) + 
+\backslash
+hbox{Br}*(1- 
+\backslash
+hbox{FBI}*
+\backslash
+hbox{Br})$
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{FBI}=(a+b)/(a+c)$
+\end_layout
+
+\end_inset
+
+ is the frequency bias index and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{Br}=(a+c)/n$
+\end_layout
+
+\end_inset
+
+ is the sample climatology from the contingency table (Table 9.1) obtained
+ from the original forecast and observation fields by thresholding with
+ the same threshold used to obtain the binary forecast and observation fields.
+ This formula follows by considering the Murphy and Winkler (1987) framework,
+ appling the Bayes' theorem to express the joint probabilities 
+\emph on
+b/n
+\emph default
+ and 
+\emph on
+c/n
+\emph default
+ as product of the marginal and conditional probability (e.g.
+ Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for
+ a random forecast the conditional probability is equal to the unconditional
+ one, so that 
+\emph on
+b/n
+\emph default
+ and 
+\emph on
+c/n
+\emph default
+ are equal to the product of the corresponding marginal probabilities solely.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+5.
+ For each threshold (
+\emph on
+t
+\emph default
+) and scale component (
+\emph on
+j
+\emph default
+), the skill score based on the MSE of binary forecast and observation scale
+ components is evaluated (Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.5).
+ The standard skill score definition as in Jolliffe and Stephenson (2003)
+ or Wilks (2006) is used, and random chance is used as reference forecast.
+ The MSE for the random binary forecast is equipartitioned on the 
+\emph on
+n+1
+\emph default
+ scales to evaluate the skill score: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox{SS} (t,j)=1- 
+\backslash
+hbox{MSE}(t,j)*(n+1)/ 
+\backslash
+hbox {MSE}(t) 
+\backslash
+hbox {random}$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The Intensity-Scale (IS) skill score evaluates the forecast skill as a function
+ of the precipitation intensity and of the spatial scale of the error.
+ Positive values of the IS skill score are associated to a skillful forecast,
+ whereas negative values are associated to no skill.
+ Usually large scales exhibit positive skill (large scale events, such as
+ fronts, are well predicted), whereas small scales exhibit negative skill
+ (small scale events, such as convective showers, are less predictable),
+ and the smallest scale and highest thresholds exhibit the worst skill.
+ For the NIMROD case illustrated note the negative skill associated to the
+ 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced
+ almost its entire length.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename image074.png
+	lyxscale 80
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.5: Intensity-Scale skill score for the NIMROD forecast and analysis shown
+ in Fig 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.1.
+ The skill score is a function of the intensity of the precipitation rate
+ and spatial scale of the error.
+ Note the negative skill associated to the scale 6 = 160 km, for the thresholds
+ to 4 mm/h, associated to the displaced storm.
+\end_layout
+
+\begin_layout Paragraph*
+In addition to the MSE and the SS, the energy squared is also evaluated,
+ for each threshold and scale (Fig 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+.6).
+ The energy squared of a field X is the average of the squared values: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{En2}(X)= 
+\backslash
+sum_i x_i^2$
+\end_layout
+
+\end_inset
+
+.
+ The energy squared provides feedback on the amount of events present in
+ the forecast and observation fields for each scale, for a given threshold.
+ Usually, small thresholds are associated to a large energy, since many
+ events exceed the threshold.
+ Large thresholds are associated to a small energy, since few events exceed
+ the threshold.
+ Comparison of the forecast and observed squared energy provide feedback
+ on the bias on different scales, for each threshold.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The En2 bias for each threshold and scale is assessed by the En2 relative
+ difference, equal to the difference between forecast and observed squared
+ energies normalized by their sum: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$[ 
+\backslash
+hbox {En2}(F)- 
+\backslash
+hbox {En2}(O)]/[ 
+\backslash
+hbox {En2}(F)+ 
+\backslash
+hbox {En2}(O)]$
+\end_layout
+
+\end_inset
+
+.
+ Since defined in such a fashion, the En2 relative difference accounts for
+ the difference between forecast and observation squared energies relative
+ to their magnitude, and it is sensitive therefore to the ratio of the forecast
+ and observed squared energies.
+ The En2 relative difference ranges between -1 and 1, positive values indicate
+ over-forecast and negative values indicate under-forecast.
+ For the NIMROD case illustrated the forecast exhibits over-forecast for
+ small thresholds, quite pronounced on the large scales, and under-forecast
+ for high thresholds.
+\end_layout
+
+\begin_layout Paragraph*
+As for the MSE, the sum of the energy of the scale components is equal to
+ the energy of the original binary field: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox {En2}(t) = j 
+\backslash
+hbox {En2}(t,j)$
+\end_layout
+
+\end_inset
+
+.
+ Therefore, the percentage that the En2 for each scale contributes the total
+ En2 may be computed: for a given threshold, 
+\emph on
+t
+\emph default
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox {En2
+\backslash
+%}(t,j) = 
+\backslash
+hbox {En2}(t,j)/
+\backslash
+hbox {En2}(t)$
+\end_layout
+
+\end_inset
+
+.
+ Usually, for precipitation fields, low thresholds exhibit most of the energy
+ percentage on large scales (and less percentage on the small scales), since
+ low thresholds are associated to large scale features, such as fronts.
+ On the other hand, for higher thresholds the energy percentage is usually
+ larger on small scales, since intense events are associated to small scales
+ features, such as convective cells or showers.
+ The comparison of the forecast and observation squared energy percentages
+ provides feedback on how the events are distributed across the scales,
+ and enable the comparison of forecast and observation scale structure.
+\end_layout
+
+\begin_layout Paragraph*
+For the NIMROD case illustrated, the scale structure is assessed again by
+ the relative difference, but calculated of the squared energy percentages.
+ For small thresholds the forecast over-estimates the number of large scale
+ events and under-estimates the number of small scale events, in proportion
+ to the total number of events.
+ On the other hand, for larger thresholds the forecast under-estimates the
+ number of large scale events and over-estimates the number of small scale
+ events, again in proportion to the total number of events.
+ Overall it appears that the forecast over-estimates the percentage of events
+ associated to high occurrence, and under-estimate the percentage of events
+ associated to low occurrence.
+ The En2
+\emph on
+%
+\emph default
+ for the 64 mm/h thresholds is homogeneously under-estimated for all the
+ scales, since the forecast does not have any event exceeding this threshold.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+Note that the energy squared of the observation binary field is identical
+ to the sample climatology 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox {Br}=(a+c)/n$
+\end_layout
+
+\end_inset
+
+.
+ Similarly, the energy squared of the forecast binary field is equal to
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(a+b)/n$
+\end_layout
+
+\end_inset
+
+.
+ The ratio of the squared energies of the forecast and observation binary
+ fields is equal to the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox {FBI}=(a+b)/(a+c)$
+\end_layout
+
+\end_inset
+
+FBI=(a+b)/(a+c), for the contingency table (Table 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.1) obtained from the original forecast and observation fields by thresholding
+ with the same threshold used to obtained the binary forecast and observation
+ fields.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Wavelet_Fig2.png
+	lyxscale 70
+	scale 42
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+.6: Energy squared and energy squared percentages, for each threshold and
+ scale, for the NIMROD forecast and analysis, and forecast and analysis
+ En2 and En2% relative differences.
+\end_layout
+
+\begin_layout Subsection
+The spatial domain constraints
+\end_layout
+
+\begin_layout Paragraph*
+The Intensity-Scale technique is constrained by the fact that orthogonal
+ wavelets (discrete wavelet transforms) are usually performed on square
+ domains of 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-points.
+ The Wavelet-Stat tool handles this issue based on settings in the configuration
+ file.
+ The Wavelet-Stat tool can define tiles of dimensions 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ over the input domain in the following ways:
+\end_layout
+
+\begin_layout Paragraph*
+1.
+ User-Defined Tiling: The user may define one or more tiles of size 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ over their domain to be applied.
+ This is done by selecting the grid coordinates for the lower-left corner
+ of the tile(s) and the tile dimension to be used.
+ If the user specifies more than one tile, the Intensity-Scale method will
+ be applied to each tile separately.
+ At the end, the results will automatically be aggregated across all the
+ tiles and written out with the results for each of the individual tiles.
+ Users are encouraged to select tiles which consist entirely of valid data.
+\end_layout
+
+\begin_layout Paragraph*
+2.
+ Automated Tiling: This tiling method is essentially the same as the user-define
+d tiling method listed above except that the tool automatically selects
+ the location and size of the tile(s) to be applied.
+ It figures out the maximum tile of dimension 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ that fits within the domain and places the tile at the center of the domain.
+ For domains that are very elongated in one direction, it defines as many
+ of these tiles as possible that fit within the domain.
+\end_layout
+
+\begin_layout Paragraph*
+3.
+ Padding: If the domain size is only slightly smaller than 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+, for certain variables (e.g.
+ precipitation), it is advisable to expand the domain out to 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-points by adding extra rows and/or columns of fill data.
+ For precipitation variables, a fill value of zero is used.
+ For continuous variables, such as temperature, the fill value is defined
+ as the mean of the valid data in the rest of the field.
+ A drawback to the padding method is the introduction of artificial data
+ into the original field.
+ Padding should only be used when a very small number of rows and/or columns
+ need to be added.
+\end_layout
+
+\begin_layout Subsection
+Aggregation of statistics on multiple cases
+\end_layout
+
+\begin_layout Paragraph*
+The Stat-Analysis tool aggregates the intensity scale technique results.
+ Since the results are scale-dependent, it is sensible to aggregate results
+ from multiple model runs (e.g.
+ daily runs for a season) on the same spatial domain, so that the scale
+ components for each singular case will be the same number, and the domain,
+ if not a square domain of
+\emph on
+ 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-points, will be treated in the same fashion.
+ Similarly, the intensity thresholds for each run should all be the same.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The MSE and forecast and observation squared energy for each scale and threshold
+s are aggregated simply with a weighted average, where weights are proportional
+ to the number of grid-points used in each single run to evaluate the statistics.
+ If the same domain is always used (and it should) the weights result all
+ the same, and the weighted averaging is a simple mean.
+ For each threshold, the aggregated Br is equal to the aggregated squared
+ energy of the binary observation field, and the aggregated FBI is obtained
+ as the ratio of the aggregated squared energies of the forecast and observation
+ binary fields.
+ From aggregated Br and FBI, the MSErandom for the aggregated runs can be
+ evaluated using the same formula as for the single run.
+ Finally, the Intensity-Scale Skill Score is evaluated by using the aggregated
+ statistics within the same formula used for the single case.
+\end_layout
+
+\begin_layout Section
+Practical information
+\end_layout
+
+\begin_layout Paragraph*
+The following sections describe the usage statement, required arguments
+ and optional arguments for the Stat-Analysis tool.
+\end_layout
+
+\begin_layout Subsection
+Wavelet_stat usage
+\end_layout
+
+\begin_layout Paragraph*
+The usage statement for the Wavelet-Stat tool is shown below:
+\end_layout
+
+\begin_layout Paragraph*
+\paragraph_spacing single
+Usage: wavelet_stat
+\end_layout
+
+\begin_layout Paragraph*
+\paragraph_spacing single
+fcst_file
+\end_layout
+
+\begin_layout Paragraph*
+\paragraph_spacing single
+obs_file
+\end_layout
+
+\begin_layout Paragraph*
+\paragraph_spacing single
+config_file
+\end_layout
+
+\begin_layout Paragraph*
+\paragraph_spacing single
+[-outdir path]
+\end_layout
+
+\begin_layout Paragraph*
+\paragraph_spacing single
+[-log file]
+\end_layout
+
+\begin_layout Paragraph*
+\paragraph_spacing single
+[-v level]
+\end_layout
+
+\begin_layout Paragraph*
+Wavelet_stat has both required arguments and optional ones.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+Required arguments for wavelet_stat
+\end_layout
+
+\begin_layout Paragraph*
+1.
+ The fcst_file argument indicates the gridded file containing the model
+ data to be verified.
+\end_layout
+
+\begin_layout Paragraph*
+2.
+ The obs_file argument indicates the gridded file containing the gridded
+ observations to be used for the verification of the model.
+\end_layout
+
+\begin_layout Paragraph*
+3.
+ The config_file argument indicates the name of the configuration file to
+ be used.
+ The contents of the configuration file are discussed below.
+\end_layout
+
+\begin_layout Paragraph*
+Optional arguments for wavelet_stat
+\end_layout
+
+\begin_layout Paragraph*
+4.
+ The -outdir path indicates the directory where output files should be written.
+\end_layout
+
+\begin_layout Paragraph*
+5.
+ The -log file option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+6.
+ The -v level option indicates the desired level of verbosity.
+ The contents of 
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
+\end_layout
+
+\begin_layout Paragraph*
+An example of the wavelet_stat calling sequence is listed below:
+\end_layout
+
+\begin_layout Paragraph*
+Example:
+\end_layout
+
+\begin_layout Paragraph*
+wavelet_stat sample_fcst.grb sample_obs.grb WaveletStatConfig
+\end_layout
+
+\begin_layout Paragraph*
+In the example, the Wavelet-Stat tool will verify the model data in the
+ sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB
+ file applying the configuration options specified in the WaveletStatConfig
+ file.
+\end_layout
+
+\begin_layout Subsection
+wavelet_stat configuration file
+\end_layout
+
+\begin_layout Paragraph*
+The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_defa
+ult, can be found in the installed share/met/config directory.
+ Another version of the configuration file is provided in scripts/config.
+ We encourage users to make a copy of the configuration files prior to modifying
+ their contents.
+ Each configuration file contains many comments describing its contents.
+ Descriptions of WaveletStatConfig_default and the required variables for
+ any wavelet_stat configuration file are also provided below.
+ While the configuration file contains many entries, most users will only
+ need to change a few for their use.
+ Specific options are described in the following subsections.
+\end_layout
+
+\begin_layout Paragraph*
+Note that environment variables may be used when editing configuration files,
+ as described in the section 3.5.2 for the PB2NC tool.
+\end_layout
+
+\begin_layout Paragraph*
+model = 
+\begin_inset Quotes eld
+\end_inset
+
+WRF
+\begin_inset Quotes erd
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Paragraph*
+The model variable contains a short text string identifying the name to
+ be assigned to the model being verified.
+ This text string is written out in the first column of the ASCII output
+ so that verification statistics from multiple models may be differentiated.
+ The value listed above is simply set to 
+\begin_inset Quotes eld
+\end_inset
+
+WRF
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+fcst = {
+\end_layout
+
+\begin_layout Subsubsection*
+field = [
+\end_layout
+
+\begin_layout Subsubsection*
+{
+\end_layout
+
+\begin_layout Subsubsection*
+name = "APCP";
+\end_layout
+
+\begin_layout Subsubsection*
+level = [ "A03" ];
+\end_layout
+
+\begin_layout Subsubsection*
+cat_thresh = [ >0.0, >=5.0 ];
+\end_layout
+
+\begin_layout Subsubsection*
+}
+\end_layout
+
+\begin_layout Subsubsection*
+];
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Subsubsection*
+obs = fcst;
+\end_layout
+
+\begin_layout Paragraph*
+The fcst and obs groups specify one or more data fields to be selected from
+ the forecast and observation files to be compared.
+ The fields should be specified in the same way that they?re specified for
+ the other MET tools, with name, level and categorical thresholds.
+\end_layout
+
+\begin_layout Subsubsection*
+mask_missing_flag = NONE;
+\end_layout
+
+\begin_layout Paragraph*
+The mask_missing_flag variable specifies how missing data in the raw model
+ and observation fields will be treated.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* NONE indicates no additional processing is to be done.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* FCST indicates missing data in the observation field should be used to
+ mask the forecast field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* OBS indicates missing data in the forecast field should be used to mask
+ the observation field.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* BOTH indicates masking should be performed in both directions (i.e., mask
+ the forecast field with the observation field and vice-versa).
+\end_layout
+
+\begin_layout Subsubsection*
+grid_decomp_flag = AUTO;
+\end_layout
+
+\begin_layout Subsubsection*
+tile = {
+\end_layout
+
+\begin_layout Subsubsection*
+width = 0;
+\end_layout
+
+\begin_layout Subsubsection*
+location = [
+\end_layout
+
+\begin_layout Subsubsection*
+{
+\end_layout
+
+\begin_layout Subsubsection*
+x_ll = 0;
+\end_layout
+
+\begin_layout Subsubsection*
+y_ll = 0;
+\end_layout
+
+\begin_layout Subsubsection*
+}
+\end_layout
+
+\begin_layout Subsubsection*
+];
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Paragraph*
+The grid_decomp_flag variable specifies how tiling should be performed:
+ 
+\end_layout
+
+\begin_layout Paragraph*
+* AUTO indicates that the automated-tiling should be done.
+\end_layout
+
+\begin_layout Paragraph*
+* TILE indicates that the user-defined tiles should be applied.
+\end_layout
+
+\begin_layout Paragraph*
+* PAD indicated that the data should be padded out to the nearest dimension
+ of 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The width and location variables allow users to manually define the tiles
+ of dimension they would like to apply.
+ The x_ll and y_ll variables specify the location of one or more lower-left
+ tile grid (x, y) points.
+\end_layout
+
+\begin_layout Subsubsection*
+wavelet = {
+\end_layout
+
+\begin_layout Subsubsection*
+type = HAAR;
+\end_layout
+
+\begin_layout Subsubsection*
+member = 2;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Paragraph*
+The wavelet_flag and wavelet_k variables specify the type and shape of the
+ wavelet to be used for the scale decomposition.
+ The Casati et al.
+ (2004) method uses a Haar wavelet which is a good choice for discontinuous
+ fields like precipitation.
+ However, users may choose to apply any wavelet family/shape that is available
+ in the GNU Scientific Library.
+ Values for the wavelet_flag variable, and associated choices for k, are
+ described below:
+\end_layout
+
+\begin_layout Paragraph*
+* HAAR for the Haar wavelet (member = 2).
+\end_layout
+
+\begin_layout Paragraph*
+* HAAR_CNTR for the Centered-Haar wavelet (member = 2).
+\end_layout
+
+\begin_layout Paragraph*
+* DAUB for the Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18,
+ 20).
+\end_layout
+
+\begin_layout Paragraph*
+* DAUB_CNTR for the Centered-Daubechies wavelet (member = 4, 6, 8, 10, 12,
+ 14, 16, 18, 20).
+\end_layout
+
+\begin_layout Paragraph*
+* BSPLINE for the Bspline wavelet (member = 103, 105, 202, 204, 206, 208,
+ 301, 303, 305, 307, 309).
+\end_layout
+
+\begin_layout Paragraph*
+* BSPLINE_CNTR for the Centered-Bspline wavelet (member = 103, 105, 202,
+ 204, 206, 208, 301, 303, 305, 307, 309).
+\end_layout
+
+\begin_layout Subsubsection*
+output_flag = {
+\end_layout
+
+\begin_layout Subsubsection*
+isc = BOTH;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Paragraph*
+The output_flag array controls the type of output that the Wavelet-Stat
+ tool generates.
+ These flags are set similarly to the output flags of the other MET tools,
+ with possible values of NONE, STAT, and BOTH.
+ The isc line type is the only one available for Intensity-Scale STAT lines.
+\end_layout
+
+\begin_layout Subsubsection*
+nc_pairs_flag = {
+\end_layout
+
+\begin_layout Subsubsection*
+latlon = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+raw = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+diff = TRUE;
+\end_layout
+
+\begin_layout Subsubsection*
+}
+\end_layout
+
+\begin_layout Subsubsection*
+ps_plot_flag = TRUE; 
+\end_layout
+
+\begin_layout Paragraph*
+These flags produce additional output from the Wavelet-Stat tool.
+ The nc_pairs_flag produces the same output that would be produced by Grid-Stat,
+ i.e.
+ it contains gridded matched pair data, not scale decompositions.
+ The other two types of output from the wavelet tool are:
+\end_layout
+
+\begin_layout Paragraph*
+1.
+ NetCDF output file containing the scale decompositions for each combination
+ of tile/field/threshold.
+\end_layout
+
+\begin_layout Paragraph*
+2.
+ PostScript output file summarizing the Intensity-Scale method.
+\end_layout
+
+\begin_layout Subsubsection*
+met_data_dir = 
+\begin_inset Quotes eld
+\end_inset
+
+MET_BASE
+\begin_inset Quotes erd
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Paragraph*
+The Wavelet-Stat tool uses several static data files when generating plots.
+ If it cannot find the data it needs in the expected directory, it will
+ error out.
+ The met_data_dir variable may be set to the installed share/met/ directory
+ to find the static data files.
+\end_layout
+
+\begin_layout Subsubsection*
+fcst_raw_plot = {
+\end_layout
+
+\begin_layout Subsubsection*
+color_table = "MET_BASE/colortables/met_default.ctable";
+\end_layout
+
+\begin_layout Subsubsection*
+plot_min = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+plot_max = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Subsubsection*
+obs_raw_plot = {
+\end_layout
+
+\begin_layout Subsubsection*
+color_table = "MET_BASE/colortables/met_default.ctable";
+\end_layout
+
+\begin_layout Subsubsection*
+plot_min = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+plot_max = 0.0;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Subsubsection*
+wvlt_plot = {
+\end_layout
+
+\begin_layout Subsubsection*
+color_table = "MET_BASE/colortables/NCL_colortables/BlWhRe.ctable";
+\end_layout
+
+\begin_layout Subsubsection*
+plot_min = -1.0;
+\end_layout
+
+\begin_layout Subsubsection*
+plot_max = 1.0;
+\end_layout
+
+\begin_layout Subsubsection*
+};
+\end_layout
+
+\begin_layout Paragraph*
+The color_table variables indicate which color table files should be used
+ when generating the Wavelet-Stat PostScript output.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+These plot_min and plot_max variables indicate the min and max data values
+ to be plotted for the raw and wavelet fields.
+ If set to non-zero values, the forecast and observation raw color tables
+ specified above will be rescaled to match the specified range.
+\end_layout
+
+\begin_layout Subsubsection*
+output_prefix = "";
+\end_layout
+
+\begin_layout Paragraph*
+This option specifies a string to be used in the output file name.
+ It can be useful for keeping results for different models or variables
+ from overwriting each other.
+\end_layout
+
+\begin_layout Subsubsection*
+version = 
+\begin_inset Quotes eld
+\end_inset
+
+v5.1
+\begin_inset Quotes erd
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Paragraph*
+The version indicates the version of the mode configuration file used.
+ Future versions of MET may include changes to mode and the mode configuration
+ file.
+ This value should not be modified.
+\end_layout
+
+\begin_layout Subsection
+wavelet_stat output
+\end_layout
+
+\begin_layout Paragraph*
+wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and
+ PostScript formats.
+ The ASCII output duplicates the STAT output but has the data organized
+ by line type.
+ While the Wavelet-Stat tool currently only outputs one STAT line type,
+ additional line types may be added in future releases.
+ The output files are written to the default output directory or the directory
+ specified by the -outdir command-line option.
+ 
+\end_layout
+
+\begin_layout Paragraph*
+The output STAT file is named using the following naming convention: 
+\end_layout
+
+\begin_layout Paragraph*
+wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates
+ the user-defined output prefix, HHMMSS indicates the forecast lead time,
+ and YYYYMMDD_HHMMSS indicates the forecast valid time.
+\end_layout
+
+\begin_layout Paragraph*
+The output ASCII files are named similarly: 
+\end_layout
+
+\begin_layout Paragraph*
+wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to
+ indicate that this is an intensity-scale line type.
+\end_layout
+
+\begin_layout Paragraph*
+The format of the STAT and ASCII output of the Wavelet-Stat tool is similar
+ to the format of the STAT and ASCII output of the Point-Stat tool.
+ Please refer to the tables in section 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+previously 4.3.3, should be updated with cross reference 
+\end_layout
+
+\end_inset
+
+(point_stat output) for a description of the common output for STAT files
+ types.
+ The information contained in the STAT and isc files are identical.
+ However, for consistency with the STAT files produced by other tools, the
+ STAT file will only have column headers for the first 21 fields.
+ The isc file contains all headers.
+ The format of the isc line type is explained in the following table.
+\end_layout
+
+\begin_layout Standard
+Table 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+-2.
+ Header information for each file wavelet-stat outputs.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="15" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Header
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Header Column Type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LINE_TYPE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ISC
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The number of grid points (forecast locations) used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TILE_DIM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The dimensions of the tile
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TILE_XLL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Horizontal coordinate of the lower left corner of the tile
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TILE_YLL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Vertical coordinate of the lower left corner of the tile
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NSCALE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of scales used in decomposition
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ISCALE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The scale at which all information following applies
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MSE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean squared error for this scale
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ISC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The intensity scale skill score
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FENERGY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast energy squared for this scale
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OENERGY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observed energy squared for this scale
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BASER
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The base rate (not scale dependent)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FBIAS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The frequency bias
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+The Wavelet-Stat tool creates a NetCDF output file containing the raw and
+ decomposed values for the forecast, observation, and difference fields
+ for each combination of variable and threshold value.
+\end_layout
+
+\begin_layout Paragraph*
+The dimensions and variables included in the wavelet_stat NetCDF files are
+ described in Tables 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+-3 and 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+X
+\end_layout
+
+\end_inset
+
+-4.
+\end_layout
+
+\begin_layout Standard
+Table 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+-3.
+ NetCDF dimensions for Wavelet-Stat output.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+mode NetCDF OUTPUT FILE DIMENSIONS
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NetCDF Dimension
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension of the tile which equals 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension of the tile which equals
+\emph on
+ 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scale
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Need to figure out how to get table entries to wrap so this doesn't hang
+ off the edge of the page.
+\end_layout
+
+\end_inset
+
+Dimension for the number of scales.
+ This is set to 
+\emph on
+n+2
+\emph default
+, where 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ is the tile dimension.
+ The 2 extra scales are for the binary image and the wavelet averaged over
+ the whole tile.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tile
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension for the number of tiles used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Table 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Chapter number
+\end_layout
+
+\end_inset
+
+-4.
+ Variables contained in Wavelet-Stat NetCDF output.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Wavelet-stat NetCDF OUTPUT FILE VARIABLES
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NetCDF Variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_FIELD_LEVEL_RAW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tile, x, y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Raw values for the forecast field specified by 
+\begin_inset Quotes eld
+\end_inset
+
+FIELD_LEVEL
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_FIELD_LEVEL_RAW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tile, x, y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Raw values for the observation field specified by 
+\begin_inset Quotes eld
+\end_inset
+
+FIELD_LEVEL
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DIFF_FIELD_LEVEL_RAW
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tile, x, y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Raw values for the difference field (
+\emph on
+f-o
+\emph default
+) specified by 
+\begin_inset Quotes eld
+\end_inset
+
+FIELD_LEVEL
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_FIELD_LEVEL_THRESH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tile, scale, x, y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Wavelet scale-decomposition of the forecast field specified by 
+\begin_inset Quotes eld
+\end_inset
+
+FIELD_LEVEL_THRESH
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_FIELD_LEVEL_THRESH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tile, scale, x, y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Wavelet scale-decomposition of the observation field specified by 
+\begin_inset Quotes eld
+\end_inset
+
+FIELD_LEVEL_THRESH
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DIFF_FIELD_LEVEL_THRESH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tile, scale, x, y
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Wavelet scale-decomposition of the difference field (
+\emph on
+f-o
+\emph default
+) specified by 
+\begin_inset Quotes eld
+\end_inset
+
+FIELD_LEVEL_THRESH
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph*
+Lastly, the Wavelet-Stat tool creates a PostScript plot summarizing the
+ scale-decomposition approach used in the verification.
+ The PostScript plot is generated using internal libraries and does not
+ depend on an external plotting package.
+ The generation of this PostScript output can be disabled using the ps_plot_flag
+ configuration file option.
+\end_layout
+
+\begin_layout Paragraph*
+The PostScript plot begins with one summary page illustrating the tiling
+ method that was applied to the domain.
+ The remaining pages depict the Intensity-Scale method that was applied.
+ For each combination of field, tile, and threshold, the binary difference
+ field (
+\emph on
+f-o
+\emph default
+) is plotted followed by the difference field for each decomposed scale.
+ Underneath each difference plot, the statistics applicable to that scale
+ are listed.
+ Examples of the PostScript plots can be obtained by running the example
+ cases provided with the MET tarball.
+\end_layout
+
+\end_body
+\end_document

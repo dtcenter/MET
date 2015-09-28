@@ -1,0 +1,444 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter*
+
+\series medium
+References
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Bradley, A.A., S.S.
+ Schwartz, and T.
+ Hashino, 2008: Sampling Uncertainty and Confidence Intervals for the Brier
+ Score and Brier Skill Score.
+ 
+\emph on
+Weather and Forecasting
+\emph default
+, 
+\series default
+23
+\series medium
+, 992-1006.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Brill, K.
+ F., and F.
+ Mesinger, 2009: Applying a general analytic method for assessing bias sensitivi
+ty to bias-adjusted threat and equitable threat scores.
+ 
+\emph on
+Weather and Forecasting
+\emph default
+, 
+\series default
+24
+\series medium
+, 1748--1754.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Brown, B.G., R.
+ Bullock, J.
+ Halley Gotway, D.
+ Ahijevych, C.
+ Davis, E.
+ Gilleland, and L.
+ Holland, 2007: Application of the MODE object-based verification tool for
+ the evaluation of model precipitation fields.
+ 
+\emph on
+AMS 22nd Conference on Weather Analysis and Forecasting and 18th Conference
+ on Numerical Weather Prediction
+\emph default
+, 25-29 June, Park City, Utah, American Meteorological Society (Boston),
+ Available at 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://ams.confex.com/ams/pdfpapers/124856.pdf."
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Casati, B., Ross, G., and Stephenson, D.
+ 2004: A new intensity-scale approach for the verification of spatial precipitat
+ion forecasts.
+ 
+\emph on
+Meteorol.
+ Appl
+\emph default
+.
+ 
+\series default
+11
+\series medium
+, 141-154
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Davis, C.A., B.G.
+ Brown, and R.G.
+ Bullock, 2006a: Object-based verification of precipitation forecasts, Part
+ I: Methodology and application to mesoscale rain areas.
+ 
+\emph on
+Monthly Weather Review
+\emph default
+, 
+\series default
+134
+\series medium
+, 1772-1784.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Davis, C.A., B.G.
+ Brown, and R.G.
+ Bullock, 2006b: Object-based verification of precipitation forecasts, Part
+ II: Application to convective rain systems.
+ 
+\emph on
+Monthly Weather Review
+\emph default
+, 
+\series default
+134
+\series medium
+, 1785-1795.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Dawid, A.
+ P., 1984: Statistical theory: The prequential approach.
+ 
+\emph on
+J.
+ Roy.
+ Stat.
+ Soc
+\emph default
+, 
+\series default
+A147
+\series medium
+:278-292.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Ebert, E.E., 2008: Fuzzy verification of high-resolution gridded forecasts:
+ a review and proposed framework.
+ 
+\emph on
+Meteorological Applications
+\emph default
+, 
+\series default
+15
+\series medium
+, 51-64.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Eckel, F.
+ Anthony, Mark S.
+ Allen, Matthew C.
+ Sittel, 2012: Estimation of Ambiguity in Ensemble Forecasts.
+ 
+\emph on
+Wea.
+ Forecasting
+\emph default
+, 
+\series default
+27
+\series medium
+, 50-69.
+ doi: 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://dx.doi.org/10.1175/WAF-D-11-00015.1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Efron B.
+ 2007: Correlation and large-scale significance testing.
+ 
+\emph on
+Journal of the American Statistical Association
+\emph default
+, 
+\series default
+102
+\series medium
+(477), 93-103.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Gilleland, E., 2010: Confidence intervals for forecast verification.
+ 
+\emph on
+NCAR Technical Note
+\emph default
+ NCAR/TN-479+STR, 71pp.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Gneiting, T., Westveld, A., Raferty, A.
+ and Goldman, T, 2004: 
+\emph on
+Calibrated Probabilistic Forecasting Using Ensemble Model Output Statistics
+ and Minimum CRPS Estimation
+\emph default
+.
+ Technical Report no.
+ 449, Department of Statistics, University of Washington.
+ [Available online at 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.stat.washington.edu/www/research/reports/"
+
+\end_inset
+
+ ]
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Hamill, T.
+ M., 2001: Interpretation of rank histograms for verifying ensemble forecasts.
+ 
+\emph on
+Mon.
+ Wea.
+ Rev
+\emph default
+., 
+\series default
+129
+\series medium
+, 550-560.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Hogan, R., E.
+ O'Connor, and A.
+ Illingworth, 2009: Verification of cloud-fraction forecasts.
+ 
+\emph on
+Quart.
+ Jour.
+ Roy.
+ Meteorol.
+ Soc.
+\emph default
+, 
+\series default
+135
+\series medium
+, 1494-1511.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Jolliffe, I.T., and D.B.
+ Stephenson, 2012: 
+\emph on
+Forecast verification.
+ A practitioner's guide in atmospheric science
+\emph default
+.
+ Wiley and Sons Ltd, 240 pp.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Murphy, A.H., and R.L.
+ Winkler, 1987: A general framework for forecast verification.
+ 
+\emph on
+Monthly Weather Review
+\emph default
+, 
+\series default
+115
+\series medium
+, 1330-1338.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Roberts, N.M., and H.W.
+ Lean, 2008: Scale-selective verification of rainfall accumulations from
+ high-resolution forecasts of convective events.
+ 
+\emph on
+Monthly Weather Review
+\emph default
+, 
+\series default
+136
+\series medium
+, 78-97.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Stephenson, D.B., 2000: Use of the 
+\begin_inset Quotes eld
+\end_inset
+
+Odds Ratio
+\begin_inset Quotes erd
+\end_inset
+
+ for diagnosing forecast skill.
+ 
+\emph on
+Weather and Forecasting
+\emph default
+, 
+\series default
+15
+\series medium
+, 221-232.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Stephenson, D.B., B.
+ Casati, C.A.T.
+ Ferro, and C.A.
+ Wilson, 2008: The extreme dependency score: A non-vanishing measure for
+ forecasts of rare events.
+ 
+\emph on
+Meteor.
+ Appl.
+
+\emph default
+ 
+\series default
+15
+\series medium
+, 41-50.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Wilks, D., 2011: 
+\emph on
+Statistical methods in the atmospheric sciences.
+
+\emph default
+ Elsevier, San Diego.
+\end_layout
+
+\end_body
+\end_document

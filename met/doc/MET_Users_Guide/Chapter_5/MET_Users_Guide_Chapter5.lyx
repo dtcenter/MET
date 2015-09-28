@@ -1,0 +1,4737 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+The Grid-Stat Tool
+\end_layout
+
+\begin_layout Section
+Introduction 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Grid-Stat tool provides verification statistics for a matched forecast
+ and observation grid.
+ All of the forecast grid points in the region of interest are matched to
+ observation grid points on the same grid.
+ All the matched grid points are used to compute the verification statistics.
+ The Grid-Stat tool functions in much the same way as the Point-Stat tool,
+ except that no interpolation is required because the forecasts and observations
+ are on the same grid.
+ However, the interpolation parameters may be used to perform a smoothing
+ operation on the forecast and observation fields prior to verification.
+ In addition to traditional verification approaches, the Grid-Stat tool
+ includes neighborhood methods, designed to examine forecast performance
+ as a function of spatial scale.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Scientific and statistical aspects of the Grid-Stat tool are briefly described
+ in this chapter, followed by practical details regarding usage and output
+ from the tool.
+\end_layout
+
+\begin_layout Section
+Scientific and statistical aspects
+\end_layout
+
+\begin_layout Subsection
+Statistical measures
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Grid-Stat tool computes a wide variety of verification statistics.
+ Broadly speaking, these statistics can be subdivided into three types of
+ statistics: measures for categorical variables, measures for continuous
+ variables, and measures for probabilistic forecasts.
+ These categories of measures are briefly described here; specific descriptions
+ of all measures are provided in Appendix C.
+ Additional information can be found in Wilks (2011) and Jolliffe and Stephenson
+ (2012), and on the world-wide web at
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.cawcr.gov.au/projects/verification/verif_web_page.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+In addition to these verification measures, the Grid-Stat tool also computes
+ partial sums and other FHO statistics that are produced by the NCEP verificatio
+n system.
+ These statistics are also described in Appendix C.
+\end_layout
+
+\begin_layout Paragraph
+
+\shape slanted
+Measures for categorical variables
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Categorical verification statistics are used to evaluate forecasts that
+ are in the form of a discrete set of categories rather than on a continuous
+ scale.
+ Grid-Stat computes both 2x2 and multi-category contingency tables and their
+ associated statistics, similar to Point-Stat.
+ See Appendix C for more information.
+\end_layout
+
+\begin_layout Paragraph
+Measures for continuous variables
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+For continuous variables, many verification measures are based on the forecast
+ error (i.e., f - o).
+ However, it also is of interest to investigate characteristics of the forecasts
+, and the observations, as well as their relationship.
+ These concepts are consistent with the general framework for verification
+ outlined by Murphy and Winkler (1987).
+ The statistics produced by MET for continuous forecasts represent this
+ philosophy of verification, which focuses on a variety of aspects of performanc
+e rather than a single measure.
+ See Appendix C for specific information.
+\end_layout
+
+\begin_layout Paragraph
+Measures for probabilistic forecasts and dichotomous outcomes
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+For probabilistic forecasts, many verification measures are based on reliability
+, accuracy and bias.
+ However, it also is of interest to investigate joint and conditional distributi
+ons of the forecasts and the observations, as in Wilks (2006).
+ See Appendix C for specific information.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Probabilistic forecast values are assumed to have a range of either 0 to
+ 1 or 0 to 100.
+ If the max data value is > 1, we assume the data range is 0 to 100, and
+ divide all the values by 100.
+ If the max data value is <= 1, then we use the values as is.
+ Further, thresholds are applied to the probabilities with equality on the
+ lower end.
+ For example, with a forecast probability p, and thresholds t1 and t2, the
+ range is defined as: t1 <= p < t2.
+ The exception is for the highest set of thresholds, when the range includes
+ 1: t1 <= p <= 1.
+\end_layout
+
+\begin_layout Paragraph
+Use of analysis fields for verification
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Grid-Stat tool allows evaluation of model forecasts using model analysis
+ fields.
+ However, users are cautioned that an analysis field is not independent
+ of its parent model; for this reason verification of model output using
+ an analysis field from the same model is generally not recommended and
+ is not likely to yield meaningful information about model performance.
+\end_layout
+
+\begin_layout Subsection
+Statistical confidence intervals
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The confidence intervals for the Grid-Stat tool are the same as those provided
+ for the Point-Stat tool except that the scores are based on pairing grid
+ points with grid points so that there are likely more values for each field
+ making any assumptions based on the central limit theorem more likely to
+ be valid.
+ However, it should be noted that spatial (and temporal) correlations are
+ not presently taken into account in the confidence interval calculations.
+ Therefore, confidence intervals reported may be somewhat too narrow (e.g.,
+ Efron 2007).
+ See Appendix D for details regarding confidence intervals provided by MET.
+ 
+\end_layout
+
+\begin_layout Subsection
+Neighborhood methods
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+MET also incorporates several neighborhood methods to give credit to forecasts
+ that are close to the observations, but not necessarily exactly matched
+ up in space.
+ Also referred to as 
+\begin_inset Quotes eld
+\end_inset
+
+fuzzy
+\begin_inset Quotes erd
+\end_inset
+
+ verification methods, these methods do not just compare a single forecast
+ at each grid point to a single observation at each grid point; they compare
+ the forecasts and observations in a neighborhood surrounding the point
+ of interest.
+ With the neighborhood method, the user chooses a distance within which
+ the forecast event can fall from the observed event and still be considered
+ a hit.
+ In MET this is implemented by defining a square search window around each
+ grid point.
+ Within the search window, the number of observed events is compared to
+ the number of forecast events.
+ In this way, credit is given to forecasts that are close to the observations
+ without requiring a strict match between forecasted events and observed
+ events at any particular grid point.
+ The neighborhood methods allow the user to see how forecast skill varies
+ with neighborhood size and can help determine the smallest neighborhood
+ size that can be used to give sufficiently accurate forecasts.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+There are several ways to present the results of the neighborhood approaches,
+ such as the Fractions Skill Score (FSS) or the Fractions Brier Score (FBS).
+ These scores are presented in Appendix C.
+ One can also simply up-scale the information on the forecast verification
+ grid by smoothing or resampling within a specified neighborhood around
+ each grid point and recalculate the traditional verification metrics on
+ the coarser grid.
+ The MET output includes traditional contingency table statistics for each
+ threshold and neighborhood window size.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The user must specify several parameters in the 
+\series default
+grid_stat
+\series medium
+ configuration file to utilize the neighborhood approach, such as the interpolat
+ion method, size of the smoothing window, and required fraction of valid
+ data points within the smoothing window.
+ For FSS-specific results, the user must specify the size of the neighborhood
+ window, the required fraction of valid data points within the window, and
+ the fractional coverage threshold from which the contingency tables are
+ defined.
+ These parameters are described further in the practical information section
+ below.
+ 
+\end_layout
+
+\begin_layout Section
+Practical information
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This section contains information about configuring and running the Grid-Stat
+ tool.
+ The Grid-Stat tool verifies gridded model data using gridded observations.
+ The input gridded model and observation datasets must be in one of the
+ MET supported file formats.
+ The input model and observation datasets must be on a common grid.
+ The gridded observation data may be a gridded analysis based on observations
+ such as Stage II or Stage IV data for verifying accumulated precipitation,
+ or a model analysis field may be used.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The Grid-Stat tool provides the capability of verifying one or more model
+ variables/levels using multiple thresholds for each model variable/level.
+ The Grid-Stat tool performs no interpolation because the input model and
+ observation datasets must already be on a common grid.
+ However, the interpolation parameters may be used to perform a smoothing
+ operation on the forecast field prior to verifying it to investigate how
+ the scale of the forecast affects the verification statistics.
+ The Grid-Stat tool computes a number of continuous statistics for the forecast
+ minus observation differences as well as discrete statistics once the data
+ have been thresholded.
+\end_layout
+
+\begin_layout Subsection
+grid_stat usage
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The usage statement for the Grid-Stat tool is listed below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: grid_stat
+\end_layout
+
+\begin_layout LyX-Code
+fcst_file
+\end_layout
+
+\begin_layout LyX-Code
+obs_file
+\end_layout
+
+\begin_layout LyX-Code
+config_file
+\end_layout
+
+\begin_layout LyX-Code
+[-outdir path]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+grid_stat has some required arguments and accepts several optional ones.
+\end_layout
+
+\begin_layout Paragraph
+Required arguments for grid_stat
+\end_layout
+
+\begin_layout Description
+1.
+ The 
+\series bold
+fcst_file
+\series default
+ argument indicates the gridded file containing the model data to be verified.
+\end_layout
+
+\begin_layout Description
+2.
+ The 
+\series bold
+obs_file
+\series default
+ argument indicates the gridded file containing the gridded observations
+ to be used for the verification of the model.
+\end_layout
+
+\begin_layout Description
+3.
+ The 
+\series bold
+config_file
+\series default
+ argument indicates the name of the configuration file to be used.
+ The contents of the configuration file are discussed below.
+\end_layout
+
+\begin_layout Paragraph
+Optional arguments for grid_stat
+\end_layout
+
+\begin_layout Description
+4.
+ The 
+\series bold
+-outdir path
+\series default
+ indicates the directory where output files should be written.
+ 
+\end_layout
+
+\begin_layout Description
+5.
+ The 
+\series bold
+-log file
+\series default
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+6.
+ The 
+\series bold
+-v leve
+\series default
+l option indicates the desired level of verbosity.
+ The contents of 
+\series bold
+
+\begin_inset Quotes eld
+\end_inset
+
+level
+\series default
+
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity above 1 will increase the amount of logging.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+An example of the grid_stat calling sequence is listed below:
+\end_layout
+
+\begin_layout Paragraph
+Example 1:
+\end_layout
+
+\begin_layout LyX-Code
+grid_stat sample_fcst.grb
+\end_layout
+
+\begin_layout LyX-Code
+sample_obs.grb
+\end_layout
+
+\begin_layout LyX-Code
+GridStatConfig
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+In Example 1, the Grid-Stat tool will verify the model data in the 
+\series default
+sample_fcst.grb
+\series medium
+ GRIB file using the observations in the 
+\series default
+sample_obs.grb
+\series medium
+ GRIB file applying the configuration options specified in the 
+\series default
+GridStatConfig
+\series medium
+ file.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+A second example of the 
+\emph on
+grid_stat
+\emph default
+ calling sequence is listed below:
+\end_layout
+
+\begin_layout Paragraph
+Example 2:
+\end_layout
+
+\begin_layout LyX-Code
+grid_stat sample_fcst.nc
+\end_layout
+
+\begin_layout LyX-Code
+sample_obs.nc
+\end_layout
+
+\begin_layout LyX-Code
+GridStatConfig
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+In the second example, the Grid-Stat tool will verify the model data in
+ the 
+\series default
+sample_fcst.nc
+\series medium
+ NetCDF output of 
+\emph on
+pcp_combine
+\emph default
+, using the observations in the 
+\series default
+sample_obs.nc
+\series medium
+ NetCDF output of 
+\emph on
+pcp_combine
+\emph default
+, and applying the configuration options specified in the 
+\series default
+GridStatConfig
+\series medium
+ file.
+ Because the model and observation files contain only a single field of
+ accumulated precipitation, the 
+\series default
+GridStatConfig
+\series medium
+ file should be configured to specify that only accumulated precipitation
+ be verified.
+\end_layout
+
+\begin_layout Subsection
+grid_stat configuration file
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The default configuration file for the Grid-Stat tool, named 
+\series default
+GridStatConfig_default
+\series medium
+, can be found in the installed 
+\emph on
+share/met/config
+\emph default
+ directory.
+ Other versions of the configuration file are included in 
+\emph on
+scripts/config
+\emph default
+.
+ We recommend that users make a copy of the default (or other) configuration
+ file prior to modifying it.
+ The contents are described in more detail below.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Note that environment variables may be used when editing configuration files,
+ as described in the section 3.5.2 for the PB2NC tool.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+model = 
+\begin_inset Quotes eld
+\end_inset
+
+WRF
+\begin_inset Quotes erd
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+model
+\series medium
+ variable contains a short text string identifying the name to be assigned
+ to the model being verified.
+ This text string is written out as a header column of the STAT output so
+ that verification statistics from multiple models may be differentiated.
+ The value listed above is simply set to 
+\begin_inset Quotes eld
+\end_inset
+
+WRF
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout LyX-Code
+fcst = {
+\end_layout
+
+\begin_layout LyX-Code
+wind_thresh = [ NA ];
+\end_layout
+
+\begin_layout LyX-Code
+field = [
+\end_layout
+
+\begin_layout LyX-Code
+{
+\end_layout
+
+\begin_layout LyX-Code
+name = "APCP";
+\end_layout
+
+\begin_layout LyX-Code
+level = [ "A03" ];
+\end_layout
+
+\begin_layout LyX-Code
+cat_thresh = [ >0.0, >=5.0 ];
+\end_layout
+
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout LyX-Code
+];
+\end_layout
+
+\begin_layout LyX-Code
+};
+\end_layout
+
+\begin_layout LyX-Code
+obs = fcst;
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+fcst
+\series medium
+ group contains a list of model variables, corresponding vertical levels,
+ and thresholds to be verified.
+ Each field is specified by giving its name and one or more accumulation
+ or vertical level indicators.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+For GRIB files, the GRIB code itself or the corresponding abbreviation may
+ be used to specify which model fields are to be verified.
+ A level indicator in the form 
+\series default
+"ANNN", "ZNNN", "PNNN", "PNNN-NNN", "LNNN"
+\series medium
+, or "
+\series default
+RNNN
+\series medium
+" must follow each GRIB code.
+ These indicate an accumulation interval, a single vertical level, a single
+ pressure level, a range of pressure levels, a generic level, and a specific
+ GRIB record number, respectively.
+ 
+\series default
+"NNN"
+\series medium
+ indicates the accumulation or level value.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+To specify verification fields for NetCDF files, use var_name(i,...,j,*,*)
+ for a single field.
+ Here, var_name is the name of the NetCDF variable, i,...,j specifies fixed
+ dimension values, and *,* specifies the two dimensions for the gridded
+ field.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The values listed above indicate that precipitation should be verified for
+ a 3 hour accumulation period.
+ All variables are treated as scalar quantities with the exception of the
+ U and V components of the wind.
+ When the U component is followed by the V component, both with the same
+ level indicator, they will be treated as vector quantities.
+ A list of GRIB codes is available at 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html"
+
+\end_inset
+
+.
+ Wind speed is typically not available in model files, but if it is, it
+ will be used directly.
+ However, if wind speed is unavailable but the U and V components of the
+ wind are included, the wind speed will be calculated automatically by MET,
+ provided that WIND is included in the 
+\series default
+field
+\series medium
+.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+To indicate that a forecast field should be treated as probabilities, include
+ the prob=TRUE indicator.
+ Probability fields should contain values in the range [0, 1] or [0, 100].
+ However, when MET encounters a probability field with a range [0, 100],
+ it will automatically rescale it to be [0, 1] before applying the probabilistic
+ verification methods.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+For each 
+\series default
+cat_thresh
+\series medium
+ listed above one or more thresholds must be specified for use in computing
+ discrete statistics.
+ The thresholds are specified using >, >=, ==, !=, <, or <=.
+ Multiple thresholds may be applied to each field by providing a comma-separated
+ list.
+ The values listed above indicate that the field of 3-hourly accumulated
+ precipitation will be thresholded greater than zero and greater than or
+ equal to 5.0 mm.
+ It is the user's responsibility to know the units for each model variable
+ and to choose appropriate threshold values.
+ For probabilistic forecasts, thresholds must be specified using >= convention.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+When verifying winds via either the u and v components or the speed and
+ direction, it can be desirable to eliminate winds below a certain speed.
+ This threshold filters the winds based on speed, even when u and v winds
+ are input.
+ Format is the same as for 
+\series default
+cat_thresh
+\series medium
+.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+mask = {
+\end_layout
+
+\begin_layout LyX-Code
+grid = [ "FULL" ];
+\end_layout
+
+\begin_layout LyX-Code
+poly = [];
+\end_layout
+
+\begin_layout LyX-Code
+};
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+grid
+\series medium
+ variable in the 
+\series default
+mask
+\series medium
+ group contains a comma-separated list of pre-defined NCEP grids over which
+ to perform the grid_stat verification.
+ The predefined grids are specified as "
+\series default
+GNNN
+\series medium
+" where 
+\series default
+NNN
+\series medium
+ is the three-digit designation for the grid.
+ Defining a new grid would require code changes and recompiling MET.
+ Supplying a value of "
+\series default
+FULL
+\series medium
+" indicates that the verification should be performed over the entire grid
+ on which the data resides.
+ The value listed above indicates that verification should be performed
+ over the full grid.
+ See Appendix B for a list of grids that will be accepted.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+poly
+\series medium
+ variable contains a comma-separated list of files that define verification
+ masking regions.
+ These masking regions may be specified in two ways: as a lat/lon polygon
+ or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
+ or Gen-Circle_mask tools.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Several masking polygons used by NCEP are predefined in the installed 
+\emph on
+share/met/poly
+\emph default
+ directory.
+ Creating a new polygon is as simple as creating a text file with a name
+ for the polygon followed by the lat/lon points which define its boundary.
+ Adding a new masking polygon requires no code changes and no recompiling.
+ Internally, the lat/lon polygon points are converted into x/y values in
+ the grid.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Alternatively, any gridded data file that MET can read may be used to define
+ a verification masking region.
+ Users must specify a description of the field to be used from the input
+ file and, optionally, may specify a threshold to be applied to that field.
+ Any grid point where the resulting field is 0, the mask is turned off.
+ Any grid point where it is non-zero, the mask is turned on.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+ci_alpha = [ 0.05 ];
+\end_layout
+
+\begin_layout LyX-Code
+boot = {
+\end_layout
+
+\begin_layout LyX-Code
+interval = PCTILE;
+\end_layout
+
+\begin_layout LyX-Code
+rep_prop = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+n_rep = 0;
+\end_layout
+
+\begin_layout LyX-Code
+rng = "mt19937";
+\end_layout
+
+\begin_layout LyX-Code
+seed = "";
+\end_layout
+
+\begin_layout LyX-Code
+}; 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+ci_alpha
+\series medium
+ variable contains a comma-separated list of alpha values to be used when
+ computing confidence intervals.
+ The confidence interval computed is 1 minus the 
+\series default
+ci_alpha
+\series medium
+ value.
+ The value of 0.05 listed above indicates that the 95th percentile confidence
+ interval should be computed.
+ Refer to Section 4.2.3 for more information about confidence intervals and
+ recommended values.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+interval
+\series medium
+ variable indicates what method should be used for computing bootstrap confidenc
+e intervals.
+ A value of 
+\series default
+BCA
+\series medium
+ indicates that the highly accurate but computationally intensive BCa (bias-corr
+ected percentile) method should be used.
+ A value of 
+\series default
+PCTILE
+\series medium
+ indicates that the somewhat less accurate but efficient percentile method
+ should be used.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+rep_prop
+\series medium
+ variable must be set to a value between 0 and 1.
+ When computing bootstrap confidence intervals over n sets of matched pairs,
+ the size of the subsample, m, may be chosen less than or equal to the size
+ of the sample, n.
+ This variable defines the size of m as a proportion relative to the size
+ of n.
+ A value of 1, as shown above, indicates that the size of the subsample,
+ m, should be equal to the size of the sample, n.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+n_rep
+\series medium
+ variable defines the number of subsamples that should be taken when computing
+ bootstrap confidence intervals.
+ This variable should be set large enough so that when confidence intervals
+ are computed multiple times for the same set of data, the intervals do
+ not change much.
+ Setting this variable to zero disables the computation of bootstrap confidence
+ intervals that may be necessary to run in realtime or near-realtime over
+ large domains.
+ Setting this variable to 1000, indicates that bootstrap confidence interval
+ should be computed over 1000 subsamples of the matched pairs.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+rng
+\series medium
+ variable defines the random number generator to be used in the computation
+ of bootstrap confidence intervals.
+ Subsamples are chosen at random from the full set of matched pairs.
+ The randomness is determined by the random number generator specified.
+ Users should refer to detailed documentation of the GNU Scientific Library
+ for a listing of the random number generators available for use.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+seed
+\series medium
+ variable may be set to a specific value to make the computation of bootstrap
+ confidence intervals fully repeatable.
+ When left empty, as shown above, the random number generator seed is chosen
+ automatically which will lead to slightly different bootstrap confidence
+ intervals being computed each time the data is run.
+ Specifying a value here ensures that the bootstrap confidence intervals
+ will be computed the same over multiple runs of the same data.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+interp = {
+\end_layout
+
+\begin_layout LyX-Code
+field = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+vld_thresh = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+type = [
+\end_layout
+
+\begin_layout LyX-Code
+{
+\end_layout
+
+\begin_layout LyX-Code
+method = UW_MEAN;
+\end_layout
+
+\begin_layout LyX-Code
+width = 1;
+\end_layout
+
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout LyX-Code
+];
+\end_layout
+
+\begin_layout LyX-Code
+};
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+interp
+\series medium
+ group contains a list of operations to be performed on the forecast or
+ observation field prior to performing verification.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+field
+\series medium
+ controls how the interpolation should be applied.
+ A value of 
+\series default
+FCST
+\series medium
+ will smooth, e.g.
+ apply the interpolation, to only the forecast field.
+ A value of 
+\series default
+OBS
+\series medium
+ applies interpolation to only the observation field.
+ To smooth both the forecast and observation fields, set the interp_flag
+ to 
+\series default
+BOTH
+\series medium
+.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+vld_thresh
+\series medium
+ variable contains a number between 0 and 1.
+ When performing a smoothing operation over some neighborhood of points
+ the ratio of the number of valid data points to the total number of points
+ in the neighborhood is computed.
+ If that ratio is greater than this threshold, a smoothed value is computed.
+ Setting this threshold to 1, which is the default, requires that the entire
+ neighborhood must contain valid data.
+ This variable will typically come into play only along the boundaries of
+ the verification region chosen.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The valid 
+\series default
+method
+\series medium
+ values that may be listed are 
+\series default
+MIN, MAX, MEDIAN
+\series medium
+, and 
+\series default
+UW_MEAN
+\series medium
+ for the minimum, maximum, median, and unweighted mean.
+ If multiple interpolation methods are provided, then statistics will be
+ computed separately for each type of smoothing operation.
+ These methods are described in Section 4.2.1.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+width
+\series medium
+ variable contains a comma-separated list of values to be used in defining
+ the neighborhoods over which the smoothing operation is performed on the
+ forecast field.
+ The neighborhood is simply a square centered on the observation point,
+ and thus must be odd.
+ The 
+\series default
+width
+\series medium
+ value specifies the width of that square.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+nbrhd = {
+\end_layout
+
+\begin_layout LyX-Code
+vld_thresh = 1.0; 
+\end_layout
+
+\begin_layout LyX-Code
+width = [ 1 ];
+\end_layout
+
+\begin_layout LyX-Code
+cov_thresh = [ >=0.5 ];
+\end_layout
+
+\begin_layout LyX-Code
+}
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+nbrhd
+\series medium
+ group contains a list of values to be used in defining the neighborhood
+ to be used when computing neighborhood verification statistics.
+ The neighborhood is simply a square centered on the current point and the
+ 
+\series default
+width
+\series medium
+ value specifies the width of that square as an odd integer.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+vld_thresh
+\series medium
+ variable contains a number between 0 and 1.
+ When performing neighborhood verification over some neighborhood of points
+ the ratio of the number of valid data points to the total number of points
+ in the neighborhood is computed.
+ If that ratio is greater than this threshold, that value is included in
+ the neighborhood verification.
+ Setting this threshold to 1, which is the default, requires that the entire
+ neighborhood must contain valid data.
+ This variable will typically come into play only along the boundaries of
+ the verification region chosen.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+cov_thresh
+\series medium
+ variable contains a comma separated list of thresholds to be applied to
+ the neighborhood coverage field.
+ The coverage is the proportion of forecast points in the neighborhood that
+ exceed the forecast threshold.
+ For example, if 10 of the 25 forecast grid points contain values larger
+ than a threshold of 2, then the coverage is 10/25 = 0.4.
+ If the coverage threshold is set to 0.5, then this neighborhood is considered
+ to be a 
+\begin_inset Quotes eld
+\end_inset
+
+No
+\begin_inset Quotes erd
+\end_inset
+
+ forecast.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+output_flag = {
+\end_layout
+
+\begin_layout LyX-Code
+fho = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+ctc = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+cts = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+mctc = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+mcts = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+cnt = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+sl1l2 = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+vl1l2 = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+pct = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+pstd = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+pjc = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+prc = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+nbrctc = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+nbrcts = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+nbrcnt = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+};
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series default
+output_flag
+\series medium
+ array controls the type of output that the Grid-Stat tool generates.
+ Each flag corresponds to an output line type in the STAT file.
+ Setting the flag to 
+\series default
+NONE
+\series medium
+ indicates that the line type should not be generated.
+ Setting the flag to 
+\series default
+STA
+\series medium
+T indicates that the line type should be written to the STAT file only.
+ Setting the flag to 
+\series default
+BOTH
+\series medium
+ indicates that the line type should be written to the STAT file as well
+ as a separate ASCII file where the data are grouped by line type.
+ The first fifteen output flags correspond to the following types of output
+ line types:
+\end_layout
+
+\begin_layout Standard
+.
+\end_layout
+
+\begin_layout Standard
+1.
+ 
+\series bold
+FHO 
+\series default
+for Forecast, Hit, Observation Rates
+\end_layout
+
+\begin_layout Standard
+2.
+ 
+\series bold
+CTC
+\series default
+ for Contingency Table Counts
+\end_layout
+
+\begin_layout Standard
+3.
+ 
+\series bold
+CTS
+\series default
+ for Contingency Table Statistics
+\end_layout
+
+\begin_layout Standard
+4.
+ 
+\series bold
+MCTC
+\series default
+ for Multi-Category Contingency Table Counts
+\end_layout
+
+\begin_layout Standard
+5.
+ 
+\series bold
+MCTS
+\series default
+ for Multi-Category Contingency Table Statistics
+\end_layout
+
+\begin_layout Standard
+6.
+ 
+\series bold
+CNT
+\series default
+ for Continuous Statistics
+\end_layout
+
+\begin_layout Standard
+7.
+ 
+\series bold
+SL1L2
+\series default
+ for Scalar L1L2 Partial Sums
+\end_layout
+
+\begin_layout Standard
+8.
+ 
+\series bold
+VL1L2
+\series default
+ for Vector L1L2 Partial Sums
+\end_layout
+
+\begin_layout Standard
+9.
+ 
+\series bold
+PCT
+\series default
+ for Contingency Table Counts for Probabilistic forecasts
+\end_layout
+
+\begin_layout Standard
+10.
+ 
+\series bold
+PSTD
+\series default
+ for Contingency Table Statistics for Probabilistic forecasts
+\end_layout
+
+\begin_layout Standard
+11.
+ 
+\series bold
+PJC
+\series default
+ for Joint and Conditional factorization for Probabilistic forecasts
+\end_layout
+
+\begin_layout Standard
+12.
+ 
+\series bold
+PRC
+\series default
+ for Receiver Operating Characteristic for Probabilistic forecasts
+\end_layout
+
+\begin_layout Standard
+13.
+ 
+\series bold
+NBRCTC
+\series default
+ for Neighborhood Contingency Table Counts
+\end_layout
+
+\begin_layout Standard
+14.
+ 
+\series bold
+NBRCTS
+\series default
+ for Neighborhood Contingency Table Statistics
+\end_layout
+
+\begin_layout Standard
+15.
+ 
+\series bold
+NBRCNT
+\series default
+ for Neighborhood Continuous Statistics
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Note that the first two line types are easily derived from one another.
+ The user is free to choose which measure is most desired.
+ See Section 5.3.3 for more information about the information in the output
+ files.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+nc_pairs_flag = {
+\end_layout
+
+\begin_layout LyX-Code
+latlon = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+raw = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+diff = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+};
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This flag indicates whether or not the matched pair and forecast minus observati
+on difference fields should be written to a NetCDF file.
+ Setting any flag to 
+\series default
+TRUE
+\series medium
+ indicates that the NetCDF file should be created, while setting all to
+ 
+\series default
+FALSE
+\series medium
+ disables its creation.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+rank_corr_flag = FALSE;
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+rank_corr_flag
+\series medium
+ variable may be set to 
+\series default
+TRUE
+\series medium
+ or 
+\series default
+FALSE
+\series medium
+ to indicate whether or not Kendall's Tau and Spearman's Rank correlation
+ coefficients should be computed.
+ The computation of these rank correlation coefficients is very slow when
+ run over many matched pairs.
+ By default, this flag is turned on, as shown above, but setting it to 
+\series default
+FALSE
+\series medium
+ should improve the runtime performance.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+tmp_dir = "/tmp";
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This parameter indicates the directory where Grid Stat should write temporary
+ files.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+output_prefix = "";
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+This option specifies a string to be used in the output file name.
+ It can be useful for keeping results for different models or variables
+ from overwriting each other.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+version = "v5.1";
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\series default
+version
+\series medium
+ indicates the version of the 
+\emph on
+grid_stat
+\emph default
+ configuration file used.
+ Future versions of MET may include changes to 
+\emph on
+grid_stat
+\emph default
+ and the 
+\emph on
+grid_stat
+\emph default
+ configuration file.
+ This value should not be modified.
+\end_layout
+
+\begin_layout Subsection
+grid_stat output
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+grid_stat
+\emph default
+ produces output in STAT and, optionally, ASCII and NetCDF formats.
+ The ASCII output duplicates the STAT output but has the data organized
+ by line type.
+ The output files are written to the default output directory or the directory
+ specified by the 
+\series default
+-outdir
+\series medium
+ command-line option.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The output STAT file is named using the following naming convention: 
+\end_layout
+
+\begin_layout Paragraph
+grid_stat__PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
+\series medium
+ where 
+\series default
+PREFIX
+\series medium
+ indicates the user-defined output prefix, 
+\series default
+YYYMMDDHH
+\series medium
+ indicates the forecast lead time and 
+\series default
+YYYYMMDD_HHMMSS
+\series medium
+ indicates the forecast valid time.
+ The output ASCII files are named similarly: 
+\series default
+grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
+\series medium
+ where 
+\series default
+TYPE
+\series medium
+ is one of 
+\series default
+fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, pct, pstd, pjc, prc, nbrctc,
+ nbrcts
+\series medium
+, and 
+\series default
+nbrcnt
+\series medium
+ to indicate the line type it contains.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The format of the STAT and ASCII output of the Grid-Stat tool are the same
+ as the format of the STAT and ASCII output of the Point-Stat tool with
+ the exception of the three additional neighborhood line types.
+ Please refer to the tables in section 4.3.3 (
+\emph on
+point_stat
+\emph default
+ output) for a description of the common output STAT and optional ASCII
+ file line types.
+ The formats of the three additional neighborhood line types for grid_stat
+ are explained in the following tables.
+\end_layout
+
+\begin_layout Paragraph
+Table 5-1.
+ Header information for each file grid-stat outputs.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Header information for each file grid-stat outputs.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="23" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.5in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="4in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+HEADER
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Header Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VERSION
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Version number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MODEL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string designating model name
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_LEAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast lead time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VALID_BEG
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast valid start time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VALID_END
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast valid end time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_LEAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation lead time in HHMMSS format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VALID_BEG
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation valid start time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VALID_END
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observation valid end time in YYYYMMDDHH format
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Model variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_LEV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Selected Vertical level for forecast
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observed variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_LEV
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Selected Vertical level for observations
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+13
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBTYPE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Type of observation selected
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+14
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VX_MASK
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Verifying masking region indicating the masking grid or polyline region
+ applied
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+15
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTERP_MTHD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Interpolation method applied to forecast field
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+INTERP_PNTS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of points used by interpolation method
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_THRESH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The threshold applied to the forecast
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_THRESH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The threshold applied to the observations
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+19
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+COV_THRESH
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Proportion of observations in specified neighborhood which must exceed obs_thres
+h
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ALPHA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Error percent value used in confidence intervals
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LINE_TYPE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Various line type options, refer to 4.3.3 and the tables below.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Table 5-2.
+ Format information for NBRCTC (Neighborhood Contingency Table Counts) output
+ line type.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Format information for NBRCTC (Neighborhood Contingency Table Counts) output
+ line type.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.5in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="4in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NBRCTC OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NBRCTC Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NBRCTC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Neighborhood Contingency Table Counts line type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of matched pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FY_OY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast yes and observation yes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FY_ON
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast yes and observation no
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FN_OY
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast no and observation yes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FN_ON
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of forecast no and observation no
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Table 5-3.
+ Format information for NBRCTS (Neighborhood Contingency Table Statistics)
+ output line type.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Format information for NBRCTS (Neighborhood Contingency Table Statistics)
+ output line type.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="24" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.5in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="4in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NBRCTS OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NBRCTS Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NBRCTS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Neighborhood Contingency Table Statistics line type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of matched pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23-27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BASER,
+\end_layout
+
+\begin_layout Plain Layout
+BASER_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+BASER_NCU, BASER_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+BASER_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Base rate including normal and bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28-32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FMEAN,
+\end_layout
+
+\begin_layout Plain Layout
+FMEAN_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+FMEAN_NCU, FMEAN_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+FMEAN_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast mean including normal and bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+33-37
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ACC,
+\end_layout
+
+\begin_layout Plain Layout
+ACC_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+ACC_NCU,
+\end_layout
+
+\begin_layout Plain Layout
+ACC_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+ACC_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Accuracy including normal and bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+38-40
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FBIAS,
+\end_layout
+
+\begin_layout Plain Layout
+FBIAS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+FBIAS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Frequency Bias including bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+41-45
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PODY,
+\end_layout
+
+\begin_layout Plain Layout
+PODY_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+PODY_NCU, PODY_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+PODY_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Probability of detecting yes including normal and bootstrap upper and lower
+ confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+46-50
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PODN,
+\end_layout
+
+\begin_layout Plain Layout
+PODN_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+PODN_NCU, PODN_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+PODN_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Probability of detecting no including normal and bootstrap upper and lower
+ confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+51-55
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+POFD,
+\end_layout
+
+\begin_layout Plain Layout
+POFD_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+POFD_NCU, POFD_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+POFD_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Probability of false detection including normal and bootstrap upper and
+ lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+56-60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FAR,
+\end_layout
+
+\begin_layout Plain Layout
+FAR_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+FAR_NCU,
+\end_layout
+
+\begin_layout Plain Layout
+FAR_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+FAR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+False alarm ratio including normal and bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+61-65
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CSI,
+\end_layout
+
+\begin_layout Plain Layout
+CSI_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+CSI_NCU,
+\end_layout
+
+\begin_layout Plain Layout
+CSI_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+CSI_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Critical Success Index including normal and bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+66-68
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GSS,
+\end_layout
+
+\begin_layout Plain Layout
+GSS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+GSS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gilbert Skill Score including bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+69-73
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HK,
+\end_layout
+
+\begin_layout Plain Layout
+HK_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+HK_NCU,
+\end_layout
+
+\begin_layout Plain Layout
+HK_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+HK_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower
+ confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+74-76
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+HSS,
+\end_layout
+
+\begin_layout Plain Layout
+HSS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+HSS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Heidke Skill Score including bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+77-81
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ODDS,
+\end_layout
+
+\begin_layout Plain Layout
+ODDS_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+ODDS_NCU,
+\end_layout
+
+\begin_layout Plain Layout
+ODDS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+ODDS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Odds Ratio including normal and bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+82-86
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+LODDS,
+\end_layout
+
+\begin_layout Plain Layout
+LODDS_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+LODDS_NCU,
+\end_layout
+
+\begin_layout Plain Layout
+LODDS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+LODDS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Logarithm of the Odds Ratio including normal and bootstrap upper and lower
+ confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+87-91
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ORSS,
+\end_layout
+
+\begin_layout Plain Layout
+ORSS _NCL,
+\end_layout
+
+\begin_layout Plain Layout
+ORSS _NCU,
+\end_layout
+
+\begin_layout Plain Layout
+ORSS _BCL,
+\end_layout
+
+\begin_layout Plain Layout
+ORSS _BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Odds Ratio Skill Score including normal and bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+92-96
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+EDS,
+\end_layout
+
+\begin_layout Plain Layout
+EDS _NCL,
+\end_layout
+
+\begin_layout Plain Layout
+EDS _NCU,
+\end_layout
+
+\begin_layout Plain Layout
+EDS _BCL,
+\end_layout
+
+\begin_layout Plain Layout
+EDS _BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Extreme Depenency Score including normal and bootstrap upper and lower confidenc
+e limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+97-101
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SEDS,
+\end_layout
+
+\begin_layout Plain Layout
+SEDS _NCL,
+\end_layout
+
+\begin_layout Plain Layout
+SEDS _NCU,
+\end_layout
+
+\begin_layout Plain Layout
+SEDS _BCL,
+\end_layout
+
+\begin_layout Plain Layout
+SEDS _BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Symmetric Extreme Depenency Score including normal and bootstrap upper and
+ lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+102-106
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+EDI,
+\end_layout
+
+\begin_layout Plain Layout
+EDI _NCL,
+\end_layout
+
+\begin_layout Plain Layout
+EDI _NCU,
+\end_layout
+
+\begin_layout Plain Layout
+EDI _BCL,
+\end_layout
+
+\begin_layout Plain Layout
+EDI _BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Extreme Depenency Index including normal and bootstrap upper and lower confidenc
+e limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+107-11
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SEDI,
+\end_layout
+
+\begin_layout Plain Layout
+SEDI _NCL,
+\end_layout
+
+\begin_layout Plain Layout
+SEDI _NCU,
+\end_layout
+
+\begin_layout Plain Layout
+SEDI _BCL,
+\end_layout
+
+\begin_layout Plain Layout
+SEDI _BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Symmetric Extremal Depenency Index including normal and bootstrap upper
+ and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+112-114
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BAGSS,
+\end_layout
+
+\begin_layout Plain Layout
+BAGSS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+BAGSS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Table 5-4.
+ Format information for NBRCNT(Neighborhood Continuous Statistics) output
+ line type.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Format information for NBRCNT(Neighborhood Continuous Statistics) output
+ line type.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="1.7cm">
+<column alignment="left" valignment="top" width="3cm">
+<column alignment="left" valignment="top" width="10cm">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NBRCNT OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NBRCNT Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NBRCNT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Neighborhood Continuous statistics line type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of matched pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23-25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FBS,
+\end_layout
+
+\begin_layout Plain Layout
+FBS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+FBS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fractions Brier Score including bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26-28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FSS,
+\end_layout
+
+\begin_layout Plain Layout
+FSS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+FSS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Fractions Skill Score including bootstrap upper and lower confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29-31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AFSS,
+\end_layout
+
+\begin_layout Plain Layout
+AFSS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+AFSS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Asymptotic Fractions Skill Score including bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32-34
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+UFSS,
+\end_layout
+
+\begin_layout Plain Layout
+UFSS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+UFSS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Uniform Fractions Skill Score including bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+35-37
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+F_RATE,
+\end_layout
+
+\begin_layout Plain Layout
+F_RATE _BCL,
+\end_layout
+
+\begin_layout Plain Layout
+F_RATE _BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Forecast event frequency including bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+38-40
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+O_RATE,
+\end_layout
+
+\begin_layout Plain Layout
+O _RATE _BCL,
+\end_layout
+
+\begin_layout Plain Layout
+O _RATE _BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Observed event frequency including bootstrap upper and lower confidence
+ limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+If requested in the 
+\series default
+output_flag
+\series medium
+ array, a NetCDF file containing the matched pair and forecast minus observation
+ difference fields for each combination of variable type/level and masking
+ region applied will be generated.
+ The output NetCDF file is named similarly to the other output files: 
+\series default
+grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc
+\series medium
+.
+ Commonly available NetCDF utilities such as ncdump or ncview may be used
+ to view the contents of the output file.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The output NetCDF file contains the dimensions and variables shown in the
+ following Tables 5-5 and 5-6.
+\end_layout
+
+\begin_layout Paragraph
+Table 5-5.
+ Dimensions defined in NetCDF matched pair output.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Dimensions defined in NetCDF matched pair output.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="10cm">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+grid_stat NetCDF DIMENSIONS
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NetCDF Dimension
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension of the latitude (i.e.
+ Number of grid points in the North-South direction)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dimension of the longitude (i.e.
+ Number of grid points in the East-West direction)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Table 5-6.
+ Variables defined in NetCDF matched pair output.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Variables defined in NetCDF matched pair output.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="4.5cm">
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="9cm">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+grid_stat NetCDF VARIABLES
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+NetCDF Variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Dimension
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_VAR_LVL_MASK
+\end_layout
+
+\begin_layout Plain Layout
+_INTERP_MTHD
+\end_layout
+
+\begin_layout Plain Layout
+_INTERP_PNTS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+For each model variable (VAR), vertical level (LVL), masking region (MASK),
+ and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS),
+ the forecast value is listed for each point in the mask
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBS_VAR_LVL_MASK
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+For each model variable (VAR), vertical level (LVL), and masking region
+ (MASK), the observation value is listed for each point in the mask 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DIFF_FCSTVAR_FCSTLVL_ OBSVAR_OBSLVL_MASK
+\end_layout
+
+\begin_layout Plain Layout
+_INTERP_MTHD
+\end_layout
+
+\begin_layout Plain Layout
+_INTERP_PNTS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+For each model variable (VAR), vertical level (LVL), masking region (MASK),
+ and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS),
+ the difference (forecast - observation) is computed for each point in the
+ mask
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The STAT output files described for 
+\emph on
+grid_stat
+\emph default
+ may be used as inputs to the STAT Analysis tool.
+ For more information on using the STAT Analysis tool to create stratifications
+ and aggregations of the STAT files produced by 
+\emph on
+grid_stat
+\emph default
+, please see Chapter 10.
+ 
+\end_layout
+
+\end_body
+\end_document
