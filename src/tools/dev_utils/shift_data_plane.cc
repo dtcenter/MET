@@ -109,7 +109,7 @@ void process_command_line(int argc, char **argv) {
    // Check for zero arguments
    if(argc == 1) usage();
 
-   // Parse the command line into tokens   
+   // Parse the command line into tokens
    cline.set(argc, argv);
 
    // Allow for negative numbers on the command line
@@ -184,7 +184,7 @@ void process_data_file() {
    VarInfoFactory v_factory;
    VarInfo *vinfo;
    vinfo = v_factory.new_var_info(mtddf->file_type());
-   
+
    if(!vinfo) {
       mlog << Error << "\nprocess_data_file() -> "
            << "unable to determine file type of \"" << InputFilename
@@ -194,7 +194,7 @@ void process_data_file() {
 
    // Populate the VarInfo object using config
    vinfo->set_dict(config);
-   
+
    // Open the input file
    if(!mtddf->open(InputFilename)) {
       mlog << Error << "\nprocess_data_file() -> can't open file \""
@@ -215,7 +215,7 @@ void process_data_file() {
 
       // Get the range of data values
       dp_in.data_range(dmin, dmax);
-   
+
       mlog << Debug(2)
            << "Range of data for \"" << ConfigString << "\" is "
            << dmin << " to " << dmax << ".\n";
@@ -225,16 +225,28 @@ void process_data_file() {
    grid = mtddf->grid();
    grid.latlon_to_xy(FrLat, -1.0*FrLon, fr_x, fr_y);
    grid.latlon_to_xy(ToLat, -1.0*ToLon, to_x, to_y);
+
+   // Check for bad data
+   if(is_bad_data(fr_x) || is_bad_data(fr_y) ||
+      is_bad_data(to_x) || is_bad_data(to_y)) {
+      mlog << Error << "\nprocess_data_file() -> "
+           << "problem defining the grid x/y shift from ("
+           << fr_x << ", " << fr_y << ") to ("
+           << to_x << ", " << to_y << ").\n\n";
+      exit(1);
+   }
+
+   // Compute the shift
    dx = to_x - fr_x;
    dy = to_y - fr_y;
-   
+
    shift_cs << cs_erase << "Shifting from lat/lon ("
             << FrLat << ", " << FrLon << ") to lat/lon ("
             << ToLat << ", " << ToLon << ") is grid x/y shift ("
             << dx << ", " << dy << ")";
 
    mlog << Debug(2) << shift_cs << "\n";
-   
+
    // Shift the data
    dp_shift = dp_in;
    for(x=0; x<dp_shift.nx(); x++) {
@@ -244,7 +256,7 @@ void process_data_file() {
          dp_shift.set(v, x, y);
       } // end for y
    } // end for x
-   
+
    // Write the shifted data
    write_netcdf(dp_shift, grid, vinfo, mtddf->file_type());
 
@@ -260,17 +272,17 @@ void process_data_file() {
 void write_netcdf(const DataPlane &dp, const Grid &grid,
                   const VarInfo *vinfo, const GrdFileType &ftype) {
    ConcatString cs;
-   
+
    // Create a new NetCDF file and open it
    NcFile *f_out = new NcFile(OutputFilename, NcFile::Replace);
-   
+
    if(!f_out->is_valid()) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output NetCDF file \""
            << OutputFilename << "\"\n\n";
       exit(1);
    }
-   
+
    // Add global attributes
    write_netcdf_global(f_out, OutputFilename, program_name);
 
@@ -286,7 +298,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
 
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
-   
+
    // Define output variable and attributes
    cs << cs_erase << vinfo->name();
    if(vinfo->level().type() != LevelType_Accum &&
@@ -309,7 +321,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
 
    // Allocate memory to store data values for each grid point
    float *data = new float [grid.nx()*grid.ny()];
-   
+
    // Store the data
    for(int x=0; x<grid.nx(); x++) {
       for(int y=0; y<grid.ny(); y++) {
@@ -324,15 +336,15 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
            << "error writing data to the output file.\n\n";
       exit(1);
    }
-   
+
    // Clean up
    if(data)  {                 delete [] data; data  = (float *)  0; }
    if(f_out) { f_out->close(); delete f_out;   f_out = (NcFile *) 0; }
-   
+
    // List the output file
    mlog << Debug(1)
         << "Writing output file: " << OutputFilename << "\n";
-   
+
    return;
 }
 
