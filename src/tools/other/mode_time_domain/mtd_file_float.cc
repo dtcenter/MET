@@ -226,7 +226,7 @@ void MtdFloatFile::set_radius(int r)
 
 if ( r < 0 )  {
 
-   cerr << "\n\n  MtdFloatFile::set_radius(int) -> bad value ... " << r << "\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::set_radius(int) -> bad value ... " << r << "\n\n";
 
    exit ( 1 );
 
@@ -264,7 +264,7 @@ void MtdFloatFile::put(const DataPlane & plane, const int t)
 
 if ( (plane.nx() != Nx) || (plane.ny() != Ny) )  {
 
-   cerr << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> plane wrong size!\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> plane wrong size!\n\n";
 
    exit ( 1 );
 
@@ -272,7 +272,7 @@ if ( (plane.nx() != Nx) || (plane.ny() != Ny) )  {
 
 if ( (t < 0) || (t >= Nt) )  {
 
-   cerr << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> bad time\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> bad time\n\n";
 
    exit ( 1 );
 
@@ -416,7 +416,7 @@ void MtdFloatFile::threshold(double T, MtdIntFile & out) const
 
 if ( !Data )  {
 
-   cerr << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
 
    exit ( 1 );
 
@@ -481,7 +481,7 @@ void MtdFloatFile::threshold(const SingleThresh & t, MtdIntFile & out) const
 
 if ( !Data )  {
 
-   cerr << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
 
    exit ( 1 );
 
@@ -589,7 +589,7 @@ var = f.get_var(data_field_name);
 
 if ( !(var->set_cur(0, 0, 0)) )  {
 
-   cerr << "\n\n  MtdFloatFile::read() -> trouble setting corner\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::read() -> trouble setting corner\n\n";
 
    exit ( 1 );
 
@@ -599,7 +599,7 @@ const time_t t_start = time(0);   //  for timing the data read operation
 
 if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
 
-   cerr << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
 
    exit ( 1 );
 
@@ -674,7 +674,7 @@ data_var = f.get_var(data_field_name);
 
 if ( !(data_var->set_cur(0, 0, 0)) )  {
 
-   cerr << "\n\n  MtdFloatFile::write() -> trouble setting corner on data field\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble setting corner on data field\n\n";
 
    exit ( 1 );
 
@@ -684,7 +684,7 @@ const time_t t_start = time(0);   //  for timing the data write operation
 
 if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
 
-   cerr << "\n\n  MtdFloatFile::write() -> trouble with put in data field\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble with put in data field\n\n";
 
    exit ( 1 );
 
@@ -715,7 +715,7 @@ NcFile f(_filename, NcFile::Replace);
 
 if ( ! f.is_valid() )  {
 
-   cerr << "\n\n  MtdFloatFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
 
    // exit ( 1 );
 
@@ -743,7 +743,7 @@ MtdFloatFile MtdFloatFile::const_t_slice(int t) const
 
 if ( (t < 0) || (t >= Nt) )  {
 
-   cerr << "\n\n  MtdFloatFile MtdFloatFile::const_t_slice(int) const -> range check error\n\n";
+   mlog << Error << "\n\n  MtdFloatFile MtdFloatFile::const_t_slice(int) const -> range check error\n\n";
 
    exit ( 1 );
 

@@ -14,6 +14,7 @@ using namespace std;
 
 #include "ascii_table.h"
 #include "fo_graph.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +158,7 @@ int FO_Graph::f_index(int f_num) const
 
 if ( (f_num < 0) || (f_num >= N_fcst) )  {
 
-   cerr << "\n\n  FO_Graph::f_index(int f_num) const -> range check error!\n\n";
+   mlog << Error << "\n\n  FO_Graph::f_index(int f_num) const -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -177,7 +178,7 @@ int FO_Graph::o_index(int o_num) const
 
 if ( (o_num < 0) || (o_num >= N_obs) )  {
 
-   cerr << "\n\n  FO_Graph::o_index(int o_num) const -> range check error!\n\n";
+   mlog << Error << "\n\n  FO_Graph::o_index(int o_num) const -> range check error!\n\n";
 
    exit ( 1 );
 
@@ -203,7 +204,7 @@ if ( (n_f == 0) && (n_o == 0) )  trouble = true;
 
 if ( trouble )  {
 
-   cerr << "\n\n  FO_Graph::set_size(int n_f, int n_o) -> bad n_f or n_o value(s)\n\n";
+   mlog << Error << "\n\n  FO_Graph::set_size(int n_f, int n_o) -> bad n_f or n_o value(s)\n\n";
 
    exit ( 1 );
 
@@ -354,7 +355,7 @@ void FO_Graph::erase_edges()
 
 if ( ! TheGraph )  {
 
-   cerr << "\n\n  FO_Graph::erase_edges() -> empty graph!\n\n";
+   mlog << Error << "\n\n  FO_Graph::erase_edges() -> empty graph!\n\n";
 
    exit ( 1 );
 
@@ -383,7 +384,7 @@ void FO_Graph::dump_as_table(ostream & out) const
 
 if ( ! TheGraph )  {
 
-   cerr << "\n\n  FO_Graph::dump_as_table() -> empty graph!\n\n";
+   mlog << Error << "\n\n  FO_Graph::dump_as_table() -> empty graph!\n\n";
 
    exit ( 1 );
 

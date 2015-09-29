@@ -13,6 +13,7 @@ using namespace std;
 #include <cmath>
 
 #include "nc_utils.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -26,7 +27,7 @@ NcAtt * att = Nc.get_att(name);
 
 if ( att->type() != ncChar )  {
 
-   cerr << "\n\n   string_att() -> attribute \"" << name << "\" is not a character string!\n\n";
+   mlog << Error << "\n\n   string_att() -> attribute \"" << name << "\" is not a character string!\n\n";
 
    exit ( 1 );
 
@@ -108,7 +109,7 @@ const int n = strlen(text);
 
 if ( n != 15 )  {
 
-   cerr << "\n\n  parse_start_time() -> bad string ... \"" << text << "\"\n\n";
+   mlog << Error << "\n\n  parse_start_time() -> bad string ... \"" << text << "\"\n\n";
 
    exit ( 1 );
 

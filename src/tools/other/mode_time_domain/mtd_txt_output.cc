@@ -41,7 +41,7 @@ out.open(output_filename);
 
 if ( ! out )  {
 
-   cerr << "\n\n  do_3d_single_txt_output() -> unable to open output filename \""
+   mlog << Error << "\n\n  do_3d_single_txt_output() -> unable to open output filename \""
         << output_filename << "\'\n\n";
 
    exit ( 1 );
@@ -134,7 +134,7 @@ out.open(output_filename);
 
 if ( ! out )  {
 
-   cerr << "\n\n  do_3d_pair_txt_output() -> unable to open output filename \""
+   mlog << Error << "\n\n  do_3d_pair_txt_output() -> unable to open output filename \""
         << output_filename << "\'\n\n";
 
    exit ( 1 );
@@ -236,7 +236,7 @@ out.open(output_filename);
 
 if ( ! out )  {
 
-   cerr << "\n\n  do_2d_txt_output() -> unable to open output filename \""
+   mlog << Error << "\n\n  do_2d_txt_output() -> unable to open output filename \""
         << output_filename << "\'\n\n";
 
    exit ( 1 );

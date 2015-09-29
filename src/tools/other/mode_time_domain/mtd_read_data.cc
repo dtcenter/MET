@@ -24,7 +24,7 @@ void mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo, const StringArray 
 
 if ( filenames.n() < 2 )  {
 
-   cerr << "\n\n  mtd_read_data() -> need at least 2 data files!\n\n";
+   mlog << Error << "\n\n  mtd_read_data() -> need at least 2 data files!\n\n";
 
    exit ( 1 );
 
@@ -54,7 +54,7 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    if ( ! data_2d_file->data_plane(varinfo, plane) )  {
 
-      cerr << "\n\n  mtd_read_data() -> unable to get data plane at time " << j << "\n\n";
+      mlog << Error << "\n\n  mtd_read_data() -> unable to get data plane at time " << j << "\n\n";
 
       exit ( 1 );
 
@@ -62,7 +62,7 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    if ( ! data_2d_file->data_plane(varinfo, plane) )  {
 
-      cerr << "\n\n  mtd_read_data() -> unable to get data plane at time " << j << "\n\n";
+      mlog << Error << "\n\n  mtd_read_data() -> unable to get data plane at time " << j << "\n\n";
 
       exit ( 1 );
 
@@ -105,7 +105,7 @@ for (j=2; j<(filenames.n()); ++j)  {
 
    if ( dt != dt_start )  {
 
-      cerr << "\n\n  mtd_read_data() -> file time increments are not constant!\n\n";
+      mlog << Error << "\n\n  mtd_read_data() -> file time increments are not constant!\n\n";
 
       exit ( 1 );
 

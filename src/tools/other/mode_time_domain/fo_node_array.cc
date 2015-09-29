@@ -154,7 +154,7 @@ FO_Node * u = new FO_Node [N];
 
 if ( !u )  {
 
-   cerr << "FO_Node_Array::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "FO_Node_Array::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -218,7 +218,7 @@ void FO_Node_Array::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   cerr << "FO_Node_Array::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "FO_Node_Array::set_alloc_int(int) -> bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -279,7 +279,7 @@ FO_Node & FO_Node_Array::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   cerr << "\n\n  FO_Node_Array::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\n\n  FO_Node_Array::operator[](int) -> range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }

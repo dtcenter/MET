@@ -56,7 +56,7 @@ if ( proj == "Polar Stereographic" )  {
 
 } else {
 
-   cerr << "\n\n  read_nc_grid() -> haven't written code to parse \"" << proj << "\" grids yet!\n\n";
+   mlog << Error << "\n\n  read_nc_grid() -> haven't written code to parse \"" << proj << "\" grids yet!\n\n";
 
    return ( false );
 
@@ -83,7 +83,7 @@ GridInfo info = g.info();
 
 if ( !(info.ok()) )  {
 
-   cerr << "\n\n  write_nc_grid(NcFile &, const Grid &) -> can't get information from grid!\n\n";
+   mlog << Error << "\n\n  write_nc_grid(NcFile &, const Grid &) -> can't get information from grid!\n\n";
 
    exit ( 1 );
 
@@ -94,7 +94,7 @@ else if ( info.lc )  write_nc_lc_grid     (f, *(info.lc));
 else if ( info.ll )  write_nc_latlon_grid (f, *(info.ll));
 else {
 
-   cerr << "\n\n  bool write_nc_grid(NcFile &, const Grid &) -> unsupported projection type\n\n";
+   mlog << Error << "\n\n  bool write_nc_grid(NcFile &, const Grid &) -> unsupported projection type\n\n";
 
    exit ( 1 );
 

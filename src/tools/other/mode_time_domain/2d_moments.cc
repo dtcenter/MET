@@ -12,6 +12,7 @@ using namespace std;
 
 #include "2d_moments.h"
 #include "trig.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,7 +169,7 @@ void Mtd_2D_Moments::centralize()
 
 if ( N == 0 )  {
 
-   cerr << "\n\n  Mtd_2D_Moments::centralize() -> no data!\n\n";
+   mlog << Error << "\n\n  Mtd_2D_Moments::centralize() -> no data!\n\n";
 
    exit ( 1 );
 
@@ -211,7 +212,7 @@ double Mtd_2D_Moments::calc_2D_axis_plane_angle() const
 
 if ( ! IsCentralized )  {
 
-   cerr << "\n\n  Mtd_2D_Moments::calc_2D_axis_plane_angle() const -> moments must be centralized first!\n\n";
+   mlog << Error << "\n\n  Mtd_2D_Moments::calc_2D_axis_plane_angle() const -> moments must be centralized first!\n\n";
 
    exit ( 1 );
 

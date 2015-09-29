@@ -154,7 +154,7 @@ const double scale = 1.0/(3*trp1*trp1);
 conv_radius = R;
 
 
-// cerr << "\n\n"
+// mlog << Error << "\n\n"
 //      << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
 //      << "\n\n";
 
@@ -172,7 +172,7 @@ conv_data = new double [Nx*Ny*Nt];
 
 if ( !conv_data )  {
 
-   cerr << "\n\n  MtdFloatFile::convolve(const int) const: process() -> memory allocation error\n\n";
+   mlog << Error << "\n\n  MtdFloatFile::convolve(const int) const: process() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -338,7 +338,7 @@ void DataHandle::set_size(int _nx, int _ny)
 
 if ( (_nx <= 0) || (_ny <= 0) )  {
 
-   cerr << "\n\n  DataHandle::set_size() -> bad size\n\n";
+   mlog << Error << "\n\n  DataHandle::set_size() -> bad size\n\n";
 
    exit ( 1 );
 
@@ -824,7 +824,7 @@ for (x=0; x<nx; ++x)  {
 
 if ( ! image.write(filename) )  {
 
-   cerr << "\n\n  unable to write image file \"" << filename << "\"\n\n";
+   mlog << Error << "\n\n  unable to write image file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -877,7 +877,7 @@ for (x=0; x<nx; ++x)  {
 
 if ( ! image.write(filename) )  {
 
-   cerr << "\n\n  unable to write image file \"" << filename << "\"\n\n";
+   mlog << Error << "\n\n  unable to write image file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 

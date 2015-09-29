@@ -223,7 +223,7 @@ Grid MtdFileBase::grid() const
 
 if ( !G )  {
 
-   cerr << "\n\n  MtdFileBase::grid() const -> no grid!\n\n";
+   mlog << Error << "\n\n  MtdFileBase::grid() const -> no grid!\n\n";
 
    exit ( 1 );
 
@@ -244,7 +244,7 @@ void MtdFileBase::latlon_to_xy(double lat, double lon, double & x, double & y) c
 
 if ( !G )  {
 
-   cerr << "\n\n  MtdFileBase::latlon_to_xy() -> no grid!\n\n";
+   mlog << Error << "\n\n  MtdFileBase::latlon_to_xy() -> no grid!\n\n";
 
    exit ( 1 );
 
@@ -294,7 +294,7 @@ void MtdFileBase::xy_to_latlon(double x, double y, double & lat, double & lon) c
 
 if ( !G )  {
 
-   cerr << "\n\n  MtdFileBase::xy_to_latlon() -> no grid!\n\n";
+   mlog << Error << "\n\n  MtdFileBase::xy_to_latlon() -> no grid!\n\n";
 
    exit ( 1 );
 
@@ -316,7 +316,7 @@ unixtime MtdFileBase::valid_time(int t) const
 
 if ( (t < 0) || ( t >= Nt) )  {
 
-   cerr << "\n\n  MtdFileBase::valid_time(int t) -> range check error\n\n";
+   mlog << Error << "\n\n  MtdFileBase::valid_time(int t) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -371,7 +371,7 @@ status = string_to_mtdfiletype(s.text(), FileType);
 
 if ( ! status )  {
 
-   cerr << "\n\n  MtdFileBase::read(NcFile &) -> unable to parse filetype string \""
+   mlog << Error << "\n\n  MtdFileBase::read(NcFile &) -> unable to parse filetype string \""
         << s << "\"\n\n";
 
    exit ( 1 );

@@ -154,7 +154,7 @@ PairAtt3D * u = new PairAtt3D [N];
 
 if ( !u )  {
 
-   cerr << "PairAtt3DArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "PairAtt3DArray::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -218,7 +218,7 @@ void PairAtt3DArray::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   cerr << "PairAtt3DArray::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "PairAtt3DArray::set_alloc_int(int) -> bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -279,7 +279,7 @@ PairAtt3D & PairAtt3DArray::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   cerr << "\n\n  PairAtt3DArray::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\n\n  PairAtt3DArray::operator[](int) -> range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }
@@ -298,7 +298,7 @@ int PairAtt3DArray::fcst_obj_number(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   cerr << "\n\n  PairAtt3DArray::fcst_obj_number(int) -> range check error\n\n";
+   mlog << Error << "\n\n  PairAtt3DArray::fcst_obj_number(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -318,7 +318,7 @@ int PairAtt3DArray::obs_obj_number(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   cerr << "\n\n  PairAtt3DArray::obs_obj_number(int) -> range check error\n\n";
+   mlog << Error << "\n\n  PairAtt3DArray::obs_obj_number(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -338,7 +338,7 @@ double PairAtt3DArray::total_interest(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   cerr << "\n\n  PairAtt3DArray::total_interest(int) -> range check error\n\n";
+   mlog << Error << "\n\n  PairAtt3DArray::total_interest(int) -> range check error\n\n";
 
    exit ( 1 );
 
