@@ -352,3 +352,40 @@ return ( e[k].total_interest() );
 ////////////////////////////////////////////////////////////////////////
 
 
+void PairAtt3DArray::patch_cluster_numbers(const MM_Engine & engine)
+
+{
+
+int j, f_s_id, f_c_id, o_s_id, o_c_id;
+
+for (j=0; j<Nelements; ++j)  {
+
+   f_s_id = e[j].fcst_obj_number();   //  1-based
+   o_s_id = e[j].obs_obj_number();    //  1-based
+
+   if ( e[j].is_simple() )  {
+
+      f_c_id = engine.map_fcst_id_to_composite (f_s_id - 1);   // 0-based
+      o_c_id = engine.map_obs_id_to_composite  (o_s_id - 1);   // 0-based
+
+      e[j].set_fcst_cluster_number (f_c_id + 1);   //  1-based
+      e[j].set_obs_cluster_number  (o_c_id + 1);   //  1-based
+
+   } else {   //  cluster
+
+      e[j].set_fcst_cluster_number (f_s_id);   //  1-based
+      e[j].set_obs_cluster_number  (o_s_id);   //  1-based
+
+   }
+
+}   //  for j
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+

@@ -292,3 +292,37 @@ return ( e[N] );
 ////////////////////////////////////////////////////////////////////////
 
 
+void SingleAtt3DArray::patch_cluster_numbers(const MM_Engine & engine)
+
+{
+
+int j, s_id, c_id;
+
+for (j=0; j<Nelements; ++j)  {
+
+   s_id = e[j].object_number();   //  1-based
+
+   if ( e[j].is_simple() )  {
+
+      if ( e[j].is_fcst() )   c_id = engine.map_fcst_id_to_composite (s_id - 1);   // 0-based
+      else                    c_id = engine.map_obs_id_to_composite  (s_id - 1);   // 0-based
+
+      e[j].set_cluster_number(c_id + 1);   //  1-based
+
+   } else {
+
+      e[j].set_cluster_number(s_id);   //  1-based
+
+   }
+
+}   //  for j
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+

@@ -26,6 +26,8 @@ using namespace std;
 
 static const char format_2_decimals [] = "%.2f";
 
+static const char format_int        [] = "%d";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -394,7 +396,22 @@ table.set_entry(row, c++, s.text());
    //   cluster number
    // 
 
-c++;
+s.erase();
+
+s << 'C';
+
+if ( is_fcst() )  s << 'F';
+else              s << 'O';
+
+if ( ClusterNumber >= 1 )  {
+
+   sprintf(junk, format_int, ClusterNumber);
+
+   s << '_' << junk;
+
+}
+
+table.set_entry(row, c++, s.text());
 
    //
    //  time index
