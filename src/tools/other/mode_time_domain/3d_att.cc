@@ -1247,7 +1247,7 @@ for (j=0; j<n3; ++j)  {
    }
 
    ++i; ++r;
- 
+
 }
 
 
@@ -1288,7 +1288,7 @@ int IV, UV;
 PairAtt3D p;
 double dx, dy;
 double x1dot, x2dot, y1dot, y2dot;
-double b;
+double b, b1, b2;
 double num, den;
 bool obs_on  = false;
 bool fcst_on = false;
@@ -1345,18 +1345,17 @@ fcst_att.velocity(x1dot, y1dot);
 
 p.set_speed_delta(fcst_att.speed() - obs_att.speed());
 
-b = sqrt( x1dot*x1dot + y1dot*y1dot );
+b1 = sqrt( x1dot*x1dot + y1dot*y1dot );
+b2 = sqrt( x2dot*x2dot + y2dot*y2dot );
 
-if ( fabs(b) < tol )  p.set_direction_diff( 0.0 );
+if ( fabs(b1) < tol || fabs(b2) < tol )  p.set_direction_diff( 0.0 );
 else {
 
-   x1dot /= b;
-   y1dot /= b;
+   x1dot /= b1;
+   y1dot /= b1;
 
-   b = sqrt( x2dot*x2dot + y2dot*y2dot );
-
-   x2dot /= b;
-   y2dot /= b;
+   x2dot /= b2;
+   y2dot /= b2;
 
    b = x1dot*x2dot + y1dot*y2dot;
 
@@ -1576,7 +1575,7 @@ if ( w != 0.0 )  {
 }
 
    //
-   //  The denominator is just the sum of the weights, 
+   //  The denominator is just the sum of the weights,
    //    which, as stated above, we already know is nonzero.
    //
 
