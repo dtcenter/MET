@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "3d_att.h"
+#include "mm_engine.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -59,6 +60,8 @@ class SingleAtt3DArray {
       void add(const SingleAtt3DArray &);
 
       SingleAtt3D & operator[](int) const;
+
+      void patch_cluster_numbers(const MM_Engine &);
 
 };
 

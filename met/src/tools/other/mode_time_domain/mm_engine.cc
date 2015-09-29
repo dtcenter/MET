@@ -401,15 +401,21 @@ int MM_Engine::map_fcst_id_to_composite(const int id) const   //  zero-based
 
 {
 
-int j, k;
+int j, k, m;
 
 
 k = id;
 
 j = part.which_class(k);
 
+for (m=0; m<N_Composites; ++m)  {
 
-return ( j );
+   if ( comp_to_eq[m] == j )  return ( m );
+
+}
+
+
+return ( -1 );
 
 }
 
@@ -421,15 +427,21 @@ int MM_Engine::map_obs_id_to_composite(const int id) const   //  zero-based
 
 {
 
-int j, k;
+int j, k, m;
 
 
 k = id + graph.n_fcst();
 
 j = part.which_class(k);
 
+for (m=0; m<N_Composites; ++m)  {
 
-return ( j );
+   if ( comp_to_eq[m] == j )  return ( m );
+
+}
+
+
+return ( -1 );
 
 }
 

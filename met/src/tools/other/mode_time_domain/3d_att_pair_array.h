@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "3d_att.h"
+#include "mm_engine.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,6 +78,8 @@ class PairAtt3DArray {
 
       void add(const PairAtt3D &);
       void add(const PairAtt3DArray &);
+
+      void patch_cluster_numbers(const MM_Engine &);
 
 
 };

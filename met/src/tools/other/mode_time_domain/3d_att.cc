@@ -505,7 +505,22 @@ table.set_entry(row, c++, s.text());
    //  cluster number
    //
 
-c++;
+s.erase();
+
+s << 'C';
+
+if ( is_fcst() )  s << 'F';
+else              s << 'O';
+
+if ( ClusterNumber >= 1 )  {
+
+   sprintf(junk, format_int, ClusterNumber);
+
+   s << '_' << junk;
+
+}
+
+table.set_entry(row, c++, s.text());
 
    //
    //  centroid x, y, t
@@ -705,6 +720,8 @@ void PairAtt3D::clear()
 
 IntersectionVol = 0;
 
+IsSimple = true;
+
 // UnionVol = 0;
 
 TimeCentroidDelta = 0.0;
@@ -717,6 +734,9 @@ SpeedDelta = 0.0;
 
 FcstObjectNumber = -1;
 ObsObjectNumber  = -1;
+
+FcstClusterNumber = -1;
+ObsClusterNumber  = -1;
 
 VolumeRatio = 0.0;
 AxisDiff    = 0.0;
@@ -741,9 +761,13 @@ void PairAtt3D::assign(const PairAtt3D & a)
 
 clear();
 
+IsSimple = a.IsSimple;
 
 FcstObjectNumber = a.FcstObjectNumber;
 ObsObjectNumber  = a.ObsObjectNumber;
+
+FcstClusterNumber = a.FcstClusterNumber;
+ObsClusterNumber  = a.ObsClusterNumber;
 
 IntersectionVol = a.IntersectionVol;
 
@@ -807,6 +831,34 @@ void PairAtt3D::set_obs_obj_number(int k)
 {
 
 ObsObjectNumber = k;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PairAtt3D::set_fcst_cluster_number(int k)
+
+{
+
+FcstClusterNumber = k;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PairAtt3D::set_obs_cluster_number(int k)
+
+{
+
+ObsClusterNumber = k;
 
 return;
 

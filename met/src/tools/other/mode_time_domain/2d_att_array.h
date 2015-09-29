@@ -26,6 +26,7 @@
 #include <iostream>
 
 #include "2d_att.h"
+#include "mm_engine.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,8 @@ class SingleAtt2DArray {
       void add(const SingleAtt2DArray &);
 
       SingleAtt2D & operator[](int) const;
+
+      void patch_cluster_numbers(const MM_Engine &);
 
 };
 

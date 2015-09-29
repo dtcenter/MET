@@ -9,7 +9,7 @@ static const char txt_2d_suffix                [] = "2d.txt";
 static const char txt_3d_single_simple_suffix  [] = "3d_ss.txt";
 static const char txt_3d_pair_simple_suffix    [] = "3d_ps.txt";
 static const char txt_3d_single_cluster_suffix [] = "3d_cs.txt";
-static const char txt_3d_pair_cluster_suffix   [] = "3d_ps.txt";
+static const char txt_3d_pair_cluster_suffix   [] = "3d_pc.txt";
 
 static const char nc_suffix                    [] = "obj.nc";
 
@@ -279,19 +279,6 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 }
 
 
-   //
-   //  write simple single attributes
-   //
-
-path << cs_erase 
-     << output_directory << '/'
-     << prefix << '_' << txt_3d_single_simple_suffix;
-
-mlog << Debug(2) 
-     << "Creating 3D single simple attributes file: \""
-     << path << "\"\n";
-
-do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path);
 
    //
    //  get simple pair attributes
@@ -317,6 +304,8 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       p.set_total_interest(e.calc(p));
 
+      p.set_simple();
+
       // cout << "   (F_" << j << ", O_" << k << ")   "
       //      << p.total_interest() << '\n';
 
@@ -329,19 +318,6 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 }
 
 
-   //
-   //  write simple pair attributes
-   //
-
-path << cs_erase 
-     << output_directory << '/'
-     << prefix << '_' << txt_3d_pair_simple_suffix;
-
-mlog << Debug(2) 
-     << "Creating 3D pair simple attributes file: \""
-     << path << "\"\n";
-
-do_3d_pair_txt_output(pa_simple, config, path);
 
    //
    //  calculate 2d attributes
@@ -405,19 +381,6 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 }   //  for j
 
 
-   //
-   //  write 2d attributes for each simple object for each time slice
-   //
-
-path << cs_erase 
-     << output_directory << '/'
-     << prefix << '_' << txt_2d_suffix;
-
-mlog << Debug(2) 
-     << "Creating 2D constant-time slice attributes file: \""
-     << path << "\"\n";
-
-do_2d_txt_output(fcst_att_2d, obs_att_2d, config, path);
 
    //
    //  create graph
@@ -526,22 +489,6 @@ for (j=0; j<n_clusters; ++j)  {
 
 // obs_cluster_att.dump(cout);
 
-
-   //
-   //  write cluster single attributes
-   //
-
-path << cs_erase 
-     << output_directory << '/'
-     << prefix << '_' << txt_3d_single_cluster_suffix;
-
-mlog << Debug(2) 
-     << "Creating 3D cluster single attributes file: \""
-     << path << "\"\n";
-
-do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
-
-
    //
    //  get cluster pair attributes
    //
@@ -570,6 +517,8 @@ for (j=0; j<n_clusters; ++j)  {
 
       p = calc_3d_pair_atts(fo, oo, fcst_cluster_att[j], obs_cluster_att[k]);
 
+      p.set_cluster();
+
       // p.set_total_interest(e.calc(p));
       p.set_total_interest(-1.0);
 
@@ -584,6 +533,77 @@ for (j=0; j<n_clusters; ++j)  {
 
 }
 
+   //
+   //  patch the cluster ids
+   //
+
+fcst_single_att.patch_cluster_numbers(e);
+ obs_single_att.patch_cluster_numbers(e);
+
+fcst_cluster_att.patch_cluster_numbers(e);
+ obs_cluster_att.patch_cluster_numbers(e);
+
+fcst_att_2d.patch_cluster_numbers(e);
+ obs_att_2d.patch_cluster_numbers(e);
+
+pa_simple.patch_cluster_numbers(e);
+pa_cluster.patch_cluster_numbers(e);
+
+   //
+   //  write 2d attributes for each simple object for each time slice
+   //
+
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_2d_suffix;
+
+mlog << Debug(2) 
+     << "Creating 2D constant-time slice attributes file: \""
+     << path << "\"\n";
+
+do_2d_txt_output(fcst_att_2d, obs_att_2d, config, path);
+
+   //
+   //  write simple single attributes
+   //
+
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_single_simple_suffix;
+
+mlog << Debug(2) 
+     << "Creating 3D single simple attributes file: \""
+     << path << "\"\n";
+
+do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path);
+
+   //
+   //  write simple pair attributes
+   //
+
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_pair_simple_suffix;
+
+mlog << Debug(2) 
+     << "Creating 3D pair simple attributes file: \""
+     << path << "\"\n";
+
+do_3d_pair_txt_output(pa_simple, config, path);
+
+   //
+   //  write cluster single attributes
+   //
+
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_single_cluster_suffix;
+
+mlog << Debug(2) 
+     << "Creating 3D cluster single attributes file: \""
+     << path << "\"\n";
+
+do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
 
    //
    //  write cluster pair attributes

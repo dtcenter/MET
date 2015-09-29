@@ -251,8 +251,13 @@ class PairAtt3D {
       int FcstObjectNumber;   //  1-based
       int ObsObjectNumber;    //  1-based
 
+      int FcstClusterNumber;  //  1-based
+      int ObsClusterNumber;   //  1-based
+
       int IntersectionVol;
       // int UnionVol;
+
+      bool IsSimple;
 
       double TimeCentroidDelta;
       double SpaceCentroidDist;
@@ -293,6 +298,12 @@ class PairAtt3D {
       void set_fcst_obj_number (int);   //  1-based
       void set_obs_obj_number  (int);   //  1-based
 
+      void set_fcst_cluster_number (int);   //  1-based
+      void set_obs_cluster_number  (int);   //  1-based
+
+      void set_simple();
+      void set_cluster();
+
       void set_intersection_volume (int);
       void set_union_volume        (int);
 
@@ -314,8 +325,14 @@ class PairAtt3D {
          //  get stuff
          //
 
+      bool is_simple() const;
+      bool is_cluster() const;
+
       int fcst_obj_number() const;   //  1-based
       int  obs_obj_number() const;   //  1-based
+
+      int fcst_cluster_number() const;   //  1-based
+      int  obs_cluster_number() const;   //  1-based
 
       int intersection_vol () const;
       int union_vol        () const;
@@ -350,6 +367,9 @@ class PairAtt3D {
 inline int PairAtt3D::fcst_obj_number() const { return ( FcstObjectNumber ); }
 inline int  PairAtt3D::obs_obj_number() const { return ( ObsObjectNumber ); }
 
+inline int PairAtt3D::fcst_cluster_number() const { return ( FcstClusterNumber ); }
+inline int  PairAtt3D::obs_cluster_number() const { return ( ObsClusterNumber ); }
+
 inline int PairAtt3D::intersection_vol () const { return ( IntersectionVol ); }
 // inline int PairAtt3D::union_vol        () const { return ( UnionVol ); }
 
@@ -366,6 +386,12 @@ inline int PairAtt3D::start_time_delta () const { return ( StartTimeDelta ); }
 inline int PairAtt3D::end_time_delta   () const { return ( EndTimeDelta ); }
 
 inline double PairAtt3D::total_interest () const { return ( TotalInterest ); }
+
+inline bool PairAtt3D::is_simple  () const { return (   IsSimple ); }
+inline bool PairAtt3D::is_cluster () const { return ( ! IsSimple ); }
+
+inline void PairAtt3D::set_simple  () { IsSimple = true;   return; }
+inline void PairAtt3D::set_cluster () { IsSimple = false;  return; }
 
 
 ////////////////////////////////////////////////////////////////////////

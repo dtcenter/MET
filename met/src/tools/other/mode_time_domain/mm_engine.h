@@ -29,7 +29,7 @@ class MM_Engine {
       void assign(const MM_Engine &);
 
       int N_Composites;
-      int N_Obs_Composites;
+      // int N_Obs_Composites;
 
       int * comp_to_eq;   //  allocated, 0-based, both ways
 
