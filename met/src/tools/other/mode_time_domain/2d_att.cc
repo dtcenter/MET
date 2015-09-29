@@ -293,7 +293,7 @@ moments = mask_2d.calc_2d_moments();
 
 if ( moments.N == 0 )  {
 
-   cerr << "\n\n  calc_2d_single_atts() -> empty object!\n\n";
+   mlog << Error << "\n\n  calc_2d_single_atts() -> empty object!\n\n";
 
    exit ( 1 );
 
@@ -321,7 +321,7 @@ values = new float [Vol];
 
 if ( !values )  {
 
-   cerr << "\n\n  calc_2d_single_atts() -> memory allocation error\n\n";
+   mlog << Error << "\n\n  calc_2d_single_atts() -> memory allocation error\n\n";
 
    exit ( 1 );
 

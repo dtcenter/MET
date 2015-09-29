@@ -242,7 +242,7 @@ if ( is_eq(_weight, 0.0) )  return;
 
 if ( _weight < 0.0 )  {
 
-   cerr << "\n\n  InterestCalculator::add() -> weithgs must be >= 0\n\n";
+   mlog << Error << "\n\n  InterestCalculator::add() -> weithgs must be >= 0\n\n";
 
    exit ( 1 );
 
@@ -279,7 +279,7 @@ void InterestCalculator::check()
 
 if ( Nelements == 0 )  {
 
-   cerr << "\n\n  InterestCalculator::scale() -> empty!\n\n";
+   mlog << Error << "\n\n  InterestCalculator::scale() -> empty!\n\n";
 
    exit ( 1 );
 

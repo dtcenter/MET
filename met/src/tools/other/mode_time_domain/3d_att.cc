@@ -1118,7 +1118,7 @@ moments = mask.calc_3d_moments();
 
 if ( moments.N == 0 )  {
 
-   cerr << "\n\n  calc_3d_single_atts() -> empty object!\n\n";
+   mlog << Error << "\n\n  calc_3d_single_atts() -> empty object!\n\n";
 
    exit ( 1 );
 
@@ -1175,7 +1175,7 @@ values = new float [Vol];
 
 if ( !values )  {
 
-   cerr << "\n\n  calc_3d_single_atts() -> memory allocation error\n\n";
+   mlog << Error << "\n\n  calc_3d_single_atts() -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -1240,6 +1240,7 @@ double b;
 double num, den;
 bool obs_on  = false;
 bool fcst_on = false;
+const double tol = 1.0e-3;
 
 
 p.set_fcst_obj_number (fcst_att.object_number());
@@ -1294,18 +1295,23 @@ p.set_speed_delta(fcst_att.speed() - obs_att.speed());
 
 b = sqrt( x1dot*x1dot + y1dot*y1dot );
 
-x1dot /= b;
-y1dot /= b;
+if ( fabs(b) < tol )  p.set_direction_diff( 0.0 );
+else {
 
-b = sqrt( x2dot*x2dot + y2dot*y2dot );
+   x1dot /= b;
+   y1dot /= b;
 
-x2dot /= b;
-y2dot /= b;
+   b = sqrt( x2dot*x2dot + y2dot*y2dot );
 
-b = x1dot*x2dot + y1dot*y2dot;
+   x2dot /= b;
+   y2dot /= b;
 
-if ( b > 0.999999 )  p.set_direction_diff( 0.0 );
-else                 p.set_direction_diff( acosd(b) );
+   b = x1dot*x2dot + y1dot*y2dot;
+
+   if ( b > 0.999999 )  p.set_direction_diff( 0.0 );
+   else                 p.set_direction_diff( acosd(b) );
+
+}
 
    //
    //  volume ratio

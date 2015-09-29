@@ -47,7 +47,7 @@ NcFile out(output_filename, NcFile::Replace);
 
 if ( ! out.is_valid() )  {
 
-   cerr << "\n\n  do_mtd_nc_output() -> trouble opening output file \""
+   mlog << Error << "\n\n  do_mtd_nc_output() -> trouble opening output file \""
         << output_filename << "\"\n\n";
 
    exit ( 1 );

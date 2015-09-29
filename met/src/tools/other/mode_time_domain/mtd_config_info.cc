@@ -233,7 +233,7 @@ else                                       all_zero = false;
 
 if ( all_zero )  {
 
-   cerr << "\n\n  MtdConfigInfo::read_config() -> all the fuzzy engine weights are zero!\n\n";
+   mlog << Error << "\n\n  MtdConfigInfo::read_config() -> all the fuzzy engine weights are zero!\n\n";
 
    exit ( 1 );
 

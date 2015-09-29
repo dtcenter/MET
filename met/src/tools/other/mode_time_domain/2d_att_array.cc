@@ -167,7 +167,7 @@ SingleAtt2D * u = new SingleAtt2D [N];
 
 if ( !u )  {
 
-   cerr << "SingleAtt2DArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "SingleAtt2DArray::extend(int) -> memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -231,7 +231,7 @@ void SingleAtt2DArray::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   cerr << "SingleAtt2DArray::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "SingleAtt2DArray::set_alloc_int(int) -> bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -292,7 +292,7 @@ SingleAtt2D & SingleAtt2DArray::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   cerr << "\n\n  SingleAtt2DArray::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\n\n  SingleAtt2DArray::operator[](int) -> range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }
