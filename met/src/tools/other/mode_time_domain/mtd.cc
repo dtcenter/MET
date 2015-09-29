@@ -44,6 +44,8 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
+static ConcatString output_directory;
+
 static StringArray fcst_filenames;
 static StringArray  obs_filenames;
 
@@ -61,6 +63,7 @@ static void set_config    (const StringArray &);
 
 static void set_verbosity (const StringArray &);
 static void set_logfile   (const StringArray &);
+static void set_outdir    (const StringArray &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,6 +84,7 @@ cline.add(set_obs,       "-obs",    -1);
 cline.add(set_config,    "-config",  1);
 cline.add(set_verbosity, "-v",       1);
 cline.add(set_logfile,   "-log",     1);
+cline.add(set_outdir,    "-outdir",  1);
 
 cline.parse();
 
@@ -88,6 +92,8 @@ if ( cline.n() != 0 )  usage();
 
 if ( fcst_filenames.n() == 0 )  usage();
 if (  obs_filenames.n() == 0 )  usage();
+
+if ( output_directory.empty() )  output_directory = ".";
 
    //
    //  read the config file
@@ -154,8 +160,9 @@ ConcatString prefix;
 int year, month, day, hour, minute, second;
 char junk[256];
 
+prefix << cs_erase << default_prefix << '_';
+
 if ( config.output_prefix.nonempty() )  prefix << config.output_prefix << '_';
-else                                    prefix << default_prefix       << '_';
 
 unix_to_mdyhms(obs_raw.start_time(), month, day, year, hour, minute, second);
 
@@ -203,11 +210,12 @@ fcst_mask = fcst_conv.threshold(config.fcst_conv_thresh);
 fcst_obj = fcst_mask;
  obs_obj =  obs_mask;
 
-mlog << Debug(2) << "Start split\n";
+mlog << Debug(2) << "Splitting fcst object field\n";
    fcst_obj.split();
-mlog << Debug(2) << "mid split\n";
+mlog << Debug(2) << "Done splitting fcst\n";
+mlog << Debug(2) << "Splitting obs object field\n";
     obs_obj.split();
-mlog << Debug(2) << "End split\n";
+mlog << Debug(2) << "Done splitting obs\n";
 
    //
    //  toss small objects
@@ -231,7 +239,7 @@ SingleAtt3DArray fcst_single_att, obs_single_att;
 Object mask;
 
 mlog << Debug(2)
-     << "calculating fcst single atts\n";
+     << "Calculating 3D fcst single attributes\n";
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
@@ -251,7 +259,8 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
 
 
-mlog << Debug(2) << "calculating obs single atts\n";
+mlog << Debug(2) 
+     << "Calculating 3D obs single attributes\n";
 
 for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
@@ -274,7 +283,13 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
    //  write simple single attributes
    //
 
-path << cs_erase << prefix << '_' << txt_3d_single_simple_suffix;
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_single_simple_suffix;
+
+mlog << Debug(2) 
+     << "Creating 3D single simple attributes file: \""
+     << path << "\"\n";
 
 do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path);
 
@@ -286,7 +301,7 @@ PairAtt3DArray pa_simple;
 PairAtt3D p;
 MtdIntFile fo, oo;
 
-// cout << "\n\n  calculating pair atts ... (Nf = "
+// cout << "\n\n  Calculating pair attributes ... (Nf = "
 //      << (fcst_obj.n_objects()) << ", No = "
 //      << (obs_obj.n_objects())  << ")\n\n";
 
@@ -318,7 +333,13 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
    //  write simple pair attributes
    //
 
-path << cs_erase << prefix << '_' << txt_3d_pair_simple_suffix;
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_pair_simple_suffix;
+
+mlog << Debug(2) 
+     << "Creating 3D pair simple attributes file: \""
+     << path << "\"\n";
 
 do_3d_pair_txt_output(pa_simple, config, path);
 
@@ -333,7 +354,7 @@ MtdIntFile mask_2d;
 
    //   fcst objects
 
-mlog << Debug(2) << "Calculating 2d fcst attributes\n";
+mlog << Debug(2) << "Calculating 2D fcst attributes\n";
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
@@ -359,7 +380,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
    //   obs objects
 
-mlog << Debug(2) << "Calculating 2d obs attributes\n";
+mlog << Debug(2) << "Calculating 2D obs attributes\n";
 
 for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
@@ -388,7 +409,13 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
    //  write 2d attributes for each simple object for each time slice
    //
 
-path << cs_erase << prefix << '_' << txt_2d_suffix;
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_2d_suffix;
+
+mlog << Debug(2) 
+     << "Creating 2D constant-time slice attributes file: \""
+     << path << "\"\n";
 
 do_2d_txt_output(fcst_att_2d, obs_att_2d, config, path);
 
@@ -448,7 +475,7 @@ SingleAtt3DArray fcst_cluster_att, obs_cluster_att;
 
 
 mlog << Debug(2)
-     << "calculating fcst cluster atts\n";
+     << "Calculating 3D fcst cluster attributes\n";
 
 for (j=0; j<n_clusters; ++j)  {
 
@@ -473,7 +500,7 @@ for (j=0; j<n_clusters; ++j)  {
 if ( mlog.verbosity_level() > 5 )  fcst_cluster_att.dump(cout);
 
 mlog << Debug(2)
-     << "calculating obs cluster atts\n";
+     << "Calculating 3D obs cluster attributes\n";
 
 for (j=0; j<n_clusters; ++j)  {
 
@@ -504,7 +531,13 @@ for (j=0; j<n_clusters; ++j)  {
    //  write cluster single attributes
    //
 
-path << cs_erase << prefix << '_' << txt_3d_single_cluster_suffix;
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_single_cluster_suffix;
+
+mlog << Debug(2) 
+     << "Creating 3D cluster single attributes file: \""
+     << path << "\"\n";
 
 do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
 
@@ -517,7 +550,7 @@ PairAtt3DArray pa_cluster;
 IntArray b;
 
 mlog << Debug(2)
-     << "calculating cluster pair atts\n";
+     << "Calculating 3D cluster pair attributes\n";
 
 for (j=0; j<n_clusters; ++j)  {
 
@@ -556,7 +589,13 @@ for (j=0; j<n_clusters; ++j)  {
    //  write cluster pair attributes
    //
 
-path << cs_erase << prefix << '_' << txt_3d_pair_cluster_suffix;
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_pair_cluster_suffix;
+
+mlog << Debug(2) 
+     << "Creating 3D cluster pair attributes file: \""
+     << path << "\"\n";
 
 do_3d_pair_txt_output(pa_cluster, config, path);
 
@@ -564,7 +603,13 @@ do_3d_pair_txt_output(pa_cluster, config, path);
    //  netcdf output
    //
 
-path << cs_erase << prefix << '_' << nc_suffix;
+path << cs_erase 
+     << output_directory << '/'
+     << prefix << '_' << nc_suffix;
+
+mlog << Debug(2) 
+     << "Creating NetCDF file: \""
+     << path << "\"\n";
 
 do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
 
@@ -590,13 +635,15 @@ ConcatString tab;
 tab.set_repeat(' ', 10 + program_name.length());
 
 mlog << Error
+     << "\n"
      << "Usage: " << program_name << "\n"
-     << tab << "-fcst   file_list\n"
-     << tab << "-obs    file_list\n"
-     << tab << "-config config_file\n"
-     << tab << "[ -log  file ]\n"
-     << tab << "[ -v    level ]\n"
-     << "\n\n";
+     << tab << "-fcst     file_list\n"
+     << tab << "-obs      file_list\n"
+     << tab << "-config   config_file\n"
+     << tab << "[ -log    file ]\n"
+     << tab << "[ -v      level ]\n"
+     << tab << "[ -outdir path ]\n"
+     << "\n";
 
 
 exit ( 1 );
@@ -676,6 +723,20 @@ ConcatString filename;
 filename = a[0];
 
 mlog.open_log_file(filename);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_outdir  (const StringArray & a)
+
+{
+
+output_directory = a[0];
 
 return;
 
