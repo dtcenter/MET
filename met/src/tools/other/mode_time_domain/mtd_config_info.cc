@@ -148,8 +148,6 @@ void MtdConfigInfo::clear()
 
    print_interest_thresh = bad_data_double;
 
-   met_data_dir.clear();
-
    zero_border_size = bad_data_int;
 
    nc_info.set_all_true();
@@ -524,10 +522,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
-
-      // Conf: met_data_dir
-
-   met_data_dir = replace_path(conf.lookup_string(conf_key_met_data_dir));
 
       // Conf: zero_border_size
 
