@@ -273,7 +273,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
 
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "Calculating 3D obs single attributes\n";
 
 for (j=0; j<(obs_obj.n_objects()); ++j)  {
@@ -567,11 +567,11 @@ pa_cluster.patch_cluster_numbers(e);
    //  write 2d attributes for each simple object for each time slice
    //
 
-path << cs_erase 
+path << cs_erase
      << output_directory << '/'
      << prefix << '_' << txt_2d_suffix;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "Creating 2D constant-time slice attributes file: \""
      << path << "\"\n";
 
@@ -581,11 +581,11 @@ do_2d_txt_output(fcst_att_2d, obs_att_2d, config, path);
    //  write simple single attributes
    //
 
-path << cs_erase 
+path << cs_erase
      << output_directory << '/'
      << prefix << '_' << txt_3d_single_simple_suffix;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "Creating 3D single simple attributes file: \""
      << path << "\"\n";
 
@@ -595,11 +595,11 @@ do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path);
    //  write simple pair attributes
    //
 
-path << cs_erase 
+path << cs_erase
      << output_directory << '/'
      << prefix << '_' << txt_3d_pair_simple_suffix;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "Creating 3D pair simple attributes file: \""
      << path << "\"\n";
 
@@ -609,11 +609,11 @@ do_3d_pair_txt_output(pa_simple, config, path);
    //  write cluster single attributes
    //
 
-path << cs_erase 
+path << cs_erase
      << output_directory << '/'
      << prefix << '_' << txt_3d_single_cluster_suffix;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "Creating 3D cluster single attributes file: \""
      << path << "\"\n";
 
@@ -623,11 +623,11 @@ do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
    //  write cluster pair attributes
    //
 
-path << cs_erase 
+path << cs_erase
      << output_directory << '/'
      << prefix << '_' << txt_3d_pair_cluster_suffix;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "Creating 3D cluster pair attributes file: \""
      << path << "\"\n";
 
@@ -637,17 +637,16 @@ do_3d_pair_txt_output(pa_cluster, config, path);
    //  netcdf output
    //
 
-path << cs_erase 
+path << cs_erase
      << output_directory << '/'
      << prefix << '_' << nc_suffix;
 
-mlog << Debug(2) 
+mlog << Debug(2)
      << "Creating NetCDF file: \""
      << path << "\"\n";
 
 
-// JHG do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
-do_mtd_nc_output(config.nc_info, e, fcst_raw, fcst_conv, fcst_obj, obs_obj, config, path);
+do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
 
 
    //
