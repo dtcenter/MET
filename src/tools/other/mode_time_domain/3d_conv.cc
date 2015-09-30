@@ -130,11 +130,10 @@ int j, n;
 int x, y, t;
 double value;
 bool ok = false;
-bool t_last  = false;
-bool t_first = false;
 MtdFloatFile out;
 double min_conv_value, max_conv_value;
 double * conv_data = (double *) 0;
+double scale;
 DataHandle handle;
 unixtime time_start, time_stop;
 double * p = 0;
@@ -147,7 +146,8 @@ const bool * ok_this  = 0;
 const bool * ok_above = 0;
 
 const int trp1 = 2*R + 1;
-const double scale = 1.0/(3*trp1*trp1);
+const double mid_scale = 1.0/(3*trp1*trp1);
+const double be_scale  = 1.0/(2*trp1*trp1);
 
 
 
@@ -189,8 +189,8 @@ time_start = time(0);
 
 for (t=0; t<Nt; ++t)  {
 
-   t_first = (t == 0);
-   t_last  = (t == (Nt - 1));
+   if ( (t == 0) || (t == (Nt - 1)) )  scale = be_scale;
+   else                                scale = mid_scale;
 
    n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
@@ -228,7 +228,25 @@ for (t=0; t<Nt; ++t)  {
 
       if ( !ok )  value = bad_data_double;
       else {
+/*
+         if ( j == 250000 )  {
 
+            cout << "Hello\n";
+
+            cout << "ok_below = " << (*ok_below) << '\n';
+            cout << "ok_this  = " << (*ok_this)  << '\n';
+            cout << "ok_above = " << (*ok_above) << '\n';
+
+            cout << '\n';
+
+            cout << "s_below  = " << (*s_below) << '\n';
+            cout << "s_this   = " << (*s_this)  << '\n';
+            cout << "s_above  = " << (*s_above) << '\n';
+
+            cout << '\n';
+
+         }
+*/
          value = 0.0;
 
          if ( *ok_below )  value += (*s_below);
@@ -258,7 +276,8 @@ for (t=0; t<Nt; ++t)  {
 
 time_stop = time(0);
 
-// mlog << Debug(5) << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n" << flush;
+
+mlog << Debug(5) << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n";
 
 
 if ( verbose )  {
@@ -410,7 +429,7 @@ const int nx = mtd.nx();
 const int ny = mtd.ny();
 
 
-// mlog << Debug(5) << "In get_data_plane\n" << flush;
+// mlog << Debug(5) << "In get_data_plane\n";
 
 for (y=0; y<ny; ++y)  {
 
@@ -473,7 +492,7 @@ const double * data_in_p      = 0;
       double * data_put_p     = 0;
 
 
-// mlog << Debug(5) << "in calc_sum_plane\n" << flush;
+// mlog << Debug(5) << "in calc_sum_plane\n";
 
 // sprintf(junk, "raw_%02d", t_count);
 
@@ -536,7 +555,6 @@ for (y=0; y<ny; ++y)  {
           ok_back = *ok_back_p;
 
       if ( ! ok_front )  ++bad_count;
-      else               moving_sum += value_front;
 
       if ( bad_count > 0 )  {
 
@@ -549,6 +567,8 @@ for (y=0; y<ny; ++y)  {
            *ok_put_p = true;
 
       }
+
+      if ( ok_front )  moving_sum += value_front;
 
       if ( ok_back )  moving_sum -= value_back;
       else            --bad_count;
@@ -626,7 +646,6 @@ for (x=0; x<nx; ++x)  {
          ok_back  = *ok_back_p;
 
       if ( ! ok_front )  ++bad_count;
-      else               moving_sum += value_front;
 
       if ( bad_count > 0 )  {
 
@@ -639,6 +658,8 @@ for (x=0; x<nx; ++x)  {
            *ok_put_p = true;
 
       }
+
+      if ( ok_front )  moving_sum += value_front;
 
       if ( ok_back )  moving_sum -= value_back;
       else            --bad_count;

@@ -198,6 +198,12 @@ e.calc.check();
  obs_conv =  obs_raw.convolve(config.obs_conv_radius);
 fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
 
+   //  rgb
+
+fcst_conv.write("c.nc");
+
+exit ( 1 );
+
    //
    //  threshold
    //
