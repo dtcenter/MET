@@ -327,7 +327,7 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
    MetNcMetDataFile *mnmdf_ptr = (MetNcMetDataFile *) mtddf_ptr;
    
    // Check for the MET_tool global attribute
-   if(!get_file_att(mnmdf_ptr->MetNc->Nc, "MET_tool", tool)) return(status);
+   if(!get_global_att(mnmdf_ptr->MetNc->Nc, "MET_tool", tool)) return(status);
 
    // Check for gen_vx_mask output
    if(tool != program_name) return(status);

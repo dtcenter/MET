@@ -37,9 +37,12 @@ using namespace std;
 
 static const char x_dim_name           [] = "west_east";
 static const char y_dim_name           [] = "south_north";
-static const char z_dim_name           [] = "num_metgrid_levels";
 static const char t_dim_name           [] = "Time";
+static const char z_dim_p_interp_name  [] = "num_metgrid_levels";
+static const char z_dim_wrf_interp_name[] = "vlevs";
+static const char strl_dim_name        [] = "DateStrLen";
 
+static const char  times_var_name      [] = "Times";
 static const char  month_var_name      [] = "month";
 static const char    day_var_name      [] = "day";
 static const char   year_var_name      [] = "year";
@@ -47,7 +50,11 @@ static const char   hour_var_name      [] = "hour";
 static const char minute_var_name      [] = "minute";
 static const char second_var_name      [] = "second";
 
-static const char pressure_var_name    [] = "pressure";
+static const char pressure_var_p_interp_name   [] = "pressure";
+static const char pressure_var_wrf_interp_name [] = "LEV";
+
+static const char pa_units_str         [] = "Pa";
+static const char hpa_units_str        [] = "hPa";
 
 static const char init_time_att_name   [] = "START_DATE";
 
@@ -157,6 +164,8 @@ Ntimes = 0;
 
 PressureIndex = -1;
 
+hPaCF = 1.0;
+
    //
    //  done
    //
@@ -174,7 +183,8 @@ bool PinterpFile::open(const char * filename)
 {
 
 int j, k;
-int month, day, year, hour, minute, second;
+int month, day, year, hour, minute, second, str_len;
+char time_str[max_str_len];
 const char * c = (const char *) 0;
 NcVar * v   = (NcVar *) 0;
 NcAtt * att = (NcAtt *) 0;
@@ -206,7 +216,7 @@ for (j=0; j<Ndims; ++j)  {
 
    Dim[j] = Nc->get_dim(j);
 
-   if ( strcmp(Dim[j]->name(), "Time") == 0 )  Ntimes = Dim[j]->size();
+   if ( strcasecmp(Dim[j]->name(), t_dim_name) == 0 )  Ntimes = Dim[j]->size();
 
    DimNames.add(Dim[j]->name());
 
@@ -216,10 +226,11 @@ for (j=0; j<Ndims; ++j)  {
 
    c = Dim[j]->name();
 
-   if ( strcmp(c, x_dim_name) == 0 )  Xdim = Dim[j];
-   if ( strcmp(c, y_dim_name) == 0 )  Ydim = Dim[j];
-   if ( strcmp(c, z_dim_name) == 0 )  Zdim = Dim[j];
-   if ( strcmp(c, t_dim_name) == 0 )  Tdim = Dim[j];
+   if ( strcasecmp(c, x_dim_name) == 0 )            Xdim = Dim[j];
+   if ( strcasecmp(c, y_dim_name) == 0 )            Ydim = Dim[j];
+   if ( strcasecmp(c, z_dim_p_interp_name  ) == 0 ||
+        strcasecmp(c, z_dim_wrf_interp_name) == 0)  Zdim = Dim[j];
+   if ( strcasecmp(c, t_dim_name) == 0 )            Tdim = Dim[j];
 
 }
 
@@ -231,18 +242,59 @@ if ( Ntimes == 0 )  { close();  return ( false ); }
 
 Time = new unixtime [Ntimes];
 
-for (j=0; j<Ntimes; ++j)  {
+   //
+   // attempt to parse variable "char Times(time, DateStrLen)"
+   // format = YYYY-MM-DD_hh:mm:ss
+   //
 
-   month  = get_int_var(Nc,  month_var_name, j);
-   day    = get_int_var(Nc,    day_var_name, j);
-   year   = get_int_var(Nc,   year_var_name, j);
-   hour   = get_int_var(Nc,   hour_var_name, j);
-   minute = get_int_var(Nc, minute_var_name, j);
-   second = get_int_var(Nc, second_var_name, j);
+if ( ( v = has_var(Nc, times_var_name) ) != 0 ) {
 
-   Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
+   get_dim(Nc, strl_dim_name, str_len, true);
 
-}   //  for j
+   for (j=0; j<Ntimes; ++j)  {
+
+      if(!v->set_cur(j, 0) ||
+         !v->get(time_str, 1, str_len)) {
+         close();
+         return ( false );
+      }
+      time_str[str_len] = '\0';
+
+      // Check for leading blank
+      if(time_str[0] == ' ') {
+         Time[j] = 0;
+      }
+      else {
+
+         if(sscanf(time_str, "%4d-%2d-%2d_%2d:%2d:%2d",
+                   &year, &month, &day, &hour, &minute, &second) != 6) {
+            mlog << Error << "\nPinterpFile::open() -> "
+                 << "error parsing time string \"" << time_str << "\".\n\n";
+            return ( false );
+         }
+
+         Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
+      }
+   }   //  for j
+}
+   //
+   // otherwise, parse variables month, day, year, hour, minute, second
+   //
+else {
+
+   for (j=0; j<Ntimes; ++j)  {
+
+      month  = get_int_var(Nc,  month_var_name, j);
+      day    = get_int_var(Nc,    day_var_name, j);
+      year   = get_int_var(Nc,   year_var_name, j);
+      hour   = get_int_var(Nc,   hour_var_name, j);
+      minute = get_int_var(Nc, minute_var_name, j);
+      second = get_int_var(Nc, second_var_name, j);
+
+      Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
+
+   }   //  for j
+}
 
 att = Nc->get_att(init_time_att_name);
 
@@ -275,7 +327,16 @@ for (j=0; j<Nvars; ++j)  {
    get_att_str( Var[j], description_att_name, Var[j].long_name_att );
    get_att_str( Var[j], units_att_name,       Var[j].units_att     );
 
-   if ( strcmp(v->name(), pressure_var_name) == 0 )  PressureIndex = j;
+   //
+   //  get the pressure variable and store the hPa conversion factor
+   //
+
+   if ( strcasecmp(v->name(), pressure_var_p_interp_name)   == 0 ||
+        strcasecmp(v->name(), pressure_var_wrf_interp_name) == 0 ) {
+      PressureIndex = j;
+           if ( strcasecmp(Var[j].units_att, pa_units_str ) == 0 ) hPaCF = 0.01;
+      else if ( strcasecmp(Var[j].units_att, hpa_units_str) == 0 ) hPaCF = 1.0;
+   }
 
    for (k=0; k<(Var[j].Ndims); ++k)  {
 
@@ -733,7 +794,7 @@ if ( P && z_slot > 0 )  {
 
    c.add(a[z_slot]);
 
-   pressure = data(P->var, c);
+   pressure = data(P->var, c) * hPaCF;
 
 }
 
@@ -787,7 +848,7 @@ plane.set_lead  ( lead_time(time_index) );
    //
 
 if ( is_accumulation(var_name) )  {
-  
+
    plane.set_accum ( lead_time(time_index) );
 
 } else  {
@@ -825,7 +886,7 @@ unixtime t;
 int month, day, year, hour, minute, second;
 
 
-j = sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d", 
+j = sscanf(s, "%4d-%2d-%2d_%2d:%2d:%2d",
                &year, &month, &day, &hour, &minute, &second);
 
 if ( j != 6 )  {

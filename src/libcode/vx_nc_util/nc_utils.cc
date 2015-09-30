@@ -15,6 +15,7 @@ using namespace std;
 
 #include <netcdf.hh>
 
+#include "vx_log.h"
 #include "nc_utils.h"
 #include "util_constants.h"
 #include "vx_cal.h"
@@ -33,7 +34,7 @@ bool get_var_att(const NcVar *var, const ConcatString &att_name,
    int i, n;
    NcAtt *att = (NcAtt *) 0;
    bool status = false;
-   
+
    // Initialize
    att_val.clear();
 
@@ -51,7 +52,7 @@ bool get_var_att(const NcVar *var, const ConcatString &att_name,
          break;
       }
    }
-   
+
    return(status);
 }
 
@@ -62,7 +63,7 @@ bool get_var_att_double(const NcVar *var, const ConcatString &att_name,
    int i, n;
    NcAtt *att = (NcAtt *) 0;
    bool status = false;
-   
+
    // Initialize
    att_val = bad_data_double;
 
@@ -80,14 +81,14 @@ bool get_var_att_double(const NcVar *var, const ConcatString &att_name,
          break;
       }
    }
-   
+
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_var_units(const NcVar *var, ConcatString &att_val) {
-  
+
    return(get_var_att(var, units_att_name, att_val));
 }
 
@@ -102,11 +103,11 @@ bool get_var_level(const NcVar *var, ConcatString &att_val) {
 
 double get_var_missing_value(const NcVar *var) {
    double v;
-   
+
    if(!get_var_att_double(var, missing_value_att_name, v)) {
       v = bad_data_double;
    }
-   
+
    return(v);
 }
 
@@ -114,11 +115,11 @@ double get_var_missing_value(const NcVar *var) {
 
 double get_var_fill_value(const NcVar *var) {
    double v;
-   
+
    if(!get_var_att_double(var, fill_value_att_name, v)) {
       v = bad_data_double;
    }
-   
+
    return(v);
 }
 
@@ -158,7 +159,7 @@ bool args_ok(const LongArray & a) {
    int j, k;
 
    for (j=0; j<(a.n_elements()); ++j)  {
-     
+
       k = a[j];
 
       if ( (k < 0) && (k != vx_data2d_star) ) return (false);
@@ -189,12 +190,12 @@ NcDim* has_dim(NcFile *nc, const char * dim_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_file_att(const NcFile *nc, const ConcatString &att_name,
-                  ConcatString &att_val) {
+bool get_global_att(const NcFile *nc, const ConcatString &att_name,
+                    ConcatString &att_val, bool error_out) {
    int i, n;
    NcAtt *att = (NcAtt *) 0;
    bool status = false;
-   
+
    // Initialize
    att_val.clear();
 
@@ -212,7 +213,88 @@ bool get_file_att(const NcFile *nc, const ConcatString &att_name,
          break;
       }
    }
-   
+
+   // Check error_out status
+   if(error_out && !status) {
+      mlog << Error << "\nget_global_att() -> "
+           << "can't find global NetCDF attribute \"" << att_name
+           << "\".\n\n";
+      exit(1);
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_global_att_double(const NcFile *nc, const ConcatString &att_name,
+                           double &att_val, bool error_out) {
+   int i, n;
+   NcAtt *att = (NcAtt *) 0;
+   bool status = false;
+
+   // Initialize
+   att_val = bad_data_double;
+
+   n = nc->num_atts();
+
+   // Loop through the attributes looking for a match
+   for(i=0; i<n; i++) {
+
+      att = nc->get_att(i);
+
+      // Look for a match
+      if(strcmp(att_name, att->name()) == 0) {
+         att_val = att->as_double(0);
+         status = true;
+         break;
+      }
+   }
+
+   // Check error_out status
+   if(error_out && !status) {
+      mlog << Error << "\nget_global_att_double() -> "
+           << "can't find global NetCDF attribute \"" << att_name
+           << "\".\n\n";
+      exit(1);
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_dim(const NcFile *nc, const ConcatString &dim_name,
+             int &dim_val, bool error_out) {
+   int i, n;
+   NcDim *dim = (NcDim *) 0;
+   bool status = false;
+
+   // Initialize
+   dim_val = bad_data_int;
+
+   n = nc->num_dims();
+
+   // Loop through the dimensions looking for a match
+   for(i=0; i<n; i++) {
+
+      dim = nc->get_dim(i);
+
+      // Look for a match
+      if(strcmp(dim_name, dim->name()) == 0) {
+         dim_val = (int) (dim->size());
+         status = true;
+         break;
+      }
+   }
+
+   // Check error_out status
+   if(error_out && !status) {
+      mlog << Error << "\nget_dim() -> "
+           << "can't find NetCDF dimension \"" << dim_name << "\".\n\n";
+      exit(1);
+   }
+
    return(status);
 }
 
