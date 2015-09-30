@@ -29,6 +29,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_data2d_factory.h"
+#include "apply_mask.h"
 #include "mtd_config_info.h"
 #include "mtd_file.h"
 #include "interest_calc.h"
@@ -121,8 +122,8 @@ GrdFileType ftype, otype;
 ftype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
 otype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
 
-if(ftype == FileType_None) ftype = grd_file_type(fcst_filenames[0]);
-if(otype == FileType_None) otype = grd_file_type(obs_filenames[0]);
+if ( ftype == FileType_None ) ftype = grd_file_type(fcst_filenames[0]);
+if ( otype == FileType_None ) otype = grd_file_type(obs_filenames[0]);
 
 config.process_config(ftype, otype);
 
@@ -153,6 +154,17 @@ if ( fcst_raw.delta_t() != obs_raw.delta_t() )  {
 }
 
 config.delta_t_seconds = fcst_raw.delta_t();
+
+   //
+   //  regrid, if necessary
+   //
+
+mlog << Debug(2) << "regridding, if needed ...\n";
+
+const Grid to_grid = parse_vx_grid(config.regrid_info, fcst_raw.grid_p(), obs_raw.grid_p());
+
+fcst_raw.regrid(to_grid, config.regrid_info);
+ obs_raw.regrid(to_grid, config.regrid_info);
 
    //
    //  make the output file prefix
@@ -201,8 +213,6 @@ fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
    //  rgb
 
 fcst_conv.write("c.nc");
-
-exit ( 1 );
 
    //
    //  threshold
