@@ -156,8 +156,6 @@ class MtdConfigInfo {
 
       double           print_interest_thresh;  // Only write output for pairs with >= this interest
 
-      ConcatString     met_data_dir;           // MET data directory
-
       int              zero_border_size;       // Zero out edge rows and columns for object definition      
 
       // bool             nc_pairs_flag;          // output NetCDF file

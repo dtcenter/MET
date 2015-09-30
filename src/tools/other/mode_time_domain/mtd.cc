@@ -210,10 +210,6 @@ e.calc.check();
  obs_conv =  obs_raw.convolve(config.obs_conv_radius);
 fcst_conv = fcst_raw.convolve(config.fcst_conv_radius);
 
-   //  rgb
-
-fcst_conv.write("c.nc");
-
    //
    //  threshold
    //
@@ -649,7 +645,9 @@ mlog << Debug(2)
      << "Creating NetCDF file: \""
      << path << "\"\n";
 
-do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
+
+// JHG do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
+do_mtd_nc_output(config.nc_info, e, fcst_raw, fcst_conv, fcst_obj, obs_obj, config, path);
 
 
    //
