@@ -801,6 +801,170 @@ return ( f );
 ////////////////////////////////////////////////////////////////////////
 
 
+void MtdFloatFile::get_data_plane(const int t, DataPlane & out)
+
+{
+
+if ( (t < 0) || (t >= Nt) )  {
+
+   mlog << Error << "\n\n  MtdFloatFile::get_data_plane() -> range check error on t\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( (out.nx() != Nx) || (out.ny() != Ny) )  out.set_size(Nx, Ny);
+
+out.set_valid(StartTime + t*DeltaT);
+
+   //  we really don't need these anyway, so just set them to zero
+
+out.set_init(0);
+out.set_lead(0);
+out.set_accum(0);
+
+int x, y, n;
+double value;
+
+for (x=0; x<Nx; ++x)  {
+
+   for (y=0; y<Ny; ++y)  {
+
+      n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
+
+      value = Data[n];
+
+      if ( value == bad_data_double )  out.put(bad_data_float, x, y);
+      else                             out.put((float) value,  x, y);
+
+   }   //  for y
+
+}   //  for x
+
+
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::put_data_plane(const int t, const DataPlane & d)
+
+{
+
+if ( (t < 0) || (t >= Nt) )  {
+
+   mlog << Error << "\n\n  MtdFloatFile::put_data_plane() -> range check error on t\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( (d.nx() != Nx) || (d.ny() != Ny) )  {
+
+   mlog << Error << "\n\n  MtdFloatFile::put_data_plane() -> data plane is wrong size!\n\n";
+
+   exit ( 1 );
+
+}
+
+int x, y, n;
+double value;
+
+
+for (x=0; x<Nx; ++x)  {
+
+   for (y=0; y<Ny; ++y)  {
+
+      n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
+
+      value = d(x, y);
+
+      if ( value == bad_data_double )  Data[n] = bad_data_float;
+      else                             Data[n] = (float) value;
+
+   }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdFloatFile::regrid(const Grid & to_grid, const RegridInfo & info)
+
+{
+
+if ( to_grid == (*G) )  return;
+
+int t;
+MtdFloatFile old = *this;
+DataPlane from_plane, to_plane;
+
+from_plane.set_size(old.nx(), old.ny());
+  to_plane.set_size(old.nx(), old.ny());
+
+delete [] Data;  Data = 0;
+
+Nx = to_grid.nx();
+Ny = to_grid.ny();
+
+Data = new float [Nx*Ny*Nt];
+
+for (t=0; t<(old.nt()); ++t)  {
+
+   old.get_data_plane(t, from_plane);
+
+   to_plane = met_regrid (from_plane, *G, to_grid, info);
+
+   put_data_plane(t, to_plane);
+
+}   //  for t
+
+   //
+   //  done
+   //
+
+calc_data_minmax();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

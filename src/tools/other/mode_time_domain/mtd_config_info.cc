@@ -83,7 +83,7 @@ void MtdConfigInfo::clear()
    model.clear();
    obtype.clear();
 
-   // regrid_info.clear();
+   regrid_info.clear();
 
    mask_missing_flag = FieldType_None;
 
@@ -285,7 +285,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Conf: regrid
 
-   // regrid_info = parse_conf_regrid(&conf);
+   regrid_info = parse_conf_regrid(&conf);
 
       // Conf: fcst and obs
 

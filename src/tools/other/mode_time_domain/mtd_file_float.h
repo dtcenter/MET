@@ -18,6 +18,7 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_grid.h"
+#include "vx_regrid.h"
 
 #include "mtd_file_base.h"
 #include "data_plane.h"
@@ -85,6 +86,8 @@ class MtdFloatFile : public MtdFileBase {
 
       const float * data() const;
 
+      void get_data_plane(const int t, DataPlane & out);
+
          //
          //  do stuff
          //
@@ -108,6 +111,10 @@ class MtdFloatFile : public MtdFileBase {
       MtdFloatFile convolve(const int r) const;
 
       void calc_data_minmax();
+
+      void put_data_plane(const int t, const DataPlane &);
+
+      void regrid(const Grid & to_grid, const RegridInfo &);
 
 };
 

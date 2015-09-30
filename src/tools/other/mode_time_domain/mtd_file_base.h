@@ -118,6 +118,8 @@ class MtdFileBase {
 
       Grid grid() const;
 
+      const Grid * grid_p() const;
+
       unixtime start_time () const;
       int      delta_t    () const;   //  seconds
 
