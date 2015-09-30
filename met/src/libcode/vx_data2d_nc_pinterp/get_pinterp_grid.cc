@@ -26,6 +26,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_math.h"
+#include "vx_nc_util.h"
 
 #include "get_pinterp_grid.h"
 
@@ -33,8 +34,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char       ps_target_name      [] = "Polar_Stereographic";
-static const char  lambert_target_name      [] = "Lambert_Conformal";
+static const char        proj_att_name      [] = "MAP_PROJ_CHAR";
+
+static const char       ps_target_name      [] = "Polar Stereographic";
+static const char  lambert_target_name      [] = "Lambert Conformal";
 static const char mercator_target_name      [] = "Mercator";
 
 static const char nx_dimension_name         [] = "west_east";
@@ -53,10 +56,6 @@ static const double default_grib_radius_km     = 6371.20;
 static bool   get_ps_grid       (NcFile & nc, Grid & grid);
 static bool   get_lambert_grid  (NcFile & nc, Grid & grid);
 static bool   get_mercator_grid (NcFile & nc, Grid & grid);
-
-static int    get_dimension(NcFile &, const char * name);
-
-static double get_att_as_double(NcFile &, const char * name);
 
 static double mercator_lon_to_u(double lon);
 static double mercator_lat_to_v(double lat);
@@ -91,8 +90,7 @@ bool get_pinterp_grid(NcFile & nc, Grid & grid)
 
 {
 
-int j, n;
-NcVar * var = (NcVar *) 0;
+ConcatString proj_att_value;
 bool status = false;
 
 
@@ -102,19 +100,15 @@ grid.clear();
    //  figure out which projection this is
    //
 
-n = nc.num_vars();
+if ( !get_global_att(&nc, proj_att_name, proj_att_value) ) return ( false );
 
-status = false;
+   //
+   //  parse the projection information
+   //
 
-for (j=0; j<n; ++j)  {
-
-   var = nc.get_var(j);
-
-   if ( strcmp(var->name(),       ps_target_name) == 0 )  { status = get_ps_grid       (nc, grid);  break; }
-   if ( strcmp(var->name(),  lambert_target_name) == 0 )  { status = get_lambert_grid  (nc, grid);  break; }
-   if ( strcmp(var->name(), mercator_target_name) == 0 )  { status = get_mercator_grid (nc, grid);  break; }
-
-}
+     if ( strcasecmp(proj_att_value,       ps_target_name) == 0 )  { status = get_ps_grid       (nc, grid); }
+else if ( strcasecmp(proj_att_value,  lambert_target_name) == 0 )  { status = get_lambert_grid  (nc, grid); }
+else if ( strcasecmp(proj_att_value, mercator_target_name) == 0 )  { status = get_mercator_grid (nc, grid); }
 
    //
    //  done
@@ -144,7 +138,7 @@ data.name = ps_default_gridname;
    //  scale latitude
    //
 
-data.scale_lat = get_att_as_double(nc, "TRUELAT1");
+get_global_att_double(&nc, "TRUELAT1", data.scale_lat, true);
 
    //
    //  hemisphere ... assume north?
@@ -157,15 +151,16 @@ else                         data.hemisphere = 'N';
    //  Nx, Ny
    //
 
-data.nx = get_dimension(nc, nx_dimension_name);
-data.ny = get_dimension(nc, ny_dimension_name);
+get_dim(&nc, nx_dimension_name, data.nx, true);
+get_dim(&nc, ny_dimension_name, data.ny, true);
 
    //
    //  pin point
    //
 
-data.lat_pin =   get_att_as_double(nc, "CEN_LAT");
-data.lon_pin = -(get_att_as_double(nc, "CEN_LON"));
+get_global_att_double(&nc, "CEN_LAT", data.lat_pin, true);
+get_global_att_double(&nc, "CEN_LON", data.lon_pin, true);
+data.lon_pin *= -1.0;
 
 data.x_pin = 0.5*(data.nx - 1.0);
 data.y_pin = 0.5*(data.ny - 1.0);
@@ -174,13 +169,15 @@ data.y_pin = 0.5*(data.ny - 1.0);
    //  orientation longitude
    //
 
-data.lon_orient = -(get_att_as_double(nc, "STAND_LON"));
+get_global_att_double(&nc, "STAND_LON", data.lon_orient, true);
+data.lon_orient *= -1.0;
 
    //
    //  D, R
    //
 
-data.d_km = 0.001*(get_att_as_double(nc, "DX"));
+get_global_att_double(&nc, "DX", data.d_km, true);
+data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
 
@@ -215,22 +212,23 @@ data.name = lambert_default_gridname;
    //  scale latitude(s)
    //
 
-data.scale_lat_1 = get_att_as_double(nc, "TRUELAT1");
-data.scale_lat_2 = get_att_as_double(nc, "TRUELAT2");
+get_global_att_double(&nc, "TRUELAT1", data.scale_lat_1, true);
+get_global_att_double(&nc, "TRUELAT2", data.scale_lat_2, true);
 
    //
    //  Nx, Ny
    //
 
-data.nx = get_dimension(nc, nx_dimension_name);
-data.ny = get_dimension(nc, ny_dimension_name);
+get_dim(&nc, nx_dimension_name, data.nx, true);
+get_dim(&nc, ny_dimension_name, data.ny, true);
 
    //
    //  pin point
    //
 
-data.lat_pin =   get_att_as_double(nc, "CEN_LAT");
-data.lon_pin = -(get_att_as_double(nc, "CEN_LON"));
+get_global_att_double(&nc, "CEN_LAT", data.lat_pin, true);
+get_global_att_double(&nc, "CEN_LON", data.lon_pin, true);
+data.lon_pin *= -1.0;
 
 data.x_pin = 0.5*(data.nx - 1.0);
 data.y_pin = 0.5*(data.ny - 1.0);
@@ -239,13 +237,15 @@ data.y_pin = 0.5*(data.ny - 1.0);
    //  orientation longitude
    //
 
-data.lon_orient = -(get_att_as_double(nc, "STAND_LON"));
+get_global_att_double(&nc, "STAND_LON", data.lon_orient, true);
+data.lon_orient *= -1.0;
 
    //
    //  D, R
    //
 
-data.d_km = 0.001*(get_att_as_double(nc, "DX"));
+get_global_att_double(&nc, "DX", data.d_km, true);
+data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
 
@@ -284,27 +284,29 @@ data.name = mercator_default_gridname;
    //  nx, ny
    //
 
-data.nx = get_dimension(nc, nx_dimension_name);
-data.ny = get_dimension(nc, ny_dimension_name);
+get_dim(&nc, nx_dimension_name, data.nx, true);
+get_dim(&nc, ny_dimension_name, data.ny, true);
 
    //
    //  center lat, lon
    //
 
-lat_center =   get_att_as_double(nc, "CEN_LAT");
-lon_center = -(get_att_as_double(nc, "CEN_LON"));
+get_global_att_double(&nc, "CEN_LAT", lat_center, true);
+get_global_att_double(&nc, "CEN_LON", lon_center, true);
+lon_center *= -1.0;
 
    //
    //  D_km
    //
 
-D_km = 0.001*(get_att_as_double(nc, "DX"));
+get_global_att_double(&nc, "DX", D_km, true);
+D_km *= 0.001;
 
    //
    //  scale latitude
    //
 
-scale_lat = get_att_as_double(nc, "TRUELAT1");
+get_global_att_double(&nc, "TRUELAT1", scale_lat, true);
 
    //
    //  do some calculations
@@ -357,61 +359,6 @@ data.lon_ur = mercator_u_to_lon(u);
 grid.set(data);
 
 return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int get_dimension(NcFile & nc, const char * name)
-
-{
-
-int d = 0;
-NcDim * dim = (NcDim *) 0;
-
-dim = nc.get_dim(name);
-
-d = (int) (dim->size());
-
-   //
-   //  done
-   //
-
-return ( d );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double get_att_as_double(NcFile & nc, const char * name)
-
-{
-
-double value = 0.0;
-NcAtt * att = (NcAtt *) 0;
-
-att = nc.get_att(name);
-
-
-if ( (att->type() != ncDouble) && (att->type() != ncFloat) )  {
-
-   mlog << Error << "\nget_att_as_double(NcFile &, const char * name) -> can't get attribute \"" << name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-value = att->as_double(0);
-
-   //
-   //  done
-   //
-
-return ( value );
 
 }
 

@@ -95,6 +95,8 @@ class PinterpFile {
 
       int PressureIndex;   //  index into Var array
 
+      double hPaCF;        //  pressure to hPa conversion factor
+
          //
          //  Grid
          //

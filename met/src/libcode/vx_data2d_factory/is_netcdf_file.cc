@@ -89,7 +89,7 @@ bool is_nccf_file(const char * filename)
 
    if (!nc_file.is_valid()) return ( false );
 
-   if (!get_file_att(&nc_file, nccf_att_name, att_val)) return ( false );
+   if (!get_global_att(&nc_file, nccf_att_name, att_val)) return ( false );
 
    return (strncmp(att_val, nccf_att_value, strlen(nccf_att_value)) == 0);
 
@@ -108,8 +108,8 @@ bool is_ncmet_file(const char * filename)
 
    if (!nc_file.is_valid()) return ( false );
  
-   return (get_file_att(&nc_file, ncmet_att_version,    att_val) ||
-           get_file_att(&nc_file, ncmet_att_projection, att_val));
+   return (get_global_att(&nc_file, ncmet_att_version,    att_val) ||
+           get_global_att(&nc_file, ncmet_att_projection, att_val));
 
 }
 
@@ -127,7 +127,7 @@ bool is_ncpinterp_file(const char * filename)
    if (!nc_file.is_valid()) return ( false );
 
    // Get the global attribute
-   if (!get_file_att(&nc_file, ncpinterp_att_name, att_val)) return ( false );
+   if (!get_global_att(&nc_file, ncpinterp_att_name, att_val)) return ( false );
 
    // Check the attribute value for the target string
    return (strstr(att_val, ncpinterp_att_value));

@@ -24,7 +24,7 @@
 extern bool get_var_att(const NcVar *, const ConcatString &, ConcatString &);
 
 extern bool get_var_att_double(const NcVar *, const ConcatString &, double &);
-   
+
 extern bool get_var_units(const NcVar *, ConcatString &);
 
 extern bool get_var_level(const NcVar *, ConcatString &);
@@ -43,7 +43,11 @@ extern NcVar* has_var(NcFile *, const char * var_name);
 
 extern NcDim* has_dim(NcFile *, const char * dim_name);
 
-extern bool get_file_att(const NcFile *, const ConcatString &, ConcatString &);
+extern bool get_global_att(const NcFile *, const ConcatString &, ConcatString &, bool error_out = false);
+
+extern bool get_global_att_double(const NcFile *, const ConcatString &, double &, bool error_out = false);
+
+extern bool get_dim(const NcFile *, const ConcatString &, int &, bool error_out = false);
 
 ////////////////////////////////////////////////////////////////////////
 
