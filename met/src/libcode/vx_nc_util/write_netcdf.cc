@@ -32,6 +32,11 @@ static const int max_netcdf_int = 2147483647;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+extern void write_netcdf_latlon_1d(NcFile *, NcDim *, NcDim *, const Grid &);
+extern void write_netcdf_latlon_2d(NcFile *, NcDim *, NcDim *, const Grid &);
+
+///////////////////////////////////////////////////////////////////////////////
+
 void write_netcdf_global(NcFile * f_out, const char *file_name,
                          const char *program_name, const char *model_name,
                          const char *obtype)
@@ -78,6 +83,79 @@ return;
 
 void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                          const Grid &grid) {
+
+   // Write 1-dimensional arrays for lat/lon grids and 2-d for all others
+   if(grid.info().ll != 0) {
+      write_netcdf_latlon_1d(f_out, lat_dim, lon_dim, grid);
+   }
+   else {
+      write_netcdf_latlon_2d(f_out, lat_dim, lon_dim, grid);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
+                            const Grid &grid) {
+   int i;
+   double lat, lon;
+   NcVar *lat_var  = (NcVar *) 0;
+   NcVar *lon_var  = (NcVar *) 0;
+   float *lat_data = (float *) 0;
+   float *lon_data = (float *) 0;
+
+   // Define Variables
+   lat_var = f_out->add_var("lat", ncFloat, lat_dim);
+   lon_var = f_out->add_var("lon", ncFloat, lon_dim);
+
+   // Add variable attributes
+   lat_var->add_att("long_name", "latitude");
+   lat_var->add_att("units", "degrees_north");
+   lat_var->add_att("standard_name", "latitude");
+
+   lon_var->add_att("long_name", "longitude");
+   lon_var->add_att("units", "degrees_east");
+   lon_var->add_att("standard_name", "longitude");
+
+   // Allocate space for lat/lon values
+   lat_data = new float [grid.ny()];
+   lon_data = new float [grid.nx()];
+
+   // Compute latitude values
+   for(i=0; i<grid.ny(); i++) {
+      grid.xy_to_latlon(0, i, lat, lon);
+      lat_data[i] = (float) lat;
+   }
+
+   // Compute longitude values (convert degrees west to east)
+   for(i=0; i<grid.nx(); i++) {
+      grid.xy_to_latlon(i, 0, lat, lon);
+      lon_data[i] = (float) -1.0*lon;
+   }
+
+   // Write the lat data
+   if(!lat_var->put(&lat_data[0], lat_dim->size())) {
+      mlog << Error << "\nwrite_netcdf_latlon() -> "
+           << "error with lat_var->put\n\n";
+      exit(1);
+   }
+
+   // Write the lon data
+   if(!lon_var->put(&lon_data[0], lon_dim->size())) {
+      mlog << Error << "\nwrite_netcdf_latlon() -> "
+           << "error with lon_var->put\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
+                            const Grid &grid) {
    int i, x, y;
    double lat, lon;
    NcVar *lat_var  = (NcVar *) 0;
@@ -131,7 +209,6 @@ void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
    return;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
