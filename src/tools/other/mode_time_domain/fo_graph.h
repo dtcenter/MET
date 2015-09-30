@@ -44,6 +44,8 @@ class FO_Graph {
 
       FO_Node * TheGraph;   //  allocated
 
+      void do_dump_table(AsciiTable &) const;
+
    public:
 
       FO_Graph();
@@ -88,6 +90,7 @@ class FO_Graph {
       void erase_edges();
 
       void dump_as_table(ostream &) const;
+      void dump_as_table(const int) const;   //  dumps to mlog with the given verbosity level
 
 
 };

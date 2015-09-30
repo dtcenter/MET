@@ -378,7 +378,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void FO_Graph::dump_as_table(ostream & out) const
+void FO_Graph::do_dump_table(AsciiTable & table) const
 
 {
 
@@ -392,7 +392,6 @@ if ( ! TheGraph )  {
 
 int r, c, j, k;
 char junk[256];
-AsciiTable table;
 const int fcst_start = 1;
 const int fcst_stop  = fcst_start + N_fcst - 1;
 const int  obs_start = fcst_stop + 2;
@@ -517,7 +516,54 @@ for (j=0; j<N_fcst; ++j)  {
    //  done
    //
 
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void FO_Graph::dump_as_table(ostream & out) const
+
+{
+
+AsciiTable table;
+
+do_dump_table(table);
+
 out << table;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void FO_Graph::dump_as_table(const int verbosity) const
+
+{
+
+int j;
+ConcatString s;
+AsciiTable table;
+
+do_dump_table(table);
+
+for (j=0; j<(table.nrows()); ++j)  {
+
+   s = table.padded_row(j);
+
+   mlog << Debug(verbosity) << s << "\n";
+
+}
+
+
+   //
+   //  done
+   //
 
 return;
 

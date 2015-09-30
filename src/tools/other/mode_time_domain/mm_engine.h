@@ -44,6 +44,7 @@ class MM_Engine {
       void clear();
 
       void partition_dump(ostream &) const;
+      void partition_dump(const int) const;   //  dump to mlog with the given verbosity
 
       InterestCalculator calc;
 

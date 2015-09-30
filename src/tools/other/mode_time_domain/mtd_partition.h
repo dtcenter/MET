@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include "concat_string.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -132,6 +134,8 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
 
       void extend(int);
 
+      ConcatString specialized_dump_string(const int Nf, const int No) const;
+
 
       EquivalenceClass ** C;   //  allocated
 
@@ -151,6 +155,7 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
       void dump(ostream &, int = 0) const;
 
       void specialized_dump(ostream &, const int Nf, const int No) const;
+      void specialized_dump(const int, const int Nf, const int No) const;   //  dump to mlog with the given verbosity
 
          //
          //  set stuff

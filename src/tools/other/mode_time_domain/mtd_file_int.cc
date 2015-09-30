@@ -407,7 +407,7 @@ if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
 
 const time_t t_stop = time(0);   //  for timing the data read operation
 
-// cout << "\n\n  MtdIntFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+// mlog << Debug(5) << "\n\n  MtdIntFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
@@ -527,7 +527,7 @@ if ( is_split )  {
 
 const time_t t_stop = time(0);   //  for timing the data write operation
 
-// cout << "\n\n  MtdIntFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
+// mlog << Debug(5) << "\n\n  MtdIntFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
@@ -1274,7 +1274,7 @@ for (j=0; j<Nobjects; ++j)  old_to_new[j] = -1;
 
 for (j=0; j<n_new; ++j)  old_to_new[new_to_old[j]] = j;
 
-// for (j=0; j<Nobjects; ++j)  cout << j << " ... " << old_to_new[j] << '\n';
+// for (j=0; j<Nobjects; ++j)  mlog << Debug(5) << j << " ... " << old_to_new[j] << '\n';
 
 int replace_count = 0;
 int zero_count = 0;
@@ -1294,8 +1294,8 @@ for (j=0; j<n3; ++j, ++d)  {
 
 }
 
-// cout << "replace count = " << replace_count << '\n' << flush;
-// cout << "zero count    = " << zero_count    << '\n' << flush;
+// mlog << Debug(5) << "replace count = " << replace_count << '\n' << flush;
+// mlog << Debug(5) << "zero count    = " << zero_count    << '\n' << flush;
 
    //
    //  rewire
@@ -1926,7 +1926,7 @@ for (x=0; x<nx; ++x)  {
 
       if ( !b )  continue;
 
-      // cout << "merging values " << a << " and " << b << "\n";
+      // mlog << Debug(5) << "merging values " << a << " and " << b << "\n";
 
       p.merge_values(a, b);
 

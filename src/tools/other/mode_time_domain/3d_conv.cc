@@ -258,13 +258,12 @@ for (t=0; t<Nt; ++t)  {
 
 time_stop = time(0);
 
-// cout << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n" << flush;
+// mlog << Debug(5) << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n" << flush;
 
 
 if ( verbose )  {
 
-   cout << "\n  Conv time       = " << (time_stop - time_start) << " seconds\n"
-        << flush;
+   mlog << Debug(5) << "\n  Conv time       = " << (time_stop - time_start) << " seconds\n";
 
 }
 
@@ -295,7 +294,7 @@ out.set_radius(R);
 
 for (x=0; x<Nx; ++x)  {
 
-   // if ( verbose && ((x%100) == 0) )  cout << "Pass 2: x = " << x << " of " << Nx << "\n" << flush;
+   // if ( verbose && ((x%100) == 0) )  mlog << Debug(5) << "Pass 2: x = " << x << " of " << Nx << "\n";
 
    for (y=0; y<Ny; ++y)  {
 
@@ -411,7 +410,7 @@ const int nx = mtd.nx();
 const int ny = mtd.ny();
 
 
-// cout << "In get_data_plane\n" << flush;
+// mlog << Debug(5) << "In get_data_plane\n" << flush;
 
 for (y=0; y<ny; ++y)  {
 
@@ -474,7 +473,7 @@ const double * data_in_p      = 0;
       double * data_put_p     = 0;
 
 
-// cout << "in calc_sum_plane\n" << flush;
+// mlog << Debug(5) << "in calc_sum_plane\n" << flush;
 
 // sprintf(junk, "raw_%02d", t_count);
 
@@ -820,7 +819,7 @@ for (x=0; x<nx; ++x)  {
 
 }
 
-// cout << "writing image file \"" << filename << "\"\n";
+// mlog << Debug(5) << "writing image file \"" << filename << "\"\n";
 
 if ( ! image.write(filename) )  {
 
@@ -873,7 +872,7 @@ for (x=0; x<nx; ++x)  {
 
 }
 
-// cout << "writing image file \"" << filename << "\"\n";
+// mlog << Debug(5) << "writing image file \"" << filename << "\"\n";
 
 if ( ! image.write(filename) )  {
 

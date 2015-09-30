@@ -265,7 +265,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Dump the contents of the config file
 
-   if(mlog.verbosity_level() >= 5) conf.dump(cout);
+   // if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
       // Initialize
 
@@ -303,7 +303,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
    obs_info->set_dict(*(obs_dict->lookup_dictionary(conf_key_field)));
 
       // Dump the contents of the VarInfo objects
-
+/*
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed forecast field:\n";
@@ -312,7 +312,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
            << "Parsed observation field:\n";
       obs_info->dump(cout);
    }
-
+*/
       // No support for wind direction
 
    if(fcst_info->is_wind_direction() || obs_info->is_wind_direction()) {
