@@ -1020,7 +1020,8 @@ const char * format = 0;
 
    //  object number
 
-sprintf(junk, "F_%d_O_%d", FcstObjectNumber, ObsObjectNumber);
+if ( is_simple() )  sprintf(junk, "F_%d_O_%d",   FcstObjectNumber, ObsObjectNumber);
+else                sprintf(junk, "CF_%d_CO_%d", FcstObjectNumber, ObsObjectNumber);
 
 table.set_entry(row, c++, junk);
 
@@ -1028,7 +1029,9 @@ table.set_entry(row, c++, junk);
    //  cluster number
    //
 
-++c;
+sprintf(junk, "CF_%d_CO_%d", FcstClusterNumber, ObsClusterNumber);
+
+table.set_entry(row, c++, junk);
 
    //  space centroid distance
 

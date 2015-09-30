@@ -309,7 +309,7 @@ for (j=0; j<Nelements; ++j)  {
 
       e[j].set_cluster_number(c_id + 1);   //  1-based
 
-   } else {
+   } else {   //  cluster
 
       e[j].set_cluster_number(s_id);   //  1-based
 

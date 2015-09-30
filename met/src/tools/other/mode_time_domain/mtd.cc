@@ -6,9 +6,11 @@
 static const char default_config_path          [] = "MET_BASE/config/MTDConfig_default";
 
 static const char txt_2d_suffix                [] = "2d.txt";
+
 static const char txt_3d_single_simple_suffix  [] = "3d_ss.txt";
 static const char txt_3d_pair_simple_suffix    [] = "3d_ps.txt";
-static const char txt_3d_single_cluster_suffix [] = "3d_cs.txt";
+
+static const char txt_3d_single_cluster_suffix [] = "3d_sc.txt";
 static const char txt_3d_pair_cluster_suffix   [] = "3d_pc.txt";
 
 static const char nc_suffix                    [] = "obj.nc";
@@ -288,7 +290,7 @@ PairAtt3DArray pa_simple;
 PairAtt3D p;
 MtdIntFile fo, oo;
 
-// cout << "\n\n  Calculating pair attributes ... (Nf = "
+// mlog << Debug(5) << "\n\n  Calculating pair attributes ... (Nf = "
 //      << (fcst_obj.n_objects()) << ", No = "
 //      << (obs_obj.n_objects())  << ")\n\n";
 
@@ -306,7 +308,7 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       p.set_simple();
 
-      // cout << "   (F_" << j << ", O_" << k << ")   "
+      // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
       //      << p.total_interest() << '\n';
 
       pa_simple.add(p);
@@ -394,11 +396,11 @@ for (j=0; j<(pa_simple.n()); ++j)  {
 
 }   //  for j
 
-if ( mlog.verbosity_level() > 5 )  e.graph.dump_as_table(cout);
+e.graph.dump_as_table(6);
 
 e.do_match_merge();
 
-if ( mlog.verbosity_level() > 5 )  e.partition_dump(cout);
+e.partition_dump(6);
 
 
 IntArray a;
@@ -410,19 +412,19 @@ if ( mlog.verbosity_level() > 5 )  {
 
    for (j=0; j<n_clusters; ++j)  {
 
-      // cout << "Fcst objects in composite " << j << ":  ";
+      // mlog << Debug(5) << "Fcst objects in composite " << j << ":  ";
 
       a = e.fcst_composite(j);
 
       // a.dump_one_line(cout);
 
-      // cout << "Obs  objects in composite " << j << ":  ";
+      // mlog << Debug(5) << "Obs  objects in composite " << j << ":  ";
 
       a = e.obs_composite(j);
 
       // a.dump_one_line(cout);
 
-      // cout << '\n';
+      // mlog << Debug(5) << '\n';
 
    }
 
@@ -460,7 +462,7 @@ for (j=0; j<n_clusters; ++j)  {
 
 }
 
-if ( mlog.verbosity_level() > 5 )  fcst_cluster_att.dump(cout);
+// if ( mlog.verbosity_level() > 5 )  fcst_cluster_att.dump(cout);
 
 mlog << Debug(2)
      << "Calculating 3D obs cluster attributes\n";
@@ -522,7 +524,7 @@ for (j=0; j<n_clusters; ++j)  {
       // p.set_total_interest(e.calc(p));
       p.set_total_interest(-1.0);
 
-      // cout << "   (F_" << j << ", O_" << k << ")   "
+      // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
       //      << p.total_interest() << '\n';
 
       pa_cluster.add(p);

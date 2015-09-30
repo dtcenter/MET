@@ -52,6 +52,9 @@ table.set_size(1 + Nobj, n_header_3d_cols + n_3d_single_cols);
 
 table.set_ics(2);
 
+table.set_bad_data_value(bad_data_double);
+table.set_bad_data_str(na_str);
+
    //
    //  column headings
    //
@@ -144,6 +147,9 @@ if ( ! out )  {
 table.set_size(1 + pa.n(), n_header_3d_cols + n_att_3d_pair_cols);
 
 table.set_ics(2);
+
+table.set_bad_data_value(bad_data_double);
+table.set_bad_data_str(na_str);
 
    //
    //  column headings
@@ -246,6 +252,9 @@ if ( ! out )  {
 table.set_size(1 + n_total, n_header_3d_cols + n_2d_cols);
 
 table.set_ics(2);
+
+table.set_bad_data_value(bad_data_double);
+table.set_bad_data_str(na_str);
 
    //
    //  column headings

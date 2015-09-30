@@ -198,7 +198,7 @@ for (j=0; j<(graph.n_fcst()); ++j)  {
 
       if ( ! graph.has_fo_edge(j, k) )  continue;
 
-      // cout << "\n  Merging fcst " << j << ", obs " << k << '\n' << flush;
+      // mlog << Debug(5) << "\n  Merging fcst " << j << ", obs " << k << '\n' << flush;
 
       part.merge_values(f_i, o_i);
 
@@ -257,15 +257,17 @@ for (j=0; j<(part.n_elements()); ++j)  {
 
 if ( mlog.verbosity_level() > 5 )  {
 
-   mlog << Debug(6) << "Composites ...\n";
+   ConcatString s;
+
+   s << "Composites ...\n";
 
    for (j=0; j<N_Composites; ++j)  {
 
-      mlog << Debug(6) << ' ' << comp_to_eq[j];
+      s << ' ' << comp_to_eq[j];
 
    }
 
-   mlog << Debug(6) << '\n';
+   mlog << Debug(6) << s << "\n";
 
 }
 
@@ -286,6 +288,20 @@ void MM_Engine::partition_dump(ostream & out) const
 {
 
 part.specialized_dump(out, graph.n_fcst(), graph.n_obs());
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MM_Engine::partition_dump(int verbosity) const
+
+{
+
+part.specialized_dump(verbosity, graph.n_fcst(), graph.n_obs());
 
 return;
 

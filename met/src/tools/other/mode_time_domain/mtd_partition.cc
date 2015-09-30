@@ -723,7 +723,7 @@ return ( C[k] );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Mtd_Partition::specialized_dump(ostream & out, const int Nf, const int No) const
+ConcatString Mtd_Partition::specialized_dump_string(const int Nf, const int No) const
 
 {
 
@@ -732,6 +732,7 @@ int id;
 static const char tab [] = "   ";
 const EquivalenceClass * c = 0;
 ConcatString s;
+ConcatString out;
 StringArray a;
 
 out << '[' << Nelements << " equivalence classes]\n";
@@ -775,6 +776,39 @@ for (j=0; j<Nelements; ++j)  {
 
 
 
+
+return ( out );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Mtd_Partition::specialized_dump(ostream & out, const int Nf, const int No) const
+
+{
+
+ConcatString s = specialized_dump_string(Nf, No);
+
+out << s;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Mtd_Partition::specialized_dump(int verbosity, const int Nf, const int No) const
+
+{
+
+ConcatString s = specialized_dump_string(Nf, No);
+
+mlog << Debug(verbosity) << s;
 
 return;
 
