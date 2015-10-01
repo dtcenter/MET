@@ -13,8 +13,9 @@
 //   Description:
 //      Parse MADIS NetCDF files containing surface point observations
 //      and reformat them for use by MET.  Current release provides
-//      support for METAR, RAOB, PROFILER, MARITIME, and MESONET MADIS
-//      types.  Support for additional MADIS types may be added.
+//      support for METAR, RAOB, PROFILER, MARITIME, MESONET, and
+//      ACARSPROFILES MADIS types.
+//      Support for additional MADIS types may be added.
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
@@ -22,11 +23,13 @@
 //   001    01-06-12  Holmes         Added use of command line class to
 //                                   parse the command line arguments.
 //   002    07-13-12  Oldenburg      Added support for profiler
-//                                   observation type
+//                                   observation type.
 //   003    02-26-14  Halley Gotway  Added support for mesonet
-//                                   observation type
+//                                   observation type.
 //   004    07-07-14  Halley Gotway  Added the mask_grid and mask_poly
-//                                     options to filter spatially.
+//                                   options to filter spatially.
+//   005    10-01-15  Chaudhuri      Added support for acarsProfiles
+//                                   observation type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -106,6 +109,7 @@ static void process_madis_raob(NcFile *&f_in);
 static void process_madis_profiler(NcFile *&f_in);
 static void process_madis_maritime(NcFile *&f_in);
 static void process_madis_mesonet(NcFile *&f_in);
+static void process_madis_acarsProfiles(NcFile *&f_in);
 
 static void usage();
 static void set_type(const StringArray &);
@@ -272,13 +276,16 @@ void process_madis_file(const char *madis_file) {
          process_madis_mesonet(f_in);
          break;
 
+      case(madis_acarsProfiles):
+         process_madis_acarsProfiles(f_in);
+         break;
+
       case(madis_coop):
       case(madis_HDW):
       case(madis_HDW1h):
       case(madis_hydro):
       case(madis_POES):
       case(madis_acars):
-      case(madis_acarsProfiles):
       case(madis_radiometer):
       case(madis_sao):
       case(madis_satrad):
@@ -800,7 +807,7 @@ void convert_wind_wdir_to_u_v(float wind, float wdir,
 
 bool check_masks(double lat, double lon) {
    double grid_x, grid_y;
-   
+
    //
    // Check grid masking.
    //
@@ -924,7 +931,7 @@ void process_madis_metar(NcFile *&f_in) {
       // Check masking regions
       //
       if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
-      
+
       //
       // Process the header type.
       // For METAR or SPECI, encode as ADPSFC.
@@ -1882,7 +1889,7 @@ void process_madis_maritime(NcFile *&f_in) {
 }
 ////////////////////////////////////////////////////////////////////////
 
-void process_madis_mesonet(NcFile *&f_in) { 
+void process_madis_mesonet(NcFile *&f_in) {
    int nhdr;
    long i_hdr;
    int hdr_sid_len;
@@ -1936,7 +1943,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       //
       // Mapping of NetCDF variable names from input to output:
       // Output                    = Input
-      // hdr_typ                   = ADPSFC (MESONET observations are at the surface) 
+      // hdr_typ                   = ADPSFC (MESONET observations are at the surface)
       // hdr_sid                   = stationId (maxStaIdLen = 6)
       // hdr_vld (YYYYMMDD_HHMMSS) = observationTime (unixtime)
       // hdr_arr[0](Lat)           = latitude
@@ -1964,7 +1971,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
 
       //
-      // Encode the header type as ADPSFC for MESONET observations. 
+      // Encode the header type as ADPSFC for MESONET observations.
       //
       put_nc_var_val(hdr_typ_var, i_hdr, "ADPSFC");
 
@@ -2130,7 +2137,241 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    if(cur) { delete [] cur; cur = (long *) 0; }
    if(dim) { delete [] dim; dim = (long *) 0; }
-  
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_madis_acarsProfiles(NcFile *&f_in) {
+   int nhdr, nlvl,nlvl1, i_lvl;
+   long i_hdr, i_cnt;
+   int hdr_sid_len, hdr_max_lev;
+   double tmp_dbl, tmp_dbl2, tmp_dbl1;
+   char tmp_str[max_str_len], qty;
+   ConcatString hdr_typ, hdr_sid, hdr_vld;
+   float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
+   float pressure, v, wdir, wind, ugrd, vgrd;
+
+   //
+   // Input header variables:
+   // Note: hdr_typ is always set to AIRCFT
+   //
+   NcVar *in_hdr_sid_var = get_nc_var(f_in, "profileAirport");
+   NcVar *in_hdr_vld_var = get_nc_var(f_in, "profileTime");
+   NcVar *in_hdr_lat_var = get_nc_var(f_in, "trackLat");
+   NcVar *in_hdr_lon_var = get_nc_var(f_in, "trackLon");
+   NcVar *in_hdr_elv_var = get_nc_var(f_in, "altitude");
+   NcVar *in_hdr_tob_var = get_nc_var(f_in, "obsTimeOfDay");
+
+   //
+   // Retrieve applicable dimensions
+   //
+   hdr_sid_len  = get_nc_dim(f_in, "AirportIdLen");
+   nhdr         = get_nc_dim(f_in, in_recNum_str);
+
+   if(rec_end == 0) rec_end = nhdr;
+
+   //
+   // Initialize variables for processing observations
+   //
+   conversion = 1.0;
+   nlvl1 = 0;
+
+   //
+   // Arrays of longs for indexing into NetCDF variables
+   //
+   long *cur = new long [3];
+   cur[0] = cur[1] = cur[2] = 0;
+   long *dim = new long [3];
+   dim[0] = dim[1] = dim[2] = 1;
+
+   //
+   // Get the number of levels
+   //
+   NcVar *in_var = get_nc_var(f_in, "nLevels");
+
+   //
+   // Obtain the total number of levels
+   //
+   for(i_hdr=rec_beg; i_hdr<rec_end; i_hdr++) {
+      cur[0] = i_hdr;
+      cur[1] = 0;
+      get_nc_var_val(in_var, cur, dim, v);
+      nlvl1 += v;
+   }
+
+   //
+   // Setup the output NetCDF file
+   //
+   setup_netcdf_out(nlvl1);
+
+   mlog << Debug(2) << "Processing ACARS Profiles recs\t\t= " << nlvl1 << "\n";
+
+   //
+   // Initialize
+   //
+   i_cnt = -1;
+
+   //
+   // Loop through each record and get the header data.
+   //
+   for(i_hdr=rec_beg; i_hdr<rec_end; i_hdr++) {
+
+      mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+
+      //
+      // Use cur to index into the NetCDF variables.
+      //
+      cur[0] = i_hdr;
+      cur[1] = 0;
+
+      // Process the header type.
+      // For ACARS, store as AIRCFT.
+      //
+      hdr_typ = "AIRCFT";
+
+      //
+      // Process the station i.e. airport name.
+      //
+      get_nc_var_val(in_hdr_sid_var, cur, hdr_sid_len, hdr_sid);
+
+      //
+      // Process the observation time.
+      //
+      get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl1);
+
+      //
+      // Process the number of levels
+      //
+      get_nc_var_val(in_var, cur, dim, nlvl);
+
+      //
+      // Loop through each level of each track
+      //
+      for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+
+         i_cnt++;
+         mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
+
+         //
+         // Write header type
+         //
+         put_nc_var_val(hdr_typ_var, i_cnt, hdr_typ);
+
+         //
+         // Write Airport ID
+         //
+         put_nc_var_val(hdr_sid_var, i_cnt, hdr_sid);
+
+         //
+         // Use cur to index into the NetCDF variables.
+         //
+         cur[1] = i_lvl;
+         obs_arr[0] = (float) i_cnt;
+
+         //
+         // Process the latitude, longitude, and elevation.
+         //
+         get_nc_var_val(in_hdr_lat_var, cur, dim, hdr_arr[0]);
+         get_nc_var_val(in_hdr_lon_var, cur, dim, hdr_arr[1]);
+         get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
+
+         //
+         // Check masked regions
+         //
+         if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
+
+         //
+         // Get the number of levels  and height for this level
+         //
+         obs_arr[3] = get_nc_obs(f_in, "altitude", cur, dim);
+         obs_arr[2] = get_nc_obs(f_in, "nLevels", cur, dim);
+
+         //
+         // Check for bad data
+         //
+         if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
+
+         //
+         // Process the observation time.
+         //
+         get_nc_var_val(in_hdr_tob_var, cur, dim, tmp_dbl2);
+
+         //
+         // Add to Profile Time
+         // Observation Time is relative to time of day
+         //
+         tmp_dbl = tmp_dbl1+tmp_dbl2-fmod(tmp_dbl1, 86400);
+         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
+         hdr_vld = tmp_str;
+
+         //
+         // Write observation time
+         //
+         put_nc_var_val(hdr_vld_var, i_cnt, hdr_vld);
+
+         //
+         // Write header array
+         //
+         put_nc_var_arr(hdr_arr_var, i_cnt, hdr_arr_len, hdr_arr);
+
+         //
+         // Compute the pressure (hPa) from altitude data
+         // Equation obtained from http://www.srh.noaa.gov/
+         //
+         pressure = 1013.25*pow((1-2.25577e-5*obs_arr[3]),5.25588);
+
+         //
+         // Replace number of Levels to Pressure values in Observation Array
+         //
+         obs_arr[2] = pressure;
+
+         // Temperature
+         process_obs(f_in, "temperature", cur, dim, 11, conversion, obs_arr);
+
+         // Dewpoint
+         process_obs(f_in, "dewpoint", cur, dim, 17, conversion, obs_arr);
+
+         // Wind Direction
+         process_obs(f_in, "windDir", cur, dim, 31, conversion, obs_arr);
+         wdir = obs_arr[4];
+
+         // Wind Speed
+         process_obs(f_in, "windSpeed", cur, dim, 32, conversion, obs_arr, qty);
+         wind = obs_arr[4];
+
+         // Convert the wind direction and speed into U and V components
+         convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
+
+         // Write U-component of wind
+         obs_arr[1] = 33;
+         obs_arr[4] = ugrd;
+         if(!is_bad_data(ugrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(qty);
+            i_obs++;
+         }
+
+         // Write V-component of wind
+         obs_arr[1] = 34;
+         obs_arr[4] = vgrd;
+         if(!is_bad_data(vgrd)) {
+            put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
+            write_qty(qty);
+            i_obs++;
+         }
+      } // end for i_lvl
+   } // end for i_hdr
+
+   print_rej_counts();
+
+   //
+   // Cleanup
+   //
+   if(cur) { delete [] cur; cur = (long *) 0; }
+   if(dim) { delete [] dim; dim = (long *) 0; }
+
    return;
 }
 
@@ -2158,7 +2399,8 @@ void usage() {
         << "\t\t\"out_file\" is the output NetCDF file (required).\n"
 
         << "\t\t\"-type str\" specifies the type of MADIS observations "
-        << "(metar, raob, profiler, maritime, or mesonet) (required).\n"
+        << "(metar, raob, profiler, maritime, mesonet, or acarsProfiles) "
+        << "(required).\n"
 
         << "\t\t\"-qc_dd list\" specifies a comma-separated list of "
         << "QC flag values to be accepted (Z,C,S,V,X,Q,K,G,B) "
@@ -2211,6 +2453,9 @@ void set_type(const StringArray & a)
    }
    else if(strcasecmp(a[0], mesonet_str) == 0) {
       mtype = madis_mesonet;
+   }
+   else if(strcasecmp(a[0], acarsProfiles_str) == 0) {
+      mtype = madis_acarsProfiles;
    }
    else {
       mlog << Error << "\nprocess_command_line() -> "
@@ -2274,7 +2519,7 @@ void set_mask_grid(const StringArray & a) {
   // List the grid masking file
   mlog << Debug(1)
        << "Grid Masking: " << a[0] << "\n";
-  
+
   // First, try to find the grid by name.
   if(!find_grid_by_name(a[0], grid_mask)) {
 
@@ -2292,7 +2537,7 @@ void set_mask_grid(const StringArray & a) {
 
     delete datafile; datafile = (Met2dDataFile *) 0;
   }
-  
+
   // List the grid mask
   mlog << Debug(2)
        << "Parsed Masking Grid: " << grid_mask.name() << " ("
@@ -2309,7 +2554,7 @@ void set_mask_poly(const StringArray & a) {
 
   // Parse the polyline file.
   poly_mask.load(replace_path(a[0]));
-  
+
   // List the polyline mask
   mlog << Debug(2)
        << "Parsed Masking Polyline: " << poly_mask.name()
@@ -2324,4 +2569,3 @@ void set_verbosity(const StringArray & a)
 }
 
 ////////////////////////////////////////////////////////////////////////
-
