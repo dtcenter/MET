@@ -51,14 +51,17 @@ static void get_mercator_data_v2      (NcFile *, MercatorData &);
 
 
 void read_netcdf_grid(NcFile * f_in, Grid & gr) {
-   bool v3_flag = false;
-
-   // Check for the MET version global attribute
-   if(has_att(f_in, "MET_version")) v3_flag = true;
 
    // Parse the projection information based on the version
-   if(v3_flag) read_netcdf_grid_v3(f_in, gr);
-   else        read_netcdf_grid_v2(f_in, gr);
+   if(has_att(f_in, "MET_version")) {
+      read_netcdf_grid_v3(f_in, gr);
+   }
+   else {
+      mlog << Warning << "\nread_netcdf_grid() -> "
+           << "Applying METv2.0 grid parsing logic since the \"MET_version\" "
+           << "global attribute is not present.\n\n";
+      read_netcdf_grid_v2(f_in, gr);
+   }
 
    return;
 }
@@ -122,7 +125,7 @@ NcAtt * proj_att = (NcAtt *) 0;
 
       ConcatString junk;
       junk << proj_att->as_string(0);
-     
+
       mlog << Error << "\nread_netcdf_grid_v3() -> "
            << "Projection type " << junk
            << " not currently supported.\n\n";
@@ -197,7 +200,7 @@ NcAtt * proj_att = (NcAtt *) 0;
 
       ConcatString junk;
       junk << proj_att->as_string(0);
-     
+
       mlog << Error << "\nread_netcdf_grid_v2() -> "
            << "Projection type " << junk
            << " not currently supported.\n\n";
