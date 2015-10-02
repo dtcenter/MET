@@ -34,11 +34,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char        proj_att_name      [] = "MAP_PROJ_CHAR";
+static const char proj_att_name             [] = "MAP_PROJ_CHAR";
+static const char ps_proj_att_name          [] = "Polar Stereographic";
+static const char lambert_proj_att_name     [] = "Lambert Conformal";
+static const char mercator_proj_att_name    [] = "Mercator";
 
-static const char       ps_target_name      [] = "Polar Stereographic";
-static const char  lambert_target_name      [] = "Lambert Conformal";
-static const char mercator_target_name      [] = "Mercator";
+static const char ps_proj_var_name          [] = "Polar_Stereographic";
+static const char lambert_proj_var_name     [] = "Lambert_Conformal";
+static const char mercator_proj_var_name    [] = "Mercator";
 
 static const char nx_dimension_name         [] = "west_east";
 static const char ny_dimension_name         [] = "south_north";
@@ -96,19 +99,24 @@ bool status = false;
 
 grid.clear();
 
-   //
-   //  figure out which projection this is
-   //
-
-if ( !get_global_att(&nc, proj_att_name, proj_att_value) ) return ( false );
+if ( get_global_att(&nc, proj_att_name, proj_att_value) ) {
 
    //
-   //  parse the projection information
+   //  if present, parse the global projection attribute value
    //
+        if ( strcasecmp(proj_att_value,       ps_proj_att_name) == 0 )  { status = get_ps_grid       (nc, grid); }
+   else if ( strcasecmp(proj_att_value,  lambert_proj_att_name) == 0 )  { status = get_lambert_grid  (nc, grid); }
+   else if ( strcasecmp(proj_att_value, mercator_proj_att_name) == 0 )  { status = get_mercator_grid (nc, grid); }
+}
+else {
 
-     if ( strcasecmp(proj_att_value,       ps_target_name) == 0 )  { status = get_ps_grid       (nc, grid); }
-else if ( strcasecmp(proj_att_value,  lambert_target_name) == 0 )  { status = get_lambert_grid  (nc, grid); }
-else if ( strcasecmp(proj_att_value, mercator_target_name) == 0 )  { status = get_mercator_grid (nc, grid); }
+   //
+   //  otherwise, check for the projection variable
+   //
+        if ( has_var(&nc,       ps_proj_var_name) ) { status = get_ps_grid       (nc, grid); }
+   else if ( has_var(&nc,  lambert_proj_var_name) ) { status = get_lambert_grid  (nc, grid); }
+   else if ( has_var(&nc, mercator_proj_var_name) ) { status = get_mercator_grid (nc, grid); }
+}
 
    //
    //  done
