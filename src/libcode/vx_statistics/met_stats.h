@@ -348,7 +348,7 @@ class NBRCNTInfo {
       double *alpha;
 
       // Fractions Brier Score,
-      // Fractions Skill Score, 
+      // Fractions Skill Score,
       // Asymptotic Fractions Skill Score,
       // Uniform Fractions Skill Score,
       // Forecast Rate, and Observation Rate
@@ -454,6 +454,7 @@ class PCTInfo {
 
       CIInfo baser;
       CIInfo brier;
+      CIInfo briercl; // Climatological brier score
       double bss;
 
       void clear();
@@ -485,7 +486,7 @@ class SSVARInfo {
       int n_bin;
       int bin_i;
       int bin_n;
-      
+
       double var_min;
       double var_max;
       double var_mean;
