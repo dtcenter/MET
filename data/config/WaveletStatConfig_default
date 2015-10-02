@@ -90,12 +90,10 @@ output_flag = {
 //
 // NetCDF matched pairs and PostScript output files
 //
-
 nc_pairs_flag   = {
    raw    = TRUE;
    diff   = TRUE;
 };
-
 ps_plot_flag  = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +108,7 @@ fcst_raw_plot = {
    plot_min = 0.0;
    plot_max = 0.0;
 };
-      
+
 obs_raw_plot = {
    color_table = "MET_BASE/colortables/met_default.ctable";
    plot_min = 0.0;
