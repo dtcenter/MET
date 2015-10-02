@@ -290,7 +290,6 @@ fcst = {
    ];
 };
 
-
 //
 // The "obs" entry specifies the same type of information as "fcst", but for
 // the observation data.  It will often be set to the same things as "fcst",
@@ -378,6 +377,57 @@ fcst = {
 //      for each verification task.
 //
 obs = fcst;
+
+//
+// The "climo_mean" dictionary specifies climatology data to read by the
+// Grid-Stat, Point-Stat, and Ensemble-Stat tools.  It consists of several
+// entires defining the climatology file names and fields to be used.
+//
+//   - The "file_names" entry specifies one or more file names containing
+//     the gridded climatology data to be used.
+//
+//   - The "field" entry is an array of dictionaries, specified the same
+//     way as those in the "fcst" and "obs" dictionaries.  If the array has
+//     length zero, not climatology data will be read and all climatology
+//     statistics will be written as missing data.  Otherwise, the array
+//     length must match the length of "field" in the "fcst" and "obs"
+//     dictionaries.
+//
+//   - The "regrid" dictionary defines how the climatology data should be
+//     regridded to the verification domain.
+//
+//   - The "time_interp_method" entry specifies how the climatology data should
+//     be interpolated in time to the forecast valid time:
+//      - NEAREST for data closest in time
+//      - UW_MEAN for average of data before and after
+//      - DW_MEAN for linear interpolation in time of data before and after
+//
+//   - The "match_day" entry may be set to TRUE or FALSE.  When searching
+//     climatology data, only consider times where the month matches the
+//     forecast valid month.  Set match_day to TRUE or FALSE to define whether
+//     the climatology day must also match.
+//      - match_day = FALSE for monthly climatology
+//      - match_day = TRUE  for daily climatology
+//
+//   - The "time_step" entry specifies the spacing of climatology data in
+//     seconds.  Set to 60*60*6 = 21600 for 6-hourly data or 60*60 = 3600
+//     for hourly data.
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   regrid = {
+      vld_thresh = 0.5;
+      method     = NEAREST;
+      width      = 1;
+   }
+
+   time_interp_method = DW_MEAN;
+   match_day          = FALSE;
+   time_step          = 21600;
+}
 
 //
 // The "mask_missing_flag" entry specifies how missing data should be handled
