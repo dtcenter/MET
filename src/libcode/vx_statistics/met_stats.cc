@@ -2230,16 +2230,20 @@ void PCTInfo::compute_ci() {
                             baser.v_ncl[i], baser.v_ncu[i]);
 
       // Compute brier CI using the VIF
-      halfwidth = pct.brier_ci_halfwidth(alpha[i]);
-      halfwidth *= sqrt(brier.vif);
-      brier.v_ncl[i] = brier.v - halfwidth;
-      brier.v_ncu[i] = brier.v + halfwidth;
+      if(!is_bad_data(brier.v)) {
+         halfwidth = pct.brier_ci_halfwidth(alpha[i]);
+         halfwidth *= sqrt(brier.vif);
+         brier.v_ncl[i] = brier.v - halfwidth;
+         brier.v_ncu[i] = brier.v + halfwidth;
+      }
 
       // Compute climatological brier CI using the VIF
-      halfwidth = climo_pct.brier_ci_halfwidth(alpha[i]);
-      halfwidth *= sqrt(briercl.vif);
-      briercl.v_ncl[i] = briercl.v - halfwidth;
-      briercl.v_ncu[i] = briercl.v + halfwidth;
+      if(!is_bad_data(briercl.v)) {
+         halfwidth = climo_pct.brier_ci_halfwidth(alpha[i]);
+         halfwidth *= sqrt(briercl.vif);
+         briercl.v_ncl[i] = briercl.v - halfwidth;
+         briercl.v_ncu[i] = briercl.v + halfwidth;
+      }
 
    } // end for i
 
