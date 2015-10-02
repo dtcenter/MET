@@ -68,47 +68,18 @@ obs = {
 //
 climo_mean = {
 
-   //
-   // Climatology mean files.
-   //
    file_name = [];
+   field     = [];
 
-   //
-   // field must be empty or the same length as fcst.field.
-   //
-   field = [];
-
-   //
-   // Method for regridding climatology data to the verification grid.
-   //
    regrid = {
       vld_thresh = 0.5;
       method     = NEAREST;
       width      = 1;
    }
 
-   //
-   // Method for interpolating climatology to forecast valid time:
-   //    NEAREST for data closest in time
-   //    UW_MEAN for average of data before and after
-   //    DW_MEAN for linear interpolation in time of data before and after
-   //
    time_interp_method = DW_MEAN;
-
-   //
-   // When searching climatology data, only consider times where the month
-   // matches the forecast month.  Set match_day to TRUE or FALSE to define
-   // whether the climatology day must also match.
-   //    match_day = FALSE for monthly climatology
-   //    match_day = TRUE  for daily climatology
-   //
-   match_day = FALSE;
-
-   //
-   // Time step of the climatology data in seconds.  Set to 60*60*6 for
-   // 6-hourly data or 60*60 for hourly data.
-   //
-   time_step = 21600;
+   match_day          = FALSE;
+   time_step          = 21600;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
