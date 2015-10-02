@@ -32,6 +32,5 @@ if ENABLE_DEVELOPMENT
     CLEANFILES = color_scanner.cc \
         	color_parser_yacc.cc \
         	color_parser_yacc.h \
-        	color_parser_yacc.hh \
         	lex.color.cc
 endif

@@ -62,5 +62,4 @@ endif
 
 EXTRA_DIST = config.tab.cc \
 	config.tab.h \
-	config.tab.hh \
 	config_scanner.cc
