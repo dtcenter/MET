@@ -44,7 +44,7 @@ fcst = {
    field = {
       name  = "APCP";
       level = "A24";
-   }
+   };
 
    raw_thresh        = >=0.0;
    conv_radius       = 5;
@@ -61,7 +61,7 @@ obs = {
    field = {
       name  = "APCP_24";
       level = "(*,*)";
-   }
+   };
 };
 
 //
@@ -217,8 +217,19 @@ plot_gcarc_flag = FALSE;
 // NetCDF matched pairs, PostScript, and contingency table output files
 //
 ps_plot_flag    = TRUE;
-nc_pairs_flag   = TRUE;
+nc_pairs_flag   = {
+   latlon       = TRUE;
+   raw          = TRUE;
+   object_raw   = TRUE;
+   object_id    = TRUE;
+   cluster_id   = TRUE;
+   polylines    = TRUE;
+};
 ct_stats_flag   = TRUE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+shift_right = 0;   //  grid squares
 
 ////////////////////////////////////////////////////////////////////////////////
 

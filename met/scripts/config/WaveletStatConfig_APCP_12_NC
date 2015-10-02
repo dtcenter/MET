@@ -19,6 +19,18 @@ obtype = "MC_PCP";
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Verification grid
+//
+regrid = {
+   to_grid    = NONE;
+   vld_thresh = 0.5;
+   method     = NEAREST;
+   width      = 1;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -78,7 +90,10 @@ output_flag = {
 //
 // NetCDF matched pairs and PostScript output files
 //
-nc_pairs_flag = TRUE;
+nc_pairs_flag   = {
+   raw    = TRUE;
+   diff   = TRUE;
+};
 ps_plot_flag  = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
