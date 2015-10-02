@@ -122,9 +122,9 @@ static const char * cnt_columns [] = {
    "E90",         "E90_BCL",       "E90_BCU",
    "EIQR",        "EIQR_BCL",      "EIQR_BCU",
    "MAD",         "MAD_BCL",       "MAD_BCU",
+   "ANOM_CORR",   "ANOM_CORR_NCL", "ANOM_CORR_NCU", "ANOM_CORR_BCL", "ANOM_CORR_BCU",
    "ME2",         "ME2_BCL",       "ME2_BCU",
-   "MSESS",       "MSESS_BCL",     "MSESS_BCU",
-   "ANOM_CORR",   "ANOM_CORR_NCL", "ANOM_CORR_NCU", "ANOM_CORR_BCL", "ANOM_CORR_BCU"
+   "MSESS",       "MSESS_BCL",     "MSESS_BCU"
 };
 
 static const char * sl1l2_columns [] = {
@@ -161,7 +161,8 @@ static const char * pstd_columns [] = {
    "BASER_NCL",   "BASER_NCU",   "RELIABILITY",
    "RESOLUTION",  "UNCERTAINTY", "ROC_AUC",
    "BRIER",       "BRIER_NCL",   "BRIER_NCU",
-   "THRESH_",     "BSS"
+   "BRIERCL",     "BRIERCL_NCL", "BRIERCL_NCU",
+   "BSS",         "THRESH_",
 };
 
 static const char * pjc_columns [] = {
@@ -231,7 +232,7 @@ static const char * isc_columns [] = {
 
 static const char * rhist_columns [] = {
    "TOTAL",       "CRPS",        "IGN",
-   "N_RANK",      "RANK_",       "CRPSS"
+   "N_RANK",      "CRPSS",       "RANK_"
 };
 
 static const char * phist_columns [] = {

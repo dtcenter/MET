@@ -60,7 +60,7 @@ struct MPRData {
 // Ranked Histogram (RHIST) data structure
 struct RHISTData {
    int total, n_rank;
-   double crps, ign;
+   double crps, ign, crpss;
    NumArray rhist_na;
 };
 

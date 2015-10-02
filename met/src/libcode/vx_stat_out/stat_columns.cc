@@ -18,7 +18,7 @@ using namespace std;
 
 #include "stat_columns.h"
 
-#include "vx_util.h" 
+#include "vx_util.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
    }
-   
+
    at.set_entry(r, col, pstd_columns[13]);
 
    return;
@@ -441,7 +441,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+12+n_ens, orank_columns[13]);
    at.set_entry(r, c+13+n_ens, orank_columns[14]);
    at.set_entry(r, c+14+n_ens, orank_columns[15]);
-   
+
    return;
 }
 
@@ -1384,7 +1384,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Alpha value
    shc.set_alpha(alpha);
-     
+
    // Write a line for each ssvar bin
    for(i=0; i<pd_ptr->ssvar_bins[0].n_bin; i++) {
 
@@ -1750,7 +1750,7 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
 
    at.set_entry(r, c+69, // Odds Ratio Skill Score BCU
       cts_info.orss.v_bcu[i]);
-   
+
    at.set_entry(r, c+70, // Extreme Dependency Score
       cts_info.eds.v);
 
@@ -1765,7 +1765,7 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
 
    at.set_entry(r, c+74, // Extreme Dependency Score BCU
       cts_info.eds.v_bcu[i]);
-   
+
    at.set_entry(r, c+75, // Symmetric Extreme Dependency Score
       cts_info.seds.v);
 
@@ -1795,7 +1795,7 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
 
    at.set_entry(r, c+84, // Extreme Dependency Index BCU
       cts_info.edi.v_bcu[i]);
-   
+
    at.set_entry(r, c+85, // Symmetric Extreme Dependency Index
       cts_info.sedi.v);
 
@@ -1851,10 +1851,10 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    E75,         E75_BCL,       E75_BCU,
    //    E90,         E90_BCL,       E90_BCU,
    //    EIQR,        EIQR_BCL,      EIQR_BCU,
+   //    ANOM_CORR,   ANOM_CORR_NCL, ANOM_CORR_NCU, ANOM_CORR_BCL, ANOM_CORR_BCU
    //    MAD,         MAD_BCL,       MAD_BCU
    //    ME2,         ME2_BCL,       ME2_BCU,
    //    MSESS,       MSESS_BCL,     MSESS_BCU,
-   //    ANOM_CORR,   ANOM_CORR_NCL, ANOM_CORR_NCU, ANOM_CORR_BCL, ANOM_CORR_BCU
    //
 
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -2078,7 +2078,7 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
 
    at.set_entry(r, c+73, // Interquartile Range of the Error BCU
       cnt_info.eiqr.v_bcu[i]);
-   
+
    at.set_entry(r, c+74, // Median Absolute Deviation
       cnt_info.mad.v);
 
@@ -2088,39 +2088,39 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    at.set_entry(r, c+76, // Median Absolute Deviation BCU
       cnt_info.mad.v_bcu[i]);
 
-   at.set_entry(r, c+77, // Mean Error Squared
-      cnt_info.me2.v);
-
-   at.set_entry(r, c+78, // Mean Error Squared BCL
-      cnt_info.me2.v_bcl[i]);
-
-   at.set_entry(r, c+79, // Mean Error Squared BCU
-      cnt_info.me2.v_bcu[i]);
-   
-   at.set_entry(r, c+80, // Mean Squared Error Skill Score
-      cnt_info.msess.v);
-
-   at.set_entry(r, c+81, // Mean Squared Error Skill Score BCL
-      cnt_info.msess.v_bcl[i]);
-
-   at.set_entry(r, c+82, // Mean Squared Error Skill Score BCU
-      cnt_info.msess.v_bcu[i]);
-
-   at.set_entry(r, c+83, // Anomaly Correlation
+   at.set_entry(r, c+77, // Anomaly Correlation
       cnt_info.anom_corr.v);
 
-   at.set_entry(r, c+84, // Anomaly Correlation NCL
+   at.set_entry(r, c+78, // Anomaly Correlation NCL
       cnt_info.anom_corr.v_ncl[i]);
 
-   at.set_entry(r, c+85, // Anomaly Correlation NCU
+   at.set_entry(r, c+79, // Anomaly Correlation NCU
       cnt_info.anom_corr.v_ncu[i]);
 
-   at.set_entry(r, c+86, // Anomaly Correlation BCL
+   at.set_entry(r, c+80, // Anomaly Correlation BCL
       cnt_info.anom_corr.v_bcl[i]);
 
-   at.set_entry(r, c+87, // Anomaly Correlation BCU
+   at.set_entry(r, c+81, // Anomaly Correlation BCU
       cnt_info.anom_corr.v_bcu[i]);
-   
+
+   at.set_entry(r, c+82, // Mean Error Squared
+      cnt_info.me2.v);
+
+   at.set_entry(r, c+83, // Mean Error Squared BCL
+      cnt_info.me2.v_bcl[i]);
+
+   at.set_entry(r, c+84, // Mean Error Squared BCU
+      cnt_info.me2.v_bcu[i]);
+
+   at.set_entry(r, c+85, // Mean Squared Error Skill Score
+      cnt_info.msess.v);
+
+   at.set_entry(r, c+86, // Mean Squared Error Skill Score BCL
+      cnt_info.msess.v_bcl[i]);
+
+   at.set_entry(r, c+87, // Mean Squared Error Skill Score BCU
+      cnt_info.msess.v_bcu[i]);
+
    return;
 }
 
@@ -2266,7 +2266,7 @@ void write_sal1l2_cols(const SL1L2Info &sl1l2_info,
    // Dump out the SAL1L2 line:
    //    TOTAL,       FABAR,       OABAR,
    //    FOABAR,      FFABAR,      OOABAR,
-   //    MAE 
+   //    MAE
    //
    at.set_entry(r, c+0,  // Total Anomaly Count
       sl1l2_info.sacount);
@@ -2286,7 +2286,7 @@ void write_sal1l2_cols(const SL1L2Info &sl1l2_info,
    at.set_entry(r, c+5,  // OOABAR
       sl1l2_info.ooabar);
 
-   at.set_entry(r, c+6,  // MAE 
+   at.set_entry(r, c+6,  // MAE
       sl1l2_info.mae);
 
    return;
@@ -2428,8 +2428,8 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //    BASER_NCL,   BASER_NCU,   RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
-   //    [THRESH] (for each threshold),
-   //    BSS
+   //    BRIERCL,     BRIERCL_NCL, BRIERCL_NCU,
+   //    BSS,         [THRESH] (for each threshold),
    //
    at.set_entry(r, c+0,  // Total count
       pct_info.pct.n());
@@ -2467,19 +2467,28 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    at.set_entry(r, c+11, // BRIER_NCU
       pct_info.brier.v_ncu[alpha_i]);
 
+   at.set_entry(r, c+12,  // BRIERCL
+      pct_info.briercl.v);
+
+   at.set_entry(r, c+13, // BRIERCL_NCL
+      pct_info.briercl.v_ncl[alpha_i]);
+
+   at.set_entry(r, c+14, // BRIERCL_NCU
+      pct_info.briercl.v_ncu[alpha_i]);
+
+   at.set_entry(r, c+15, // Brier Skill Score
+      pct_info.bss);
+
    //
    // Write THRESH_i for each probability threshold
    //
-   for(i=0, col=c+12; i<=pct_info.pct.nrows(); i++) {
+   for(i=0, col=c+16; i<=pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
       col++;
    }
 
-   at.set_entry(r, col,   // BSS
-      pct_info.bss);
-   
    return;
 }
 
@@ -2622,7 +2631,7 @@ void write_nbrcts_cols(const NBRCTSInfo &nbrcts_info, int i,
    // Neighborhood Method Contingency Table Statistics Line Type (NBRCTS)
    //
    write_cts_cols(nbrcts_info.cts_info, i, at, r, c);
-   
+
    return;
 }
 
@@ -2689,7 +2698,7 @@ void write_nbrcnt_cols(const NBRCNTInfo &nbrcnt_info, int i,
 
    at.set_entry(r, c+15, // Forecast Rate BCU
       nbrcnt_info.f_rate.v_bcu[i]);
-   
+
    at.set_entry(r, c+16, // Observation Rate
       nbrcnt_info.o_rate.v);
 
@@ -2698,7 +2707,7 @@ void write_nbrcnt_cols(const NBRCNTInfo &nbrcnt_info, int i,
 
    at.set_entry(r, c+18, // Observation Rate BCU
       nbrcnt_info.o_rate.v_bcu[i]);
-   
+
    return;
 }
 
@@ -2827,8 +2836,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    // Ensemble Ranked Histogram
    // Dump out the RHIST line:
    //    TOTAL,   CRPS,   IGN,
-   //    N_RANKS, [RANK_] (for each bin)
-   //    CRPSS
+   //    N_RANKS, CRPSS,  [RANK_] (for each bin)
    //
    at.set_entry(r, c+0,  // Total Number of Ranked Observations
       nint(pd_ptr->rhist_na.sum()));
@@ -2842,18 +2850,18 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    at.set_entry(r, c+3,  // Total Number of Ranks
       pd_ptr->rhist_na.n_elements());
 
+   at.set_entry(r, c+4,  // Continuous Ranked Probability Skill Score
+      pd_ptr->crpss());
+
    //
    // Write RANK_i count for each bin
    //
-   for(i=0, col=c+4; i<pd_ptr->rhist_na.n_elements(); i++) {
+   for(i=0, col=c+5; i<pd_ptr->rhist_na.n_elements(); i++) {
 
       at.set_entry(r, col, // RANK_i
          nint(pd_ptr->rhist_na[i]));
       col++;
    }
-
-   at.set_entry(r, col,  // Continuous Ranked Probability Skill Score
-      pd_ptr->crpss());
 
    return;
 }
@@ -2954,15 +2962,15 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    }
 
    // Observation Quality Control
-   at.set_entry(r, c+12+pd_ptr->n_ens, 
+   at.set_entry(r, c+12+pd_ptr->n_ens,
       pd_ptr->o_qc_sa[i]);
-   
+
    // Ensemble mean values
-   at.set_entry(r, c+13+pd_ptr->n_ens, 
+   at.set_entry(r, c+13+pd_ptr->n_ens,
       pd_ptr->mn_na[i]);
 
    // Climatology value
-   at.set_entry(r, c+14+pd_ptr->n_ens, 
+   at.set_entry(r, c+14+pd_ptr->n_ens,
       pd_ptr->cmn_na[i]);
 
    return;
@@ -2981,7 +2989,7 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    cnt_info.allocate_n_alpha(1);
    cnt_info.alpha[0] = alpha;
    compute_cntinfo(pd_ptr->ssvar_bins[i].sl1l2_info, 0, cnt_info);
-   
+
    //
    // Ensemble spread/skill variance bins
    // Dump out the SSVAR line:

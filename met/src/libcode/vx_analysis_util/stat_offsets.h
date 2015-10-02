@@ -319,6 +319,17 @@ static const int cnt_eiqr_bcu_offset     = nhc + 73;
 static const int cnt_mad_offset          = nhc + 74;
 static const int cnt_mad_bcl_offset      = nhc + 75;
 static const int cnt_mad_bcu_offset      = nhc + 76;
+static const int cnt_anom_corr_offset    = nhc + 77;
+static const int cnt_anom_corr_ncl_offset= nhc + 78;
+static const int cnt_anom_corr_ncu_offset= nhc + 79;
+static const int cnt_anom_corr_bcl_offset= nhc + 80;
+static const int cnt_anom_corr_bcu_offset= nhc + 81;
+static const int cnt_me2_offset          = nhc + 82;
+static const int cnt_me2_bcl_offset      = nhc + 83;
+static const int cnt_me2_bcu_offset      = nhc + 84;
+static const int cnt_msess_offset        = nhc + 85;
+static const int cnt_msess_bcl_offset    = nhc + 86;
+static const int cnt_msess_bcu_offset    = nhc + 87;
 
 //
 // MPR Line Type offsets
@@ -504,8 +515,11 @@ static const int pstd_roc_auc_offset     = nhc + 8;
 static const int pstd_brier_offset       = nhc + 9;
 static const int pstd_brier_ncl_offset   = nhc + 10;
 static const int pstd_brier_ncu_offset   = nhc + 11;
+static const int pstd_briercl_offset     = nhc + 12;
+static const int pstd_briercl_ncl_offset = nhc + 13;
+static const int pstd_briercl_ncu_offset = nhc + 14;
+static const int pstd_bss_offset         = nhc + 15;
 inline int pstd_thresh_offset(int i)     { return(nhc + 12 + i); }
-inline int pstd_bss_offset(int n)        { return(nhc + 12 + n); }
 
 //
 // PJC Line Type offsets
@@ -536,8 +550,8 @@ static const int rhist_total_offset      = nhc + 0;
 static const int rhist_crps_offset       = nhc + 1;
 static const int rhist_ign_offset        = nhc + 2;
 static const int rhist_n_rank_offset     = nhc + 3;
+static const int rhist_crpss_offset      = nhc + 4;
 inline int rhist_rank_offset(int i)      { return(nhc + 4 + i); }
-inline int rhist_crpss_offset(int n)     { return(nhc + 4 + n); }
 
 //
 // PHIST Line Type offsets

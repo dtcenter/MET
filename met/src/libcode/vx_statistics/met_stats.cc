@@ -641,7 +641,7 @@ void CNTInfo::clear() {
    fthresh.clear();
    othresh.clear();
    logic = SetLogic_None;
-   
+
    fbar.clear();
    fstdev.clear();
    obar.clear();
@@ -960,7 +960,7 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
       s_info.fobar = (fobar*scount + c.fobar*c.scount)/s_info.scount;
       s_info.ffbar = (ffbar*scount + c.ffbar*c.scount)/s_info.scount;
       s_info.oobar = (oobar*scount + c.oobar*c.scount)/s_info.scount;
-      
+
       if(is_bad_data(mae) || is_bad_data(c.mae)) {
          s_info.mae = bad_data_double;
       }
@@ -1081,7 +1081,7 @@ void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
    // Apply filtering thresholds to subset the matched pairs
    subset_pairs(in_f_na, fthresh, in_o_na, othresh, in_c_na,
                 logic, f_na, o_na, c_na);
-   
+
    // Check for no matched pairs to process
    if(f_na.n_elements() == 0) return;
 
@@ -1179,7 +1179,7 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    cnt_info.e50.set_bad_data();
    cnt_info.e75.set_bad_data();
    cnt_info.e90.set_bad_data();
-   cnt_info.eiqr.set_bad_data();   
+   cnt_info.eiqr.set_bad_data();
    cnt_info.mad.set_bad_data();
    cnt_info.n_ranks    = 0;
    cnt_info.frank_ties = 0;
@@ -1192,17 +1192,17 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    fobar = (aflag ? s.foabar  : s.fobar);
    ffbar = (aflag ? s.ffabar  : s.ffbar);
    oobar = (aflag ? s.ooabar  : s.oobar);
-   
+
    // Number of matched pairs
    cnt_info.n = n;
-   
+
    // Forecast mean and standard deviation
    cnt_info.fbar.v   = fbar;
    cnt_info.fstdev.v = compute_stdev(fbar*n, ffbar*n, n);
 
    // Observation mean and standard deviation
    cnt_info.obar.v   = obar;
-   cnt_info.ostdev.v = compute_stdev(obar*n, oobar*n, n);   
+   cnt_info.ostdev.v = compute_stdev(obar*n, oobar*n, n);
 
    // Multiplicative bias
    cnt_info.mbias.v = (is_eq(obar, 0.0) ? bad_data_double : fbar/obar);
@@ -1666,7 +1666,7 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
    n_info.sl1l2_info.scount = sl1l2_info.scount + c.sl1l2_info.scount;
 
    if(n_info.sl1l2_info.scount) {
-      
+
       //
       // Aggregate FBS as a weighted average
       //
@@ -1711,7 +1711,7 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
                          n_info.sl1l2_info.scount;
       n_info.o_rate.v = (sl1l2_info.scount*o_rate.v + c.sl1l2_info.scount*c.o_rate.v) /
                          n_info.sl1l2_info.scount;
-      
+
       //
       // Recompute AFSS and UFSS using the aggregated rates
       //
@@ -2140,6 +2140,7 @@ void PCTInfo::clear() {
 
    baser.clear();
    brier.clear();
+   briercl.clear();
    bss = bad_data_double;
 
    return;
@@ -2160,9 +2161,10 @@ void PCTInfo::assign(const PCTInfo &c) {
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
 
-   baser = c.baser;
-   brier = c.brier;
-   bss   = c.bss;
+   baser   = c.baser;
+   brier   = c.brier;
+   briercl = c.briercl;
+   bss     = c.bss;
 
    return;
 }
@@ -2185,6 +2187,7 @@ void PCTInfo::allocate_n_alpha(int i) {
 
       baser.allocate_n_alpha(n_alpha);
       brier.allocate_n_alpha(n_alpha);
+      briercl.allocate_n_alpha(n_alpha);
    }
 
    return;
@@ -2193,20 +2196,20 @@ void PCTInfo::allocate_n_alpha(int i) {
 ////////////////////////////////////////////////////////////////////////
 
 void PCTInfo::compute_stats() {
-   double ref;
 
-   baser.v = pct.baser();
-   brier.v = pct.brier_score();
+   baser.v   = pct.baser();
+   brier.v   = pct.brier_score();
+   briercl.v = climo_pct.brier_score();
 
    //
    // Compute the brier skill score
    //
-   ref = climo_pct.brier_score();
-   if(is_bad_data(brier.v) || is_bad_data(ref) || is_eq(ref, 0.0)) {
+   if(is_bad_data(brier.v) || is_bad_data(briercl.v) ||
+      is_eq(briercl.v, 0.0)) {
       bss = bad_data_double;
    }
    else {
-      bss = (brier.v - ref)/ref;
+      bss = (brier.v - briercl.v)/briercl.v;
    }
 
    return;
@@ -2231,6 +2234,13 @@ void PCTInfo::compute_ci() {
       halfwidth *= sqrt(brier.vif);
       brier.v_ncl[i] = brier.v - halfwidth;
       brier.v_ncu[i] = brier.v + halfwidth;
+
+      // Compute climatological brier CI using the VIF
+      halfwidth = climo_pct.brier_ci_halfwidth(alpha[i]);
+      halfwidth *= sqrt(briercl.vif);
+      briercl.v_ncl[i] = briercl.v - halfwidth;
+      briercl.v_ncu[i] = briercl.v + halfwidth;
+
    } // end for i
 
    return;
@@ -2521,7 +2531,7 @@ double compute_afss(double f_rate, double o_rate) {
    else {
       afss = num/den;
    }
-   
+
    return(afss);
 }
 
@@ -2712,7 +2722,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       den = sqrt(v);
       cnt_info.pr_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
    }
-   
+
    //
    // Compute Anomaly Correlation
    //
@@ -2739,7 +2749,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    cnt_info.e75.v  = err_na.percentile_array(0.75);
    cnt_info.e90.v  = err_na.percentile_array(0.90);
    cnt_info.eiqr.v = cnt_info.e75.v - cnt_info.e25.v;
-   
+
    //
    // Compute the median absolute deviation
    //
@@ -2758,7 +2768,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    // Compute mean error squared
    //
    cnt_info.me2.v = cnt_info.me.v * cnt_info.me.v;
-   
+
    //
    // Compute mean absolute error
    //
@@ -3237,7 +3247,7 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
 
    // Flag to process climo
    cflag = set_cflag(f_na, c_na);
-   
+
    //
    // Store the thresholds as an array of doubles
    //
@@ -3352,7 +3362,7 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
       ff_sum += f*f;
       oo_sum += o*o;
       fo_sum += f*o;
-      
+
       f_thr_sum += f_thr_na[j];
       o_thr_sum += o_thr_na[j];
    } // end for i
@@ -3374,7 +3384,7 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    nbrcnt_info.f_rate.v = f_thr_sum/n;
    nbrcnt_info.o_rate.v = o_thr_sum/n;
-   
+
    //
    // Only compute stats if requested
    //
@@ -3423,7 +3433,7 @@ void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
       f_na_i.add(f_na[i]);
       o_na_i.add(o_na[i]);
       f_thr_na_i.add(f_thr_na[i]);
-      o_thr_na_i.add(o_thr_na[i]);      
+      o_thr_na_i.add(o_thr_na[i]);
       i_na_i.add(count);
       count++;
    }
@@ -3572,7 +3582,7 @@ void subset_pairs(const NumArray &f_na, const SingleThresh &ft,
                   NumArray &ff_na, NumArray &oo_na, NumArray &cc_na) {
    int i;
    bool fcheck, ocheck, cflag;
-   
+
    if(f_na.n_elements() != o_na.n_elements()) {
       mlog << Error << "\nsubset_pairs() -> "
            << "the number of forecast values (" << f_na.n_elements()
@@ -3595,7 +3605,7 @@ void subset_pairs(const NumArray &f_na, const SingleThresh &ft,
       // Skip bad data
       if((is_bad_data(f_na[i]) || is_bad_data(o_na[i])) ||
          (cflag                && is_bad_data(c_na[i]))) continue;
-      
+
       // Add points which meet the thresholding logic
       if(check_fo_thresh(f_na[i], ft, o_na[i], ot, type)) {
          ff_na.add(f_na[i]);
@@ -3659,10 +3669,10 @@ bool set_cflag(const NumArray &f_na, const NumArray &c_na) {
    // The climo values must be non-zero and match the forecast values
    if(c_na.n_elements() != f_na.n_elements() ||
       c_na.n_elements() < 1) return(false);
-   
+
    // The first climo value must be valid
    if(is_bad_data(c_na[0]))  return(false);
-      
+
    return(true);
 }
 

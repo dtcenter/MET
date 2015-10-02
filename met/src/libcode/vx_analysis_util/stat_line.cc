@@ -1118,8 +1118,8 @@ int get_pstd_column_offset(const char *col_name, const STATLine &L) {
    //    BASER_NCL,   BASER_NCU,   RELIABILTY,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
-   //    [THRESH] (for each threshold),
-   //    BSS
+   //    BRIERCL,     BRIERCL_NCL, BRIERCL_NCU,
+   //    BSS,         [THRESH] (for each threshold),
    //
 
    //
@@ -1147,14 +1147,6 @@ int get_pstd_column_offset(const char *col_name, const STATLine &L) {
          i      = parse_thresh_index(col_name);
          offset = n_header_columns + 12 + (i-1);
       }
-   }
-
-   //
-   // Check for the BSS special case after the variable columns
-   //
-   if(strcasecmp(col_name, "BSS") == 0) {
-      n      = atoi(L.get_item(get_rhist_column_offset("N_THRESH", L)));
-      offset = pstd_bss_offset(n);
    }
 
    return(offset);
@@ -1343,8 +1335,7 @@ int get_rhist_column_offset(const char *col_name, const STATLine &L) {
    //
    // If not found, search the rhist columns:
    //    TOTAL,  CRPS,  IGN,
-   //    N_RANK, [RANK_] (for possible ranks, n_ens+1),
-   //    CRPSS
+   //    CRPSS,  N_RANK, [RANK_] (for possible ranks, n_ens+1),
    //
 
    //
@@ -1371,14 +1362,6 @@ int get_rhist_column_offset(const char *col_name, const STATLine &L) {
          i      = parse_thresh_index(col_name);
          offset = n_header_columns + 4 + (i-1);
       }
-   }
-   
-   //
-   // Check for the CRPSS special case after the variable columns
-   //
-   if(strcasecmp(col_name, "CRPSS") == 0) {
-      n      = atoi(L.get_item(get_rhist_column_offset("N_RANK", L)));
-      offset = rhist_crpss_offset(n);
    }
 
    return(offset);
@@ -1459,7 +1442,7 @@ int get_orank_column_offset(const char *col_name, const STATLine &L) {
    //    [ENS_] (for each ensemble member)
    //    OBS_QC,      ENS_MEAN,    CLIMO
    //
-   
+
    //
    // Check the static columns
    //
@@ -1501,7 +1484,7 @@ int get_orank_column_offset(const char *col_name, const STATLine &L) {
       n      = atoi(L.get_item(get_orank_column_offset("N_ENS", L)));
       offset = orank_ens_mean_offset(n);
    }
-   
+
    //
    // Check for the CLIMO special case after the variable columns
    //

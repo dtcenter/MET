@@ -177,7 +177,7 @@ void parse_sl1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.ffbar  = atof(l.get_item(sl1l2_ffbar_offset));
    s_info.oobar  = atof(l.get_item(sl1l2_oobar_offset));
 
-   // Parse mae, if present
+   // Parse MAE, if present
    s_info.mae = (l.n_items() > sl1l2_mae_offset ?
                  atof(l.get_item(sl1l2_mae_offset)) :
                  bad_data_double);
@@ -254,19 +254,19 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &n_info) {
    n_info.sl1l2_info.scount = atoi(l.get_item(nbrcnt_total_offset));
    n_info.fbs.v      = atof(l.get_item(nbrcnt_fbs_offset));
    n_info.fss.v      = atof(l.get_item(nbrcnt_fss_offset));
-   
+
    // Parse AFSS, UFSS, F_RATE, and O_RATE, if present
    n_info.afss.v     = (l.n_items() > nbrcnt_afss_offset ?
-                        atof(l.get_item(nbrcnt_afss_offset)) : 
+                        atof(l.get_item(nbrcnt_afss_offset)) :
                         bad_data_double);
    n_info.ufss.v     = (l.n_items() > nbrcnt_ufss_offset ?
-                        atof(l.get_item(nbrcnt_ufss_offset)) : 
+                        atof(l.get_item(nbrcnt_ufss_offset)) :
                         bad_data_double);
    n_info.f_rate.v   = (l.n_items() > nbrcnt_f_rate_offset ?
-                        atof(l.get_item(nbrcnt_f_rate_offset)) : 
+                        atof(l.get_item(nbrcnt_f_rate_offset)) :
                         bad_data_double);
    n_info.o_rate.v   = (l.n_items() > nbrcnt_o_rate_offset ?
-                        atof(l.get_item(nbrcnt_o_rate_offset)) : 
+                        atof(l.get_item(nbrcnt_o_rate_offset)) :
                         bad_data_double);
 
    return;
@@ -329,6 +329,7 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    r_data.crps   = atof(l.get_item(rhist_crps_offset));
    r_data.ign    = atof(l.get_item(rhist_ign_offset));
    r_data.n_rank = atoi(l.get_item(rhist_n_rank_offset));
+   r_data.crpss  = atoi(l.get_item(rhist_crpss_offset));
 
    r_data.rhist_na.clear();
 
@@ -384,7 +385,7 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    for(i=0; i<o_data.n_ens; i++) {
       o_data.ens_na.add(atof(l.get_item(orank_ens_offset(i))));
    }
-   
+
    // Parse OBS_QC, if present
    if(l.n_items() > orank_obs_qc_offset(o_data.n_ens)) {
       o_data.obs_qc = l.get_item(orank_obs_qc_offset(o_data.n_ens));
