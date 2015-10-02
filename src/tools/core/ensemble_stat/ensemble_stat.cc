@@ -879,7 +879,7 @@ int process_point_ens(int i_ens, int n_miss) {
       if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
 
       // Read the current ensemble file
-      if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file, etype))) {
+      if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file, info->file_type()))) {
          mlog << Error << "\nprocess_point_ens() -> "
               << "Trouble reading " << file_type << " file \""
               << ens_file << "\"\n\n";
