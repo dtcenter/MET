@@ -350,7 +350,7 @@ static const int n_ssvar_columns        = sizeof(ssvar_columns)/sizeof(*ssvar_co
 
 inline int get_n_mctc_columns  (int n) { return(2  + n*n); }
 inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
-inline int get_n_pstd_columns  (int n) { return(13 +    max(1, n)   ); }
+inline int get_n_pstd_columns  (int n) { return(16 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_rhist_columns (int n) { return(5  + n);               } // n = N_RANK

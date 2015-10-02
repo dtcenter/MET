@@ -217,16 +217,18 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    at.set_entry(r, c+9,  pstd_columns[9]);
    at.set_entry(r, c+10, pstd_columns[10]);
    at.set_entry(r, c+11, pstd_columns[11]);
+   at.set_entry(r, c+12, pstd_columns[12]);
+   at.set_entry(r, c+13, pstd_columns[13]);
+   at.set_entry(r, c+14, pstd_columns[14]);
+   at.set_entry(r, c+15, pstd_columns[15]);
 
    // Write THRESH_i for each threshold
-   for(i=0, col=c+12; i<n_thresh; i++) {
+   for(i=0, col=c+16; i<n_thresh; i++) {
 
-      sprintf(tmp_str, "%s%i", pstd_columns[12], i+1);
+      sprintf(tmp_str, "%s%i", pstd_columns[16], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
    }
-
-   at.set_entry(r, col, pstd_columns[13]);
 
    return;
 }
@@ -356,16 +358,15 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
    at.set_entry(r, c+1, rhist_columns[1]);
    at.set_entry(r, c+2, rhist_columns[2]);
    at.set_entry(r, c+3, rhist_columns[3]);
+   at.set_entry(r, c+4, rhist_columns[4]);
 
    // Write RANK_i for each rank
-   for(i=0, col=c+4; i<n_rank; i++) {
+   for(i=0, col=c+5; i<n_rank; i++) {
 
-      sprintf(tmp_str, "%s%i", rhist_columns[4], i+1);
+      sprintf(tmp_str, "%s%i", rhist_columns[5], i+1);
       at.set_entry(r, col, tmp_str); // Counts for each rank
       col++;
    }
-
-   at.set_entry(r, c+4+n_rank, rhist_columns[5]);
 
    return;
 }
