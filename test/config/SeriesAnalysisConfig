@@ -22,9 +22,10 @@ obtype = "${OBTYPE}";
 // Verification grid
 //
 regrid = {
-   to_grid = NONE;
-   method  = NEAREST;
-   width   = 1;
+   to_grid    = NONE;
+   vld_thresh = 0.5;
+   method     = NEAREST;
+   width      = 1;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
