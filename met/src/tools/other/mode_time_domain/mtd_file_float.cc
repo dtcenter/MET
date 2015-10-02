@@ -951,6 +951,10 @@ for (t=0; t<(old.nt()); ++t)  {
 
 }   //  for t
 
+   //  store the updated grid
+
+*G = to_grid;
+
    //
    //  done
    //
