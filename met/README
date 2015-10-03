@@ -262,6 +262,15 @@ sub-directory, or the MET Online Tutorial:
   --enable-mode_graphics
       Enable compilation of mode_graphics
 
+  --disable-mode_time_domain
+      Disable compilation of mode_time_domain
+
+  --disable-gsi_tools
+      Disable compilation of gsi_tools
+
+  --disable-regrid_data_plane
+      Disable compilation of regrid_data_plane
+
   --disable-tc_utils
       Disable compilation of tc_utils
 
