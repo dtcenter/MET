@@ -9,54 +9,33 @@ MAINTAINERCLEANFILES	= Makefile.in
 include ${top_srcdir}/Make-include
 
 # The program
-
 bin_PROGRAMS    = mtd
-mtd_SOURCES = mtd.cc  \
-              mtdfiletype_to_string.h   \
-              mtdfiletype_to_string.cc  \
-              nc_utils.cc  \
-              nc_grid.cc  \
-              3d_moments.h  \
-              3d_moments.cc  \
-              2d_moments.h  \
-              2d_moments.cc  \
-              fo_node.h  \
-              fo_node.cc  \
-              fo_node_array.h  \
-              fo_node_array.cc  \
-              fo_graph.h  \
-              fo_graph.cc  \
-              mtd_config_info.h  \
-              mtd_config_info.cc  \
-              mtd_file_base.cc  \
-              mtd_file_float.cc  \
-              mtd_file_int.cc  \
-              mtd_read_data.h  \
-              mtd_read_data.cc  \
-              3d_att.h  \
-              3d_att.cc  \
-              3d_att_single_array.h  \
-              3d_att_single_array.cc  \
-              3d_att_pair_array.h  \
-              3d_att_pair_array.cc  \
-              2d_att.h  \
-              2d_att.cc  \
-              2d_att_array.h  \
-              2d_att_array.cc  \
-              3d_conv.cc    \
-              3d_pair_columns.h    \
-              3d_single_columns.h  \
-              2d_columns.h  \
-              mtd_txt_output.h  \
-              mtd_txt_output.cc  \
-              mtd_nc_output.h  \
-              mtd_nc_output.cc  \
-              interest_calc.h  \
-              interest_calc.cc  \
-              mtd_partition.h  \
-              mtd_partition.cc  \
-              mm_engine.h  \
-              mm_engine.cc
+mtd_SOURCES = mtd.cc \
+              mtdfiletype_to_string.cc mtdfiletype_to_string.h \
+              nc_utils.cc nc_utils.h \
+              nc_grid.cc nc_grid.h \
+              3d_moments.cc 3d_moments.h \
+              2d_moments.cc 2d_moments.h \
+              fo_node.cc fo_node.h \
+              fo_node_array.cc fo_node_array.h \
+              fo_graph.cc fo_graph.h \
+              mtd_config_info.cc mtd_config_info.h \
+              mtd_file_base.cc mtd_file_base.h mtd_file.h \
+              mtd_file_float.cc mtd_file_float.h \
+              mtd_file_int.cc mtd_file_int.h \
+              mtd_read_data.cc mtd_read_data.h \
+              3d_att.cc 3d_att.h 3d_txt_header.h \
+              3d_att_single_array.cc 3d_att_single_array.h \
+              3d_att_pair_array.cc 3d_att_pair_array.h \
+              2d_att.cc 2d_att.h \
+              2d_att_array.cc 2d_att_array.h \
+              3d_conv.cc 3d_conv.h \
+              3d_pair_columns.h 3d_single_columns.h 2d_columns.h \
+              mtd_txt_output.cc mtd_txt_output.h \
+              mtd_nc_output.cc mtd_nc_output.h mtd_nc_defs.h \
+              interest_calc.cc interest_calc.h \
+              mtd_partition.cc mtd_partition.h \
+              mm_engine.cc mm_engine.h
 mtd_CPPFLAGS = ${MET_CPPFLAGS}
 mtd_LDFLAGS = ${MET_LDFLAGS}
 mtd_LDADD = -lvx_pxm \
