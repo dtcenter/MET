@@ -561,6 +561,26 @@ else
     AC_MSG_NOTICE([plot_data_plane will not be compiled])
 fi
 
+# regrid_data_plane
+
+AC_ARG_ENABLE(regrid_data_plane,
+          [AS_HELP_STRING([--disable-regrid_data_plane], [Disable compilation of regrid_data_plane])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_REGRID_DATA_PLANE="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-regrid_data_plane) ;;
+   esac],
+  [ENABLE_REGRID_DATA_PLANE="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_REGRID_DATA_PLANE], [test "x$ENABLE_REGRID_DATA_PLANE" = "xyes"])
+
+if test "x$ENABLE_REGRID_DATA_PLANE" = "xyes"; then
+    AC_DEFINE([ENABLE_REGRID_DATA_PLANE], [], ["build regrid_data_plane"])
+    AC_MSG_NOTICE([regrid_data_plane will be compiled])
+else
+    AC_MSG_NOTICE([regrid_data_plane will not be compiled])
+fi
+
 # plot_point_obs
 
 AC_ARG_ENABLE(plot_point_obs,
@@ -721,16 +741,15 @@ else
     AC_MSG_NOTICE([mode_graphics will not be compiled])
 fi
 
-
 # mode_time_domain
 
 AC_ARG_ENABLE(mode_time_domain,
-	  [AS_HELP_STRING([--enable-mode_time_domain], [Enable compilation of mode_time_domain])],
+          [AS_HELP_STRING([--disable-mode_time_domain], [Disable compilation of mode_time_domain])],
   [case "${enableval}" in
      yes | no ) ENABLE_MODE_TIME_DOMAIN="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --enable-mode_time_domain) ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-mode_time_domain) ;;
    esac],
-  [ENABLE_MODE_TIME_DOMAIN="no"]
+  [ENABLE_MODE_TIME_DOMAIN="yes"]
 )
 
 AM_CONDITIONAL([ENABLE_MODE_TIME_DOMAIN], [test "x$ENABLE_MODE_TIME_DOMAIN" = "xyes"])

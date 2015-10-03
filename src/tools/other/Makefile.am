@@ -54,16 +54,16 @@ if ENABLE_MODE_GRAPHICS
   SUBDIRS += mode_graphics
 endif
 
-#if ENABLE_GSI_TOOLS
-  SUBDIRS += gsi_tools
-#endif
-
-#if ENABLE_REGRID_DATA_PLANE
-  SUBDIRS += regrid_data_plane
-#endif
-
-#if ENABLE_MODE_TIME_DOMAIN
+if ENABLE_MODE_TIME_DOMAIN
   SUBDIRS += mode_time_domain
-#endif
+endif
+
+if ENABLE_GSI_TOOLS
+  SUBDIRS += gsi_tools
+endif
+
+if ENABLE_REGRID_DATA_PLANE
+  SUBDIRS += regrid_data_plane
+endif
 
 MAINTAINERCLEANFILES 	= Makefile.in

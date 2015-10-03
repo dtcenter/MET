@@ -48,7 +48,7 @@ export ENABLE_MODE_ANALYSIS
 export ENABLE_PB2NC
 export ENABLE_PCP_COMBINE
 export ENABLE_PLOT_DATA_PLANE
-export ENABLE_PLOT_G2
+export ENABLE_REGRID_DATA_PLANE
 export ENABLE_PLOT_POINT_OBS
 export ENABLE_POINT_STAT
 export ENABLE_STAT_ANALYSIS
@@ -58,6 +58,7 @@ export ENABLE_WWMCA
 export ENABLE_MODIS
 export ENABLE_TC_UTILS
 export ENABLE_MODE_GRAPHICS
+export ENABLE_MODE_TIME_DOMAIN
 export ENABLE_GSI_TOOLS
 
 ###############################################################################
