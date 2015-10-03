@@ -29,7 +29,7 @@ mtd_SOURCES = mtd.cc \
               3d_att_pair_array.cc 3d_att_pair_array.h \
               2d_att.cc 2d_att.h \
               2d_att_array.cc 2d_att_array.h \
-              3d_conv.cc 3d_conv.h \
+              3d_conv.cc \
               3d_pair_columns.h 3d_single_columns.h 2d_columns.h \
               mtd_txt_output.cc mtd_txt_output.h \
               mtd_nc_output.cc mtd_nc_output.h mtd_nc_defs.h \
