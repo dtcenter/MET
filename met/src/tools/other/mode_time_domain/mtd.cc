@@ -68,6 +68,8 @@ static void set_verbosity (const StringArray &);
 static void set_logfile   (const StringArray &);
 static void set_outdir    (const StringArray &);
 
+static StringArray parse_file_list(const StringArray &, const GrdFileType);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -121,6 +123,17 @@ GrdFileType ftype, otype;
 
 ftype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
 otype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
+
+   //
+   //  parse the forecast and observation file lists
+   //
+
+fcst_filenames = parse_file_list(fcst_filenames, ftype);
+obs_filenames  = parse_file_list(obs_filenames,  otype);
+
+   //
+   //  retrieve the gridded file types
+   //
 
 if ( ftype == FileType_None ) ftype = grd_file_type(fcst_filenames[0]);
 if ( otype == FileType_None ) otype = grd_file_type(obs_filenames[0]);
@@ -670,10 +683,10 @@ ConcatString tab;
 tab.set_repeat(' ', 10 + program_name.length());
 
 mlog << Error
-     << "\n"
+     << "\n*** Model Evaluation Tools (MET" << met_version << ") ***\n\n"
      << "Usage: " << program_name << "\n"
-     << tab << "-fcst     file_list\n"
-     << tab << "-obs      file_list\n"
+     << tab << "-fcst     file1 ... file_n | file_list\n"
+     << tab << "-obs      file1 ... file_n | file_list\n"
      << tab << "-config   config_file\n"
      << tab << "[ -log    file ]\n"
      << tab << "[ -v      level ]\n"
@@ -781,6 +794,40 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+StringArray parse_file_list  (const StringArray & a, const GrdFileType type)
+
+{
+
+int i;
+Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+Met2dDataFileFactory factory;
+StringArray list;
+
+   //
+   //  check for empty list
+   //
+if(a.n_elements() == 0) {
+   mlog << Error << "\nparse_file_list() -> "
+        << "empty list!\n\n";
+   exit(1);
+}
+
+   //
+   //  attempt to read the first file as a gridded data file
+   //
+mtddf = factory.new_met_2d_data_file(a[0], type);
+
+   //
+   //  if the read was successful, store the list of gridded files.
+   //  otherwise, process entries as ASCII files.
+   //
+if(mtddf)                            list.add(a);
+else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0]);
+
+return ( list );
+
+}
 
 
+////////////////////////////////////////////////////////////////////////
 
