@@ -203,11 +203,12 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    obs_info  = new VarInfo * [n_obs];
 
    // Initialize pointers
-   for(i=0; i<n_fcst; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
+   for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) 0;
+   for(i=0; i<n_obs;  i++) obs_info[i]  = (VarInfo *) 0;
 
    // Parse the fcst field information
    for(i=0; i<n_fcst; i++) {
-    
+
       // Allocate new VarInfo objects
       fcst_info[i] = info_factory.new_var_info(ftype);
 
@@ -270,7 +271,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
    // Conf: block_size
    block_size = conf.lookup_int(conf_key_block_size);
-   
+
    if(block_size <= 0.0) {
       mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
            << "The \"" << conf_key_block_size << "\" parameter ("
@@ -330,7 +331,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
          check_mctc_thresh(ocat_ta);
       }
    } // end if categorical
-   
+
    // Sanity check continuous thresholds
    if((output_stats[stat_sl1l2].n_elements()  +
        output_stats[stat_sal1l2].n_elements() +
@@ -341,7 +342,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
       // Conf: obs.cnt_thresh
       ocnt_ta = odict->lookup_thresh_array(conf_key_cnt_thresh);
-   
+
       // Conf: cnt_logic
       cnt_logic = check_setlogic(
                      int_to_setlogic(i_fdict.lookup_int(conf_key_cnt_logic)),
@@ -358,7 +359,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       while(ocnt_ta.n_elements() < n) ocnt_ta.add(na_str);
 
    } // end if continuous
-   
+
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);
 
@@ -388,7 +389,7 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    // Initialize the mask to all points on
    mask_dp.set_size(grid.nx(), grid.ny());
    mask_dp.set_constant(mask_on_value);
-   
+
    // Conf: mask.grid
    mask_grid_file = conf.lookup_string(conf_key_mask_grid);
 
