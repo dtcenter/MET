@@ -404,11 +404,12 @@ LevelType VarInfoGrib2::g2_lty_to_level_type(int lt) {
 
    //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
    switch( lt ){
-      case 8:
+      case   8:
          return LevelType_Accum;
       case 100:
       case 108:
          return LevelType_Pres;
+      case   1:
       case 102:
       case 103:
          return LevelType_Vert;
