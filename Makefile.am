@@ -44,8 +44,8 @@ dist-hook:
 	-rm -rf `find ${distdir} -name "*.ll"`
 	-rm -rf `find ${distdir} -name "*.yy"`
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
-	-rm -rf internal_tests
-	-rm -rf src/tool/dev_utils
+	-rm -rf ${distdir}/internal_tests
+	-rm -rf ${distdir}/src/tool/dev_utils
 
 # Run the non-standard test suite
 
