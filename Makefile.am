@@ -20,9 +20,9 @@ ACLOCAL_AMFLAGS		= -I m4
 
 SUBDIRS 		= data src
 
-#if IS_MET_DEVELOPMENT
+if ENABLE_DEVELOPMENT
   SUBDIRS += internal_tests
-#endif
+endif
 
 MAINTAINERCLEANFILES 	= \
 	Makefile.in \
@@ -30,11 +30,22 @@ MAINTAINERCLEANFILES 	= \
 	configure \
 	config.h.in
 
-# Remove an SVN files from the distribution
+# Cleanup for the distribution
+#   - Remove any SVN files
+#   - Remove the lyx documentation source files
+#   - Remove lex/yacc source files
+#   - Run the check for copyright utility
+#   - Remove the internal_tests directory
+#   - Remove the dev_utils directory
 
 dist-hook:
 	-rm -rf `find ${distdir} -name .svn`
+	-rm -rf `find ${distdir} -name "*.lyx"`
+	-rm -rf `find ${distdir} -name "*.ll"`
+	-rm -rf `find ${distdir} -name "*.yy"`
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
+	-rm -rf internal_tests
+	-rm -rf src/tool/dev_utils
 
 # Run the non-standard test suite
 
