@@ -404,17 +404,25 @@ LevelType VarInfoGrib2::g2_lty_to_level_type(int lt) {
 
    //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
    switch( lt ){
-      case   8:
+      case   8: // Nominal Top of the Atmosphere
          return LevelType_Accum;
-      case 100:
-      case 108:
+         break;
+
+      case 100: // Isobaric Surface
+      case 108: // Level at Specified Pressure Difference from Ground to Level
          return LevelType_Pres;
-      case   1:
-      case 102:
-      case 103:
+         break;
+
+      case   1: // Ground or Water Surface
+      case 101: // Mean Sea Level
+      case 102: // Specific Altitude Above Mean Sea Level
+      case 103: // Specified Height Level Above Ground
          return LevelType_Vert;
+         break;
+
       default:
          return LevelType_None;
+         break;
    }
 }
 
