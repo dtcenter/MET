@@ -27,7 +27,7 @@ if (test -n "$MET_NETCDFLIB" && test -z "$MET_NETCDFINC") || \
   else
     AC_MSG_ERROR([MET_NETCDFINC environment variable set, but MET_NETCDFLIB not set.  If one of these variables is set, then both must be set.])
   fi
-fi 
+fi
 
 # If the individual locations weren't specified, then the main NetCDF directory
 # must be specified.  If it isn't, let the user know they need to supply one.
@@ -58,7 +58,7 @@ fi
 #
 ## Still empty? Check for installed flaim tool kit.
 #if test -z "$FTKLIB"; then
-#  AC_CHECK_LIB([flaimtk], [ftkFastChecksum], 
+#  AC_CHECK_LIB([flaimtk], [ftkFastChecksum],
 #    [AC_CHECK_HEADERS([flaimtk.h])
 #     LIBS="-lflaimtk $LIBS"],
 #    [AC_MSG_ERROR([No FLAIM Took Kit found.])])
@@ -91,7 +91,7 @@ if (test -n "$MET_GRIB2CLIB" && test -z "$MET_GRIB2CINC") || \
   else
     AC_MSG_ERROR([MET_GRIB2CINC environment variable set, but MET_GRIB2CLIB not set.  If one of these variables is set, then both must be set.])
   fi
-fi 
+fi
 
 # If the individual locations weren't specified, then the main Grib2c directory
 # must be specified.  If it isn't, let the user know they need to supply one.
@@ -128,7 +128,7 @@ if (test -n "$MET_GSLLIB" && test -z "$MET_GSLINC") || \
   else
     AC_MSG_ERROR([MET_GSLINC environment variable set, but MET_GSLLIB not set.  If one of these variables is set, then both must be set.])
   fi
-fi 
+fi
 
 # If the individual locations weren't specified, then the main Gsl directory
 # must be specified.  If it isn't, let the user know they need to supply one.
@@ -188,7 +188,7 @@ if (test -n "$MET_HDFLIB" && test -z "$MET_HDFINC") || \
   else
     AC_MSG_ERROR([MET_HDFINC environment variable set, but MET_HDFLIB not set.  If one of these variables is set, then both must be set.])
   fi
-fi 
+fi
 
 # If the individual locations weren't specified, then the main Hdf directory
 # must be specified.  If it isn't, let the user know they need to supply one.
@@ -225,7 +225,7 @@ if (test -n "$MET_HDFEOSLIB" && test -z "$MET_HDFEOSINC") || \
   else
     AC_MSG_ERROR([MET_HDFEOSINC environment variable set, but MET_HDFEOSLIB not set.  If one of these variables is set, then both must be set.])
   fi
-fi 
+fi
 
 # If the individual locations weren't specified, then the main Hdfeos directory
 # must be specified.  If it isn't, let the user know they need to supply one.
@@ -262,7 +262,7 @@ if (test -n "$MET_CAIROLIB" && test -z "$MET_CAIROINC") || \
   else
     AC_MSG_ERROR([MET_CAIROINC environment variable set, but MET_CAIROLIB not set.  If one of these variables is set, then both must be set.])
   fi
-fi 
+fi
 
 # If the individual locations weren't specified, then the main Cairo directory
 # must be specified.  If it isn't, let the user know they need to supply one.
@@ -299,7 +299,7 @@ if (test -n "$MET_FREETYPELIB" && test -z "$MET_FREETYPEINC") || \
   else
     AC_MSG_ERROR([MET_FREETYPEINC environment variable set, but MET_FREETYPELIB not set.  If one of these variables is set, then both must be set.])
   fi
-fi 
+fi
 
 # If the individual locations weren't specified, then the main Freetype directory
 # must be specified.  If it isn't, let the user know they need to supply one.
@@ -1026,14 +1026,13 @@ AC_CONFIG_FILES([Makefile
                  src/tools/core/series_analysis/Makefile
                  src/tools/core/stat_analysis/Makefile
                  src/tools/core/wavelet_stat/Makefile
-                 src/tools/dev_utils/Makefile
                  src/tools/other/Makefile
                  src/tools/other/ascii2nc/Makefile
                  src/tools/other/gen_vx_mask/Makefile
                  src/tools/other/madis2nc/Makefile
                  src/tools/other/mode_graphics/Makefile
                  src/tools/other/modis_regrid/Makefile
-                 src/tools/other/pb2nc/Makefile 
+                 src/tools/other/pb2nc/Makefile
                  src/tools/other/plot_data_plane/Makefile
                  src/tools/other/plot_point_obs/Makefile
                  src/tools/other/wwmca_tool/Makefile
@@ -1045,24 +1044,21 @@ AC_CONFIG_FILES([Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
                  src/tools/tc_utils/tc_stat/Makefile])
 
-
-#AM_CONDITIONAL([IS_MET_DEVELOPMENT], [test -n "$MET_DEVELOPMENT"])
-#AM_COND_IF([IS_MET_DEVELOPMENT],
-#           [AC_CONFIG_FILES([internal_tests/Makefile
-AC_CONFIG_FILES([internal_tests/Makefile
-                    internal_tests/basic/Makefile
-                    internal_tests/basic/vx_config/Makefile
-                    internal_tests/basic/vx_log/Makefile
-                    internal_tests/basic/vx_util/Makefile
-                    internal_tests/libcode/Makefile
-                    internal_tests/libcode/vx_data2d/Makefile
-                    internal_tests/libcode/vx_data2d_factory/Makefile
-                    internal_tests/libcode/vx_data2d_grib/Makefile
-                    internal_tests/libcode/vx_data2d_nc_met/Makefile
-                    internal_tests/libcode/vx_data2d_nccf/Makefile
-                    internal_tests/libcode/vx_geodesy/Makefile
-                    internal_tests/libcode/vx_plot_util/Makefile
-                    internal_tests/libcode/vx_ps/Makefile
-                    internal_tests/libcode/vx_tc_util/Makefile])
+AC_CONFIG_FILES([src/tools/dev_utils/Makefile
+                 internal_tests/Makefile
+                 internal_tests/basic/Makefile
+                 internal_tests/basic/vx_config/Makefile
+                 internal_tests/basic/vx_log/Makefile
+                 internal_tests/basic/vx_util/Makefile
+                 internal_tests/libcode/Makefile
+                 internal_tests/libcode/vx_data2d/Makefile
+                 internal_tests/libcode/vx_data2d_factory/Makefile
+                 internal_tests/libcode/vx_data2d_grib/Makefile
+                 internal_tests/libcode/vx_data2d_nc_met/Makefile
+                 internal_tests/libcode/vx_data2d_nccf/Makefile
+                 internal_tests/libcode/vx_geodesy/Makefile
+                 internal_tests/libcode/vx_plot_util/Makefile
+                 internal_tests/libcode/vx_ps/Makefile
+                 internal_tests/libcode/vx_tc_util/Makefile])
 
 AC_OUTPUT
