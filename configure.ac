@@ -1044,21 +1044,23 @@ AC_CONFIG_FILES([Makefile
                  src/tools/tc_utils/tc_pairs/Makefile
                  src/tools/tc_utils/tc_stat/Makefile])
 
-AC_CONFIG_FILES([src/tools/dev_utils/Makefile
-                 internal_tests/Makefile
-                 internal_tests/basic/Makefile
-                 internal_tests/basic/vx_config/Makefile
-                 internal_tests/basic/vx_log/Makefile
-                 internal_tests/basic/vx_util/Makefile
-                 internal_tests/libcode/Makefile
-                 internal_tests/libcode/vx_data2d/Makefile
-                 internal_tests/libcode/vx_data2d_factory/Makefile
-                 internal_tests/libcode/vx_data2d_grib/Makefile
-                 internal_tests/libcode/vx_data2d_nc_met/Makefile
-                 internal_tests/libcode/vx_data2d_nccf/Makefile
-                 internal_tests/libcode/vx_geodesy/Makefile
-                 internal_tests/libcode/vx_plot_util/Makefile
-                 internal_tests/libcode/vx_ps/Makefile
-                 internal_tests/libcode/vx_tc_util/Makefile])
+if test -n "$MET_DEVELOPMENT"; then
+   AC_CONFIG_FILES([src/tools/dev_utils/Makefile
+                    internal_tests/Makefile
+                    internal_tests/basic/Makefile
+                    internal_tests/basic/vx_config/Makefile
+                    internal_tests/basic/vx_log/Makefile
+                    internal_tests/basic/vx_util/Makefile
+                    internal_tests/libcode/Makefile
+                    internal_tests/libcode/vx_data2d/Makefile
+                    internal_tests/libcode/vx_data2d_factory/Makefile
+                    internal_tests/libcode/vx_data2d_grib/Makefile
+                    internal_tests/libcode/vx_data2d_nc_met/Makefile
+                    internal_tests/libcode/vx_data2d_nccf/Makefile
+                    internal_tests/libcode/vx_geodesy/Makefile
+                    internal_tests/libcode/vx_plot_util/Makefile
+                    internal_tests/libcode/vx_ps/Makefile
+                    internal_tests/libcode/vx_tc_util/Makefile])
+fi
 
 AC_OUTPUT
