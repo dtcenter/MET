@@ -76,6 +76,12 @@ if ( (strcmp(s, "-0") == 0) || (strcmp(s, "+0") == 0) )  {
 if ( strchr(s, '.') == NULL )  return;
 
    //
+   //  scientific notation? ... just return
+   //
+
+if ( strchr(s, 'e') != NULL || strchr(s, 'E') != NULL )  return;
+
+   //
    //  get to work
    //
 
