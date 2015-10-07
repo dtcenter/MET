@@ -473,6 +473,15 @@ void calc_sum_plane(const int nx, const int ny,
 
 {
 
+if ( conv_radius == 0 )  {
+
+   memcpy(   sum_plane, data_plane, nx*ny*sizeof(double));
+   memcpy(ok_sum_plane,   ok_plane, nx*ny*sizeof(bool));
+
+   return;
+
+}
+
 int j, x, y, n;
 int bad_count;
 static int t_count = 0;
