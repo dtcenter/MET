@@ -140,6 +140,94 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  for single fields
+   //
+
+void do_mtd_nc_output(const MtdNcOutInfo &  nc_info,
+                      const MtdFloatFile & raw,
+                      const MtdIntFile   & obj,
+                      const MtdConfigInfo & config, 
+                      const char * output_filename)
+
+{
+
+NcFile out(output_filename, NcFile::Replace);
+
+if ( ! out.is_valid() )  {
+
+   mlog << Error << "\n\n  do_mtd_nc_output[single]() -> trouble opening output file \""
+        << output_filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+// nc_info.dump(cout);
+
+nx_dim = 0;
+ny_dim = 0;
+nt_dim = 0;
+
+   //
+   //  dimensions
+   //
+
+
+out.add_dim(nx_dim_name, raw.nx());
+out.add_dim(ny_dim_name, raw.ny());
+out.add_dim(nt_dim_name, raw.nt());
+
+nx_dim = out.get_dim(nx_dim_name);
+ny_dim = out.get_dim(ny_dim_name);
+nt_dim = out.get_dim(nt_dim_name);
+
+   //
+   //  global attributes
+   //
+
+write_netcdf_global(&out, output_filename, "MTD", config.model, config.obtype);
+
+write_nc_grid(out, raw.grid());
+
+   //
+   //  variables
+   //
+
+if ( nc_info.do_latlon )  {
+
+   do_latlon(out, raw.grid());
+
+}
+
+
+if ( nc_info.do_raw )  {
+
+   do_raw(out, raw, true);
+
+}
+
+if ( nc_info.do_object_id )  {
+
+   do_object_id (out, obj, true);
+
+}
+
+
+
+   //
+   //  done
+   //
+
+out.close();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 void do_latlon(NcFile & out, const Grid & grid)
 
