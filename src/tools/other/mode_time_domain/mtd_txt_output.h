@@ -49,6 +49,19 @@ extern void do_2d_txt_output(const SingleAtt2DArray & fcst_att,
                              const MtdConfigInfo &, 
                              const char * output_filename);
 
+   //
+   //  for single fields
+   //
+
+extern void do_2d_txt_output(const SingleAtt2DArray &, 
+                             const MtdConfigInfo &, 
+                             const char * output_filename);
+
+
+extern void do_3d_single_txt_output(const SingleAtt3DArray &, 
+                                    const MtdConfigInfo &, 
+                                    const char * output_filename);
+
 
 ////////////////////////////////////////////////////////////////////////
 

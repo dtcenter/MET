@@ -38,6 +38,17 @@ extern void do_mtd_nc_output(const MtdNcOutInfo &, const MM_Engine &,
                              const MtdConfigInfo & config, 
                              const char * output_filename);
 
+   //
+   //  for single fields
+   //
+
+
+extern void do_mtd_nc_output(const MtdNcOutInfo &,
+                             const MtdFloatFile & raw,
+                             const MtdIntFile   & obj,
+                             const MtdConfigInfo & config, 
+                             const char * output_filename);
+
 
 
 ////////////////////////////////////////////////////////////////////////

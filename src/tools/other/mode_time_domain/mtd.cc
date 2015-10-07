@@ -60,6 +60,8 @@ static ConcatString output_directory;
 static StringArray fcst_filenames;
 static StringArray  obs_filenames;
 
+static StringArray  single_filenames;
+
 static ConcatString local_config_filename;
 
 
@@ -70,6 +72,7 @@ static void usage();
 
 static void set_fcst      (const StringArray &);
 static void set_obs       (const StringArray &);
+static void set_single    (const StringArray &);
 static void set_config    (const StringArray &);
 
 static void set_verbosity (const StringArray &);
@@ -77,6 +80,10 @@ static void set_logfile   (const StringArray &);
 static void set_outdir    (const StringArray &);
 
 static StringArray parse_file_list(const StringArray &, const GrdFileType);
+
+static ConcatString make_output_prefix(const MtdConfigInfo &, unixtime start_time);
+
+static void do_single_field(MtdConfigInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,6 +101,7 @@ cline.set_usage(usage);
 
 cline.add(set_fcst,      "-fcst",   -1);
 cline.add(set_obs,       "-obs",    -1);
+cline.add(set_single,    "-single", -1);
 cline.add(set_config,    "-config",  1);
 cline.add(set_verbosity, "-v",       1);
 cline.add(set_logfile,   "-log",     1);
@@ -103,8 +111,12 @@ cline.parse();
 
 if ( cline.n() != 0 )  usage();
 
-if ( fcst_filenames.n() == 0 )  usage();
-if (  obs_filenames.n() == 0 )  usage();
+if ( single_filenames.n() == 0 )  {
+
+   if ( fcst_filenames.n() == 0 )  usage();
+   if (  obs_filenames.n() == 0 )  usage();
+
+}
 
 if ( output_directory.empty() )  output_directory = ".";
 
@@ -121,10 +133,39 @@ default_config_filename = replace_path(default_config_path);
 
 config.read_config(default_config_filename, local_config_filename);
 
+
+
    //
    //  determine the input file types
    //    - check the config file for the file_type
    //    - check the first data file
+   //
+
+
+   //
+   //  if we're doing a single field, handle this separately
+   //
+
+if ( single_filenames.n() > 0 )  {
+
+   GrdFileType stype;
+
+   stype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));   //  use the "fcst" dictionary
+
+   single_filenames = parse_file_list(single_filenames, stype);
+
+   if ( stype == FileType_None ) stype = grd_file_type(single_filenames[0]);
+
+   config.process_config(stype, stype);
+
+   do_single_field(config);
+
+   return ( 0 );
+
+}
+
+   //
+   //  parse the forecast and observation file lists
    //
 
 GrdFileType ftype, otype;
@@ -132,21 +173,15 @@ GrdFileType ftype, otype;
 ftype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
 otype = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
 
-   //
-   //  parse the forecast and observation file lists
-   //
-
 fcst_filenames = parse_file_list(fcst_filenames, ftype);
 obs_filenames  = parse_file_list(obs_filenames,  otype);
-
-   //
-   //  retrieve the gridded file types
-   //
 
 if ( ftype == FileType_None ) ftype = grd_file_type(fcst_filenames[0]);
 if ( otype == FileType_None ) otype = grd_file_type(obs_filenames[0]);
 
 config.process_config(ftype, otype);
+
+const double ti_thresh = config.total_interest_thresh;
 
 
 int j, k;
@@ -155,7 +190,6 @@ MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
 MtdIntFile fcst_obj, obs_obj;
 MM_Engine engine;
-const double ti_thresh = config.total_interest_thresh;
 
 
    //
@@ -192,18 +226,11 @@ fcst_raw.regrid(to_grid, config.regrid_info);
    //
 
 ConcatString prefix;
-int year, month, day, hour, minute, second;
-char junk[256];
+// int year, month, day, hour, minute, second;
+// char junk[256];
 
-prefix << cs_erase << default_prefix << '_';
+prefix = make_output_prefix(config, obs_raw.start_time());
 
-if ( config.output_prefix.nonempty() )  prefix << config.output_prefix << '_';
-
-unix_to_mdyhms(obs_raw.start_time(), month, day, year, hour, minute, second);
-
-snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d%02d%02dV", year, month, day, hour, minute, second);
-
-prefix << junk;
 
    //
    //  set up the total interest calculator
@@ -728,6 +755,7 @@ mlog << Error
      << "Usage: " << program_name << "\n"
      << tab << "-fcst     file1 ... file_n | file_list\n"
      << tab << "-obs      file1 ... file_n | file_list\n"
+     << tab << "-single   file1 ... file_n | file_list\n"
      << tab << "-config   config_file\n"
      << tab << "[ -log    file ]\n"
      << tab << "[ -v      level ]\n"
@@ -764,6 +792,20 @@ void set_obs  (const StringArray & a)
 {
 
 obs_filenames = a;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_single  (const StringArray & a)
+
+{
+
+single_filenames = a;
 
 return;
 
@@ -866,6 +908,212 @@ if(mtddf)                            list.add(a);
 else for(i=0; i<a.n_elements(); i++) list = parse_ascii_file_list(a[0]);
 
 return ( list );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString make_output_prefix(const MtdConfigInfo & config, unixtime start_time)
+
+{
+
+ConcatString prefix;
+int year, month, day, hour, minute, second;
+char junk[256];
+
+
+prefix << cs_erase << default_prefix << '_';
+
+if ( config.output_prefix.nonempty() )  prefix << config.output_prefix << '_';
+
+unix_to_mdyhms(start_time, month, day, year, hour, minute, second);
+
+snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d%02d%02dV", year, month, day, hour, minute, second);
+
+prefix << junk;
+
+
+
+return ( prefix );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_single_field(MtdConfigInfo & config)
+
+{
+
+MtdFloatFile raw, conv;
+MtdIntFile mask, obj;
+ConcatString prefix;
+ConcatString path;
+
+
+   //
+   //  read the data files
+   //
+
+mtd_read_data(config, *(config.fcst_info), single_filenames, raw);
+
+config.delta_t_seconds = raw.delta_t();
+
+   //
+   //  regrid, if necessary
+   //
+
+mlog << Debug(2) << "regridding, if needed ...\n";
+
+const Grid to_grid = parse_vx_grid(config.regrid_info, raw.grid_p(), raw.grid_p());
+
+raw.regrid(to_grid, config.regrid_info);
+
+   //
+   //  make the output file prefix
+   //
+
+prefix = make_output_prefix(config, raw.start_time());
+
+   //
+   //  convolve
+   //
+
+conv =  raw.convolve(config.fcst_conv_radius);
+
+   //
+   //  threshold
+   //
+
+mask = conv.threshold(config.fcst_conv_thresh);
+
+   //
+   //  number the objects
+   //
+
+obj = mask;
+
+mlog << Debug(2) << "Splitting object field\n";
+   obj.split();
+mlog << Debug(2) << "Done splitting\n";
+
+   //
+   //  toss small objects
+   //
+
+obj.toss_small_objects(config.min_volume);
+
+int j;
+SingleAtt3D att_3;
+SingleAtt3DArray single_att;
+Object select_mask;
+
+mlog << Debug(2)
+     << "Calculating 3D fcst single attributes\n";
+
+for (j=0; j<(obj.n_objects()); ++j)  {
+
+   select_mask = obj.select(j + 1);   //  1-based
+
+   att_3 = calc_3d_single_atts(select_mask, raw, config.model);
+
+   att_3.set_object_number(j + 1);   //  1-based
+
+   att_3.set_fcst();
+
+   att_3.set_simple();
+
+   single_att.add(att_3);
+
+}
+
+   //
+   //  calculate 2d attributes
+   //
+
+int t;
+SingleAtt2DArray att_2d;
+SingleAtt2D att_2;
+MtdIntFile mask_2d;
+
+
+mlog << Debug(2) << "Calculating 2D fcst attributes\n";
+
+for (j=0; j<(obj.n_objects()); ++j)  {
+
+   att_3 = single_att[j];
+
+   for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
+
+      mask_2d = obj.const_t_mask(t, j + 1);   //  1-based
+
+      att_2 = calc_2d_single_atts(mask_2d, j + 1);
+
+      att_2.set_fcst();
+
+      att_2.set_object_number(j + 1);   //  1-based
+
+      att_2.set_time_index(t);
+
+      att_2d.add(att_2);
+
+   }   //  for k
+
+}   //  for j
+
+   //
+   //  write 2d attributes for each simple object for each time slice
+   //
+
+path << cs_erase
+     << output_directory << '/'
+     << prefix << '_' << txt_2d_suffix;
+
+mlog << Debug(2)
+     << "Creating 2D constant-time slice attributes file: \""
+     << path << "\"\n";
+
+do_2d_txt_output(att_2d, config, path);
+
+   //
+   //  write simple single attributes
+   //
+
+path << cs_erase
+     << output_directory << '/'
+     << prefix << '_' << txt_3d_single_simple_suffix;
+
+mlog << Debug(2)
+     << "Creating 3D single simple attributes file: \""
+     << path << "\"\n";
+
+do_3d_single_txt_output(single_att, config, path);
+
+   //
+   //  netcdf output
+   //
+
+path << cs_erase
+     << output_directory << '/'
+     << prefix << '_' << nc_suffix;
+
+mlog << Debug(2)
+     << "Creating NetCDF file: \""
+     << path << "\"\n";
+
+
+do_mtd_nc_output(config.nc_info, raw, obj, config, path);
+
+
+
+   //
+   //  done
+   //
+
+return;
 
 }
 
