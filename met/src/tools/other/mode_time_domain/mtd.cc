@@ -154,7 +154,7 @@ MtdFloatFile fcst_raw, obs_raw;
 MtdFloatFile fcst_conv, obs_conv;
 MtdIntFile fcst_mask, obs_mask;
 MtdIntFile fcst_obj, obs_obj;
-MM_Engine e;
+MM_Engine engine;
 const double ti_thresh = config.total_interest_thresh;
 
 
@@ -209,20 +209,20 @@ prefix << junk;
    //  set up the total interest calculator
    //
 
-e.calc.add(config.space_centroid_dist_wt, config.space_centroid_dist_if, &PairAtt3D::SpaceCentroidDist);
-e.calc.add(config.time_centroid_delta_wt, config.time_centroid_delta_if, &PairAtt3D::TimeCentroidDelta);
-e.calc.add(config.speed_delta_wt,         config.speed_delta_if,         &PairAtt3D::SpeedDelta);
-e.calc.add(config.direction_diff_wt,      config.direction_diff_if,      &PairAtt3D::DirectionDifference);
-e.calc.add(config.volume_ratio_wt,        config.volume_ratio_if,        &PairAtt3D::VolumeRatio);
-e.calc.add(config.axis_angle_diff_wt,     config.axis_angle_diff_if,     &PairAtt3D::AxisDiff);
-e.calc.add(config.start_time_delta_wt,    config.start_time_delta_if,    &PairAtt3D::StartTimeDelta);
-e.calc.add(config.end_time_delta_wt,      config.end_time_delta_if,      &PairAtt3D::EndTimeDelta);
+engine.calc.add(config.space_centroid_dist_wt, config.space_centroid_dist_if, &PairAtt3D::SpaceCentroidDist);
+engine.calc.add(config.time_centroid_delta_wt, config.time_centroid_delta_if, &PairAtt3D::TimeCentroidDelta);
+engine.calc.add(config.speed_delta_wt,         config.speed_delta_if,         &PairAtt3D::SpeedDelta);
+engine.calc.add(config.direction_diff_wt,      config.direction_diff_if,      &PairAtt3D::DirectionDifference);
+engine.calc.add(config.volume_ratio_wt,        config.volume_ratio_if,        &PairAtt3D::VolumeRatio);
+engine.calc.add(config.axis_angle_diff_wt,     config.axis_angle_diff_if,     &PairAtt3D::AxisDiff);
+engine.calc.add(config.start_time_delta_wt,    config.start_time_delta_if,    &PairAtt3D::StartTimeDelta);
+engine.calc.add(config.end_time_delta_wt,      config.end_time_delta_if,      &PairAtt3D::EndTimeDelta);
 
    //
    //  make sure that not all of the weights are zero
    //
 
-e.calc.check();
+engine.calc.check();
 
    //
    //  convolve
@@ -259,11 +259,14 @@ mlog << Debug(2) << "Done splitting obs\n";
 fcst_obj.toss_small_objects(config.min_volume);
  obs_obj.toss_small_objects(config.min_volume);
 
+const bool have_pairs =    (fcst_obj.n_objects() != 0)
+                        && ( obs_obj.n_objects() != 0);
+
    //
    //  set up the match/merge engine
    //
 
-e.set_size(fcst_obj.n_objects(), obs_obj.n_objects());
+if ( have_pairs )  engine.set_size(fcst_obj.n_objects(), obs_obj.n_objects());
 
    //
    //  get single attributes
@@ -323,34 +326,38 @@ PairAtt3DArray pa_simple;
 PairAtt3D p;
 MtdIntFile fo, oo;
 
-// mlog << Debug(5) << "\n\n  Calculating pair attributes ... (Nf = "
-//      << (fcst_obj.n_objects()) << ", No = "
-//      << (obs_obj.n_objects())  << ")\n\n";
+if ( have_pairs )  {
 
-for (j=0; j<(fcst_obj.n_objects()); ++j)  {
+   // mlog << Debug(5) << "\n\n  Calculating pair attributes ... (Nf = "
+   //      << (fcst_obj.n_objects()) << ", No = "
+   //      << (obs_obj.n_objects())  << ")\n\n";
 
-   fo = fcst_obj.select(j + 1);
+   for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
-   for (k=0; k<(obs_obj.n_objects()); ++k)  {
+      fo = fcst_obj.select(j + 1);
 
-      oo = obs_obj.select(k + 1);
+      for (k=0; k<(obs_obj.n_objects()); ++k)  {
 
-      p = calc_3d_pair_atts(fo, oo, fcst_single_att[j], obs_single_att[k]);
+         oo = obs_obj.select(k + 1);
 
-      p.set_total_interest(e.calc(p));
+         p = calc_3d_pair_atts(fo, oo, fcst_single_att[j], obs_single_att[k]);
 
-      p.set_simple();
+         p.set_total_interest(engine.calc(p));
 
-      // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
-      //      << p.total_interest() << '\n';
+         p.set_simple();
 
-      pa_simple.add(p);
+         // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
+         //      << p.total_interest() << '\n';
+
+         pa_simple.add(p);
+
+      }
+
+      // cout.put('\n');
 
    }
 
-   // cout.put('\n');
-
-}
+}   //  if have_pairs
 
 
 
@@ -421,49 +428,52 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
    //  create graph
    //
 
-for (j=0; j<(pa_simple.n()); ++j)  {
-
-   if ( pa_simple.total_interest(j) < ti_thresh )  continue;
-
-   e.graph.set_fo_edge(pa_simple.fcst_obj_number(j) - 1, pa_simple.obs_obj_number(j) - 1);
-
-}   //  for j
-
-e.graph.dump_as_table(6);
-
-e.do_match_merge();
-
-e.partition_dump(6);
-
-
 IntArray a;
-const int n_clusters = e.n_composites();
+int n_clusters = 0;
 
-// mlog << Debug(2) << "N clusters = " << n_clusters << '\n';
+if ( have_pairs )  {
 
-if ( mlog.verbosity_level() > 5 )  {
+   for (j=0; j<(pa_simple.n()); ++j)  {
 
-   for (j=0; j<n_clusters; ++j)  {
+      if ( pa_simple.total_interest(j) < ti_thresh )  continue;
 
-      // mlog << Debug(5) << "Fcst objects in composite " << j << ":  ";
+      engine.graph.set_fo_edge(pa_simple.fcst_obj_number(j) - 1, pa_simple.obs_obj_number(j) - 1);
 
-      a = e.fcst_composite(j);
+   }   //  for j
 
-      // a.dump_one_line(cout);
+   engine.graph.dump_as_table(6);
 
-      // mlog << Debug(5) << "Obs  objects in composite " << j << ":  ";
+   engine.do_match_merge();
 
-      a = e.obs_composite(j);
+   engine.partition_dump(6);
 
-      // a.dump_one_line(cout);
+   // mlog << Debug(2) << "N clusters = " << n_clusters << '\n';
 
-      // mlog << Debug(5) << '\n';
+   if ( mlog.verbosity_level() > 5 )  {
 
-   }
+      for (j=0; j<n_clusters; ++j)  {
 
-}   //  if
+         // mlog << Debug(5) << "Fcst objects in composite " << j << ":  ";
 
-// mlog << Debug(2) << "N composites = " << e.n_composites() << "\n";
+         a = engine.fcst_composite(j);
+
+         // a.dump_one_line(cout);
+
+         // mlog << Debug(5) << "Obs  objects in composite " << j << ":  ";
+
+         a = engine.obs_composite(j);
+
+         // a.dump_one_line(cout);
+
+         // mlog << Debug(5) << '\n';
+
+      }
+
+   }   //  if
+
+   // mlog << Debug(2) << "N composites = " << e.n_composites() << "\n";
+
+}   //  if have_pairs
 
    //
    //  get single cluster attributes
@@ -471,58 +481,61 @@ if ( mlog.verbosity_level() > 5 )  {
 
 SingleAtt3DArray fcst_cluster_att, obs_cluster_att;
 
+if ( have_pairs )  {
 
-mlog << Debug(2)
-     << "Calculating 3D fcst cluster attributes\n";
+   mlog << Debug(2)
+        << "Calculating 3D fcst cluster attributes\n";
 
-for (j=0; j<n_clusters; ++j)  {
+   for (j=0; j<n_clusters; ++j)  {
 
-   a = e.fcst_composite(j);   //  0-based
+      a = engine.fcst_composite(j);   //  0-based
 
-   a.increment(1);
+      a.increment(1);
 
-   mask = fcst_obj.select(a);   //  1-based
+      mask = fcst_obj.select(a);   //  1-based
 
-   att_3 = calc_3d_single_atts(mask, fcst_raw, config.model);
+      att_3 = calc_3d_single_atts(mask, fcst_raw, config.model);
 
-   att_3.set_object_number(j + 1);   //  1-based
+      att_3.set_object_number(j + 1);   //  1-based
 
-   att_3.set_fcst();
+      att_3.set_fcst();
 
-   att_3.set_cluster();
+      att_3.set_cluster();
 
-   fcst_cluster_att.add(att_3);
+      fcst_cluster_att.add(att_3);
 
-}
+   }
 
-// if ( mlog.verbosity_level() > 5 )  fcst_cluster_att.dump(cout);
+   // if ( mlog.verbosity_level() > 5 )  fcst_cluster_att.dump(cout);
 
-mlog << Debug(2)
-     << "Calculating 3D obs cluster attributes\n";
+   mlog << Debug(2)
+        << "Calculating 3D obs cluster attributes\n";
 
-for (j=0; j<n_clusters; ++j)  {
+   for (j=0; j<n_clusters; ++j)  {
 
-   a = e.obs_composite(j);   //  0-based
+      a = engine.obs_composite(j);   //  0-based
 
-   a.increment(1);
+      a.increment(1);
 
-   mask = obs_obj.select(a);   //  1-based
+      mask = obs_obj.select(a);   //  1-based
 
-   att_3 = calc_3d_single_atts(mask, obs_raw, config.model);
+      att_3 = calc_3d_single_atts(mask, obs_raw, config.model);
 
-   // if ( att.Xvelocity > 20.0 )  mask.write("w.nc");
+      // if ( att.Xvelocity > 20.0 )  mask.write("w.nc");
 
-   att_3.set_object_number(j + 1);   //  1-based
+      att_3.set_object_number(j + 1);   //  1-based
 
-   att_3.set_obs();
+      att_3.set_obs();
 
-   att_3.set_cluster();
+      att_3.set_cluster();
 
-   obs_cluster_att.add(att_3);
+      obs_cluster_att.add(att_3);
 
-}
+   }
 
-// obs_cluster_att.dump(cout);
+   // obs_cluster_att.dump(cout);
+
+}   //  if have_pairs
 
    //
    //  get cluster pair attributes
@@ -531,58 +544,66 @@ for (j=0; j<n_clusters; ++j)  {
 PairAtt3DArray pa_cluster;
 IntArray b;
 
-mlog << Debug(2)
-     << "Calculating 3D cluster pair attributes\n";
+if ( have_pairs )  {
 
-for (j=0; j<n_clusters; ++j)  {
+   mlog << Debug(2)
+        << "Calculating 3D cluster pair attributes\n";
 
-   a = e.fcst_composite(j);   //  0-based
+   for (j=0; j<n_clusters; ++j)  {
 
-   a.increment(1);
+      a = engine.fcst_composite(j);   //  0-based
 
-   fo = fcst_obj.select(a);   //  1-based
+      a.increment(1);
 
-   for (k=0; k<n_clusters; ++k)  {
+      fo = fcst_obj.select(a);   //  1-based
 
-      b = e.obs_composite(k);   //  0-based
+      for (k=0; k<n_clusters; ++k)  {
 
-      b.increment(1);
+         b = engine.obs_composite(k);   //  0-based
 
-      oo = obs_obj.select(b);   //  1-based
+         b.increment(1);
 
-      p = calc_3d_pair_atts(fo, oo, fcst_cluster_att[j], obs_cluster_att[k]);
+         oo = obs_obj.select(b);   //  1-based
 
-      p.set_cluster();
+         p = calc_3d_pair_atts(fo, oo, fcst_cluster_att[j], obs_cluster_att[k]);
 
-      // p.set_total_interest(e.calc(p));
-      p.set_total_interest(-1.0);
+         p.set_cluster();
 
-      // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
-      //      << p.total_interest() << '\n';
+         // p.set_total_interest(e.calc(p));
+         p.set_total_interest(-1.0);
 
-      pa_cluster.add(p);
+         // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
+         //      << p.total_interest() << '\n';
+
+         pa_cluster.add(p);
+
+      }
+
+      // cout.put('\n');
 
    }
 
-   // cout.put('\n');
-
-}
+}   //  if have_pairs
 
    //
    //  patch the cluster ids
    //
 
-fcst_single_att.patch_cluster_numbers(e);
- obs_single_att.patch_cluster_numbers(e);
+if ( have_pairs )  {
 
-fcst_cluster_att.patch_cluster_numbers(e);
- obs_cluster_att.patch_cluster_numbers(e);
+   fcst_single_att.patch_cluster_numbers(engine);
+    obs_single_att.patch_cluster_numbers(engine);
 
-fcst_att_2d.patch_cluster_numbers(e);
- obs_att_2d.patch_cluster_numbers(e);
+   fcst_cluster_att.patch_cluster_numbers(engine);
+    obs_cluster_att.patch_cluster_numbers(engine);
 
-pa_simple.patch_cluster_numbers(e);
-pa_cluster.patch_cluster_numbers(e);
+   fcst_att_2d.patch_cluster_numbers(engine);
+    obs_att_2d.patch_cluster_numbers(engine);
+
+   pa_simple.patch_cluster_numbers(engine);
+   pa_cluster.patch_cluster_numbers(engine);
+
+}
 
    //
    //  write 2d attributes for each simple object for each time slice
@@ -616,43 +637,55 @@ do_3d_single_txt_output(fcst_single_att, obs_single_att, config, path);
    //  write simple pair attributes
    //
 
-path << cs_erase
-     << output_directory << '/'
-     << prefix << '_' << txt_3d_pair_simple_suffix;
+if ( have_pairs )  {
 
-mlog << Debug(2)
-     << "Creating 3D pair simple attributes file: \""
-     << path << "\"\n";
+   path << cs_erase
+        << output_directory << '/'
+        << prefix << '_' << txt_3d_pair_simple_suffix;
 
-do_3d_pair_txt_output(pa_simple, config, path);
+   mlog << Debug(2)
+        << "Creating 3D pair simple attributes file: \""
+        << path << "\"\n";
+
+   do_3d_pair_txt_output(pa_simple, config, path);
+
+}
 
    //
    //  write cluster single attributes
    //
 
-path << cs_erase
-     << output_directory << '/'
-     << prefix << '_' << txt_3d_single_cluster_suffix;
+if ( have_pairs )  {
 
-mlog << Debug(2)
-     << "Creating 3D cluster single attributes file: \""
-     << path << "\"\n";
+   path << cs_erase
+        << output_directory << '/'
+        << prefix << '_' << txt_3d_single_cluster_suffix;
 
-do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
+   mlog << Debug(2)
+        << "Creating 3D cluster single attributes file: \""
+        << path << "\"\n";
+
+   do_3d_single_txt_output(fcst_cluster_att, obs_cluster_att, config, path);
+
+}
 
    //
    //  write cluster pair attributes
    //
 
-path << cs_erase
-     << output_directory << '/'
-     << prefix << '_' << txt_3d_pair_cluster_suffix;
+if ( have_pairs )  {
 
-mlog << Debug(2)
-     << "Creating 3D cluster pair attributes file: \""
-     << path << "\"\n";
+   path << cs_erase
+        << output_directory << '/'
+        << prefix << '_' << txt_3d_pair_cluster_suffix;
 
-do_3d_pair_txt_output(pa_cluster, config, path);
+   mlog << Debug(2)
+        << "Creating 3D cluster pair attributes file: \""
+        << path << "\"\n";
+
+   do_3d_pair_txt_output(pa_cluster, config, path);
+
+}
 
    //
    //  netcdf output
@@ -667,7 +700,7 @@ mlog << Debug(2)
      << path << "\"\n";
 
 
-do_mtd_nc_output(config.nc_info, e, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
+do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, config, path);
 
 
    //
