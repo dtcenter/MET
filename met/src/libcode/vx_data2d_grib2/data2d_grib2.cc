@@ -318,7 +318,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                                             vector<Grib2Record*> &listMatchExact,
                                             vector<Grib2Record*> &listMatchRange
                                           ){
-   
+
    //  clear the contents of the result vectors
    listMatchExact.clear();
    listMatchRange.clear();
@@ -336,9 +336,9 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       bool rec_match_ex = false;
       bool rec_match_rn = false;
 
-      double rec_lvl1 = (double)((*it)->LvlVal1);
-      double rec_lvl2 = (double)((*it)->LvlVal2);
-   
+      double rec_lvl1 = min((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
+      double rec_lvl2 = max((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
+
       //  test the timing information
       if( (!is_bad_data(vinfo->lead())  && vinfo->lead()  != (*it)->LeadTime)  ||
           (vinfo->valid()               && vinfo->valid() != (*it)->ValidTime) ||
@@ -366,10 +366,10 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
          //  generic level type
          else if( LevelType_None == vinfo_lty ){
-            rec_match_ex = ( is_eq(lvl1, rec_lvl1) ) && ( is_eq(lvl1, lvl2) || is_eq(lvl2, rec_lvl2) );
+            rec_match_ex = ( is_eq(lvl1, rec_lvl1) && is_eq(lvl2, rec_lvl2) );
             rec_match_rn = ( !is_eq(lvl1, lvl2) && lvl1 <= rec_lvl1 && lvl2 >= rec_lvl2 );
          }
-         
+
          //  accumulation level type
          else if( LevelType_Accum == vinfo_lty ){
             rec_match_ex = ( is_eq(lvl1, (*it)->Accum) );
@@ -381,7 +381,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                rec_lvl1 /= 100;
                rec_lvl2 /= 100;
             }
-            rec_match_ex = ( is_eq(lvl1, rec_lvl1) ) && ( is_eq(lvl1, lvl2) || is_eq(lvl2, rec_lvl2) );
+            rec_match_ex = ( is_eq(lvl1, rec_lvl1) && is_eq(lvl2, rec_lvl2) );
             rec_match_rn = ( !is_eq(lvl1, lvl2) && lvl1 <= rec_lvl1 && lvl2 >= rec_lvl2 );
          }  //  END: if( level match )
 
@@ -747,7 +747,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       mlog << Debug(4)
            << "Switching the GRIB2 radius of the earth value of "
            << r_km << " km to " << grib_earth_radius_km
-           << " km for internal consistency.\n";       
+           << " km for internal consistency.\n";
       r_km = grib_earth_radius_km;
    }
 
@@ -774,7 +774,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
                 - ((double)gfld->igdtmpl[14] / 1000000.0));
          data.delta_lat = d/(data.Nlat);
       }
-      
+
       //  longitudinal increment.  If not given, compute from lon1 and lon2
       if( ResCompFlag & 32 ) {
          data.delta_lon = (double)gfld->igdtmpl[16] / 1000000.0;
