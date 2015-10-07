@@ -43,7 +43,7 @@ static void do_cluster_id (NcFile & out, const MtdIntFile   &  id, const bool is
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_mtd_nc_output(const MtdNcOutInfo &  nc_info, const MM_Engine    & e, 
+void do_mtd_nc_output(const MtdNcOutInfo &  nc_info, const MM_Engine    & engine, 
                       const MtdFloatFile & fcst_raw, const MtdFloatFile & obs_raw,
                       const MtdIntFile   & fcst_obj, const MtdIntFile   & obs_obj,
                       const MtdConfigInfo & config, 
@@ -61,6 +61,9 @@ if ( ! out.is_valid() )  {
    exit ( 1 );
 
 }
+
+const bool have_pairs =    (fcst_obj.n_objects() != 0)
+                        && ( obs_obj.n_objects() != 0);
 
 // nc_info.dump(cout);
 
@@ -115,10 +118,10 @@ if ( nc_info.do_object_id )  {
 }
 
 
-if ( nc_info.do_cluster_id )  {
+if ( have_pairs && (nc_info.do_cluster_id) )  {
 
-   do_cluster_id (out, fcst_obj, true,  e);
-   do_cluster_id (out,  obs_obj, false, e);
+   do_cluster_id (out, fcst_obj, true,  engine);
+   do_cluster_id (out,  obs_obj, false, engine);
 
 }
 
