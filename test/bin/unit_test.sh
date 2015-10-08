@@ -51,7 +51,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_mode_graphics.xml \
           unit_regrid.xml \
           unit_gsi_tools.xml \
-          unit_aeronet.xml"
+          unit_aeronet.xml \
+          unit_shift_data_plane"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
@@ -71,7 +72,7 @@ for CUR_XML in ${UNIT_XML}; do
     echo
     exit 1
   fi
-  
+
 done
 
 # Success if we reach here
