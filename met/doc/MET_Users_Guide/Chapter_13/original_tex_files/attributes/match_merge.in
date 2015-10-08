@@ -1,0 +1,184 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\SubSection{Matching \& Merging}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include "basic_graph.gin"
+#include "node_colors.gin"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Matching and merging operations in MTD are done in a 
+simpler fashion
+than in MODE.  In order to understand this operation, it
+is necessary to discuss some very basic notions of 
+graph theory.
+
+\par
+
+A {\bf graph} is a finite set of {\bf vertices}
+(also called {\bf nodes})
+and {\bf edges}, with each edge connecting two
+vertices.  Conceptually, it is enough for our
+purposes to think of vertices as points and edges as
+lines connecting them.  See
+illust_number(basic_graph_fig) for an illustration.
+In the figure we see a collection of \Nbasic\ nodes, 
+indicated by the small circles, together with some 
+edges indicated by straight line segments.
+A {\bf path} is a sequence of vertices 
+$(v_1, v_2, \ldots, v_n)$
+such that for each $1 \leq i < n$ there is an edge 
+connecting $v_i$ to $v_{i + 1}$.
+For example, in 
+illust_number(basic_graph_fig), there is no edge connecting
+vertices \#6 and \#7, but there is a path connecting them.
+In illustrations, graph vertices are often labelled with
+identifying information, such as the numbers in
+illust_number(basic_graph_fig).
+
+\par
+
+If we consider two distinct nodes in a graph to 
+be related if there
+is a path connecting them, then it's easy to see that
+this defines an equivalence
+relation on the set of nodes, partitioning the graph into
+equivalence classes.
+Any node, such as \#10 in 
+illust_number(basic_graph_fig), 
+that has no edges emanating from it 
+is in a class by itself.
+
+//////////////////////////////
+illust_insert(basic_graph_fig)
+//////////////////////////////
+
+
+\par
+
+We have barely scratched the surface of the enormous subject
+of graph theory, but this will suffice for our purposes.
+How does MTD use graphs?  Essentially the simple forecast
+and observed objects become nodes in a graph.  Each pair
+of objects that have sufficiently high total interest
+(as determined by the fuzzy logic engine) generates
+an edge connecting the two corresponding nodes in the
+graph.  The graph is then partitioned into equivalence
+classes using path connectivity (as explained above), 
+and the resulting equivalence classes determine the 
+matches and merges.
+
+\par
+
+An example will hopefully make this clear.  In
+parts (a) and (b) of 
+illust_number(2d_example_fig)
+we indicate the objects in the forecast and observed
+field for this simple example.  We have used 2D
+rather than 3D objects in this example for simplicity.
+Also, to help distinguish the objects in each field, 
+the forecast objects are labelled by numbers and the
+observed object by letters.
+Each forecast and each observed object become nodes
+in a graph as indicated in part (c) of the figure.
+
+\par
+
+For the purposes of this example, suppose that the 
+MTD fuzzy engine reports that observed simple object B
+and forecast simple object 4 together have a total interest
+higher than the total interest threshold specified
+in the config file.  Also, observed simple object C and
+forecast simple object 4 have high enough interest to pass
+the threshold.
+Furthermore, forecast simple objects 2 and 3 both have 
+sufficiently high interest when paired with 
+observed simple object A.
+
+\par
+
+These four parings result in the 4 edges in the graph
+shown by the solid lines in part (c) of the figure.
+Partitioning this graph into equivalence classes results
+in the three sets indicated in part (d) of the figure.
+These three sets are the cluster objects determined
+by MTD.
+In this example, forecast objects 2 and 3 are merged
+into forecast cluster object \#1 which is matched to 
+observed cluster object \#1, consisting of observed 
+object A.  (As in MODE, a cluster object may contain
+multiple simple objects, but may also consist of a single 
+simple object.)  Essentially, forecast simple objects
+2 and 3 are merged because there is a path connecting
+them in the graph. This is indicated by the dashed 
+line in the graph.
+
+\par
+
+Continuing this example, forecast cluster object 
+\#2 (consisting only of forecast simple object 4)
+is matched to observed cluster object \#2 (consisting
+of observed simple objects B and C).  Again, the
+merging of observed simple objects is indicated by
+the dashed line in the graph.
+
+// \par
+
+Forecast cluster object \#3 consists solely of 
+forecast simple object 1.  
+It is not matched to any observed cluster object.
+Alternatively, one may take the viewpoint that
+forecast simple object 1 ended up not participating
+in the matching and merging process; it is not 
+merged with anything, it is not matched with anything.
+Essentially it represents a false alarm.
+
+\par
+
+To summarize: Any forecast simple objects that find
+themselves in the same equivalence class are merged.
+Similarly, any observed objects in the same class 
+are merged.  Any forecast and observed objects in
+the same class are matched.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////
+// illust_insert(graph_scan_fig)
+illust_insert(2d_example_fig)
+/////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+

@@ -1,0 +1,18 @@
+Fuzzy Logic Algorithm 
+Fuzzy Logic is system of logic in which a
+statement can be true (1), false (0), or any of the values in
+between. A fuzzy logic 
+{\italicfont algorithm}
+uses a set of weighted
+functions to produce a value between 0 and 1. In MODE, the
+functions and weights are chosen by the user. The ``interest''
+value produced by the algorithm typically compares how well
+two items correspond to each other in terms of the attributes
+used in the functions or interest maps. For example, two objects
+may correspond very well 
+(\ie,~have a total interest value close to 1)
+if their boundary distance is 0.
+// (\ie,~they overlap).
+
+\Comment{Contributed by Tressa}
+

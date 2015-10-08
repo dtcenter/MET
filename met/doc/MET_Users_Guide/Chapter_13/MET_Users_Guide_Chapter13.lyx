@@ -77,7 +77,7 @@ MODE Time Domain
 Introduction
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODE Time Domain (MTD) is an extension of the MODE object-based approach
  to verification.
  In addition to incorporating spatial information, MTD utilizes the time
@@ -90,7 +90,7 @@ MODE Time Domain (MTD) is an extension of the MODE object-based approach
 \end_layout
 
 \begin_layout Standard
-Hello.
+A plot of some MTD precipitation objects is shown
 \end_layout
 
 \end_body

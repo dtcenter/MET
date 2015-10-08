@@ -1,0 +1,12 @@
+Grid
+In MODE (and more generally in MET) 
+atmospheric grids are represented internally 
+as the composition of a basic map projection and an
+affine transformation of the $xy$ plane.
+Often it is convenient to pretend that grids
+have real-valued $x$ and $y$ coordinates, so that
+we can use $x$ and $y$ as a coordinate 
+system on that region of the Earth covered by the grid.
+However, since we only have data values
+at integer values of $x$ and $y$, for many purposes
+we regard grids merely as subsets of $\Z \times \Z$.

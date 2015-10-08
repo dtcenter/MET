@@ -1,0 +1,6 @@
+Convex
+A region in the $xy$-plane is convex if whenever
+two points are chosen in the region, the straight
+line segment joining the points lies entirely inside
+the region.
+

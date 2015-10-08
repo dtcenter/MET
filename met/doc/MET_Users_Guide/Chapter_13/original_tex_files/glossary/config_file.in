@@ -1,0 +1,4 @@
+Config File
+Short for {\italicfont configuration file}, this is an
+{\co ascii} file that MODE reads in at the beginning of each
+run to set values for all of the user-tunable parameters.

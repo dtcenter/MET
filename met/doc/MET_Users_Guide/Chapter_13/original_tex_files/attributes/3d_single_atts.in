@@ -1,0 +1,158 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\SubSection{3D Single Attributes}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include "axis_3d.gin"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#define SKIP_AMT 0.2in
+
+/*
+\newbox\itembox%
+\def\myitem#1{%
+
+   \setbox\itembox=\hbox{\boldfont #1}%
+
+   \dp\itembox=0pt%
+
+   \hbox{\vbox to \wd\itembox{\box\itembox\vskip 1pt\hrule}}%
+
+   \leavevmode%
+
+}%
+*/
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  3D centroid
+   //  vector velocity
+   //  spatial axis
+   //  "volume"
+   //  start time, end time
+   //  intensity percentiles
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MTD calculates several 3D attributes for single objects.
+The object could come from either the forecast field
+or the observed field.
+
+// \vskip SKIP_AMT
+\par
+
+A 3D spacetime {\boldfont centroid}  
+$(\overline{x}, \overline{y}, \overline{t})$
+is calculated. There are no statistical overtones here.
+The number $\overline{x}$, for example, is just the average
+value of the $x$ coordinate over the object.
+
+// \vskip SKIP_AMT
+\par
+
+The vector {\boldfont velocity} 
+$(v_x, v_y)$
+is obtained by fitting a 
+line to an 3D object.  The requirement for fitting the 
+line is to minimize the sum of the squares of the
+{\italicfont spatial} distances from each point of the
+object to the line be minimized.
+(We can't measure distances in spacetime but at each
+fixed time $t$ we can measure purely spatial distances.)
+From this velocity we get the {\boldfont speed} and
+{\boldfont direction} of movement of the object.
+// \Comment{Show velocity figure from my tutorial talks here.}
+
+///////////////////////////
+illust_insert(velocity_fig)
+///////////////////////////
+
+// \par
+
+The spatial orientation of a object (what traditional
+MODE calls the {\boldfont axis angle} of an object)
+is gotten by fitting a plane to an object.
+As with the case of velocity, our optimization criterion
+is that the sum of the squares of the 
+spatial distances from each point
+of the object to the plane be minimized.
+
+\par
+
+illust_number(axis_3d_fig) gives some idea of the
+reason for fitting a plane, rather than a line, as MODE does.
+On the left in the figure, 
+we see an object (in \ObjectColor, shaped like an ``\LetterShape'')
+at several time steps moving through the grid.
+For simplicity, the object is not rotating as it moves 
+(though of course real objects can certainly do this).
+At each time step, the 2D MODE spatial axis of the object is
+indicated by the \AxisColor\ line.
+
+In the center of the figure, we see the same thing, just with
+more time steps.  And on the right, even more time steps.
+We see that the axis lines at each time step
+sweep out a plane in three dimensions, shown in 
+\AxisColor\ on the right.
+This plane is the same one that MTD would calculate 
+for this 3D object to determine its spatial orientation, 
+\ie, axis angle.  Indeed, for the special case of an object
+that is not moving at all, the MTD calculation of 
+axis angle reduces to the same one that traditional 
+MODE uses, as it should.
+
+
+
+
+//////////////////////////
+illust_insert(axis_3d_fig)
+//////////////////////////
+
+\par
+
+A simple integer count of the number of grid squares in an object 
+for all of it's lifetime gives the {\boldfont volume} of the object.
+Remember that while we're working in three dimensions, one of
+the dimensions is non-spatial, so one should not attempt to
+convert this to a volume in, \eg, ${\hbox{km}}^3$.
+
+\par
+
+The {\boldfont start time} and {\boldfont end time} of an object
+are attributes as well.  This is an integer telling which time
+step an object starts and ends at.  These values are zero-based, so
+for example, 
+if an object comes into existence at the 
+do_ordinal(3) 
+time step and lasts until the 
+do_ordinal(9) 
+time step, then the start time 
+and end time will be listed as 2 and 8, respectively.
+Note that this object has a lifetime of 7 time steps, not 6.
+
+\par
+
+Finally, MTD calculates several 
+{\boldfont intensity percentiles} 
+of the raw data values inside each object.
+Not all of the the attributes are purely geometrical.
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+

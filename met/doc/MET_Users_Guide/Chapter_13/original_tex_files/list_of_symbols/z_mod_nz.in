@@ -1,0 +1,28 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\LosItem{$\Z/n\Z$}%
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+The set of integers modulo $n$:
+$\Z/n\Z = \left\{0, 1, 2, 3, \ldots, n - 1\right\}$.
+This is the set of all possible remainders of integers after
+division by $n$.  Addition and multiplication are defined in the
+usual way, with the proviso that multiples of $n$ are thrown away.
+For example, in $\Z/5\Z$ we have $2 + 4 = 1$ and $2 \times 4 = 3$.
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\EndLosItem
+
+
+////////////////////////////////////////////////////////////////////////
+
+

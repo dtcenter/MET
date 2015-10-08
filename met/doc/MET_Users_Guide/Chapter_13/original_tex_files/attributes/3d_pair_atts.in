@@ -1,0 +1,132 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\SubSection{3D Pair Attributes}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include "axis_diff.gin"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  space centroid dist
+   //  time centroid delta
+   //  axis diff
+   //  speed delta
+   //  direction diff
+   //  volume ratio
+   //  start time delta
+   //    end time delta
+   //  intersection volume
+   //  total interest
+   //
+
+
+The next category of spatial attributes is for pairs of 
+objects --- one of the pair coming from the collection
+of forecast objects, the other coming from the observation
+objects.
+
+\par
+
+Note: whenever a pair attribute is described below as a 
+{\italicfont delta}, that means it's a simple difference of
+two single-object attributes.  The difference is always
+taken as ``forecast minus observed.''
+
+\par
+
+The {\boldfont spatial centroid distance} is 
+the purely spatial part of the centroid separation of two
+objects.  If one centroid is at 
+$(\overline{x}_1, \overline{y}_1, \overline{t}_1)$
+and the other is at
+$(\overline{x}_2, \overline{y}_2, \overline{t}_2)$
+then the distance is calculated as
+
+$$
+
+\sqrt{
+
+   \left(\overline{x}_1 - \overline{x}_2\right)^2
+
+    +
+
+   \left(\overline{y}_1 - \overline{y}_2\right)^2
+
+}
+
+$$
+
+
+\indent 
+The {\boldfont time centroid delta} is the difference
+between the time coordinates of the centroid.  Since this
+is a simple difference, it can be either positive or negative.
+
+\par
+
+The {\boldfont axis difference} is smaller of the two angles
+that the two spatial axis planes make with each other.
+// For example, in illust_number(axis_diff_fig), the axis difference is
+// the angle $ \ADSmall $, not $ \ADLarge $.
+
+\par
+
+{\boldfont Speed delta} and
+{\boldfont direction difference} are obtained from the 
+velocity vectors of the two objects.
+Speed delta is the difference in the lengths of the vectors, 
+and direction difference is the angle that the two vectors
+make with each other.
+
+\par
+
+{\boldfont Volume ratio} is volume of the forecast 
+object divided by the volume of the observed object.
+Note that any 3D object must necessarily have a nonzero 
+volume, so there's no chance of zeros in the
+denominator.
+
+\par
+
+{\boldfont Start time delta}
+and
+{\boldfont end time delta}
+are the differences in the corresponding times associated with
+the two objects.
+
+\par
+
+{\boldfont Intersection volume} measures the overlap of two objects.
+If the two objects do not overlap, then this will be zero.
+
+\par
+
+Finally, the {\boldfont total interest} gives the result of the
+fuzzy-logic matching and merging calculation for this pair of
+objects.  Note that this is provided only for simple objects, 
+not for composites.
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////
+// illust_insert(axis_diff_fig)
+////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+

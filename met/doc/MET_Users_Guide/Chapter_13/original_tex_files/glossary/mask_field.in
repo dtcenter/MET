@@ -1,0 +1,4 @@
+Mask Field
+The field obtained by thresholding the convolved field.
+Takes the value $1$ where the convolved field meets or
+exceeds the threshold, and $0$ elsewhere.

@@ -1,0 +1,7 @@
+Centroid
+The centroid of an object is the geometric center
+of the object.  In most cases, this point can be
+thought of as the ``midpoint'' of the object, although 
+for objects with complex shapes
+or having holes, the centroid may actually lie outside 
+the object.

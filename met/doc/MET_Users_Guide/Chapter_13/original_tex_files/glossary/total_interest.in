@@ -1,0 +1,5 @@
+Total Interest
+A weighted average of interest and confidence
+maps for a given pair of objects.
+This value is thresholded to determine the matches
+and merges.

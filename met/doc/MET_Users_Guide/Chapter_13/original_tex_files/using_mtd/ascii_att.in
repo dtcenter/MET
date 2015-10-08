@@ -1,0 +1,101 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\SubSubSection{ASCII Attribute Files}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include "txt_header_table.gin"
+
+
+////////////////////////////////////////////////////////////////////////
+
+   //
+   //  3D atts for simple    single objects
+   //  3D atts for composite single objects
+   //
+   //  3D atts for simple    pair   objects
+   //  3D atts for composite pair   objects
+   //
+   //  2D atts for single simple    objects
+   //
+
+In all, five ascii output files are created:
+
+\vskip 0.1in
+
+\myitem
+Single attributes for 3D simple    objects
+
+\myitem
+Single attributes for 3D composite objects
+
+\myitem
+Pair   attributes for 3D simple    objects
+
+\myitem
+Pair   attributes for 3D composite objects
+
+\myitem
+2D spatial attributes for single simple objects
+for each time index of their existence.
+
+\vskip 0.1in
+
+\par
+
+Each ascii file is laid out in tabular format, with
+the first line consisting of text strings giving 
+names for each column.
+The first \NHeaderCols\ columns of each file are identical,
+and give information on timestamps, model names, 
+and the convolution radius and threshold used
+for the forecast and observation input data.
+
+These columns are explained in illust_number(txt_header_table).
+Each file contains additional columns that come after
+these.
+
+///////////////////////////////
+illust_insert(txt_header_table)
+///////////////////////////////
+
+\par
+
+The extra columns in the 3D single attributes text files are
+shown in illust_number(3d_single_table).
+
+
+The extra columns in the 3D pair attributes text files are
+shown in illust_number(3d_pair_table).
+
+
+The extra columns in the 2D spatial attributes text files are
+shown in illust_number(2d_table).
+
+\Comment{Expand on this later.}
+
+
+//////////////////////////////
+illust_insert(3d_single_table)
+//////////////////////////////
+
+
+//////////////////////////////
+illust_insert(3d_pair_table)
+//////////////////////////////
+
+
+///////////////////////
+illust_insert(2d_table)
+///////////////////////
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
