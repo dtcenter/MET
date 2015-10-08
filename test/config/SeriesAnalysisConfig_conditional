@@ -95,6 +95,7 @@ output_stats = {
    mcts   = [ ];
    cnt    = [ "TOTAL", "ME", "RMSE" ];
    sl1l2  = [ "FBAR", "OBAR" ];
+   sal1l2 = [ ];
    pct    = [ ];
    pstd   = [ ];
    pjc    = [ ];

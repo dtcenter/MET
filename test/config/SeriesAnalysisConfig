@@ -88,17 +88,18 @@ vld_thresh = 1.0;
 // Statistical output types
 //
 output_stats = {
-   fho    = [ ${FHO_STATS}   ];
-   ctc    = [ ${CTC_STATS}   ];
-   cts    = [ ${CTS_STATS}   ];
-   mctc   = [ ${MCTC_STATS}  ];
-   mcts   = [ ${MCTS_STATS}  ];
-   cnt    = [ ${CNT_STATS}   ];
-   sl1l2  = [ ${SL1L2_STATS} ];
-   pct    = [ ${PCT_STATS}   ];
-   pstd   = [ ${PSTD_STATS}  ];
-   pjc    = [ ${PJC_STATS}   ];
-   prc    = [ ${PRC_STATS}   ];
+   fho    = [ ${FHO_STATS}    ];
+   ctc    = [ ${CTC_STATS}    ];
+   cts    = [ ${CTS_STATS}    ];
+   mctc   = [ ${MCTC_STATS}   ];
+   mcts   = [ ${MCTS_STATS}   ];
+   cnt    = [ ${CNT_STATS}    ];
+   sl1l2  = [ ${SL1L2_STATS}  ];
+   sal1l2 = [ ${SAL1L2_STATS} ];
+   pct    = [ ${PCT_STATS}    ];
+   pstd   = [ ${PSTD_STATS}   ];
+   pjc    = [ ${PJC_STATS}    ];
+   prc    = [ ${PRC_STATS}    ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////

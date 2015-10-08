@@ -33,6 +33,7 @@
       <pair><name>MCTS_STATS</name>      <value>"ACC", "ACC_NCL", "ACC_NCU"</value></pair>
       <pair><name>CNT_STATS</name>       <value>"TOTAL", "ME", "ME_NCL", "ME_NCU"</value></pair>
       <pair><name>SL1L2_STATS</name>     <value>"FBAR", "OBAR"</value></pair>
+      <pair><name>SAL1L2_STATS</name>    <value></value></pair>
       <pair><name>PCT_STATS</name>       <value></value></pair>
       <pair><name>PSTD_STATS</name>      <value></value></pair>
       <pair><name>PJC_STATS</name>       <value></value></pair>
@@ -95,6 +96,7 @@
       <pair><name>MCTS_STATS</name>      <value></value></pair>
       <pair><name>CNT_STATS</name>       <value></value></pair>
       <pair><name>SL1L2_STATS</name>     <value></value></pair>
+      <pair><name>SAL1L2_STATS</name>    <value></value></pair>
       <pair><name>PCT_STATS</name>       <value>"OY_1", "ON_1"</value></pair>
       <pair><name>PSTD_STATS</name>      <value>"TOTAL", "ROC_AUC", "BRIER", "BRIER_NCL", "BRIER_NCU"</value></pair>
       <pair><name>PJC_STATS</name>       <value>"CALIBRATION_1", "REFINEMENT_1"</value></pair>
@@ -129,6 +131,7 @@
       <pair><name>MCTS_STATS</name>      <value></value></pair>
       <pair><name>CNT_STATS</name>       <value>"TOTAL", "FBAR", "FSTDEV", "OBAR", "OSTDEV", "PR_CORR", "RMSE", "MAE"</value></pair>
       <pair><name>SL1L2_STATS</name>     <value></value></pair>
+      <pair><name>SAL1L2_STATS</name>    <value></value></pair>
       <pair><name>PCT_STATS</name>       <value></value></pair>
       <pair><name>PSTD_STATS</name>      <value></value></pair>
       <pair><name>PJC_STATS</name>       <value></value></pair>
