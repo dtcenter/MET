@@ -1,0 +1,5 @@
+Cluster Object
+A collection of objects in one field that have been
+merged together.  Often consists of more than
+one simple object, but it's possible for a cluster
+to contain a single simple object.

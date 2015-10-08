@@ -1,0 +1,35 @@
+Convolution
+A two-dimensional smoothing operation used on input forecast
+and observation fields to reduce the effect of noise on subsequent
+steps of object identification. ``Smoother'' is a generic name for
+any of a 
+variety of techniques that can be used to either remove undesired
+high-spatial-frequency data points (\eg,~locations of rapid variation,
+such as noise contamination), or to resample dependent variable
+values to other independent variable locations using the values
+of the data at nearby points. 
+
+\Comment{Contributed by Tressa}
+
+
+
+   //
+   //  this part isn't quite right
+   //
+
+// In MODE, convolution is applied
+// via distance-weighted averaging of all points within a specified
+// radius of each target point, i.e. it is a circular weighted
+// mean smoother. The weight of each point is proportional to
+// the square of its distance from the target location.
+
+
+   //
+   //  my old definition
+   //
+
+// Essentially a smoothing operation.
+// MODE uses a convolution filter to produce
+// a weighted average of the raw field values
+// near a point.
+// \Comment{This isn't enough.}

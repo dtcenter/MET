@@ -1,0 +1,6 @@
+Weight
+A scalar value associated to a certain
+attribute that tells MODE how to gauge the
+relative importance of that attribute (as
+compared to others) in the matching and merging
+process.

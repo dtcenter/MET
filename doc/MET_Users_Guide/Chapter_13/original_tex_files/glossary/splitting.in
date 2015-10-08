@@ -1,0 +1,15 @@
+Splitting
+
+The process by which the connectedness of each (grid)point
+to other points is determined. Points that are connected form
+simple objects. Points that are not connected are contained
+within different simple objects. See 
+illust_number(splitting_fig) 
+on page~illust_page_number(splitting_fig)
+for an illustration. 
+Essentially, splitting is the process of distinguishing
+objects from one another and from the surrounding empty
+grid space.
+
+\Comment{Contributed by Tressa}
+

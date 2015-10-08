@@ -1,0 +1,51 @@
+
+
+$$
+
+\phi(x) = \cases{
+
+             \displaystyle{1 \over 2 R + 1} & if $|x| \leq R$ \cr
+
+             \na
+
+             0 & otherwise. \cr
+
+         }
+
+$$
+
+Then
+
+$$
+
+(f * \phi)(x) = \sum_{x'=-\infty}^{\infty}
+
+   f(x') \, \phi(x - x')
+
+$$
+
+We can restrict the range of summation to where $\phi$ is nonzero.
+Now
+
+$$\eqalign{
+
+\phi(x - x') \neq 0
+
+&\hskip 0.1in\hbox{iff}\hskip 0.1in  \left| x  - x'\right| \leq R\cr
+&\hskip 0.1in\hbox{iff}\hskip 0.1in  \left| x' - x \right| \leq R\cr
+&\hskip 0.1in\hbox{iff}\hskip 0.1in  -R    \leq x' - x  \leq R\cr
+&\hskip 0.1in\hbox{iff}\hskip 0.1in  x - R \leq x'     \leq x + R\cr
+
+}$$
+
+Thus
+
+$$\eqalign{
+
+(f * \phi)(x) &= \sum_{x'=x - R}^{x + R} f(x') \, {1 \over 2 R + 1}  \cr
+
+              &= {1 \over 2 R + 1} \sum_{x'=x - R}^{x + R} f(x')  \cr
+
+              &= \hbox{average value of $f$ on $[x - R, x + R]$}   \cr
+
+}$$

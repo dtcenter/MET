@@ -1,0 +1,5 @@
+Field
+A scalar dataset on a grid.
+Examples are
+temperature, precipitation, 
+humidity.

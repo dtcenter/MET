@@ -1,0 +1,8 @@
+Curvature
+The curvature of a curve at a point measures the
+extent to which the curve deviates from a straight
+line near the point.  This can be obtained by determining
+the circle that best fits the curve near the point (called
+the {\italicfont osculating circle}).  The curvature 
+is defined to be the reciprocal of the radius of the 
+fitted circle.

@@ -1,0 +1,59 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\SubSubSection{NetCDF File}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#define SKIP_AMT 0.1in
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //   latlon
+   //   raw
+   //   object_id
+   //   cluster_id
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+MTD writes a \netcdf\ file containing various types of information 
+as specified in the configuration file. The possible output data are:
+
+\vskip SKIP_AMT
+
+\myitem 
+{\boldfont Latitude} and {\boldfont longitude} of all the points in the 2D grid.
+Useful for geolocating points or regions given by grid coordinates.
+
+\vskip SKIP_AMT
+
+\myitem 
+{\boldfont Raw data} from the input data files.  This can be useful if the input 
+data were grib format, since \netcdf\ is often easier to read.
+
+\vskip SKIP_AMT
+
+\myitem 
+{\boldfont Object ID} numbers, giving for each grid point the number of the
+simple object (if any) that covers that point.  These numbers are one-based.
+A value of zero means that this point is not part of any object.
+
+\vskip SKIP_AMT
+
+\myitem 
+{\boldfont Cluster ID} numbers.  As above, only for cluster objects rather
+than simple objects.
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+

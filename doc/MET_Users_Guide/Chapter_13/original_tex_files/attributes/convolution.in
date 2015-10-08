@@ -1,0 +1,93 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+\SubSection{Convolution}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+As in MODE, MTD applies a convolution filter to the raw 
+data as a preliminary step in resolving the field into 
+objects.  The convolution step in MTD differs in several 
+respects from that performed in MODE, however.  
+
+\par
+
+First, MTD typically reads in several planes of data for
+each data field---one plane for each time step, and there
+is really no limit to the number of time steps.  So MTD
+is convolving much more data than it would be if it 
+were simply analyzing a 2D data field.  Secondly, MTD
+convolves in time as well as space, which again increases
+the amount of data needing to be processed.  The net 
+effect of all this is to greatly increase the time needed 
+to perform the convolution step.
+
+\par
+
+Because of this, the developers decided to make several 
+changes in the way convolution was performed in MTD.
+Most of the differences come from the need to make the 
+convolution step as fast as possible.
+
+\par
+
+The most basic change is to use a square convolution filter
+rather than the circular one that MODE uses.  The overall
+``size'' of the filter is still determined by one parameter
+(denoted $R$, as in MODE), but this should not be thought
+of as a {\italicfont radius}.  Instead, the size of the
+square is $(2 R + 1) \times (2 R + 1)$, 
+as shown in illust_number(two_r_plus_one_fig).
+
+\par
+
+Another change is that we do not allow any bad data in thee
+convolution square.  in MODE, the user may specify what 
+percentage of bad data in the convolution region is
+permissible, and MODE will rescale the value of the filter
+accordingly for each data point.  For the sake of speed, 
+MTD requires that there be no bad data in the convolution
+region.  If any bad data exists in the region, the convolved
+value there is set to a bad data flag.
+
+
+
+
+
+
+\par
+
+\Comment{Mention how convolution is done differently from 2D MODE,
+         using a rectangular filter, rather than a circular one.}
+
+\par
+
+\Comment{Explain how we do convolution in time as well as space.}
+
+\par
+
+\Comment{Explain that we sacrificed a lot in the code in order to make 
+         the convolution step as fast as possible.}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+// #include "average.in"
+
+
+////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////
+illust_insert(two_r_plus_one_fig)
+/////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
