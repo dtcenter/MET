@@ -19,7 +19,7 @@ model = "NGAC";
 regrid = {
    to_grid    = NONE;
    vld_thresh = 0.5;
-   method     = NONE;
+   method     = NEAREST;
    width      = 1;
 };
 
@@ -38,7 +38,7 @@ fcst = {
    field = [
       {
         name       = "AOTK";
-        level      = [ "L9" ];
+        level      = [ "L0-9" ];
       }      
    ];
 
@@ -79,7 +79,7 @@ climo_mean = {
    //
    regrid = {
       vld_thresh = 0.5;
-      method     = NONE;
+      method     = NEAREST;
       width      = 1;
    }
 
