@@ -13,9 +13,12 @@
 
 <met_test>
 
+  <!-- MADIS data can be retrieved from the NOAA JET machine here:
+       /public/data/madis/point -->
+
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-  
+
   <test name="madis2nc_METAR">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \
@@ -23,58 +26,70 @@
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
       -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
       -type metar -rec_beg 2000 -rec_end 6000 -v 2
-    </param>   
+    </param>
     <output>
       <exist>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log</exist>
       <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc</point_nc>
     </output>
   </test>
-  
+
   <test name="madis2nc_RAOB">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/raob/raob_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/raob_2012040912_F000.nc \
       -type raob -v 2
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/madis2nc/raob_2012040912_F000.nc</point_nc>
     </output>
   </test>
-  
+
   <test name="madis2nc_PROFILER_MASK_POLY">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/profiler/profiler_20120409_1200.nc \
       &OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc \
       -type profiler -mask_poly &MET_BASE;/poly/CONUS.poly -v 2
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/madis2nc/profiler_2012040912_F000.nc</point_nc>
     </output>
   </test>
-  
+
   <test name="madis2nc_MARITIME">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/maritime/maritime_20120409_1200.nc \
       &OUTPUT_DIR;/madis2nc/maritime_2012040912_F000.nc \
       -type maritime -qc_dd V,Q -v 2
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/madis2nc/maritime_2012040912_F000.nc</point_nc>
     </output>
   </test>
-  
+
   <test name="madis2nc_MESONET_MASK_GRID">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \
       &DATA_DIR_OBS;/madis/mesonet/mesonet_20140704_1200.nc \
       &OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc \
       -type mesonet -mask_grid G207 -v 2
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/madis2nc/mesonet_2014070412_F000.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_ACARS_PROFILES">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/acarsProfiles/acarsProfiles_20151005_1200.nc \
+      &OUTPUT_DIR;/madis2nc/acarsProfiles_20151005_1200.nc \
+      -type acarsProfiles -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/acarsProfiles_20151005_1200.nc</point_nc>
     </output>
   </test>
 
