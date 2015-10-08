@@ -129,14 +129,14 @@ rirw = {
    thresh = >=30.0;
 }
 
-//
+// 
 // Specify whether only those track points occurring near landfall should be
-// retained, and define the landfall retention window as a number of seconds
-// offset from the landfall time.  
+// retained, and define the landfall retention window in HH[MMSS] format
+// around the landfall time.
 //
 landfall     = FALSE;
-landfall_beg = -86400;
-landfall_end = 0;
+landfall_beg = "-24";
+landfall_end = "00";
 
 //
 // Specify whether only those track points common to both the ADECK and BDECK
