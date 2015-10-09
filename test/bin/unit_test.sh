@@ -52,7 +52,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_regrid.xml \
           unit_gsi_tools.xml \
           unit_aeronet.xml \
-          unit_shift_data_plane.xml"
+          unit_shift_data_plane.xml \
+          unit_mtd.xml"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do

@@ -1,0 +1,108 @@
+
+   //
+   // Output model name to be written
+   //
+
+model = "WRF";
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+   //
+   // Forecast and observation fields to be verified
+   //
+
+fcst = {
+
+   field = {
+      name  = "APCP_01";
+      level = "A0_01";
+   };
+   
+   conv_radius       = 5;
+   conv_thresh       = >=1.5;
+
+   raw_thresh        = NA;
+   vld_thresh        = 0.5;
+   area_thresh       = NA;
+   inten_perc_value  = 100;
+   inten_perc_thresh = NA;
+   merge_thresh      = >=1.25;
+   merge_flag        = THRESH;
+
+};
+
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+min_volume = 10000;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+   //
+   // Total interest threshold for determining matches
+   //
+
+total_interest_thresh = 0.65;
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+nc_output = {
+
+   latlon       = true;
+   raw          = true;
+   object_id    = true;
+   cluster_id   = true;
+   do_polylines = false;
+
+};
+
+txt_output = {
+
+   attributes_2d   = true;
+   attributes_3d   = true;
+
+   // convex_hulls_2d = true;
+
+};
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+weight = {
+
+   space_centroid_dist  = 1.0;
+
+   time_centroid_delta  = 1.0;
+
+   speed_delta          = 1.0;
+
+   direction_diff       = 1.0;
+
+   volume_ratio         = 1.0;
+
+   axis_angle_diff      = 0.0;
+
+   start_time_delta     = 1.0;
+
+   end_time_delta       = 1.0;
+
+};
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+output_prefix  = "basic";
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
