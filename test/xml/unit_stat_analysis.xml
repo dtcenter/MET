@@ -30,7 +30,7 @@
       -out_stat &OUTPUT_DIR;/stat_analysis/AGG_RHIST_out.stat \
       -out &OUTPUT_DIR;/stat_analysis/AGG_RHIST.out \
       -v 1
-    </param>   
+    </param>
     <output>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_RHIST_dump.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_RHIST_out.stat</stat>
@@ -49,7 +49,7 @@
       -set_hdr VX_MASK NWC_AND_GRB \
       -out &OUTPUT_DIR;/stat_analysis/AGG_PHIST.out \
       -v 1
-    </param>   
+    </param>
     <output>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_PHIST_dump.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_PHIST_out.stat</stat>
@@ -110,7 +110,7 @@
       <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_SSVAR.out</exist>
     </output>
   </test>
-  
+
   <test name="stat_analysis_AGG_SSVAR">
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <param> \
@@ -192,6 +192,25 @@
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_by_vx_mask_out.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh_out.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat</stat>
+    </output>
+  </test>
+
+  <test name="stat_analysis_RAMPS">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis</value></pair>
+    </env>
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &DATA_DIR_MODEL;/time_series/*.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_ramps \
+      -out &OUTPUT_DIR;/stat_analysis/RAMPS.out \
+      -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/stat_analysis/RAMPS.out</exist>
+      <stat>&OUTPUT_DIR;/stat_analysis/RAMPS_100_100.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/RAMPS_25_100.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/RAMPS_25_100_30min.stat</stat>
     </output>
   </test>
 
