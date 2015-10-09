@@ -125,7 +125,7 @@ void BasicModeAnalysisJob::clear()
 {
 
 precision = default_precision;
-   
+
 atts.clear();
 
 columns.clear();
@@ -322,7 +322,7 @@ int j;
 
 // Nothing to do with no dump file
 if ( !dumpfile )  return;
-   
+
 // Write header before the first line
 if ( n_dump == 0 )  {
 
@@ -363,7 +363,7 @@ if ( n_dump%dump_at.nrows() == 0 ) {
    //
    // done
    //
-   
+
 return;
 
 }
@@ -495,10 +495,14 @@ const int ncols = 12;
 
 table.set_size(Nfields + 2, ncols);
 
+table.set_column_just(0, LeftJust);
+for (j=1; j<table.ncols(); ++j) table.set_column_just(j, RightJust);
+
 table.set_bad_data_value(bad_data_double);
 table.set_bad_data_str(na_str);
-
+table.set_delete_trailing_blank_rows(1);
 table.set_ics(3);
+
 
 k = 0;
 
@@ -541,6 +545,7 @@ for (j=0; j<Nfields; ++j)  {
    table.set_entry(r, k++, accums[j].sum());
 
 }
+
 
 for (j=0; j<ncols; ++j)  {
 
@@ -857,9 +862,12 @@ AsciiTable table;
 
 table.set_size(Nrows, Ncols);
 
+table.set_column_just(0, LeftJust);
+for (j=1; j<table.ncols(); ++j) table.set_column_just(j, RightJust);
+
 table.set_bad_data_value(bad_data_double);
 table.set_bad_data_str(na_str);
-
+table.set_delete_trailing_blank_rows(1);
 table.set_ics(3);
 
    //
