@@ -289,6 +289,8 @@ fcst_obj.toss_small_objects(config.min_volume);
 const bool have_pairs =    (fcst_obj.n_objects() != 0)
                         && ( obs_obj.n_objects() != 0);
 
+mlog << Debug(5) << "have_pairs = " << bool_to_string(have_pairs) << '\n';
+
    //
    //  set up the match/merge engine
    //
@@ -472,9 +474,11 @@ if ( have_pairs )  {
 
    engine.do_match_merge();
 
+   n_clusters = engine.n_composites();
+
    engine.partition_dump(6);
 
-   // mlog << Debug(2) << "N clusters = " << n_clusters << '\n';
+   mlog << Debug(2) << "N clusters = " << n_clusters << '\n';
 
    if ( mlog.verbosity_level() > 5 )  {
 

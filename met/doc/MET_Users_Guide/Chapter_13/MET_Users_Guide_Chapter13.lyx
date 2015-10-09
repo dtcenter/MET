@@ -90,7 +90,52 @@ MODE Time Domain (MTD) is an extension of the MODE object-based approach
 \end_layout
 
 \begin_layout Standard
-A plot of some MTD precipitation objects is shown
+A plot of some MTD precipitation objects is shown in Figure 
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename 3d_color_fig.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+lookie here:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sqrt{\left(\overline{x}_{1}-\overline{x}_{2}\right)^{2}+\left(\overline{y}_{1}-\overline{y}_{2}\right)^{2}}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \end_body

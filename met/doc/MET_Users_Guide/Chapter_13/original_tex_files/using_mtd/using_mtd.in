@@ -18,9 +18,9 @@
 
 #include "data_files.in"
 #include "command_line.in"
-#include "config_file.in"
-#include "output.in"
 #include "making_plots.in"
+#include "output.in"
+#include "config_file.in"
 
 
 ////////////////////////////////////////////////////////////////////////
