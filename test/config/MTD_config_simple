@@ -16,7 +16,7 @@ fcst = {
 
    field = {
       name  = "APCP_01";
-      level = "A0_01";
+      level = "(*,*)";
    };
    
    conv_radius       = 5;

@@ -20,22 +20,21 @@
     <env>
     </env>
     <param> \
-      -fcst    &DATA_DIR;/a* \
-      -obs     &DATA_DIR;/o* \
+      -fcst    &DATA_DIR;/arw* \
+      -obs     &DATA_DIR;/obs* \
       -config  &CONFIG_DIR;/MTD_config_simple  \
-      -outdir  &OUTPUT_DIR;/mtd/basic -v 1
-    </param>   
+      -outdir  &OUTPUT_DIR;/mtd -v 1
+    </param>
+
     <output>
-
-      <exist>&OUTPUT_DIR;/mtd/mtd_test_20100517_010000V_2d.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_test_20100517_010000V_3d_pc.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_test_20100517_010000V_3d_ps.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_test_20100517_010000V_3d_sc.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_test_20100517_010000V_3d_ss.txt</exist>
-
-      <exist>&OUTPUT_DIR;/mtd/mtd_test_20100517_010000V_obj.nc</exist>
-
+      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_2d.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_pc.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_ps.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_sc.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_ss.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_obj.nc</exist>
     </output>
+
   </test>
 
 </met_test>
