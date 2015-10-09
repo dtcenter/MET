@@ -1253,34 +1253,37 @@ int * new_volumes = (int *) 0;
 int * d = Data;
 
 
-if ( n_new == 0 )  {
+// if ( n_new == 0 )  {
+// 
+//    mlog << Error << "\n\n  MtdIntFile::sift_objects() -> no objects left!\n\n";
+// 
+//    exit ( 1 );
+// 
+// }
 
-   mlog << Error << "\n\n  MtdIntFile::sift_objects() -> no objects left!\n\n";
 
-   exit ( 1 );
+
+
+if ( n_new > 0 )  {
+
+   old_to_new = new int [Nobjects];
+
+   for (j=0; j<Nobjects; ++j)  old_to_new[j] = -1;
+
+   new_volumes = new int [n_new];
+
+   for (j=0; j<n_new; ++j)  {
+
+      new_volumes[j] = ObjVolume[new_to_old[j]];
+
+      // new_intensities[j] = MaxConvIntensity[new_to_old[j]];
+
+   }
+
+   for (j=0; j<n_new; ++j)  old_to_new[new_to_old[j]] = j;
 
 }
 
-
-old_to_new = new int [Nobjects];
-
-
-new_volumes = new int [n_new];
-
-// new_intensities = new double [n_new];
-
-
-for (j=0; j<n_new; ++j)  {
-
-   new_volumes[j] = ObjVolume[new_to_old[j]];
-
-   // new_intensities[j] = MaxConvIntensity[new_to_old[j]];
-
-}
-
-for (j=0; j<Nobjects; ++j)  old_to_new[j] = -1;
-
-for (j=0; j<n_new; ++j)  old_to_new[new_to_old[j]] = j;
 
 // for (j=0; j<Nobjects; ++j)  mlog << Debug(5) << j << " ... " << old_to_new[j] << '\n';
 
@@ -1289,16 +1292,24 @@ int zero_count = 0;
 
 d = Data;
 
-for (j=0; j<n3; ++j, ++d)  {
+if ( n_new > 0 )  {
 
-   k = (int) (*d);
+   for (j=0; j<n3; ++j, ++d)  {
 
-   if ( k == 0 )  continue;
+      k = (int) (*d);
 
-   k = old_to_new[k - 1];
+      if ( k == 0 )  continue;
 
-   if ( k < 0 )    { *d = 0;      ++zero_count; }
-   else            { *d = 1 + k;  ++replace_count; }
+      k = old_to_new[k - 1];
+
+      if ( k < 0 )    { *d = 0;      ++zero_count; }
+      else            { *d = 1 + k;  ++replace_count; }
+
+   }
+
+} else {
+
+   for (j=0; j<n3; ++j)  *d++ = 0;
 
 }
 
@@ -1313,21 +1324,20 @@ Nobjects = n_new;
 
 DataMax  = Nobjects;
 
+if ( n_new > 0 )  {
 
-delete [] ObjVolume;  ObjVolume = (int *) 0;
+   delete [] ObjVolume;  ObjVolume = (int *) 0;
 
-ObjVolume = new_volumes;
+   ObjVolume = new_volumes;
 
+} else ObjVolume = 0;
 
-// delete [] MaxConvIntensity;  MaxConvIntensity = (double *) 0;
-// 
-// MaxConvIntensity = new_intensities;
 
    //
    //  done
    //
 
-delete [] old_to_new;   old_to_new = (int *) 0;
+if ( old_to_new )  { delete [] old_to_new;   old_to_new = (int *) 0; }
 
 return;
 
