@@ -551,7 +551,7 @@ static const int rhist_crps_offset       = nhc + 1;
 static const int rhist_ign_offset        = nhc + 2;
 static const int rhist_n_rank_offset     = nhc + 3;
 static const int rhist_crpss_offset      = nhc + 4;
-inline int rhist_rank_offset(int i)      { return(nhc + 4 + i); }
+inline int rhist_rank_offset(int i)      { return(nhc + 5 + i); }
 
 //
 // PHIST Line Type offsets
