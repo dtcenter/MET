@@ -414,21 +414,22 @@ var->add_att("_FillValue", bad_data_int);
    //
 
 const int n_clusters = e.n_composites();
+const int n_objects = ( is_fcst ? (e.n_fcst_simples()) : (e.n_obs_simples()) );
 
 // mlog << Debug(5) << "\n\n  " << n_clusters << " clusters\n\n";
 
-remap = new int [n_clusters + 1];
+remap = new int [n_objects + 1];
 
 remap[0] = 0;
 
-for (j=1; j<=n_clusters; ++j)  {
+for (j=1; j<=n_objects; ++j)  {
 
    if ( is_fcst )  k = e.map_fcst_id_to_composite (j - 1);
    else            k = e.map_obs_id_to_composite  (j - 1);
 
    remap[j] = 1 + k;
 
-   // mlog << Debug(5) << "remap[" << j << "] = " << remap[j] << '\n';
+   mlog << Debug(5) << "remap " << j << " = " << remap[j] << '\n';
 
 }
 

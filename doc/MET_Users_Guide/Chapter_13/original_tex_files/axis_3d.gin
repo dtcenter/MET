@@ -1,0 +1,6 @@
+\def\ObjectColor{blue}
+\def\AxisColor{red}
+\def\LetterShape{A}
+\def\AxisNLeft{5}
+\def\AxisNCenter{20}
+\def\AxisNRight{300}
