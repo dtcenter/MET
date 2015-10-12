@@ -218,7 +218,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 					 valid_time,
 					 _stationLat, _stationLon,
 					 _stationAlt,
-					 "NA",
+					 na_str,
 					 AOT_GRIB_CODE,
 					 dlevel, dheight,
 					 atof(data_line[k])));			     

@@ -59,7 +59,7 @@ bool MetHandler::isFileType(LineDataFile &ascii_file) const
   // Initialize the return value.
   //
   bool is_file_type = false;
-  
+
   //
   // Read the first line from the file
   //
@@ -72,10 +72,10 @@ bool MetHandler::isFileType(LineDataFile &ascii_file) const
 
   if (dl.n_items() == n_met_col || dl.n_items() == n_met_col_qty)
     is_file_type = true;
-   
+
   return is_file_type;
 }
-  
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -93,9 +93,9 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
     double hdr_lat = 0.0;
     double hdr_lon = 0.0;
     double hdr_elv = 0.0;
-    
+
     time_t hdr_vld = 0;
-    
+
     // Check for the first line of the file or the header changing
 
     if (data_line.line_number()  == 1       ||
@@ -127,7 +127,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
       hdr_elv = atof(data_line[5]);
 
       hdr_vld = _getValidTime(hdr_vld_str.text());
-      
+
     }
 
     // Pressure level (hPa) or precip accumulation interval (sec)
@@ -141,13 +141,13 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Observation quality
 
-    ConcatString obs_qty = (_nFileColumns == n_met_col ? "NA" : data_line[9]);
+    ConcatString obs_qty = (_nFileColumns == n_met_col ? na_str : data_line[9]);
 
     // Observation value
 
     int obs_idx = (_nFileColumns == n_met_col ? 9 : 10);
     double obs_val = atof(data_line[obs_idx]);
-             
+
     // Save the observation info
 
     _addObservations(Observation(hdr_typ.text(),
@@ -161,4 +161,4 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
   return true;
 }
-  
+

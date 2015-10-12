@@ -138,7 +138,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 
     return false;
   }
-  
+
   mlog << Debug(2) << "Processing observations for " << _nhdr
        << " headers.\n";
 
@@ -731,6 +731,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
 bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
                                 const ConcatString &qty) {
    float obs_arr[OBS_ARRAY_LEN];
+   ConcatString obs_qty;
 
    //
    // Increment observation count before writing
@@ -757,10 +758,11 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
    }
 
    //
-   // Write the observation flag value
+   // Write the observation QC flag, resetting an empty string to NA
    //
+   obs_qty = (qty.length() == 0 ? na_str : qty);
    if(!_obsQualityVar->set_cur(_obsNum, (long) 0) ||
-      !_obsQualityVar->put(qty, (long) 1, (long) qty.length()) ) {
+      !_obsQualityVar->put(obs_qty, (long) 1, (long) obs_qty.length()) ) {
       mlog << Error << "\nFileHandler::_writeObsInfo() -> "
            << "error writing the quality flag to the NetCDF file\n\n";
       return false;
@@ -789,7 +791,7 @@ bool FileHandler::_addObservations(const Observation &obs)
         return false;
      }
    }
-   
+
    //
    // Apply the polyline mask
    //
@@ -803,7 +805,7 @@ bool FileHandler::_addObservations(const Observation &obs)
    }
 
    _observations.push_back(obs);
-  
+
   return true;
 }
 
