@@ -47,7 +47,7 @@
   <test name="mode_graphics_PLOT_FCST_COMPOSITE_OBJ">
     <exec>&MET_DIR;/bin/plot_mode_field</exec>
     <param> \
-      -composite \
+      -cluster \
       -fcst \
       -config &CONFIG_DIR;/PlotModeFieldConfig \
       &OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj.nc
