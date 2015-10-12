@@ -30,10 +30,10 @@
 enum ModeObjectField {
 
    mof_fcst_obj, 
-   mof_fcst_comp, 
+   mof_fcst_clus, 
 
    mof_obs_obj, 
-   mof_obs_comp, 
+   mof_obs_clus, 
 
 };
 
@@ -63,10 +63,10 @@ class ModeNcOutputFile {
       Grid * _Grid;   //  allocated
 
       NcVar * FcstObjId;   //  NOT allocated
-      NcVar * FcstCompId;  //  NOT allocated
+      NcVar * FcstClusId;  //  NOT allocated
 
       NcVar * ObsObjId;    //  NOT allocated
-      NcVar * ObsCompId;   //  NOT allocated
+      NcVar * ObsClusId;   //  NOT allocated
 
       NcVar * FcstRaw;     //  NOT allocated
       NcVar * ObsRaw;      //  NOT allocated
@@ -91,10 +91,10 @@ class ModeNcOutputFile {
       int AccumTime;   //  seconds
 
       // int NFcstObjs;
-      // int NFcstComps;
+      // int NFcstClus;
 
       // int NObsObjs;
-      // int NObsComps;
+      // int NObsClus;
 
    public:
 
@@ -122,23 +122,23 @@ class ModeNcOutputFile {
       int n_fcst_simple_objs () const;
       int n_obs_simple_objs  () const;
 
-      int n_fcst_comp_objs () const;
-      int n_obs_comp_objs  () const;
+      int n_fcst_clus_objs () const;
+      int n_obs_clus_objs  () const;
 
       double fcst_raw  (int x, int y) const;
       double  obs_raw  (int x, int y) const;
 
       int fcst_obj_id  (int x, int y) const;
-      int fcst_comp_id (int x, int y) const;
+      int fcst_clus_id (int x, int y) const;
 
       int obs_obj_id   (int x, int y) const;
-      int obs_comp_id  (int x, int y) const;
+      int obs_clus_id  (int x, int y) const;
 
       DataPlane select_fcst_obj  (int) const;   //  -1 for all
-      DataPlane select_fcst_comp (int) const;   //  -1 for all
+      DataPlane select_fcst_clus (int) const;   //  -1 for all
 
       DataPlane select_obs_obj   (int) const;   //  -1 for all
-      DataPlane select_obs_comp  (int) const;   //  -1 for all
+      DataPlane select_obs_clus  (int) const;   //  -1 for all
 
       bool x_line_valid(const int x) const;
       bool y_line_valid(const int y) const;
@@ -167,8 +167,8 @@ inline int ModeNcOutputFile::accum_time () const { return ( AccumTime ); }
 // inline int ModeNcOutputFile::n_fcst_objs () const { return ( NFcstObjs ); }
 // inline int ModeNcOutputFile::n_obs_objs  () const { return ( NObsObjs ); }
 // 
-// inline int ModeNcOutputFile::n_fcst_comps () const { return ( NFcstComps ); }
-// inline int ModeNcOutputFile::n_obs_comps  () const { return ( NObsComps ); }
+// inline int ModeNcOutputFile::n_fcst_clus () const { return ( NFcstClus ); }
+// inline int ModeNcOutputFile::n_obs_clus  () const { return ( NObsClus ); }
 
 
 ////////////////////////////////////////////////////////////////////////

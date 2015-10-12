@@ -121,10 +121,10 @@ if ( f )  { delete f;  f = (NcFile *) 0; }
 if ( _Grid )  { delete _Grid;  _Grid = (Grid *) 0; }
 
 FcstObjId  = (NcVar *) 0;
-FcstCompId = (NcVar *) 0;
+FcstClusId = (NcVar *) 0;
 
 ObsObjId   = (NcVar *) 0;
-ObsCompId  = (NcVar *) 0;
+ObsClusId  = (NcVar *) 0;
 
 FcstRaw    = (NcVar *) 0;
 ObsRaw     = (NcVar *) 0;
@@ -141,11 +141,11 @@ fcst_data_range_calculated = false;
 FcstDataMin = FcstDataMax = 0.0;
  ObsDataMin =  ObsDataMax = 0.0;
 
-// NFcstObjs  = 0;
-// NFcstComps = 0;
+// NFcstObjs = 0;
+// NFcstClus = 0;
 // 
-// NObsObjs   = 0;
-// NObsComps  = 0;
+// NObsObjs  = 0;
+// NObsClus  = 0;
 
 Filename.clear();
 
@@ -207,12 +207,10 @@ FcstRaw    = f->get_var("fcst_raw" );
 ObsRaw     = f->get_var("obs_raw" );
 
 FcstObjId  = f->get_var("fcst_obj_id" );
-// FcstCompId = f->get_var("fcst_comp_id");
-FcstCompId = f->get_var("fcst_clus_id");
+FcstClusId = f->get_var("fcst_clus_id");
 
 ObsObjId   = f->get_var("obs_obj_id" );
-// ObsCompId  = f->get_var("obs_comp_id");
-ObsCompId  = f->get_var("obs_clus_id");
+ObsClusId  = f->get_var("obs_clus_id");
 
    //
    //  count objects
@@ -230,13 +228,13 @@ for (x=0; x<Nx; ++x)  {
 
       if ( value > NObsObjs )  NObsObjs = value;
 
-      value = fcst_comp_id(x, y);
+      value = fcst_clus_id(x, y);
 
-      if ( value > NFcstComps )  NFcstComps = value;
+      if ( value > NFcstClus )  NFcstClus = value;
 
-      value = obs_comp_id(x, y);
+      value = obs_clus_id(x, y);
 
-      if ( value > NObsComps )  NObsComps = value;
+      if ( value > NObsClus )  NObsClus = value;
 
    }
 
@@ -357,8 +355,8 @@ if ( f )  {
 // 
 // out << "\n";
 // 
-// out << "NFcstComps = " << NFcstComps << "\n";
-// out << "NObsComps  = " << NObsComps  << "\n";
+// out << "NFcstClus = " << NFcstClus << "\n";
+// out << "NObsClus  = " << NObsClus  << "\n";
 
 out << "\n";
 
@@ -421,13 +419,13 @@ return ( n );
 ////////////////////////////////////////////////////////////////////////
 
 
-int ModeNcOutputFile::n_fcst_comp_objs() const
+int ModeNcOutputFile::n_fcst_clus_objs() const
 
 {
 
 if ( !f )  {
 
-   mlog << Error << "\n\n  ModeNcOutputFile::n_fcst_comp_objs() const -> no file open!\n\n";
+   mlog << Error << "\n\n  ModeNcOutputFile::n_fcst_clus_objs() const -> no file open!\n\n";
 
    exit ( 1 );
 
@@ -435,7 +433,7 @@ if ( !f )  {
 
 int n;
 
-n = count_objects(FcstCompId);
+n = count_objects(FcstClusId);
 
 return ( n );
 
@@ -445,13 +443,13 @@ return ( n );
 ////////////////////////////////////////////////////////////////////////
 
 
-int ModeNcOutputFile::n_obs_comp_objs() const
+int ModeNcOutputFile::n_obs_clus_objs() const
 
 {
 
 if ( !f )  {
 
-   mlog << Error << "\n\n  ModeNcOutputFile::n_obs_comp_objs() const -> no file open!\n\n";
+   mlog << Error << "\n\n  ModeNcOutputFile::n_obs_clus_objs() const -> no file open!\n\n";
 
    exit ( 1 );
 
@@ -459,7 +457,7 @@ if ( !f )  {
 
 int n;
 
-n = count_objects(ObsCompId);
+n = count_objects(ObsClusId);
 
 return ( n );
 
@@ -635,13 +633,13 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
-int ModeNcOutputFile::fcst_comp_id(int x, int y) const
+int ModeNcOutputFile::fcst_clus_id(int x, int y) const
 
 {
 
 int k;
 
-k = get_int(FcstCompId, x, y);
+k = get_int(FcstClusId, x, y);
 
 return ( k );
 
@@ -667,13 +665,13 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
-int ModeNcOutputFile::obs_comp_id(int x, int y) const
+int ModeNcOutputFile::obs_clus_id(int x, int y) const
 
 {
 
 int k;
 
-k = get_int(ObsCompId, x, y);
+k = get_int(ObsClusId, x, y);
 
 return ( k );
 
@@ -725,16 +723,16 @@ for (x=0; x<Nx; ++x)  {
             value = fcst_obj_id(x, y);
             break;
 
-         case mof_fcst_comp:
-            value = fcst_comp_id(x, y);
+         case mof_fcst_clus:
+            value = fcst_clus_id(x, y);
             break;
 
          case mof_obs_obj:
             value = obs_obj_id(x, y);
             break;
 
-         case mof_obs_comp:
-            value = obs_comp_id(x, y);
+         case mof_obs_clus:
+            value = obs_clus_id(x, y);
             break;
 
          default:
@@ -781,13 +779,13 @@ return ( fdata );
 ////////////////////////////////////////////////////////////////////////
 
 
-DataPlane ModeNcOutputFile::select_fcst_comp (int n) const
+DataPlane ModeNcOutputFile::select_fcst_clus (int n) const
 
 {
 
 DataPlane fdata;
 
-fdata = select_obj(mof_fcst_comp, n);
+fdata = select_obj(mof_fcst_clus, n);
 
 return ( fdata );
 
@@ -813,13 +811,13 @@ return ( fdata );
 ////////////////////////////////////////////////////////////////////////
 
 
-DataPlane ModeNcOutputFile::select_obs_comp  (int n) const
+DataPlane ModeNcOutputFile::select_obs_clus  (int n) const
 
 {
 
 DataPlane fdata;
 
-fdata = select_obj(mof_obs_comp, n);
+fdata = select_obj(mof_obs_clus, n);
 
 return ( fdata );
 
