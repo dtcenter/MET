@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "NGAC";
+model = "GFS";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -27,84 +27,63 @@ regrid = {
 
 cat_thresh  = [ NA ];
 cnt_thresh  = [ NA ];
-//cnt_logic   = UNION;
+cnt_logic   = UNION;
 wind_thresh = [ NA ];
-//wind_logic  = UNION;
+wind_logic  = UNION;
 
 //
 // Forecast and observation fields to be verified
 //
 fcst = {
+   sid_exc    = [];
+   cat_thresh = [];
+   message_type = [ "ADPSFC" ];
+
    field = [
       {
-        name       = "AOTK";
-        level      = [ "L0-9" ];
-      }      
+        name         = "TMP";
+        level        = [ "Z2" ];
+      },
+      {
+        name         = "TMP";
+        level        = [ "P500" ];
+        message_type = [ "ADPUPA" ];
+      },
+      {
+        name         = "UGRD";
+        level        = [ "Z10" ];
+      },
+      {
+        name         = "VGRD";
+        level        = [ "Z10" ];
+      },
+      {
+        name         = "WIND";
+        level        = [ "Z10" ];
+      }
    ];
-
 };
-
-obs = {
-   message_type = [ "AERONET_AOD_MEAN_010000" ];
-   sid_exc      = [];
-
-   field = [
-      {
-        name       = "AOD";
-        level      = [ "L500" ];
-	GRIB1_ptv  = 141;
-      }   
-   ];   
-};
+obs = fcst;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Climatology mean data
 //
+climo_mean = fcst;
 climo_mean = {
 
-   //
-   // Climatology mean files.
-   //
-   file_name = [];
+   file_name = [ "${CLIMO_MEAN_FILE}" ];
 
-   //
-   // field must be empty or the same length as fcst.field.
-   //
-   field = [];
-
-   //
-   // Method for regridding climatology data to the verification grid.
-   //
    regrid = {
       vld_thresh = 0.5;
-      method     = NEAREST;
-      width      = 1;
+      method     = BILIN;
+      width      = 2;
    }
 
-   //
-   // Method for interpolating climatology to forecast valid time:
-   //    NEAREST for data closest in time
-   //    UW_MEAN for average of data before and after
-   //    DW_MEAN for linear interpolation in time of data before and after
-   //
    time_interp_method = DW_MEAN;
-
-   //   
-   // When searching climatology data, only consider times where the month
-   // matches the forecast month.  Set match_day to TRUE or FALSE to define
-   // whether the climatology day must also match.
-   //    match_day = FALSE for monthly climatology
-   //    match_day = TRUE  for daily climatology
-   //
-   match_day = FALSE;
-
-   //
-   // Time step of the climatology data in seconds.  Set to 60*60*6 for
-   // 6-hourly data or 60*60 for hourly data.
-   //
-   time_step = 21600;
+   match_day          = ${MATCH_DAY};
+   time_step          = 21600;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,8 +92,8 @@ climo_mean = {
 // Point observation time window
 //
 obs_window = {
-   beg = 0;
-   end = 0;
+   beg = -5400;
+   end =  5400;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,8 +102,8 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid    = [ "FULL" ];
-   poly    = [];
+   grid    = [];
+   poly    = [ "MET_BASE/poly/CONUS.poly" ];
    sid     = [];
 };
 
@@ -153,8 +132,8 @@ interp = {
 
    type = [
       {
-         method = BILIN;
-         width  = 2;
+         method = NEAREST;
+         width  = 1;
       }
    ];
 };
@@ -170,16 +149,16 @@ output_flag = {
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = NONE;
-   sl1l2  = NONE;
-   sal1l2 = NONE;
-   vl1l2  = NONE;
-   val1l2 = NONE;
+   cnt    = BOTH;
+   sl1l2  = BOTH;
+   sal1l2 = BOTH;
+   vl1l2  = BOTH;
+   val1l2 = BOTH;
    pct    = NONE;
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   mpr    = STAT;
+   mpr    = BOTH;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
