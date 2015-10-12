@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass book
@@ -12,13 +12,13 @@
 \font_roman default
 \font_sans default
 \font_typewriter default
+\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -30,15 +30,24 @@
 \use_hyperref false
 \papersize default
 \use_geometry true
-\use_amsmath 1
-\use_esint 1
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -1655,7 +1664,7 @@ status open
 \begin_layout Plain Layout
 
 \series bold
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Values for the level_category option.
@@ -1671,7 +1680,7 @@ Values for the level_category option.
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="2">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top" width="2in">
 <column alignment="center" valignment="top" width="4in">
 <row>
@@ -2053,7 +2062,7 @@ status open
 \begin_layout Plain Layout
 
 \series bold
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 NetCDF file dimensions for pb2nc output.
@@ -2069,7 +2078,7 @@ NetCDF file dimensions for pb2nc output.
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="2">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top" width="4in">
 <row>
@@ -2245,7 +2254,7 @@ status open
 \begin_layout Plain Layout
 
 \series bold
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 NetCDF variables in pb2nc output.
@@ -2262,7 +2271,7 @@ NetCDF variables in pb2nc output.
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1in">
 <column alignment="left" valignment="top" width="1in">
 <column alignment="left" valignment="top" width="4in">
@@ -2610,7 +2619,7 @@ status open
 \begin_layout Plain Layout
 
 \series bold
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Input MET ascii2nc point observation format
@@ -2626,7 +2635,7 @@ Input MET ascii2nc point observation format
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.5in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4in">
@@ -4158,7 +4167,7 @@ status open
 \begin_layout Plain Layout
 
 \series bold
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 NetCDF file dimensions for pcp_combine output.
@@ -4174,7 +4183,7 @@ NetCDF file dimensions for pcp_combine output.
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4.5in">
 <row>
@@ -4288,7 +4297,7 @@ status open
 \begin_layout Plain Layout
 
 \series bold
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 NetCDF variables for pcp_combine output.
@@ -4304,7 +4313,7 @@ NetCDF variables for pcp_combine output.
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="0.5in">
 <column alignment="left" valignment="top" width="4in">
@@ -4737,7 +4746,7 @@ status open
 \begin_layout Plain Layout
 
 \series bold
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Example plot showing surface temperature froma MODIS file.
@@ -4752,7 +4761,7 @@ Example plot showing surface temperature froma MODIS file.
 
 \series bold
 \begin_inset Graphics
-	filename fig3.1.png
+	filename /var/autofs/mnt/dakota_d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Data_Formats/fig3.1.png
 	scale 60
 
 \end_inset
@@ -5390,7 +5399,11 @@ Usage: plot_mode_field
 \end_layout
 
 \begin_layout LyX-Code
--simple | -composite | -raw
+mode_nc_file_list
+\end_layout
+
+\begin_layout LyX-Code
+-raw | -simple | -cluster
 \end_layout
 
 \begin_layout LyX-Code
@@ -5398,11 +5411,7 @@ Usage: plot_mode_field
 \end_layout
 
 \begin_layout LyX-Code
--config path
-\end_layout
-
-\begin_layout LyX-Code
-mode_nc_file_list
+-config file
 \end_layout
 
 \begin_layout LyX-Code
@@ -5433,9 +5442,21 @@ Required arguments for plot_mode_field
 1.
  The 
 \series bold
--simple | -composite | -raw argument
+mode_nc_file_list
 \series medium
- indicates the types of objects to be plotted.
+ specifies the MODE output files to be used for plotting.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+-raw | -simple | -cluster
+\series medium
+ argument indicates the types of field to be plotted.
  Exactly one must be specified.
  For details about the types of objects, see the chapter in this document
  on MODE.
@@ -5444,7 +5465,7 @@ Required arguments for plot_mode_field
 \begin_layout Description
 
 \series medium
-2.
+3.
  The 
 \series bold
 -obs | -fcst
@@ -5457,24 +5478,12 @@ Required arguments for plot_mode_field
 \begin_layout Description
 
 \series medium
-3.
- The 
-\series bold
--config path
-\series medium
- specifies the configuration file to use for specification of plotting options.
-\end_layout
-
-\begin_layout Description
-
-\series medium
 4.
  The 
 \series bold
-mode_nc_file_list
+-config file
 \series medium
- specifies the MODE output files to be used for plotting.
- 
+ specifies the configuration file to use for specification of plotting options.
 \end_layout
 
 \begin_layout Description
@@ -5554,7 +5563,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Simple observed precipitation objects
@@ -5567,7 +5576,7 @@ Simple observed precipitation objects
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename fig3.2.png
+	filename /var/autofs/mnt/dakota_d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Data_Formats/fig3.2.png
 	scale 55
 
 \end_inset
