@@ -53,7 +53,7 @@
       &OUTPUT_DIR;/mode/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj.nc
     </param>
     <output>
-      <exist>&OUTPUT_DIR;/plot_mode_field/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj_fcst_comp.png</exist>
+      <exist>&OUTPUT_DIR;/plot_mode_field/mode_CUT_LINE_120000L_20131001_120000V_120000A_obj_fcst_cluster.png</exist>
     </output>
   </test>
 
