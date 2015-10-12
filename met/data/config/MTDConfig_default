@@ -61,24 +61,6 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
    //
-   // Handle missing data
-   //
-
-mask_missing_flag = NONE;
-
-   //
-   // Match objects between the forecast and observation fields
-   //
-
-match_flag = MERGE_BOTH;
-
-   //
-   // Maximum centroid distance for objects to be compared
-   //
-
-max_centroid_dist = 800.0/grid_res;
-
-   //
    //  Throw away 3D objects with volumes smaller than this
    //
 
