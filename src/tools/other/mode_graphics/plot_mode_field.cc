@@ -612,7 +612,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
 
      << "Usage: " << program_name << "\n"
      << "\tmode_nc_file_list\n"
-     << "\t-simple | -cluster | -raw\n"
+     << "\t-raw | -simple | -cluster\n"
      << "\t-obs | -fcst\n"
      << "\t-config file\n"
      << "\t[-log file]\n"
