@@ -202,7 +202,7 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
 				 valid_time,
 				 _stationLat, _stationLon,
 				 0,
-				 "NA",
+				 na_str,
 				 GRIB_CODE,
 				 0.0, 0.0,
 				 atof(data_line[0])));
