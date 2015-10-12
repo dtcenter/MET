@@ -136,7 +136,7 @@ filename "fwd_refs_appendix/MET_Users_Guide_Forward.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_1/MET_Users_Guide_Chapter1.lyx"
+filename "Overview/MET_Users_Guide_Overview.lyx"
 
 \end_inset
 
@@ -153,7 +153,7 @@ filename "Chapter_1/MET_Users_Guide_Chapter1.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_2/MET_Users_Guide_Chapter2.lyx"
+filename "Installation/MET_Users_Guide_Installation.lyx"
 
 \end_inset
 
@@ -170,7 +170,7 @@ filename "Chapter_2/MET_Users_Guide_Chapter2.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_3/MET_Users_Guide_Chapter3.lyx"
+filename "Data_Formats/MET_Users_Guide_Data_Formats.lyx"
 
 \end_inset
 
@@ -187,7 +187,7 @@ filename "Chapter_3/MET_Users_Guide_Chapter3.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_4/MET_Users_Guide_Chapter4.lyx"
+filename "Point-Stat/MET_Users_Guide_Point-Stat.lyx"
 
 \end_inset
 
@@ -204,7 +204,7 @@ filename "Chapter_4/MET_Users_Guide_Chapter4.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_5/MET_Users_Guide_Chapter5.lyx"
+filename "Grid-Stat/MET_Users_Guide_Grid-Stat.lyx"
 
 \end_inset
 
@@ -221,7 +221,7 @@ filename "Chapter_5/MET_Users_Guide_Chapter5.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_6/MET_Users_Guide_Chapter6.lyx"
+filename "Series-Analysis/MET_Users_Guide_Series-Analysis.lyx"
 
 \end_inset
 
@@ -238,7 +238,7 @@ filename "Chapter_6/MET_Users_Guide_Chapter6.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_7/MET_Users_Guide_Chapter7.lyx"
+filename "Ensemble-Stat/MET_Users_Guide_Ensemble-Stat.lyx"
 
 \end_inset
 
@@ -277,7 +277,7 @@ Chapter 9 placeholder
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_10/MET_Users_Guide_Chapter10.lyx"
+filename "Stat-Analysis/MET_Users_Guide_Stat-Analysis.lyx"
 
 \end_inset
 
@@ -294,7 +294,7 @@ filename "Chapter_10/MET_Users_Guide_Chapter10.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_11/MET_Users_Guide_Chapter11.lyx"
+filename "MODE-Analysis/MET_Users_Guide_MODE-Analysis.lyx"
 
 \end_inset
 
@@ -311,7 +311,7 @@ filename "Chapter_11/MET_Users_Guide_Chapter11.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_12/MET_Users_Guide_Chapter12.lyx"
+filename "Plotting/MET_Users_Guide_Plotting.lyx"
 
 \end_inset
 
@@ -325,7 +325,7 @@ filename "Chapter_12/MET_Users_Guide_Chapter12.lyx"
 
 \begin_inset CommandInset include
 LatexCommand include
-filename "Chapter_13/MET_Users_Guide_Chapter13.lyx"
+filename "MODE-TD/MET_Users_Guide_MODE-TD.lyx"
 
 \end_inset
 
