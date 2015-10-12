@@ -399,18 +399,20 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 */
       // Conf: max_centroid_dist
 
-   max_centroid_dist = conf.lookup_double(conf_key_max_centroid_dist);
+   // max_centroid_dist = conf.lookup_double(conf_key_max_centroid_dist);
 
       // Check that max_centroid_dist is > 0
-
+/*
    if(max_centroid_dist <= 0) {
       mlog << Warning << "\nMtdConfigInfo::process_config() -> "
            << "max_centroid_dist (" << max_centroid_dist
            << ") should be set > 0\n\n";
    }
 
+*/
       // Conf: mask.grid
 
+/*
    mask_grid_name = conf.lookup_string(conf_key_mask_grid);
    mask_grid_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_grid_flag));
 
@@ -418,6 +420,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    mask_poly_name = conf.lookup_string(conf_key_mask_poly);
    mask_poly_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_poly_flag));
+*/
 
       // Conf: weight
 
@@ -512,30 +515,30 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Conf: print_interest_thresh
 
-   print_interest_thresh = conf.lookup_double(conf_key_print_interest_thresh);
+   // print_interest_thresh = conf.lookup_double(conf_key_print_interest_thresh);
 
       // Check that print_interest_thresh is between 0 and 1.
-
+/*
    if(print_interest_thresh < 0 || print_interest_thresh > 1) {
       mlog << Error << "\nMtdConfigInfo::process_config() -> "
            << "print_interest_thresh (" << print_interest_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
-
+*/
       // Conf: zero_border_size
 
-   zero_border_size = conf.lookup_int(conf_key_zero_border_size);
+//    zero_border_size = conf.lookup_int(conf_key_zero_border_size);
 
       // Check that zero_border_size >= 1
-
+/*
    if(zero_border_size < 1) {
       mlog << Error << "\nMtdConfigInfo::process_config() -> "
            << "zero_border_size (" << zero_border_size
            << ") must be set >= 1.\n\n";
       exit(1);
    }
-
+*/
       // Conf: nc_pairs_flag
 
    parse_nc_info();
