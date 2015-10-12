@@ -70,20 +70,6 @@ min_volume = 2000;
 ////////////////////////////////////////////////////////////////////////////////
 
    //
-   // Verification masking regions
-   //
-
-mask = {
-   grid      = "";
-   grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
-   poly      = "";
-   poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
-
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
-   //
    // Fuzzy engine weights
    //
 
@@ -197,22 +183,6 @@ interest_function = {
    //
 
 total_interest_thresh = 0.7;
-
-   //
-   // Interest threshold for printing output pair information
-   //
-
-print_interest_thresh = 0.0;
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-   //
-   // Number of grid boxes to fill with bad data values along the edge of the field
-   // to avoid edge effects.
-   //
-
-zero_border_size = 1;
 
 
 ////////////////////////////////////////////////////////////////////////////////
