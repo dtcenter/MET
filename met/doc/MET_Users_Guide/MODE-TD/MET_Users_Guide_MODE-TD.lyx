@@ -82,14 +82,6 @@ MODE Time Domain (MTD) is an extension of the MODE object-based approach
  as similar as possible to that of traditional MODE.
 \end_layout
 
-\begin_layout Paragraph*
-
-\series medium
-// 
-\backslash
-Comment{Example plot of 3D objects, here.}
-\end_layout
-
 \begin_layout Standard
 \begin_inset Float figure
 wide false
@@ -149,54 +141,6 @@ A plot of some MTD precipitation objects is shown //?? over the United States
 \begin_layout Paragraph*
 
 \series medium
-
-\backslash
-par
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-// MODE MTD // 
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-// Location errors Timing errors.
- 
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-// Intensity errors Speed & direction errors.
- 
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-// Shape errors Buildup & decay errors.
- 
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-// Size errors Duration errors.
- 
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-// Orientation errors
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
 The 2D (or traditional) MODE approach to object-base verification enabled
  users to analyze forecasts in terms of location errors, intensity errors
  and shape, size and orientation errors.
@@ -209,14 +153,6 @@ The 2D (or traditional) MODE approach to object-base verification enabled
 \begin_layout Paragraph*
 
 \series medium
-
-\backslash
-par
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
 In the past, many MET users have performed separate MODE runs at a series
  of forecast valid times and analyzed the resulting object attributes, matches
  and merges as functions of time in an effort to incorporate temporal informatio
@@ -224,14 +160,6 @@ n in assessments of forecast quality.
  MTD was developed as a way to address this need in a more systematic way.
  Most of the information obtained from such multiple coordinated MODE runs
  can be obtained more simply from MTD.
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-
-\backslash
-par
 \end_layout
 
 \begin_layout Paragraph*
@@ -253,14 +181,6 @@ At first glance, the addition of a third dimension would seem to entail
 \begin_layout Paragraph*
 
 \series medium
-
-\backslash
-par
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
 In this users' guide, we will assume that the reader has a basic familiarity
  with traditional MODE, its internal operation, (convolution thresholding,
  fuzzy logic matching and merging) and its output.
@@ -272,30 +192,958 @@ In this users' guide, we will assume that the reader has a basic familiarity
  a more robust MTD release in the future.
 \end_layout
 
-\begin_layout Paragraph*
-
-\series medium
-////////////////////////////////////////////////////////////////////////
+\begin_layout Chapter
+Attributes
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Paragraph
 
 \series medium
-/////////////////////////// illust_insert(3d_color_fig) ////////////////////////
-///
+Object attributes are, for the most part, calculated in much the same way
+ in MTD as they are in MODE, although the fact that one of the dimensions
+ is non-spatial introduces a few quirks.
+ Several of the object attributes that traditional MODE calculates assume
+ that distances, angles and areas can be calculated in grid coordinates
+ via the usual Euclidian/Cartesian methods.
+ That is no longer the case in spacetime, since there is no distance function
+ (more precisely, no {
+\backslash
+italicfont metric}) there.
+ Given two points in this spacetime, say ?? $(x_1, y_1, t_1)$ and $(x_2,
+ y_2, t_2)$, there is no way to measure their separation with a single nonnegati
+ve number in a physically meaningful way.
+ If all three of our dimensions were spatial, there would be no difficulties.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Paragraph
 
 \series medium
-// ////////////////////// // illust_insert(xyt_fig) // //////////////////////
-\end_layout
-
-\begin_layout Paragraph*
-
-\series medium
-////////////////////////////////////////////////////////////////////////
+This means that some care must be taken both in determining how to generalize
+ the calculation of a geometric attribute to three-dimensional spacetime,
+ and also in interpreting the attributes even in the case where the generalizati
+on is straightforward.
  
+\end_layout
+
+\begin_layout Section
+Convolution
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+As in MODE, MTD applies a convolution filter to the raw data as a preliminary
+ step in resolving the field into objects.
+ The convolution step in MTD differs in several respects from that performed
+ in MODE, however.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+First, MTD typically reads in several planes of data for each data field---one
+ plane for each time step, and there is really no limit to the number of
+ time steps.
+ So MTD is convolving much more data than it would be if it were simply
+ analyzing a 2D data field.
+ Secondly, MTD convolves in time as well as space, which again increases
+ the amount of data needing to be processed.
+ The net effect of all this is to greatly increase the time needed to perform
+ the convolution step.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Because of this, the developers decided to make several changes in the way
+ convolution was performed in MTD.
+ Most of the differences come from the need to make the convolution step
+ as fast as possible.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The most basic change is to use a square convolution filter rather than
+ the circular one that MODE uses.
+ The overall 
+\begin_inset Quotes eld
+\end_inset
+
+size
+\begin_inset Quotes erd
+\end_inset
+
+ of the filter is still determined by one parameter (denoted R, as in MODE),
+ but this should not be thought of as a 
+\emph on
+radius
+\emph default
+.
+ Instead, the size of the square is (2R + 1) 
+\backslash
+times (2R + 1), as shown in Figure 2.1
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+2R+1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename two_r_plus_one_fig.png
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Another change is that we do not allow any bad data in thee convolution
+ square.
+ in MODE, the user may specify what percentage of bad data in the convolution
+ region is permissible, and MODE will rescale the value of the filter accordingl
+y for each data point.
+ For the sake of speed, MTD requires that there be no bad data in the convolutio
+n region.
+ If any bad data exists in the region, the convolved value there is set
+ to a bad data flag.
+\end_layout
+
+\begin_layout Section
+3D Single Attributes
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+MTD calculates several 3D attributes for single objects.
+ The object could come from either the forecast field or the observed field.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+A 3D spacetime
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Unable to bold text.
+\end_layout
+
+\end_inset
+
+ 
+\emph on
+centroid
+\emph default
+ ??$(
+\backslash
+overline{x}, 
+\backslash
+overline{y}, 
+\backslash
+overline{t})$ is calculated.
+ There are no statistical overtones here.
+ The number ??$
+\backslash
+overline{x}$, for example, is just the average value of the 
+\emph on
+x
+\emph default
+ coordinate over the object.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+// 
+\backslash
+vskip SKIP_AMT 
+\backslash
+par
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The vector 
+\emph on
+velocity
+\emph default
+ ??$(v_x, v_y)$ is obtained by fitting a line to an 3D object.
+ The requirement for fitting the line is to minimize the sum of the squares
+ of the 
+\emph on
+spatial
+\emph default
+ distances from each point of the object to the line be minimized.
+ (We can't measure distances in spacetime but at each fixed time 
+\emph on
+t
+\emph default
+ we can measure purely spatial distances.) From this velocity we get the
+ 
+\emph on
+speed
+\emph default
+ and 
+\emph on
+direction
+\emph default
+ of movement of the object.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Velocity
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename velocity_fig.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The spatial orientation of a object (what traditional MODE calls the 
+\emph on
+axis angle
+\emph default
+ of an object) is gotten by fitting a plane to an object.
+ As with the case of velocity, our optimization criterion is that the sum
+ of the squares of the spatial distances from each point of the object to
+ the plane be minimized.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Figure 4 gives some idea of the reason for fitting a plane, rather than
+ a line, as MODE does.
+ On the left in the figure, we see an object (in blue shaped like an 
+\begin_inset Quotes eld
+\end_inset
+
+A
+\begin_inset Quotes erd
+\end_inset
+
+) at several time steps moving through the grid.
+ For simplicity, the object is not rotating as it moves (though of course
+ real objects can certainly do this).
+ At each time step, the 2D MODE spatial axis of the object is indicated
+ by the red line.
+ In the center of the figure, we see the same thing, just with more time
+ steps.
+ And on the right, even more time steps.
+ We see that the axis lines at each time step sweep out a plane in three
+ dimensions, shown in red on the right.
+ This plane is the same one that MTD would calculate for this 3D object
+ to determine its spatial orientation, 
+\backslash
+ie, axis angle.
+ Indeed, for the special case of an object that is not moving at all, the
+ MTD calculation of axis angle reduces to the same one that traditional
+ MODE uses, as it should.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+3D axis
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename axis_3d_fig.png
+	scale 55
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+A simple integer count of the number of grid squares in an object for all
+ of it's lifetime gives the 
+\emph on
+volume
+\emph default
+ of the object.
+ Remember that while we're working in three dimensions, one of the dimensions
+ is non-spatial, so one should not attempt to convert this to a volume in,
+ e.g., ??${
+\backslash
+hbox{km}}^3$.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\emph on
+start time
+\emph default
+ and 
+\emph on
+end time
+\emph default
+ of an object are attributes as well.
+ This is an integer telling which time step an object starts and ends at.
+ These values are zero-based, so for example, if an object comes into existence
+ at the ??do_ordinal(3) time step and lasts until the ??do_ordinal(9) time
+ step, then the start time and end time will be listed as 2 and 8, respectively.
+ Note that this object has a lifetime of 7 time steps, not 6.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Finally, MTD calculates several 
+\emph on
+intensity percentiles
+\emph default
+ of the raw data values inside each object.
+ Not all of the the attributes are purely geometrical.
+\end_layout
+
+\begin_layout Section
+3D Pair Attributes
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The next category of spatial attributes is for pairs of objects --- one
+ of the pair coming from the collection of forecast objects, the other coming
+ from the observation objects.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Note: whenever a pair attribute is described below as a 
+\emph on
+delta
+\emph default
+, that means it's a simple difference of two single-object attributes.
+ The difference is always taken as 
+\begin_inset Quotes eld
+\end_inset
+
+forecast minus observed.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\emph on
+spatial centroid
+\emph default
+ is the purely spatial part of the centroid separation of two objects.
+ If one centroid is at ??$(
+\backslash
+overline{x}_1, 
+\backslash
+overline{y}_1, 
+\backslash
+overline{t}_1)$ and the other is at ??$(
+\backslash
+overline{x}_2, 
+\backslash
+overline{y}_2, 
+\backslash
+overline{t}_2)$ then the distance is calculated as??
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+$$
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+
+\backslash
+sqrt{
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+
+\backslash
+left(
+\backslash
+overline{x}_1 - 
+\backslash
+overline{x}_2
+\backslash
+right)^2
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
++
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+
+\backslash
+left(
+\backslash
+overline{y}_1 - 
+\backslash
+overline{y}_2
+\backslash
+right)^2
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+}
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+$$
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\emph on
+time centroid delta
+\emph default
+ is the difference between the time coordinates of the centroid.
+ Since this is a simple difference, it can be either positive or negative.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The 
+\emph on
+axis difference
+\emph default
+ is smaller of the two angles that the two spatial axis planes make with
+ each other.
+ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+Speed delta
+\emph default
+ and 
+\emph on
+direction difference
+\emph default
+ are obtained from the velocity vectors of the two objects.
+ Speed delta is the difference in the lengths of the vectors, and direction
+ difference is the angle that the two vectors make with each other.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+Volume ratio
+\emph default
+ is volume of the forecast object divided by the volume of the observed
+ object.
+ Note that any 3D object must necessarily have a nonzero volume, so there's
+ no chance of zeros in the denominator.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+Start time delta
+\emph default
+ and 
+\emph on
+end time delta
+\emph default
+ are the differences in the corresponding times associated with the two
+ objects.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+\emph on
+Intersection volume
+\emph default
+ measures the overlap of two objects.
+ If the two objects do not overlap, then this will be zero.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Finally, the 
+\emph on
+total interest
+\emph default
+ gives the result of the fuzzy-logic matching and merging calculation for
+ this pair of objects.
+ Note that this is provided only for simple objects, not for composites.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+axis diff
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename axis_diff_fig.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+2D Constant-Time Attributes
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+The final category of object attributes calculated by MTD are two-dimensional
+ spatial attributes for horizontal (
+\emph on
+i.e
+\emph default
+., constant-time) slices of a spacetime object.
+ This is so that the behavior of these attributes over time can be examined.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+For example, in our earlier discussion relating to Figure 4, we mentioned
+ that for simplicity, the object in the figure was not allowed to rotate
+ as it moved.
+ But what if the object (a hurricane, for example) 
+\emph on
+is
+\emph default
+ rotating over time? In that case, it's probably not meaningful to assign
+ a single spatial orientation to the object over its entire lifetime.
+ If we had a spatial axis angle at each time, however, then we could fit
+ a model such as ??$
+\backslash
+theta = 
+\backslash
+theta_0 + 
+\backslash
+omega t$ to the angles and test the goodness of fit.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+For such reasons, having 2D spatial attributes ??({
+\backslash
+italicfont 
+\backslash
+`a la} MODE) for each object at each time step can be useful.
+ The list of the 2D attributes calculated is:
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+??
+\backslash
+medskip
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+
+\backslash
+myitem Centroid $(x, y)$ 
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+
+\backslash
+myitem Centroid latitude and longitude 
+\backslash
+myitem Area 
+\backslash
+myitem Axis angle
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+
+\backslash
+medskip
+\end_layout
+
+\begin_layout Section
+
+\series medium
+Matching & Merging
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+#include "basic_graph.gin" #include "node_colors.gin"
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Matching and merging operations in MTD are done in a simpler fashion than
+ in MODE.
+ In order to understand this operation, it is necessary to discuss some
+ very basic notions of graph theory.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+A 
+\emph on
+graph
+\emph default
+ is a finite set of 
+\emph on
+vertices
+\emph default
+ (also called
+\emph on
+ nodes
+\emph default
+) and 
+\emph on
+edges
+\emph default
+, with each edge connecting two vertices.
+ Conceptually, it is enough for our purposes to think of vertices as points
+ and edges as lines connecting them.
+ See Figure 5 for an illustration.
+ In the figure we see a collection of 11 nodes, indicated by the small circles,
+ together with some edges indicated by straight line segments.
+ A 
+\emph on
+path
+\emph default
+ is a sequence of vertices ??$(v_1, v_2, 
+\backslash
+ldots, v_n)$ such that for each?? $1 
+\backslash
+leq i < n$ there is an edge connecting ??$v_i$ to $v_{i + 1}$.
+ For example, in Figure 5, there is no edge connecting vertices 
+\backslash
+#6 and 
+\backslash
+#7, but there is a path connecting them.
+ In illustrations, graph vertices are often labelled with identifying informatio
+n, such as the numbers in Figure 5.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+If we consider two distinct nodes in a graph to be related if there is a
+ path connecting them, then it's easy to see that this defines an equivalence
+ relation on the set of nodes, partitioning the graph into equivalence classes.
+ Any node, such as #10 in Figure 5, that has no edges emanating from it
+ is in a class by itself.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+basic graph
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename basic_graph_fig.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+We have barely scratched the surface of the enormous subject of graph theory,
+ but this will suffice for our purposes.
+ How does MTD use graphs? Essentially the simple forecast and observed objects
+ become nodes in a graph.
+ Each pair of objects that have sufficiently high total interest (as determined
+ by the fuzzy logic engine) generates an edge connecting the two corresponding
+ nodes in the graph.
+ The graph is then partitioned into equivalence classes using path connectivity
+ (as explained above), and the resulting equivalence classes determine the
+ matches and merges.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+An example will hopefully make this clear.
+ In parts (a) and (b) of Figure 6 we indicate the objects in the forecast
+ and observed field for this simple example.
+ We have used 2D rather than 3D objects in this example for simplicity.
+ Also, to help distinguish the objects in each field, the forecast objects
+ are labelled by numbers and the observed object by letters.
+ Each forecast and each observed object become nodes in a graph as indicated
+ in part (c) of the figure.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+For the purposes of this example, suppose that the MTD fuzzy engine reports
+ that observed simple object B and forecast simple object 4 together have
+ a total interest higher than the total interest threshold specified in
+ the config file.
+ Also, observed simple object C and forecast simple object 4 have high enough
+ interest to pass the threshold.
+ Furthermore, forecast simple objects 2 and 3 both have sufficiently high
+ interest when paired with observed simple object A.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+These four parings result in the 4 edges in the graph shown by the solid
+ lines in part (c) of the figure.
+ Partitioning this graph into equivalence classes results in the three sets
+ indicated in part (d) of the figure.
+ These three sets are the cluster objects determined by MTD.
+ In this example, forecast objects 2 and 3 are merged into forecast cluster
+ object #1 which is matched to observed cluster object #1, consisting of
+ observed object A.
+ (As in MODE, a cluster object may contain multiple simple objects, but
+ may also consist of a single simple object.) Essentially, forecast simple
+ objects 2 and 3 are merged because there is a path connecting them in the
+ graph.
+ This is indicated by the dashed line in the graph.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Continuing this example, forecast cluster object #2 (consisting only of
+ forecast simple object 4) is matched to observed cluster object #2 (consisting
+ of observed simple objects B and C).
+ Again, the merging of observed simple objects is indicated by the dashed
+ line in the graph.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+Forecast cluster object #3 consists solely of forecast simple object 1.
+ It is not matched to any observed cluster object.
+ Alternatively, one may take the viewpoint that forecast simple object 1
+ ended up not participating in the matching and merging process; it is not
+ merged with anything, it is not matched with anything.
+ Essentially it represents a false alarm.
+\end_layout
+
+\begin_layout Paragraph
+
+\series medium
+To summarize: Any forecast simple objects that find themselves in the same
+ equivalence class are merged.
+ Similarly, any observed objects in the same class are merged.
+ Any forecast and observed objects in the same class are matched.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+figure 6, 2D example
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename 2d_example_fig.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body
