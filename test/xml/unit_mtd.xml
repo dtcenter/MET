@@ -7,7 +7,7 @@
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
 
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
-  <!ENTITY DATA_DIR       "&INPUT_DIR;/mtd/files">
+  <!ENTITY DATA_DIR       "&INPUT_DIR;/mtd">
 ]>
 
 <met_test>
@@ -18,23 +18,41 @@
   <test name="mtd_basic">
     <exec>&MET_DIR;/bin/mtd</exec>
     <env>
+       <pair><name>OUTPUT_PREFIX</name> <value>BASIC</value></pair>
     </env>
     <param> \
-      -fcst    &DATA_DIR;/arw* \
-      -obs     &DATA_DIR;/obs* \
+      -fcst    &DATA_DIR;/fcst_files/*.grb \
+      -obs     &DATA_DIR;/obs_files/*.grb \
       -config  &CONFIG_DIR;/MTD_config_simple  \
       -outdir  &OUTPUT_DIR;/mtd -v 1
     </param>
 
     <output>
-      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_2d.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_pc.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_ps.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_sc.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_3d_ss.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_basic_20100517_010000V_obj.nc</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_2d.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pc.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_ps.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_sc.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_ss.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_obj.nc</exist>
     </output>
+  </test>
 
+  <test name="mtd_single">
+    <exec>&MET_DIR;/bin/mtd</exec>
+    <env>
+       <pair><name>OUTPUT_PREFIX</name> <value>SINGLE</value></pair>
+    </env>
+    <param> \
+      -single  &DATA_DIR;/fcst_files/*.grb \
+      -config  &CONFIG_DIR;/MTD_config_simple  \
+      -outdir  &OUTPUT_DIR;/mtd -v 1
+    </param>
+
+    <output>
+      <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_2d.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_3d_ss.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_obj.nc</exist>
+    </output>
   </test>
 
 </met_test>

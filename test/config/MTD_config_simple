@@ -5,7 +5,6 @@
 
 model = "WRF";
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
    //
@@ -15,33 +14,29 @@ model = "WRF";
 fcst = {
 
    field = {
-      name  = "APCP_01";
-      level = "(*,*)";
+      name  = "APCP";
+      level = "A01";
    };
-   
-   conv_radius       = 5;
-   conv_thresh       = >=1.5;
 
-   raw_thresh        = NA;
-   vld_thresh        = 0.5;
-   area_thresh       = NA;
-   inten_perc_value  = 100;
-   inten_perc_thresh = NA;
-   merge_thresh      = >=1.25;
-   merge_flag        = THRESH;
+   conv_radius       = 2;
+   conv_thresh       = >=0.5;
 
 };
 
 obs = fcst;
+obs = {
+   GRIB1_ptv = 129;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
+   //
+   //  Throw away 3D objects with volumes smaller than this
+   //
 
-min_volume = 10000;
-
+min_volume = 1000;
 
 ////////////////////////////////////////////////////////////////////////////////
-
 
    //
    // Total interest threshold for determining matches
@@ -51,7 +46,6 @@ total_interest_thresh = 0.65;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-
 
 nc_output = {
 
@@ -65,16 +59,12 @@ nc_output = {
 
 txt_output = {
 
-   attributes_2d   = true;
-   attributes_3d   = true;
-
-   // convex_hulls_2d = true;
+   attributes_2d = true;
+   attributes_3d = true;
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////
-
 
 weight = {
 
@@ -96,13 +86,8 @@ weight = {
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
-
-output_prefix  = "basic";
-
+output_prefix = "${OUTPUT_PREFIX}";
 
 ////////////////////////////////////////////////////////////////////////////////
-
-
