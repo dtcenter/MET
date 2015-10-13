@@ -4761,7 +4761,7 @@ Example plot showing surface temperature froma MODIS file.
 
 \series bold
 \begin_inset Graphics
-	filename /var/autofs/mnt/dakota_d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Data_Formats/fig3.1.png
+	filename fig3.1.png
 	scale 60
 
 \end_inset
@@ -5576,7 +5576,7 @@ Simple observed precipitation objects
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename /var/autofs/mnt/dakota_d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Data_Formats/fig3.2.png
+	filename fig3.2.png
 	scale 55
 
 \end_inset
