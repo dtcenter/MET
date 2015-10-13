@@ -15,6 +15,7 @@
 
 #include <utility>
 #include <vector>
+#include <ctime>
 
 #include "vx_cal.h"
 #include "vx_util.h"
