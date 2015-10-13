@@ -1307,7 +1307,7 @@ int get_prc_column_offset(const char *col_name) {
 ////////////////////////////////////////////////////////////////////////
 
 int get_rhist_column_offset(const char *col_name, const STATLine &L) {
-   int i, n;
+   int i;
    int offset = bad_data_int;
 
    //
