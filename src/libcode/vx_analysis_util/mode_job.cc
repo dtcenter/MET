@@ -486,9 +486,8 @@ const int Nfields = columns.n_elements();
 
 if ( Nfields == 0 )  return;
 
-int j, k, r, m;
+int j, k, r;
 double mean, stdev;
-char junk[256];
 AsciiTable table;
 const int ncols = 12;
 
@@ -856,7 +855,7 @@ void ByCaseJob::do_output(ostream & out) const
 
 if ( valid_times.n_elements() == 0 )  return;
 
-int j, k, m;
+int j, k;
 int r;
 const int Ncols = 7;
 const int Nrows = 2 + valid_times.n_elements();
