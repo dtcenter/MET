@@ -221,6 +221,57 @@ filename "Grid-Stat/MET_Users_Guide_Grid-Stat.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
+filename "Ensemble-Stat/MET_Users_Guide_Ensemble-Stat.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Wavelet-Stat/MET_Users_Guide_Wavelet-Stat.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Stat-Analysis/MET_Users_Guide_Stat-Analysis.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
 filename "Series-Analysis/MET_Users_Guide_Series-Analysis.lyx"
 
 \end_inset
@@ -238,46 +289,7 @@ filename "Series-Analysis/MET_Users_Guide_Series-Analysis.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Ensemble-Stat/MET_Users_Guide_Ensemble-Stat.lyx"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Chapter 8 placeholder
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Chapter 9 placeholder
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand include
-filename "Stat-Analysis/MET_Users_Guide_Stat-Analysis.lyx"
+filename "MODE/MET_Users_Guide_MODE.lyx"
 
 \end_inset
 
@@ -311,7 +323,7 @@ filename "MODE-Analysis/MET_Users_Guide_MODE-Analysis.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Plotting/MET_Users_Guide_Plotting.lyx"
+filename "MODE-TD/MET_Users_Guide_MODE-TD.lyx"
 
 \end_inset
 
@@ -325,7 +337,7 @@ filename "Plotting/MET_Users_Guide_Plotting.lyx"
 
 \begin_inset CommandInset include
 LatexCommand include
-filename "MODE-TD/MET_Users_Guide_MODE-TD.lyx"
+filename "doc/MET-TC_Users_Guide/MET-TC_Users_Guide.lyx"
 
 \end_inset
 
