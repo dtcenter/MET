@@ -759,17 +759,22 @@ void usage()
 
 {
 
+ConcatString tab;
+
+tab.set_repeat(' ', 10);
+
 cout << "\n*** Model Evaluation Tools (MET" << met_version
      << ") ***\n\n"
 
      << "Usage: " << program_name << "\n"
-     << "\t-fcst    file1 ... file_n | file_list\n"
-     << "\t-obs     file1 ... file_n | file_list\n"
-     << "\t-single  file1 ... file_n | file_list\n"
-     << "\t-config  config_file\n"
-     << "\t[-outdir path]\n"
-     << "\t[-log    file]\n"
-     << "\t[-v      level]\n\n"
+
+     << tab << "-fcst    file_1 ... file_n | file_list\n"
+     << tab << "-obs     file_1 ... file_n | file_list\n"
+     << tab << "-single  file_1 ... file_n | file_list\n"
+     << tab << "-config  config_file\n"
+     << tab << "[-outdir path]\n"
+     << tab << "[-log    file]\n"
+     << tab << "[-v      level]\n\n"
 
      << "\twhere\t\"-fcst file_1 ... file_n\" are the gridded "
      << "forecast files to be used (required).\n"
