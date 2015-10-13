@@ -19,6 +19,7 @@ using namespace std;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <ctime>
 
 #include "mtd_file.h"
 #include "mtd_partition.h"
