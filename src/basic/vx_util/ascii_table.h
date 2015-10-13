@@ -307,6 +307,8 @@ class AsciiTable {
 
       virtual bool elim_trailing_whitespace() const;
 
+      virtual void underline_row(const int row, const char);
+
 };
 
 

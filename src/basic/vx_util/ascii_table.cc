@@ -1420,6 +1420,31 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void AsciiTable::underline_row(const int row, const char underline_char)
+
+{
+
+int j;
+ConcatString s;
+
+for (j=0; j<Ncols; ++j)  {
+
+   s.set_repeat(underline_char, ColWidth[j]);
+
+   set_entry(row, j, s.text());
+
+}   //  for j
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //
