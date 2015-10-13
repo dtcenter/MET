@@ -73,7 +73,7 @@
 Appendix D - Confidence Intervals 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 A single verification statistic is statistically meaningless without associated
  uncertainty information in accompaniment.
  There can be numerous sources of uncertainty associated with such a statistic
@@ -143,7 +143,7 @@ alpha=0.05}$
  then we expect the true value to fall within 95 of the intervals.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 There are two main types of CIs available with MET: parametric and non-parametri
 c.
  All of the parametric intervals used with MET rely on the underlying sample
@@ -175,7 +175,7 @@ displaystyle{F-O}$
  and this is described subsequently.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The most commonly used confidence interval about an estimate for a statistic
  (or parameter), 
 \begin_inset ERT
@@ -216,7 +216,7 @@ eqno{(D.1)}$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 where 
 \begin_inset ERT
 status open
@@ -430,7 +430,7 @@ right)^2}$
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Mostly, the normal approximation is used as an asymptotic approximation.
  That is, the interval (D.1) may only be appropriate for large 
 \emph on
@@ -532,7 +532,7 @@ sigma}$
 , as described above.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Table D.1 summarizes the verification statistics in MET that have normal
  approximation CIs given by (D.1) along with their corresponding standard
  error estimates, .
@@ -956,7 +956,7 @@ frac{1}{d}}}$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Other statistics in MET having parametric CIs that rely on the underlying
  sample to be at least approximately iid normal, but have a different form
  derived from the normality assumption on the sample include the variance,
@@ -964,7 +964,7 @@ Other statistics in MET having parametric CIs that rely on the underlying
  These are addressed subsequently.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Generally, the normal interval (D.1) is appropriate for statistics of continuous
  variables, but a limit law for the binomial distribution allows for use
  of this interval with proportions.
@@ -1035,7 +1035,7 @@ eqno{(D.3)}$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 where 
 \begin_inset ERT
 status open
@@ -1056,7 +1056,7 @@ hat p$
  is the interval employed by MET.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The forecast/observation variance has CIs derived from the underlying sample
  being approximately iid normal with mean 
 \begin_inset ERT
@@ -1161,7 +1161,7 @@ n-1
 servation standard deviation.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Finally, the linear correlation coefficient has limits given by 
 \begin_inset ERT
 status open
@@ -1224,7 +1224,7 @@ sqrt {n-3}}} $
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 All other verification scores with CIs in MET must be obtained through bootstrap
  resampling.
  However, it is also possible to obtain bootstrap CIs for any of the statistics
@@ -1259,7 +1259,7 @@ Calculate CIs for the parameters directly from the sample (see text below
  for more details)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Typically, a simple random sample is taken for step 2, and that is how it
  is done in MET.
  As an example of what happens in this step, suppose our sample is 
@@ -1314,7 +1314,7 @@ $m < n$
  root of the original sample size).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 There are numerous ways to construct CIs from the sample obtained in step
  4.
  MET allows for two of these procedures: the percentile and the BCa.
@@ -1356,7 +1356,7 @@ alpha/2$
  variance.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 If there is dependency in the sample, then it is prudent to account for
  this dependency in some way.
  One method that does not make a lot of assumptions is circular block bootstrapp

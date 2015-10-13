@@ -73,7 +73,7 @@ The Series Analysis Tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Series-Analysis Tool accumulates statistics separately for each horizontal
@@ -91,7 +91,7 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal
 Practical Information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section contains a description of how to configure and run the Series-Analy
@@ -107,7 +107,7 @@ d over the whole domain for a single time or height as is done by Grid-Stat.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This tool computes statistics for exactly one series each time it is run.
@@ -120,7 +120,7 @@ This tool computes statistics for exactly one series each time it is run.
  Several examples of defining series are described below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To define a time series of forecasts where the valid time changes for each
@@ -132,7 +132,7 @@ To define a time series of forecasts where the valid time changes for each
  with the same valid time.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To define a time series of forecasts that all have the same valid time,
@@ -144,7 +144,7 @@ To define a time series of forecasts that all have the same valid time,
  from each, and then retrieve the verifying observations.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To define a series of vertical levels all contained in a single input file,
@@ -161,7 +161,7 @@ To define a series of vertical levels all contained in a single input file,
 series_analysis usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the Series Analysis tool is shown below:
@@ -202,14 +202,14 @@ Usage: series_analysis
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 series_analysis 
 \series medium
 has some required arguments and accepts optional ones.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments ensemble_stat
 \end_layout
 
@@ -267,7 +267,7 @@ arguments for series_analysis
  The -v level overrides the default level of logging (2).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the series_analysis calling sequence is shown below:
@@ -297,7 +297,7 @@ series_analysis
 -out out/my_series_statistics.nc -v 2 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the Series-Analysis tool will process the list of forecast
@@ -311,7 +311,7 @@ In this example, the Series-Analysis tool will process the list of forecast
 series_analysis output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Series-Analysis tool produces NetCDF files containing output statistics
@@ -375,7 +375,7 @@ An example of the Gilbert Skill Score for precipitation forecasts at each
 series_analysis configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the Series-Analysis tool named 
@@ -391,7 +391,7 @@ share/met/config
  below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that environment variables may be used when editing configuration files,
@@ -426,7 +426,7 @@ WRF
 ;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -510,7 +510,7 @@ Z2
 obs = fcst;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -528,7 +528,7 @@ field
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For GRIB files, the GRIB code itself or the corresponding abbreviation may
@@ -553,7 +553,7 @@ indicates the accumulation or level value.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To specify verification fields for NetCDF files, the name of the NetCDF
@@ -563,7 +563,7 @@ To specify verification fields for NetCDF files, the name of the NetCDF
  dimensions for the gridded field.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The values listed above indicate that specific humidity, temperature, height,
@@ -588,7 +588,7 @@ target "http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html"
  provided that WIND is included in the field group.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For each 
@@ -605,7 +605,7 @@ rated list.
  For probabilistic forecast, thresholds must be specified using >= convention.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To indicate that a forecast field should be treated as probabilities, set
@@ -616,7 +616,7 @@ To indicate that a forecast field should be treated as probabilities, set
  verification methods.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -634,7 +634,7 @@ except that they apply to the observation field.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For each observation field, one or more thresholds can be specified for
@@ -667,7 +667,7 @@ height "1pt"
 ci_alpha[] = [0.05];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -716,7 +716,7 @@ seed = "";
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -738,7 +738,7 @@ variable indicates what method should be used for computing bootstrap confidence
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -755,7 +755,7 @@ variable must be set to a value between 0 and 1.
  m, should be equal to the size of the sample, n.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -775,7 +775,7 @@ variable defines the number of subsamples that should be taken when computing
  pairs.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -790,7 +790,7 @@ variable defines the random number generator to be used in the computation
  for a listing of the random number generators available for use.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -838,7 +838,7 @@ poly = "";
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -884,7 +884,7 @@ FULL
  See Appendix B for a list of grids that will be accepted.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -898,7 +898,7 @@ variable contains a single of file that defines the verification masking
  or Gen-Circle_mask tools.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Several masking polygons used by NCEP are predefined in the installed share/met/
@@ -910,7 +910,7 @@ poly directory.
  the grid.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Alternatively, any gridded data file that MET can read may be used to define
@@ -1083,7 +1083,7 @@ height "1pt"
 block_size = 1024;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Number of grid points to be processed concurrently.
@@ -1111,7 +1111,7 @@ height "1pt"
 vld_thresh = 1.0;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Ratio of valid matched pairs required to compute statistics for a grid point.
@@ -1138,7 +1138,7 @@ height "1pt"
 rank_corr_flag = TRUE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -1184,7 +1184,7 @@ height "1pt"
 tmp_dir = "/tmp";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This parameter indicates the directory where Series-Analysis should write
@@ -1219,7 +1219,7 @@ v5.1
 ;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The version indicates the version of the 

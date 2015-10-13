@@ -85,7 +85,7 @@ Introduction
 Motivation
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 MODE Time Domain (MTD) is an extension of the MODE object-based approach
@@ -146,7 +146,7 @@ name "par:A-plot-of-1"
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 A plot of some MTD precipitation objects is shown over the United States
@@ -179,7 +179,7 @@ illust_number(3d_color_fig).
  this method.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The 2D (or traditional) MODE approach to object-base verification enabled
@@ -191,7 +191,7 @@ The 2D (or traditional) MODE approach to object-base verification enabled
  This opens up new ways of analyzing forecast quality.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 In the past, many MET users have performed separate MODE runs at a series
@@ -203,7 +203,7 @@ n in assessments of forecast quality.
  can be obtained more simply from MTD.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 At first glance, the addition of a third dimension would seem to entail
@@ -219,7 +219,7 @@ At first glance, the addition of a third dimension would seem to entail
  be incorporated into MODE.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 In this users' guide, we will assume that the reader has a basic familiarity
@@ -237,7 +237,7 @@ In this users' guide, we will assume that the reader has a basic familiarity
 Attributes
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Object attributes are, for the most part, calculated in much the same way
@@ -279,7 +279,7 @@ $(x_2, y_2, t_2)$
  If all three of our dimensions were spatial, there would be no difficulties.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This means that some care must be taken both in determining how to generalize
@@ -293,7 +293,7 @@ on is straightforward.
 Convolution
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 As in MODE, MTD applies a convolution filter to the raw data as a preliminary
@@ -303,7 +303,7 @@ As in MODE, MTD applies a convolution filter to the raw data as a preliminary
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 First, MTD typically reads in several planes of data for each data field---one
@@ -317,7 +317,7 @@ First, MTD typically reads in several planes of data for each data field---one
  the convolution step.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Because of this, the developers decided to make several changes in the way
@@ -326,7 +326,7 @@ Because of this, the developers decided to make several changes in the way
  as fast as possible.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The most basic change is to use a square convolution filter rather than
@@ -398,7 +398,7 @@ Convolution Region
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Another change is that we do not allow any bad data in thee convolution
@@ -416,14 +416,14 @@ n region.
 3D Single Attributes
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MTD calculates several 3D attributes for single objects.
  The object could come from either the forecast field or the observed field.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A 3D spacetime 
@@ -493,7 +493,7 @@ $x$
  coordinate over the object.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The vector 
@@ -599,7 +599,7 @@ Velocity
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The spatial orientation of a object (what traditional MODE calls the 
@@ -612,7 +612,7 @@ axis angle
  the plane be minimized.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Figure 1.4 gives some idea of the reason for fitting a plane, rather than
@@ -677,7 +677,7 @@ status open
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A simple integer count of the number of grid squares in an object for all
@@ -713,7 +713,7 @@ hbox{km}}^3$
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -776,7 +776,7 @@ hbox{th}}$
  Note that this object has a lifetime of 7 time steps, not 6.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Finally, MTD calculates several 
@@ -800,7 +800,7 @@ bf intensity percentiles}
 3D Pair Attributes
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The next category of spatial attributes is for pairs of objects --- one
@@ -808,7 +808,7 @@ The next category of spatial attributes is for pairs of objects --- one
  from the observation objects.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note: whenever a pair attribute is described below as a 
@@ -827,7 +827,7 @@ forecast minus observed.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -943,7 +943,7 @@ $$
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -963,7 +963,7 @@ bf time centroid delta}
  Since this is a simple difference, it can be either positive or negative.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -984,7 +984,7 @@ bf axis difference}
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset ERT
@@ -1017,7 +1017,7 @@ bf direction difference}
  difference is the angle that the two vectors make with each other.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset ERT
@@ -1038,7 +1038,7 @@ bf Volume ratio}
  no chance of zeros in the denominator.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset ERT
@@ -1068,7 +1068,7 @@ status open
  objects.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset ERT
@@ -1087,7 +1087,7 @@ bf Intersection volume}
  If the two objects do not overlap, then this will be zero.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Finally, the 
@@ -1149,7 +1149,7 @@ Axis Angle Difference
 2D Constant-Time Attributes
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The final category of object attributes calculated by MTD are two-dimensional
@@ -1161,7 +1161,7 @@ i.e
  This is so that the behavior of these attributes over time can be examined.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For example, in our earlier discussion relating to Figure 1.4, we mentioned
@@ -1194,7 +1194,7 @@ omega t$
  to the angles and test the goodness of fit.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For such reasons, having 2D spatial attributes (as in MODE) for each object
@@ -1202,7 +1202,7 @@ For such reasons, having 2D spatial attributes (as in MODE) for each object
  The list of the 2D attributes calculated is:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 ??
@@ -1210,7 +1210,7 @@ For such reasons, having 2D spatial attributes (as in MODE) for each object
 medskip
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 
@@ -1218,7 +1218,7 @@ medskip
 myitem Centroid $(x, y)$ 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 
@@ -1234,7 +1234,7 @@ myitem Axis angle
 Matching & Merging
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Matching and merging operations in MTD are done in a simpler fashion than
@@ -1243,7 +1243,7 @@ Matching and merging operations in MTD are done in a simpler fashion than
  very basic notions of graph theory.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A 
@@ -1376,7 +1376,7 @@ $v_{i + 1}$
 n, such as the numbers in Figure 1.5.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 If we consider two distinct nodes in a graph to be related if there is a
@@ -1423,7 +1423,7 @@ Basic Graph Example
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 We have barely scratched the surface of the enormous subject of graph theory,
@@ -1438,7 +1438,7 @@ We have barely scratched the surface of the enormous subject of graph theory,
  matches and merges.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example will hopefully make this clear.
@@ -1451,7 +1451,7 @@ An example will hopefully make this clear.
  in part (c) of the figure.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For the purposes of this example, suppose that the MTD fuzzy engine reports
@@ -1464,7 +1464,7 @@ For the purposes of this example, suppose that the MTD fuzzy engine reports
  interest when paired with observed simple object A.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These four pairings result in the 4 edges in the graph shown by the solid
@@ -1482,7 +1482,7 @@ These four pairings result in the 4 edges in the graph shown by the solid
  This is indicated by the dashed line in the graph.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Continuing this example, forecast cluster object #2 (consisting only of
@@ -1492,7 +1492,7 @@ Continuing this example, forecast cluster object #2 (consisting only of
  line in the graph.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Forecast cluster object #3 consists solely of forecast simple object 1.
@@ -1503,7 +1503,7 @@ Forecast cluster object #3 consists solely of forecast simple object 1.
  Essentially it represents a false alarm.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To summarize: Any forecast simple objects that find themselves in the same
@@ -2565,17 +2565,17 @@ Observation vertical level
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The extra columns in the 3D single attributes text files are shown in Table
  1.3.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The extra columns in the 3D pair attributes text files are shown in Table
  1.4
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The extra columns in the 2D spatial attributes text files are shown in Table
  1.2
 \end_layout

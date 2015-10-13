@@ -73,7 +73,7 @@ The Ensemble Stat Tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This chapter contains a description of the Ensemble-Stat tool.
@@ -92,7 +92,7 @@ This chapter contains a description of the Ensemble-Stat tool.
 Practical Information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section contains information about configuring and running the Ensemble-Sta
@@ -110,7 +110,7 @@ t tool.
 ensemble_stat usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the Ensemble Stat tool is shown below:
@@ -161,14 +161,14 @@ config_file
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 ensemble_stat 
 \series medium
 has required arguments and can take many optional ones.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments ensemble_stat
 \end_layout
 
@@ -286,7 +286,7 @@ level
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the ensemble_stat calling sequence is shown below:
@@ -326,7 +326,7 @@ config/EnsembleStatConfig
 -outdir out/ensemble_stat -v 2 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the Ensemble-Stat tool will process six forecast files
@@ -3180,7 +3180,7 @@ Root mean squared error
 ensemble_stat configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the Ensemble-Stat tool named 
@@ -3201,7 +3201,7 @@ share/met/config
  below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that environment variables may be used when editing configuration files,
@@ -3228,7 +3228,7 @@ height "1pt"
 model = "WRF";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3302,7 +3302,7 @@ cat_thresh = [ >0.0, >=5.0 ];
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When summarizing the ensemble, compute a ratio of the number of valid ensemble
@@ -3317,7 +3317,7 @@ ens_thresh
  to be processed.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When summarizing the ensemble, for each grid point compute a ratio of the
@@ -3332,7 +3332,7 @@ vld_thresh
  data for all ensemble members.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For each 
@@ -3418,7 +3418,7 @@ level = [ "A03" ];
 obs = fcst;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3438,7 +3438,7 @@ message_type
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Ensemble-Stat tool performs verification using observations for one
@@ -3465,7 +3465,7 @@ target "http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.ht
  for a list of the possible types.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The obs can be set equal to 
@@ -3475,7 +3475,7 @@ fcst
  to use the identical fields.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3487,7 +3487,7 @@ sid_exc
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3535,7 +3535,7 @@ end = 5400;
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each gridded forecast file has a valid time associated with it.
@@ -3598,7 +3598,7 @@ sid = [];
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -3610,7 +3610,7 @@ The
  areas from the verification and only use the remaining areas.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3640,7 +3640,7 @@ FULL
  See Appendix B for a list of grids that will be accepted.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3654,7 +3654,7 @@ poly
  or Gen-Circle-Mask tools.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Several masking polygons used by NCEP are predefined in the installed 
@@ -3673,7 +3673,7 @@ share/met/config
  within the polygon defined is done in x/y grid space.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Alternatively, any gridded data file that MET can read may be used to define
@@ -3685,7 +3685,7 @@ Alternatively, any gridded data file that MET can read may be used to define
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3761,7 +3761,7 @@ width = 1;
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3772,7 +3772,7 @@ ci_alpha
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3786,7 +3786,7 @@ tion to be performed, and the width of the grid to use in the interpolation.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3801,7 +3801,7 @@ field
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3819,7 +3819,7 @@ vld_thresh
  the verification region chosen.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3837,7 +3837,7 @@ eighted mean, least squares fit, and bilinear interpolation.
  These methods are described in Section 4.2.1.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -3913,7 +3913,7 @@ ssvar = BOTH;
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -4098,7 +4098,7 @@ seed = "";
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4120,7 +4120,7 @@ seed
  for a listing of the random number generators available for use.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4156,7 +4156,7 @@ height "1pt"
 duplicate_flag = NONE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The reporting mechanism for this feature can be activated by specifying
@@ -4190,7 +4190,7 @@ height "1pt"
 obs_quality = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This list of string values is used to filter point observations by their
@@ -4217,7 +4217,7 @@ height "1pt"
 output_prefix = "";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option specifies a string to be used in the output file name.
@@ -4253,7 +4253,7 @@ v5.1
 ;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The version indicates the version of the MET software used.

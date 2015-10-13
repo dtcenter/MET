@@ -68,7 +68,7 @@
 Foreword: A note to MET users
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This user's guide is provided as an aid to users of the Model Evaluation
@@ -80,7 +80,7 @@ This user's guide is provided as an aid to users of the Model Evaluation
  weather predictions.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 It is important to note here that MET is an evolving software package.
@@ -94,7 +94,7 @@ It is important to note here that MET is an evolving software package.
  in future versions.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This user's guide was prepared by the developers of the MET, including John
@@ -107,7 +107,7 @@ This user's guide was prepared by the developers of the MET, including John
 New for MET v5.1
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Users will notice major upgrades for METv5.1.
@@ -410,7 +410,7 @@ TERMS OF USE
 IMPORTANT!
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 USE OF THIS SOFTWARE IS SUBJECT TO THE FOLLOWING TERMS AND CONDITIONS:
 \end_layout
 
@@ -591,7 +591,7 @@ on for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with
  All Rights Reserved." 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The following notice shall be displayed on any scholarly works associated
  with, related to or derived from the Software: 
 \end_layout
@@ -606,7 +606,7 @@ ic Research (NCAR) through grants from the National Science Foundation (NSF),
  NCAR is sponsored by the United States National Science Foundation." 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 By using or downloading the Software, you agree to be bound by the terms
@@ -620,7 +620,7 @@ By using or downloading the Software, you agree to be bound by the terms
 Acknowledgments
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 We thank the the National Science Foundation (NSF), the National Oceanic

@@ -73,7 +73,7 @@ The Point-Stat Tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Point-Stat tool provides verification statistics for forecasts at observatio
@@ -88,7 +88,7 @@ s.
  measures - are computed for the verification statistics.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Scientific and statistical aspects of the Point-Stat tool are discussed
@@ -100,7 +100,7 @@ Scientific and statistical aspects of the Point-Stat tool are discussed
 Scientific and statistical aspects
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The statistical methods and measures computed by the Point-Stat tool are
@@ -118,7 +118,7 @@ The statistical methods and measures computed by the Point-Stat tool are
 Interpolation/matching methods
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section provides information about the various methods available in
@@ -127,7 +127,7 @@ This section provides information about the various methods available in
  different methods.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In the vertical, if forecasts and observations are at the same vertical
@@ -142,7 +142,7 @@ In the vertical, if forecasts and observations are at the same vertical
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To match forecasts and observations in the horizontal plane, the user can
@@ -161,7 +161,7 @@ To match forecasts and observations in the horizontal plane, the user can
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section describes the options for interpolation in the horizontal.
@@ -235,7 +235,7 @@ Illustration of some matching and interpolation methods used in MET.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \end_layout
 
@@ -251,11 +251,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Nearest Neighbor
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The forecast value at P is assigned the value at the nearest grid point.
@@ -281,11 +281,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Minimum value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The forecast value at P is the minimum of the values in the W x W square.
@@ -307,11 +307,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Maximum value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The forecast value at P is the maximum of the values in the W x W square.
@@ -333,11 +333,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Distance-weighted mean
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The forecast value at P is a weighted sum of the values in the W x W square.
@@ -364,11 +364,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Unweighted mean
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This method is similar to the distance-weighted mean, except all the weights
@@ -392,11 +392,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Median
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The forecast value at P is the median of the forecast values in the W x
@@ -419,11 +419,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Least-Squares Fit
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To perform least squares interpolation of a gridded field at a location
@@ -435,7 +435,7 @@ WxW
  Figure 4-1 shows the case where N = 5.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 If we denote the horizontal coordinate in this subgrid by x, and vertical
@@ -515,11 +515,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Bilinear Interpolation
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This method is performed using the four closest grid squares.
@@ -531,7 +531,7 @@ This method is performed using the four closest grid squares.
 Statistical measures
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Point-Stat tool computes a wide variety of verification statistics.
@@ -543,7 +543,7 @@ The Point-Stat tool computes a wide variety of verification statistics.
  (2003), and on the world-wide web at
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset CommandInset href
@@ -555,7 +555,7 @@ target "http://www.bom.gov.au/bmrc/wefor/staff/eee/verif/verif_web_page.html"
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In addition to these verification measures, the Point-Stat tool also computes
@@ -564,11 +564,11 @@ n system.
  These statistics are also described in Appendix C.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Measures for categorical variables
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Categorical verification statistics are used to evaluate forecasts that
@@ -587,11 +587,11 @@ Categorical verification statistics are used to evaluate forecasts that
  See Appendix C for more information.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Measures for continuous variables
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For continuous variables, many verification measures are based on the forecast
@@ -606,11 +606,11 @@ e rather than a single measure.
  See Appendix C for specific information.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Measures for probabilistic forecasts and dichotomous outcomes
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For probabilistic forecasts, many verification measures are based on reliability
@@ -620,7 +620,7 @@ ons of the forecasts and the observations, as in Wilks (2006).
  See Appendix C for specific information.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Probabilistic forecast values are assumed to have a range of either 0 to
@@ -640,7 +640,7 @@ Probabilistic forecast values are assumed to have a range of either 0 to
 Statistical confidence intervals
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A single summary score gives an indication of the forecast performance,
@@ -659,7 +659,7 @@ A single summary score gives an indication of the forecast performance,
  to use.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For continuous fields (e.g., temperature), it is possible to estimate confidence
@@ -676,7 +676,7 @@ For continuous fields (e.g., temperature), it is possible to estimate confidence
  is necessary for the interpretation of the resulting confidence intervals.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For the measures relating the two fields (i.e., mean error, correlation and
@@ -691,7 +691,7 @@ s variables, is usually a reasonable assumption, even for the standard deviation
  of the errors.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Bootstrap confidence intervals for any verification statistic are available
@@ -719,7 +719,7 @@ Bootstrap confidence intervals for any verification statistic are available
  appendix.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Confidence intervals can be calculated from the sample of verification statistic
@@ -741,7 +741,7 @@ s obtained through the bootstrap algorithm.
  the considerably more efficient percentile method being the default.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The only other option associated with bootstrapping currently available
@@ -754,7 +754,7 @@ The only other option associated with bootstrapping currently available
  See Gilleland (2008) for more information and references about this topic.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET provides parametric confidence intervals based on assumptions of normality
@@ -877,7 +877,7 @@ the dot is in here intentionally to help with formatting - do not remove
 * Symmetric Extremal Dependency Index
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET provides parametric confidence intervals based on assumptions of normality
@@ -914,7 +914,7 @@ MET provides parametric confidence intervals based on assumptions of normality
 * Mean Error
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET provides parametric confidence intervals based on assumptions of normality
@@ -939,7 +939,7 @@ MET provides parametric confidence intervals based on assumptions of normality
 * Base Rate
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET provides non-parametric bootstrap confidence intervals for many categorical
@@ -950,7 +950,7 @@ MET provides non-parametric bootstrap confidence intervals for many categorical
  computationally unrealistic.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For more information on confidence intervals pertaining to verification
@@ -962,7 +962,7 @@ For more information on confidence intervals pertaining to verification
 Practical information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section contains a description of how to configure and run the Point-Stat
@@ -992,7 +992,7 @@ ascii2nc
 point_stat usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the Point-Stat tool is shown below:
@@ -1042,7 +1042,7 @@ config_file
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -1051,7 +1051,7 @@ point_stat
  has some required arguments and can take many optional ones.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for point_stat
 \end_layout
 
@@ -1192,7 +1192,7 @@ point_stat
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the point_stat calling sequence is shown below:
@@ -1210,7 +1210,7 @@ sample_pb.nc
 PointStatConfig
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the Point-Stat tool evaluates the model data in the 
@@ -1232,7 +1232,7 @@ sample_pb.nc
 point_stat configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the Point-Stat tool named 
@@ -1255,7 +1255,7 @@ scripts/config
  below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that environment variables may be used when editing configuration files,
@@ -1282,7 +1282,7 @@ height "1pt"
 model = "WRF";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1428,7 +1428,7 @@ cat_thresh = [ >5.0 ];
 obs = fcst;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 or
@@ -1440,7 +1440,7 @@ fcst_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)"
  ]; for NetCDF input
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1459,7 +1459,7 @@ field
  level indicators.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For GRIB files, the GRIB code itself or the corresponding abbreviation may
@@ -1484,7 +1484,7 @@ For GRIB files, the GRIB code itself or the corresponding abbreviation may
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To specify verification fields for NetCDF files, the name of the NetCDF
@@ -1494,7 +1494,7 @@ To specify verification fields for NetCDF files, the name of the NetCDF
  dimensions for the gridded field.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The values listed above indicate that temperature, height, and the U and
@@ -1522,7 +1522,7 @@ field
  group.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For each 
@@ -1539,7 +1539,7 @@ rated list within the double quotes (e.g.
  For probabilistic forecast, thresholds must be specified using >= convention.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To indicate that a forecast field should be treated as probabilities, set
@@ -1554,7 +1554,7 @@ prob
  verification methods.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1573,7 +1573,7 @@ fcst
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For each observation field, one or more thresholds can be specified for
@@ -1586,7 +1586,7 @@ cat_thresh
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When verifying winds via either the u and v components or the speed and
@@ -1603,7 +1603,7 @@ cat_thresh
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Point-Stat tool performs verification using observations for one message
@@ -1637,7 +1637,7 @@ message_type
 n dictionary.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1682,7 +1682,7 @@ end = 5400;
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each gridded forecast file has a valid time associated with it.
@@ -1737,7 +1737,7 @@ sid = [];
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1772,7 +1772,7 @@ FULL
  See Appendix B for a list of grids that will be accepted.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1786,7 +1786,7 @@ poly
  or Gen-Circle_Mask tools.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Several masking polygons used by NCEP are predefined in the share/met/poly
@@ -1802,7 +1802,7 @@ Several masking polygons used by NCEP are predefined in the share/met/poly
  within the polygon defined is done in x/y grid space.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Alternatively, any gridded data file that MET can read may be used to define
@@ -1814,7 +1814,7 @@ Alternatively, any gridded data file that MET can read may be used to define
  Any grid point where it is non-zero, the mask is turned on.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1856,7 +1856,7 @@ height "1pt"
 ci_alpha[] = [0.05];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The ci_alpha variable contains a comma-separated list of alpha values to
@@ -1913,7 +1913,7 @@ seed = "";
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1935,7 +1935,7 @@ e intervals.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1952,7 +1952,7 @@ rep_prop
  m, should be equal to the size of the sample, n.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1972,7 +1972,7 @@ n_rep
  pairs.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -1987,7 +1987,7 @@ The
  for a listing of the random number generators available for use.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2055,7 +2055,7 @@ width = 1;
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2066,7 +2066,7 @@ interp
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2084,7 +2084,7 @@ vld_thresh
  the verification region chosen.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2102,7 +2102,7 @@ eighted mean, a least squares fit, and bilinear interpolation.
  These methods are described in Section 4.2.1.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2410,7 +2410,7 @@ MPR
  for Matched Pair data
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that the first two line types are easily derived from each other.
@@ -2418,7 +2418,7 @@ Note that the first two line types are easily derived from each other.
  All of the line types are described in more detail in Section 4.3.3.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that writing out matched pair data (MPR lines) for a large number of
@@ -2447,7 +2447,7 @@ height "1pt"
 obs_quality = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The is a list of quality control strings to be used for filtering the observatio
@@ -2474,7 +2474,7 @@ height "1pt"
 duplicate_flag = NONE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The reporting mechanism for this feature can be activated by specifying
@@ -2503,7 +2503,7 @@ height "1pt"
 rank_corr_flag = TRUE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2538,7 +2538,7 @@ height "1pt"
 tmp_dir = "/tmp";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option specifies the directory where temp files should be written by
@@ -2565,7 +2565,7 @@ height "1pt"
 output_prefix = "";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option specifies a string to be used in the output file name.
@@ -2593,7 +2593,7 @@ height "1pt"
 version = "v5.1";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The version indicates the version of the 
@@ -2621,7 +2621,7 @@ point_stat
  output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -2670,7 +2670,7 @@ val1l2
  to indicate the line type it contains.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The first set of header columns are common to all of the output files generated
@@ -5020,7 +5020,7 @@ Column Number
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Paragraph
+\begin_layout Standard
 CNT Column Name
 \end_layout
 
@@ -5029,7 +5029,7 @@ CNT Column Name
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Paragraph
+\begin_layout Standard
 Description
 \end_layout
 
@@ -9781,7 +9781,7 @@ Quality control flag for observation
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The STAT output files described for point_stat may be used as inputs to

@@ -77,7 +77,7 @@ The Wavelet-Stat Tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Wavelet-Stat tool decomposes two-dimensional forecasts and observations
  according to intensity and scale.
  This chapter provides a description of the MET Wavelet-Stat Tool, which
@@ -86,7 +86,7 @@ The Wavelet-Stat tool decomposes two-dimensional forecasts and observations
  (2004).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Intensity-Scale technique is one of the recently developed verification
  approaches that focus on verification of forecasts defined over spatial
  domains.
@@ -101,14 +101,14 @@ The Intensity-Scale technique is one of the recently developed verification
  error in physical terms.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Intensity-Scale verification technique, as most of the spatial verification
  approaches, compares a forecast field to an observation field.
  To apply the Intensity-Scale verification approach, observations need to
  be defined over the same spatial domain of the forecast to be verified.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Within the spatial verification approaches, the Intensity-Scale technique
  belongs to the scale-decomposition (or scale-separation) verification approache
 s.
@@ -122,7 +122,7 @@ s.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The spatial scale components are obtained usually by applying a single band
  spatial filter to the forecast and observation fields (e.g.
  Fourier, Wavelets).
@@ -135,7 +135,7 @@ The spatial scale components are obtained usually by applying a single band
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Intensity-Scale technique evaluates the forecast skill as a function
  of the intensity values and of the spatial scale of the error.
  The scale components are obtained by applying a two dimensional Haar wavelet
@@ -162,7 +162,7 @@ Scientific and statistical aspects
 The method
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Casati et al (2004) applied the Intensity-Scale verification to preprocessed
  and re-calibrated (unbiased) data.
  The preprocessing was aimed to mainly normalize the data, and defined categoric
@@ -176,11 +176,11 @@ al thresholds so that each categorical bin had a similar sample size.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Intensity Scale approach can be summarized in the following 5 steps:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 1.
  For each threshold, the forecast and observation fields are transformed
  into binary fields: where the grid-point precipitation value meets the
@@ -554,7 +554,7 @@ X
  The forecast shows a storm of 160 km displaced almost its entire length.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 2.
  The binary forecast and observation fields obtained from the thresholding
  are then decomposed into the sum of components on different scales, by
@@ -688,7 +688,7 @@ X
  (1280 km resolution).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Note that the wavelet transform is a linear operator: this implies that
  the difference of the spatial scale components of the binary forecast and
  observation fields (Fig 
@@ -781,7 +781,7 @@ X
  displaced almost of its entire length.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Note also that the means of the binary forecast and observation fields (i.e.
  their largest father wavelet components) are equal to the proportion of
  forecast and observed events above the threshold,
@@ -821,7 +821,7 @@ Chapter number
  and observation fields therefore provides feedback on the whole field bias.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 3.
  For each threshold (
 \emph on
@@ -939,7 +939,7 @@ X
  the thresholds ½ to 4 mm/h, associated to the displaced storm.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Note that the MSE of the original binary fields is equal to the proportion
  of the counts of misses (
 \emph on
@@ -980,7 +980,7 @@ hbox {MSE}(t)=(b+c)/n$
  (Fig 8.1).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 4.
  The MSE for the random binary forecast and observation fields is estimated
  by 
@@ -1063,7 +1063,7 @@ c/n
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 5.
  For each threshold (
 \emph on
@@ -1113,7 +1113,7 @@ hbox {random}$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Intensity-Scale (IS) skill score evaluates the forecast skill as a function
  of the precipitation intensity and of the spatial scale of the error.
  Positive values of the IS skill score are associated to a skillful forecast,
@@ -1167,7 +1167,7 @@ Chapter number
  to 4 mm/h, associated to the displaced storm.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 In addition to the MSE and the SS, the energy squared is also evaluated,
  for each threshold and scale (Fig 
 \begin_inset Note Note
@@ -1207,7 +1207,7 @@ sum_i x_i^2$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The En2 bias for each threshold and scale is assessed by the En2 relative
  difference, equal to the difference between forecast and observed squared
  energies normalized by their sum: 
@@ -1241,7 +1241,7 @@ hbox {En2}(O)]$
  for high thresholds.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 As for the MSE, the sum of the energy of the scale components is equal to
  the energy of the original binary field: 
 \begin_inset ERT
@@ -1295,7 +1295,7 @@ hbox {En2}(t)$
  and enable the comparison of forecast and observation scale structure.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 For the NIMROD case illustrated, the scale structure is assessed again by
  the relative difference, but calculated of the squared energy percentages.
  For small thresholds the forecast over-estimates the number of large scale
@@ -1316,7 +1316,7 @@ For the NIMROD case illustrated, the scale structure is assessed again by
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Note that the energy squared of the observation binary field is identical
  to the sample climatology 
 \begin_inset ERT
@@ -1405,7 +1405,7 @@ X
 The spatial domain constraints
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Intensity-Scale technique is constrained by the fact that orthogonal
  wavelets (discrete wavelet transforms) are usually performed on square
  domains of 
@@ -1458,7 +1458,7 @@ n
  over the input domain in the following ways:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 1.
  User-Defined Tiling: The user may define one or more tiles of size 
 \emph on
@@ -1492,7 +1492,7 @@ n
  Users are encouraged to select tiles which consist entirely of valid data.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 2.
  Automated Tiling: This tiling method is essentially the same as the user-define
 d tiling method listed above except that the tool automatically selects
@@ -1524,7 +1524,7 @@ n
  of these tiles as possible that fit within the domain.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 3.
  Padding: If the domain size is only slightly smaller than 
 \emph on
@@ -1585,7 +1585,7 @@ n
 Aggregation of statistics on multiple cases
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Stat-Analysis tool aggregates the intensity scale technique results.
  Since the results are scale-dependent, it is sensible to aggregate results
  from multiple model runs (e.g.
@@ -1618,7 +1618,7 @@ n
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The MSE and forecast and observation squared energy for each scale and threshold
 s are aggregated simply with a weighted average, where weights are proportional
  to the number of grid-points used in each single run to evaluate the statistics.
@@ -1638,7 +1638,7 @@ s are aggregated simply with a weighted average, where weights are proportional
 Practical information
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The following sections describe the usage statement, required arguments
  and optional arguments for the Stat-Analysis tool.
 \end_layout
@@ -1647,83 +1647,83 @@ The following sections describe the usage statement, required arguments
 Wavelet_stat usage
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The usage statement for the Wavelet-Stat tool is shown below:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 Usage: wavelet_stat
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 fcst_file
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 obs_file
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 config_file
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 [-outdir path]
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 [-log file]
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 [-v level]
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Wavelet_stat has both required arguments and optional ones.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Required arguments for wavelet_stat
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 1.
  The fcst_file argument indicates the gridded file containing the model
  data to be verified.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 2.
  The obs_file argument indicates the gridded file containing the gridded
  observations to be used for the verification of the model.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 3.
  The config_file argument indicates the name of the configuration file to
  be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Optional arguments for wavelet_stat
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 4.
  The -outdir path indicates the directory where output files should be written.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 5.
  The -log file option directs output and errors to the specified log file.
  All messages will be written to that file as well as cout and cerr.
@@ -1733,7 +1733,7 @@ Optional arguments for wavelet_stat
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 6.
  The -v level option indicates the desired level of verbosity.
  The contents of 
@@ -1749,19 +1749,19 @@ level
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 An example of the wavelet_stat calling sequence is listed below:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Example:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 wavelet_stat sample_fcst.grb sample_obs.grb WaveletStatConfig
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 In the example, the Wavelet-Stat tool will verify the model data in the
  sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB
  file applying the configuration options specified in the WaveletStatConfig
@@ -1772,7 +1772,7 @@ In the example, the Wavelet-Stat tool will verify the model data in the
 wavelet_stat configuration file
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_defa
 ult, can be found in the installed share/met/config directory.
  Another version of the configuration file is provided in scripts/config.
@@ -1786,12 +1786,12 @@ ult, can be found in the installed share/met/config directory.
  Specific options are described in the following subsections.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Note that environment variables may be used when editing configuration files,
  as described in the section 3.5.2 for the PB2NC tool.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 model = 
 \begin_inset Quotes eld
 \end_inset
@@ -1803,7 +1803,7 @@ WRF
 ;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The model variable contains a short text string identifying the name to
  be assigned to the model being verified.
  This text string is written out in the first column of the ASCII output
@@ -1859,7 +1859,7 @@ cat_thresh = [ >0.0, >=5.0 ];
 obs = fcst;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The fcst and obs groups specify one or more data fields to be selected from
  the forecast and observation files to be compared.
  The fields should be specified in the same way that they?re specified for
@@ -1870,30 +1870,30 @@ The fcst and obs groups specify one or more data fields to be selected from
 mask_missing_flag = NONE;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The mask_missing_flag variable specifies how missing data in the raw model
  and observation fields will be treated.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * NONE indicates no additional processing is to be done.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * FCST indicates missing data in the observation field should be used to
  mask the forecast field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * OBS indicates missing data in the forecast field should be used to mask
  the observation field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * BOTH indicates masking should be performed in both directions (i.e., mask
  the forecast field with the observation field and vice-versa).
 \end_layout
@@ -1938,20 +1938,20 @@ y_ll = 0;
 };
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The grid_decomp_flag variable specifies how tiling should be performed:
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * AUTO indicates that the automated-tiling should be done.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * TILE indicates that the user-defined tiles should be applied.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * PAD indicated that the data should be padded out to the nearest dimension
  of 
 \emph on
@@ -1976,7 +1976,7 @@ n
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The width and location variables allow users to manually define the tiles
  of dimension they would like to apply.
  The x_ll and y_ll variables specify the location of one or more lower-left
@@ -1999,7 +1999,7 @@ member = 2;
 };
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The wavelet_flag and wavelet_k variables specify the type and shape of the
  wavelet to be used for the scale decomposition.
  The Casati et al.
@@ -2011,30 +2011,30 @@ The wavelet_flag and wavelet_k variables specify the type and shape of the
  described below:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * HAAR for the Haar wavelet (member = 2).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * HAAR_CNTR for the Centered-Haar wavelet (member = 2).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * DAUB for the Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18,
  20).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * DAUB_CNTR for the Centered-Daubechies wavelet (member = 4, 6, 8, 10, 12,
  14, 16, 18, 20).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * BSPLINE for the Bspline wavelet (member = 103, 105, 202, 204, 206, 208,
  301, 303, 305, 307, 309).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * BSPLINE_CNTR for the Centered-Bspline wavelet (member = 103, 105, 202,
  204, 206, 208, 301, 303, 305, 307, 309).
 \end_layout
@@ -2051,7 +2051,7 @@ isc = BOTH;
 };
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The output_flag array controls the type of output that the Wavelet-Stat
  tool generates.
  These flags are set similarly to the output flags of the other MET tools,
@@ -2083,7 +2083,7 @@ diff = TRUE;
 ps_plot_flag = TRUE; 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 These flags produce additional output from the Wavelet-Stat tool.
  The nc_pairs_flag produces the same output that would be produced by Grid-Stat,
  i.e.
@@ -2091,13 +2091,13 @@ These flags produce additional output from the Wavelet-Stat tool.
  The other two types of output from the wavelet tool are:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 1.
  NetCDF output file containing the scale decompositions for each combination
  of tile/field/threshold.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 2.
  PostScript output file summarizing the Intensity-Scale method.
 \end_layout
@@ -2114,7 +2114,7 @@ MET_BASE
 ;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Wavelet-Stat tool uses several static data files when generating plots.
  If it cannot find the data it needs in the expected directory, it will
  error out.
@@ -2182,13 +2182,13 @@ plot_max = 1.0;
 };
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The color_table variables indicate which color table files should be used
  when generating the Wavelet-Stat PostScript output.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 These plot_min and plot_max variables indicate the min and max data values
  to be plotted for the raw and wavelet fields.
  If set to non-zero values, the forecast and observation raw color tables
@@ -2199,7 +2199,7 @@ These plot_min and plot_max variables indicate the min and max data values
 output_prefix = "";
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 This option specifies a string to be used in the output file name.
  It can be useful for keeping results for different models or variables
  from overwriting each other.
@@ -2217,7 +2217,7 @@ v5.1
 ;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The version indicates the version of the mode configuration file used.
  Future versions of MET may include changes to mode and the mode configuration
  file.
@@ -2228,7 +2228,7 @@ The version indicates the version of the mode configuration file used.
 wavelet_stat output
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and
  PostScript formats.
  The ASCII output duplicates the STAT output but has the data organized
@@ -2240,26 +2240,26 @@ wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The output STAT file is named using the following naming convention: 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates
  the user-defined output prefix, HHMMSS indicates the forecast lead time,
  and YYYYMMDD_HHMMSS indicates the forecast valid time.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The output ASCII files are named similarly: 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to
  indicate that this is an intensity-scale line type.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The format of the STAT and ASCII output of the Wavelet-Stat tool is similar
  to the format of the STAT and ASCII output of the Point-Stat tool.
  Please refer to the tables in section 
@@ -2745,13 +2745,13 @@ The frequency bias
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The Wavelet-Stat tool creates a NetCDF output file containing the raw and
  decomposed values for the forecast, observation, and difference fields
  for each combination of variable and threshold value.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The dimensions and variables included in the wavelet_stat NetCDF files are
  described in Tables 
 \begin_inset Note Note
@@ -3293,7 +3293,7 @@ FIELD_LEVEL_THRESH
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Lastly, the Wavelet-Stat tool creates a PostScript plot summarizing the
  scale-decomposition approach used in the verification.
  The PostScript plot is generated using internal libraries and does not
@@ -3302,7 +3302,7 @@ Lastly, the Wavelet-Stat tool creates a PostScript plot summarizing the
  configuration file option.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The PostScript plot begins with one summary page illustrating the tiling
  method that was applied to the domain.
  The remaining pages depict the Intensity-Scale method that was applied.

@@ -77,7 +77,7 @@ The MODE Tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 This chapter provides a description of the Method for Object-Based Diagnostic
  Evaluation (MODE) tool, which was developed at the Research Applications
  Laboratory, NCAR/Boulder, USA.
@@ -86,7 +86,7 @@ This chapter provides a description of the Method for Object-Based Diagnostic
  (2007).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODE was developed in response to a need for verification methods that can
  provide diagnostic information that is more directly useful and meaningful
  than the information that can be obtained from traditional verification
@@ -96,7 +96,7 @@ tion forecasts, but it can also be applied to other fields with coherent
  spatial structures (e.g., clouds, convection).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODE is only one of a number of different approaches that have been developed
  in recent years to meet these needs.
  In the future, we expect that the MET package will include additional methods.
@@ -110,7 +110,7 @@ target "http://www.rap.ucar.edu/projects/icp/index.html"
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODE may be used in a generalized way to compare any two fields.
  For simplicity, field1 may be thought of in this chapter as "the forecast,"
  while field2 may be thought of as "the observation", which is usually a
@@ -131,7 +131,7 @@ MODE may be used in a generalized way to compare any two fields.
 Scientific and statistical aspects
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The methods used by the MODE tool to identify and match forecast and observed
  objects are briefly described in this section.
  
@@ -141,7 +141,7 @@ The methods used by the MODE tool to identify and match forecast and observed
 Resolving objects
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The process used for resolving objects in a raw data field is called 
 \shape italic
 convolution thresholding
@@ -151,7 +151,7 @@ convolution thresholding
  follows:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \begin_inset ERT
 status open
 
@@ -169,7 +169,7 @@ phi (u,v)f(x-u)(y-v).$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 In this formula, 
 \emph on
 f
@@ -207,7 +207,7 @@ H
 : 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \begin_inset ERT
 status open
 
@@ -249,7 +249,7 @@ phi (x,y)=0$
  otherwise.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The parameters 
 \emph on
 R
@@ -266,7 +266,7 @@ H
  over the grid be unity: 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \begin_inset ERT
 status open
 
@@ -282,7 +282,7 @@ pi R^2H=1.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Thus, the radius of influence 
 \emph on
 R
@@ -299,7 +299,7 @@ H
  is determined by the above equation.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Once the convolved field, 
 \emph on
 C
@@ -322,7 +322,7 @@ $M(x,y)=1$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 if 
 \begin_inset ERT
 status open
@@ -350,7 +350,7 @@ $M (x,y)=H$
  otherwise.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The objects are the connected regions where 
 \emph on
 M = 1
@@ -364,7 +364,7 @@ F
 :
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \begin_inset ERT
 status open
 
@@ -378,7 +378,7 @@ $$F(x,y)=M(x,y)f(x,y).$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Thus, two parameters - the radius of influence, 
 \emph on
 R
@@ -390,7 +390,7 @@ T
  - control the entire process of resolving objects in the raw data field.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 An example of the steps involved in resolving objects is shown in Fig 8-1.
  Figure 8-1a shows a "raw" precipitation field, where the vertical coordinate
  represents the precipitation amount.
@@ -421,14 +421,14 @@ ure 8-1: Example of an application of the MODE object identification process
 Attributes
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Object attributes are defined both for single objects and for object pairs.
  One of the objects in a pair is from the forecast field and the other is
  taken from the observed field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Area is simply a count of the number of grid squares an object occupies.
  If desired, a true area (say, in 
 \begin_inset Formula $km^{2}$
@@ -438,7 +438,7 @@ Area is simply a count of the number of grid squares an object occupies.
  an object, but in practice this is deemed not to be necessary.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Moments are used in the calculation of several object attributes.
  If we define 
 \begin_inset Formula $\xi(x,y)$
@@ -481,7 +481,7 @@ xi (x,y).$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Higher order moments are similarly defined and are used in the calculation
  of some of the other attributes.
  For example, the centroid is a kind of geometric center of an object, and
@@ -491,7 +491,7 @@ Higher order moments are similarly defined and are used in the calculation
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Axis Angle, denoted by 
 \begin_inset Formula $\theta$
 \end_inset
@@ -502,7 +502,7 @@ Axis Angle, denoted by
 ly, third-order moments.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Aspect Ratio is computed by fitting a rectangle around an object.
  The rectangle is aligned so that it has the same axis angle as the object,
  and the length and width are chosen so as to just enclose the object.
@@ -514,13 +514,13 @@ Aspect Ratio is computed by fitting a rectangle around an object.
  to be the width of the rectangle divided by its length.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Another object attribute defined by MODE is complexity.
  Complexity is defined by comparing the area of an object to the area of
  its convex hull.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 All the attributes discussed so far are defined for single objects.
  Once these are determined, they can be used to calculate attributes for
  pairs of objects.
@@ -530,7 +530,7 @@ All the attributes discussed so far are defined for single objects.
  Another example is angle difference, the difference between the axis angles.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Several area measures are also used for pair attributes.
  Union Area is the total area that is in either one (or both) of the two
  objects.
@@ -543,7 +543,7 @@ Several area measures are also used for pair attributes.
 Fuzzy logic
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Once object attributes 
 \begin_inset Formula $\alpha_{1},\alpha_{2},\ldots,\alpha_{n}$
 \end_inset
@@ -569,7 +569,7 @@ are estimated, some of them are used as input to a fuzzy logic engine that
  and high values indicate more interest.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The next step is to define confidence maps, 
 \begin_inset Formula $C_{i}$
 \end_inset
@@ -605,7 +605,7 @@ The next step is to define confidence maps,
  near one having low confidence, and values far from one having high confidence.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Next, scalar weights, 
 \emph on
 w
@@ -622,7 +622,7 @@ w
  than that given by any other attribute) that they were related.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Finally, all these ingredients are collected into a single number called
  the total interest, 
 \emph on
@@ -656,13 +656,13 @@ alpha)}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 This total interest value is then thresholded, and pairs of objects that
  have total interest values above the threshold are merged (if they are
  in the same field) or matched (if they are in different fields).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Another merging method is available in MODE, which can be used instead of,
  or along with, the fuzzy logic based merging just described.
  Recall that the convolved field was thresholded to produce the mask field.
@@ -674,7 +674,7 @@ Another merging method is available in MODE, which can be used instead of,
 Summary statistics
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Once MODE has been run, summary statistics are written to an output file.
  These files contain information about all single and cluster objects and
  their attributes.
@@ -692,7 +692,7 @@ Once MODE has been run, summary statistics are written to an output file.
 Practical information
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 This section contains a description of how MODE can be configured and run.
  The MODE tool is used to perform a features-based verification of gridded
  model data using gridded observations.
@@ -707,7 +707,7 @@ This section contains a description of how MODE can be configured and run.
  output using an analysis field produced by the same model.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODE provides the capability to select a single model variable/level from
  which to derive objects to be analyzed.
  MODE was developed and tested using accumulated precipitation.
@@ -728,7 +728,7 @@ MODE provides the capability to select a single model variable/level from
 mode usage
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The usage statement for the MODE tool is listed below:
 \end_layout
 
@@ -768,39 +768,39 @@ config_file
 [-v level] 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The MODE tool has three required arguments and can accept several optional
  arguments.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Required arguments for mode
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 1.
  The fcst_file argument indicates the gridded file containing the model
  field to be verified.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 2.
  The obs_file argument indicates the gridded file containing the gridded
  observations to be used for the verification of the model.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 3.
  The config_file argument indicates the name of the configuration file to
  be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Optional arguments for mode
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 4.
  The -config_merge merge_config_file argument indicates the name of a second
  configuration file to be used when performing fuzzy engine merging by comparing
@@ -816,12 +816,12 @@ Optional arguments for mode
  the config_file in the previous argument will be used.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 5.
  The -outdir path indicates the directory where output files should be written.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 6.
  The -log file option directs output and errors to the specified log file.
  All messages will be written to that file as well as cout and cerr.
@@ -831,7 +831,7 @@ Optional arguments for mode
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 7.
  The -v level option indicates the desired level of verbosity.
  The contents of "level" will override the default setting of 2.
@@ -839,53 +839,53 @@ Optional arguments for mode
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 An example of the MODE calling sequence is listed below:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Example 1
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 mode sample_fcst.grb
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 sample_obs.grb
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODEConfig_grb
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 In Example 1, the MODE tool will verify the model data in the sample_fcst.grb
  GRIB file using the observations in the sample_obs.grb GRIB file applying
  the configuration options specified in the MODEConfig_grb file.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 A second example of the MODE calling sequence is presented below:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Example 2
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 mode sample_fcst.nc
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 sample_obs.nc
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODEConfig_nc
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 In Example 2, the MODE tool will verify the model data in the sample_fcst.nc
  NetCDF output of pcp_combine using the observations in the sample_obs.nc
  NetCDF output of pcp_combine, using the configuration options specified
@@ -899,7 +899,7 @@ d precipitation, the MODEConfig_nc file should specify that accumulated
 mode configuration file
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The default configuration file for the MODE tool, MODEConfig_default, can
  be found in the installed share/met/config directory.
  Another version of the configuration file is provided in scripts/config.
@@ -912,7 +912,7 @@ The default configuration file for the MODE tool, MODEConfig_default, can
  Specific options are described in the following subsections.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Note that environment variables may be used when editing configuration files,
  as described in the section 3.5.2 for the PB2NC tool.
 \end_layout
@@ -921,7 +921,7 @@ Note that environment variables may be used when editing configuration files,
 model = "WRF";
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The model variable contains a short text string identifying the name to
  be assigned to the model being verified.
  This text string is written out as a header column of the ASCII output
@@ -933,7 +933,7 @@ The model variable contains a short text string identifying the name to
 grid_res = 4;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The grid_res variable is the nominal spacing for each grid square in kilometers.
  The variable is not used directly in the code, but subsequent variables
  in the configuration file are defined in terms of it.
@@ -1005,14 +1005,14 @@ merge_flag = THRESH;
 obs = fcst; 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The field variables in the forecast and observation dictionaries specify
  the model variable and observation variable, respectively, and correspond
  to the vertical level to be verified.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The raw_thresh variable is used to threshold the raw forecast and / or observati
 on fields.
  Prior to defining objects, it is recommended that the raw fields should
@@ -1023,7 +1023,7 @@ on fields.
  By default, no raw field thresholded is applied.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The conv_radius variable defines the radius of the circular convolution
  applied to smooth the raw fields.
  The radii are specified in terms of grid units.
@@ -1031,13 +1031,13 @@ The conv_radius variable defines the radius of the circular convolution
  grid_res variable.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The conv_thresh variable specifies the threshold values to be applied to
  the convolved field to define objects.
  By default, objects are defined using a convolution threshold of 5.0.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The vld_thresh variable must be set between 0 and 1.
  When performing the circular convolution step if the proportion of bad
  data values in the convolution area is greater than or equal to this threshold,
@@ -1047,7 +1047,7 @@ The vld_thresh variable must be set between 0 and 1.
  By default, the vld_thresh is set to 0.5.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The area_thresh variable specifies the area threshold values to be applied
  to the defined objects.
  The area of an object is simply a count of the number of grid squares that
@@ -1057,7 +1057,7 @@ The area_thresh variable specifies the area threshold values to be applied
  By default, all objects are retained since no area threshold is applied.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The inten_perc_value and inten_perc_thresh variables specify the intensity
  threshold values to be applied to the defined objects.
  For each object defined, the intensity values within the object are sorted,
@@ -1071,7 +1071,7 @@ The inten_perc_value and inten_perc_thresh variables specify the intensity
  By default, no intensity percentile threshold is applied.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The merge_thresh variables are used to define larger objects for use in
  merging the original objects.
  These variables define the threshold value used in the double thresholding
@@ -1088,35 +1088,35 @@ The merge_thresh variables are used to define larger objects for use in
  1.25.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The merge_flag variable controls what type of merging techniques will be
  applied to the objects defined in each field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * NONE indicates that no merging should be applied.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * THRESH indicates that the double thresholding merging technique should
  be applied.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * ENGINE indicates that objects in each field should be merged by comparing
  the objects to themselves using a fuzzy engine approach.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * BOTH indicates that both techniques should be used.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 By default, the double thresholding merging technique is applied.
 \end_layout
 
@@ -1124,35 +1124,35 @@ By default, the double thresholding merging technique is applied.
 mask_missing_flag = NONE;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The mask_missing_flag variable specifies how missing data in the raw model
  and observation fields will be treated.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * NONE indicates no additional processing is to be done.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * FCST indicates missing data in the observation field should be used to
  mask the forecast field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * OBS indicates missing data in the forecast field should be used to mask
  the observation field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * BOTH indicates masking should be performed in both directions (i.e., mask
  the forecast field with the observation field and vice-versa).
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Prior to defining objects, it is recommended that the raw fields be made
  to look similar to each other by assigning a value of BOTH to this parameter.
  However, by default no masking is performed.
@@ -1162,7 +1162,7 @@ Prior to defining objects, it is recommended that the raw fields be made
 match_flag = MERGE_BOTH;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The match_flag variable controls how matching will be performed when comparing
  objects from the forecast field to objects from the observation field.
  An interest value is computed for each possible pair of forecast/observation
@@ -1174,30 +1174,30 @@ The match_flag variable controls how matching will be performed when comparing
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * NONE indicates that no matching should be performed between the fields
  at all.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * MERGE_BOTH indicates that additional merging is allowed in both fields.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * MERGE_FCST indicates that additional merging is allowed only in the forecast
  field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * NO_MERGE indicates that no additional merging is allowed in either field,
  meaning that each object will match at most one object in the other field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 By default, additional merging is allowed in both fields.
 \end_layout
 
@@ -1205,7 +1205,7 @@ By default, additional merging is allowed in both fields.
 max_centroid_dist = 800/grid_res;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Computing the attributes for all possible pairs of objects can take some
  time depending on the numbers of objects.
  The max_centroid_dist variable is used to specify how far apart objects
@@ -1242,7 +1242,7 @@ poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 };
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The grid variable specifies a pre-defined NCEP grid with which to mask the
  raw forecast and observation fields.
  The predefined grids are specified as "GNNN" where NNN is the three digit
@@ -1252,38 +1252,38 @@ The grid variable specifies a pre-defined NCEP grid with which to mask the
  in Appendix B.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The grid_flag variable specifies how the grid should be applied.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * NONE indicates that the masking grid should not be applied.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * FCST indicates that the masking grid should be applied to the forecast
  field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * OBS indicates that the masking grid should be applied to the observation
  field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * BOTH indicates that the masking grid should be applied to both fields.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 By default, the masking grid is not applied.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Similar to the grid variable above, the poly variable is the name of a file
  that defines a verification masking region.
  These masking regions may be specified in two ways: as a lat/lon polygon
@@ -1291,7 +1291,7 @@ Similar to the grid variable above, the poly variable is the name of a file
  or Gen-Circle_Mask tools.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Several masking polygons used by NCEP are predefined in the installed share/met/
 poly directory.
  Creating a new polygon is as simple as creating a text file with a name
@@ -1301,7 +1301,7 @@ poly directory.
  the grid.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Alternatively, any gridded data file that MET can read may be used to define
  a verification masking region.
  Users must specify a description of the field to be used from the input
@@ -1310,31 +1310,31 @@ Alternatively, any gridded data file that MET can read may be used to define
  Any grid point where it is non-zero, the mask is turned on.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Similar to the grid_flag variable above, the poly_flag variable specifies
  how the masking polygon should be applied.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * NONE indicates the masking polygon should be applied to neither field.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * FCST indicates the masking polygon should be applied to the forecast field.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * OBS indicates the masking polygon should be applied to the observation
  field.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * BOTH indicates that the masking polygon should be applied to both fields.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 By default, the masking polygon is not applied.
 \end_layout
 
@@ -1382,7 +1382,7 @@ inten_perc_value = 50;
 } 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The weight variables listed above control how much weight is assigned to
  each pairwise attribute when computing a total interest value for object
  pairs.
@@ -1396,7 +1396,7 @@ The weight variables listed above control how much weight is assigned to
  by the sum of the weights listed above.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The inten_perc_value variable corresponds to the inten_perc_ratio.
  The inten_perc_value should be set between 0 and 100 to define which percentile
  of intensity should be compared for pairs of objects.
@@ -1543,7 +1543,7 @@ inten_perc_ratio = ratio_if;
 }
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The set of interest function variables listed above define which values
  are of interest for each pairwise attribute measured.
  The interest functions may be defined as a piecewise linear function or
@@ -1562,7 +1562,7 @@ The set of interest function variables listed above define which values
 total_interest_thresh = 0.7;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The total_interest_thresh variable should be set between 0 and 1.
  This threshold is applied to the total interest values computed for each
  pair of objects.
@@ -1578,7 +1578,7 @@ The total_interest_thresh variable should be set between 0 and 1.
 print_interest_thresh = 0.0;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The print_interest_thresh variable determines which pairs of object attributes
  will be written to the output object attribute ASCII file.
  The user may choose to set the print_interest_thresh to the same value
@@ -1593,7 +1593,7 @@ The print_interest_thresh variable determines which pairs of object attributes
 met_data_dir = "MET_BASE";
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The MODE tool uses several static data files when generating plots.
  If it cannot find the data it needs in the expected directory, it will
  error out.
@@ -1661,7 +1661,7 @@ color_table = "MET_BASE/colortables/mode_obj.ctable";
 };
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The color_table variables indicate which color table files are to be used
  when generating the output PostScript plot.
  The forecast and observation raw field are plotted using values in the
@@ -1675,14 +1675,14 @@ The color_table variables indicate which color table files are to be used
  will be scaled to match the actual range of the data present in raw field.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The plot_min and plot_max variables indicate the min and max data values
  to be plotted for the forecast and observation fields.
  If set to non-zero values, the forecast and observation raw color tables
  specified above will be rescaled to match the specified range.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The MODE tool generates a color bar to represent the contents of the colortable
  that was used to plot a field of data.
  The number of entries in the color bar matches the number of entries in
@@ -1701,7 +1701,7 @@ The MODE tool generates a color bar to represent the contents of the colortable
 zero_border_size = 1;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The MODE tool is not able to define objects that touch the edge of the grid.
  After the convolution step is performed the outer columns and rows of data
  are zeroed out to enable MODE to identify objects.
@@ -1713,22 +1713,22 @@ The MODE tool is not able to define objects that touch the edge of the grid.
 plot_valid_flag = FALSE;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 When applied, the plot_valid_flag variable indicates that only the region
  containing valid data after masking is applied should be plotted.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * FALSE indicates the entire domain should be plotted.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 * TRUE indicates only the region containing valid data after masking should
  be plotted.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The default value of this flag is FALSE.
 \end_layout
 
@@ -1736,7 +1736,7 @@ The default value of this flag is FALSE.
 plot_gcarc_flag = FALSE;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 When applied, the plot_gcarc_flag variable indicates that the edges of polylines
  should be plotted using great circle arcs as opposed to straight lines
  in the grid.
@@ -1751,7 +1751,7 @@ ps_plot_flag = TRUE;
 ct_stats_flag = TRUE;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 These flags can be set to TRUE or FALSE to produce additional output, in
  the form of postscript plots (ps_plot_flag) or contingency table counts
  and statistics (ct_stats_flag).
@@ -1790,7 +1790,7 @@ polylines = TRUE;
 };
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Each component of the pairs information in the NetCDF file can be turned
  on or off.
  The old syntax is still supported: TRUE means accept the defaults, FALSE
@@ -1803,7 +1803,7 @@ Each component of the pairs information in the NetCDF file can be turned
 shift_right = 0;
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 When MODE is run on global grids, this parameter specifies how many grid
  squares to shift the grid to the right.
  MODE does not currently connect objects from one side of a global grid
@@ -1817,7 +1817,7 @@ When MODE is run on global grids, this parameter specifies how many grid
 output_prefix = "";
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 This option specifies a string to be used in the output file name.
  It can be useful for keeping results for different models or variables
  from overwriting each other.
@@ -1827,7 +1827,7 @@ This option specifies a string to be used in the output file name.
 version = "v5.1";
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The version indicates the version of the MODE configuration file used.
  Future versions of MET may include changes to MODE and the MODE configuration
  file.
@@ -1838,11 +1838,11 @@ The version indicates the version of the MODE configuration file used.
 MODE output
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 MODE produces output in ASCII, NetCDF, and PostScript formats.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The MODE tool creates two ASCII output files.
  The first ASCII file contains contingency table counts and statistics for
  comparing the forecast and observation fields.
@@ -1857,7 +1857,7 @@ The MODE tool creates two ASCII output files.
  This file uses the following naming convention: 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 mode_PREFIX_FCST_VAR_LVL_vs_ OBS_VAR_LVL_HHMMSSL_YYYYMMDD_HHMMSSV_ HHMMSSA_cts.tx
 t where PREFIX indicates the user-defined output prefix, FCST_VAR_LVL is
  the forecast variable and vertical level being used, OBS_VAR_LVL is the
@@ -2979,7 +2979,7 @@ Odds Ratio
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The second ASCII file the MODE tool generates contains all of the attributes
  for simple objects, the merged cluster objects, and pairs of objects.
  Each line in this file contains the same number of columns, though those
@@ -3167,7 +3167,7 @@ Attributes for pairs of forecast and observation cluster objects
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 A note on terminology: a cluster (referred to as "composite" in earlier
  versions) object need not necessarily consist of more than one simple object.
  A cluster object is by definition any set of one or more objects in one
@@ -3176,7 +3176,7 @@ A note on terminology: a cluster (referred to as "composite" in earlier
  object, they are each considered to be cluster objects as well.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The contents of the columns in this ASCII file are summarized in Table 8-3.
 \end_layout
 
@@ -4545,7 +4545,7 @@ Total interest value computed for a pair of simple objects (unitless)
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The MODE tool creates a NetCDF output file containing the object fields
  that are defined.
  The NetCDF file contains gridded fields including indices for the simple
@@ -4559,7 +4559,7 @@ The MODE tool creates a NetCDF output file containing the object fields
 on file option.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The dimensions and variables included in the mode NetCDF files are described
  in Tables 8-4 and 8-5.
 \end_layout
@@ -6571,7 +6571,7 @@ Observation Cluster Convex Hull Point Y-Coordinate
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Lastly, the MODE tool creates a PostScript plot summarizing the features-based
  approach used in the verification.
  The PostScript plot is generated using internal libraries and does not
@@ -6580,7 +6580,7 @@ Lastly, the MODE tool creates a PostScript plot summarizing the features-based
  configuration file option.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The PostScript plot will contain 5 summary pages at a minimum, but the number
  of pages will depend on the merging options chosen.
  Additional pages will be created if merging is performed using the double
@@ -6590,7 +6590,7 @@ The PostScript plot will contain 5 summary pages at a minimum, but the number
  cases provided with the MET tarball.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The first page of PostScript output contains a great deal of summary information.
  Six tiles of images provide thumbnail images of the raw fields, matched/merged
  object fields, and object index fields for the forecast and observation
@@ -6607,7 +6607,7 @@ The first page of PostScript output contains a great deal of summary information
  object index plots.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 The second and third pages of the PostScript output file display enlargements
  of the forecast and observation raw and object fields, respectively.
  The fourth page displays the forecast object with the outlines of the observati
@@ -6616,7 +6616,7 @@ on objects overlaid, and vice versa.
  cluster objects.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 If the double threshold merging or the fuzzy engine merging techniques have
  been applied, the output from those steps is summarized on additional pages.
 \end_layout

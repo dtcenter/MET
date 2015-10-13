@@ -74,12 +74,12 @@ How do I ...
 Frequently Asked Questions
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  Why was the MET written largely in C++ instead of FORTRAN?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -89,12 +89,12 @@ MET relies upon the object-oriented aspects of C++, particularly in using
  forecast verification library that was developed at NCAR.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  Why is PrepBufr used?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -104,12 +104,12 @@ The first goal of MET was to replicate the capabilities of existing verification
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  Why is GRIB used?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -117,12 +117,12 @@ Forecast data from both WRF cores can be processed into GRIB format, and
  it is a commonly accepted output format for many NWP models.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  Is GRIB2 supported?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -134,13 +134,13 @@ Yes, forecast output in GRIB2 format can be read by MET.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  How does MET differ from the previously mentioned existing verification
  packages?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -148,12 +148,12 @@ MET is an actively maintained, evolving software package that is being made
  freely available to the public through controlled version releases.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  How does the MODE tool differ from the Grid-Stat tool?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -162,12 +162,12 @@ They offer different ways of viewing verification.
  MODE provides specialized spatial statistics.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  Will the MET work on data in native model coordinates?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  N
 \series medium
@@ -176,12 +176,12 @@ o - it will not.
  systems.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  How do I get help if my questions are not answered in the User's Guide?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -196,12 +196,12 @@ target "http://www.dtcenter.org/met/users"
  If that doesn't answer your question, then email: met_help@ucar.edu.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Q.
  Where are the graphics?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A.
  
 \series medium
@@ -218,7 +218,7 @@ Currently, very few graphics are included.
 Troubleshooting
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The first place to look for help with individual commands is this user's
@@ -239,7 +239,7 @@ scripts/
  installing or running MET.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 MET won't compile
 \end_layout
 
@@ -259,7 +259,7 @@ MET won't compile
  3.6 can be used with MET.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Grid_stat won't run
 \end_layout
 
@@ -267,7 +267,7 @@ Grid_stat won't run
 * Are both the observational and forecast datasets on the same grid?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 MODE won't run
 \end_layout
 
@@ -288,7 +288,7 @@ Point_stat won't run
 * Have you run pb2nc first on your PrepBufr observation data?
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 General troubleshooting
 \end_layout
 
@@ -323,7 +323,7 @@ n to the screen.
 Where to get help
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 If none of the above suggestions have helped solve your problem, help is
@@ -334,7 +334,7 @@ If none of the above suggestions have helped solve your problem, help is
 How to contribute code
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 If you have code you would like to contribute, we will gladly consider your

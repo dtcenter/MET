@@ -73,7 +73,7 @@
 Appendix C - Verification Measures
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 \paragraph_spacing single
 \noindent
 
@@ -92,7 +92,7 @@ This appendix provides specific information about the many verification
 C.1 MET verification measures for categorical (dichotomous) variables
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The verification statistics for dichotomous variables are formulated using
@@ -540,7 +540,7 @@ T = n
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The counts, n
@@ -592,7 +592,7 @@ The counts, n
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 By dividing the counts in the cells by the overall total, T, the joint proportio
@@ -712,7 +712,7 @@ p
 t tool.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The values in Table C-1 can also be used to compute the F, O, and H relative
@@ -729,7 +729,7 @@ T
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The categorical verification measures produced by the Point-Stat and Grid-Stat
@@ -741,7 +741,7 @@ The categorical verification measures produced by the Point-Stat and Grid-Stat
 TOTAL
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The total number of forecast-observation pairs, 
@@ -755,19 +755,19 @@ T
 Base rate
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "O_RATE" in FHO output (Table 4-3)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "BASER" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The base rate is defined as 
@@ -804,13 +804,13 @@ o = 1
 Mean forecast
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "F_RATE" in FHO output (Table 4-3); 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FMEAN" in CTS output (Table 4-5)
@@ -859,7 +859,7 @@ Accuracy
 Called "ACC" in CTS output (Table 4-5) 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Accuracy for a 2x2 contingency table is defined as 
@@ -880,7 +880,7 @@ over{T}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 That is, it is the proportion of forecasts that were either hits or correct
@@ -911,13 +911,13 @@ n
 Frequency Bias
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FBIAS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Frequency Bias is the ratio of the total number of forecasts of an event
@@ -942,7 +942,7 @@ over {n_1}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 A "good" value of Frequency Bias is close to 1; a value greater than 1 indicates
@@ -955,19 +955,19 @@ A "good" value of Frequency Bias is close to 1; a value greater than 1 indicates
 Probability of Detection (POD)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "H_RATE" in FHO output (Table 4-3); 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "PODY" in CTS output (Table 4-5) 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 POD is defined as 
@@ -990,7 +990,7 @@ over{n_{1}}}.$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 It is the fraction of events that were correctly forecasted to occur.
@@ -1003,13 +1003,13 @@ It is the fraction of events that were correctly forecasted to occur.
 Probability of False Detection (POFD)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "POFD" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 POFD is defined as 
@@ -1032,7 +1032,7 @@ over{n_{.0}}}.$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 It is the proportion of non-events that were forecast to be events.
@@ -1044,13 +1044,13 @@ It is the proportion of non-events that were forecast to be events.
 Probability of Detection of the non-event (PODn)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "PODN" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 PODn is defined as 
@@ -1073,7 +1073,7 @@ over{n_{.0}}}.$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 It is the proportion of non-events that were correctly forecasted to be
@@ -1087,13 +1087,13 @@ It is the proportion of non-events that were correctly forecasted to be
 False Alarm Ratio (FAR)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FAR" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 FAR is defined as 
@@ -1116,7 +1116,7 @@ over{n_{1.}}}.$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 It is the proportion of forecasts of the event occurring for which the event
@@ -1129,13 +1129,13 @@ It is the proportion of forecasts of the event occurring for which the event
 Critical Success Index (CSI)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "CSI" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 CSI is defined as 
@@ -1156,7 +1156,7 @@ over{n_{11}+n_{10}+n_{01}}}}.$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 It is the ratio of the number of times the event was correctly forecasted
@@ -1186,13 +1186,13 @@ n
 Gilbert Skill Score (GSS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "GSS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 GSS is based on the CSI, corrected for the number of hits that would be
@@ -1232,7 +1232,7 @@ over{T}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 GSS is also known as the Equitable Threat Score (ETS).
@@ -1245,13 +1245,13 @@ GSS is also known as the Equitable Threat Score (ETS).
 Hanssen-Kuipers Discriminant (H-K)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "HK" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 H-K is defined as 
@@ -1272,7 +1272,7 @@ over{(n_{11}+n_{01})(n_{10}+n_{00})}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 More simply, 
@@ -1295,7 +1295,7 @@ hbox{POFD}.$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 H-K is also known as the True Skill Statistic (TSS) and less commonly (although
@@ -1310,11 +1310,11 @@ H-K is also known as the True Skill Statistic (TSS) and less commonly (although
 Heidke Skill Score (HSS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Called "HSS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 HSS is a skill score based on Accuracy, where the Accuracy is corrected
@@ -1354,7 +1354,7 @@ over{T}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 HSS can range from minus infinity to 1.
@@ -1365,13 +1365,13 @@ HSS can range from minus infinity to 1.
 Odds Ratio (OR)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "ODDS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 OR measures the ratio of the odds of a forecast of the event being correct
@@ -1420,7 +1420,7 @@ biggr)}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 OR can range from 0 to 
@@ -1437,13 +1437,13 @@ OR can range from 0 to
 Logarithm of the Odds Ratio (LODDS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "LODDS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 LODDS transforms the odds ratio via the logarithm, which tends to normalize
@@ -1473,13 +1473,13 @@ hbox{LODDS}=ln(OR)$
 Odds Ratio Skill Score (ORSS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "ORSS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 ORSS is a skill score based on the odds ratio.
@@ -1501,7 +1501,7 @@ over{OR+1}}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 ORSS is sometime also referred to as Yule's Q.
@@ -1514,13 +1514,13 @@ ORSS is sometime also referred to as Yule's Q.
 Extreme Dependency Score (EDS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "EDS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The extreme dependency score measures the association between forecast and
@@ -1559,7 +1559,7 @@ biggr)}}-1}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 EDS can range from -1 to 1, with 0 representing no skill.
@@ -1572,11 +1572,11 @@ EDS can range from -1 to 1, with 0 representing no skill.
 Extreme Dependency Index (EDI)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Called "EDI" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The extreme dependency index measures the association between forecast and
@@ -1586,7 +1586,7 @@ ly.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 EDI can range from -
@@ -1602,13 +1602,13 @@ EDI can range from -
 Symmetric Extreme Dependency Score (SEDS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "SEDS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The symmetric extreme dependency score measures the association between
@@ -1647,7 +1647,7 @@ biggr)}}-1}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 SEDS can range from -
@@ -1663,13 +1663,13 @@ SEDS can range from -
 Symmetric Extremal Dependency Index (SEDI)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "SEDI" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The symmetric extremal dependency idex measures the association between
@@ -1708,7 +1708,7 @@ ln (1-F)}},$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 where 
@@ -1745,7 +1745,7 @@ are the Hit Rate and False Alarm Rate, respectively.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 SEDI can range from -
@@ -1762,13 +1762,13 @@ SEDI can range from -
 Bias Adjusted Gilbert Skill Score (GSS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "BAGSS" in CTS output (Table 4-5)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 BAGSS is based on the GSS, but is corrected as much as possible for forecast
@@ -1780,7 +1780,7 @@ BAGSS is based on the GSS, but is corrected as much as possible for forecast
 C.2 MET verification measures for continuous variables
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 For continuous variables, many verification measures are based on the forecast
@@ -1798,7 +1798,7 @@ For continuous variables, many verification measures are based on the forecast
 e rather than a single measure.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The verification measures currently evaluated by the Point-Stat tool are
@@ -1822,19 +1822,19 @@ n
 Mean forecast
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FBAR" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FBAR" in SL1L2 output (Table 4-11)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The sample mean forecast, FBAR, is defined as 
@@ -1861,19 +1861,19 @@ sum_{i=1}^nf_i$
 Mean observation
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "OBAR" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "OBAR" in SL1L2 output (Table 4-11)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The sample mean observation is defined as 
@@ -1900,13 +1900,13 @@ sum_{i=1}^no_i$
 Forecast standard deviation
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FSTDEV" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The sample variance of the forecasts is defined as 
@@ -1929,7 +1929,7 @@ overline f)^2.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The forecast standard deviation is defined as 
@@ -1952,13 +1952,13 @@ sqrt{s_f^2}$
 Observation standard deviation
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "OSTDEV" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The sample variance of the observations is defined as 
@@ -1981,7 +1981,7 @@ overline o)^2.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The observed standard deviation is defined as 
@@ -2004,13 +2004,13 @@ sqrt{s_o^2}$
 Pearson Correlation Coefficient
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "PR_CORR" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Pearson correlation coefficient, 
@@ -2053,7 +2053,7 @@ overline o)^2}}}$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -2073,13 +2073,13 @@ Spearman rank correlation coefficient (
 )
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "SP_CORR" in CNT (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Spearman rank correlation coefficient (
@@ -2106,7 +2106,7 @@ r
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 A simpler formulation of the Spearman-rank correlation is based on differences
@@ -2134,7 +2134,7 @@ sum_{i=1}^{n}d_i^2$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Like 
@@ -2156,11 +2156,11 @@ Kendall's Tau statistic (
 )
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Called "KT_CORR" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Kendall's Tau statistic (
@@ -2202,7 +2202,7 @@ displaystyle{n(n-1)/2}}$
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 where NC is the number of "concordant" pairs and ND is the number of "discordant
@@ -2242,7 +2242,7 @@ o
  pairs is .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Like 
@@ -2267,13 +2267,13 @@ ce) and a value of -1 indicates perfect negative association.
 Mean Error (ME)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "ME" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Mean Error, ME, is a measure of overall bias for continuous variables;
@@ -2302,7 +2302,7 @@ overline{o}}$
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 A perfect forecast has ME = 0.
@@ -2312,13 +2312,13 @@ A perfect forecast has ME = 0.
 Mean Error Squared (ME2)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "ME2" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Mean Error Squared, ME2, is provided to give a complete breakdown of
@@ -2342,7 +2342,7 @@ hbox{ME}^2$
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 A perfect forecast has ME2 = 0.
@@ -2352,13 +2352,13 @@ A perfect forecast has ME2 = 0.
 Multiplicative Bias
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "MBIAS" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Multiplicative bias is simply the ratio of the means of the forecasts and
@@ -2386,13 +2386,13 @@ overline{o}}$
 Mean-squared error (MSE) 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "MSE" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 MSE measures the average squared error of the forecasts.
@@ -2407,13 +2407,13 @@ MSE measures the average squared error of the forecasts.
 Root-mean-squared error (RMSE)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "RMSE" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 RMSE is simply the square root of the MSE, 
@@ -2428,7 +2428,7 @@ RMSE is simply the square root of the MSE,
 Standard deviation of the error
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "ESTDEV" in CNT output (Table 4-6)
@@ -2438,13 +2438,13 @@ Called "ESTDEV" in CNT output (Table 4-6)
 Bias-Corrected MSE
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "BCMSE" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 MSE and RMSE are strongly impacted by large errors.
@@ -2453,7 +2453,7 @@ MSE and RMSE are strongly impacted by large errors.
  A perfect forecast would have MSE = RMSE = 0.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 MSE can be re-written as 
@@ -2548,7 +2548,7 @@ $MSE=ME^2+s^2_{f-o}$
  Moreover, MSE can be strongly influenced by ME, as shown by this decomposition.
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The standard deviation of the error, 
@@ -2563,7 +2563,7 @@ The standard deviation of the error,
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Note that the square of the standard deviation of the error (ESTDEV2) is
@@ -2575,13 +2575,13 @@ Note that the square of the standard deviation of the error (ESTDEV2) is
 Mean Absolute Error (MAE)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "MAE" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Mean Absolute Error (MAE) is defined as 
@@ -2591,7 +2591,7 @@ The Mean Absolute Error (MAE) is defined as
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 MAE is less influenced by large errors and also does not depend on the mean
@@ -2603,13 +2603,13 @@ MAE is less influenced by large errors and also does not depend on the mean
 Inter Quartile Range of the Errors (IQR)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "IQR" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Inter Quartile Range of the Errors (IQR) is the difference between the
@@ -2630,7 +2630,7 @@ hbox{IQR}=p_{75}(f_i-o_i)-p_{25}(f_i-o_i)$
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 IQR is another estimate of spread, similar to standard error, but is less
@@ -2642,11 +2642,11 @@ IQR is another estimate of spread, similar to standard error, but is less
 Median Absolute Deviation (MAD)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Called "MAD" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Median Absolute Deviation (MAD) is defined as 
@@ -2667,7 +2667,7 @@ hbox{median}|f_i-o_i|$
 .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 MAD is an estimate of spread, similar to standard error, but is less influenced
@@ -2679,13 +2679,13 @@ MAD is an estimate of spread, similar to standard error, but is less influenced
 Bias Adjusted Gilbert Skill Score
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "BAGSS" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Bias Adjusted Gilbert Skill Score (BAGSS) is the Gilbert Skill Score,
@@ -2698,13 +2698,13 @@ The Bias Adjusted Gilbert Skill Score (BAGSS) is the Gilbert Skill Score,
 Percentiles of the errors
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "E10", "E25", "E50", "E75", "E90" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Percentiles of the errors provide more information about the distribution
@@ -2722,13 +2722,13 @@ Percentiles of the errors provide more information about the distribution
 Anomaly Correlation Coefficient
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "ANOM_CORR" in CNT output (Table 4-6)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Anomaly correlation coefficient is equivalent to the Pearson correlation
@@ -2745,7 +2745,7 @@ c
  The 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Anomaly correlation coefficient is defined as: 
@@ -2791,7 +2791,7 @@ sum (o_i - c)^2 } } }.$$
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect
@@ -2805,14 +2805,14 @@ Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect
 Scalar L1 and L2 values
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output (Table
  4-11)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 These statistics are simply the 1st and 2nd moments of the forecasts, observatio
@@ -2939,7 +2939,7 @@ sum_{i=1}^no^2_i$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Some of the other statistics for continuous forecasts (e.g., RMSE) can be
@@ -2952,14 +2952,14 @@ Some of the other statistics for continuous forecasts (e.g., RMSE) can be
 Scalar anomaly L1L2 values
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output (Table
  4-12)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Computation of these statistics requires a climatological value, c.
@@ -2967,7 +2967,7 @@ Computation of these statistics requires a climatological value, c.
  The moments are defined as:
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 and 
@@ -2977,14 +2977,14 @@ and
 Vector L1 and L2 values
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR"
  in VL1L2 output (Table 4-13)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 These statistics are the moments for wind vector values, where 
@@ -3225,14 +3225,14 @@ sum_{i=1}^n(u_{oi}^2+v_{oi}^2)$$
 Vector anomaly L1 and L2 values
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR
 " in VAL1L2 output (Table 4-14)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 These statistics require climatological values for the wind vector components,
@@ -3428,7 +3428,7 @@ sum_{i=1}^n((u_{oi}-u_c)^2+(v_{oi}-v_c)^2))$$
 C.3 MET verification measures for probabilistic forecasts
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The results of the probabilistic verification methods that are included
@@ -3446,7 +3446,7 @@ The results of the probabilistic verification methods that are included
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The verification statistics for probabilistic forecasts of dichotomous variables
@@ -4023,7 +4023,7 @@ T =
 Reliability 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 A component of the Brier score.
@@ -4061,7 +4061,7 @@ overline o_i)^2}$$
 Resolution 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 A component of the Brier score that measures how well forecasts divide events
@@ -4071,7 +4071,7 @@ s in the subsets to be different than the overall event frequency.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 \begin_inset ERT
@@ -4099,7 +4099,7 @@ overline o)^2$$
 Uncertainty 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A component of the Brier score.
@@ -4133,7 +4133,7 @@ frac{n_{.1}}{T})$$
 Brier score 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Brier score is the mean squared probability error.
@@ -4203,7 +4203,7 @@ i
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 BS can be partitioned into three terms: (1) reliability, (2) resolution,
@@ -4246,7 +4246,7 @@ overline o)$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 This score is sensitive to the base rate or climatological frequency of
@@ -4262,7 +4262,7 @@ This score is sensitive to the base rate or climatological frequency of
 Brier Skill Score (BSS)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 BSS is a skill score based on the Brier Scores of the forecast and a reference
@@ -4294,7 +4294,7 @@ OY_TP - Observed Yes Total Proportion.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 This is the cell probability for row 
@@ -4335,7 +4335,7 @@ ON_TP - Observed No Total Proportion.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 This is the cell probability for row 
@@ -4374,7 +4374,7 @@ hbox{probability}(o_{i0})$$
 Calibration 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Calibration is the conditional probability of an event given each probability
@@ -4419,7 +4419,7 @@ hbox{probability}(o_1|p_i)$$
 Refinement 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The relative frequency associated with each forecast probability, sometimes
@@ -4457,7 +4457,7 @@ hbox{probability}(p_i)$$
 Likelihood 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Likelihood is the conditional probability for each forecast category (row)
@@ -4488,7 +4488,7 @@ hbox{probability}(p_i|o_1)$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Likelihood values are also used to create "discrimination" plots that compare
@@ -4503,7 +4503,7 @@ Likelihood values are also used to create "discrimination" plots that compare
 Base Rate 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 This is the probability of an event for each forecast category 
@@ -4554,7 +4554,7 @@ hbox{probability}(o_{i1})$$
 Reliability diagram 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The reliability diagram is a plot of the observed frequency of events versus
@@ -4563,7 +4563,7 @@ ies divided into categories.
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The ideal forecast (i.e., one with perfect reliability) has conditional observed
@@ -4595,7 +4595,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 Receiver operating characteristic 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET produces hit rate (POD) and false alarm rate (POFD) values for each
@@ -4608,7 +4608,7 @@ MET produces hit rate (POD) and false alarm rate (POFD) values for each
  See the area under the ROC curve (AUC) entry for related information.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An ROC plot is shown for an example set of forecasts, with a solid line
@@ -4619,7 +4619,7 @@ An ROC plot is shown for an example set of forecasts, with a solid line
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An ROC curve shows how well the forecast discriminates between two outcomes,
@@ -4648,7 +4648,7 @@ An ROC curve shows how well the forecast discriminates between two outcomes,
 Area Under the ROC curve (AUC)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The area under the receiver operating characteristic (ROC) curve is often
@@ -4659,7 +4659,7 @@ The area under the receiver operating characteristic (ROC) curve is often
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The area under the curve can be estimated in a variety of ways.
@@ -4693,7 +4693,7 @@ C.4 MET verification measures for ensemble forecasts
 CRPS
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The continuous ranked probability score (CRPS) is the integral, over all
@@ -4704,7 +4704,7 @@ The continuous ranked probability score (CRPS) is the integral, over all
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 WARNING: The normal distribution is probably a good fit for temperature
@@ -4714,7 +4714,7 @@ WARNING: The normal distribution is probably a good fit for temperature
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Closed form expressions for the CRPS are difficult to define when using
@@ -4788,7 +4788,7 @@ biggr)$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 In this equation, the y represents the event threshold.
@@ -4813,7 +4813,7 @@ phi and the cumulative distribution function (CDF), denoted in the above
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The overall CRPS is calculated as the average of the individual measures.
@@ -4839,7 +4839,7 @@ sum_i^Ncrps_i$
  .
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The score can be interpreted as a continuous version of the mean absolute
@@ -4855,7 +4855,7 @@ The score can be interpreted as a continuous version of the mean absolute
 CRPS Skill Score
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The continuous ranked probability skill score (CRPSS) is similar to the
@@ -4891,7 +4891,7 @@ hbox{CRPS}_{ref} }$$
 IGN
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The ignorance score (IGN) is the negative logarithm of a predictive probability
@@ -4952,7 +4952,7 @@ sigma^2}.$$
 
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Accumulation of the ignorance score for many forecasts is via the average
@@ -4967,7 +4967,7 @@ Accumulation of the ignorance score for many forecasts is via the average
 PIT
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The probability integral transform (PIT) is the analog of the rank histogram
@@ -4987,7 +4987,7 @@ The probability integral transform (PIT) is the analog of the rank histogram
 RANK
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The rank of an observation, compared to all members of an ensemble forecast,
@@ -4999,7 +4999,7 @@ The rank of an observation, compared to all members of an ensemble forecast,
  
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The rank histogram does not provide information about the accuracy of ensemble
@@ -5016,7 +5016,7 @@ The rank histogram does not provide information about the accuracy of ensemble
 C.5 MET verification measures for neighborhood methods
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The results of the neighborhood verification approaches that are included
@@ -5028,98 +5028,98 @@ The results of the neighborhood verification approaches that are included
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The traditional contingency table statistics computed by the Grid-Stat neighborh
 ood tool, and included in the NBRCTS output, are listed below: 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Base Rate (called "BASER" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Mean Forecast (called "FMEAN" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Accuracy (called "ACC" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Frequency Bias (called "FBIAS" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Probability of Detection (called "PODY" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Probability of Detection of the non-event (called "PODN" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Probability of False Detection (called "POFD" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * False Alarm Ratio (called "FAR" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Critical Success Index (called "CSI" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Gilbert Skill Score (called "GSS" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Hanssen-Kuipers Discriminant (called "H-K" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Heidke Skill Score (called "HSS" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 * Odds Ratio (called "ODDS" in Table 5-3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 All of these measures are defined in Section C.1 of Appendix C.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In addition to these standard statistics, the neighborhood analysis provides
@@ -5136,13 +5136,13 @@ In addition to these standard statistics, the neighborhood analysis provides
 Fractions Brier Score
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Called "FBS" in NBRCNT output (Table 5-4)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Fractions Brier Score (FBS) is defined as 
@@ -5226,13 +5226,13 @@ rangle _{s}$
 Fractions Skill Score
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "FSS" in NBRCNT output (Table 5-4)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Fractions Skill Score (FSS) is defined as 
@@ -5284,11 +5284,11 @@ biggr]}}$$
 Asymptotic Fractions Skill Score
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 Called "AFSS" in NBRCNT output (Table 5-4)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Asymptotic Fractions Brier Score (AFBS) is a special case of the Fractions
@@ -5303,13 +5303,13 @@ The Asymptotic Fractions Brier Score (AFBS) is a special case of the Fractions
 Uniform Fractions Skill Score
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "UFSS" in NBRCNT output (Table 5-4)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The Uniform Fractions Skill Score (AFBS) is a reference statistic for the
@@ -5326,13 +5326,13 @@ The Uniform Fractions Skill Score (AFBS) is a reference statistic for the
 Forecast Rate
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "F_rate" in NBRCNT output (Table 5-4)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The overall proportion of grid points with forecast events to total grid
@@ -5344,13 +5344,13 @@ The overall proportion of grid points with forecast events to total grid
 Observation Rate
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 Called "O_rate" in NBRCNT output (Table 5-4)
 \end_layout
 
-\begin_layout Paragraph*
+\begin_layout Standard
 
 \series medium
 The overall proportion of grid points with observed events to total grid
