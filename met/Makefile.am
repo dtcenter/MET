@@ -38,9 +38,10 @@ MAINTAINERCLEANFILES 	= \
 
 dist-hook:
 	-rm -rf `find ${distdir} -name .svn`
-	-rm -rf `find ${distdir} -name "*.lyx"`
 	-rm -rf `find ${distdir} -name "*.ll"`
 	-rm -rf `find ${distdir} -name "*.yy"`
+	-rm -rf ${distdir}/doc/MET_Users_Guide
+	-rm -rf ${distdir}/doc/MET-TC_Users_Guide
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
 	-rm -rf ${distdir}/internal_tests
 	-rm -rf ${distdir}/src/tools/dev_utils
