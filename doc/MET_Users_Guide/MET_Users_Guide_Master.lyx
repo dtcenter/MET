@@ -254,13 +254,7 @@ filename "Ensemble-Stat/MET_Users_Guide_Ensemble-Stat.lyx"
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand include
-filename "Wavelet-Stat/MET_Users_Guide_Wavelet-Stat.lyx"
-
-\end_inset
-
-
+placeholder for wavelet stat
 \end_layout
 
 \begin_layout Standard
@@ -305,13 +299,7 @@ filename "Series-Analysis/MET_Users_Guide_Series-Analysis.lyx"
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand include
-filename "MODE/MET_Users_Guide_MODE.lyx"
-
-\end_inset
-
-
+placeholder for MODE
 \end_layout
 
 \begin_layout Standard
@@ -436,13 +424,7 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixB.lyx"
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand include
-filename "fwd_refs_appendix/MET_Users_Guide_AppendixC.lyx"
-
-\end_inset
-
-
+placeholder for AppendixC
 \begin_inset Newpage pagebreak
 \end_inset
 
@@ -450,13 +432,7 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixC.lyx"
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset include
-LatexCommand include
-filename "fwd_refs_appendix/MET_Users_Guide_AppendixD.lyx"
-
-\end_inset
-
-
+placeholder for AppendixD
 \end_layout
 
 \end_body
