@@ -2146,7 +2146,7 @@ void process_madis_mesonet(NcFile *&f_in) {
 void process_madis_acarsProfiles(NcFile *&f_in) {
    int nhdr, nlvl,nlvl1, i_lvl;
    long i_hdr, i_cnt;
-   int hdr_sid_len, hdr_max_lev;
+   int hdr_sid_len;
    double tmp_dbl, tmp_dbl2, tmp_dbl1;
    char tmp_str[max_str_len], qty;
    ConcatString hdr_typ, hdr_sid, hdr_vld;

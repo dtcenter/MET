@@ -1794,7 +1794,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 void write_ens_nc(int i_vx, DataPlane &dp) {
    int i, j;
    double t, v;
-   char thresh_str[max_str_len], type_str[max_str_len];
+   char type_str[max_str_len];
 
 
    // Arrays for storing ensemble data
@@ -1915,7 +1915,6 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
       // Loop through each threshold
       for(i=0; i<conf_info.ens_ta[i_vx].n_elements(); i++) {
 
-         // conf_info.ens_ta[i_vx][i].get_abbr_str(thresh_str);
          sprintf(type_str, "ENS_FREQ_%s", conf_info.ens_ta[i_vx][i].get_abbr_str().contents());
 
          // Store the data

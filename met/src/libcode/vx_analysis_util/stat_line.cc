@@ -38,18 +38,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char * suffix_list [] = {
-
-   ".stat"
-
-};
-
-static const int n_suffixes = sizeof(suffix_list)/sizeof(*suffix_list);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class STATLine
    //
@@ -1099,7 +1087,7 @@ int get_pct_column_offset(const char *col_name) {
 ////////////////////////////////////////////////////////////////////////
 
 int get_pstd_column_offset(const char *col_name, const STATLine &L) {
-   int i, n;
+   int i;
    int offset = bad_data_int;
 
    //

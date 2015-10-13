@@ -65,7 +65,7 @@ int get_tc_col_offset(const char **arr, int n_cols, const char *col_name) {
 ////////////////////////////////////////////////////////////////////////
 
 int get_tc_mpr_col_offset(const char *col_name) {
-   int i, j, wind;
+   int i;
    ConcatString s;
    int offset = bad_data_int;
 
@@ -179,7 +179,7 @@ void write_tc_header_row(const char **cols, int n_cols, int hdr_flag,
 
 void write_tc_mpr_header_row(int hdr_flag, AsciiTable &at,
                              int r, int c) {
-   int i, j;
+   int i;
    ConcatString s;
 
    // Write the header column names if requested

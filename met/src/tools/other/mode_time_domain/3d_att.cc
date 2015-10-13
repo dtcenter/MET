@@ -1023,7 +1023,6 @@ void PairAtt3D::write_txt(AsciiTable & table, const int row) const
 int k;
 char junk[512];
 int c = n_header_3d_cols;
-const char * format = 0;
 
 
    //  object number
