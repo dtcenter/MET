@@ -347,7 +347,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    }
    
    if(hdr_name.has("INTERP_PNTS", index)) {
-      wdth = nint(sqrt(atoi(hdr_value[index])));
+      wdth = nint(sqrt(atof(hdr_value[index])));
    }
    shc.set_interp_wdth(wdth);
 
