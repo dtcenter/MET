@@ -74,7 +74,7 @@
 \begin_body
 
 \begin_layout Chapter
-New Chapter
+MODE Time Domain
 \end_layout
 
 \begin_layout Section
@@ -247,12 +247,37 @@ Object attributes are, for the most part, calculated in much the same way
  that distances, angles and areas can be calculated in grid coordinates
  via the usual Euclidian/Cartesian methods.
  That is no longer the case in spacetime, since there is no distance function
- (more precisely, no {
-\backslash
-italicfont metric}) there.
- Given two points in this spacetime, say ?? $(x_1, y_1, t_1)$ and $(x_2,
- y_2, t_2)$, there is no way to measure their separation with a single nonnegati
-ve number in a physically meaningful way.
+ (more precisely, no 
+\emph on
+metric
+\emph default
+ there.
+ Given two points in this spacetime, say 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$(x_1, y_1, t_1)$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$(x_2, y_2, t_2)$
+\end_layout
+
+\end_inset
+
+, there is no way to measure their separation with a single nonnegative
+ number in a physically meaningful way.
  If all three of our dimensions were spatial, there would be no difficulties.
 \end_layout
 
@@ -322,9 +347,21 @@ size
 radius
 \emph default
 .
- Instead, the size of the square is (2R + 1) 
+ Instead, the size of the square is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$(2 R + 1) 
 \backslash
-times (2R + 1), as shown in Figure 2.1
+times (2 R + 1)$
+\end_layout
+
+\end_inset
+
+, as shown in Figure 2.1
 \end_layout
 
 \begin_layout Standard
@@ -392,35 +429,72 @@ MTD calculates several 3D attributes for single objects.
 \begin_layout Paragraph
 
 \series medium
-A 3D spacetime
-\begin_inset Note Note
+A 3D spacetime 
+\begin_inset ERT
 status open
 
 \begin_layout Plain Layout
 
 \series medium
-Unable to bold text.
+{
+\backslash
+bf centroid} 
 \end_layout
 
 \end_inset
 
- 
+
 \emph on
-centroid
-\emph default
- ??$(
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(
 \backslash
 overline{x}, 
 \backslash
 overline{y}, 
 \backslash
-overline{t})$ is calculated.
+overline{t})$
+\end_layout
+
+\end_inset
+
+
+\emph default
+ is calculated.
  There are no statistical overtones here.
- The number ??$
+ The number 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
 \backslash
-overline{x}$, for example, is just the average value of the 
+overline{x}$
+\end_layout
+
+\end_inset
+
+ , for example, is just the average value of the 
 \emph on
-x
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+\emph on
+$x$
+\end_layout
+
+\end_inset
+
+
 \emph default
  coordinate over the object.
 \end_layout
@@ -428,21 +502,33 @@ x
 \begin_layout Paragraph
 
 \series medium
-// 
-\backslash
-vskip SKIP_AMT 
-\backslash
-par
-\end_layout
+The vector 
+\begin_inset ERT
+status open
 
-\begin_layout Paragraph
+\begin_layout Plain Layout
 
 \series medium
-The vector 
-\emph on
-velocity
-\emph default
- ??$(v_x, v_y)$ is obtained by fitting a line to an 3D object.
+{
+\backslash
+bf velocity}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$(v_x, v_y)$
+\end_layout
+
+\end_inset
+
+ is obtained by fitting a line to an 3D object.
  The requirement for fitting the line is to minimize the sum of the squares
  of the 
 \emph on
@@ -455,13 +541,33 @@ t
 \emph default
  we can measure purely spatial distances.) From this velocity we get the
  
-\emph on
-speed
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf speed}
+\end_layout
+
+\end_inset
+
  and 
-\emph on
-direction
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf direction}
+\end_layout
+
+\end_inset
+
  of movement of the object.
  
 \end_layout
@@ -586,33 +692,103 @@ status open
 \series medium
 A simple integer count of the number of grid squares in an object for all
  of it's lifetime gives the 
-\emph on
-volume
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf volume}
+\end_layout
+
+\end_inset
+
  of the object.
  Remember that while we're working in three dimensions, one of the dimensions
  is non-spatial, so one should not attempt to convert this to a volume in,
- e.g., ??${
+ e.g., 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+${
 \backslash
-hbox{km}}^3$.
+hbox{km}}^3$
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Paragraph
 
 \series medium
 The 
-\emph on
-start time
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf start time}
+\end_layout
+
+\end_inset
+
  and 
-\emph on
-end time
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf end time}
+\end_layout
+
+\end_inset
+
  of an object are attributes as well.
  This is an integer telling which time step an object starts and ends at.
  These values are zero-based, so for example, if an object comes into existence
- at the ??do_ordinal(3) time step and lasts until the ??do_ordinal(9) time
- step, then the start time and end time will be listed as 2 and 8, respectively.
+ at the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$3^{
+\backslash
+hbox{rd}}$
+\end_layout
+
+\end_inset
+
+ time step and lasts until the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$9^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ time step, then the start time and end time will be listed as 2 and 8,
+ respectively.
  Note that this object has a lifetime of 7 time steps, not 6.
 \end_layout
 
@@ -620,9 +796,19 @@ end time
 
 \series medium
 Finally, MTD calculates several 
-\emph on
-intensity percentiles
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf intensity percentiles}
+\end_layout
+
+\end_inset
+
  of the raw data values inside each object.
  Not all of the the attributes are purely geometrical.
 \end_layout
@@ -662,43 +848,76 @@ forecast minus observed.
 
 \series medium
 The 
-\emph on
-spatial centroid
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf spatial centroid distance}
+\end_layout
+
+\end_inset
+
  is the purely spatial part of the centroid separation of two objects.
- If one centroid is at ??$(
+ If one centroid is at 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(
 \backslash
 overline{x}_1, 
 \backslash
 overline{y}_1, 
 \backslash
-overline{t}_1)$ and the other is at ??$(
+overline{t}_1)$
+\end_layout
+
+\end_inset
+
+ and the other is at 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(
 \backslash
 overline{x}_2, 
 \backslash
 overline{y}_2, 
 \backslash
-overline{t}_2)$ then the distance is calculated as??
+overline{t}_2)$
 \end_layout
 
-\begin_layout Paragraph
+\end_inset
 
-\series medium
+ then the distance is calculated as
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
 $$
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Plain Layout
 
-\series medium
 
 \backslash
 sqrt{
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Plain Layout
 
-\series medium
-
+   
 \backslash
 left(
 \backslash
@@ -709,16 +928,14 @@ overline{x}_2
 right)^2
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Plain Layout
 
-\series medium
-+
+    +
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Plain Layout
 
-\series medium
-
+   
 \backslash
 left(
 \backslash
@@ -729,25 +946,38 @@ overline{y}_2
 right)^2
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Plain Layout
 
-\series medium
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Plain Layout
 
-\series medium
 $$
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
 
 \series medium
 The 
-\emph on
-time centroid delta
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf time centroid delta}
+\end_layout
+
+\end_inset
+
  is the difference between the time coordinates of the centroid.
  Since this is a simple difference, it can be either positive or negative.
 \end_layout
@@ -756,9 +986,19 @@ time centroid delta
 
 \series medium
 The 
-\emph on
-axis difference
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf axis difference}
+\end_layout
+
+\end_inset
+
  is smaller of the two angles that the two spatial axis planes make with
  each other.
  
@@ -767,13 +1007,33 @@ axis difference
 \begin_layout Paragraph
 
 \series medium
-\emph on
-Speed delta
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf Speed delta}
+\end_layout
+
+\end_inset
+
  and 
-\emph on
-direction difference
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf direction difference}
+\end_layout
+
+\end_inset
+
  are obtained from the velocity vectors of the two objects.
  Speed delta is the difference in the lengths of the vectors, and direction
  difference is the angle that the two vectors make with each other.
@@ -782,9 +1042,19 @@ direction difference
 \begin_layout Paragraph
 
 \series medium
-\emph on
-Volume ratio
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf Volume ratio}
+\end_layout
+
+\end_inset
+
  is volume of the forecast object divided by the volume of the observed
  object.
  Note that any 3D object must necessarily have a nonzero volume, so there's
@@ -794,13 +1064,31 @@ Volume ratio
 \begin_layout Paragraph
 
 \series medium
-\emph on
-Start time delta
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf Start time delta}
+\end_layout
+
+\end_inset
+
  and 
-\emph on
-end time delta
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{end time delta}
+\end_layout
+
+\end_inset
+
  are the differences in the corresponding times associated with the two
  objects.
 \end_layout
@@ -808,9 +1096,19 @@ end time delta
 \begin_layout Paragraph
 
 \series medium
-\emph on
-Intersection volume
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf Intersection volume}
+\end_layout
+
+\end_inset
+
  measures the overlap of two objects.
  If the two objects do not overlap, then this will be zero.
 \end_layout
@@ -819,10 +1117,20 @@ Intersection volume
 
 \series medium
 Finally, the 
-\emph on
-total interest
-\emph default
- gives the result of the fuzzy-logic matching and merging calculation for
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf total interest}
+\end_layout
+
+\end_inset
+
+  gives the result of the fuzzy-logic matching and merging calculation for
  this pair of objects.
  Note that this is provided only for simple objects, not for composites.
 \end_layout
@@ -893,23 +1201,31 @@ is
  rotating over time? In that case, it's probably not meaningful to assign
  a single spatial orientation to the object over its entire lifetime.
  If we had a spatial axis angle at each time, however, then we could fit
- a model such as ??$
+ a model such as 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
 \backslash
 theta = 
 \backslash
 theta_0 + 
 \backslash
-omega t$ to the angles and test the goodness of fit.
+omega t$
+\end_layout
+
+\end_inset
+
+ to the angles and test the goodness of fit.
 \end_layout
 
 \begin_layout Paragraph
 
 \series medium
-For such reasons, having 2D spatial attributes ??({
-\backslash
-italicfont 
-\backslash
-`a la} MODE) for each object at each time step can be useful.
+For such reasons, having 2D spatial attributes (as in MODE) for each object
+ at each time step can be useful.
  The list of the 2D attributes calculated is:
 \end_layout
 
@@ -941,14 +1257,6 @@ myitem Area
 myitem Axis angle
 \end_layout
 
-\begin_layout Paragraph
-
-\series medium
-
-\backslash
-medskip
-\end_layout
-
 \begin_layout Subsection
 
 \series medium
@@ -968,21 +1276,65 @@ Matching and merging operations in MTD are done in a simpler fashion than
 
 \series medium
 A 
-\emph on
-graph
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf graph}
+\end_layout
+
+\end_inset
+
  is a finite set of 
-\emph on
-vertices
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf vertices}
+\end_layout
+
+\end_inset
+
  (also called
 \emph on
- nodes
+ 
 \emph default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf nodes}
+\end_layout
+
+\end_inset
+
 ) and 
-\emph on
-edges
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
+\backslash
+bf edges}
+\end_layout
+
+\end_inset
+
 , with each edge connecting two vertices.
  Conceptually, it is enough for our purposes to think of vertices as points
  and edges as lines connecting them.
@@ -990,19 +1342,72 @@ edges
  In the figure we see a collection of 11 nodes, indicated by the small circles,
  together with some edges indicated by straight line segments.
  A 
-\emph on
-path
-\emph default
- is a sequence of vertices ??$(v_1, v_2, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+{
 \backslash
-ldots, v_n)$ such that for each?? $1 
+bf path}
+\end_layout
+
+\end_inset
+
+ is a sequence of vertices 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(v_1, v_2, 
 \backslash
-leq i < n$ there is an edge connecting ??$v_i$ to $v_{i + 1}$.
- For example, in Figure 1.5, there is no edge connecting vertices 
+ldots, v_n)$
+\end_layout
+
+\end_inset
+
+ such that for each 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$1 
 \backslash
-#6 and 
-\backslash
-#7, but there is a path connecting them.
+leq i < n$
+\end_layout
+
+\end_inset
+
+ there is an edge connecting 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$v_i$
+\end_layout
+
+\end_inset
+
+ to 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$v_{i + 1}$
+\end_layout
+
+\end_inset
+
+.
+ For example, in Figure 1.5, there is no edge connecting vertices #6 and
+ #7, but there is a path connecting them.
  In illustrations, graph vertices are often labelled with identifying informatio
 n, such as the numbers in Figure 1.5.
 \end_layout
@@ -1098,7 +1503,7 @@ For the purposes of this example, suppose that the MTD fuzzy engine reports
 \begin_layout Paragraph
 
 \series medium
-These four parings result in the 4 edges in the graph shown by the solid
+These four pairings result in the 4 edges in the graph shown by the solid
  lines in part (c) of the figure.
  Partitioning this graph into equivalence classes results in the three sets
  indicated in part (d) of the figure.
@@ -1189,17 +1594,16 @@ Using MTD
 Data Files
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The formats for two-dimensional data files used as input to MTD are the
  same ones supported by most of the MET tools.
  Generally speaking, if MODE can use a forecast or observation data file
  as input, then that file can also be used by MTD.
- The only difference is that while MODE (and most of the other MET tools)
- takes only one forecast and one observed data file as input, MTD takes
- a series of files.
+ The only difference is that while MODE takes only one forecast and one
+ observed data file as input, MTD takes a series of files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 As shown in the next section, filenames for each time used must be given.
  Thus, for example, if MTD is being used for verification over a period
  of 24 hours, and the data file valid times are separated by one hour, then
@@ -1214,7 +1618,7 @@ As shown in the next section, filenames for each time used must be given.
 The Command Line
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The MTD usage statement is shown in Figure 1.8.
  The command-line switches may be given in any order.
 \end_layout
@@ -1256,44 +1660,91 @@ usage
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
+\begin_inset ERT
+status open
 
-\emph on
--fcst file_list
-\emph default
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -fcst file
+\backslash
+_list}
+\end_layout
+
+\end_inset
+
  gives a list of forecast 2D data files to be processed by MTD.
  The files should have equally-spaced intervals of valid time.
  
-\emph on
-Required
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Required}
+\end_layout
+
+\end_inset
+
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
+\begin_inset ERT
+status open
 
-\emph on
--obs file_list
-\emph default
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -obs file
+\backslash
+_list}
+\end_layout
+
+\end_inset
+
  gives a list of observation 2D data files to be processed by MTD.
- As with the 
-\emph on
--fcst
-\emph default
- option, the files should have equally-spaced intervals of valid time.
+ As with the {
+\backslash
+cb -fcst} option, the files should have equally-spaced intervals of valid
+ time.
  This valid time spacing should be the same as for the forecast files.
  
-\emph on
-Required
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Required}
+\end_layout
+
+\end_inset
+
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
+\begin_inset ERT
+status open
 
-\emph on
--config config_file
-\emph default
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -config config
+\backslash
+_file}
+\end_layout
+
+\end_inset
+
  gives the path to a local configuration file that is specific to this particula
 r run of MTD.
  The default MTD configuration file will be read first, followed by this
@@ -1303,58 +1754,117 @@ r run of MTD.
  Options set in this file will override any corresponding options set in
  the default configuration file.
  
-\emph on
-Required
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Required}
+\end_layout
+
+\end_inset
+
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
+\begin_inset ERT
+status open
 
-\emph on
--log file
-\emph default
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -log file}
+\end_layout
+
+\end_inset
+
  gives the name of a file where a log of this MTD run will be written.
  All output that appears on the screen during a MTD run will be duplicated
  in the log file.
  
-\emph on
-Optional
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Optional}
+\end_layout
+
+\end_inset
+
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
+\begin_inset ERT
+status open
 
-\emph on
--v level
-\emph default
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -v level}
+\end_layout
+
+\end_inset
+
  gives the verbosity level.
- As with the 
-\emph on
--log
-\emph default
- option described above, this option is present in most of the MET tools.
+ As with the {
+\backslash
+co -log} option described above, this option is present in most of the MET
+ tools.
  Increasing this value causes more diagnostic output to be written to the
  screen (and also to the log file, if one has been specified).
  
-\emph on
-Optional
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Optional}
+\end_layout
+
+\end_inset
+
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
+\begin_inset ERT
+status open
 
-\emph on
--outdir path
-\emph default
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -outdir path}
+\end_layout
+
+\end_inset
+
  gives the name of the directory into which MTD will write its output files.
  If not specified, then MTD will write its output into the current directory.
  
-\emph on
-Optional
-\emph default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Optional}
+\end_layout
+
+\end_inset
+
 .
 \end_layout
 
@@ -2897,20 +3407,14 @@ INTENSITY_10
 \begin_inset Text
 
 \begin_layout Plain Layout
-10th
-\begin_inset Note Note
+\begin_inset ERT
 status open
 
 \begin_layout Plain Layout
-make the 
-\begin_inset Quotes eld
-\end_inset
 
-th
-\begin_inset Quotes erd
-\end_inset
-
- small
+$10^{
+\backslash
+hbox{th}}$
 \end_layout
 
 \end_inset
@@ -2944,7 +3448,19 @@ INTENSITY_25
 \begin_inset Text
 
 \begin_layout Plain Layout
-25th percentile intensity inside object
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$25^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity inside object
 \end_layout
 
 \end_inset
@@ -2973,7 +3489,19 @@ INTENSITY_50
 \begin_inset Text
 
 \begin_layout Plain Layout
-50th percentile intensity inside object
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$50^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity inside object
 \end_layout
 
 \end_inset
@@ -3002,7 +3530,19 @@ INTENSITY_75
 \begin_inset Text
 
 \begin_layout Plain Layout
-75th percentile intensity inside object
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$75^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity inside object
 \end_layout
 
 \end_inset
@@ -3031,7 +3571,19 @@ INTENSITY_90
 \begin_inset Text
 
 \begin_layout Plain Layout
-90th percentile intensity inside object
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$90^{
+\backslash
+hbox{th}}$
+\end_layout
+
+\end_inset
+
+ percentile intensity inside object
 \end_layout
 
 \end_inset
@@ -3223,11 +3775,18 @@ SPACE_CENTROID_DIST
 \begin_inset Text
 
 \begin_layout Plain Layout
-Spatial distance between (
-\emph on
-x, y
-\emph default
-) cordintates of object spacetime centroid
+Spatial distance between 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(x, y)$
+\end_layout
+
+\end_inset
+
+ coordintates of object spacetime centroid
 \end_layout
 
 \end_inset
@@ -3258,7 +3817,19 @@ TIME_CENTROID_DELTA
 \begin_layout Plain Layout
 Difference in 
 \emph on
-t 
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\emph on
+$t$
+\end_layout
+
+\end_inset
+
+ 
 \emph default
 index of object spacetime centroid
 \end_layout
@@ -3470,7 +4041,7 @@ Volume
 \begin_inset Quotes erd
 \end_inset
 
- of jobect intersection
+ of object intersection
 \end_layout
 
 \end_inset
@@ -3578,11 +4149,22 @@ Cluster ID
 Making Plots
 \end_layout
 
-\begin_layout Paragraph
-MODE, along with several other of the MET tools 
-\emph on
-(wavelet_stat
-\emph default
+\begin_layout Standard
+MODE, along with several other of the MET tools (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt wavelet
+\backslash
+_stat}
+\end_layout
+
+\end_inset
+
  for example, and a few others), provides PostScript-based graphics output
  to help visualize the output.
  Unfortunately, no similar graphics capabilities are provided with MTD,
@@ -3591,7 +4173,7 @@ MODE, along with several other of the MET tools
 on software.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 This should not discourage the user from making her own plots, however.
  There is enough information in the various output files created by MTD
  to make a wide variety of plots.
