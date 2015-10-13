@@ -452,7 +452,7 @@ void AggrTimeSeriesInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void AggrTimeSeriesInfo::sort() {
-   int i, j;
+   int j;
    AggrTimeSeriesInfo ri_sort;
 
    // Copy

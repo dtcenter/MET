@@ -60,7 +60,7 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    //
    // Parse top-level configuration filtering options
    //
-   
+
    j.model           = c.lookup_string_array(conf_key_model, false);
    j.fcst_lead       = c.lookup_seconds_array(conf_key_fcst_lead, false);
    j.obs_lead        = c.lookup_seconds_array(conf_key_obs_lead, false);
@@ -93,20 +93,20 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    j.weight          = c.lookup_num_array(conf_key_weight, false);
 
    j.out_alpha       = c.lookup_double(conf_key_out_alpha, false);
-   
+
    boot_info         = parse_conf_boot(&c);
    j.boot_interval   = boot_info.interval;
    j.boot_rep_prop   = boot_info.rep_prop;
    j.n_boot_rep      = boot_info.n_rep;
    j.set_boot_rng(boot_info.rng);
    j.set_boot_seed(boot_info.seed);
-   
+
    j.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
    j.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
-   
+
    //
    // No settings in the default job for column_min_name/value,
-   // column_max_name/value, column_str_name/value, and 
+   // column_max_name/value, column_str_name/value, and
    // column_case since those are strictly job command options.
    //
 
@@ -363,7 +363,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
          // Loop through the columns to be summarized
          //
          for(i=0; i<j.column.n_elements(); i++) {
-        
+
             //
             // Build the key and get the current column value
             //
@@ -379,9 +379,9 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     << "can't retrieve column \"" << j.column[i]
                     << "\" from the \"" << j.line_type[0]
                     << "\" line type.\n\n";
-               throw(1); 
+               throw(1);
             }
-            
+
             //
             // Retrieve the value
             //
@@ -389,7 +389,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
 
             //
             // Add value to existing map entry or add a new one
-            //         
+            //
             if(!is_bad_data(v)) {
                if(summary_map.count(key) > 0) {
                   summary_map[key].add(v);
@@ -482,7 +482,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
       // Write the data row
       //
       c = 0;
-      
+
       // Split the current map key
       sa = it->first.split(":");
 
@@ -641,7 +641,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       aggr_rhist_lines(f, j, rhist_map, n_in, n_out);
       write_job_aggr_rhist(j, lt, rhist_map, out_at);
    }
-   
+
    //
    // Sum the PHIST line types
    //
@@ -801,7 +801,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //
    else if(in_lt  == stat_mpr &&
            out_lt == stat_wdir) {
-      
+
       mlog << Debug(4) << "do_job_aggr_stat() -> "
            << "For MPR to WDIR conversion, searching for UGRD and VGRD MPR lines.\n";
 
@@ -986,7 +986,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    return;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
@@ -1009,7 +1009,7 @@ void write_job_aggr_hdr(STATAnalysisJob &j, int n_row, int n_col,
    } // end for i
 
    return;
-}   
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1121,7 +1121,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
 
          nbrcts_info.clear();
          nbrcts_info.cts_info = it->second.cts_info;
-        
+
          at.set_entry(r, c++, "NBRCTC:");
          write_case_cols(it->first, at, r, c);
          write_nbrctc_cols(nbrcts_info, at, r, c);
@@ -1268,7 +1268,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    map<ConcatString, AggrPCTInfo>::iterator it;
    int n, n_row, n_col, r, c;
    StatHdrColumns shc;
-   
+
    //
    // Determine the maximum PCT dimension
    //
@@ -1483,7 +1483,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
       else if(lt == stat_cnt) {
 
          it->second.cnt_info.clear();
-         
+
          //
          // Allocate space for confidence intervals
          //
@@ -1497,7 +1497,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
             compute_cntinfo(it->second.sl1l2_info, 0, it->second.cnt_info);
          else
             compute_cntinfo(it->second.sl1l2_info, 1, it->second.cnt_info);
-         
+
          at.set_entry(r, c++, "CNT:");
          write_case_cols(it->first, at, r, c);
          write_cnt_cols(it->second.cnt_info, 0, at, r, c);
@@ -1707,7 +1707,7 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
    for(it = m.begin(), n = 0; it != m.end(); it++) {
       n = max(it->second.ens_pd.rhist_na.n_elements(), n);
    }
-   
+
    //
    // Setup the output table
    //
@@ -1774,7 +1774,7 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
    for(it = m.begin(), n = 0; it != m.end(); it++) {
       n = max(it->second.ens_pd.phist_na.n_elements(), n);
    }
-   
+
    //
    // Setup the output table
    //
@@ -1808,7 +1808,7 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
       if(j.stat_out) {
          write_header_cols(shc, j.stat_at, r);
       }
-      
+
       //
       // Initialize
       //
@@ -1843,7 +1843,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
    //
    cnt_info.allocate_n_alpha(1);
    cnt_info.alpha[0] = j.out_alpha;
-   
+
    //
    // Determine the number of rows
    //
@@ -1907,7 +1907,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
          // Compute CNTInfo statistics from the aggregated partial sums
          //
          compute_cntinfo(bin_it->second.sl1l2_info, 0, cnt_info);
-      
+
          //
          // SSVAR output line
          //
@@ -2005,7 +2005,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    map<ConcatString, AggrORANKInfo>::iterator it;
    int i, n, n_row, n_col, r, c;
    StatHdrColumns shc;
-   
+
    //
    // Determine the maximum number of ranks for RHIST and PHIST or
    // the total number of SSVAR bins.
@@ -2022,13 +2022,13 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output table
    //
-   n_col = 1 + j.column_case.n_elements();   
+   n_col = 1 + j.column_case.n_elements();
    if(lt == stat_rhist) {
       n_row  = 1 + m.size();
       n_col += get_n_rhist_columns(n);
    }
    else if(lt == stat_phist) {
-      n_row  = 1 + m.size(); 
+      n_row  = 1 + m.size();
       n_col += get_n_phist_columns(n);
    }
    else if(lt == stat_ssvar) {
@@ -2141,7 +2141,7 @@ void write_job_aggr_isc(STATAnalysisJob &j, STATLineType lt,
    map<ConcatString, AggrISCInfo>::iterator it;
    int i, n, n_row, n_col, r, c;
    StatHdrColumns shc;
-   
+
    //
    // Determine the maximum number of scales
    //
@@ -2406,7 +2406,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
       // PRC output line
       //
       else if(lt == stat_prc) {
-         mpr_to_pct(j, it->second, pct_info);        
+         mpr_to_pct(j, it->second, pct_info);
          at.set_entry(r, c++, "PRC:");
          write_case_cols(it->first, at, r, c);
          write_prc_cols(pct_info, at, r, c);
@@ -2432,11 +2432,10 @@ void write_job_ramp(STATAnalysisJob &j,
    NumArray framps, oramps, fdat, odat;
    NumArray vals_part, ramp_part, dat_part;
    TimeArray ts, ts_part, beg, end;
-   int i, k, f, o, c, beg_i, end_i;
+   int i, k, f, o, c;
    int cur_dt, min_dt, i_min_dt, i_swap;
    int n_row, n_col;
-   bool sort_vld, status;
-   double delta;
+   bool sort_vld;
    unixtime init_ut, valid_ut;
    CTSInfo cts_info;
    StatHdrColumns ctc_shc, cts_shc;
@@ -2508,7 +2507,7 @@ void write_job_ramp(STATAnalysisJob &j,
    // Setup the output STAT file
    //
    j.setup_stat_file(n_stat_row, 0);
-   
+
    mlog << Debug(2) << "Applying ramp detection logic for "
         << (int) m.size() << " case(s).\n";
 
@@ -2552,7 +2551,7 @@ void write_job_ramp(STATAnalysisJob &j,
       // Subset the time series down to consistent time steps
       //
       ts.equal_dt(beg, end);
-      
+
       if(beg.n_elements() > 1) {
          mlog << Debug(4)
               << "Processing time series in " << beg.n_elements()
@@ -2577,10 +2576,10 @@ void write_job_ramp(STATAnalysisJob &j,
               << unix_to_yyyymmdd_hhmmss(beg[i]) << " to "
               << unix_to_yyyymmdd_hhmmss(end[i]) << " with time step of "
               << sec_to_hhmmss(cur_dt) << ".\n";
-         
+
          //
          // Compute forecast ramps
-         //           
+         //
          cs << cs_erase << it->second.fcst_var << " " << j.column[0];
          mlog << Debug(4)
               << "Computing " << cs << " "
@@ -2589,14 +2588,17 @@ void write_job_ramp(STATAnalysisJob &j,
               << " ramps for case \"" << it->first << "\".\n";
 
          vals_part = it->second.f_na.subset(ts.index(beg[i]), ts.index(end[i]));
-         
-         status = (j.ramp_type == TimeSeriesType_DyDt ?
-                   compute_dydt_ramps(cs, vals_part, ts_part,
-                      j.ramp_time_fcst, j.ramp_exact_fcst, j.ramp_thresh_fcst,
-                      ramp_part, dat_part) :
-                   compute_swing_ramps(cs, vals_part, ts_part,
-                      j.swing_width, j.ramp_thresh_fcst,
-                      ramp_part, dat_part));
+
+         if(j.ramp_type == TimeSeriesType_DyDt) {
+            compute_dydt_ramps(cs, vals_part, ts_part,
+               j.ramp_time_fcst, j.ramp_exact_fcst, j.ramp_thresh_fcst,
+               ramp_part, dat_part);
+         }
+         else {
+            compute_swing_ramps(cs, vals_part, ts_part,
+               j.swing_width, j.ramp_thresh_fcst,
+               ramp_part, dat_part);
+         }
 
          //
          // Store data for current segment
@@ -2616,13 +2618,16 @@ void write_job_ramp(STATAnalysisJob &j,
 
          vals_part = it->second.o_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
-         status = (j.ramp_type == TimeSeriesType_DyDt ?
-                   compute_dydt_ramps(cs, vals_part, ts_part,
-                      j.ramp_time_obs, j.ramp_exact_obs, j.ramp_thresh_obs,
-                      ramp_part, dat_part) :
-                   compute_swing_ramps(cs, vals_part, ts_part,
-                      j.swing_width, j.ramp_thresh_obs,
-                      ramp_part, dat_part));
+         if(j.ramp_type == TimeSeriesType_DyDt) {
+            compute_dydt_ramps(cs, vals_part, ts_part,
+               j.ramp_time_obs, j.ramp_exact_obs, j.ramp_thresh_obs,
+               ramp_part, dat_part);
+         }
+         else {
+            compute_swing_ramps(cs, vals_part, ts_part,
+               j.swing_width, j.ramp_thresh_obs,
+               ramp_part, dat_part);
+         }
 
          //
          // Store data for current segment
@@ -2656,7 +2661,7 @@ void write_job_ramp(STATAnalysisJob &j,
             //
             for(k=0, min_dt=bad_data_int, i_min_dt=bad_data_int;
                 k<ts.n_elements(); k++) {
-            
+
                //
                // Skip points before the time window
                //
@@ -2781,7 +2786,7 @@ void write_job_ramp(STATAnalysisJob &j,
       // Copy over the output STAT header columns
       //
       ctc_shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, stat_ctc);
-      
+
       //
       // Compute contingency table statistics, if requested
       //
@@ -2879,7 +2884,7 @@ void write_job_ramp(STATAnalysisJob &j,
 
 void write_job_ramp_cols(const STATAnalysisJob &j, AsciiTable &at,
                          int &r, int &c) {
-   
+
    //
    // Ramp Job Defintion columns:
    //    TYPE,
@@ -3071,7 +3076,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
            << jobstring << "\n\n";
       throw(1);
    }
-   
+
    //
    // Determine the ramp columns, use defaults if necessary
    //
@@ -3109,7 +3114,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
            << jobstring << "\n\n";
       throw(1);
    }
-   
+
    //
    // Determine the ramp thresholds, no defaults
    //
@@ -3121,7 +3126,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
            << "ramp events: " << jobstring << "\n\n";
       throw(1);
    }
-   
+
    //
    // Parse the input stat lines
    //
@@ -3153,7 +3158,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
 
 void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
    int i;
-   
+
    // Left-justify header columns and right-justify data columns
    for(i=0;          i<n_hdr_cols; i++) at.set_column_just(i, LeftJust);
    for(i=n_hdr_cols; i<at.ncols(); i++) at.set_column_just(i, RightJust);

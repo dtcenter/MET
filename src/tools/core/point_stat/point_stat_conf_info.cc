@@ -149,7 +149,7 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_config(GrdFileType ftype) {
-   int i, j, n;
+   int i, n;
    ConcatString s;
    StringArray sa;
    VarInfoFactory info_factory;

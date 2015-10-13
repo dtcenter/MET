@@ -160,7 +160,7 @@ void GridStatConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
-   int i, j, n;
+   int i, n;
    ConcatString s;
    StringArray sa;
    VarInfoFactory info_factory;

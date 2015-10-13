@@ -212,7 +212,7 @@ void process_conv(const char *conv_filename, const char *output_filename) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_rad(const char *rad_filename, const char *output_filename) {
-   int i, j, k;
+   int i;
    int n_in, n_out;
    ofstream out;
    AsciiTable at;

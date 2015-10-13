@@ -188,7 +188,7 @@ void MM_Engine::do_match_merge()
 
 {
 
-int j, k, m, n;
+int j, k, n;
 int f_i, o_i;
 
 
@@ -230,16 +230,12 @@ for (j=0; j<(graph.n_fcst()); ++j)  {
    //
 
 
-bool has_fcst = false;
-bool has_obs  = false;
 const EquivalenceClass * eq = 0;
 
 
 N_Composites = 0;
 
 for (j=0; j<(part.n_elements()); ++j)  {
-
-   has_fcst = has_obs = false;
 
    eq = part(j);
 
@@ -323,7 +319,7 @@ int MM_Engine::composite_with_fcst (const int k) const
 
 {
 
-int j, m, fcst_num, index;
+int j, m, fcst_num;
 const EquivalenceClass * eq = 0;
 
 fcst_num = k;
@@ -350,7 +346,7 @@ int MM_Engine::composite_with_obs (const int k) const
 
 {
 
-int j, m, obs_num, index;
+int j, m, obs_num;
 const EquivalenceClass * eq = 0;
 
 obs_num = k + graph.n_fcst();
