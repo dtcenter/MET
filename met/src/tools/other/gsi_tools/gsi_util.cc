@@ -298,7 +298,7 @@ void setup_header(StatHdrColumns &shc,
 
    // INTERP_PNTS
    if(name.has("INTERP_PNTS", index)) {
-      shc.set_interp_wdth(nint(sqrt(atoi(value[index]))));
+      shc.set_interp_wdth(nint(sqrt(atof(value[index]))));
    }
    else {
       shc.set_interp_wdth(default_interp_wdth);
