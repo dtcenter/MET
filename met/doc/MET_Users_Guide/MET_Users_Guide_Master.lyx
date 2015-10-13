@@ -337,7 +337,7 @@ filename "MODE-TD/MET_Users_Guide_MODE-TD.lyx"
 
 \begin_inset CommandInset include
 LatexCommand include
-filename "doc/MET-TC_Users_Guide/MET-TC_Users_Guide.lyx"
+filename "MET-TC/MET-TC_Users_Guide.lyx"
 
 \end_inset
 
@@ -407,6 +407,34 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixA.lyx"
 \begin_inset CommandInset include
 LatexCommand include
 filename "fwd_refs_appendix/MET_Users_Guide_AppendixB.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "fwd_refs_appendix/MET_Users_Guide_AppendixC.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "fwd_refs_appendix/MET_Users_Guide_AppendixD.lyx"
 
 \end_inset
 
