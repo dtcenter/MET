@@ -73,7 +73,7 @@ Overview of MET
 Purpose and organization of the User's Guide
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The goal of this User's Guide is to provide basic information for users
@@ -93,7 +93,7 @@ target "http://www.wrf-model.org/index.php"
  this document) are followed.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Since the release of METv4.1, tropical cyclone verification tools, collectively
@@ -104,7 +104,7 @@ Since the release of METv4.1, tropical cyclone verification tools, collectively
  the web site.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET User's Guide is organized as follows.
@@ -143,7 +143,7 @@ is, which aggregate the output statistics from the other tools across multiple
  community.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The remainder of this chapter includes information about the context for
@@ -157,7 +157,7 @@ The remainder of this chapter includes information about the context for
 The Developmental Testbed Center (DTC)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET has been developed, and will be maintained and enhanced, by the Developmenta
@@ -182,7 +182,7 @@ n of models before new models are implemented operationally.
  and weaknesses of advances in NWP prior to operational implementation.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package will also be available to DTC visitors and to the WRF modeling
@@ -194,7 +194,7 @@ The MET package will also be available to DTC visitors and to the WRF modeling
 MET goals and design philosophy
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The primary goal of MET development is to provide a state-of-the-art verificatio
@@ -217,7 +217,7 @@ n package to the NWP community.
 es.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package has been designed to be modular and adaptable.
@@ -231,7 +231,7 @@ The MET package has been designed to be modular and adaptable.
  by any user on their own computer platform.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET code and documentation is maintained by the DTC in Boulder, Colorado.
@@ -244,7 +244,7 @@ The MET code and documentation is maintained by the DTC in Boulder, Colorado.
 MET components
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The major components of the MET package are represented in Figure 1-1.
@@ -300,7 +300,7 @@ Basic representation of current MET structure and modules.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The reformatting stage of MET consists of the Gen-Poly-Mask, Gen-Circle-Mask,
@@ -333,7 +333,7 @@ The reformatting stage of MET consists of the Gen-Poly-Mask, Gen-Circle-Mask,
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Several optional plotting utilities are provided to assist users in checking
@@ -349,7 +349,7 @@ Several optional plotting utilities are provided to assist users in checking
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The main statistical analysis components of the current version of MET are:
@@ -369,7 +369,7 @@ The main statistical analysis components of the current version of MET are:
  between two models when a limited number of model runs is available.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Sometimes it may be useful to verify a forecast against gridded fields (e.g.,
@@ -384,7 +384,7 @@ Sometimes it may be useful to verify a forecast against gridded fields (e.g.,
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Users wishing to accumulate statistics over a time, height, or other series
@@ -396,7 +396,7 @@ Users wishing to accumulate statistics over a time, height, or other series
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE (Method for Object-based Diagnostic Evaluation) tool also uses
@@ -422,7 +422,7 @@ The MODE (Method for Object-based Diagnostic Evaluation) tool also uses
  size, and intensity.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Wavelet-Stat tool decomposes two-dimensional forecasts and observations
@@ -431,7 +431,7 @@ The Wavelet-Stat tool decomposes two-dimensional forecasts and observations
  (2004).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 There are many types of spatial verification approaches and the Intensity-Scale
@@ -449,7 +449,7 @@ There are many types of spatial verification approaches and the Intensity-Scale
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Results from the statistical analysis stage are output in ASCII, NetCDF
@@ -467,7 +467,7 @@ Results from the statistical analysis stage are output in ASCII, NetCDF
  statistics not produced by the NCEP version.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis and MODE-Analysis tools aggregate the output statistics
@@ -485,7 +485,7 @@ The Stat-Analysis and MODE-Analysis tools aggregate the output statistics
 Future development plans
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET is an evolving verification software package.
@@ -504,7 +504,7 @@ target "www.dtcenter.org/met/users/support"
  Some of the planned additions are listed below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Additional statistical capabilities
 \end_layout
 
@@ -532,7 +532,7 @@ Enhanced support for time series verification
 Additional methods for verification of climate and seasonal forecasts
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Support for other input formats
 \end_layout
 
@@ -542,7 +542,7 @@ Support for other input formats
 Support for gridded data in NetCDF, CF-4 convention
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Additional analysis capabilities and plotting routines
 \end_layout
 
@@ -624,7 +624,7 @@ Database and display system for the statistical output of MET
 Code support
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET support is provided through a MET-help e-mail address: met_help@ucar.edu.
@@ -640,7 +640,7 @@ target "http://www.dtcenter.org/met/users/"
 ).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 We welcome comments and suggestions for improvements to MET, especially
@@ -652,7 +652,7 @@ We welcome comments and suggestions for improvements to MET, especially
  take all suggestions into consideration.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package is a "living" set of tools.

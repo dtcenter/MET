@@ -65,7 +65,7 @@
 Appendix D ? Confidence Intervals
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 A single verification statistic is statistically meaningless without associated
  uncertainty information in accompaniment.
  There can be numerous sources of uncertainty associated with such a statistic
@@ -86,7 +86,7 @@ A single verification statistic is statistically meaningless without associated
  intervals.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 There are two main types of CIs available with MET: parametric and non-parametri
 c.
  All of the parametric intervals used with MET rely on the underlying sample
@@ -106,16 +106,16 @@ c.
  and this is described subsequently.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The most commonly used confidence interval about an estimate for a statistic
  (or parameter), θ, is given by the normal approximation
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 , (D.1) 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 where is the ?-th quantile of the standard normal distribution, and is the
  standard error of the statistic (or parameter), ?.
  For example, the most common example is for the mean of a sample, X1, .
@@ -129,7 +129,7 @@ where is the ?-th quantile of the standard normal distribution, and is the
  ? by its estimate, , where .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Mostly, the normal approximation is used as an asymptotic approximation.
  That is, the interval (D.1) may only be appropriate for large n.
  For small n, the mean has an interval based on the Student?s t distribution
@@ -138,15 +138,15 @@ Mostly, the normal approximation is used as an asymptotic approximation.
  That is, the interval is given by
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 , (D.2)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 where again, ? is replaced by its estimate, , as described above.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table D.1 summarizes the verification statistics in MET that have normal
  approximation CIs given by (D.1) along with their corresponding standard
  error estimates, .
@@ -155,7 +155,7 @@ rvation Mean and Mean error) MET also calculates the interval (D.2) for small
  sample sizes.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table D.1: Verification statistics with normal approximation CIs provided
  given by (D.1) provided in MET along with their associated standard error
  estimate.
@@ -330,7 +330,7 @@ Logarithm of the odds ratio (OR)
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Other statistics in MET having parametric CIs that rely on the underlying
  sample to be at least approximately iid normal, but have a different form
  derived from the normality assumption on the sample include the variance,
@@ -338,7 +338,7 @@ Other statistics in MET having parametric CIs that rely on the underlying
  These are addressed subsequently.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Generally, the normal interval (D.1) is appropriate for statistics of continuous
  variables, but a limit law for the binomial distribution allows for use
  of this interval with proportions.
@@ -348,11 +348,11 @@ Generally, the normal interval (D.1) is appropriate for statistics of continuous
  which is 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 , (D.3)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 where is the estimated proportion (e.g., hit rate, false alarm rate, PODy,
  PODn, etc.).
  Because this interval (D.3) generally works better than the more intuitive
@@ -360,36 +360,36 @@ where is the estimated proportion (e.g., hit rate, false alarm rate, PODy,
  is the interval employed by MET.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The forecast/observation variance has CIs derived from the underlying sample
  being approximately iid normal with mean ? and variance.
  The lower and upper limits for the interval are given by
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 and , (D.4)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 respectively, where is the ?-th quantile of the chi-square distribution
  with n-1 degrees of freedom.
  Taking the square roots of the limits in (D.4) yields the CI for the forecast/ob
 servation standard deviation.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Finally, the linear correlation coefficient has limits given by
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 , (D.5)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 where and .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 All other verification scores with CIs in MET must be obtained through bootstrap
  resampling.
  However, it is also possible to obtain bootstrap CIs for any of the statistics
@@ -398,34 +398,34 @@ All other verification scores with CIs in MET must be obtained through bootstrap
  The bootstrap algorithm is described below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 1.
  Assume the sample is representative of the population.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 2.
  Resample with replacement from the sample (see text below).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 3.
  Estimate the parameter(s) of interest for the current replicated sample.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 4.
  Repeat steps 2 and 3 numerous times, say B times, so that you now have
  a sample of size B of the parameter(s).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 5.
  Calculate CIs for the parameters directly from the sample (see text below
  for more details)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Typically, a simple random sample is taken for step 2, and that is how it
  is done in MET.
  As an example of what happens in this step, suppose our sample is .
@@ -437,7 +437,7 @@ Typically, a simple random sample is taken for step 2, and that is how it
  root of the original sample size).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 There are numerous ways to construct CIs from the sample obtained in step
  4.
  MET allows for two of these procedures: the percentile and the BCa.
@@ -453,7 +453,7 @@ d.
  variance.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 If there is dependency in the sample, then it is prudent to account for
  this dependency in some way.
  One method that does not make a lot of assumptions is circular block bootstrapp
@@ -464,14 +464,14 @@ ing.
  consult Gilleland (2010) for more details.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 1 The GO Index is a summary measure for NWP models that is used by the Air
  Force Weather Agency.
  It combines verification statistics for several forecast variables and
  lead times.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 2 Note that the false alarm rate is not the same as the false alarm ratio,
  also described here.
 \end_layout

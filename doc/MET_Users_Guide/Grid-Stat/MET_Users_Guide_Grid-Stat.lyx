@@ -73,7 +73,7 @@ The Grid-Stat Tool
 Introduction 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Grid-Stat tool provides verification statistics for a matched forecast
@@ -91,7 +91,7 @@ The Grid-Stat tool provides verification statistics for a matched forecast
  as a function of spatial scale.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Scientific and statistical aspects of the Grid-Stat tool are briefly described
@@ -107,7 +107,7 @@ Scientific and statistical aspects
 Statistical measures
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Grid-Stat tool computes a wide variety of verification statistics.
@@ -120,7 +120,7 @@ The Grid-Stat tool computes a wide variety of verification statistics.
  (2012), and on the world-wide web at
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset CommandInset href
@@ -132,7 +132,7 @@ target "http://www.cawcr.gov.au/projects/verification/verif_web_page.html"
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In addition to these verification measures, the Grid-Stat tool also computes
@@ -141,13 +141,13 @@ n system.
  These statistics are also described in Appendix C.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \shape slanted
 Measures for categorical variables
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Categorical verification statistics are used to evaluate forecasts that
@@ -158,11 +158,11 @@ Categorical verification statistics are used to evaluate forecasts that
  See Appendix C for more information.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Measures for continuous variables
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For continuous variables, many verification measures are based on the forecast
@@ -177,11 +177,11 @@ e rather than a single measure.
  See Appendix C for specific information.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Measures for probabilistic forecasts and dichotomous outcomes
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For probabilistic forecasts, many verification measures are based on reliability
@@ -191,7 +191,7 @@ ons of the forecasts and the observations, as in Wilks (2006).
  See Appendix C for specific information.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Probabilistic forecast values are assumed to have a range of either 0 to
@@ -207,11 +207,11 @@ Probabilistic forecast values are assumed to have a range of either 0 to
  1: t1 <= p <= 1.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Use of analysis fields for verification
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Grid-Stat tool allows evaluation of model forecasts using model analysis
@@ -226,7 +226,7 @@ The Grid-Stat tool allows evaluation of model forecasts using model analysis
 Statistical confidence intervals
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The confidence intervals for the Grid-Stat tool are the same as those provided
@@ -246,7 +246,7 @@ The confidence intervals for the Grid-Stat tool are the same as those provided
 Neighborhood methods
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET also incorporates several neighborhood methods to give credit to forecasts
@@ -280,7 +280,7 @@ fuzzy
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 There are several ways to present the results of the neighborhood approaches,
@@ -294,7 +294,7 @@ There are several ways to present the results of the neighborhood approaches,
  threshold and neighborhood window size.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user must specify several parameters in the 
@@ -317,7 +317,7 @@ ion method, size of the smoothing window, and required fraction of valid
 Practical information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section contains information about configuring and running the Grid-Stat
@@ -332,7 +332,7 @@ This section contains information about configuring and running the Grid-Stat
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Grid-Stat tool provides the capability of verifying one or more model
@@ -351,7 +351,7 @@ The Grid-Stat tool provides the capability of verifying one or more model
 grid_stat usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the Grid-Stat tool is listed below:
@@ -385,13 +385,13 @@ config_file
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 grid_stat has some required arguments and accepts several optional ones.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for grid_stat
 \end_layout
 
@@ -424,7 +424,7 @@ config_file
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for grid_stat
 \end_layout
 
@@ -476,13 +476,13 @@ level
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the grid_stat calling sequence is listed below:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Example 1:
 \end_layout
 
@@ -498,7 +498,7 @@ sample_obs.grb
 GridStatConfig
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In Example 1, the Grid-Stat tool will verify the model data in the 
@@ -516,7 +516,7 @@ GridStatConfig
  file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A second example of the 
@@ -526,7 +526,7 @@ grid_stat
  calling sequence is listed below:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Example 2:
 \end_layout
 
@@ -542,7 +542,7 @@ sample_obs.nc
 GridStatConfig
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In the second example, the Grid-Stat tool will verify the model data in
@@ -580,7 +580,7 @@ GridStatConfig
 grid_stat configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the Grid-Stat tool, named 
@@ -602,7 +602,7 @@ scripts/config
  The contents are described in more detail below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that environment variables may be used when editing configuration files,
@@ -637,7 +637,7 @@ WRF
 ;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -703,7 +703,7 @@ cat_thresh = [ >0.0, >=5.0 ];
 obs = fcst;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -716,7 +716,7 @@ fcst
  or vertical level indicators.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For GRIB files, the GRIB code itself or the corresponding abbreviation may
@@ -741,7 +741,7 @@ RNNN
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To specify verification fields for NetCDF files, use var_name(i,...,j,*,*)
@@ -751,7 +751,7 @@ To specify verification fields for NetCDF files, use var_name(i,...,j,*,*)
  field.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The values listed above indicate that precipitation should be verified for
@@ -780,7 +780,7 @@ field
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To indicate that a forecast field should be treated as probabilities, include
@@ -791,7 +791,7 @@ To indicate that a forecast field should be treated as probabilities, include
  verification methods.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For each 
@@ -811,7 +811,7 @@ cat_thresh
  For probabilistic forecasts, thresholds must be specified using >= convention.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When verifying winds via either the u and v components or the speed and
@@ -857,7 +857,7 @@ poly = [];
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -891,7 +891,7 @@ FULL
  See Appendix B for a list of grids that will be accepted.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -905,7 +905,7 @@ poly
  or Gen-Circle_mask tools.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Several masking polygons used by NCEP are predefined in the installed 
@@ -920,7 +920,7 @@ share/met/poly
  the grid.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Alternatively, any gridded data file that MET can read may be used to define
@@ -979,7 +979,7 @@ seed = "";
 }; 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -999,7 +999,7 @@ ci_alpha
  recommended values.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1023,7 +1023,7 @@ PCTILE
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1040,7 +1040,7 @@ rep_prop
  m, should be equal to the size of the sample, n.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1059,7 +1059,7 @@ n_rep
  should be computed over 1000 subsamples of the matched pairs.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1074,7 +1074,7 @@ rng
  for a listing of the random number generators available for use.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1146,7 +1146,7 @@ width = 1;
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1158,7 +1158,7 @@ interp
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1186,7 +1186,7 @@ BOTH
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1204,7 +1204,7 @@ vld_thresh
  the verification region chosen.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The valid 
@@ -1225,7 +1225,7 @@ UW_MEAN
  These methods are described in Section 4.2.1.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1280,7 +1280,7 @@ cov_thresh = [ >=0.5 ];
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1297,7 +1297,7 @@ width
  value specifies the width of that square as an odd integer.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1316,7 +1316,7 @@ vld_thresh
  the verification region chosen.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1594,7 +1594,7 @@ NBRCNT
  for Neighborhood Continuous Statistics
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that the first two line types are easily derived from one another.
@@ -1639,7 +1639,7 @@ diff = TRUE;
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This flag indicates whether or not the matched pair and forecast minus observati
@@ -1676,7 +1676,7 @@ height "1pt"
 rank_corr_flag = FALSE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1722,7 +1722,7 @@ height "1pt"
 tmp_dir = "/tmp";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This parameter indicates the directory where Grid Stat should write temporary
@@ -1749,7 +1749,7 @@ height "1pt"
 output_prefix = "";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option specifies a string to be used in the output file name.
@@ -1777,7 +1777,7 @@ height "1pt"
 version = "v5.1";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1805,7 +1805,7 @@ grid_stat
 grid_stat output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -1823,13 +1823,13 @@ grid_stat
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output STAT file is named using the following naming convention: 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 grid_stat__PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
 \series medium
  where 
@@ -1865,7 +1865,7 @@ nbrcnt
  to indicate the line type it contains.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The format of the STAT and ASCII output of the Grid-Stat tool are the same
@@ -1881,7 +1881,7 @@ point_stat
  are explained in the following tables.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table 5-1.
  Header information for each file grid-stat outputs.
 \end_layout
@@ -2604,7 +2604,7 @@ Various line type options, refer to 4.3.3 and the tables below.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table 5-2.
  Format information for NBRCTC (Neighborhood Contingency Table Counts) output
  line type.
@@ -2896,7 +2896,7 @@ Number of forecast no and observation no
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table 5-3.
  Format information for NBRCTS (Neighborhood Contingency Table Statistics)
  output line type.
@@ -3934,7 +3934,7 @@ Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table 5-4.
  Format information for NBRCNT(Neighborhood Continuous Statistics) output
  line type.
@@ -4332,7 +4332,7 @@ Observed event frequency including bootstrap upper and lower confidence
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 If requested in the 
@@ -4351,14 +4351,14 @@ grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc
  to view the contents of the output file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output NetCDF file contains the dimensions and variables shown in the
  following Tables 5-5 and 5-6.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table 5-5.
  Dimensions defined in NetCDF matched pair output.
 \end_layout
@@ -4491,7 +4491,7 @@ Dimension of the longitude (i.e.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Table 5-6.
  Variables defined in NetCDF matched pair output.
 \end_layout
@@ -4716,7 +4716,7 @@ For each model variable (VAR), vertical level (LVL), masking region (MASK),
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The STAT output files described for 

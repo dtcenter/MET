@@ -69,7 +69,7 @@
 Plotting and Graphics Support
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Once MET has been applied to forecast and observed fields (or observing
@@ -93,7 +93,7 @@ target "http://www.dtcenter.org/met/users/"
 Grid-Stat tool examples
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The plots in Figure 12-1 show time series of frequency bias and Gilbert
@@ -110,7 +110,7 @@ The plots in Figure 12-1 show time series of frequency bias and Gilbert
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Figure 12-1: Time series of forecast area bias and Gilbert Skill Score for
  four model configurations (different lines) stratified by time-of-day.
 \end_layout
@@ -161,7 +161,7 @@ Time series of forecast area bias and Gilbert Skill Score for four model
 MODE tool examples
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When using the MODE tool, it is possible to think of matched objects as
@@ -189,7 +189,7 @@ When using the MODE tool, it is possible to think of matched objects as
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Fig.
@@ -212,7 +212,7 @@ Fig.
  Dashed lines show about 2 bootstrap standard deviations from the estimate.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Figure 12-2: Traditional verification scores applied to output of the MODE
@@ -265,7 +265,7 @@ Traditional verification scores applied to output of the MODE tool, computed
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In addition to the traditional scores, MODE output allows more information
@@ -291,7 +291,7 @@ In addition to the traditional scores, MODE output allows more information
  object centroids) is greater than 20 grid squares.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Figure 12-3: Circle histograms showing object centroid angles and distances
  (see text for explanation).
 \end_layout

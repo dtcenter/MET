@@ -72,7 +72,7 @@ Software Installation/Getting Started
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This chapter describes how to install the MET package.
@@ -89,7 +89,7 @@ This chapter describes how to install the MET package.
 Supported architectures
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package was developed on Debian Linux using the GNU compilers and
@@ -105,7 +105,7 @@ t team lacks access to an IBM machine for testing.
  the WRF model itself.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package runs on a single processor.
@@ -121,7 +121,7 @@ The MET package runs on a single processor.
 Programming languages
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package is written primarily in C/C++ in order to be compatible
@@ -130,7 +130,7 @@ The MET package is written primarily in C/C++ in order to be compatible
  the object-oriented aspects of C++.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Knowledge of C/C++ is not necessary to use the MET package.
@@ -139,7 +139,7 @@ Knowledge of C/C++ is not necessary to use the MET package.
  without the need for source code modifications.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 NCEP's BUFRLIB is written entirely in Fortran.
@@ -147,7 +147,7 @@ NCEP's BUFRLIB is written entirely in Fortran.
  PrepBufr point observation files is also written in Fortran.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package is intended to be a tool for the modeling community to use
@@ -162,7 +162,7 @@ The MET package is intended to be a tool for the modeling community to use
 Required compilers and scripting languages
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package was developed and tested using the GNU g++/gfortran compilers,
@@ -172,14 +172,14 @@ The MET package was developed and tested using the GNU g++/gfortran compilers,
  the list of supported platforms/compilers.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The GNU make utility is used in building all executables and is therefore
  required.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package consists of a group of command line utilities that are compiled
@@ -190,7 +190,7 @@ The MET package consists of a group of command line utilities that are compiled
  line utilities.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In order to control the desired flow through MET, users are encouraged to
@@ -205,7 +205,7 @@ In order to control the desired flow through MET, users are encouraged to
 Required libraries and optional utilities
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Three external libraries are required for compiling/building MET and should
@@ -272,7 +272,7 @@ target "http://www.gnu.org/software/gsl"
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Two additional utilities are strongly recommended for use with MET:
@@ -325,7 +325,7 @@ target "http://www.dtcenter.org/wrf-nmm/users"
 Installation of required libraries
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 As described in section 2.5, some external libraries are required for building
@@ -541,7 +541,7 @@ target "http://sourceforge.net/projects/gs-fonts"
 Installation of optional utilities
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 As described in the introduction to this chapter, two additional utilities
@@ -585,7 +585,7 @@ target "http://www.dtcenter.org/wrf-nmm/users/docs/user_guide/V3/users_guide_nmm
 MET directory structure 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Once you have downloaded the MET tarball and unzipped and unpacked its contents,
@@ -726,7 +726,7 @@ ylwrap
 \end_layout
 
 \end_deeper
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The top-level MET directory consists of a README file, Makefiles, configuration
@@ -737,7 +737,7 @@ The top-level MET directory consists of a README file, Makefiles, configuration
  2.9.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When MET has been successfully built and installed, the installation directory
@@ -758,7 +758,7 @@ When MET has been successfully built and installed, the installation directory
  and tropical cyclone data, respectively.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The data/ directory contains several configuration and static data files
@@ -768,14 +768,14 @@ The data/ directory contains several configuration and static data files
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The doc/ directory contains documentation for MET, including the MET User's
  Guide.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The out/ directory will be populated with sample output from the test cases
@@ -783,14 +783,14 @@ The out/ directory will be populated with sample output from the test cases
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The src/ directory contains the source code for each of the tools in MET.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The scripts/ directory contains test scripts that are run by make test after
@@ -806,7 +806,7 @@ The scripts/ directory contains test scripts that are run by make test after
 Building the MET package
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Building the MET package consists of three main steps: (1) install the required
@@ -814,7 +814,7 @@ Building the MET package consists of three main steps: (1) install the required
  execute the build.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Install the required libraries.
@@ -826,13 +826,13 @@ Install the required libraries.
 Please refer to Section 2.6 on how to install the required and optional libraries.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Set Environment Variables
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET build uses environment variables to specify the locations of the
@@ -841,7 +841,7 @@ The MET build uses environment variables to specify the locations of the
  the locations: $MET_<lib>, $MET_<lib>INC and $MET_<lib>LIB.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The $MET_<lib> environment variable can be used if the external library
@@ -853,7 +853,7 @@ The $MET_<lib> environment variable can be used if the external library
  $MET_NETCDF environment variable to be "/opt/netcdf".
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the
@@ -866,11 +866,11 @@ The $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the
  to "/opt/include/netcdf" and $MET_NETCDFLIB to "/opt/lib/netcdf".
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 The following environment variables should also be set:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 - Set $MET_NETCDF to point to the main NetCDF directory, or set $MET_NETCDFINC
@@ -878,7 +878,7 @@ The following environment variables should also be set:
  to point to the directory with the NetCDF library files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 - Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRLIB
@@ -887,7 +887,7 @@ The following environment variables should also be set:
  specify $MET_BUFRINC.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 - Set $MET_GSL to point to the main GSL directory, or set $MET_GSLINC to
@@ -895,7 +895,7 @@ The following environment variables should also be set:
  point to the directory with the GSL library files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 - If compiling support for GRIB2, set $MET_GRIB2CINC and $MET_GRIB2CLIB
@@ -905,7 +905,7 @@ The following environment variables should also be set:
  not contain include and lib subdirectories.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 - If compiling MODIS-Regrid, set $MET_HDF to point to the main HDF directory,
@@ -916,7 +916,7 @@ SINC to point to the directory with the HDF EOS include files and set $MET_HDFEO
 SLIB to point to the directory with the HDF EOS library files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 - If compiling MODE Graphics, set $MET_CAIRO to point to the main Cairo
@@ -929,7 +929,7 @@ SLIB to point to the directory with the HDF EOS library files.
  files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 - When running MODE Graphics, set $MET_FONT_DIR to the directory containing
@@ -938,21 +938,21 @@ SLIB to point to the directory with the HDF EOS library files.
  website.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For ease of use, you should define these in your .cshrc or equivalent file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Configure and execute the build
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Example:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To configure MET to install all of the available tools in the "bin" subdirectory
@@ -987,7 +987,7 @@ To configure MET to install all of the available tools in the "bin" subdirectory
  When make is finished, type 'CNTRL-C' to quit the tail.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 If all tools are enabled and the build is successful, the "<prefix>/bin"
@@ -1133,7 +1133,7 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 - wwmca_regrid
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 NOTE: Several compilation warnings may occur which are expected.
@@ -1142,7 +1142,7 @@ NOTE: Several compilation warnings may occur which are expected.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The configure script has command line options to specify where to install
@@ -1538,11 +1538,11 @@ Disable use of BLOCK4 in the compilation.
 if you have trouble using PrepBufr files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Make Targets
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The autoconf utility provides some standard make targets for the users.
@@ -1597,7 +1597,7 @@ MET also has the following non-standard targets:
 Sample test cases
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Once the MET package has been built successfully, the user is encouraged
@@ -1648,7 +1648,7 @@ Once the MET package has been built successfully, the user is encouraged
 Configuration File Details
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Many of the MET tools use a configuration file to set parameters.
@@ -1656,7 +1656,7 @@ Many of the MET tools use a configuration file to set parameters.
  makes the output easier to duplicate.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The configuration files that control many of the MET tools contain formatted
@@ -1665,7 +1665,7 @@ The configuration files that control many of the MET tools contain formatted
  releases.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Settings common to multiple tools are described in the top part of the share/met
@@ -1675,7 +1675,7 @@ Settings common to multiple tools are described in the top part of the share/met
 EADME-TC.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A configuration file entry is an entry name, followed by an equal sign =,
@@ -1838,7 +1838,7 @@ The configuration file language supports the following data types:
 - The (x, y) points are *NOT* separated by commas.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The context of a configuration entry matters.
@@ -1851,7 +1851,7 @@ ly search for that entry in the parent dictionaries, all the way up to the
  level to have finer control over the behavior.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In order to make the configuration files more readable, several descriptive
@@ -1860,7 +1860,7 @@ In order to make the configuration files more readable, several descriptive
  file entries.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each of the configurable MET tools expects a certain set of configuration
@@ -1898,7 +1898,7 @@ When you pass a configuration file to a MET tool, the tool actually parses
 (3) Reads the user-specified configuration file from the command line.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Many of the entries from step (2) are overwritten by the user-specified
@@ -1907,7 +1907,7 @@ Many of the entries from step (2) are overwritten by the user-specified
  only needs to contain entries that differ from the defaults.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The configuration file language supports the use of environment variables.
@@ -1917,7 +1917,7 @@ The configuration file language supports the use of environment variables.
  variable.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET_BASE variable is defined in the code at compilation time as the
@@ -1928,7 +1928,7 @@ The MET_BASE variable is defined in the code at compilation time as the
  instead of the one defined at compilation time.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An error in the syntax of a configuration file will result in an error from

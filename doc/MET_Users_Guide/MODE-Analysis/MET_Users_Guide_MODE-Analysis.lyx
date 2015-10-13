@@ -72,7 +72,7 @@ The MODE-Analysis Tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MODE output files can be quite large; currently, these files contain 51
@@ -94,7 +94,7 @@ MODE output files can be quite large; currently, these files contain 51
 Scientific and statistical aspects
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE-Analysis tool operates in two modes, called "summary" and "by case".
@@ -113,7 +113,7 @@ The MODE-Analysis tool operates in two modes, called "summary" and "by case".
  The dump file will consist only of lines that match the specified criteria.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The other option for operating the analysis tool is "by case".
@@ -129,7 +129,7 @@ The other option for operating the analysis tool is "by case".
 Practical information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE-Analysis tool reads lines from MODE output files and applies filtering
@@ -147,7 +147,7 @@ mode_analysis
 mode_analysis usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the MODE-Analysis tool is shown below:
@@ -197,13 +197,13 @@ Usage: mode_analysis
 [-config config_file] | [MODE LINE OPTIONS]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for 
 \emph on
 mode_analysis
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE-Analysis tool requires specification of a "job type" and a filename
@@ -219,7 +219,7 @@ lookin
  option may be called multiple times.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE-Analysis tool can perform two basic types of jobs, which are identified
@@ -234,14 +234,14 @@ The MODE-Analysis tool can perform two basic types of jobs, which are identified
 -bycase
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Exactly one of these job types must be specified.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Specifying "-
@@ -260,7 +260,7 @@ column
  More information about this option is provided in subsequent sections.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Specifying "-
@@ -271,19 +271,19 @@ bycase
  Any columns specified are ignored for this option.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output for each of these jobs types is described in later sections.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for 
 \emph on
 mode_analysis
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -295,11 +295,11 @@ mode_analysis
  mode line options.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Analysis options
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The general analysis options described below provide a way for the user
@@ -329,7 +329,7 @@ height "1pt"
  filename
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option gives the name of a configuration file to be read.
@@ -358,7 +358,7 @@ height "1pt"
  filename
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Any MODE lines kept from the input files are written to
@@ -392,7 +392,7 @@ column
  column
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Specifies which columns in the MODE output files to generate statistics
@@ -420,11 +420,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 MODE line options
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MODE line options are used to create filters that determine which of the
@@ -436,7 +436,7 @@ MODE line options are used to create filters that determine which of the
  These options are described in subsequent sections.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -445,7 +445,7 @@ Toggles
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE line options described in this section are shown in pairs.
@@ -479,7 +479,7 @@ height "1pt"
 -fcst / -obs
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This toggle indicates whether forecast or observed lines should be used
@@ -508,7 +508,7 @@ height "1pt"
 -single / -pair
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This toggle indicates whether single object or object pair lines should
@@ -537,7 +537,7 @@ height "1pt"
 -simple / -cluster
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This toggle indicates whether simple object or cluster object lines should
@@ -566,7 +566,7 @@ height "1pt"
 -matched / -unmatched
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This toggle indicates whether matched or unmatched object lines should be
@@ -591,11 +591,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Multiple-set string options 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following options set various string attributes.
@@ -630,7 +630,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option specifies which model to use; 
@@ -670,7 +670,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These two options specify thresholds for forecast and observation objects
@@ -708,7 +708,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options indicate the names of variables to be used in the analysis
@@ -745,7 +745,7 @@ value
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options indicate vertical levels for forecast and observed fields
@@ -770,11 +770,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Multiple-set integer options 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following options set various integer attributes.
@@ -813,7 +813,7 @@ value
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options are integers of the form HH[MMSS] specifying an (hour-minute-secon
@@ -850,7 +850,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options are integers of the form HH[MMSS] specifying an (hour-minute-secon
@@ -887,7 +887,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options are integers of the form HHMMSS specifying an (hour-minute-second)
@@ -924,7 +924,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options indicate the convolution radius used for forecast or observed
@@ -949,11 +949,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Integer max/min options 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options set limits on various integer attributes.
@@ -993,7 +993,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options are used to indicate minimum/maximum values for the area attribute
@@ -1030,7 +1030,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options are used to indicate minimum/maximum values accepted for the
@@ -1069,7 +1069,7 @@ value
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options are used to indicate minimum/maximum values accepted for the
@@ -1112,7 +1112,7 @@ intersection_area_ma
 x value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options refer to the minimum/maximum values accepted for the intersection
@@ -1149,7 +1149,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options refer to the minimum/maximum union area values accepted for
@@ -1186,7 +1186,7 @@ height "1pt"
  value
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options refer to the minimum/maximum values for symmetric difference
@@ -1211,18 +1211,18 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Date/time max/min options 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options set limits on various date/time attributes.
  The values can be specified in one of three ways: 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 First, the options may be indicated by a string of the form YYYYMMDD_HHMMSS.
@@ -1230,14 +1230,14 @@ First, the options may be indicated by a string of the form YYYYMMDD_HHMMSS.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Second, they may be indicated by a string of the form YYYYMMDD_HH.
  Here, the minutes and seconds are assumed to be zero.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The third way of indicating date/time attributes is by a string of the form
@@ -1283,7 +1283,7 @@ fcst_valid_max
  yyyymmdd[_hh[mmss]]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options indicate minimum/maximum values for the forecast valid time.
@@ -1327,18 +1327,18 @@ obs_valid_max
  yyyymmdd[_hh[mmss]]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These two options indicate minimum/maximum values for observation valid
  time.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Floating-point max/min options 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Setting limits on various floating-point attributes.
@@ -2388,11 +2388,11 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Miscellaneous options
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 These options are used to indicate parameters that did not fall into any
@@ -2428,7 +2428,7 @@ mask_poly
  filename
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option indicates the name of a polygon mask file to be used for filtering.
@@ -2460,7 +2460,7 @@ height "1pt"
 -help
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This option prints the usage message.
@@ -2492,7 +2492,7 @@ mode_analysis
  configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 To use the MODE analysis tool, the user must un-comment the options in the
@@ -2504,7 +2504,7 @@ mode_analysis
  are the same as the MODE line options described in Section 9.3.1.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The parameters that are set in the configuration file either add to or override
@@ -2520,7 +2520,7 @@ ion file override those set on the command line.
 MODE-Analysis tool output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output of the MODE Analysis tool is a self-describing tabular format

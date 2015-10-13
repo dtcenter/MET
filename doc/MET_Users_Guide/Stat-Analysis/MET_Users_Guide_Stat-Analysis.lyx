@@ -73,7 +73,7 @@ The Stat-Analysis Tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat,
@@ -81,7 +81,7 @@ The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat,
 on and a way to filter their STAT output files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool requires STAT output from Point-Stat, Grid-Stat,
@@ -95,7 +95,7 @@ t tools.
 Scientific and statistical aspects
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool (i) aggregates results over a user-specified time;
@@ -128,7 +128,7 @@ ons based on climatology (e.g., anomaly correlation).
 Filter STAT lines
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool can be used to simply filter out specific STAT lines
@@ -141,7 +141,7 @@ The Stat-Analysis tool can be used to simply filter out specific STAT lines
 Summary statistics for columns
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analy
@@ -157,7 +157,7 @@ sis tool can be used to produce summary information for a single column
  maximum, and the 10th, 25th, 50th, 75th, and 90th percentiles.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Confidence intervals are computed for the mean and standard deviation of
@@ -175,7 +175,7 @@ Confidence intervals are computed for the mean and standard deviation of
 Aggregated values from multiple STAT lines
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool can be used to create aggregated values from multiple
@@ -194,7 +194,7 @@ The Stat-Analysis tool can be used to create aggregated values from multiple
 Aggregate STAT lines and produce aggregated statistics
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool can be used to aggregate multiple STAT lines of the
@@ -217,7 +217,7 @@ The Stat-Analysis tool can be used to aggregate multiple STAT lines of the
  types (VL1L2 or VAL1L2).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When aggregating the matched pair line type (MPR) and computing an output
@@ -236,7 +236,7 @@ When aggregating the matched pair line type (MPR) and computing an output
 Skill Score Index, including GO Index
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool can be used to calculate the skill score indices
@@ -1086,7 +1086,7 @@ Mean sea level
 Wind Direction Statistics
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Stat-Analysis tool can be used to calculate the error statistics for
@@ -1104,7 +1104,7 @@ The Stat-Analysis tool can be used to calculate the error statistics for
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The first step in verifying wind direction is running the Grid-Stat and/or
@@ -1143,7 +1143,7 @@ The first step in verifying wind direction is running the Grid-Stat and/or
 s tool.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Once the appropriate lines have been generated for each verification time
@@ -1182,7 +1182,7 @@ Once the appropriate lines have been generated for each verification time
 Practical information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following sections describe the usage statement, required arguments
@@ -1193,7 +1193,7 @@ The following sections describe the usage statement, required arguments
 stat_analysis usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the Stat-Analysis tool is shown below:
@@ -1227,7 +1227,7 @@ Usage: stat_analysis
 [-config config_file] | [JOB COMMAND LINE]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -1237,7 +1237,7 @@ Stat_analysis
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In the usage statement for the STAT analysis tool, some additional terminology
@@ -1263,7 +1263,7 @@ wavelet_stat
  are described in section 10.3.2.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for 
 \emph on
 stat_analysis
@@ -1388,7 +1388,7 @@ level
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the 
@@ -1406,7 +1406,7 @@ stat_analysis -lookin ../out/point_stat
 -config STATAnalysisConfig
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the stat analysis tool will search for valid STAT lines
@@ -1430,7 +1430,7 @@ stat_analysis
  configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the stat analysis tool named 
@@ -1453,7 +1453,7 @@ d that users make a copy of these files prior to modifying their contents.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Most of the user-specified parameters listed in the STAT analysis configuration
@@ -1470,7 +1470,7 @@ ensemble_stat
  configuration file will be retained.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that the options specified in the first section of the configuration
@@ -1490,7 +1490,7 @@ model
  option as "Run1", that job will be performed only on "Run1" data.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Also note that environment variables may be used when editing configuration
@@ -1517,7 +1517,7 @@ height "1pt"
 model = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of model names to be used for
@@ -1556,7 +1556,7 @@ fcst_lead = [];
 obs_lead = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of forecast and observation
@@ -1613,7 +1613,7 @@ obs_valid_end = ""
 obs_valid_hour = "";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify the beginning, ending, and instantaneous valid times
@@ -1691,7 +1691,7 @@ obs_init_end = "";
 obs_init_hour = "";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify the beginning, ending, or exact model initialization
@@ -1734,7 +1734,7 @@ fcst_var = [];
 obs_var = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of forecast and observation
@@ -1776,7 +1776,7 @@ fcst_lev = [];
 obs_lev = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of forecast and observation
@@ -1814,7 +1814,7 @@ height "1pt"
 obtype = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of observation types to be used
@@ -1848,7 +1848,7 @@ height "1pt"
 vx_mask = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of verification masking regions
@@ -1883,7 +1883,7 @@ height "1pt"
 interp_mthd = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of interpolation methods to
@@ -1917,7 +1917,7 @@ height "1pt"
 interp_pnts = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of interpolation points to be
@@ -1959,7 +1959,7 @@ obs_thresh = [];
 cov_thresh = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify comma-separated lists of forecast, observation, and
@@ -1997,7 +1997,7 @@ height "1pt"
 alpha = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list alpha confidence values to be
@@ -2030,7 +2030,7 @@ height "1pt"
 line_type = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify a comma-separated list of line types to be used for
@@ -2069,7 +2069,7 @@ column = [];
 weight = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The column and weight fields are used to define a skill score index.
@@ -2107,7 +2107,7 @@ jobs = [
 ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify one or more analysis jobs to be performed on the STAT
@@ -2117,7 +2117,7 @@ The user may specify one or more analysis jobs to be performed on the STAT
  The format for an analysis job is as follows:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -2126,7 +2126,7 @@ The user may specify one or more analysis jobs to be performed on the STAT
  REQUIRED and OPTIONAL ARGUMENTS
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 All possible tasks for 
@@ -2378,7 +2378,7 @@ Calculates the GO Index as described in section 8.1.1.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 *Job command FILTERING options can be used when the -line_type has been
@@ -2389,25 +2389,25 @@ Calculates the GO Index as described in section 8.1.1.
  on their intersection:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 "-column_min col_name value"
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 "-column_max col_name value"
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 "-column_eq col_name value"
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 "-column_str col_name string" separate multiple filtering strings with commas
@@ -2445,7 +2445,7 @@ seed = "";
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2461,7 +2461,7 @@ e intervals.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2478,7 +2478,7 @@ rep_prop
  m, should be equal to the size of the sample, n.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2498,7 +2498,7 @@ n_rep
  pairs.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2513,7 +2513,7 @@ rng
  for a listing of the random number generators available for use.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2549,7 +2549,7 @@ height "1pt"
 rank_corr_flag = TRUE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2595,7 +2595,7 @@ height "1pt"
 vif_flag = FALSE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The variance inflation factor (VIF) flag indicates whether to apply a first
@@ -2632,7 +2632,7 @@ height "1pt"
 tmp_dir = "/tmp";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This parameter indicates the directory where the stat analysis tool should
@@ -2659,7 +2659,7 @@ height "1pt"
 version = "v5.1";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 version 
 \series medium
 indicates the version number for the contents of this configuration file.
@@ -2686,7 +2686,7 @@ height "1pt"
 Stat-Analysis tool output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output generated by the Stat-Analysis tool contains statistics produced
@@ -2702,7 +2702,7 @@ The output generated by the Stat-Analysis tool contains statistics produced
  The format of output from each STAT job command is described below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The "-by column" job command option may be used to run the same job multiple
@@ -2715,11 +2715,11 @@ The "-by column" job command option may be used to run the same job multiple
  of masking region and lead time.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Job: filter
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This job command finds and filters STAT lines down to those meeting criteria
@@ -2732,18 +2732,18 @@ dump_row
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output of this job is the same STAT format described in sections 4.3.3,
  5.3.3, and 9.3.3.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Job: summary
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This job produces summary statistics for the column name and line type specified
@@ -2821,7 +2821,7 @@ Column Number
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Paragraph
+\begin_layout Standard
 Description
 \end_layout
 
@@ -3064,11 +3064,11 @@ Maximum value
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Job: aggregate
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This job aggregates output from the STAT line type specified using the "-
@@ -3093,11 +3093,11 @@ COL_NAME
  the statistics for that line type.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Job: aggregate_stat
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This job is similar to the "
@@ -3383,11 +3383,11 @@ out_obs_thresh
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Job: go_index
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output from this job consists of three lines, the first two of which

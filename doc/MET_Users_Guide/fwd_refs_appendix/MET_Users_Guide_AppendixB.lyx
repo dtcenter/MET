@@ -103,7 +103,7 @@ The following map projections are currently supported in MET:
 Grids
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 All of NCEP's pre-defined grids that reside on one of the projections listed
@@ -114,14 +114,14 @@ All of NCEP's pre-defined grids that reside on one of the projections listed
  library and recompiling.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Please see NCEP's website for a description and plot of these pre-defined
  grids: 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset CommandInset href
@@ -193,7 +193,7 @@ o G248, G250,G251
 Polylines
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Many of NCEP's pre-defined verification regions are implemented in MET as
@@ -204,7 +204,7 @@ n files by pointing to the lat/lon polyline file in the installed share/met/poly
  Users may also easily define their own lat/lon polyline files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 See NCEP's website for a description and plot of these pre-defined verification
@@ -218,7 +218,7 @@ target "http://www.emc.ncep.noaa.gov/mmb/research/nearsfc/nearsfc.verf.html "
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The NCEP verification regions that are implemented in MET as lat/lon polylines

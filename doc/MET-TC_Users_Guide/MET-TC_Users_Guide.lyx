@@ -116,7 +116,7 @@ August 2014
 Foreword
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This user's guide is provided as an aid to users of the Model Evaluation
@@ -127,7 +127,7 @@ This user's guide is provided as an aid to users of the Model Evaluation
  This module is included in the MET v5.1 release.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The first release of MET-TC (v4.1) was intended to replicate the functionality
@@ -145,7 +145,7 @@ nts in TC verification.
  enable consistent forecast evaluation studies.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET-TC is an evolving module within the MET software package.
@@ -157,7 +157,7 @@ MET-TC is an evolving module within the MET software package.
  to the MET-TC tool.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Contributors to this user's guide include: Kathryn Newman, John Halley Gotway,
@@ -172,7 +172,7 @@ TERMS OF USE
 IMPORTANT!
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 USE OF THIS SOFTWARE IS SUBJECT TO THE FOLLOWING TERMS AND CONDITIONS:
 \end_layout
 
@@ -362,7 +362,7 @@ Notices and Additional Terms.
  All Rights Reserved."
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following notice shall be displayed on any scholarly works associated
@@ -381,7 +381,7 @@ The following notice shall be displayed on any scholarly works associated
  NCAR is sponsored by the United States National Science Foundation."
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 By using or downloading the Software, you agree to be bound by the terms
@@ -392,7 +392,7 @@ By using or downloading the Software, you agree to be bound by the terms
 Acknowledgments
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Funding for the development of MET-TC is from the National Oceanic and Atmospher
@@ -414,7 +414,7 @@ Overview of MET-TC
 Purpose of organization of the User's Guide
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The purpose of this User's Guide is to provide basic information to the
@@ -426,7 +426,7 @@ The purpose of this User's Guide is to provide basic information to the
  Forecast (ATCF) file format.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The User's Guide is organized as follows.
@@ -446,7 +446,7 @@ The User's Guide is organized as follows.
 MET-TC components
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET-TC software is included as a module within the full Model Evaluation
@@ -493,7 +493,7 @@ Basic representation of the structure of the MET-TC module.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-dland tool is used to generate a gridded file that determines the
@@ -509,7 +509,7 @@ The TC-dland tool is used to generate a gridded file that determines the
 Software installation
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET-TC was developed to utilize the software framework of MET, therefore
@@ -519,14 +519,14 @@ MET-TC was developed to utilize the software framework of MET, therefore
  refer to Chapter 2 of the MET User's Guide.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Within the full directory structure of MET, locations of MET-TC specific
  code and tools include:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The installed 
@@ -542,7 +542,7 @@ tc_dland, tc_pairs, tc_stat
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The installed 
@@ -586,7 +586,7 @@ wwpts_us.txt
  is a sample watch/warning file to be used in TC-Pairs.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -598,7 +598,7 @@ doc/
  the MET software package.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -608,7 +608,7 @@ src/tools/tc_utils/
  directory contains the source code for the three tools in MET-TC.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -624,7 +624,7 @@ plot_tcmpr.R
  User's Guide.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -659,7 +659,7 @@ MET_BASE
 Code support
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET-TC support is supplied through the MET helpdesk.
@@ -673,7 +673,7 @@ MET-TC support is supplied through the MET helpdesk.
 Data input/output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This chapter discusses the input and output file formats expected and produced
@@ -688,7 +688,7 @@ This chapter discusses the input and output file formats expected and produced
 Input data format
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Best track and aids files in Automated Tropical Cyclone Forecasting System
@@ -701,7 +701,7 @@ Best track and aids files in Automated Tropical Cyclone Forecasting System
  parse the input data.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The ATCF file format includes a section with common fields:
@@ -1001,7 +1001,7 @@ SEAS4:
  fourth quadrant seas radius as defined by SEASCODE
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Of the above common fields in the ATCF file format, MET-TC requires the
@@ -1011,7 +1011,7 @@ Of the above common fields in the ATCF file format, MET-TC requires the
  and TAU fields should be present.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-Pairs tool expects two input data sources in order to generate matched
@@ -1025,7 +1025,7 @@ The TC-Pairs tool expects two input data sources in order to generate matched
  of all available observations of the storm.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The BEST is in ATCF file format and contains all the above listed common
@@ -1041,7 +1041,7 @@ The BEST is in ATCF file format and contains all the above listed common
  available filtering options.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 All operational model aids and the BEST can be obtained from the NHC ftp
@@ -1055,7 +1055,7 @@ target "ftp://ftp.nhc.noaa.gov/atcf/archive/"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For more detailed information on the ATCF format description and specifications
@@ -1069,7 +1069,7 @@ target "http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abdeck.txt"
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In order to adhere to ATCF file format, model data must be run through a
@@ -1093,7 +1093,7 @@ target "http://www.dtcenter.org/HurrWRF/users/downloads/index.php"
 Output data format
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package produces output in four basic file formats: STAT files,
@@ -1121,7 +1121,7 @@ TC-dland tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Many filtering criteria within the MET-TC tools depend on the distinction
@@ -1132,7 +1132,7 @@ Many filtering criteria within the MET-TC tools depend on the distinction
  landfall.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-dland tool underwent a major overhaul for MET v5.1, switching from
@@ -1144,7 +1144,7 @@ The TC-dland tool underwent a major overhaul for MET v5.1, switching from
  differences in the computed distances compared with the previous version.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 While the TC-dland tool is available to be run, most users will find the
@@ -1156,7 +1156,7 @@ While the TC-dland tool is available to be run, most users will find the
 Input/output format
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The input for the TC-dland tool is a file containing the longitude (degrees
@@ -1178,7 +1178,7 @@ share/met/tc_data/
  of coastlines and a significant landmass.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output file from TC-dland is a NetCDF format file containing a gridded
@@ -1195,7 +1195,7 @@ share/met/tc_data
  directory: 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -1204,7 +1204,7 @@ dland_nw_hem_tenth_degree.nc
 : TC-dland output from aland.dat using a 1/10th degree grid
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -1218,7 +1218,7 @@ dland_global_tenth_degree.nc
 Practical information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section briefly describes how to run tc_dland.
@@ -1261,20 +1261,20 @@ out_file
 Required arguments for tc_dland:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Out_file
 \series medium
 : The -out_file argument indicates the NetCDF output file containing the
  computed distances to land.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for tc_dland
 \series medium
 :
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Grid spec
 \series medium
 : The -grid spec argument overrides the default grid (1/10th NH grid).
@@ -1283,27 +1283,27 @@ Grid spec
 lat_ll lon_ll delta_lat delta_lon n_lat n_lon
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Noll
 \series medium
 : The -noll argument skips writing the lon/lat variables in the output NetCDF
  file to reduce the file size.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Land file
 \series medium
 : The -land file argument overwrites the default land data files (aland.dat,
  shland.dat, and wland.dat).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Log file
 \series medium
 : The -log file argument outputs log messages to the specified file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 V level
 \series medium
 : The -v level argument overrides the default level of verbosity (2).
@@ -1317,7 +1317,7 @@ TC-Pairs tool
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-Pairs tool provides position and intensity verification for tropical
@@ -1335,7 +1335,7 @@ The TC-Pairs tool provides position and intensity verification for tropical
 Practical information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section describes how to configure and run the TC-Pairs tool.
@@ -1356,7 +1356,7 @@ tc_pairs
 tc_pairs usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for tc_pairs is shown below:
@@ -1390,7 +1390,7 @@ Usage: tc_pairs
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -1399,11 +1399,11 @@ tc_pairs
  has three required arguments and can take up to three optional arguments.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for tc_pairs:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Adeck source
 \series medium
 : The 
@@ -1424,7 +1424,7 @@ Adeck source
  to be processed.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Bdeck source
 \series medium
 : The 
@@ -1447,7 +1447,7 @@ Bdeck source
  be any ATCF format reference.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Config file
 \series medium
 : The 
@@ -1458,20 +1458,20 @@ Config file
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for tc_pairs
 \series medium
 :
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Out base:
 \series medium
  The -out argument indicates the path of the output file base.
  This argument overrides the default output file base (./out_tcmpr)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Log file:
 \series medium
  The -log argument indicates the name of the log file associated with 
@@ -1481,7 +1481,7 @@ tc_pairs
  output.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 V level:
 \series medium
  The -v option indicates the desired level of verbosity.
@@ -1499,7 +1499,7 @@ level
  output.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the tc_pairs calling sequence is shown below:
@@ -1509,7 +1509,7 @@ An example of the tc_pairs calling sequence is shown below:
 tc_pairs -adeck aal092010.dat -bdeck bal092010.dat -config TCPairsConfig
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the TC-Pairs tool matches the model track (aal092010.dat)
@@ -1523,7 +1523,7 @@ TCPairsConfig
  file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-Pairs tool implements the following logic:
@@ -1576,7 +1576,7 @@ on times match.
 TC_Pairs configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the TC-Pairs tool named 'TCPairsConfig_defaul
@@ -1607,14 +1607,14 @@ height "1pt"
 model = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: model = ["DSHP", "LGEM", "HWRF"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1648,14 +1648,14 @@ height "1pt"
 storm_id = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: storm_id=["AL092010"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1689,14 +1689,14 @@ height "1pt"
 basin = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: basin = ["AL", "EP"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1730,7 +1730,7 @@ height "1pt"
 cyclone = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -1753,7 +1753,7 @@ Does this need a
 02"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1786,14 +1786,14 @@ height "1pt"
 storm_name = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: storm_name = ["IRENE","EARL"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1831,21 +1831,21 @@ init_beg = " ";
 init_end = " ";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: init_beg="20100701";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 init_end="20101031";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1886,21 +1886,21 @@ init_inc = [ ];
 init_exc = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: init_inc = ["20101031_06"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 init_exc = ["20101031_12"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1942,21 +1942,21 @@ valid_beg = " ";
 valid_end = " ";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: valid_beg = "20100701_00"
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 valid_end = "20101031_18"
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1993,14 +1993,14 @@ height "1pt"
 init_hour = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: init_hour = ["00", "06", "12", "18"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2033,14 +2033,14 @@ height "1pt"
 init_mask = " ";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: init_mask = "MET_BASE/poly/EP.poly";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2073,14 +2073,14 @@ height "1pt"
 valid_mask = " ";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: valid_mask = "MET_BASE/poly/EP.poly";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2112,14 +2112,14 @@ height "1pt"
 check_dup = TRUE or FALSE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: check_dup = FALSE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2168,14 +2168,14 @@ height "1pt"
 interp12 = NONE, FILL, or REPLACE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: interp12 = NONE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2272,7 +2272,7 @@ min_req = 2;
 ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2342,14 +2342,14 @@ height "1pt"
 lag_time = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: lag_time = ["06","12"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2383,14 +2383,14 @@ height "1pt"
 best_baseline = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
 e.g.: best_baseline = ["BCLP", "BCD5", "BCLA"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2401,7 +2401,7 @@ best_baseline
  to be derived from the best tracks.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following are valid baselines for the 
@@ -2411,7 +2411,7 @@ best_baseline
  field:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 BTCLIP
 \series medium
 : Neumann original 3-day CLIPER in best track mode.
@@ -2419,7 +2419,7 @@ BTCLIP
  Specify model as BCLP.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 BTCLIP5
 \series medium
 : 5-day CLIPER (
@@ -2434,7 +2434,7 @@ DeMaria and Knaff, 2001
  Specify model as BCS5.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 BTCLIPA
 \series medium
 : Sim Aberson's recreation of Neumann original 3-day CLIPER in best-track
@@ -2443,7 +2443,7 @@ BTCLIPA
  Specify model as BCLA.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 oper_baseline = [ ];
 \end_layout
 
@@ -2454,7 +2454,7 @@ oper_baseline = [ ];
 e.g.: oper_baseline = ["OCLP","OCS5","OCD5"];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2465,7 +2465,7 @@ oper_baseline
  to be derived from the operational (CARQ) tracks.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following are valid baselines for the 
@@ -2475,7 +2475,7 @@ oper_baseline
  field:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 OCLIP
 \series medium
 : Merrill modified (operational) 3-day CLIPER run in operational mode.
@@ -2483,7 +2483,7 @@ OCLIP
  Specify model as OCLP.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 OCLIP5
 \series medium
 : 5-day CLIPER (
@@ -2498,7 +2498,7 @@ DeMaria and Knaff, 2001
  Specify model as OCS5.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 OCLIPD5
 \series medium
 : 5-day CLIPER (
@@ -2540,7 +2540,7 @@ match_points = TRUE or FALSE;
 e.g.: match_points = TRUE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2584,7 +2584,7 @@ dland_file = " ";
 e.g.: dland_file="MET_BASE/tc_data/dland_global_tenth_degree.nc";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2657,7 +2657,7 @@ time_offset = -14400;
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -2726,7 +2726,7 @@ version = " ";
 e.g.: version = "v5.1";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The version string indicates the version of TC-Pairs configuration file
@@ -2741,7 +2741,7 @@ The version string indicates the version of TC-Pairs configuration file
 TC_Pairs output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 TC-Pairs produces output in TCSTAT format.
@@ -4261,7 +4261,7 @@ TC-Stat
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-Stat tool ties together results from the TC-Pairs tool by providing
@@ -4286,7 +4286,7 @@ Statistical aspects
 Filter TCST lines
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-Stat tool can be used to simply filter specific lines of the TCST
@@ -4296,7 +4296,7 @@ The TC-Stat tool can be used to simply filter specific lines of the TCST
  The output file is also in TCST format.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Filtering options are outlined below in section 5.3.2 (configuration file).
@@ -4340,7 +4340,7 @@ Filtering options are outlined below in section 5.3.2 (configuration file).
 arguments: column_name string
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 If multiple options are listed, the job will be performed on their intersection.
@@ -4350,7 +4350,7 @@ If multiple options are listed, the job will be performed on their intersection.
 Summary statistics for columns
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-Stat tool can be used to produce summary information for a single
@@ -4362,7 +4362,7 @@ The TC-Stat tool can be used to produce summary information for a single
  10th, 25th, 50th, 75th, and 90th percentiles, and maximum.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Confidence intervals are computed for the mean of the column of data.
@@ -4372,7 +4372,7 @@ Confidence intervals are computed for the mean of the column of data.
  D of the MET user's guide.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When operating on columns, a specific column name can be listed (e.g.
@@ -4384,7 +4384,7 @@ When operating on columns, a specific column name can be listed (e.g.
  Shortcut options for the -column entry are as follows:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 .
@@ -4431,7 +4431,7 @@ XY:
 X- and Y-component track errors (X_ERR, Y_ERR)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The TC-Stat tool can also be used to generate frequency of superior performance
@@ -4439,13 +4439,13 @@ The TC-Stat tool can also be used to generate frequency of superior performance
  job.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \emph on
 Frequency of Superior Performance
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The frequency of superior performance (FSP) looks at multiple model forecasts
@@ -4458,13 +4458,13 @@ The frequency of superior performance (FSP) looks at multiple model forecasts
  not equal 100%.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \emph on
 Time-Series Independence
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The time-series independence evaluates effective forecast separation time
@@ -4479,7 +4479,7 @@ The time-series independence evaluates effective forecast separation time
 Practical information
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following sections describe the usage statement, required arguments,
@@ -4490,7 +4490,7 @@ The following sections describe the usage statement, required arguments,
 tc_stat usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for tc_stat is shown below:
@@ -4516,7 +4516,7 @@ Usage: -lookin source
 [-config file] | [JOB COMMAND LINE]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 TC-Stat has one required argument and accepts optional ones.
@@ -4535,11 +4535,11 @@ TC-Stat has one required argument and accepts optional ones.
  described in section 5.3.2.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for tc_stat:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Lookin source:
 \series medium
  The 
@@ -4557,11 +4557,11 @@ tc_pairs
  Multiple tcst files may be specified by using a wild card (*).
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for tc_stat:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Out file:
 \series medium
  The 
@@ -4571,7 +4571,7 @@ Out file:
  argument indicates the desired name of the TCST format output file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Log file:
 \series medium
  The -
@@ -4581,7 +4581,7 @@ log
  argument indicates the name of the log file associated with tc_stat output.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 V level:
 \series medium
  The 
@@ -4595,7 +4595,7 @@ option indicates the desired level of verbosity.
  output.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Config file:
 \series medium
  The 
@@ -4606,7 +4606,7 @@ Config file:
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the 
@@ -4620,7 +4620,7 @@ calling sequence is shown below:
 tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the TC-Stat tool uses any TCST file (output from 
@@ -4640,7 +4640,7 @@ TCStatConfig
 tc_stat configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the 
@@ -4660,7 +4660,7 @@ share/met/config
 d that users make a copy of these files prior to modifying their contents.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Most of the user-specified options listed in the TC-Stat configuration file
@@ -4674,7 +4674,7 @@ tc_pairs
  A detailed description of the TC-Stat configuration file is listed below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Note that the options specified in the first section of the configuration
@@ -4718,7 +4718,7 @@ amodel = [ ];
 bmodel = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4773,7 +4773,7 @@ height "1pt"
 storm_id = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4806,7 +4806,7 @@ height "1pt"
 basin = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4844,7 +4844,7 @@ height "1pt"
 cyclone = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4881,7 +4881,7 @@ height "1pt"
 storm_name = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4922,7 +4922,7 @@ init_beg = " ";
 init_eng = " ";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -4970,7 +4970,7 @@ init_inc = [ ];
 init_exc = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5019,7 +5019,7 @@ valid_beg = " ";
 valid_end = " ";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5067,7 +5067,7 @@ valid_inc = [ ];
 valid_exc = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5120,7 +5120,7 @@ valid_hour = [ ];
 lead = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5174,7 +5174,7 @@ init_mask = [ ];
 valid_mask = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5217,7 +5217,7 @@ height "1pt"
 line_type = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5248,7 +5248,7 @@ height "1pt"
 track_watch_warn = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5266,13 +5266,13 @@ track_watch_warn
 " option within the job command lines may further refine these selections.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Other uses of the WATCH_WARN column include filtering when:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 .
@@ -5306,7 +5306,7 @@ Other uses of the WATCH_WARN column include filtering when:
  A forecast is verified when a watch/warn is NOT in effect
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following filtering options can be achieved by the following:
@@ -5380,7 +5380,7 @@ column_str_val = ["NA"];
 \end_layout
 
 \end_deeper
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Further information on the 
@@ -5423,7 +5423,7 @@ column_thresh_name = [ ];
 column_thresh_val = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5476,7 +5476,7 @@ column_str_name = [ ];
 column_str_val = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5529,7 +5529,7 @@ init_thresh_name = [];
 init_thresh_val = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5588,7 +5588,7 @@ nit_str_name = [];
 init_str_val = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The
@@ -5638,7 +5638,7 @@ height "1pt"
 water_only = ;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5725,7 +5725,7 @@ thresh = >=30.0;
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5826,7 +5826,7 @@ landfall_beg = -86400;
 landfall_end = 0;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5883,7 +5883,7 @@ height "1pt"
 match_points = TRUE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5919,7 +5919,7 @@ height "1pt"
 event_equal = FALSE;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5959,7 +5959,7 @@ height "1pt"
 event_equal_lead = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -5998,7 +5998,7 @@ height "1pt"
 out_init_mask = "";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -6035,7 +6035,7 @@ height "1pt"
 out_valid_mask = "";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -6072,7 +6072,7 @@ height "1pt"
 jobs[] = [ ];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may specify one or more analysis jobs to be performed on the TCST
@@ -6129,7 +6129,7 @@ height "1pt"
 version = "v5.1";
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -6163,7 +6163,7 @@ height "1pt"
 tc_stat output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output generated from the TC-Stat tool contains statistics produced
@@ -6182,11 +6182,11 @@ tc_stat
  job command is listed below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Job: Filter
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This job command finds and filters TCST lines down to those meeting the
@@ -6200,11 +6200,11 @@ dump_row
  3 and 4.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Job: Summary
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This job produces summary statistics for the column name specified by the
@@ -6243,7 +6243,7 @@ SUMMARY
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Table 5.1: Columnar output of 
@@ -6595,7 +6595,7 @@ plotting and graphics support
 Introduction
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Graphical capabilities are included in the MET-TC release in order to assist
@@ -6611,7 +6611,7 @@ scripts/Rscripts/plot_tcmpr.R
 plot_tcmpr.R usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement with a short description of the options for 
@@ -6636,7 +6636,7 @@ plot_tcmpr.R
 " argument.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In order to run this script, the 
@@ -6655,7 +6655,7 @@ tc_stat tool
 Examples
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The supplied R script can generate a number of different plot types including
@@ -6666,7 +6666,7 @@ The supplied R script can generate a number of different plot types including
  Below are two example plots generated from the tools.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Figure 6.1: Example boxplot from plot_tcmpr.R.
@@ -6715,7 +6715,7 @@ Example boxplot from plot_tcmpr.R.
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Figure 6.2: Example mean intensity error with confidence intervals at 95%
@@ -6771,7 +6771,7 @@ l models GHMI, HWFI.
 References
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Alberson, S.D., 1998: Five-day Tropical cyclone track forecasts in the North
@@ -6788,7 +6788,7 @@ Vol
  13, p.1005-1015.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Knaff, J.A., M.
@@ -6820,13 +6820,13 @@ Issue
  80-92.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 iii
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 13

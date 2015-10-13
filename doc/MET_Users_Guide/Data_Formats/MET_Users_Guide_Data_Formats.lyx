@@ -78,7 +78,7 @@
 MET Data I/O, Re-Formatting, and Checking
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Data must be preprocessed prior to using for verification.
@@ -99,7 +99,7 @@ Data must be preprocessed prior to using for verification.
 Input data formats
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package can handle gridded input data in one of three formats: GRIB
@@ -114,7 +114,7 @@ The MET package can handle gridded input data in one of three formats: GRIB
  forecasts at the surface or on pressure levels.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When comparing two gridded fields with the Grid-Stat, Wavelet-Stat, or MODE
@@ -125,7 +125,7 @@ When comparing two gridded fields with the Grid-Stat, Wavelet-Stat, or MODE
  to re-grid the model data to the observation grid, rather than vice versa.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Input point observation files in PrepBufr format are available through NCEP.
@@ -151,7 +151,7 @@ n types in a single file in a standard format.
 Intermediate data formats
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 MET uses NetCDF as an intermediate file format.
@@ -160,7 +160,7 @@ MET uses NetCDF as an intermediate file format.
  format.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Pcp-Combine tool operates in 3 different modes.
@@ -183,7 +183,7 @@ subtract
  mode in which it is run.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The user may choose to: (1) combine the model accumulations to match the
@@ -203,7 +203,7 @@ pcp_combine
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -224,7 +224,7 @@ Gen-Circle_Mask
  It must be regenerated for each domain used.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The PB2NC tool is used to reformat the input PrepBufr files containing point
@@ -235,7 +235,7 @@ The PB2NC tool is used to reformat the input PrepBufr files containing point
  step performed in the Point-Stat tool.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The ASCII2NC tool simply reformats ASCII point observations into the NetCDF
@@ -248,7 +248,7 @@ The ASCII2NC tool simply reformats ASCII point observations into the NetCDF
 Output data formats
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MET package currently produces output in four basic file formats: STAT
@@ -256,7 +256,7 @@ The MET package currently produces output in four basic file formats: STAT
  the Plot-Mode-Field utility.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The STAT format consists of tabular ASCII data that can be easily read by
@@ -272,7 +272,7 @@ The STAT format consists of tabular ASCII data that can be easily read by
  for many columns of data change from line to line.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For this reason, ASCII output is also available as an alternative for the
@@ -284,7 +284,7 @@ For this reason, ASCII output is also available as an alternative for the
  or not the optional ASCII files are generated.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE tool creates two ASCII output files as well (although they are
@@ -297,7 +297,7 @@ The MODE tool creates two ASCII output files as well (although they are
  not applicable to a given line type contain fill data.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Ensemble-Stat, Grid-Stat, Wavelet-Stat, Series-Analysis, and MODE tools
@@ -325,7 +325,7 @@ on of the forecast and observation fields for each variable type/level,
  point observations.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The MODE and Wavelet-Stat tools produce PostScript plots summarizing the
@@ -345,7 +345,7 @@ n fields.
  line options.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs,
@@ -358,7 +358,7 @@ Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs,
 Data format summary
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The following is a summary of the input and output formats for each of the
@@ -883,7 +883,7 @@ Output
 PB2NC tool
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section describes how to configure and run the PB2NC tool.
@@ -898,7 +898,7 @@ This section describes how to configure and run the PB2NC tool.
 pb2nc usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the PB2NC tool is shown below:
@@ -952,14 +952,14 @@ config_file
 [ level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 pb2nc has both required and optional arguments.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for pb2nc
 \end_layout
 
@@ -997,7 +997,7 @@ config_file
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for pb2nc
 \end_layout
 
@@ -1127,7 +1127,7 @@ level
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the pb2nc calling sequence is shown below:
@@ -1145,7 +1145,7 @@ sample_pb.nc
 PB2NCConfig
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the PB2NC tool will process the input 
@@ -1167,7 +1167,7 @@ sample_pb.nc
 pb2nc configuration file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The default configuration file for the PB2NC tool named 
@@ -1186,7 +1186,7 @@ scripts/config
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 When editing configuration files, environment variables may be used for
@@ -1201,7 +1201,7 @@ ${VAR_NAME}
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 For example, using an environment variable to set the 
@@ -1244,14 +1244,14 @@ ADPSFC
 message_type[] = [ ${MSG_TYP} ]; 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The example script for running MODE included in section 10.2 provides another
  example of using environment variables in configuration files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The contents of the default pb2nc configuration file are described in the
@@ -1282,7 +1282,7 @@ height "1pt"
 message_type = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each PrepBufr message is tagged with one of eighteen message types as listed
@@ -1317,7 +1317,7 @@ height "1pt"
 station_id = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each PrepBufr message has a station identification string associated with
@@ -1361,7 +1361,7 @@ end = 5400;
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each PrepBufr file has an observation time associated with it.
@@ -1432,7 +1432,7 @@ poly = "";
 };
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1513,7 +1513,7 @@ end = 100000;
 }
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1560,7 +1560,7 @@ in_report_type = [];
 instrument_type = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1615,7 +1615,7 @@ end = 255;
 level_category = [];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1632,7 +1632,7 @@ end
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The 
@@ -1879,7 +1879,7 @@ Auxiliary levels generated via interpolation from spanning levels
 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \end_layout
 
@@ -1899,7 +1899,7 @@ height "1pt"
 obs_grib_code = ['SPFH', 'TMP', 'HGT', 'UGRD', 'VGRD'];
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each PrepBufr message will likely contain multiple observation variables.
@@ -1940,7 +1940,7 @@ height "1pt"
 quality_mark_thresh = 2;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each observation has a quality mark value associated with it.
@@ -1975,7 +1975,7 @@ height "1pt"
 event_stack_flag = TOP;
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A PrepBufr message may contain duplicate observations with different quality
@@ -2000,26 +2000,26 @@ BOTTOM
  option uses the data closes to raw values.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 tmp_dir = '/tmp';
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The tmp_dir indicates where temporary files should be written.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 version = 'v5.1';
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The version indicates the version of the 
@@ -2044,7 +2044,7 @@ pb2nc
 PB2NC output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each NetCDF file generated by the PB2NC tool contains the dimensions and
@@ -2569,7 +2569,7 @@ Array of floats containing values for each PrepBufr message including:
 ASCII2NC tool
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section describes how to run the ASCII2NC tool.
@@ -2587,7 +2587,7 @@ ons, a configuration file may be specified.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The initial version of the ASCII2NC tool supports input ASCII point observation
@@ -2596,7 +2596,7 @@ The initial version of the ASCII2NC tool supports input ASCII point observation
  both little_r and SURFRAD formats.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The input ASCII point observation format consists of one row of data per
@@ -3044,7 +3044,7 @@ Observation value in units consistent with the GRIB code definition.
 ascii2nc usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Once the ASCII point observations have been formatted as expected, the ASCII
@@ -3089,14 +3089,14 @@ netcdf_file
 [ level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 ascii2nc has two required arguments and can take several optional ones.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for ascii2nc
 \end_layout
 
@@ -3210,7 +3210,7 @@ option directs output and errors to the specified log file.
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the 
@@ -3228,7 +3228,7 @@ ascii2nc sample_ascii_obs.txt
 sample_ascii_obs.nc
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the ASCII2NC tool will reformat the input 
@@ -3246,7 +3246,7 @@ sample_ascii_obs.nc
 MADIS2NC tool
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section describes how to run the MADIS2NC tool.
@@ -3272,7 +3272,7 @@ target "http://madis.noaa.gov."
 madis2nc usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for MADIS2NC tool is shown below:
@@ -3318,7 +3318,7 @@ out_file
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -3328,7 +3328,7 @@ madis2nc
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for madis2nc
 \end_layout
 
@@ -3441,7 +3441,7 @@ arguments for madis2nc
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the madis2nc calling sequence is shown below:
@@ -3455,7 +3455,7 @@ madis2nc sample_madis_obs.nc
 sample_madis_obs_met.nc -log madislog -v 3
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the MADIS2NC tool will reformat the input 
@@ -3476,7 +3476,7 @@ sample_madis_obs_met.nc
 Pcp-Combine tool
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section contains a description of running the Pcp-Combine tool.
@@ -3499,7 +3499,7 @@ ion time.
 pcp_combine usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the Pcp-Combine tool is shown below:
@@ -3533,7 +3533,7 @@ pcp_combine
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The arguments to 
@@ -3544,7 +3544,7 @@ pcp_combine
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Listed below are the arguments for the 
@@ -3619,7 +3619,7 @@ accum1
 out_file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Listed below are the arguments for the subtract command:
@@ -3649,11 +3649,11 @@ accum2
 out_file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for the pcp_combine
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 1.
@@ -3669,7 +3669,7 @@ Required arguments for the pcp_combine
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for pcp_combine
 \end_layout
 
@@ -3738,7 +3738,7 @@ level
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Required arguments for the pcp_combine sum command
@@ -3811,7 +3811,7 @@ out_file
 argument indicates the name for the NetCDF file to be written.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Optional arguments for pcp_combine sum command
 \end_layout
 
@@ -3867,7 +3867,7 @@ reg_exp
  expression which will speed up the run time.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for the pcp_combine add command
 \end_layout
 
@@ -3900,7 +3900,7 @@ in_accum1
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An arbitrary number of additional files and accumulations can be provided.
@@ -3908,7 +3908,7 @@ An arbitrary number of additional files and accumulations can be provided.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for the pcp_combine subtract command
 \end_layout
 
@@ -3999,13 +3999,13 @@ P500
 ;'.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the pcp_combine calling sequence is presented below:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Example 1:
 \end_layout
 
@@ -4029,7 +4029,7 @@ sample_fcst.nc
 -pcpdir ../data/sample_fcst/2005080700
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In Example 1, the Pcp-Combine tool will sum the values in model files initialize
@@ -4045,7 +4045,7 @@ sample_fcst.nc
  input files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Pcp-Combine tool will search for 8 files containing 3-hourly accumulation
@@ -4053,13 +4053,13 @@ The Pcp-Combine tool will search for 8 files containing 3-hourly accumulation
  It will write out a single NetCDF file containing that 24 hours of accumulation.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 A second example of the pcp_combine calling sequence is presented below:
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Example 2:
 \end_layout
 
@@ -4083,7 +4083,7 @@ sample_obs.nc
 -pcpdir ../data/sample_obs/ST2ml
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Example 2 shows an example of using the Pcp-Combine tool to sum observation
@@ -4107,7 +4107,7 @@ in_accum
  provides a different directory to be searched for the input files.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The Pcp-Combine tool will search for 24 files containing 1-hourly accumulation
@@ -4115,7 +4115,7 @@ The Pcp-Combine tool will search for 24 files containing 1-hourly accumulation
  It will write out a single NetCDF file containing that 24 hours of accumulation.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Example 3:
 \end_layout
 
@@ -4123,7 +4123,7 @@ Example 3:
 pcp_combine -add input_pinterp.nc 'name="TT"; level="(0,*,*)";' tt_10.ps 
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This command would grab the first level of the TT variable from a pinterp
@@ -4134,7 +4134,7 @@ This command would grab the first level of the TT variable from a pinterp
 pcp_combine output
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The output NetCDF files contain the requested accumulation intervals as
@@ -4145,7 +4145,7 @@ The output NetCDF files contain the requested accumulation intervals as
  of the output file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 Each NetCDF file generated by the Pcp-Combine tool contains the dimensions
@@ -4488,7 +4488,7 @@ Amount of precipitation for each point in the grid.
 MODIS regrid tool
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section contains a description of running the MODIS regrid tool.
@@ -4501,7 +4501,7 @@ This section contains a description of running the MODIS regrid tool.
 modis_regrid usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the modis_regrid utility is shown below:
@@ -4543,7 +4543,7 @@ Usage: modis_regrid
 modis_file
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -4666,7 +4666,7 @@ Optional arguments for modis_regrid
  specifies units string in the global attributes section of the output file.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the modis_regrid calling sequence is shown below:
@@ -4718,7 +4718,7 @@ modis_regrid -field Cloud_Fraction
 /home/joeuser/modis_regrid_test_data/modisfile
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the modis_regrid tool will process the input field from
@@ -4782,7 +4782,7 @@ Example plot showing surface temperature froma MODIS file.
 Gen-Vx-Mask tool
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \begin_inset Note Note
@@ -4811,7 +4811,7 @@ This section contains a description of running the Gen-Poly-Mask tool.
 gen_vx_mask usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the Gen-Poly-Mask tool is shown below:
@@ -4845,14 +4845,14 @@ netcdf_file
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 gen_poly_mask has required arguments and can take optional ones.
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for gen_vx_mask
 \end_layout
 
@@ -4942,7 +4942,7 @@ l
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the gen_poly_mask calling sequence is shown below:
@@ -4960,7 +4960,7 @@ CONUS.poly
 CONUS_poly.nc
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the Gen-Poly-Mask tool will apply the polyline defined
@@ -4985,7 +4985,7 @@ CONUS_poly.nc
 Plotting Utilities
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 This section describes how to check your data files using plotting utilities.
@@ -5003,7 +5003,7 @@ ield.
 plot_point_obs usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the plot_point_obs utility is shown below:
@@ -5045,7 +5045,7 @@ ps_file
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -5055,7 +5055,7 @@ plot_point_obs
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for plot_point_obs
 \end_layout
 
@@ -5163,7 +5163,7 @@ arguments for plot_point_obs
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the 
@@ -5177,7 +5177,7 @@ plot_point_obs
 plot_point_obs sample_pb.nc sample_data.ps
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the plot_point_obs tool will process the input 
@@ -5195,7 +5195,7 @@ sample_pb.ps
 plot_data_plane usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the plot_data_plane utility is shown below:
@@ -5237,7 +5237,7 @@ config_string
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -5247,7 +5247,7 @@ plot_data_plane
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for plot_data_plane
 \end_layout
 
@@ -5357,7 +5357,7 @@ l option indicates the desired level of verbosity.
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the plot_data_plane calling sequence is shown below:
@@ -5372,7 +5372,7 @@ or plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";' -v 4 (use
  -v4 to make sure it is grabbing the correct data)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In the first example, the plot_point_obs tool will process the input test.grb
@@ -5388,7 +5388,7 @@ test.ps
 plot_mode_field usage
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 The usage statement for the plot_mode_field utility is shown below:
@@ -5422,7 +5422,7 @@ mode_nc_file_list
 [-v level]
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 \emph on
@@ -5432,7 +5432,7 @@ plot_mode_field
  
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 Required arguments for plot_mode_field
 \end_layout
 
@@ -5522,7 +5522,7 @@ arguments for plot_mode_field
  while increasing the verbosity will increase the amount of logging.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 An example of the 
@@ -5537,7 +5537,7 @@ plot_mode_field -simple -obs -config plotMODEconfig mode_120000L_20050807_120000
 V_000000A_obj.nc
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Standard
 
 \series medium
 In this example, the plot_mode_field tool will plot simple objects from
