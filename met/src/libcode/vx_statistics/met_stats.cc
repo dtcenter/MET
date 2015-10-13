@@ -3585,7 +3585,7 @@ void subset_pairs(const NumArray &f_na, const SingleThresh &ft,
                   const NumArray &c_na, const SetLogic type,
                   NumArray &ff_na, NumArray &oo_na, NumArray &cc_na) {
    int i;
-   bool fcheck, ocheck, cflag;
+   bool cflag;
 
    if(f_na.n_elements() != o_na.n_elements()) {
       mlog << Error << "\nsubset_pairs() -> "

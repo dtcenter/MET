@@ -529,8 +529,7 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 int STATAnalysisJob::is_keeper(const STATLine & L) const {
-   int j, n, c;
-   double v;
+   int c;
 
    //
    // model

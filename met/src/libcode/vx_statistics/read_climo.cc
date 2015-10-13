@@ -72,17 +72,6 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    bool match_day;
    int i, time_step;
 
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-
-   VarInfoFactory info_factory;
-   VarInfo *cinfo = (VarInfo *) 0;
-
-   int vld_month, cur_month;
-   int vld_day, cur_day;
-   int year, hour, minute, second;
-   unixtime vld_ref, cur_ref;
-
    // Check for null
    if(!dict) return(dpa);
 

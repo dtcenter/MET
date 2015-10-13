@@ -1335,7 +1335,7 @@ void AsciiTable::line_up_decimal_points()
 
 {
 
-int r, c, n, k, w, len;
+int r, c, n, k;
 int max_left, max_right;
 int w_old, w_new;
 int * left = 0;
@@ -1392,7 +1392,7 @@ for (c=0; c<Ncols; ++c)  {
 
       n = rc_to_n(r, c);
 
-      len = (e[n] == (char *) 0 ? 0 : strlen(e[n]));
+      // len = (e[n] == (char *) 0 ? 0 : strlen(e[n]));
 
       k = max_right - right[r];
 

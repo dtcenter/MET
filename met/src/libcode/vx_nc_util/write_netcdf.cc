@@ -28,10 +28,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const int max_netcdf_int = 2147483647;
-
-///////////////////////////////////////////////////////////////////////////////
-
 extern void write_netcdf_latlon_1d(NcFile *, NcDim *, NcDim *, const Grid &);
 extern void write_netcdf_latlon_2d(NcFile *, NcDim *, NcDim *, const Grid &);
 
