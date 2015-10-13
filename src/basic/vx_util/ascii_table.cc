@@ -194,6 +194,8 @@ DeleteTrailingBlankRows = false;
 
 ElimTrailingWhitespace = true;
 
+DecimalPointsAligned = false;
+
 return;
 
 }
@@ -300,6 +302,8 @@ DoCommaString = a.DoCommaString;
 DeleteTrailingBlankRows = a.DeleteTrailingBlankRows;
 
 ElimTrailingWhitespace = a.ElimTrailingWhitespace;
+
+DecimalPointsAligned = a.DecimalPointsAligned;
 
 
 for (r=0; r<Nrows; ++r)  {
@@ -1412,6 +1416,8 @@ for (c=0; c<Ncols; ++c)  {
 if ( left  )  { delete [] left;   left  = 0; }
 if ( right )  { delete [] right;  right = 0; }
 
+DecimalPointsAligned = true;
+
 return;
 
 }
@@ -1457,7 +1463,7 @@ ostream & operator<<(ostream & out, AsciiTable & t)
 
 {
 
-// t.line_up_decimal_points();
+if ( !t.decimal_points_aligned() ) t.line_up_decimal_points();
 
 int j, r, c, n;
 int rmax;
