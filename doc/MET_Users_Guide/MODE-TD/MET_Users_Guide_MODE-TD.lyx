@@ -1583,7 +1583,7 @@ The Command Line
 \end_layout
 
 \begin_layout Standard
-The MTD usage statement is shown in Figure 1.8.
+The MTD usage statement is shown below.
  The command-line switches may be given in any order.
 \end_layout
 
@@ -1674,39 +1674,6 @@ hskip 0.5in    [ -log    file ]
 
 \backslash
 hskip 0.5in    [ -v      level ] }
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Usage
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename usage_fig.png
-	scale 70
-
-\end_inset
-
-
 \end_layout
 
 \end_inset

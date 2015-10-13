@@ -546,7 +546,7 @@ for (j=0; j<Nfields; ++j)  {
 
 }
 
-
+/*
 for (j=0; j<ncols; ++j)  {
 
    m = table.col_width(j);
@@ -558,7 +558,11 @@ for (j=0; j<ncols; ++j)  {
    table.set_entry(1, j, junk);
 
 };
+*/
 
+table.line_up_decimal_points();
+
+table.underline_row(1, underline_char);
 
 
    //
@@ -924,7 +928,7 @@ for (j=0; j<(valid_times.n_elements()); ++j)  {
    //
    //  underline
    //
-
+/*
 for (j=0; j<Ncols; ++j)  {
 
    m = table.col_width(j);
@@ -936,7 +940,11 @@ for (j=0; j<Ncols; ++j)  {
    table.set_entry(1, j, junk);
 
 };
+*/
 
+table.line_up_decimal_points();
+
+table.underline_row(1, underline_char);
 
 
    //

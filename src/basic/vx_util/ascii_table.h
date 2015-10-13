@@ -134,10 +134,10 @@ class AsciiTable {
 
       char PadChar;      //  pad character for table entries
 
-      int TableIndent;  //  how many blank spaces before each line of the table
-                        //  this has no effect on TableWidth
+      int TableIndent;   //  how many blank spaces before each line of the table
+                         //  this has no effect on TableWidth
 
-      bool FillBlank;   //  fill empty lines in the output with blanks?
+      bool FillBlank;    //  fill empty lines in the output with blanks?
 
       char ** e;   //  table entries
                    //  this is really a two-dimensional

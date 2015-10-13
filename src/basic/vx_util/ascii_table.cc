@@ -1457,7 +1457,7 @@ ostream & operator<<(ostream & out, AsciiTable & t)
 
 {
 
-t.line_up_decimal_points();
+// t.line_up_decimal_points();
 
 int j, r, c, n;
 int rmax;
