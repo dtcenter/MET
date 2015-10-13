@@ -586,9 +586,6 @@ void SingleThresh::set(const char *str)
 
 {
 
-int i, offset, found;
-char test_type[3], test_abbr[3];
-
    //
    // Check for bad data
    //

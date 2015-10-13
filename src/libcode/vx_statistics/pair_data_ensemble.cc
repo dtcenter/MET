@@ -480,7 +480,7 @@ double PairDataEnsemble::crpss() const {
       cmn_na.n_elements() == 0) return(bad_data_double);
 
    // Compute the climatology MSE relative to the observations
-   ccbar = oobar = cobar;
+   ccbar = oobar = cobar = 0.0;
    n = o_na.n_elements();
    for(i=0; i<n; i++) {
       if(is_bad_data(cmn_na[i])) return(bad_data_double);

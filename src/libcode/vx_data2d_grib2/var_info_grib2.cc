@@ -401,29 +401,32 @@ bool VarInfoGrib2::is_wind_direction() const {
 ////////////////////////////////////////////////////////////////////////
 
 LevelType VarInfoGrib2::g2_lty_to_level_type(int lt) {
+   LevelType t = LevelType_None; 
 
    //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
    switch( lt ){
       case   8: // Nominal Top of the Atmosphere
-         return LevelType_Accum;
+         t = LevelType_Accum;
          break;
 
       case 100: // Isobaric Surface
       case 108: // Level at Specified Pressure Difference from Ground to Level
-         return LevelType_Pres;
+         t = LevelType_Pres;
          break;
 
       case   1: // Ground or Water Surface
       case 101: // Mean Sea Level
       case 102: // Specific Altitude Above Mean Sea Level
       case 103: // Specified Height Level Above Ground
-         return LevelType_Vert;
+         t = LevelType_Vert;
          break;
 
       default:
-         return LevelType_None;
+         t = LevelType_None;
          break;
    }
+
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
