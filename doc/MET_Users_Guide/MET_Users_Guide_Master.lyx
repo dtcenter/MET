@@ -433,7 +433,13 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixB.lyx"
 \end_layout
 
 \begin_layout Standard
-placeholder for AppendixC
+\begin_inset CommandInset include
+LatexCommand include
+filename "fwd_refs_appendix/MET_Users_Guide_AppendixC.lyx"
+
+\end_inset
+
+
 \begin_inset Newpage pagebreak
 \end_inset
 
@@ -441,7 +447,13 @@ placeholder for AppendixC
 \end_layout
 
 \begin_layout Standard
-placeholder for AppendixD
+\begin_inset CommandInset include
+LatexCommand include
+filename "fwd_refs_appendix/MET_Users_Guide_AppendixD.lyx"
+
+\end_inset
+
+
 \end_layout
 
 \end_body
