@@ -1,0 +1,310 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\float_placement H
+\paperfontsize default
+\spacing onehalf
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip bigskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Chapter
+Regional Verification using Masking
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Verification over a particular region or area of interest may be performed
+ using 
+\begin_inset Quotes eld
+\end_inset
+
+masking
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The Gen-Vx-Mask tool replaces the Gen-Poly-Mask and Gen-Circle-Mask tool
+ in previous releases.
+ It may be run to create a bitmap verification masking region to be used
+ by many of the statistical tools.
+ This tool enables the user to generate a polyline masking region once for
+ a domain and apply it to many cases.
+ It has been enhanced to allow for more complex masking of regions (e.g.
+ tropical-cyclone track over water only).
+ An iterative approach is needed generate the more complex masking grids.
+\end_layout
+
+\begin_layout Section
+Gen-Vx-Mask tool
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+This section needs to be updated to reflect generalization of the tool
+\end_layout
+
+\end_inset
+
+This section contains a description of running the Gen-Poly-Mask tool.
+ The Gen-Poly-Mask tool may be run to create a bitmap verification masking
+ region to be used by the the Grid-Stat, Point-Stat, Ensemble-Stat, Series-Analy
+sis, MODE tools.
+ This tool enables the user to generate a polyline masking region once for
+ a domain and apply it to many cases.
+ When using a complex polyline containing hundreds of vertices, it is a
+ good idea to use the Gen-Poly-Mask tool to create a bitmap masking region
+ before running the other MET tools as doing so will make them run more
+ efficiently.
+\end_layout
+
+\begin_layout Subsection
+gen_vx_mask usage
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the Gen-Poly-Mask tool is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: gen_vx_mask
+\end_layout
+
+\begin_layout LyX-Code
+data_file
+\end_layout
+
+\begin_layout LyX-Code
+mask_poly
+\end_layout
+
+\begin_layout LyX-Code
+netcdf_file
+\end_layout
+
+\begin_layout LyX-Code
+[-name str]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+gen_poly_mask has required arguments and can take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+Required arguments for gen_vx_mask
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+data_file
+\series medium
+ argument indicates the name of a gridded data file that defines the domain
+ over which the masking bitmap is to be defined.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+mask_poly
+\series medium
+ argument indicates the name of the ASCII Lat/Lon polyline file defining
+ the masking region.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ The 
+\series bold
+netcdf_file
+\series medium
+ argument indicates the name given to the output NetCDF file.
+\end_layout
+
+\begin_layout Description
+Optional 
+\series bold
+arguments for gen_vx_mask
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+-name str
+\series medium
+ optional argument can be used to specify the output NetCDF variable name
+ to be used.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
+-log file
+\series medium
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ The 
+\series bold
+-v leve
+\series default
+l
+\series medium
+ option indicates the desired level of verbosity.
+ The value of "level" will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+An example of the gen_poly_mask calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+gen_vx_mask sample_fcst.grb
+\end_layout
+
+\begin_layout LyX-Code
+CONUS.poly
+\end_layout
+
+\begin_layout LyX-Code
+CONUS_poly.nc
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In this example, the Gen-Poly-Mask tool will apply the polyline defined
+ in the file 
+\emph on
+CONUS.poly
+\emph default
+ to the domain on which the data in the file 
+\emph on
+sample_fcst.grb
+\emph default
+ resides.
+ It will create a NetCDF file containing a bitmap for the domain with a
+ value of 1 for all grid points inside the CONUS polyline and a value of
+ 0 for all grid points outside.
+ It will write an output NetCDF file named 
+\emph on
+CONUS_poly.nc
+\end_layout
+
+\end_body
+\end_document
