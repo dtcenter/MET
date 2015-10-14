@@ -29,11 +29,11 @@ enum ThreshType {
    thresh_eq = 3,
    thresh_ne = 4,
    thresh_gt = 5,
-   thresh_ge = 6, 
+   thresh_ge = 6,
 
-   thresh_complex = -2, 
+   thresh_complex = -2,
 
-   no_thresh_type = -1, 
+   no_thresh_type = -1,
 
 };
 
@@ -45,8 +45,8 @@ static const char * const thresh_abbr_str[n_thresh_type] = {
    "na", "lt", "le", "eq", "ne", "gt", "ge"
 };
 
-static const int   thresh_default_precision = 3;
-static const char *thresh_default_sep = ",";
+static const int  thresh_default_precision = 3;
+static const char thresh_default_sep[]     = ",";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -220,7 +220,7 @@ class SingleThresh {
       SingleThresh();
       ~SingleThresh();
       SingleThresh(const SingleThresh &);
-      SingleThresh(const char *);      
+      SingleThresh(const char *);
       SingleThresh & operator=(const SingleThresh &);
 
       void dump(ostream &, int = 0) const;
