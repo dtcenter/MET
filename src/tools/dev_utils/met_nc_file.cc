@@ -47,7 +47,7 @@ MetNcFile::MetNcFile(const string &file_path) :
 {
 }
 
-  
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -66,7 +66,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
 			 vector< SDObservation > &observations)
 {
   static const string method_name = "MetNcFile::readFile()";
-  
+
   // Open the netCDF point observation file
 
   mlog << Debug(1) << "Opening netCDF file: " << _filePath << "\n";
@@ -80,7 +80,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
     _ncFile->close();
     delete _ncFile;
     _ncFile = (NcFile *) 0;
-    
+
     return false;
   }
 
@@ -99,7 +99,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   _hdrSidVar = _ncFile->get_var("hdr_sid");
   _hdrVldVar = _ncFile->get_var("hdr_vld");
   _obsArrVar = _ncFile->get_var("obs_arr");
-  
+
   if (!_hdrArrDim || !_hdrArrDim->is_valid() ||
       !_obsArrDim || !_obsArrDim->is_valid() ||
       !_nhdrDim    || !_nhdrDim->is_valid()    ||
@@ -118,7 +118,6 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
   // Allocate space to store the data
 
-  float *hdr_arr = new float[_hdrArrDim->size()];
   float *obs_arr = new float[_obsArrDim->size()];
 
   mlog << Debug(2) << "Processing " << _nobsDim->size() << " observations at "
@@ -145,7 +144,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
     int grib_code = nint(obs_arr[1]);
 
     // Check if we want to plot this variable type.
-    
+
     if (grib_code != desired_grib_code)
       continue;
 
@@ -160,7 +159,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
       return false;
     }
     string message_type = message_type_buffer;
-    
+
     if (message_type != desired_message_type)
       continue;
 
@@ -175,10 +174,10 @@ bool MetNcFile::readFile(const int desired_grib_code,
       return false;
     }
     string station_id = station_id_buffer;
-    
+
     if (station_id != desired_station_id)
       continue;
-    
+
     // Get the corresponding header valid time
 
     char hdr_vld_buffer[max_str_len];
@@ -194,9 +193,13 @@ bool MetNcFile::readFile(const int desired_grib_code,
     // If we get here, this is an observation that we want to use
 
     SDObservation obs(hdr_vld_buffer, obs_arr[4]);
-    
+
     observations.push_back(obs);
    } // end for i
+
+  // Cleanup
+
+  if (obs_arr) { delete obs_arr; obs_arr = (float *) 0; }
 
   return true;
 }

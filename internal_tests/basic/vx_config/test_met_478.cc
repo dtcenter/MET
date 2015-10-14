@@ -63,8 +63,6 @@ if ( dup2(1, 2) < 0 )  {
 
 config.set_debug(debug);
 
-bool status = false;
-
    //
    //
    //

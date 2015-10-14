@@ -20,20 +20,20 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 // Constants
-static const char  *default_model       = "GSI";
-static const int    default_lead        = 0;
-static const char  *default_lev         = na_str;
-static const char  *default_obtype      = na_str;
-static const char  *default_vx_mask     = na_str;
-static const char  *default_interp_mthd = na_str;
-static const int    default_interp_wdth = 0;
-static const char  *default_thresh      = na_str;
-static const double default_alpha       = bad_data_double;
+static const char   default_model[]       = "GSI";
+static const int    default_lead          = 0;
+static const char   default_lev[]         = "NA";
+static const char   default_obtype[]      = "NA";
+static const char   default_vx_mask[]     = "NA";
+static const char   default_interp_mthd[] = "NA";
+static const int    default_interp_wdth   = 0;
+static const char   default_thresh[]      = "NA";
+static const double default_alpha         = bad_data_double;
 
-static const int    bad_setup_qc        = -999;
-static const char  *key_sep             = ":";
+static const int    bad_setup_qc          = -999;
+static const char   key_sep[]             = ":";
 
-static const char  *conv_id_str         = "conv";
+static const char   conv_id_str[]         = "conv";
 
 static const char  *micro_id_str [] = {
    "amsua", "amsub", "mhs",

@@ -604,7 +604,7 @@ if ( !(var->set_cur(0, 0, 0)) )  {
 
 }
 
-const time_t t_start = time(0);   //  for timing the data read operation
+// const time_t t_start = time(0);   //  for timing the data read operation
 
 if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
 
@@ -614,7 +614,7 @@ if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
 
 }
 
-const time_t t_stop = time(0);   //  for timing the data read operation
+// const time_t t_stop = time(0);   //  for timing the data read operation
 
 // mlog << Debug(5) << "\n\n  MtdFloatFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
@@ -689,7 +689,7 @@ if ( !(data_var->set_cur(0, 0, 0)) )  {
 
 }
 
-const time_t t_start = time(0);   //  for timing the data write operation
+// const time_t t_start = time(0);   //  for timing the data write operation
 
 if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
 
@@ -700,7 +700,7 @@ if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
 }
 
 
-const time_t t_stop = time(0);   //  for timing the data write operation
+// const time_t t_stop = time(0);   //  for timing the data write operation
 
 // mlog << Debug(5) << "\n\n  MtdFloatFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 

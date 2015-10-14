@@ -9,7 +9,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// Commenting out functionality for Angstrom - We are pulling back on 
+// Commenting out functionality for Angstrom - We are pulling back on
 // this until we have a use case.
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,9 +72,9 @@ bool AeronetHandler::isFileType(LineDataFile &ascii_file) const
   // Initialize the return value.
   //
   bool is_file_type = false;
-  
+
   //
-  // Read the first, second, and third lines from the file.  We will 
+  // Read the first, second, and third lines from the file.  We will
   // skip these line since we don't know how many tokens they will have.
   //
   DataLine dl;
@@ -83,19 +83,19 @@ bool AeronetHandler::isFileType(LineDataFile &ascii_file) const
   ascii_file >> dl;
   ascii_file >> dl;
 
-  // 
+  //
   // Read the fourth line in the file.  It should start with AOD Level.
   //
   ascii_file >> dl;
   string line = dl.get_line();
   line = line.substr(0, 9);
-  
+
   if (strcmp(line.c_str(), "AOD Level") == 0)
     is_file_type = true;
 
   return is_file_type;
 }
-  
+
 
 ////////////////////////////////////////////////////////////////////////
 // Private/Protected methods
@@ -111,11 +111,11 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 
   if (!_readHeaderInfo(ascii_file))
     return false;
-   
+
   //
   // Get the Level number from the fourth header line
   //
-  
+
   ascii_file >> data_line;
   ConcatString dl_string(data_line[0]);
   StringArray tokens = dl_string.split(" ");
@@ -126,14 +126,14 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   //
 
   ascii_file >> data_line;
-  StringArray hdr_tokens; 
+  StringArray hdr_tokens;
   IntArray process_flag;
 
   hdr_tokens.parse_css(data_line.get_line());
 
   string aot = "AOT";
   //string angstrom = "Angstrom";
-  
+
   for (int j = 0; j < hdr_tokens.n_elements(); j++)
   {
     string hdr_field = hdr_tokens[j];
@@ -153,12 +153,12 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     {
       process_flag.add(0);
     }
-  }  
+  }
 
   //
   // Process the observation lines
   //
-  data_line.set_delimiter(","); 
+  data_line.set_delimiter(",");
   while (ascii_file >> data_line)
   {
     //
@@ -173,11 +173,11 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 	   << NUM_OBS_COLS << ").\n\n";
       return false;
     }
-    
+
     //
     // Pull the valid time from the data line
     //
-    
+
     time_t valid_time = _getValidTime(data_line);
 
     if (valid_time == 0)
@@ -189,9 +189,9 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     for (int k = 0; k < process_flag.n_elements(); k++)
     {
       if (process_flag[k] == 1)
-      {	
+      {
 	string hdr_field = hdr_tokens[k];
-	int found_aot = hdr_field.find(aot);
+	size_t found_aot = hdr_field.find(aot);
 	//int found_angstrom = hdr_field.find(angstrom);
 	string height = "";
 
@@ -199,16 +199,16 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 	{
 	  height = hdr_field.substr((found_aot + 4), hdr_field.size() - 1);
 	}
-	
+
 	//if (found_angstrom != string::npos)
 	//{
-	//  int found_dash = hdr_field.find("-");
+	//  size_t found_dash = hdr_field.find("-");
 	//  if (found_dash != string::npos)
 	//  {
 	//    height = hdr_field.substr(0, found_dash);
 	//  }
 	//}
-	
+
 	double dlevel = bad_data_double;
 	double dheight = atoi(height.c_str());
 
@@ -221,14 +221,14 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 					 na_str,
 					 AOT_GRIB_CODE,
 					 dlevel, dheight,
-					 atof(data_line[k])));			     
+					 atof(data_line[k])));
       }
     }
   } // end while
 
   return true;
 }
-  
+
 ////////////////////////////////////////////////////////////////////////
 
 time_t AeronetHandler::_getValidTime(const DataLine &data_line) const
@@ -266,9 +266,9 @@ time_t AeronetHandler::_getValidTime(const DataLine &data_line) const
   time_struct.tm_hour = atoi(hour.c_str());
   time_struct.tm_min = atoi(min.c_str());
   time_struct.tm_sec = atoi(sec.c_str());
-  
+
   return timegm(&time_struct);
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -277,7 +277,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 {
   DataLine data_line;
   data_line.set_delimiter(",");
-  
+
   //
   // Skip the first two lines
   //
@@ -313,7 +313,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
   //
   // Get the stationId
   //
-  
+
   ConcatString stationId_string(data_line[0]);
   StringArray stationIdTokens = stationId_string.split("=");
   _stationId = stationIdTokens[stationIdTokens.n_elements()-1];
@@ -321,7 +321,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
   //
   // Get the stationLon
   //
-  
+
   ConcatString stationLon_string(data_line[1]);
   StringArray stationLonTokens = stationLon_string.split("=");
   _stationLon = atof(stationLonTokens[stationLonTokens.n_elements()-1]);
@@ -329,7 +329,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
   //
   // Get the stationLat
   //
-  
+
   ConcatString stationLat_string(data_line[2]);
   StringArray stationLatTokens = stationLat_string.split("=");
   _stationLat = atof(stationLatTokens[stationLatTokens.n_elements()-1]);
@@ -337,11 +337,11 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
   //
   // Get the stationAlt
   //
-  
+
   ConcatString stationAlt_string(data_line[3]);
   StringArray stationAltTokens = stationAlt_string.split("=");
   _stationAlt = atof(stationAltTokens[stationAltTokens.n_elements()-1]);
 
   return true;
-  
+
 }

@@ -43,10 +43,10 @@ static void do_cluster_id (NcFile & out, const MtdIntFile   &  id, const bool is
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_mtd_nc_output(const MtdNcOutInfo &  nc_info, const MM_Engine    & engine, 
+void do_mtd_nc_output(const MtdNcOutInfo &  nc_info, const MM_Engine    & engine,
                       const MtdFloatFile & fcst_raw, const MtdFloatFile & obs_raw,
                       const MtdIntFile   & fcst_obj, const MtdIntFile   & obs_obj,
-                      const MtdConfigInfo & config, 
+                      const MtdConfigInfo & config,
                       const char * output_filename)
 
 {
@@ -147,7 +147,7 @@ return;
 void do_mtd_nc_output(const MtdNcOutInfo &  nc_info,
                       const MtdFloatFile & raw,
                       const MtdIntFile   & obj,
-                      const MtdConfigInfo & config, 
+                      const MtdConfigInfo & config,
                       const char * output_filename)
 
 {
@@ -413,7 +413,7 @@ var->add_att("_FillValue", bad_data_int);
    //  create mapping array
    //
 
-const int n_clusters = e.n_composites();
+// const int n_clusters = e.n_composites();
 const int n_objects = ( is_fcst ? (e.n_fcst_simples()) : (e.n_obs_simples()) );
 
 // mlog << Debug(5) << "\n\n  " << n_clusters << " clusters\n\n";
