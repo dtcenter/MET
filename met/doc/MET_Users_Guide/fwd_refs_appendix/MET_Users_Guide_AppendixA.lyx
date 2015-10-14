@@ -195,14 +195,26 @@ A.
  
 \series medium
 First, look on our website 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.dtcenter.org/met/users"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/met/users
+\end_layout
 
 \end_inset
 
 .
- If that doesn't answer your question, then email: met_help@ucar.edu.
+ If that doesn't answer your question, then email: 
+\begin_inset CommandInset href
+LatexCommand href
+name "met_help@ucar.edu"
+type "mailto:"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -336,7 +348,15 @@ Where to get help
 
 \series medium
 If none of the above suggestions have helped solve your problem, help is
- available through: met_help@ucar.edu
+ available through: 
+\begin_inset CommandInset href
+LatexCommand href
+name "met_help@ucar.edu"
+type "mailto:"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -348,7 +368,15 @@ How to contribute code
 \series medium
 If you have code you would like to contribute, we will gladly consider your
  contribution.
- Please send email to: met_help@ucar.edu
+ Please send email to: 
+\begin_inset CommandInset href
+LatexCommand href
+name "met_help@ucar.edu"
+type "mailto:"
+
+\end_inset
+
+
 \end_layout
 
 \end_body
