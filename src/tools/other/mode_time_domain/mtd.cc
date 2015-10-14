@@ -424,6 +424,8 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       att_2.set_fcst();
 
+      att_2.set_valid_time(fcst_obj.start_time() + t*(fcst_obj.delta_t()));
+
       att_2.set_object_number(j + 1);   //  1-based
 
       att_2.set_time_index(t);
@@ -449,6 +451,8 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
       att_2 = calc_2d_single_atts(mask_2d, j + 1);
 
       att_2.set_obs();
+
+      att_2.set_valid_time(obs_obj.start_time() + t*(obs_obj.delta_t()));
 
       att_2.set_object_number(j + 1);   //  1-based
 

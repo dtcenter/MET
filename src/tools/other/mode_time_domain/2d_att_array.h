@@ -11,19 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Warning:  This file is machine generated
-   //
-   //            Do not edit by hand
-   //
-   //
-   //  Created by arraygen on September 17, 2015   10:11 am   MDT
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #ifndef  __MTD_2D_ATT_ARRAY_H__
 #define  __MTD_2D_ATT_ARRAY_H__
 
@@ -83,6 +70,8 @@ class SingleAtt2DArray {
       SingleAtt2D & operator[](int) const;
 
       void patch_cluster_numbers(const MM_Engine &);
+
+      unixtime valid_time(int index) const;
 
 };
 

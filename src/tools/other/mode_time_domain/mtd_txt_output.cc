@@ -18,6 +18,7 @@ using namespace std;
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <cstdio>
 #include <cmath>
 
 #include "ascii_table.h"
@@ -390,6 +391,42 @@ for (j=0; j<n_total; ++j)  {
    r = j + 1;
 
    config.write_header_cols(table, r);
+
+}
+
+   //
+   //  overwrite the fcst valid and obs valid entries in the header columns
+   //
+
+char junk[512];
+const int fcst_valid_column = 3;   //  0-based
+const int  obs_valid_column = 5;   //  0-based
+int month, day, year, hour, minute, second;
+
+
+for (j=0; j<(fcst_att.n()); ++j)  {
+
+   r = j + 1;
+
+   unix_to_mdyhms(fcst_att.valid_time(j), month, day, year, hour, minute, second);
+
+   snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+
+   table.set_entry(r, fcst_valid_column, junk);
+   table.set_entry(r,  obs_valid_column, na_str);
+
+}
+
+for (j=0; j<(obs_att.n()); ++j)  {
+
+   r = fcst_att.n() + j + 1;
+
+   unix_to_mdyhms(obs_att.valid_time(j), month, day, year, hour, minute, second);
+
+   snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+
+   table.set_entry(r, fcst_valid_column, na_str);
+   table.set_entry(r,  obs_valid_column, junk);
 
 }
 

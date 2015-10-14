@@ -136,6 +136,8 @@ TimeIndex = -1;
 
 IsFcst = true;
 
+ValidTime = (unixtime) 0;
+
 return;
 
 }
@@ -168,6 +170,7 @@ CentroidLon = a.CentroidLon;
 
 IsFcst = a.IsFcst;
 
+ValidTime = a.ValidTime;
 
 return;
 
@@ -203,6 +206,7 @@ out << prefix << "ClusterNumber = " << ClusterNumber << "\n";
 out << prefix << "Area          = " << Area << "\n";
 out << prefix << "Centroid      = " << '(' << Xbar << ", " << Ybar << ")\n";
 out << prefix << "AxisAngle     = " << AxisAngle     << "\n";
+out << prefix << "ValidTime     = " << ValidTime     << "\n";
 
    //
    //  done
@@ -272,6 +276,20 @@ void SingleAtt2D::set_obs(bool tf)
 {
 
 IsFcst = !tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt2D::set_valid_time(const unixtime t)
+
+{
+
+ValidTime = t;
 
 return;
 
