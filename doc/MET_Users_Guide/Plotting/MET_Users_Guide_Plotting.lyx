@@ -86,7 +86,7 @@ Once MET has been applied to forecast and observed fields (or observing
  graphical and summary analyses can be performed depending on a specific
  user's needs.
  Here we give some examples of graphics and summary scores that one might
- wish to compute with the given output of MET.
+ wish to compute with the given output of MET and MET-TC.
  Any computing language could be used for this stage; some scripts will
  be provided on the MET users web page (
 \begin_inset CommandInset href
@@ -338,6 +338,159 @@ Circle histograms showing object centroid angles and distances (see text
 \end_layout
 
 \begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+TC-Stat tool example
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+There is a basic R script is located in the MET build in 
+\series default
+scripts/Rscripts/plot_tcmpr.R
+\series medium
+.
+ The usage statement with a short description of the options for 
+\emph on
+plot_tcmpr.R
+\emph default
+ can be obtained by typing: Rscript 
+\emph on
+plot_tcmpr.R
+\emph default
+ with no additional arguments.
+ The only required argument is the 
+\emph on
+-lookin
+\emph default
+ source, which is the path to the TC-Pairs TCST output files.
+ The R script reads directly from the TC-Pairs output, and calls TC-Stat
+ directly for filter jobs specified in the "
+\emph on
+-filter options
+\emph default
+" argument.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In order to run this script, the 
+\series default
+MET_BUILD_DIR
+\series medium
+ environment variable must be set to the top-level MET build directory.
+ In addition, the 
+\emph on
+tc_stat tool
+\emph default
+ must be in your path.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The supplied R script can generate a number of different plot types including
+ boxplots, mean, median, rank, and relative performance.
+ Pairwise differences can be plotted for the boxplots, mean, and median.
+ Normal confidence intervals are applied to all figures unless the no_ci
+ option is set to TRUE.
+ Below are two example plots generated from the tools.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Figure 6.1: Example boxplot from plot_tcmpr.R.
+ Track error distributions by lead time for three operational models GFNI,
+ GHMI, HFWI.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename fig12.4.jpg
+	scale 120
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\series medium
+Example boxplot from plot_tcmpr.R.
+ Track error distributions by lead time for three operational models GFNI,
+ GHMI, HFWI.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Figure 6.2: Example mean intensity error with confidence intervals at 95%
+ from plot_tcmpr.R.
+ Raw intensity error by lead time for a homogeneous comparison of two operationa
+l models GHMI, HWFI.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename fig12.5.jpg
+	scale 120
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\series medium
+Example mean intensity error with confidence intervals at 95% from plot_tcmpr.R.
+ Raw intensity error by lead time for a homogeneous comparison of two operationa
+l models GHMI, HWFI.
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
