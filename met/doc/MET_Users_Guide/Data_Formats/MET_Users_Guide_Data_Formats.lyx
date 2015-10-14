@@ -4494,7 +4494,18 @@ MODIS regrid tool
 This section contains a description of running the MODIS regrid tool.
  This tool may be run to create a NetCDF file for use in other MET tools
  from MODIS level 2 cloud product from NASA.
- The data browser for these files is: http://ladsweb.nascom.nasa.gov/ .
+ The data browser for these files is: 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ladsweb.nascom.nasa.gov/
+\end_layout
+
+\end_inset
+
+ .
 \end_layout
 
 \begin_layout Subsection
