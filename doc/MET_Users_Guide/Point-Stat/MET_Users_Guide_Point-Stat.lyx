@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass book
@@ -12,13 +12,13 @@
 \font_roman default
 \font_sans default
 \font_typewriter default
+\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -26,19 +26,28 @@
 \index_command default
 \float_placement H
 \paperfontsize default
-\spacing single
+\spacing onehalf
 \use_hyperref false
 \papersize default
 \use_geometry true
-\use_amsmath 1
-\use_esint 1
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -174,7 +183,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Diagram illustrating matching and interpolation methods used in MET.
@@ -208,7 +217,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Illustration of some matching and interpolation methods used in MET.
@@ -478,7 +487,6 @@ status open
 
 \begin_layout Plain Layout
 
-\series medium
 $
 \backslash
 alpha, 
@@ -2690,7 +2698,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Header information for each file point-stat outputs.
@@ -2704,9 +2712,9 @@ Header information for each file point-stat outputs.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="23" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
-<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="9cm">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -3407,7 +3415,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for FHO (Forecast, Hit rate, Observation rate) output
@@ -3422,10 +3430,10 @@ Format information for FHO (Forecast, Hit rate, Observation rate) output
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -3660,7 +3668,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for CTC (Contingency Table Count) output line type.
@@ -3674,10 +3682,10 @@ Format information for CTC (Contingency Table Count) output line type.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -3941,7 +3949,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 
@@ -3957,7 +3965,7 @@ Format information for CTS (Contingency Table Statistics) output line type.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -4954,7 +4962,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 
@@ -4970,7 +4978,7 @@ Format information for CNT(Continuous Statistics) output line type.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.2cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -5020,7 +5028,7 @@ Column Number
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 CNT Column Name
 \end_layout
 
@@ -5029,7 +5037,7 @@ CNT Column Name
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Standard
+\begin_layout Plain Layout
 Description
 \end_layout
 
@@ -5928,7 +5936,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for MCTC (Multi-category Contingency Table Count) output
@@ -5943,7 +5951,7 @@ Format information for MCTC (Multi-category Contingency Table Count) output
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -6149,7 +6157,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for MCTS (Multi- category Contingency Table Statistics)
@@ -6164,7 +6172,7 @@ Format information for MCTS (Multi- category Contingency Table Statistics)
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -6477,7 +6485,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for PCT (Contingency Table Counts for Probabilistic forecasts
@@ -6492,7 +6500,7 @@ Format information for PCT (Contingency Table Counts for Probabilistic forecasts
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.5cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -6786,7 +6794,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for PSTD (Contingency Table Statistics for Probabilistic
@@ -6801,7 +6809,7 @@ Format information for PSTD (Contingency Table Statistics for Probabilistic
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.2cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -7196,7 +7204,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for PJC (Joint and Conditional factorization for Probabilisti
@@ -7211,7 +7219,7 @@ c forecasts) output line type.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.5cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -7625,7 +7633,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for PRC (PRC for Receiver Operating Characteristic for
@@ -7640,7 +7648,7 @@ Format information for PRC (PRC for Receiver Operating Characteristic for
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -7934,7 +7942,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for SL1L2 (Scalar Partial Sums) output line type.
@@ -7948,7 +7956,7 @@ Format information for SL1L2 (Scalar Partial Sums) output line type.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -8269,7 +8277,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line
@@ -8284,7 +8292,7 @@ Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -8606,7 +8614,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for VL1L2 (Vector Partial Sums) output line type.
@@ -8620,7 +8628,7 @@ Format information for VL1L2 (Vector Partial Sums) output line type.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -8971,7 +8979,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for VAL1L2 (Vector Anomaly Partial Sums) output line
@@ -8986,7 +8994,7 @@ Format information for VAL1L2 (Vector Anomaly Partial Sums) output line
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -9337,7 +9345,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for MPR (Matched Pair) output line type.
@@ -9351,7 +9359,7 @@ Format information for MPR (Matched Pair) output line type.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
