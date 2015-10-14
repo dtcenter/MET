@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -230,10 +230,14 @@ Three external libraries are required for compiling/building MET and should
  NCEP's BUFRLIB is used by MET to decode point-based observation datasets
  in PrepBufr format.
  BUFRLIB is distributed and supported by NCEP and is freely available for
- download from NCEP's website at
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB"
+ download from NCEP's website at 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB
+\end_layout
 
 \end_inset
 
@@ -250,9 +254,13 @@ target "http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB"
  NetCDF files.
  NetCDF libraries are distributed and supported by Unidata and are freely
  available for download from Unidata's website at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.unidata.ucar.edu/software/netcdf"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.unidata.ucar.edu/software/netcdf
+\end_layout
 
 \end_inset
 
@@ -271,9 +279,13 @@ target "http://www.unidata.ucar.edu/software/netcdf"
  intervals.
  GSL is distributed and supported by the GNU Software Foundation and is
  freely available for download from the GNU website at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.gnu.org/software/gsl"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.gnu.org/software/gsl
+\end_layout
 
 \end_inset
 
@@ -295,9 +307,13 @@ Two additional utilities are strongly recommended for use with MET:
  model output prior to verifying the model forecasts with MET.
  The Unified Post-Processor is freely available for download from the "downloads
 " section of the WRF-NMM user's website at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.dtcenter.org/wrf-nmm/users"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/wrf-nmm/users
+\end_layout
 
 \end_inset
 
@@ -442,9 +458,13 @@ Compiling the BUFRLIB using the Intel icc and ifort compilers consists of
  Users may also find some utilities built for NetCDF such as ncdump and
  ncview useful for viewing the contents of NetCDF files.
  Detailed installation instructions are available from Unidata at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-install/"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-install/
+\end_layout
 
 \end_inset
 
@@ -463,9 +483,13 @@ target "http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-install/"
  When installing GSL from a precompiled package on Debian Linux, the developer's
  version of GSL must be used; otherwise, use the GSL version available from
  the GNU website (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.gnu.org/software/gsl/"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.gnu.org/software/gsl/
+\end_layout
 
 \end_inset
 
@@ -483,9 +507,13 @@ target "http://www.gnu.org/software/gsl/"
  Library in C (g2clib) must be installed, along with jasperlib, libpng,
  and zlib.
  (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
+\end_layout
 
 \end_inset
 
@@ -498,16 +526,24 @@ target "http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2"
 5.
  Users wishing to compile MODIS-regrid will need to install both the HDF4
  and HDF-EOS2 libraries available from the HDF group websites (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.hdfgroup.org/products/hdf4"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.hdfgroup.org/products/hdf4
+\end_layout
 
 \end_inset
 
 ) and (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.hdfgroup.org/hdfeos.html"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.hdfgroup.org/hdfeos.html
+\end_layout
 
 \end_inset
 
@@ -521,25 +557,37 @@ target "http://www.hdfgroup.org/hdfeos.html"
  The MODE-Graphics utility requires Cairo and FreeType.
  Thus, users who wish to compile this utility must install both libraries,
  available from (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://cairographics.org/releases"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://cairographics.org/releases
+\end_layout
 
 \end_inset
 
 ) and (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.freetype.org/download.html"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.freetype.org/download.html
+\end_layout
 
 \end_inset
 
 ).
  In addition, users will need to download Ghostscript font data required
  at runtime (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://sourceforge.net/projects/gs-fonts"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://sourceforge.net/projects/gs-fonts
+\end_layout
 
 \end_inset
 
@@ -569,9 +617,13 @@ As described in the introduction to this chapter, two additional utilities
  and use the Unified Post-Processor.
  Installation instructions for the Unified Post-Processor can be found in
  Chapter 7 of the WRF-NMM User's Guide or online at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.dtcenter.org/wrf-nmm/users/docs/user_guide/V3/users_guide_nmm_chap7.pdf"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/wrf-nmm/users/docs/user_guide/V3/users_guide_nmm_chap7.pdf
+\end_layout
 
 \end_inset
 
