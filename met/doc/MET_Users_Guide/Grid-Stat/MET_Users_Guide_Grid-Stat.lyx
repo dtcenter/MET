@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass book
@@ -12,13 +12,13 @@
 \font_roman default
 \font_sans default
 \font_typewriter default
+\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -26,19 +26,28 @@
 \index_command default
 \float_placement H
 \paperfontsize default
-\spacing single
+\spacing onehalf
 \use_hyperref false
 \papersize default
 \use_geometry true
-\use_amsmath 1
-\use_esint 1
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -1893,7 +1902,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Header information for each file grid-stat outputs.
@@ -1907,7 +1916,7 @@ Header information for each file grid-stat outputs.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="23" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.5in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4in">
@@ -2621,7 +2630,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for NBRCTC (Neighborhood Contingency Table Counts) output
@@ -2636,7 +2645,7 @@ Format information for NBRCTC (Neighborhood Contingency Table Counts) output
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.5in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4in">
@@ -2913,7 +2922,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for NBRCTS (Neighborhood Contingency Table Statistics)
@@ -2928,7 +2937,7 @@ Format information for NBRCTS (Neighborhood Contingency Table Statistics)
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.5in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4in">
@@ -3947,7 +3956,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Format information for NBRCNT(Neighborhood Continuous Statistics) output
@@ -3962,7 +3971,7 @@ Format information for NBRCNT(Neighborhood Continuous Statistics) output
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1.7cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="10cm">
@@ -4370,7 +4379,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Dimensions defined in NetCDF matched pair output.
@@ -4384,8 +4393,8 @@ Dimensions defined in NetCDF matched pair output.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="10cm">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -4507,7 +4516,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Variables defined in NetCDF matched pair output.
@@ -4521,9 +4530,9 @@ Variables defined in NetCDF matched pair output.
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="4.5cm">
-<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="9cm">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
