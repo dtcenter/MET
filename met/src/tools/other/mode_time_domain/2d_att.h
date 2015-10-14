@@ -60,6 +60,8 @@ class SingleAtt2D {
 
       bool IsFcst;
 
+      unixtime ValidTime;
+
    public:
 
       SingleAtt2D();
@@ -89,6 +91,8 @@ class SingleAtt2D {
       void set_fcst (bool = true);
       void set_obs  (bool = true);
 
+      void set_valid_time(const unixtime);
+
          //
          //  get stuff
          //
@@ -112,6 +116,8 @@ class SingleAtt2D {
 
       bool is_fcst () const;
       bool is_obs  () const;
+
+      unixtime valid_time() const;
 
          //
          //  do stuff
@@ -151,6 +157,8 @@ inline double SingleAtt2D::axis() const { return ( AxisAngle ); }
 
 inline bool   SingleAtt2D::is_fcst() const { return (   IsFcst ); }
 inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
+
+inline unixtime SingleAtt2D::valid_time () const { return ( ValidTime ); }
 
 
 ////////////////////////////////////////////////////////////////////////

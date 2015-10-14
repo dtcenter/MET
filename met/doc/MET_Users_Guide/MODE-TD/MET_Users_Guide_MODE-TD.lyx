@@ -1901,10 +1901,20 @@ tt -v level}
 \end_inset
 
  gives the verbosity level.
- As with the {
+ As with the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
 \backslash
-co -log} option described above, this option is present in most of the MET
- tools.
+tt -log}
+\end_layout
+
+\end_inset
+
+ option described above, this option is present in most of the MET tools.
  Increasing this value causes more diagnostic output to be written to the
  screen (and also to the log file, if one has been specified).
  
