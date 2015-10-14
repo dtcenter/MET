@@ -686,19 +686,37 @@ Notices and Additional Terms
 The source of this material is the Research Applications Laboratory at the
  National Center for Atmospheric Research, a program of the University Corporati
 on for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with
- the National Science Foundation; ©2007 University Corporation for Atmospheric
- Research.
+ the National Science Foundation; ©2007-2015 University Corporation for
+ Atmospheric Research.
  All Rights Reserved." 
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\paragraph_spacing double
+
+\series bold
+\begin_inset Tabular
+<lyxtabular version="3" rows="1" columns="1">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top" width="6in">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
 The following notice shall be displayed on any scholarly works associated
  with, related to or derived from the Software: 
 \end_layout
 
-\begin_layout Subparagraph
+\begin_layout Plain Layout
 
-\series medium
+\shape italic
 "Model Evaluation Tools (MET) was developed at the National Center for Atmospher
 ic Research (NCAR) through grants from the National Science Foundation (NSF),
  the National Oceanic and Atmospheric Administration (NOAA), the United
@@ -706,12 +724,40 @@ ic Research (NCAR) through grants from the National Science Foundation (NSF),
  NCAR is sponsored by the United States National Science Foundation." 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\series medium
+\series bold
+If MET-TC is used, the following notice shall be displayed on any scholarly
+ works associated with, related to or derived from the Software:
+\end_layout
+
+\begin_layout Plain Layout
+
+\shape italic
+"Model Evaluation Tools - Tropical Cyclone (MET-TC) was developed at the
+ National Center for Atmospheric Research (NCAR) through a grant from the
+ National Oceanic and Atmospheric Administration (NOAA) through the Hurricane
+ Forecast Improvement Project (HFIP).
+ Model Evaluation Tools (MET) was developed through a grant from the United
+ States Air Force Weather Agency (AFWA).
+ NCAR is sponsored by the United States National Science Foundation."
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
 By using or downloading the Software, you agree to be bound by the terms
  and conditions of this Agreement.
- 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter*
@@ -727,6 +773,15 @@ We thank the the National Science Foundation (NSF), the National Oceanic
  and Atmospheric Administration (NOAA), the United States Air Force (AF),
  and the United States Department of Energy (DOE) for their support of this
  work.
+ Funding for the development of MET-TC is from the National Oceanic and
+ Atmospheric Administration (NOAA)'s Hurricane Forecast Improvement Project
+ (HFIP) through the Developmental Testbed Center (DTC).
+ The DTC is funded by the NOAA, the Air Force Weather Agency (AFWA), and
+ the National Science Foundation (NSF).
+ The National Center for Atmospheric Research (NCAR) is sponsored by NSF.
+ We would like to thank James Franklin at the National Hurricane Center
+ (NHC) for his insight into the original development of the existing NHC
+ verification software.
  Thanks also go to the staff at the Developmental Testbed Center for their
  help, advice, and many types of support.
  We are grateful to the individuals who participated in MET planning workshops
