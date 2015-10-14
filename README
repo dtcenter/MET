@@ -463,11 +463,16 @@ Version 5.1 Release Notes:
         - Update the vx_data2d_pinterp library to also read the output of the
           wrf_interp utility.
     - Summary of changes to existing line types:
-        - CNT: Add ANOM_CORR, ME2, and MSESS plus confidence limits columns.
-        - PSTD: Add BRIERCL and BSS columns.
-        - ORANK: Add ensemble mean (ENS_MEAN) and climatology (CLIMO) columns.
-        - RHIST: Add CRPSS column.
-        - TCST: Add 16 columns for the ADECK and BDECK values for RADP, RRP,
+        - CNT: Add columns for anomaly correlation (ANOM_CORR), mean error
+          squared (ME2), and the mean squared error skill score (MSESS) plus
+          confidence limits
+        - PSTD: Add columns for climatological brier score (BRIERCL) and brier
+          skill score (BSS).
+        - ORANK: Add columns for ensemble mean (ENS_MEAN) and climatology
+          (CLIMO).
+        - RHIST: Add column for continuous ranked probability skill score
+          (CRPSS).
+        - TCMPR: Add 16 columns for the ADECK and BDECK values for RADP, RRP,
           MRD, GUSTS, EYE, DIR, SPEED, and DEPTH.
 
 Version 5.0 Release Notes:
