@@ -119,9 +119,13 @@ New for MET v5.1
 \begin_layout Standard
 
 \series medium
-Users will notice the addition of six new tools for METv5.1.
- A list of these and other enhancements is included below.
- 
+METv5.1 includes several new tools and enhancements.
+ The six new tools are MODE Time Domain (mtd), regrid_data_plane, shift_data_pla
+ne, gen_vx_mask, gsid2mpr, and gsidens2mpr.
+ Major enhancments for this release include automated regridding of data,
+ generalized definition of thresholds, conditional continuous statistics,
+ and the expanded use of climatology data.
+ Additional details on these changes are listed below.
 \end_layout
 
 \begin_layout Subsection*
@@ -233,11 +237,10 @@ Replace references to "rapid_inten" with "rirw" to shorten command line
 \end_layout
 
 \begin_layout Itemize
-Redefined config file options landfall _beg and landfall_end as timestring
+Redefine config file options landfall _beg and landfall_end as timestring
  in HH[MMSS] format rather than an integer number of seconds, but make it
- backwards compatible.
-  If integer, interpret them as second.
-  If string, parse the timestring.
+ backward compatible.
+  Interpret integers as seconds and strings as timestrings.
 \end_layout
 
 \begin_layout Itemize
@@ -295,7 +298,7 @@ Add -out_wind_thresh job command option as a shortcut for -out_fcst_wind_thresh
 
 \begin_layout Itemize
 Add -column_thresh job command option to be consistent with other tools,
- but retain -column_min, -column_max, and -column_eq for backwards compatibility.
+ but retain -column_min, -column_max, and -column_eq for backward compatibility.
 \end_layout
 
 \end_deeper
@@ -479,25 +482,26 @@ Summary of changes to existing line types
 
 \begin_deeper
 \begin_layout Itemize
-CNT: Add ANOM_CORR, ME2, and MSESS plus confidence limits to Grid-Stat,
- Point-Stat, and Series-Analysis.
+CNT: Add columns for anomaly correlation (ANOM_CORR), mean error squared
+ (ME2), and the mean squared error skill score (MSESS) plus confidence limits.
 \end_layout
 
 \begin_layout Itemize
-PSTD: Add BRIERCL and BSS output columns.
+PSTD: Add columns for climatological brier score (BRIERCL) and brier skill
+ score (BSS).
 \end_layout
 
 \begin_layout Itemize
-ORANK: Add ensemble mean (ENS_MEAN) and climatology (CLIMO) to the end of
- the ORANK line type.
+ORANK: Add columns for ensemble mean (ENS_MEAN) and climatology (CLIMO)
+ columns.
 \end_layout
 
 \begin_layout Itemize
-RHIST: Add CRPSS.
+RHIST: Add column continuous ranked probability skill score (CRPSS).
 \end_layout
 
 \begin_layout Itemize
-TCST: Add 16 columns for the ADECK and BDECK values for RADP, RRP, MRD,
+TCMPR: Add 16 columns for the ADECK and BDECK values for RADP, RRP, MRD,
  GUSTS, EYE, DIR, SPEED, and DEPTH.
 \end_layout
 
