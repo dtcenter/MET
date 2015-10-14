@@ -1,4 +1,4 @@
-Model Evaluation Tools METv5.1 (August 2015)
+Model Evaluation Tools METv5.1 (October 2015)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -111,6 +111,8 @@ Dependencies
       - http://www.unidata.ucar.edu/software/netcdf
    - GNU Scientific Library (GSL), developer's version
       - http://www.gnu.org/software/gsl
+   - Zlib
+      - http://www.zlib.net
    - NCEP's BUFRLIB Library, if wishing to compile PB2NC
       - http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB
    - NCEP's GRIB2 Library in C (g2clib), if wishing to compile GRIB2 support
@@ -184,7 +186,7 @@ sub-directory, or the MET Online Tutorial:
      directory, or set $MET_FREETYPEINC to point to the directory with the
      FreeType include files and set $MET_FREETYPELIB to point to the directory
      with the FreeType library files.
-   
+
    - When running MODE Graphics, set $MET_FONT_DIR to the directory containing
      font data required at runtime.  A link to the tarball containing this font
      data can be found on the MET website.
@@ -202,6 +204,10 @@ sub-directory, or the MET Online Tutorial:
   --enable-grib2
       Enable compilation of utilities using GRIB2
 
+  --disable-block4
+      Disable use of BLOCK4 in the compilation. Use this
+      if you have trouble using PrepBufr files.
+
   --disable-ascii2nc
       Disable compilation of ascii2nc
 
@@ -213,7 +219,7 @@ sub-directory, or the MET Online Tutorial:
 
   --disable-grid_stat
       Disable compilation of grid_stat
- 
+
   --disable-madis2nc
       Disable compilation of madis2nc
 
@@ -232,14 +238,11 @@ sub-directory, or the MET Online Tutorial:
   --disable-plot_data_plane
       Disable compilation of plot_data_plane
 
-  --disable-plot_point_obs
-      Disable compilation of plot_point_obs
-
-  --disable-gsi_tools
-      Disable compilation of gsi_tools 
-
   --disable-regrid_data_plane
       Disable compilation of regrid_data_plane
+
+  --disable-plot_point_obs
+      Disable compilation of plot_point_obs
 
   --disable-point_stat
       Disable compilation of point_stat
@@ -265,18 +268,11 @@ sub-directory, or the MET Online Tutorial:
   --disable-mode_time_domain
       Disable compilation of mode_time_domain
 
-  --disable-gsi_tools
-      Disable compilation of gsi_tools
-
-  --disable-regrid_data_plane
-      Disable compilation of regrid_data_plane
-
   --disable-tc_utils
       Disable compilation of tc_utils
 
-  --disable-block4
-      Disable use of BLOCK4 in the compilation. Use this
-      if you have trouble using PrepBufr files.
+  --disable-gsi_tools
+      Disable compilation of gsi_tools
 
   So, to configure MET to install all of the available tools in the "bin"
   subdirectory of your current directory, you would use the following command:
@@ -291,15 +287,18 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 23 executables:
+  command line) will contain 26 executables:
    - ascii2nc
    - ensemble_stat
    - gen_vx_mask
    - grid_stat
+   - gsid2mpr
+   - gsidens2orank
    - madis2nc
    - mode
    - mode_analysis
    - modis_regrid
+   - mtd
    - pb2nc
    - pcp_combine
    - plot_data_plane
@@ -338,6 +337,138 @@ Release Notes
 
 Version 5.1 Release Notes:
 -------------------------
+
+- What's New:
+    - METv5.1 includes several new tools and enhancements:
+      - New Tools: MODE Time Domain (mtd), regrid_data_plane, shift_data_plane,
+        gen_vx_mask, gsid2mpr, and gsidens2mpr
+      - Major Enhancments: Automated regridding of data, generalized definition
+        of thresholds, conditional continuous statistics, and the expanded use
+        of climatology data
+
+- New Tools:
+    - The mtd (MODE Time Domain) tool runs on time-series of gridded data fields
+      to define 3-dimensional space-time objects.
+    - The regrid_data_plane tool regrids one or more gridded data fields to the
+      user-defined output grid.
+    - The shift_data_plane tool reads a single gridded data field and applies a
+      rigid shift defined by source and destination lat/lon values.
+    - The gen_vx_mask tool replaces the gen_poly_mask and gen_circle_mask tools
+      and adds support for track masking and accumulating multiple masks
+      together.
+    - The gsid2mpr tool reads one or more binary GSI diagnostic files and
+      reformats them into the MPR line type for further analysis by the
+      STAT-Analysis tool.
+    - The gsidens2orank tool reads an ensemble of binary GSI diagnostic files
+      and reformats them into the ORANK line type for further analysis by the
+      STAT-Analysis tool.
+
+- Enhancements to Existing Tools:
+    - Distribute the latest set of bugfixes, details not listed here.
+    - ASCII2NC
+        - Add support for WWSIS data.
+        - Add support AERONET observations.
+    - MADIS2NC
+        - Add support for acarsProfiles data, as provided to MET by AER.
+    - TC-Pairs
+        - Reduce the minimum number of required input ATCF columns from 18 to 8.
+        - Add 16 columns to the TCST output line type for the ADECK and BDECK
+          values for RADP, RRP, MRD, GUSTS, EYE, DIR, SPEED, and DEPTH.
+    - TC-Stat
+        - Add rapid intensification and weakening (RIRW) event category job
+          type.
+        - Replace references to "rapid_inten" with "rirw" to shorten command
+          line and config file options.
+        - Redefined config file options landfall _beg and landfall_end as
+          timestring in HH[MMSS] format rather than an integer number of
+          seconds, but make it backward compatible.  Interpret integers as
+          seconds and strings as timestrings.
+        - Add support for reading and filtering extra columns of data at the end
+          of the input ASCII files.
+    - Stat-Analysis
+        - When passed a directory, search for .stat files.  When passed a file
+          name, read it regardless of the extension.
+        - Add support for reading and filtering extra columns of data at the end
+          of the input ASCII files.
+        - Add new ramp job type based on DYDT logic or the swinging door
+          algorithm.
+        - Add swinging door algorithm to the new vx_time_series library.
+        - Add -out_stat output to write aggregated actual STAT lines.
+        - Add -set_hdr option to explicitly set output STAT header column
+          values.
+        - Add support for ORANK to SSVAR aggregate_stat job type.
+        - Add -out_cnt_logic and -out_wind_logic job command options to handle
+          conditional continuous verification.
+        - Add -out_thresh job command option as a shortcut for -out_fcst_thresh
+          and -out_obs_thresh.
+        - Add -out_wind_thresh job command option as a shortcut for
+          -out_fcst_wind_thresh and -out_obs_wind_thresh.
+        - Add -column_thresh job command option to be consistent with other
+          tools, but retain -column_min, -column_max, and -column_eq for
+          backward compatibility.
+    - PCP-Combine
+        - Rename -varname command line option to -name to be consistent with
+          other MET tools.
+    - Grid-Stat
+        - Add SAL1L2 and VAL1L2 output line types.
+    - Series-Analysis
+        - Add SAL1L2 output statistics types.
+    - Automated regridding
+        - Add automated regridding support to the MET statistics tools to regrid
+          to verify on the forecast grid, observation grid, or an independent,
+          user-defined grid.
+        - Add regrid dictionary to the config files to define how regridding
+          should be performed.
+        - Add vx_regrid library to support automated regridding.
+    - Generalized thresholding:
+        - Generalized definition of thresholds across all the MET tools.  Use
+          && or || to string together event definition logic.
+    - Conditional continuous verification
+        - Add support for conditional continuous verification to Point-Stat,
+          Grid-Stat, Series-Analysis.
+        - Add cnt_thresh and cnt_logic config file options to specify what
+          filtering thresholds should be applied.
+    - Climatology Data
+        - Add support for reading climatology data to Point-Stat, Grid-Stat,
+          Ensemble-Stat, and Series-Analysis.
+        - Add climo_mean dictionary to the config files for these tools to
+          specify the climatology data to be read.
+        - Remove the -climo command line option from Point-Stat since the new
+          functionality replaces the old.
+        - Add anomaly correlation (ANOM_CORR) to the CNT line type.
+        - Add the climatology value (CLIMO) to ORANK line type.
+        - Add the climatology-based Brier score (BRIERCL) and the Brier Skill
+          Score (BSS) to the PSTD line type.
+        - Add the Continuous Ranked Probability Skill Score (CRPSS) to the RHIST
+          line type.
+    - ConfigConstants
+        - Add exit_on_warning option.  If true, any warning message results in
+          an error and returning of bad status.
+        - Add output_precision option to specify the number of non-zero decimal
+          places to be written to ASCII output files.
+    - File I/O Changes
+        - Improved logic when writing large unixtime values to NetCDF files.
+          Write them as strings rather than integers, which caused integer
+          overflow.
+        - Better handling of timing information and lat/lon dimensions from
+          CF-compliant NetCDF files.
+        - When writing gridded NetCDF output, write lat/lon variables for
+          lat/lon grids as 1-dimensional.  For all other projection types,
+          continue writing 2-dimensional lat/lon variables.
+        - Add obtype configuration entry to Grid-Stat, Ensemble-Stat,
+          Wavelet-Stat, MODE, and Series-Analysis.  It's string value is written
+          to the output files.
+        - Add Rscript to scripts directory named gspairs2mpr.R to read Grid-Stat
+          NetCDF matches pairs and write MPR output lines.
+        - Update the vx_data2d_pinterp library to also read the output of the
+          wrf_interp utility.
+    - Summary of changes to existing line types:
+        - CNT: Add ANOM_CORR, ME2, and MSESS plus confidence limits columns.
+        - PSTD: Add BRIERCL and BSS columns.
+        - ORANK: Add ensemble mean (ENS_MEAN) and climatology (CLIMO) columns.
+        - RHIST: Add CRPSS column.
+        - TCST: Add 16 columns for the ADECK and BDECK values for RADP, RRP,
+          MRD, GUSTS, EYE, DIR, SPEED, and DEPTH.
 
 Version 5.0 Release Notes:
 -------------------------
@@ -439,7 +570,7 @@ Version 5.0 Release Notes:
          the output file specified with the -dump_row option.
        - Enhanced the NetCDF output of MODE by adding convex hull polyline
          points.
-       - Add the model name as a global attribute to the NetCDF output of 
+       - Add the model name as a global attribute to the NetCDF output of
          Grid-Stat, Wavelet-Stat, Ensemble-Stat, MODE, and Series-Analysis.
        - Reduced the file size of the PostScript files generated by the MET
          tools by adding zlib compression.
@@ -519,7 +650,7 @@ Version 4.0 Release Notes:
 - What's New:
     - Users will notice two major upgrades for METv4.0:
       support for GRIB2 and a restructuring of the MET configuration files.
-    
+
 - Major Upgrades:
     - Added optional support for GRIB2.  This support depends on the external
       NCEP GRIB2 C-library.  Support for GRIB2 is enabled by setting the
@@ -982,7 +1113,7 @@ Version 1.0 Release Notes:
   - Modified the configuration file parser code.  The formats of all of the
     configuration files in MET have changed since the Beta release.  The
     version of the configuration files in the data/config or scripts/config
-    directories  must be used with METv1.0. 
+    directories  must be used with METv1.0.
 
 - PB2NC
   - Support message type strings "ANYAIR", "ANYSFC", and "ONLYSF".  See the
