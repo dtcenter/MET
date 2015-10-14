@@ -67,11 +67,11 @@ static const double default_mask_val = 1.0;
 ////////////////////////////////////////////////////////////////////////
 
 // Input data file, mask file, and output NetCDF file
-static ConcatString data_filename, mask_filename, out_filename;
+static ConcatString input_filename, mask_filename, out_filename;
 
 // Optional arguments
 static MaskType mask_type = default_mask_type;
-static ConcatString data_config_str, mask_config_str;
+static ConcatString input_config_str, mask_config_str;
 static SetLogic set_logic = SetLogic_None;
 static bool complement = false;
 static SingleThresh thresh;
@@ -90,7 +90,7 @@ static MetConfig config;
 ////////////////////////////////////////////////////////////////////////
 
 static void      process_command_line(int, char **);
-static void      process_data_file(DataPlane &dp);
+static void      process_input_file(DataPlane &dp);
 static void      process_mask_file(DataPlane &dp);
 static void      get_data_plane(Met2dDataFile *mtddf_ptr,
                                 const char *config_str, DataPlane &dp);
@@ -105,7 +105,7 @@ static DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask, Set
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
 static void      set_type(const StringArray &);
-static void      set_data_config(const StringArray &);
+static void      set_input_config(const StringArray &);
 static void      set_mask_config(const StringArray &);
 static void      set_complement(const StringArray &);
 static void      set_union(const StringArray &);
