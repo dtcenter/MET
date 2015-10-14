@@ -59,8 +59,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -76,6 +76,626 @@
 
 \begin_layout Chapter
 Plotting and Graphics Support
+\end_layout
+
+\begin_layout Section
+Plotting Utilities
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This section describes how to check your data files using plotting utilities.
+ Point observations can be plotted using the plot_point_obs utility.
+ A single model level can be plotted using the plot_data_plane utility.
+ For object based evaluations, the MODE objects can be plotted using plot_mode_f
+ield.
+ Occasionally, a postprocessing or timing error can lead to errors in MET.
+ These tools can assist the user by showing the data to be verified to ensure
+ that times and locations match up as expected.
+ 
+\end_layout
+
+\begin_layout Subsection
+plot_point_obs usage
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the plot_point_obs utility is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: plot_point_obs
+\end_layout
+
+\begin_layout LyX-Code
+nc_file
+\end_layout
+
+\begin_layout LyX-Code
+ps_file
+\end_layout
+
+\begin_layout LyX-Code
+[-gc code]
+\end_layout
+
+\begin_layout LyX-Code
+[-msg_typ name]
+\end_layout
+
+\begin_layout LyX-Code
+[-data_file name]
+\end_layout
+
+\begin_layout LyX-Code
+[-dotsize val]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\emph on
+plot_point_obs
+\emph default
+ has required arguments and can take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+Required arguments for plot_point_obs
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+nc_file
+\series medium
+ argument indicates the name of the file to be plotted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+ps_file
+\series medium
+ argument indicates the name given to the output file containing the plot.
+\end_layout
+
+\begin_layout Description
+Optional 
+\series bold
+arguments for plot_point_obs
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ The 
+\series bold
+-gc code
+\series medium
+ is the GRIB code(s) to be plotted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+-msg_typ name
+\series medium
+ is the message type(s) to be plotted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
+-data_file name
+\series medium
+ is a data file whose grid should be used for the plot.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ The 
+\series bold
+-dotsize val
+\series medium
+ option overrides the default dotsize value (1).
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ The 
+\series bold
+-log file
+\series medium
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ The 
+\series bold
+-v level
+\series medium
+ option indicates the desired level of verbosity.
+ The value of "level" will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+An example of the 
+\emph on
+plot_point_obs
+\emph default
+ calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+plot_point_obs sample_pb.nc sample_data.ps
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In this example, the plot_point_obs tool will process the input 
+\series default
+sample_pb.nc
+\series medium
+ file write a postscript file containing a plot to a file named 
+\series default
+sample_pb.ps
+\series medium
+.
+\end_layout
+
+\begin_layout Subsection
+plot_data_plane usage
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the plot_data_plane utility is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: plot_data_plane
+\end_layout
+
+\begin_layout LyX-Code
+input_filename
+\end_layout
+
+\begin_layout LyX-Code
+output_filename
+\end_layout
+
+\begin_layout LyX-Code
+config_string
+\end_layout
+
+\begin_layout LyX-Code
+[-color_table color_table_name]
+\end_layout
+
+\begin_layout LyX-Code
+[-plot_range min max]
+\end_layout
+
+\begin_layout LyX-Code
+[-title title_string]
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\emph on
+plot_data_plane
+\emph default
+ has required arguments and can take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+Required arguments for plot_data_plane
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+input_filename
+\series medium
+ argument indicates the name of the gridded data file to be plotted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+output_filename
+\series medium
+ argument indicates the name given to the output PostScript file containing
+ the plot.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ The 
+\series bold
+config_string
+\series medium
+ argument contains information about the field and level to be plotted.
+\end_layout
+
+\begin_layout Description
+Optional 
+\series bold
+arguments for 
+\emph on
+plot_data_plane
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+-color_table color_table_name
+\series medium
+ overrides the default color table
+\begin_inset Newline newline
+\end_inset
+
+ ("$(MET_BASE)/colortables/met_default.ctable")
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
+-plot_range min max
+\series medium
+ sets the minimum and maximum values to plot.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ The 
+\series bold
+-title title_string
+\series medium
+ sets the title text for the plot.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ The 
+\series bold
+-log file
+\series medium
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ The 
+\series bold
+-v leve
+\series medium
+l option indicates the desired level of verbosity.
+ The value of "level" will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+An example of the plot_data_plane calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+plot_data_plane test.grb test.ps 'name="TMP"; level="Z2"; 
+\end_layout
+
+\begin_layout LyX-Code
+or 
+\end_layout
+
+\begin_layout LyX-Code
+plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";'
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-v 4 (use -v4 to make sure it is grabbing the correct data)
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In the first example, the plot_point_obs tool will process the input test.grb
+ file write a postscript file containing a plot to a file named 
+\series default
+test.ps
+\series medium
+ showing temperature at 2 meters.
+ The second example will show downward shortwave radiation flux at the surface.
+\end_layout
+
+\begin_layout Subsection
+plot_mode_field usage
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the plot_mode_field utility is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: plot_mode_field
+\end_layout
+
+\begin_layout LyX-Code
+mode_nc_file_list
+\end_layout
+
+\begin_layout LyX-Code
+-raw | -simple | -cluster
+\end_layout
+
+\begin_layout LyX-Code
+-obs | -fcst
+\end_layout
+
+\begin_layout LyX-Code
+-config file
+\end_layout
+
+\begin_layout LyX-Code
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+[-v level]
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\emph on
+plot_mode_field
+\emph default
+ has required arguments and can take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+Required arguments for plot_mode_field
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+mode_nc_file_list
+\series medium
+ specifies the MODE output files to be used for plotting.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+-raw | -simple | -cluster
+\series medium
+ argument indicates the types of field to be plotted.
+ Exactly one must be specified.
+ For details about the types of objects, see the chapter in this document
+ on MODE.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ The 
+\series bold
+-obs | -fcst
+\series medium
+ option specifies whether to plot the observed or forecast field from the
+ MODE output files.
+ Exactly one must be specified.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+-config file
+\series medium
+ specifies the configuration file to use for specification of plotting options.
+\end_layout
+
+\begin_layout Description
+Optional 
+\series bold
+arguments for plot_mode_field
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
+-log file
+\series medium
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ The 
+\series bold
+-v level
+\series medium
+ option indicates the desired level of verbosity.
+ The value of "level" will override the default .
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+An example of the 
+\emph on
+plot_mode_field
+\emph default
+ calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+plot_mode_field -simple -obs -config 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+plotMODEconfig mode_120000L_20050807_120000V_000000A_obj.nc
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In this example, the plot_mode_field tool will plot simple objects from
+ an observed precipitation field using parameters from the configuration
+ file plotMODEconfig and objects from the MODE output file 
+\emph on
+mode_120000L_20050807_120000V_000000A_obj.nc.
+
+\emph default
+ An example plot showing twelve simple observed precipitation objects is
+ shown below.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename fig3.2.png
+	scale 55
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Simple observed precipitation objects
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -99,6 +719,10 @@ target "http://www.dtcenter.org/met/users/"
 \end_layout
 
 \begin_layout Section
+Examples of plotting MET output
+\end_layout
+
+\begin_layout Subsection
 Grid-Stat tool examples
 \end_layout
 
@@ -120,21 +744,20 @@ The plots in Figure 12-1 show time series of frequency bias and Gilbert
 \end_layout
 
 \begin_layout Standard
-Figure 12-1: Time series of forecast area bias and Gilbert Skill Score for
- four model configurations (different lines) stratified by time-of-day.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename fig12.1.gif
+	scale 60
 
-\end_layout
+\end_inset
 
-\begin_layout Plain Layout
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -148,16 +771,6 @@ Time series of forecast area bias and Gilbert Skill Score for four model
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename fig12.1.gif
-	scale 60
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -166,7 +779,7 @@ Time series of forecast area bias and Gilbert Skill Score for four model
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 MODE tool examples
 \end_layout
 
@@ -222,23 +835,19 @@ Fig.
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-Figure 12-2: Traditional verification scores applied to output of the MODE
- tool, computed by defining matched observed objects to be hits, unmatched
- observed objects to be misses, and unmatched forecast objects to be false
- alarms; weighted by object area.
- Bar plots show numbers (pennultimate row) and areas (bottom row) of observed
- and forecast objects, respectively.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename fig12.2.gif
+	scale 60
+
+\end_inset
+
 
 \end_layout
 
@@ -253,16 +862,6 @@ Traditional verification scores applied to output of the MODE tool, computed
  Bar plots show numbers (pennultimate row) and areas (bottom row) of observed
  and forecast objects, respectively.
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename fig12.2.gif
-	scale 60
 
 \end_inset
 
@@ -301,11 +900,6 @@ In addition to the traditional scores, MODE output allows more information
 \end_layout
 
 \begin_layout Standard
-Figure 12-3: Circle histograms showing object centroid angles and distances
- (see text for explanation).
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
@@ -316,6 +910,13 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename fig12.3.jpg
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -329,15 +930,6 @@ Circle histograms showing object centroid angles and distances (see text
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename fig12.3.jpg
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -346,7 +938,7 @@ Circle histograms showing object centroid angles and distances (see text
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 TC-Stat tool example
 \end_layout
 
