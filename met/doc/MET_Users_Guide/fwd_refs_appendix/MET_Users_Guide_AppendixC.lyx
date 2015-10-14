@@ -28,7 +28,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -52,6 +52,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -102,11 +106,46 @@ The verification statistics for dichotomous variables are formulated using
  values 0 and 1.
  The values in Table C-1 are counts of the number of occurrences of the
  four possible combinations of forecasts and observations.
+ 
+\series default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+setcounter{table}{0} 
+\backslash
+renewcommand{
+\backslash
+thetable}{C.
+\backslash
+arabic{table}} 
 \end_layout
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-Table C-1: 2x2 contingency table in terms of counts.
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+2x2 contingency table in terms of counts.
  The 
 \emph on
 n
@@ -135,8 +174,13 @@ j
  The "." symbols in the total cells represent sums across categories.
 \end_layout
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features rotate="0" tabularvalignment="middle">
@@ -534,6 +578,11 @@ T = n
 </cell>
 </row>
 </lyxtabular>
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -2742,13 +2791,7 @@ c
 ) of some variety.
  It measures the strength of linear association between the forecast anomolies
  and observed anomalies.
- The 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Anomaly correlation coefficient is defined as: 
+ The Anomaly correlation coefficient is defined as: 
 \begin_inset ERT
 status open
 
@@ -3457,11 +3500,44 @@ The verification statistics for probabilistic forecasts of dichotomous variables
  values 0 and 1.
  The values in Table C-2 are counts of the number of occurrences of all
  possible combinations of forecasts and observations.
+ 
+\series default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+setcounter{table}{0}
+\backslash
+renewcommand{
+\backslash
+thetable}{C.2} 
 \end_layout
 
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-Table C-2: nx2 contingency table in terms of counts.
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+nx2 contingency table in terms of counts.
  The 
 \emph on
 n
@@ -3490,7 +3566,13 @@ represents the observations.
  The "." symbols in the total cells represent sums across categories.
 \end_layout
 
-\begin_layout Standard
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="4">
 <features rotate="0" tabularvalignment="middle">
@@ -4013,6 +4095,11 @@ T =
 </cell>
 </row>
 </lyxtabular>
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -4580,11 +4667,63 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
  used in combination with the ROC, which is conditioned on the observations,
  to provide a "complete" representation of the performance of probabilistic
  forecasts.
+ 
+\series default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+setcounter{figure}{0}
+\backslash
+renewcommand{
+\backslash
+thefigure}{C.
+\backslash
+arabic{figure}} 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
 \begin_inset Graphics
-	filename image261.jpg
+	filename Rel_diag_example.jpg
+	scale 30
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example of Reliability Diagram
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
 
 \end_inset
 
@@ -4631,13 +4770,60 @@ An ROC curve shows how well the forecast discriminates between two outcomes,
  Since the ROC is conditioned on the observations, it is often paired with
  the reliability diagram, which is conditioned on the forecasts.
  
+\series default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+setcounter{figure}{0}
+\backslash
+renewcommand{
+\backslash
+thefigure}{C.2} 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
 \begin_inset Graphics
-	filename image263.jpg
-	lyxscale 80
-	width 6in
+	filename ROC_example.jpg
+	scale 30
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example of ROC Curve
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
 
 \end_inset
 
