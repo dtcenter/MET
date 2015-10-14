@@ -3473,9 +3473,13 @@ message_type
 \series medium
  must be provided.
  See 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+\end_layout
 
 \end_inset
 
