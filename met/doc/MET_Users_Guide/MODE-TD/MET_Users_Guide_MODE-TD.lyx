@@ -106,35 +106,19 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename 3d_color_fig.png
+	scale 50
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 MTD Spacetime Objects
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "par:A-plot-of"
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "par:A-plot-of-1"
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename 3d_color_fig.png
-	scale 50
 
 \end_inset
 
@@ -368,15 +352,10 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Convolution Region
-\end_layout
+\align center
+\begin_inset Graphics
+	filename two_r_plus_one_fig.png
+	scale 70
 
 \end_inset
 
@@ -384,9 +363,12 @@ Convolution Region
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename two_r_plus_one_fig.png
-	scale 70
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Convolution Region
+\end_layout
 
 \end_inset
 
@@ -573,21 +555,19 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename velocity_fig.png
+	scale 60
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Velocity
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename velocity_fig.png
-	scale 60
 
 \end_inset
 
@@ -651,21 +631,19 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename axis_3d_fig.png
+	scale 55
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 3D axis
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename axis_3d_fig.png
-	scale 55
 
 \end_inset
 
@@ -1119,21 +1097,19 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename axis_diff_fig.png
+	scale 50
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Axis Angle Difference
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename axis_diff_fig.png
-	scale 50
 
 \end_inset
 
@@ -1397,21 +1373,19 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename basic_graph_fig.png
+	scale 60
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Basic Graph Example
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename basic_graph_fig.png
-	scale 60
 
 \end_inset
 
@@ -1524,21 +1498,19 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename 2d_example_fig.png
+	scale 60
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Match & Merge Example
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename 2d_example_fig.png
-	scale 60
 
 \end_inset
 
@@ -2058,6 +2030,7 @@ txt_header_table
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="17" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -2613,6 +2586,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -2987,6 +2961,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="20" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -3702,6 +3677,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
 <features rotate="0" tabularvalignment="middle">
