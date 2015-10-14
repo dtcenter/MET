@@ -28,7 +28,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -52,6 +52,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -216,17 +220,20 @@ Insert Chapter number X.
 \end_layout
 
 \begin_layout Standard
-Table 
-\begin_inset Note Note
+\begin_inset Float table
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-Chapter number
+
 \end_layout
 
-\end_inset
+\begin_layout Plain Layout
+\begin_inset Caption Standard
 
--1: 
+\begin_layout Plain Layout
+
 \emph on
 2x2
 \emph default
@@ -259,7 +266,12 @@ j
  
 \end_layout
 
-\begin_layout Standard
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features rotate="0" tabularvalignment="middle">
@@ -514,29 +526,36 @@ a+b+c+d
 
 \end_layout
 
-\begin_layout Standard
-\begin_inset Graphics
-	filename Wavelet_Fig1.png
-	lyxscale 70
-	scale 42
-
 \end_inset
 
 
 \end_layout
 
 \begin_layout Standard
-Figure 
-\begin_inset Note Note
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-X
-\end_layout
+\begin_inset Graphics
+	filename fig9.1.png
+	rotateOrigin center
 
 \end_inset
 
-.1: NIMROD 3h lead-time forecast and corresponding verifying analysis field
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+NIMROD 3h lead-time forecast and corresponding verifying analysis field
  (precipitation rate in mm/h, valid the 05/29/99 at 15:00 UTC); forecast
  and analysis binary fields obtained for a threshold of 1mm/h, the binary
  field difference has their corresponding Contingency Table Image (see Table
@@ -552,6 +571,16 @@ X
 
 .1).
  The forecast shows a storm of 160 km displaced almost its entire length.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -649,43 +678,48 @@ n
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename image064.png
-	lyxscale 70
-	scale 42
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename image065.png
-	lyxscale 70
-	scale 42
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset Note Note
+\begin_inset Float figure
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-X
-\end_layout
+\begin_inset Graphics
+	filename fig9.2a.png
+	rotateOrigin center
 
 \end_inset
 
-.2: NIMROD binary forecast (top) and binary analysis (bottom) spatial scale
+
+\begin_inset Graphics
+	filename fig9.2b.png
+	rotateOrigin center
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+NIMROD binary forecast (top) and binary analysis (bottom) spatial scale
  components obtained by a 2D Haar wavelet transform (th=1 mm/h).
  Scale 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160,
  320, 640 km resolution); scale 9 refer to the largest father wavelet component
  (1280 km resolution).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -751,34 +785,47 @@ Chapter number
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename image068.png
-	lyxscale 70
-	scale 42
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset Note Note
+\begin_inset Float figure
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-X
-\end_layout
+\align center
+\begin_inset Graphics
+	filename fig9.3.png
+	rotateOrigin center
 
 \end_inset
 
-.3: NIMROD binary field difference spatial scale components obtained by a
- 2D Haar wavelet transform (th=1 mm/h).
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+NIMROD binary field difference spatial scale components obtained by a 2D
+ Haar wavelet transform (th=1 mm/h).
  Scales 1 to 8 refer to mother wavelet components (5, 10, 20, 40, 80, 160,
  320, 640 km resolution); scale 9 refers to the largest father wavelet component
  (1280 km resolution).
  Note the large error at the scale 6 = 160 km, due to the storm, 160 km
  displaced almost of its entire length.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -901,42 +948,44 @@ hbox{MSE}(t)$
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename image071.png
-	lyxscale 70
-	scale 42
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename image072.png
-	lyxscale 70
-	scale 42
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset Note Note
+\begin_inset Float figure
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-X
+\align center
+\begin_inset Graphics
+	filename fig9.4.png
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+MSE and MSE % for the NIMROD binary forecast and analysis spatial scale
+ components.
+ In the MSE%, note the large error associated to the scale 6 = 160 km, for
+ the thresholds ½ to 4 mm/h, associated to the displaced storm.
 \end_layout
 
 \end_inset
 
-.4: MSE and MSE % for the NIMROD binary forecast and analysis spatial scale
- components.
- In the MSE%, note the large error associated to the scale 6 = 160 km, for
- the thresholds ½ to 4 mm/h, associated to the displaced storm.
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1128,29 +1177,28 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename image074.png
-	lyxscale 80
-	scale 42
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset Note Note
+\begin_inset Float figure
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-Chapter number
-\end_layout
+\align center
+\begin_inset Graphics
+	filename fig9.5.png
+	rotateOrigin center
 
 \end_inset
 
-.5: Intensity-Scale skill score for the NIMROD forecast and analysis shown
- in Fig 
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Intensity-Scale skill score for the NIMROD forecast and analysis shown in
+ Fig 
 \begin_inset Note Note
 status open
 
@@ -1165,6 +1213,20 @@ Chapter number
  and spatial scale of the error.
  Note the negative skill associated to the scale 6 = 160 km, for the thresholds
  to 4 mm/h, associated to the displaced storm.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1375,10 +1437,39 @@ X
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
 \begin_inset Graphics
-	filename Wavelet_Fig2.png
-	lyxscale 70
-	scale 42
+	filename fig9.6.png
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Energy squared and energy squared percentages, for each threshold and scale,
+ for the NIMROD forecast and analysis, and forecast and analysis En2 and
+ En2% relative differences.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
 
 \end_inset
 
@@ -1396,9 +1487,7 @@ X
 
 \end_inset
 
-.6: Energy squared and energy squared percentages, for each threshold and
- scale, for the NIMROD forecast and analysis, and forecast and analysis
- En2 and En2% relative differences.
+.6: 
 \end_layout
 
 \begin_layout Subsection
@@ -2282,21 +2371,29 @@ previously 4.3.3, should be updated with cross reference
 \end_layout
 
 \begin_layout Standard
-Table 
-\begin_inset Note Note
+\begin_inset Float table
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-Chapter number
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Header information for each file wavelet-stat outputs.
 \end_layout
 
 \end_inset
 
--2.
- Header information for each file wavelet-stat outputs.
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="15" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -2745,6 +2842,11 @@ The frequency bias
 
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 The Wavelet-Stat tool creates a NetCDF output file containing the raw and
  decomposed values for the forecast, observation, and difference fields
@@ -2777,48 +2879,33 @@ X
 \end_layout
 
 \begin_layout Standard
-Table 
-\begin_inset Note Note
+\begin_inset Float table
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-Chapter number
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+NetCDF dimensions for Wavelet-Stat output.
 \end_layout
 
 \end_inset
 
--3.
- NetCDF dimensions for Wavelet-Stat output.
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+\align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="5" columns="2">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-mode NetCDF OUTPUT FILE DIMENSIONS
-\end_layout
-
-\end_inset
-</cell>
-<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2827,7 +2914,7 @@ NetCDF Dimension
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2838,7 +2925,7 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2847,7 +2934,7 @@ x
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2869,7 +2956,7 @@ n
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2878,7 +2965,7 @@ y
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2900,7 +2987,7 @@ n
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2909,20 +2996,10 @@ scale
 
 \end_inset
 </cell>
-<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Need to figure out how to get table entries to wrap so this doesn't hang
- off the edge of the page.
-\end_layout
-
-\end_inset
-
 Dimension for the number of scales.
  This is set to 
 \emph on
@@ -2950,7 +3027,7 @@ n
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2959,7 +3036,7 @@ tile
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2976,39 +3053,44 @@ Dimension for the number of tiles used
 
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
-Table 
-\begin_inset Note Note
+\begin_inset Float table
+wide false
+sideways false
 status open
 
 \begin_layout Plain Layout
-Chapter number
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Variables contained in Wavelet-Stat NetCDF output.
 \end_layout
 
 \end_inset
 
--4.
- Variables contained in Wavelet-Stat NetCDF output.
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
+\align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="7" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Wavelet-stat NetCDF OUTPUT FILE VARIABLES
-\end_layout
-
-\end_inset
-</cell>
-<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3017,7 +3099,16 @@ Wavelet-stat NetCDF OUTPUT FILE VARIABLES
 
 \end_inset
 </cell>
-<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3028,7 +3119,7 @@ Wavelet-stat NetCDF OUTPUT FILE VARIABLES
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3037,7 +3128,7 @@ NetCDF Variable
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3046,7 +3137,7 @@ Dimension
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3057,7 +3148,7 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3066,7 +3157,7 @@ FCST_FIELD_LEVEL_RAW
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3075,7 +3166,7 @@ tile, x, y
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3094,7 +3185,7 @@ FIELD_LEVEL
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3103,7 +3194,7 @@ OBS_FIELD_LEVEL_RAW
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3112,7 +3203,7 @@ tile, x, y
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3131,7 +3222,7 @@ FIELD_LEVEL
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3140,7 +3231,7 @@ DIFF_FIELD_LEVEL_RAW
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3149,7 +3240,7 @@ tile, x, y
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3172,7 +3263,7 @@ FIELD_LEVEL
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3181,7 +3272,7 @@ FCST_FIELD_LEVEL_THRESH
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3190,7 +3281,7 @@ tile, scale, x, y
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3209,7 +3300,7 @@ FIELD_LEVEL_THRESH
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3218,7 +3309,7 @@ OBS_FIELD_LEVEL_THRESH
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3227,7 +3318,7 @@ tile, scale, x, y
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3245,48 +3336,12 @@ FIELD_LEVEL_THRESH
 \end_inset
 </cell>
 </row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-DIFF_FIELD_LEVEL_THRESH
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-tile, scale, x, y
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Wavelet scale-decomposition of the difference field (
-\emph on
-f-o
-\emph default
-) specified by 
-\begin_inset Quotes eld
-\end_inset
-
-FIELD_LEVEL_THRESH
-\begin_inset Quotes erd
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
 </lyxtabular>
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
