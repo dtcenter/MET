@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
    process_command_line(argc, argv);
 
    // Process the data file and extract the grid information
-   process_data_file(dp_data);
+   process_input_file(dp_data);
 
    // Process the mask file
    process_mask_file(dp_mask);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
    else {
       dp_out = dp_mask;
    }
-  
+
 
    // Write out the mask file to NetCDF
    write_netcdf(dp_out);
@@ -98,7 +98,7 @@ void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_type,         "-type",         1);
-   cline.add(set_data_config,  "-data_config",  1);
+   cline.add(set_input_config, "-input_config", 1);
    cline.add(set_mask_config,  "-mask_config",  1);
    cline.add(set_complement,   "-complement",   0);
    cline.add(set_union,        "-union",        0);
@@ -117,35 +117,35 @@ void process_command_line(int argc, char **argv) {
    if(cline.n() != 3) usage();
 
    // Store the arguments
-   data_filename = cline[0];
-   mask_filename = cline[1];
-   out_filename  = cline[2];
+   input_filename = cline[0];
+   mask_filename  = cline[1];
+   out_filename   = cline[2];
 
    // List the input files
    mlog << Debug(1)
-        << "Input File:\t\t" << data_filename << "\n"
-        << "Mask File:\t\t" << mask_filename << "\n";
+        << "Input File:\t\t" << input_filename << "\n"
+        << "Mask File:\t\t"  << mask_filename  << "\n";
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_data_file(DataPlane &dp) {
+void process_input_file(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
 
    // Get the gridded file type from the data config string, if present
-   if(data_config_str.length() > 0) {
-      config.read_string(data_config_str);
+   if(input_config_str.length() > 0) {
+      config.read_string(input_config_str);
       ftype = parse_conf_file_type(&config);
    }
 
-   mtddf_ptr = mtddf_factory.new_met_2d_data_file(data_filename, ftype);
+   mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_filename, ftype);
    if(!mtddf_ptr) {
-      mlog << Error << "\nprocess_data_file() -> "
-           << "can't open data file \"" << data_filename << "\"\n\n";
+      mlog << Error << "\nprocess_input_file() -> "
+           << "can't open input file \"" << input_filename << "\"\n\n";
       exit(1);
    }
 
@@ -153,8 +153,8 @@ void process_data_file(DataPlane &dp) {
    grid = mtddf_ptr->grid();
 
    // Read the input data plane, if requested
-   if(data_config_str.length() > 0) {
-      get_data_plane(mtddf_ptr, data_config_str, dp);
+   if(input_config_str.length() > 0) {
+      get_data_plane(mtddf_ptr, input_config_str, dp);
    }
    // Check for the output of a previous call to this tool
    else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
@@ -164,7 +164,7 @@ void process_data_file(DataPlane &dp) {
       dp.set_size(grid.nx(), grid.ny());
       dp.set_constant(0.0);
    }
-   
+
    mlog << Debug(2)
         << "Parsed Data Grid:\t" << grid.name()
         << " (" << grid.nx() << " x " << grid.ny() << ")\n";
@@ -226,7 +226,7 @@ void process_mask_file(DataPlane &dp) {
          exit(1);
       }
    }
-   
+
    // Read the mask data plane, if requested
    if(mask_type == MaskType_Data) {
       if(mask_config_str.length() == 0) {
@@ -277,7 +277,7 @@ static void get_data_plane(Met2dDataFile *mtddf_ptr,
    VarInfoFactory vi_factory;
    VarInfo *vi_ptr = (VarInfo *) 0;
    double dmin, dmax;
-   
+
    // Parse the config string
    config.read_string(config_str);
 
@@ -291,7 +291,7 @@ static void get_data_plane(Met2dDataFile *mtddf_ptr,
 
    // Read config into the VarInfo object
    vi_ptr->set_dict(config);
-      
+
    // Get data plane from the file for this VarInfo object
    if(!mtddf_ptr->data_plane(*vi_ptr, dp)) {
       mlog << Error << "\nget_data_plane() -> "
@@ -309,7 +309,7 @@ static void get_data_plane(Met2dDataFile *mtddf_ptr,
 
    // Clean up
    if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) 0; }
-   
+
    return;
 }
 
@@ -322,10 +322,10 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
 
    // Must be MET NetCDF format
    if(mtddf_ptr->file_type() != FileType_NcMet) return(status);
-   
+
    // Cast pointer of correct type
    MetNcMetDataFile *mnmdf_ptr = (MetNcMetDataFile *) mtddf_ptr;
-   
+
    // Check for the MET_tool global attribute
    if(!get_global_att(mnmdf_ptr->MetNc->Nc, "MET_tool", tool)) return(status);
 
@@ -355,7 +355,7 @@ static void apply_poly_mask(DataPlane &dp) {
    int x, y, n_in;
    bool inside;
    double lat, lon;
-   
+
    // Check each grid point being inside the polyline
    for(x=0,n_in=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
@@ -383,17 +383,17 @@ static void apply_poly_mask(DataPlane &dp) {
       mlog << Debug(3)
            << "Applying complement of polyline mask.\n";
    }
-   
+
    // List number of points inside the mask
    mlog << Debug(3)
         << "Polyline Masking:\t" << n_in << " of " << grid.nx() * grid.ny()
         << " points inside\n";
-   
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
-   
+
 static void apply_circle_mask(DataPlane &dp) {
    int x, y, i, n_in;
    double lat, lon, dist, v;
@@ -423,7 +423,7 @@ static void apply_circle_mask(DataPlane &dp) {
          // Apply threshold, if specified
          if(thresh.get_type() != thresh_na) {
             check = thresh.check(dist);
-            
+
             // Check the complement
             if(complement) check = !check;
 
@@ -445,7 +445,7 @@ static void apply_circle_mask(DataPlane &dp) {
       mlog << Debug(3)
            << "Applying complement of circle mask.\n";
    }
-   
+
    // List the number of points inside the mask
    if(thresh.get_type() != thresh_na) {
       mlog << Debug(3)
@@ -465,7 +465,7 @@ static void apply_circle_mask(DataPlane &dp) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-   
+
 static void apply_track_mask(DataPlane &dp) {
    int x, y, i, n_in;
    double lat, lon, dist, v;
@@ -520,7 +520,7 @@ static void apply_track_mask(DataPlane &dp) {
       mlog << Debug(3)
            << "Applying complement of track mask.\n";
    }
-   
+
    // List the number of points inside the mask
    if(thresh.get_type() != thresh_na) {
       mlog << Debug(3)
@@ -545,7 +545,7 @@ static void apply_grid_mask(DataPlane &dp) {
    int x, y, n_in;
    bool inside;
    double lat, lon, mask_x, mask_y;
-   
+
    // Check each grid point being inside the polyline
    for(x=0,n_in=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
@@ -590,7 +590,7 @@ static void apply_grid_mask(DataPlane &dp) {
 static void apply_data_mask(DataPlane &dp) {
    int x, y, n_in;
    bool check;
-   
+
    // Nothing to do without a threshold
    if(thresh.get_type() == thresh_na) {
       double dmin, dmax;
@@ -622,7 +622,7 @@ static void apply_data_mask(DataPlane &dp) {
          dp.set(check ? 1.0 : 0.0, x, y);
       } // end for y
    } // end for x
-   
+
    // List the number of points inside the mask
    mlog << Debug(3)
         << "Data Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
@@ -651,7 +651,7 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 
    // Set the output data plane size
    dp.set_size(grid.nx(), grid.ny());
-   
+
    // Process each point
    for(x=0,n_in=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
@@ -676,7 +676,7 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
                if((v_data && !v_mask) || (!v_data && v_mask)) v = mask_val;
                else                                           v = 0.0;
                break;
-            
+
             // Default behavior is to apply the mask value or pass through
             // the data value
             default:
@@ -687,7 +687,7 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 
          // Increment count
          n_in += !is_eq(v, 0.0);
-         
+
          // Store the result
          dp.set(v, x, y);
 
@@ -762,7 +762,7 @@ void write_netcdf(const DataPlane &dp) {
    cs << cs_erase << masktype_to_string(mask_type);
    if(thresh.get_type() != thresh_na) cs << thresh.get_str();
    mask_var->add_att("mask_type", cs);
-   
+
    // Allocate memory to store the mask values for each grid point
    mask_data = new float [grid.nx()*grid.ny()];
 
@@ -808,7 +808,7 @@ MaskType string_to_masktype(const char *s) {
            << "unsupported masking type \"" << s << "\"\n\n";
       exit(1);
    }
-   
+
    return(t);
 }
 
@@ -838,21 +838,21 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tdata_file\n"
+        << "\tinput_file\n"
         << "\tmask_file\n"
         << "\tout_file\n"
         << "\t[-type str]\n"
-        << "\t[-data_config str]\n"
+        << "\t[-input_config str]\n"
         << "\t[-mask_config str]\n"
         << "\t[-complement]\n"
-        << "\t[-union | -intersection | -symdiff]\n"
+        << "\t[-union|-intersection|-symdiff]\n"
         << "\t[-thresh str]\n"
         << "\t[-value n]\n"
         << "\t[-name str]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"data_file\" is the input gridded data file "
+        << "\twhere\t\"input_file\" is the input gridded data file "
         << "(required).\n"
         << "\t\t   If " << program_name << " output, automatically read mask data.\n"
 
@@ -862,19 +862,19 @@ void usage() {
 
         << "\t\t\"out_file\" is the output NetCDF mask file to be "
         << "written (required).\n"
-        
+
         << "\t\t\"-type str\" overrides the default masking type ("
         << masktype_to_string(default_mask_type) << ") (optional).\n"
         << "\t\t   May be set to \"poly\", \"circle\", \"track\", \"grid\", or \"data\".\n"
 
-        << "\t\t\"-data_config str\" to read existing mask data from the input \"data_file\" (optional).\n"
+        << "\t\t\"-input_config str\" to read existing mask data from \"input_file\" (optional).\n"
 
-        << "\t\t\"-mask_config str\" to define the \"mask_file\" field for \"data\" masking (optional).\n"
+        << "\t\t\"-mask_config str\" to define the field from \"mask_file\" to be used for \"data\" masking (optional).\n"
 
         << "\t\t\"-complement\" to compute the complement of the area defined in \"mask_file\" (optional).\n"
 
         << "\t\t\"-union | -intersection | -symdiff\" to specify how to combine the "
-        << "masks from \"data_file\" and \"mask_file\" (optional).\n"
+        << "masks from \"input_file\" and \"mask_file\" (optional).\n"
 
         << "\t\t\"-thresh str\" defines the threshold to be applied (optional).\n"
         << "\t\t   Distance (km) for \"circle\" and \"track\" masking.\n"
@@ -905,8 +905,8 @@ void set_type(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_data_config(const StringArray & a) {
-   data_config_str = a[0];
+void set_input_config(const StringArray & a) {
+   input_config_str = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
