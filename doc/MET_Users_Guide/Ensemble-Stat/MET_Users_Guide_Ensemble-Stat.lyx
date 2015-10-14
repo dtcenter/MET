@@ -59,8 +59,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -490,6 +490,8 @@ Header information for ensemble-stat output RHIST file.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="28" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -497,7 +499,7 @@ Header information for ensemble-stat output RHIST file.
 <column alignment="left" valignment="top" width="3.5cm">
 <column alignment="left" valignment="top" width="9cm">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1352,6 +1354,8 @@ Header information for ensemble-stat output ORANK file.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -1863,6 +1867,8 @@ Header information for ensemble-stat output PHIST file.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -2084,6 +2090,8 @@ Header information for ensemble-stat output SSVAR file.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="37" columns="3">
 <features rotate="0" tabularvalignment="middle">
