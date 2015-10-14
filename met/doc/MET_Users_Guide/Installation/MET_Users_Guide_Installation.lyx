@@ -811,6 +811,33 @@ The scripts/ directory contains test scripts that are run by make test after
  and modify them for their own use.
 \end_layout
 
+\begin_layout Standard
+
+\series medium
+The 
+\series default
+scripts/Rscripts/
+\series medium
+ directory contains the R script 
+\emph on
+plot_tcmpr.R
+\emph default
+, which provides graphic utilities for MET-TC.
+ For more information on the graphics capabilities, see 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Chapter 6
+\end_layout
+
+\end_inset
+
+ of this User's Guide.
+\end_layout
+
 \begin_layout Section
 Building the MET package
 \end_layout
