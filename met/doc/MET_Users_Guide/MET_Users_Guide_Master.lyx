@@ -254,7 +254,13 @@ filename "Ensemble-Stat/MET_Users_Guide_Ensemble-Stat.lyx"
 \end_layout
 
 \begin_layout Standard
-placeholder for wavelet stat
+\begin_inset CommandInset include
+LatexCommand include
+filename "Wavelet-Stat/MET_Users_Guide_Wavelet-Stat.lyx"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -299,10 +305,13 @@ filename "Series-Analysis/MET_Users_Guide_Series-Analysis.lyx"
 \end_layout
 
 \begin_layout Standard
-placeholder for MODE
-\end_layout
+\begin_inset CommandInset include
+LatexCommand include
+filename "MODE/MET_Users_Guide_MODE.lyx"
 
-\begin_layout Standard
+\end_inset
+
+
 \begin_inset Newpage pagebreak
 \end_inset
 
