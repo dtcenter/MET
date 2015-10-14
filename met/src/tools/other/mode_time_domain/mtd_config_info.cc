@@ -681,9 +681,17 @@ table.set_entry(row, c++, junk);
 
    //  fcst valid
 
-unix_to_mdyhms(fcst_info->valid(), month, day, year, hour, minute, second);
+if ( fcst_info->valid() == 0 )  {
 
-snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s", na_str);
+
+} else {
+
+   unix_to_mdyhms(fcst_info->valid(), month, day, year, hour, minute, second);
+
+   snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+
+}
 
 table.set_entry(row, c++, junk);
 
@@ -715,9 +723,17 @@ table.set_entry(row, c++, junk);
 
    //  obs valid
 
-unix_to_mdyhms(obs_info->valid(), month, day, year, hour, minute, second);
+if ( obs_info->valid() == 0 )  {
 
-snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+   snprintf(junk, sizeof(junk), "%s", na_str);
+
+} else {
+
+   unix_to_mdyhms(obs_info->valid(), month, day, year, hour, minute, second);
+
+   snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
+
+}
 
 table.set_entry(row, c++, junk);
 
