@@ -73,354 +73,12 @@
 
 \begin_body
 
-\begin_layout Title
-
-\series medium
-Model Evaluation Tools - Tropical Cyclone 
-\end_layout
-
-\begin_layout Title
-
-\series medium
-Version 5.1 (MET-TC)
-\end_layout
-
-\begin_layout Title
-
-\series medium
-User's Guide
-\end_layout
-
-\begin_layout Address
-
-\series medium
-Developmental Testbed Center
-\end_layout
-
-\begin_layout Address
-
-\series medium
-Research Applications Laboratory
-\end_layout
-
-\begin_layout Address
-
-\series medium
-National Center for Atmospheric Research
-\end_layout
-
-\begin_layout Address
-
-\series medium
-Boulder, CO
-\end_layout
-
-\begin_layout Date
-
-\series medium
-August 2014
-\end_layout
-
-\begin_layout Chapter*
-Foreword
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-This user's guide is provided as an aid to users of the Model Evaluation
- Tools - Tropical Cyclone (MET-TC).
- MET-TC is a set of tropical cyclone specific verification tools developed
- by the Developmental Testbed Center (DTC) for use by the hurricane modeling
- community.
- This module is included in the MET v5.1 release.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The first release of MET-TC (v4.1) was intended to replicate the functionality
- of the verification software developed at the National Hurricane Center
- (NHC).
- Additional capabilities have been added to incorporate user needs and advanceme
-nts in TC verification.
- This software is primarily intended for operational purposes, but is also
- utilized for research purposes in the hurricane modeling community.
- The purpose of the MET-TC software is to replicate the functionally of
- the NHC verification system, with a modular design allowing additional
- capabilities and features to be added in future releases.
- The goal of this toolkit is to provide a standard set of verification metrics
- and comprehensive output statistics, which are available to all users to
- enable consistent forecast evaluation studies.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-MET-TC is an evolving module within the MET software package.
- The first version of MET-TC was released in May 2013 with MET v4.1.
- The second version of MET-TC was released in August 2014.
- The updates for MET-TC v5.1 primarily involve adding additional flags and
- added flexibility to each of the MET-TC modules to enhance user capabilities.
- Future releases are expected to include new capabilities and enhancements
- to the MET-TC tool.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Contributors to this user's guide include: Kathryn Newman, John Halley Gotway,
- Tressa Fowler, Paul Kucera and Barbara Brown.
-\end_layout
-
-\begin_layout Chapter*
-TERMS OF USE
-\end_layout
-
-\begin_layout Section*
-IMPORTANT!
-\end_layout
-
-\begin_layout Standard
-USE OF THIS SOFTWARE IS SUBJECT TO THE FOLLOWING TERMS AND CONDITIONS:
-\end_layout
-
-\begin_layout Description
-
-\series medium
-1.
- 
-\series bold
-License.
-
-\series medium
- Subject to these terms and conditions, University Corporation for Atmospheric
- Research (UCAR) grants you a non-exclusive, royalty-free license to use,
- create derivative works, publish, distribute, disseminate, transfer, modify,
- revise and copy the Model Evaluation Tools - Tropical Cyclone (MET-TC)
- software, in both object and source code (the 
-\begin_inset Quotes eld
-\end_inset
-
-Software
-\begin_inset Quotes erd
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Description
-
-\series medium
-You shall not sell, license or transfer for a fee the Software, or any work
- that in any manner contains the Software.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-2.
- 
-\series bold
-Disclaimer of Warranty on Software
-\series medium
-.
- Use of the Software is at your sole risk.
- The Software is provided "AS IS" and without warranty of any kind and UCAR
- EXPRESSLY DISCLAIMS ALL WARRANTIES AND/OR CONDITIONS OF ANY KIND, EXPRESS
- OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES OR CONDITIONS
- OF TITLE, NON-INFRINGEMENT OF A THIRD PARTY's INTELLECTUAL PROPERTY, MERCHANTAB
-ILITY OR SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
- THE PARTIES EXPRESSLY DISCLAIM THAT THE UNIFORM COMPUTER INFORMATION TRANSACTIO
-NS ACT (UCITA) APPLIES TO OR GOVERNS THIS AGREEMENT.
- No oral or written information or advice given by UCAR or a UCAR authorized
- representative shall create a warranty or in any way increase the scope
- of this warranty.
- Should the Software prove defective, you (and neither UCAR nor any UCAR
- representative) assume the cost of all necessary correction.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-3.
- L
-\series bold
-imitation of Liability
-\series medium
-.
- UNDER NO CIRCUMSTANCES, INCLUDING NEGLIGENCE, SHALL UCAR BE LIABLE FOR
- ANY DIRECT, INCIDENTAL, SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES INCLUDING
- LOST REVENUE, PROFIT OR DATA, WHETHER IN AN ACTION IN CONTRACT OR TORT
- ARISING OUT OF OR RELATING TO THE USE OF OR INABILITY TO USE THE SOFTWARE,
- EVEN IF UCAR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-4.
- 
-\series bold
-Compliance with Law
-\series medium
-.
- All Software and any technical data delivered under this Agreement are
- subject to U.S.
- export control laws and may be subject to export or import regulations
- in other countries.
- You agree to comply strictly with all applicable laws and regulations in
- connection with use and distribution of the Software, including export
- control laws, and you acknowledge that you have responsibility to obtain
- any required license to export, re-export, or import as may be required.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-5.
- 
-\series bold
-No Endorsement/No Support.
-
-\series medium
- The names UCAR/NCAR, National Center for Atmospheric Research and the Universit
-y Corporation for Atmospheric Research may not be used in any advertising
- or publicity to endorse or promote any products or commercial entity unless
- specific written permission is obtained from UCAR.
- The Software is provided without any support or maintenance, and without
- any obligation to provide you with modifications, improvements, enhancements,
- or updates of the Software.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-6.
- 
-\series bold
-Controlling Law and Severability
-\series medium
-.
- This Agreement shall be governed by the laws of the United States and the
- State of Colorado.
- If for any reason a court of competent jurisdiction finds any provision,
- or portion thereof, to be unenforceable, the remainder of this Agreement
- shall continue in full force and effect.
- This Agreement shall not be governed by the United Nations Convention on
- Contracts for the International Sale of Goods, the application of which
- is hereby expressly excluded.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-7.
- 
-\series bold
-Termination
-\series medium
-.
- Your rights under this Agreement will terminate automatically without notice
- from UCAR if you fail to comply with any term(s) of this Agreement.
- You may terminate this Agreement at any time by destroying the Software
- and any related documentation and any complete or partial copies thereof.
- Upon termination, all rights granted under this Agreement shall terminate.
- The following provisions shall survive termination: Sections 2, 3, 6 and
- 9.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-8.
- 
-\series bold
-Complete Agreement.
-
-\series medium
- This Agreement constitutes the entire agreement between the parties with
- respect to the use of the Software and supersedes all prior or contemporaneous
- understandings regarding such subject matter.
- No amendment to or modification of this Agreement will be binding unless
- in writing and signed by UCAR.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-9.
- 
-\series bold
-Notices and Additional Terms.
-
-\series medium
- Copyright in Software is held by UCAR.
- You must include, with each copy of the Software and associated documentation,
- a copy of this Agreement and the following notice:
-\end_layout
-
-\begin_layout Subparagraph
-
-\series medium
-"The source of this material is the Research Applications Laboratory at
- the National Center for Atmospheric Research, a program of the University
- Corporation for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement
- with the National Science Foundation; ©2007 University Corporation for
- Atmospheric Research.
- All Rights Reserved."
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The following notice shall be displayed on any scholarly works associated
- with, related to or derived from the Software:
-\end_layout
-
-\begin_layout Subparagraph
-
-\series medium
-"Model Evaluation Tools - Tropical Cyclone (MET-TC) was developed at the
- National Center for Atmospheric Research (NCAR) through a grant from the
- National Oceanic and Atmospheric Administration (NOAA) through the Hurricane
- Forecast Improvement Project (HFIP).
- Model Evaluation Tools (MET) was developed through a grant from the United
- States Air Force Weather Agency (AFWA).
- NCAR is sponsored by the United States National Science Foundation."
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-By using or downloading the Software, you agree to be bound by the terms
- and conditions of this Agreement.
-\end_layout
-
-\begin_layout Chapter*
-Acknowledgments
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Funding for the development of MET-TC is from the National Oceanic and Atmospher
-ic Administration (NOAA)'s Hurricane Forecast Improvement Project (HFIP)
- through the Developmental Testbed Center (DTC).
- The DTC is funded by the NOAA, the Air Force Weather Agency (AFWA), and
- the National Science Foundation (NSF).
- The National Center for Atmospheric Research (NCAR) is sponsored by NSF.
- We would like to thank James Franklin at the National Hurricane Center
- (NHC) for his insight into the original development of the existing NHC
- verification software.
-\end_layout
-
 \begin_layout Chapter
-Overview of MET-TC
+MET-TC Overview
 \end_layout
 
 \begin_layout Section
-Purpose of organization of the User's Guide
+Purpose of tool
 \end_layout
 
 \begin_layout Standard
@@ -515,192 +173,19 @@ The TC-dland tool is used to generate a gridded file that determines the
 \end_layout
 
 \begin_layout Section
-Software installation
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-MET-TC was developed to utilize the software framework of MET, therefore
- MET-TC is available as a module included in the overall MET package.
- For more information on the required and recommended libraries, how to
- install MET, the MET directory structure, and supported architectures,
- refer to Chapter 2 of the MET User's Guide.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Within the full directory structure of MET, locations of MET-TC specific
- code and tools include:
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The installed 
-\series default
-bin/
-\series medium
- directory will contain executables for each module of MET once it has been
- successfully built.
- MET-TC modules include: 
-\emph on
-tc_dland, tc_pairs, tc_stat
-\emph default
-.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The installed 
-\series default
-share/met/config/
-\series medium
- directory contains several configuration and static data files used by
- MET.
- For MET-TC, the 
-\emph on
-TCPairsConfig_default
-\emph default
- and 
-\emph on
-TCStatConfig_default
-\emph default
- are default configuration files for the TC_Pairs and TC-Stat tools.
- Users are encouraged to copy the default configuration files to another
- location to modify.
- The installed 
-\series default
-share/met/tc_data/
-\series medium
- directory contains static files used in MET_TC.
- The files 
-\emph on
-aland.dat, shland.data, wland.dat
-\emph default
- are included to be used as input files for 
-\emph on
-TC-dland, dland_nw_hem_tenth_degree.nc
-\emph default
- and 
-\emph on
-dland_global_tenth_degree.nc 
-\emph default
-are pre-computed distance to land files, and 
-\emph on
-wwpts_us.txt
-\emph default
- is a sample watch/warning file to be used in TC-Pairs.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series default
-doc/
-\series medium
- directory contains the documentation for both MET and MET-TC.
- The MET User's Guide should be referenced for further information on building
- the MET software package.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series default
-src/tools/tc_utils/
-\series medium
- directory contains the source code for the three tools in MET-TC.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series default
-scripts/Rscripts/
-\series medium
- directory contains the R script 
-\emph on
-plot_tcmpr.R
-\emph default
-, which provides graphic utilities for MET-TC.
- For more information on the graphics capabilities, see Chapter 6 of this
- User's Guide.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series default
-MET_BASE
-\series medium
- variable is defined in the code at compilation time as the path to the
- 
-\series default
-share/met
-\series medium
- installation directory (
-\series default
-<prefix>/share/met
-\series medium
-).
- 
-\series default
-MET_BASE
-\series medium
- may be used in the MET-TC configuration files when specifying paths and
- the appropriate path will be substituted in.
- If 
-\series default
-MET_BASE
-\series medium
- is defined as an environment variable, its value will be used instead of
- the one defined at compilation time.
-\end_layout
-
-\begin_layout Section
-Code support
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-MET-TC support is supplied through the MET helpdesk.
- The MET help email address is: met_help@ucar.edu.
- Comments and suggestions for improvements to MET-TC are welcome and encouraged.
- We cannot guarantee all suggested improvements will be incorporated into
- the code, but all suggestions will be considered.
-\end_layout
-
-\begin_layout Chapter
-Data input/output
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-This chapter discusses the input and output file formats expected and produced
- by MET-TC.
- When discussing the input data, it is expected that users have run model
- output through vortex tracking software in order to obtain position and
- intensity information in Automated Tropical Cyclone Forecasting System
- (ATCF) file format.
-\end_layout
-
-\begin_layout Section
 Input data format
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Best track and aids files in Automated Tropical Cyclone Forecasting System
+his chapter discusses the input and output file formats expected and produced
+ by MET-TC.
+ When discussing the input data, it is expected that users have run model
+ output through vortex tracking software in order to obtain position and
+ intensity information in Automated Tropical Cyclone Forecasting System
+ (ATCF) file format.
+ Best track and aids files in Automated Tropical Cyclone Forecasting System
  (ATCF) format (hereafter referred to as ATCF format) are necessary for
  model data input into the TC-Pairs tool.
  The ATCF format was first developed at the Naval Oceanographic and Atmospheric
@@ -1744,22 +1229,10 @@ cyclone = [ ];
 \series medium
 \emph on
 e.g.: cyclone = ["01",
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Does this need a 
-\begin_inset Quotes eld
-\end_inset
-
-
-\series medium
+\emph default
  
-\end_layout
-
-\end_inset
-
-02"];
+\emph on
+"02"];
 \end_layout
 
 \begin_layout Standard
@@ -2786,6 +2259,7 @@ Header information for TC-Pairs TCST output
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="50" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -6277,6 +5751,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -6299,6 +5774,7 @@ summary
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="2">
 <features rotate="0" tabularvalignment="middle">
@@ -6690,6 +6166,13 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename image004.jpg
+	scale 120
+
+\end_inset
+
 
 \end_layout
 
@@ -6703,16 +6186,6 @@ Example boxplot from plot_tcmpr.R.
  Track error distributions by lead time for three operational models GFNI,
  GHMI, HFWI.
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename image004.jpg
-	scale 120
 
 \end_inset
 
@@ -6740,6 +6213,13 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename image006.jpg
+	scale 120
+
+\end_inset
+
 
 \end_layout
 
@@ -6759,86 +6239,9 @@ l models GHMI, HWFI.
 
 \end_layout
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename image006.jpg
-	scale 120
-
 \end_inset
 
 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Chapter*
-
-\series medium
-References
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Alberson, S.D., 1998: Five-day Tropical cyclone track forecasts in the North
- Atlantic Basin.
- 
-\emph on
-Weather & Forecasting
-\emph default
-, 
-\series default
-Vol
-\series medium
-.
- 13, p.1005-1015.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Knaff, J.A., M.
- DeMaria, C.R.
- Sampson, and J.M.
- Gross, 2003: Statistical, Five-Day Tropical Cyclone Intensity Forecasts
- Derived from Climatology and Persistence.
-\begin_inset Quotes erd
-\end_inset
-
-
-\emph on
-Weather & Forecasting,
-\emph default
-
-\begin_inset Quotes erd
-\end_inset
-
- 
-\series default
-Vol
-\series medium
-.
- 18 
-\series default
-Issue
-\series medium
- 2, p.
- 80-92.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-iii
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-13
 \end_layout
 
 \end_body
