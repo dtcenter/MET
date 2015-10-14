@@ -25,7 +25,7 @@
 \bibtex_command default
 \index_command default
 \paperfontsize default
-\spacing single
+\spacing onehalf
 \use_hyperref false
 \papersize default
 \use_geometry true
@@ -2131,10 +2131,8 @@ OBS_LEAD
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observation lead time in HHMMSS format; 
-w
-\lang english
-hen field2 is actually an observation, this should be "000000"
+Observation lead time in HHMMSS format; when field2 is actually an observation,
+ this should be "000000"
 \end_layout
 
 \end_inset
