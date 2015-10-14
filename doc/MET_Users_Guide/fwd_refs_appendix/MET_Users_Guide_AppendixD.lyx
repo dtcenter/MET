@@ -28,7 +28,7 @@
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -52,6 +52,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -540,22 +544,20 @@ Table D.1 summarizes the verification statistics in MET that have normal
 rvation Mean and Mean error) MET also calculates the interval (D.2) for small
  sample sizes.
  
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Standard
-Table D.1: Verification statistics with normal approximation CIs provided
- given by (D.1) provided in MET along with their associated standard error
- estimate.
-\begin_inset Note Note
+\begin_inset ERT
 status open
 
 \begin_layout Plain Layout
-The previous sentence should be a table caption, unsure how to format as
- such.
+
+
+\backslash
+setcounter{table}{0} 
+\backslash
+renewcommand{
+\backslash
+thetable}{D.
+\backslash
+arabic{table}} 
 \end_layout
 
 \end_inset
@@ -564,6 +566,34 @@ The previous sentence should be a table caption, unsure how to format as
 \end_layout
 
 \begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Verification statistics with normal approximation CIs given by (D.1) provided
+ in MET along with their associated standard error estimate.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
 <features rotate="0" tabularvalignment="middle">
@@ -950,6 +980,11 @@ frac{1}{d}}}$
 </cell>
 </row>
 </lyxtabular>
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
