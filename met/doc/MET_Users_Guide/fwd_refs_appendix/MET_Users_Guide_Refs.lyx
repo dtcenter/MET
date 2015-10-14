@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -150,9 +150,13 @@ AMS 22nd Conference on Weather Analysis and Forecasting and 18th Conference
 \emph default
 , 25-29 June, Park City, Utah, American Meteorological Society (Boston),
  Available at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://ams.confex.com/ams/pdfpapers/124856.pdf."
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ams.confex.com/ams/pdfpapers/124856.pdf.
+\end_layout
 
 \end_inset
 
@@ -267,9 +271,13 @@ Wea.
 \series medium
 , 50-69.
  doi: 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://dx.doi.org/10.1175/WAF-D-11-00015.1"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://dx.doi.org/10.1175/WAF-D-11-00015.1
+\end_layout
 
 \end_inset
 
@@ -317,9 +325,13 @@ Calibrated Probabilistic Forecasting Using Ensemble Model Output Statistics
  Technical Report no.
  449, Department of Statistics, University of Washington.
  [Available online at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.stat.washington.edu/www/research/reports/"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.stat.washington.edu/www/research/reports/
+\end_layout
 
 \end_inset
 
