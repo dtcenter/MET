@@ -119,8 +119,8 @@ New for MET v5.1
 \begin_layout Standard
 
 \series medium
-Users will notice major upgrades for METv5.1.
- A list of these and other upgrades is included below.
+Users will notice the addition of six new tools for METv5.1.
+ A list of these and other enhancements is included below.
  
 \end_layout
 
@@ -128,29 +128,47 @@ Users will notice major upgrades for METv5.1.
 Major Upgrades:
 \end_layout
 
+\begin_layout Standard
+New tools:
+\end_layout
+
 \begin_layout Description
 1.
- METv5.1 includes a major overhaul of the build process, the addition of
- two new tools, and several enhancements to existing tools.
- The build and installation process is now done using autoconf by running
- the "configure" script followed by "make install" and "make test".
+ The mtd (MODE Time Domain) tool runs on time-series of gridded data fields
+ to define 3-dimensional space-time objects.
  
 \end_layout
 
 \begin_layout Description
 2.
- The new gen_circle_mask tool generates a verification masking region similar
- to the gen_poly_mask tool.
- It draws a circle of configurable radius around one or more lat/lon locations.
- It may be useful in defining areas close to radar locations or the area
- around a hurricane.
+ The regrid_data_plane tool regrids one or more gridded data fields to the
+ user-defined output grid.
  
 \end_layout
 
 \begin_layout Description
 3.
- The new plot_mode_field tool reads one or more MODE NetCDF output files
- and creates PNG images to display the data.
+ The shift_data_plane tool reads a single gridded data field and applies
+ a rigid shift defined by source and destination lat/lon values.
+\end_layout
+
+\begin_layout Description
+4.
+ The gen_vx_mask tool replaces the gen_poly_mask and gen_circle_mask tools
+ and adds support for track masking and accumulating multiple masks together.
+\end_layout
+
+\begin_layout Description
+5.
+ The gsid2mpr tool reads one or more binary GSI diagnostic files and reformats
+ them into the MPR line type for further analysis by the STAT-Analysis tool.
+\end_layout
+
+\begin_layout Description
+6.
+ The gsidens2orank tool reads an ensemble of binary GSI diagnostic files
+ and reformats them into the ORANK line type for further analysis by the
+ STAT-Analysis tool.
 \end_layout
 
 \begin_layout Subsection*
@@ -158,256 +176,329 @@ Enhancements to Existing Tools:
 \end_layout
 
 \begin_layout Itemize
-Distributed latest set of bug fixes for METv4.1.
+Distribute the latest set of bugfixes, details not listed here.
 \end_layout
 
 \begin_layout Itemize
-Changes to existing logic:
-\end_layout
-
-\begin_layout Itemize
-Fixed bug in STAT-Analysis when aggregating FSS values across multiple cases.
-\end_layout
-
-\begin_layout Itemize
-Fixed bug in MODE where object intensity percentiles were only being computed
- over values greater than zero, rather than the full range.
-\end_layout
-
-\begin_layout Itemize
-Fixed bug in pcp_combine -varname option that was preventing the use of
- underscores in the output variable name.
-\end_layout
-
-\begin_layout Itemize
-Enhanced TC-Pairs to refine interpretation of zeros as bad data in many
- of the input ATCF columns.
-\end_layout
-
-\begin_layout Itemize
-Enhanced MADIS2NC by adding support for mesonet datasets.
-\end_layout
-
-\begin_layout Itemize
-Refined logic in TC-Pairs when computing consensus tracks by ensuring that
- the required members are present at each lead time.
-\end_layout
-
-\begin_layout Itemize
-Major overhaul of the TC-Dland tool to compute global distances to land
- rather than being limited to the Atlantic and Eastern Pacific basins.
- Added a global 1/10th degree distance to land data file to the release.
-\end_layout
-
-\begin_layout Itemize
-Enhanced STAT-Analysis by adding support for an aggregate_stat job type
- conversion of MPR to WDIR that reads UGRD and VGRD matched pair lines and
- computes aggregated wind direction errors.
- Added
-\end_layout
-
-\begin_layout Itemize
--out_fcst_wind_thresh and -out_obs_wind_thresh options to filter the U/V
- pairs by wind speed prior to computing wind direction errors.
-\end_layout
-
-\begin_layout Itemize
-Added new output statistics:
+ASCII2NC
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Enhanced the SL1L2 and SAL1L2 line types from Point-Stat and Grid-Stat by
- adding the mean absolute error (MAE), enabling MAE to be aggregated across
- multiple cases.
+Add support for Western Wind and Solar Integration Study (WWSIS) data.
 \end_layout
 
 \begin_layout Itemize
-Enhanced the CNT line type from Point-Stat and Grid-Stat by adding the inter-qua
-rtile range of the error (EIQR) and the median absolute deviation (MAD).
-\end_layout
-
-\begin_layout Itemize
-Enhanced the CTS line type from Point-Stat and Grid-Stat by adding the log
- odds ratio (LODDS), odds ratio skill score (ORSS), extreme dependency score
- (EDS), symmetric EDS (SEDS), extreme dependency index (EDI), symmetric
- EDI (SEDI), and the bias-adjusted Gilbert skill score (BAGSS).
-\end_layout
-
-\begin_layout Itemize
-Enhanced the NBRCNT line type from Grid-Stat by adding the asymptotic fractions
- skill score (AFSS), uniform fractions skill score (UFSS), and the forecast
- and observation rates (F_RATE and O_RATE).
-\end_layout
-
-\begin_layout Itemize
-Enhanced the MPR line type from Point-Stat and the ORANK line type from
- Ensemble-Stat by adding the observation quality flag value.
-\end_layout
-
-\begin_layout Itemize
-Enhanced Ensemble-Stat by adding the probability integral transform histogram
- (PHIST) line type.
-\end_layout
-
-\begin_layout Itemize
-Enhanced STAT-Analysis to aggregate and recompute all the new statistics
- listed above.
+Add support for AOT AERONET observations.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Added new command line and configuration options:
+MADIS2NC
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Enhanced Point-Stat and Ensemble-Stat by adding a station id exclusion,
- sid_exc, option to the configuration file to easily discard specific stations
- known to contain bad data.
- See METv5.1/data/config/README for details.
-\end_layout
-
-\begin_layout Itemize
-Enhanced ASCII2NC and MADIS2NC by adding the -mask_poly and -mask_grid command
- line options to filter the point observations spatially.
-\end_layout
-
-\begin_layout Itemize
-Enhanced STAT-Analysis to support comma-separated lists of values on the
- command line rather than using the same command line switch multiple times.
-\end_layout
-
-\begin_layout Itemize
-Enhanced the configuration files for MODE, Grid-Stat, and Wavelet-Stat to
- allow the user to select which fields should be included in the gridded
- NetCDF output.
-\end_layout
-
-\begin_layout Itemize
-See METv5.1/data/config/README for details.
+Add support for acarsProfiles data, as provided to MET by AER.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Enhanced ASCII2NC by adding a message_type_map entry to the configuration
- file which defines a mapping of input little_R report types to output message
- types.
- Previously this mapping had been hard coded and any changes required recompilin
-g.
-\end_layout
-
-\begin_layout Itemize
-Enhanced MODE by adding a shift_right entry to configuration file to shift
- a global grid by some number of grid points.
- This enables the user to define the location of the longitude cut line
- for global grids.
-\end_layout
-
-\begin_layout Itemize
-Enhanced TC-Pairs by refining the interp12 configuration option.
- See METv5.1/data/config/README-TC for details.
-\end_layout
-
-\begin_layout Itemize
-Enhanced TC-Stat by adding an event_equal_lead configuration option to list
- specific lead times that must be present for a track to be included in
- the event equalization logic.
-\end_layout
-
-\begin_layout Itemize
-Enhanced TC-Stat by refining the rapid intensification criteria in the rapid_int
-en section of the configuration file.
- See METv5.1/data/config/README_TC for details.
-\end_layout
-
-\begin_layout Itemize
-Improved input and output behavior:
+TC-Pairs
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Enhanced support for reading TRMM NetCDF data from these sources:
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-\begin_inset CommandInset href
-LatexCommand href
-target "http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42.shtml"
-
-\end_inset
-
-
+Reduce the minimum number of required input ATCF columns from 18 to 8.
 \end_layout
 
 \begin_layout Itemize
-\begin_inset CommandInset href
-LatexCommand href
-target "http://disc2.nascom.nasa.gov/Giovanni/tovas/TRMM_V7.3B42_daily.shtml"
-
-\end_inset
-
-
+Add 16 columns to the TCST output line type for the ADECK and BDECK values
+ for RADP, RRP, MRD, GUSTS, EYE, DIR, SPEED, and DEPTH.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Enhanced MET's handling of NetCDF files by reading and applying the FillValue
- and/or missing_value variable attributes when parsing gridded data.
-\end_layout
-
-\begin_layout Itemize
-Enhanced STAT-Analysis and MODE-Analysis to include column headers in the
- output file specified with the -dump_row option.
-\end_layout
-
-\begin_layout Itemize
-Enhanced the NetCDF output of MODE by adding convex hull polyline points.
-\end_layout
-
-\begin_layout Itemize
-Add the model name as a global attribute to the NetCDF output of Grid-Stat,
- Wavelet-Stat, Ensemble-Stat, MODE, and Series-Analysis.
-\end_layout
-
-\begin_layout Itemize
-Reduced the file size of the PostScript files generated by the MET tools
- by adding zlib compression.
-\end_layout
-
-\begin_layout Itemize
-Enhanced the MODE PostScript files by placing the data into tables.
-\end_layout
-
-\begin_layout Itemize
-Right-justify all numeric output columns in the ASCII output of MET.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Update the GRIB1 and GRIB2 table definitions:
+TC-Stat
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.nco.ncep.noaa.gov/pmb/docs/on388"
-
-\end_inset
-
-
+Add rapid intensification and weakening (RIRW) event category job type.
 \end_layout
 
 \begin_layout Itemize
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml"
+Replace references to "rapid_inten" with "rirw" to shorten command line
+ and config file options.
+\end_layout
 
-\end_inset
+\begin_layout Itemize
+Redefined config file options landfall _beg and landfall_end as timestring
+ in HH[MMSS] format rather than an integer number of seconds, but make it
+ backwards compatible.
+  If integer, interpret them as second.
+  If string, parse the timestring.
+\end_layout
 
+\begin_layout Itemize
+Add support for reading and filtering extra columns of data at the end of
+ the input ASCII files.
+\end_layout
 
+\end_deeper
+\begin_layout Itemize
+Stat-Analysis
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+When passed a directory, search for .stat files.
+  When passed a file name, read it regardless of the extension.
+\end_layout
+
+\begin_layout Itemize
+Add support for reading and filtering extra columns of data at the end of
+ the input ASCII files.
+\end_layout
+
+\begin_layout Itemize
+Add new ramp job type based on DYDT logic or the swinging door algorithm.
+\end_layout
+
+\begin_layout Itemize
+Add swinging door algorithm to the new vx_time_series library.
+\end_layout
+
+\begin_layout Itemize
+Add -out_stat output to write aggregated actual STAT lines.
+  Including -set_hdr option.
+\end_layout
+
+\begin_layout Itemize
+Add support for ORANK to SSVAR aggregate_stat job type.
+\end_layout
+
+\begin_layout Itemize
+Add -out_cnt_logic and -out_wind_logic job command options to handle conditional
+ continuous verification.
+\end_layout
+
+\begin_layout Itemize
+Add -out_thresh job command option as a shortcut for -out_fcst_thresh and
+ -out_obs_thresh.
+\end_layout
+
+\begin_layout Itemize
+Add -out_wind_thresh job command option as a shortcut for -out_fcst_wind_thresh
+ and -out_obs_wind_thresh.
+\end_layout
+
+\begin_layout Itemize
+Add -column_thresh job command option to be consistent with other tools,
+ but retain -column_min, -column_max, and -column_eq for backwards compatibility.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+PCP-Combine
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Rename -varname command line option to -name to be consistent with other
+ MET tools.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Grid-Stat
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Add SAL1L2 and VAL1L2 output line types.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Series-Analysis
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Add SAL1L2 output statistics types.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Automated regridding
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Add automated regridding support to the MET statistics tools to regrid to
+ verify on the forecast grid, observation grid, or an independent, user-defined
+ grid.
+\end_layout
+
+\begin_layout Itemize
+Add regrid dictionary to the config files to define how regridding should
+ be performed.
+\end_layout
+
+\begin_layout Itemize
+Add vx_regrid library to support automated regridding.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Generalized thresholding
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Generalized definition of thresholds across all the MET tools.
+  Use && or || to string together event definition logic.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Conditional continuous verification
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Add support for conditional continuous verification to Point-Stat, Grid-Stat,
+ Series-Analysis.
+\end_layout
+
+\begin_layout Itemize
+Add cnt_thresh and cnt_logic config file options to specify what filtering
+ thresholds should be applied.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Climatology Data
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Add support for reading climatology data to Point-Stat, Grid-Stat, Ensemble-Stat
+, and Series-Analysis.
+\end_layout
+
+\begin_layout Itemize
+Add climo_mean dictionary to the config files for these tools to specify
+ the climatology data to be read.
+\end_layout
+
+\begin_layout Itemize
+Remove the -climo command line option from Point-Stat since the new functionalit
+y replaces the old.
+\end_layout
+
+\begin_layout Itemize
+Add anomaly correlation (ANOM_CORR) to the CNT line type.
+\end_layout
+
+\begin_layout Itemize
+Add the climatology value (CLIMO) to ORANK line type.
+\end_layout
+
+\begin_layout Itemize
+Add the climatology-based Brier score (BRIERCL) and the Brier Skill Score
+ (BSS) to the PSTD line type.
+\end_layout
+
+\begin_layout Itemize
+Add the Continuous Ranked Probability Skill Score (CRPSS) to the RHIST line
+ type.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+ConfigConstants
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Add exit_on_warning option.
+  If true, any warning message results in an error and returning of bad
+ status.
+\end_layout
+
+\begin_layout Itemize
+Add output_precision option to specify the number of non-zero decimal places
+ to be written to ASCII output files.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+File I/O Changes
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Improved logic when writing large unixtime values to NetCDF files.
+  Write them as strings rather than integers, which caused integer overflow.
+\end_layout
+
+\begin_layout Itemize
+Better handling of timing information and lat/lon dimensions from CF-compliant
+ NetCDF files.
+\end_layout
+
+\begin_layout Itemize
+When writing gridded NetCDF output, write lat/lon variables for lat/lon
+ grids as 1-dimensional.
+  For all other projection types, continue writing 2-dimensional lat/lon
+ variables.
+\end_layout
+
+\begin_layout Itemize
+Add obtype configuration entry to Grid-Stat, Ensemble-Stat, Wavelet-Stat,
+ MODE, and Series-Analysis.
+  It's string value is written to the output files.
+\end_layout
+
+\begin_layout Itemize
+Add Rscript to scripts directory named gspairs2mpr.R to read Grid-Stat NetCDF
+ matches pairs and write MPR output lines.
+\end_layout
+
+\begin_layout Itemize
+Update the vx_data2d_pinterp library to also read the output of the wrf_interp
+ utility.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Summary of changes to existing line types
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+CNT: Add ANOM_CORR, ME2, and MSESS plus confidence limits to Grid-Stat,
+ Point-Stat, and Series-Analysis.
+\end_layout
+
+\begin_layout Itemize
+PSTD: Add BRIERCL and BSS output columns.
+\end_layout
+
+\begin_layout Itemize
+ORANK: Add ensemble mean (ENS_MEAN) and climatology (CLIMO) to the end of
+ the ORANK line type.
+\end_layout
+
+\begin_layout Itemize
+RHIST: Add CRPSS.
+\end_layout
+
+\begin_layout Itemize
+TCST: Add 16 columns for the ADECK and BDECK values for RADP, RRP, MRD,
+ GUSTS, EYE, DIR, SPEED, and DEPTH.
 \end_layout
 
 \end_deeper
