@@ -108,7 +108,11 @@ void BasicModeAnalysisJob::init_from_scratch()
 
 {
 
-accums = (NumArray *) 0;
+accums   = (NumArray *) 0;
+
+dumpfile = (ostream *)  0;   //  don't delete
+
+outfile  = (ostream *)  0;   //  don't delete
 
 clear();
 
