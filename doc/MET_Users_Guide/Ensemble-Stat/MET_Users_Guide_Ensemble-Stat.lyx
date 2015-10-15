@@ -495,9 +495,9 @@ Header information for ensemble-stat output RHIST file.
 \begin_inset Tabular
 <lyxtabular version="3" rows="28" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="1.5cm">
-<column alignment="left" valignment="top" width="3.5cm">
-<column alignment="left" valignment="top" width="9cm">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -1359,9 +1359,9 @@ Header information for ensemble-stat output ORANK file.
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="3cm">
-<column alignment="left" valignment="top">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -1872,9 +1872,9 @@ Header information for ensemble-stat output PHIST file.
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="3cm">
-<column alignment="left" valignment="top">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -2095,9 +2095,9 @@ Header information for ensemble-stat output SSVAR file.
 \begin_inset Tabular
 <lyxtabular version="3" rows="37" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="1.7cm">
-<column alignment="left" valignment="top" width="3cm">
-<column alignment="left" valignment="top" width="10cm">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
