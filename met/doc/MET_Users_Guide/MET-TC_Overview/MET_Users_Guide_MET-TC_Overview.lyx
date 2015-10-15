@@ -496,10 +496,14 @@ SEAS4:
 
 \begin_layout Standard
 
-\series medium
+\series bold
+\shape italic
 Of the above common fields in the ATCF file format, MET-TC requires the
- input file has the first 17 comma-separated columns present.
- Although all 17 columns must exist, valid data in each field is not required.
+ input file has the first 8 comma-separated columns present.
+
+\series medium
+\shape default
+ Although all 8 columns must exist, valid data in each field is not required.
  In order to ensure proper matching, unique data in the BASIN, CY, YYYYMMDDHH,
  and TAU fields should be present.
 \end_layout
