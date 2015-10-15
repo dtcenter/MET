@@ -17,8 +17,7 @@ bin_PROGRAMS    = chk4copyright \
 	gribtab_dat_to_flat  \
 	nceptab_to_flat  \
 	insitu_nc_to_ascii \
-	swinging_door \
-        shift_data_plane
+	swinging_door
 
 chk4copyright_SOURCES = chk4copyright.cc
 chk4copyright_CPPFLAGS = ${MET_CPPFLAGS}
@@ -92,26 +91,6 @@ swinging_door_LDADD = -lvx_time_series \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf
-
-shift_data_plane_SOURCES = shift_data_plane.cc
-shift_data_plane_CPPFLAGS = ${MET_CPPFLAGS}
-shift_data_plane_LDFLAGS = ${MET_LDFLAGS}
-shift_data_plane_LDADD = -lvx_data2d \
-        -lvx_data2d_factory \
-        -lvx_data2d_nc_met \
-        -lvx_data2d_grib $(GRIB2_LIBS) \
-        -lvx_nc_util \
-        -lvx_data2d \
-        -lvx_data2d_nc_pinterp \
-        -lvx_data2d_nccf \
-        -lvx_grid \
-        -lvx_config \
-        -lvx_util \
-        -lvx_math \
-        -lvx_cal \
-        -lvx_log \
-        -lvx_color \
-        -lm -lnetcdf_c++ -lnetcdf 
 
 # Build chk4copyright when making a distribution so that we can
 #  add missing copyrights to the source files

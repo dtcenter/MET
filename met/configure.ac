@@ -581,6 +581,26 @@ else
     AC_MSG_NOTICE([regrid_data_plane will not be compiled])
 fi
 
+# shift_data_plane
+
+AC_ARG_ENABLE(shift_data_plane,
+          [AS_HELP_STRING([--disable-shift_data_plane], [Disable compilation of shift_data_plane])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_SHIFT_DATA_PLANE="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-shift_data_plane) ;;
+   esac],
+  [ENABLE_SHIFT_DATA_PLANE="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_SHIFT_DATA_PLANE], [test "x$ENABLE_SHIFT_DATA_PLANE" = "xyes"])
+
+if test "x$ENABLE_SHIFT_DATA_PLANE" = "xyes"; then
+    AC_DEFINE([ENABLE_SHIFT_DATA_PLANE], [], ["build shift_data_plane"])
+    AC_MSG_NOTICE([shift_data_plane will be compiled])
+else
+    AC_MSG_NOTICE([shift_data_plane will not be compiled])
+fi
+
 # plot_point_obs
 
 AC_ARG_ENABLE(plot_point_obs,
@@ -801,26 +821,6 @@ else
     AC_MSG_NOTICE([gsi_tools will not be compiled])
 fi
 
-# regrid_data_plane
-
-AC_ARG_ENABLE(regrid_data_plane,
-          [AS_HELP_STRING([--disable-regrid_data_plane], [Disable compilation of regrid_data_plane])],
-  [case "${enableval}" in
-     yes | no ) ENABLE_PLOT_DATA_PLANE="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --disable-regrid_data_plane) ;;
-   esac],
-  [ENABLE_PLOT_DATA_PLANE="yes"]
-)
-
-AM_CONDITIONAL([ENABLE_PLOT_DATA_PLANE], [test "x$ENABLE_PLOT_DATA_PLANE" = "xyes"])
-
-if test "x$ENABLE_PLOT_DATA_PLANE" = "xyes"; then
-    AC_DEFINE([ENABLE_PLOT_DATA_PLANE], [], ["build regrid_data_plane"])
-    AC_MSG_NOTICE([regrid_data_plane will be compiled])
-else
-    AC_MSG_NOTICE([regrid_data_plane will not be compiled])
-fi
-
 # GRIB2
 
 AC_ARG_ENABLE(grib2,
@@ -1038,6 +1038,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/wwmca_tool/Makefile
                  src/tools/other/gsi_tools/Makefile
                  src/tools/other/regrid_data_plane/Makefile
+                 src/tools/other/shift_data_plane/Makefile
                  src/tools/other/mode_time_domain/Makefile
                  src/tools/tc_utils/Makefile
                  src/tools/tc_utils/tc_dland/Makefile
