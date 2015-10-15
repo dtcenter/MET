@@ -303,6 +303,20 @@ filename "Wavelet-Stat/MET_Users_Guide_Wavelet-Stat.lyx"
 \end_inset
 
 
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "GSI-Tools/MET_Users_Guide_GSI-Tools.lyx"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
