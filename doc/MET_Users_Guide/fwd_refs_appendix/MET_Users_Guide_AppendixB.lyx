@@ -73,13 +73,12 @@
 
 \begin_body
 
-\begin_layout Chapter
-\start_of_appendix
-Map Projections, Grids, and Polylines
+\begin_layout Section*
+Appendix B - Map Projections, Grids, and Polylines
 \end_layout
 
-\begin_layout Section
-Map Projections
+\begin_layout Subsection*
+B.1 Map Projections
 \end_layout
 
 \begin_layout Standard
@@ -108,8 +107,8 @@ The following map projections are currently supported in MET:
 * Lat/Lon Projection
 \end_layout
 
-\begin_layout Section
-Grids
+\begin_layout Subsection*
+B.2 Grids
 \end_layout
 
 \begin_layout Standard
@@ -195,8 +194,8 @@ o G110, G175, G228, G229, G230, G231, G232, G233, G234, G243
 o G248, G250,G251
 \end_layout
 
-\begin_layout Section
-Polylines
+\begin_layout Subsection*
+B.3 Polylines for NCEP Regions
 \end_layout
 
 \begin_layout Standard
