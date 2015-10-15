@@ -100,6 +100,13 @@ The TC-Stat tool ties together results from the TC-Pairs tool by providing
 
 \begin_layout Section
 Statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Statistical-aspects"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
