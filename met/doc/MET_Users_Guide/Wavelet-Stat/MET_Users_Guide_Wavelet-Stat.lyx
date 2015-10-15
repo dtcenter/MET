@@ -272,6 +272,7 @@ j
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="4">
 <features rotate="0" tabularvalignment="middle">
@@ -684,15 +685,22 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Graphics
 	filename fig9.2a.png
+	scale 40
 	rotateOrigin center
 
 \end_inset
 
 
+\begin_inset Newline newline
+\end_inset
+
+
 \begin_inset Graphics
 	filename fig9.2b.png
+	scale 40
 	rotateOrigin center
 
 \end_inset
@@ -794,6 +802,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename fig9.3.png
+	scale 40
 	rotateOrigin center
 
 \end_inset
@@ -1186,6 +1195,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename fig9.5.png
+	scale 40
 	rotateOrigin center
 
 \end_inset
@@ -2397,9 +2407,9 @@ Header information for each file wavelet-stat outputs.
 \begin_inset Tabular
 <lyxtabular version="3" rows="15" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
+<column alignment="center" valignment="top" width="0.75in">
+<column alignment="center" valignment="top" width="1.5in">
+<column alignment="center" valignment="top" width="3.25in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -2902,8 +2912,8 @@ NetCDF dimensions for Wavelet-Stat output.
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
+<column alignment="center" valignment="top" width="0.75in">
+<column alignment="center" valignment="top" width="5.25in">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
