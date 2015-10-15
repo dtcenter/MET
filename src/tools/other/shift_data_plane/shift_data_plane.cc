@@ -367,7 +367,7 @@ void usage() {
         << "\t[-v level]\n\n"
 
         << "\twhere\t\"input_filename\" is the name of a "
-        << " gridded data file to be plotted (required).\n"
+        << "gridded data file to be plotted (required).\n"
 
         << "\t\t\"output_filename\" is the name of the output "
         << "NetCDF file to be written (required).\n"
