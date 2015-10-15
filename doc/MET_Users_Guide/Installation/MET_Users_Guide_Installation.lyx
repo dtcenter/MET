@@ -293,6 +293,29 @@ http://www.gnu.org/software/gsl
  
 \end_layout
 
+\begin_layout Description
+
+\series medium
+4.
+ The Zlib is used by MET for compression when writing post-script files
+ from tools (e.g.
+ MODE and Wavelet-Stat).
+ Zlib is distributed and supported Zlib.org and is freely available for download
+ from the Zlib website at 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.zlib.net
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
 \begin_layout Standard
 
 \series medium
