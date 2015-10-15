@@ -2813,8 +2813,8 @@ Columnar output of "summary" job output from the Stat-Analysis tool.
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="2">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="10cm">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="5.25in"">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text

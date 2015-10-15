@@ -1902,9 +1902,9 @@ Format of CTS output file.
 \begin_inset Tabular
 <lyxtabular version="3" rows="37" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.25in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -3044,9 +3044,9 @@ Object identifier descriptions for MODE object attribute output files.
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
+<column alignment="center" valignment="top" width="1.10in">
+<column alignment="center" valignment="top" width="1.25in">
+<column alignment="center" valignment="top" width="3.15in">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3243,9 +3243,9 @@ Format of MODE object attribute output files.
 \begin_inset Tabular
 <lyxtabular version="3" rows="46" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.25in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -4650,8 +4650,8 @@ NetCDF dimensions for MODE output.
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="2">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="1.75in">
+<column alignment="left" valignment="top" width="4.25in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -5066,9 +5066,9 @@ Variables contained in MODE NetCDF output.
 \begin_inset Tabular
 <lyxtabular version="3" rows="55" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="1.25in">
+<column alignment="left" valignment="top" width="1.25in">
+<column alignment="left" valignment="top" width="3.00in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
