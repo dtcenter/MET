@@ -73,17 +73,18 @@
 
 \begin_body
 
-\begin_layout Chapter
-\start_of_appendix
-How do I ...
+\begin_layout Section*
+Appendix A - FAQs & How do I ...
  ?
 \end_layout
 
-\begin_layout Section
-Frequently Asked Questions
+\begin_layout Subsection*
+A.1 Frequently Asked Questions
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  Why was the MET written largely in C++ instead of FORTRAN?
 \end_layout
@@ -99,6 +100,8 @@ MET relies upon the object-oriented aspects of C++, particularly in using
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  Why is PrepBufr used?
 \end_layout
@@ -114,6 +117,8 @@ The first goal of MET was to replicate the capabilities of existing verification
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  Why is GRIB used?
 \end_layout
@@ -127,6 +132,8 @@ Forecast data from both WRF cores can be processed into GRIB format, and
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  Is GRIB2 supported?
 \end_layout
@@ -144,6 +151,8 @@ Yes, forecast output in GRIB2 format can be read by MET.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  How does MET differ from the previously mentioned existing verification
  packages?
@@ -158,6 +167,8 @@ MET is an actively maintained, evolving software package that is being made
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  How does the MODE tool differ from the Grid-Stat tool?
 \end_layout
@@ -172,6 +183,8 @@ They offer different ways of viewing verification.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  Will the MET work on data in native model coordinates?
 \end_layout
@@ -186,6 +199,8 @@ o - it will not.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  How do I get help if my questions are not answered in the User's Guide?
 \end_layout
@@ -218,6 +233,8 @@ type "mailto:"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Q.
  Where are the graphics?
 \end_layout
@@ -235,8 +252,8 @@ Currently, very few graphics are included.
  website.
 \end_layout
 
-\begin_layout Section
-Troubleshooting
+\begin_layout Subsection*
+A.2 Troubleshooting
 \end_layout
 
 \begin_layout Standard
@@ -261,6 +278,8 @@ scripts/
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 MET won't compile
 \end_layout
 
@@ -281,6 +300,8 @@ MET won't compile
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Grid_stat won't run
 \end_layout
 
@@ -289,6 +310,8 @@ Grid_stat won't run
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 MODE won't run
 \end_layout
 
@@ -301,8 +324,10 @@ MODE won't run
 * Are both the observation and forecast datasets on the same grid?
 \end_layout
 
-\begin_layout Description
-Point_stat won't run
+\begin_layout Standard
+
+\series bold
+Point-Stat won't run
 \end_layout
 
 \begin_layout Description
@@ -310,6 +335,8 @@ Point_stat won't run
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 General troubleshooting
 \end_layout
 
@@ -340,8 +367,8 @@ n to the screen.
  
 \end_layout
 
-\begin_layout Section
-Where to get help
+\begin_layout Subsection*
+A.3 Where to get help
 \end_layout
 
 \begin_layout Standard
@@ -359,8 +386,8 @@ type "mailto:"
 
 \end_layout
 
-\begin_layout Section
-How to contribute code
+\begin_layout Subsection*
+A.4 How to contribute code
 \end_layout
 
 \begin_layout Standard
