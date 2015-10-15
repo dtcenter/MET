@@ -188,7 +188,49 @@ filename "Installation/MET_Users_Guide_Installation.lyx"
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
-filename "Data_Formats/MET_Users_Guide_Data_Formats.lyx"
+filename "Data_IO/MET_Users_Guide_Data_IO.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Reformat_Point/MET_Users_Guide_Reformat_Point.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Reformat_Grid/MET_Users_Guide_Reformat_Grid.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Masking/MET_Users_Guide_Masking.lyx"
 
 \end_inset
 
@@ -352,7 +394,40 @@ filename "MODE-TD/MET_Users_Guide_MODE-TD.lyx"
 
 \begin_inset CommandInset include
 LatexCommand include
-filename "MET-TC/MET-TC_Users_Guide.lyx"
+filename "MET-TC_Overview/MET_Users_Guide_MET-TC_Overview.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand include
+filename "TC-Dland/MET_Users_Guide_TC-Dland.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand include
+filename "TC-Pairs/MET_Users_Guide_TC-Pairs.lyx"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\begin_inset CommandInset include
+LatexCommand include
+filename "TC-Stat/MET_Users_Guide_TC-Stat.lyx"
 
 \end_inset
 
