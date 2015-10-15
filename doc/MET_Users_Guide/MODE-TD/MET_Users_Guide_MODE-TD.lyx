@@ -109,7 +109,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename 3d_color_fig.png
-	scale 50
+	scale 75
 
 \end_inset
 
@@ -355,7 +355,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename two_r_plus_one_fig.png
-	scale 70
+	scale 50
 
 \end_inset
 
@@ -457,7 +457,7 @@ overline{x}$
 
 \end_inset
 
- , for example, is just the average value of the 
+, for example, is just the average value of the 
 \emph on
 
 \begin_inset ERT
@@ -1951,6 +1951,10 @@ bf Optional}
 
 \begin_layout Subsection
 The Config File
+\end_layout
+
+\begin_layout Standard
+Hello.
 \end_layout
 
 \begin_layout Subsection

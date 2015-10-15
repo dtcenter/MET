@@ -83,6 +83,9 @@ void MtdConfigInfo::clear()
    model.clear();
    obtype.clear();
 
+   do_2d_att_ascii = true;
+   do_3d_att_ascii = true;
+
    regrid_info.clear();
 
    mask_missing_flag = FieldType_None;
@@ -543,6 +546,10 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    parse_nc_info();
 
+      //  ascii attribute output flags
+
+   parse_txt_info();
+
       // Conf: ct_stats_flag
 
    // ct_stats_flag = conf.lookup_bool(conf_key_ct_stats_flag);
@@ -630,6 +637,66 @@ nc_info.do_raw        = d->lookup_bool(conf_key_raw_flag);
 nc_info.do_object_id  = d->lookup_bool(conf_key_object_id_flag);
 nc_info.do_cluster_id = d->lookup_bool(conf_key_cluster_id_flag);
 // nc_info.do_polylines  = d->lookup_bool(conf_key_do_polylines_flag);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdConfigInfo::parse_txt_info()
+
+{
+
+const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+const char * key = conf_key_txt_output;
+
+
+e = conf.lookup(key);
+
+if ( !e )  {
+
+   mlog << Error
+        << "\n\n  MtdConfigInfo::parse_txt_info() -> lookup failed for key \""
+        << key << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  it should be a dictionary
+   //
+
+const ConfigObjectType type = e->type();
+
+if ( type != DictionaryType )  {
+
+   mlog << Error
+        << "\n\n  MtdConfigInfo::parse_txt_info() -> bad type ("
+        << configobjecttype_to_string(type)
+        << ") for key \""
+        << key << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  parse the various entries
+   //
+
+Dictionary * d = e->dict_value();
+
+do_2d_att_ascii = d->lookup_bool(conf_key_do_2d_att_flag);
+do_3d_att_ascii = d->lookup_bool(conf_key_do_3d_att_flag);
 
    //
    //  done

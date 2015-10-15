@@ -40,6 +40,8 @@ void do_3d_single_txt_output(const SingleAtt3DArray & fcst_att,
 
 {
 
+if ( !(config.do_3d_att_ascii) )  return;
+
 int j, r, c;
 ofstream out;
 AsciiTable table;
@@ -142,6 +144,8 @@ void do_3d_single_txt_output(const SingleAtt3DArray & att,
 
 {
 
+if ( !(config.do_3d_att_ascii) )  return;
+
 int j, r, c;
 ofstream out;
 AsciiTable table;
@@ -233,6 +237,8 @@ void do_3d_pair_txt_output(const PairAtt3DArray & pa,
                            const char * output_filename)
 
 {
+
+if ( !(config.do_3d_att_ascii) )  return;
 
 int j, r, c;
 ofstream out;
@@ -337,6 +343,8 @@ void do_2d_txt_output(const SingleAtt2DArray & fcst_att,
                       const char * output_filename)
 
 {
+
+if ( !(config.do_2d_att_ascii) )  return;
 
 int j, r, c;
 ofstream out;
@@ -472,6 +480,8 @@ void do_2d_txt_output(const SingleAtt2DArray & att,
                       const char * output_filename)
 
 {
+
+if ( !(config.do_2d_att_ascii) )  return;
 
 int j, r, c;
 ofstream out;
