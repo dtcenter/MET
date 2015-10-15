@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -146,6 +146,8 @@ Basic representation of the structure of the MET-TC module.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Graphics
 	filename image002.png
 	scale 80
@@ -540,9 +542,13 @@ The BEST is in ATCF file format and contains all the above listed common
 \series medium
 All operational model aids and the BEST can be obtained from the NHC ftp
  server: 
-\begin_inset CommandInset href
-LatexCommand href
-target "ftp://ftp.nhc.noaa.gov/atcf/archive/"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+ftp://ftp.nhc.noaa.gov/atcf/archive/
+\end_layout
 
 \end_inset
 
@@ -554,9 +560,13 @@ target "ftp://ftp.nhc.noaa.gov/atcf/archive/"
 \series medium
 For more detailed information on the ATCF format description and specifications
  see: 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abdeck.txt"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abdeck.txt
+\end_layout
 
 \end_inset
 
@@ -574,9 +584,13 @@ In order to adhere to ATCF file format, model data must be run through a
  One vortex tracking algorithm that is supported and freely available is
  the GFDL vortex tracker.
  Refer to 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.dtcenter.org/HurrWRF/users/downloads/index.php"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/HurrWRF/users/downloads/index.php
+\end_layout
 
 \end_inset
 
