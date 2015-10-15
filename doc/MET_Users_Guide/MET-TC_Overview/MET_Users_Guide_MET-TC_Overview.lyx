@@ -130,6 +130,15 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename image002.png
+	scale 80
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -139,18 +148,6 @@ Basic representation of the structure of the MET-TC module.
  Dark blue areas represent each executable and light blue areas represent
  required input and output to MET-TC.
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Graphics
-	filename image002.png
-	scale 80
 
 \end_inset
 
