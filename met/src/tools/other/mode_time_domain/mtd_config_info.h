@@ -76,6 +76,7 @@ class MtdConfigInfo {
       void process_config (GrdFileType ftype, GrdFileType otype);
 
       void parse_nc_info  ();
+      void parse_txt_info  ();
 
          // Store data parsed from the MODE configuration object
 
@@ -161,6 +162,9 @@ class MtdConfigInfo {
       // bool             nc_pairs_flag;          // output NetCDF file
       MtdNcOutInfo      nc_info; 
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
+
+      bool             do_2d_att_ascii;
+      bool             do_3d_att_ascii;
 
       // int              shift_right;            //  shift amount for global grids
 

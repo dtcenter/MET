@@ -205,8 +205,6 @@ txt_output = {
    attributes_2d   = true;
    attributes_3d   = true;
 
-   // convex_hulls_2d = true;
-
 };
 
 

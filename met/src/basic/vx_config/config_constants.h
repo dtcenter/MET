@@ -439,6 +439,9 @@ static const char conf_key_object_id_flag[]    = "object_id";
 static const char conf_key_cluster_id_flag[]   = "cluster_id";
 static const char conf_key_polylines_flag[]    = "polylines";
 
+static const char conf_key_do_2d_att_flag   [] = "attributes_2d";
+static const char conf_key_do_3d_att_flag   [] = "attributes_3d";
+
 //
 // Climatology parameter key names
 //
@@ -569,6 +572,7 @@ static const char conf_key_start_time_delta    [] = "start_time_delta";
 static const char conf_key_end_time_delta      [] = "end_time_delta";
 
 static const char conf_key_nc_output           [] = "nc_output";
+static const char conf_key_txt_output          [] = "txt_output";
 static const char conf_key_do_polylines_flag   [] = "do_polylines";
 
 //
