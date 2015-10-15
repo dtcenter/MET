@@ -2263,7 +2263,7 @@ TK_ERR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Track error of adeck relative to bdeck
+Track error of adeck relative to bdeck (nm)
 \end_layout
 
 \end_inset
@@ -2292,7 +2292,7 @@ X_ERR
 \begin_inset Text
 
 \begin_layout Plain Layout
-X component position error
+X component position error (nm)
 \end_layout
 
 \end_inset
@@ -2321,7 +2321,7 @@ Y_ERR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Y component position error
+Y component position error (nm)
 \end_layout
 
 \end_inset
@@ -2350,7 +2350,7 @@ ALTK_ERR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Along track error
+Along track error (nm)
 \end_layout
 
 \end_inset
@@ -2379,7 +2379,7 @@ CRTK_ERR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Cross track error
+Cross track error (nm)
 \end_layout
 
 \end_inset
@@ -2408,7 +2408,7 @@ ADLAND
 \begin_inset Text
 
 \begin_layout Plain Layout
-adeck distance to land
+adeck distance to land (nm)
 \end_layout
 
 \end_inset
@@ -2437,7 +2437,7 @@ BDLAND
 \begin_inset Text
 
 \begin_layout Plain Layout
-bdeck distance to land
+bdeck distance to land (nm)
 \end_layout
 
 \end_inset
@@ -2466,7 +2466,7 @@ AMSLP
 \begin_inset Text
 
 \begin_layout Plain Layout
-adeck mean sea level pressure
+adeck mean sea level pressure 
 \end_layout
 
 \end_inset
@@ -2495,7 +2495,7 @@ BMSLP
 \begin_inset Text
 
 \begin_layout Plain Layout
-bdeck mean sea level pressure
+bdeck mean sea level pressure 
 \end_layout
 
 \end_inset
@@ -2524,7 +2524,7 @@ AMAX_WIND
 \begin_inset Text
 
 \begin_layout Plain Layout
-adeck maximum wind speed
+adeck maximum wind speed 
 \end_layout
 
 \end_inset
@@ -2553,7 +2553,7 @@ BMAX_WIND
 \begin_inset Text
 
 \begin_layout Plain Layout
-bdeck maximum wind speed
+bdeck maximum wind speed 
 \end_layout
 
 \end_inset
