@@ -698,8 +698,14 @@ Once MODE has been run, summary statistics are written to an output file.
  The output file is in a simple flat ASCII tabular format (with one header
  line) and thus should be easily readable by just about any programming
  language, scripting language, or statistics package.
- Refer to Section 8.3.3 for lists of the statistics included in the MODE output
- files.
+ Refer to Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MODE-output"
+
+\end_inset
+
+ for lists of the statistics included in the MODE output files.
  Example scripts will be posted on the MET website in the future.
 \end_layout
 
@@ -794,20 +800,63 @@ Required arguments for mode
 
 \begin_layout Standard
 1.
- The fcst_file argument indicates the gridded file containing the model
- field to be verified.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf fcst
+\backslash
+_file}
+\end_layout
+
+\end_inset
+
+ argument indicates the gridded file containing the model field to be verified.
 \end_layout
 
 \begin_layout Standard
 2.
- The obs_file argument indicates the gridded file containing the gridded
- observations to be used for the verification of the model.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf obs
+\backslash
+_file}
+\end_layout
+
+\end_inset
+
+ argument indicates the gridded file containing the gridded observations
+ to be used for the verification of the model.
 \end_layout
 
 \begin_layout Standard
 3.
- The config_file argument indicates the name of the configuration file to
- be used.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf config
+\backslash
+_file}
+\end_layout
+
+\end_inset
+
+ argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
@@ -817,28 +866,107 @@ Optional arguments for mode
 
 \begin_layout Standard
 4.
- The -config_merge merge_config_file argument indicates the name of a second
- configuration file to be used when performing fuzzy engine merging by comparing
- the model or observation field to itself.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf -config
+\backslash
+_merge merge
+\backslash
+_config
+\backslash
+_file}
+\end_layout
+
+\end_inset
+
+ argument indicates the name of a second configuration file to be used when
+ performing fuzzy engine merging by comparing the model or observation field
+ to itself.
  The MODE tool provides the capability of performing merging within a single
  field by comparing the field to itself.
  Interest values are computed for each object and all of its neighbors.
  If an object and its neighbor have an interest value above some threshold,
  they are merged.
- The merge_config_file controls the settings of the fuzzy engine used to
- perform this merging step.
- If a merge_config_file is not provided, the configuration specified by
- the config_file in the previous argument will be used.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf merge
+\backslash
+_config
+\backslash
+_file}
+\end_layout
+
+\end_inset
+
+ controls the settings of the fuzzy engine used to perform this merging
+ step.
+ If a 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf merge
+\backslash
+_config
+\backslash
+_file}
+\end_layout
+
+\end_inset
+
+ is not provided, the configuration specified by the config_file in the
+ previous argument will be used.
 \end_layout
 
 \begin_layout Standard
 5.
- The -outdir path indicates the directory where output files should be written.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf -outdir path}
+\end_layout
+
+\end_inset
+
+ indicates the directory where output files should be written.
 \end_layout
 
 \begin_layout Standard
 6.
- The -log file option directs output and errors to the specified log file.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf -log file}
+\end_layout
+
+\end_inset
+
+ option directs output and errors to the specified log file.
  All messages will be written to that file as well as cout and cerr.
  Thus, users can save the messages without having to redirect the output
  on the command line.
@@ -848,7 +976,20 @@ Optional arguments for mode
 
 \begin_layout Standard
 7.
- The -v level option indicates the desired level of verbosity.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf -v level}
+\end_layout
+
+\end_inset
+
+ option indicates the desired level of verbosity.
  The contents of "level" will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity above 1 will increase the amount of logging.
@@ -873,22 +1014,65 @@ Please review examples.
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 mode sample_fcst.grb
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 sample_obs.grb
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 MODEConfig_grb
 \end_layout
 
 \begin_layout Standard
-In Example 1, the MODE tool will verify the model data in the sample_fcst.grb
- GRIB file using the observations in the sample_obs.grb GRIB file applying
- the configuration options specified in the MODEConfig_grb file.
+In Example 1, the MODE tool will verify the model data in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf sample
+\backslash
+_fcst.grb}
+\end_layout
+
+\end_inset
+
+ GRIB file using the observations in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf sample
+\backslash
+_obs.grb}
+\end_layout
+
+\end_inset
+
+ GRIB file applying the configuration options specified in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf MODEConfig
+\backslash
+_grb}
+\end_layout
+
+\end_inset
+
+ file.
 \end_layout
 
 \begin_layout Standard
@@ -899,26 +1083,81 @@ A second example of the MODE calling sequence is presented below:
 Example 2
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 mode sample_fcst.nc
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 sample_obs.nc
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 MODEConfig_nc
 \end_layout
 
 \begin_layout Standard
-In Example 2, the MODE tool will verify the model data in the sample_fcst.nc
- NetCDF output of pcp_combine using the observations in the sample_obs.nc
+In Example 2, the MODE tool will verify the model data in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf sample
+\backslash
+_fcst.nc}
+\end_layout
+
+\end_inset
+
+ NetCDF output of pcp_combine using the observations in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf sample
+\backslash
+_obs.nc}
+\end_layout
+
+\end_inset
+
  NetCDF output of pcp_combine, using the configuration options specified
- in the MODEConfig file.
+ in the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf MODEConfig}
+\end_layout
+
+\end_inset
+
+ file.
  Since the model and observation files contain only a single field of accumulate
-d precipitation, the MODEConfig_nc file should specify that accumulated
- precipitation be verified.
+d precipitation, the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf MODEConfig
+\backslash
+_nc}
+\end_layout
+
+\end_inset
+
+ file should specify that accumulated precipitation be verified.
 \end_layout
 
 \begin_layout Subsection
@@ -926,13 +1165,42 @@ mode configuration file
 \end_layout
 
 \begin_layout Standard
-The default configuration file for the MODE tool, MODEConfig_default, can
- be found in the installed share/met/config directory.
+The default configuration file for the MODE tool, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf MODEConfig
+\backslash
+_default}
+\end_layout
+
+\end_inset
+
+, can be found in the installed share/met/config directory.
  Another version of the configuration file is provided in scripts/config.
  We encourage users to make a copy of the configuration files prior to modifying
  their contents.
- Descriptions of MODEConfig_default and the required variables for any mode
- configuration file are also provided below.
+ Descriptions of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf MODEConfig
+\backslash
+_default}
+\end_layout
+
+\end_inset
+
+ and the required variables for any mode configuration file are also provided
+ below.
  While the configuration file contains many entries, most users will only
  need to change a few for their use.
  Specific options are described in the following subsections.
@@ -940,7 +1208,17 @@ The default configuration file for the MODE tool, MODEConfig_default, can
 
 \begin_layout Standard
 Note that environment variables may be used when editing configuration files,
- as described in the section 3.5.2 for the PB2NC tool.
+ as described in the 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Link to section
+\end_layout
+
+\end_inset
+
+section 3.5.2 for the PB2NC tool.
 \begin_inset Newline newline
 \end_inset
 
@@ -961,8 +1239,12 @@ model = "WRF";
 \end_layout
 
 \begin_layout Standard
-The model variable contains a short text string identifying the name to
- be assigned to the model being verified.
+The 
+\series bold
+model
+\series default
+ variable contains a short text string identifying the name to be assigned
+ to the model being verified.
  This text string is written out as a header column of the ASCII output
  so that verification statistics from multiple models may be differentiated.
  The value listed above is simply set to "WRF".
@@ -986,7 +1268,11 @@ grid_res = 4;
 \end_layout
 
 \begin_layout Standard
-The grid_res variable is the nominal spacing for each grid square in kilometers.
+The 
+\series bold
+grid_res
+\series default
+ variable is the nominal spacing for each grid square in kilometers.
  The variable is not used directly in the code, but subsequent variables
  in the configuration file are defined in terms of it.
  Therefore, setting this appropriately will help ensure that appropriate
@@ -1006,80 +1292,87 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 fcst = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 field = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 name = "APCP";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 level = "A03";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 raw_thresh = NA;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 conv_radius = 60.0/grid_res; // in grid squares
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 conv_thresh = >=5.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 vld_thresh = 0.5;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 area_thresh = NA;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 inten_perc_value = 100;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 inten_perc_thresh = NA;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 merge_thresh = >=1.25;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 merge_flag = THRESH;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 obs = fcst; 
 \end_layout
 
 \begin_layout Standard
-The field variables in the forecast and observation dictionaries specify
- the model variable and observation variable, respectively, and correspond
- to the vertical level to be verified.
+The 
+\series bold
+field
+\series default
+ variables in the forecast and observation dictionaries specify the model
+ variable and observation variable, respectively, and correspond to the
+ vertical level to be verified.
  
 \end_layout
 
 \begin_layout Standard
-The raw_thresh variable is used to threshold the raw forecast and / or observati
-on fields.
+The 
+\series bold
+raw_thresh
+\series default
+ variable is used to threshold the raw forecast and / or observation fields.
  Prior to defining objects, it is recommended that the raw fields should
  be made to look similar to each other.
  For example, if the model only predicts values for a variable above some
@@ -1089,32 +1382,52 @@ on fields.
 \end_layout
 
 \begin_layout Standard
-The conv_radius variable defines the radius of the circular convolution
- applied to smooth the raw fields.
+The 
+\series bold
+conv_radius
+\series default
+ variable defines the radius of the circular convolution applied to smooth
+ the raw fields.
  The radii are specified in terms of grid units.
  The default convolution radii are defined in terms of the previously defined
  grid_res variable.
 \end_layout
 
 \begin_layout Standard
-The conv_thresh variable specifies the threshold values to be applied to
- the convolved field to define objects.
+The 
+\series bold
+conv_thresh
+\series default
+ variable specifies the threshold values to be applied to the convolved
+ field to define objects.
  By default, objects are defined using a convolution threshold of 5.0.
 \end_layout
 
 \begin_layout Standard
-The vld_thresh variable must be set between 0 and 1.
+The 
+\series bold
+vld_thresh
+\series default
+ variable must be set between 0 and 1.
  When performing the circular convolution step if the proportion of bad
  data values in the convolution area is greater than or equal to this threshold,
  the resulting convolved value will be bad data.
  If the proportion is less than this threshold, the convolution will be
  performed on only the valid data.
- By default, the vld_thresh is set to 0.5.
+ By default, the 
+\series bold
+vld_thresh
+\series default
+ is set to 0.5.
 \end_layout
 
 \begin_layout Standard
-The area_thresh variable specifies the area threshold values to be applied
- to the defined objects.
+The 
+\series bold
+area_thresh
+\series default
+ variable specifies the area threshold values to be applied to the defined
+ objects.
  The area of an object is simply a count of the number of grid squares that
  comprise it.
  A user may, for example, want to only consider objects that meet some minimum
@@ -1123,8 +1436,16 @@ The area_thresh variable specifies the area threshold values to be applied
 \end_layout
 
 \begin_layout Standard
-The inten_perc_value and inten_perc_thresh variables specify the intensity
- threshold values to be applied to the defined objects.
+The 
+\series bold
+inten_perc_value
+\series default
+ and 
+\series bold
+inten_perc_thresh
+\series default
+ variables specify the intensity threshold values to be applied to the defined
+ objects.
  For each object defined, the intensity values within the object are sorted,
  and the requested intensity percentile value is computed.
  By default, the maximum value is computed since the intensity percentiles
@@ -1137,8 +1458,12 @@ The inten_perc_value and inten_perc_thresh variables specify the intensity
 \end_layout
 
 \begin_layout Standard
-The merge_thresh variables are used to define larger objects for use in
- merging the original objects.
+The 
+\series bold
+merge_thresh
+\series default
+ variables are used to define larger objects for use in merging the original
+ objects.
  These variables define the threshold value used in the double thresholding
  merging technique.
  Note that in order to use this merging technique, it must be requested
@@ -1154,30 +1479,49 @@ The merge_thresh variables are used to define larger objects for use in
 \end_layout
 
 \begin_layout Standard
-The merge_flag variable controls what type of merging techniques will be
- applied to the objects defined in each field.
+The 
+\series bold
+merge_flag
+\series default
+ variable controls what type of merging techniques will be applied to the
+ objects defined in each field.
  
 \end_layout
 
-\begin_layout Standard
-* NONE indicates that no merging should be applied.
+\begin_layout Itemize
+
+\series bold
+NONE
+\series default
+ indicates that no merging should be applied.
  
 \end_layout
 
-\begin_layout Standard
-* THRESH indicates that the double thresholding merging technique should
- be applied.
+\begin_layout Itemize
+
+\series bold
+THRESH
+\series default
+ indicates that the double thresholding merging technique should be applied.
  
 \end_layout
 
-\begin_layout Standard
-* ENGINE indicates that objects in each field should be merged by comparing
- the objects to themselves using a fuzzy engine approach.
+\begin_layout Itemize
+
+\series bold
+ENGINE
+\series default
+ indicates that objects in each field should be merged by comparing the
+ objects to themselves using a fuzzy engine approach.
  
 \end_layout
 
-\begin_layout Standard
-* BOTH indicates that both techniques should be used.
+\begin_layout Itemize
+
+\series bold
+BOTH
+\series default
+ indicates that both techniques should be used.
  
 \end_layout
 
@@ -1203,31 +1547,51 @@ mask_missing_flag = NONE;
 \end_layout
 
 \begin_layout Standard
-The mask_missing_flag variable specifies how missing data in the raw model
- and observation fields will be treated.
+The 
+\series bold
+mask_missing_flag
+\series default
+ variable specifies how missing data in the raw model and observation fields
+ will be treated.
  
 \end_layout
 
-\begin_layout Standard
-* NONE indicates no additional processing is to be done.
+\begin_layout Itemize
+
+\series bold
+NONE
+\series default
+ indicates no additional processing is to be done.
  
 \end_layout
 
-\begin_layout Standard
-* FCST indicates missing data in the observation field should be used to
- mask the forecast field.
+\begin_layout Itemize
+
+\series bold
+FCST
+\series default
+ indicates missing data in the observation field should be used to mask
+ the forecast field.
  
 \end_layout
 
-\begin_layout Standard
-* OBS indicates missing data in the forecast field should be used to mask
- the observation field.
+\begin_layout Itemize
+
+\series bold
+OBS
+\series default
+ indicates missing data in the forecast field should be used to mask the
+ observation field.
  
 \end_layout
 
-\begin_layout Standard
-* BOTH indicates masking should be performed in both directions (i.e., mask
- the forecast field with the observation field and vice-versa).
+\begin_layout Itemize
+
+\series bold
+BOTH
+\series default
+ indicates masking should be performed in both directions (i.e., mask the
+ forecast field with the observation field and vice-versa).
 \end_layout
 
 \begin_layout Standard
@@ -1254,37 +1618,59 @@ match_flag = MERGE_BOTH;
 \end_layout
 
 \begin_layout Standard
-The match_flag variable controls how matching will be performed when comparing
- objects from the forecast field to objects from the observation field.
+The 
+\series bold
+match_flag
+\series default
+ variable controls how matching will be performed when comparing objects
+ from the forecast field to objects from the observation field.
  An interest value is computed for each possible pair of forecast/observation
  objects.
  The interest values are then thresholded to define which objects match.
  If two objects in one field happen to match the same object in the other
  field, then those two objects could be merged.
- The match_flag controls what type of merging is allowed in this context.
+ The 
+\series bold
+match_flag
+\series default
+ controls what type of merging is allowed in this context.
  
 \end_layout
 
-\begin_layout Standard
-* NONE indicates that no matching should be performed between the fields
- at all.
+\begin_layout Itemize
+
+\series bold
+NONE
+\series default
+ indicates that no matching should be performed between the fields at all.
  
 \end_layout
 
-\begin_layout Standard
-* MERGE_BOTH indicates that additional merging is allowed in both fields.
+\begin_layout Itemize
+
+\series bold
+MERGE_BOTH
+\series default
+ indicates that additional merging is allowed in both fields.
  
 \end_layout
 
-\begin_layout Standard
-* MERGE_FCST indicates that additional merging is allowed only in the forecast
- field.
+\begin_layout Itemize
+
+\series bold
+MERGE_FCST
+\series default
+ indicates that additional merging is allowed only in the forecast field.
  
 \end_layout
 
-\begin_layout Standard
-* NO_MERGE indicates that no additional merging is allowed in either field,
- meaning that each object will match at most one object in the other field.
+\begin_layout Itemize
+
+\series bold
+NO_MERGE
+\series default
+ indicates that no additional merging is allowed in either field, meaning
+ that each object will match at most one object in the other field.
  
 \end_layout
 
@@ -1312,14 +1698,22 @@ max_centroid_dist = 800/grid_res;
 \begin_layout Standard
 Computing the attributes for all possible pairs of objects can take some
  time depending on the numbers of objects.
- The max_centroid_dist variable is used to specify how far apart objects
- should be in order to conclude that they have no chance of matching.
+ The 
+\series bold
+max_centroid_dist
+\series default
+ variable is used to specify how far apart objects should be in order to
+ conclude that they have no chance of matching.
  No pairwise attributes are computed for pairs of objects whose centroids
  are farther away than this distance, defined in terms of grid units.
  Setting this variable to a reasonable value will improve the execution
  time of the MODE tool.
  By default, the maximum centroid distance is defined in terms of the previously
- defined grid_res variable.
+ defined 
+\series bold
+grid_res
+\series default
+ variable.
 \begin_inset Newline newline
 \end_inset
 
@@ -1335,64 +1729,93 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 mask = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 grid = "";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 poly = "";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
 \begin_layout Standard
-The grid variable specifies a pre-defined NCEP grid with which to mask the
- raw forecast and observation fields.
- The predefined grids are specified as "GNNN" where NNN is the three digit
- designation for the grid.
+The 
+\series bold
+grid
+\series default
+ variable specifies a pre-defined NCEP grid with which to mask the raw forecast
+ and observation fields.
+ The predefined grids are specified as "
+\series bold
+GNNN
+\series default
+" where 
+\series bold
+NNN
+\series default
+ is the three digit designation for the grid.
  By default, no masking grid is applied.
  A list of the set of pre-defined masks included with the MODE tool is presented
  in Appendix B.
 \end_layout
 
 \begin_layout Standard
-The grid_flag variable specifies how the grid should be applied.
+The 
+\series bold
+grid_flag
+\series default
+ variable specifies how the grid should be applied.
  
 \end_layout
 
-\begin_layout Standard
-* NONE indicates that the masking grid should not be applied.
+\begin_layout Itemize
+
+\series bold
+NONE
+\series default
+ indicates that the masking grid should not be applied.
  
 \end_layout
 
-\begin_layout Standard
-* FCST indicates that the masking grid should be applied to the forecast
- field.
+\begin_layout Itemize
+
+\series bold
+FCST
+\series default
+ indicates that the masking grid should be applied to the forecast field.
  
 \end_layout
 
-\begin_layout Standard
-* OBS indicates that the masking grid should be applied to the observation
- field.
+\begin_layout Itemize
+
+\series bold
+OBS
+\series default
+ indicates that the masking grid should be applied to the observation field.
  
 \end_layout
 
-\begin_layout Standard
-* BOTH indicates that the masking grid should be applied to both fields.
+\begin_layout Itemize
+
+\series bold
+BOTH
+\series default
+ indicates that the masking grid should be applied to both fields.
  
 \end_layout
 
@@ -1401,8 +1824,15 @@ By default, the masking grid is not applied.
 \end_layout
 
 \begin_layout Standard
-Similar to the grid variable above, the poly variable is the name of a file
- that defines a verification masking region.
+Similar to the 
+\series bold
+grid
+\series default
+ variable above, the 
+\series bold
+poly
+\series default
+ variable is the name of a file that defines a verification masking region.
  These masking regions may be specified in two ways: as a lat/lon polygon
  or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
  or Gen-Circle_Mask tools.
@@ -1428,26 +1858,48 @@ Alternatively, any gridded data file that MET can read may be used to define
 \end_layout
 
 \begin_layout Standard
-Similar to the grid_flag variable above, the poly_flag variable specifies
- how the masking polygon should be applied.
+Similar to the 
+\series bold
+grid_flag
+\series default
+ variable above, the 
+\series bold
+poly_flag
+\series default
+ variable specifies how the masking polygon should be applied.
 \end_layout
 
-\begin_layout Standard
-* NONE indicates the masking polygon should be applied to neither field.
+\begin_layout Itemize
+
+\series bold
+NONE
+\series default
+ indicates the masking polygon should be applied to neither field.
 \end_layout
 
-\begin_layout Standard
-* FCST indicates the masking polygon should be applied to the forecast field.
+\begin_layout Itemize
+
+\series bold
+FCST
+\series default
+ indicates the masking polygon should be applied to the forecast field.
  
 \end_layout
 
-\begin_layout Standard
-* OBS indicates the masking polygon should be applied to the observation
- field.
+\begin_layout Itemize
+
+\series bold
+OBS
+\series default
+ indicates the masking polygon should be applied to the observation field.
 \end_layout
 
-\begin_layout Standard
-* BOTH indicates that the masking polygon should be applied to both fields.
+\begin_layout Itemize
+
+\series bold
+BOTH
+\series default
+ indicates that the masking polygon should be applied to both fields.
  
 \end_layout
 
@@ -1468,68 +1920,119 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 weight = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 centroid_dist = 2.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 boundary_dist = 4.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 convex_hull_dist = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 angle_diff = 1.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 area_ratio = 1.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 int_area_ratio = 2.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 complexity_ratio = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 inten_perc_ratio = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 inten_perc_value = 50;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 } 
 \end_layout
 
 \begin_layout Standard
-The weight variables listed above control how much weight is assigned to
- each pairwise attribute when computing a total interest value for object
- pairs.
- The weights listed above correspond to the centroid distance between the
- objects, the boundary distance (or minimum distance), the convex hull distance
- (or minimum distance between the convex hulls of the objects), the orientation
- angle difference, the object area ratio, the intersection divided by the
- union area ratio, the complexity ratio, and the intensity ratio.
+The 
+\series bold
+weight
+\series default
+ variables listed above control how much weight is assigned to each pairwise
+ attribute when computing a total interest value for object pairs.
+ The weights listed above correspond to the 
+\series bold
+centroid distance
+\series default
+ between the objects, the 
+\series bold
+boundary distance
+\series default
+ (or minimum distance), the 
+\series bold
+convex hull distance
+\series default
+ (or minimum distance between the convex hulls of the objects), the 
+\series bold
+orientation angle difference
+\series default
+, the 
+\series bold
+object area ratio
+\series default
+, the 
+\series bold
+intersection divided by the union area ratio
+\series default
+, the 
+\series bold
+complexity ratio
+\series default
+, and the 
+\series bold
+intensity ratio
+\series default
+.
  The weights need not sum to any particular value.
  When the total interest value is computed, the weighted sum is normalized
  by the sum of the weights listed above.
 \end_layout
 
 \begin_layout Standard
-The inten_perc_value variable corresponds to the inten_perc_ratio.
- The inten_perc_value should be set between 0 and 100 to define which percentile
- of intensity should be compared for pairs of objects.
+The 
+\series bold
+inten_perc_value
+\series default
+ variable corresponds to the 
+\series bold
+inten_perc_ratio
+\series default
+.
+ The 
+\series bold
+inten_perc_value
+\series default
+ should be set between 
+\series bold
+0
+\series default
+ and 
+\series bold
+100
+\series default
+ to define which percentile of intensity should be compared for pairs of
+ objects.
  By default, the 50th percentile, or median value, is chosen.
 \begin_inset Newline newline
 \end_inset
@@ -1546,143 +2049,143 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 interest_function = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 centroid_dist = (
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.0, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 60.0/grid_res, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 600.0/grid_res, 0.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 );
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 boundary_dist = (
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.0, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 400.0/grid_res, 0.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 );
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 convex_hull_dist = (
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.0, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 400.0/grid_res, 0.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 );
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 angle_diff = (
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.0, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 30.0, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 90.0, 0.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 );
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 corner = 0.8;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ratio_if = (
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.0, 0.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( corner, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 1.0, 1.0 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 );
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 area_ratio = ratio_if;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 int_area_ratio = (
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.00, 0.00 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.10, 0.50 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 0.25, 1.00 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ( 1.00, 1.00 )
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 );
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 complexity_ratio = ratio_if;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 inten_perc_ratio = ratio_if;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 }
 \end_layout
 
@@ -1696,9 +2199,24 @@ The set of interest function variables listed above define which values
  An algebraic function may be defined in terms of several built-in mathematical
  functions.
  See the documentation for the configuration file language on the MET User's
- website (http://www.dtcenter.org/met/users) for more details.
+ website (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/met/users
+\end_layout
+
+\end_inset
+
+) for more details.
  By default, many of these functions are defined in terms of the previously
- defined grid_res variable.
+ defined 
+\series bold
+grid_res
+\series default
+ variable.
 \begin_inset Newline newline
 \end_inset
 
@@ -1719,7 +2237,19 @@ total_interest_thresh = 0.7;
 \end_layout
 
 \begin_layout Standard
-The total_interest_thresh variable should be set between 0 and 1.
+The 
+\series bold
+total_interest_thresh
+\series default
+ variable should be set between 
+\series bold
+0
+\series default
+ and 
+\series bold
+1
+\series default
+.
  This threshold is applied to the total interest values computed for each
  pair of objects.
  Object pairs that have an interest value that is above this threshold will
@@ -1748,14 +2278,29 @@ print_interest_thresh = 0.0;
 \end_layout
 
 \begin_layout Standard
-The print_interest_thresh variable determines which pairs of object attributes
- will be written to the output object attribute ASCII file.
- The user may choose to set the print_interest_thresh to the same value
- as the total_interest_thresh, meaning that only object pairs that actually
- match are written to the output file.
+The 
+\series bold
+print_interest_thresh
+\series default
+ variable determines which pairs of object attributes will be written to
+ the output object attribute ASCII file.
+ The user may choose to set the 
+\series bold
+print_interest_thresh
+\series default
+ to the same value as the 
+\series bold
+total_interest_thresh
+\series default
+, meaning that only object pairs that actually match are written to the
+ output file.
  By default, the print interest threshold is set to zero, meaning that all
  object pair attributes will be written as long as the distance between
- the object centroids is less than the max_centroid_dist variable.
+ the object centroids is less than the 
+\series bold
+max_centroid_dist
+\series default
+ variable.
 \begin_inset Newline newline
 \end_inset
 
@@ -1779,8 +2324,12 @@ met_data_dir = "MET_BASE";
 The MODE tool uses several static data files when generating plots.
  If it cannot find the data it needs in the expected directory, it will
  error out.
- The met_data_dir variable may be set to the installed share/met directory
- to find the static data files.
+ The 
+\series bold
+met_data_dir
+\series default
+ variable may be set to the installed share/met directory to find the static
+ data files.
 \begin_inset Newline newline
 \end_inset
 
@@ -1796,72 +2345,88 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 fcst_raw_plot = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_min = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_max = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 colorbar_spacing = 1;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 obs_raw_plot = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_min = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_max = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 colorbar_spacing = 1;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 object_plot = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 color_table = "MET_BASE/colortables/mode_obj.ctable";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
 \begin_layout Standard
-The color_table variables indicate which color table files are to be used
- when generating the output PostScript plot.
+The 
+\series bold
+color_table
+\series default
+ variables indicate which color table files are to be used when generating
+ the output PostScript plot.
  The forecast and observation raw field are plotted using values in the
- fcst_raw group and obs_raw group, while the objects identified are plotted
- using the values in the object_plot group.
+ 
+\series bold
+fcst_raw
+\series default
+ group and 
+\series bold
+obs_raw
+\series default
+ group, while the objects identified are plotted using the values in the
+ 
+\series bold
+object_plot
+\series default
+ group.
  By default, these variables point to color tables in the MET distribution.
  Users are free to create their own color tables following the format in
  the examples.
@@ -1871,8 +2436,16 @@ The color_table variables indicate which color table files are to be used
 \end_layout
 
 \begin_layout Standard
-The plot_min and plot_max variables indicate the min and max data values
- to be plotted for the forecast and observation fields.
+The 
+\series bold
+plot_min
+\series default
+ and 
+\series bold
+plot_max
+\series default
+ variables indicate the min and max data values to be plotted for the forecast
+ and observation fields.
  If set to non-zero values, the forecast and observation raw color tables
  specified above will be rescaled to match the specified range.
 \end_layout
@@ -1884,8 +2457,12 @@ The MODE tool generates a color bar to represent the contents of the colortable
  the color table.
  The values defined for each color in the color table are also plotted next
  to the color bar.
- The colorbar_spacing variable is used to define the frequency with which
- the color table values should be plotted.
+ The 
+\series bold
+colorbar_spacing
+\series default
+ variable is used to define the frequency with which the color table values
+ should be plotted.
  Setting this variable to 1, as shown above, indicates that every color
  table value should be plotted.
  Setting it to an integer, n > 1, indicates that only every nth color table
@@ -1913,8 +2490,12 @@ zero_border_size = 1;
 The MODE tool is not able to define objects that touch the edge of the grid.
  After the convolution step is performed the outer columns and rows of data
  are zeroed out to enable MODE to identify objects.
- The zero_border_size variable specifies how many outer columns and rows
- of data should be set to bad data.
+ The 
+\series bold
+zero_border_size
+\series default
+ variable specifies how many outer columns and rows of data should be set
+ to bad data.
 \begin_inset Newline newline
 \end_inset
 
@@ -1935,18 +2516,30 @@ plot_valid_flag = FALSE;
 \end_layout
 
 \begin_layout Standard
-When applied, the plot_valid_flag variable indicates that only the region
- containing valid data after masking is applied should be plotted.
+When applied, the 
+\series bold
+plot_valid_flag
+\series default
+ variable indicates that only the region containing valid data after masking
+ is applied should be plotted.
  
 \end_layout
 
-\begin_layout Standard
-* FALSE indicates the entire domain should be plotted.
+\begin_layout Itemize
+
+\series bold
+FALSE 
+\series default
+indicates the entire domain should be plotted.
 \end_layout
 
-\begin_layout Standard
-* TRUE indicates only the region containing valid data after masking should
- be plotted.
+\begin_layout Itemize
+
+\series bold
+TRUE
+\series default
+ indicates only the region containing valid data after masking should be
+ plotted.
 \end_layout
 
 \begin_layout Standard
@@ -1971,24 +2564,34 @@ plot_gcarc_flag = FALSE;
 \end_layout
 
 \begin_layout Standard
-When applied, the plot_gcarc_flag variable indicates that the edges of polylines
- should be plotted using great circle arcs as opposed to straight lines
- in the grid.
+When applied, the 
+\series bold
+plot_gcarc_flag
+\series default
+ variable indicates that the edges of polylines should be plotted using
+ great circle arcs as opposed to straight lines in the grid.
  The default value of this flag is FALSE.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ps_plot_flag = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ct_stats_flag = TRUE;
 \end_layout
 
 \begin_layout Standard
 These flags can be set to TRUE or FALSE to produce additional output, in
- the form of postscript plots (ps_plot_flag) or contingency table counts
- and statistics (ct_stats_flag).
+ the form of postscript plots (
+\series bold
+ps_plot_flag
+\series default
+) or contingency table counts and statistics (
+\series bold
+ct_stats_flag
+\series default
+).
  
 \begin_inset Newline newline
 \end_inset
@@ -2005,42 +2608,49 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 nc_pairs_flag = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 latlon = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 raw = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 object_raw = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 object_id = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 cluster_id = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 polylines = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
 \begin_layout Standard
 Each component of the pairs information in the NetCDF file can be turned
  on or off.
- The old syntax is still supported: TRUE means accept the defaults, FALSE
+ The old syntax is still supported: 
+\series bold
+TRUE
+\series default
+ means accept the defaults, 
+\series bold
+FALSE
+\series default
  means no netcdf output is generated.
  Netcdf output can also be turned off by setting all the individual dictionary
  flags to false.
@@ -2114,7 +2724,11 @@ version = "v5.1";
 \end_layout
 
 \begin_layout Standard
-The version indicates the version of the MODE configuration file used.
+The 
+\series bold
+version
+\series default
+ indicates the version of the MODE configuration file used.
  Future versions of MET may include changes to MODE and the MODE configuration
  file.
  This value should not be modified.
@@ -2122,6 +2736,13 @@ The version indicates the version of the MODE configuration file used.
 
 \begin_layout Subsection
 MODE output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2144,15 +2765,38 @@ The MODE tool creates two ASCII output files.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 mode_PREFIX_FCST_VAR_LVL_vs_ OBS_VAR_LVL_HHMMSSL_YYYYMMDD_HHMMSSV_ HHMMSSA_cts.tx
-t where PREFIX indicates the user-defined output prefix, FCST_VAR_LVL is
- the forecast variable and vertical level being used, OBS_VAR_LVL is the
- observation variable and vertical level being used, HHMMSSL indicates the
- forecast lead time, YYYYMMDD_HHMMSSV indicates the forecast valid time,
- and HHMMSSA indicates the accumulation period.
+t
+\series default
+ where PREFIX indicates the user-defined output prefix, 
+\series bold
+FCST_VAR_LVL
+\series default
+ is the forecast variable and vertical level being used, 
+\series bold
+OBS_VAR_LVL
+\series default
+ is the observation variable and vertical level being used, 
+\series bold
+HHMMSSL
+\series default
+ indicates the forecast lead time, 
+\series bold
+YYYYMMDD_HHMMSSV
+\series default
+ indicates the forecast valid time, and 
+\series bold
+HHMMSSA
+\series default
+ indicates the accumulation period.
  The cts string stands for contingency table statistics.
- The generation of this file can be disabled using the ct_stats_flag option
- in the configuration file.
+ The generation of this file can be disabled using the 
+\series bold
+ct_stats_flag
+\series default
+ option in the configuration file.
  This CTS output file differs somewhat from the CTS output of the Point-Stat
  and Grid-Stat tools.
  The columns of this output file are summarized in table 
@@ -2208,6 +2852,8 @@ name "CTS_output"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 MODE ASCII CONTINGENCY TABLE OUTPUT FORMAT
 \end_layout
 
@@ -2237,6 +2883,8 @@ MODE ASCII CONTINGENCY TABLE OUTPUT FORMAT
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Column Number
 \end_layout
 
@@ -2246,6 +2894,8 @@ Column Number
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 MODE CTS Column Name
 \end_layout
 
@@ -2255,6 +2905,8 @@ MODE CTS Column Name
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -3301,16 +3953,45 @@ The second ASCII file the MODE tool generates contains all of the attributes
  The number of lines in this file depends on the number of objects defined.
  This file contains lines of 6 types that are indicated by the contents
  of the "object_id" column.
- The "object_id" can take the following 6 forms: FNNN, ONNN, FNNN_ONNN,
- CFNNN, CONNN, CFNNN_CONNN.
- In each case, NNN is a three-digit number indicating the object index.
+ The "
+\series bold
+object_id
+\series default
+" can take the following 6 forms: 
+\series bold
+FNNN, ONNN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN
+\series default
+.
+ In each case, 
+\series bold
+NNN
+\series default
+ is a three-digit number indicating the object index.
  While all lines have the first 18 header columns in common, these 6 forms
- for "object_id" can be divided into two types - one for single objects
- and one for pairs of objects.
- The single object lines (FNNN, ONNN, CFNNN, and CONNN) contain valid data
- in columns 19-39 and fill data in columns 40-51.
- The object pair lines (FNNN_ONNN and CFNNN_CONNN) contain valid data in
- columns 40-51 and fill data in columns 19-39.
+ for "
+\series bold
+object_id
+\series default
+" can be divided into two types - one for single objects and one for pairs
+ of objects.
+ The single object lines (
+\series bold
+FNNN, ONNN, CFNNN,
+\series default
+ and 
+\series bold
+CONNN
+\series default
+) contain valid data in columns 19-39 and fill data in columns 40-51.
+ The object pair lines (
+\series bold
+FNNN_ONNN
+\series default
+ and 
+\series bold
+CFNNN_CONNN
+\series default
+) contain valid data in columns 40-51 and fill data in columns 19-39.
  These object identifiers are described in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3364,6 +4045,8 @@ name "MODE_object_attribute"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Object identifier (object_id)
 \end_layout
 
@@ -3373,6 +4056,8 @@ Object identifier (object_id)
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Valid Data Columns
 \end_layout
 
@@ -3382,6 +4067,8 @@ Valid Data Columns
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description of valid data
 \end_layout
 
@@ -3517,8 +4204,12 @@ Attributes for pairs of forecast and observation cluster objects
 \end_layout
 
 \begin_layout Standard
-A note on terminology: a cluster (referred to as "composite" in earlier
- versions) object need not necessarily consist of more than one simple object.
+
+\series bold
+A note on terminology:
+\series default
+ a cluster (referred to as "composite" in earlier versions) object need
+ not necessarily consist of more than one simple object.
  A cluster object is by definition any set of one or more objects in one
  field which match a set of one or more objects in the other field.
  When a single simple forecast object matches a single simple observation
@@ -3586,6 +4277,8 @@ name "MODE_object_attribute_output"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
 \end_layout
 
@@ -3615,6 +4308,8 @@ MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Column 
 \end_layout
 
@@ -3624,6 +4319,8 @@ Column
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 MODE Column Name
 \end_layout
 
@@ -3633,6 +4330,8 @@ MODE Column Name
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -4600,6 +5299,8 @@ name "MODE_object_attribute_output_part_2"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
 \end_layout
 
@@ -4629,6 +5330,8 @@ MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Column 
 \end_layout
 
@@ -4638,6 +5341,8 @@ Column
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 MODE Column Name
 \end_layout
 
@@ -4647,6 +5352,8 @@ MODE Column Name
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -4930,7 +5637,11 @@ Symmetric difference of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-INTERSECTION_OVER_AREA
+INTERSECTION
+\begin_inset Newline newline
+\end_inset
+
+_OVER_AREA
 \end_layout
 
 \end_inset
@@ -4959,7 +5670,11 @@ Ratio of intersection area to union area (unitless)
 \begin_inset Text
 
 \begin_layout Plain Layout
-COMPLEXITY_RATIO
+COMPLEXITY
+\begin_inset Newline newline
+\end_inset
+
+_RATIO
 \end_layout
 
 \end_inset
@@ -4989,7 +5704,11 @@ Ratio of complexities of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-PERCENTILE_INTENSITY_RATIO
+PERCENTILE
+\begin_inset Newline newline
+\end_inset
+
+_INTENSITY_RATIO
 \end_layout
 
 \end_inset
@@ -5057,8 +5776,11 @@ The MODE tool creates a NetCDF output file containing the object fields
  The NetCDF file also contains lat/lon and x/y data for the vertices of
  the polygons for the boundaries of the simple forecast and observation
  objects.
- The generation of this file can be disabled using the nc_pairs_flag configurati
-on file option.
+ The generation of this file can be disabled using the 
+\series bold
+nc_pairs_flag
+\series default
+ configuration file option.
 \end_layout
 
 \begin_layout Standard
@@ -5128,6 +5850,8 @@ name "NetCDF_dimensions_for_MODE_output"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 mode NetCDF OUTPUT FILE DIMENSIONS
 \end_layout
 
@@ -5148,6 +5872,8 @@ mode NetCDF OUTPUT FILE DIMENSIONS
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 NetCDF Dimension
 \end_layout
 
@@ -5157,6 +5883,8 @@ NetCDF Dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -5552,6 +6280,8 @@ name "Variables_contained_in_MODE_NetCDF_output"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 mode NetCDF OUTPUT FILE VARIABLES
 \end_layout
 
@@ -5581,6 +6311,8 @@ mode NetCDF OUTPUT FILE VARIABLES
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 NetCDF Variable
 \end_layout
 
@@ -5590,6 +6322,8 @@ NetCDF Variable
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Dimension
 \end_layout
 
@@ -5599,6 +6333,8 @@ Dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -6153,6 +6889,8 @@ name "Variables_contained_in_MODE_NetCDF_output_part_2"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 mode NetCDF OUTPUT FILE VARIABLES
 \end_layout
 
@@ -6182,6 +6920,8 @@ mode NetCDF OUTPUT FILE VARIABLES
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 NetCDF Variable
 \end_layout
 
@@ -6191,6 +6931,8 @@ NetCDF Variable
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Dimension
 \end_layout
 
@@ -6200,6 +6942,8 @@ Dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -7263,7 +8007,10 @@ Lastly, the MODE tool creates a PostScript plot summarizing the features-based
  approach used in the verification.
  The PostScript plot is generated using internal libraries and does not
  depend on an external plotting package.
- The generation of this PostScript output can be disabled using the ps_plot_flag
+ The generation of this PostScript output can be disabled using the 
+\series bold
+ps_plot_flag
+\series default
  configuration file option.
 \end_layout
 
