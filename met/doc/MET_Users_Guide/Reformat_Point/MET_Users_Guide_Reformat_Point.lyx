@@ -1298,7 +1298,7 @@ NetCDF file dimensions for pb2nc output.
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top" width="4in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1493,7 +1493,7 @@ NetCDF variables in pb2nc output.
 <column alignment="left" valignment="top" width="1in">
 <column alignment="left" valignment="top" width="4in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1858,7 +1858,7 @@ Input MET ascii2nc point observation format
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout

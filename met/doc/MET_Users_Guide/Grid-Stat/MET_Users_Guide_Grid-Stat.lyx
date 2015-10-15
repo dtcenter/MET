@@ -1927,11 +1927,11 @@ Header information for each file grid-stat outputs.
 \begin_inset Tabular
 <lyxtabular version="3" rows="23" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0.5in">
+<column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2658,11 +2658,11 @@ Format information for NBRCTC (Neighborhood Contingency Table Counts) output
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0.5in">
+<column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2952,9 +2952,9 @@ Format information for NBRCTS (Neighborhood Contingency Table Statistics)
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0.5in">
+<column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -3540,9 +3540,9 @@ REDO NUMBERING!!! This is part of table 3.
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0.5in">
+<column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -4059,9 +4059,9 @@ Format information for NBRCNT(Neighborhood Continuous Statistics) output
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="1.7cm">
-<column alignment="left" valignment="top" width="3cm">
-<column alignment="left" valignment="top" width="10cm">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text

@@ -948,9 +948,9 @@ NetCDF variables for pcp_combine output.
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="1.5in">
-<column alignment="left" valignment="top" width="0.5in">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="1.25in">
+<column alignment="left" valignment="top" width="1.25in">
+<column alignment="left" valignment="top" width="3.5in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -1022,7 +1022,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-\align center
+\noindent
 lat
 \end_layout
 
@@ -1032,7 +1032,7 @@ lat
 \begin_inset Text
 
 \begin_layout Plain Layout
-\align center
+\noindent
 lat, lon
 \end_layout
 
@@ -1042,7 +1042,7 @@ lat, lon
 \begin_inset Text
 
 \begin_layout Plain Layout
-\align center
+\noindent
 Latitude value for each point in the grid
 \end_layout
 
