@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -105,13 +105,17 @@ MODE is only one of a number of different approaches that have been developed
  in recent years to meet these needs.
  In the future, we expect that the MET package will include additional methods.
  References for many of these methods are provided at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.rap.ucar.edu/projects/icp/index.html"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.rap.ucar.edu/projects/icp/index.html
+\end_layout
 
 \end_inset
 
-.
+ .
 \end_layout
 
 \begin_layout Standard
@@ -849,6 +853,17 @@ An example of the MODE calling sequence is listed below:
 
 \begin_layout Standard
 Example 1
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Please review examples.
+ They aren't lined up correctly.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -919,6 +934,19 @@ The default configuration file for the MODE tool, MODEConfig_default, can
 \begin_layout Standard
 Note that environment variables may be used when editing configuration files,
  as described in the section 3.5.2 for the PB2NC tool.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -931,6 +959,19 @@ The model variable contains a short text string identifying the name to
  This text string is written out as a header column of the ASCII output
  so that verification statistics from multiple models may be differentiated.
  The value listed above is simply set to "WRF".
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -943,6 +984,19 @@ The grid_res variable is the nominal spacing for each grid square in kilometers.
  in the configuration file are defined in terms of it.
  Therefore, setting this appropriately will help ensure that appropriate
  default values are used for these variables.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1122,6 +1176,19 @@ The merge_flag variable controls what type of merging techniques will be
 
 \begin_layout Standard
 By default, the double thresholding merging technique is applied.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1160,6 +1227,19 @@ The mask_missing_flag variable specifies how missing data in the raw model
 Prior to defining objects, it is recommended that the raw fields be made
  to look similar to each other by assigning a value of BOTH to this parameter.
  However, by default no masking is performed.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1203,6 +1283,19 @@ The match_flag variable controls how matching will be performed when comparing
 
 \begin_layout Standard
 By default, additional merging is allowed in both fields.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1220,6 +1313,19 @@ Computing the attributes for all possible pairs of objects can take some
  time of the MODE tool.
  By default, the maximum centroid distance is defined in terms of the previously
  defined grid_res variable.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1340,6 +1446,19 @@ Similar to the grid_flag variable above, the poly_flag variable specifies
 
 \begin_layout Standard
 By default, the masking polygon is not applied.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1405,6 +1524,19 @@ The inten_perc_value variable corresponds to the inten_perc_ratio.
  The inten_perc_value should be set between 0 and 100 to define which percentile
  of intensity should be compared for pairs of objects.
  By default, the 50th percentile, or median value, is chosen.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1560,6 +1692,19 @@ The set of interest function variables listed above define which values
  website (http://www.dtcenter.org/met/users) for more details.
  By default, many of these functions are defined in terms of the previously
  defined grid_res variable.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1576,6 +1721,19 @@ The total_interest_thresh variable should be set between 0 and 1.
  Increasing the threshold will decrease the number of matches while decreasing
  the threshold will increase the number of matches.
  By default, the total interest threshold is set to 0.7.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1591,6 +1749,19 @@ The print_interest_thresh variable determines which pairs of object attributes
  By default, the print interest threshold is set to zero, meaning that all
  object pair attributes will be written as long as the distance between
  the object centroids is less than the max_centroid_dist variable.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1603,6 +1774,19 @@ The MODE tool uses several static data files when generating plots.
  error out.
  The met_data_dir variable may be set to the installed share/met directory
  to find the static data files.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1699,6 +1883,19 @@ The MODE tool generates a color bar to represent the contents of the colortable
  table value should be plotted.
  Setting it to an integer, n > 1, indicates that only every nth color table
  value should be plotted.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1711,6 +1908,19 @@ The MODE tool is not able to define objects that touch the edge of the grid.
  are zeroed out to enable MODE to identify objects.
  The zero_border_size variable specifies how many outer columns and rows
  of data should be set to bad data.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1734,6 +1944,19 @@ When applied, the plot_valid_flag variable indicates that only the region
 
 \begin_layout Standard
 The default value of this flag is FALSE.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1760,6 +1983,19 @@ These flags can be set to TRUE or FALSE to produce additional output, in
  the form of postscript plots (ps_plot_flag) or contingency table counts
  and statistics (ct_stats_flag).
  
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1801,6 +2037,19 @@ Each component of the pairs information in the NetCDF file can be turned
  means no netcdf output is generated.
  Netcdf output can also be turned off by setting all the individual dictionary
  flags to false.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1815,6 +2064,19 @@ When MODE is run on global grids, this parameter specifies how many grid
  be cut in half.
  Shifting the grid by some amount enables the user to control where that
  longitude cut line occurs.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1825,6 +2087,19 @@ output_prefix = "";
 This option specifies a string to be used in the output file name.
  It can be useful for keeping results for different models or variables
  from overwriting each other.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1899,6 +2174,8 @@ Format of CTS output file.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="37" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -3044,7 +3321,7 @@ Object identifier descriptions for MODE object attribute output files.
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top" width="1.10in">
+<column alignment="center" valignment="top" width="1.1in">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="3.15in">
 <row>
@@ -3240,6 +3517,8 @@ Format of MODE object attribute output files.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="46" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -5068,7 +5347,7 @@ Variables contained in MODE NetCDF output.
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1.25in">
 <column alignment="left" valignment="top" width="1.25in">
-<column alignment="left" valignment="top" width="3.00in">
+<column alignment="left" valignment="top" width="3in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
