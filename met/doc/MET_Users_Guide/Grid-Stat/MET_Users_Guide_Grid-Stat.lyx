@@ -1843,7 +1843,7 @@ The output STAT file is named using the following naming convention:
 \end_layout
 
 \begin_layout Standard
-grid_stat__PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
+grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
 \series medium
  where 
 \series default
@@ -1851,11 +1851,11 @@ PREFIX
 \series medium
  indicates the user-defined output prefix, 
 \series default
-YYYMMDDHH
+HHMMSSL
 \series medium
  indicates the forecast lead time and 
 \series default
-YYYYMMDD_HHMMSS
+YYYYMMDD_HHMMSSV
 \series medium
  indicates the forecast valid time.
  The output ASCII files are named similarly: 
