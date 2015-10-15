@@ -162,6 +162,30 @@ arguments: column_name string
 
 \begin_layout Standard
 
+\series bold
+-column
+\series default
+ AMAX_WIND-BMAX_WIND # difference 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+-column
+\series default
+ abs(ALTK_ERR) # absolute value 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+-column
+\series default
+ abs(AMAX_WIND-BMAX_WIND) # absolute value of a difference
+\end_layout
+
+\begin_layout Standard
+
 \series medium
 If multiple options are listed, the job will be performed on their intersection.
 \end_layout
@@ -1917,7 +1941,7 @@ The user may specify one or more analysis jobs to be performed on the TCST
 
 \series medium
 \emph on
-e.g.: -job filter -model HWFI -dump_row ./tc_filter_job.tcst
+e.g.: -job filter -amodel HWFI -dump_row ./tc_filter_job.tcst
 \end_layout
 
 \begin_layout LyX-Code
