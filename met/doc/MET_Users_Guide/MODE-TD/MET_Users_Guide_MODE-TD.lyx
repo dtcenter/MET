@@ -1954,7 +1954,479 @@ The Config File
 \end_layout
 
 \begin_layout Standard
-Hello.
+Most of the entries in the MTD configuration file should be familiar from
+ the corresponding file for MODE.
+ This initial beta release of MTD does not offer all the tunable options
+ that MODE has accumulated over the years, however.
+ In this section, we will not bother to repeat explanations of config file
+ details that are exactly the same as those in MODE; we will only explain
+ those elements that are different from MODE, and those that are unique
+ to MTD.
+\end_layout
+
+\begin_layout Standard
+The supported entries are as follows:
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf fcst}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf obs}
+\end_layout
+
+\end_inset
+
+ dictionaries are conceptually the same as the corresponding entries in
+ the MODE config file, with the exception that there are fewer entries in
+ the dictionaries.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf field}
+\end_layout
+
+\end_inset
+
+ sub-dictionary enables the user to choose the name of the data field and
+ the level in the input gridded files.
+ As in the case of MODE, the user can simply write
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{
+\backslash
+tt 
+\backslash
+hskip
+\backslash
+parindent obs = fcst;}
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent 
+\end_layout
+
+\end_inset
+
+to express the fact that the parameters defining the observation field are
+ identical to those of the forecast field.The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf conv
+\backslash
+_radius}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf conv
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
+ set the convolution radius and threshold, respectively.
+ The syntax for expressing these quantities is the same as for MODE.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf min
+\backslash
+_volume}
+\end_layout
+
+\end_inset
+
+ entry tell MTD to throw away objects whose ``volume'' (as described elsewhere
+ in this chapter) is smaller than the given value.
+ Spacetime objects whose volume is less than this will not participate in
+ the matching and merging process, and no attribute information will be
+ written to the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt ascii}
+\end_layout
+
+\end_inset
+
+ output files.
+ The default value is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+10{,}000
+\end_layout
+
+\end_inset
+
+.
+ If this seems rather large, consider the following example: Suppose the
+ user is running MTD on a 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$600 
+\backslash
+times 400$
+\end_layout
+
+\end_inset
+
+ grid, using 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$24$
+\end_layout
+
+\end_inset
+
+ time steps.
+ Then the volume of the whole data field is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$600 
+\backslash
+times 400 
+\backslash
+times 24 = 5{,}760{,}000$
+\end_layout
+
+\end_inset
+
+ cells.
+ An object ov volume 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+10{,}000
+\end_layout
+
+\end_inset
+
+ represents only 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$10{,}000/5{,}760{,}000 = 1/576$
+\end_layout
+
+\end_inset
+
+ of the total data field.
+ Setting 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt min
+\backslash
+_volume}
+\end_layout
+
+\end_inset
+
+ too small will typically produce a very large number of small objects,
+ slowing down the MTD run and increasing the size of the output files.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf total
+\backslash
+_interest
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
+ parameter gives the total interest threshold used in matching and merging.
+ Conceptually, this is identical to the corresponding quantity in MODE.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf nc
+\backslash
+_output}
+\end_layout
+
+\end_inset
+
+ dictionary contains a collection of boolean flags controlling which fields
+ are written to the NetCDF output file.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf latlon}
+\end_layout
+
+\end_inset
+
+ controls the output of a pair of 2D fields giving the latitude and longitude
+ of each grid point.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf raw}
+\end_layout
+
+\end_inset
+
+ entry controls the output of the raw input data for the MTD run.
+ These will be 3D fields, one for the forecast data and one for the observation
+ data.
+ Finally, the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf object
+\backslash
+_id}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf cluster
+\backslash
+_id}
+\end_layout
+
+\end_inset
+
+ flags control the output of the object numbers and cluster numbers for
+ the objects.
+ This is similar to MODE.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf txt
+\backslash
+_output}
+\end_layout
+
+\end_inset
+
+ dictionary also contains a collection of boolean flags, in this case controllin
+g the output of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt ascii}
+\end_layout
+
+\end_inset
+
+ attribute files.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf attributes
+\backslash
+_2d}
+\end_layout
+
+\end_inset
+
+ flag controls the output of the 2D object attributes for constant-time
+ slices of 3D objects, while the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf attributes
+\backslash
+_3d}
+\end_layout
+
+\end_inset
+
+ flag controls the output of single and pair 3D spacetime object attributes.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf output
+\backslash
+_prefix}
+\end_layout
+
+\end_inset
+
+ entry allows the user to customize the names of the output files for each
+ run, if needed.
+\end_layout
+
+\begin_layout Standard
+Finally, the user can set weights and interest maps for the 3D attributes
+ used in matching and merging spacetime objects.
+ The syntax is identical to that in the MODE configuration file, although
+ of course the collection of attributes is different.
 \end_layout
 
 \begin_layout Subsection
