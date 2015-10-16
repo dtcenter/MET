@@ -17,8 +17,14 @@ AM_LFLAGS	= --prefix=color --outfile=lex.yy.c
 # The library
 
 noinst_LIBRARIES = libvx_color.a
-libvx_color_a_SOURCES = \
-              color_parser_yacc.yy color_scanner.ll \
+
+if ENABLE_DEVELOPMENT
+    libvx_color_a_SOURCES = color_parser_yacc.yy color_scanner.ll
+else
+    libvx_color_a_SOURCES = color_parser_yacc.cc color_parser_yacc.h color_scanner.cc
+endif
+
+libvx_color_a_SOURCES += \
               color.cc color.h \
               color_list.cc color_list.h \
               color_table.cc \
