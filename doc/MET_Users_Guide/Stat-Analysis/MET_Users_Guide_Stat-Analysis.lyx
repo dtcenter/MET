@@ -60,7 +60,7 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\paragraph_indentation default
+\paragraph_indentation 0bp
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -256,11 +256,24 @@ The Stat-Analysis tool can be used to calculate the skill score indices
  temperature, temperature, height, and pressure at several levels in the
  atmosphere.
  The variables, levels, and lead times included in the index are shown in
- Table 10-1.
+ Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "compute_GO_Index"
+
+\end_inset
+
+.
  The partial sums (SL1L2 lines in the STAT output) for each of these variables
  at each level and lead time must have been computed in a previous step.
- The STAT analysis tool then uses the weights in Table 10-1 to compute values
- for the GO Index.
+ The STAT analysis tool then uses the weights in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "compute_GO_Index"
+
+\end_inset
+
+ to compute values for the GO Index.
  For a general skill score index, the user can specify the weights and variables
  to use in the calculations.
  
@@ -283,9 +296,17 @@ Variables, levels, and weights used to compute the GO Index.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "compute_GO_Index"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="6">
 <features rotate="0" tabularvalignment="middle">
@@ -2142,7 +2163,14 @@ All possible tasks for
 \emph on
 job_name
 \emph default
- are listed in Table 10-2.
+ are listed in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Des_components_STAT_analysis_tool"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -2166,9 +2194,17 @@ Description of components of the job command lines for the STAT analysis
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "Des_components_STAT_analysis_tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -2458,7 +2494,7 @@ seed = "";
 
 \series medium
 The 
-\series default
+\series bold
 interval
 \series medium
  variable indicates what method should be used for computing bootstrap confidenc
@@ -2474,7 +2510,7 @@ e intervals.
 
 \series medium
 The 
-\series default
+\series bold
 rep_prop
 \series medium
  variable must be set to a value between 0 and 1.
@@ -2491,10 +2527,10 @@ rep_prop
 
 \series medium
 The 
-\series default
-n_rep
+\series bold
+n_rep 
 \series medium
- variable defines the number of subsamples that should be taken when computing
+variable defines the number of subsamples that should be taken when computing
  bootstrap confidence intervals.
  This variable should be set large enough so that when confidence intervals
  are computed multiple times for the same set of data, the intervals do
@@ -2511,7 +2547,7 @@ n_rep
 
 \series medium
 The 
-\series default
+\series bold
 rng
 \series medium
  variable defines the random number generator to be used in the computation
@@ -2526,7 +2562,7 @@ rng
 
 \series medium
 The 
-\series default
+\series bold
 seed
 \series medium
  variable may be set to a specific value to make the computation of bootstrap
@@ -2562,23 +2598,23 @@ rank_corr_flag = TRUE;
 
 \series medium
 The 
-\series default
+\series bold
 rank_corr_flag
 \series medium
  variable may be set to 
-\series default
+\series bold
 TRUE
 \series medium
  or 
-\series default
-FALSE
+\series bold
+FALSE 
 \series medium
- to indicate whether or not Kendall's Tau and Spearman's Rank correlation
+to indicate whether or not Kendall's Tau and Spearman's Rank correlation
  coefficients should be computed.
  The computation of these rank correlation coefficients is very slow when
  run over many matched pairs.
  By default, this flag is turned on, as shown above, but setting it to 
-\series default
+\series bold
 FALSE
 \series medium
  should improve the runtime performance.
@@ -2612,9 +2648,13 @@ The variance inflation factor (VIF) flag indicates whether to apply a first
  an aggregated time series of contingency table counts or partial sums.
  The VIF adjusts the variance estimate for the lower effective sample size
  caused by autocorrelation of the statistics through time.
- A value of FALSE will not compute confidence intervals using the VIF.
  A value of 
-\series default
+\series bold
+FALSE 
+\series medium
+will not compute confidence intervals using the VIF.
+ A value of 
+\series bold
 TRUE
 \series medium
  will include the VIF, resulting in a slightly wider normal confidence interval.
@@ -2725,6 +2765,8 @@ The "-by column" job command option may be used to run the same job multiple
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Job: filter
 \end_layout
 
@@ -2749,6 +2791,8 @@ The output of this job is the same STAT format described in sections 4.3.3,
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Job: summary
 \end_layout
 
@@ -2784,7 +2828,14 @@ SUMMARY
 ", followed by a colon, then the total, mean with confidence intervals,
  standard deviation with confidence intervals, minimum value, percentiles
  (10th, 25th, 50th, 75th, and 90th) and the maximum value.
- The output columns are shown in Table 10-3 below.
+ The output columns are shown in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Columnar_output"
+
+\end_inset
+
+ below.
 \end_layout
 
 \begin_layout Standard
@@ -2807,14 +2858,22 @@ Columnar output of "summary" job output from the Stat-Analysis tool.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "Columnar_output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="2">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
-<column alignment="left" valignment="top" width="5.25in"">
+<column alignment="left" valignment="top" width="5.25in">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -3074,6 +3133,8 @@ Maximum value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Job: aggregate
 \end_layout
 
@@ -3103,6 +3164,8 @@ COL_NAME
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Job: aggregate_stat
 \end_layout
 
@@ -3132,7 +3195,14 @@ JOB_LIST", "COL_NAME
 \emph on
 out_line_type
 \emph default
-" arguments are listed in Table 8-4 below.
+" arguments are listed in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "arg_agg_stat_job"
+
+\end_inset
+
+ below.
 \end_layout
 
 \begin_layout Standard
@@ -3156,9 +3226,17 @@ Valid combinations of "-line_type" and "-out_line_type" arguments for the
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "arg_agg_stat_job"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features rotate="0" tabularvalignment="middle">
@@ -3393,6 +3471,8 @@ out_obs_thresh
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Job: go_index
 \end_layout
 
