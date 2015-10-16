@@ -72,11 +72,25 @@ void check_met_version(const char * check_version) {
 
 bool less_than_met_version(const char *str1, const char *str2) {
 
-   // Assuming version number format "Vn.n"
-   double v1 = atof(str1 + 1);
-   double v2 = atof(str2 + 1); 
+   // Skip past the leading 'V'
+   ConcatString cs1 = str1 + 1;
+   ConcatString cs2 = str2 + 1;
 
-   return(v1 < v2);
+   // Split based on the period
+   StringArray sa1 = cs1.split(".");
+   StringArray sa2 = cs2.split(".");
+
+   int n = max(sa1.n_elements(), sa2.n_elements());
+
+   // str1 < str2 if any sa1 elements are less than sa2
+   // or they are all the same but it is shorter in length
+   for(int i=0; i<sa2.n_elements(); i++) {
+      if(i == sa1.n_elements())            return(true);
+      else if(atoi(sa1[i]) < atoi(sa2[i])) return(true);
+      else if(atoi(sa1[i]) > atoi(sa2[i])) return(false);
+   }
+
+   return(false);
 }
 
 
