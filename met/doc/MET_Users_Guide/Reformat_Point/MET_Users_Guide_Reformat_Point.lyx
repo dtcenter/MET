@@ -174,6 +174,8 @@ pb2nc has both required and optional arguments.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for pb2nc
 \end_layout
 
@@ -212,6 +214,8 @@ config_file
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Optional arguments for pb2nc
 \end_layout
 
@@ -363,15 +367,15 @@ PB2NCConfig
 
 \series medium
 In this example, the PB2NC tool will process the input 
-\series default
+\series bold
 sample_pb.blk
 \series medium
  file applying the configuration specified in the 
-\series default
+\series bold
 PB2NCConfig
 \series medium
  file and write the output to a file named 
-\series default
+\series bold
 sample_pb.nc
 \series medium
 .
@@ -385,7 +389,7 @@ pb2nc configuration file
 
 \series medium
 The default configuration file for the PB2NC tool named 
-\series default
+\series bold
 PB2NCConfig_default
 \series medium
  can be found in the installed share/met/config directory.
@@ -409,7 +413,7 @@ When editing configuration files, environment variables may be used for
  full value before proceeding.
  Within the configuration file, environment variables must be specified
  in the form: 
-\series default
+\series bold
 ${VAR_NAME}
 \series medium
 .
@@ -419,7 +423,7 @@ ${VAR_NAME}
 
 \series medium
 For example, using an environment variable to set the 
-\series default
+\series bold
 message_type
 \series medium
  (see below) parameter to use ADPUPA and ADPSFC message types might consist
@@ -582,28 +586,28 @@ Each PrepBufr file has an observation time associated with it.
  Every PrepBufr message within the file has a time-offset defined relative
  to that file's observation time.
  The 
-\series default
+\series bold
 beg
 \series medium
  and 
-\series default
+\series bold
 end
 \series medium
  variables define a time window around the file's observation time for PrepBufr
  messages that should be retained.
  
-\series default
+\series bold
 beg
 \series medium
  indicates how many seconds relative to the file's observation time to begin
  retaining observations to be used for verification (the negative sign indicates
- this window begins 
-\series default
-prior
+ this window begins
+\series bold
+ prior
 \series medium
  to the time assigned to the PrepBufr file).
  
-\series default
+\series bold
 end
 \series medium
  indicates how many seconds after the file's time to stop retaining observations
@@ -650,31 +654,30 @@ poly = "";
 
 \series medium
 The 
-\series default
+\series bold
 grid
 \series medium
  and 
-\series default
+\series bold
 poly
 \series medium
  variables are used to define a spatial masking region for retaining observation
 s.
  
-\series default
-grid
+\series bold
+grid 
 \series medium
- may be set to one of the pre-defined NCEP grids which are specified as
- 
-\series default
+may be set to one of the pre-defined NCEP grids which are specified as 
+\series bold
 GNNN
 \series medium
  where 
-\series default
+\series bold
 NNN
 \series medium
  is the three digit designation for the grid.
  
-\series default
+\series bold
 poly
 \series medium
  may be set to a pre-defined or a user-created file consisting of a name
@@ -731,12 +734,12 @@ end = 100000;
 
 \series medium
 The 
-\series default
+\series bold
 beg
 \series medium
- and 
-\series default
-end
+ and
+\series bold
+ end
 \series medium
  variables are used to stratify the elevation (in meters) of the observations
  to be retained.
@@ -778,11 +781,13 @@ instrument_type = [];
 
 \series medium
 The 
+\series bold
+pb_report_type, in_report_type
 \series default
-pb_report_type, in_report_type,
+,
 \series medium
  and 
-\series default
+\series bold
 instrument_type
 \series medium
  variables are used to specify comma-separated lists of PrepBufr report
@@ -833,11 +838,11 @@ level_category = [];
 
 \series medium
 The 
-\series default
+\series bold
 beg
 \series medium
  and 
-\series default
+\series bold
 end
 \series medium
  variables are used to stratify the model level of observations to be retained.
@@ -850,7 +855,7 @@ end
 
 \series medium
 The 
-\series default
+\series bold
 level_category
 \series medium
  variable is used to specify a comma-separated list of Prepbufr data level
@@ -858,9 +863,13 @@ level_category
  An empty string indicates that all level categories should be retained.
  Accepted values and their meanings are described in the table below.
  These represent the same categories available from 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm "
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm 
+\end_layout
 
 \end_inset
 
@@ -1119,7 +1128,7 @@ obs_grib_code = ['SPFH', 'TMP', 'HGT', 'UGRD', 'VGRD'];
 \series medium
 Each PrepBufr message will likely contain multiple observation variables.
  The 
-\series default
+\series bold
 obs_grib_code
 \series medium
  variable is used to specify which observation variables are to be retained
@@ -1160,7 +1169,7 @@ quality_mark_thresh = 2;
 \series medium
 Each observation has a quality mark value associated with it.
  The 
-\series default
+\series bold
 quality_mark_thresh
 \series medium
  is used to stratify out which quality marks will be retained.
@@ -1196,26 +1205,44 @@ event_stack_flag = TOP;
 A PrepBufr message may contain duplicate observations with different quality
  mark values.
  The 
-\series default
+\series bold
 event_stack_flag
 \series medium
  indicates whether to use the observations at the top of the event stack
  (observation values have had more quality control processing applied) or
  the bottom of the event stack (observation values have had no quality control
  processing applied).
- The flag value of 
-\series default
-TOP
+ The flag value of
+\series bold
+ TOP
 \series medium
  listed above indicates the observations with the most amount of quality
  control processing should be used, the 
-\series default
+\series bold
 BOTTOM
 \series medium
  option uses the data closes to raw values.
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
 
 \series medium
 tmp_dir = '/tmp';
@@ -1226,9 +1253,27 @@ tmp_dir = '/tmp';
 \series medium
 The tmp_dir indicates where temporary files should be written.
  
+\series default
+
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
 
 \series medium
 version = 'v5.1';
@@ -1810,7 +1855,8 @@ ons, a configuration file may be specified.
 The initial version of the ASCII2NC tool supports input ASCII point observation
  format consisting of 11 columns of data for each observation value.
  The ASCII2NC tool was enhanced for version 4.1 of MET to handle data in
- both little_r and SURFRAD formats and for version 5.1 of MET to handle data in both WWSIS and AERONET formats.
+ both little_r and SURFRAD formats and for version 5.1 of MET to handle data
+ in both WWSIS and AERONET formats.
 \end_layout
 
 \begin_layout Standard
@@ -2309,12 +2355,17 @@ netcdf_file
 
 \begin_layout Standard
 
+\emph on
+ascii2nc
 \series medium
-ascii2nc has two required arguments and can take several optional ones.
+\emph default
+ has two required arguments and can take several optional ones.
  
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for ascii2nc
 \end_layout
 
@@ -2452,11 +2503,11 @@ sample_ascii_obs.nc
 
 \series medium
 In this example, the ASCII2NC tool will reformat the input 
-\series default
-sample_ascii_obs.txt
+\series bold
+sample_ascii_obs.txt file
 \series medium
- file into NetCDF format and write the output to a file named 
-\series default
+ into NetCDF format and write the output to a file named 
+\series bold
 sample_ascii_obs.nc
 \series medium
 .
@@ -2476,9 +2527,13 @@ This section describes how to run the MADIS2NC tool.
  More information about MADIS data and formatting is available at 
 \series default
 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://madis.noaa.gov."
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://madis.noaa.gov
+\end_layout
 
 \end_inset
 
@@ -2557,6 +2612,8 @@ madis2nc
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for madis2nc
 \end_layout
 
@@ -2658,7 +2715,6 @@ arguments for madis2nc
  The 
 \series bold
 -mask_poly file
-\series medium
 \series medium
  option defines a polyline masking file for filtering the point observations
  spatially.
