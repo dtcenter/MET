@@ -59,8 +59,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation skip
-\defskip bigskip
+\paragraph_separation indent
+\paragraph_indentation 0bp
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -87,7 +87,14 @@ Several MET tools exist for the purpose of reformatting gridded fields.
  into the intermediate files required by some MET modules.
  These steps are represented by the first columns in the MET flowchart depicted
  in Fig.
- 1-1.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "temp_MODIS"
+
+\end_inset
+
+.
  Output data formats and the software modules used to reformat gridded fields
  are described in later sections.
 \end_layout
@@ -270,6 +277,8 @@ out_file
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for the pcp_combine
 \end_layout
 
@@ -360,7 +369,7 @@ level
 
 \begin_layout Standard
 
-\series medium
+\series bold
 Required arguments for the pcp_combine sum command
 \end_layout
 
@@ -432,6 +441,8 @@ argument indicates the name for the NetCDF file to be written.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Optional arguments for pcp_combine sum command
 \end_layout
 
@@ -488,6 +499,8 @@ reg_exp
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for the pcp_combine add command
 \end_layout
 
@@ -529,6 +542,8 @@ An arbitrary number of additional files and accumulations can be provided.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for the pcp_combine subtract command
 \end_layout
 
@@ -1397,8 +1412,15 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Example plot showing surface temperature froma MODIS file.
+Example plot showing surface temperature from a MODIS file.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "temp_MODIS"
 
 \end_inset
 
