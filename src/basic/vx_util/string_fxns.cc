@@ -72,39 +72,11 @@ void check_met_version(const char * check_version) {
 
 bool less_than_met_version(const char *str1, const char *str2) {
 
-   NumArray v1 = parse_version(str1);
-   NumArray v2 = parse_version(str2);
-   int n = max(v1.n_elements(), v2.n_elements());
+   // Assuming version number format "Vn.n"
+   double v1 = atof(str1 + 1);
+   double v2 = atof(str2 + 1); 
 
-   // v1 < v2 if any of it's elements are less than v2
-   // or they are all the same but it is shorter in length
-   for(int i=0; i<v2.n_elements(); i++) {
-      if(i == v1.n_elements()) return(true);
-      else if(v1[i] < v2[i])   return(true);
-      else if(v1[i] > v2[i])   return(false);
-   }
-
-   return(false);
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-NumArray parse_version(const char * str) {
-   NumArray version;
-
-   // Skip past the leading 'V'
-   ConcatString cs = str + 1;
-
-   // Split using a period
-   StringArray sa = cs.split(".");
-
-   for(int i=0; i<sa.n_elements(); i++) {
-      version.add(atoi(sa[i]));
-   }
-
-   return(version);
+   return(v1 < v2);
 }
 
 
