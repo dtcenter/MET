@@ -80,8 +80,6 @@ bool less_than_met_version(const char *str1, const char *str2) {
    StringArray sa1 = cs1.split(".");
    StringArray sa2 = cs2.split(".");
 
-   int n = max(sa1.n_elements(), sa2.n_elements());
-
    // str1 < str2 if any sa1 elements are less than sa2
    // or they are all the same but it is shorter in length
    for(int i=0; i<sa2.n_elements(); i++) {
