@@ -709,9 +709,13 @@ Once MET has been applied to forecast and observed fields (or observing
  wish to compute with the given output of MET and MET-TC.
  Any computing language could be used for this stage; some scripts will
  be provided on the MET users web page (
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.dtcenter.org/met/users/"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/met/users/
+\end_layout
 
 \end_inset
 
@@ -729,8 +733,15 @@ Grid-Stat tool examples
 \begin_layout Standard
 
 \series medium
-The plots in Figure 12-1 show time series of frequency bias and Gilbert
- Skill Score, stratified according to time of day.
+The plots in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Gilbert_skill_score"
+
+\end_inset
+
+ show time series of frequency bias and Gilbert Skill Score, stratified
+ according to time of day.
  This type of figure is particularly useful for diagnosing problems that
  are tied to the diurnal cycle.
  In this case, two of the models (green dash-dotted and black dotted lines)
@@ -764,6 +775,13 @@ status open
 Time series of forecast area bias and Gilbert Skill Score for four model
  configurations (different lines) stratified by time-of-day.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Gilbert_skill_score"
 
 \end_inset
 
@@ -814,20 +832,44 @@ When using the MODE tool, it is possible to think of matched objects as
 \begin_layout Standard
 
 \series medium
-Fig.
- 12-2 gives an example of two traditional verification scores (Bias and
- CSI) along with bar plots showing the total numbers of objects for the
- forecast and observed fields, as well as bar plots showing their total
- areas.
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "verification"
+
+\end_inset
+
+ gives an example of two traditional verification scores (Bias and CSI)
+ along with bar plots showing the total numbers of objects for the forecast
+ and observed fields, as well as bar plots showing their total areas.
  These data are from the same set of 13-km WRF model runs analyzed in Fig.
- 12-1.
+ 12-1
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+This needs to be linked
+\end_layout
+
+\end_inset
+
+.
  The model runs were initialized at 0 UTC and cover the period 15 July to
  15 August 2005.
  For the forecast evaluation, we compared 3-hour accumulated precipitation
  for lead times of 3-24 hours to Stage II radar-gauge precipitation.
  Note that for the 3-hr lead time, indicated as the 0300 UTC valid time
  in Fig.
- 12-2, the Bias is significantly larger than the other lead times.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Gilbert_skill_score"
+
+\end_inset
+
+, the Bias is significantly larger than the other lead times.
  This is evidenced by the fact that there are both a larger number of forecast
  objects, and a larger area of forecast objects for this lead time, and
  only for this lead time.
@@ -866,6 +908,13 @@ Traditional verification scores applied to output of the MODE tool, computed
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "verification"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -881,22 +930,62 @@ In addition to the traditional scores, MODE output allows more information
  It is even useful when computing the traditional scores to understand how
  much the forecasts are displaced in terms of both distance and direction.
  Fig.
- 12-3, for example, shows circle histograms for matched objects.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "histogram"
+
+\end_inset
+
+, for example, shows circle histograms for matched objects.
  The petals show the percentage of times the forecast object centroids are
  at a given angle from the observed object centroids.
  In Fig.
- 12-3 (top diagram) about 25% of the time the forecast object centroids
- are west of the observed object centroids, whereas in Fig.
- 12-3 (bottom diagram) there is less bias in terms of the forecast objects'
- centroid locations compared to those of the observed objects, as evidenced
- by the petals' relatively similar lengths, and their relatively even dispersion
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "histogram"
+
+\end_inset
+
+ (top diagram) about 25% of the time the forecast object centroids are west
+ of the observed object centroids, whereas in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "histogram"
+
+\end_inset
+
+ (bottom diagram) there is less bias in terms of the forecast objects' centroid
+ locations compared to those of the observed objects, as evidenced by the
+ petals' relatively similar lengths, and their relatively even dispersion
  around the circle.
  The colors on the petals represent the proportion of centroid distances
  within each colored bin along each direction.
- For example, Fig 12-3 (top row) shows that among the forecast object centroids
- that are located to the West of the observed object centroids, the greatest
- proportion of the separation distances (between the observed and forecast
- object centroids) is greater than 20 grid squares.
+ For example, Fig
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Is the correct figure linked?
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "histogram"
+
+\end_inset
+
+ (top row) shows that among the forecast object centroids that are located
+ to the West of the observed object centroids, the greatest proportion of
+ the separation distances (between the observed and forecast object centroids)
+ is greater than 20 grid squares.
 \end_layout
 
 \begin_layout Standard
@@ -923,6 +1012,13 @@ status open
 Circle histograms showing object centroid angles and distances (see text
  for explanation).
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "histogram"
 
 \end_inset
 
@@ -999,14 +1095,6 @@ The supplied R script can generate a number of different plot types including
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-Figure 6.1: Example boxplot from plot_tcmpr.R.
- Track error distributions by lead time for three operational models GFNI,
- GHMI, HFWI.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
@@ -1042,15 +1130,6 @@ Example boxplot from plot_tcmpr.R.
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Figure 6.2: Example mean intensity error with confidence intervals at 95%
- from plot_tcmpr.R.
- Raw intensity error by lead time for a homogeneous comparison of two operationa
-l models GHMI, HWFI.
 \end_layout
 
 \begin_layout Standard
