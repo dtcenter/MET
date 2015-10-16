@@ -186,13 +186,17 @@ tc_pairs
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for tc_pairs:
 \end_layout
 
 \begin_layout Standard
-Adeck source
+
+\series bold
+Adeck source:
 \series medium
-: The 
+ The 
 \emph on
 -adeck
 \emph default
@@ -211,9 +215,11 @@ Adeck source
 \end_layout
 
 \begin_layout Standard
-Bdeck source
+
+\series bold
+Bdeck source:
 \series medium
-: The 
+ The 
 \emph on
 -bdeck
 \emph default
@@ -234,9 +240,11 @@ Bdeck source
 \end_layout
 
 \begin_layout Standard
-Config file
+
+\series bold
+Config file:
 \series medium
-: The 
+ The 
 \emph on
 -config
 \emph default
@@ -245,12 +253,14 @@ Config file
 \end_layout
 
 \begin_layout Standard
-Optional arguments for tc_pairs
-\series medium
-:
+
+\series bold
+Optional arguments for tc_pairs:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Out base:
 \series medium
  The -out argument indicates the path of the output file base.
@@ -258,6 +268,8 @@ Out base:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Log file:
 \series medium
  The -log argument indicates the name of the log file associated with 
@@ -268,7 +280,11 @@ tc_pairs
 \end_layout
 
 \begin_layout Standard
-V level:
+
+\series bold
+V level
+\series default
+:
 \series medium
  The -v option indicates the desired level of verbosity.
  The value of 
@@ -315,47 +331,42 @@ TCPairsConfig
 The TC-Pairs tool implements the following logic:
 \end_layout
 
-\begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Parse the adeck and bdeck data files and store them as track objects.
+Parse the adeck and bdeck data files and store them as track objects.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Apply configuration file settings to filter the adeck and bdeck track
- data down to a subset of interest.
+Apply configuration file settings to filter the adeck and bdeck track data
+ down to a subset of interest.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Apply configuration file settings to derive additional adeck track data,
+Apply configuration file settings to derive additional adeck track data,
  such as interpolated tracks, consensus tracks, time-lagged tracks, and
  statistical track and intensity models.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* For each adeck track that was parsed or derived, search for a matching
- bdeck track with the same basin and cyclone number and overlapping valid
- times.
+For each adeck track that was parsed or derived, search for a matching bdeck
+ track with the same basin and cyclone number and overlapping valid times.
  If not matching against the BEST track, also ensure that the model initializati
 on times match.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* For each adeck/bdeck track pair, match up their track points in time,
- lookup distances to land, compute track location errors, and write an output
- TCMPR line for each track point.
+For each adeck/bdeck track pair, match up their track points in time, lookup
+ distances to land, compute track location errors, and write an output TCMPR
+ line for each track point.
 \end_layout
 
 \begin_layout Subsection
@@ -366,7 +377,11 @@ TC_Pairs configuration file
 
 \series medium
 The default configuration file for the TC-Pairs tool named 'TCPairsConfig_defaul
-t' can be found in the installed share/met/config/ directory.
+t' can be found in the installed 
+\series bold
+share/met/config/ directory
+\series medium
+.
  It is encouraged for users to copy these default files before modifying
  their contents.
  The contents of the configuration file are described in the subsections
@@ -404,7 +419,7 @@ e.g.: model = ["DSHP", "LGEM", "HWRF"];
 
 \series medium
 The 
-\series default
+\series bold
 model
 \series medium
  variable contains a list of comma-separated models to be used.
@@ -445,7 +460,7 @@ e.g.: storm_id=["AL092010"];
 
 \series medium
 The 
-\series default
+\series bold
 storm_id
 \series medium
  variable contains the specific storm identifier (or comma separated list
@@ -486,7 +501,7 @@ e.g.: basin = ["AL", "EP"];
 
 \series medium
 The 
-\series default
+\series bold
 basin
 \series medium
  variable contains a comma-separated list of basins to be processed.
@@ -531,7 +546,7 @@ e.g.: cyclone = ["01",
 
 \series medium
 The 
-\series default
+\series bold
 cyclone
 \series medium
  variable contains the cyclone number (or a comma separated list of cyclone
@@ -571,7 +586,7 @@ e.g.: storm_name = ["IRENE","EARL"];
 
 \series medium
 The 
-\series default
+\series bold
 storm_name
 \series medium
  variable contains the specific named storm (or a comma separated list of
@@ -623,11 +638,11 @@ init_end="20101031";
 
 \series medium
 The 
-\series default
+\series bold
 init_beg
 \series medium
  and 
-\series default
+\series bold
 init_end
 \series medium
  fields specify a model initialization time window (YYYYMMDD_[HH[MMSS]]).
@@ -678,11 +693,11 @@ init_exc = ["20101031_12"];
 
 \series medium
 The 
-\series default
+\series bold
 init_inc
 \series medium
  and 
-\series default
+\series bold
 init_exc
 \series medium
  are comma separated lists of specific initialization times (YYYYMMDD_[HH[MMSS]]
@@ -734,12 +749,14 @@ valid_end = "20101031_18"
 
 \series medium
 The 
-\series default
+\series bold
 valid_beg
 \series medium
  and
 \series default
- valid_end
+ 
+\series bold
+valid_end
 \series medium
  fields specify a valid time window (YYYYMMDD_[HH[MMSS]]).
  Tracks for which all valid times fall within the time window will be used.
@@ -777,9 +794,9 @@ e.g.: init_hour = ["00", "06", "12", "18"];
 \begin_layout Standard
 
 \series medium
-The 
-\series default
-init_hour
+The
+\series bold
+ init_hour
 \series medium
  field specifies a comma-separated list of model initialization hours to
  be used (HH[MMSS]).
@@ -818,7 +835,7 @@ e.g.: init_mask = "MET_BASE/poly/EP.poly";
 
 \series medium
 The 
-\series default
+\series bold
 init_mask
 \series medium
  field specifies a lat/lon polyline defining a masking region to be applied.
@@ -858,7 +875,7 @@ e.g.: valid_mask = "MET_BASE/poly/EP.poly";
 
 \series medium
 The 
-\series default
+\series bold
 valid_mask
 \series medium
  field specifies a lat/lon polyline defining a masking region to be applied.
@@ -897,26 +914,26 @@ e.g.: check_dup = FALSE;
 
 \series medium
 The 
-\series default
+\series bold
 check_dup
 \series medium
  flag expects either TRUE and FALSE, indicating whether the code should
  check for duplicate ATCF lines when building tracks.
  Setting 
-\series default
+\series bold
 check_dup
 \series medium
  to TRUE will check for duplicated lines, and produce output information
  regarding the duplicate.
  The duplicated ATCF line will not be processed in the tc_pairs output.
  Setting 
-\series default
+\series bold
 check_dup
 \series medium
  to FALSE, will still exclude tracks that decrease with time, and will overwrite
  repeated lines, but specific duplicate log information will not be output.
  Setting 
-\series default
+\series bold
 check_dup
 \series medium
  to FALSE will make parsing the track quicker.
@@ -953,7 +970,7 @@ e.g.: interp12 = NONE;
 
 \series medium
 The 
-\series default
+\series bold
 interp12
 \series medium
  flag expects the entry NONE, FILL, or REPLACE, indicating whether special
@@ -1050,7 +1067,7 @@ min_req = 2;
 
 \series medium
 The 
-\series default
+\series bold
 consensus
 \series medium
  field allows the user to generate a user-defined consensus forecasts from
@@ -1059,7 +1076,10 @@ consensus
 models
 \series medium
 .
- All models used in the consensus forecast need to be included in the model
+ All models used in the consensus forecast need to be included in the 
+\series bold
+model
+\series medium
  field (1st entry in TCPairsConfig_default).
  The 
 \series default
@@ -1067,13 +1087,13 @@ name
 \series medium
  field is the desired consensus model name.
  The 
-\series default
+\series bold
 members
 \series medium
  field is a comma-separated list of model IDs that make up the members of
  the consensus.
  The 
-\series default
+\series bold
 required
 \series medium
  field is a comma-separated list of true/false values associated with each
@@ -1085,10 +1105,10 @@ required
  The length of the required array must be the same length as the members
  array.
  The 
-\series default
-min_req
+\series bold
+min_req 
 \series medium
- field is the number of members required in order for the consensus to be
+field is the number of members required in order for the consensus to be
  computed.
  The required and min_req field options are applied at each forecast lead
  time.
@@ -1127,7 +1147,7 @@ e.g.: lag_time = ["06","12"];
 
 \series medium
 The 
-\series default
+\series bold
 lag_time
 \series medium
  field is a comma-separated list of forecast lag times to be used (HH[MMSS]).
@@ -1168,7 +1188,7 @@ e.g.: best_baseline = ["BCLP", "BCD5", "BCLA"];
 
 \series medium
 The 
-\series default
+\series bold
 best_baseline
 \series medium
  field specifies a comma-separated list of CLIPER/SHIFOR baseline forecasts
@@ -1179,13 +1199,15 @@ best_baseline
 
 \series medium
 The following are valid baselines for the 
-\series default
+\series bold
 best_baseline
 \series medium
  field:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 BTCLIP
 \series medium
 : Neumann original 3-day CLIPER in best track mode.
@@ -1194,6 +1216,8 @@ BTCLIP
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 BTCLIP5
 \series medium
 : 5-day CLIPER (
@@ -1209,6 +1233,8 @@ DeMaria and Knaff, 2001
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 BTCLIPA
 \series medium
 : Sim Aberson's recreation of Neumann original 3-day CLIPER in best-track
@@ -1232,7 +1258,7 @@ e.g.: oper_baseline = ["OCLP","OCS5","OCD5"];
 
 \series medium
 The 
-\series default
+\series bold
 oper_baseline
 \series medium
  field specifies a comma-separated list of CLIPER/SHIFOR baseline forecasts
@@ -1250,6 +1276,8 @@ oper_baseline
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 OCLIP
 \series medium
 : Merrill modified (operational) 3-day CLIPER run in operational mode.
@@ -1258,6 +1286,8 @@ OCLIP
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 OCLIP5
 \series medium
 : 5-day CLIPER (
@@ -1273,6 +1303,8 @@ DeMaria and Knaff, 2001
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 OCLIPD5
 \series medium
 : 5-day CLIPER (
@@ -1318,13 +1350,13 @@ e.g.: match_points = TRUE;
 
 \series medium
 The 
-\series default
+\series bold
 match_points
 \series medium
  field specifies whether only those track points common to both the adeck
  and bdeck tracks should be written out.
  If 
-\series default
+\series bold
 match_points
 \series medium
  is selected as FALSE, the union of the adeck and bdeck tracks will be written
@@ -1362,7 +1394,7 @@ e.g.: dland_file="MET_BASE/tc_data/dland_global_tenth_degree.nc";
 
 \series medium
 The 
-\series default
+\series bold
 dland_file
 \series medium
  string specifies the path of the NetCDF format file (default file: dland_global
@@ -1373,7 +1405,7 @@ tc_pairs code
 .
  This file is generated using tc_dland (default file provided in installed
  
-\series default
+\series bold
 share/met/tc_data
 \series medium
  directory).
@@ -1435,16 +1467,16 @@ time_offset = -14400;
 
 \series medium
 The 
-\series default
+\series bold
 watch_warn
 \series medium
  field specifies the file name and time applied offset to the 
-\series default
+\series bold
 watch_warn
 \series medium
  flag.
  The 
-\series default
+\series bold
 file_name
 \series medium
  string specifies the path of the watch/warning file to be used to determine
@@ -1455,22 +1487,33 @@ file_name
 wwpts_us.txt
 \emph default
 , which is found in the installed 
-\series default
+\series bold
 share/met/tc_data/
 \series medium
  directory within the MET build.
  The 
-\series default
-time_offset
+\series bold
+time_offset 
 \series medium
- string is the time window (in seconds) assigned to the watch/warning.
+string is the time window (in seconds) assigned to the watch/warning.
  Due to the non-uniform time watches and warnings are issued, a time window
  is assigned for which watch/warnings are included in the verification for
  each valid time.
  The default watch/warn file is static, and therefore may not include warned
  storms beyond the current MET code release date; therefore users may wish
- to contact met_help@ucar.edu to obtain the most recent watch/warning file
- if the static file does not contain storms of interest.
+ to contact 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+met_help@ucar.edu
+\end_layout
+
+\end_inset
+
+ to obtain the most recent watch/warning file if the static file does not
+ contain storms of interest.
 \begin_inset Newline newline
 \end_inset
 
