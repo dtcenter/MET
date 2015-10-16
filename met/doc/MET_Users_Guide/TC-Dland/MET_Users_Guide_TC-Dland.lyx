@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -124,10 +124,10 @@ The input for the TC-dland tool is a file containing the longitude (degrees
  islands considered to be a significant landmass.
  The default input is to use all three land data files (aland.dat, shland.dat,
  wland.dat) found in the installed 
-\series default
-share/met/tc_data/
+\series bold
+share/met/tc_data/ 
 \series medium
- directory.
+directory.
  The use of all three files produces a global land data file.
  The aland.dat file contains the longitude and latitude distinctions used
  by NHC for the Atlantic and eastern North Pacific basins, the shland.dat
@@ -149,7 +149,7 @@ The output file from TC-dland is a NetCDF format file containing a gridded
  As noted in chapter 1.3, pre-computed distance to land (NetCDF output from
  TC-dland) files are available in the release.
  In the installed 
-\series default
+\series bold
 share/met/tc_data
 \series medium
  directory: 
@@ -222,35 +222,43 @@ Required arguments for tc_dland:
 \end_layout
 
 \begin_layout Standard
-Out_file
+
+\series bold
+Out_file:
 \series medium
-: The -out_file argument indicates the NetCDF output file containing the
+ The -out_file argument indicates the NetCDF output file containing the
  computed distances to land.
 \end_layout
 
 \begin_layout Standard
-Optional arguments for tc_dland
-\series medium
-:
+
+\series bold
+Optional arguments for tc_dland:
 \end_layout
 
 \begin_layout Standard
-Grid spec
+
+\series bold
+Grid spec:
 \series medium
-: The -grid spec argument overrides the default grid (1/10th NH grid).
+ The -grid spec argument overrides the default grid (1/10th NH grid).
  Spec = 
 \emph on
 lat_ll lon_ll delta_lat delta_lon n_lat n_lon
 \end_layout
 
 \begin_layout Standard
-Noll
+
+\series bold
+Noll:
 \series medium
-: The -noll argument skips writing the lon/lat variables in the output NetCDF
+ The -noll argument skips writing the lon/lat variables in the output NetCDF
  file to reduce the file size.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Land file
 \series medium
 : The -land file argument overwrites the default land data files (aland.dat,
@@ -258,15 +266,19 @@ Land file
 \end_layout
 
 \begin_layout Standard
-Log file
+
+\series bold
+Log file:
 \series medium
-: The -log file argument outputs log messages to the specified file.
+ The -log file argument outputs log messages to the specified file.
 \end_layout
 
 \begin_layout Standard
-V level
+
+\series bold
+V level:
 \series medium
-: The -v level argument overrides the default level of verbosity (2).
+ The -v level argument overrides the default level of verbosity (2).
 \end_layout
 
 \end_body
