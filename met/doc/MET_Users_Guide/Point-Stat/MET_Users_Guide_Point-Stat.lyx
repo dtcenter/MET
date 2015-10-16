@@ -59,8 +59,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -102,7 +102,14 @@ s.
 \series medium
 Scientific and statistical aspects of the Point-Stat tool are discussed
  in the following section.
- Practical aspects of the Point-Stat tool are described in Section 4.3.
+ Practical aspects of the Point-Stat tool are described in Section
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Practical-information"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -114,17 +121,45 @@ Scientific and statistical aspects
 \series medium
 The statistical methods and measures computed by the Point-Stat tool are
  described briefly in this section.
- In addition, Section 4.2.1 discusses the various interpolation options available
- for matching the forecast grid point values to the observation points.
+ In addition, Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Interpolation/matching-methods"
+
+\end_inset
+
+ discusses the various interpolation options available for matching the
+ forecast grid point values to the observation points.
  The statistical measures computed by the Point-Stat tool are described
- briefly in Section 4.2.2 and in more detail in Appendix C.
- Section 4.2.3 describes the methods for computing confidence intervals that
- are applied to some of the measures computed by the Point-Stat tool; more
- detail on confidence intervals is provided in Appendix D.
+ briefly in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Statistical-measures"
+
+\end_inset
+
+ and in more detail in Appendix C.
+ Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Statistical-confidence-intervals"
+
+\end_inset
+
+ describes the methods for computing confidence intervals that are applied
+ to some of the measures computed by the Point-Stat tool; more detail on
+ confidence intervals is provided in Appendix D.
 \end_layout
 
 \begin_layout Subsection
 Interpolation/matching methods
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Interpolation/matching-methods"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -183,22 +218,21 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename fig4.1.png
+	scale 50
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 Diagram illustrating matching and interpolation methods used in MET.
  See text for explanation.
 \end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename fig4.1.png
-	scale 50
 
 \end_inset
 
@@ -217,6 +251,15 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename fig4.2.jpg
+	scale 25
+
+\end_inset
+
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -229,22 +272,8 @@ Illustration of some matching and interpolation methods used in MET.
 
 \end_layout
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename fig4.2.jpg
-	scale 25
-
 \end_inset
 
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
@@ -537,6 +566,13 @@ This method is performed using the four closest grid squares.
 
 \begin_layout Subsection
 Statistical measures
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Statistical-measures"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -646,6 +682,13 @@ Probabilistic forecast values are assumed to have a range of either 0 to
 
 \begin_layout Subsection
 Statistical confidence intervals
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Statistical-confidence-intervals"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -772,26 +815,6 @@ MET provides parametric confidence intervals based on assumptions of normality
 \begin_layout Standard
 
 \series medium
-.
- 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-the dot is in here intentionally to help with formatting - do not remove
- here or in other lists
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\series medium
 * Base Rate
 \end_layout
 
@@ -895,12 +918,6 @@ MET provides parametric confidence intervals based on assumptions of normality
 \begin_layout Standard
 
 \series medium
-.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
 * Forecast and Observation Means
 \end_layout
 
@@ -927,12 +944,6 @@ MET provides parametric confidence intervals based on assumptions of normality
 \series medium
 MET provides parametric confidence intervals based on assumptions of normality
  for the following probabilistic statistics:
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-.
 \end_layout
 
 \begin_layout Standard
@@ -968,6 +979,13 @@ For more information on confidence intervals pertaining to verification
 
 \begin_layout Section
 Practical information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Practical-information"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2710,6 +2728,8 @@ Header information for each file point-stat outputs.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="23" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -3428,6 +3448,8 @@ Format information for FHO (Forecast, Hit rate, Observation rate) output
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -3680,6 +3702,8 @@ Format information for CTC (Contingency Table Count) output line type.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -3963,6 +3987,8 @@ Format information for CTS (Contingency Table Statistics) output line type.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -4976,6 +5002,8 @@ Format information for CNT(Continuous Statistics) output line type.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -5949,6 +5977,8 @@ Format information for MCTC (Multi-category Contingency Table Count) output
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -6170,6 +6200,8 @@ Format information for MCTS (Multi- category Contingency Table Statistics)
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -6498,6 +6530,8 @@ Format information for PCT (Contingency Table Counts for Probabilistic forecasts
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -6807,6 +6841,8 @@ Format information for PSTD (Contingency Table Statistics for Probabilistic
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -7217,6 +7253,8 @@ c forecasts) output line type.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -7646,6 +7684,8 @@ Format information for PRC (PRC for Receiver Operating Characteristic for
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -7954,6 +7994,8 @@ Format information for SL1L2 (Scalar Partial Sums) output line type.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -8290,6 +8332,8 @@ Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -8626,6 +8670,8 @@ Format information for VL1L2 (Vector Partial Sums) output line type.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -8992,6 +9038,8 @@ Format information for VAL1L2 (Vector Anomaly Partial Sums) output line
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -9357,6 +9405,8 @@ Format information for MPR (Matched Pair) output line type.
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
 <features rotate="0" tabularvalignment="middle">
