@@ -17,7 +17,14 @@ AM_LFLAGS	= --prefix=config --outfile=lex.yy.c
 # The library
 
 noinst_LIBRARIES = libvx_config.a
-libvx_config_a_SOURCES = config.tab.yy config_scanner.ll \
+
+if ENABLE_DEVELOPMENT
+    libvx_config_a_SOURCES = config.tab.yy config_scanner.ll
+else
+    libvx_config_a_SOURCES = config.tab.cc config.tab.h config_scanner.cc
+endif
+
+libvx_config_a_SOURCES += \
               configobjecttype_to_string.cc configobjecttype_to_string.h \
               grdfiletype_to_string.cc grdfiletype_to_string.h \
               dictionary.cc dictionary.h \
