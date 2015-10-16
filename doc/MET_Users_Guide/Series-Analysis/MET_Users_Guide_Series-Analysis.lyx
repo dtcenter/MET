@@ -59,8 +59,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -219,6 +219,8 @@ has some required arguments and accepts optional ones.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments ensemble_stat
 \end_layout
 
@@ -334,7 +336,14 @@ s being the wind vector and neighborhood statistics.
  the ncdump -h command to view header information.
  Additionally, ncview or the plot_data_plane tool can be used to visualize
  the output.
- An example of Series-Analysis output is shown in Figure 6-1 below.
+ An example of Series-Analysis output is shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Glibert_precip"
+
+\end_inset
+
+ below.
  
 \end_layout
 
@@ -345,10 +354,13 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\begin_inset Graphics
+	filename fig6.1.png
+	scale 30
 
-\end_layout
+\end_inset
 
-\begin_layout Plain Layout
+
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -359,19 +371,12 @@ An example of the Gilbert Skill Score for precipitation forecasts at each
 \end_inset
 
 
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename fig6.1.png
-	scale 30
+\begin_inset CommandInset label
+LatexCommand label
+name "Glibert_precip"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -440,7 +445,9 @@ WRF
 \series medium
 The
 \series default
- model 
+ 
+\series bold
+model 
 \series medium
 variable contains a short text string identifying the name to be assigned
  to the model being verified.
@@ -523,13 +530,13 @@ obs = fcst;
 
 \series medium
 The 
-\series default
+\series bold
 fcst
 \series medium
  group contains information about the model forecast fields, levels and
  thresholds to use in verification.
  The 
-\series default
+\series bold
 field
 \series medium
  variable contains a comma-separated list of model variables and corresponding
@@ -543,12 +550,18 @@ field
 For GRIB files, the GRIB code itself or the corresponding abbreviation may
  be used to specify which model fields are to be verified.
  A level indicator in the form 
+\series bold
+"ANNN", "ZNNN", "PNNN", "PNNN-NNN", "LNNN"
 \series default
-"ANNN", "ZNNN", "PNNN", "PNNN-NNN", "LNNN", 
+, 
 \series medium
 or
 \series default
- "RNNN" 
+ 
+\series bold
+"RNNN"
+\series default
+ 
 \series medium
 must correspond to each field name.
  These indicate an accumulation interval, a single vertical level, a single
@@ -556,7 +569,11 @@ must correspond to each field name.
  GRIB record number, respectively.
 
 \series default
- "NNN" 
+ 
+\series bold
+"NNN"
+\series default
+ 
 \series medium
 indicates the accumulation or level value.
  
@@ -583,9 +600,13 @@ The values listed above indicate that specific humidity, temperature, height,
  When the U component is followed by the V component, both with the same
  level indicator, they will be treated as vector quantities.
  A list of GRIB codes is available at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+\end_layout
 
 \end_inset
 
@@ -594,14 +615,18 @@ target "http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html"
  will be used directly.
  However, if wind speed is unavailable but the U and V components of the
  wind are included, the wind speed will be calculated automatically by MET,
- provided that WIND is included in the field group.
+ provided that WIND is included in the 
+\series bold
+field 
+\series medium
+group.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 For each 
-\series default
+\series bold
 name 
 \series medium
 listed in the forecast field, one or more thresholds must be specified for
@@ -629,8 +654,10 @@ To indicate that a forecast field should be treated as probabilities, set
 
 \series medium
 The 
+\series bold
+obs
 \series default
-obs 
+ 
 \series medium
 group can be defined in the same way as the forecast group.
  However, for most users, setting obs=fcst to use the same settings will
@@ -650,7 +677,11 @@ For each observation field, one or more thresholds can be specified for
  use in computing discrete statistics.
  Specification is done exactly as for
 \series default
- cat_thresh.
+ 
+\series bold
+cat_thresh
+\series default
+.
  
 \series medium
 
@@ -681,13 +712,19 @@ ci_alpha[] = [0.05];
 \series medium
 The
 \series default
- ci_alpha 
+ 
+\series bold
+ci_alpha
+\series default
+ 
 \series medium
 variable contains a comma-separated list of alpha values to be used when
  computing confidence intervals.
  The confidence interval computed is 1 minus the
 \series default
- ci_alpha
+ 
+\series bold
+ci_alpha
 \series medium
  value.
  The value of 0.05 listed above indicates that the 95th percentile confidence
@@ -730,13 +767,21 @@ seed = "";
 \series medium
 The
 \series default
- boot 
+ 
+\series bold
+boot
+\series default
+ 
 \series medium
 group defines the parameters to be used in calculation of bootstrap confidence
  intervals.
  The
 \series default
- interval 
+ 
+\series bold
+interval
+\series default
+ 
 \series medium
 variable indicates what method should be used for computing bootstrap confidence
  intervals.
@@ -751,8 +796,10 @@ variable indicates what method should be used for computing bootstrap confidence
 
 \series medium
 The 
+\series bold
+rep_prop
 \series default
-rep_prop 
+ 
 \series medium
 variable must be set to a value between 0 and 1.
  When computing bootstrap confidence intervals over n sets of matched pairs,
@@ -768,8 +815,10 @@ variable must be set to a value between 0 and 1.
 
 \series medium
 The 
+\series bold
+n_rep
 \series default
-n_rep 
+ 
 \series medium
 variable defines the number of subsamples that should be taken when computing
  bootstrap confidence intervals.
@@ -788,8 +837,10 @@ variable defines the number of subsamples that should be taken when computing
 
 \series medium
 The 
+\series bold
+rng
 \series default
-rng 
+ 
 \series medium
 variable defines the random number generator to be used in the computation
  of bootstrap confidence intervals.
@@ -804,7 +855,11 @@ variable defines the random number generator to be used in the computation
 \series medium
 The
 \series default
- seed 
+ 
+\series bold
+seed
+\series default
+ 
 \series medium
 variable may be set to a specific value to make the computation of bootstrap
  confidence intervals fully repeatable.
@@ -852,17 +907,27 @@ poly = "";
 \series medium
 The
 \series default
- grid 
+ 
+\series bold
+grid
+\series default
+ 
 \series medium
 variable in the
 \series default
- mask 
+ 
+\series bold
+mask
+\series default
+ 
 \series medium
 group contains a single NCEP grid over which to perform the series_analysis
  verification.
  The predefined grids are specified as
 \series default
  
+\series bold
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -870,11 +935,17 @@ GNNN
 \begin_inset Quotes erd
 \end_inset
 
+
+\series default
  
 \series medium
 where
 \series default
- NNN 
+ 
+\series bold
+NNN
+\series default
+ 
 \series medium
 is the three-digit designation for the grid.
  Defining a new grid would require code changes and recompiling MET.
@@ -898,7 +969,11 @@ FULL
 \series medium
 The
 \series default
- poly 
+ 
+\series bold
+poly
+\series default
+ 
 \series medium
 variable contains a single of file that defines the verification masking
  regions.
@@ -1003,7 +1078,11 @@ prc = [];
 \series medium
 The
 \series default
- output_stats 
+ 
+\series bold
+output_stats
+\series default
+ 
 \series medium
 array controls the type of output that the Series-Analysis tool generates.
  Each flag corresponds to an output line type in the STAT file and is used
@@ -1011,61 +1090,57 @@ array controls the type of output that the Series-Analysis tool generates.
  The output flags correspond to the following types of output line types:
 \end_layout
 
-\begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
+\begin_layout Description
 1.
  FHO for Forecast, Hit, Observation Rates
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 2.
  CTC for Contingency Table Counts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 3.
  CTS for Contingency Table Statistics
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 4.
  MCTC for Multi-Category Contingency Table Counts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 5.
  MCTS for Multi-Category Contingency Table Statistics
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 6.
  CNT for Continuous Statistics
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 7.
  SL1L2 for Scalar L1L2 Partial Sums
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 8.
  PCT for Contingency Table Counts for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 9.
  PSTD for Contingency Table Statistics for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 10.
  PJC for Joint and Conditional factorization for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 11.
  PRC for Receiver Operating Characteristic for Probabilistic forecasts
 \series medium
