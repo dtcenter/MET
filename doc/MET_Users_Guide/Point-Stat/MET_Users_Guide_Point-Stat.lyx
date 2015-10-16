@@ -138,7 +138,26 @@ reference "sub:Statistical-measures"
 
 \end_inset
 
- and in more detail in Appendix C.
+ and in more detail in 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Please fix, this link to Appx C is WRONG.
+\end_layout
+
+\end_inset
+
+Appendix C
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Appendix-C--"
+
+\end_inset
+
+.
  Section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -198,7 +217,14 @@ To match forecasts and observations in the horizontal plane, the user can
  A width of 3 defines a 3 x 3 square consisting of 9 grid points centered
  on the grid point closest to P.
  Fig.
- 4-1 provides illustration.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MET_interpolation_methods"
+
+\end_inset
+
+ provides illustration.
  The point P denotes the observation location where the interpolated value
  is calculated.
  The interpolation width W, shown is five.
@@ -233,6 +259,13 @@ status open
 Diagram illustrating matching and interpolation methods used in MET.
  See text for explanation.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "MET_interpolation_methods"
 
 \end_inset
 
@@ -290,6 +323,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Nearest Neighbor
 \end_layout
 
@@ -320,6 +355,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Minimum value
 \end_layout
 
@@ -346,6 +383,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Maximum value
 \end_layout
 
@@ -372,6 +411,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Distance-weighted mean
 \end_layout
 
@@ -403,6 +444,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Unweighted mean
 \end_layout
 
@@ -431,6 +474,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Median
 \end_layout
 
@@ -458,6 +503,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Least-Squares Fit
 \end_layout
 
@@ -470,7 +517,14 @@ To perform least squares interpolation of a gridded field at a location
 WxW
 \emph default
  subgrid centered (as closely as possible) at P.
- Figure 4-1 shows the case where N = 5.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MET_interpolation_methods"
+
+\end_inset
+
+ shows the case where N = 5.
 \end_layout
 
 \begin_layout Standard
@@ -553,6 +607,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Bilinear Interpolation
 \end_layout
 
@@ -590,9 +646,13 @@ The Point-Stat tool computes a wide variety of verification statistics.
 \begin_layout Standard
 
 \series medium
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.bom.gov.au/bmrc/wefor/staff/eee/verif/verif_web_page.html"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.bom.gov.au/bmrc/wefor/staff/eee/verif/verif_web_page.html
+\end_layout
 
 \end_inset
 
@@ -703,10 +763,10 @@ A single summary score gives an indication of the forecast performance,
  imperative to analyze the uncertainty in the realized scores.
  One good way to do this is to utilize confidence intervals.
  A confidence interval indicates that if the process were repeated many
- times, say 100, then the true score would fall within the interval 100(1-?)%
+ times, say 100, then the true score would fall within the interval 100(1-??)%
  of the time.
- Typical values of ? are 0.01, 0.05, and 0.10.
- The Point-Stat tool allows the user to select one or more specific ?-values
+ Typical values of ?? are 0.01, 0.05, and 0.10.
+ The Point-Stat tool allows the user to select one or more specific ??-values
  to use.
 \end_layout
 
@@ -721,7 +781,7 @@ For continuous fields (e.g., temperature), it is possible to estimate confidence
  deviation, correlation, mean error, and the standard deviation of the error.
  In the case of the respective means, the central limit theorem suggests
  that the means are normally distributed, and this assumption leads to the
- usual 100(1-?)% confidence intervals for the mean.
+ usual 100(1-??)% confidence intervals for the mean.
  For the standard deviations of each field, one must be careful to check
  that the field of interest is normally distributed, as this assumption
  is necessary for the interpretation of the resulting confidence intervals.
@@ -812,100 +872,100 @@ MET provides parametric confidence intervals based on assumptions of normality
  for the following categorical statistics:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Base Rate
+Base Rate
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Forecast Mean
+Forecast Mean
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Accuracy
+Accuracy
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Probability of Detection
+Probability of Detection
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Probability of Detection of the non-event
+Probability of Detection of the non-event
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Probability of False Detection
+Probability of False Detection
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* False Alarm Ratio
+False Alarm Ratio
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Critical Success Index
+Critical Success Index
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Hanssen-Kuipers Discriminant
+Hanssen-Kuipers Discriminant
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Odds Ratio
+Odds Ratio
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Log Odds Ratio
+Log Odds Ratio
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Odds Ratio Skill Score
+Odds Ratio Skill Score
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Extreme Dependency Score
+Extreme Dependency Score
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Symmetric Extreme Dependency Score
+Symmetric Extreme Dependency Score
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Extreme Dependency Index
+Extreme Dependency Index
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Symmetric Extremal Dependency Index
+Symmetric Extremal Dependency Index
 \end_layout
 
 \begin_layout Standard
@@ -915,28 +975,28 @@ MET provides parametric confidence intervals based on assumptions of normality
  for the following continuous statistics:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Forecast and Observation Means
+Forecast and Observation Means
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Forecast, Observation, and Error Standard Deviations
+Forecast, Observation, and Error Standard Deviations
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Pearson Correlation Coefficient
+Pearson Correlation Coefficient
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Mean Error
+Mean Error
 \end_layout
 
 \begin_layout Standard
@@ -946,16 +1006,16 @@ MET provides parametric confidence intervals based on assumptions of normality
  for the following probabilistic statistics:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Brier Score
+Brier Score
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
 \series medium
-* Base Rate
+Base Rate
 \end_layout
 
 \begin_layout Standard
@@ -1008,7 +1068,14 @@ ascii2nc
  step.
  The Point-Stat tool provides the capability of interpolating the gridded
  forecast data to the observation points using a variety of methods as described
- in Section 4.2.1.
+ in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Interpolation/matching-methods"
+
+\end_inset
+
+.
  The Point-Stat tool computes a number of continuous statistics on the matched
  pair data as well as discrete statistics once the matched pair data have
  been thresholded.
@@ -1078,6 +1145,8 @@ point_stat
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for point_stat
 \end_layout
 
@@ -1086,7 +1155,7 @@ Required arguments for point_stat
 \series medium
 1.
  The 
-\series default
+\series bold
 fcst_file
 \series medium
  argument names the gridded file containing the model data to be verified.
@@ -1097,7 +1166,7 @@ fcst_file
 \series medium
 2.
  The 
-\series default
+\series bold
 obs_file
 \series medium
  argument indicates the NetCDF file containing the point observations to
@@ -1109,7 +1178,7 @@ obs_file
 \series medium
 3.
  The 
-\series default
+\series bold
 config_file
 \series medium
  argument indicates the name of the configuration file to be used.
@@ -1312,10 +1381,10 @@ model = "WRF";
 
 \series medium
 The 
-\series default
-model
+\series bold
+model 
 \series medium
- variable contains a short text string identifying the name to be assigned
+variable contains a short text string identifying the name to be assigned
  to the model being verified.
  This text string is written out as a header column of the STAT output so
  that verification statistics from multiple models may be differentiated.
@@ -1469,9 +1538,9 @@ fcst_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)"
 \begin_layout Standard
 
 \series medium
-The 
-\series default
-fcst
+The
+\series bold
+ fcst
 \series medium
  group contains information about the model forecast fields, levels and
  threshold to use in verification.
@@ -1491,11 +1560,11 @@ field
 For GRIB files, the GRIB code itself or the corresponding abbreviation may
  be used to specify which model fields are to be verified.
  A level indicator in the form 
-\series default
+\series bold
 "ANNN", "ZNNN", "PNNN", "PNNN-NNN", "LNNN"
 \series medium
 , or 
-\series default
+\series bold
 "RNNN"
 \series medium
  must correspond to each field name.
@@ -1503,7 +1572,7 @@ For GRIB files, the GRIB code itself or the corresponding abbreviation may
  pressure level, a range of pressure levels, a generic level, and a specific
  GRIB record number, respectively.
  
-\series default
+\series bold
 "NNN"
 \series medium
  indicates the accumulation or level value.
@@ -1530,9 +1599,13 @@ The values listed above indicate that temperature, height, and the U and
  When the U component is followed by the V component, both with the same
  level indicator, they will be treated as vector quantities.
  A list of GRIB codes is available at 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+\end_layout
 
 \end_inset
 
@@ -1552,7 +1625,7 @@ field
 
 \series medium
 For each 
-\series default
+\series bold
 name
 \series medium
  listed in the forecast field, one or more thresholds must be specified
@@ -1570,7 +1643,7 @@ rated list within the double quotes (e.g.
 \series medium
 To indicate that a forecast field should be treated as probabilities, set
  the 
-\series default
+\series bold
 prob
 \series medium
  field to TRUE.
@@ -1584,7 +1657,7 @@ prob
 
 \series medium
 The 
-\series default
+\series bold
 obs
 \series medium
  group can be defined in the same way as the forecast group.
@@ -1592,10 +1665,10 @@ obs
  will be most valuable, since point observations are specified using GRIB1
  conventions.
  The variables are identical to those in the 
-\series default
-fcst
+\series bold
+fcst 
 \series medium
- except that they apply to the observation field.
+except that they apply to the observation field.
  
 \end_layout
 
@@ -1605,10 +1678,10 @@ fcst
 For each observation field, one or more thresholds can be specified for
  use in computing discrete statistics.
  Specification is done exactly as for 
-\series default
-cat_thresh
+\series bold
+cat_thresh.
+
 \series medium
-.
  
 \end_layout
 
@@ -1635,27 +1708,31 @@ cat_thresh
 The Point-Stat tool performs verification using observations for one message
  type at a time.
  The 
-\series default
+\series bold
 message_type
 \series medium
  variable contains a comma-separated list of the message types to use for
  verification.
  By default, only surface and upper air observations are used for verification.
  At least one 
-\series default
+\series bold
 message_type
 \series medium
  must be provided.
  See 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm"
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
+\end_layout
 
 \end_inset
 
  for a list of the possible types.
  The 
-\series default
+\series bold
 message_type
 \series medium
  must be specified in the observation dictionary.
@@ -1667,7 +1744,7 @@ n dictionary.
 
 \series medium
 The 
-\series default
+\series bold
 sid_exc
 \series medium
  variable contains a list of the station id's to be excluded from verification.
@@ -1713,15 +1790,15 @@ end = 5400;
 \series medium
 Each gridded forecast file has a valid time associated with it.
  The 
-\series default
+\series bold
 beg
 \series medium
  and 
-\series default
-end
+\series bold
+end 
 \series medium
- variables define a time window in seconds around the valid time of the
- forecast file for the observations to be matched to it.
+variables define a time window in seconds around the valid time of the forecast
+ file for the observations to be matched to it.
  For a forecast valid time, v, observations with a valid time falling in
  the time window [v+beg, v+end] will be used.
  
@@ -1767,31 +1844,31 @@ sid = [];
 
 \series medium
 The 
-\series default
+\series bold
 mask
 \series medium
  group contains variables to define the verification grid.
  The 
-\series default
+\series bold
 grid
 \series medium
  variable contains a comma-separated list of pre-defined NCEP grids over
  which to perform the Point-Stat verification.
- The predefined grids are specified as "
-\series default
-GNNN
+ The predefined grids are specified as 
+\series bold
+"GNNN"
 \series medium
-" where 
-\series default
+ where 
+\series bold
 NNN
 \series medium
  is the three digit designation for the grid.
  Defining a new grid would require code changes and recompiling MET.
- Supplying a value of "
-\series default
-FULL
+ Supplying a value of 
+\series bold
+"FULL"
 \series medium
-" indicates that the verification should be performed over the entire grid
+ indicates that the verification should be performed over the entire grid
  on which the data resides.
  The value listed above indicates that verification should be performed
  over the NCEP Grid number 212.
@@ -1802,7 +1879,7 @@ FULL
 
 \series medium
 The 
-\series default
+\series bold
 poly
 \series medium
  variable contains a comma-separated list of files that define verification
@@ -1844,7 +1921,7 @@ Alternatively, any gridded data file that MET can read may be used to define
 
 \series medium
 The 
-\series default
+\series bold
 sid
 \series medium
  variable is specified as an array of strings.
@@ -1885,9 +1962,17 @@ ci_alpha[] = [0.05];
 \begin_layout Standard
 
 \series medium
-The ci_alpha variable contains a comma-separated list of alpha values to
- be used when computing confidence intervals.
- The confidence interval computed is 1 minus the ci_alpha value.
+The 
+\series bold
+ci_alpha
+\series medium
+ variable contains a comma-separated list of alpha values to be used when
+ computing confidence intervals.
+ The confidence interval computed is 1 minus the 
+\series bold
+ci_alpha
+\series medium
+ value.
  The value of 0.05 listed above indicates that the 95th percentile confidence
  interval should be computed.
  Refer to Section 4.2.3 for more information about confidence intervals and
@@ -1943,13 +2028,13 @@ seed = "";
 
 \series medium
 The 
-\series default
+\series bold
 boot
 \series medium
  group defines the parameters to be used in calculation of bootstrap confidence
  intervals.
  The 
-\series default
+\series bold
 interval
 \series medium
  variable indicates what method should be used for computing bootstrap confidenc
@@ -1965,7 +2050,7 @@ e intervals.
 
 \series medium
 The 
-\series default
+\series bold
 rep_prop
 \series medium
  variable must be set to a value between 0 and 1.
@@ -1982,7 +2067,7 @@ rep_prop
 
 \series medium
 The 
-\series default
+\series bold
 n_rep
 \series medium
  variable defines the number of subsamples that should be taken when computing
@@ -2003,7 +2088,9 @@ n_rep
 \series medium
 The
 \series default
- rng
+ 
+\series bold
+rng
 \series medium
  variable defines the random number generator to be used in the computation
  of bootstrap confidence intervals.
@@ -2017,7 +2104,7 @@ The
 
 \series medium
 The 
-\series default
+\series bold
 seed
 \series medium
  variable may be set to a specific value to make the computation of bootstrap
@@ -2085,7 +2172,7 @@ width = 1;
 
 \series medium
 The 
-\series default
+\series bold
 interp
 \series medium
  group specifies the parameters for grid interpolation or smoothing.
@@ -2096,7 +2183,7 @@ interp
 
 \series medium
 The 
-\series default
+\series bold
 vld_thresh
 \series medium
  variable contains a number between 0 and 1.
@@ -2114,10 +2201,10 @@ vld_thresh
 
 \series medium
 The 
-\series default
-method
+\series bold
+method 
 \series medium
- variable contains a comma-separated list of interpolation methods to be
+variable contains a comma-separated list of interpolation methods to be
  used when interpolating forecast data to observation locations.
  The valid values which may be listed are MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN,
  LS_FIT, and BILIN for the minimum, maximum, median, unweighted mean, distance-w
@@ -2132,19 +2219,23 @@ eighted mean, a least squares fit, and bilinear interpolation.
 
 \series medium
 The 
-\series default
+\series bold
 width
 \series medium
  variable contains a comma-separated list of values to be used in defining
  the neighborhoods over which the interpolation is performed.
  The neighborhood is simply a square containing the observation point.
  The 
-\series default
+\series bold
 width
 \series medium
- value specifies the width of that square.
+ value specifies the 
+\series bold
+width
+\series medium
+ of that square.
  A 
-\series default
+\series bold
 width
 \series medium
  value of 1 is interpreted as the nearest neighbor model grid point to the
@@ -2155,7 +2246,7 @@ width
 \series medium
  of 2 defines a 2 x 2 square of grid points around the observation point
  (the 4 closest model grid points), while a 
-\series default
+\series bold
 width
 \series medium
  of 3 defines a 3 x 3 square of grid points around the observation point,
@@ -2252,7 +2343,7 @@ mpr = BOTH;
 
 \series medium
 The 
-\series default
+\series bold
 output_flag
 \series medium
  array controls the type of output that the Point-Stat tool generates.
@@ -2266,11 +2357,7 @@ output_flag
  The output flags correspond to the following output line types:
 \end_layout
 
-\begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 1.
@@ -2281,7 +2368,7 @@ FHO
  for Forecast, Hit, Observation Rates
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 2.
@@ -2292,7 +2379,7 @@ CTC
  for Contingency Table Counts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 3.
@@ -2303,7 +2390,7 @@ CTS
  for Contingency Table Statistics
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 4.
@@ -2314,7 +2401,7 @@ MCTC
  for Multi-category Contingency Table Counts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 5.
@@ -2325,7 +2412,7 @@ MCTS
  for Multi-category Contingency Table Statistics
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 6.
@@ -2336,7 +2423,7 @@ CNT
  for Continuous Statistics
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 7.
@@ -2347,7 +2434,7 @@ SL1L2
  for Scalar L1L2 Partial Sums
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 8.
@@ -2358,7 +2445,7 @@ SAL1L2
  for Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 9.
@@ -2369,7 +2456,7 @@ VL1L2
  for Vector L1L2 Partial Sums
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 10.
@@ -2380,7 +2467,7 @@ VAL1L2
  for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 11.
@@ -2391,7 +2478,7 @@ PCT
  for Contingency Table counts for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 12.
@@ -2403,7 +2490,7 @@ PSTD
  outcomes
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 13.
@@ -2414,7 +2501,7 @@ PJC
  for Joint and Conditional factorization for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 14.
@@ -2425,7 +2512,7 @@ PRC
  for Receiver Operating Characteristic for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 15.
@@ -2533,7 +2620,7 @@ rank_corr_flag = TRUE;
 
 \series medium
 The 
-\series default
+\series bold
 rank_corr_flag
 \series medium
  variable may be set to TRUE or FALSE to indicate whether or not Kendall's
@@ -2660,37 +2747,39 @@ point_stat
  directory specified using the "-outdir" command line option.
  The output STAT file will be named using the following naming convention:
  
-\series default
+\series bold
 point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
 \series medium
  where 
-\series default
+\series bold
 PREFIX
 \series medium
  indicates the user-defined output prefix, 
-\series default
+\series bold
 HHMMSSL
 \series medium
  indicates the forecast lead time and 
-\series default
+\series bold
 YYYYMMDD_HHMMSS
 \series medium
  indicates the forecast valid time.
  The output ASCII files are named similarly: 
-\series default
+\series bold
 point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
 \series medium
  where 
-\series default
+\series bold
 TYPE
 \series medium
  is one of 
-\series default
+\series bold
 mpr, fho, ctc, cts, cnt, mctc, mcts, pct, pstd, pjc, prc, sl1l2, sal1l2,
- vl1l2,
+ vl1l2
+\series default
+,
 \series medium
  or 
-\series default
+\series bold
 val1l2
 \series medium
  to indicate the line type it contains.
@@ -5057,6 +5146,8 @@ Column Number
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 CNT Column Name
 \end_layout
 
@@ -5066,6 +5157,8 @@ CNT Column Name
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
