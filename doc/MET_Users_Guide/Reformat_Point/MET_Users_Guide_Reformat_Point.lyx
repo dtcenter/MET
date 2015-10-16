@@ -1810,7 +1810,7 @@ ons, a configuration file may be specified.
 The initial version of the ASCII2NC tool supports input ASCII point observation
  format consisting of 11 columns of data for each observation value.
  The ASCII2NC tool was enhanced for version 4.1 of MET to handle data in
- both little_r and SURFRAD formats.
+ both little_r and SURFRAD formats and for version 5.1 of MET to handle data in both WWSIS and AERONET formats.
 \end_layout
 
 \begin_layout Standard
@@ -2304,7 +2304,7 @@ netcdf_file
 \end_layout
 
 \begin_layout LyX-Code
-[ level]
+[-v level]
 \end_layout
 
 \begin_layout Standard
@@ -2356,7 +2356,7 @@ arguments for ascii2nc
 \series bold
 -format ASCII_format
 \series medium
- may be set to "met_point", "little_r" or "surfrad".
+ may be set to "met_point", "little_r", "surfrad", "wwsis", or "aeronet".
  
 \end_layout
 
@@ -2531,6 +2531,14 @@ out_file
 \end_layout
 
 \begin_layout LyX-Code
+[-mask_grid string]
+\end_layout
+
+\begin_layout LyX-Code
+[-mask_poly file]
+\end_layout
+
+\begin_layout LyX-Code
 [-log file]
 \end_layout
 
@@ -2637,6 +2645,31 @@ arguments for madis2nc
 7.
  The 
 \series bold
+-mask_grid string
+\series medium
+ option specifies a named grid or a gridded data file for filtering the
+ point observations spatially.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ The 
+\series bold
+-mask_poly file
+\series medium
+\series medium
+ option defines a polyline masking file for filtering the point observations
+ spatially.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+9.
+ The 
+\series bold
 -log file
 \series medium
  option directs output and errors to the specified log file.
@@ -2650,7 +2683,7 @@ arguments for madis2nc
 \begin_layout Description
 
 \series medium
-8.
+10.
  The 
 \series bold
 -v level
