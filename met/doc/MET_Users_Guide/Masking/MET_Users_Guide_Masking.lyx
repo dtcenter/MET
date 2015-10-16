@@ -139,7 +139,7 @@ gen_vx_mask usage
 \begin_layout Standard
 
 \series medium
-The usage statement for the Gen-Poly-Mask tool is shown below:
+The usage statement for the Gen-Vx-Mask tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -147,15 +147,39 @@ Usage: gen_vx_mask
 \end_layout
 
 \begin_layout LyX-Code
-data_file
+input_file
 \end_layout
 
 \begin_layout LyX-Code
-mask_poly
+mask_file
 \end_layout
 
 \begin_layout LyX-Code
-netcdf_file
+out_file
+\end_layout
+
+\begin_layout LyX-Code
+[-type str]
+\end_layout
+
+\begin_layout LyX-Code
+[-input_config str]
+\end_layout
+
+\begin_layout LyX-Code
+[-mask_config str]
+\end_layout
+
+\begin_layout LyX-Code
+[-complement]
+\end_layout
+
+\begin_layout LyX-Code
+[-union|-intersection|-symdiff]
+\end_layout
+
+\begin_layout LyX-Code
+[-thresh str]
 \end_layout
 
 \begin_layout LyX-Code
@@ -173,7 +197,7 @@ netcdf_file
 \begin_layout Standard
 
 \series medium
-gen_poly_mask has required arguments and can take optional ones.
+gen_vx_mask has required arguments and can take optional ones.
  
 \end_layout
 
@@ -187,7 +211,7 @@ Required arguments for gen_vx_mask
 1.
  The 
 \series bold
-data_file
+input_file
 \series medium
  argument indicates the name of a gridded data file that defines the domain
  over which the masking bitmap is to be defined.
@@ -199,10 +223,51 @@ data_file
 2.
  The 
 \series bold
-mask_poly
+mask_file
 \series medium
- argument indicates the name of the ASCII Lat/Lon polyline file defining
- the masking region.
+ argument indicates the name of the file data file that defines the masking
+ region - ASCII Lat/Lon polyline file for 
+\begin_inset Quotes eld
+\end_inset
+
+poly
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+circle
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+track
+\begin_inset Quotes erd
+\end_inset
+
+ masking; Gridded data file for 
+\begin_inset Quotes eld
+\end_inset
+
+grid
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+data
+\begin_inset Quotes erd
+\end_inset
+
+ masking.
+ 
 \end_layout
 
 \begin_layout Description
@@ -211,15 +276,15 @@ mask_poly
 3.
  The 
 \series bold
-netcdf_file
+out_file
 \series medium
- argument indicates the name given to the output NetCDF file.
+ argument indicates the name given to the output NetCDF mask file.
 \end_layout
 
 \begin_layout Description
-Optional 
+Optional
 \series bold
-arguments for gen_vx_mask
+ arguments for gen_vx_mask
 \end_layout
 
 \begin_layout Description
@@ -228,17 +293,96 @@ arguments for gen_vx_mask
 4.
  The 
 \series bold
--name str
+-type str
 \series medium
- optional argument can be used to specify the output NetCDF variable name
- to be used.
- 
+ optional argument can be used to override the default masking type (poly).
 \end_layout
 
 \begin_layout Description
 
 \series medium
 5.
+ The 
+\series bold
+-input_config str
+\series medium
+ option can be used to read existing mask data from "input_file".
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ The 
+\series bold
+-mask_config str
+\series medium
+ option can be used to define the field from "mask_file" to be used for
+ "data" masking.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ The 
+\series bold
+-complement
+\series medium
+ option can be used to to compute the complement of the area defined in
+ "mask_file".
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ The 
+\series bold
+-union | -intersection | -symdiff
+\series medium
+ option can be used to specify how to combine the masks from "input_file"
+ and "mask_file".
+\end_layout
+
+\begin_layout Description
+
+\series medium
+9.
+ The 
+\series bold
+-thresh str
+\series medium
+ option can be used to define the threshold to be applied - Distance (km)
+ for "circle" and "track" masking; Raw input values for "data" masking.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+10.
+ The 
+\series bold
+-value n
+\series medium
+ option can be used to override the default output mask data value (1).
+\end_layout
+
+\begin_layout Description
+
+\series medium
+11.
+ The 
+\series bold
+-name str
+\series medium
+ option can be used to specify the output variable name for the mask.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+12.
  The 
 \series bold
 -log file
@@ -254,12 +398,10 @@ arguments for gen_vx_mask
 \begin_layout Description
 
 \series medium
-6.
+13.
  The 
 \series bold
--v leve
-\series default
-l
+-v level
 \series medium
  option indicates the desired level of verbosity.
  The value of "level" will override the default setting of 2.
@@ -270,7 +412,7 @@ l
 \begin_layout Standard
 
 \series medium
-An example of the gen_poly_mask calling sequence is shown below:
+An example of the gen_vx_mask calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -288,8 +430,8 @@ CONUS_poly.nc
 \begin_layout Standard
 
 \series medium
-In this example, the Gen-Poly-Mask tool will apply the polyline defined
- in the file 
+In this example, the Gen-Vx-Mask tool will apply the polyline defined in
+ the file 
 \emph on
 CONUS.poly
 \emph default
