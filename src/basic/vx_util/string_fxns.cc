@@ -24,6 +24,7 @@ using namespace std;
 
 #include "util_constants.h"
 #include "string_fxns.h"
+#include "num_array.h"
 #include "vx_cal.h"
 #include "vx_log.h"
 
@@ -63,6 +64,47 @@ void check_met_version(const char * check_version) {
    }
 
    return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool less_than_met_version(const char *str1, const char *str2) {
+
+   NumArray v1 = parse_version(str1);
+   NumArray v2 = parse_version(str2);
+   int n = max(v1.n_elements(), v2.n_elements());
+
+   // v1 < v2 if any of it's elements are less than v2
+   // or they are all the same but it is shorter in length
+   for(int i=0; i<v2.n_elements(); i++) {
+      if(i == v1.n_elements()) return(true);
+      else if(v1[i] < v2[i])   return(true);
+      else if(v1[i] > v2[i])   return(false);
+   }
+
+   return(false);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+NumArray parse_version(const char * str) {
+   NumArray version;
+
+   // Skip past the leading 'V'
+   ConcatString cs = str + 1;
+
+   // Split using a period
+   StringArray sa = cs.split(".");
+
+   for(int i=0; i<sa.n_elements(); i++) {
+      version.add(atoi(sa[i]));
+   }
+
+   return(version);
 }
 
 
@@ -222,7 +264,7 @@ bool has_prefix(const char **prefix_list, int n_prefix,
 // Does replace(met_base_str, MET_BASE) on the output string, first
 // checking the MET_BASE environment variable.
 //
-////////////////////////////////////////////////////////////////////////   
+////////////////////////////////////////////////////////////////////////
 
 ConcatString replace_path(const char * path) {
    ConcatString s, met_base_val;
@@ -232,7 +274,7 @@ ConcatString replace_path(const char * path) {
    s = path;
 
    // Use the MET_BASE environment variable, if set.
-   // Otherwise, use the compile-time value.   
+   // Otherwise, use the compile-time value.
    if((ptr = getenv(met_base_str)) != NULL) met_base_val = ptr;
    else                                     met_base_val = MET_BASE;
 

@@ -42,6 +42,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+extern void parse_rhist_line_pre5_1 (STATLine &l, RHISTData &r_data);
+extern void parse_rhist_line_current(STATLine &l, RHISTData &r_data);
+
+////////////////////////////////////////////////////////////////////////
+
 void parse_fho_ctable(STATLine &l, TTContingencyTable &ct) {
    int n, fy, fy_oy, oy;
    double f_rate, h_rate, o_rate;
@@ -323,6 +328,41 @@ void parse_isc_line(STATLine &l, ISCInfo &i_info, int &iscale) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_rhist_line(STATLine &l, RHISTData &r_data) {
+
+   if(less_than_met_version(l.version(), "V5.1")) {
+      parse_rhist_line_pre5_1 (l, r_data);
+   }
+   else {
+      parse_rhist_line_current(l, r_data);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_rhist_line_pre5_1(STATLine &l, RHISTData &r_data) {
+   int i;
+
+   r_data.total  = atoi(l.get_item(rhist_total_offset));
+   r_data.crps   = atof(l.get_item(rhist_crps_offset));
+   r_data.ign    = atof(l.get_item(rhist_ign_offset));
+   r_data.n_rank = atoi(l.get_item(rhist_n_rank_offset));
+   r_data.crpss  = bad_data_double;
+
+   r_data.rhist_na.clear();
+
+   // Parse out RANK_i
+   for(i=0; i<r_data.n_rank; i++) {
+      r_data.rhist_na.add(atoi(l.get_item(rhist_rank_offset_pre5_1(i))));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_rhist_line_current(STATLine &l, RHISTData &r_data) {
    int i;
 
    r_data.total  = atoi(l.get_item(rhist_total_offset));
