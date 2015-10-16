@@ -163,7 +163,7 @@ config_file
 \end_layout
 
 \begin_layout LyX-Code
-[ level]
+[-v level]
 \end_layout
 
 \begin_layout Standard
@@ -325,7 +325,7 @@ path
 7.
  The 
 \series bold
-level
+-v level
 \series medium
  option indicates the desired level of verbosity.
  The value of 
