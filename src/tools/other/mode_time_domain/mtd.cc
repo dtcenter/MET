@@ -208,6 +208,15 @@ MM_Engine engine;
 mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
 mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
 
+if ( fcst_raw.nt() != obs_raw.nt() )  {
+
+   mlog << Error
+        << "\n\n  " << program_name << ": forecast and obervation must have the same number of times!\n\n";
+
+   exit ( 1 );
+
+}
+
 if ( fcst_raw.delta_t() != obs_raw.delta_t() )  {
 
    mlog << Error
