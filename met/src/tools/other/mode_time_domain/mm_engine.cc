@@ -90,6 +90,8 @@ void MM_Engine::init_from_scratch()
 
 {
 
+comp_to_eq = (int *) 0;
+
 clear();
 
 return;
@@ -252,7 +254,7 @@ n = 0;
 for (j=0; j<(part.n_elements()); ++j)  {
 
    eq = part(j);
-   
+
    if ( eq->n_elements() <= 1 )  continue;
 
    comp_to_eq[n++] = j;
