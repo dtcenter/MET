@@ -206,7 +206,7 @@ out_file
 [-pcprx reg_exp]
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Standard
 
 \series medium
 Listed below are the arguments for the 
@@ -1188,7 +1188,7 @@ Usage: modis_regrid
 \end_layout
 
 \begin_layout LyX-Code
-modis_file
+    modis_file
 \end_layout
 
 \begin_layout Standard
