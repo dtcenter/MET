@@ -146,9 +146,9 @@ The MODE-Analysis tool reads lines from MODE output files and applies filtering
  For each job type, filter parameters can be set to determine which MODE
  output lines are used.
  The following sections describe the 
-\emph on
+\series bold
 mode_analysis
-\emph default
+\series default
  usage statement, required arguments, and optional arguments.
 \end_layout
 
@@ -208,7 +208,7 @@ Usage: mode_analysis
 
 \begin_layout Standard
 Required arguments for 
-\emph on
+\series bold
 mode_analysis
 \end_layout
 
@@ -217,14 +217,14 @@ mode_analysis
 \series medium
 The MODE-Analysis tool requires specification of a "job type" and a filename
  or directory indicated by the -
-\emph on
+\series bold
 lookin
-\emph default
+\series default
  option.
  The -
-\emph on
+\series bold
 lookin
-\emph default
+\series default
  option may be called multiple times.
 \end_layout
 
@@ -254,15 +254,15 @@ Exactly one of these job types must be specified.
 
 \series medium
 Specifying "-
-\emph on
+\series bold
 summary
-\emph default
+\series default
 " will produce summary statistics for the MODE output column specified.
  For this job type, a column name (or column number) must be specified using
  the "-
-\emph on
+\series bold
 column
-\emph default
+\series default
 " option.
  Column names are not case sensitive.
  The column names are the same as described in Section 8.3.3 of Chapter 8.
@@ -273,9 +273,9 @@ column
 
 \series medium
 Specifying "-
-\emph on
+\series bold
 bycase
-\emph default
+\series default
 " will produce a table of metrics for each case undergoing analysis.
  Any columns specified are ignored for this option.
 \end_layout
@@ -288,7 +288,7 @@ The output for each of these jobs types is described in later sections.
 
 \begin_layout Standard
 Optional arguments for 
-\emph on
+\series bold
 mode_analysis
 \end_layout
 
@@ -296,9 +296,9 @@ mode_analysis
 
 \series medium
 The 
-\emph on
+\series bold
 mode_analysis
-\emph default
+\series default
  options are described in the following section.
  These are divided into sub-sections describing the analysis options and
  mode line options.
@@ -333,8 +333,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -config
-\emph on
  filename
 \end_layout
 
@@ -362,8 +362,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -dump_row
-\emph on
  filename
 \end_layout
 
@@ -393,11 +393,11 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 column
-\emph on
+\series bold
  column
 \end_layout
 
@@ -448,9 +448,9 @@ MODE line options are used to create filters that determine which of the
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 Toggles
-\emph default
+\series default
  
 \end_layout
 
@@ -634,8 +634,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -model
-\emph on
  value
 \end_layout
 
@@ -668,14 +668,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -fcst_thr
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -obs_thr
-\emph on
  value
 \end_layout
 
@@ -706,14 +706,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -fcst_var
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -obs_var
-\emph on
  value
 \end_layout
 
@@ -743,14 +743,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -fcst_lev 
-\emph on
 value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -obs_lev
-\emph on
  value
 \end_layout
 
@@ -811,14 +811,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -fcst_lead 
-\emph on
 value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -obs_lead
-\emph on
  value
 \end_layout
 
@@ -848,14 +848,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -fcst_init
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -obs_init
-\emph on
  value
 \end_layout
 
@@ -885,14 +885,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -fcst_accum
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -obs_accum
-\emph on
  value
 \end_layout
 
@@ -922,14 +922,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -fcst_rad
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -obs_rad
-\emph on
  value
 \end_layout
 
@@ -991,14 +991,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -area_min
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -area_max
-\emph on
  value
 \end_layout
 
@@ -1028,14 +1028,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -area_filter_min
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -area_filter_max
-\emph on
  value
 \end_layout
 
@@ -1067,14 +1067,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -area_thresh_min 
-\emph on
 value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -area_thresh_max
-\emph on
  value
 \end_layout
 
@@ -1106,18 +1106,18 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -intersection_area_min 
-\emph on
 value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intersection_area_ma
-\emph on
+\series bold
 x value
 \end_layout
 
@@ -1147,14 +1147,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -union_area_min
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -union_area_max
-\emph on
  value
 \end_layout
 
@@ -1184,14 +1184,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -symmetric_diff_min
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -symmetric_diff_max
-\emph on
  value
 \end_layout
 
@@ -1274,21 +1274,21 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 fcst_valid_min 
-\emph on
+\series bold
 yyyymmdd[_hh[mmss]]
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 fcst_valid_max
-\emph on
+\series bold
  yyyymmdd[_hh[mmss]]
 \end_layout
 
@@ -1318,21 +1318,21 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 obs_valid_min
-\emph on
+\series bold
  yyyymmdd[_hh[mmss]]
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 obs_valid_max
-\emph on
+\series bold
  yyyymmdd[_hh[mmss]]
 \end_layout
 
@@ -1376,20 +1376,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+\series bold
 -centroid_x_min
-\emph on
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_x_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1411,23 +1411,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_y_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_y_max 
-\emph on
+\series bold
 value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1449,23 +1449,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_lat_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_lat_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1487,23 +1487,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_lon_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_lon_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1525,23 +1525,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 axis_ang_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 axis_ang_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1563,23 +1563,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 length_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 length_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1601,23 +1601,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 width_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 width_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1639,23 +1639,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 curvature_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 curvature_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1677,23 +1677,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 curvature_x_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 curvature_x_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1715,23 +1715,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 curvature_y_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 curvature_y_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1753,23 +1753,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 complexity_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 complexity_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1791,23 +1791,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_10_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_10_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1829,23 +1829,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_25_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_25_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1867,23 +1867,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_50_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_50_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1905,23 +1905,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_75_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_75_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1943,23 +1943,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_90_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_90_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -1981,23 +1981,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_user_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_user_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2019,23 +2019,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_sum_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intensity_sum_max 
-\emph on
+\series bold
 value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2057,23 +2057,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_dist_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 centroid_dist_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2095,23 +2095,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 boundary_dist_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 boundary_dist_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2133,23 +2133,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 convex_hull_dist_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 convex_hull_dist_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2171,23 +2171,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 angle_diff_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 angle_diff_max 
-\emph on
+\series bold
 value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2209,23 +2209,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 area_ratio_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 area_ratio_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2247,23 +2247,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intersection_over_area_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 intersection_over_area_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2285,23 +2285,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 complexity_ratio_min 
-\emph on
+\series bold
 value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 complexity_ratio_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2323,23 +2323,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 percentile_intensity_ratio_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 percentile_intensity_ratio_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2361,23 +2361,23 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 interest_min
-\emph on
+\series bold
  value
 \end_layout
 
 \begin_layout LyX-Code
 
-\emph on
+\series bold
 -
-\emph default
+\series default
 interest_max
-\emph on
+\series bold
  value
-\emph default
+\series default
 
 \begin_inset Newline newline
 \end_inset
@@ -2429,11 +2429,11 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-\emph on
+\series bold
 -
-\emph default
+\series default
 mask_poly
-\emph on
+\series bold
  filename
 \end_layout
 
@@ -2495,9 +2495,9 @@ height "1pt"
 
 \begin_layout Subsection
 
-\emph on
+\series bold
 mode_analysis
-\emph default
+\series default
  configuration file
 \end_layout
 
@@ -2507,9 +2507,9 @@ mode_analysis
 To use the MODE analysis tool, the user must un-comment the options in the
  configuration file to apply them and comment out unwanted options.
  The options in the configuration file for 
-\emph on
+\series bold
 mode_analysis
-\emph default
+\series default
  are the same as the MODE line options described in Section 9.3.1.
 \end_layout
 
@@ -2535,13 +2535,13 @@ MODE-Analysis tool output
 The output of the MODE Analysis tool is a self-describing tabular format
  written to standard output.
  The length and contents of the table vary depending on whether 
-\emph on
+\series bold
 -summary
-\emph default
+\series default
  or -
-\emph on
+\series bold
 bycase
-\emph default
+\series default
  is selected.
  The contents also change for -summary depending on the fields selected
  by the user for output.
