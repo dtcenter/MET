@@ -19,7 +19,6 @@
 
 
 #include "concat_string.h"
-#include "num_array.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,8 +29,6 @@ extern bool match_met_version(const char *);
 extern void check_met_version(const char *);
 
 extern bool less_than_met_version(const char *, const char *);
-
-extern NumArray parse_version(const char *);
 
 extern const char * get_short_name(const char * path);
 
