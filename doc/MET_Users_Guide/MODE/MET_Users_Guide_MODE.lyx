@@ -85,8 +85,16 @@ Introduction
 This chapter provides a description of the Method for Object-Based Diagnostic
  Evaluation (MODE) tool, which was developed at the Research Applications
  Laboratory, NCAR/Boulder, USA.
- More information about MODE can be found in Davis et al.
- (2006a,b) and Brown et al.
+ More information about MODE can be found in Davis 
+\emph on
+et al.
+
+\emph default
+ (2006a,b) and Brown 
+\emph on
+et al.
+
+\emph default
  (2007).
 \end_layout
 
@@ -120,9 +128,9 @@ http://www.rap.ucar.edu/projects/icp/index.html
 
 \begin_layout Standard
 MODE may be used in a generalized way to compare any two fields.
- For simplicity, field1 may be thought of in this chapter as "the forecast,"
- while field2 may be thought of as "the observation", which is usually a
- gridded analysis of some sort.
+ For simplicity, field1 may be thought of in this chapter as ``the forecast,''
+ while field2 may be thought of as ``the observation'', which is usually
+ a gridded analysis of some sort.
  The convention of field1/field2 is also used in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -132,10 +140,10 @@ reference "MODE_object_attribute"
 
  .
  MODE resolves objects in both the forecast and observed fields.
- These objects mimic what humans would call "regions of interest".
- Object attributes are calculated and compared, and are used to associate
- ("merge") objects within a single field, as well as to "match" objects
- between the forecast and observed fields.
+ These objects mimic what humans would call ``regions of interest.'' Object
+ attributes are calculated and compared, and are used to associate (``merge'')
+ objects within a single field, as well as to ``match'' objects between
+ the forecast and observed fields.
  Finally, summary statistics describing the objects and object pairs are
  produced.
  These statistics can be used to identify correlations and differences among
