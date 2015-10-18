@@ -519,7 +519,11 @@ sum_{x,y} x
 \backslash
 xi (x,y) 
 \backslash
-hbox{ and }S_y=
+hskip 0.25in 
+\backslash
+hbox{and} 
+\backslash
+hskip 0.25in S_y=
 \backslash
 sum_{x,y} y 
 \backslash
@@ -574,7 +578,7 @@ bf Axis Angle}
 \end_inset
 
 , is calculated from the second-order moments.
- It gives information on the orientation or "tilt" of an object.
+ It gives information on the orientation or ``tilt'' of an object.
  Curvature is another attribute that uses moments in its calculation, specifical
 ly, third-order moments.
 \end_layout
@@ -1668,7 +1672,7 @@ _nc}
 \end_layout
 
 \begin_layout Subsection
-mode configuration file
+MODE configuration file
 \end_layout
 
 \begin_layout Standard
@@ -3590,18 +3594,66 @@ fcst_raw_plot = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 plot_min = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 plot_max = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 colorbar_spacing = 1;
 \end_layout
 
@@ -3614,18 +3666,66 @@ obs_raw_plot = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 plot_min = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 plot_max = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 colorbar_spacing = 1;
 \end_layout
 
@@ -3638,6 +3738,18 @@ object_plot = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 color_table = "MET_BASE/colortables/mode_obj.ctable";
 \end_layout
 
@@ -3853,26 +3965,98 @@ nc_pairs_flag = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 latlon = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 raw = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 object_raw = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 object_id = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 cluster_id = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 polylines = TRUE;
 \end_layout
 
@@ -4005,37 +4189,182 @@ The MODE tool creates two ASCII output files.
 \end_layout
 
 \begin_layout Standard
+\begin_inset ERT
+status open
 
-\series bold
-mode_PREFIX_FCST_VAR_LVL_vs_ OBS_VAR_LVL_HHMMSSL_YYYYMMDD_HHMMSSV_ HHMMSSA_cts.tx
-t
-\series default
- where PREFIX indicates the user-defined output prefix, 
-\series bold
-FCST_VAR_LVL
-\series default
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{
+\backslash
+tt mode
+\backslash
+_PREFIX
+\backslash
+_FCST
+\backslash
+_VAR
+\backslash
+_LVL
+\backslash
+_vs
+\backslash
+_OBS
+\backslash
+_VAR
+\backslash
+_LVL
+\backslash
+_HHMMSSL
+\backslash
+_YYYYMMDD
+\backslash
+_HHMMSSV
+\backslash
+_HHMMSSA
+\backslash
+_cts.txt}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+where 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt PREFIX}
+\end_layout
+
+\end_inset
+
+ indicates the user-defined output prefix, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt FCST
+\backslash
+_VAR
+\backslash
+_LVL}
+\end_layout
+
+\end_inset
+
  is the forecast variable and vertical level being used, 
-\series bold
-OBS_VAR_LVL
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt OBS
+\backslash
+_VAR
+\backslash
+_LVL}
+\end_layout
+
+\end_inset
+
  is the observation variable and vertical level being used, 
-\series bold
-HHMMSSL
-\series default
- indicates the forecast lead time, 
-\series bold
-YYYYMMDD_HHMMSSV
-\series default
- indicates the forecast valid time, and 
-\series bold
-HHMMSSA
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt HHMMSSL}
+\end_layout
+
+\end_inset
+
+ indicates the forecast lead time
+, 
+\lang english
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt YYYYMMDD
+\backslash
+_HHMMSSV}
+\end_layout
+
+\end_inset
+
+ indicates the forecast valid time, and
+ 
+\lang english
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt HHMMSSA}
+\end_layout
+
+\end_inset
+
  indicates the accumulation period.
- The cts string stands for contingency table statistics.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt cts}
+\end_layout
+
+\end_inset
+
+ string stands for contingency table statistics.
  The generation of this file can be disabled using the 
-\series bold
-ct_stats_flag
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt ct
+\backslash
+_stats
+\backslash
+_flag}
+\end_layout
+
+\end_inset
+
  option in the configuration file.
  This CTS output file differs somewhat from the CTS output of the Point-Stat
  and Grid-Stat tools.
@@ -4054,10 +4383,6 @@ reference "CTS_output"
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
