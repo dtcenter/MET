@@ -90,7 +90,7 @@ This chapter provides a description of the Method for Object-Based Diagnostic
 et al.
 
 \emph default
- (2006a,b) and Brown 
+ (2006a, b) and Brown 
 \emph on
 et al.
 
@@ -105,7 +105,11 @@ MODE was developed in response to a need for verification methods that can
  approaches, especially in application to high-resolution NWP output.
  The MODE approach was originally developed for application to spatial precipita
 tion forecasts, but it can also be applied to other fields with coherent
- spatial structures (e.g., clouds, convection).
+ spatial structures (
+\shape italic
+e.g.
+\shape default
+, clouds, convection).
 \end_layout
 
 \begin_layout Standard
@@ -123,7 +127,7 @@ http://www.rap.ucar.edu/projects/icp/index.html
 
 \end_inset
 
- .
+.
 \end_layout
 
 \begin_layout Standard
@@ -138,7 +142,7 @@ reference "MODE_object_attribute"
 
 \end_inset
 
- .
+.
  MODE resolves objects in both the forecast and observed fields.
  These objects mimic what humans would call ``regions of interest.'' Object
  attributes are calculated and compared, and are used to associate (``merge'')
@@ -1745,62 +1749,90 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
-model = "WRF";
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+par
+\backslash
+tt
+\backslash
+noindent model = "WRF";}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 The 
-\series bold
-model
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt model}
+\end_layout
+
+\end_inset
+
  variable contains a short text string identifying the name to be assigned
  to the model being verified.
  This text string is written out as a header column of the ASCII output
  so that verification statistics from multiple models may be differentiated.
  The value listed above is simply set to "WRF".
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
 \end_layout
 
-\begin_layout Subsubsection*
-grid_res = 4;
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+par
+\backslash
+tt
+\backslash
+noindent grid
+\backslash
+_res = 4;}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 The 
-\series bold
-grid_res
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt grid
+\backslash
+_res}
+\end_layout
+
+\end_inset
+
  variable is the nominal spacing for each grid square in kilometers.
  The variable is not used directly in the code, but subsequent variables
  in the configuration file are defined in terms of it.
  Therefore, setting this appropriately will help ensure that appropriate
  default values are used for these variables.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout LyX-Code
@@ -2025,9 +2057,18 @@ obs = fcst;
 
 \begin_layout Standard
 The 
-\series bold
-field
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt field}
+\end_layout
+
+\end_inset
+
  variables in the forecast and observation dictionaries specify the model
  variable and observation variable, respectively, and correspond to the
  vertical level to be verified.
@@ -2036,9 +2077,20 @@ field
 
 \begin_layout Standard
 The 
-\series bold
-raw_thresh
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt raw
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
  variable is used to threshold the raw forecast and / or observation fields.
  Prior to defining objects, it is recommended that the raw fields should
  be made to look similar to each other.
@@ -2050,9 +2102,20 @@ raw_thresh
 
 \begin_layout Standard
 The 
-\series bold
-conv_radius
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt conv
+\backslash
+_radius}
+\end_layout
+
+\end_inset
+
  variable defines the radius of the circular convolution applied to smooth
  the raw fields.
  The radii are specified in terms of grid units.
@@ -2062,9 +2125,20 @@ conv_radius
 
 \begin_layout Standard
 The 
-\series bold
-conv_thresh
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt conv
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
  variable specifies the threshold values to be applied to the convolved
  field to define objects.
  By default, objects are defined using a convolution threshold of 5.0.
@@ -2072,9 +2146,20 @@ conv_thresh
 
 \begin_layout Standard
 The 
-\series bold
-vld_thresh
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt vld
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
  variable must be set between 0 and 1.
  When performing the circular convolution step if the proportion of bad
  data values in the convolution area is greater than or equal to this threshold,
@@ -2082,17 +2167,39 @@ vld_thresh
  If the proportion is less than this threshold, the convolution will be
  performed on only the valid data.
  By default, the 
-\series bold
-vld_thresh
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt vld
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
  is set to 0.5.
 \end_layout
 
 \begin_layout Standard
 The 
-\series bold
-area_thresh
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt area
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
  variable specifies the area threshold values to be applied to the defined
  objects.
  The area of an object is simply a count of the number of grid squares that
@@ -2104,13 +2211,39 @@ area_thresh
 
 \begin_layout Standard
 The 
-\series bold
-inten_perc_value
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt intern
+\backslash
+_perc
+\backslash
+_value}
+\end_layout
+
+\end_inset
+
  and 
-\series bold
-inten_perc_thresh
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt inten
+\backslash
+_perc
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
  variables specify the intensity threshold values to be applied to the defined
  objects.
  For each object defined, the intensity values within the object are sorted,
@@ -2126,9 +2259,20 @@ inten_perc_thresh
 
 \begin_layout Standard
 The 
-\series bold
-merge_thresh
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt merge
+\backslash
+_thresh}
+\end_layout
+
+\end_inset
+
  variables are used to define larger objects for use in merging the original
  objects.
  These variables define the threshold value used in the double thresholding
@@ -2172,9 +2316,20 @@ geq 2.5$
 
 \begin_layout Standard
 The 
-\series bold
-merge_flag
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt merge
+\backslash
+_flag}
+\end_layout
+
+\end_inset
+
  variable controls what type of merging techniques will be applied to the
  objects defined in each field.
  
@@ -2234,15 +2389,48 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
-mask_missing_flag = NONE;
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+par
+\backslash
+tt
+\backslash
+noindent mask
+\backslash
+_missing
+\backslash
+_flag = NONE;}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 The 
-\series bold
-mask_missing_flag
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt mask
+\backslash
+_missing
+\backslash
+_flag}
+\end_layout
+
+\end_inset
+
  variable specifies how missing data in the raw model and observation fields
  will be treated.
  
@@ -2305,15 +2493,35 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
-match_flag = MERGE_BOTH;
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+par
+\backslash
+tt
+\backslash
+noindent match
+\backslash
+_flag = MERGE
+\backslash
+_BOTH;}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 match_flag
-\series default
+\family default
  variable controls how matching will be performed when comparing objects
  from the forecast field to objects from the observation field.
  An interest value is computed for each possible pair of forecast/observation
@@ -2322,9 +2530,9 @@ match_flag
  If two objects in one field happen to match the same object in the other
  field, then those two objects could be merged.
  The 
-\series bold
+\family typewriter
 match_flag
-\series default
+\family default
  controls what type of merging is allowed in this context.
  
 \end_layout
@@ -2384,6 +2592,9 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 max_centroid_dist = 800/grid_res;
 \end_layout
 
@@ -2391,9 +2602,9 @@ max_centroid_dist = 800/grid_res;
 Computing the attributes for all possible pairs of objects can take some
  time depending on the numbers of objects.
  The 
-\series bold
+\family typewriter
 max_centroid_dist
-\series default
+\family default
  variable is used to specify how far apart objects should be in order to
  conclude that they have no chance of matching.
  No pairwise attributes are computed for pairs of objects whose centroids
@@ -2402,9 +2613,9 @@ max_centroid_dist
  time of the MODE tool.
  By default, the maximum centroid distance is defined in terms of the previously
  defined 
-\series bold
+\family typewriter
 grid_res
-\series default
+\family default
  variable.
 \begin_inset Newline newline
 \end_inset
@@ -2495,19 +2706,19 @@ poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 grid
-\series default
+\family default
  variable specifies a pre-defined NCEP grid with which to mask the raw forecast
  and observation fields.
- The predefined grids are specified as "
-\series bold
-GNNN
-\series default
-" where 
-\series bold
+ The predefined grids are specified as 
+\family typewriter
+"GNNN"
+\family default
+ where 
+\family typewriter
 NNN
-\series default
+\family default
  is the three digit designation for the grid.
  By default, no masking grid is applied.
  A list of the set of pre-defined masks included with the MODE tool is presented
@@ -2516,9 +2727,9 @@ NNN
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 grid_flag
-\series default
+\family default
  variable specifies how the grid should be applied.
  
 \end_layout
@@ -2565,13 +2776,13 @@ By default, the masking grid is not applied.
 
 \begin_layout Standard
 Similar to the 
-\series bold
+\family typewriter
 grid
-\series default
+\family default
  variable above, the 
-\series bold
+\family typewriter
 poly
-\series default
+\family default
  variable is the name of a file that defines a verification masking region.
  These masking regions may be specified in two ways: as a lat/lon polygon
  or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
@@ -2599,13 +2810,13 @@ Alternatively, any gridded data file that MET can read may be used to define
 
 \begin_layout Standard
 Similar to the 
-\series bold
+\family typewriter
 grid_flag
-\series default
+\family default
  variable above, the 
-\series bold
+\family typewriter
 poly_flag
-\series default
+\family default
  variable specifies how the masking polygon should be applied.
 \end_layout
 
@@ -2814,9 +3025,9 @@ inten_perc_value = 50;
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 weight
-\series default
+\family default
  variables listed above control how much weight is assigned to each pairwise
  attribute when computing a total interest value for object pairs.
  The weights listed above correspond to the 
@@ -2859,28 +3070,20 @@ intensity ratio
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 inten_perc_value
-\series default
+\family default
  variable corresponds to the 
-\series bold
+\family typewriter
 inten_perc_ratio
-\series default
+\family default
 .
  The 
-\series bold
+\family typewriter
 inten_perc_value
-\series default
- should be set between 
-\series bold
-0
-\series default
- and 
-\series bold
-100
-\series default
- to define which percentile of intensity should be compared for pairs of
- objects.
+\family default
+ should be set between 0 and 100 to define which percentile of intensity
+ should be compared for pairs of objects.
  By default, the 50th percentile, or median value, is chosen.
 \begin_inset Newline newline
 \end_inset
@@ -3457,9 +3660,9 @@ http://www.dtcenter.org/met/users
 ) for more details.
  By default, many of these functions are defined in terms of the previously
  defined 
-\series bold
+\family typewriter
 grid_res
-\series default
+\family default
  variable.
 \begin_inset Newline newline
 \end_inset
@@ -3477,14 +3680,17 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 total_interest_thresh = 0.7;
 \end_layout
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 total_interest_thresh
-\series default
+\family default
  variable should be set between 
 \series bold
 0
@@ -3518,32 +3724,35 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 print_interest_thresh = 0.0;
 \end_layout
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 print_interest_thresh
-\series default
+\family default
  variable determines which pairs of object attributes will be written to
  the output object attribute ASCII file.
  The user may choose to set the 
-\series bold
+\family typewriter
 print_interest_thresh
-\series default
+\family default
  to the same value as the 
-\series bold
+\family typewriter
 total_interest_thresh
-\series default
+\family default
 , meaning that only object pairs that actually match are written to the
  output file.
  By default, the print interest threshold is set to zero, meaning that all
  object pair attributes will be written as long as the distance between
  the object centroids is less than the 
-\series bold
+\family typewriter
 max_centroid_dist
-\series default
+\family default
  variable.
 \begin_inset Newline newline
 \end_inset
@@ -3561,6 +3770,9 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 met_data_dir = "MET_BASE";
 \end_layout
 
@@ -3569,9 +3781,9 @@ The MODE tool uses several static data files when generating plots.
  If it cannot find the data it needs in the expected directory, it will
  error out.
  The 
-\series bold
+\family typewriter
 met_data_dir
-\series default
+\family default
  variable may be set to the installed share/met directory to find the static
  data files.
 \begin_inset Newline newline
@@ -3759,25 +3971,25 @@ color_table = "MET_BASE/colortables/mode_obj.ctable";
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 color_table
-\series default
+\family default
  variables indicate which color table files are to be used when generating
  the output PostScript plot.
  The forecast and observation raw field are plotted using values in the
  
-\series bold
+\family typewriter
 fcst_raw
-\series default
+\family default
  group and 
-\series bold
+\family typewriter
 obs_raw
-\series default
+\family default
  group, while the objects identified are plotted using the values in the
  
-\series bold
+\family typewriter
 object_plot
-\series default
+\family default
  group.
  By default, these variables point to color tables in the MET distribution.
  Users are free to create their own color tables following the format in
@@ -3789,13 +4001,13 @@ object_plot
 
 \begin_layout Standard
 The 
-\series bold
+\family typewriter
 plot_min
-\series default
+\family default
  and 
-\series bold
+\family typewriter
 plot_max
-\series default
+\family default
  variables indicate the min and max data values to be plotted for the forecast
  and observation fields.
  If set to non-zero values, the forecast and observation raw color tables
@@ -3810,9 +4022,9 @@ The MODE tool generates a color bar to represent the contents of the colortable
  The values defined for each color in the color table are also plotted next
  to the color bar.
  The 
-\series bold
+\family typewriter
 colorbar_spacing
-\series default
+\family default
  variable is used to define the frequency with which the color table values
  should be plotted.
  Setting this variable to 1, as shown above, indicates that every color
@@ -3835,6 +4047,9 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 zero_border_size = 1;
 \end_layout
 
@@ -3843,9 +4058,9 @@ The MODE tool is not able to define objects that touch the edge of the grid.
  After the convolution step is performed the outer columns and rows of data
  are zeroed out to enable MODE to identify objects.
  The 
-\series bold
+\family typewriter
 zero_border_size
-\series default
+\family default
  variable specifies how many outer columns and rows of data should be set
  to bad data.
 \begin_inset Newline newline
@@ -3864,14 +4079,17 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 plot_valid_flag = FALSE;
 \end_layout
 
 \begin_layout Standard
 When applied, the 
-\series bold
+\family typewriter
 plot_valid_flag
-\series default
+\family default
  variable indicates that only the region containing valid data after masking
  is applied should be plotted.
  
@@ -3912,14 +4130,17 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 plot_gcarc_flag = FALSE;
 \end_layout
 
 \begin_layout Standard
 When applied, the 
-\series bold
+\family typewriter
 plot_gcarc_flag
-\series default
+\family default
  variable indicates that the edges of polylines should be plotted using
  great circle arcs as opposed to straight lines in the grid.
  The default value of this flag is FALSE.
@@ -3936,13 +4157,13 @@ ct_stats_flag = TRUE;
 \begin_layout Standard
 These flags can be set to TRUE or FALSE to produce additional output, in
  the form of postscript plots (
-\series bold
+\family typewriter
 ps_plot_flag
-\series default
+\family default
 ) or contingency table counts and statistics (
-\series bold
+\family typewriter
 ct_stats_flag
-\series default
+\family default
 ).
  
 \begin_inset Newline newline
@@ -4068,13 +4289,13 @@ polylines = TRUE;
 Each component of the pairs information in the NetCDF file can be turned
  on or off.
  The old syntax is still supported: 
-\series bold
+\family typewriter
 TRUE
-\series default
+\family default
  means accept the defaults, 
-\series bold
+\family typewriter
 FALSE
-\series default
+\family default
  means no netcdf output is generated.
  Netcdf output can also be turned off by setting all the individual dictionary
  flags to false.
@@ -4094,6 +4315,9 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 shift_right = 0;
 \end_layout
 
@@ -4121,6 +4345,9 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 output_prefix = "";
 \end_layout
 
@@ -4144,6 +4371,9 @@ height "1pt"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\family typewriter
+\series medium
 version = "v5.1";
 \end_layout
 
@@ -4299,10 +4529,7 @@ tt HHMMSSL}
 
 \end_inset
 
- indicates the forecast lead time
-, 
-\lang english
-
+ indicates the forecast lead time, 
 \begin_inset ERT
 status open
 
@@ -4317,10 +4544,7 @@ _HHMMSSV}
 
 \end_inset
 
- indicates the forecast valid time, and
- 
-\lang english
-
+ indicates the forecast valid time, and 
 \begin_inset ERT
 status open
 
@@ -5517,46 +5741,98 @@ The second ASCII file the MODE tool generates contains all of the attributes
  the column names.
  The number of lines in this file depends on the number of objects defined.
  This file contains lines of 6 types that are indicated by the contents
- of the "object_id" column.
- The "
-\series bold
+ of the 
+\family typewriter
 object_id
-\series default
-" can take the following 6 forms: 
+\family default
+ column.
+ The 
+\family typewriter
+object_id
+\family default
+ can take the following 6 forms: 
+\family typewriter
+FNNN
+\family default
 \series bold
-FNNN, ONNN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN
+, 
+\family typewriter
 \series default
+ONNN
+\family default
+\series bold
+, 
+\family typewriter
+\series default
+FNNN_ONNN
+\family default
+\series bold
+, 
+\family typewriter
+\series default
+CFNNN
+\family default
+\series bold
+, 
+\family typewriter
+\series default
+CONNN
+\family default
+\series bold
+, 
+\family typewriter
+\series default
+CFNNN_CONNN
+\family default
+\series bold
 .
- In each case, 
-\series bold
-NNN
+
 \series default
+ In each case, 
+\family typewriter
+NNN
+\family default
  is a three-digit number indicating the object index.
  While all lines have the first 18 header columns in common, these 6 forms
- for "
-\series bold
+ for 
+\family typewriter
 object_id
-\series default
-" can be divided into two types - one for single objects and one for pairs
+\family default
+ can be divided into two types - one for single objects and one for pairs
  of objects.
  The single object lines (
+\family typewriter
+FNNN
+\family default
 \series bold
-FNNN, ONNN, CFNNN,
+, 
+\family typewriter
+\series default
+ONNN
+\family default
+\series bold
+, 
+\family typewriter
+\series default
+CFNNN
+\family default
+\series bold
+,
 \series default
  and 
-\series bold
+\family typewriter
 CONNN
-\series default
-) contain valid data in columns 19-39 and fill data in columns 40-51.
+\family default
+) contain valid data in columns 19--39 and fill data in columns 40--51.
  The object pair lines (
-\series bold
+\family typewriter
 FNNN_ONNN
-\series default
+\family default
  and 
-\series bold
+\family typewriter
 CFNNN_CONNN
-\series default
-) contain valid data in columns 40-51 and fill data in columns 19-39.
+\family default
+) contain valid data in columns 40--51 and fill data in columns 19--39.
  These object identifiers are described in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -9573,9 +9849,9 @@ Lastly, the MODE tool creates a PostScript plot summarizing the features-based
  The PostScript plot is generated using internal libraries and does not
  depend on an external plotting package.
  The generation of this PostScript output can be disabled using the 
-\series bold
+\family typewriter
 ps_plot_flag
-\series default
+\family default
  configuration file option.
 \end_layout
 
