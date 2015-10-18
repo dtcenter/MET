@@ -227,7 +227,7 @@ R
 \emph on
 H
 \emph default
-: 
+:
 \end_layout
 
 \begin_layout Standard
@@ -236,40 +236,43 @@ status open
 
 \begin_layout Plain Layout
 
-$
-\backslash
-phi (x,y)=H$
+$$
 \end_layout
-
-\end_inset
-
- if 
-\begin_inset ERT
-status open
 
 \begin_layout Plain Layout
 
-$x^2+y^2
+
 \backslash
-le R^2$
+phi(x, y) = 
+\backslash
+cases{
 \end_layout
-
-\end_inset
-
-, and 
-\begin_inset ERT
-status open
 
 \begin_layout Plain Layout
 
-$
+   H & if $x^2 + y^2 
 \backslash
-phi (x,y)=0$
+leq R^2$ 
+\backslash
+cr
+\end_layout
+
+\begin_layout Plain Layout
+
+   0 & otherwise.
+ 
+\backslash
+cr
+\end_layout
+
+\begin_layout Plain Layout
+
+}$$
 \end_layout
 
 \end_inset
 
- otherwise.
+
 \end_layout
 
 \begin_layout Standard
@@ -331,46 +334,55 @@ C
 \emph on
 M
 \emph default
-: 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$M(x,y)=1$
-\end_layout
-
-\end_inset
-
-
+:
 \end_layout
 
 \begin_layout Standard
-if 
 \begin_inset ERT
 status open
 
 \begin_layout Plain Layout
 
-$C(x,y)
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+M(x, y) = 
 \backslash
-ge T$
+cases{ 
 \end_layout
-
-\end_inset
-
-, and 
-\begin_inset ERT
-status open
 
 \begin_layout Plain Layout
 
-$M (x,y)=H$
+  1 & if $C(x, y) 
+\backslash
+geq T$ 
+\backslash
+cr
+\end_layout
+
+\begin_layout Plain Layout
+
+  0 & otherwise.
+ 
+\backslash
+cr
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
 \end_layout
 
 \end_inset
 
- otherwise.
+
 \end_layout
 
 \begin_layout Standard
@@ -402,7 +414,7 @@ $$F(x,y)=M(x,y)f(x,y).$$
 \end_layout
 
 \begin_layout Standard
-Thus, two parameters - the radius of influence, 
+Thus, two parameters --- the radius of influence, 
 \emph on
 R
 \emph default
@@ -410,11 +422,12 @@ R
 \emph on
 T
 \emph default
- - control the entire process of resolving objects in the raw data field.
+ --- control the entire process of resolving objects in the raw data field.
 \end_layout
 
 \begin_layout Standard
-An example of the steps involved in resolving objects is shown in Fig 8-1.
+An example of the steps involved in resolving objects is shown in Figure
+ 8-1.
  Figure 8-1a shows a "raw" precipitation field, where the vertical coordinate
  represents the precipitation amount.
  Part b shows the convolved field, and part c shows the masked field obtained
@@ -452,7 +465,19 @@ Object attributes are defined both for single objects and for object pairs.
 \end_layout
 
 \begin_layout Standard
-Area is simply a count of the number of grid squares an object occupies.
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Area}
+\end_layout
+
+\end_inset
+
+ is simply a count of the number of grid squares an object occupies.
  If desired, a true area (say, in 
 \begin_inset Formula $km^{2}$
 \end_inset
@@ -467,7 +492,7 @@ Moments are used in the calculation of several object attributes.
 \begin_inset Formula $\xi(x,y)$
 \end_inset
 
-to be 1 for points (
+ to be 1 for points (
 \emph on
 x, y
 \emph default
@@ -490,11 +515,15 @@ $$S_x=
 \backslash
 sum_{x,y} x 
 \backslash
+, 
+\backslash
 xi (x,y) 
 \backslash
 hbox{ and }S_y=
 \backslash
 sum_{x,y} y 
+\backslash
+, 
 \backslash
 xi (x,y).$$
 \end_layout
@@ -507,15 +536,40 @@ xi (x,y).$$
 \begin_layout Standard
 Higher order moments are similarly defined and are used in the calculation
  of some of the other attributes.
- For example, the centroid is a kind of geometric center of an object, and
- can be calculated from first moments.
+ For example, the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf centroid}
+\end_layout
+
+\end_inset
+
+ is a kind of geometric center of an object, and can be calculated from
+ first moments.
  It allows one to assign a single point location to what may be a large,
  extended object.
  
 \end_layout
 
 \begin_layout Standard
-Axis Angle, denoted by 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Axis Angle}
+\end_layout
+
+\end_inset
+
+, denoted by 
 \begin_inset Formula $\theta$
 \end_inset
 
@@ -526,7 +580,19 @@ ly, third-order moments.
 \end_layout
 
 \begin_layout Standard
-Aspect Ratio is computed by fitting a rectangle around an object.
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Aspect Ratio}
+\end_layout
+
+\end_inset
+
+ is computed by fitting a rectangle around an object.
  The rectangle is aligned so that it has the same axis angle as the object,
  and the length and width are chosen so as to just enclose the object.
  We make no claim that the rectangle so obtained is the smallest possible
@@ -538,7 +604,20 @@ Aspect Ratio is computed by fitting a rectangle around an object.
 \end_layout
 
 \begin_layout Standard
-Another object attribute defined by MODE is complexity.
+Another object attribute defined by MODE is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf complexity}
+\end_layout
+
+\end_inset
+
+.
  Complexity is defined by comparing the area of an object to the area of
  its convex hull.
 \end_layout
@@ -547,19 +626,80 @@ Another object attribute defined by MODE is complexity.
 All the attributes discussed so far are defined for single objects.
  Once these are determined, they can be used to calculate attributes for
  pairs of objects.
- One example is centroid difference.
+ One example is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf centroid difference}
+\end_layout
+
+\end_inset
+
+.
  This measure is simply the (vector) difference between the centroids of
  the two objects.
- Another example is angle difference, the difference between the axis angles.
+ Another example is 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+angle difference}
+\end_layout
+
+\end_inset
+
+, the difference between the axis angles.
 \end_layout
 
 \begin_layout Standard
 Several area measures are also used for pair attributes.
- Union Area is the total area that is in either one (or both) of the two
- objects.
- Intersection Area is the area that is inside both objects simultaneously.
- Symmetric Difference is the area inside at least one object, but not inside
- both.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Union Area}
+\end_layout
+
+\end_inset
+
+ is the total area that is in either one (or both) of the two objects.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Intersection Area}
+\end_layout
+
+\end_inset
+
+ is the area that is inside both objects simultaneously.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Symmetrid Difference}
+\end_layout
+
+\end_inset
+
+ is the area inside at least one object, but not inside both.
 \end_layout
 
 \begin_layout Subsection
@@ -571,7 +711,7 @@ Once object attributes
 \begin_inset Formula $\alpha_{1},\alpha_{2},\ldots,\alpha_{n}$
 \end_inset
 
-are estimated, some of them are used as input to a fuzzy logic engine that
+ are estimated, some of them are used as input to a fuzzy logic engine that
  performs the matching and merging steps.
  Merging refers to grouping together objects in a single field, while matching
  refers to grouping together objects in different fields, typically the
@@ -639,7 +779,7 @@ w
 
 , are assigned to each attribute, representing an empirical judgment regarding
  the relative importance of the various attributes.
- As an example, in initial applications of MODE, centroid distance was weighted
+ As an example, the initial development of MODE, centroid distance was weighted
  more heavily than other attributes, because the location of storm systems
  close to each other in space seemed to be a strong indication (stronger
  than that given by any other attribute) that they were related.
@@ -750,11 +890,28 @@ MODE provides the capability to select a single model variable/level from
  threshold will be matched/merged.
  Through the configuration file, MODE offers a wide range of flexibility
  in how the objects are defined, processed, matched, and merged.
- 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vfill
+\backslash
+eject
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
-mode usage
+MODE usage
 \end_layout
 
 \begin_layout Standard
@@ -762,38 +919,118 @@ The usage statement for the MODE tool is listed below:
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
-Usage:
-\series default
- mode
+mode
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 fcst_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 obs_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 config_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-config_merge merge_config_file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-outdir path]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file] 
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level] 
 \end_layout
 
@@ -816,7 +1053,7 @@ status open
 
 {
 \backslash
-bf fcst
+tt fcst
 \backslash
 _file}
 \end_layout
@@ -836,7 +1073,7 @@ status open
 
 {
 \backslash
-bf obs
+tt obs
 \backslash
 _file}
 \end_layout
@@ -857,7 +1094,7 @@ status open
 
 {
 \backslash
-bf config
+tt config
 \backslash
 _file}
 \end_layout
@@ -882,7 +1119,7 @@ status open
 
 {
 \backslash
-bf -config
+tt -config
 \backslash
 _merge merge
 \backslash
@@ -909,7 +1146,7 @@ status open
 
 {
 \backslash
-bf merge
+tt merge
 \backslash
 _config
 \backslash
@@ -928,7 +1165,7 @@ status open
 
 {
 \backslash
-bf merge
+tt merge
 \backslash
 _config
 \backslash
@@ -951,7 +1188,7 @@ status open
 
 {
 \backslash
-bf -outdir path}
+tt -outdir path}
 \end_layout
 
 \end_inset
@@ -969,7 +1206,7 @@ status open
 
 {
 \backslash
-bf -log file}
+tt -log file}
 \end_layout
 
 \end_inset
@@ -992,7 +1229,7 @@ status open
 
 {
 \backslash
-bf -v level}
+tt -v level}
 \end_layout
 
 \end_inset
@@ -1005,6 +1242,22 @@ bf -v level}
 
 \begin_layout Standard
 An example of the MODE calling sequence is listed below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+vskip 0.1in}
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1022,16 +1275,131 @@ Please review examples.
 
 \end_layout
 
-\begin_layout LyX-Code
-mode sample_fcst.grb
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt mode}
 \end_layout
 
-\begin_layout LyX-Code
-sample_obs.grb
+\end_inset
+
+
 \end_layout
 
-\begin_layout LyX-Code
-MODEConfig_grb
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt sample
+\backslash
+_fcst.grb}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt sample
+\backslash
+_obs.grb}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt MODEConfig
+\backslash
+_grb}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1043,7 +1411,7 @@ status open
 
 {
 \backslash
-bf sample
+tt sample
 \backslash
 _fcst.grb}
 \end_layout
@@ -1058,7 +1426,7 @@ status open
 
 {
 \backslash
-bf sample
+tt sample
 \backslash
 _obs.grb}
 \end_layout
@@ -1073,7 +1441,7 @@ status open
 
 {
 \backslash
-bf MODEConfig
+tt MODEConfig
 \backslash
 _grb}
 \end_layout
@@ -1088,19 +1456,150 @@ A second example of the MODE calling sequence is presented below:
 \end_layout
 
 \begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+vskip 0.1in}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Example 2
 \end_layout
 
-\begin_layout LyX-Code
-mode sample_fcst.nc
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt mode}
 \end_layout
 
-\begin_layout LyX-Code
-sample_obs.nc
+\end_inset
+
+
 \end_layout
 
-\begin_layout LyX-Code
-MODEConfig_nc
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt sample
+\backslash
+_fcst.nc}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt sample
+\backslash
+_obs.nc}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt MODEConfig
+\backslash
+_nc}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1181,7 +1680,7 @@ status open
 
 {
 \backslash
-bf MODEConfig
+tt MODEConfig
 \backslash
 _default}
 \end_layout
@@ -1200,7 +1699,7 @@ status open
 
 {
 \backslash
-bf MODEConfig
+tt MODEConfig
 \backslash
 _default}
 \end_layout
@@ -1305,54 +1804,210 @@ fcst = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 field = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 name = "APCP";
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 level = "A03";
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 };
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 raw_thresh = NA;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 conv_radius = 60.0/grid_res; // in grid squares
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 conv_thresh = >=5.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 vld_thresh = 0.5;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 area_thresh = NA;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 inten_perc_value = 100;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 inten_perc_thresh = NA;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 merge_thresh = >=1.25;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 merge_flag = THRESH;
 \end_layout
 
@@ -1478,8 +2133,33 @@ merge_thresh
  for both the forecast and observation fields.
  These thresholds should be chosen to define larger objects that fully contain
  the originally defined objects.
- For example, for objects defined as >=5.0, a merge threshold of >=2.5 will
- define larger objects that fully contain the original objects.
+ For example, for objects defined as 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+geq 5.0$
+\end_layout
+
+\end_inset
+
+, a merge threshold of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+geq 2.5$
+\end_layout
+
+\end_inset
+
+ will define larger objects that fully contain the original objects.
  Any two original objects contained within the same larger object will be
  merged.
  By default, the merge thresholds are set to be greater than or equal to
@@ -1742,18 +2422,66 @@ mask = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 grid = "";
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 poly = "";
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 \end_layout
 
@@ -1933,38 +2661,146 @@ weight = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 centroid_dist = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 boundary_dist = 4.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 convex_hull_dist = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 angle_diff = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 area_ratio = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 int_area_ratio = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 complexity_ratio = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 inten_perc_ratio = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 inten_perc_value = 50;
 \end_layout
 
@@ -2062,134 +2898,530 @@ interest_function = {
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 centroid_dist = (
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 60.0/grid_res, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 600.0/grid_res, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 );
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 boundary_dist = (
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 400.0/grid_res, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 );
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 convex_hull_dist = (
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 400.0/grid_res, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 );
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 angle_diff = (
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 30.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 90.0, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 );
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 corner = 0.8;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 ratio_if = (
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.0, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( corner, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 1.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 );
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 area_ratio = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 int_area_ratio = (
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.00, 0.00 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.10, 0.50 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 0.25, 1.00 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.50in}
+\end_layout
+
+\end_inset
+
 ( 1.00, 1.00 )
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 );
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 complexity_ratio = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.25in}
+\end_layout
+
+\end_inset
+
 inten_perc_ratio = ratio_if;
 \end_layout
 
