@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 The Grid-Stat Tool
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:The-Grid-Stat-Tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -507,8 +514,11 @@ hskip 0.5in}
 
 \begin_layout Standard
 
+\emph on
+grid_stat
 \series medium
-grid_stat has some required arguments and accepts several optional ones.
+\emph default
+ has some required arguments and accepts several optional ones.
 \end_layout
 
 \begin_layout Standard
@@ -584,14 +594,10 @@ Optional arguments for grid_stat
 \series default
  option indicates the desired level of verbosity.
  The contents of 
-\series bold
-
 \begin_inset Quotes eld
 \end_inset
 
 level
-\series default
-
 \begin_inset Quotes erd
 \end_inset
 
