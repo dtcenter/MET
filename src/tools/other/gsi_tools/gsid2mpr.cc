@@ -483,7 +483,7 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tgsi_file1 [gsi_file2 gsi_file3 ... gsi_filen]\n"
+        << "\tgsi_file_1 [gsi_file_2 ... gsi_file_n]\n"
         << "\t[-swap]\n"
         << "\t[-channel n]\n"
         << "\t[-set_hdr col_name value]\n"        
