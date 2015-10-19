@@ -980,7 +980,7 @@ The usage statement for the MODE tool is listed below:
 \end_layout
 
 \begin_layout LyX-Code
-mode
+Usage: mode
 \end_layout
 
 \begin_layout LyX-Code
@@ -1101,46 +1101,26 @@ The MODE tool has three required arguments and can accept several optional
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for mode
 \end_layout
 
 \begin_layout Standard
 1.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt fcst
-\backslash
-_file}
-\end_layout
-
-\end_inset
-
+\series bold
+fcst_file
+\series default
  argument indicates the gridded file containing the model field to be verified.
 \end_layout
 
 \begin_layout Standard
 2.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt obs
-\backslash
-_file}
-\end_layout
-
-\end_inset
-
+\series bold
+obs_file
+\series default
  argument indicates the gridded file containing the gridded observations
  to be used for the verification of the model.
 \end_layout
@@ -1148,49 +1128,25 @@ _file}
 \begin_layout Standard
 3.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt config
-\backslash
-_file}
-\end_layout
-
-\end_inset
-
+\series bold
+config_file
+\series default
  argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Optional arguments for mode
 \end_layout
 
 \begin_layout Standard
 4.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt -config
-\backslash
-_merge merge
-\backslash
-_config
-\backslash
-_file}
-\end_layout
-
-\end_inset
-
+\series bold
+-config_merge merge_config_file
+\series default
  argument indicates the name of a second configuration file to be used when
  performing fuzzy engine merging by comparing the model or observation field
  to itself.
@@ -1200,41 +1156,15 @@ _file}
  If an object and its neighbor have an interest value above some threshold,
  they are merged.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt merge
-\backslash
-_config
-\backslash
-_file}
-\end_layout
-
-\end_inset
-
+\series bold
+merge_config_file
+\series default
  controls the settings of the fuzzy engine used to perform this merging
  step.
  If a 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt merge
-\backslash
-_config
-\backslash
-_file}
-\end_layout
-
-\end_inset
-
+\series bold
+merge_config_file
+\series default
  is not provided, the configuration specified by the config_file in the
  previous argument will be used.
 \end_layout
@@ -1242,37 +1172,19 @@ _file}
 \begin_layout Standard
 5.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt -outdir path}
-\end_layout
-
-\end_inset
-
+\series bold
+-outdir path
+\series default
  indicates the directory where output files should be written.
 \end_layout
 
 \begin_layout Standard
 6.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt -log file}
-\end_layout
-
-\end_inset
-
- option directs output and errors to the specified log file.
+\series bold
+-log file 
+\series default
+option directs output and errors to the specified log file.
  All messages will be written to that file as well as cout and cerr.
  Thus, users can save the messages without having to redirect the output
  on the command line.
@@ -1283,18 +1195,9 @@ tt -log file}
 \begin_layout Standard
 7.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt -v level}
-\end_layout
-
-\end_inset
-
+\series bold
+-v level
+\series default
  option indicates the desired level of verbosity.
  The contents of "level" will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
