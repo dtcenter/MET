@@ -287,7 +287,7 @@ MET components
 The major components of the MET package are represented in Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "MET_Overview_v5.0"
+reference "MET_Overview_Flowchart"
 
 \end_inset
 
@@ -316,6 +316,13 @@ status open
 \align center
 
 \series bold
+\begin_inset CommandInset label
+LatexCommand label
+name "MET_Overview_Flowchart"
+
+\end_inset
+
+
 \begin_inset Graphics
 	filename fig1.1.png
 	scale 60
@@ -335,13 +342,6 @@ Basic representation of current MET structure and modules.
  Colored areas represent software and modules included in MET, and gray
  areas represent input and output files.
 \end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "MET_Overview_v5.0"
 
 \end_inset
 
