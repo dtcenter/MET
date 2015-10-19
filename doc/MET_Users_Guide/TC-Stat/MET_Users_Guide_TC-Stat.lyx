@@ -75,6 +75,13 @@
 
 \begin_layout Chapter
 TC-Stat
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:TC-Stat"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -423,18 +430,66 @@ Usage: -lookin source
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-out file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-config file] | [JOB COMMAND LINE]
 \end_layout
 
@@ -473,22 +528,18 @@ reference "sub:tc_stat-configuration-file"
 \begin_layout Standard
 
 \series bold
-Required arguments for tc_stat:
+Required arguments for tc_stat
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-Lookin source
-\series default
-:
-\series medium
+\begin_layout Description
+1.
  The 
-\emph on
--lookin
-\emph default
- argument indicates the location of the input TCST files generated from
+\series bold
+-lookin source
+\series default
  
+\series medium
+argument indicates the location of the input TCST files generated from 
 \emph on
 tc_pairs
 \emph default
@@ -501,65 +552,67 @@ tc_pairs
 \begin_layout Standard
 
 \series bold
-Optional arguments for tc_stat:
+Optional arguments for tc_stat
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-Out file
-\series default
-:
-\series medium
+\begin_layout Description
+2.
  The 
-\emph on
--out
-\emph default
- argument indicates the desired name of the TCST format output file.
-\end_layout
-
-\begin_layout Standard
-
 \series bold
-Log file
+-out file
 \series default
-:
+ 
 \series medium
- The -
-\emph on
-log
-\emph default
- argument indicates the name of the log file associated with tc_stat output.
+argument indicates the desired name of the TCST format output file.
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-V level:
-\series medium
+\begin_layout Description
+3.
  The 
-\emph on
--v 
-\emph default
-option indicates the desired level of verbosity.
- The value of "level" will override the default setting of 2.
+\series bold
+-log file
+\series default
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+4.
+ The 
+\series bold
+-v level
+\series default
+ option indicates the desired level of verbosity.
+ The contents of 
+\series bold
+
+\begin_inset Quotes eld
+\end_inset
+
+level
+\series default
+
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
- while increasing the verbosity above 2 will increase the amount of log
- output.
+ while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-Config file
-\series default
-:
-\series medium
+\begin_layout Description
+5.
  The 
-\emph on
--config
-\emph default
- argument indicates the name of the configuration file to be used.
+\series bold
+-config file
+\series default
+ 
+\series medium
+argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
