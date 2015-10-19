@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 MET Data I/O
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:MET-Data-I/O"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -86,17 +93,44 @@ Data must be preprocessed prior to using for verification.
  In addition to preprocessing observations, some plotting utilities for
  data checking are also provided and described at the end of this chapter.
  Both the input and output file formats are described in this chapter.
- Sections 3.1 and 3.2 are primarily concerned with re-formatting input files
- into the intermediate files required by some MET modules.
+ Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Input-data-formats"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Intermediate-data-formats"
+
+\end_inset
+
+ are primarily concerned with re-formatting input files into the intermediate
+ files required by some MET modules.
  These steps are represented by the first three columns in the MET flowchart
- depicted in Fig.
- 1-1.
+ depicted in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MET_Overview_Flowchart"
+
+\end_inset
+
+.
  Output data formats and the software modules used to reformat the data
  are described in later sections.
 \end_layout
 
 \begin_layout Section
 Input data formats
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Input-data-formats"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -149,6 +183,13 @@ n types in a single file in a standard format.
 
 \begin_layout Section
 Intermediate data formats
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Intermediate-data-formats"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -246,6 +287,13 @@ The ASCII2NC tool simply reformats ASCII point observations into the NetCDF
 
 \begin_layout Section
 Output data formats
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Output-data-formats"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -356,6 +404,13 @@ Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs,
 
 \begin_layout Section
 Data format summary
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Data-format-summary"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
