@@ -230,7 +230,9 @@ Use of a climatology field for comparative verification
 
 \series medium
 The Grid-Stat tool allows evaluation of model forecasts compared with a
- user supplied climatology.
+ user-supplied climatology.
+ Prior to calculation of statistics, the climatology must be put on the
+ same grid as the forecasts and observations.
  In particular, the anomoly correlation and mean squared error skill score
  provide a measure of the forecast skill versus the climatology.
  For more details about climatological comparisons and reference forecasts,
@@ -380,14 +382,17 @@ This section contains information about configuring and running the Grid-Stat
 \series medium
 The Grid-Stat tool provides the capability of verifying one or more model
  variables/levels using multiple thresholds for each model variable/level.
- The Grid-Stat tool performs no interpolation because the input model and
- observation datasets must already be on a common grid.
- However, the interpolation parameters may be used to perform a smoothing
- operation on the forecast field prior to verifying it to investigate how
- the scale of the forecast affects the verification statistics.
+ The Grid-Stat tool performs no interpolation because the input model, observati
+on, and climatology datasets must be on a common grid.
+ MET will interpolate these files to a common grid if one is specified.
+ The interpolation parameters may be used to perform a smoothing operation
+ on the forecast field prior to verifying it to investigate how the scale
+ of the forecast affects the verification statistics.
  The Grid-Stat tool computes a number of continuous statistics for the forecast
- minus observation differences as well as discrete statistics once the data
- have been thresholded.
+ minus observation differences, discrete statistics once the data have been
+ thresholded, or statistics for probabilistic forecasts.
+ All types of statistics can incorporate a climatological reference.
+ 
 \end_layout
 
 \begin_layout Subsection
