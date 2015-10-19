@@ -81,7 +81,7 @@ Re-Formatting of Point Observations
 \begin_layout Standard
 
 \series medium
-There are several format of point observations format that may preprocessed
+There are several formats of point observations format that may preprocessed
  using the suite of reformatting tools in MET.
  These include PrepBufr data from NCEP, SURFRAD data from NOAA, Aeronet
  Data from NASA, MADIS data from NOAA, little_r from WRF simulations, and
