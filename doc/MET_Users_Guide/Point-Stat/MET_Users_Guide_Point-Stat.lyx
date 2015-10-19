@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 The Point-Stat Tool
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:The-Point-Stat-Tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1146,7 +1153,7 @@ MET provides non-parametric bootstrap confidence intervals for many categorical
 
 \series medium
 For more information on confidence intervals pertaining to verification
- measures, see Wilks (2006), Jolliffe and Stephenson (2003), and Bradley
+ measures, see Wilks (2011), Jolliffe and Stephenson (2003), and Bradley
  (2008).
 \end_layout
 
