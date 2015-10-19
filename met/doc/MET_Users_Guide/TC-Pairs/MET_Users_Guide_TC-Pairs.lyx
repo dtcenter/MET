@@ -1556,6 +1556,13 @@ The version string indicates the version of TC-Pairs configuration file
 
 \begin_layout Subsection
 TC_Pairs output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:TC_Pairs-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
