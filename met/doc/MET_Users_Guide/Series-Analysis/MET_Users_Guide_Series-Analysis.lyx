@@ -188,38 +188,126 @@ Usage: series_analysis
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -fcst file_1 ...
  file_n
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -obs file_1 ...
  file_n
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-both file_1 ...
  file_n]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -out file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -config file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
 \begin_layout Standard
-series_analysis 
+
+\emph on
+series_analysis
+\emph default
+ 
 \series medium
 has some required arguments and accepts optional ones.
  
@@ -233,27 +321,42 @@ Required arguments ensemble_stat
 
 \begin_layout Description
 1.
- The -fcst file_1 ...
- file_n options specify the gridded forecast files or ASCII files containing
- lists of file names to be used.
-\end_layout
-
-\begin_layout Description
-2.
- The -obs file_1 ...
- file_n are the gridded observation files or ASCII files containing lists
+ The 
+\series bold
+-fcst file_1 ...
+ file_n
+\series default
+ options specify the gridded forecast files or ASCII files containing lists
  of file names to be used.
 \end_layout
 
 \begin_layout Description
+2.
+ The 
+\series bold
+-obs file_1 ...
+ file_n
+\series default
+ are the gridded observation files or ASCII files containing lists of file
+ names to be used.
+\end_layout
+
+\begin_layout Description
 3.
- The -out file is the NetCDF output file containing computed statistics.
+ The 
+\series bold
+-out file
+\series default
+ is the NetCDF output file containing computed statistics.
 \end_layout
 
 \begin_layout Description
 4.
- The -config file is a Series Analysis Configuration file containing the
- desired settings.
+ The 
+\series bold
+-config file
+\series default
+ is a Series Analysis Configuration file containing the desired settings.
 \end_layout
 
 \begin_layout Description
@@ -271,18 +374,30 @@ arguments for series_analysis
 \begin_layout Description
 5.
  To set both the forecast and observations to the same set of files, use
- the optional -both file_1 ...
- file_n option to the same set of files.
+ the optional 
+\series bold
+-both file_1 ...
+ file_n
+\series default
+ option to the same set of files.
 \end_layout
 
 \begin_layout Description
 6.
- The -log file outputs log messages to the specified file.
+ The 
+\series bold
+-log file
+\series default
+ outputs log messages to the specified file.
 \end_layout
 
 \begin_layout Description
 7.
- The -v level overrides the default level of logging (2).
+ The 
+\series bold
+-v level
+\series default
+ overrides the default level of logging (2).
 \end_layout
 
 \begin_layout Standard
