@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 Regional Verification using Masking
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Regional-Verification-using"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -340,8 +347,11 @@ hskip 0.5in}
 
 \begin_layout Standard
 
+\emph on
+gen_vx_mask
 \series medium
-gen_vx_mask has required arguments and can take optional ones.
+\emph default
+ has required arguments and can take optional ones.
  
 \end_layout
 
