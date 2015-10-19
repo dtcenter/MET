@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 The Ensemble Stat Tool
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:The-Ensemble-Stat"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -297,7 +304,11 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-ensemble_stat 
+
+\emph on
+ensemble_stat
+\emph default
+ 
 \series medium
 has required arguments and can take many optional ones.
  
