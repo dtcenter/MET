@@ -1108,10 +1108,6 @@ config_file
 \end_layout
 
 \begin_layout LyX-Code
-[-climo climo_file]
-\end_layout
-
-\begin_layout LyX-Code
 [-point_obs netcdf_observation_file]
 \end_layout
 
@@ -1158,7 +1154,8 @@ Required arguments for point_stat
 \series bold
 fcst_file
 \series medium
- argument names the gridded file containing the model data to be verified.
+ argument names the gridded file in either GRIB or NetCDF containing the
+ model data to be verified.
 \end_layout
 
 \begin_layout Description
@@ -1169,8 +1166,8 @@ fcst_file
 \series bold
 obs_file
 \series medium
- argument indicates the NetCDF file containing the point observations to
- be used for verifying the model.
+ argument indicates the NetCDF file (output of PB2NC or ASCII2NC) containing
+ the point observations to be used for verifying the model.
 \end_layout
 
 \begin_layout Description
@@ -1197,21 +1194,6 @@ point_stat
 
 \series medium
 4.
- The
-\series bold
- -climo climo_file
-\series medium
- identifies the gridded file containing climatological values on the same
- grid as the forecast file to be used when computing scalar and vector anomaly
- measures.
- If the "climo_file" is not provided, scalar and vector anomaly values will
- not be computed.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-5.
  The 
 \series bold
 -point_obs netcdf_file
@@ -1224,7 +1206,7 @@ point_stat
 \begin_layout Description
 
 \series medium
-6.
+5.
  The 
 \series bold
 -obs_valid_beg time
@@ -1236,7 +1218,7 @@ point_stat
 \begin_layout Description
 
 \series medium
-7.
+6.
  The 
 \series bold
 -obs_valid_end time
@@ -1248,7 +1230,7 @@ point_stat
 \begin_layout Description
 
 \series medium
-8.
+7.
  The 
 \series bold
 -outdir path
@@ -1260,7 +1242,7 @@ point_stat
 \begin_layout Description
 
 \series medium
-9.
+8.
  The 
 \series bold
 -log file
@@ -1276,7 +1258,7 @@ point_stat
 \begin_layout Description
 
 \series medium
-10.
+9.
  The 
 \series bold
 -v level
