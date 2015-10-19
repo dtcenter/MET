@@ -160,54 +160,122 @@ Usage: tc_pairs
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -adeck source
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -bdeck source
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -config file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-out base]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-\emph on
 tc_pairs
-\emph default
+\series medium
  has three required arguments and can take up to three optional arguments.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
-Required arguments for tc_pairs:
+Required arguments for tc_pairs
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-Adeck source:
-\series medium
+\begin_layout Description
+1.
  The 
-\emph on
--adeck
-\emph default
- argument indicates the ATCF format data source containing tropical cyclone
+\series bold
+-adeck source
+\series default
+ 
+\series medium
+argument indicates the ATCF format data source containing tropical cyclone
  model forecast (output from tracker) data to be verified.
  It specifies the name of an ATCF format file or top-level directory containing
  ATCF format files ending in 
@@ -221,17 +289,16 @@ Adeck source:
  to be processed.
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-Bdeck source:
-\series medium
+\begin_layout Description
+2.
  The 
-\emph on
--bdeck
-\emph default
- argument indicates the ATCF format data source containing the tropical
- cyclone reference dataset to be used for verifying the adeck source.
+\series bold
+-bdeck source
+\series default
+ 
+\series medium
+argument indicates the ATCF format data source containing the tropical cyclone
+ reference dataset to be used for verifying the adeck source.
  It specifies the name of an ATCF format file or top-level directory containing
  ATCF format files ending in 
 \begin_inset Quotes eld
@@ -246,66 +313,70 @@ Bdeck source:
  be any ATCF format reference.
 \end_layout
 
-\begin_layout Standard
-
-\series bold
-Config file:
-\series medium
+\begin_layout Description
+3.
  The 
-\emph on
--config
-\emph default
- argument indicates the name of the configuration file to be used.
+\series bold
+-config file
+\series default
+ 
+\series medium
+argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
 \begin_layout Standard
 
 \series bold
-Optional arguments for tc_pairs:
+Optional arguments for tc_pairs
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+4.
+ The 
 \series bold
-Out base:
+-out base 
 \series medium
- The -out argument indicates the path of the output file base.
+argument indicates the path of the output file base.
  This argument overrides the default output file base (./out_tcmpr)
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+5.
+ The 
 \series bold
-Log file:
-\series medium
- The -log argument indicates the name of the log file associated with 
-\emph on
-tc_pairs
-\emph default
- output.
+-log file
+\series default
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+6.
+ The 
 \series bold
-V level
+-v level
 \series default
-:
-\series medium
- The -v option indicates the desired level of verbosity.
- The value of 
+ option indicates the desired level of verbosity.
+ The contents of 
+\series bold
+
 \begin_inset Quotes eld
 \end_inset
 
 level
+\series default
+
 \begin_inset Quotes erd
 \end_inset
 
  will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
- while increasing the verbosity above 2 will increase the amount of log
- output.
+ while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
 \begin_layout Standard
