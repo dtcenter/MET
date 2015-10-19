@@ -123,6 +123,8 @@ The Grid-Stat tool computes a wide variety of verification statistics.
  Broadly speaking, these statistics can be subdivided into three types of
  statistics: measures for categorical variables, measures for continuous
  variables, and measures for probabilistic forecasts.
+ Further, when a climatology file is included, reference statistics for
+ the forecasts compared to the climatology can be calculated.
  These categories of measures are briefly described here; specific descriptions
  of all measures are provided in Appendix C.
  Additional information can be found in Wilks (2011) and Jolliffe and Stephenson
@@ -154,7 +156,7 @@ n system.
  These statistics are also described in Appendix C.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsubsection*
 
 \shape slanted
 Measures for categorical variables
@@ -171,7 +173,7 @@ Categorical verification statistics are used to evaluate forecasts that
  See Appendix C for more information.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsubsection*
 Measures for continuous variables
 \end_layout
 
@@ -190,7 +192,7 @@ e rather than a single measure.
  See Appendix C for specific information.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsubsection*
 Measures for probabilistic forecasts and dichotomous outcomes
 \end_layout
 
@@ -220,7 +222,21 @@ Probabilistic forecast values are assumed to have a range of either 0 to
  1: t1 <= p <= 1.
 \end_layout
 
+\begin_layout Subsubsection*
+Use of a climatology field for comparative verification
+\end_layout
+
 \begin_layout Standard
+
+\series medium
+The Grid-Stat tool allows evaluation of model forecasts compared with a
+ user supplied climatology.
+ In particular, the anomoly correlation and mean squared error skill score
+ provide a measure of the forecast skill versus the climatology.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
 Use of analysis fields for verification
 \end_layout
 
@@ -1408,7 +1424,15 @@ sl1l2 = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
+sal1l2 = NONE;
+\end_layout
+
+\begin_layout LyX-Code
 vl1l2 = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+val1l2 = NONE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1468,139 +1492,139 @@ BOTH
 \series medium
  indicates that the line type should be written to the STAT file as well
  as a separate ASCII file where the data are grouped by line type.
- The first fifteen output flags correspond to the following types of output
- line types:
+ These output flags correspond to the following types of output line types:
 \end_layout
 
-\begin_layout Standard
-1.
- 
+\begin_layout Enumerate
+
 \series bold
 FHO 
 \series default
 for Forecast, Hit, Observation Rates
 \end_layout
 
-\begin_layout Standard
-2.
- 
+\begin_layout Enumerate
+
 \series bold
 CTC
 \series default
  for Contingency Table Counts
 \end_layout
 
-\begin_layout Standard
-3.
- 
+\begin_layout Enumerate
+
 \series bold
 CTS
 \series default
  for Contingency Table Statistics
 \end_layout
 
-\begin_layout Standard
-4.
- 
+\begin_layout Enumerate
+
 \series bold
 MCTC
 \series default
  for Multi-Category Contingency Table Counts
 \end_layout
 
-\begin_layout Standard
-5.
- 
+\begin_layout Enumerate
+
 \series bold
 MCTS
 \series default
  for Multi-Category Contingency Table Statistics
 \end_layout
 
-\begin_layout Standard
-6.
- 
+\begin_layout Enumerate
+
 \series bold
 CNT
 \series default
  for Continuous Statistics
 \end_layout
 
-\begin_layout Standard
-7.
- 
+\begin_layout Enumerate
+
 \series bold
 SL1L2
 \series default
  for Scalar L1L2 Partial Sums
 \end_layout
 
-\begin_layout Standard
-8.
- 
+\begin_layout Enumerate
+
+\series bold
+SAL1L2
+\series medium
+ for Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
+\end_layout
+
+\begin_layout Enumerate
+
 \series bold
 VL1L2
 \series default
  for Vector L1L2 Partial Sums
 \end_layout
 
-\begin_layout Standard
-9.
- 
+\begin_layout Enumerate
+
+\series bold
+VAL1L2
+\series medium
+ for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+\end_layout
+
+\begin_layout Enumerate
+
 \series bold
 PCT
 \series default
  for Contingency Table Counts for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
-10.
- 
+\begin_layout Enumerate
+
 \series bold
 PSTD
 \series default
  for Contingency Table Statistics for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
-11.
- 
+\begin_layout Enumerate
+
 \series bold
 PJC
 \series default
  for Joint and Conditional factorization for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
-12.
- 
+\begin_layout Enumerate
+
 \series bold
 PRC
 \series default
  for Receiver Operating Characteristic for Probabilistic forecasts
 \end_layout
 
-\begin_layout Standard
-13.
- 
+\begin_layout Enumerate
+
 \series bold
 NBRCTC
 \series default
  for Neighborhood Contingency Table Counts
 \end_layout
 
-\begin_layout Standard
-14.
- 
+\begin_layout Enumerate
+
 \series bold
 NBRCTS
 \series default
  for Neighborhood Contingency Table Statistics
 \end_layout
 
-\begin_layout Standard
-15.
- 
+\begin_layout Enumerate
+
 \series bold
 NBRCNT
 \series default
@@ -1612,8 +1636,20 @@ NBRCNT
 \series medium
 Note that the first two line types are easily derived from one another.
  The user is free to choose which measure is most desired.
- See Section 5.3.3 for more information about the information in the output
- files.
+ See 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Tara please cross reference the section in the point stat chapter.
+ Section 5.3.3 
+\end_layout
+
+\end_inset
+
+for more information about the information in the output files.
 \begin_inset Newline newline
 \end_inset
 
