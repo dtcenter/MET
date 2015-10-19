@@ -88,19 +88,14 @@ The TC-Stat tool ties together results from the TC-Pairs tool by providing
  summary statistics and filtering jobs on TCST output files.
  The TC-Stat tool requires TCST output from the TC-Pairs tool.
  See section 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Input link
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:TC_Pairs-output"
 
 \end_inset
 
-4.2.3 of this users guide for information on the TCST output format of the
- TC-Pairs tool.
+ of this users guide for information on the TCST output format of the TC-Pairs
+ tool.
  A filtering job using TC-Stat provides the ability to filter the input
  data by various conditions and thresholds described in section 
 \begin_inset CommandInset ref
@@ -255,17 +250,27 @@ The TC-Stat tool can be used to produce summary information for a single
 Confidence intervals are computed for the mean of the column of data.
  Confidence intervals are computed using the assumption of normality for
  the mean.
- For further information on computing confidence intervals, refer to 
+ For further information on computing confidence intervals, refer to Appendix
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Appendix-D--"
+
+\end_inset
+
+ D 
 \begin_inset Note Note
 status open
 
 \begin_layout Plain Layout
-Insert link
+
+\series medium
+Confirm link works
 \end_layout
 
 \end_inset
 
-Appendix D of the MET user's guide.
+of the MET user's guide.
 \end_layout
 
 \begin_layout Standard
@@ -2171,18 +2176,20 @@ dump_row
 " option.
  The TCST output from this job follows the TCST output description in Chapters
  
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-add link
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:TC-dland-tool"
 
 \end_inset
 
-3 and 4.
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:TC-Pairs-tool"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
