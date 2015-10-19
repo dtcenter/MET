@@ -87,6 +87,13 @@ name "chap:Plotting-and-Graphics"
 
 \begin_layout Section
 Plotting Utilities
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Plotting-Utilities"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -105,6 +112,13 @@ ield.
 
 \begin_layout Subsection
 plot_point_obs usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:plot_point_obs-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -395,6 +409,13 @@ sample_pb.ps
 
 \begin_layout Subsection
 plot_data_plane usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:plot_data_plane-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -697,6 +718,13 @@ test.ps
 
 \begin_layout Subsection
 plot_mode_field usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:plot_mode_field-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -997,10 +1025,24 @@ http://www.dtcenter.org/met/users/
 
 \begin_layout Section
 Examples of plotting MET output
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Examples-of-plotting"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 Grid-Stat tool examples
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Grid-Stat-tool-examples"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1072,6 +1114,13 @@ name "Gilbert_skill_score"
 
 \begin_layout Subsection
 MODE tool examples
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE-tool-examples"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1309,6 +1358,13 @@ name "histogram"
 
 \begin_layout Subsection
 TC-Stat tool example
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:TC-Stat-tool-example"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
