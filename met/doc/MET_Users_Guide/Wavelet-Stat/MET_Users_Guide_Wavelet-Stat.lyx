@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -184,7 +184,7 @@ al thresholds so that each categorical bin had a similar sample size.
 The Intensity Scale approach can be summarized in the following 5 steps:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 1.
  For each threshold, the forecast and observation fields are transformed
  into binary fields: where the grid-point precipitation value meets the
@@ -207,16 +207,442 @@ Insert Chapter numberX.1
  The displacement error is clearly visible from the binary field difference
  and the contingency table image obtained for the same threshold (Table
  
-\begin_inset Note Note
-status open
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "contingency_table_counts"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Description
+2.
+ The binary forecast and observation fields obtained from the thresholding
+ are then decomposed into the sum of components on different scales, by
+ using a 2D Haar wavelet filter (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_binary_fcst"
+
+\end_inset
+
+).
+ Note that the scale components are fields, and their sum adds up to the
+ original binary field.
+ For a forecast defined over square domain of 
+\emph on
+2
+\begin_inset script superscript
 
 \begin_layout Plain Layout
-Insert Chapter number X.
+n
 \end_layout
 
 \end_inset
 
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-points, the scale components are 
+\emph on
+n+1
+\emph default
+: 
+\emph on
+n
+\emph default
+ mother wavelet components + the largest father wavelet (or scale-function)
+ component.
+ The 
+\emph on
+n
+\emph default
+ mother wavelet components have resolution equal to 
+\emph on
+1, 2, 4, ...
+ 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n-1
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-points.
+ The largest father wavelet component is a constant field over the 
+\emph on
+2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ x 2
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+
+\emph default
+ grid-point domain with value equal to the field mean.
+ 
+\end_layout
+
+\begin_layout Description
+Note that the wavelet transform is a linear operator: this implies that
+ the difference of the spatial scale components of the binary forecast and
+ observation fields (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_binary_fcst"
+
+\end_inset
+
+) are equal to the spatial scale components of the difference of the binary
+ forecast and observation fields (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_binary_scale9"
+
+\end_inset
+
+), and these scale components also add up to the original binary field differenc
+e (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_3h_fcst"
+
+\end_inset
+
 1).
+ The intensity-scale technique considers thus the spatial scale of the error.
+ For the case illustrated (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_3h_fcst"
+
+\end_inset
+
+ and Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_binary_scale9"
+
+\end_inset
+
+) note the large error associated at the scale of 160 km, due the storm,
+ 160km displaced almost its entire length.
+\end_layout
+
+\begin_layout Description
+Note also that the means of the binary forecast and observation fields (i.e.
+ their largest father wavelet components) are equal to the proportion of
+ forecast and observed events above the threshold,
+\emph on
+ (a+b)/n
+\emph default
+ and 
+\emph on
+(a+c)/n
+\emph default
+, evaluated from the contingency table counts (Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "contingency_table_counts"
+
+\end_inset
+
+) obtained from the original forecast and observation fields by thresholding
+ with the same threshold used to obtain the binary forecast and observation
+ fields.
+ This relation is intuitive when observing forecast and observation binary
+ fields and their corresponding contingency table image (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_3h_fcst"
+
+\end_inset
+
+).
+ The comparison of the largest father wavelet component of binary forecast
+ and observation fields therefore provides feedback on the whole field bias.
+\end_layout
+
+\begin_layout Description
+3.
+ For each threshold (
+\emph on
+t
+\emph default
+) and for each scale component (
+\emph on
+j
+\emph default
+) of the binary forecast and observation, the Mean Squared Error (MSE) is
+ then evaluated (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MSE_percent_NIMROD"
+
+\end_inset
+
+).
+ The error is usually large for small thresholds, and decreases as the threshold
+ increases.
+ This behavior is partially artificial, and occurs because the smaller the
+ threshold the more events will exceed it, and therefore the larger would
+ be the error, since the error tends to be proportional to the amount of
+ events in the binary fields.
+ The artificial effect can be diminished by normalization: because of the
+ wavelet orthogonal properties, the sum of the MSE of the scale components
+ is equal to the MSE of the original binary fields: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox {MSE}(t) = j 
+\backslash
+hbox{MSE}(t,j)$
+\end_layout
+
+\end_inset
+
+.
+ Therefore, the percentage that the MSE for each scale contributes to the
+ total MSE may be computed: for a given threshold, 
+\emph on
+t
+\emph default
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox {MSE
+\backslash
+%}(t,j) = 
+\backslash
+hbox {MSE}(t,j)/ 
+\backslash
+hbox{MSE}(t)$
+\end_layout
+
+\end_inset
+
+.
+ The MSE% does not exhibit the threshold dependency, and usually shows small
+ errors on large scales and large errors on small scales, with the largest
+ error associated to the smallest scale and highest threshold.
+ For the NIMROD case illustrated note the large error at 160 km and between
+ the thresholds of and 4 mm/h, due to the storm, 160km displaced almost
+ its entire length.
+\end_layout
+
+\begin_layout Description
+Note that the MSE of the original binary fields is equal to the proportion
+ of the counts of misses (
+\emph on
+c/n
+\emph default
+) and false alarms (
+\emph on
+b/n
+\emph default
+) for the contingency table (Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "contingency_table_counts"
+
+\end_inset
+
+) obtained from the original forecast and observation fields by thresholding
+ with the same threshold used to obtain the binary forecast and observation
+ fields: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox {MSE}(t)=(b+c)/n$
+\end_layout
+
+\end_inset
+
+.
+ This relation is intuitive when comparing the forecast and observation
+ binary field difference and their corresponding contingency table image
+ (Fig 8.1).
+\end_layout
+
+\begin_layout Description
+4.
+ The MSE for the random binary forecast and observation fields is estimated
+ by 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox{MSE}(t) 
+\backslash
+hbox{random}=
+\backslash
+hbox {FBI}*
+\backslash
+hbox{Br}*(1-
+\backslash
+hbox{Br}) + 
+\backslash
+hbox{Br}*(1- 
+\backslash
+hbox{FBI}*
+\backslash
+hbox{Br})$
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{FBI}=(a+b)/(a+c)$
+\end_layout
+
+\end_inset
+
+ is the frequency bias index and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{Br}=(a+c)/n$
+\end_layout
+
+\end_inset
+
+ is the sample climatology from the contingency table (Table 9.1) obtained
+ from the original forecast and observation fields by thresholding with
+ the same threshold used to obtain the binary forecast and observation fields.
+ This formula follows by considering the Murphy and Winkler (1987) framework,
+ appling the Bayes' theorem to express the joint probabilities 
+\emph on
+b/n
+\emph default
+ and 
+\emph on
+c/n
+\emph default
+ as product of the marginal and conditional probability (e.g.
+ Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for
+ a random forecast the conditional probability is equal to the unconditional
+ one, so that 
+\emph on
+b/n
+\emph default
+ and 
+\emph on
+c/n
+\emph default
+ are equal to the product of the corresponding marginal probabilities solely.
+ 
+\end_layout
+
+\begin_layout Description
+5.
+ For each threshold (
+\emph on
+t
+\emph default
+) and scale component (
+\emph on
+j
+\emph default
+), the skill score based on the MSE of binary forecast and observation scale
+ components is evaluated (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Intensity_Scale_skill_score_NIMROD"
+
+\end_inset
+
+).
+ The standard skill score definition as in Jolliffe and Stephenson (2003)
+ or Wilks (2006) is used, and random chance is used as reference forecast.
+ The MSE for the random binary forecast is equipartitioned on the 
+\emph on
+n+1
+\emph default
+ scales to evaluate the skill score: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$ 
+\backslash
+hbox{SS} (t,j)=1- 
+\backslash
+hbox{MSE}(t,j)*(n+1)/ 
+\backslash
+hbox {MSE}(t) 
+\backslash
+hbox {random}$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+The Intensity-Scale (IS) skill score evaluates the forecast skill as a function
+ of the precipitation intensity and of the spatial scale of the error.
+ Positive values of the IS skill score are associated to a skillful forecast,
+ whereas negative values are associated to no skill.
+ Usually large scales exhibit positive skill (large scale events, such as
+ fronts, are well predicted), whereas small scales exhibit negative skill
+ (small scale events, such as convective showers, are less predictable),
+ and the smallest scale and highest thresholds exhibit the worst skill.
+ For the NIMROD case illustrated note the negative skill associated to the
+ 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced
+ almost its entire length.
 \end_layout
 
 \begin_layout Standard
@@ -224,10 +650,6 @@ Insert Chapter number X.
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
@@ -265,6 +687,13 @@ j
  represents the observations.
  
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "contingency_table_counts"
 
 \end_inset
 
@@ -533,10 +962,6 @@ a+b+c+d
 \end_layout
 
 \begin_layout Standard
-
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
@@ -561,121 +986,31 @@ NIMROD 3h lead-time forecast and corresponding verifying analysis field
  and analysis binary fields obtained for a threshold of 1mm/h, the binary
  field difference has their corresponding Contingency Table Image (see Table
  
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-X
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "contingency_table_counts"
 
 \end_inset
 
-.1).
+).
  The forecast shows a storm of 160 km displaced almost its entire length.
 \end_layout
 
 \end_inset
 
 
-\end_layout
+\begin_inset CommandInset label
+LatexCommand label
+name "NIMROD_3h_fcst"
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Standard
-2.
- The binary forecast and observation fields obtained from the thresholding
- are then decomposed into the sum of components on different scales, by
- using a 2D Haar wavelet filter (
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Fig Insert Chapter numberX.2
-\end_layout
-
-\end_inset
-
-).
- Note that the scale components are fields, and their sum adds up to the
- original binary field.
- For a forecast defined over square domain of 
-\emph on
-2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-n
-\end_layout
-
-\end_inset
-
- x 2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-n
-\end_layout
-
 \end_inset
 
 
-\emph default
- grid-points, the scale components are 
-\emph on
-n+1
-\emph default
-: 
-\emph on
-n
-\emph default
- mother wavelet components + the largest father wavelet (or scale-function)
- component.
- The 
-\emph on
-n
-\emph default
- mother wavelet components have resolution equal to 
-\emph on
-1, 2, 4, ...
- 2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-n-1
-\end_layout
-
-\end_inset
-
-
-\emph default
- grid-points.
- The largest father wavelet component is a constant field over the 
-\emph on
-2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-n
-\end_layout
-
-\end_inset
-
- x 2
-\begin_inset script superscript
-
-\begin_layout Plain Layout
-n
-\end_layout
-
-\end_inset
-
-
-\emph default
- grid-point domain with value equal to the field mean.
- 
 \end_layout
 
 \begin_layout Standard
@@ -719,6 +1054,13 @@ NIMROD binary forecast (top) and binary analysis (bottom) spatial scale
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "NIMROD_binary_fcst"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -728,68 +1070,6 @@ NIMROD binary forecast (top) and binary analysis (bottom) spatial scale
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Note that the wavelet transform is a linear operator: this implies that
- the difference of the spatial scale components of the binary forecast and
- observation fields (Fig 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-X
-\end_layout
-
-\end_inset
-
-.2) are equal to the spatial scale components of the difference of the binary
- forecast and observation fields (Fig.
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
-.3), and these scale components also add up to the original binary field
- difference (Fig.
- 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-X
-\end_layout
-
-\end_inset
-
-.1).
- The intensity-scale technique considers thus the spatial scale of the error.
- For the case illustrated (Fig 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
-.1 and Fig 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
-.3) note the large error associated at the scale of 160 km, due the storm,
- 160km displaced almost its entire length.
 \end_layout
 
 \begin_layout Standard
@@ -826,6 +1106,13 @@ NIMROD binary field difference spatial scale components obtained by a 2D
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "NIMROD_binary_scale9"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -835,125 +1122,6 @@ NIMROD binary field difference spatial scale components obtained by a 2D
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Note also that the means of the binary forecast and observation fields (i.e.
- their largest father wavelet components) are equal to the proportion of
- forecast and observed events above the threshold,
-\emph on
- (a+b)/n
-\emph default
- and 
-\emph on
-(a+c)/n
-\emph default
-, evaluated from the contingency table counts (Table 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
-.1) obtained from the original forecast and observation fields by thresholding
- with the same threshold used to obtain the binary forecast and observation
- fields.
- This relation is intuitive when observing forecast and observation binary
- fields and their corresponding contingency table image (Fig 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
-.1).
- The comparison of the largest father wavelet component of binary forecast
- and observation fields therefore provides feedback on the whole field bias.
-\end_layout
-
-\begin_layout Standard
-3.
- For each threshold (
-\emph on
-t
-\emph default
-) and for each scale component (
-\emph on
-j
-\emph default
-) of the binary forecast and observation, the Mean Squared Error (MSE) is
- then evaluated (Figure 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
-.4).
- The error is usually large for small thresholds, and decreases as the threshold
- increases.
- This behavior is partially artificial, and occurs because the smaller the
- threshold the more events will exceed it, and therefore the larger would
- be the error, since the error tends to be proportional to the amount of
- events in the binary fields.
- The artificial effect can be diminished by normalization: because of the
- wavelet orthogonal properties, the sum of the MSE of the scale components
- is equal to the MSE of the original binary fields: 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$
-\backslash
-hbox {MSE}(t) = j 
-\backslash
-hbox{MSE}(t,j)$
-\end_layout
-
-\end_inset
-
-.
- Therefore, the percentage that the MSE for each scale contributes to the
- total MSE may be computed: for a given threshold, 
-\emph on
-t
-\emph default
-, 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$ 
-\backslash
-hbox {MSE
-\backslash
-%}(t,j) = 
-\backslash
-hbox {MSE}(t,j)/ 
-\backslash
-hbox{MSE}(t)$
-\end_layout
-
-\end_inset
-
-.
- The MSE% does not exhibit the threshold dependency, and usually shows small
- errors on large scales and large errors on small scales, with the largest
- error associated to the smallest scale and highest threshold.
- For the NIMROD case illustrated note the large error at 160 km and between
- the thresholds of and 4 mm/h, due to the storm, 160km displaced almost
- its entire length.
 \end_layout
 
 \begin_layout Standard
@@ -986,6 +1154,13 @@ MSE and MSE % for the NIMROD binary forecast and analysis spatial scale
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "MSE_percent_NIMROD"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -995,194 +1170,6 @@ MSE and MSE % for the NIMROD binary forecast and analysis spatial scale
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Note that the MSE of the original binary fields is equal to the proportion
- of the counts of misses (
-\emph on
-c/n
-\emph default
-) and false alarms (
-\emph on
-b/n
-\emph default
-) for the contingency table (Table 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
--1) obtained from the original forecast and observation fields by thresholding
- with the same threshold used to obtain the binary forecast and observation
- fields: 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$ 
-\backslash
-hbox {MSE}(t)=(b+c)/n$
-\end_layout
-
-\end_inset
-
-.
- This relation is intuitive when comparing the forecast and observation
- binary field difference and their corresponding contingency table image
- (Fig 8.1).
-\end_layout
-
-\begin_layout Standard
-4.
- The MSE for the random binary forecast and observation fields is estimated
- by 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$ 
-\backslash
-hbox{MSE}(t) 
-\backslash
-hbox{random}=
-\backslash
-hbox {FBI}*
-\backslash
-hbox{Br}*(1-
-\backslash
-hbox{Br}) + 
-\backslash
-hbox{Br}*(1- 
-\backslash
-hbox{FBI}*
-\backslash
-hbox{Br})$
-\end_layout
-
-\end_inset
-
-, where 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$
-\backslash
-hbox{FBI}=(a+b)/(a+c)$
-\end_layout
-
-\end_inset
-
- is the frequency bias index and 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$
-\backslash
-hbox{Br}=(a+c)/n$
-\end_layout
-
-\end_inset
-
- is the sample climatology from the contingency table (Table 9.1) obtained
- from the original forecast and observation fields by thresholding with
- the same threshold used to obtain the binary forecast and observation fields.
- This formula follows by considering the Murphy and Winkler (1987) framework,
- appling the Bayes' theorem to express the joint probabilities 
-\emph on
-b/n
-\emph default
- and 
-\emph on
-c/n
-\emph default
- as product of the marginal and conditional probability (e.g.
- Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for
- a random forecast the conditional probability is equal to the unconditional
- one, so that 
-\emph on
-b/n
-\emph default
- and 
-\emph on
-c/n
-\emph default
- are equal to the product of the corresponding marginal probabilities solely.
- 
-\end_layout
-
-\begin_layout Standard
-5.
- For each threshold (
-\emph on
-t
-\emph default
-) and scale component (
-\emph on
-j
-\emph default
-), the skill score based on the MSE of binary forecast and observation scale
- components is evaluated (Figure 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
-
-\end_inset
-
-.5).
- The standard skill score definition as in Jolliffe and Stephenson (2003)
- or Wilks (2006) is used, and random chance is used as reference forecast.
- The MSE for the random binary forecast is equipartitioned on the 
-\emph on
-n+1
-\emph default
- scales to evaluate the skill score: 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$ 
-\backslash
-hbox{SS} (t,j)=1- 
-\backslash
-hbox{MSE}(t,j)*(n+1)/ 
-\backslash
-hbox {MSE}(t) 
-\backslash
-hbox {random}$
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The Intensity-Scale (IS) skill score evaluates the forecast skill as a function
- of the precipitation intensity and of the spatial scale of the error.
- Positive values of the IS skill score are associated to a skillful forecast,
- whereas negative values are associated to no skill.
- Usually large scales exhibit positive skill (large scale events, such as
- fronts, are well predicted), whereas small scales exhibit negative skill
- (small scale events, such as convective showers, are less predictable),
- and the smallest scale and highest thresholds exhibit the worst skill.
- For the NIMROD case illustrated note the negative skill associated to the
- 160 km scale, for the thresholds to 4 mm/h, due to the 160 km storm displaced
- almost its entire length.
 \end_layout
 
 \begin_layout Standard
@@ -1208,17 +1195,14 @@ status open
 
 \begin_layout Plain Layout
 Intensity-Scale skill score for the NIMROD forecast and analysis shown in
- Fig 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_3h_fcst"
 
 \end_inset
 
-.1.
+.
  The skill score is a function of the intensity of the precipitation rate
  and spatial scale of the error.
  Note the negative skill associated to the scale 6 = 160 km, for the thresholds
@@ -1228,9 +1212,12 @@ Chapter number
 \end_inset
 
 
-\end_layout
+\begin_inset CommandInset label
+LatexCommand label
+name "Intensity_Scale_skill_score_NIMROD"
 
-\begin_layout Plain Layout
+\end_inset
+
 
 \end_layout
 
@@ -1241,17 +1228,14 @@ Chapter number
 
 \begin_layout Standard
 In addition to the MSE and the SS, the energy squared is also evaluated,
- for each threshold and scale (Fig 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Chapter number
-\end_layout
+ for each threshold and scale (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "energy_squared_NIMROD"
 
 \end_inset
 
-.6).
+).
  The energy squared of a field X is the average of the squared values: 
 \begin_inset ERT
 status open
@@ -1432,16 +1416,13 @@ hbox {FBI}=(a+b)/(a+c)$
 \end_inset
 
 FBI=(a+b)/(a+c), for the contingency table (Table 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-X
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "contingency_table_counts"
 
 \end_inset
 
-.1) obtained from the original forecast and observation fields by thresholding
+) obtained from the original forecast and observation fields by thresholding
  with the same threshold used to obtained the binary forecast and observation
  fields.
 \end_layout
@@ -1475,6 +1456,13 @@ Energy squared and energy squared percentages, for each threshold and scale,
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "energy_squared_NIMROD"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -1484,20 +1472,6 @@ Energy squared and energy squared percentages, for each threshold and scale,
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-X
-\end_layout
-
-\end_inset
-
-.6: 
 \end_layout
 
 \begin_layout Subsection
@@ -1557,7 +1531,7 @@ n
  over the input domain in the following ways:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 1.
  User-Defined Tiling: The user may define one or more tiles of size 
 \emph on
@@ -1591,7 +1565,7 @@ n
  Users are encouraged to select tiles which consist entirely of valid data.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 2.
  Automated Tiling: This tiling method is essentially the same as the user-define
 d tiling method listed above except that the tool automatically selects
@@ -1623,7 +1597,7 @@ n
  of these tiles as possible that fit within the domain.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 3.
  Padding: If the domain size is only slightly smaller than 
 \emph on
@@ -1750,37 +1724,37 @@ Wavelet_stat usage
 The usage statement for the Wavelet-Stat tool is shown below:
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 \paragraph_spacing single
 Usage: wavelet_stat
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 \paragraph_spacing single
 fcst_file
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 \paragraph_spacing single
 obs_file
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 \paragraph_spacing single
 config_file
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 \paragraph_spacing single
 [-outdir path]
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 \paragraph_spacing single
 [-log file]
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 \paragraph_spacing single
 [-v level]
 \end_layout
@@ -1791,40 +1765,62 @@ Wavelet_stat has both required arguments and optional ones.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for wavelet_stat
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 1.
- The fcst_file argument indicates the gridded file containing the model
- data to be verified.
+ The 
+\series bold
+fcst_file
+\series default
+ argument indicates the gridded file containing the model data to be verified.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 2.
- The obs_file argument indicates the gridded file containing the gridded
- observations to be used for the verification of the model.
+ The 
+\series bold
+obs_file
+\series default
+ argument indicates the gridded file containing the gridded observations
+ to be used for the verification of the model.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 3.
- The config_file argument indicates the name of the configuration file to
- be used.
+ The 
+\series bold
+config_file
+\series default
+ argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Standard
-Optional arguments for wavelet_stat
+\begin_layout Description
+Optional 
+\series bold
+arguments for wavelet_stat
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 4.
- The -outdir path indicates the directory where output files should be written.
+ The 
+\series bold
+-outdir path
+\series default
+ indicates the directory where output files should be written.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 5.
- The -log file option directs output and errors to the specified log file.
+ The
+\series bold
+ -log file
+\series default
+ option directs output and errors to the specified log file.
  All messages will be written to that file as well as cout and cerr.
  Thus, users can save the messages without having to redirect the output
  on the command line.
@@ -1832,14 +1828,22 @@ Optional arguments for wavelet_stat
  
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 6.
- The -v level option indicates the desired level of verbosity.
+ The 
+\series bold
+-v level
+\series default
+ option indicates the desired level of verbosity.
  The contents of 
 \begin_inset Quotes eld
 \end_inset
 
+
+\series bold
 level
+\series default
+
 \begin_inset Quotes erd
 \end_inset
 
@@ -1856,14 +1860,24 @@ An example of the wavelet_stat calling sequence is listed below:
 Example:
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 wavelet_stat sample_fcst.grb sample_obs.grb WaveletStatConfig
 \end_layout
 
 \begin_layout Standard
 In the example, the Wavelet-Stat tool will verify the model data in the
- sample_fcst.grb GRIB file using the observations in the sample_obs.grb GRIB
- file applying the configuration options specified in the WaveletStatConfig
+ 
+\series bold
+sample_fcst.grb
+\series default
+ GRIB file using the observations in the 
+\series bold
+sample_obs.grb
+\series default
+ GRIB file applying the configuration options specified in the 
+\series bold
+WaveletStatConfig
+\series default
  file.
 \end_layout
 
@@ -1872,14 +1886,32 @@ wavelet_stat configuration file
 \end_layout
 
 \begin_layout Standard
-The default configuration file for the Wavelet-Stat tool, WaveletStatConfig_defa
-ult, can be found in the installed share/met/config directory.
- Another version of the configuration file is provided in scripts/config.
+The default configuration file for the Wavelet-Stat tool, 
+\series bold
+WaveletStatConfig_default
+\series default
+, can be found in the installed 
+\emph on
+share/met/config
+\emph default
+ directory.
+ Another version of the configuration file is provided in 
+\emph on
+scripts/config
+\emph default
+.
  We encourage users to make a copy of the configuration files prior to modifying
  their contents.
  Each configuration file contains many comments describing its contents.
- Descriptions of WaveletStatConfig_default and the required variables for
- any wavelet_stat configuration file are also provided below.
+ Descriptions of 
+\series bold
+WaveletStatConfig_default
+\series default
+ and the required variables for any 
+\emph on
+wavelet_stat
+\emph default
+ configuration file are also provided below.
  While the configuration file contains many entries, most users will only
  need to change a few for their use.
  Specific options are described in the following subsections.
@@ -1888,9 +1920,24 @@ ult, can be found in the installed share/met/config directory.
 \begin_layout Standard
 Note that environment variables may be used when editing configuration files,
  as described in the section 3.5.2 for the PB2NC tool.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 model = 
 \begin_inset Quotes eld
 \end_inset
@@ -1903,8 +1950,12 @@ WRF
 \end_layout
 
 \begin_layout Standard
-The model variable contains a short text string identifying the name to
- be assigned to the model being verified.
+The 
+\series bold
+model
+\series default
+ variable contains a short text string identifying the name to be assigned
+ to the model being verified.
  This text string is written out in the first column of the ASCII output
  so that verification statistics from multiple models may be differentiated.
  The value listed above is simply set to 
@@ -1916,53 +1967,87 @@ WRF
 \end_inset
 
 .
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 fcst = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 field = [
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 name = "APCP";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 level = [ "A03" ];
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 cat_thresh = [ >0.0, >=5.0 ];
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 }
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ];
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 obs = fcst;
 \end_layout
 
 \begin_layout Standard
-The fcst and obs groups specify one or more data fields to be selected from
- the forecast and observation files to be compared.
- The fields should be specified in the same way that they?re specified for
+The 
+\series bold
+fcst
+\series default
+ and 
+\series bold
+obs
+\series default
+ groups specify one or more data fields to be selected from the forecast
+ and observation files to be compared.
+ The fields should be specified in the same way that they're specified for
  the other MET tools, with name, level and categorical thresholds.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1970,89 +2055,121 @@ mask_missing_flag = NONE;
 \end_layout
 
 \begin_layout Standard
-The mask_missing_flag variable specifies how missing data in the raw model
- and observation fields will be treated.
+The 
+\series bold
+mask_missing_flag
+\series default
+ variable specifies how missing data in the raw model and observation fields
+ will be treated.
  
 \end_layout
 
-\begin_layout Standard
-* NONE indicates no additional processing is to be done.
+\begin_layout Itemize
+NONE indicates no additional processing is to be done.
  
 \end_layout
 
-\begin_layout Standard
-* FCST indicates missing data in the observation field should be used to
- mask the forecast field.
+\begin_layout Itemize
+FCST indicates missing data in the observation field should be used to mask
+ the forecast field.
  
 \end_layout
 
-\begin_layout Standard
-* OBS indicates missing data in the forecast field should be used to mask
+\begin_layout Itemize
+OBS indicates missing data in the forecast field should be used to mask
  the observation field.
  
 \end_layout
 
-\begin_layout Standard
-* BOTH indicates masking should be performed in both directions (i.e., mask
+\begin_layout Itemize
+BOTH indicates masking should be performed in both directions (i.e., mask
  the forecast field with the observation field and vice-versa).
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 grid_decomp_flag = AUTO;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 tile = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 width = 0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 location = [
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 x_ll = 0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 y_ll = 0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 }
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ];
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
 \begin_layout Standard
-The grid_decomp_flag variable specifies how tiling should be performed:
+The 
+\series bold
+grid_decomp_flag
+\series default
+ variable specifies how tiling should be performed: 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+AUTO
+\series default
+ indicates that the automated-tiling should be done.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+TILE
+\series default
+ indicates that the user-defined tiles should be applied.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+PAD
+\series default
+ indicated that the data should be padded out to the nearest dimension of
  
-\end_layout
-
-\begin_layout Standard
-* AUTO indicates that the automated-tiling should be done.
-\end_layout
-
-\begin_layout Standard
-* TILE indicates that the user-defined tiles should be applied.
-\end_layout
-
-\begin_layout Standard
-* PAD indicated that the data should be padded out to the nearest dimension
- of 
 \emph on
 2
 \begin_inset script superscript
@@ -2076,129 +2193,227 @@ n
 \end_layout
 
 \begin_layout Standard
-The width and location variables allow users to manually define the tiles
- of dimension they would like to apply.
+The
+\series bold
+ width
+\series default
+ and 
+\series bold
+location
+\series default
+ variables allow users to manually define the tiles of dimension they would
+ like to apply.
  The x_ll and y_ll variables specify the location of one or more lower-left
  tile grid (x, y) points.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 wavelet = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 type = HAAR;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 member = 2;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
 \begin_layout Standard
-The wavelet_flag and wavelet_k variables specify the type and shape of the
- wavelet to be used for the scale decomposition.
+The 
+\series bold
+wavelet_flag
+\series default
+ and 
+\series bold
+wavelet_k
+\series default
+ variables specify the type and shape of the wavelet to be used for the
+ scale decomposition.
  The Casati et al.
  (2004) method uses a Haar wavelet which is a good choice for discontinuous
  fields like precipitation.
  However, users may choose to apply any wavelet family/shape that is available
  in the GNU Scientific Library.
- Values for the wavelet_flag variable, and associated choices for k, are
- described below:
+ Values for the 
+\series bold
+wavelet_flag
+\series default
+ variable, and associated choices for k, are described below:
 \end_layout
 
-\begin_layout Standard
-* HAAR for the Haar wavelet (member = 2).
+\begin_layout Itemize
+
+\series bold
+HAAR
+\series default
+ for the Haar wavelet (member = 2).
 \end_layout
 
-\begin_layout Standard
-* HAAR_CNTR for the Centered-Haar wavelet (member = 2).
+\begin_layout Itemize
+
+\series bold
+HAAR_CNTR
+\series default
+ for the Centered-Haar wavelet (member = 2).
 \end_layout
 
-\begin_layout Standard
-* DAUB for the Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18,
- 20).
+\begin_layout Itemize
+
+\series bold
+DAUB
+\series default
+ for the Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16, 18, 20).
 \end_layout
 
-\begin_layout Standard
-* DAUB_CNTR for the Centered-Daubechies wavelet (member = 4, 6, 8, 10, 12,
- 14, 16, 18, 20).
+\begin_layout Itemize
+
+\series bold
+DAUB_CNTR
+\series default
+ for the Centered-Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
+ 18, 20).
 \end_layout
 
-\begin_layout Standard
-* BSPLINE for the Bspline wavelet (member = 103, 105, 202, 204, 206, 208,
+\begin_layout Itemize
+
+\series bold
+BSPLINE
+\series default
+ for the Bspline wavelet (member = 103, 105, 202, 204, 206, 208, 301, 303,
+ 305, 307, 309).
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+BSPLINE_CNTR
+\series default
+ for the Centered-Bspline wavelet (member = 103, 105, 202, 204, 206, 208,
  301, 303, 305, 307, 309).
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Standard
-* BSPLINE_CNTR for the Centered-Bspline wavelet (member = 103, 105, 202,
- 204, 206, 208, 301, 303, 305, 307, 309).
-\end_layout
-
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 output_flag = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 isc = BOTH;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
 \begin_layout Standard
-The output_flag array controls the type of output that the Wavelet-Stat
- tool generates.
+The 
+\series bold
+output_flag
+\series default
+ array controls the type of output that the Wavelet-Stat tool generates.
  These flags are set similarly to the output flags of the other MET tools,
  with possible values of NONE, STAT, and BOTH.
  The isc line type is the only one available for Intensity-Scale STAT lines.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 nc_pairs_flag = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 latlon = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 raw = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 diff = TRUE;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 }
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 ps_plot_flag = TRUE; 
 \end_layout
 
 \begin_layout Standard
 These flags produce additional output from the Wavelet-Stat tool.
- The nc_pairs_flag produces the same output that would be produced by Grid-Stat,
- i.e.
+ The 
+\series bold
+nc_pairs_flag
+\series default
+ produces the same output that would be produced by Grid-Stat, i.e.
  it contains gridded matched pair data, not scale decompositions.
  The other two types of output from the wavelet tool are:
 \end_layout
 
-\begin_layout Standard
-1.
- NetCDF output file containing the scale decompositions for each combination
+\begin_layout Enumerate
+NetCDF output file containing the scale decompositions for each combination
  of tile/field/threshold.
 \end_layout
 
-\begin_layout Standard
-2.
- PostScript output file summarizing the Intensity-Scale method.
+\begin_layout Enumerate
+PostScript output file summarizing the Intensity-Scale method.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -2217,81 +2432,123 @@ MET_BASE
 The Wavelet-Stat tool uses several static data files when generating plots.
  If it cannot find the data it needs in the expected directory, it will
  error out.
- The met_data_dir variable may be set to the installed share/met/ directory
- to find the static data files.
+ The 
+\series bold
+met_data_dir
+\series default
+ variable may be set to the installed share/met/ directory to find the static
+ data files.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 fcst_raw_plot = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_min = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_max = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 obs_raw_plot = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_min = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_max = 0.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 wvlt_plot = {
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 color_table = "MET_BASE/colortables/NCL_colortables/BlWhRe.ctable";
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_min = -1.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 plot_max = 1.0;
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 };
 \end_layout
 
 \begin_layout Standard
-The color_table variables indicate which color table files should be used
- when generating the Wavelet-Stat PostScript output.
+The 
+\series bold
+color_table
+\series default
+ variables indicate which color table files should be used when generating
+ the Wavelet-Stat PostScript output.
  
 \end_layout
 
 \begin_layout Standard
-These plot_min and plot_max variables indicate the min and max data values
- to be plotted for the raw and wavelet fields.
+These
+\series bold
+ plot_min
+\series default
+ and 
+\series bold
+plot_max
+\series default
+ variables indicate the min and max data values to be plotted for the raw
+ and wavelet fields.
  If set to non-zero values, the forecast and observation raw color tables
  specified above will be rescaled to match the specified range.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -2302,6 +2559,19 @@ output_prefix = "";
 This option specifies a string to be used in the output file name.
  It can be useful for keeping results for different models or variables
  from overwriting each other.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -2317,10 +2587,27 @@ v5.1
 \end_layout
 
 \begin_layout Standard
-The version indicates the version of the mode configuration file used.
+The 
+\series bold
+version
+\series default
+ indicates the version of the mode configuration file used.
  Future versions of MET may include changes to mode and the mode configuration
  file.
  This value should not be modified.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -2328,14 +2615,22 @@ wavelet_stat output
 \end_layout
 
 \begin_layout Standard
-wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and
- PostScript formats.
+
+\emph on
+wavelet_stat
+\emph default
+ produces output in STAT and, optionally, ASCII and NetCDF and PostScript
+ formats.
  The ASCII output duplicates the STAT output but has the data organized
  by line type.
  While the Wavelet-Stat tool currently only outputs one STAT line type,
  additional line types may be added in future releases.
  The output files are written to the default output directory or the directory
- specified by the -outdir command-line option.
+ specified by the 
+\series bold
+-outdir
+\series default
+ command-line option.
  
 \end_layout
 
@@ -2344,9 +2639,23 @@ The output STAT file is named using the following naming convention:
 \end_layout
 
 \begin_layout Standard
-wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates
- the user-defined output prefix, HHMMSS indicates the forecast lead time,
- and YYYYMMDD_HHMMSS indicates the forecast valid time.
+
+\series bold
+wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
+\series default
+ where 
+\series bold
+PREFIX
+\series default
+ indicates the user-defined output prefix, 
+\series bold
+HHMMSS
+\series default
+ indicates the forecast lead time, and 
+\series bold
+YYYYMMDD_HHMMSS
+\series default
+ indicates the forecast valid time.
 \end_layout
 
 \begin_layout Standard
@@ -2354,8 +2663,19 @@ The output ASCII files are named similarly:
 \end_layout
 
 \begin_layout Standard
-wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to
- indicate that this is an intensity-scale line type.
+
+\series bold
+wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
+\series default
+ where 
+\series bold
+TYPE
+\series default
+ is 
+\series bold
+isc
+\series default
+ to indicate that this is an intensity-scale line type.
 \end_layout
 
 \begin_layout Standard
@@ -2371,13 +2691,20 @@ previously 4.3.3, should be updated with cross reference
 
 \end_inset
 
-(point_stat output) for a description of the common output for STAT files
- types.
+(
+\emph on
+point_stat output
+\emph default
+) for a description of the common output for STAT files types.
  The information contained in the STAT and isc files are identical.
  However, for consistency with the STAT files produced by other tools, the
  STAT file will only have column headers for the first 21 fields.
  The isc file contains all headers.
- The format of the isc line type is explained in the following table.
+ The format of the
+\series bold
+ isc
+\series default
+ line type is explained in the following table.
 \end_layout
 
 \begin_layout Standard
@@ -2415,6 +2742,8 @@ Header information for each file wavelet-stat outputs.
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Header
 \end_layout
 
@@ -2444,6 +2773,8 @@ Header
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Column Number
 \end_layout
 
@@ -2453,6 +2784,8 @@ Column Number
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Header Column Type
 \end_layout
 
@@ -2462,6 +2795,8 @@ Header Column Type
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -2858,34 +3193,32 @@ The frequency bias
 \end_layout
 
 \begin_layout Standard
-The Wavelet-Stat tool creates a NetCDF output file containing the raw and
- decomposed values for the forecast, observation, and difference fields
- for each combination of variable and threshold value.
+The 
+\emph on
+Wavelet-Stat
+\emph default
+ tool creates a NetCDF output file containing the raw and decomposed values
+ for the forecast, observation, and difference fields for each combination
+ of variable and threshold value.
 \end_layout
 
 \begin_layout Standard
 The dimensions and variables included in the wavelet_stat NetCDF files are
  described in Tables 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-X
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_NetCDF_dim_Wave_output"
 
 \end_inset
 
--3 and 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-X
-\end_layout
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "_table_variables_wave_NetCDF_output"
 
 \end_inset
 
--4.
+.
 \end_layout
 
 \begin_layout Standard
@@ -2905,20 +3238,51 @@ NetCDF dimensions for Wavelet-Stat output.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_NetCDF_dim_Wave_output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="2">
+<lyxtabular version="3" rows="6" columns="2">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0.75in">
 <column alignment="center" valignment="top" width="5.25in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+mode NetCDF OUTPUT FILE DIMENSIONS
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 NetCDF Dimension
 \end_layout
 
@@ -2928,6 +3292,8 @@ NetCDF Dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -3089,6 +3455,13 @@ Variables contained in Wavelet-Stat NetCDF output.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "_table_variables_wave_NetCDF_output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -3096,11 +3469,22 @@ Variables contained in Wavelet-Stat NetCDF output.
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
 <features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top" width="2in">
 <column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
-<column alignment="center" valignment="top">
+<column alignment="center" valignment="top" width="4in">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Wavelet-stat NetCDF OUTPUT FILE VARIABLES
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3109,16 +3493,7 @@ Variables contained in Wavelet-Stat NetCDF output.
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3133,6 +3508,8 @@ Variables contained in Wavelet-Stat NetCDF output.
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 NetCDF Variable
 \end_layout
 
@@ -3142,6 +3519,8 @@ NetCDF Variable
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Dimension
 \end_layout
 
@@ -3151,6 +3530,8 @@ Dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
@@ -3363,7 +3744,10 @@ Lastly, the Wavelet-Stat tool creates a PostScript plot summarizing the
  scale-decomposition approach used in the verification.
  The PostScript plot is generated using internal libraries and does not
  depend on an external plotting package.
- The generation of this PostScript output can be disabled using the ps_plot_flag
+ The generation of this PostScript output can be disabled using the 
+\series bold
+ps_plot_flag
+\series default
  configuration file option.
 \end_layout
 
