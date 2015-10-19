@@ -288,8 +288,11 @@ hskip 0.5in}
 
 \begin_layout Standard
 
+\emph on
+pb2nc
 \series medium
-pb2nc has both required and optional arguments.
+\emph default
+ has both required and optional arguments.
  
 \end_layout
 
@@ -388,7 +391,7 @@ Optional arguments for pb2nc
 \end_inset
 
 
-\series bold
+\series default
 num_messages
 \series medium
 
@@ -415,7 +418,7 @@ num_messages
 \end_inset
 
 
-\series bold
+\series default
 path
 \series medium
 
