@@ -84,8 +84,10 @@ Introduction
 \begin_layout Standard
 
 \series medium
-MODE output files can be quite large; currently, these files contain 51
- columns.
+Many users may wish to summarize the many individual ascii files produced
+ by MODE.
+ These MODE output files can be quite large; currently, these files contain
+ 51 columns.
  This means that it is very difficult - effectively impossible - to interpret
  the results by simply browsing the files.
  Furthermore, for particular applications some data fields in the MODE output
@@ -106,7 +108,8 @@ Scientific and statistical aspects
 \begin_layout Standard
 
 \series medium
-The MODE-Analysis tool operates in two modes, called "summary" and "by case".
+The MODE-Analysis tool operates in two modes, called ``summary'' and ``by
+ case''.
  In summary mode, the user provides (on the command line or via a configuration
  file) information regarding which fields (columns) are of interest, as
  well as matching criteria that determine which lines in each file are used
@@ -116,8 +119,8 @@ The MODE-Analysis tool operates in two modes, called "summary" and "by case".
  particular region.
  The summary statistics generated (for each field) are the minimum, maximum,
  mean, standard deviation, and the 10th, 25th, 50th, 75th and 90th percentiles.
- In addition, the user may specify a "dump" file: the individual MODE lines
- used to produce the statistics will be written to this file.
+ In addition, the user may specify a ``dump'' file: the individual MODE
+ lines used to produce the statistics will be written to this file.
  This option provides the user with a filtering capability.
  The dump file will consist only of lines that match the specified criteria.
 \end_layout
@@ -125,7 +128,7 @@ The MODE-Analysis tool operates in two modes, called "summary" and "by case".
 \begin_layout Standard
 
 \series medium
-The other option for operating the analysis tool is "by case".
+The other option for operating the analysis tool is ``by case''.
  Given initial and final values for forecast lead time, the tool will output,
  for each valid time in the interval, the matched area, unmatched area,
  and the number of forecast and observed objects that were matched or unmatched.
@@ -163,67 +166,195 @@ The usage statement for the MODE-Analysis tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: mode_analysis
+mode_analysis
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -lookin path
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -summary | -bycase
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-column name]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-dump_row filename]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-out filename]
 \end_layout
 
 \begin_layout LyX-Code
-[-log file]
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-log file] 
 \end_layout
 
 \begin_layout LyX-Code
-[-v level]
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-v level] 
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-help]
 \end_layout
 
 \begin_layout LyX-Code
-[MODE FILE LIST]
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[MODE FILE LIST] 
 \end_layout
 
 \begin_layout LyX-Code
-[-config config_file] | [MODE LINE OPTIONS]
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-config config_file] | [MODE LINE OPTIONS] 
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \begin_layout Standard
 Required arguments for 
-\series bold
+\family typewriter
 mode_analysis
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The MODE-Analysis tool requires specification of a "job type" and a filename
- or directory indicated by the -
+The MODE-Analysis tool requires specification of a ``job type'' and a filename
+ or directory indicated by the 
 \series bold
-lookin
+-lookin
 \series default
  option.
- The -
+ The 
 \series bold
-lookin
+-lookin
 \series default
  option may be called multiple times.
 \end_layout
@@ -253,30 +384,40 @@ Exactly one of these job types must be specified.
 \begin_layout Standard
 
 \series medium
-Specifying "-
+Specifying 
 \series bold
-summary
+-summary
 \series default
-" will produce summary statistics for the MODE output column specified.
+ will produce summary statistics for the MODE output column specified.
  For this job type, a column name (or column number) must be specified using
- the "-
+ the 
 \series bold
-column
+-column
 \series default
-" option.
+ option.
  Column names are not case sensitive.
- The column names are the same as described in Section 8.3.3 of Chapter 8.
+ The column names are the same as described in 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Insert reference: Section 8.3.3 of Chapter 8
+\end_layout
+
+\end_inset
+
+.
  More information about this option is provided in subsequent sections.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Specifying "-
+Specifying 
 \series bold
-bycase
+-bycase
 \series default
-" will produce a table of metrics for each case undergoing analysis.
+ will produce a table of metrics for each case undergoing analysis.
  Any columns specified are ignored for this option.
 \end_layout
 
@@ -290,6 +431,8 @@ The output for each of these jobs types is described in later sections.
 Optional arguments for 
 \series bold
 mode_analysis
+\series default
+ 
 \end_layout
 
 \begin_layout Standard
@@ -333,9 +476,7 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--config
- filename
+-config filename
 \end_layout
 
 \begin_layout Standard
@@ -362,9 +503,7 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--dump_row
- filename
+-dump_row filename
 \end_layout
 
 \begin_layout Standard
@@ -392,13 +531,7 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-column
-\series bold
- column
+-column column
 \end_layout
 
 \begin_layout Standard
@@ -447,7 +580,6 @@ MODE line options are used to create filters that determine which of the
 
 \begin_layout Standard
 
-\series medium
 \series bold
 Toggles
 \series default
@@ -634,9 +766,7 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--model
- value
+-model value
 \end_layout
 
 \begin_layout Standard
@@ -668,15 +798,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--fcst_thr
- value
+-fcst_thr value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--obs_thr
- value
+-obs_thr value
 \end_layout
 
 \begin_layout Standard
@@ -706,15 +832,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--fcst_var
- value
+-fcst_var value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--obs_var
- value
+-obs_var value
 \end_layout
 
 \begin_layout Standard
@@ -743,15 +865,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--fcst_lev 
-value
+-fcst_lev value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--obs_lev
- value
+-obs_lev value
 \end_layout
 
 \begin_layout Standard
@@ -811,15 +929,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--fcst_lead 
-value
+-fcst_lead value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--obs_lead
- value
+-obs_lead value
 \end_layout
 
 \begin_layout Standard
@@ -848,15 +962,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--fcst_init
- value
+-fcst_init value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--obs_init
- value
+-obs_init value
 \end_layout
 
 \begin_layout Standard
@@ -885,15 +995,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--fcst_accum
- value
+-fcst_accum value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--obs_accum
- value
+-obs_accum value
 \end_layout
 
 \begin_layout Standard
@@ -922,15 +1028,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--fcst_rad
- value
+-fcst_rad value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--obs_rad
- value
+-obs_rad value
 \end_layout
 
 \begin_layout Standard
@@ -991,15 +1093,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--area_min
- value
+-area_min value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--area_max
- value
+-area_max value
 \end_layout
 
 \begin_layout Standard
@@ -1028,15 +1126,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--area_filter_min
- value
+-area_filter_min value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--area_filter_max
- value
+-area_filter_max value
 \end_layout
 
 \begin_layout Standard
@@ -1067,15 +1161,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--area_thresh_min 
-value
+-area_thresh_min value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--area_thresh_max
- value
+-area_thresh_max value
 \end_layout
 
 \begin_layout Standard
@@ -1106,19 +1196,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--intersection_area_min 
-value
+-intersection_area_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-intersection_area_ma
-\series bold
-x value
+-intersection_area_max value
 \end_layout
 
 \begin_layout Standard
@@ -1147,15 +1229,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--union_area_min
- value
+-union_area_min value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--union_area_max
- value
+-union_area_max value
 \end_layout
 
 \begin_layout Standard
@@ -1184,15 +1262,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--symmetric_diff_min
- value
+-symmetric_diff_min value
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--symmetric_diff_max
- value
+-symmetric_diff_max value
 \end_layout
 
 \begin_layout Standard
@@ -1273,23 +1347,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-fcst_valid_min 
-\series bold
-yyyymmdd[_hh[mmss]]
+-fcst_valid_min yyyymmdd[_hh[mmss]]
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-fcst_valid_max
-\series bold
- yyyymmdd[_hh[mmss]]
+-fcst_valid_max yyyymmdd[_hh[mmss]]
 \end_layout
 
 \begin_layout Standard
@@ -1317,23 +1379,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-obs_valid_min
-\series bold
- yyyymmdd[_hh[mmss]]
+-obs_valid_min yyyymmdd[_hh[mmss]]
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-obs_valid_max
-\series bold
- yyyymmdd[_hh[mmss]]
+-obs_valid_max yyyymmdd[_hh[mmss]]
 \end_layout
 
 \begin_layout Standard
@@ -1376,21 +1426,35 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-\series bold
--centroid_x_min
- value
+-centroid_x_min value
 \end_layout
 
 \begin_layout LyX-Code
+-centroid_x_max value
+\begin_inset Newline newline
+\end_inset
 
-\series bold
--
-\series default
-centroid_x_max
-\series bold
- value
-\series default
 
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+-centroid_y_min value
+\end_layout
+
+\begin_layout LyX-Code
+-centroid_y_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -1414,21 +1478,11 @@ height "1pt"
 \series bold
 -
 \series default
-centroid_y_min
-\series bold
- value
+centroid_lat_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-centroid_y_max 
-\series bold
-value
-\series default
-
+-centroid_lat_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -1448,25 +1502,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-centroid_lat_min
-\series bold
- value
+-centroid_lon_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-centroid_lat_max
-\series bold
- value
-\series default
-
+-centroid_lon_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -1486,25 +1526,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-centroid_lon_min
-\series bold
- value
+-axis_ang_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-centroid_lon_max
-\series bold
- value
-\series default
-
+-axis_ang_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -1524,25 +1550,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-axis_ang_min
-\series bold
- value
+-length_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-axis_ang_max
-\series bold
- value
-\series default
-
+-length_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -1562,25 +1574,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-length_min
-\series bold
- value
+-width_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-length_max
-\series bold
- value
-\series default
-
+-width_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -1600,25 +1598,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-width_min
-\series bold
- value
+-curvature_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-width_max
-\series bold
- value
-\series default
-
+-curvature_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -1638,63 +1622,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-curvature_min
-\series bold
- value
+-curvature_x_min value
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
--
-\series default
-curvature_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
--
-\series default
-curvature_x_min
-\series bold
- value
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
--
-\series default
-curvature_x_max
-\series bold
- value
-\series default
-
+-curvature_x_max value
 \begin_inset Newline newline
 \end_inset
 
@@ -2427,14 +2359,7 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
-\series bold
--
-\series default
-mask_poly
-\series bold
- filename
+-mask_poly filename
 \end_layout
 
 \begin_layout Standard
@@ -2464,8 +2389,6 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-
-\series bold
 -help
 \end_layout
 
@@ -2507,10 +2430,21 @@ mode_analysis
 To use the MODE analysis tool, the user must un-comment the options in the
  configuration file to apply them and comment out unwanted options.
  The options in the configuration file for 
-\series bold
-mode_analysis
+\family typewriter
 \series default
- are the same as the MODE line options described in Section 9.3.1.
+mode_analysis
+\family default
+ are the same as the MODE line options described in 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Insert Reference: Section 9.3.1
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -2518,11 +2452,11 @@ mode_analysis
 \series medium
 The parameters that are set in the configuration file either add to or override
  parameters that are set on the command line.
- For the "set string" and "set integer type" options enclosed in brackets,
+ For the ``set string'' and ``set integer type'' options enclosed in brackets,
  the values specified in the conftiguration file are added to any values
  set on the command line.
- For the toggle and min/max type options, the values specified in the configurat
-ion file override those set on the command line.
+ For the ``toggle'' and ``min/max type'' options, the values specified in
+ the configuration file override those set on the command line.
 \end_layout
 
 \begin_layout Subsection
@@ -2535,13 +2469,14 @@ MODE-Analysis tool output
 The output of the MODE Analysis tool is a self-describing tabular format
  written to standard output.
  The length and contents of the table vary depending on whether 
-\series bold
+\family typewriter
+\series default
 -summary
-\series default
- or -
-\series bold
-bycase
-\series default
+\family default
+ or 
+\family typewriter
+-bycase
+\family default
  is selected.
  The contents also change for -summary depending on the fields selected
  by the user for output.
