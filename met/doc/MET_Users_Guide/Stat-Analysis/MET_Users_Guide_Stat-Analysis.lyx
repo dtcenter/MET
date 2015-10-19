@@ -1234,26 +1234,98 @@ Usage: stat_analysis
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -lookin path
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-out name]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-tmp_dir path]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-config config_file] | [JOB COMMAND LINE]
 \end_layout
 
@@ -1294,6 +1366,8 @@ wavelet_stat
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for 
 \emph on
 stat_analysis
@@ -1302,9 +1376,9 @@ stat_analysis
 \begin_layout Description
 1.
  The 
-\emph on
+\series bold
 -lookin
-\emph default
+\series default
  
 \series bold
 path
@@ -1318,25 +1392,25 @@ path
 \begin_layout Description
 2.
  Either a configuration file must be specified with the 
-\emph on
+\series bold
 -config
-\emph default
- option, or a "
-\emph on
+\series default
+ option, or a 
+\series bold
 JOB COMMAND LINE
-\emph default
-" must be denoted.
- The "
-\emph on
+\series default
+ must be denoted.
+ The 
+\series bold
 JOB COMMAND LINE
-\emph default
-" is described in section 8.3.2,
+\series default
+ is described in section 8.3.2,
 \end_layout
 
 \begin_layout Description
-Optional 
+Optional
 \series bold
-arguments for 
+ arguments for 
 \emph on
 stat_analysis
 \end_layout
@@ -1344,12 +1418,8 @@ stat_analysis
 \begin_layout Description
 3.
  The 
-\emph on
--config
-\emph default
- 
 \series bold
-config_file
+-config config_file
 \series default
  specifies the configuration file to be used.
  The contents of the configuration file are discussed below.
@@ -1358,12 +1428,8 @@ config_file
 \begin_layout Description
 4.
  The 
-\emph on
--out
-\emph default
- 
 \series bold
-name
+-out name
 \series default
  option indicates the filename to which output data should be written.
  If this option is not used, the output is directed to standard output.
@@ -1372,9 +1438,9 @@ name
 \begin_layout Description
 5.
  The 
-\emph on
+\series bold
 -tmp_dir
-\emph default
+\series default
  
 \series bold
 path
@@ -1386,9 +1452,9 @@ path
 \begin_layout Description
 6.
  The 
-\emph on
+\series bold
 -log
-\emph default
+\series default
  
 \series bold
 file
@@ -1403,10 +1469,10 @@ file
 
 \begin_layout Description
 7.
- The 
-\emph on
--v
-\emph default
+ The
+\series bold
+ -v
+\series default
  
 \series bold
 level
