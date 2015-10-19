@@ -141,22 +141,82 @@ pcp_combine
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [[-sum] sum_args] | [-add add_args] | [-subtract subtract_args]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-config config_str]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-varname variable_name]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
@@ -186,30 +246,114 @@ SUM_ARGS:
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 init_time
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 in_accum
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 valid_time
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 out_accum
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 out_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-pcpdir path]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-pcprx reg_exp]
 \end_layout
 
@@ -228,14 +372,50 @@ ADD_ARGS:
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 in_file1
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 accum1
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [in_file2 accum2 in_file3 accum3 .
  .
  .
@@ -243,6 +423,18 @@ accum1
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 out_file
 \end_layout
 
@@ -257,22 +449,82 @@ SUBTRACT_ARGS:
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 in_file1
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 accum1
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 in_file2
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 accum2
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 out_file
 \end_layout
 
@@ -299,6 +551,8 @@ Required arguments for the pcp_combine
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Optional arguments for pcp_combine
 \end_layout
 
@@ -1175,34 +1429,130 @@ Usage: modis_regrid
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -data_file path
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -field name
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -out path
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -scale value
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -offset value
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 -fill value
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [ -units text ]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
     modis_file
 \end_layout
 
@@ -1217,14 +1567,12 @@ modis_regrid
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for modis_regrid
 \end_layout
 
-\begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 1.
@@ -1235,7 +1583,7 @@ data_file path
  argument specifies the data files used to get the grid information.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 2.
@@ -1246,7 +1594,7 @@ field name
  argument specifies the name of the field to use in the MODIS data file.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 3.
@@ -1259,7 +1607,7 @@ out path
  argument specifies the name of the output NetCDF file.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 4.
@@ -1270,7 +1618,7 @@ scale value
  argument specifies the scale factor to be used on the raw MODIS values.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 5.
@@ -1281,7 +1629,7 @@ offset value
  argument specifies the offset value to be used on the raw MODIS values.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 6.
@@ -1293,7 +1641,7 @@ fill value
  
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 7.
@@ -1310,7 +1658,7 @@ modis_file
 Optional arguments for modis_regrid
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 8.
@@ -1321,7 +1669,7 @@ Optional arguments for modis_regrid
  specifies units string in the global attributes section of the output file.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 An example of the modis_regrid calling sequence is shown below:
