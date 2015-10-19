@@ -431,17 +431,50 @@ T
 
 \begin_layout Standard
 An example of the steps involved in resolving objects is shown in Figure
- 8-1.
- Figure 8-1a shows a "raw" precipitation field, where the vertical coordinate
- represents the precipitation amount.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig_MODE_object_id"
+
+\end_inset
+
+.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig_MODE_object_id"
+
+\end_inset
+
+a shows a "raw" precipitation field, where the vertical coordinate represents
+ the precipitation amount.
  Part b shows the convolved field, and part c shows the masked field obtained
  after the threshold is applied.
  Finally, Fig.
- 8-1d shows the objects once the original precipitation values have been
- restored to the interiors of the objects.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig_MODE_object_id"
+
+\end_inset
+
+d shows the objects once the original precipitation values have been restored
+ to the interiors of the objects.
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Graphics
 	filename fig8.1.png
 	scale 75
@@ -449,22 +482,32 @@ An example of the steps involved in resolving objects is shown in Figure
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Fig
-\begin_inset Note Note
-status open
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Tara, this image is a gif, and tex complains about it.
- It seems to want a png.
+Example of an application of the MODE object identification process to a
+ model precipitation field.
 \end_layout
 
 \end_inset
 
-ure 8-1: Example of an application of the MODE object identification process
- to a model precipitation field.
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig_MODE_object_id"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
