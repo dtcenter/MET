@@ -1090,59 +1090,54 @@ array controls the type of output that the Series-Analysis tool generates.
  The output flags correspond to the following types of output line types:
 \end_layout
 
-\begin_layout Description
-1.
- FHO for Forecast, Hit, Observation Rates
+\begin_layout Enumerate
+FHO for Forecast, Hit, Observation Rates
 \end_layout
 
-\begin_layout Description
-2.
- CTC for Contingency Table Counts
+\begin_layout Enumerate
+CTC for Contingency Table Counts
 \end_layout
 
-\begin_layout Description
-3.
- CTS for Contingency Table Statistics
+\begin_layout Enumerate
+CTS for Contingency Table Statistics
 \end_layout
 
-\begin_layout Description
-4.
- MCTC for Multi-Category Contingency Table Counts
+\begin_layout Enumerate
+MCTC for Multi-Category Contingency Table Counts
 \end_layout
 
-\begin_layout Description
-5.
- MCTS for Multi-Category Contingency Table Statistics
+\begin_layout Enumerate
+MCTS for Multi-Category Contingency Table Statistics
 \end_layout
 
-\begin_layout Description
-6.
- CNT for Continuous Statistics
+\begin_layout Enumerate
+CNT for Continuous Statistics
 \end_layout
 
-\begin_layout Description
-7.
- SL1L2 for Scalar L1L2 Partial Sums
+\begin_layout Enumerate
+SL1L2 for Scalar L1L2 Partial Sums
 \end_layout
 
-\begin_layout Description
-8.
- PCT for Contingency Table Counts for Probabilistic forecasts
+\begin_layout Enumerate
+SAL1L2 for Scalar Anomoly L1L2 Partial Sums 
+\series medium
+climatological data is supplied
 \end_layout
 
-\begin_layout Description
-9.
- PSTD for Contingency Table Statistics for Probabilistic forecasts
+\begin_layout Enumerate
+PCT for Contingency Table Counts for Probabilistic forecasts
 \end_layout
 
-\begin_layout Description
-10.
- PJC for Joint and Conditional factorization for Probabilistic forecasts
+\begin_layout Enumerate
+PSTD for Contingency Table Statistics for Probabilistic forecasts
 \end_layout
 
-\begin_layout Description
-11.
- PRC for Receiver Operating Characteristic for Probabilistic forecasts
+\begin_layout Enumerate
+PJC for Joint and Conditional factorization for Probabilistic forecasts
+\end_layout
+
+\begin_layout Enumerate
+PRC for Receiver Operating Characteristic for Probabilistic forecasts
 \series medium
 
 \begin_inset Newline newline
