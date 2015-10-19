@@ -342,9 +342,9 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-Required arguments for 
-\family typewriter
-mode_analysis
+
+\series bold
+Required arguments for mode_analysis
 \end_layout
 
 \begin_layout Standard
@@ -432,9 +432,9 @@ The output for each of these jobs types is described in later sections.
 \end_layout
 
 \begin_layout Standard
-Optional arguments for 
+
 \series bold
-mode_analysis
+Optional arguments for mode_analysis
 \series default
  
 \end_layout
