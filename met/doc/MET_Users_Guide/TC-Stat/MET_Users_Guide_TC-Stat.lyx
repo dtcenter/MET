@@ -588,14 +588,10 @@ argument indicates the desired name of the TCST format output file.
 \series default
  option indicates the desired level of verbosity.
  The contents of 
-\series bold
-
 \begin_inset Quotes eld
 \end_inset
 
 level
-\series default
-
 \begin_inset Quotes erd
 \end_inset
 
