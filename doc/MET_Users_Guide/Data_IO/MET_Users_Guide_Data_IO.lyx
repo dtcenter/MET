@@ -110,14 +110,7 @@ reference "sec:Intermediate-data-formats"
  are primarily concerned with re-formatting input files into the intermediate
  files required by some MET modules.
  These steps are represented by the first three columns in the MET flowchart
- depicted in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "MET_Overview_Flowchart"
-
-\end_inset
-
-.
+ depicted in Figure .
  Output data formats and the software modules used to reformat the data
  are described in later sections.
 \end_layout

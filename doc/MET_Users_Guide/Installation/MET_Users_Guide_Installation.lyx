@@ -905,15 +905,10 @@ scripts/Rscripts/
 plot_tcmpr.R
 \emph default
 , which provides graphic utilities for MET-TC.
- For more information on the graphics capabilities, see 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Chapter 6
-\end_layout
+ For more information on the graphics capabilities, see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:TC-Stat-tool-example"
 
 \end_inset
 

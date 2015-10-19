@@ -316,13 +316,6 @@ status open
 \align center
 
 \series bold
-\begin_inset CommandInset label
-LatexCommand label
-name "MET_Overview_Flowchart"
-
-\end_inset
-
-
 \begin_inset Graphics
 	filename fig1.1.png
 	scale 60
@@ -342,6 +335,13 @@ Basic representation of current MET structure and modules.
  Colored areas represent software and modules included in MET, and gray
  areas represent input and output files.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig_Overview_MET_Overview_Flowchart"
 
 \end_inset
 
