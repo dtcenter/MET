@@ -75,6 +75,13 @@
 
 \begin_layout Chapter
 The Wavelet-Stat Tool
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:The-Wavelet-Stat-Tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1738,36 +1745,112 @@ Usage: wavelet_stat
 
 \begin_layout LyX-Code
 \paragraph_spacing single
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 fcst_file
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 obs_file
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 config_file
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-outdir path]
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
 \begin_layout Standard
-Wavelet_stat has both required arguments and optional ones.
+
+\emph on
+wavelet_stat 
+\emph default
+has both required arguments and optional ones.
  
 \end_layout
 
@@ -1846,11 +1929,7 @@ arguments for wavelet_stat
 \begin_inset Quotes eld
 \end_inset
 
-
-\series bold
 level
-\series default
-
 \begin_inset Quotes erd
 \end_inset
 
