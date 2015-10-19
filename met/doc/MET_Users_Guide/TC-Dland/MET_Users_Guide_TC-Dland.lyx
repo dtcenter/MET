@@ -298,8 +298,11 @@ hskip 0.5in}
 
 \begin_layout Standard
 
+\emph on
+tc_dland
 \series medium
-tc_dland has one required arguments and accepts several optional ones.
+\emph default
+ has one required arguments and accepts several optional ones.
 \end_layout
 
 \begin_layout Standard
@@ -380,14 +383,10 @@ argument outputs log messages to the specified file.
 \series default
  option indicates the desired level of verbosity.
  The contents of 
-\series bold
-
 \begin_inset Quotes eld
 \end_inset
 
 level
-\series default
-
 \begin_inset Quotes erd
 \end_inset
 
