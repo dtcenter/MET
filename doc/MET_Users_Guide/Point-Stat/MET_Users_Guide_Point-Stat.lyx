@@ -749,6 +749,13 @@ Probabilistic forecast values are assumed to have a range of either 0 to
 
 \begin_layout Subsubsection*
 Measures for comparison against climatology
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Climatology"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
