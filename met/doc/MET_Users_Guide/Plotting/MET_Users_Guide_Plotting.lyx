@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 Plotting and Graphics Support
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Plotting-and-Graphics"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
