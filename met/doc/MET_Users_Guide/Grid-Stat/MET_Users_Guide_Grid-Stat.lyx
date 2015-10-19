@@ -202,7 +202,7 @@ Measures for probabilistic forecasts and dichotomous outcomes
 For probabilistic forecasts, many verification measures are based on reliability
 , accuracy and bias.
  However, it also is of interest to investigate joint and conditional distributi
-ons of the forecasts and the observations, as in Wilks (2006).
+ons of the forecasts and the observations, as in Wilks (2011).
  See Appendix C for specific information.
 \end_layout
 
