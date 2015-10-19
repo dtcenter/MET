@@ -570,7 +570,7 @@ b/n
 c/n
 \emph default
  as product of the marginal and conditional probability (e.g.
- Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for
+ Jolliffe and Stephenson, 2003; Wilks, 2011), and then noticing that for
  a random forecast the conditional probability is equal to the unconditional
  one, so that 
 \emph on
@@ -604,7 +604,7 @@ reference "Intensity_Scale_skill_score_NIMROD"
 
 ).
  The standard skill score definition as in Jolliffe and Stephenson (2003)
- or Wilks (2006) is used, and random chance is used as reference forecast.
+ or Wilks (2011) is used, and random chance is used as reference forecast.
  The MSE for the random binary forecast is equipartitioned on the 
 \emph on
 n+1
