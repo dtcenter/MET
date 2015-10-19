@@ -92,6 +92,8 @@ This chapter contains a description of the Ensemble-Stat tool.
  If observations are also included, ensemble statistics such as rank histograms,
  probability integral transform histogras, spread / skill variance, and
  continuous ranked probability score are produced.
+ A climatology file may also be provided, and will be used as a reference
+ forecast in several of the output statistics.
  Details about and equations for the statistics produced for ensembles are
  given in Appendix C.4.
  
@@ -108,8 +110,9 @@ This section contains information about configuring and running the Ensemble-Sta
 t tool.
  The Ensemble-Stat tool creates or verifies gridded model data.
  For verification, this tool can accept either gridded or point observations.
- The input gridded model and observation datasets must be on the same grid,
- and in one of the MET supported gridded file formats.
+ If provided, the climatology file must be gridded.
+ The input gridded model, observation, and climatology datasets must be
+ on the same grid, and in one of the MET supported gridded file formats.
  Point observations should be in the NetCDF format produced by pb2nc, ascii2nc,
  or madis2nc.
  
