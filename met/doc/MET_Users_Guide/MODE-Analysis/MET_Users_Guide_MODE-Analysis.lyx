@@ -342,9 +342,9 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-Required arguments for mode_analysis
+Required arguments for 
+\family typewriter
+mode_analysis
 \end_layout
 
 \begin_layout Standard
@@ -400,13 +400,10 @@ Specifying
 \series default
  option.
  Column names are not case sensitive.
- The column names are the same as described in 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Insert reference: Section 8.3.3 of Chapter 8
-\end_layout
+ The column names are the same as described in Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MODE-output"
 
 \end_inset
 
@@ -432,9 +429,9 @@ The output for each of these jobs types is described in later sections.
 \end_layout
 
 \begin_layout Standard
-
+Optional arguments for 
 \series bold
-Optional arguments for mode_analysis
+mode_analysis
 \series default
  
 \end_layout
@@ -487,7 +484,14 @@ height "1pt"
 
 \series medium
 This option gives the name of a configuration file to be read.
- The contents of the configuration file are described in Section 8.3.3.
+ The contents of the configuration file are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MODE-output"
+
+\end_inset
+
+.
 \begin_inset Newline newline
 \end_inset
 
@@ -1408,7 +1412,14 @@ Setting limits on various floating-point attributes.
  One may specify these as integers (i.e., without a decimal point), if desired.
  The following pairs of options indicate minimum and maximum values for
  each MODE attribute that can be described as a floating-point number.
- Please refer to Chapter 6 for a description of these attributes as needed.
+ Please refer to Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:The-Series-Analysis"
+
+\end_inset
+
+ for a description of these attributes as needed.
 \series default
 
 \begin_inset Newline newline
@@ -2438,17 +2449,14 @@ To use the MODE analysis tool, the user must un-comment the options in the
 \series default
 mode_analysis
 \family default
- are the same as the MODE line options described in 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Insert Reference: Section 9.3.1
-\end_layout
+ are the same as the MODE line options described in Section
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Wavelet_stat-usage"
 
 \end_inset
 
-.
+ .
 \end_layout
 
 \begin_layout Standard
