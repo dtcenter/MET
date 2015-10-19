@@ -130,43 +130,163 @@ Usage: ensemble_stat
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 n_ens ens_file_1 ...
  ens_file_n | ens_file_list
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 config_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-grid_obs file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-point_obs file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-ssvar_mean file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-obs_valid_beg time]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-obs_valid_end time]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-outdir path]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
@@ -178,30 +298,35 @@ has required arguments and can take many optional ones.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments ensemble_stat
 \end_layout
 
 \begin_layout Description
 1.
- The"n_ens ens_file_1 ...
- ens_file_n" is the number of ensemble members followed by a list of ensemble
- member file names.
+ The
+\series bold
+ n_ens ens_file_1 ...
+ ens_file_n
+\series default
+ is the number of ensemble members followed by a list of ensemble member
+ file names.
  This argument is not required when ensemble files are specified in the
  
-\begin_inset Quotes eld
-\end_inset
-
+\series bold
 ens_file_list
-\begin_inset Quotes erd
-\end_inset
-
+\series default
 , detailed below.
 \end_layout
 
 \begin_layout Description
 2.
- The "ens_file_list" is an ASCII file containing a list of ensemble member
- file names.
+ The 
+\series bold
+ens_file_list
+\series default
+ is an ASCII file containing a list of ensemble member file names.
  This is not required when a file list is included on the command line,
  as in #2 above.
  
@@ -209,8 +334,11 @@ ens_file_list
 
 \begin_layout Description
 3.
- The "config_file" is an EnsembleStatConfig file containing the desired
- configuration settings.
+ The 
+\series bold
+config_file
+\series default
+ is an EnsembleStatConfig file containing the desired configuration settings.
 \end_layout
 
 \begin_layout Description
@@ -227,7 +355,11 @@ arguments for ensemble_stat
 \begin_layout Description
 4.
  To produce rank histogram information when you have gridded observations,
- use the "-grid_obs file" option to specify a gridded observation file.
+ use the 
+\series bold
+-grid_obs file
+\series default
+ option to specify a gridded observation file.
  This option may be used multiple times if your observations are in several
  files.
 \end_layout
@@ -235,34 +367,60 @@ arguments for ensemble_stat
 \begin_layout Description
 5.
  To produce rank histogram information when you have point observations,
- use the "-point_obs file" to specify a NetCDF point observation file.
+ use the 
+\series bold
+-point_obs file
+\series default
+ to specify a NetCDF point observation file.
  This option may be used multiple times if your observations are in several
  files.
 \end_layout
 
 \begin_layout Description
 6.
- Used in conjunction with the SSVAR output line type, the "-ssvar_mean file"
+ Used in conjunction with the SSVAR output line type, the 
+\series bold
+-ssvar_mean file
+\series default
  specifies an ensemble mean model data file.
  
 \end_layout
 
 \begin_layout Description
 7.
- To filter observations by time, use "-obs_valid_beg time" in YYYYMMDD[_HH[MMSS]
-] format to set the beginning of the matching observation time window.
+ To filter observations by time, use 
+\series bold
+-obs_valid_beg
+\series default
+ 
+\series bold
+time
+\series default
+ in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation
+ time window.
 \end_layout
 
 \begin_layout Description
 8.
- As above, use "-obs_valid_end time" in YYYYMMDD[_HH[MMSS]] format to set
- the end of the matching observation time window.
+ As above, use 
+\series bold
+-obs_valid_end
+\series default
+ 
+\series bold
+time
+\series default
+ in YYYYMMDD[_HH[MMSS]] format to set the end of the matching observation
+ time window.
 \end_layout
 
 \begin_layout Description
 9.
- Specify the "-outdir path" option to override the default output directory
- (/out/ensemble_stat).
+ Specify the 
+\series bold
+-outdir path
+\series default
+ option to override the default output directory (/out/ensemble_stat).
  
 \end_layout
 
