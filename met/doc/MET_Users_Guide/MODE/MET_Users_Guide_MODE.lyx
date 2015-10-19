@@ -75,6 +75,13 @@
 
 \begin_layout Chapter
 The MODE Tool
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:The-MODE-Tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1096,8 +1103,11 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-The MODE tool has three required arguments and can accept several optional
- arguments.
+The 
+\emph on
+mode
+\emph default
+ tool has three required arguments and can accept several optional arguments.
 \end_layout
 
 \begin_layout Standard
