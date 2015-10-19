@@ -663,7 +663,8 @@ float get_nc_obs(NcFile *&f_in, const char *in_str,
       dd_str << cs_erase << qty;
    }
    else {
-      dd_str << cs_erase << "";
+      qty = '\0';
+      dd_str << cs_erase << na_str;
    }
 
    //
@@ -743,7 +744,8 @@ void process_obs(NcFile *&f_in, const char *in_str,
 
 void write_qty(char &qty) {
    ConcatString qty_str;
-   qty_str << qty;
+   if(qty == '\0') qty_str = na_str;
+   else            qty_str << qty;
    qty_str.replace(" ", "_", false);
    put_nc_var_val(obs_qty_var, i_obs, qty_str);
 }
