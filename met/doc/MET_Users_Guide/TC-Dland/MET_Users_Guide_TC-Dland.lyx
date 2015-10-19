@@ -201,91 +201,199 @@ Usage: tc_dland
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 out_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-grid spec]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-noll]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-land file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
-\begin_layout LyX-Code
-Required arguments for tc_dland:
-\end_layout
-
 \begin_layout Standard
 
-\series bold
-Out_file:
 \series medium
- The -out_file argument indicates the NetCDF output file containing the
- computed distances to land.
+tc_dland has one required arguments and accepts several optional ones.
 \end_layout
 
 \begin_layout Standard
 
 \series bold
-Optional arguments for tc_dland:
+Required arguments for tc_dland
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+1.
+ The 
 \series bold
-Grid spec:
+out_file
+\series default
+ argument indicates 
 \series medium
- The -grid spec argument overrides the default grid (1/10th NH grid).
+indicates the NetCDF output file containing the computed distances to land.
+\end_layout
+
+\begin_layout Description
+
+\series bold
+Optional arguments for tc_dland
+\end_layout
+
+\begin_layout Description
+2.
+ The 
+\series bold
+-grid spec
+\series default
+ 
+\series medium
+argument overrides the default grid (1/10th NH grid).
  Spec = 
 \emph on
 lat_ll lon_ll delta_lat delta_lon n_lat n_lon
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+3.
+ The 
 \series bold
-Noll:
+-noll
+\series default
+ 
 \series medium
- The -noll argument skips writing the lon/lat variables in the output NetCDF
- file to reduce the file size.
+argument skips writing the lon/lat variables in the output NetCDF file to
+ reduce the file size.
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+4.
+ The 
 \series bold
-Land file
+-land file 
 \series medium
-: The -land file argument overwrites the default land data files (aland.dat,
- shland.dat, and wland.dat).
+argument overwrites the default land data files (aland.dat, shland.dat, and
+ wland.dat).
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+5.
+ The 
 \series bold
-Log file:
+-log file
+\series default
+ 
 \series medium
- The -log file argument outputs log messages to the specified file.
+argument outputs log messages to the specified file.
 \end_layout
 
-\begin_layout Standard
-
+\begin_layout Description
+6.
+ The 
 \series bold
-V level:
-\series medium
- The -v level argument overrides the default level of verbosity (2).
+-v level
+\series default
+ option indicates the desired level of verbosity.
+ The contents of 
+\series bold
+
+\begin_inset Quotes eld
+\end_inset
+
+level
+\series default
+
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
 \end_body
