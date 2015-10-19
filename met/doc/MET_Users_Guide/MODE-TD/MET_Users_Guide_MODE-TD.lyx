@@ -2479,8 +2479,11 @@ Each ascii file is laid out in tabular format, with the first line consisting
 \end_layout
 
 \begin_layout Standard
-These columns are explained in Table 11.
+These columns are explained in Table 1.1.
  Each file contains additional columns that come after these.
+ Columns for 3D single and pair attributes are shown in Tables 1.3 and 1.3
+ respectively.
+ Columns for 2D constant-time attributes are shown in Table 1.2.
 \end_layout
 
 \begin_layout Standard
@@ -2497,7 +2500,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-txt_header_table
+Text Header Columns
 \end_layout
 
 \end_inset
@@ -3022,21 +3025,6 @@ Observation vertical level
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-The extra columns in the 3D single attributes text files are shown in Table
- 1.3.
-\end_layout
-
-\begin_layout Standard
-The extra columns in the 3D pair attributes text files are shown in Table
- 1.4
-\end_layout
-
-\begin_layout Standard
-The extra columns in the 2D spatial attributes text files are shown in Table
- 1.2
 \end_layout
 
 \begin_layout Standard
