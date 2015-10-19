@@ -256,8 +256,11 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
+
+\emph on
 tc_pairs
 \series medium
+\emph default
  has three required arguments and can take up to three optional arguments.
 \end_layout
 
@@ -363,14 +366,10 @@ argument indicates the path of the output file base.
 \series default
  option indicates the desired level of verbosity.
  The contents of 
-\series bold
-
 \begin_inset Quotes eld
 \end_inset
 
 level
-\series default
-
 \begin_inset Quotes erd
 \end_inset
 
