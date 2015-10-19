@@ -166,7 +166,11 @@ The usage statement for the MODE-Analysis tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-mode_analysis
+
+\series bold
+Usage:
+\series default
+ mode_analysis
 \end_layout
 
 \begin_layout LyX-Code
