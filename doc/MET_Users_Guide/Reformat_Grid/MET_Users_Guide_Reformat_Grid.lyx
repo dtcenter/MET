@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 Re-Formatting of Gridded Fields
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Re-Formatting-of-Gridded"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -739,7 +746,7 @@ path
 \end_inset
 
 
-\series bold
+\series default
 reg_exp
 \series medium
 
