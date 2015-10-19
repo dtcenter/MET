@@ -87,15 +87,48 @@ Introduction
 The TC-Stat tool ties together results from the TC-Pairs tool by providing
  summary statistics and filtering jobs on TCST output files.
  The TC-Stat tool requires TCST output from the TC-Pairs tool.
- See section 4.2.3 of this users guide for information on the TCST output
- format of the TC-Pairs tool.
+ See section 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Input link
+\end_layout
+
+\end_inset
+
+4.2.3 of this users guide for information on the TCST output format of the
+ TC-Pairs tool.
  A filtering job using TC-Stat provides the ability to filter the input
- data by various conditions and thresholds described in section 5.3.2.
+ data by various conditions and thresholds described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:tc_stat-configuration-file"
+
+\end_inset
+
+.
  A summary job produces summary statistics including frequency of superior
  performance, time-series independence calculations, and confidence intervals
  on the mean.
- These statistical aspects are described in section 5.2, and practical use
- information for the TC-Stat tool is described in section 5.3.
+ These statistical aspects are described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Statistical-aspects"
+
+\end_inset
+
+, and practical use information for the TC-Stat tool is described in section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Practical-information-1"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -126,16 +159,19 @@ The TC-Stat tool can be used to simply filter specific lines of the TCST
 \begin_layout Standard
 
 \series medium
-Filtering options are outlined below in section 5.3.2 (configuration file).
+Filtering options are outlined below in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:tc_stat-configuration-file"
+
+\end_inset
+
+ (configuration file).
  Additional filtering options that can be executed on the command line will
  give the minimum, maximum, or exact value for a particular column: 
 \end_layout
 
-\begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 -column_min
@@ -143,7 +179,7 @@ Filtering options are outlined below in section 5.3.2 (configuration file).
  arguments: column_name value
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 -column_max
@@ -151,7 +187,7 @@ Filtering options are outlined below in section 5.3.2 (configuration file).
  arguments: column_name value
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 -column_eq
@@ -159,7 +195,7 @@ Filtering options are outlined below in section 5.3.2 (configuration file).
  arguments: column_name value
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 -column_str 
@@ -167,7 +203,7 @@ Filtering options are outlined below in section 5.3.2 (configuration file).
 arguments: column_name string
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 -column
@@ -175,7 +211,7 @@ arguments: column_name string
  AMAX_WIND-BMAX_WIND # difference 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 -column
@@ -183,7 +219,7 @@ arguments: column_name string
  abs(ALTK_ERR) # absolute value 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 -column
@@ -219,8 +255,17 @@ The TC-Stat tool can be used to produce summary information for a single
 Confidence intervals are computed for the mean of the column of data.
  Confidence intervals are computed using the assumption of normality for
  the mean.
- For further information on computing confidence intervals, refer to Appendix
- D of the MET user's guide.
+ For further information on computing confidence intervals, refer to 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Insert link
+\end_layout
+
+\end_inset
+
+Appendix D of the MET user's guide.
 \end_layout
 
 \begin_layout Standard
@@ -241,7 +286,7 @@ When operating on columns, a specific column name can be listed (e.g.
 .
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 TRACK:
@@ -250,7 +295,7 @@ TRACK:
  (CRTK_ERR)
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 WIND:
@@ -258,7 +303,7 @@ WIND:
  all wind radii errors (34-, 50-, and 64-kt) for each quadrant
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 TI:
@@ -266,7 +311,7 @@ TI:
  track error (TK_ERR) and absolute intensity error (abs(AMAX_WIND-BMAX_WIND))
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 AC:
@@ -274,7 +319,7 @@ AC:
  along- and cross-track errors (ALTK_ERR, CRTK_ERR)
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series bold
 XY: 
@@ -292,6 +337,7 @@ The TC-Stat tool can also be used to generate frequency of superior performance
 
 \begin_layout Standard
 
+\series bold
 \emph on
 Frequency of Superior Performance
 \end_layout
@@ -311,6 +357,7 @@ The frequency of superior performance (FSP) looks at multiple model forecasts
 
 \begin_layout Standard
 
+\series bold
 \emph on
 Time-Series Independence
 \end_layout
@@ -328,13 +375,26 @@ The time-series independence evaluates effective forecast separation time
 
 \begin_layout Section
 Practical information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Practical-information-1"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 The following sections describe the usage statement, required arguments,
- and optional arguments for tc_stat.
+ and optional arguments for 
+\series default
+\emph on
+tc_stat
+\series medium
+\emph default
+.
 \end_layout
 
 \begin_layout Subsection
@@ -344,7 +404,13 @@ tc_stat usage
 \begin_layout Standard
 
 \series medium
-The usage statement for tc_stat is shown below:
+The usage statement for 
+\series default
+\emph on
+tc_stat
+\series medium
+\emph default
+ is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -382,16 +448,35 @@ TC-Stat has one required argument and accepts optional ones.
  analysis jobs at the same time.
  If jobs are specified in both the configuration file and the command line,
  only the jobs indicated in the configuration file will be run.
- The various jobs are described in Table 5-1 and the filtering options are
- described in section 5.3.2.
+ The various jobs are described in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_columnar_output_summary_tc_stat"
+
+\end_inset
+
+ and the filtering options are described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:tc_stat-configuration-file"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for tc_stat:
 \end_layout
 
 \begin_layout Standard
-Lookin source:
+
+\series bold
+Lookin source
+\series default
+:
 \series medium
  The 
 \emph on
@@ -409,11 +494,17 @@ tc_pairs
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Optional arguments for tc_stat:
 \end_layout
 
 \begin_layout Standard
-Out file:
+
+\series bold
+Out file
+\series default
+:
 \series medium
  The 
 \emph on
@@ -423,7 +514,11 @@ Out file:
 \end_layout
 
 \begin_layout Standard
-Log file:
+
+\series bold
+Log file
+\series default
+:
 \series medium
  The -
 \emph on
@@ -433,6 +528,8 @@ log
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 V level:
 \series medium
  The 
@@ -447,7 +544,11 @@ option indicates the desired level of verbosity.
 \end_layout
 
 \begin_layout Standard
-Config file:
+
+\series bold
+Config file
+\series default
+:
 \series medium
  The 
 \emph on
@@ -489,6 +590,13 @@ TCStatConfig
 
 \begin_layout Subsection
 tc_stat configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:tc_stat-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -573,18 +681,18 @@ bmodel = [ ];
 
 \series medium
 The 
-\series default
-amodel
+\series bold
+amodel 
 \series medium
- and 
-\series default
-bmodel
+and
+\series bold
+ bmodel
 \series medium
  fields stratify by the amodel and bmodel columns based on a comma-separated
  list of model names used for all analysis performed.
  The names must be in double quotation marks (e.g.: "HWFI").
  The 
-\series default
+\series bold
 amodel
 \series medium
  list specifies the model to be verified against the listed 
@@ -592,7 +700,11 @@ amodel
 bmodel
 \series medium
 .
- The bmodel specifies the reference dataset, generally the best track analysis.
+ The 
+\series bold
+bmodel
+\series medium
+ specifies the reference dataset, generally the best track analysis.
  Using the 
 \emph on
 "-amodel"
@@ -628,10 +740,10 @@ storm_id = [ ];
 
 \series medium
 The 
-\series default
-storm_id
+\series bold
+storm_id 
 \series medium
- field specifies a comma-separated list of storm id's to be used: the expected
+field specifies a comma-separated list of storm id's to be used: the expected
  format is 2-letter basin, 2-digit cyclone number, 4-digit year.
  An empty list indicates all storms in TCST input will be used.
  This may also be set up using basin, cyclone, and timing information below.
@@ -661,10 +773,10 @@ basin = [ ];
 
 \series medium
 The 
-\series default
-basin
+\series bold
+basin 
 \series medium
- field stratifies by the basin column, based on a comma-separated list of
+field stratifies by the basin column, based on a comma-separated list of
  basins to be used.
  The expected format is the 2-letter basin identifier.
  An empty list indicates all basins in the TCST input will be used.
@@ -699,7 +811,7 @@ cyclone = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 cyclone
 \series medium
  field stratifies by the cyclone column, based on a comma-separated list
@@ -736,7 +848,7 @@ storm_name = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 storm_name
 \series medium
  field stratifies by the storm_name column, based on a comma-separated list
@@ -777,11 +889,11 @@ init_eng = " ";
 
 \series medium
 The 
-\series default
+\series bold
 init_beg
 \series medium
  and 
-\series default
+\series bold
 init_end
 \series medium
  fields stratify by initialization time.
@@ -825,11 +937,11 @@ init_exc = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 init_inc
 \series medium
  and 
-\series default
+\series bold
 init_exc
 \series medium
  fields stratify by initialization times, based on a comma-separated list
@@ -873,13 +985,13 @@ valid_end = " ";
 \begin_layout Standard
 
 \series medium
-The 
-\series default
-valid_beg
+The
+\series bold
+ valid_beg 
 \series medium
- and 
-\series default
-valid_end
+and
+\series bold
+ valid_end
 \series medium
  fields stratify by valid time.
  Beginning and ending time windows are defined by YYYYMMDD[_HH[MMSS]].
@@ -922,11 +1034,11 @@ valid_exc = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 valid_inc
 \series medium
  and 
-\series default
+\series bold
 valid_exc
 \series medium
  fields stratify by valid times, based on a comma-separated list of specific
@@ -975,15 +1087,17 @@ lead = [ ];
 
 \series medium
 The 
+\series bold
+init_hour, valid_hour
 \series default
-init_hour, valid_hour,
+,
 \series medium
  and 
-\series default
-lead
+\series bold
+lead 
 \series medium
- fields stratify by the initialization time, valid time, and lead time,
- respectively.
+fields stratify by the initialization time, valid time, and lead time, respectiv
+ely.
  This field specifies a comma-separated list of initialization times, valid
  times, and lead times in HH[MMSS] format.
  Using the "
@@ -1029,11 +1143,11 @@ valid_mask = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 init_mask
 \series medium
  and 
-\series default
+\series bold
 valid_mask
 \series medium
  fields stratify by the init_mask and valid_mask columns in the TCST output.
@@ -1072,7 +1186,7 @@ line_type = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 line_type
 \series medium
  field stratifies by the line_type column.
@@ -1103,7 +1217,7 @@ track_watch_warn = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 track_watch_warn
 \series medium
  flag stratifies over the watch_warn column in the TCST files.
@@ -1123,34 +1237,28 @@ track_watch_warn
 Other uses of the WATCH_WARN column include filtering when:
 \end_layout
 
-\begin_layout Standard
-
-\series medium
-.
-\end_layout
-
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 1.
  A forecast is issued when a watch/warn is in effect
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 2.
  A forecast is verifying when a watch/warn is in effect
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 3.
  A forecast is issued when a watch/warn is NOT in effect
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 4.
@@ -1163,7 +1271,7 @@ Other uses of the WATCH_WARN column include filtering when:
 The following filtering options can be achieved by the following:
 \end_layout
 
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1172,7 +1280,7 @@ The following filtering options can be achieved by the following:
 \end_layout
 
 \begin_deeper
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1180,7 +1288,7 @@ init_str_val = ["ALL"];
 \end_layout
 
 \end_deeper
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1189,7 +1297,7 @@ init_str_val = ["ALL"];
 \end_layout
 
 \begin_deeper
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1197,7 +1305,7 @@ column_str_val = ["ALL"];
 \end_layout
 
 \end_deeper
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1206,7 +1314,7 @@ column_str_val = ["ALL"];
 \end_layout
 
 \begin_deeper
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1214,7 +1322,7 @@ init_str_val = ["NA"];
 \end_layout
 
 \end_deeper
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1223,7 +1331,7 @@ init_str_val = ["NA"];
 \end_layout
 
 \begin_deeper
-\begin_layout Description
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1234,18 +1342,18 @@ column_str_val = ["NA"];
 \begin_layout Standard
 
 \series medium
-Further information on the 
-\series default
-column_str
+Further information on the
+\series bold
+ column_str
 \series medium
  and 
-\series default
+\series bold
 init_str
 \series medium
  fields is described below.
- Listing a comma-separated list of watch/warning types in the 
-\series default
-column_str_val
+ Listing a comma-separated list of watch/warning types in the
+\series bold
+ column_str_val
 \series medium
  field will stratify by a single or multiple types of warnings.
 \begin_inset Newline newline
@@ -1278,21 +1386,21 @@ column_thresh_val = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 column_thresh_name
 \series medium
  and 
-\series default
+\series bold
 column_thresh_val
 \series medium
  fields stratify by applying thresholds to numeric data columns.
  Specify a comma-separated list of columns names and thresholds to be applied.
  The length of 
-\series default
+\series bold
 column_thresh_val
 \series medium
  should match that of 
-\series default
+\series bold
 column_thresh_name
 \series medium
 .
@@ -1331,21 +1439,21 @@ column_str_val = [ ];
 
 \series medium
 The 
-\series default
+\series bold
 column_str_name
 \series medium
  and 
-\series default
+\series bold
 column_str_val
 \series medium
  fields stratify by performing string matching on non-numeric data columns.
  Specify a comma-separated list of columns names and values to be checked.
  The length of the 
-\series default
+\series bold
 column_str_val
 \series medium
  should match that of the 
-\series default
+\series bold
 column_str_name
 \series medium
 .
@@ -1384,11 +1492,11 @@ init_thresh_val = [];
 
 \series medium
 The 
-\series default
+\series bold
 init_thresh_name
 \series medium
  and 
-\series default
+\series bold
 init_thresh_val
 \series medium
  fields stratify by applying thresholds to numeric data columns only when
@@ -1396,11 +1504,11 @@ init_thresh_val
  If lead =0, but the value does not meet the threshold, discard the entire
  track.
  The length of the 
-\series default
+\series bold
 init_thresh_val
 \series medium
  should match that of the 
-\series default
+\series bold
 init_thresh_name
 \series medium
 .
@@ -1443,22 +1551,24 @@ init_str_val = [];
 
 \series medium
 The
-\series default
- init_str_name
+\series bold
+ init_str_name 
 \series medium
- and
+and
 \series default
- init_str_val
+ 
+\series bold
+init_str_val
 \series medium
  fields stratify by performing string matching on non-numeric data columns
  only when lead = 0.
  If lead =0, but the string does not match, discard the entire track.
  The length of the 
-\series default
+\series bold
 init_str_val 
 \series medium
 should match that of the 
-\series default
+\series bold
 init_str_name
 \series medium
 .
@@ -1493,8 +1603,10 @@ water_only = ;
 
 \series medium
 The 
+\series bold
+water_only
 \series default
-water_only 
+ 
 \series medium
 flag stratifies by only using points where both the amodel and bmodel tracks
  are over water.
@@ -1580,13 +1692,13 @@ thresh = >=30.0;
 
 \series medium
 The 
-\series default
+\series bold
 rapid_inten
 \series medium
  field specifies those track points for which rapid intensification (RI)
  or rapid weakening (RW) occurred, based on user defined RI/RW thresholds.
  The 
-\series default
+\series bold
 track
 \series medium
  entry specifies that RI/RW is not turned on 
@@ -1604,7 +1716,7 @@ ADECK
 ), or computed when both the amodel and bmodel (the union of the two) indicate
  RI/RW (BOTH).
  If 
-\series default
+\series bold
 track
 \series medium
  is set to 
@@ -1620,24 +1732,30 @@ BOTH
  wind speed over a 24-hour period is greater than or equal to 30 kts.
  This is the default setting, however flexibility in this definition is
  provided through the use of the 
+\series bold
+time, exact 
 \series default
-time, exact and thresh options
+and 
+\series bold
+thresh
+\series default
+ options
 \series medium
 .
  The 
-\series default
+\series bold
 time
 \series medium
  field specifies the time window (HH[MMSS] format) for which the RI/RW occurred.
  The 
-\series default
+\series bold
 exact 
 \series medium
 field specifies whether to only count RI/RW when the intensity change is
  over the exact time window (TRUE), which follows the official RI definition,
  or if the intensity threshold is met anytime during the time window (FALSE).
  Finally, the 
-\series default
+\series bold
 thresh
 \series medium
  field specifies the user defined intensity threshold (where ">=" indicates
@@ -1681,12 +1799,14 @@ landfall_end = 0;
 
 \series medium
 The 
-\series default
+\series bold
 landfall, landfall_beg,
 \series medium
  and
 \series default
- landfall_end
+ 
+\series bold
+landfall_end
 \series medium
  fields specify whether only those track points occurring near landfall
  should be retained.
@@ -1738,9 +1858,9 @@ match_points = TRUE;
 
 \series medium
 The 
-\emph on
+\series bold
 match_points
-\emph default
+\series medium
  flag specifies whether only those track points common to both the amodel
  and bmodel track should be retained.
  This option may be modified using the "-
@@ -1774,7 +1894,7 @@ event_equal = FALSE;
 
 \series medium
 The 
-\series default
+\series bold
 event_equal
 \series medium
  flag specifies whether only those track points common to all models in
@@ -1814,7 +1934,7 @@ event_equal_lead = [];
 
 \series medium
 The 
-\series default
+\series bold
 event_equal_lead
 \series medium
  flag specifies lead times that must be present for a track to be included
@@ -1853,7 +1973,7 @@ out_init_mask = "";
 
 \series medium
 The 
-\series default
+\series bold
 out_init_mask
 \series medium
  field applies polyline masking logic to the location of the amodel track
@@ -1890,7 +2010,7 @@ out_valid_mask = "";
 
 \series medium
 The 
-\series default
+\series bold
 out_valid_mask
 \series medium
  field applies polyline masking logic to the location of the amodel track
@@ -1984,7 +2104,7 @@ version = "v5.1";
 
 \series medium
 The 
-\series default
+\series bold
 version
 \series medium
  string indicates the version of TC-Stat configuration file used.
@@ -2034,6 +2154,8 @@ tc_stat
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Job: Filter
 \end_layout
 
@@ -2048,10 +2170,24 @@ dump_row
 \emph default
 " option.
  The TCST output from this job follows the TCST output description in Chapters
- 3 and 4.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+add link
+\end_layout
+
+\end_inset
+
+3 and 4.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Job: Summary
 \end_layout
 
@@ -2078,19 +2214,13 @@ SUMMARY
 , which is followed by the total, mean (with confidence intervals), standard
  deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum
  value, sum, time to independence, and frequency of superior performance.
- The output columns are shown below in 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Table 1.1
-\end_layout
+ The output columns are shown below in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_columnar_output_summary_tc_stat"
 
 \end_inset
 
-.
  The "
 \emph on
 -by
@@ -2129,6 +2259,13 @@ summary
 
  job output from the TC-Stat tool.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_columnar_output_summary_tc_stat"
 
 \end_inset
 
