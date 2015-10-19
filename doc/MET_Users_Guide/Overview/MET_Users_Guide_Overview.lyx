@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 Overview of MET
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Overview-of-MET"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -121,11 +128,24 @@ Since the release of METv4.1, tropical cyclone verification tools, collectively
 
 \series medium
 The MET User's Guide is organized as follows.
- Chapter 1 provides an overview of MET and its components.
- Chapter 2 contains basic information about how to get started with MET
- - including system requirements, required software (and how to obtain it),
- how to download MET, and information about compilers, libraries, and how
- to build the code.
+ Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Overview-of-MET"
+
+\end_inset
+
+ provides an overview of MET and its components.
+ Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Software-Installation/Getting-St"
+
+\end_inset
+
+ contains basic information about how to get started with MET - including
+ system requirements, required software (and how to obtain it), how to download
+ MET, and information about compilers, libraries, and how to build the code.
  Chapter 3 focuses on the data needed to run MET, including formats for
  forecasts, observations, and output.
  This chapter also documents the plotting tools included in the MET release
