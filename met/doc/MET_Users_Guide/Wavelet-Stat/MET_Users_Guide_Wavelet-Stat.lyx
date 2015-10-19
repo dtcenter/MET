@@ -570,7 +570,7 @@ b/n
 c/n
 \emph default
  as product of the marginal and conditional probability (e.g.
- Jolliffe and Stephenson, 2003; Wilks, 2011), and then noticing that for
+ Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for
  a random forecast the conditional probability is equal to the unconditional
  one, so that 
 \emph on
@@ -604,7 +604,7 @@ reference "Intensity_Scale_skill_score_NIMROD"
 
 ).
  The standard skill score definition as in Jolliffe and Stephenson (2003)
- or Wilks (2011) is used, and random chance is used as reference forecast.
+ or Wilks (2006) is used, and random chance is used as reference forecast.
  The MSE for the random binary forecast is equipartitioned on the 
 \emph on
 n+1
@@ -1718,6 +1718,13 @@ The following sections describe the usage statement, required arguments
 
 \begin_layout Subsection
 Wavelet_stat usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Wavelet_stat-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1731,103 +1738,31 @@ Usage: wavelet_stat
 
 \begin_layout LyX-Code
 \paragraph_spacing single
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 fcst_file
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 obs_file
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 config_file
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 [-outdir path]
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
 \paragraph_spacing single
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 [-v level]
 \end_layout
 
