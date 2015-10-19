@@ -391,26 +391,98 @@ Usage: grid_stat
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 fcst_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 obs_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 config_file
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-outdir path]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
 \begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-v level]
 \end_layout
 
@@ -421,6 +493,8 @@ grid_stat has some required arguments and accepts several optional ones.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for grid_stat
 \end_layout
 
@@ -454,6 +528,8 @@ config_file
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Optional arguments for grid_stat
 \end_layout
 
@@ -485,9 +561,9 @@ Optional arguments for grid_stat
 6.
  The 
 \series bold
--v leve
+-v level
 \series default
-l option indicates the desired level of verbosity.
+ option indicates the desired level of verbosity.
  The contents of 
 \series bold
 
