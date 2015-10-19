@@ -2487,14 +2487,46 @@ These columns are explained in Table 1.1.
 \end_layout
 
 \begin_layout Standard
+One thing that is slightly different in the ascii output files from the
+ way MODE does things is the way in which object numbers (both simple and
+ composite) are indicated.
+ For example, in the ascii attribute files that MODE produces, forecast
+ simple object number #1 is indicated as 
+\family typewriter
+F001
+\family default
+, while in MTD it' indicated as 
+\family typewriter
+F_1
+\family default
+.
+ Similarly, for cluster forecast object #1 is indicated in MODE as 
+\family typewriter
+CF001
+\family default
+, while in MTD it is indicated by 
+\family typewriter
+CF_1
+\family default
+.
+ MODE indicates that a simple object is not part of a cluster by giving
+ it a cluster number of zero, as in 
+\family typewriter
+CF000
+\family default
+.
+ In MTD, the corresponding notation is simply 
+\family typewriter
+CF
+\family default
+.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
