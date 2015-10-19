@@ -233,7 +233,21 @@ The Grid-Stat tool allows evaluation of model forecasts compared with a
  user supplied climatology.
  In particular, the anomoly correlation and mean squared error skill score
  provide a measure of the forecast skill versus the climatology.
+ For more details about climatological comparisons and reference forecasts,
+ see the relevant section in the Point-Stat Chapter.
  
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Tara, please insert cross reference to Climatology.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
