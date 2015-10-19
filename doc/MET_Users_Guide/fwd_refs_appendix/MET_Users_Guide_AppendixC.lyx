@@ -3490,7 +3490,7 @@ The results of the probabilistic verification methods that are included
  a formula, the mid-point value of the bin is used.
  These measures include the Brier Score (BS) with confidence bounds (Bradley
  2008); the joint distribution, calibration-refinement, likelihood-base
- rate (Wilks 2006); and receiver operating characteristic information.
+ rate (Wilks 2011); and receiver operating characteristic information.
  Using these statistics, reliability and discrimination diagrams can be
  produced.
  
@@ -4399,7 +4399,7 @@ i
 \emph on
 j=1
 \emph default
- (observed event), a part of the joint distribution (Wilks, 2006).
+ (observed event), a part of the joint distribution (Wilks, 2011).
  Along with ON_TP, this set of measures provides information about the joint
  distribution of forecasts and events.
  There are no ideal or better values.
@@ -4440,7 +4440,7 @@ i
 \emph on
 j=0
 \emph default
- (observed non-event), a part of the joint distribution (Wilks, 2006).
+ (observed non-event), a part of the joint distribution (Wilks, 2011).
  Along with OY_TP, this set of measures provides information about the joint
  distribution of forecasts and events.
  There are no ideal or better values.
@@ -4479,7 +4479,7 @@ nx2
 \emph default
  contingency table).
  This set of measures is paired with refinement in the calibration-refinement
- factorization discussed in Wilks (2006).
+ factorization discussed in Wilks (2011).
  A well-calibrated forecast will have calibration values that are near the
  forecast probability.
  For example, a 50% probability of precipitation should ideally have a calibrati
@@ -4521,7 +4521,7 @@ The relative frequency associated with each forecast probability, sometimes
  This measure ignores the event outcome, and simply provides information
  about the frequency of forecasts for each probability category.
  This set of measures is paired with the calibration measures in the calibration
--refinement factorization discussed by Wilks (2006).
+-refinement factorization discussed by Wilks (2011).
 
 \series default
  
@@ -4556,7 +4556,7 @@ Likelihood
 \series medium
 Likelihood is the conditional probability for each forecast category (row)
  given an event and a component of the likelihood-base rate factorization;
- see Wilks (2006) for details.
+ see Wilks (2011) for details.
  This set of measures considers the distribution of forecasts for only the
  cases when events occur.
  Thus, as the forecast probability increases, so should the likelihood.
@@ -4618,7 +4618,7 @@ i
  (row), i.e.
  the conditional base rate.
  This set of measures if paired with likelihood in the likelihood-base rate
- factorization, see Wilks (2006) for further information.
+ factorization, see Wilks (2011) for further information.
  This measure is calculated for each row of the contingency table.
  Ideally, the event should become more frequent as the probability forecast
  increases.
