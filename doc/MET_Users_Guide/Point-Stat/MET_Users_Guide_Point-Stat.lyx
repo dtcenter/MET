@@ -687,7 +687,7 @@ Categorical verification statistics are used to evaluate forecasts that
  are available separately, in line type MCTS.
  Categorical variables can be intrinsic (e.g., rain/no-rain) or they may be
  formed by applying one or more thresholds to a continuous variable (e.g.,
- temperature < 273.15?K or cloud coverage percentages in 10% bins).
+ temperature < 273.15 K or cloud coverage percentages in 10% bins).
  See Appendix C for more information.
 \end_layout
 
@@ -763,11 +763,52 @@ A single summary score gives an indication of the forecast performance,
  imperative to analyze the uncertainty in the realized scores.
  One good way to do this is to utilize confidence intervals.
  A confidence interval indicates that if the process were repeated many
- times, say 100, then the true score would fall within the interval 100(1-??)%
+ times, say 100, then the true score would fall within the interval 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$100(1-
+\backslash
+alpha)
+\backslash
+%$
+\end_layout
+
+\end_inset
+
  of the time.
- Typical values of ?? are 0.01, 0.05, and 0.10.
- The Point-Stat tool allows the user to select one or more specific ??-values
- to use.
+ Typical values of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$
+\backslash
+alpha$
+\end_layout
+
+\end_inset
+
+ are 0.01, 0.05, and 0.10.
+ The Point-Stat tool allows the user to select one or more specific 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$
+\backslash
+alpha$
+\end_layout
+
+\end_inset
+
+-values to use.
 \end_layout
 
 \begin_layout Standard
@@ -781,7 +822,22 @@ For continuous fields (e.g., temperature), it is possible to estimate confidence
  deviation, correlation, mean error, and the standard deviation of the error.
  In the case of the respective means, the central limit theorem suggests
  that the means are normally distributed, and this assumption leads to the
- usual 100(1-??)% confidence intervals for the mean.
+ usual 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$100(1-
+\backslash
+alpha)
+\backslash
+%$
+\end_layout
+
+\end_inset
+
+ confidence intervals for the mean.
  For the standard deviations of each field, one must be careful to check
  that the field of interest is normally distributed, as this assumption
  is necessary for the interpretation of the resulting confidence intervals.
@@ -857,8 +913,30 @@ s obtained through the bootstrap algorithm.
 \series medium
 The only other option associated with bootstrapping currently available
  in MET is to obtain replicated samples smaller than the original sample
- (i.e., to sample m<n points at each replicate).
- Ordinarily, one should use m=n, and this is the default.
+ (i.e., to sample 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$m<n$
+\end_layout
+
+\end_inset
+
+ points at each replicate).
+ Ordinarily, one should use 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$m=n$
+\end_layout
+
+\end_inset
+
+, and this is the default.
  However, there are cases where it is more appropriate to use a smaller
  value of m (e.g., when making inference about high percentiles of the original
  sample).
@@ -5076,7 +5154,7 @@ Format information for CNT(Continuous Statistics) output line type.
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="24" columns="3">
+<lyxtabular version="3" rows="27" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.2cm">
@@ -5983,7 +6061,7 @@ The Interquartile Range including bootstrap upper and lower confidence limits
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5992,7 +6070,7 @@ The Interquartile Range including bootstrap upper and lower confidence limits
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6009,12 +6087,136 @@ MAD_BCU
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 The Median Absolute Deviation including bootstrap upper and lower confidence
  limits 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+99-103
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ANOM_CORR,
+\end_layout
+
+\begin_layout Plain Layout
+ANOM_CORR_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+ANOM_CORR_NCU,
+\end_layout
+
+\begin_layout Plain Layout
+ANOM_CORR_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+ANOM_CORR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The Anomoly Correlation including normal and bootstrap upper and lower confidenc
+e limits.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+104-106
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ME2, 
+\end_layout
+
+\begin_layout Plain Layout
+ME2_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+ME2_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The square of the mean error (bias) including bootstrap upper and lower
+ confidence limits.
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+107-109
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MSESS,
+\end_layout
+
+\begin_layout Plain Layout
+MSESS_BCL,
+\end_layout
+
+\begin_layout Plain Layout
+MSESS_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The mean squared error skill score including bootstrap upper and lower confidenc
+e limits.
 \end_layout
 
 \end_inset
@@ -6919,7 +7121,7 @@ Format information for PSTD (Contingency Table Statistics for Probabilistic
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="12" columns="3">
+<lyxtabular version="3" rows="14" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.2cm">
@@ -7268,11 +7470,77 @@ Brier Score including normal upper and lower confidence limits
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+34-36
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BRIERCL,
+\end_layout
+
+\begin_layout Plain Layout
+BRIERCL_NCL,
+\end_layout
+
+\begin_layout Plain Layout
+BRIERCL_NCU 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Climatological Brier Score including upper and lower normal confidence limits
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+37
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BSS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Brier Skill Score
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+38
 \end_layout
 
 \end_inset
