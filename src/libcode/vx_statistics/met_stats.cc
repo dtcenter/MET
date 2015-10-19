@@ -1216,7 +1216,10 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    else {
       den = sqrt(v);
       corr = ((fobar*n*n) - (fbar*obar*n*n)) / den;
-      if(corr > 1) corr = bad_data_double;
+
+      // Check the computed range
+           if(corr >  1) corr =  1.0;
+      else if(corr < -1) corr = -1.0;
    }
 
    // Handle SAL1L2 data
