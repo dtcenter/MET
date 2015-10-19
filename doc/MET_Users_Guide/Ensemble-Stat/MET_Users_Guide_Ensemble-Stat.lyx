@@ -112,7 +112,10 @@ t tool.
  For verification, this tool can accept either gridded or point observations.
  If provided, the climatology file must be gridded.
  The input gridded model, observation, and climatology datasets must be
- on the same grid, and in one of the MET supported gridded file formats.
+ on the same grid prior to calculation of any statistics, and in one of
+ the MET supported gridded file formats.
+ If gridded files are not on the same grid, MET will do the regridding for
+ you if you specify the desired output grid.
  Point observations should be in the NetCDF format produced by pb2nc, ascii2nc,
  or madis2nc.
  
