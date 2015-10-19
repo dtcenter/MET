@@ -107,13 +107,16 @@ This section contains a description of how to configure and run the Series-Analy
 sis tool.
  This tool performs verification of gridded model fields using matching
  gridded observation fields.
+ It also accepts, but does not require, a user provided gridded climatology
+ file.
  The series analysis tool will produce a variety of user-selected statistics,
  a subset of those produced by the Grid-Stat tool and documented in Chapter
  5.
  However, these statistics will be produced separately for each grid location
  and accumulated over some series such as time or height, rather than accumulate
 d over the whole domain for a single time or height as is done by Grid-Stat.
- 
+ If a climatology file is provided, then statistics that use a climatological
+ reference (such as anomaly correlation) may be selected.
 \end_layout
 
 \begin_layout Standard
