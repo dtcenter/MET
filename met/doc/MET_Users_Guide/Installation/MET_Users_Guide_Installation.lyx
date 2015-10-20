@@ -86,6 +86,13 @@ name "chap:Software-Installation/Getting-St"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -103,6 +110,13 @@ This chapter describes how to install the MET package.
 
 \begin_layout Section
 Supported architectures
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Supported-architectures"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -135,6 +149,13 @@ The MET package runs on a single processor.
 
 \begin_layout Section
 Programming languages
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Programming-languages"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -176,6 +197,13 @@ The MET package is intended to be a tool for the modeling community to use
 
 \begin_layout Section
 Required compilers and scripting languages
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Required-compilers-and"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -219,6 +247,13 @@ In order to control the desired flow through MET, users are encouraged to
 
 \begin_layout Section
 Required libraries and optional utilities
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Required-libraries-and"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -378,6 +413,13 @@ http://www.dtcenter.org/wrf-nmm/users
 
 \begin_layout Section
 Installation of required libraries
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Installation-of-required"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -626,6 +668,13 @@ http://sourceforge.net/projects/gs-fonts
 
 \begin_layout Section
 Installation of optional utilities
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Installation-of-optional"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -674,6 +723,13 @@ http://www.dtcenter.org/wrf-nmm/users/docs/user_guide/V3/users_guide_nmm_chap7.p
 
 \begin_layout Section
 MET directory structure 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MET-directory-structure"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -917,6 +973,13 @@ reference "sub:TC-Stat-tool-example"
 
 \begin_layout Section
 Building the MET package
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Building-the-MET"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1708,6 +1771,13 @@ MET also has the following non-standard targets:
 
 \begin_layout Section
 Sample test cases
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Sample-test-cases"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1759,6 +1829,13 @@ Once the MET package has been built successfully, the user is encouraged
 
 \begin_layout Section
 Configuration File Details
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Configuration-File-Details"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

@@ -75,6 +75,13 @@
 
 \begin_layout Chapter*
 Foreword: A note to MET users
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Foreword:-A-note"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -114,6 +121,13 @@ This user's guide was prepared by the developers of the MET, including John
 
 \begin_layout Section*
 New for MET v5.1
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:New-for-MET"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -508,6 +522,13 @@ TCMPR: Add 16 columns for the ADECK and BDECK values for RADP, RRP, MRD,
 \end_deeper
 \begin_layout Chapter*
 TERMS OF USE
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:TERMS-OF-USE"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section*
@@ -747,13 +768,6 @@ If MET-TC is used, the following notice shall be displayed on any scholarly
  NCAR is sponsored by the United States National Science Foundation."
 \end_layout
 
-\begin_layout Plain Layout
-
-\series bold
-By using or downloading the Software, you agree to be bound by the terms
- and conditions of this Agreement.
-\end_layout
-
 \end_inset
 </cell>
 </row>
@@ -764,10 +778,24 @@ By using or downloading the Software, you agree to be bound by the terms
 
 \end_layout
 
+\begin_layout Standard
+
+\series bold
+By using or downloading the Software, you agree to be bound by the terms
+ and conditions of this Agreement.
+\end_layout
+
 \begin_layout Chapter*
 
 \series medium
 Acknowledgments
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Acknowledgments"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
