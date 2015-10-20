@@ -110,7 +110,14 @@ reference "sec:IO_Intermediate-data-formats"
  are primarily concerned with re-formatting input files into the intermediate
  files required by some MET modules.
  These steps are represented by the first three columns in the MET flowchart
- depicted in Figure .
+ depicted in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig_Overview_MET_Overview_Flowchart"
+
+\end_inset
+
+.
  Output data formats and the software modules used to reformat the data
  are described in later sections.
 \end_layout
@@ -799,11 +806,18 @@ Input
 \series bold
 Output
 \series medium
-: One STAT file containing the ?ISC? line type, one ASCII file containing
- intensity-scale information and statistics, one NetCDF file containing
- information about the wavelet decomposition of forecast and observed fields
- and their differences, and one PostScript file containing plots and summaries
- of the intensity-scale verification.
+: One STAT file containing the 
+\begin_inset Quotes eld
+\end_inset
+
+ISC
+\begin_inset Quotes erd
+\end_inset
+
+ line type, one ASCII file containing intensity-scale information and statistics
+, one NetCDF file containing information about the wavelet decomposition
+ of forecast and observed fields and their differences, and one PostScript
+ file containing plots and summaries of the intensity-scale verification.
 \end_layout
 
 \end_deeper
@@ -955,19 +969,9 @@ Input
 \series bold
 Output
 \series medium
-: 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-NEED TO UPDATE
-\end_layout
-
-\end_inset
-
-
+: Three ASCII files containing 2D single object and 3D single and pair object
+ attribute values and one NetCDF file containing object indices for the
+ gridded simple and cluster object fields.
 \end_layout
 
 \end_deeper
