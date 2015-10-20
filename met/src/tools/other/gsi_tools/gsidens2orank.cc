@@ -504,13 +504,13 @@ void write_orank() {
    // Update header columns for microwave
    if(micro_flag) {
        write_header_row(micro_extra_columns, n_micro_extra_cols, 0, at, 0,
-                        n_header_columns + n_orank_columns + micro_extra_begin);
+                        n_header_columns + n_orank_cols + micro_extra_begin);
    }
 
    // Update header columns for retrievals
    if(retr_flag) {
        write_header_row(retr_extra_columns, n_retr_extra_cols, 0, at, 0,
-                        n_header_columns + n_orank_columns + retr_extra_begin);
+                        n_header_columns + n_orank_cols + retr_extra_begin);
    }
 
    mlog << Debug(1)
