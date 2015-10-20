@@ -2869,6 +2869,13 @@ Header information for each file wavelet-stat outputs.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_wavelet_header_info_wavelet_stat_outputs"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
