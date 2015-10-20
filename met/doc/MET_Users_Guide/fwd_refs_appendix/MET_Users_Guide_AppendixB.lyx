@@ -75,6 +75,13 @@
 
 \begin_layout Section*
 Appendix B - Map Projections, Grids, and Polylines
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Appendix-B"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection*
