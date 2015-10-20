@@ -526,7 +526,14 @@ hbox {MSE}(t)=(b+c)/n$
 .
  This relation is intuitive when comparing the forecast and observation
  binary field difference and their corresponding contingency table image
- (Fig 8.1).
+ (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:MODE_Introduction"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Description
@@ -585,9 +592,16 @@ hbox{Br}=(a+c)/n$
 
 \end_inset
 
- is the sample climatology from the contingency table (Table 9.1) obtained
- from the original forecast and observation fields by thresholding with
- the same threshold used to obtain the binary forecast and observation fields.
+ is the sample climatology from the contingency table (Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:WS_Introduction"
+
+\end_inset
+
+) obtained from the original forecast and observation fields by thresholding
+ with the same threshold used to obtain the binary forecast and observation
+ fields.
  This formula follows by considering the Murphy and Winkler (1987) framework,
  appling the Bayes' theorem to express the joint probabilities 
 \emph on
@@ -2054,7 +2068,14 @@ wavelet_stat
 
 \begin_layout Standard
 Note that environment variables may be used when editing configuration files,
- as described in the section 3.5.2 for the PB2NC tool.
+ as described in the section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
 \begin_inset Newline newline
 \end_inset
 
