@@ -282,11 +282,11 @@ Confidence intervals are computed for the mean of the column of data.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Appendix-D--"
+reference "chap:App_D-Confidence-Intervals"
 
 \end_inset
 
- D 
+  
 \begin_inset Note Note
 status open
 
