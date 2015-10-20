@@ -89,7 +89,7 @@ name "chap:The-Series-Analysis"
 Introduction
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:StA_Introduction"
+name "sec:SeA_Introduction"
 
 \end_inset
 
@@ -114,7 +114,7 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal
 Practical Information
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:StA_Practical-Information"
+name "sec:SeA_Practical-Information"
 
 \end_inset
 
