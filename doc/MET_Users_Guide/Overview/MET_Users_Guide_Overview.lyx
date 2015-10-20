@@ -250,14 +250,53 @@ reference "chap:Plotting-and-Graphics"
 g data.
  as well as some additional tools and information for plotting MET results.
  The appendices provide further useful information, including answers to
- some typical questions  (Appendix A: How do I...
+ some typical questions  (Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_A-FAQs-&-How"
+
+\end_inset
+
+: How do I...
  ?); and links and information about map projections, grids, and polylines
- (Appendix B).
- Appendices C and D provide more information about the verification measures
- and confidence intervals that are provided by MET.
+ (Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_B-Map-Projections-Grids"
+
+\end_inset
+
+).
+ Appendices 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_D-Confidence-Intervals"
+
+\end_inset
+
+ provide more information about the verification measures and confidence
+ intervals that are provided by MET.
  Sample code that can be used to perform analyses on the output of MET and
  create particular types of plots of verification results is posted on the
- MET website (http://www.dtcenter.org/met/users/).
+ MET website (
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/met/users/
+\end_layout
+
+\end_inset
+
+).
  Note that the MET development group also accepts contributed analysis and
  plotting scripts which may be posted on the MET website for use by the
  community.

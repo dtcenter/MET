@@ -505,6 +505,10 @@ filename "fwd_refs_appendix/MET_Users_Guide_Refs.lyx"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\start_of_appendix
 \begin_inset CommandInset include
 LatexCommand include
 filename "fwd_refs_appendix/MET_Users_Guide_AppendixA.lyx"
@@ -512,9 +516,6 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixA.lyx"
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
 \begin_inset Newpage pagebreak
 \end_inset
 
@@ -547,9 +548,6 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixC.lyx"
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
 filename "fwd_refs_appendix/MET_Users_Guide_AppendixD.lyx"
