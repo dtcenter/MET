@@ -87,6 +87,13 @@ name "chap:Overview-of-MET"
 
 \begin_layout Section
 Purpose and organization of the User's Guide
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Purpose-and-organization"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -188,6 +195,13 @@ The remainder of this chapter includes information about the context for
 
 \begin_layout Section
 The Developmental Testbed Center (DTC)
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:The-Developmental-Testbed"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -229,6 +243,13 @@ The MET package will also be available to DTC visitors and to the WRF modeling
 
 \begin_layout Section
 MET goals and design philosophy
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MET-goals-and"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -279,6 +300,13 @@ The MET code and documentation is maintained by the DTC in Boulder, Colorado.
 
 \begin_layout Section
 MET components
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MET-components"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -536,6 +564,13 @@ The Stat-Analysis and MODE-Analysis tools aggregate the output statistics
 
 \begin_layout Section
 Future development plans
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Future-development-plans"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -679,6 +714,13 @@ Database and display system for the statistical output of MET
 
 \begin_layout Section
 Code support
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Code-support"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
