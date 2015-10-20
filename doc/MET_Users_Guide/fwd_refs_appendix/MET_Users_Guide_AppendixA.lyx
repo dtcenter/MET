@@ -76,6 +76,13 @@
 \begin_layout Section*
 Appendix A - FAQs & How do I ...
  ?
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Appendix-A"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection*
