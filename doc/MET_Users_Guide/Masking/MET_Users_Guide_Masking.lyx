@@ -98,15 +98,19 @@ masking
 \end_inset
 
 .
- The Gen-Vx-Mask tool replaces the Gen-Poly-Mask and Gen-Circle-Mask tool
- in previous releases.
+ Defining a masking region is simply selecting the desired set of grid points
+ to be used.
+ The Gen-Vx-Mask tool automates this process and replaces the Gen-Poly-Mask
+ and Gen-Circle-Mask tools in previous releases.
  It may be run to create a bitmap verification masking region to be used
  by many of the statistical tools.
- This tool enables the user to generate a polyline masking region once for
- a domain and apply it to many cases.
- It has been enhanced to allow for more complex masking of regions (e.g.
+ This tool enables the user to generate a masking region once for a domain
+ and apply it to many cases.
+ It has been enhanced to support additional types of masking region definition
+ (e.g.
  tropical-cyclone track over water only).
- An iterative approach is needed generate the more complex masking grids.
+ An iterative approach may be used to define complex areas by combininig
+ multiple masking regions together.
 \end_layout
 
 \begin_layout Section
@@ -123,27 +127,16 @@ name "sec:Gen-Vx-Mask-tool"
 \begin_layout Standard
 
 \series medium
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-This section needs to be updated to reflect generalization of the tool
-\end_layout
-
-\end_inset
-
-This section contains a description of running the Gen-Poly-Mask tool.
- The Gen-Poly-Mask tool may be run to create a bitmap verification masking
- region to be used by the the Grid-Stat, Point-Stat, Ensemble-Stat, Series-Analy
-sis, MODE tools.
- This tool enables the user to generate a polyline masking region once for
- a domain and apply it to many cases.
- When using a complex polyline containing hundreds of vertices, it is a
- good idea to use the Gen-Poly-Mask tool to create a bitmap masking region
- before running the other MET tools as doing so will make them run more
- efficiently.
+This section contains a description of running the Gen-Vx-Mask tool.
+ The Gen-Vx-Mask tool may be run to create a bitmap verification masking
+ region to be used by the the MET statistics tools.
+ This tool enables the user to generate a masking region once for a domain
+ and apply it to many cases.
+ While the MET statistics tools can define some masking regions on the fly,
+ doing so can be slow especially for complex polylines containing hundreds
+ of vertices.
+ Using the Gen-Poly-Mask tool to create a bitmap masking region before running
+ the other MET tools will make them run more efficiently.
 \end_layout
 
 \begin_layout Subsection
@@ -324,6 +317,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-value n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-name str]
 \end_layout
 
@@ -465,7 +474,7 @@ Optional
 \series bold
 -type str
 \series medium
- optional argument can be used to override the default masking type (poly).
+ option can be used to override the default masking type (poly).
 \end_layout
 
 \begin_layout Description
@@ -580,42 +589,203 @@ Optional
 \end_layout
 
 \begin_layout Standard
+The Gen-Vx-Mask tool supports the following types of masking region definition
+ selected using the 
+\series bold
+-type
+\series default
+ command line option:
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ Polyline (
+\series bold
+poly
+\series medium
+) masking reads an input ASCII file containing Lat/Lon locations, connects
+ the first and last points, and selects grid points falling inside that
+ polyline.
+ This option is useful when defining large geographic sub-sections of a
+ domain.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ Circle (
+\series bold
+circle
+\series medium
+) masking reads an input ASCII file contianing Lat/Lon locations and for
+ each grid point, computes the minimum great-circle arc distance in kilometers
+ to those points.
+ If the 
+\series bold
+-thresh
+\series default
+ command line option is not used, the minimum distance value for each grid
+ point will be written to the output.
+ If it is used, only those grid points whose minimum distance meets the
+ threshold criteria will be selected.
+ This option is useful when defining areas within a certain radius of radar
+ locations.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ Track (
+\series bold
+track
+\series medium
+) masking reads an input ASCII file contianing Lat/Lon locations and for
+ each grid point, computes the minimum great-circle arc distance in kilometers
+ to the track defined by those points.
+ The first and last track points are not connected.
+ As with 
+\series bold
+circle
+\series medium
+ masking the output for each grid points depends on the use of the 
+\series bold
+-thresh
+\series default
+ command line option.
+ This option is useful when defining the area near a hurricane track.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ Grid (
+\series bold
+grid
+\series medium
+) masking reads an input gridded data file, extracts the field specified
+ using the its grid definition, and selects grid points falling inside that
+ grid.
+ This option is useful when using a model nest to define the corresponding
+ area of the parent domain.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ Data (
+\series bold
+data
+\series medium
+) masking reads an input gridded data file, extracts the field specified
+ using the
+\series bold
+ -mask_config
+\series default
+ command line option, thresholds the data using the 
+\series bold
+-thresh
+\series default
+ command line option, and 
+\series medium
+selects grid points which meet that threshold criteria.
+ The option is useful when thresholding topography to define a mask based
+ on elevation or when threshold land use to extract a particular category.
+\end_layout
+
+\begin_layout Standard
+The polyline, circle, and track masking methods all read an ASCII file containin
+g Lat/Lon locations.
+ Those files must contain a string, which defines the name of the masking
+ region, followed by a series of whitespace-separated latitude (degrees
+ north) and longitude (degree east) values.
+\end_layout
+
+\begin_layout Standard
+The Gen-Vx-Mask tool read the 
+\series bold
+input_file
+\series default
+ file and extracts the grid definition from the file.
+ If the 
+\series bold
+-input_config
+\series default
+ command line option is used, it will read the specified field of data and
+ initialize each grid point to the value of that field.
+ If that option is not used, the tool will check to see if the 
+\series bold
+input_file
+\series default
+ file was generated by the Gen-Vx-Mask tool.
+ If so, it will read the previously defined mask data and initialize each
+ grid point to the value of that mask.
+ If not, it will simply initialize each grid point to a value of zero.
+\end_layout
+
+\begin_layout Standard
+This feature enables the Gen-Vx-Mask tool to be run iteratively on its own
+ output to generate complex masking areas.
+ Additionally, the 
+\series bold
+-union
+\series default
+,
+\series bold
+ -intersection
+\series default
+, and
+\series bold
+ -symdiff
+\series default
+ options control the logic for combining the input data value and current
+ mask value at each grid point.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 An example of the gen_vx_mask calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-gen_vx_mask sample_fcst.grb
+gen_vx_mask sample_fcst.grb 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
-CONUS.poly
-\end_layout
-
-\begin_layout LyX-Code
-CONUS_poly.nc
+CONUS.poly CONUS_poly.nc
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-In this example, the Gen-Vx-Mask tool will apply the polyline defined in
- the file 
-\emph on
+In this example, the Gen-Vx-Mask tool will read the ASCII Lat/Lon file named
+ 
+\series bold
 CONUS.poly
-\emph default
- to the domain on which the data in the file 
-\emph on
-sample_fcst.grb
-\emph default
+\series medium
+ and apply the default polyline masking method to the domain on which the
+ data in the file 
+\series bold
+sample_fcst.grib
+\series medium
  resides.
  It will create a NetCDF file containing a bitmap for the domain with a
  value of 1 for all grid points inside the CONUS polyline and a value of
  0 for all grid points outside.
  It will write an output NetCDF file named 
-\emph on
+\series bold
 CONUS_poly.nc
+\series default
+\emph on
+.
 \end_layout
 
 \end_body
