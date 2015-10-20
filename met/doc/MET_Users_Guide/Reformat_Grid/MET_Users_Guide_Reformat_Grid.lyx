@@ -89,6 +89,7 @@ name "chap:Re-Formatting-of-Gridded"
 
 \series medium
 Several MET tools exist for the purpose of reformatting gridded fields.
+ MET offers a suite of reformatting tools to put data in a common format.
  Both the input and output file formats are described in this chapter.
  Sections 3.1 and 3.2 are primarily concerned with re-formatting input files
  into the intermediate files required by some MET modules.
@@ -1419,10 +1420,817 @@ Amount of precipitation for each point in the grid.
 \end_layout
 
 \begin_layout Section
+Regrid_data_plane tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reformat_Grid-Regrid-data-plane"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This section contains a description of running the MODIS regrid tool.
+ This tool may be run to create a NetCDF file for use in other MET tools
+ from MODIS level 2 cloud product from NASA.
+ The data browser for these files is: 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ladsweb.nascom.nasa.gov/
+\end_layout
+
+\end_inset
+
+ .
+\end_layout
+
+\begin_layout Subsection
+regrid_data_plane usage
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the regrid_data_plane utility is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+Usage:
+\series default
+ regrid_data_plane 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+input_filename 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+to_grid 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+output_filename 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-config string 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-method type] 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-width n] 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-vld_thresh n] 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-name str] 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-log file] 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-v level]
+\end_layout
+
+\begin_layout Standard
+where "input_filename" is the gridded data file to be read (required).
+ "to_grid" defines the output grid a as named grid, the path to a gridded
+ data file, or an explicit grid specification string (required).
+ "output_filename" is the output NetCDF file to be written (required).
+ "-config string" may be used multiple times to define the field(s) to be
+ regridded (required).
+ "-method type" overrides the default regridding method (NEAREST) (optional).
+ "-width n" overrides the default regridding width (1) (optional).
+ "-vld_thresh n" overrides the default required ratio of valid data for
+ regridding (0.5) (optional).
+ "-name str" specifies the output variable name (optional).
+ "-log file" outputs log messages to the specified file (optional).
+ "-v level" overrides the default level of logging (2) (optional).
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:regrid_data_plane_usage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\emph on
+regrid_data_plane
+\emph default
+ has some required arguments and can also take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Required arguments for regrid_data_plane
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+"input_filename" 
+\series default
+is the gridded data file to be read.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The
+\series bold
+ "to_grid"
+\series default
+ defines the output grid a as named grid (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+ for options)
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ The
+\series default
+ 
+\series bold
+"output_filename"
+\series default
+ is the output NetCDF file to be written.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ 
+\series default
+The 
+\series bold
+"-config string"
+\series default
+ may be used multiple times to define the field(s) to be regridded.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Optional arguments for regrid_data_plane
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ 
+\series default
+The "-method type" overrides the default regridding method.
+ Default is NEAREST.
+ (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+ for options)
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ 
+\series default
+The "-width n" overrides the default regridding width.
+ Default is 1.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ 
+\series default
+The "-vld_thresh n" overrides the default required ratio of valid data for
+ regridding.
+ Default is 0.5.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ 
+\series default
+The "-name str" specifies the output variable name
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ 
+\series default
+"-width n" overrides the default regridding width.
+ Default is 1.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+An example of the modis_regrid calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+modis_regrid -field Cloud_Fraction 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-data_file grid_file 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-out t2.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-units percent 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-scale 0.01 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-offset 0 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-fill 127 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+/home/joeuser/modis_regrid_test_data/modisfile
+\end_layout
+
+\begin_layout Subsection
+regrid_data_plane output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:regrid_data_plane-output"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Automated regridding in tools
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Automated-Regridding-in"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+dfjkl;ajorpue
+\end_layout
+
+\begin_layout Section
+shift_data_plane tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Reform_Grid-Shift-Data-Plane"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This section contains a description of running the MODIS regrid tool.
+ This tool may be run to create a NetCDF file for use in other MET tools
+ from MODIS level 2 cloud product from NASA.
+ The data browser for these files is: 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://ladsweb.nascom.nasa.gov/
+\end_layout
+
+\end_inset
+
+ .
+\end_layout
+
+\begin_layout Subsection
+shift_data_plane usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:shift_data_plane-usage"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the shift_data_plane utility is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+Usage: modis_regrid
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-data_file path
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-field name
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-out path
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-scale value
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-offset value
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-fill value
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[ -units text ]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+    modis_file
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\emph on
+modis_regrid
+\emph default
+ has some required arguments and can also take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Required arguments for modis_regrid
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+data_file path
+\series medium
+ argument specifies the data files used to get the grid information.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+field name
+\series medium
+ argument specifies the name of the field to use in the MODIS data file.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ The
+\series default
+ 
+\series bold
+out path
+\series medium
+ argument specifies the name of the output NetCDF file.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+scale value
+\series medium
+ argument specifies the scale factor to be used on the raw MODIS values.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
+offset value
+\series medium
+ argument specifies the offset value to be used on the raw MODIS values.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ The 
+\series bold
+fill value
+\series medium
+ argument specifies the bad data value in the MODIS data.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ The 
+\series bold
+modis_file
+\series medium
+ is the name of the MODIS input file.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Optional arguments for modis_regrid
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ The 
+\series bold
+-units text
+\series medium
+ specifies units string in the global attributes section of the output file.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+An example of the modis_regrid calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+modis_regrid -field Cloud_Fraction 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-data_file grid_file 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-out t2.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-units percent 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-scale 0.01 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-offset 0 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-fill 127 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+/home/joeuser/modis_regrid_test_data/modisfile
+\end_layout
+
+\begin_layout Subsection
+shift_data_plane output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:shift_data_plane-output"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 MODIS regrid tool
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:MODIS-regrid-tool"
+name "sec:Reformat_Grid-MODIS-regrid-tool"
 
 \end_inset
 
