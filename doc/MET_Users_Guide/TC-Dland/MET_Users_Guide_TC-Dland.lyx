@@ -167,8 +167,15 @@ The output file from TC-dland is a NetCDF format file containing a gridded
  specified in the input file.
  This file is used in the TC-Pairs tool to compute the distance from land
  for each track point in the adeck and bdeck.
- As noted in chapter 1.3, pre-computed distance to land (NetCDF output from
- TC-dland) files are available in the release.
+ As noted in chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:MET-goals-and"
+
+\end_inset
+
+, pre-computed distance to land (NetCDF output from TC-dland) files are
+ available in the release.
  In the installed 
 \series bold
 share/met/tc_data
