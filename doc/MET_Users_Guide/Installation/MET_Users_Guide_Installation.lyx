@@ -262,7 +262,14 @@ name "sec:Install_Required-libraries-and"
 Three external libraries are required for compiling/building MET and should
  be downloaded and installed before attempting to install MET.
  Additional external libraries required for building advanced features in
- MET are discussed in section 2.6 :
+ MET are discussed in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Installation-of-required"
+
+\end_inset
+
+ :
 \end_layout
 
 \begin_layout Description
@@ -425,8 +432,14 @@ name "sec:Installation-of-required"
 \begin_layout Standard
 
 \series medium
-As described in section 2.5, some external libraries are required for building
- the MET:
+As described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Install_Required-libraries-and"
+
+\end_inset
+
+, some external libraries are required for building the MET:
 \end_layout
 
 \begin_layout Description
@@ -881,7 +894,14 @@ The top-level MET directory consists of a README file, Makefiles, configuration
  The top-level Makefile and configuration files control how the entire toolkit
  is built.
  Instructions for using these files to build MET can be found in Section
- 2.9.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Install_Building-the-MET"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -999,7 +1019,21 @@ Install the required libraries.
 \begin_layout Itemize
 
 \series medium
-Please refer to Section 2.6 on how to install the required and optional libraries.
+Please refer to Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Installation-of-required"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Installation-of-optional"
+
+\end_inset
+
+ on how to install the required and optional libraries.
 \end_layout
 
 \begin_layout Standard
