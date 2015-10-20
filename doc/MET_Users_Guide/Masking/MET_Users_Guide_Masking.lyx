@@ -111,6 +111,13 @@ masking
 
 \begin_layout Section
 Gen-Vx-Mask tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Gen-Vx-Mask-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -141,6 +148,13 @@ sis, MODE tools.
 
 \begin_layout Subsection
 gen_vx_mask usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:gen_vx_mask-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

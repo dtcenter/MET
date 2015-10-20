@@ -102,6 +102,13 @@ There are several formats of point observations format that may preprocessed
 
 \begin_layout Section
 PB2NC tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:PB2NC-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -117,6 +124,13 @@ This section describes how to configure and run the PB2NC tool.
 
 \begin_layout Subsection
 pb2nc usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:pb2nc-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -513,6 +527,13 @@ sample_pb.nc
 
 \begin_layout Subsection
 pb2nc configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:pb2nc-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1432,6 +1453,13 @@ pb2nc
 
 \begin_layout Subsection
 PB2NC output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:PB2NC-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1959,6 +1987,13 @@ Array of floats containing values for each PrepBufr message including:
 
 \begin_layout Section
 ASCII2NC tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:ASCII2NC-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2436,6 +2471,13 @@ Observation value in units consistent with the GRIB code definition.
 
 \begin_layout Subsection
 ascii2nc usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:ascii2nc-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2741,6 +2783,13 @@ sample_ascii_obs.nc
 
 \begin_layout Section
 MADIS2NC tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MADIS2NC-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2771,6 +2820,13 @@ http://madis.noaa.gov
 
 \begin_layout Subsection
 madis2nc usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:madis2nc-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
