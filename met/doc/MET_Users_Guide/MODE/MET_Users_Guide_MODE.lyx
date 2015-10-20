@@ -86,6 +86,13 @@ name "chap:The-MODE-Tool"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MODE_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -163,6 +170,13 @@ reference "MODE_object_attribute"
 
 \begin_layout Section
 Scientific and statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MODE_Scientific-and-statistical"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -173,6 +187,13 @@ The methods used by the MODE tool to identify and match forecast and observed
 
 \begin_layout Subsection
 Resolving objects
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE_Resolving-objects"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -519,6 +540,13 @@ name "Fig_MODE_object_id"
 
 \begin_layout Subsection
 Attributes
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE_Attributes"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -772,6 +800,13 @@ status open
 
 \begin_layout Subsection
 Fuzzy logic
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE_Fuzzy-logic"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -903,6 +938,13 @@ Another merging method is available in MODE, which can be used instead of,
 
 \begin_layout Subsection
 Summary statistics
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE_Summary-statistics"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -927,6 +969,13 @@ reference "sub:MODE-output"
 
 \begin_layout Section
 Practical information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MODE_Practical-information"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -980,6 +1029,13 @@ eject
 
 \begin_layout Subsection
 MODE usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1643,6 +1699,13 @@ _nc}
 
 \begin_layout Subsection
 MODE configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MODE-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

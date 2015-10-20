@@ -75,14 +75,35 @@
 
 \begin_layout Chapter
 MODE Time Domain
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:MODE-Time-Domain"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MTD_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 Motivation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MDT_Motivation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -219,6 +240,13 @@ In this users' guide, we will assume that the reader has a basic familiarity
 
 \begin_layout Section
 Attributes
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MTD_Attributes"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -275,6 +303,13 @@ on is straightforward.
 
 \begin_layout Subsection
 Convolution
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_Convolution"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -396,6 +431,13 @@ n region.
 
 \begin_layout Subsection
 3D Single Attributes
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_3D-Single-Attributes"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -776,6 +818,13 @@ bf intensity percentiles}
 
 \begin_layout Subsection
 3D Pair Attributes
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_3D-Pair-Attributes"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1123,6 +1172,13 @@ Axis Angle Difference
 
 \begin_layout Subsection
 2D Constant-Time Attributes
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_2D-Constant-Time-Attributes"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1208,6 +1264,13 @@ myitem Axis angle
 
 \begin_layout Subsection
 Matching & Merging
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_Matching-&-Merging"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1524,10 +1587,24 @@ Match & Merge Example
 
 \begin_layout Section
 Using MTD
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Using-MTD"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 Data Files
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_Data-Files"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1552,6 +1629,13 @@ As shown in the next section, filenames for each time used must be given.
 
 \begin_layout Subsection
 The Command Line
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_The-Command-Line"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1951,6 +2035,13 @@ bf Optional}
 
 \begin_layout Subsection
 The Config File
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_The-Config-File"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2431,6 +2522,13 @@ Finally, the user can set weights and interest maps for the 3D attributes
 
 \begin_layout Subsection
 Output Files
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_Output-Files"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2442,7 +2540,14 @@ MTD creates several output files after each run.
 \end_layout
 
 \begin_layout Subsection
-ASCII Attribute Files
+ASCII Attribute Files 
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MTD_ASCII-Attribute-Files"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4733,6 +4838,13 @@ bf Cluster ID}
 
 \begin_layout Section
 Making Plots
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MTD_Making-Plots"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
