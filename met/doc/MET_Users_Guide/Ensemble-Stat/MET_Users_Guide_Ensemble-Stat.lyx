@@ -109,7 +109,14 @@ This chapter contains a description of the Ensemble-Stat tool.
  A climatology file may also be provided, and will be used as a reference
  forecast in several of the output statistics.
  Details about and equations for the statistics produced for ensembles are
- given in Appendix C.4.
+ given in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:App_C-ensemble"
+
+\end_inset
+
+.
  
 \end_layout
 
@@ -562,80 +569,76 @@ name "sub:ensemble_stat-output"
 The Ensemble-Stat tool can calculate any of the following:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Mean fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Standard Deviation fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Mean - 1 Standard Deviation fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Mean + 1 Standard Deviation fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Minimum fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Maximum fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Range fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Valid Data Count fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ensemble Relative Frequency by threshold fields
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Ranked Histograms (if Observation Field Provided)
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Probability Integral Transform (PIT) Histograms (if Observation Field Provided)
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph*
 
 \series bold
 Spread / Skill variance (if Observation Field Provided)
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -644,31 +647,31 @@ Spread / Skill variance (if Observation Field Provided)
 The Ensemble-Stat tool then writes:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph
 
 \series bold
 Gridded fields of Ensemble forecast values to a NetCDF file
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph
 
 \series bold
 Gridded field of Observation Ranks to a NetCDF file
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph
 
 \series bold
 Stat file with Rank/PIT Histogram and Ensemble information
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph
 
 \series bold
 Observation Rank Matched Pairs
 \end_layout
 
-\begin_layout Standard
+\begin_layout Paragraph
 
 \series bold
 SSVAR file containing spread / skill variance information
@@ -686,6 +689,13 @@ status open
 \begin_layout Plain Layout
 Header information for ensemble-stat output RHIST file.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_ES_header_info_es_out_RHIST"
 
 \end_inset
 
@@ -1583,6 +1593,13 @@ Header information for ensemble-stat output ORANK file.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_ES_header_info_es_out_ORANK"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -1652,7 +1669,14 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Same as in Table 7-1 above.
+Same as in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_RHIST"
+
+\end_inset
+
+ above.
 \end_layout
 
 \end_inset
@@ -2154,6 +2178,13 @@ Header information for ensemble-stat output PHIST file.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_ES_header_info_es_out_PHIST"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -2223,7 +2254,14 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Same as in Table 7-1 above.
+Same as in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_RHIST"
+
+\end_inset
+
+ above.
 \end_layout
 
 \end_inset
@@ -2377,6 +2415,13 @@ Header information for ensemble-stat output SSVAR file.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_ES_header_info_es_out_SSVAR"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -2446,7 +2491,14 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Same as in Table 7-1 above.
+Same as in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_RHIST"
+
+\end_inset
+
+ above.
 \end_layout
 
 \end_inset
@@ -3519,7 +3571,14 @@ share/met/config
 
 \series medium
 Note that environment variables may be used when editing configuration files,
- as described in the section 3.5.2 for the PB2NC tool.
+ as described in the Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
 \begin_inset Newline newline
 \end_inset
 
@@ -3545,9 +3604,9 @@ model = "WRF";
 \begin_layout Standard
 
 \series medium
-The 
-\series default
-model
+The
+\series bold
+ model
 \series medium
  variable contains a short text string identifying the name to be assigned
  to the model being verified.
@@ -3622,7 +3681,7 @@ cat_thresh = [ >0.0, >=5.0 ];
 When summarizing the ensemble, compute a ratio of the number of valid ensemble
  fields to the total number of ensemble members.
  If this ratio is less than the 
-\series default
+\series bold
 ens_thresh
 \series medium
 , then quit with an error.
@@ -3637,7 +3696,7 @@ ens_thresh
 When summarizing the ensemble, for each grid point compute a ratio of the
  number of valid data values to the number of ensemble members.
  If that ratio is less than 
-\series default
+\series bold
 vld_thresh
 \series medium
 , write out bad data.
@@ -3650,7 +3709,7 @@ vld_thresh
 
 \series medium
 For each 
-\series default
+\series bold
 field
 \series medium
  listed in the forecast field, give the name and vertical or accumulation
@@ -3736,16 +3795,16 @@ obs = fcst;
 
 \series medium
 The 
-\series default
+\series bold
 fcst
 \series medium
  and 
-\series default
+\series bold
 obs
 \series medium
  variables should specify a list of ensemble field names and levels to be
  verified, with the corresponding observations (
-\series default
+\series bold
 message_type
 \series medium
 ).
@@ -3758,14 +3817,14 @@ message_type
 The Ensemble-Stat tool performs verification using observations for one
  message type at a time.
  The 
-\series default
+\series bold
 message_type
 \series medium
  variable contains a comma-separated list of the message types to use for
  verification.
  By default, only surface and upper air observations are used for verification.
  At least one 
-\series default
+\series bold
 message_type
 \series medium
  must be provided.
@@ -3786,8 +3845,12 @@ http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 \begin_layout Standard
 
 \series medium
-The obs can be set equal to 
-\series default
+The 
+\series bold
+obs 
+\series medium
+can be set equal to 
+\series bold
 fcst
 \series medium
  to use the identical fields.
@@ -3797,7 +3860,7 @@ fcst
 
 \series medium
 The 
-\series default
+\series bold
 sid_exc
 \series medium
  list of station ids used to exclude observations from those stations from
@@ -3808,12 +3871,12 @@ sid_exc
 \begin_layout Standard
 
 \series medium
-The 
-\series default
-ens_ssvar_bin_size
+The
+\series bold
+ ens_ssvar_bin_size
 \series medium
  and 
-\series default
+\series bold
 ens_phist_bin_size
 \series medium
  specify the width of the categorical bins used to accumulate frequencies
@@ -3858,11 +3921,11 @@ end = 5400;
 \series medium
 Each gridded forecast file has a valid time associated with it.
  The 
-\series default
-beg
+\series bold
+beg 
 \series medium
- and 
-\series default
+and 
+\series bold
 end
 \series medium
  variables define a time window in seconds around the valid time of the
@@ -3870,14 +3933,16 @@ end
  For a forecast valid time, v, observations with a valid time falling in
  the time window [v+beg_ds, v+end_ds] will be used.
  These selections are overridden by the command line arguments 
-\series default
+\series bold
 -valid_beg
 \series medium
  and
 \series default
- -valid_end
+ 
+\series bold
+-valid_end.
 \series medium
-.
+
 \begin_inset Newline newline
 \end_inset
 
@@ -3921,7 +3986,9 @@ sid = [];
 \series medium
 The
 \series default
- mask
+ 
+\series bold
+mask
 \series medium
  group contains information about the domain to be verified.
  It allows the user to place a "mask" over their existing grid to hide some
@@ -3932,37 +3999,44 @@ The
 
 \series medium
 The 
-\series default
-grid
+\series bold
+grid 
 \series medium
- variable contains a comma-separated list of pre-defined NCEP grids over
+variable contains a comma-separated list of pre-defined NCEP grids over
  which to perform the verification.
  The predefined grids are specified as "
-\series default
+\series bold
 GNNN
 \series medium
 " where 
-\series default
+\series bold
 NNN
 \series medium
  is the three digit designation for the grid.
  Defining a new grid would require code changes and recompiling MET.
  Supplying a value of "
-\series default
+\series bold
 FULL
 \series medium
 " indicates that the verification should be performed over the entire grid
  on which the data resides.
  The value listed above indicates that verification should be performed
  over the full grid.
- See Appendix B for a list of grids that will be accepted.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_B-Map-Projections-Grids"
+
+\end_inset
+
+ for a list of grids that will be accepted.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 The 
-\series default
+\series bold
 poly
 \series medium
  variable contains a comma-separated list of files that define verification
@@ -4007,7 +4081,7 @@ Alternatively, any gridded data file that MET can read may be used to define
 
 \series medium
 The 
-\series default
+\series bold
 sid
 \series medium
  variable contains a filename that contains a space-separated list of station
@@ -4083,7 +4157,7 @@ width = 1;
 
 \series medium
 The 
-\series default
+\series bold
 ci_alpha
 \series medium
  values are the significance levels for the confidence intervals.
@@ -4094,7 +4168,7 @@ ci_alpha
 
 \series medium
 The 
-\series default
+\series bold
 interp
 \series medium
  group controls interpolation of forecast and/or observation fields.
@@ -4108,7 +4182,7 @@ tion to be performed, and the width of the grid to use in the interpolation.
 
 \series medium
 The 
-\series default
+\series bold
 field
 \series medium
  variable controls how the interpolation should be applied.
@@ -4123,7 +4197,7 @@ field
 
 \series medium
 The 
-\series default
+\series bold
 vld_thresh
 \series medium
  variable contains a number between 0 and 1.
@@ -4141,7 +4215,7 @@ vld_thresh
 
 \series medium
 The 
-\series default
+\series bold
 method
 \series medium
  variable contains a comma-separated list of interpolation methods to be
@@ -4152,37 +4226,44 @@ eighted mean, least squares fit, and bilinear interpolation.
  Providing multiple interpolation methods indicates that statistics should
  be computed multiple times using a different interpolation method each
  time.
- These methods are described in Section 4.2.1.
+ These methods are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:PS_Interpolation/matching-methods"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 The 
-\series default
+\series bold
 width
 \series medium
  variable contains a comma-separated list of values to be used in defining
  the neighborhoods over which the interpolation is performed.
  The neighborhood is simply a square centered on the observation point.
  The 
-\series default
+\series bold
 width
 \series medium
  value specifies the width of that square.
  A 
-\series default
+\series bold
 width
 \series medium
  value of 1 is interpreted as the nearest neighbor model grid point to the
  observation point.
  A 
-\series default
+\series bold
 width
 \series medium
  of 2 defines a 2 x 2 square of grid points around the observation point
  (the 4 closest model grid points), while a 
-\series default
+\series bold
 width
 \series medium
  of 3 defines a 3 x 3 square of grid points around the observation point,
@@ -4236,7 +4317,9 @@ ssvar = BOTH;
 \series medium
 The
 \series default
- output_flag
+ 
+\series bold
+output_flag
 \series medium
  array controls the type of output that is generated.
  Each flag corresponds to an output line type in the STAT file.
@@ -4248,7 +4331,14 @@ The
  by line type.
  Note that these two line types are easily derived from each other.
  Users are free to choose which measures are most desired.
- All of the line types are described in more detail in Section 4.3.3.
+ All of the line types are described in more detail in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
+
+\end_inset
+
+.
 \begin_inset Newline newline
 \end_inset
 
@@ -4319,7 +4409,7 @@ rank = TRUE;
 
 \series medium
 The 
-\series default
+\series bold
 ensemble_flag
 \series medium
  specifies which derived ensemble fields should be calculated and output.
@@ -4328,58 +4418,44 @@ ensemble_flag
  The flags correspond to the following output line types:
 \end_layout
 
-\begin_layout Standard
-.
+\begin_layout Enumerate
+Ensemble Mean Field
 \end_layout
 
-\begin_layout Standard
-1.
- Ensemble Mean Field
+\begin_layout Enumerate
+Ensemble Standard Deviation Field
 \end_layout
 
-\begin_layout Standard
-2.
- Ensemble Standard Deviation Field
+\begin_layout Enumerate
+Ensemble Mean - One Standard Deviation Field
 \end_layout
 
-\begin_layout Standard
-3.
- Ensemble Mean - One Standard Deviation Field
+\begin_layout Enumerate
+Ensemble Mean + One Standard Deviation Field
 \end_layout
 
-\begin_layout Standard
-4.
- Ensemble Mean + One Standard Deviation Field
+\begin_layout Enumerate
+Ensemble Minimum Field
 \end_layout
 
-\begin_layout Standard
-5.
- Ensemble Minimum Field
+\begin_layout Enumerate
+Ensemble Maximum Field
 \end_layout
 
-\begin_layout Standard
-6.
- Ensemble Maximum Field
+\begin_layout Enumerate
+Ensemble Range Field
 \end_layout
 
-\begin_layout Standard
-7.
- Ensemble Range Field
+\begin_layout Enumerate
+Ensemble Valid Data Count 
 \end_layout
 
-\begin_layout Standard
-8.
- Ensemble Valid Data Count 
+\begin_layout Enumerate
+Ensemble Relative Frequency by threshold Fields
 \end_layout
 
-\begin_layout Standard
-9.
- Ensemble Relative Frequency by threshold Fields
-\end_layout
-
-\begin_layout Standard
-10.
- Gridded Field of Observation Ranks written to netCDF file
+\begin_layout Enumerate
+Gridded Field of Observation Ranks written to netCDF file
 \series medium
 
 \begin_inset Newline newline
@@ -4420,15 +4496,17 @@ seed = "";
 
 \series medium
 The 
-\series default
+\series bold
 rng
 \series medium
  group defines the random number generator
 \series default
- type
+ 
+\series bold
+type
 \series medium
  and 
-\series default
+\series bold
 seed
 \series medium
  to be used in the computation of bootstrap confidence intervals.
@@ -4442,7 +4520,7 @@ seed
 
 \series medium
 The 
-\series default
+\series bold
 seed
 \series medium
  variable may be set to a specific value to make the computation of bootstrap
@@ -4574,7 +4652,11 @@ v5.1
 \begin_layout Standard
 
 \series medium
-The version indicates the version of the MET software used.
+The 
+\series bold
+version
+\series medium
+ indicates the version of the MET software used.
  This value should not be modified.
 \end_layout
 
