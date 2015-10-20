@@ -14,7 +14,8 @@ output_precision = 5;
 //
 // Defintion of constants used throughout MET configuration files.
 //
-// The following should not be modified.
+// THE FOLLOWING SHOULD NOT BE MODIFIED.  DOING SO WILL MAKE THE MET
+// CONFIGURATION FILES UNREADABLE. 
 //
 ////////////////////////////////////////////////////////////////////////////////
 
