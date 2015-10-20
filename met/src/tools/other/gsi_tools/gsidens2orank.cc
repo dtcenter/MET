@@ -139,7 +139,6 @@ int main(int argc, char * argv []) {
       if(i==0) {
          setup_header(shc, hdr_name, hdr_value, "ORANK");
          conv_flag  = is_conv(cline[0]);
-         micro_flag = (!conv_flag) && is_micro(cline[0]);
          retr_flag  = (!conv_flag) && is_retr(cline[0]);
       }
 
@@ -500,12 +499,6 @@ void write_orank() {
                                   n_header_columns + n_orank_cols);
    else          write_header_row(rad_extra_columns, n_rad_extra_cols, 0, at, 0,
                                   n_header_columns + n_orank_cols);
-
-   // Update header columns for microwave
-   if(micro_flag) {
-       write_header_row(micro_extra_columns, n_micro_extra_cols, 0, at, 0,
-                        n_header_columns + n_orank_cols + micro_extra_begin);
-   }
 
    // Update header columns for retrievals
    if(retr_flag) {
