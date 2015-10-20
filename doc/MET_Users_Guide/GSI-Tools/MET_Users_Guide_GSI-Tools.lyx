@@ -1642,6 +1642,10 @@ Surface wind speed (m/s)
 \begin_inset Text
 
 \begin_layout Plain Layout
+FRAC_CLD
+\end_layout
+
+\begin_layout Plain Layout
 CLD_LWC
 \end_layout
 
@@ -1652,6 +1656,10 @@ CLD_LWC
 
 \begin_layout Plain Layout
 Cloud fraction (%)
+\end_layout
+
+\begin_layout Plain Layout
+Cloud liquid water (kg/m**2) (microwave only)
 \end_layout
 
 \end_inset
@@ -1671,6 +1679,10 @@ Cloud fraction (%)
 \begin_inset Text
 
 \begin_layout Plain Layout
+CTOP_PRS
+\end_layout
+
+\begin_layout Plain Layout
 TC_PWAT
 \end_layout
 
@@ -1680,7 +1692,12 @@ TC_PWAT
 \begin_inset Text
 
 \begin_layout Plain Layout
-Cloud top pressure (hPa)
+Cloud top pressure (hPa) 
+\end_layout
+
+\begin_layout Plain Layout
+Total column precip.
+ water (km/m**2) (microwave only)
 \end_layout
 
 \end_inset
