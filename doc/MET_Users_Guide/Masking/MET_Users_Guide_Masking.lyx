@@ -608,8 +608,7 @@ poly
 ) masking reads an input ASCII file containing Lat/Lon locations, connects
  the first and last points, and selects grid points falling inside that
  polyline.
- This option is useful when defining large geographic sub-sections of a
- domain.
+ This option is useful when defining geographic sub-regions of a domain.
 \end_layout
 
 \begin_layout Description
@@ -656,7 +655,8 @@ circle
 -thresh
 \series default
  command line option.
- This option is useful when defining the area near a hurricane track.
+ This option is useful when defining the area within a certain distance
+ of a hurricane track.
 \end_layout
 
 \begin_layout Description
@@ -745,6 +745,19 @@ This feature enables the Gen-Vx-Mask tool to be run iteratively on its own
 \series default
  options control the logic for combining the input data value and current
  mask value at each grid point.
+ For example, one could define a complex masking region by selecting grid
+ points with an elevation greater than 1000 meters within a specified geographic
+ region by doing the following.
+ Run the Gen-Vx-Mask tool to apply data masking by thresholding a field
+ of topography greater than 1000 meters.
+ Next, rerun the Gen-Vx-Mask tool passing in the output of the first call
+ and applying polyline masking to define the geographic area of interest.
+ Use the 
+\series bold
+-intersection
+\series default
+ option to only select grid points whose value is non-zero in both the input
+ field and the current mask.
 \end_layout
 
 \begin_layout Standard
