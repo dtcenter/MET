@@ -87,6 +87,13 @@ name "chap:The-Series-Analysis"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:StA_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -105,6 +112,13 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal
 
 \begin_layout Section
 Practical Information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:StA_Practical-Information"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
