@@ -2823,13 +2823,10 @@ isc
 \begin_layout Standard
 The format of the STAT and ASCII output of the Wavelet-Stat tool is similar
  to the format of the STAT and ASCII output of the Point-Stat tool.
- Please refer to the tables in section 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-previously 4.3.3, should be updated with cross reference 
-\end_layout
+ Please refer to the tables in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
 
 \end_inset
 
