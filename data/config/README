@@ -94,7 +94,7 @@ MET tool stating the location of the parsing error.
 
 //
 // The "exit_on_warning" entry in ConfigConstants may be set to true or false.
-// If set totrue and a MET tool encounters a warning, it will immediately exit
+// If set to true and a MET tool encounters a warning, it will immediately exit
 // with bad status after writing the warning message.
 //
 exit_on_warning = FALSE;
@@ -748,7 +748,7 @@ output_prefix  = "";
 // The configuration file version number should match the version number of
 // the MET code being run.  This value should generally not be modified.
 //
-version = "V4.1";
+version = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
