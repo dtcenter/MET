@@ -159,10 +159,10 @@ reference "sub:PS_Statistical-measures"
 
 \end_inset
 
- and in more detail in Appendix C
+ and in more detail in Appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Appendix-C--"
+reference "chap:App_C-Verification-Measures"
 
 \end_inset
 
@@ -176,7 +176,14 @@ reference "sub:PS_Statistical-confidence-intervals"
 
  describes the methods for computing confidence intervals that are applied
  to some of the measures computed by the Point-Stat tool; more detail on
- confidence intervals is provided in Appendix D.
+ confidence intervals is provided in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_D-Confidence-Intervals"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -647,7 +654,14 @@ The Point-Stat tool computes a wide variety of verification statistics.
  Broadly speaking, these statistics can be subdivided into statistics for
  categorical variables and statistics for continuous variables.
  The categories of measures are briefly described here; specific descriptions
- of the measures are provided in Appendix C.
+ of the measures are provided in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+.
  Additional information can be found in Wilks (2011) and Jolliffe and Stephenson
  (2003), and on the world-wide web at
 \end_layout
@@ -674,7 +688,14 @@ http://www.bom.gov.au/bmrc/wefor/staff/eee/verif/verif_web_page.html
 In addition to these verification measures, the Point-Stat tool also computes
  partial sums and other FHO statistics that are produced by the NCEP verificatio
 n system.
- These statistics are also described in Appendix C.
+ These statistics are also described in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -697,7 +718,14 @@ Categorical verification statistics are used to evaluate forecasts that
  Categorical variables can be intrinsic (e.g., rain/no-rain) or they may be
  formed by applying one or more thresholds to a continuous variable (e.g.,
  temperature < 273.15 K or cloud coverage percentages in 10% bins).
- See Appendix C for more information.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+ for more information.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -716,7 +744,14 @@ For continuous variables, many verification measures are based on the forecast
  The statistics produced by MET for continuous forecasts represent this
  philosophy of verification, which focuses on a variety of aspects of performanc
 e rather than a single measure.
- See Appendix C for specific information.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+ for specific information.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -730,7 +765,14 @@ For probabilistic forecasts, many verification measures are based on reliability
 , accuracy and bias.
  However, it also is of interest to investigate joint and conditional distributi
 ons of the forecasts and the observations, as in Wilks (2011).
- See Appendix C for specific information.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+ for specific information.
 \end_layout
 
 \begin_layout Standard
@@ -1587,7 +1629,14 @@ scripts/config
 
 \series medium
 Note that environment variables may be used when editing configuration files,
- as described in the section 3.5.2 for the PB2NC tool.
+ as described in the section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
 \begin_inset Newline newline
 \end_inset
 
@@ -2105,7 +2154,14 @@ NNN
  on which the data resides.
  The value listed above indicates that verification should be performed
  over the NCEP Grid number 212.
- See Appendix B for a list of grids that will be accepted.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_B-Map-Projections-Grids"
+
+\end_inset
+
+ for a list of grids that will be accepted.
 \end_layout
 
 \begin_layout Standard
@@ -2208,8 +2264,14 @@ ci_alpha
  value.
  The value of 0.05 listed above indicates that the 95th percentile confidence
  interval should be computed.
- Refer to Section 4.2.3 for more information about confidence intervals and
- recommended values.
+ Refer to Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:PS_Statistical-confidence-intervals"
+
+\end_inset
+
+ for more information about confidence intervals and recommended values.
  
 \begin_inset Newline newline
 \end_inset
@@ -2445,7 +2507,14 @@ eighted mean, a least squares fit, and bilinear interpolation.
  Providing multiple interpolation methods indicates that statistics should
  be computed multiple times using a different interpolation method each
  time.
- These methods are described in Section 4.2.1.
+ These methods are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:PS_Interpolation/matching-methods"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -2761,7 +2830,14 @@ MPR
 \series medium
 Note that the first two line types are easily derived from each other.
  Users are free to choose which measures are most desired.
- All of the line types are described in more detail in Section 4.3.3.
+ All of the line types are described in more detail in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -3050,6 +3126,13 @@ status open
 \begin_layout Plain Layout
 Header information for each file point-stat outputs.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_header_info_point-stat_out"
 
 \end_inset
 
@@ -3735,7 +3818,32 @@ LINE_TYPE
 \begin_inset Text
 
 \begin_layout Plain Layout
-Output line types are listed in tables 4-2 through 4-16.
+Output line types are listed in tables 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_FHO"
+
+\end_inset
+
+ through 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_VL1L2"
+
+\end_inset
+
+.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Originally referenced tables 4.2 to 4.16 but tables go past this.
+ Does this reference need to reflect this? ~Lisa
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -3770,6 +3878,13 @@ status open
 Format information for FHO (Forecast, Hit rate, Observation rate) output
  line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_FHO"
 
 \end_inset
 
@@ -4024,6 +4139,13 @@ status open
 \begin_layout Plain Layout
 Format information for CTC (Contingency Table Count) output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_CTC"
 
 \end_inset
 
@@ -4309,6 +4431,13 @@ status open
 \series medium
 Format information for CTS (Contingency Table Statistics) output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_CTS"
 
 \end_inset
 
@@ -4892,6 +5021,13 @@ Format information for CTS (Contingency Table Statistics) output line type,
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_CTS_cont"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -5432,6 +5568,13 @@ status open
 \series medium
 Format information for CNT(Continuous Statistics) output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_CNT"
 
 \end_inset
 
@@ -6074,6 +6217,13 @@ Format information for CNT(Continuous Statistics) output line type
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_CNT_cont"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -6647,6 +6797,13 @@ Format information for MCTC (Multi-category Contingency Table Count) output
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_MCTC"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -6866,6 +7023,13 @@ status open
 Format information for MCTS (Multi- category Contingency Table Statistics)
  output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_MCTS"
 
 \end_inset
 
@@ -7200,6 +7364,13 @@ Format information for PCT (Contingency Table Counts for Probabilistic forecasts
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_PCT"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -7507,6 +7678,13 @@ status open
 Format information for PSTD (Contingency Table Statistics for Probabilistic
  forecasts) output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_PSTD"
 
 \end_inset
 
@@ -7989,6 +8167,13 @@ c forecasts) output line type.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_PJC"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -8420,6 +8605,13 @@ Format information for PRC (PRC for Receiver Operating Characteristic for
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_PRC"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -8726,6 +8918,13 @@ status open
 \begin_layout Plain Layout
 Format information for SL1L2 (Scalar Partial Sums) output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_SL1L2"
 
 \end_inset
 
@@ -9068,6 +9267,13 @@ Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_SAL1L2"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -9402,6 +9608,13 @@ status open
 \begin_layout Plain Layout
 Format information for VL1L2 (Vector Partial Sums) output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_VL1L2"
 
 \end_inset
 
@@ -9774,6 +9987,13 @@ Format information for VAL1L2 (Vector Anomaly Partial Sums) output line
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_VAL1L2"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -10137,6 +10357,13 @@ status open
 \begin_layout Plain Layout
 Format information for MPR (Matched Pair) output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_PS_format_info_MPR"
 
 \end_inset
 
@@ -10585,7 +10812,14 @@ The STAT output files described for point_stat may be used as inputs to
  the STAT Analysis tool.
  For more information on using the STAT Analysis tool to create stratifications
  and aggregations of the STAT files produced by point_stat, please see Chapter
- 10.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:The-Stat-Analysis-Tool"
+
+\end_inset
+
+.
  
 \end_layout
 
