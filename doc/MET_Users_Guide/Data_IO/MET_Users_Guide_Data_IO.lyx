@@ -118,8 +118,38 @@ reference "Fig_Overview_MET_Overview_Flowchart"
 \end_inset
 
 .
- Output data formats and the software modules used to reformat the data
- are described in later sections.
+ Output data formats are described in later Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:IO_Output-data-formats"
+
+\end_inset
+
+.
+ Common configuration files options are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:IO_Common-Config-Options"
+
+\end_inset
+
+.
+ Description of software modules used to reformat the data may now be found
+ in Chapters 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Re-Formatting-of-Point"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Re-Formatting-of-Gridded"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -975,5 +1005,74 @@ Output
 \end_layout
 
 \end_deeper
+\begin_layout Section
+Common Config Options
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:IO_Common-Config-Options"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Part of the strength of MET is the leveraging of capability across tools.
+ There are several config options that are common to many of the tools.
+ They are described in this section.
+\end_layout
+
+\begin_layout Subsection
+General MET Config Options - Common to many tools
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This information may also be found, along with detailed information regarding
+ configuration of individual tools, in the data/config/README file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand verbatiminput
+filename "E:/MET/Releases/Documentation/doc/MET_Users_Guide/READMEs/README"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+MET-TC Config Options - Common to all TC tools
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:IO_MET-TC-Config-Options"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This information may also be found, along with detailed information regarding
+ configuration of individual tools, in the data/config/README_TC file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand verbatiminput
+filename "E:/MET/Releases/Documentation/doc/MET_Users_Guide/READMEs/README_TC"
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document

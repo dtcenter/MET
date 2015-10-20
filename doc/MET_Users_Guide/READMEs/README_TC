@@ -1,0 +1,104 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Configuration file overview.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+See General MET Readme for overview
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Configuration settings common to multiple tools
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Specify a comma-separated list of storm id's to be used:
+//    2-letter basin, 2-digit cyclone number, 4-digit year
+// An empty list indicates that all should be used.
+//
+// e.g. storm_id = [ "AL092011" ];
+//
+// This may also be set using basin, cyclone, and timing information below.
+//
+storm_id = [];
+
+//
+// Specify a comma-separated list of basins to be used.
+// An empty list indicates that all should be used.
+//   Valid basins: WP, IO, SH, CP, EP, AL, SL
+//
+// e.g. basin = [ "AL", "EP" ];
+//
+basin = [];
+
+//
+// Specify a comma-separated list of cyclone numbers (01-99) to be used.
+// An empty list indicates that all should be used.
+//
+// e.g. cyclone = [ "01", "02", "03" ];
+//
+cyclone = [];
+
+
+//
+// Specify a comma-separated list of storm names to be used.
+// An empty list indicates that all should be used.
+//
+// e.g. storm_name = [ "KATRINA" ];
+//
+storm_name = [];
+
+//
+// Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
+// or provide a list of specific initialization times to include or exclude.
+// Tracks whose initial time meets the specified criteria will be used.
+// An empty string indicates that all times should be used.
+//
+// e.g. init_beg = "20100101";
+//      init_end = "20101231";
+//      init_inc = [ "20101231_06" ];
+//      init_exc = [ "20101231_00" ];
+//
+init_beg = "";
+init_end = "";
+init_inc = [];
+init_exc = [];
+
+//
+// Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format.
+// Tracks for which all valid times fall within the time window will be used.
+// An empty string indicates that all times should be used.
+//
+// e.g. valid_beg = "20100101";
+//      valid_end = "20101231";
+//
+valid_beg = "";
+valid_end = "";
+
+//
+// Specify a comma-separated list of model initialization hours to be used
+// in HH[MMSS] format. An empty list indicates that all hours should be used.
+//
+// e.g. init_hour = [ "00", "06", "12", "18" ];
+//
+init_hour = [];
+
+//
+// Specify lat/lon polylines defining masking regions to be applied.
+// Tracks whose initial location falls within init_mask will be used.
+// Tracks for which all locations fall within valid_mask will be used.
+//
+// e.g. init_mask  = "MET_BASE/poly/EAST.poly";
+//
+init_mask  = "";
+valid_mask = "";
+
+//
+// Indicate the version number for the contents of this configuration file.
+// The value should generally not be modified.
+//
+version = "V5.1";
+
