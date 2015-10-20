@@ -96,14 +96,14 @@ Data must be preprocessed prior to using for verification.
  Sections 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Input-data-formats"
+reference "sec:IO_Input-data-formats"
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Intermediate-data-formats"
+reference "sec:IO_Intermediate-data-formats"
 
 \end_inset
 
@@ -119,7 +119,7 @@ reference "sec:Intermediate-data-formats"
 Input data formats
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Input-data-formats"
+name "sec:IO_Input-data-formats"
 
 \end_inset
 
@@ -178,7 +178,7 @@ n types in a single file in a standard format.
 Intermediate data formats
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Intermediate-data-formats"
+name "sec:IO_Intermediate-data-formats"
 
 \end_inset
 
@@ -282,7 +282,7 @@ The ASCII2NC tool simply reformats ASCII point observations into the NetCDF
 Output data formats
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Output-data-formats"
+name "sec:IO_Output-data-formats"
 
 \end_inset
 
@@ -399,7 +399,7 @@ Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs,
 Data format summary
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Data-format-summary"
+name "sec:IO_Data-format-summary"
 
 \end_inset
 
