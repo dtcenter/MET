@@ -86,6 +86,13 @@ name "chap:TC-Pairs-tool"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:TC-Pairs_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -102,7 +109,7 @@ The TC-Pairs tool provides position and intensity verification for tropical
  Practical aspects of the TC-Pairs tool are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Practical-information"
+reference "sec:TC-Pairs_Practical-information"
 
 \end_inset
 
@@ -121,7 +128,7 @@ reference "sec:Statistical-aspects"
 Practical information
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Practical-information"
+name "sec:TC-Pairs_Practical-information"
 
 \end_inset
 
@@ -147,6 +154,13 @@ tc_pairs
 
 \begin_layout Subsection
 tc_pairs usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:tc_pairs-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -448,6 +462,13 @@ For each adeck/bdeck track pair, match up their track points in time, lookup
 
 \begin_layout Subsection
 TC_Pairs configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:TC_Pairs-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

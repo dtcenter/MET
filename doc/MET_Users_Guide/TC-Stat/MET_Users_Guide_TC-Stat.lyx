@@ -86,6 +86,13 @@ name "chap:TC-Stat"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:TC-Stat_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -146,6 +153,13 @@ name "sec:Statistical-aspects"
 
 \begin_layout Subsection
 Filter TCST lines
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Filter-TCST-lines"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -237,6 +251,13 @@ If multiple options are listed, the job will be performed on their intersection.
 
 \begin_layout Subsection
 Summary statistics for columns
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:TC-Pairs_Summary-statistics-for"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -411,6 +432,13 @@ tc_stat
 
 \begin_layout Subsection
 tc_stat usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:tc_stat-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2186,6 +2214,13 @@ height "1pt"
 
 \begin_layout Subsection
 tc_stat output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:tc_stat-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

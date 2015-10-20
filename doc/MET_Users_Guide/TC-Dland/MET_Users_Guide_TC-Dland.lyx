@@ -86,6 +86,13 @@ name "chap:TC-dland-tool"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:TC_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -121,6 +128,13 @@ While the TC-dland tool is available to be run, most users will find the
 
 \begin_layout Section
 Input/output format
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:TC_Input/output-format"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -183,6 +197,13 @@ dland_global_tenth_degree.nc
 
 \begin_layout Section
 Practical information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:TC_Practical-information"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -194,6 +215,13 @@ This section briefly describes how to run tc_dland.
 
 \begin_layout Subsection
 tc_dland usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:tc_dland-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout LyX-Code
