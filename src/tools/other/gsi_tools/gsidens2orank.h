@@ -87,30 +87,19 @@ static const int n_rad_extra_cols =
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *micro_extra_columns [] = {
-   "CLD_LWC", // cloud liquid water (kg/m**2)
-   "TC_PWAT"  // total column precip. water (km/m**2)
-};
-
-static const int n_micro_extra_cols =
-   sizeof(micro_extra_columns)/sizeof(*micro_extra_columns);
-static const int micro_extra_begin = 21;
-
-////////////////////////////////////////////////////////////////////////
-
 static const char *retr_extra_columns [] = {
-   "SST_FG",   // SST first guess used for SST retrieval
-   "SST_NCEP", // NCEP SST analysis at t
-   "SST_PHY",  // Physical SST retrieval
-   "SST_NAVY", // Navy SST retrieval
-   "D_TA",     // d(ta) corresponding to sstph
-   "D_QA",     // d(qa) corresponding to sstph
-   "DATA_TYPE" // data type
+   "SST_FG",   // SST first guess used for SST retrieval -- replaces SFC_TWTR
+   "SST_NCEP", // NCEP SST analysis at t                 -- replaces SFC_TLND
+   "SST_PHY",  // Physical SST retrieval                 -- replaces SFC_TICE
+   "SST_NAVY", // Navy SST retrieval                     -- replaces SFC_TSNW
+   "D_TA",     // d(ta) corresponding to sstph           -- replaces TSOIL
+   "D_QA",     // d(qa) corresponding to sstph           -- replaces SOILM
+   "DATA_TYPE" // data type                              -- replaces LAND_TYPE
 };
 
 static const int n_retr_extra_cols =
    sizeof(retr_extra_columns)/sizeof(*retr_extra_columns);
-static const int retr_extra_begin = 11;
+static const int retr_extra_begin = 12;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -126,7 +115,7 @@ static StringArray    hdr_name;
 static StringArray    hdr_value;
 static StatHdrColumns shc;
 static int            n_ens;
-static bool           conv_flag, micro_flag, retr_flag;
+static bool           conv_flag, retr_flag;
 
 // Pointer to the random number generator to be used
 static gsl_rng     *rng_ptr          = (gsl_rng *) 0;

@@ -97,8 +97,8 @@ static const int n_rad_extra_cols =
 ////////////////////////////////////////////////////////////////////////
 
 static const char *micro_extra_columns [] = {
-   "CLD_LWC", // cloud liquid water (kg/m**2)
-   "TC_PWAT"  // total column precip. water (km/m**2)
+   "CLD_LWC", // cloud liquid water (kg/m**2)         -- replaces FRAC_CLD
+   "TC_PWAT"  // total column precip. water (km/m**2) -- replaces CTOP_PRS
 };
 
 static const int n_micro_extra_cols =
@@ -108,13 +108,13 @@ static const int micro_extra_begin  = 21;
 ////////////////////////////////////////////////////////////////////////
 
 static const char *retr_extra_columns [] = {
-   "SST_FG",   // SST first guess used for SST retrieval
-   "SST_NCEP", // NCEP SST analysis at t
-   "SST_PHY",  // Physical SST retrieval
-   "SST_NAVY", // Navy SST retrieval
-   "D_TA",     // d(ta) corresponding to sstph
-   "D_QA",     // d(qa) corresponding to sstph
-   "DATA_TYPE" // data type
+   "SST_FG",   // SST first guess used for SST retrieval -- replaces SFC_TWTR
+   "SST_NCEP", // NCEP SST analysis at t                 -- replaces SFC_TLND
+   "SST_PHY",  // Physical SST retrieval                 -- replaces SFC_TICE
+   "SST_NAVY", // Navy SST retrieval                     -- replaces SFC_TSNW
+   "D_TA",     // d(ta) corresponding to sstph           -- replaces TSOIL
+   "D_QA",     // d(qa) corresponding to sstph           -- replaces SOILM
+   "DATA_TYPE" // data type                              -- replaces LAND_TYPE
 };
 
 static const int n_retr_extra_cols =
