@@ -492,6 +492,7 @@ void write_orank() {
    // Setup output AsciiTable
    at.set_size(ens_pd.n_obs + 1,
                n_header_columns + n_orank_cols + n_extra_cols);
+   setup_table(at);
 
    // Write header row
    write_orank_header_row(1, n_ens, at, 0, 0);

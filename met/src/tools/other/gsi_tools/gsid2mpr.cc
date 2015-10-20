@@ -135,6 +135,7 @@ void process_conv(const char *conv_filename, const char *output_filename) {
 
    // Setup output AsciiTable
    at.set_size(1, n_header_columns + n_mpr_columns + n_conv_extra_cols);
+   setup_table(at);
 
    // Write header row
    write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
@@ -225,6 +226,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 
    // Setup output AsciiTable
    at.set_size(1, n_header_columns + n_mpr_columns + n_rad_extra_cols);
+   setup_table(at);
 
    // Write header row
    write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
