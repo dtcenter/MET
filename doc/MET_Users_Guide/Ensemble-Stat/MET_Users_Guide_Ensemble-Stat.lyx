@@ -87,6 +87,13 @@ name "chap:The-Ensemble-Stat"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:ES_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -108,6 +115,13 @@ This chapter contains a description of the Ensemble-Stat tool.
 
 \begin_layout Section
 Practical Information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:ES_Practical-Information"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -130,6 +144,13 @@ t tool.
 
 \begin_layout Subsection
 ensemble_stat usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:ensemble_stat-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -526,6 +547,13 @@ In this example, the Ensemble-Stat tool will process six forecast files
 
 \begin_layout Subsection
 ensemble_stat output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:ensemble_stat-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3457,6 +3485,13 @@ Root mean squared error
 
 \begin_layout Subsection
 ensemble_stat configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:ensemble_stat-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

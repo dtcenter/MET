@@ -87,6 +87,13 @@ name "chap:The-Stat-Analysis-Tool"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:StA_Introduction-1"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -109,6 +116,13 @@ t tools.
 
 \begin_layout Section
 Scientific and statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:StA_Scientific-and-statistical"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -155,6 +169,13 @@ The Stat-Analysis tool can be used to simply filter out specific STAT lines
 
 \begin_layout Subsection
 Summary statistics for columns
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:StA_Summary-statistics-for"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -189,6 +210,13 @@ Confidence intervals are computed for the mean and standard deviation of
 
 \begin_layout Subsection
 Aggregated values from multiple STAT lines
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:StA_Aggregated-values-from"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -208,6 +236,13 @@ The Stat-Analysis tool can be used to create aggregated values from multiple
 
 \begin_layout Subsection
 Aggregate STAT lines and produce aggregated statistics
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:StA_Aggregate-STAT-lines"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -249,7 +284,14 @@ When aggregating the matched pair line type (MPR) and computing an output
 \end_layout
 
 \begin_layout Subsection
-Skill Score Index, including GO Index
+Skill Score Index, including GO Index 
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:StA_Skill-Score-Index,"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1121,6 +1163,13 @@ Mean sea level
 
 \begin_layout Subsection
 Wind Direction Statistics
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:StA_Wind-Direction-Statistics"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1217,6 +1266,13 @@ Once the appropriate lines have been generated for each verification time
 
 \begin_layout Section
 Practical information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:StA_Practical-information-2"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1228,6 +1284,13 @@ The following sections describe the usage statement, required arguments
 
 \begin_layout Subsection
 stat_analysis usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:stat_analysis-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1531,6 +1594,13 @@ config/STATAnalysisConfig
 stat_analysis
 \emph default
  configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:stat_analysis-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2806,6 +2876,13 @@ height "1pt"
 
 \begin_layout Subsection
 Stat-Analysis tool output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Stat-Analysis-tool-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

@@ -76,6 +76,13 @@
 
 \begin_layout Chapter
 GSI Tools
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:GSI-Tools"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -94,6 +101,13 @@ MET includes two tools for handling binary GSI diagnostic files.
 
 \begin_layout Section
 GSID2MPR tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:GSID2MPR-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -109,6 +123,13 @@ This section describes how to run the tool gsid2mpr tool.
 
 \begin_layout Subsection
 gsid2mpr usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:gsid2mpr-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -410,6 +431,12 @@ out
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:gsid2mpr-output"
+
+\end_inset
+
 gsid2mpr output
 \end_layout
 
@@ -1952,6 +1979,13 @@ ANLY_USE
 
 \begin_layout Section
 GSIDENS2ORANK tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:GSIDENS2ORANK-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1967,6 +2001,13 @@ This section describes how to run the tool gsidens2orank tool.
 
 \begin_layout Subsection
 gsidens2orank usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:gsidens2orank-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
