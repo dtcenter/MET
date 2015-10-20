@@ -108,6 +108,13 @@ reference "temp_MODIS"
 
 \begin_layout Section
 Pcp-Combine tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Pcp-Combine-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -131,6 +138,13 @@ ion time.
 
 \begin_layout Subsection
 pcp_combine usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:pcp_combine-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1044,6 +1058,13 @@ This command would grab the first level of the TT variable from a pinterp
 
 \begin_layout Subsection
 pcp_combine output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:pcp_combine-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1399,6 +1420,13 @@ Amount of precipitation for each point in the grid.
 
 \begin_layout Section
 MODIS regrid tool
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MODIS-regrid-tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1423,6 +1451,13 @@ http://ladsweb.nascom.nasa.gov/
 
 \begin_layout Subsection
 modis_regrid usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:modis_regrid-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
