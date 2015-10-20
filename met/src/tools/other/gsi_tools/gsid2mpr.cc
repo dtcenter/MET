@@ -68,10 +68,10 @@ static void set_verbosity(const StringArray &);
 int main(int argc, char * argv []) {
    CommandLine cline;
    ConcatString output_filename;
-   
+
    // Parse the command line into tokens
    cline.set(argc, argv);
-   
+
    // Set the usage
    cline.set_usage(usage);
 
@@ -89,7 +89,7 @@ int main(int argc, char * argv []) {
 
    // Check for zero files to process
    if(cline.n() == 0) usage();
-   
+
    // Process each remaining argument
    for(int i=0; i<(cline.n()); i++) {
 
@@ -132,11 +132,10 @@ void process_conv(const char *conv_filename, const char *output_filename) {
    ConvFile f;
    ConvRecord r;
    ConvData d, d_v;
-   
+
    // Setup output AsciiTable
    at.set_size(1, n_header_columns + n_mpr_columns + n_conv_extra_cols);
-   setup_table(at);
-   
+
    // Write header row
    write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
    write_header_row(conv_extra_columns, n_conv_extra_cols, 0, at, 0,
@@ -195,7 +194,8 @@ void process_conv(const char *conv_filename, const char *output_filename) {
    mlog << Debug(2) << "Read " << n_in << " records and wrote "
         << n_out << " lines.\n";
 
-   // Write AsciiTable to output file
+   // Format and write AsciiTable to output file
+   setup_table(at);
    out << at;
 
    // Close files
@@ -225,13 +225,12 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 
    // Setup output AsciiTable
    at.set_size(1, n_header_columns + n_mpr_columns + n_rad_extra_cols);
-   setup_table(at);
 
    // Write header row
    write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
    write_header_row(rad_extra_columns, n_rad_extra_cols, 0, at, 0,
                     n_header_columns + n_mpr_columns);
-   
+
    // Update header columns for microwave
    if(is_micro(rad_filename)) {
        write_header_row(micro_extra_columns, n_micro_extra_cols, 0, at, 0,
@@ -303,7 +302,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
          d = parse_rad_data(r, i_channel[i]-1,
                             f.channel_val(i_channel[i]-1),
                             f.use_channel(i_channel[i]-1));
-         
+
          if(!is_dup(get_rad_key(d))) write_mpr_row_rad(at, n_out++, d);
       }
 
@@ -313,7 +312,8 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    mlog << Debug(2) << "Read " << n_in << " records and wrote "
         << n_out << " lines.\n";
 
-   // Write AsciiTable to output file
+   // Format and write AsciiTable to output file
+   setup_table(at);
    out << at;
 
    // Close files
@@ -332,7 +332,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
    int col;
 
-   // Update header for current data   
+   // Update header for current data
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d.fcst_ut);
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d.fcst_ut);
    if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d.obs_ut);
@@ -385,7 +385,7 @@ void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
 void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
    int col;
 
-   // Update header for current data   
+   // Update header for current data
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d.fcst_ut);
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d.fcst_ut);
    if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d.obs_ut);
@@ -447,13 +447,13 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
    at.set_entry(row, col++, d.idtw);        // IDTW
    at.set_entry(row, col++, d.idtc);        // IDTC
    at.set_entry(row, col++, d.itz_tr);      // ITZ_TR
-   
+
    at.set_entry(row, col++, d.obs_err);     // OBS_ERR
    at.set_entry(row, col++, d.fcst_nobc);   // FCST_NOBC
    at.set_entry(row, col++, d.sfc_emis);    // SFC_EMIS
    at.set_entry(row, col++, d.stability);   // STABILITY
    at.set_entry(row, col++, d.prs_max_wgt); // PRS_MAX_WGT
-   
+
    return;
 }
 
@@ -486,7 +486,7 @@ void usage() {
         << "\tgsi_file_1 [gsi_file_2 ... gsi_file_n]\n"
         << "\t[-swap]\n"
         << "\t[-channel n]\n"
-        << "\t[-set_hdr col_name value]\n"        
+        << "\t[-set_hdr col_name value]\n"
         << "\t[-suffix string]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
