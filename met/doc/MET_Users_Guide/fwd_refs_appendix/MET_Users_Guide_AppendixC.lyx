@@ -73,11 +73,11 @@
 
 \begin_body
 
-\begin_layout Section*
-Appendix C - Verification Measures
+\begin_layout Chapter
+Verification Measures
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Appendix-C"
+name "chap:App_C-Verification-Measures"
 
 \end_inset
 
@@ -99,8 +99,15 @@ This appendix provides specific information about the many verification
  measures are only provided by the Grid-Stat tool.
 \end_layout
 
-\begin_layout Subsection*
-C.1 MET verification measures for categorical (dichotomous) variables
+\begin_layout Section
+MET verification measures for categorical (dichotomous) variables
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_C-categorical"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1832,8 +1839,15 @@ BAGSS is based on the GSS, but is corrected as much as possible for forecast
  
 \end_layout
 
-\begin_layout Subsection*
-C.2 MET verification measures for continuous variables
+\begin_layout Section
+MET verification measures for continuous variables
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_C-continuous"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3474,8 +3488,15 @@ sum_{i=1}^n((u_{oi}-u_c)^2+(v_{oi}-v_c)^2))$$
 
 \end_layout
 
-\begin_layout Subsection*
-C.3 MET verification measures for probabilistic forecasts
+\begin_layout Section
+MET verification measures for probabilistic forecasts
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_C-probability"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4874,8 +4895,15 @@ sum_{i=1}^{Nthresh}(POD_{i+1}+POD_i)(POFD_{i+1}+POFD_i)$$
 
 \end_layout
 
-\begin_layout Subsection*
-C.4 MET verification measures for ensemble forecasts
+\begin_layout Section
+MET verification measures for ensemble forecasts
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_C-ensemble"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
@@ -5201,8 +5229,15 @@ The rank histogram does not provide information about the accuracy of ensemble
  
 \end_layout
 
-\begin_layout Subsection*
-C.5 MET verification measures for neighborhood methods
+\begin_layout Section
+MET verification measures for neighborhood methods
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_C-neighborhood"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

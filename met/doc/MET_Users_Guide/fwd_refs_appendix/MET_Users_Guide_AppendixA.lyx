@@ -73,20 +73,27 @@
 
 \begin_body
 
-\begin_layout Section*
-Appendix A - FAQs & How do I ...
+\begin_layout Chapter
+FAQs & How do I ...
  ?
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Appendix-A"
+name "chap:App_A-FAQs-&-How"
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Subsection*
-A.1 Frequently Asked Questions
+\begin_layout Section
+Frequently Asked Questions
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_A-Frequently-Asked-Questions"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -259,8 +266,15 @@ Currently, very few graphics are included.
  website.
 \end_layout
 
-\begin_layout Subsection*
-A.2 Troubleshooting
+\begin_layout Section
+Troubleshooting
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_A-Troubleshooting"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -374,8 +388,15 @@ n to the screen.
  
 \end_layout
 
-\begin_layout Subsection*
-A.3 Where to get help
+\begin_layout Section
+Where to get help
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_A-Where-to-get-help"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -393,8 +414,15 @@ type "mailto:"
 
 \end_layout
 
-\begin_layout Subsection*
-A.4 How to contribute code
+\begin_layout Section
+How to contribute code
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:App_A-How-to-contribute-code"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

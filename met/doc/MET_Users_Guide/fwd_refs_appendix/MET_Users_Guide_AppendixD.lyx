@@ -73,11 +73,11 @@
 
 \begin_body
 
-\begin_layout Section*
-Appendix D - Confidence Intervals 
+\begin_layout Chapter
+Confidence Intervals 
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Appendix-D"
+name "chap:App_D-Confidence-Intervals"
 
 \end_inset
 
