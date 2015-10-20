@@ -2089,8 +2089,9 @@ http://www.esrl.noaa.gov/gmd/grad/surfrad/
 \end_inset
 
 ).
- In version 5.1 of MET to handle data in both Western Wind and Solar Integration
- Study (WWSIS) and AErosol RObotic NEtwork (AERONET) formats.
+ In version 5.1 of MET ASCII2NC was enhanced to handle data in both Western
+ Wind and Solar Integration Study (WWSIS) and AErosol RObotic NEtwork (AERONET)
+ formats.
  WWSIS data are available by request from National Renewable Energy Laboratory
  in Boulder, CO.
  AERONET data are available at 
@@ -2921,6 +2922,20 @@ http://madis.noaa.gov
 \series medium
  Since the MADIS2NC tool simply performs a reformatting step, no configuration
  file is needed.
+ The ASCII2NC tool was enhanced for version 5.1 of MET to handle ACARS (automated
+ aircraft) profiles.
+ A listing of variables in ACARS format may be found at 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://madis.noaa.gov/acars_variable_list.shtml
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -3167,7 +3182,7 @@ netcdf_file
 -type str
 \series medium
  specifies the type of MADIS observations (metar, raob, profiler, maritime,
- mesonet).
+ mesonet or acarsProfiles).
 \end_layout
 
 \begin_layout Description
