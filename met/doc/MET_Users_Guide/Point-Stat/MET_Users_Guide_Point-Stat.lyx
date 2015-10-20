@@ -159,19 +159,7 @@ reference "sub:PS_Statistical-measures"
 
 \end_inset
 
- and in more detail in 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Please fix, this link to Appx C is WRONG.
-\end_layout
-
-\end_inset
-
-Appendix C
+ and in more detail in Appendix C
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Appendix-C--"

@@ -88,7 +88,7 @@ name "chap:Software-Installation/Getting-St"
 Introduction
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Introduction"
+name "sec:Install_Introduction"
 
 \end_inset
 
@@ -112,7 +112,7 @@ This chapter describes how to install the MET package.
 Supported architectures
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Supported-architectures"
+name "sec:Install_Supported-architectures"
 
 \end_inset
 
@@ -151,7 +151,7 @@ The MET package runs on a single processor.
 Programming languages
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Programming-languages"
+name "sec:Install_Programming-languages"
 
 \end_inset
 
@@ -199,7 +199,7 @@ The MET package is intended to be a tool for the modeling community to use
 Required compilers and scripting languages
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Required-compilers-and"
+name "sec:Install_Required-compilers-and"
 
 \end_inset
 
@@ -249,7 +249,7 @@ In order to control the desired flow through MET, users are encouraged to
 Required libraries and optional utilities
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Required-libraries-and"
+name "sec:Install_Required-libraries-and"
 
 \end_inset
 
@@ -725,7 +725,7 @@ http://www.dtcenter.org/wrf-nmm/users/docs/user_guide/V3/users_guide_nmm_chap7.p
 MET directory structure 
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:MET-directory-structure"
+name "sec:Install_MET-directory-structure"
 
 \end_inset
 
@@ -975,7 +975,7 @@ reference "sub:TC-Stat-tool-example"
 Building the MET package
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Building-the-MET"
+name "sec:Install_Building-the-MET"
 
 \end_inset
 
@@ -1773,7 +1773,7 @@ MET also has the following non-standard targets:
 Sample test cases
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Sample-test-cases"
+name "sec:Install_Sample-test-cases"
 
 \end_inset
 
@@ -1831,7 +1831,7 @@ Once the MET package has been built successfully, the user is encouraged
 Configuration File Details
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Configuration-File-Details"
+name "sec:Install_Configuration-File-Details"
 
 \end_inset
 

@@ -315,7 +315,7 @@ name "sec:MET-components"
 The major components of the MET package are represented in Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "MET_Overview_Flowchart"
+reference "Fig_Overview_MET_Overview_Flowchart"
 
 \end_inset
 
