@@ -75,10 +75,24 @@
 
 \begin_layout Chapter
 The MODE-Analysis Tool
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:The-MODE-Analysis-Tool"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MODE-A_Introduction-1"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -103,6 +117,13 @@ Many users may wish to summarize the many individual ascii files produced
 
 \begin_layout Section
 Scientific and statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MODE_A-Scientific-and-statistical"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -139,6 +160,13 @@ The other option for operating the analysis tool is ``by case''.
 
 \begin_layout Section
 Practical information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MODE_A-Practical-information"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -157,6 +185,13 @@ mode_analysis
 
 \begin_layout Subsection
 mode_analysis usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:mode_analysis-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2437,6 +2472,13 @@ height "1pt"
 mode_analysis
 \series default
  configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:mode_analysis-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2473,6 +2515,13 @@ The parameters that are set in the configuration file either add to or override
 
 \begin_layout Subsection
 MODE-Analysis tool output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:mode-Analysis-tool-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
