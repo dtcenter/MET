@@ -87,6 +87,13 @@ name "chap:The-Point-Stat-Tool"
 
 \begin_layout Section
 Introduction
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:PS_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -121,6 +128,13 @@ reference "sec:Practical-information"
 
 \begin_layout Section
 Scientific and statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:PS_Scientific-and-statistical"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -131,7 +145,7 @@ The statistical methods and measures computed by the Point-Stat tool are
  In addition, Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Interpolation/matching-methods"
+reference "sub:PS_Interpolation/matching-methods"
 
 \end_inset
 
@@ -141,7 +155,7 @@ reference "sub:Interpolation/matching-methods"
  briefly in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Statistical-measures"
+reference "sub:PS_Statistical-measures"
 
 \end_inset
 
@@ -168,7 +182,7 @@ reference "sec:Appendix-C--"
  Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Statistical-confidence-intervals"
+reference "sub:PS_Statistical-confidence-intervals"
 
 \end_inset
 
@@ -181,7 +195,7 @@ reference "sub:Statistical-confidence-intervals"
 Interpolation/matching methods
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Interpolation/matching-methods"
+name "sub:PS_Interpolation/matching-methods"
 
 \end_inset
 
@@ -631,7 +645,7 @@ This method is performed using the four closest grid squares.
 Statistical measures
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Statistical-measures"
+name "sub:PS_Statistical-measures"
 
 \end_inset
 
@@ -795,7 +809,7 @@ Often, the sample climatology is used as a reference by a skill score.
 Statistical confidence intervals
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Statistical-confidence-intervals"
+name "sub:PS_Statistical-confidence-intervals"
 
 \end_inset
 
@@ -1198,7 +1212,7 @@ ascii2nc
  in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Interpolation/matching-methods"
+reference "sub:PS_Interpolation/matching-methods"
 
 \end_inset
 
@@ -1210,6 +1224,13 @@ reference "sub:Interpolation/matching-methods"
 
 \begin_layout Subsection
 point_stat usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:point_stat-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1542,6 +1563,13 @@ sample_pb.nc
 
 \begin_layout Subsection
 point_stat configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:point_stat-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2949,6 +2977,13 @@ point_stat
 point_stat
 \emph default
  output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:point_stat-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

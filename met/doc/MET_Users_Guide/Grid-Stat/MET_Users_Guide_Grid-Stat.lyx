@@ -87,6 +87,13 @@ name "chap:The-Grid-Stat-Tool"
 
 \begin_layout Section
 Introduction 
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:GS_Introduction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -117,10 +124,24 @@ Scientific and statistical aspects of the Grid-Stat tool are briefly described
 
 \begin_layout Section
 Scientific and statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:GS_Scientific-and-statistical"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 Statistical measures
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:GS_Statistical-measures"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -276,6 +297,13 @@ The Grid-Stat tool allows evaluation of model forecasts using model analysis
 
 \begin_layout Subsection
 Statistical confidence intervals
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:GS_Statistical-confidence-intervals"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -296,6 +324,13 @@ The confidence intervals for the Grid-Stat tool are the same as those provided
 
 \begin_layout Subsection
 Neighborhood methods
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:GS_Neighborhood-methods"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -367,6 +402,13 @@ ion method, size of the smoothing window, and required fraction of valid
 
 \begin_layout Section
 Practical information
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:GS_Practical-information"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -404,6 +446,13 @@ on, and climatology datasets must be on a common grid.
 
 \begin_layout Subsection
 grid_stat usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:grid_stat-usage"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -708,6 +757,13 @@ GridStatConfig
 
 \begin_layout Subsection
 grid_stat configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:grid_stat-configuration-file"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1953,6 +2009,13 @@ grid_stat
 
 \begin_layout Subsection
 grid_stat output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:grid_stat-output"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
