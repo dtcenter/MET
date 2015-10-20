@@ -232,8 +232,7 @@ To match forecasts and observations in the horizontal plane, the user can
  P, or simply the 4 grid points closest to P.
  A width of 3 defines a 3 x 3 square consisting of 9 grid points centered
  on the grid point closest to P.
- Fig.
- 
+ Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "MET_interpolation_methods"
