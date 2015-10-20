@@ -109,9 +109,51 @@ on and a way to filter their STAT output files.
 \series medium
 The Stat-Analysis tool requires STAT output from Point-Stat, Grid-Stat,
  and/or Wavelet-Stat.
- See Sections 4.3.3, 5.3.3, 7.3.3, or 9.3.3 respectively, for information on the
- STAT output format of the Point-Stat, Grid-Stat, Ensemble-Stat, and Wavelet-Sta
-t tools.
+ See Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:grid_stat-output"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:ensemble_stat-configuration-file"
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Please note, this is supposed to be 7.3.3.
+ There is no 7.3.3 in the original documentation.
+ There is a 7.2.3, which is what I referenced.
+ ~Lisa
+\end_layout
+
+\end_inset
+
+, or 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:wavelet_stat-output"
+
+\end_inset
+
+ respectively, for information on the STAT output format of the Point-Stat,
+ Grid-Stat, Ensemble-Stat, and Wavelet-Stat tools.
 \end_layout
 
 \begin_layout Section
@@ -1431,8 +1473,21 @@ wavelet_stat
  analysis jobs at the same time.
  If jobs are specified in both the configuration file and the command line,
  only the jobs indicated in the configuration file will be run.
- The various jobs types are described in Table 10-2 and the filtering options
- are described in section 10.3.2.
+ The various jobs types are described in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_wavelet_header_info_wavelet_stat_outputs"
+
+\end_inset
+
+ and the filtering options are described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:wavelet_stat-configuration-file"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -1474,7 +1529,14 @@ JOB COMMAND LINE
 \series bold
 JOB COMMAND LINE
 \series default
- is described in section 8.3.2,
+ is described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MODE-configuration-file"
+
+\end_inset
+
+,
 \end_layout
 
 \begin_layout Description
@@ -1615,8 +1677,14 @@ STATAnalysisConfig_default
 share/met/config
 \emph default
  directory.
- The version used for the example run in Chapter 2 is also available in
- 
+ The version used for the example run in Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Software-Installation/Getting-St"
+
+\end_inset
+
+ is also available in 
 \emph on
 scripts/config
 \emph default
@@ -1667,7 +1735,14 @@ model
 
 \series medium
 Also note that environment variables may be used when editing configuration
- files, as described in the section 3.5.2 for the PB2NC tool.
+ files, as described in the section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
 \begin_inset Newline newline
 \end_inset
 
@@ -2531,7 +2606,25 @@ go_index
 \begin_inset Text
 
 \begin_layout Plain Layout
-Calculates the GO Index as described in section 8.1.1.
+Calculates the GO Index as described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:MODE_Introduction"
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+This refers to the OLD 8.1.1 but there is no 8.1.1.
+ I'm using the 8.1 Introduction (now chapter 14.1) ~Lisa
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \end_inset
@@ -2936,8 +3029,28 @@ dump_row
 \begin_layout Standard
 
 \series medium
-The output of this job is the same STAT format described in sections 4.3.3,
- 5.3.3, and 9.3.3.
+The output of this job is the same STAT format described in sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:grid_stat-output"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:wavelet_stat-output"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -3297,7 +3410,28 @@ line_type
 \emph default
 " argument.
  The output of this job type is in the same format as the line type specified
- (see Sections 4.3.3, 5.3.3, and 9.3.3).
+ (see Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:grid_stat-output"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:wavelet_stat-output"
+
+\end_inset
+
+).
  Again the output consists of three lines.
  The first line contains "
 \emph on
