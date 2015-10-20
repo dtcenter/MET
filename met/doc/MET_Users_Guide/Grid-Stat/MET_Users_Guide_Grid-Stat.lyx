@@ -154,7 +154,14 @@ The Grid-Stat tool computes a wide variety of verification statistics.
  Further, when a climatology file is included, reference statistics for
  the forecasts compared to the climatology can be calculated.
  These categories of measures are briefly described here; specific descriptions
- of all measures are provided in Appendix C.
+ of all measures are provided in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+.
  Additional information can be found in Wilks (2011) and Jolliffe and Stephenson
  (2012), and on the world-wide web at
 \end_layout
@@ -181,7 +188,14 @@ http://www.cawcr.gov.au/projects/verification/verif_web_page.html
 In addition to these verification measures, the Grid-Stat tool also computes
  partial sums and other FHO statistics that are produced by the NCEP verificatio
 n system.
- These statistics are also described in Appendix C.
+ These statistics are also described in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -198,7 +212,14 @@ Categorical verification statistics are used to evaluate forecasts that
  scale.
  Grid-Stat computes both 2x2 and multi-category contingency tables and their
  associated statistics, similar to Point-Stat.
- See Appendix C for more information.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+ for more information.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -217,7 +238,14 @@ For continuous variables, many verification measures are based on the forecast
  The statistics produced by MET for continuous forecasts represent this
  philosophy of verification, which focuses on a variety of aspects of performanc
 e rather than a single measure.
- See Appendix C for specific information.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+ for specific information.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -231,7 +259,14 @@ For probabilistic forecasts, many verification measures are based on reliability
 , accuracy and bias.
  However, it also is of interest to investigate joint and conditional distributi
 ons of the forecasts and the observations, as in Wilks (2011).
- See Appendix C for specific information.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+ for specific information.
 \end_layout
 
 \begin_layout Standard
@@ -318,7 +353,14 @@ The confidence intervals for the Grid-Stat tool are the same as those provided
  not presently taken into account in the confidence interval calculations.
  Therefore, confidence intervals reported may be somewhat too narrow (e.g.,
  Efron 2007).
- See Appendix D for details regarding confidence intervals provided by MET.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_D-Confidence-Intervals"
+
+\end_inset
+
+ for details regarding confidence intervals provided by MET.
  
 \end_layout
 
@@ -372,7 +414,14 @@ fuzzy
 \series medium
 There are several ways to present the results of the neighborhood approaches,
  such as the Fractions Skill Score (FSS) or the Fractions Brier Score (FBS).
- These scores are presented in Appendix C.
+ These scores are presented in Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_C-Verification-Measures"
+
+\end_inset
+
+.
  One can also simply up-scale the information on the forecast verification
  grid by smoothing or resampling within a specified neighborhood around
  each grid point and recalculate the traditional verification metrics on
@@ -792,7 +841,14 @@ scripts/config
 
 \series medium
 Note that environment variables may be used when editing configuration files,
- as described in the section 3.5.2 for the PB2NC tool.
+ as described in the Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-usage"
+
+\end_inset
+
+ for the PB2NC tool.
 \begin_inset Newline newline
 \end_inset
 
@@ -1078,7 +1134,14 @@ FULL
  on which the data resides.
  The value listed above indicates that verification should be performed
  over the full grid.
- See Appendix B for a list of grids that will be accepted.
+ See Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:App_B-Map-Projections-Grids"
+
+\end_inset
+
+ for a list of grids that will be accepted.
 \end_layout
 
 \begin_layout Standard
@@ -1185,8 +1248,14 @@ ci_alpha
  value.
  The value of 0.05 listed above indicates that the 95th percentile confidence
  interval should be computed.
- Refer to Section 4.2.3 for more information about confidence intervals and
- recommended values.
+ Refer to Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:PS_Statistical-confidence-intervals"
+
+\end_inset
+
+ for more information about confidence intervals and recommended values.
 \end_layout
 
 \begin_layout Standard
@@ -1412,7 +1481,14 @@ UW_MEAN
  for the minimum, maximum, median, and unweighted mean.
  If multiple interpolation methods are provided, then statistics will be
  computed separately for each type of smoothing operation.
- These methods are described in Section 4.2.1.
+ These methods are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:PS_Interpolation/matching-methods"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -1793,20 +1869,14 @@ NBRCNT
 \series medium
 Note that the first two line types are easily derived from one another.
  The user is free to choose which measure is most desired.
- See 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Tara please cross reference the section in the point stat chapter.
- Section 5.3.3 
-\end_layout
+ See Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:grid_stat-output"
 
 \end_inset
 
-for more information about the information in the output files.
+ for more information about the information in the output files.
 \begin_inset Newline newline
 \end_inset
 
@@ -2084,7 +2154,14 @@ nbrcnt
 The format of the STAT and ASCII output of the Grid-Stat tool are the same
  as the format of the STAT and ASCII output of the Point-Stat tool with
  the exception of the three additional neighborhood line types.
- Please refer to the tables in section 4.3.3 (
+ Please refer to the tables in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
+
+\end_inset
+
+ (
 \emph on
 point_stat
 \emph default
@@ -2092,11 +2169,6 @@ point_stat
  file line types.
  The formats of the three additional neighborhood line types for grid_stat
  are explained in the following tables.
-\end_layout
-
-\begin_layout Standard
-Table 5-1.
- Header information for each file grid-stat outputs.
 \end_layout
 
 \begin_layout Standard
@@ -2111,6 +2183,13 @@ status open
 \begin_layout Plain Layout
 Header information for each file grid-stat outputs.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_header_info_gs_outputs"
 
 \end_inset
 
@@ -2797,7 +2876,14 @@ LINE_TYPE
 \begin_inset Text
 
 \begin_layout Plain Layout
-Various line type options, refer to 4.3.3 and the tables below.
+Various line type options, refer to Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:point_stat-output"
+
+\end_inset
+
+ and the tables below.
 \end_layout
 
 \end_inset
@@ -2820,12 +2906,6 @@ Various line type options, refer to 4.3.3 and the tables below.
 \end_layout
 
 \begin_layout Standard
-Table 5-2.
- Format information for NBRCTC (Neighborhood Contingency Table Counts) output
- line type.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
@@ -2842,6 +2922,13 @@ status open
 Format information for NBRCTC (Neighborhood Contingency Table Counts) output
  line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_format_info_NBRCTC"
 
 \end_inset
 
@@ -3114,12 +3201,6 @@ Number of forecast no and observation no
 \end_layout
 
 \begin_layout Standard
-Table 5-3.
- Format information for NBRCTS (Neighborhood Contingency Table Statistics)
- output line type.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
@@ -3136,6 +3217,13 @@ status open
 Format information for NBRCTS (Neighborhood Contingency Table Statistics)
  output line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_format_info_NBRCTS"
 
 \end_inset
 
@@ -3721,9 +3809,16 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-REDO NUMBERING!!! This is part of table 3.
- Can we have 3a & 3b?
+Format information for NBRCTS (Neighborhood Contingency Table Statistics)
+ output line type, continued from above.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_format_info_NBRCTS_cont"
 
 \end_inset
 
@@ -4225,9 +4320,7 @@ Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence
 
 \end_inset
 
-Table 5-4.
- Format information for NBRCNT(Neighborhood Continuous Statistics) output
- line type.
+
 \end_layout
 
 \begin_layout Standard
@@ -4243,6 +4336,13 @@ status open
 Format information for NBRCNT(Neighborhood Continuous Statistics) output
  line type.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_format_info_NBRCNT"
 
 \end_inset
 
@@ -4647,12 +4747,21 @@ grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc
 
 \series medium
 The output NetCDF file contains the dimensions and variables shown in the
- following Tables 5-5 and 5-6.
-\end_layout
+ following Tables 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_Dimensions_NetCDF_matched_pair_out"
 
-\begin_layout Standard
-Table 5-5.
- Dimensions defined in NetCDF matched pair output.
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_GS_var_NetCDF_matched_pair_out"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -4667,6 +4776,13 @@ status open
 \begin_layout Plain Layout
 Dimensions defined in NetCDF matched pair output.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_Dimensions_NetCDF_matched_pair_out"
 
 \end_inset
 
@@ -4786,11 +4902,6 @@ Dimension of the longitude (i.e.
 \end_layout
 
 \begin_layout Standard
-Table 5-6.
- Variables defined in NetCDF matched pair output.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float table
 wide false
 sideways false
@@ -4806,6 +4917,13 @@ status open
 \begin_layout Plain Layout
 Variables defined in NetCDF matched pair output.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_var_NetCDF_matched_pair_out"
 
 \end_inset
 
@@ -5025,7 +5143,14 @@ grid_stat
 \emph on
 grid_stat
 \emph default
-, please see Chapter 10.
+, please see Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:The-Stat-Analysis-Tool"
+
+\end_inset
+
+.
  
 \end_layout
 
