@@ -75,10 +75,10 @@ static void set_verbosity(const StringArray &);
 int main(int argc, char * argv []) {
    CommandLine cline;
    StringArray ens_file_list;
-   
+
    // Parse the command line into tokens
    cline.set(argc, argv);
-   
+
    // Set the usage
    cline.set_usage(usage);
 
@@ -117,7 +117,7 @@ int main(int argc, char * argv []) {
          ens_file_list.add(cline[i]);
       }
    }
-   
+
    // Set the expected number of ensemble members
    n_ens = ens_file_list.n_elements();
 
@@ -145,12 +145,12 @@ int main(int argc, char * argv []) {
 
       // Check for consistent ensemble member file types
       if(is_conv(cline[i]) != conv_flag) {
-         mlog << Error 
+         mlog << Error
               << "\nThe ensemble binary GSI diagnostic files must all "
               << "be of the same type (conventional or radiance).\n\n.";
          exit(1);
       }
-      
+
       // Process by file type
       if(conv_flag) process_conv(cline[i], i);
       else          process_rad (cline[i], i);
@@ -164,7 +164,7 @@ int main(int argc, char * argv []) {
 
       // Check for consistent ensemble mean file type
       if(is_conv(ens_mean_filename) != conv_flag) {
-         mlog << Error 
+         mlog << Error
               << "\nThe ensemble mean binary GSI diagnostic file must "
               << "be of the same type as the members.\n\n.";
          exit(1);
@@ -176,7 +176,7 @@ int main(int argc, char * argv []) {
 
    // Write the output
    write_orank();
-   
+
    return(0);
 }
 
@@ -199,7 +199,7 @@ void process_conv(const char *conv_filename, int i_mem) {
            << "can't open input file \"" << conv_filename << "\"\n\n";
       exit(1);
    }
-   
+
    // Process each record
    n_in = 0;
    while(f >> r) {
@@ -296,7 +296,7 @@ void process_conv_data(ConvData &d, int i_mem) {
       // Keep track of ensemble members using this observation
       if(d.anly_use == 1) conv_data[i_obs].n_use++;
    }
-   
+
    // Keep track of unique quality control values
    if(!conv_data[i_obs].obs_qc.has(d.obs_qc[0])) {
       conv_data[i_obs].obs_qc.add(d.obs_qc[0]);
@@ -304,7 +304,7 @@ void process_conv_data(ConvData &d, int i_mem) {
 
    return;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Process GSI radiance data.
@@ -485,14 +485,13 @@ void write_orank() {
    ofstream out;
    AsciiTable at;
    NumArray ens;
-   
+
    int n_orank_cols = get_n_orank_columns(n_ens);
    int n_extra_cols = (conv_flag ? n_conv_extra_cols : n_rad_extra_cols);
-   
+
    // Setup output AsciiTable
    at.set_size(ens_pd.n_obs + 1,
                n_header_columns + n_orank_cols + n_extra_cols);
-   setup_table(at);
 
    // Write header row
    write_orank_header_row(1, n_ens, at, 0, 0);
@@ -512,9 +511,9 @@ void write_orank() {
        write_header_row(retr_extra_columns, n_retr_extra_cols, 0, at, 0,
                         n_header_columns + n_orank_columns + retr_extra_begin);
    }
-   
+
    mlog << Debug(1)
-        << "\nWriting: " << output_filename << "\n"; 
+        << "\nWriting: " << output_filename << "\n";
 
    // Open output file
    out.open(output_filename);
@@ -527,7 +526,7 @@ void write_orank() {
    // Compute statistics
    ens_pd.compute_rank(rng_ptr);
    ens_pd.compute_stats();
-   
+
    // Compute ensemble mean, if necessary
    if(ens_mean_filename.length() == 0) {
       for(i=0; i<ens_pd.n_obs; i++) {
@@ -546,10 +545,11 @@ void write_orank() {
       if(conv_flag) write_orank_row_conv(at, n_out++, i);
       else          write_orank_row_rad (at, n_out++, i);
    } // end for i
-   
+
    mlog << Debug(2) << "Wrote " << n_out << " lines.\n";
 
-   // Write AsciiTable to output file
+   // Format and write AsciiTable to output file
+   setup_table(at);
    out << at;
 
    // Close files
@@ -569,7 +569,7 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    ConcatString cs;
    ConvData *d = &conv_data[i_obs];
 
-   // Update header for current data   
+   // Update header for current data
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d->fcst_ut);
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d->fcst_ut);
    if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d->obs_ut);
@@ -630,7 +630,7 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    ConcatString cs;
    RadData *d = &rad_data[i_obs];
 
-   // Update header for current data   
+   // Update header for current data
    if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d->fcst_ut);
    if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d->fcst_ut);
    if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d->obs_ut);
@@ -744,7 +744,7 @@ void usage() {
         << "\t[-channel n]\n"
         << "\t[-rng_name str]\n"
         << "\t[-rng_seed str]\n"
-        << "\t[-set_hdr col_name value]\n"        
+        << "\t[-set_hdr col_name value]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
