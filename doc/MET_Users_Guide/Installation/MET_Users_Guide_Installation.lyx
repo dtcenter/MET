@@ -138,13 +138,14 @@ t team lacks access to an IBM machine for testing.
 \begin_layout Standard
 
 \series medium
-The MET package runs on a single processor.
- Outside organizations have tentative plans to run it across multiple processors
- in the future.
- Should this occur, the information will be included in future versions
- of this documentation.
+The MET tools run on a single processor.
  Therefore, none of the utilities necessary for running WRF on multiple
  processors are necessary for running MET.
+ Individual calls to the MET tools have relatively low computing and memory
+ requirements.
+ However users will likely be making many calls to the tools and passing
+ those individual calls to several processors will accomplish the verification
+ task more efficiently.
 \end_layout
 
 \begin_layout Section
@@ -317,7 +318,7 @@ http://www.unidata.ucar.edu/software/netcdf
  The same family of compilers used to build NetCDF should be used when building
  MET.
  MET is compatible with most NetCDF version 3 releases, but it is not yet
- compatible with NetCDF version 4.
+ compatible with the enhanced data model provide in NetCDF version 4.
 \end_layout
 
 \begin_layout Description
@@ -346,9 +347,9 @@ http://www.gnu.org/software/gsl
 
 \series medium
 4.
- The Zlib is used by MET for compression when writing post-script files
+ The Zlib is used by MET for compression when writing postscript image files
  from tools (e.g.
- MODE and Wavelet-Stat).
+ MODE, Wavelet-Stat, Plot-Data-Plane, and Plot-Point-Obs).
  Zlib is distributed and supported Zlib.org and is freely available for download
  from the Zlib website at 
 \begin_inset Flex URL
@@ -406,16 +407,16 @@ http://www.dtcenter.org/wrf-nmm/users
 \series medium
 2.
  The copygb utility is recommended for re-gridding model and observation
- datasets in GRIB format to a common verification grid.
- This utility is highly recommended when using the Grid-Stat, Series-Analysis,
- Pcp-Combine, Wavelet-Stat, or MODE tools.
- Prior to running MET, the model output and verifying gridded observations
- must be placed on the same grid.
+ datasets in GRIB version 1 format to a common verification grid.
  The copygb utility is distributed as part of the Unified Post-Processor
  and is available from other sources as well.
- However, the copygb utility is not strictly required as long as users can
- ensure that their model and gridded observation datasets reside on a common
- grid.
+ While earlier versions of MET required that all gridded data be placed
+ on a common grid, MET version 5.1 added support for automated re-gridding
+ on the fly.
+ After version 5.1, users have the option of running copygb to regrid their
+ GRIB1 data ahead of time or leveraging the automated regridding capability
+ within MET.
+ 
 \end_layout
 
 \begin_layout Section
@@ -879,12 +880,6 @@ scripts/
 src/
 \end_layout
 
-\begin_layout LyX-Code
-
-\series medium
-ylwrap
-\end_layout
-
 \end_deeper
 \begin_layout Standard
 
@@ -974,9 +969,9 @@ The scripts/ directory contains test scripts that are run by make test after
 \series medium
 The 
 \series default
-scripts/Rscripts/
+scripts/Rscripts
 \series medium
- directory contains the R script 
+ directory contains a handful of sample R scripts, include 
 \emph on
 plot_tcmpr.R
 \emph default
@@ -1202,7 +1197,7 @@ To configure MET to install all of the available tools in the "bin" subdirectory
 \series medium
 If all tools are enabled and the build is successful, the "<prefix>/bin"
  directory (where <prefix> is the prefix you specified on your configure
- command line) will contain 23 executables:
+ command line) will contain 27 executables:
 \end_layout
 
 \begin_layout LyX-Code
@@ -1220,19 +1215,21 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 \begin_layout LyX-Code
 
 \series medium
-- gen_circle_mask
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-- gen_poly_mask
+- gen_vx_mask
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
 - grid_stat
+\end_layout
+
+\begin_layout LyX-Code
+- gsid2mpr
+\end_layout
+
+\begin_layout LyX-Code
+- gsidens2orank
 \end_layout
 
 \begin_layout LyX-Code
@@ -1257,6 +1254,10 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 
 \series medium
 - modis_regrid
+\end_layout
+
+\begin_layout LyX-Code
+- mtd
 \end_layout
 
 \begin_layout LyX-Code
@@ -1296,9 +1297,17 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 \end_layout
 
 \begin_layout LyX-Code
+- regrid_data_plane
+\end_layout
+
+\begin_layout LyX-Code
 
 \series medium
 - series_analysis
+\end_layout
+
+\begin_layout LyX-Code
+- shift_data_plane
 \end_layout
 
 \begin_layout LyX-Code
@@ -1361,10 +1370,6 @@ The configure script has command line options to specify where to install
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --prefix=PREFIX
@@ -1374,23 +1379,8 @@ The configure script has command line options to specify where to install
 
 \series medium
 By default, MET will install all the files in "/usr/local/bin".
- You can
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-specify an installation prefix other than "/usr/local" using "--prefix",
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-for instance "--prefix=$HOME" or "--prefix=`pwd`".
-\end_layout
-
-\begin_layout Standard
-.
+ You can specify an installation prefix other than "/usr/local" using "--prefix"
+, for instance "--prefix=$HOME" or "--prefix=`pwd`".
 \end_layout
 
 \begin_layout Standard
@@ -1406,7 +1396,16 @@ Enable compilation of utilities using GRIB2
 \end_layout
 
 \begin_layout Standard
-.
+
+\series bold
+--disable-block4
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Disable use of BLOCK4 in the compilation.
+ Use this if you have trouble using PrepBufr files.
 \end_layout
 
 \begin_layout Standard
@@ -1422,10 +1421,6 @@ Disable compilation of ascii2nc
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --disable-ensemble_stat
@@ -1438,23 +1433,15 @@ Disable compilation of ensemble_stat
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
---disable-gen_poly_mask
+--disable-gen_vx_mask
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Disable compilation of gen_poly_mask
-\end_layout
-
-\begin_layout Standard
-.
+Disable compilation of gen_vx_mask
 \end_layout
 
 \begin_layout Standard
@@ -1470,10 +1457,6 @@ Disable compilation of grid_stat
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --disable-madis2nc
@@ -1483,10 +1466,6 @@ Disable compilation of grid_stat
 
 \series medium
 Disable compilation of madis2nc
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -1502,10 +1481,6 @@ Disable compilation of mode
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --disable-mode_analysis
@@ -1515,10 +1490,6 @@ Disable compilation of mode
 
 \series medium
 Disable compilation of mode_analysis
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -1534,10 +1505,6 @@ Disable compilation of pb2nc
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --disable-pcp_combine
@@ -1547,10 +1514,6 @@ Disable compilation of pb2nc
 
 \series medium
 Disable compilation of pcp_combine
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -1566,7 +1529,39 @@ Disable compilation of plot_data_plane
 \end_layout
 
 \begin_layout Standard
-.
+
+\series bold
+--disable-plot_data_plane
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Disable compilation of plot_data_plane
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+--disable-regrid_data_plane
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Disable compilation of regrid_data_plane
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+--disable-shift_data_plane
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Disable compilation of shift_data_plane
 \end_layout
 
 \begin_layout Standard
@@ -1582,10 +1577,6 @@ Disable compilation of plot_point_obs
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --disable-point_stat
@@ -1595,10 +1586,6 @@ Disable compilation of plot_point_obs
 
 \series medium
 Disable compilation of point_stat
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -1614,10 +1601,6 @@ Disable compilation of stat_analysis
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --disable-wavelet_stat
@@ -1627,10 +1610,6 @@ Disable compilation of stat_analysis
 
 \series medium
 Disable compilation of wavelet_stat
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -1646,10 +1625,6 @@ Disable compilation of series_analysis
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --disable-wwmca
@@ -1659,10 +1634,6 @@ Disable compilation of series_analysis
 
 \series medium
 Disable compilation of wwmca
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -1678,10 +1649,6 @@ Enable compilation of modis
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 --enable-mode_graphics
@@ -1694,23 +1661,15 @@ Enable compilation of mode_graphics
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
---disable-gen_circle_mask
+--disable-mode_time_domain
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Disable compilation of gen_circle_mask
-\end_layout
-
-\begin_layout Standard
-.
+Disable compilation of mode_time_domain
 \end_layout
 
 \begin_layout Standard
@@ -1726,26 +1685,15 @@ Disable compilation of tc_utils
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
---disable-block4
+--disable-gsi_tools
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Disable use of BLOCK4 in the compilation.
- Use this
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-if you have trouble using PrepBufr files.
+Disable compilation of gsi_tools
 \end_layout
 
 \begin_layout Standard
@@ -1763,14 +1711,22 @@ The autoconf utility provides some standard make targets for the users.
 
 \series medium
 1.
- all - compile all of the components in the package, but don't install them.
+ 
+\series bold
+all
+\series medium
+ - compile all of the components in the package, but don't install them.
 \end_layout
 
 \begin_layout Description
 
 \series medium
 2.
- install - install the components (where is described below).
+ 
+\series bold
+install
+\series medium
+ - install the components (where is described below).
  Will also compile if "make all" hasn't been done yet.
 \end_layout
 
@@ -1778,14 +1734,22 @@ The autoconf utility provides some standard make targets for the users.
 
 \series medium
 3.
- clean - remove all of the temporary files created during the compilation.
+ 
+\series bold
+clean
+\series medium
+ - remove all of the temporary files created during the compilation.
 \end_layout
 
 \begin_layout Description
 
 \series medium
 4.
- uninstall - remove the installed files.
+ 
+\series bold
+uninstall
+\series medium
+ - remove the installed files.
  For us, these are the executables and the files in $MET_BASE.
 \end_layout
 
@@ -1799,7 +1763,11 @@ MET also has the following non-standard targets:
 
 \series medium
 5.
- test - runs the scripts/test_all.sh script.
+ 
+\series bold
+test
+\series medium
+ - runs the scripts/test_all.sh script.
  You must run "make install" before using this target.
 \end_layout
 
@@ -1902,8 +1870,8 @@ EADME-TC.
 \begin_layout Standard
 
 \series medium
-A configuration file entry is an entry name, followed by an equal sign =,
- followed by an entry value, and is terminated by a semicolon ;.
+A configuration file entry is an entry name, followed by an equal sign (=),
+ followed by an entry value, and is terminated by a semicolon (;).
  The configuration file itself is one large dictionary consisting of entries,
  some of which are dictionaries themselves.
 \end_layout
@@ -1927,10 +1895,6 @@ The configuration file language supports the following data types:
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 - Array:
@@ -1949,10 +1913,6 @@ The configuration file language supports the following data types:
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 - String
@@ -1962,10 +1922,6 @@ The configuration file language supports the following data types:
 
 \series medium
 - A character string enclosed by double quotation marks "".
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -1981,10 +1937,6 @@ The configuration file language supports the following data types:
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 - Float:
@@ -1997,10 +1949,6 @@ The configuration file language supports the following data types:
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 - Boolean:
@@ -2010,10 +1958,6 @@ The configuration file language supports the following data types:
 
 \series medium
 - A boolean value (TRUE or FALSE).
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
@@ -2058,10 +2002,6 @@ The configuration file language supports the following data types:
 \end_layout
 
 \begin_layout Standard
-.
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 - Piecewise-Linear Function (currently used only by MODE):
@@ -2099,6 +2039,8 @@ In order to make the configuration files more readable, several descriptive
  integer types have been defined in the ConfigConstants file.
  These integer names may be used on the right-hand side for many configuration
  file entries.
+ However, the integer value defined in ConfigConstants should not be modified.
+ Doing so will make the MET configuration files unreadable.
 \end_layout
 
 \begin_layout Standard
@@ -2106,19 +2048,15 @@ In order to make the configuration files more readable, several descriptive
 \series medium
 Each of the configurable MET tools expects a certain set of configuration
  entries.
- Examples of the MET configuration files can be found in the installed directori
-es share/met/config and scripts/config.
+ Examples of the MET configuration files can be found in the scripts/config
+ directory and the installed share/met/config directory.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 When you pass a configuration file to a MET tool, the tool actually parses
- three different configuration files in the following order:
-\end_layout
-
-\begin_layout Standard
-.
+ up to four different configuration files in the following order:
 \end_layout
 
 \begin_layout Standard
@@ -2130,20 +2068,27 @@ When you pass a configuration file to a MET tool, the tool actually parses
 \begin_layout Standard
 
 \series medium
-(2) Reads the default configuration file for the tool from share/met/config.
+(2) If the tool produces PostScript output, it reads share/met/config/ConfigMapD
+ata to define the map data to be plotted.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-(3) Reads the user-specified configuration file from the command line.
+(3) Reads the default configuration file for the tool from share/met/config.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Many of the entries from step (2) are overwritten by the user-specified
- entries from step (3).
+(4) Reads the user-specified configuration file from the command line.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Many of the entries from step (3) are overwritten by the user-specified
+ entries from step (4).
  Therefore, the configuration file you pass in on the command line really
  only needs to contain entries that differ from the defaults.
 \end_layout
@@ -2152,10 +2097,15 @@ Many of the entries from step (2) are overwritten by the user-specified
 
 \series medium
 The configuration file language supports the use of environment variables.
- When scripting up many calls to the MET tools, you may find it convenient
- to use them.
  They are specified as ${ENV_VAR}, where ENV_VAR is the name of the environment
  variable.
+ When scripting up many calls to the MET tools, you may find it convenient
+ to use them.
+ For example, when calling the MODE tool many times and varying the threshold
+ slightly each time, consider defining the threshold as an environment variable
+ which the controling script sets prior to each call.
+ Rather than having to maintian many very similar configuration files, only
+ one is required.
 \end_layout
 
 \begin_layout Standard
