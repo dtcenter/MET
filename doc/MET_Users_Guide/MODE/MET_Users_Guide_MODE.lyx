@@ -1009,24 +1009,6 @@ MODE provides the capability to select a single model variable/level from
  in how the objects are defined, processed, matched, and merged.
 \end_layout
 
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-vfill
-\backslash
-eject
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 MODE usage
 \begin_inset CommandInset label
@@ -1291,18 +1273,9 @@ vskip 0.1in}
 \end_layout
 
 \begin_layout Standard
-Example 1
-\begin_inset Note Note
-status open
 
-\begin_layout Plain Layout
-Please review examples.
- They aren't lined up correctly.
-\end_layout
-
-\end_inset
-
-
+\series bold
+Example 1:
 \end_layout
 
 \begin_layout Standard
@@ -1502,7 +1475,9 @@ vskip 0.1in}
 \end_layout
 
 \begin_layout Standard
-Example 2
+
+\series bold
+Example 2:
 \end_layout
 
 \begin_layout Standard
