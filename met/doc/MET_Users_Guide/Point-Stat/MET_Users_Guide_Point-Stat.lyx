@@ -721,6 +721,9 @@ Measures for categorical variables
 Categorical verification statistics are used to evaluate forecasts that
  are in the form of a discrete set of categories rather than on a continuous
  scale.
+ If the original forecast is continuous, the user may specify one or more
+ threhsolds in the configuration file to divide the continuous measure into
+ categories.
  Currently, Point-Stat computes categorical statistics for variables in
  two or more categories.
  The special case of dichotomous (i.e., 2-category) variables has several
@@ -765,6 +768,23 @@ reference "chap:App_C-Verification-Measures"
 \end_inset
 
  for specific information.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+A user may wish to eliminate certain values of the forecasts from the calculatio
+n of statistics, a process referred to here as``'conditional verification''.
+ For example, a user may eliminate all temperatures above freezing and then
+ calculate the error statistics only for those forecasts of below freezing
+ temperatures.
+ Another common example involves verification of wind forecasts.
+ Since wind direction is indeterminate at very low wind speeds, the user
+ may wish to set a minimum wind speed threshold prior to calculating error
+ statistics for wind direction.
+ The user may specify these threhsolds in the configuration file to specify
+ the conditional verification.
+ 
 \end_layout
 
 \begin_layout Subsubsection*
