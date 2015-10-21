@@ -144,6 +144,13 @@ MTD Spacetime Objects
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "MTD_3d_color_fig"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -155,21 +162,14 @@ MTD Spacetime Objects
 
 \series medium
 A plot of some MTD precipitation objects is shown over the United States
- in 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-I tried linking to the figure.
- I am unhappy with the results.
- This is the only one I tried.
-\end_layout
+ in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_3d_color_fig"
 
 \end_inset
 
-illust_number(3d_color_fig).
+.
  The colors indicate longitude, with red in the east moving through the
  spectrum to blue in the west.
  Time increases vertically in this plot (and in most of the spacetime diagrams
@@ -263,7 +263,7 @@ Object attributes are, for the most part, calculated in much the same way
 \emph on
 metric
 \emph default
- there.
+) there.
  Given two points in this spacetime, say 
 \begin_inset ERT
 status open
@@ -358,8 +358,19 @@ size
 \begin_inset Quotes erd
 \end_inset
 
- of the filter is still determined by one parameter (denoted R, as in MODE),
- but this should not be thought of as a 
+ of the filter is still determined by one parameter (denoted 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$R$
+\end_layout
+
+\end_inset
+
+, as in MODE), but this should not be thought of as a 
 \emph on
 radius
 \emph default
@@ -377,7 +388,14 @@ times (2 R + 1)$
 
 \end_inset
 
-, as shown in Figure 2.1
+, as shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_two_r_plus_one"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -404,6 +422,13 @@ status open
 \begin_layout Plain Layout
 Convolution Region
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "MTD_two_r_plus_one"
 
 \end_inset
 
@@ -555,8 +580,16 @@ spatial
 \emph on
 t
 \emph default
- we can measure purely spatial distances.) From this velocity we get the
- 
+ we can measure purely spatial distances.) See Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_velocity"
+
+\end_inset
+
+ for an illustration, where the solid line is the fitted axis, and the inclinati
+on of the axis from the vertical is a measure of object speed.
+ Thus, from this velocity we get the 
 \begin_inset ERT
 status open
 
@@ -583,7 +616,6 @@ bf direction}
 \end_inset
 
  of movement of the object.
- 
 \end_layout
 
 \begin_layout Standard
@@ -614,6 +646,13 @@ Velocity
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "MTD_velocity"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -625,9 +664,9 @@ Velocity
 
 \series medium
 The spatial orientation of a object (what traditional MODE calls the 
-\emph on
+\series bold
 axis angle
-\emph default
+\series medium
  of an object) is gotten by fitting a plane to an object.
  As with the case of velocity, our optimization criterion is that the sum
  of the squares of the spatial distances from each point of the object to
@@ -637,8 +676,15 @@ axis angle
 \begin_layout Standard
 
 \series medium
-Figure 1.4 gives some idea of the reason for fitting a plane, rather than
- a line, as MODE does.
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_axis_3d"
+
+\end_inset
+
+ gives some idea of the reason for fitting a plane, rather than a line,
+ as MODE does.
  On the left in the figure, we see an object (in blue shaped like an 
 \begin_inset Quotes eld
 \end_inset
@@ -659,8 +705,12 @@ A
  dimensions, shown in red on the right.
  This plane is the same one that MTD would calculate for this 3D object
  to determine its spatial orientation, 
-\backslash
-ie, axis angle.
+\series default
+\shape italic
+i.e.
+\series medium
+\shape default
+, axis angle.
  Indeed, for the special case of an object that is not moving at all, the
  MTD calculation of axis angle reduces to the same one that traditional
  MODE uses, as it should.
@@ -686,6 +736,13 @@ status open
 \begin_layout Plain Layout
 3D axis
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "MTD_axis_3d"
 
 \end_inset
 
@@ -717,7 +774,13 @@ bf volume}
  of the object.
  Remember that while we're working in three dimensions, one of the dimensions
  is non-spatial, so one should not attempt to convert this to a volume in,
- e.g., 
+ 
+\series default
+\shape italic
+e.g.
+\series medium
+\shape default
+, 
 \begin_inset ERT
 status open
 
@@ -1008,7 +1071,43 @@ bf axis difference}
 
  is smaller of the two angles that the two spatial axis planes make with
  each other.
- 
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_axis_diff"
+
+\end_inset
+
+ shows the idea.
+ In the figure, the axis angle would be reported as angle 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$
+\backslash
+alpha$
+\end_layout
+
+\end_inset
+
+, not angle 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+$
+\backslash
+beta$
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -1163,6 +1262,13 @@ Axis Angle Difference
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "MTD_axis_diff"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -1196,9 +1302,15 @@ i.e
 \begin_layout Standard
 
 \series medium
-For example, in our earlier discussion relating to Figure 1.4, we mentioned
- that for simplicity, the object in the figure was not allowed to rotate
- as it moved.
+For example, in our earlier discussion relating to Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_axis_3d"
+
+\end_inset
+
+, we mentioned that for simplicity, the object in the figure was not allowed
+ to rotate as it moved.
  But what if the object (a hurricane, for example) 
 \emph on
 is
@@ -1235,31 +1347,30 @@ For such reasons, having 2D spatial attributes (as in MODE) for each object
 \end_layout
 
 \begin_layout Standard
+◦ Centroid 
+\begin_inset ERT
+status open
 
-\series medium
-??
-\backslash
-medskip
+\begin_layout Plain Layout
+
+$(x, y)$
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-
-\backslash
-myitem Centroid $(x, y)$ 
+◦ Centorid latitude and longidude
 \end_layout
 
 \begin_layout Standard
+◦ Area
+\end_layout
 
-\series medium
-
-\backslash
-myitem Centroid latitude and longitude 
-\backslash
-myitem Area 
-\backslash
-myitem Axis angle
+\begin_layout Standard
+◦ Axis Angle
 \end_layout
 
 \begin_layout Subsection
@@ -1344,7 +1455,14 @@ bf edges}
 , with each edge connecting two vertices.
  Conceptually, it is enough for our purposes to think of vertices as points
  and edges as lines connecting them.
- See Figure 1.5 for an illustration.
+ See Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_basic_graph"
+
+\end_inset
+
+ for an illustration.
  In the figure we see a collection of 11 nodes, indicated by the small circles,
  together with some edges indicated by straight line segments.
  A 
@@ -1409,10 +1527,24 @@ $v_{i + 1}$
 \end_inset
 
 .
- For example, in Figure 1.5, there is no edge connecting vertices #6 and
- #7, but there is a path connecting them.
+ For example, in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_basic_graph"
+
+\end_inset
+
+, there is no edge connecting vertices #6 and #7, but there is a path connecting
+ them.
  In illustrations, graph vertices are often labelled with identifying informatio
-n, such as the numbers in Figure 1.5.
+n, such as the numbers in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_basic_graph"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -1421,8 +1553,14 @@ n, such as the numbers in Figure 1.5.
 If we consider two distinct nodes in a graph to be related if there is a
  path connecting them, then it's easy to see that this defines an equivalence
  relation on the set of nodes, partitioning the graph into equivalence classes.
- Any node, such as #10 in Figure 1.5, that has no edges emanating from it
- is in a class by itself.
+ Any node, such as #10 in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_basic_graph"
+
+\end_inset
+
+, that has no edges emanating from it is in a class by itself.
 \end_layout
 
 \begin_layout Standard
@@ -1453,6 +1591,13 @@ Basic Graph Example
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "MTD_basic_graph"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -1479,8 +1624,15 @@ We have barely scratched the surface of the enormous subject of graph theory,
 
 \series medium
 An example will hopefully make this clear.
- In parts (a) and (b) of Figure 1.6 we indicate the objects in the forecast
- and observed field for this simple example.
+ In parts (a) and (b) of Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "MTD_2d_example"
+
+\end_inset
+
+ we indicate the objects in the forecast and observed field for this simple
+ example.
  We have used 2D rather than 3D objects in this example for simplicity.
  Also, to help distinguish the objects in each field, the forecast objects
  are labelled by numbers and the observed object by letters.
@@ -1574,6 +1726,13 @@ status open
 \begin_layout Plain Layout
 Match & Merge Example
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "MTD_2d_example"
 
 \end_inset
 
@@ -2158,7 +2317,8 @@ noindent
 \end_inset
 
 to express the fact that the parameters defining the observation field are
- identical to those of the forecast field.The 
+ identical to those of the forecast field.
+ The 
 \begin_inset ERT
 status open
 
@@ -2280,7 +2440,7 @@ times 24 = 5{,}760{,}000$
 \end_inset
 
  cells.
- An object ov volume 
+ An object of volume 
 \begin_inset ERT
 status open
 
@@ -2600,7 +2760,7 @@ One thing that is slightly different in the ascii output files from the
 \family typewriter
 F001
 \family default
-, while in MTD it' indicated as 
+, while in MTD is indicated as 
 \family typewriter
 F_1
 \family default
@@ -4778,7 +4938,7 @@ bf longitude}
 
 \end_inset
 
-longitude of all the points in the 2D grid.
+ of all the points in the 2D grid.
  Useful for geolocating points or regions given by grid coordinates.
 \end_layout
 
