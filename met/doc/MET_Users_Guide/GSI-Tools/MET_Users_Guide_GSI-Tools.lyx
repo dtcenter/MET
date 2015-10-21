@@ -1712,7 +1712,7 @@ Total column precip.
 \begin_inset Text
 
 \begin_layout Plain Layout
-ITREF
+TFND
 \end_layout
 
 \end_inset
@@ -1721,7 +1721,7 @@ ITREF
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Foundation temperature: Tr
 \end_layout
 
 \end_inset
@@ -1741,7 +1741,7 @@ ITREF
 \begin_inset Text
 
 \begin_layout Plain Layout
-IDTW
+TWARM
 \end_layout
 
 \end_inset
@@ -1750,7 +1750,7 @@ IDTW
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Diurnal warming: d(Tw) at depth zob
 \end_layout
 
 \end_inset
@@ -1770,7 +1770,7 @@ IDTW
 \begin_inset Text
 
 \begin_layout Plain Layout
-IDTC
+TCOOL
 \end_layout
 
 \end_inset
@@ -1779,7 +1779,7 @@ IDTC
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Sub-layer cooling: d(Tc) at depth zob
 \end_layout
 
 \end_inset
@@ -1799,7 +1799,7 @@ IDTC
 \begin_inset Text
 
 \begin_layout Plain Layout
-ITZ_TR
+TZFND
 \end_layout
 
 \end_inset
@@ -1808,7 +1808,7 @@ ITZ_TR
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+d(Tz)/d(Tr)
 \end_layout
 
 \end_inset
@@ -3450,7 +3450,7 @@ Last-3
 \begin_inset Text
 
 \begin_layout Plain Layout
-ITREF
+TFND
 \end_layout
 
 \end_inset
@@ -3459,7 +3459,7 @@ ITREF
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Foundation temperature: Tr
 \end_layout
 
 \end_inset
@@ -3479,7 +3479,7 @@ Last-2
 \begin_inset Text
 
 \begin_layout Plain Layout
-IDTW
+TWARM
 \end_layout
 
 \end_inset
@@ -3488,7 +3488,7 @@ IDTW
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Diurnal warming: d(Tw) at depth zob
 \end_layout
 
 \end_inset
@@ -3508,7 +3508,7 @@ Last-1
 \begin_inset Text
 
 \begin_layout Plain Layout
-IDTC
+TCOOL
 \end_layout
 
 \end_inset
@@ -3517,7 +3517,7 @@ IDTC
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Sub-layer cooling: d(Tc) at depth zob
 \end_layout
 
 \end_inset
@@ -3537,7 +3537,7 @@ Last
 \begin_inset Text
 
 \begin_layout Plain Layout
-ITZ_TR
+TZFND
 \end_layout
 
 \end_inset
@@ -3546,7 +3546,7 @@ ITZ_TR
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+d(Tz)/d(Tr)
 \end_layout
 
 \end_inset
