@@ -2032,12 +2032,29 @@ The configuration file language supports the following data types:
 
 \series medium
 - The threshold type may also be specified using two letter abbreviations
+ (lt, le, eq, ne, ge, gt).
 \end_layout
 
 \begin_layout Standard
+- Multiple thresholds may be combined by specifying the logic type of AND
+ (&&) or OR (||).
+ For example, 
+\begin_inset Quotes eld
+\end_inset
 
-\series medium
-(lt, le, eq, ne, ge, gt).
+>=5&&<=10
+\begin_inset Quotes erd
+\end_inset
+
+ defines the numbers between 5 and 10 and 
+\begin_inset Quotes eld
+\end_inset
+
+==1||==2
+\begin_inset Quotes erd
+\end_inset
+
+ defines numbers exactly equal to 1 or 2.
 \end_layout
 
 \begin_layout Standard
