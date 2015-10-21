@@ -417,7 +417,7 @@ void usage() {
         << "written (required).\n"
 
         << "\t\t\"-field string\" may be used multiple times to define "
-        << "the field(s) to be regridded (required).\n"
+        << "the data to be regridded (required).\n"
 
         << "\t\t\"-method type\" overrides the default regridding "
         << "method (" << interpmthd_to_string(RGInfo.method)
