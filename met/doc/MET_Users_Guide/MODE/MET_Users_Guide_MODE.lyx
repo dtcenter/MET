@@ -214,9 +214,11 @@ status open
 
 $$C(x,y)=
 \backslash
-sum 
+sum_{u, v} 
 \backslash
-phi (u,v)f(x-u)(y-v).$$
+phi (u,v) 
+\backslash
+, f(x-u)(y-v).$$
 \end_layout
 
 \end_inset
@@ -358,11 +360,11 @@ H
 \end_layout
 
 \begin_layout Standard
-Once the convolved field, 
+Once the convolved field 
 \emph on
 C
 \emph default
-, is in hand, it is thresholded to create a mask field, 
+ is in hand, it is thresholded to create a mask field 
 \emph on
 M
 \emph default
@@ -418,13 +420,25 @@ $$
 \end_layout
 
 \begin_layout Standard
-The objects are the connected regions where 
+where 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T$
+\end_layout
+
+\end_inset
+
+ is the threshold.
+ The objects are the connected regions where 
 \emph on
 M = 1
 \emph default
 .
  Finally, the raw data are restored to object interiors to obtain the object
- field, 
+ field 
 \emph on
 F
 \emph default
@@ -446,11 +460,11 @@ $$F(x,y)=M(x,y)f(x,y).$$
 \end_layout
 
 \begin_layout Standard
-Thus, two parameters --- the radius of influence, 
+Thus, two parameters --- the radius of influence 
 \emph on
 R
 \emph default
-, and the threshold, 
+, and the threshold 
 \emph on
 T
 \emph default
@@ -478,8 +492,7 @@ a shows a "raw" precipitation field, where the vertical coordinate represents
  the precipitation amount.
  Part b shows the convolved field, and part c shows the masked field obtained
  after the threshold is applied.
- Finally, Fig.
- 
+ Finally, Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "Fig_MODE_object_id"
@@ -575,7 +588,7 @@ bf Area}
 \end_inset
 
 ) can be obtained by adding up the true areas of all the grid squares inside
- an object, but in practice this is deemed not to be necessary.
+ an object, but in practice this is seldom necessary.
 \end_layout
 
 \begin_layout Standard
@@ -584,11 +597,30 @@ Moments are used in the calculation of several object attributes.
 \begin_inset Formula $\xi(x,y)$
 \end_inset
 
- to be 1 for points (
-\emph on
-x, y
-\emph default
-) inside our object, and zero for points outside, then the first-order moments,
+ to be 1 for points 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Randy: putting this (x, y) in an hbox to prevent a bad line break
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{$(x, y)$}
+\end_layout
+
+\end_inset
+
+ inside our object, and zero for points outside, then the first-order moments,
  
 \begin_inset Formula $S_{x}$
 \end_inset
@@ -671,8 +703,21 @@ bf Axis Angle}
 
 , is calculated from the second-order moments.
  It gives information on the orientation or ``tilt'' of an object.
- Curvature is another attribute that uses moments in its calculation, specifical
-ly, third-order moments.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Curvature}
+\end_layout
+
+\end_inset
+
+ is another attribute that uses moments in its calculation, specifically,
+ third-order moments.
 \end_layout
 
 \begin_layout Standard
@@ -696,7 +741,7 @@ bf Aspect Ratio}
  However, this rectangle is much easier to calculate than a smallest enclosing
  rectangle and serves our purposes just as well.
  Once the rectangle is determined, the aspect ratio of the object is defined
- to be the width of the rectangle divided by its length.
+ to be the width of the fitted rectangle divided by its length.
 \end_layout
 
 \begin_layout Standard
@@ -746,7 +791,7 @@ status open
 
 {
 \backslash
-angle difference}
+bf angle difference}
 \end_layout
 
 \end_inset
@@ -790,7 +835,9 @@ status open
 
 \begin_layout Plain Layout
 
-{Symmetrid Difference}
+{
+\backslash
+bf Symmetric Difference}
 \end_layout
 
 \end_inset
@@ -816,36 +863,64 @@ Once object attributes
 
  are estimated, some of them are used as input to a fuzzy logic engine that
  performs the matching and merging steps.
- Merging refers to grouping together objects in a single field, while matching
+ 
+\series bold
+Merging
+\series default
+ refers to grouping together objects in a single field, while 
+\series bold
+matching
+\series default
  refers to grouping together objects in different fields, typically the
  forecast and observed fields.
- Interest maps, 
+ Interest maps 
 \begin_inset Formula $I_{i}$
 \end_inset
 
-, are applied to the individual attributes, 
+ are applied to the individual attributes 
 \begin_inset Formula $\alpha_{i}$
 \end_inset
 
-, to convert them into interest values, which range from zero (representing
+ to convert them into interest values, which range from zero (representing
  no interest) to one (high interest).
  For example, the default interest map for centroid difference is one for
  small distances, and falls to zero as the distance increases.
- For other attributes (e.g., intersection area), low values indicate low interest,
- and high values indicate more interest.
+ For other attributes (
+\shape italic
+e.g.
+\shape default
+, intersection area), low values indicate low interest, and high values
+ indicate more interest.
 \end_layout
 
 \begin_layout Standard
-The next step is to define confidence maps, 
+The next step is to define confidence maps 
 \begin_inset Formula $C_{i}$
 \end_inset
 
-, for each attribute.
+ for each attribute.
  These maps (again with values ranging from zero to one) reflect how confident
  we are in the calculated value of an attribute.
  The confidence maps generally are functions of the entire attribute vector
  
-\begin_inset Formula $\alpha_{1},\alpha_{2},\ldots,\alpha_{n}$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+alpha = (
+\backslash
+alpha_1, 
+\backslash
+alpha_2, 
+\backslash
+ldots, 
+\backslash
+alpha_n)$
+\end_layout
+
 \end_inset
 
 , in contrast to the interest maps, where each 
@@ -872,7 +947,7 @@ The next step is to define confidence maps,
 \end_layout
 
 \begin_layout Standard
-Next, scalar weights, 
+Next, scalar weights 
 \emph on
 w
 \emph default
@@ -880,7 +955,7 @@ w
 \begin_inset Formula $_{i}$
 \end_inset
 
-, are assigned to each attribute, representing an empirical judgment regarding
+ are assigned to each attribute, representing an empirical judgment regarding
  the relative importance of the various attributes.
  As an example, the initial development of MODE, centroid distance was weighted
  more heavily than other attributes, because the location of storm systems
@@ -900,21 +975,51 @@ status open
 
 \begin_layout Plain Layout
 
-$$T(
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+T(
 \backslash
-alpha)={{
+alpha) = {
+\end_layout
+
+\begin_layout Plain Layout
+
+          {
 \backslash
 sum_iw_iC_i(
 \backslash
 alpha)I_i(
 \backslash
 alpha_i)}
+\end_layout
+
+\begin_layout Plain Layout
+
+         
 \backslash
-over{
+over
+\end_layout
+
+\begin_layout Plain Layout
+
+           {
 \backslash
 sum_i w_iC_i(
 \backslash
-alpha)}}.$$
+alpha)}.
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
 \end_layout
 
 \end_inset
@@ -931,7 +1036,7 @@ This total interest value is then thresholded, and pairs of objects that
 \begin_layout Standard
 Another merging method is available in MODE, which can be used instead of,
  or along with, the fuzzy logic based merging just described.
- Recall that the convolved field was thresholded to produce the mask field.
+ Recall that the convolved field is thresholded to produce the mask field.
  A second (lower) threshold can be specified so that objects that are separated
  at the higher threshold but joined at the lower threshold are merged.
 \end_layout
@@ -1141,11 +1246,24 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-The 
-\emph on
-mode
-\emph default
- tool has three required arguments and can accept several optional arguments.
+The MODE tool has three required arguments and can accept several optional
+ arguments.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+goodbreak
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1157,18 +1275,18 @@ Required arguments for mode
 \begin_layout Standard
 1.
  The 
-\series bold
+\family typewriter
 fcst_file
-\series default
+\family default
  argument indicates the gridded file containing the model field to be verified.
 \end_layout
 
 \begin_layout Standard
 2.
  The 
-\series bold
+\family typewriter
 obs_file
-\series default
+\family default
  argument indicates the gridded file containing the gridded observations
  to be used for the verification of the model.
 \end_layout
@@ -1176,9 +1294,9 @@ obs_file
 \begin_layout Standard
 3.
  The 
-\series bold
+\family typewriter
 config_file
-\series default
+\family default
  argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
@@ -1192,9 +1310,9 @@ Optional arguments for mode
 \begin_layout Standard
 4.
  The 
-\series bold
+\family typewriter
 -config_merge merge_config_file
-\series default
+\family default
  argument indicates the name of a second configuration file to be used when
  performing fuzzy engine merging by comparing the model or observation field
  to itself.
@@ -1204,15 +1322,15 @@ Optional arguments for mode
  If an object and its neighbor have an interest value above some threshold,
  they are merged.
  The 
-\series bold
+\family typewriter
 merge_config_file
-\series default
+\family default
  controls the settings of the fuzzy engine used to perform this merging
  step.
  If a 
-\series bold
+\family typewriter
 merge_config_file
-\series default
+\family default
  is not provided, the configuration specified by the config_file in the
  previous argument will be used.
 \end_layout
@@ -1221,8 +1339,11 @@ merge_config_file
 5.
  The 
 \series bold
--outdir path
+-
+\family typewriter
 \series default
+outdir path
+\family default
  indicates the directory where output files should be written.
 \end_layout
 
@@ -1230,7 +1351,13 @@ merge_config_file
 6.
  The 
 \series bold
--log file 
+-
+\family typewriter
+\series default
+log file
+\family default
+\series bold
+ 
 \series default
 option directs output and errors to the specified log file.
  All messages will be written to that file as well as cout and cerr.
@@ -1243,11 +1370,11 @@ option directs output and errors to the specified log file.
 \begin_layout Standard
 7.
  The 
-\series bold
+\family typewriter
 -v level
-\series default
+\family default
  option indicates the desired level of verbosity.
- The contents of "level" will override the default setting of 2.
+ The contents of ``level'' will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
@@ -1616,7 +1743,7 @@ status open
 
 {
 \backslash
-bf sample
+tt sample
 \backslash
 _fcst.nc}
 \end_layout
@@ -1631,7 +1758,7 @@ status open
 
 {
 \backslash
-bf sample
+tt sample
 \backslash
 _obs.nc}
 \end_layout
@@ -1647,7 +1774,7 @@ status open
 
 {
 \backslash
-bf MODEConfig}
+tt MODEConfig}
 \end_layout
 
 \end_inset
@@ -1662,7 +1789,7 @@ status open
 
 {
 \backslash
-bf MODEConfig
+tt MODEConfig
 \backslash
 _nc}
 \end_layout
@@ -2474,8 +2601,11 @@ OBS
 \series bold
 BOTH
 \series default
- indicates masking should be performed in both directions (i.e., mask the
- forecast field with the observation field and vice-versa).
+ indicates masking should be performed in both directions (
+\shape italic
+i.e.
+\shape default
+, mask the forecast field with the observation field and vice-versa).
 \end_layout
 
 \begin_layout Standard
@@ -2794,13 +2924,26 @@ poly
 \end_layout
 
 \begin_layout Standard
-Several masking polygons used by NCEP are predefined in the installed share/met/
-poly directory.
+Several masking polygons used by NCEP are predefined in the installed 
+\family typewriter
+share/met/poly
+\family default
+ directory.
  Creating a new polygon is as simple as creating a text file with a name
  for the polygon followed by the lat/lon points which define its boundary.
  Adding a new masking polygon requires no code changes and no recompiling.
- Internally, the lat/lon polygon points are converted into x/y values in
- the grid.
+ Internally, the lat/lon polygon points are converted into 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(x, y)$
+\end_layout
+
+\end_inset
+
+ values in the grid.
 \end_layout
 
 \begin_layout Standard
@@ -4033,8 +4176,18 @@ colorbar_spacing
  should be plotted.
  Setting this variable to 1, as shown above, indicates that every color
  table value should be plotted.
- Setting it to an integer, n > 1, indicates that only every nth color table
- value should be plotted.
+ Setting it to an integer 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$n > 1$
+\end_layout
+
+\end_inset
+
+ indicates that only every nth color table value should be plotted.
 \begin_inset Newline newline
 \end_inset
 
@@ -4329,10 +4482,10 @@ shift_right = 0;
 When MODE is run on global grids, this parameter specifies how many grid
  squares to shift the grid to the right.
  MODE does not currently connect objects from one side of a global grid
- to the other, potentially causing objects straddling that longitude to
- be cut in half.
- Shifting the grid by some amount enables the user to control where that
- longitude cut line occurs.
+ to the other, potentially causing objects straddling the ``cut'' longitude
+ to be separated into two objects.
+ Shifting the grid by integer number of grid units enables the user to control
+ where that longitude cut line occurs.
 \begin_inset Newline newline
 \end_inset
 
