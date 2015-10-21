@@ -248,10 +248,11 @@ void process_command_line(int argc, char **argv)
    cline.add(set_pcpdir,    "-pcpdir",   1);
    cline.add(set_pcprx,     "-pcprx",    1);
    cline.add(set_user_dict, "-config",   1);
+   cline.add(set_user_dict, "-field",    1);
    cline.add(set_name,      "-name",     1);
    cline.add(set_name,      "-varname",  1);
    cline.add(set_logfile,   "-log",      1);
-   cline.add(set_verbosity, "-v",        1);   
+   cline.add(set_verbosity, "-v",        1);
 
    //
    // parse the command line
@@ -776,7 +777,7 @@ void do_add_command()
    //
    // Read current field
    //
-   mlog << Debug(1) 
+   mlog << Debug(1)
         << "Reading input file: " << in_file[0] << "\n";
 
 
@@ -845,7 +846,7 @@ void do_add_command()
    //
    // Write the combined precipitation field out in NetCDF format
    //
-   mlog << Debug(1) 
+   mlog << Debug(1)
         << "Writing output file: " << out_filename << "\n";
 
    write_netcdf(nc_init_time, nc_valid_time, nc_accum, grid1, total);
@@ -878,12 +879,12 @@ void do_sub_command()
    //
    // Read the two specified data files
    //
-   mlog << Debug(1) 
+   mlog << Debug(1)
         << "Reading input file: " << in_file[0] << "\n";
 
    get_field(in_file[0], accum_mag[0], 0, 0, grid1, plus);
 
-   mlog << Debug(1) 
+   mlog << Debug(1)
         << "Reading input file: " << in_file[1] << "\n";
 
    get_field(in_file[1], accum_mag[1], 0, 0, grid2, minus);
@@ -1007,10 +1008,10 @@ void get_field(const char * filename, const char * fld_accum_mag,
 
    //  parse the config string
    config.read_string(config_str);
-   
+
    //  get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&config);
-   
+
    //  open the data file and build a VarInfo object
    datafile = factory.new_met_2d_data_file(filename, ftype);
    if( !datafile ){
@@ -1025,7 +1026,7 @@ void get_field(const char * filename, const char * fld_accum_mag,
            << filename << "\"\n\n";
       exit (1);
    }
-   
+
    //  initialize the VarInfo object with a config
    var->set_dict(config);
 
@@ -1095,13 +1096,13 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    if(run_command == sum) {
 
-      command_str << cs_erase 
-                  << "Sum: " << n_files << " files with accumulations of " 
+      command_str << cs_erase
+                  << "Sum: " << n_files << " files with accumulations of "
                   << sec_to_hhmmss(in_accum) << '.';
 
    } else if(run_command == add) {
 
-      command_str << cs_erase 
+      command_str << cs_erase
                   << "Addition: " << n_files << " files.";
 
    }
@@ -1232,7 +1233,7 @@ void usage()
 
         << "Usage: " << program_name << "\n"
         << "\t[[-sum] sum_args] | [-add add_args] | [-subtract subtract_args]\n"
-        << "\t[-config config_str]\n"
+        << "\t[-field string]\n"
         << "\t[-name variable_name]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
@@ -1249,8 +1250,8 @@ void usage()
         << "accumulations from two files should be subtracted using "
         << "the arguments provided.\n"
 
-        << "\t\t\"-config config_str\" configuration string to use when "
-        << "searching for records in input files (optional).\n"
+        << "\t\t\"-field string\" defines the data to be extracted from "
+        << "the input files (optional).\n"
 
         << "\t\t\"-name variable_name\" name of combined variable in "
         << "output NetCDF file (optional).\n"
