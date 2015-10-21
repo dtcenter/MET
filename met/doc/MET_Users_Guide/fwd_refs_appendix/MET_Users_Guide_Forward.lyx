@@ -103,20 +103,29 @@ It is important to note here that MET is an evolving software package.
  Previous releases of MET have occurred each year since 2008.
  This documentation describes the 5.1 release from 2015.
  Intermediate releases may include bug fixes.
- In the future, MET will also be able to accept new modules contributed
- by the community.
- A protocol will be established to determine the maturity of new verification
- methods that are contributed and to coordinate the inclusion of new modules
- in future versions.
+ MET is also be able to accept new modules contributed by the community.
+ If you have code you would like to contribute, we will gladly consider
+ your contribution.
+ Please send email to: 
+\begin_inset CommandInset href
+LatexCommand href
+name "met_help@ucar.edu"
+type "mailto:"
+
+\end_inset
+
+.
+ We will then determine the maturity of new verification method and coordinate
+ the inclusion of the new module in a future version.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-This user's guide was prepared by the developers of the MET, including John
- Halley Gotway, Randy Bullock, Nancy Rehak, Julie Prestopnik, Paul Oldenburg,
- Anne Holmes, Tara Jensen, Lacey Holland, Barbara Brown, Tressa Fowler,
- David Ahijevych, Eric Gilleland and Bonny Strong.
+This User's Guide was prepared by the developers of the MET, including Tressa
+ Fowler, John Halley Gotway, Randy Bullock, Kathryn Newman, Julie Prestopnik,
+ Lisa Goodrich, Tara Jensen, Barbara Brown, Nancy Rehak, Paul Oldenburg,
+ Anne Holmes, Lacey Holland, David Ahijevych, Eric Gilleland and Bonny Strong.
 \end_layout
 
 \begin_layout Section*
