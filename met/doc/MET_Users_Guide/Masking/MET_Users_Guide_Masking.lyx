@@ -747,12 +747,24 @@ This feature enables the Gen-Vx-Mask tool to be run iteratively on its own
  mask value at each grid point.
  For example, one could define a complex masking region by selecting grid
  points with an elevation greater than 1000 meters within a specified geographic
- region by doing the following.
- Run the Gen-Vx-Mask tool to apply data masking by thresholding a field
- of topography greater than 1000 meters.
- Next, rerun the Gen-Vx-Mask tool passing in the output of the first call
- and applying polyline masking to define the geographic area of interest.
- Use the 
+ region by doing the following:
+\end_layout
+
+\begin_layout Itemize
+Run the Gen-Vx-Mask tool to apply data masking by thresholding a field of
+ topography greater than 1000 meters.
+ 
+\end_layout
+
+\begin_layout Itemize
+Rerun the Gen-Vx-Mask tool passing in the output of the first call and applying
+ polyline masking to define the geographic area of interest.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Use the 
 \series bold
 -intersection
 \series default
@@ -760,6 +772,7 @@ This feature enables the Gen-Vx-Mask tool to be run iteratively on its own
  field and the current mask.
 \end_layout
 
+\end_deeper
 \begin_layout Standard
 
 \series medium

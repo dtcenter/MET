@@ -102,11 +102,6 @@ Gridpoint Statistical Interpolation (GSI) diagnostic files are binary files
 \series medium
 For more detail on generating GSI diagnostic files and their contents, see
  the GSI User's Guide: 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
 \begin_inset Flex URL
 status open
 
