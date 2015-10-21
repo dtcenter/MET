@@ -70,7 +70,7 @@ static const char *program_name = "plot_data_plane";
 
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
-static ConcatString ConfigString;
+static ConcatString FieldString;
 static ConcatString ColorTableName;
 static ConcatString TitleString;
 
@@ -120,8 +120,8 @@ int main(int argc, char * argv[])
    MetConfig config;
    config.read(replace_path(config_const_filename));
    config.read(replace_path(config_map_data_filename));
-   config.read_string(ConfigString);
-   
+   config.read_string(FieldString);
+
       //
       // get the gridded file type from config string, if present
       //
@@ -171,7 +171,7 @@ int main(int argc, char * argv[])
    if (!met_ptr->data_plane(*var_ptr, data_plane))
    {
       mlog << Error << "\n" << program_name << " -> trouble getting field \""
-           << ConfigString << "\" from file \"" << InputFilename << "\"\n\n";
+           << FieldString << "\" from file \"" << InputFilename << "\"\n\n";
       exit (1);
    }
 
@@ -279,9 +279,9 @@ void process_command_line(int argc, char **argv)
       //
       // store the filenames and magic string.
       //
-   InputFilename = cline[0];
+   InputFilename  = cline[0];
    OutputFilename = cline[1];
-   ConfigString = cline[2];
+   FieldString    = cline[2];
 
 }
 
@@ -297,7 +297,7 @@ void usage()
         << "Usage: " << program_name << "\n"
         << "\tinput_filename\n"
         << "\toutput_filename\n"
-        << "\tconfig_string\n"
+        << "\tfield_string\n"
         << "\t[-color_table color_table_name]\n"
         << "\t[-plot_range min max]\n"
         << "\t[-title title_string]\n"
@@ -310,7 +310,7 @@ void usage()
         << "\t\t\"output_filename\" is the name of the output "
         << "PostScript file to be written (required).\n"
 
-        << "\t\t\"config_string\" defines the data to be plotted "
+        << "\t\t\"field_string\" defines the data to be plotted "
         << "from the input file (required).\n"
 
         << "\t\t\"-color_table color_table_name\" overrides the "
