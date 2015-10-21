@@ -606,11 +606,104 @@ Output
 \end_deeper
 \begin_layout Description
 
-\series medium
+\series bold
 5.
+ Regrid-Data-Plane Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One gridded model or observation field and one gridded field to provide
+ grid specification if desired.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One NetCDF file containing the regridded data field.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+6.
+
+\series bold
+ Shift-Data-Plane Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One gridded model or observation field.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One NetCDF file containing the shifted data field.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+7.
  
 \series bold
-Gen-Poly-Mask Tool
+MODIS-Regrid Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One gridded model or observation field and one gridded field to provide
+ grid specification.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One NetCDF file containing the regridded data field.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+8.
+ 
+\series bold
+Gen-VX-Mask Tool
 \end_layout
 
 \begin_deeper
@@ -640,40 +733,7 @@ Output
 \begin_layout Description
 
 \series medium
-6.
- 
-\series bold
-Gen-Circle-Mask Tool
-\end_layout
-
-\begin_deeper
-\begin_layout Description
-
-\series medium
-* 
-\series bold
-Input
-\series medium
-: One gridded model or observation file and one ASCII file defining a set
- of Lat/Lon locations.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-* 
-\series bold
-Output
-\series medium
-: One NetCDF file containing a bitmap for the masking region defined by
- the polyline over the domain of the gridded input file.
-\end_layout
-
-\end_deeper
-\begin_layout Description
-
-\series medium
-7.
+9.
  
 \series bold
 Point-Stat Tool
@@ -707,7 +767,7 @@ Output
 \begin_layout Description
 
 \series medium
-8.
+10.
  
 \series bold
 Grid-Stat Tool
@@ -742,41 +802,7 @@ Output
 \begin_layout Description
 
 \series medium
-9.
- 
-\series bold
-Series Analysis Tool
-\end_layout
-
-\begin_deeper
-\begin_layout Description
-
-\series medium
-* 
-\series bold
-Input
-\series medium
-: An arbitrary number of gridded model files and gridded observation files
- and one or more optional files containing observations.
- 
-\end_layout
-
-\begin_layout Description
-
-\series medium
-* 
-\series bold
-Output
-\series medium
-: One NetCDF file containing requested output statistics on the same grid
- as the input files.
-\end_layout
-
-\end_deeper
-\begin_layout Description
-
-\series medium
-10.
+11.
  
 \series bold
 Ensemble Stat Tool
@@ -811,7 +837,7 @@ Output
 \begin_layout Description
 
 \series medium
-11.
+12.
  
 \series bold
 Wavelet-Stat Tool
@@ -854,7 +880,71 @@ ISC
 \begin_layout Description
 
 \series medium
-12.
+13.
+ 
+\series bold
+GSID2MPR Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One or more binary GSI diagnostic files (conventional or radiance) to
+ be reformatted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One ASCII file in matched pair format.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+14.
+ 
+\series bold
+GSID2ORANK Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One or more binary GSI diagnostic files (conventional or radiance) to
+ be reformatted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One ASCII file in orank format.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+15.
  
 \series bold
 Stat-Analysis Tool
@@ -896,7 +986,41 @@ Output
 \begin_layout Description
 
 \series medium
-13.
+16.
+ 
+\series bold
+Series Analysis Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: An arbitrary number of gridded model files and gridded observation files
+ and one or more optional files containing observations.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One NetCDF file containing requested output statistics on the same grid
+ as the input files.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+17.
  
 \series bold
 MODE Tool
@@ -932,7 +1056,7 @@ Output
 \begin_layout Description
 
 \series medium
-14.
+18.
  
 \series bold
 MODE-Analysis Tool
@@ -974,7 +1098,7 @@ Output
 \begin_layout Description
 
 \series medium
-15.
+19.
  
 \series bold
 MODE-TD Tool
@@ -1002,6 +1126,222 @@ Output
 : Three ASCII files containing 2D single object and 3D single and pair object
  attribute values and one NetCDF file containing object indices for the
  gridded simple and cluster object fields.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+20.
+ 
+\series bold
+TC-Dland Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One file containing the longitude (degrees W negative) and latitude (degrees
+ N positive) of all the coastlines and islands considered to be a significant
+ landmass.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One NetCDF format file containing a gridded field representing the distance
+ to the nearest coastline or island, as specified in the input file
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+21.
+ 
+\series bold
+TC-Pair Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: Two ATCF format files containing output from a tropical cyclone tracker
+ and one configuration file.
+ One file would be for the forecast, or 
+\begin_inset Quotes eld
+\end_inset
+
+A
+\begin_inset Quotes erd
+\end_inset
+
+-deck.
+ The other is expected to be the NHC Best Track Analysis, but could also
+ be any ATCF format reference.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: ASCII output with the suffix .tcstat
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+22.
+ 
+\series bold
+TC-Stat Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One or more TCSTAT files output from the Point-Stat, Grid-Stat, or Ensemble
+ Stat, or Wavelet-Stat tools and, optionally, one configuration file containing
+ specifications for the analysis job(s) to be run on the TCSTAT data.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: ASCII output of the analysis jobs will be printed to the screen unless
+ redirected to a file using the 
+\begin_inset Quotes eld
+\end_inset
+
+-out
+\begin_inset Quotes erd
+\end_inset
+
+ option.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+23.
+ 
+\series bold
+Plot-Point-Obs Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One NetCDF file with point observations in it.
+ Most likely the output from ascii2nc, pb2nc, madis2nc.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One postscript file containing a plot of the requested field.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+24.
+ 
+\series bold
+Plot-Data-Plane Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One gridded data file to be plotted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One postscript file containing a plot of the requested field.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+25.
+ 
+\series bold
+Plot-MODE-Field Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One or more MODE output files to be used for plotting and one configuration
+ file.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One NetCDF file with the requested MODE objects plotted.
+ Options for objects include raw, simple or cluster and forecast or observed
+ objects.
 \end_layout
 
 \end_deeper
