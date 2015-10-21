@@ -60,7 +60,7 @@ static const double     DefaultVldThresh  = 0.5;
 // Variables for command line arguments
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
-static StringArray ConfigSA;
+static StringArray FieldSA;
 static RegridInfo RGInfo;
 static ConcatString VarName;
 
@@ -78,7 +78,7 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
                      const VarInfo *vinfo, const GrdFileType& ftype);
 static void close_nc();
 static void usage();
-static void set_config(const StringArray &);
+static void set_field(const StringArray &);
 static void set_method(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
@@ -116,22 +116,22 @@ void process_command_line(int argc, char **argv) {
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
    RGInfo.vld_thresh = DefaultVldThresh;
-   
+
    // Check for zero arguments
    if(argc == 1) usage();
 
-   // Parse the command line into tokens   
+   // Parse the command line into tokens
    cline.set(argc, argv);
 
    // Set the usage function
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_config,     "-config",     1);
+   cline.add(set_field,      "-field",      1);
    cline.add(set_method,     "-method",     1);
    cline.add(set_width,      "-width",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
-   cline.add(set_name,       "-name",       1);   
+   cline.add(set_name,       "-name",       1);
    cline.add(set_logfile,    "-log",        1);
    cline.add(set_verbosity,  "-v",          1);
 
@@ -139,7 +139,9 @@ void process_command_line(int argc, char **argv) {
    cline.parse();
 
    // Check for error. There should be three arguments left:
-   // the input filename, the output filename, and config string.
+   // - input filename
+   // - destination grid,
+   // - output filename
    if(cline.n() != 3) usage();
 
    // Store the filenames and config string.
@@ -148,9 +150,9 @@ void process_command_line(int argc, char **argv) {
    OutputFilename = cline[2];
 
    // Check for at least one configuration string
-   if(ConfigSA.n_elements() < 1) {
+   if(FieldSA.n_elements() < 1) {
       mlog << Error << "\nprocess_command_line() -> "
-           << "The -config option must be used at least once!\n\n";
+           << "The -field option must be used at least once!\n\n";
       usage();
    }
 
@@ -164,7 +166,7 @@ void process_command_line(int argc, char **argv) {
       RGInfo.method = InterpMthd_Nearest;
    }
 
-   // Check the bilinear and budget special cases   
+   // Check the bilinear and budget special cases
    if((RGInfo.method == InterpMthd_Bilin ||
        RGInfo.method == InterpMthd_Budget) &&
       RGInfo.width != 2) {
@@ -190,11 +192,11 @@ void process_data_file() {
    // Initialize configuration object
    MetConfig config;
    config.read(replace_path(config_const_filename));
-   config.read_string(ConfigSA[0]);
+   config.read_string(FieldSA[0]);
 
    // Get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&config);
-   
+
    // Read the input data file
    Met2dDataFileFactory m_factory;
    Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
@@ -219,10 +221,10 @@ void process_data_file() {
         << "method = " << interpmthd_to_string(RGInfo.method)
         << ", width = " << RGInfo.width
         << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
-   
+
    // Build the run command string
    run_cs << "Regrid from " << fr_grid.serialize() << " to " << to_grid.serialize();
-   
+
    // Setup the VarInfo request object
    VarInfoFactory v_factory;
    VarInfo *vinfo;
@@ -237,24 +239,24 @@ void process_data_file() {
 
    // Open the output file
    open_nc(to_grid, run_cs);
-   
+
    // Loop through the requested fields
-   for(int i=0; i<ConfigSA.n_elements(); i++) {
+   for(int i=0; i<FieldSA.n_elements(); i++) {
 
       // Initialize
       vinfo->clear();
 
-      // Populate the VarInfo object using the config string      
-      config.read_string(ConfigSA[i]);
+      // Populate the VarInfo object using the config string
+      config.read_string(FieldSA[i]);
       vinfo->set_dict(config);
 
       // Get the data plane from the file for this VarInfo object
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
          mlog << Error << "\nprocess_data_file() -> trouble getting field \""
-              << ConfigSA[i] << "\" from file \"" << InputFilename << "\"\n\n";
+              << FieldSA[i] << "\" from file \"" << InputFilename << "\"\n\n";
          exit(1);
       }
- 
+
       // Regrid the data plane
       to_dp = met_regrid(fr_dp, fr_grid, to_grid, RGInfo);
 
@@ -262,22 +264,22 @@ void process_data_file() {
       if(mlog.verbosity_level() >= 2) {
          fr_dp.data_range(dmin, dmax);
          mlog << Debug(2)
-              << "Range of input data (" << ConfigSA[i] << ") is "
+              << "Range of input data (" << FieldSA[i] << ") is "
               << dmin << " to " << dmax << ".\n";
          to_dp.data_range(dmin, dmax);
          mlog << Debug(2)
-              << "Range of regridded data (" << ConfigSA[i] << ") is "
+              << "Range of regridded data (" << FieldSA[i] << ") is "
               << dmin << " to " << dmax << ".\n";
       }
-   
+
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, fr_mtddf->file_type());
-   
+
    } // end for i
 
    // Close the output file
    close_nc();
-   
+
    // Clean up
    if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) 0; }
    if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       0; }
@@ -288,17 +290,17 @@ void process_data_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void open_nc(const Grid &grid, ConcatString run_cs) {
-   
+
    // Create output file
    nc_out = new NcFile(OutputFilename, NcFile::Replace);
-   
+
    if(!nc_out->is_valid()) {
       mlog << Error << "\nopen_nc() -> "
            << "trouble opening output NetCDF file \""
            << OutputFilename << "\"\n\n";
       exit(1);
    }
-   
+
    // Add global attributes
    write_netcdf_global(nc_out, OutputFilename, program_name);
 
@@ -317,13 +319,13 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 
    return;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
 
 void write_nc(const DataPlane &dp, const Grid &grid,
               const VarInfo *vinfo, const GrdFileType &ftype) {
    ConcatString nc_var_name;
-   
+
    // Define output variable name, if not already set
    if(VarName.length() == 0) {
       nc_var_name << cs_erase << vinfo->name();
@@ -349,7 +351,7 @@ void write_nc(const DataPlane &dp, const Grid &grid,
 
    // Allocate memory to store data values for each grid point
    float *data = new float [grid.nx()*grid.ny()];
-   
+
    // Store the data
    for(int x=0; x<grid.nx(); x++) {
       for(int y=0; y<grid.ny(); y++) {
@@ -364,10 +366,10 @@ void write_nc(const DataPlane &dp, const Grid &grid,
            << "error writing data to the output file.\n\n";
       exit(1);
    }
-   
+
    // Clean up
    if(data) { delete [] data;  data = (float *)  0; }
-   
+
    return;
 }
 
@@ -381,7 +383,7 @@ void close_nc() {
    // List the output file
    mlog << Debug(1)
         << "Writing output file: " << OutputFilename << "\n";
-   
+
    return;
 }
 
@@ -396,7 +398,7 @@ void usage() {
         << "\tinput_filename\n"
         << "\tto_grid\n"
         << "\toutput_filename\n"
-        << "\t-config string\n"
+        << "\t-field string\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
         << "\t[-vld_thresh n]\n"
@@ -410,11 +412,11 @@ void usage() {
         << "\t\t\"to_grid\" defines the output grid a as named grid, the "
         << "path to a gridded data file, or an explicit grid "
         << "specification string (required).\n"
-        
+
         << "\t\t\"output_filename\" is the output NetCDF file to be "
         << "written (required).\n"
 
-        << "\t\t\"-config string\" may be used multiple times to define "
+        << "\t\t\"-field string\" may be used multiple times to define "
         << "the field(s) to be regridded (required).\n"
 
         << "\t\t\"-method type\" overrides the default regridding "
@@ -442,8 +444,8 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray &a) {
-   ConfigSA.add(a[0]);
+void set_field(const StringArray &a) {
+   FieldSA.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
