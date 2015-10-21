@@ -262,6 +262,15 @@ n of statistics, a process referred to here as``'conditional verification''.
  statistics for wind direction.
  The user may specify these threhsolds in the configuration file to specify
  the conditional verification.
+ Thresholds can be specified using the usual Fortran conventions (<, <=,
+ ==, !-, >=, or >) followed by a numeric value.
+ The threshold type may also be specified using two letter abbreviations
+ (lt, le, eq, ne, ge, gt).
+ Further, more complex thresholds can be achieved by defining multiple threshold
+s and using && or || to string together event definition logic.
+ The forecast and observation threshold can be used together according to
+ user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetri
+c difference).
  
 \end_layout
 
