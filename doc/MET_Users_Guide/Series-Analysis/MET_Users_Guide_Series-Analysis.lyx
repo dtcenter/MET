@@ -128,9 +128,34 @@ This section contains a description of how to configure and run the Series-Analy
 sis tool.
  This tool performs verification of gridded model fields using matching
  gridded observation fields.
- The series analysis tool will produce a variety of user-selected statistics,
- a subset of those produced by the Grid-Stat tool and documented in Chapter
- 5.
+ The series analysis tool will produce a variety of user-selected statistics.
+ These statistics are a subset of those produced by the Grid-Stat tool,
+ with options for statistic types, thresholds, and conditional verification
+ options as discussed in the Chapter on Grid-Stat
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Tara, please insert cross reference to Grid-Stat chapter
+\end_layout
+
+\end_inset
+
+ and documented in the configuration options 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Tara, please insert cross reference to configuration options
+\end_layout
+
+\end_inset
+
+.
  However, these statistics will be produced separately for each grid location
  and accumulated over some series such as time or height, rather than accumulate
 d over the whole domain for a single time or height as is done by Grid-Stat.
