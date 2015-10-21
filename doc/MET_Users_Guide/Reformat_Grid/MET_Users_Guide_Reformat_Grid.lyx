@@ -917,6 +917,8 @@ An example of the pcp_combine calling sequence is presented below:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Example 1:
 \end_layout
 
@@ -979,6 +981,8 @@ A second example of the pcp_combine calling sequence is presented below:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Example 2:
 \end_layout
 
@@ -1043,6 +1047,8 @@ The Pcp-Combine tool will search for 24 files containing 1-hourly accumulation
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Example 3:
 \end_layout
 

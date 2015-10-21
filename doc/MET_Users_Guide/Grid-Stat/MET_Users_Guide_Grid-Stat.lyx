@@ -299,16 +299,10 @@ The Grid-Stat tool allows evaluation of model forecasts compared with a
  In particular, the anomoly correlation and mean squared error skill score
  provide a measure of the forecast skill versus the climatology.
  For more details about climatological comparisons and reference forecasts,
- see the relevant section in the Point-Stat Chapter.
- 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Tara, please insert cross reference to Climatology.
-\end_layout
+ see the relevant section in the Point-Stat Chapter, Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Climatology"
 
 \end_inset
 
@@ -711,15 +705,21 @@ An example of the grid_stat calling sequence is listed below:
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Example 1:
 \end_layout
 
 \begin_layout LyX-Code
-grid_stat sample_fcst.grb
+grid_stat sample_fcst.grb 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
-sample_obs.grb
+sample_obs.grb 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
@@ -755,6 +755,8 @@ grid_stat
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Example 2:
 \end_layout
 

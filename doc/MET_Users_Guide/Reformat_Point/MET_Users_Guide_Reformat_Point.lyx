@@ -496,11 +496,15 @@ An example of the pb2nc calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-pb2nc sample_pb.blk
+pb2nc sample_pb.blk 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
-sample_pb.nc
+sample_pb.nc 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
