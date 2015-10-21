@@ -101,9 +101,21 @@ name "sec:MODE-A_Introduction-1"
 Many users may wish to summarize the many individual ascii files produced
  by MODE.
  These MODE output files can be quite large; currently, these files contain
- 51 columns.
- This means that it is very difficult - effectively impossible - to interpret
- the results by simply browsing the files.
+ 51 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series medium
+Randy: this number is correct as of version 5.1
+\end_layout
+
+\end_inset
+
+columns.
+ This means that it is very difficult --- effectively impossible --- to
+ interpret the results by simply browsing the files.
  Furthermore, for particular applications some data fields in the MODE output
  files may not be of interest.
  Because of these and similar considerations, the MET development team believed
@@ -130,11 +142,10 @@ name "sec:MODE_A-Scientific-and-statistical"
 
 \series medium
 The MODE-Analysis tool operates in two modes, called ``summary'' and ``by
- case''.
- In summary mode, the user provides (on the command line or via a configuration
- file) information regarding which fields (columns) are of interest, as
- well as matching criteria that determine which lines in each file are used
- and which are ignored.
+ case.'' In summary mode, the user provides (on the command line or via a
+ configuration file) information regarding which fields (columns) are of
+ interest, as well as matching criteria that determine which lines in each
+ file are used and which are ignored.
  For example, a user may be interested in forecast object areas, but only
  if the object was matched, and only if the object centroid is inside a
  particular region.
@@ -149,10 +160,10 @@ The MODE-Analysis tool operates in two modes, called ``summary'' and ``by
 \begin_layout Standard
 
 \series medium
-The other option for operating the analysis tool is ``by case''.
- Given initial and final values for forecast lead time, the tool will output,
- for each valid time in the interval, the matched area, unmatched area,
- and the number of forecast and observed objects that were matched or unmatched.
+The other option for operating the analysis tool is ``by case.'' Given initial
+ and final values for forecast lead time, the tool will output, for each
+ valid time in the interval, the matched area, unmatched area, and the number
+ of forecast and observed objects that were matched or unmatched.
  For the areas, the user can specify forecast or observed objects, and also
  simple or cluster objects.
  A dump file may also be specified in this mode.
@@ -172,8 +183,8 @@ name "sec:MODE_A-Practical-information"
 \begin_layout Standard
 
 \series medium
-The MODE-Analysis tool reads lines from MODE output files and applies filtering
- and computes basic statistics on the object attribute values.
+The MODE-Analysis tool reads lines from MODE ASCII output files and applies
+ filtering and computes basic statistics on the object attribute values.
  For each job type, filter parameters can be set to determine which MODE
  output lines are used.
  The following sections describe the 
@@ -379,7 +390,7 @@ hskip 0.5in}
 \begin_layout Standard
 Required arguments for 
 \family typewriter
-mode_analysis
+mode_analysis:
 \end_layout
 
 \begin_layout Standard
@@ -435,7 +446,7 @@ Specifying
 \series default
  option.
  Column names are not case sensitive.
- The column names are the same as described in Chapter 
+ The column names are the same as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:MODE-output"
@@ -522,11 +533,11 @@ This option gives the name of a configuration file to be read.
  The contents of the configuration file are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MODE-output"
+reference "sub:mode_analysis-configuration-file"
 
 \end_inset
 
-.
+
 \begin_inset Newline newline
 \end_inset
 
@@ -554,7 +565,11 @@ height "1pt"
 \series medium
 Any MODE lines kept from the input files are written to
 \series default
- filename.
+ 
+\family typewriter
+filename
+\family default
+.
 \begin_inset Newline newline
 \end_inset
 
@@ -585,9 +600,19 @@ Specifies which columns in the MODE output files to generate statistics
  Fields may be indicated by name (case insensitive) or column number (beginning
  at one).
  This option can be repeated to specify multiple columns.
-\series default
+\end_layout
 
-\begin_inset Newline newline
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+goodbreak
+\end_layout
+
 \end_inset
 
 
@@ -606,6 +631,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 MODE line options
 \end_layout
 
@@ -618,7 +645,7 @@ MODE line options are used to create filters that determine which of the
  They fall into seven categories: toggles, multiple set string options,
  multiple set integer options, integer max/min options, date/time max/min
  options, floating-point max/min options, and miscellaneous options.
- These options are described in subsequent sections.
+ These options are described here.
 \end_layout
 
 \begin_layout Standard
@@ -776,7 +803,11 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
-Multiple-set string options 
+
+\series bold
+Multiple-set string options
+\series default
+ 
 \end_layout
 
 \begin_layout Standard
@@ -941,7 +972,11 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
-Multiple-set integer options 
+
+\series bold
+Multiple-set integer options
+\series default
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1104,6 +1139,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Integer max/min options 
 \end_layout
 
@@ -1338,6 +1375,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Date/time max/min options 
 \end_layout
 
@@ -1437,6 +1476,20 @@ These two options indicate minimum/maximum values for observation valid
 \end_layout
 
 \begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
 Floating-point max/min options 
 \end_layout
 
@@ -2380,6 +2433,8 @@ height "1pt"
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Miscellaneous options
 \end_layout
 
