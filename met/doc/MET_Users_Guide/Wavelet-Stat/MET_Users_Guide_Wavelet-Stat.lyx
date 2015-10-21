@@ -219,12 +219,9 @@ The Intensity Scale approach can be summarized in the following 5 steps:
  threshold criteria it is assigned 1, where the threshold criteria are not
  met it is assigned 0.
  Figure 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Insert Chapter numberX.1
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "NIMROD_3h_fcst"
 
 \end_inset
 
@@ -1996,10 +1993,6 @@ level
 
 \begin_layout Standard
 An example of the wavelet_stat calling sequence is listed below:
-\end_layout
-
-\begin_layout Standard
-Example:
 \end_layout
 
 \begin_layout LyX-Code

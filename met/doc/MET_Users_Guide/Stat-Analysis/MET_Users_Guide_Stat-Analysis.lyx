@@ -1628,6 +1628,8 @@ stat_analysis
 
 \begin_layout LyX-Code
 stat_analysis -lookin ../out/point_stat 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code

@@ -427,11 +427,15 @@ series_analysis
 \end_layout
 
 \begin_layout LyX-Code
--fcst myfcstfilelist.txt
+-fcst myfcstfilelist.txt 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
--obs myobsfilelist.txt
+-obs myobsfilelist.txt 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code

@@ -318,6 +318,13 @@ Illustration of some matching and interpolation methods used in MET.
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig_Interpolation_Methods"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -548,8 +555,15 @@ reference "MET_interpolation_methods"
 If we denote the horizontal coordinate in this subgrid by x, and vertical
  coordinate by y, then we can assign coordinates to the point P relative
  to this subgrid.
- These coordinates are chosen so that the center of the grid is .
- In the figure, for example, P has coordinates (-0.4, 0.2).
+ These coordinates are chosen so that the center of the grid is.
+ For example, in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig_Interpolation_Methods"
+
+\end_inset
+
+, P has coordinates (-0.4, 0.2).
  Since the grid is centered near P, the coordinates of P should always be
  at most 0.5 in absolute value.
  At each of the vertices of the grid (indicated by black dots in the figure),
@@ -1561,11 +1575,15 @@ An example of the point_stat calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-point_stat sample_fcst.grb
+point_stat sample_fcst.grb 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
-sample_pb.nc
+sample_pb.nc 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
