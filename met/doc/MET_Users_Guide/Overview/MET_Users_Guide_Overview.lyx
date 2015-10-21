@@ -466,7 +466,7 @@ status open
 \series bold
 \begin_inset Graphics
 	filename fig1.1.png
-	scale 60
+	scale 25
 
 \end_inset
 
