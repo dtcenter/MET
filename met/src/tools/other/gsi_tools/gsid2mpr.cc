@@ -445,10 +445,10 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
    at.set_entry(row, col++, d.frac_cld);    // FRAC_CLD
    at.set_entry(row, col++, d.ctop_prs);    // CTOP_PRS
 
-   at.set_entry(row, col++, d.itref);       // ITREF
-   at.set_entry(row, col++, d.idtw);        // IDTW
-   at.set_entry(row, col++, d.idtc);        // IDTC
-   at.set_entry(row, col++, d.itz_tr);      // ITZ_TR
+   at.set_entry(row, col++, d.tfnd);        // TFND
+   at.set_entry(row, col++, d.twarm);       // TWARM
+   at.set_entry(row, col++, d.tcool);       // TCOOL
+   at.set_entry(row, col++, d.tzfnd);       // TZFND
 
    at.set_entry(row, col++, d.obs_err);     // OBS_ERR
    at.set_entry(row, col++, d.fcst_nobc);   // FCST_NOBC

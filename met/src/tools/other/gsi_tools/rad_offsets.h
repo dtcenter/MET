@@ -61,10 +61,10 @@ static const int rad_wind_speed_index         = 24; // wind speed (m/s)
 static const int rad_cloud_frac_index         = 25; // cloud fraction (%)
 static const int rad_cloud_top_pressure_index = 26; // cloud top pressure (hPa)
 
-static const int rad_itref_index              = 27; // itref
-static const int rad_idtw_index               = 28; // idtw
-static const int rad_idtc_index               = 29; // idtc
-static const int rad_itz_tr_index             = 30; // itz_tr
+static const int rad_itref_index              = 27; // foundation temperature: Tr 
+static const int rad_idtw_index               = 28; // diurnal warming: d(Tw) at depth zob
+static const int rad_idtc_index               = 29; // sub-layer cooling: d(Tc) at depth zob
+static const int rad_itz_tr_index             = 30; // d(Tz)/d(Tr)
 
 
 ////////////////////////////////////////////////////////////////////////

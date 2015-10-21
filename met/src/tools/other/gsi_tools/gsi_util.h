@@ -74,7 +74,7 @@ struct RadData {
    int land_type;
    double frac_veg, snw_dpth, sfc_wind;
    double frac_cld, ctop_prs;
-   double itref, idtw, idtc, itz_tr;
+   double tfnd, twarm, tcool, tzfnd;
    double obs_err, fcst_nobc, sfc_emis, stability;
    double prs_max_wgt;
    int n_use;
