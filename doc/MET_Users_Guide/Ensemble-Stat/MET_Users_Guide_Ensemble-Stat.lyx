@@ -565,115 +565,105 @@ name "sub:ensemble_stat-output"
 
 \begin_layout Standard
 
-\series medium
+\series bold
 The Ensemble-Stat tool can calculate any of the following:
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Mean fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Standard Deviation fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Mean - 1 Standard Deviation fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Mean + 1 Standard Deviation fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Minimum fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Maximum fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Range fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Valid Data Count fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ensemble Relative Frequency by threshold fields
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Ranked Histograms (if Observation Field Provided)
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Probability Integral Transform (PIT) Histograms (if Observation Field Provided)
 \end_layout
 
-\begin_layout Paragraph*
-
-\series bold
+\begin_layout Standard
+\paragraph_spacing single
+\noindent
 Spread / Skill variance (if Observation Field Provided)
 \end_layout
 
 \begin_layout Standard
 
-\series medium
+\series bold
 The Ensemble-Stat tool then writes:
 \end_layout
 
-\begin_layout Paragraph
-
-\series bold
+\begin_layout Standard
 Gridded fields of Ensemble forecast values to a NetCDF file
 \end_layout
 
-\begin_layout Paragraph
-
-\series bold
+\begin_layout Standard
 Gridded field of Observation Ranks to a NetCDF file
 \end_layout
 
-\begin_layout Paragraph
-
-\series bold
+\begin_layout Standard
 Stat file with Rank/PIT Histogram and Ensemble information
 \end_layout
 
-\begin_layout Paragraph
-
-\series bold
+\begin_layout Standard
 Observation Rank Matched Pairs
 \end_layout
 
-\begin_layout Paragraph
-
-\series bold
+\begin_layout Standard
 SSVAR file containing spread / skill variance information
 \end_layout
 
