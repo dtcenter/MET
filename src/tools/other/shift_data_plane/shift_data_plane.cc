@@ -61,7 +61,7 @@ static double ToLat = bad_data_double;
 static double ToLon = bad_data_double;
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
-static ConcatString ConfigString;
+static ConcatString FieldString;
 static InterpMthd Method = InterpMthd_DW_Mean;
 static int Width = 2;
 
@@ -137,7 +137,7 @@ void process_command_line(int argc, char **argv) {
    // Store the filenames and config string.
    InputFilename  = cline[0];
    OutputFilename = cline[1];
-   ConfigString   = cline[2];
+   FieldString    = cline[2];
 
    // Check definition of the shift
    if(is_bad_data(FrLat) || is_bad_data(FrLon) ||
@@ -162,7 +162,7 @@ void process_data_file() {
    // Parse the config string
    MetConfig config;
    config.read(replace_path(config_const_filename));
-   config.read_string(ConfigString);
+   config.read_string(FieldString);
 
    // Get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&config);
@@ -205,7 +205,7 @@ void process_data_file() {
    // Get the data plane from the file for this VarInfo object
    if(!mtddf->data_plane(*vinfo, dp_in)) {
       mlog << Error << "\nprocess_data_file() -> trouble getting field \""
-           << ConfigString << "\" from file \"" << InputFilename << "\"\n\n";
+           << FieldString << "\" from file \"" << InputFilename << "\"\n\n";
       exit(1);
    }
 
@@ -217,7 +217,7 @@ void process_data_file() {
       dp_in.data_range(dmin, dmax);
 
       mlog << Debug(2)
-           << "Range of data for \"" << ConfigString << "\" is "
+           << "Range of data for \"" << FieldString << "\" is "
            << dmin << " to " << dmax << ".\n";
    }
 
@@ -358,9 +358,9 @@ void usage() {
         << "Usage: " << program_name << "\n"
         << "\tinput_filename\n"
         << "\toutput_filename\n"
-        << "\tconfig_string\n"
+        << "\tfield_string\n"
         << "\t-from lat lon\n"
-        << "\t-to   lat_lon\n"
+        << "\t-to   lat lon\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
         << "\t[-log file]\n"
@@ -372,13 +372,15 @@ void usage() {
         << "\t\t\"output_filename\" is the name of the output "
         << "NetCDF file to be written (required).\n"
 
-        << "\t\t\"config_string\" defines the data to be shifted "
+        << "\t\t\"field_string\" defines the data to be shifted "
         << "from the input file (required).\n"
 
-        << "\t\t\"-from lat lon\" specifies the starting location to "
+        << "\t\t\"-from lat lon\" specifies the starting latitude "
+        << "(degrees north) and longitude (degrees east) to "
         << "define the shift.\n"
 
-        << "\t\t\"-to lat lon\" specifies the ending location to "
+        << "\t\t\"-to lat lon\" specifies the ending latitude "
+        << "(degrees north) and longitude (degrees east) to "
         << "define the shift.\n"
 
         << "\t\t\"-method type\" overrides the default interpolation "
