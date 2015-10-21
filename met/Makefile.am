@@ -44,6 +44,7 @@ dist-hook:
 	${top_srcdir}/src/tools/dev_utils/chk4copyright -dir ${distdir} -notice ${top_srcdir}/data/copyright_notice.txt
 	-rm -rf ${distdir}/internal_tests
 	-rm -rf ${distdir}/src/tools/dev_utils
+	-rm -rf ${distdir}/ylwrap
 
 # Run the non-standard test suite
 
