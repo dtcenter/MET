@@ -439,10 +439,10 @@ void process_rad_data(RadData &d, int i_mem) {
    check_int(d.land_type, rad_data[i_obs].land_type, "LAND_TYPE", key);
    check_dbl(d.frac_veg,  rad_data[i_obs].frac_veg,  "FRAC_VEG",  key);
    check_dbl(d.snw_dpth,  rad_data[i_obs].snw_dpth,  "SNW_DPTH",  key);
-   check_dbl(d.itref,     rad_data[i_obs].itref,     "ITREF",     key);
-   check_dbl(d.idtw,      rad_data[i_obs].idtw,      "IDTW",      key);
-   check_dbl(d.idtc,      rad_data[i_obs].idtc,      "IDTC",      key);
-   check_dbl(d.itz_tr,    rad_data[i_obs].itz_tr,    "ITZ_TR",    key);
+   check_dbl(d.tfnd,      rad_data[i_obs].tfnd,      "TFND",      key);
+   check_dbl(d.twarm,     rad_data[i_obs].twarm,     "TWARM",     key);
+   check_dbl(d.tcool,     rad_data[i_obs].tcool,     "TCOOL",     key);
+   check_dbl(d.tzfnd,     rad_data[i_obs].tzfnd,     "TZFND",     key);
 
    // Store current ensemble data
    if(mn) {
@@ -693,10 +693,10 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, d->frac_veg);              // FRAC_VEG
    at.set_entry(row, col++, d->snw_dpth);              // SNW_DPTH
 
-   at.set_entry(row, col++, d->itref);                 // ITREF
-   at.set_entry(row, col++, d->idtw);                  // IDTW
-   at.set_entry(row, col++, d->idtc);                  // IDTC
-   at.set_entry(row, col++, d->itz_tr);                // ITZ_TR
+   at.set_entry(row, col++, d->tfnd);                  // TFND
+   at.set_entry(row, col++, d->twarm);                 // TWARM
+   at.set_entry(row, col++, d->tcool);                 // TCOOL
+   at.set_entry(row, col++, d->tzfnd);                 // TZFND
 
    return;
 }

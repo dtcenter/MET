@@ -119,10 +119,10 @@ RadData parse_rad_data(const RadRecord  &r, const int i,
    d.frac_cld  = r.diag_data(rad_cloud_frac_index - 1);
    d.ctop_prs  = r.diag_data(rad_cloud_top_pressure_index - 1);
 
-   d.itref     = r.diag_data(rad_itref_index - 1);
-   d.idtw      = r.diag_data(rad_idtw_index - 1);
-   d.idtc      = r.diag_data(rad_idtc_index - 1);
-   d.itz_tr    = r.diag_data(rad_itz_tr_index - 1);
+   d.tfnd      = r.diag_data(rad_itref_index - 1);
+   d.twarm     = r.diag_data(rad_idtw_index - 1);
+   d.tcool     = r.diag_data(rad_idtc_index - 1);
+   d.tzfnd     = r.diag_data(rad_itz_tr_index - 1);
    
    d.obs_err   = r.diagchan_data(rad_inv_chan_index - 1, i);
    d.fcst_nobc = d.obs - r.diagchan_data(rad_omg_nobc_chan_index - 1, i);

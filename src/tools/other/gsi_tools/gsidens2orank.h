@@ -76,10 +76,10 @@ static const char * rad_extra_columns [] = {
    "LAND_TYPE", // surface land type
    "FRAC_VEG",  // vegetation fraction
    "SNW_DPTH",  // snow depth
-   "ITREF",     // itref
-   "IDTW",      // idtw
-   "IDTC",      // idtc
-   "ITZ_TR"     // itz_tr
+   "TFND",      // foundation temperature: Tr
+   "TWARM",     // diurnal warming: d(Tw) at depth zob
+   "TCOOL",     // sub-layer cooling: d(Tc) at depth zob
+   "TZFND"      // d(Tz)/d(Tr)
 };
 
 static const int n_rad_extra_cols =

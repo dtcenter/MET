@@ -80,10 +80,10 @@ static const char * rad_extra_columns [] = {
    "SFC_WIND",   // surface wind speed (m/s)
    "FRAC_CLD",   // cloud fraction (%)
    "CTOP_PRS",   // cloud top pressure (hPa)
-   "ITREF",      // itref
-   "IDTW",       // idtw
-   "IDTC",       // idtc
-   "ITZ_TR",     // itz_tr
+   "TFND",       // foundation temperature: Tr
+   "TWARM",      // diurnal warming: d(Tw) at depth zob
+   "TCOOL",      // sub-layer cooling: d(Tc) at depth zob
+   "TZFND",      // d(Tz)/d(Tr)
    "OBS_ERR",    // inverse observation error
    "FCST_NOBC",  // Tb with no bias correction (K)
    "SFC_EMIS",   // surface emissivity
