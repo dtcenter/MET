@@ -473,7 +473,7 @@ hskip 0.5in}
 
 \end_inset
 
-config_string
+field_string
 \end_layout
 
 \begin_layout LyX-Code
@@ -599,7 +599,7 @@ output_filename
 3.
  The 
 \series bold
-config_string
+field_string
 \series medium
  argument contains information about the field and level to be plotted.
 \end_layout
@@ -687,7 +687,7 @@ An example of the plot_data_plane calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-plot_data_plane test.grb test.ps 'name="TMP"; level="Z2"; 
+plot_data_plane test.grb test.ps 'name="TMP"; level="Z2";' 
 \end_layout
 
 \begin_layout LyX-Code
@@ -695,7 +695,7 @@ or
 \end_layout
 
 \begin_layout LyX-Code
-plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";'
+plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";' 
 \backslash
 
 \end_layout
