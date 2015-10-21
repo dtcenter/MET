@@ -1381,7 +1381,7 @@ This information may also be found, along with detailed information regarding
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand verbatiminput
-filename "E:/MET/Releases/Documentation/doc/MET_Users_Guide/READMEs/README"
+filename "../READMEs/README"
 
 \end_inset
 
@@ -1407,7 +1407,7 @@ This information may also be found, along with detailed information regarding
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand verbatiminput
-filename "E:/MET/Releases/Documentation/doc/MET_Users_Guide/READMEs/README_TC"
+filename "../READMEs/README_TC"
 
 \end_inset
 
