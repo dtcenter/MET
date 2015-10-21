@@ -413,6 +413,8 @@ Version 5.1 Release Notes:
     - PCP-Combine
         - Rename -varname command line option to -name to be consistent with
           other MET tools.
+        - Rename -config command line option to -field to be consistent with
+          other MET tools.  Silently support -config for backward compatibility.
     - Grid-Stat
         - Add SAL1L2 and VAL1L2 output line types.
     - Series-Analysis

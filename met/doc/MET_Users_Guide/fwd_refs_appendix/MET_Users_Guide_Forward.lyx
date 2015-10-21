@@ -335,6 +335,12 @@ Rename -varname command line option to -name to be consistent with other
  MET tools.
 \end_layout
 
+\begin_layout Itemize
+Rename -config command line option to -field to be consistent with other
+ MET tools.
+ Silently support -config for backward compatibility.
+\end_layout
+
 \end_deeper
 \begin_layout Itemize
 Grid-Stat
