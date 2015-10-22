@@ -94,8 +94,14 @@ There are several formats of point observations that may preprocessed using
  Data from NASA, MADIS data from NOAA, little_r from WRF simulations, and
  user defined data in a generic ASCII format.
  These steps are represented by the first columns in the MET flowchart depicted
- in Fig.
- 1-1.
+ in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig_Overview_MET_Overview_Flowchart"
+
+\end_inset
+
+.
  Output data formats and the software modules used to reformat point data
  are described in later sections.
 \end_layout
@@ -119,7 +125,7 @@ This section describes how to configure and run the PB2NC tool.
  observation file and reformat it into NetCDF format for use by the Point-Stat
  tool.
  The PB2NC tool must be run on the input PrepBufr point observation file
- prior to performing verification using the Point-Stat tool.
+ prior to performing verification with the MET statistics tools.
 \end_layout
 
 \begin_layout Subsection
@@ -562,8 +568,6 @@ scripts/config
 .
  It is recommended that users make a copy of configuration files prior to
  modifying their contents.
- Each configuration file contains many comments describing its contents.
- 
 \end_layout
 
 \begin_layout Standard
@@ -627,28 +631,57 @@ message_type[] = [ ${MSG_TYP} ];
 \begin_layout Standard
 
 \series medium
-The example script for running MODE included in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:MODE_Practical-information"
+The contents of the default pb2nc configuration file are described below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
 
 \end_inset
 
- provides another example of using environment variables in configuration
- files.
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_window = { beg  = -5400; end  = 5400; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+mask       = { grid = "";    poly = "";   }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+tmp_dir    = "/tmp";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version    = "VN.N";
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The contents of the default pb2nc configuration file are described in the
- subsections below.
-\series default
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
 
-\begin_inset Newline newline
 \end_inset
 
-
+.
 \end_layout
 
 \begin_layout Standard
@@ -673,17 +706,11 @@ message_type = [];
 
 \series medium
 Each PrepBufr message is tagged with one of eighteen message types as listed
- in the configuration file.
+ in the share/met/config/README file.
  The 'message_type' refers to the type of observation from which the observation
  value (or 'report') was derived.
  The user may specify a comma-separated list of message types to be retained.
  Providing an empty list indicates that all message types should be retained.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -712,12 +739,6 @@ Each PrepBufr message has a station identification string associated with
  The user may specify a comma-separated list of station IDs to be retained.
  Providing an empty list indicates that messages from all station IDs will
  be retained.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -733,170 +754,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-obs_window = {
-\end_layout
 
-\begin_layout LyX-Code
-beg = -5400;
-\end_layout
-
-\begin_layout LyX-Code
-end = 5400;
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Each PrepBufr file has an observation time associated with it.
- Every PrepBufr message within the file has a time-offset defined relative
- to that file's observation time.
- The 
 \series bold
-beg
-\series medium
- and 
-\series bold
-end
-\series medium
- variables define a time window around the file's observation time for PrepBufr
- messages that should be retained.
- 
-\series bold
-beg
-\series medium
- indicates how many seconds relative to the file's observation time to begin
- retaining observations to be used for verification (the negative sign indicates
- this window begins
-\series bold
- prior
-\series medium
- to the time assigned to the PrepBufr file).
- 
-\series bold
-end
-\series medium
- indicates how many seconds after the file's time to stop retaining observations
- for verification.
- The time window shown above is +/- 1.5 hours (+/- 5400 seconds) around the
- file observation time.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-mask = {
-\end_layout
-
-\begin_layout LyX-Code
-grid = "";
-\end_layout
-
-\begin_layout LyX-Code
-poly = "";
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-grid
-\series medium
- and 
-\series bold
-poly
-\series medium
- variables are used to define a spatial masking region for retaining observation
-s.
- 
-\series bold
-grid 
-\series medium
-may be set to one of the pre-defined NCEP grids which are specified as 
-\series bold
-GNNN
-\series medium
- where 
-\series bold
-NNN
-\series medium
- is the three digit designation for the grid.
- 
-\series bold
-poly
-\series medium
- may be set to a pre-defined or a user-created file consisting of a name
- for the polygon followed by a series of lat/lon points used to define a
- masking region.
- If a masking region is specified, only observations falling inside the
- region will be retained.
- Refer to Appendix B for a list of the grids available for 
-\emph on
-mask_grid
-\emph default
- and pre-defined polylines for 
-\emph on
-mask_poly
-\emph default
-.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-elevation_range = {
-\end_layout
-
-\begin_layout LyX-Code
-beg = -1000;
-\end_layout
-
-\begin_layout LyX-Code
-end = 100000;
-\end_layout
-
-\begin_layout LyX-Code
-}
+elevation_range = { beg = -1000; end = 100000; }
 \end_layout
 
 \begin_layout Standard
@@ -914,12 +774,6 @@ beg
  to be retained.
  The range shown above is set to -1000 to 100000 meters, which essentially
  retains every observation.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -935,14 +789,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-pb_report_type = [];
+
+\series bold
+pb_report_type  = [];
 \end_layout
 
 \begin_layout LyX-Code
-in_report_type = [];
+
+\series bold
+in_report_type  = [];
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 instrument_type = [];
 \end_layout
 
@@ -963,9 +823,32 @@ instrument_type
  types, input report types, and instrument types to be retained, respectively.
  If left empty, all PrepBufr report types, input report types, and instrument
  types will be retained.
-\series default
+ See the following for more details:
+\end_layout
 
-\begin_inset Newline newline
+\begin_layout Standard
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_4.htm
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_6.htm
+\end_layout
+
 \end_inset
 
 
@@ -984,22 +867,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-level_range = {
+
+\series bold
+level_range    = { beg = 1; end = 255; }
 \end_layout
 
 \begin_layout LyX-Code
-beg = 1;
-\end_layout
 
-\begin_layout LyX-Code
-end = 255;
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout LyX-Code
+\series bold
 level_category = [];
 \end_layout
 
@@ -1038,7 +913,12 @@ reference "table_reform-point_pb2nc_level_category"
 \end_inset
 
 .
- These represent the same categories available from 
+ See the following for more details:
+\end_layout
+
+\begin_layout Standard
+
+\series medium
 \begin_inset Flex URL
 status open
 
@@ -1287,10 +1167,6 @@ Auxiliary levels generated via interpolation from spanning levels
 \end_layout
 
 \begin_layout Standard
-
-\end_layout
-
-\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1303,7 +1179,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-obs_grib_code = ['SPFH', 'TMP', 'HGT', 'UGRD', 'VGRD'];
+
+\series bold
+obs_grib_code = [ 'SPFH', 'TMP', 'HGT', 'UGRD', 'VGRD' ];
 \end_layout
 
 \begin_layout Standard
@@ -1314,21 +1192,17 @@ Each PrepBufr message will likely contain multiple observation variables.
 \series bold
 obs_grib_code
 \series medium
- variable is used to specify which observation variables are to be retained
+ variable is used to specify which observation variables should be retained
  or derived.
- The GRIB code itself or the corresponding abbreviation may be used to specify
- which observation variables are to be retained or derived.
+ The value from GRIB parameter table version 2 or the corresponding abbreviation
+ may be used to specify which observation variables are to be retained or
+ derived.
+ The following GRIB codes may be retained: SPFH, TMP, HGT, UGRD, and VGRD
+ for specific humidity, temperature, height, and the u and v components
+ of winds.
  The following GRIB codes may be derived: DPT, WIND, RH, MIXR, and PRMSL
  for dewpoint, wind speed, relative humidity, mixing ratio, and pressure
  reduced to MSL.
- The list of GRIB codes shown above indicates that specific humidity, temperatur
-e, height, and the u and v components of the wind are to be retained.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1344,6 +1218,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 quality_mark_thresh = 2;
 \end_layout
 
@@ -1358,12 +1234,6 @@ quality_mark_thresh
  is used to stratify out which quality marks will be retained.
  The value shown above indicates that only observations with quality marks
  less than or equal to 2 will be retained.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1379,6 +1249,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 event_stack_flag = TOP;
 \end_layout
 
@@ -1405,89 +1277,13 @@ event_stack_flag
 BOTTOM
 \series medium
  option uses the data closest to raw values.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-tmp_dir = '/tmp';
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The tmp_dir indicates where temporary files should be written.
- 
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-version = 'v5.1';
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The version indicates the version of the 
-\emph on
-pb2nc
-\emph default
- configuration file used.
- Future versions of MET may include changes to 
-\emph on
-pb2nc
-\emph default
- and the 
-\emph on
-pb2nc
-\emph default
- configuration file.
- This value should not be modified.
- 
 \end_layout
 
 \begin_layout Subsection
-PB2NC output
+pb2nc output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PB2NC-output"
+name "sub:pb2nc-output"
 
 \end_inset
 
@@ -2069,19 +1865,19 @@ This section describes how to run the ASCII2NC tool.
  file is needed.
  However, for more complex processing, such as summarizing time series observati
 ons, a configuration file may be specified.
- For details on the configuration file options, see the README and example
- configuration files distributed with the MET code.
+ For details on the configuration file options, see the share/met/config/README
+ file and example configuration files distributed with the MET code.
  
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The initial version of the ASCII2NC tool supports input ASCII point observation
- format consisting of 11 columns of data for each observation value.
- The ASCII2NC tool was enhanced for version 4.1 of MET to handle data in
- both little_r and SURFace RADiation (SURFRAD) and Integrated Surface Irradiance
- Study (ISIS) formats (found at 
+Initial versions of the ASCII2NC tool supported only a simple 11 column
+ ASCII point observation format.
+ It currently supports point observation data in the following formats:
+ the default 11 column format, little_r format, SURFace RADiation (SURFRAD)
+ and Integrated Surface Irradiance Study (ISIS) formats (found at 
 \begin_inset Flex URL
 status open
 
@@ -2092,13 +1888,8 @@ http://www.esrl.noaa.gov/gmd/grad/surfrad/
 
 \end_inset
 
-).
- In version 5.1 of MET ASCII2NC was enhanced to handle data in both Western
- Wind and Solar Integration Study (WWSIS) and AErosol RObotic NEtwork (AERONET)
- formats.
- WWSIS data are available by request from National Renewable Energy Laboratory
- in Boulder, CO.
- AERONET data are available at 
+), the Western Wind and Solar Integration Study (WWSIS) format, and the
+ AErosol RObotic NEtwork (AERONET) format (found at 
 \begin_inset Flex URL
 status open
 
@@ -2109,13 +1900,15 @@ http://aeronet.gsfc.nasa.gov/
 
 \end_inset
 
-.
+).
+ WWSIS data are available by request from National Renewable Energy Laboratory
+ in Boulder, CO.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The input ASCII point observation format consists of one row of data per
+The default ASCII point observation format consists of one row of data per
  observation value.
  Each row of data consists of 11 columns as shown in Table 
 \begin_inset CommandInset ref
@@ -2553,7 +2346,6 @@ Observation_Value
 
 \begin_layout Plain Layout
 Observation value in units consistent with the GRIB code definition.
- 3.6.1 ascii2nc usage
 \end_layout
 
 \end_inset
@@ -2607,7 +2399,7 @@ hskip 0.5in}
 
 \end_inset
 
-ascii_file [ascii_file2 ascii_file3 ...
+ascii_file [ascii_file2 ...
  ascii_filen]
 \end_layout
 
@@ -2756,9 +2548,7 @@ ascii_file
 2.
  The 
 \series bold
-netcdf_fil
-\series default
-e
+netcdf_file
 \series medium
  argument indicates the name given to the output NetCDF file.
 \end_layout
@@ -2777,7 +2567,7 @@ arguments for ascii2nc
 \series bold
 -format ASCII_format
 \series medium
- may be set to "met_point", "little_r", "surfrad", "wwsis", or "aeronet".
+ option may be set to "met_point", "little_r", "surfrad", "wwsis", or "aeronet".
  If passing in ISIS data, use the 
 \begin_inset Quotes eld
 \end_inset
@@ -2795,10 +2585,10 @@ surfrad
 4.
  The 
 \series bold
--config file option
+-config file 
 \series medium
- specifies the configuration file to generate summaries of the fields in
- the ASCII files.
+option specifies the configuration file to generate summaries of the fields
+ in the ASCII files.
 \end_layout
 
 \begin_layout Description
@@ -2891,6 +2681,294 @@ sample_ascii_obs.nc
 .
 \end_layout
 
+\begin_layout Subsection
+ascii2nc configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:ascii2nc-configuration-file"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The default configuration file for the ASCII2NC tool named 
+\series bold
+Ascii2NcConfig_default
+\series medium
+ can be found in the installed share/met/config directory.
+ It is recommended that users make a copy of this file prior to modifying
+ its contents.
+\end_layout
+
+\begin_layout Standard
+The ASCII2NC configuration file is optional and only necessary when defining
+ time summaries or message type mapping for litte_r data.
+
+\series medium
+ The contents of the default ASCII2NC configuration file are described below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version = "VN.N";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+time_summary = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   flag      = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   beg       = "000000";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   end       = "235959";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   step      = 300;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   width     = 600;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   grib_code = [ 11, 204, 211 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   type      = [ "min", "max", "range", "mean", "stdev", "median", "p80"
+ ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The time summary feature was implemented to allow additional processing
+ of observations with high temporal resolution, such as SURFRAD data every
+ 5 minutes.
+ The "flag" entry toggles the "time_summary" on (TRUE) and off (FALSE).
+ Observations may be summarized across the user specified time period defined
+ by the "beg" and "end" entries in HHMMSS format.
+ The "step" entry defines the time between intervals in seconds.
+ The "width" entry specifies the width of the summary interval in seconds.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This example listed above does a 10-minute time summary (width = 600;) every
+ 5 minutes (step = 300;) throughout the day (beg = 
+\begin_inset Quotes eld
+\end_inset
+
+000000
+\begin_inset Quotes erd
+\end_inset
+
+; end = 235959
+\begin_inset Quotes erd
+\end_inset
+
+;).
+ The first interval will be from 23:55:00 the previous day through 00:04:59
+ of the current day.
+ The second interval will be from 0:00:00 through 00:09:59.
+ And so on.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The summaries will only be calculated for the specified GRIB codes.
+ The supported summaries are "min" (minimum), "max" (maximum), "range",
+ "mean", "stdev" (standard deviation), "median" and "p##" (percentile, with
+ the desired percentile value specified in place of ##).
+ If multiple summaries are selected in a single run, a string indicating
+ the summary method applied will be appended to the output message type.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+message_type_map = [
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-12 SYNOP";  val = "ADPSFC"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-13 SHIP";   val = "SFCSHP"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-15 METAR";  val = "ADPSFC"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-18 BUOY";   val = "SFCSHP"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-281 QSCAT"; val = "ASCATW"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-32 PILOT";  val = "ADPUPA"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-35 TEMP";   val = "ADPUPA"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-88 SATOB";  val = "SATWND"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "FM-97 ACARS";  val = "AIRCFT"; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+];
+\end_layout
+
+\begin_layout Standard
+This entry is an array of dictionaries, each containing a "key" string and
+ "val" string which define a mapping of input strings to output message
+ types.
+ This mapping is currently only applied when converting input little_r report
+ types to output message types.
+\end_layout
+
+\begin_layout Subsection
+ascii2nc output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:ascii2nc-output"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The NetCDF output of the ASCII2NC tool is structured in the same way as
+ the output of the PB2NC tool described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-output"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
 MADIS2NC tool
 \begin_inset CommandInset label
@@ -2908,7 +2986,7 @@ name "sec:MADIS2NC-tool"
 This section describes how to run the MADIS2NC tool.
  The MADIS2NC tool is used to reformat Meteorological Assimilation Data
  Ingest System (MADIS) point observations into the NetCDF format expected
- by the Point-Stat tool.
+ by the MET statistics tools.
  More information about MADIS data and formatting is available at 
 \series default
 
@@ -2924,22 +3002,13 @@ http://madis.noaa.gov
 
 
 \series medium
+.
  Since the MADIS2NC tool simply performs a reformatting step, no configuration
  file is needed.
- The ASCII2NC tool was enhanced for version 5.1 of MET to handle ACARS (automated
- aircraft) profiles.
- A listing of variables in ACARS format may be found at 
-\begin_inset Flex URL
-status open
-
-\begin_layout Plain Layout
-
-https://madis.noaa.gov/acars_variable_list.shtml
-\end_layout
-
-\end_inset
-
-.
+ The MADIS2NC tool supports many of the MADIS data types, as listed in the
+ usage statement below.
+ Support for additional MADIS data types may be added in the future based
+ on user feedback.
 \end_layout
 
 \begin_layout Subsection
@@ -3318,7 +3387,31 @@ sample_madis_obs_met.nc
 .
  Warnings and error messages will be written to the madislog file, and the
  verbosity will be level three.
- 
+\end_layout
+
+\begin_layout Subsection
+madis2nc output
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:madis2nc-output"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The NetCDF output of the MADIS2NC tool is structured in the same way as
+ the output of the PB2NC tool described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-output"
+
+\end_inset
+
+.
 \end_layout
 
 \end_body
