@@ -1935,7 +1935,7 @@ While the regrid_data_plane tool is useful as a stand-alone tool, the capability
  See Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:IO_Common-Config-Options"
+reference "sec:IO_Configuration-File-Details"
 
 \end_inset
 
