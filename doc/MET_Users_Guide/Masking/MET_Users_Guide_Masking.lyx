@@ -237,7 +237,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-input_config str]
+[-input_field string]
 \end_layout
 
 \begin_layout LyX-Code
@@ -253,7 +253,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-mask_config str]
+[-mask_field string]
 \end_layout
 
 \begin_layout LyX-Code
@@ -301,7 +301,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-thresh str]
+[-thresh string]
 \end_layout
 
 \begin_layout LyX-Code
@@ -333,7 +333,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-name str]
+[-name string]
 \end_layout
 
 \begin_layout LyX-Code
@@ -472,7 +472,7 @@ Optional
 4.
  The 
 \series bold
--type str
+-type string
 \series medium
  option can be used to override the default masking type (poly).
 \end_layout
@@ -483,7 +483,7 @@ Optional
 5.
  The 
 \series bold
--input_config str
+-input_field string
 \series medium
  option can be used to read existing mask data from "input_file".
 \end_layout
@@ -494,7 +494,7 @@ Optional
 6.
  The 
 \series bold
--mask_config str
+-mask_field string
 \series medium
  option can be used to define the field from "mask_file" to be used for
  "data" masking.
@@ -530,7 +530,7 @@ Optional
 9.
  The 
 \series bold
--thresh str
+-thresh string
 \series medium
  option can be used to define the threshold to be applied - Distance (km)
  for "circle" and "track" masking; Raw input values for "data" masking.
@@ -553,7 +553,7 @@ Optional
 11.
  The 
 \series bold
--name str
+-name string
 \series medium
  option can be used to specify the output variable name for the mask.
 \end_layout
@@ -685,7 +685,7 @@ data
 ) masking reads an input gridded data file, extracts the field specified
  using the
 \series bold
- -mask_config
+ -mask_field
 \series default
  command line option, thresholds the data using the 
 \series bold
@@ -714,7 +714,7 @@ input_file
  file and extracts the grid definition from the file.
  If the 
 \series bold
--input_config
+-input_field
 \series default
  command line option is used, it will read the specified field of data and
  initialize each grid point to the value of that field.
