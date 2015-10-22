@@ -90,21 +90,18 @@ name "chap:Re-Formatting-of-Gridded"
 \series medium
 Several MET tools exist for the purpose of reformatting gridded fields.
  MET offers a suite of reformatting tools to put data in a common format.
- Both the input and output file formats are described in this chapter.
- Sections 3.1 and 3.2 are primarily concerned with re-formatting input files
- into the intermediate files required by some MET modules.
- These steps are represented by the first columns in the MET flowchart depicted
- in Fig.
+ Both the input and output file formats of these reformatting tools are
+ described in this chapter.
+ These tools are represented by the reformatting column of MET flowchart
+ depicted in Fig.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "temp_MODIS"
+reference "Fig_Overview_MET_Overview_Flowchart"
 
 \end_inset
 
 .
- Output data formats and the software modules used to reformat gridded fields
- are described in later sections.
 \end_layout
 
 \begin_layout Section
@@ -124,17 +121,43 @@ name "sec:Pcp-Combine-tool"
 This section contains a description of running the Pcp-Combine tool.
  The Pcp-Combine tool is used (if needed) to modify the precipitation accumulati
 on intervals from two or more gridded files into a single NetCDF file containing
- the desired accumulation interval, for input to the MET statistics tools.
- The "sum" command can only be run on GRIB1 or GRIB2 files while "add" and
- "subtract" can be run on any gridded file.
+ the desired accumulation interval.
+ This tool enables users to define identical forecast and observation or
+ analysis precipitation accumulation intervals prior to running the MET
+ statistics tools.
+ The "sum" command can only be run on GRIB1 or GRIB2 files while the "add"
+ and "subtract" commands can be run on any gridded file.
  Use of Pcp-Combine on a single file will result in that file being written
- out in NetCDF format, with no changes to the content.
- The files being combined must have already been placed on the grid on which
- the user would like to verify.
- The copygb utility is recommended for re-gridding GRIB files.
- In addition, the Pcp-Combine tool will only operate on files with the same
- initialization time unless it is indicated that it shoud ignore the initializat
-ion time.
+ out in NetCDF format, with no changes to the data values.
+ The files being combined must all be on a common grid.
+ The Pcp-Combine tool does not support automated regridding.
+ When running the 
+\begin_inset Quotes eld
+\end_inset
+
+subtract
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+sum
+\begin_inset Quotes erd
+\end_inset
+
+ command, the input files must have the same initialization time unless
+ the user has indicated that it shoud ignore the initialization time for
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+sum
+\begin_inset Quotes erd
+\end_inset
+
+ command.
 \end_layout
 
 \begin_layout Subsection
@@ -191,7 +214,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-config config_str]
+[-field string]
 \end_layout
 
 \begin_layout LyX-Code
@@ -207,7 +230,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-varname variable_name]
+[-name variable_name]
 \end_layout
 
 \begin_layout LyX-Code
@@ -406,42 +429,8 @@ hskip 0.5in}
 
 \end_inset
 
-in_file1
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-accum1
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-[in_file2 accum2 in_file3 accum3 .
- .
- .
- ]
+in_file1 accum1 [in_file2 accum2 ...
+ in_filen accumn]
 \end_layout
 
 \begin_layout LyX-Code
@@ -483,7 +472,7 @@ hskip 0.5in}
 
 \end_inset
 
-in_file1
+in_file1 accum1
 \end_layout
 
 \begin_layout LyX-Code
@@ -499,39 +488,7 @@ hskip 0.5in}
 
 \end_inset
 
-accum1
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-in_file2
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
-accum2
+in_file2 accum2
 \end_layout
 
 \begin_layout LyX-Code
@@ -556,7 +513,7 @@ out_file
 Required arguments for the pcp_combine
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 1.
@@ -584,10 +541,9 @@ Optional arguments for pcp_combine
 1.
  The 
 \series bold
--config config_str
+-field string
 \series medium
- option is the configuration string to use when searching for records in
- input files.
+ option defines the data to be extracted from the input files.
 \end_layout
 
 \begin_layout Description
@@ -596,7 +552,7 @@ Optional arguments for pcp_combine
 2.
  The 
 \series bold
--varname variable_name
+-name variable_name
 \series medium
  gives the name of the combined variable in output NetCDF file.
  
@@ -1053,14 +1009,14 @@ Example 3:
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -add input_pinterp.nc 'name="TT"; level="(0,*,*)";' tt_10.ps 
+pcp_combine -add input_pinterp.nc 'name="TT"; level="(0,*,*)";' tt_10.nc 
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 This command would grab the first level of the TT variable from a pinterp
- NetCDF file.
+ NetCDF file and write it to the output tt_10.nc file.
 \end_layout
 
 \begin_layout Subsection
@@ -1079,10 +1035,18 @@ name "sub:pcp_combine-output"
 \series medium
 The output NetCDF files contain the requested accumulation intervals as
  well as information about the grid on which the data lie.
- That grid projection information will be parsed out and used by the statistics
- tools in subsequent steps.
+ That grid projection information will be parsed out and used by the MET
+ statistics tools in subsequent steps.
  One may use NetCDF utilities such as ncdump or ncview to view the contents
  of the output file.
+ Alternatively, the MET Plot-Data-Plane tool described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:plot_data_plane-usage"
+
+\end_inset
+
+ may be run to create a PostScript image of the data.
 \end_layout
 
 \begin_layout Standard
@@ -1387,7 +1351,7 @@ Longitude value for each point in the grid
 \begin_inset Text
 
 \begin_layout Plain Layout
-GRIB Code Abbreviation
+GRIB Code Abbreviation or -name option
 \end_layout
 
 \end_inset
@@ -1405,9 +1369,9 @@ lat, lon
 \begin_inset Text
 
 \begin_layout Plain Layout
-Amount of precipitation for each point in the grid.
+Data value (i.e.
+ accumulated precipitation) for each point in the grid.
  The name of the variable describes the name and level.
- 3.10 MODIS regrid tool
 \end_layout
 
 \end_inset
@@ -1440,13 +1404,14 @@ name "sec:Reformat_Grid-Regrid-data-plane"
 
 \series medium
 This section contains a description of running the regrid_data_plane tool.
- This tool may be run to regrid Grib1, Grib2 or NetCDF files to a user-defined
- specification and write the field(s) out in NetCDF format.
+ This tool may be run to read data from any gridded file MET supports (i.e
+ GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a user-specified
+ grid, and write the field(s) out in NetCDF format.
  The user may specify the method of interpolation used for regridding as
  well as which fields to regrid.
- This tool is particularly useful when dealing with Grib2 and NetCDF input
+ This tool is particularly useful when dealing with GRIB2 and NetCDF input
  files that need to be regridded.
- For Grib1 files, it has also been tested for compatibility with the 
+ For GRIB1 files, it has also been tested for compatibility with the 
 \series bold
 copygb
 \series medium
@@ -1664,30 +1629,9 @@ is the gridded data file to be read.
 \series bold
  to_grid
 \series default
- defines the output grid a as named grid (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
- for options however 
-\begin_inset Quotes eld
-\end_inset
-
-FCST
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-OBS
-\begin_inset Quotes erd
-\end_inset
-
- are not options for this tool)
+ defines the output grid as a named grid, the path to a gridded data file,
+ or an explicit grid specification string.
+ 
 \end_layout
 
 \begin_layout Description
@@ -1732,16 +1676,8 @@ The
 \series bold
 -method type
 \series default
- overrides the default regridding method.
+ option overrides the default regridding method.
  Default is NEAREST.
- (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
- for options)
 \end_layout
 
 \begin_layout Description
@@ -1754,16 +1690,8 @@ The
 \series bold
 -width n
 \series default
- overrides the default regridding width.
+ option overrides the default regridding width.
  Default is 1.
- (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
- for options)
 \end_layout
 
 \begin_layout Description
@@ -1776,7 +1704,7 @@ The
 \series bold
 -vld_thresh n
 \series default
- overrides the default required ratio of valid data for regridding.
+ option overrides the default required ratio of valid data for regridding.
  Default is 0.5.
  
 \end_layout
@@ -1791,7 +1719,7 @@ The
 \series bold
 -name str
 \series default
- specifies the output variable name
+ option specifies the output variable name
 \end_layout
 
 \begin_layout Description
@@ -1835,20 +1763,50 @@ level
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
+For more details on setting the 
+\series bold
+-method
+\series default
+, 
+\series bold
+-width
+\series default
+, and 
+\series bold
+-vld_thresh
+\series default
+ options, see the 
+\series bold
+regrid
+\series default
+ entry in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
 
 \series medium
-An example of the modis_regrid calling sequence is shown below:
+ An example of the regrid_data_plane calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-regrid_data_plane input.nc 
+regrid_data_plane 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
-togrid.grib 
+input.grb 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+togrid.grb 
 \backslash
 
 \end_layout
@@ -1860,29 +1818,29 @@ regridded.nc
 \end_layout
 
 \begin_layout LyX-Code
--config 'name="APCP"; level="A6";'
+-field 'name="APCP"; level="A6";'
 \end_layout
 
 \begin_layout LyX-Code
--config 'name="TMP"; level="Z2";' 
+-field 'name="TMP";  level="Z2";' 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
--config 'name="UGRD"; level="Z10";' 
+-field 'name="UGRD"; level="Z10";' 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
--config 'name="VGRD"; level="Z10";' 
+-field 'name="VGRD"; level="Z10";' 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
--config 'name="HGT"; level="P500";' 
+-field 'name="HGT";  level="P500";' 
 \backslash
 
 \end_layout
@@ -1894,15 +1852,15 @@ regridded.nc
 \begin_layout Standard
 
 \series medium
-In this example, the regrid_data_plane tool will regrid the 
+In this example, the regrid_data_plane tool will regrid data from the 
 \series bold
-input.nc
+input.grb
 \series medium
- to the 
+ file to the grid on which the first record of the 
 \series bold
-togrid.grib
+togrid.grb
 \series medium
- definition using Bilinear Interpolation with a width of 2 and write the
+ file resides using Bilinear Interpolation with a width of 2 and write the
  output in NetCDF format to a file named 
 \series bold
 regridded.nc
@@ -1912,8 +1870,8 @@ regridded.nc
 \series bold
 regridded.nc 
 \series default
-include 6-hour accumulated precipitation, 2m temperature, 10m U and V components
- of the wind and the 500mb geopotential height.
+will include 6-hour accumulated precipitation, 2m temperature, 10m U and
+ V components of the wind, and the 500mb geopotential height.
  
 \end_layout
 
@@ -1930,16 +1888,21 @@ name "sub:Automated-Regridding-in"
 
 \begin_layout Standard
 While the regrid_data_plane tool is useful as a stand-alone tool, the capability
- is also included to automatically regrid one or both fields in all MET
- tools that handle gridded data.
- See Section 
+ is also included to automatically regrid one or both fields in most of
+ the MET tools that handle gridded data.
+ See the 
+\series bold
+regrid
+\series default
+ entry in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:IO_Configuration-File-Details"
 
 \end_inset
 
- for how to use automated regridding within these tools.
+ for a description of the configuration file entries that control automated
+ regridding.
 \end_layout
 
 \begin_layout Section
@@ -1961,13 +1924,13 @@ This section contains a description of running the shift_data_plane tool.
  on user-defined specifications and write the field(s) out in NetCDF format.
  This tool was originally designed to account for track error when comparing
  fields associated with tropical cyclones.
- The user specifies the latitude and longitude within the file they would
- like to shift and then specifies which latitude and longitude to which
- is should be shifted.
- The entire grid is then remapped to the new location.
- The user may specify the method of interpolation and which field to include
- in the output file.
- The effects of topography are ignored.
+ The user specifies the latitude and longitude of the source and destination
+ points to define the shift.
+ Both points must fall within the domain and are used to define the X and
+ Y direction grid unit shift.
+ The rigid is then applied to all grid points.
+ The user may specify the method of interpolation and the field to be shifted.
+ The effects of topography and land/water masks are ignored.
  
 \end_layout
 
@@ -2069,7 +2032,7 @@ hskip 0.5in}
 
 \end_inset
 
--from lat lon
+-to   lat lon
 \end_layout
 
 \begin_layout LyX-Code
@@ -2085,7 +2048,7 @@ hskip 0.5in}
 
 \end_inset
 
-[ -method type ]
+[-method type]
 \end_layout
 
 \begin_layout LyX-Code
@@ -2101,7 +2064,7 @@ hskip 0.5in}
 
 \end_inset
 
-[ width n ]
+[-width n]
 \end_layout
 
 \begin_layout LyX-Code
@@ -2140,7 +2103,7 @@ hskip 0.5in}
 
 \series medium
 \emph on
-modis_regrid
+shift_data_plane
 \emph default
  has some required arguments and can also take optional ones.
  
@@ -2149,7 +2112,7 @@ modis_regrid
 \begin_layout Standard
 
 \series bold
-Required arguments for regrid_data_plane
+Required arguments for shift_data_plane
 \end_layout
 
 \begin_layout Description
@@ -2184,9 +2147,9 @@ output_filename
 \series default
 The 
 \series bold
--field string
+field_string
 \series default
- may be used multiple times to define the field(s) to be regridded.
+ defines the data to be shifted from the input file.
 \end_layout
 
 \begin_layout Description
@@ -2222,7 +2185,7 @@ The
 \begin_layout Standard
 
 \series bold
-Optional arguments for regrid_data_plane
+Optional arguments for shift_data_plane
 \end_layout
 
 \begin_layout Description
@@ -2237,14 +2200,6 @@ The
 \series default
  overrides the default regridding method.
  Default is NEAREST.
- (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
- for options)
 \end_layout
 
 \begin_layout Description
@@ -2259,14 +2214,6 @@ The
 \series default
  overrides the default regridding width.
  Default is 1.
- (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
- for options)
 \end_layout
 
 \begin_layout Description
@@ -2310,23 +2257,103 @@ level
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
 
-\begin_layout Description
-
-\series medium
-An example of the modis_regrid calling sequence is shown below:
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-NEED EXAMPLE FROM JOHN
-\end_layout
+\begin_layout Standard
+For more details on setting the 
+\series bold
+-method
+\series default
+ and 
+\series bold
+-width
+\series default
+ options, see the 
+\series bold
+regrid
+\series default
+ entry in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
 
 \end_inset
 
+.
 
+\series medium
+ An example of the shift_data_plane calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+shift_data_plane 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+nam.grib 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+nam_shift_APCP_12.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+'name = "APCP"; level = "A12";' 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-from 38.6272  -90.1978 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-to   40.1717 -105.1092 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-v 2
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In this example, the shift_data_plane tool reads 12-hour accumulated preciptiati
+on from the 
+\series bold
+nam.grb
+\series medium
+ file, applies a rigid shift defined by (
+\series default
+38.6272, -90.1978
+\series medium
+) to
+\series default
+ (40.1717, -105.1092) and writes the 
+\series medium
+output in NetCDF format to a file named 
+\series bold
+nam_shift_APCP_12.nc
+\series medium
+.
+ These 
+\series bold
+-from
+\series medium
+ and 
+\series bold
+-to
+\series medium
+ locations result in a grid shift of -108.30 units in the x-direction and
+ 16.67 units in the y-direction.
 \end_layout
 
 \begin_layout Section
@@ -2357,7 +2384,7 @@ http://ladsweb.nascom.nasa.gov/
 
 \end_inset
 
- .
+.
 \end_layout
 
 \begin_layout Subsection
@@ -2490,7 +2517,7 @@ hskip 0.5in}
 
 \end_inset
 
-[ -units text ]
+[-units text]
 \end_layout
 
 \begin_layout LyX-Code
@@ -2531,7 +2558,7 @@ Required arguments for modis_regrid
 1.
  The 
 \series bold
-data_file path
+-data_file path
 \series medium
  argument specifies the data files used to get the grid information.
 \end_layout
@@ -2542,7 +2569,7 @@ data_file path
 2.
  The 
 \series bold
-field name
+-field name
 \series medium
  argument specifies the name of the field to use in the MODIS data file.
 \end_layout
@@ -2555,7 +2582,7 @@ field name
 \series default
  
 \series bold
-out path
+-out path
 \series medium
  argument specifies the name of the output NetCDF file.
 \end_layout
@@ -2566,7 +2593,7 @@ out path
 4.
  The 
 \series bold
-scale value
+-scale value
 \series medium
  argument specifies the scale factor to be used on the raw MODIS values.
 \end_layout
@@ -2577,7 +2604,7 @@ scale value
 5.
  The 
 \series bold
-offset value
+-offset value
 \series medium
  argument specifies the offset value to be used on the raw MODIS values.
 \end_layout
@@ -2588,7 +2615,7 @@ offset value
 6.
  The 
 \series bold
-fill value
+-fill value
 \series medium
  argument specifies the bad data value in the MODIS data.
  
@@ -2600,9 +2627,9 @@ fill value
 7.
  The 
 \series bold
-modis_file
+-modis_file
 \series medium
- is the name of the MODIS input file.
+ argument is the name of the MODIS input file.
 \end_layout
 
 \begin_layout Standard
@@ -2619,7 +2646,8 @@ Optional arguments for modis_regrid
 \series bold
 -units text
 \series medium
- specifies units string in the global attributes section of the output file.
+ option specifies the units string in the global attributes section of the
+ output file.
 \end_layout
 
 \begin_layout Description
@@ -2671,19 +2699,19 @@ modis_regrid -field Cloud_Fraction
 \end_layout
 
 \begin_layout LyX-Code
-/home/joeuser/modis_regrid_test_data/modisfile
+modisfile
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-In this example, the modis_regrid tool will process the input field from
- 
+In this example, the modis_regrid tool will process the Cloud_Fraction field
+ from 
 \series default
 modisfile
 \series medium
-, into NetCDF format and write it out to the output file t2.nc on the grid
- specified in 
+ and write it out to the output NetCDF file t2.nc on the grid specified in
+ 
 \series default
 grid_file
 \series medium
