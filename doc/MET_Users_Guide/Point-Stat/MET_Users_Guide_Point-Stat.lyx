@@ -867,11 +867,12 @@ For each of the types of statistics mentioned above (categorical, continuous,
 
 \series medium
 Often, the sample climatology is used as a reference by a skill score.
- This is the average over all included observations and may be transparen
- to the user.
+ The sample climatology is the average over all included observations and
+ may be transparent to the user.
  This is the case in most categorical skill scores.
- The sample climatology will probably prove more difficult to improve upon,
- since it will be from the same locations and time periods as the forecasts.
+ The sample climatology will probably prove more difficult to improve upon
+ than a long term climatology, since it will be from the same locations
+ and time periods as the forecasts.
  This may mask legitimate forecast skill.
  However, a more general climatology, perhaps covering many years, is often
  easier to improve upon and is less likely to mask real forecast skill.
@@ -1271,13 +1272,13 @@ This section contains a description of how to configure and run the Point-Stat
  The gridded model field to be verified must be in one of the supported
  file formats.
  The point observations must be in NetCDF format as the output of the 
-\emph on
-pb2nc
-\emph default
+\series default
+PB2NC
+\series medium
  or 
-\emph on
-ascii2nc
-\emph default
+\series default
+ASCII2NC
+\series medium
  step.
  The Point-Stat tool provides the capability of interpolating the gridded
  forecast data to the observation points using a variety of methods as described
@@ -1626,11 +1627,7 @@ In this example, the Point-Stat tool evaluates the model data in the
 \series default
 sample_fcst.grb
 \series medium
- GRIB file using the observations in the NetCDF output of 
-\emph on
-pb2nc
-\emph default
-, 
+ GRIB file using the observations in the NetCDF output of PB2NC, 
 \series default
 sample_pb.nc
 \series medium
@@ -2019,15 +2016,16 @@ cat_thresh.
 When verifying winds via either the u and v components or the speed and
  direction, it can be desirable to eliminate winds below a certain speed.
  The 
-\series default
+\series bold
 wind_thresh
 \series medium
- filters the winds based on speed, even when u and v winds are input.
- Format is the same as for 
-\series default
-cat_thresh
+ and 
+\series bold
+wind_logic
 \series medium
-.
+ options in the configuration files allow users to filter the winds based
+ on speed, even when u and v winds are input.
+ 
 \end_layout
 
 \begin_layout Standard
