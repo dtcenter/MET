@@ -229,7 +229,7 @@ cout << "\n\n"
      << tab << "-scale value\n"
      << tab << "-offset value\n"
      << tab << "-fill value\n"
-     << tab << "[ -units text ]\n"
+     << tab << "[-units text]\n"
      << tab << "      modis_file\n\n"
 
      << "  where  \"-data_file path\" specifies the data files used to get the grid information\n"
@@ -238,7 +238,7 @@ cout << "\n\n"
      << "         \"-scale value\" specifies the scale factor to be used on the raw modis values\n"
      << "         \"-offset value\" specifies the offset value to be used on the raw modis values\n"
      << "         \"-fill value\" specifies the bad data value in the modis data\n"
-     << "         \"[ -units text ]\" specifies units string in the global attributes section of the output file (optional)\n"
+     << "         \"[-units text]\" specifies the units string in the global attributes section of the output file (optional)\n"
      << "         \"modis file\" is the name of the modis input file\n"
 
      << "\n\n";
