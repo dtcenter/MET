@@ -88,8 +88,8 @@ name "chap:Re-Formatting-of-Point"
 \begin_layout Standard
 
 \series medium
-There are several formats of point observations format that may preprocessed
- using the suite of reformatting tools in MET.
+There are several formats of point observations that may preprocessed using
+ the suite of reformatting tools in MET.
  These include PrepBufr data from NCEP, SURFRAD data from NOAA, Aeronet
  Data from NASA, MADIS data from NOAA, little_r from WRF simulations, and
  user defined data in a generic ASCII format.
@@ -560,8 +560,8 @@ reference "sec:Install_Sample-test-cases"
 scripts/config
 \emph default
 .
- It is recommended that users make a copy of these files prior to modifying
- their contents.
+ It is recommended that users make a copy of configuration files prior to
+ modifying their contents.
  Each configuration file contains many comments describing its contents.
  
 \end_layout
@@ -1404,7 +1404,7 @@ event_stack_flag
 \series bold
 BOTTOM
 \series medium
- option uses the data closes to raw values.
+ option uses the data closest to raw values.
 \series default
 
 \begin_inset Newline newline
