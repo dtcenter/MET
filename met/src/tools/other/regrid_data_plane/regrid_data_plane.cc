@@ -409,7 +409,7 @@ void usage() {
         << "\twhere\t\"input_filename\" is the gridded data file to be "
         << "read (required).\n"
 
-        << "\t\t\"to_grid\" defines the output grid a as named grid, the "
+        << "\t\t\"to_grid\" defines the output grid as a named grid, the "
         << "path to a gridded data file, or an explicit grid "
         << "specification string (required).\n"
 
