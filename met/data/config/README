@@ -5,15 +5,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 The configuration files that control many of the MET tools contain formatted
-ASCII text.  This format has been updated for METv4.0.
+ASCII text.  This format has been updated for METv4.0 and continues to be used
+in subsequent releases.
 
 Settings common to multiple tools are described in the top part of this README
 file and settings specific to individual tools are described beneath the common
 settings.  Please refer to the MET User's Guide in the "doc" directory for more
 details about the settings if necessary.
 
-A configuration file entry is an entry name, followed by an equal sign =,
-followed by an entry value, and is terminated by a semicolon ;.  The
+A configuration file entry is an entry name, followed by an equal sign (=),
+followed by an entry value, and is terminated by a semicolon (;).  The
 configuration file itself is one large dictionary consisting of entries, some of
 which are dictionaries themselves.
 
@@ -58,20 +59,31 @@ Each of the configurable MET tools expects a certain set of configuration
 entries.  Examples of the MET configuration files can be found in data/config
 and scripts/config.
 
-When you pass a configuration file to a MET tool, the tool actually parses three
-different configuration files in the following order:
-   (1) Reads data/config/ConfigConstants to define constants.
-   (2) Reads the default configuration file for the tool from data/config.
-   (3) Reads the user-specified configuration file from the command line.
+When you pass a configuration file to a MET tool, the tool actually parses up
+to four different configuration files in the following order:
+   (1) Reads share/met/config/ConfigConstants to define constants.
+   (2) If the tool produces PostScript output, it reads
+       share/met/config/ConfigMapData to define the map data to be plotted.
+   (3) Reads the default configuration file for the tool from share/met/config.
+   (4) Reads the user-specified configuration file from the command line.
 
-Many of the entries from step (2) are overwritten by the user-specified entries
-from step (3).  Therefore, the configuration file you pass in on the command
+Many of the entries from step (3) are overwritten by the user-specified entries
+from step (4).  Therefore, the configuration file you pass in on the command
 line really only needs to contain entries that differ from the defaults.
 
-The configuration file language supports the use of environment variables. When
-scripting up many calls to the MET tools, you may find it convenient to use them.
-They are specified as ${ENV_VAR}, where ENV_VAR is the name of the environment
-variable.
+Any of the configuration entries may be overwritten by the user-specified
+configuration file.  For example, the map data to be plotted may be included in
+the user-specified configuration file and override the default settings defined
+in the share/met/config/ConfigMapData file.
+
+The configuration file language supports the use of environment variables. They
+are specified as ${ENV_VAR}, where ENV_VAR is the name of the environment
+variable.  When scripting up many calls to the MET tools, you may find it
+convenient to use them.  For example, when applying the same configuration to
+the output from multiple models, consider defining the model name as an
+environment variable which the controlling script sets prior to verifying the
+output of each model.  Setting MODEL to that environment variable enables you
+to use one configuration file rather than maintianing many very similar ones.
 
 The MET_BASE variable is defined in the code at compilation time as the path
 to the MET shared data.  These are things like the default configuration files,
