@@ -548,7 +548,7 @@ In this example, the Ensemble-Stat tool will process six forecast files
  These ranks can then be used to plot a rank histogram for each type of
  observation.
  Ensemble Stat will create a NetCDF file containing requested ensemble fields
- and an ascii stat file.
+ and an output STAT file.
  
 \end_layout
 

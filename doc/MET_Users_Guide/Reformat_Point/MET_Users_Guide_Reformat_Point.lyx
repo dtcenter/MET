@@ -92,7 +92,7 @@ There are several formats of point observations format that may preprocessed
  using the suite of reformatting tools in MET.
  These include PrepBufr data from NCEP, SURFRAD data from NOAA, Aeronet
  Data from NASA, MADIS data from NOAA, little_r from WRF simulations, and
- user defined data in a generic ascii format.
+ user defined data in a generic ASCII format.
  These steps are represented by the first columns in the MET flowchart depicted
  in Fig.
  1-1.

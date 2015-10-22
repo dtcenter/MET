@@ -99,7 +99,7 @@ name "sec:MTD_Introduction"
 Motivation
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MDT_Motivation"
+name "sub:MTD_Motivation"
 
 \end_inset
 
@@ -364,7 +364,6 @@ status open
 
 \begin_layout Plain Layout
 
-\series medium
 $R$
 \end_layout
 
@@ -1085,7 +1084,6 @@ status open
 
 \begin_layout Plain Layout
 
-\series medium
 $
 \backslash
 alpha$
@@ -1099,7 +1097,6 @@ status open
 
 \begin_layout Plain Layout
 
-\series medium
 $
 \backslash
 beta$
@@ -2372,20 +2369,7 @@ _volume}
  in this chapter) is smaller than the given value.
  Spacetime objects whose volume is less than this will not participate in
  the matching and merging process, and no attribute information will be
- written to the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt ascii}
-\end_layout
-
-\end_inset
-
- output files.
+ written to the ASCII output files.
  The default value is 
 \begin_inset ERT
 status open
@@ -2605,20 +2589,7 @@ _output}
 \end_inset
 
  dictionary also contains a collection of boolean flags, in this case controllin
-g the output of 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt ascii}
-\end_layout
-
-\end_inset
-
- attribute files.
+g the output of ASCII attribute files.
  The 
 \begin_inset ERT
 status open
@@ -2711,7 +2682,7 @@ name "sub:MTD_ASCII-Attribute-Files"
 \end_layout
 
 \begin_layout Standard
-In all, five ascii output files are created:
+In all, five ASCII output files are created:
 \end_layout
 
 \begin_layout Itemize
@@ -2736,7 +2707,7 @@ Pair attributes for 3D composite objects
 \end_layout
 
 \begin_layout Standard
-Each ascii file is laid out in tabular format, with the first line consisting
+Each ASCII file is laid out in tabular format, with the first line consisting
  of text strings giving names for each column.
  The first 15 columns of each file are identical, and give information on
  timestamps, model names, and the convolution radius and threshold used
@@ -2752,10 +2723,10 @@ These columns are explained in Table 1.1.
 \end_layout
 
 \begin_layout Standard
-One thing that is slightly different in the ascii output files from the
+One thing that is slightly different in the ASCII output files from the
  way MODE does things is the way in which object numbers (both simple and
  composite) are indicated.
- For example, in the ascii attribute files that MODE produces, forecast
+ For example, in the ASCII attribute files that MODE produces, forecast
  simple object number #1 is indicated as 
 \family typewriter
 F001
