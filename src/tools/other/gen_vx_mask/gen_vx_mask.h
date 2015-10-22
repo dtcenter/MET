@@ -71,7 +71,7 @@ static ConcatString input_filename, mask_filename, out_filename;
 
 // Optional arguments
 static MaskType mask_type = default_mask_type;
-static ConcatString input_config_str, mask_config_str;
+static ConcatString input_field_str, mask_field_str;
 static SetLogic set_logic = SetLogic_None;
 static bool complement = false;
 static SingleThresh thresh;
@@ -105,8 +105,8 @@ static DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask, Set
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
 static void      set_type(const StringArray &);
-static void      set_input_config(const StringArray &);
-static void      set_mask_config(const StringArray &);
+static void      set_input_field(const StringArray &);
+static void      set_mask_field(const StringArray &);
 static void      set_complement(const StringArray &);
 static void      set_union(const StringArray &);
 static void      set_intersection(const StringArray &);
