@@ -126,22 +126,7 @@ reference "sub:grid_stat-output"
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:ensemble_stat-configuration-file"
-
-\end_inset
-
-
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Please note, this is supposed to be 7.3.3.
- There is no 7.3.3 in the original documentation.
- There is a 7.2.3, which is what I referenced.
- ~Lisa
-\end_layout
+reference "sub:ensemble_stat-output"
 
 \end_inset
 
@@ -2608,21 +2593,10 @@ go_index
 \begin_inset Text
 
 \begin_layout Plain Layout
-Calculates the GO Index as described in section 
+Calculates the GO Index as described in section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:MODE_Introduction"
-
-\end_inset
-
-
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-This refers to the OLD 8.1.1 but there is no 8.1.1.
- I'm using the 8.1 Introduction (now chapter 14.1) ~Lisa
-\end_layout
+reference "sub:StA_Skill-Score-Index,"
 
 \end_inset
 
