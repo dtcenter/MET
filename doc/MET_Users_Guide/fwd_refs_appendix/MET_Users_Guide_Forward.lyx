@@ -188,14 +188,14 @@ New tools:
 \begin_layout Description
 5.
  The gsid2mpr tool reads one or more binary GSI diagnostic files and reformats
- them into the MPR line type for further analysis by the STAT-Analysis tool.
+ them into the MPR line type for further analysis by the Stat-Analysis tool.
 \end_layout
 
 \begin_layout Description
 6.
  The gsidens2orank tool reads an ensemble of binary GSI diagnostic files
  and reformats them into the ORANK line type for further analysis by the
- STAT-Analysis tool.
+ Stat-Analysis tool.
 \end_layout
 
 \begin_layout Subsection*
