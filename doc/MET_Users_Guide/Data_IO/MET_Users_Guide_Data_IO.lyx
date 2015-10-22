@@ -213,6 +213,12 @@ n types in a single file in a standard format.
  verification tool.
 \end_layout
 
+\begin_layout Standard
+Tropical cyclone forecasts and observations are typically provided in a
+ specific ASCII format, in A Deck and B Deck files.
+ 
+\end_layout
+
 \begin_layout Section
 Intermediate data formats
 \begin_inset CommandInset label
@@ -373,40 +379,34 @@ The MODE tool creates two ASCII output files as well (although they are
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-The Ensemble-Stat, Grid-Stat, Wavelet-Stat, Series-Analysis, MODE, and MODE-TD
- tools generate gridded NetCDF output.
- The MODE tool creates a NetCDF file containing four gridded fields for
- the objects identified in the forecast and observation, simple and cluster
- object fields.
- MODE-TD produces three ASCII files containing 2D single object and 3D single
- and pair object attribute values and one NetCDF file containing object
- indices for the gridded simple and cluster object fields.
- The Ensemble-Stat creates a NetCDF file containing the ensemble forecast
- values, statistics, and, if requested, matched observations for each verificati
-on region and variable type/level requested in the configuration file.
- In addition, when rank histogram information is requested, the NetCDF file
- contains the observation rank values.
- The Grid-Stat tool creates a NetCDF file containing the matched forecast/observ
-ation pairs and the forecast minus observation difference fields for each
- verification region and variable type/level requested in the configuration
- file.
- The Wavelet-Stat tool creates a NetCDF file summarizing the wavelet decompositi
-on of the forecast and observation fields for each variable type/level,
- raw threshold, and tile masking region chosen.
- The generation of these files is controlled by configuration files or command
- line switches.
- As discussed in the previous section, the Pcp-Combine and Gen-Vx-Mask tools
- create gridded NetCDF output as well, while the PB2NC, MADIS2NC, and ASCII2NC
- tools create intermediate NetCDF files containing point observations.
+The TC-Pairs and TC-Stat modules produce ASCII output, similar in style
+ to the STAT files, but with TC relevant fields.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The MODE and Wavelet-Stat tools produce PostScript plots summarizing the
- features-based approach used in the verification.
+Many of the tools generate gridded NetCDF output.
+ Generally, this output acts as input to other MET tools or plotting programs.
+ The point observation preprocessing tools produce NetCDF output as input
+ to the statistics tools.
+ Full details of the contents of the NetCDF files is found in the section
+ below.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:IO_Data-format-summary"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The MODE, Wavelet-Stat,and plotting tools produce PostScript plots summarizing
+ the features-based approach used in the verification.
  The PostScript plots are generated using internal libraries and do not
  depend on an external plotting package.
  The MODE plots contain several summary pages at the beginning, but the
