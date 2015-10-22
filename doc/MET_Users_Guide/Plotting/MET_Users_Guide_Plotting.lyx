@@ -297,10 +297,10 @@ ps_file
  argument indicates the name given to the output file containing the plot.
 \end_layout
 
-\begin_layout Description
-Optional 
+\begin_layout Standard
+
 \series bold
-arguments for plot_point_obs
+Optional arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
@@ -567,6 +567,8 @@ plot_data_plane
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for plot_data_plane
 \end_layout
 
@@ -604,12 +606,10 @@ field_string
  argument contains information about the field and level to be plotted.
 \end_layout
 
-\begin_layout Description
-Optional 
+\begin_layout Standard
+
 \series bold
-arguments for 
-\emph on
-plot_data_plane
+Optional arguments for plot_data_plane
 \end_layout
 
 \begin_layout Description
@@ -687,33 +687,35 @@ An example of the plot_data_plane calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-plot_data_plane test.grb test.ps 'name="TMP"; level="Z2";' 
+plot_data_plane test.grb test.ps 'name="TMP"; level="Z2";'
 \end_layout
 
 \begin_layout LyX-Code
-or 
-\end_layout
 
-\begin_layout LyX-Code
-plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";' 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
--v 4 (use -v4 to make sure it is grabbing the correct data)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-In the first example, the plot_point_obs tool will process the input test.grb
- file write a postscript file containing a plot to a file named 
+A second example of the plot_data_plane calling sequence is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+plot_data_plane test.grb2 test.ps 'name="DSWRF"; level="L0";' -v 4
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In the first example, the plot_data_plane tool will process the input test.grb
+ file and write a PostScript image to a file named 
 \series default
 test.ps
 \series medium
  showing temperature at 2 meters.
- The second example will show downward shortwave radiation flux at the surface.
+ The second example plots downward shortwave radiation flux at the surface.
+ The second example is run at verbosity level 4 so that user can inspect
+ the output and make sure its plotting the intended record.
 \end_layout
 
 \begin_layout Subsection
