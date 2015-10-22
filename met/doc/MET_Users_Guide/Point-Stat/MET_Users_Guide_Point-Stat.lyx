@@ -3874,7 +3874,7 @@ reference "table_PS_format_info_FHO"
  through 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "table_PS_format_info_VL1L2"
+reference "table_PS_format_info_MPR"
 
 \end_inset
 
@@ -5077,6 +5077,8 @@ name "table_PS_format_info_CTS_cont"
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="3">
 <features rotate="0" tabularvalignment="middle">
@@ -6273,6 +6275,8 @@ name "table_PS_format_info_CNT_cont"
 \end_layout
 
 \begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="3">
 <features rotate="0" tabularvalignment="middle">
