@@ -104,12 +104,12 @@ This chapter contains a description of the Ensemble-Stat tool.
  spread, etc) from a set of several forecast model files to be used by the
  MET statistics tools.
  If observations are also included, ensemble statistics such as rank histograms,
- probability integral transform histogras, spread / skill variance, and
+ probability integral transform histograms, spread / skill variance, and
  continuous ranked probability score are produced.
  A climatology file may also be provided, and will be used as a reference
  forecast in several of the output statistics.
  Details about and equations for the statistics produced for ensembles are
- given in Appendix 
+ given in Appendix C 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:App_C-ensemble"
@@ -144,8 +144,8 @@ t tool.
  the MET supported gridded file formats.
  If gridded files are not on the same grid, MET will do the regridding for
  you if you specify the desired output grid.
- Point observations should be in the NetCDF format produced by pb2nc, ascii2nc,
- or madis2nc.
+ Point observations should be in the NetCDF format produced by PB2NC, ASCII2NC,
+ or MADIS2NC.
  
 \end_layout
 
@@ -4632,7 +4632,7 @@ version =
 \begin_inset Quotes eld
 \end_inset
 
-v5.1
+v#
 \begin_inset Quotes erd
 \end_inset
 
