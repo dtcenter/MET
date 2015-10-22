@@ -10859,8 +10859,8 @@ Quality control flag for observation
 
 \series medium
 The STAT output files described for point_stat may be used as inputs to
- the STAT Analysis tool.
- For more information on using the STAT Analysis tool to create stratifications
+ the Stat-Analysis tool.
+ For more information on using the Stat-Analysis tool to create stratifications
  and aggregations of the STAT files produced by point_stat, please see Chapter
  
 \begin_inset CommandInset ref

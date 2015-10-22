@@ -134,7 +134,7 @@ MET includes two tools for processing GSI diagnostic files.
  The gsidens2orank tool processes an ensemble of GSI diagnostic files and
  reformats them into the MET observation rank (ORANK) line type, similar
  to the output of the Ensemble-Stat tool.
- The output of both tools may be passed to the STAT-Analysis tool to compute
+ The output of both tools may be passed to the Stat-Analysis tool to compute
  a wide variety of continuous, categorical, and ensemble statistics.
 \end_layout
 
@@ -156,7 +156,7 @@ This section describes how to run the tool gsid2mpr tool.
  The gsid2mpr tool reformats one or more GSI diagnostic files into an ASCII
  matched pair (MPR) format, similar to the MPR output of the Point-Stat
  tool.
- The output MPR data may be passed to the STAT-Analysis tool to compute
+ The output MPR data may be passed to the Stat-Analysis tool to compute
  a wide variety of continuous or categorical statistics.
 \end_layout
 
@@ -1973,7 +1973,7 @@ Pressure of the maximum weighing function
 
 \begin_layout Standard
 \noindent
-The gsid2mpr output may be passed to the STAT-Analysis tool to derive additional
+The gsid2mpr output may be passed to the Stat-Analysis tool to derive additional
  statistics.
  In particular, users should consider running the 
 \series bold
@@ -1982,7 +1982,7 @@ aggregate_stat
  job type to read MPR lines and compute partial sums (SL1L2), continuous
  statistics (CNT), contingency table counts (CTC), or contingency table
  statistics (CTS).
- STAT-Analysis has been enhanced to parse any extra columns found at the
+ Stat-Analysis has been enhanced to parse any extra columns found at the
  end of the input lines.
  Users can filter the values in those extra columns using the 
 \series bold
@@ -1998,7 +1998,7 @@ aggregate_stat
 \begin_layout Standard
 
 \series medium
-An example of the STAT-Analysis calling sequence is shown below:
+An example of the Stat-Analysis calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -2020,7 +2020,7 @@ stat_analysis -lookin diag_conv_ges.mem001.stat
 \begin_layout Standard
 
 \series medium
-In this example, the STAT-Analysis tool will read MPR lines from the input
+In this example, the Stat-Analysis tool will read MPR lines from the input
  file named
 \series default
  
@@ -2062,7 +2062,7 @@ This section describes how to run the tool gsidens2orank tool.
  to the output of the Ensemble-Stat tool.
  The ORANK line type contains ensemble matched pair information and is anologous
  to the MPR line type for a deterministic model.
- The output ORANK data may be passed to the STAT-Analysis tool to compute
+ The output ORANK data may be passed to the Stat-Analysis tool to compute
  ensemble statistics.
 \end_layout
 
@@ -3566,7 +3566,7 @@ d(Tz)/d(Tr)
 
 \begin_layout Standard
 \noindent
-The gsidens2orank output may be passed to the STAT-Analysis tool to derive
+The gsidens2orank output may be passed to the Stat-Analysis tool to derive
  additional statistics.
  In particular, users should consider running the 
 \series bold
@@ -3575,7 +3575,7 @@ aggregate_stat
  job type to read ORANK lines and ranked histograms (RHIST), probability
  integral transform historgrams (PHIST), and spread-skill variance output
  (SSVAR).
- STAT-Analysis has been enhanced to parse any extra columns found at the
+ Stat-Analysis has been enhanced to parse any extra columns found at the
  end of the input lines.
  Users can filter the values in those extra columns using the 
 \series bold
@@ -3591,7 +3591,7 @@ aggregate_stat
 \begin_layout Standard
 
 \series medium
-An example of the STAT-Analysis calling sequence is shown below:
+An example of the Stat-Analysis calling sequence is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -3613,7 +3613,7 @@ stat_analysis -lookin diag_conv_ges_ens_mean_orank.txt
 \begin_layout Standard
 
 \series medium
-In this example, the STAT-Analysis tool will read ORANK lines from the input
+In this example, the Stat-Analysis tool will read ORANK lines from the input
  file named
 \series default
  

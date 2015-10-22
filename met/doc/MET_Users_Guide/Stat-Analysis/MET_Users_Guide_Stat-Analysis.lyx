@@ -342,7 +342,7 @@ reference "compute_GO_Index"
 .
  The partial sums (SL1L2 lines in the STAT output) for each of these variables
  at each level and lead time must have been computed in a previous step.
- The STAT analysis tool then uses the weights in Table 
+ The Stat-Analysis tool then uses the weights in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "compute_GO_Index"
@@ -1260,11 +1260,11 @@ s tool.
 
 \series medium
 Once the appropriate lines have been generated for each verification time
- of interest, the user may run the STAT-Analysis tool to analyze them.
- The STAT-Analysis job "aggregate_stat", along with the "-output_line_type
+ of interest, the user may run the Stat-Analysis tool to analyze them.
+ The Stat-Analysis job "aggregate_stat", along with the "-output_line_type
  WDIR" option, reads all of the input lines and computes statistics about
  the wind direction.
- When running this job the user is encouraged to use the many STAT-Analysis
+ When running this job the user is encouraged to use the many Stat-Analysis
  options to filter the input lines down to the set of lines of interest.
  The output of the wind direction analysis job consists of two lines with
  wind direction statistics computed in two slightly different ways.
@@ -1439,9 +1439,9 @@ Stat_analysis
 \begin_layout Standard
 
 \series medium
-In the usage statement for the STAT analysis tool, some additional terminology
+In the usage statement for the Stat-Analysis tool, some additional terminology
  is introduced.
- In the STAT analysis tool, the term "job" refers to a set of tasks to be
+ In the Stat-Analysis tool, the term "job" refers to a set of tasks to be
  performed after applying user-specified options (i.e., "filters").
  The filters are used to pare down a collection of output from 
 \emph on
@@ -1624,7 +1624,7 @@ stat_analysis -lookin ../out/point_stat
 \begin_layout Standard
 
 \series medium
-In this example, the stat analysis tool will search for valid STAT lines
+In this example, the Stat-Analysis tool will search for valid STAT lines
  located in the 
 \emph on
 ../out/point_stat
@@ -1655,7 +1655,7 @@ name "sub:stat_analysis-configuration-file"
 \begin_layout Standard
 
 \series medium
-The default configuration file for the stat analysis tool named 
+The default configuration file for the Stat-Analysis tool named 
 \emph on
 STATAnalysisConfig_default
 \emph default
@@ -1684,7 +1684,7 @@ d that users make a copy of these files prior to modifying their contents.
 \begin_layout Standard
 
 \series medium
-Most of the user-specified parameters listed in the STAT analysis configuration
+Most of the user-specified parameters listed in the Stat-Analysis configuration
  file are used to filter the ASCII statistical output from 
 \emph on
 grid_stat, point_stat, wavelet_stat
@@ -1694,7 +1694,7 @@ grid_stat, point_stat, wavelet_stat
 ensemble_stat
 \emph default
  down to a desired subset of lines over which statistics are to be computed.
- Only output that meet all of the parameters specified in the STAT analysis
+ Only output that meet all of the parameters specified in the Stat-Analysis
  configuration file will be retained.
 \end_layout
 
@@ -2392,7 +2392,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Description of components of the job command lines for the STAT analysis
+Description of components of the job command lines for the Stat-Analysis
  tool.
 \end_layout
 
@@ -2896,7 +2896,7 @@ tmp_dir = "/tmp";
 \begin_layout Standard
 
 \series medium
-This parameter indicates the directory where the stat analysis tool should
+This parameter indicates the directory where the Stat-Analysis tool should
  write temporary files.
 \begin_inset Newline newline
 \end_inset
