@@ -181,10 +181,12 @@ The MET package can handle gridded input data in one of three formats: GRIB
 \begin_layout Standard
 
 \series medium
-When comparing two gridded fields with the Grid-Stat, Wavelet-Stat, or MODE
- tools, the input model and observation datasets must have already been
- placed on the same grid.
- The copygb utility is recommended for re-gridding GRIB files.
+When comparing two gridded fields with the Grid-Stat, Wavelet-Stat, Ensemble-Sta
+t, MODE, or MODE-TD tools, the input model and observation datasets must
+ be on the same grid.
+ MET will regrid files according to user specified options.
+ Alternately, outside of MET, the copygb utility is recommended for re-gridding
+ GRIB files.
  To preserve characteristics of the observations, it is generally preferred
  to re-grid the model data to the observation grid, rather than vice versa.
 \end_layout
@@ -226,15 +228,14 @@ name "sec:IO_Intermediate-data-formats"
 
 \series medium
 MET uses NetCDF as an intermediate file format.
- The Ensemble-Tool, WWMCA-Tool, Pcp-Combine, Gen-Poly-Mask, Gen-Circle-Mask,
- PB2NC, MADIS2NC, and ASCII2NC tools write intermediate files in NetCDF
- format.
+ The Ensemble-Stat, WWMCA-Tool, Pcp-Combine, Gen-Vx-Mask, PB2NC, MADIS2NC,
+ and ASCII2NC tools write intermediate files in NetCDF format.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The Pcp-Combine tool operates in 3 different modes.
+The Pcp-Combine tool operates in three different modes.
  It may be used to 
 \series default
 sum
@@ -279,17 +280,13 @@ pcp_combine
 \series medium
 The 
 \emph on
-Gen-Poly-Mask
+Gen-Vx-Mask
 \emph default
- and 
-\emph on
-Gen-Circle_Mask
-\emph default
- tools are used to define a bitmapped masking region that can be used by
- the statistics tools as a verification subdomain.
- It is generally more efficient to use the NetCDF output of these tools
- to define a masking region than using a complex polyline directly in the
- other MET tools.
+ tool is used to define a bitmapped masking region that can be used by the
+ statistics tools as a verification subdomain.
+ It is generally more efficient to use the NetCDF output of this tool to
+ define a masking region than using a complex polyline directly in the other
+ MET tools.
  However, the NetCDF output can only be applied to datasets on a common
  domain.
  It must be regenerated for each domain used.
@@ -329,9 +326,9 @@ name "sec:IO_Output-data-formats"
 \begin_layout Standard
 
 \series medium
-The MET package currently produces output in four basic file formats: STAT
- files, ASCII files, NetCDF files, PostScript plots, and png plots from
- the Plot-Mode-Field utility.
+The MET package currently produces output in the following basic file formats:
+ STAT files, ASCII files, NetCDF files, PostScript plots, and png plots
+ from the Plot-Mode-Field utility.
 \end_layout
 
 \begin_layout Standard
@@ -378,11 +375,14 @@ The MODE tool creates two ASCII output files as well (although they are
 \begin_layout Standard
 
 \series medium
-The Ensemble-Stat, Grid-Stat, Wavelet-Stat, Series-Analysis, and MODE tools
- generate gridded NetCDF output.
+The Ensemble-Stat, Grid-Stat, Wavelet-Stat, Series-Analysis, MODE, and MODE-TD
+ tools generate gridded NetCDF output.
  The MODE tool creates a NetCDF file containing four gridded fields for
  the objects identified in the forecast and observation, simple and cluster
  object fields.
+ MODE-TD produces three ASCII files containing 2D single object and 3D single
+ and pair object attribute values and one NetCDF file containing object
+ indices for the gridded simple and cluster object fields.
  The Ensemble-Stat creates a NetCDF file containing the ensemble forecast
  values, statistics, and, if requested, matched observations for each verificati
 on region and variable type/level requested in the configuration file.
@@ -397,10 +397,9 @@ on of the forecast and observation fields for each variable type/level,
  raw threshold, and tile masking region chosen.
  The generation of these files is controlled by configuration files or command
  line switches.
- As discussed in the previous section, the Pcp-Combine, Gen-Poly-Mask, and
- Gen-Circle-Mask tools create gridded NetCDF output as well, while the PB2NC,
- MADIS2NC, and ASCII2NC tools create intermediate NetCDF files containing
- point observations.
+ As discussed in the previous section, the Pcp-Combine and Gen-Vx-Mask tools
+ create gridded NetCDF output as well, while the PB2NC, MADIS2NC, and ASCII2NC
+ tools create intermediate NetCDF files containing point observations.
 \end_layout
 
 \begin_layout Standard
