@@ -2553,10 +2553,10 @@ netcdf_file
  argument indicates the name given to the output NetCDF file.
 \end_layout
 
-\begin_layout Description
-Optional 
+\begin_layout Standard
+
 \series bold
-arguments for ascii2nc
+Optional arguments for ascii2nc
 \end_layout
 
 \begin_layout Description
@@ -3258,10 +3258,10 @@ netcdf_file
  mesonet or acarsProfiles).
 \end_layout
 
-\begin_layout Description
-Optional 
+\begin_layout Standard
+
 \series bold
-arguments for madis2nc
+Optional arguments for madis2nc
 \end_layout
 
 \begin_layout Description
