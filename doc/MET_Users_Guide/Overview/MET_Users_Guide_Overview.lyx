@@ -123,17 +123,6 @@ http://www.wrf-model.org/index.php
 \begin_layout Standard
 
 \series medium
-Since the release of METv4.1, tropical cyclone verification tools, collectively
- called MET-TC, are included with MET.
- Because this package operates in a very different way than the other MET
- tools, MET-TC is documented separately.
- The MET-TC documentation is also included with the released code and on
- the web site.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
 The MET User's Guide is organized as follows.
  Chapter 
 \begin_inset CommandInset ref
@@ -247,8 +236,8 @@ reference "chap:Plotting-and-Graphics"
 \end_inset
 
  includes plotting tools included in the MET release for checking and visualizin
-g data.
- as well as some additional tools and information for plotting MET results.
+g data, as well as some additional tools and information for plotting MET
+ results.
  The appendices provide further useful information, including answers to
  some typical questions  (Appendix 
 \begin_inset CommandInset ref
@@ -440,15 +429,15 @@ reference "Fig_Overview_MET_Overview_Flowchart"
 \end_inset
 
 .
- The main stages represented are input, reformatting, intermediate output,
- statistical analyses, and output and aggregation/analysis.
+ The main stages represented are input, reformatting, plotting, intermediate
+ output, statistical analyses, and output and aggregation/analysis.
+ The MET-TC package functions independently of the other MET modules, as
+ inducated in the Figure.
  Each of these stages is described further in later chapters.
  For example, the input and output formats are discussed in Chapter 2 as
  well as in the chapters associated with each of the statistics modules.
  MET input files are represented on the far left.
- Note that forecast model output is currently expected to be in GRIB1, GRIB2,
- or the pinterp NetCDF format; other formats may be incorporated in future
- releases of MET.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -504,9 +493,8 @@ name "Fig_Overview_MET_Overview_Flowchart"
 \begin_layout Standard
 
 \series medium
-The reformatting stage of MET consists of the Gen-Poly-Mask, Gen-Circle-Mask,
- PB2NC, ASCII2NC, Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and
- Ensemble Stat tools.
+The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC,
+ Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and Ensemble Stat tools.
  The PB2NC tool is used to create NetCDF files from input PrepBufr files
  containing point observations.
  Likewise, the ASCII2NC tool is used to create NetCDF files from input ASCII
@@ -516,13 +504,14 @@ The reformatting stage of MET consists of the Gen-Poly-Mask, Gen-Circle-Mask,
  MODIS and WWMCA files are regridded and formatted into NetCDF files by
  their respective tools.
  These NetCDF files are then used in the statistical analysis step.
- The Gen-Poly-Mask, Gen-Circle-Mask, and Pcp-Combine are optional.
- The Gen-Poly-Mask tool will create a bitmapped masking area from a user
- specified polygon, i.e.
+ The Gen-Vx-Mask and Pcp-Combine are optional.
+ The Gen-Vx-Mask tool will create a bitmapped masking area in one of two
+ ways.
+ The first is from a user specified polygon, i.e.
  a text file containing a series of latitudes / longitudes.
  This mask can then be used to efficiently limit verification to the interior
  of a user specified region.
- Similarly, the Gen-Circle-Mask tool creates circular masking regions, frequency
+ Similarly, the Gen-Vx-Mask tool can create a circular masking region, frequency
  used with radar observations.
  The Pcp-Combine tool accumulates precipitation amounts into the time interval
  selected by the user - if a user would like to verify over a different
@@ -554,7 +543,8 @@ Several optional plotting utilities are provided to assist users in checking
 
 \series medium
 The main statistical analysis components of the current version of MET are:
- Point-Stat, Grid-Stat, Series-Analysis, MODE, and Wavelet-Stat.
+ Point-Stat, Grid-Stat, Series-Analysis, Ensemble-Stat, MODE, MODE-TD (MTD),
+ and Wavelet-Stat.
  The Point-Stat tool is used for grid-to-point verification, or verification
  of a gridded forecast field against a point-based observation (i.e., surface
  observing stations, ACARS, rawinsondes, and other observation types that
@@ -626,16 +616,21 @@ The MODE (Method for Object-based Diagnostic Evaluation) tool also uses
 \begin_layout Standard
 
 \series medium
-The Wavelet-Stat tool decomposes two-dimensional forecasts and observations
- according to the Intensity-Scale verification technique described by Casati
- et al.
- (2004).
+The MODE-TD tool extends object-based analysis from two-dimensional forecasts
+ and observations to include the time dimension.
+ In addition to the two dimensional information provded by MODE, MODE-TD
+ can be used to examine even more features including displacement in time,
+ and duration and speed of moving areas of interest.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-There are many types of spatial verification approaches and the Intensity-Scale
+The Wavelet-Stat tool decomposes two-dimensional forecasts and observations
+ according to the Intensity-Scale verification technique described by Casati
+ et al.
+ (2004).
+ There are many types of spatial verification approaches and the Intensity-Scale
  technique belongs to the scale-decomposition (or scale-separation) verification
  approaches.
  The spatial scale components are obtained by applying a wavelet transformation
@@ -647,6 +642,13 @@ There are many types of spatial verification approaches and the Intensity-Scale
  to reproduce the observed scale structure.
  The Wavelet-Stat tool is primarily used for precipitation fields.
  However, the tool can be applied to other variables, such as cloud fraction.
+ 
+\end_layout
+
+\begin_layout Standard
+Though Ensemble-Stat is a preprocessing tool for creation of ensemble forecasts
+ from a group of files, it also produces several types of ensemble statistics.
+ Thus, it is included as a statistics tool in the flowchart.
  
 \end_layout
 
@@ -680,6 +682,21 @@ The Stat-Analysis and MODE-Analysis tools aggregate the output statistics
  be used to produce summary information about object location, size, and
  intensity (as well as other object characteristics) across one or more
  cases.
+\end_layout
+
+\begin_layout Standard
+Tropical cyclone forecasts and observations are quite different than numerical
+ model forecasts, and thus they have their own set of tools.
+ The MET-TC package includes three modules: TC-DLAND, TC-PAIRS, and TC-STAT.
+ The TC-DLAND module calculates the distance to land from all locations
+ on a specified grid.
+ This information can be used in later modules to eliminate tropical cyclones
+ that are over land from being included in the statistics.
+ TC-PAIRS matches up tropical cyclone forecasts and observations and writes
+ all output to a file.
+ In TC-STAT, these forecast / observation pairs are analyzed according to
+ user preference to produce statistics.
+ 
 \end_layout
 
 \begin_layout Section
@@ -751,7 +768,7 @@ Support for other input formats
 \begin_layout Itemize
 
 \series medium
-Support for gridded data in NetCDF, CF-4 convention
+Support for NetCDF 4.
 \end_layout
 
 \begin_layout Standard
