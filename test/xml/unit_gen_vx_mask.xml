@@ -225,7 +225,7 @@
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
       &OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc \
-      -type data -mask_config 'name="APCP"; level="A24";' -thresh '&#62;&#61;2.54' -v 2
+      -type data -mask_field 'name="APCP"; level="A24";' -thresh '&#62;&#61;2.54' -v 2
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/DATA_APCP_24_mask.nc</grid_nc>

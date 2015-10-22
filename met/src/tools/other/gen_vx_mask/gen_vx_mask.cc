@@ -98,8 +98,8 @@ void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_type,         "-type",         1);
-   cline.add(set_input_config, "-input_config", 1);
-   cline.add(set_mask_config,  "-mask_config",  1);
+   cline.add(set_input_field,  "-input_field",  1);
+   cline.add(set_mask_field,   "-mask_field",   1);
    cline.add(set_complement,   "-complement",   0);
    cline.add(set_union,        "-union",        0);
    cline.add(set_intersection, "-intersection", 0);
@@ -137,8 +137,8 @@ void process_input_file(DataPlane &dp) {
    GrdFileType ftype = FileType_None;
 
    // Get the gridded file type from the data config string, if present
-   if(input_config_str.length() > 0) {
-      config.read_string(input_config_str);
+   if(input_field_str.length() > 0) {
+      config.read_string(input_field_str);
       ftype = parse_conf_file_type(&config);
    }
 
@@ -153,8 +153,8 @@ void process_input_file(DataPlane &dp) {
    grid = mtddf_ptr->grid();
 
    // Read the input data plane, if requested
-   if(input_config_str.length() > 0) {
-      get_data_plane(mtddf_ptr, input_config_str, dp);
+   if(input_field_str.length() > 0) {
+      get_data_plane(mtddf_ptr, input_field_str, dp);
    }
    // Check for the output of a previous call to this tool
    else if(get_gen_vx_mask_data(mtddf_ptr, dp)) {
@@ -198,8 +198,8 @@ void process_mask_file(DataPlane &dp) {
    else {
 
       // Get the gridded file type from the mask config string, if present
-      if(mask_config_str.length() > 0) {
-         config.read_string(mask_config_str);
+      if(mask_field_str.length() > 0) {
+         config.read_string(mask_field_str);
          ftype = parse_conf_file_type(&config);
       }
 
@@ -229,12 +229,12 @@ void process_mask_file(DataPlane &dp) {
 
    // Read the mask data plane, if requested
    if(mask_type == MaskType_Data) {
-      if(mask_config_str.length() == 0) {
+      if(mask_field_str.length() == 0) {
          mlog << Error << "\nprocess_mask_file() -> "
-              << "use \"-mask_config\" to specify the field for \"data\" masking.\n\n";
+              << "use \"-mask_field\" to specify the field for \"data\" masking.\n\n";
          exit(1);
       }
-      get_data_plane(mtddf_ptr, mask_config_str, dp);
+      get_data_plane(mtddf_ptr, mask_field_str, dp);
    }
    // Otherwise, initialize the masking data
    else {
@@ -841,14 +841,14 @@ void usage() {
         << "\tinput_file\n"
         << "\tmask_file\n"
         << "\tout_file\n"
-        << "\t[-type str]\n"
-        << "\t[-input_config str]\n"
-        << "\t[-mask_config str]\n"
+        << "\t[-type string]\n"
+        << "\t[-input_field string]\n"
+        << "\t[-mask_field string]\n"
         << "\t[-complement]\n"
         << "\t[-union|-intersection|-symdiff]\n"
-        << "\t[-thresh str]\n"
+        << "\t[-thresh string]\n"
         << "\t[-value n]\n"
-        << "\t[-name str]\n"
+        << "\t[-name string]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -863,27 +863,27 @@ void usage() {
         << "\t\t\"out_file\" is the output NetCDF mask file to be "
         << "written (required).\n"
 
-        << "\t\t\"-type str\" overrides the default masking type ("
+        << "\t\t\"-type string\" overrides the default masking type ("
         << masktype_to_string(default_mask_type) << ") (optional).\n"
         << "\t\t   May be set to \"poly\", \"circle\", \"track\", \"grid\", or \"data\".\n"
 
-        << "\t\t\"-input_config str\" to read existing mask data from \"input_file\" (optional).\n"
+        << "\t\t\"-input_field string\" to read existing mask data from \"input_file\" (optional).\n"
 
-        << "\t\t\"-mask_config str\" to define the field from \"mask_file\" to be used for \"data\" masking (optional).\n"
+        << "\t\t\"-mask_field string\" to define the field from \"mask_file\" to be used for \"data\" masking (optional).\n"
 
         << "\t\t\"-complement\" to compute the complement of the area defined in \"mask_file\" (optional).\n"
 
         << "\t\t\"-union | -intersection | -symdiff\" to specify how to combine the "
         << "masks from \"input_file\" and \"mask_file\" (optional).\n"
 
-        << "\t\t\"-thresh str\" defines the threshold to be applied (optional).\n"
+        << "\t\t\"-thresh string\" defines the threshold to be applied (optional).\n"
         << "\t\t   Distance (km) for \"circle\" and \"track\" masking.\n"
         << "\t\t   Raw input values for \"data\" masking.\n"
 
         << "\t\t\"-value n\" overrides the default output mask data value ("
         << default_mask_val << ") (optional).\n"
 
-        << "\t\t\"-name str\" specifies the output variable name for the mask"
+        << "\t\t\"-name string\" specifies the output variable name for the mask"
         << " (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
@@ -905,14 +905,14 @@ void set_type(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_input_config(const StringArray & a) {
-   input_config_str = a[0];
+void set_input_field(const StringArray & a) {
+   input_field_str = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_config(const StringArray & a) {
-   mask_config_str = a[0];
+void set_mask_field(const StringArray & a) {
+   mask_field_str = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
