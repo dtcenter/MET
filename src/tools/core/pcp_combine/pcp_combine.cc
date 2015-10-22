@@ -1305,11 +1305,7 @@ void usage()
         << "observation files.\n\n"
 
         << "\tADD_ARGS:\n"
-        << "\t\tin_file1\n"
-        << "\t\taccum1\n"
-        << "\t\t...\n"
-        << "\t\tin_filen\n"
-        << "\t\taccumn\n"
+        << "\t\tin_file1 accum1 [in_file2 accum2 ... in_filen accumn]\n"
         << "\t\tout_file\n\n"
 
         << "\t\twhere\t\"in_file1\" indicates the name of the first input data "
@@ -1328,10 +1324,8 @@ void usage()
         << "be written (required).\n\n"
 
         << "\tSUBTRACT_ARGS:\n"
-        << "\t\tin_file1\n"
-        << "\t\taccum1\n"
-        << "\t\tin_file2\n"
-        << "\t\taccum2\n"
+        << "\t\tin_file1 accum1\n"
+        << "\t\tin_file2 accum2\n"
         << "\t\tout_file\n\n"
 
         << "\t\twhere\t\"in_file1\" indicates the name of the first input data "
