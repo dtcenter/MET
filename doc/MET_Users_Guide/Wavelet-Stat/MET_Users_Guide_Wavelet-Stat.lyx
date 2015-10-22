@@ -266,7 +266,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -317,7 +321,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -483,7 +491,7 @@ hbox{MSE}(t)$
  The MSE% does not exhibit the threshold dependency, and usually shows small
  errors on large scales and large errors on small scales, with the largest
  error associated to the smallest scale and highest threshold.
- For the NIMROD case illustrated note the large error at 160 km and between
+ For the NIMROD case illustrated, note the large error at 160 km and between
  the thresholds of and 4 mm/h, due to the storm, 160km displaced almost
  its entire length.
 \end_layout
@@ -696,7 +704,11 @@ status open
 \begin_layout Plain Layout
 
 \emph on
-2x2
+2
+\emph default
+x
+\emph on
+2
 \emph default
  contingency table in terms of counts.
  The 
@@ -1538,7 +1550,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -1563,7 +1579,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -1590,7 +1610,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -1627,7 +1651,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -1656,7 +1684,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -1679,7 +1711,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -1728,7 +1764,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -2329,7 +2369,11 @@ n
 
 \end_inset
 
- x 2
+ 
+\emph default
+x
+\emph on
+ 2
 \begin_inset script superscript
 
 \begin_layout Plain Layout
@@ -2728,7 +2772,7 @@ version =
 \begin_inset Quotes eld
 \end_inset
 
-v5.1
+v#
 \begin_inset Quotes erd
 \end_inset
 
@@ -2740,10 +2784,10 @@ The
 \series bold
 version
 \series default
- indicates the version of the mode configuration file used.
- Future versions of MET may include changes to mode and the mode configuration
- file.
- This value should not be modified.
+ indicates the release version of MET.
+ It should be set correctly in the example configuration files and should
+ not be modified.
+ 
 \begin_inset Newline newline
 \end_inset
 
