@@ -386,7 +386,7 @@ void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
-        << "\tascii_file1 [ascii_file2 ascii_file3 ... ascii_filen]\n"
+        << "\tascii_file1 [ascii_file2 ... ascii_filen]\n"
         << "\tnetcdf_file\n"
         << "\t[-format ASCII_format]\n"
         << "\t[-config file]\n"
