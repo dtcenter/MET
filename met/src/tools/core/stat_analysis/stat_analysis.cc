@@ -662,7 +662,7 @@ void usage() {
 
         << "Usage: " << program_name << "\n"
         << "\t-lookin path\n"
-        << "\t[-out filename]\n"
+        << "\t[-out file]\n"
         << "\t[-tmp_dir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -672,8 +672,8 @@ void usage() {
         << "top-level directory containing STAT files.  It allows the "
         << "use of wildcards (at least one required).\n"
 
-        << "\t\t\"-out filename\" specifies a file name to which "
-        << "output should be written rather than the screen (optional).\n"
+        << "\t\t\"-out file\" specifies a file to which output should "
+        << "be written rather than the screen (optional).\n"
 
         << "\t\t\"-tmp_dir path\" specifies the directory into which "
         << "temporary files should be written (optional).\n"
