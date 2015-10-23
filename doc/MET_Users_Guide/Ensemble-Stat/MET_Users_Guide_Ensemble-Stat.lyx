@@ -551,6 +551,778 @@ In this example, the Ensemble-Stat tool will process six forecast files
 \end_layout
 
 \begin_layout Subsection
+ensemble_stat configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:ensemble_stat-configuration-file"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The default configuration file for the Ensemble-Stat tool named 
+\emph on
+EnsembleStatConfig_default
+\emph default
+ can be found in the installed 
+\emph on
+share/met/config
+\emph default
+ directory.
+ Another version is located in scripts/config.
+ We encourage users to make a copy of these files prior to modifying their
+ contents.
+ Each configuration file (both the default and sample) contains many comments
+ describing its contents.
+ The contents of the configuration file are also described in the subsections
+ below.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Note that environment variables may be used when editing configuration files,
+ as described in the Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+model          = "WRF";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obtype         = "ANALYS";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
+ = 1; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_mean ...
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_window     = { beg = -5400; end =  5400; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ci_alpha       = [ 0.05 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+interp         = { field = BOTH; vld_thresh = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                   type = [ { method = NEAREST; width  = 1; } ]; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+duplicate_flag = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_quality    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+output_prefix  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version        = "VN.N";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ens = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ens_thresh = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   field = [
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+         name = "APCP";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+         level = "A03";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+         cat_thresh = [ >0.0, >=5.0 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+ens
+\series medium
+ dictionary defines which ensemble fields should be processed.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+When summarizing the ensemble, compute a ratio of the number of valid ensemble
+ fields to the total number of ensemble members.
+ If this ratio is less than the 
+\series bold
+ens_thresh
+\series medium
+, then quit with an error.
+ This threshold must be between 0 and 1.
+ Setting this threshold to 1 will require that all ensemble members be present
+ to be processed.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+When summarizing the ensemble, for each grid point compute a ratio of the
+ number of valid data values to the number of ensemble members.
+ If that ratio is less than 
+\series bold
+vld_thresh
+\series medium
+, write out bad data.
+ This threshold must be between 0 and 1.
+ Setting this threshold to 1 will require each grid point to contain valid
+ data for all ensemble members.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+For each 
+\series bold
+field
+\series medium
+ listed in the forecast field, give the name and vertical or accumulation
+ level, plus one or more categorical thresholds.
+ The thresholds are specified using symbols, as shown above.
+ It is the user's responsibility to know the units for each model variable
+ and to choose appropriate threshold values.
+ The thresholds are used to define ensemble relative frequencies, e.g.
+ a threshold of >=5 can be used to compute the proportion of ensemble members
+ predicting precipitation of at least 5mm at each grid point.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+sid_exc            = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ens_ssvar_bin_size = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ens_phist_bin_size = 0.05;
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Setting up the 
+\series bold
+fcst
+\series medium
+ and 
+\series bold
+obs
+\series medium
+ dictionaries of the configuration file is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+ The following are some special consideration for the Ensemble-Stat tool.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+ens
+\series default
+ and 
+\series bold
+fcst
+\series default
+ dictionaries do not need to include the same fields.
+ Users may specify any number of ensemble fields to be summarized, but generally
+ there are many fewer fields with verifying observations available.
+ The 
+\series bold
+ens 
+\series default
+dictionary specified the fields to be summarized while the 
+\series bold
+fcst 
+\series default
+dictionary specifies the fields to be verified.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+obs
+\series medium
+ dictionary looks very simliar to the 
+\series bold
+fcst
+\series medium
+ dictionary.
+ If verifying against point observations which are assigned GRIB1 codes,
+ the observation section must be defined following GRIB1 conventions.
+ When verifying GRIB1 forecast data, one can easily copy over the forecast
+ settings to the observation dictionary using 
+\series bold
+obs=fcst;
+\series medium
+.
+ However, when verifying non-GRIB1 forecast data, users will need to specify
+ the 
+\series bold
+fcst
+\series medium
+ and 
+\series bold
+obs
+\series medium
+ sections separately.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+sid_exc
+\series medium
+ entry, defined in the 
+\series bold
+obs
+\series medium
+ dictionary, contains a comma-separated list of the station id's to be excluded
+ from verification.
+ This option is typically used when an observation file contains some stations
+ known to have bad or unreliable data.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The
+\series bold
+ ens_ssvar_bin_size
+\series medium
+ and 
+\series bold
+ens_phist_bin_size
+\series medium
+ specify the width of the categorical bins used to accumulate frequencies
+ for spread-skill-variance or probability integral transform statistics,
+ respectively.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+output_flag = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   rhist = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   phist = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   orank = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ssvar = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The
+\series default
+ 
+\series bold
+output_flag
+\series medium
+ array controls the type of output that is generated.
+ Each flag corresponds to an output line type in the STAT file.
+ Setting the flag to NONE indicates that the line type should not be generated.
+ Setting the flag to STAT indicates that the line type should be written
+ to the STAT file only.
+ Setting the flag to BOTH indicates that the line type should be written
+ to the STAT file as well as a separate ASCII file where the data is grouped
+ by line type.
+ The output flags correspond to the following output line types:
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ 
+\series bold
+RHIST
+\series medium
+ for Rankd Histogram Counts
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+
+\series bold
+ PHIST
+\series medium
+ for Probability Integral Transform Histogram Counts
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ 
+\series bold
+ORANK
+\series medium
+ for Ensemble Matched Pair Information when point observations are supplied
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ 
+\series bold
+SSVAR
+\series medium
+ for Binned Spread/Skill Variance Information
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ensemble_flag = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   mean     = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   stdev     = TRUE; 
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   minus     = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   plus      = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   min       = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   max       = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   range     = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_count = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   frequency = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   rank      = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+ensemble_flag
+\series medium
+ specifies which derived ensemble fields should be calculated and output.
+ Setting the flag to TRUE produces output of the specified field, while
+ FALSE produces no output for that field type.
+ The flags correspond to the following output line types:
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Mean Field
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Standard Deviation Field
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Mean - One Standard Deviation Field
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Mean + One Standard Deviation Field
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Minimum Field
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Maximum Field
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Range Field
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Valid Data Count 
+\end_layout
+
+\begin_layout Enumerate
+Ensemble Relative Frequency for each categorical threshold (
+\series bold
+cat_thresh
+\series default
+) specified.
+ This is an uncalibrated probability forecast.
+\end_layout
+
+\begin_layout Enumerate
+Observation Ranks for Input Gridded Observations
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+rng = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   type = "mt19937";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   seed = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+rng
+\series medium
+ group defines the random number generator
+\series default
+ 
+\series bold
+type
+\series medium
+ and 
+\series bold
+seed
+\series medium
+ to be used.
+ In the case of a tie when determining the rank of an observation, the rank
+ is randomly chosen from all available possibilities.
+ The randomness is determined by the random number generator specified.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+seed
+\series medium
+ variable may be set to a specific value to make the assignment of ranks
+ fully repeatable.
+ When left empty, as shown above, the random number generator seed is chosen
+ automatically which will lead to slightly different bootstrap confidence
+ intervals being computed each time the data is run.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Refer to the description of the 
+\series bold
+boot
+\series medium
+ entry in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+ for more details on the random number generator.
+\end_layout
+
+\begin_layout Subsection
 ensemble_stat output
 \begin_inset CommandInset label
 LatexCommand label
@@ -3673,778 +4445,6 @@ Root mean squared error
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsection
-ensemble_stat configuration file
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:ensemble_stat-configuration-file"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The default configuration file for the Ensemble-Stat tool named 
-\emph on
-EnsembleStatConfig_default
-\emph default
- can be found in the installed 
-\emph on
-share/met/config
-\emph default
- directory.
- Another version is located in scripts/config.
- We encourage users to make a copy of these files prior to modifying their
- contents.
- Each configuration file (both the default and sample) contains many comments
- describing its contents.
- The contents of the configuration file are also described in the subsections
- below.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Note that environment variables may be used when editing configuration files,
- as described in the Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:pb2nc-configuration-file"
-
-\end_inset
-
- for the PB2NC tool.
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-model          = "WRF";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-obtype         = "ANALYS";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
- = 1; }
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-climo_mean ...
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-obs_window     = { beg = -5400; end =  5400; }
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-ci_alpha       = [ 0.05 ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-interp         = { field = BOTH; vld_thresh = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-                   type = [ { method = NEAREST; width  = 1; } ]; }
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-duplicate_flag = NONE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-obs_quality    = [];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-output_prefix  = "";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-version        = "VN.N";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The configuration options listed above are common to many MET tools and
- are described in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-ens = {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   ens_thresh = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   vld_thresh = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   field = [
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-         name = "APCP";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-         level = "A03";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-         cat_thresh = [ >0.0, >=5.0 ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      }
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-ens
-\series medium
- dictionary defines which ensemble fields should be processed.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-When summarizing the ensemble, compute a ratio of the number of valid ensemble
- fields to the total number of ensemble members.
- If this ratio is less than the 
-\series bold
-ens_thresh
-\series medium
-, then quit with an error.
- This threshold must be between 0 and 1.
- Setting this threshold to 1 will require that all ensemble members be present
- to be processed.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-When summarizing the ensemble, for each grid point compute a ratio of the
- number of valid data values to the number of ensemble members.
- If that ratio is less than 
-\series bold
-vld_thresh
-\series medium
-, write out bad data.
- This threshold must be between 0 and 1.
- Setting this threshold to 1 will require each grid point to contain valid
- data for all ensemble members.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-For each 
-\series bold
-field
-\series medium
- listed in the forecast field, give the name and vertical or accumulation
- level, plus one or more categorical thresholds.
- The thresholds are specified using symbols, as shown above.
- It is the user's responsibility to know the units for each model variable
- and to choose appropriate threshold values.
- The thresholds are used to define ensemble relative frequencies, e.g.
- a threshold of >=5 can be used to compute the proportion of ensemble members
- predicting precipitation of at least 5mm at each grid point.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-sid_exc            = [];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-ens_ssvar_bin_size = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-ens_phist_bin_size = 0.05;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Setting up the 
-\series bold
-fcst
-\series medium
- and 
-\series bold
-obs
-\series medium
- dictionaries of the configuration file is described in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
-.
- The following are some special consideration for the Ensemble-Stat tool.
-\end_layout
-
-\begin_layout Standard
-The 
-\series bold
-ens
-\series default
- and 
-\series bold
-fcst
-\series default
- dictionaries do not need to include the same fields.
- Users may specify any number of ensemble fields to be summarized, but generally
- there are many fewer fields with verifying observations available.
- The 
-\series bold
-ens 
-\series default
-dictionary specified the fields to be summarized while the 
-\series bold
-fcst 
-\series default
-dictionary specifies the fields to be verified.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-obs
-\series medium
- dictionary looks very simliar to the 
-\series bold
-fcst
-\series medium
- dictionary.
- If verifying against point observations which are assigned GRIB1 codes,
- the observation section must be defined following GRIB1 conventions.
- When verifying GRIB1 forecast data, one can easily copy over the forecast
- settings to the observation dictionary using 
-\series bold
-obs=fcst;
-\series medium
-.
- However, when verifying non-GRIB1 forecast data, users will need to specify
- the 
-\series bold
-fcst
-\series medium
- and 
-\series bold
-obs
-\series medium
- sections separately.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-sid_exc
-\series medium
- entry, defined in the 
-\series bold
-obs
-\series medium
- dictionary, contains a comma-separated list of the station id's to be excluded
- from verification.
- This option is typically used when an observation file contains some stations
- known to have bad or unreliable data.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series bold
- ens_ssvar_bin_size
-\series medium
- and 
-\series bold
-ens_phist_bin_size
-\series medium
- specify the width of the categorical bins used to accumulate frequencies
- for spread-skill-variance or probability integral transform statistics,
- respectively.
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-output_flag = {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   rhist = BOTH;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   phist = BOTH;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   orank = BOTH;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   ssvar = BOTH;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series default
- 
-\series bold
-output_flag
-\series medium
- array controls the type of output that is generated.
- Each flag corresponds to an output line type in the STAT file.
- Setting the flag to NONE indicates that the line type should not be generated.
- Setting the flag to STAT indicates that the line type should be written
- to the STAT file only.
- Setting the flag to BOTH indicates that the line type should be written
- to the STAT file as well as a separate ASCII file where the data is grouped
- by line type.
- The output flags correspond to the following output line types:
-\end_layout
-
-\begin_layout Description
-
-\series medium
-1.
- 
-\series bold
-RHIST
-\series medium
- for Rankd Histogram Counts
-\end_layout
-
-\begin_layout Description
-
-\series medium
-2.
-
-\series bold
- PHIST
-\series medium
- for Probability Integral Transform Histogram Counts
-\end_layout
-
-\begin_layout Description
-
-\series medium
-3.
- 
-\series bold
-ORANK
-\series medium
- for Ensemble Matched Pair Information when point observations are supplied
-\end_layout
-
-\begin_layout Description
-
-\series medium
-4.
- 
-\series bold
-SSVAR
-\series medium
- for Binned Spread/Skill Variance Information
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-ensemble_flag = {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   mean     = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   stdev     = TRUE; 
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   minus     = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   plus      = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   min       = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   max       = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   range     = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   vld_count = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   frequency = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   rank      = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-ensemble_flag
-\series medium
- specifies which derived ensemble fields should be calculated and output.
- Setting the flag to TRUE produces output of the specified field, while
- FALSE produces no output for that field type.
- The flags correspond to the following output line types:
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Mean Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Standard Deviation Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Mean - One Standard Deviation Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Mean + One Standard Deviation Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Minimum Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Maximum Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Range Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Valid Data Count 
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Relative Frequency for each categorical threshold (
-\series bold
-cat_thresh
-\series default
-) specified.
- This is an uncalibrated probability forecast.
-\end_layout
-
-\begin_layout Enumerate
-Observation Ranks for Input Gridded Observations
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-rng = {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   type = "mt19937";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   seed = "";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-rng
-\series medium
- group defines the random number generator
-\series default
- 
-\series bold
-type
-\series medium
- and 
-\series bold
-seed
-\series medium
- to be used.
- In the case of a tie when determining the rank of an observation, the rank
- is randomly chosen from all available possibilities.
- The randomness is determined by the random number generator specified.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-seed
-\series medium
- variable may be set to a specific value to make the assignment of ranks
- fully repeatable.
- When left empty, as shown above, the random number generator seed is chosen
- automatically which will lead to slightly different bootstrap confidence
- intervals being computed each time the data is run.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Refer to the description of the 
-\series bold
-boot
-\series medium
- entry in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
-
-\end_inset
-
- for more details.
 \end_layout
 
 \end_body
