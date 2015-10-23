@@ -2192,7 +2192,7 @@ fcst_raw_plot     = { color_table = "MET_BASE/colortables/met_default.ctable
 \begin_layout LyX-Code
 
 \series bold
-                      plot_min = 0.0; plot_max = 0.0; };
+                      plot_min = 0.0; plot_max = 0.0; }
 \end_layout
 
 \begin_layout LyX-Code
@@ -2488,7 +2488,7 @@ output_flag = {
 \begin_layout LyX-Code
 
 \series bold
-};
+}
 \end_layout
 
 \begin_layout Standard
