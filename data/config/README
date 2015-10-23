@@ -1804,7 +1804,10 @@ output_stats = {
 //                                 PCT, PSTD, PJC, PRC
 //          Additional Optional Args for -line_type MPR:
 //             -mask_grid, -mask_poly,
+//             -out_thresh or -out_fcst_thresh and -out_obs_thresh
+//             -out_cnt_logic
 //             -out_wind_thresh or -out_fcst_wind_thresh and -out_obs_wind_thresh
+//             -out_wind_logic
 //             When -out_line_type WDIR
 //          Additional Optional Args for -line_type ORANK -out_line_type PHIST, SSVAR:
 //             -out_bin_size
@@ -1949,8 +1952,16 @@ output_stats = {
 //       "-out_fcst_thresh value" multiple for multi-category contingency tables
 //                                and probabilistic forecasts
 //       "-out_obs_thresh  value" multiple for multi-category contingency tables
-//       "-out_alpha       value"
+//       "-out_cnt_logic   value"
+//
+//       "-out_wind_thresh      value"
+//       "-out_fcst_wind_thresh value"
+//       "-out_obs_wind_thresh  value"
+//       "-out_wind_logic       value"
+//
 //       "-out_bin_size    value"
+//
+//       "-out_alpha       value"
 //
 //       "-boot_interval   value"
 //       "-boot_rep_prop   value"
