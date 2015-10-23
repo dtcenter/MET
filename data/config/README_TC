@@ -436,13 +436,19 @@ rapid_inten = {
 
 //
 // Specify whether only those track points occurring near landfall should be
-// retained, and define the landfall retention window as a number of seconds
-// offset from the landfall time.  Landfall is defined as the last BDECK track
-// point before the distance to land switches from positive to 0 or negative.
-// May modify using the "-landfall_window" job command option, which automatically
-// sets -landfall to TRUE.
-// Use "-landfall_window width" in HH[MMSS] format to define a symmetric time window.
-// Use "-landfall_window beg end" in HH[MMSS] format to define an asymmetric time window.
+// retained, and define the landfall retention window as a timestring in HH[MMSS]
+// format (or as an integer number of seconds) offset from the landfall time.
+// Landfall is defined as the last BDECK track point before the distance to land
+// switches from positive to 0 or negative.
+//
+// May modify using the "-landfall_window" job command option, which
+// automatically sets -landfall to TRUE.
+// 
+// The "-landfall_window" job command option takes 1 or 2 arguments in  HH[MMSS] format.
+// Use 1 argument to define a symmetric time window.  For example, "-landfall_window 06"
+// defines the time window +/- 6 hours around the landfall time.
+// Use 2 arguments to define an asymmetric time window.  For example, "-landfall_window 00 12"
+// defines the time window from the landfall event to 12 hours after.
 //
 // e.g. landfall     = FALSE;
 //      landfall_beg = "-24"; (24 hours prior to landfall)
@@ -588,4 +594,4 @@ out_valid_mask = "";
 //               "-job summary -line_type TCMPR -column AC -dumprow ./tc_summary_job.tcst",
 //               "-job rirw -amodel AHW4 -dump_row ./tc_rirw_job" ]
 //
-jobs =[];
+jobs = [];
