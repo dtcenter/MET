@@ -2741,7 +2741,7 @@ OBS_VAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Observed variable
+Observation variable
 \end_layout
 
 \end_inset
@@ -2799,7 +2799,7 @@ OBTYPE
 \begin_inset Text
 
 \begin_layout Plain Layout
-Type of observation selected
+Observation message type selected
 \end_layout
 
 \end_inset
