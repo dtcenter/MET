@@ -2222,7 +2222,7 @@ MPR
 \series medium
 Note that the first two line types are easily derived from each other.
  Users are free to choose which measures are most desired.
- All of the line types are described in more detail in Section 
+ The output line types are described in more detail in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:point_stat-output"
