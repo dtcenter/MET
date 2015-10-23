@@ -1712,7 +1712,7 @@ regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
 \begin_layout LyX-Code
 
 \series bold
-climo_mean ...
+climo_mean     = {}
 \end_layout
 
 \begin_layout LyX-Code
