@@ -1536,9 +1536,9 @@ The
 \series bold
 grid_res
 \series default
- variable is the nominal spacing for each grid square in kilometers.
- The variable is not used directly in the code, but subsequent variables
- in the configuration file are defined in terms of it.
+ entry is the nominal spacing for each grid square in kilometers.
+ This entry is not used directly in the code, but subsequent entries in
+ the configuration file are defined in terms of it.
  Therefore, setting this appropriately will help ensure that appropriate
  default values are used for these entries.
 \end_layout
@@ -2781,8 +2781,8 @@ colorbar_spacing
 \series default
  entry is used to define the frequency with which the color table values
  should be plotted.
- Setting this variable to 1, as shown above, indicates that every color
- table value should be plotted.
+ Setting this entry to 1, as shown above, indicates that every color table
+ value should be plotted.
  Setting it to an integer, n > 1, indicates that only every n-th color table
  value should be plotted.
 \end_layout
@@ -4384,97 +4384,77 @@ The second ASCII file the MODE tool generates contains all of the attributes
  The number of lines in this file depends on the number of objects defined.
  This file contains lines of 6 types that are indicated by the contents
  of the 
-\family typewriter
-object_id
-\family default
+\series bold
+OBJECT_ID
+\series default
  column.
  The 
-\family typewriter
-object_id
-\family default
+\series bold
+OBJECT_ID
+\series default
  can take the following 6 forms: 
-\family typewriter
-FNNN
-\family default
 \series bold
-, 
-\family typewriter
+FNN
 \series default
-ONNN
-\family default
+, 
 \series bold
-, 
-\family typewriter
+ONN
 \series default
+, 
+\series bold
 FNNN_ONNN
-\family default
-\series bold
-, 
-\family typewriter
 \series default
+, 
+\series bold
 CFNNN
-\family default
-\series bold
-, 
-\family typewriter
 \series default
+, 
+\series bold
 CONNN
-\family default
-\series bold
+\series default
 , 
-\family typewriter
-\series default
-CFNNN_CONNN
-\family default
 \series bold
-.
-
+CFNNN_CONNN
 \series default
+.
  In each case, 
-\family typewriter
+\series bold
 NNN
-\family default
+\series default
  is a three-digit number indicating the object index.
  While all lines have the first 18 header columns in common, these 6 forms
  for 
-\family typewriter
-object_id
-\family default
+\series bold
+OBJECT_ID
+\series default
  can be divided into two types - one for single objects and one for pairs
  of objects.
  The single object lines (
-\family typewriter
-FNNN
-\family default
 \series bold
-, 
-\family typewriter
+FNN
 \series default
-ONNN
-\family default
+, 
 \series bold
-, 
-\family typewriter
+ONN
 \series default
+, 
+\series bold
 CFNNN
-\family default
-\series bold
-,
 \series default
- and 
-\family typewriter
+, and 
+\series bold
 CONNN
-\family default
+\series default
 ) contain valid data in columns 19--39 and fill data in columns 40--51.
  The object pair lines (
-\family typewriter
+\series bold
 FNNN_ONNN
-\family default
+\series default
  and 
-\family typewriter
-CFNNN_CONNN
-\family default
-) contain valid data in columns 40--51 and fill data in columns 19--39.
+\series bold
+CFNNN_CONNN)
+\series default
+ contain valid data in columns 40--51 and fill data in columns 19--39.
  These object identifiers are described in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -4559,6 +4539,8 @@ mode ASCII OBJECT IDENTIFIER DESCRIPTIONS
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 
 \series bold
 Object identifier (object_id)
@@ -4570,6 +4552,8 @@ Object identifier (object_id)
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 
 \series bold
 Valid Data Columns
@@ -4581,6 +4565,8 @@ Valid Data Columns
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 
 \series bold
 Description of valid data
@@ -4594,6 +4580,8 @@ Description of valid data
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 FNNN, ONNN
 \end_layout
 
@@ -4603,6 +4591,8 @@ FNNN, ONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 1-18,19-39
 \end_layout
 
@@ -4612,6 +4602,8 @@ FNNN, ONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Attributes for simple forecast, observation objects
 \end_layout
 
@@ -4623,7 +4615,13 @@ Attributes for simple forecast, observation objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-FNNN_ONNN
+\noindent
+\align left
+FNNN_
+\begin_inset Newline newline
+\end_inset
+
+ONNN
 \end_layout
 
 \end_inset
@@ -4632,6 +4630,8 @@ FNNN_ONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 1-18, 40-51
 \end_layout
 
@@ -4641,6 +4641,8 @@ FNNN_ONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Attributes for pairs of simple forecast and observation objects
 \end_layout
 
@@ -4652,6 +4654,8 @@ Attributes for pairs of simple forecast and observation objects
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 CFNNN, CONNN
 \end_layout
 
@@ -4661,6 +4665,8 @@ CFNNN, CONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 1-18,19-39
 \end_layout
 
@@ -4670,6 +4676,8 @@ CFNNN, CONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Attributes for merged cluster objects in forecast, observation fields
 \end_layout
 
@@ -4681,7 +4689,13 @@ Attributes for merged cluster objects in forecast, observation fields
 \begin_inset Text
 
 \begin_layout Plain Layout
-CFNNN_CONNN
+\noindent
+\align left
+CFNNN_
+\begin_inset Newline newline
+\end_inset
+
+CONNN
 \end_layout
 
 \end_inset
@@ -4690,6 +4704,8 @@ CFNNN_CONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 1-18, 40-51
 \end_layout
 
@@ -4699,6 +4715,8 @@ CFNNN_CONNN
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Attributes for pairs of forecast and observation cluster objects 
 \end_layout
 
@@ -5976,7 +5994,11 @@ Minimum distance between the boundaries of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-CONVEX_HULL_DIST
+CONVEX_HULL
+\begin_inset Newline newline
+\end_inset
+
+_DIST
 \end_layout
 
 \end_inset
@@ -6064,7 +6086,11 @@ Ratio of the areas of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-INTERSECTION_AREA
+INTERSECTION
+\begin_inset Newline newline
+\end_inset
+
+_AREA
 \end_layout
 
 \end_inset
@@ -6222,7 +6248,11 @@ PERCENTILE
 \begin_inset Newline newline
 \end_inset
 
-_INTENSITY_RATIO
+_INTENSITY
+\begin_inset Newline newline
+\end_inset
+
+_RATIO
 \end_layout
 
 \end_inset
@@ -7208,7 +7238,11 @@ Observation convolution radius
 \begin_inset Text
 
 \begin_layout Plain Layout
-fcst_conv_threshold
+fcst_conv
+\begin_inset Newline newline
+\end_inset
+
+_threshold
 \end_layout
 
 \end_inset
@@ -7237,7 +7271,11 @@ Forecast convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-obs_conv_threshold
+obs_conv
+\begin_inset Newline newline
+\end_inset
+
+_threshold
 \end_layout
 
 \end_inset
@@ -7477,7 +7515,11 @@ Description
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_bdy_start
+fcst_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_start
 \end_layout
 
 \end_inset
@@ -7512,7 +7554,11 @@ Forecast Simple Boundary Starting Index
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_bdy_npts
+fcst_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_npts
 \end_layout
 
 \end_inset
@@ -7547,7 +7593,11 @@ Number of Forecast Simple Boundary Points
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_bdy_lat
+fcst_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_lat
 \end_layout
 
 \end_inset
@@ -7582,7 +7632,11 @@ Forecast Simple Boundary PoLatitude
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_bdy_lon
+fcst_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_lon
 \end_layout
 
 \end_inset
@@ -7687,7 +7741,11 @@ Forecast Simple Boundary PoY-Coordinate
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_hull_start
+fcst_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_start
 \end_layout
 
 \end_inset
@@ -7722,7 +7780,11 @@ Forecast Simple Convex Hull Starting Index
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_hull_npts
+fcst_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_npts
 \end_layout
 
 \end_inset
@@ -7757,7 +7819,11 @@ Number of Forecast Simple Convex Hull Points
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_hull_lat
+fcst_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_lat
 \end_layout
 
 \end_inset
@@ -7792,7 +7858,11 @@ Forecast Simple Convex Hull Point Latitude
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_simp_hull_lon
+fcst_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_lon
 \end_layout
 
 \end_inset
@@ -7897,7 +7967,11 @@ Forecast Simple Convex Hull Point Y-Coordinate
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_bdy_start
+obs_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_start
 \end_layout
 
 \end_inset
@@ -7932,7 +8006,11 @@ Observation Simple Boundary Starting Index
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_bdy_npts
+obs_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_npts
 \end_layout
 
 \end_inset
@@ -7967,7 +8045,11 @@ Number of Observation Simple Boundary Points
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_bdy_lat
+obs_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_lat
 \end_layout
 
 \end_inset
@@ -8002,7 +8084,11 @@ Observation Simple Boundary Point Latitude
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_bdy_lon
+obs_simp_bdy
+\begin_inset Newline newline
+\end_inset
+
+_lon
 \end_layout
 
 \end_inset
@@ -8107,7 +8193,11 @@ Observation Simple Boundary Point Y-Coordinate
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_hull_start
+obs_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_start
 \end_layout
 
 \end_inset
@@ -8142,7 +8232,11 @@ Observation Simple Convex Hull Starting Index
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_hull_npts
+obs_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_npts
 \end_layout
 
 \end_inset
@@ -8177,7 +8271,11 @@ Number of Observation Simple Convex Hull Points
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_hull_lat
+obs_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_lat
 \end_layout
 
 \end_inset
@@ -8212,7 +8310,11 @@ Observation Simple Convex Hull Point Latitude
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_simp_hull_lon
+obs_simp_hull
+\begin_inset Newline newline
+\end_inset
+
+_lon
 \end_layout
 
 \end_inset
@@ -8317,7 +8419,11 @@ Observation Simple Convex Hull Point Y-Coordinate
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_clus_hull_start
+fcst_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_start
 \end_layout
 
 \end_inset
@@ -8352,7 +8458,11 @@ Forecast Cluster Convex Hull Starting Index
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_clus_hull_npts
+fcst_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_npts
 \end_layout
 
 \end_inset
@@ -8387,7 +8497,11 @@ Number of Forecast Cluster Convex Hull Points
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_clus_hull_lat
+fcst_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_lat
 \end_layout
 
 \end_inset
@@ -8422,7 +8536,11 @@ Forecast Cluster Convex Hull Point Latitude
 \begin_layout Plain Layout
 \noindent
 \align left
-fcst_clus_hull_lon
+fcst_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_lon
 \end_layout
 
 \end_inset
@@ -8527,7 +8645,11 @@ Forecast Cluster Convex Hull Point Y-Coordinate
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_clus_hull_start
+obs_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_start
 \end_layout
 
 \end_inset
@@ -8562,7 +8684,11 @@ Observation Cluster Convex Hull Starting Index
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_clus_hull_npts
+obs_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_npts
 \end_layout
 
 \end_inset
@@ -8597,7 +8723,11 @@ Number of Observation Cluster Convex Hull Points
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_clus_hull_lat
+obs_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_lat
 \end_layout
 
 \end_inset
@@ -8632,7 +8762,11 @@ Observation Cluster Convex Hull Point Latitude
 \begin_layout Plain Layout
 \noindent
 \align left
-obs_clus_hull_lon
+obs_clus_hull
+\begin_inset Newline newline
+\end_inset
+
+_lon
 \end_layout
 
 \end_inset
