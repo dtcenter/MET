@@ -301,12 +301,6 @@ When operating on columns, a specific column name can be listed (e.g.
  Shortcut options for the -column entry are as follows:
 \end_layout
 
-\begin_layout Standard
-
-\series medium
-.
-\end_layout
-
 \begin_layout Description
 
 \series bold
@@ -656,6 +650,31 @@ on options specified in the
 TCStatConfig
 \emph default
  file.
+ Further, using flags (e.g.
+ 
+\emph on
+"-basin"
+\emph default
+, 
+\emph on
+"-column", "-storm_name", etc...)
+\emph default
+ option within the JOB COMMAND LINE may further refine these selections.
+ See Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:tc_stat-configuration-file"
+
+\end_inset
+
+ for options available for JOB COMMAND LINE and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_MET-TC-Config-Options"
+
+\end_inset
+
+ for how to use them.
 \end_layout
 
 \begin_layout Subsection
@@ -692,15 +711,85 @@ d that users make a copy of these files prior to modifying their contents.
 \begin_layout Standard
 
 \series medium
-Most of the user-specified options listed in the TC-Stat configuration file
- are used to filter the TCST output from 
-\emph on
-tc_pairs
-\emph default
- down to the desired subset over which the statistics will be computed.
- Only output from the TC-Pairs tool that meet the filtering criteria listed
- in the TC-Stat configuration file will be retained.
- A detailed description of the TC-Stat configuration file is listed below.
+The contents of the default pb2nc configuration file are described below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+storm_id = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+basin = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+cyclone = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+storm_name = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+init_beg = " ";
+\end_layout
+
+\begin_layout LyX-Code
+init_eng = " ";
+\end_layout
+
+\begin_layout LyX-Code
+init_inc = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+init_exc = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+valid_beg = " ";
+\end_layout
+
+\begin_layout LyX-Code
+valid_eng = " ";
+\end_layout
+
+\begin_layout LyX-Code
+init_hour = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+init_mask = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+valid_mask = [ ];
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_MET-TC-Config-Options"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -803,296 +892,6 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-storm_id = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-storm_id 
-\series medium
-field specifies a comma-separated list of storm id's to be used: the expected
- format is 2-letter basin, 2-digit cyclone number, 4-digit year.
- An empty list indicates all storms in TCST input will be used.
- This may also be set up using basin, cyclone, and timing information below.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-basin = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-basin 
-\series medium
-field stratifies by the basin column, based on a comma-separated list of
- basins to be used.
- The expected format is the 2-letter basin identifier.
- An empty list indicates all basins in the TCST input will be used.
- Using the 
-\emph on
-"-basin"
-\emph default
- option within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-cyclone = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-cyclone
-\series medium
- field stratifies by the cyclone column, based on a comma-separated list
- of 2-digit (01-99) cyclone numbers.
- An empty list indicates all cyclones in the TCST input will be used.
- Using the 
-\emph on
-"-column"
-\emph default
- option within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-storm_name = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-storm_name
-\series medium
- field stratifies by the storm_name column, based on a comma-separated list
- of storm names.
- An empty list indicates all storms in the TCST input will be used.
- Using the 
-\emph on
-"-storm_name"
-\emph default
- option within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-init_beg = " ";
-\end_layout
-
-\begin_layout LyX-Code
-init_eng = " ";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-init_beg
-\series medium
- and 
-\series bold
-init_end
-\series medium
- fields stratify by initialization time.
- Beginning and ending time windows are defined by YYYYMMDD[_HH[MMSS]].
- Using the 
-\emph on
-"-init_beg"
-\emph default
-,
-\emph on
-"-init_end"
-\emph default
- options within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-init_inc = [ ];
-\end_layout
-
-\begin_layout LyX-Code
-init_exc = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-init_inc
-\series medium
- and 
-\series bold
-init_exc
-\series medium
- fields stratify by initialization times, based on a comma-separated list
- of specific initialization times to include (inc) or exclude (exc).
- Time strings are defined by YYYYMMDD[_HH[MMSS]].
- Using the 
-\emph on
-"-init_inc"
-\emph default
-, 
-\emph on
-"-init_exc"
-\emph default
- options within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-valid_beg = " ";
-\end_layout
-
-\begin_layout LyX-Code
-valid_end = " ";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series bold
- valid_beg 
-\series medium
-and
-\series bold
- valid_end
-\series medium
- fields stratify by valid time.
- Beginning and ending time windows are defined by YYYYMMDD[_HH[MMSS]].
- Using the 
-\emph on
-"-valid_beg"
-\emph default
-,
-\emph on
- "-valid_end
-\emph default
-" options within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
 valid_inc = [ ];
 \end_layout
 
@@ -1142,7 +941,7 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-init_hour = [ ];
+
 \end_layout
 
 \begin_layout LyX-Code
@@ -1158,7 +957,7 @@ lead = [ ];
 \series medium
 The 
 \series bold
-init_hour, valid_hour
+valid_hour
 \series default
 ,
 \series medium
@@ -1172,62 +971,11 @@ ely.
  times, and lead times in HH[MMSS] format.
  Using the "
 \emph on
--init_hour
-\emph default
-", "
-\emph on
 -valid_hour
 \emph default
 ", and "
 \emph on
 -lead
-\emph default
-" options within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-init_mask = [ ];
-\end_layout
-
-\begin_layout LyX-Code
-valid_mask = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-init_mask
-\series medium
- and 
-\series bold
-valid_mask
-\series medium
- fields stratify by the init_mask and valid_mask columns in the TCST output.
- Using the "
-\emph on
--init_mask
-\emph default
-" and "
-\emph on
--valid_mask
 \emph default
 " options within the job command lines may further refine these selections.
 \begin_inset Newline newline
@@ -1464,7 +1212,7 @@ column_thresh_name
 column_thresh_val
 \series medium
  fields stratify by applying thresholds to numeric data columns.
- Specify a comma-separated list of columns names and thresholds to be applied.
+ Specify a comma-separated list of column names and thresholds to be applied.
  The length of 
 \series bold
 column_thresh_val
@@ -1688,6 +1436,18 @@ water_only = TRUE;
  for the verification, even if the track moves back over water.
 \end_layout
 
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout LyX-Code
 
 \series bold
@@ -1830,11 +1590,42 @@ thresh
 \series medium
  field specifies the user defined intensity threshold (where ">=" indicates
  RI, and "<=" indicates RW).
- Using the "-
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Using the "-
 \emph on
-rapid_inten
+rirw_track
 \emph default
-" option within the job command lines may further refine these selections.
+", "-
+\emph on
+rirw_time_adeck
+\emph default
+", "-
+\emph on
+rirw_time_bdeck
+\emph default
+", "-
+\emph on
+rirw_exact_adeck
+\emph default
+", "-
+\emph on
+rirw_exact_bdeck
+\emph default
+", "-
+\emph on
+rirw_thresh_adeck
+\emph default
+", "-
+\emph on
+rirw_thresh_bdeck
+\emph default
+" options within the JOB COMMAND LINE may further refine these selections.
+ 
 \begin_inset Newline newline
 \end_inset
 
@@ -1858,11 +1649,27 @@ landfall = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
-landfall_beg = -86400;
+landfall_beg = 
+\series medium
+"
+\series default
+-24
+\series medium
+"
+\series default
+;
 \end_layout
 
 \begin_layout LyX-Code
-landfall_end = 0;
+landfall_end = 
+\series medium
+"
+\series default
+00
+\series medium
+"
+\series default
+;
 \end_layout
 
 \begin_layout Standard
@@ -1880,8 +1687,8 @@ landfall_end
 \series medium
  fields specify whether only those track points occurring near landfall
  should be retained.
- The landfall retention window is defined as the number of seconds offset
- from the time of landfall.
+ The landfall retention window is defined as the hours offset from the time
+ of landfall.
  Landfall is defined as the last bmodel track point before the distance
  to land switches from water to land.
  When 
@@ -1895,13 +1702,9 @@ landfall_beg
  to the time of landfall.
  Using the 
 \emph on
-"-landfall", "-landfall_beg",
+"-landfall_window"
 \emph default
- and "
-\emph on
--landfall_end
-\emph default
-" options within the job command lines may further refine these selections.
+
 \begin_inset Newline newline
 \end_inset
 
