@@ -629,7 +629,14 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Standard MPR columns
+Standard MPR columns described in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_MPR"
+
+\end_inset
+
+.
 \end_layout
 
 \end_inset
@@ -996,7 +1003,14 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Standard MPR columns
+Standard MPR columns described in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_MPR"
+
+\end_inset
+
+.
 \end_layout
 
 \end_inset
@@ -2587,7 +2601,14 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Standard ORANK columns based on the number of ensemble members
+Standard ORANK columns described in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ORANK"
+
+\end_inset
+
+.
 \end_layout
 
 \end_inset
@@ -2809,7 +2830,14 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-Standard ORANK columns based on the number of ensemble members
+Standard ORANK columns described in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_ORANK"
+
+\end_inset
+
+.
 \end_layout
 
 \end_inset
