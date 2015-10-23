@@ -929,7 +929,7 @@ fcst
  When verifying GRIB1 forecast data, one can easily copy over the forecast
  settings to the observation dictionary using 
 \series bold
-obs=fcst;
+obs = fcst;
 \series medium
 .
  However, when verifying non-GRIB1 forecast data, users will need to specify

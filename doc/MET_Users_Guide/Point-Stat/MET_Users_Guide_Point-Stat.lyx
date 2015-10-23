@@ -1853,7 +1853,7 @@ fcst
  When verifying GRIB1 forecast data, one can easily copy over the forecast
  settings to the observation dictionary using 
 \series bold
-obs=fcst;
+obs = fcst;
 \series medium
 .
  However, when verifying non-GRIB1 forecast data, users will need to specify
@@ -1917,7 +1917,7 @@ http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
  If verifying GRIB1 forecsat data, it may be defined in the forecast dictionary
  and the copied into the observation dictionary using 
 \series bold
-obs=fcst;
+obs = fcst;
 \series medium
 .
 \end_layout

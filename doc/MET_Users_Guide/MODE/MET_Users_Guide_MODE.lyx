@@ -598,16 +598,6 @@ Moments are used in the calculation of several object attributes.
 \end_inset
 
  to be 1 for points 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Randy: putting this (x, y) in an hbox to prevent a bad line break
-\end_layout
-
-\end_inset
-
- 
 \begin_inset ERT
 status open
 
@@ -1251,62 +1241,36 @@ The MODE tool has three required arguments and can accept several optional
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-goodbreak
-\end_layout
-
-\end_inset
-
-
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Randy: fixing a bad page break here
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 Required arguments for mode
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 1.
  The 
-\family typewriter
+\series bold
 fcst_file
-\family default
+\series default
  argument indicates the gridded file containing the model field to be verified.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 2.
  The 
-\family typewriter
-obs_file
-\family default
- argument indicates the gridded file containing the gridded observations
+\series bold
+obs_file 
+\series default
+argument indicates the gridded file containing the gridded observations
  to be used for the verification of the model.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 3.
  The 
-\family typewriter
+\series bold
 config_file
-\family default
+\series default
  argument indicates the name of the configuration file to be used.
  The contents of the configuration file are discussed below.
 \end_layout
@@ -1317,13 +1281,13 @@ config_file
 Optional arguments for mode
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 4.
  The 
-\family typewriter
+\series bold
 -config_merge merge_config_file
-\family default
- argument indicates the name of a second configuration file to be used when
+\series default
+ option indicates the name of a second configuration file to be used when
  performing fuzzy engine merging by comparing the model or observation field
  to itself.
  The MODE tool provides the capability of performing merging within a single
@@ -1332,44 +1296,35 @@ Optional arguments for mode
  If an object and its neighbor have an interest value above some threshold,
  they are merged.
  The 
-\family typewriter
+\series bold
 merge_config_file
-\family default
+\series default
  controls the settings of the fuzzy engine used to perform this merging
  step.
  If a 
-\family typewriter
+\series bold
 merge_config_file
-\family default
+\series default
  is not provided, the configuration specified by the config_file in the
  previous argument will be used.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 5.
- The 
+ The
 \series bold
--
-\family typewriter
+ -outdir path 
 \series default
-outdir path
-\family default
- indicates the directory where output files should be written.
+option indicates the directory where output files should be written.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 6.
- The 
+ The
 \series bold
--
-\family typewriter
+ -log file
 \series default
-log file
-\family default
-\series bold
- 
-\series default
-option directs output and errors to the specified log file.
+ option directs output and errors to the specified log file.
  All messages will be written to that file as well as cout and cerr.
  Thus, users can save the messages without having to redirect the output
  on the command line.
@@ -1377,12 +1332,12 @@ option directs output and errors to the specified log file.
  
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 7.
- The 
-\family typewriter
--v level
-\family default
+ The
+\series bold
+ -v level
+\series default
  option indicates the desired level of verbosity.
  The contents of ``level'' will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
@@ -1394,221 +1349,35 @@ An example of the MODE calling sequence is listed below:
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 
 \series bold
 Example 1:
 \end_layout
 
-\begin_layout Standard
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
-<features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
+\begin_layout LyX-Code
+mode sample_fcst.grb 
 \backslash
-tt mode}
-\end_layout
-
-\end_inset
-
 
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
+\begin_layout LyX-Code
+sample_obs.grb 
 \backslash
-tt sample
-\backslash
-_fcst.grb}
-\end_layout
-
-\end_inset
-
 
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt sample
-\backslash
-_obs.grb}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt MODEConfig
-\backslash
-_grb}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
+\begin_layout LyX-Code
+MODEConfig_grb
 \end_layout
 
 \begin_layout Standard
-In Example 1, the MODE tool will verify the model data in the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt sample
-\backslash
-_fcst.grb}
-\end_layout
-
-\end_inset
-
- GRIB file using the observations in the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt sample
-\backslash
-_obs.grb}
-\end_layout
-
-\end_inset
-
- GRIB file applying the configuration options specified in the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt MODEConfig
-\backslash
-_grb}
-\end_layout
-
-\end_inset
-
- file.
+In Example 1, the MODE tool will verify the model data in the sample_fcst.grb
+ GRIB file using the observations in the sample_obs.grb GRIB file applying
+ the configuration options specified in the MODEConfig_grb file.
 \end_layout
 
 \begin_layout Standard
 A second example of the MODE calling sequence is presented below:
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1617,196 +1386,30 @@ vskip 0.1in}
 Example 2:
 \end_layout
 
-\begin_layout Standard
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
-<features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0pt">
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
+\begin_layout LyX-Code
+mode sample_fcst.nc 
 \backslash
-tt mode}
-\end_layout
-
-\end_inset
-
 
 \end_layout
 
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
+\begin_layout LyX-Code
+sample_obs.nc 
 \backslash
-tt sample
-\backslash
-_fcst.nc}
-\end_layout
-
-\end_inset
-
 
 \end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt sample
-\backslash
-_obs.nc}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt MODEConfig
-\backslash
-_nc}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
+\begin_layout LyX-Code
+MODEConfig_nc
 \end_layout
 
 \begin_layout Standard
-In Example 2, the MODE tool will verify the model data in the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt sample
-\backslash
-_fcst.nc}
-\end_layout
-
-\end_inset
-
- NetCDF output of pcp_combine using the observations in the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt sample
-\backslash
-_obs.nc}
-\end_layout
-
-\end_inset
-
+In Example 2, the MODE tool will verify the model data in the sampe_fcst.nc
+ NetCDF output of pcp_combine using the observations in the sample_obs.nc
  NetCDF output of pcp_combine, using the configuration options specified
- in the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt MODEConfig}
-\end_layout
-
-\end_inset
-
- file.
+ in the MODEConfig_nc file.
  Since the model and observation files contain only a single field of accumulate
-d precipitation, the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt MODEConfig
-\backslash
-_nc}
-\end_layout
-
-\end_inset
-
- file should specify that accumulated precipitation be verified.
+d precipitation, the MODEConfig_nc file should specify that accumulated
+ precipitation be verified.
 \end_layout
 
 \begin_layout Subsection
@@ -1821,64 +1424,33 @@ name "sub:MODE-configuration-file"
 \end_layout
 
 \begin_layout Standard
-The default configuration file for the MODE tool, 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt MODEConfig
-\backslash
-_default}
-\end_layout
-
-\end_inset
-
-, can be found in the installed share/met/config directory.
+The default configuration file for the MODE tool, MODEConfig_default, can
+ be found in the installed share/met/config directory.
  Another version of the configuration file is provided in scripts/config.
  We encourage users to make a copy of the configuration files prior to modifying
  their contents.
- Descriptions of 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt MODEConfig
-\backslash
-_default}
-\end_layout
-
-\end_inset
-
- and the required variables for any mode configuration file are also provided
- below.
+ Descriptions of MODEConfig_default and the required variables for any MODE
+ configuration file are also provided below.
  While the configuration file contains many entries, most users will only
  need to change a few for their use.
  Specific options are described in the following subsections.
 \end_layout
 
 \begin_layout Standard
-Note that environment variables may be used when editing configuration files,
- as described in the 
-\begin_inset Note Note
-status open
 
-\begin_layout Plain Layout
-Link to section
+\series medium
+Note that environment variables may be used when editing configuration files,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
 \end_layout
 
-\end_inset
-
-section 3.5.2 for the PB2NC tool.
-\begin_inset Newline newline
-\end_inset
-
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1890,349 +1462,226 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Standard
-\begin_inset ERT
-status open
+\begin_layout LyX-Code
 
-\begin_layout Plain Layout
-
-{
-\backslash
-par
-\backslash
-tt
-\backslash
-noindent model = "WRF";}
+\series bold
+model          = "WRF";
 \end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obtype         = "ANALYS";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
+ = 1; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+met_data_dir   = "MET_BASE";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+output_prefix  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version        = "VN.N";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+grid_res = 4;
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt model}
-\end_layout
-
-\end_inset
-
- variable contains a short text string identifying the name to be assigned
- to the model being verified.
- This text string is written out as a header column of the ASCII output
- so that verification statistics from multiple models may be differentiated.
- The value listed above is simply set to "WRF".
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-par
-\backslash
-tt
-\backslash
-noindent grid
-\backslash
-_res = 4;}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt grid
-\backslash
-_res}
-\end_layout
-
-\end_inset
-
+\series bold
+grid_res
+\series default
  variable is the nominal spacing for each grid square in kilometers.
  The variable is not used directly in the code, but subsequent variables
  in the configuration file are defined in terms of it.
  Therefore, setting this appropriately will help ensure that appropriate
- default values are used for these variables.
+ default values are used for these entries.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 fcst = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-field = {
+\series bold
+   field = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-name = "APCP";
+\series bold
+      name = "APCP";
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-level = "A03";
+\series bold
+      level = "A03";
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
+\series bold
+   }
 \end_layout
 
-\end_inset
+\begin_layout LyX-Code
 
+\series bold
+   raw_thresh        = NA;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   conv_radius       = 60.0/grid_res; // in grid squares
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   conv_thresh       = >=5.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh        = 0.5;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   area_thresh       = NA;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   inten_perc_value  = 100;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   inten_perc_thresh = NA;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   merge_thresh      = >=1.25;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   merge_flag        = THRESH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-raw_thresh = NA;
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-conv_radius = 60.0/grid_res; // in grid squares
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-conv_thresh = >=5.0;
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-vld_thresh = 0.5;
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-area_thresh = NA;
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-inten_perc_value = 100;
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-inten_perc_thresh = NA;
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-merge_thresh = >=1.25;
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-merge_flag = THRESH;
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout LyX-Code
+\series bold
 obs = fcst; 
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt field}
-\end_layout
+\series bold
+field 
+\series default
+entries in the forecast and observation dictionaries specify the model and
+ observation variables and level to be compared.
+ See a more complete description of them in Section
+\series medium
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
 
 \end_inset
 
- variables in the forecast and observation dictionaries specify the model
- variable and observation variable, respectively, and correspond to the
- vertical level to be verified.
- 
+.
+ In the above example, the forecast settings are copied into the observation
+ dictionary using 
+\series bold
+obs = fcst;
+\series medium
+.
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt raw
-\backslash
-_thresh}
-\end_layout
-
-\end_inset
-
- variable is used to threshold the raw forecast and / or observation fields.
+\series bold
+raw_thresh
+\series default
+ entry is used to threshold the raw forecast and/or observation fields.
  Prior to defining objects, it is recommended that the raw fields should
  be made to look similar to each other.
  For example, if the model only predicts values for a variable above some
@@ -2243,105 +1692,54 @@ _thresh}
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt conv
-\backslash
-_radius}
-\end_layout
-
-\end_inset
-
- variable defines the radius of the circular convolution applied to smooth
+\series bold
+conv_radius
+\series default
+ entry defines the radius of the circular convolution applied to smooth
  the raw fields.
  The radii are specified in terms of grid units.
  The default convolution radii are defined in terms of the previously defined
- grid_res variable.
+ 
+\series bold
+grid_res
+\series default
+ entry.
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt conv
-\backslash
-_thresh}
-\end_layout
-
-\end_inset
-
- variable specifies the threshold values to be applied to the convolved
- field to define objects.
+\series bold
+conv_thresh 
+\series default
+entry specifies the threshold values to be applied to the convolved field
+ to define objects.
  By default, objects are defined using a convolution threshold of 5.0.
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt vld
-\backslash
-_thresh}
-\end_layout
-
-\end_inset
-
- variable must be set between 0 and 1.
+\series bold
+vld_thresh 
+\series default
+entry must be set between 0 and 1.
  When performing the circular convolution step if the proportion of bad
  data values in the convolution area is greater than or equal to this threshold,
  the resulting convolved value will be bad data.
  If the proportion is less than this threshold, the convolution will be
  performed on only the valid data.
  By default, the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt vld
-\backslash
-_thresh}
-\end_layout
-
-\end_inset
-
+\series bold
+vld_thresh
+\series default
  is set to 0.5.
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt area
-\backslash
-_thresh}
-\end_layout
-
-\end_inset
-
- variable specifies the area threshold values to be applied to the defined
+\series bold
+area_thresh
+\series default
+ entry specifies the area threshold values to be applied to the defined
  objects.
  The area of an object is simply a count of the number of grid squares that
  comprise it.
@@ -2352,40 +1750,14 @@ _thresh}
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt intern
-\backslash
-_perc
-\backslash
-_value}
-\end_layout
-
-\end_inset
-
+\series bold
+inten_perc_value
+\series default
  and 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt inten
-\backslash
-_perc
-\backslash
-_thresh}
-\end_layout
-
-\end_inset
-
- variables specify the intensity threshold values to be applied to the defined
+\series bold
+inten_perc_thresh
+\series default
+ entries specify the intensity threshold values to be applied to the defined
  objects.
  For each object defined, the intensity values within the object are sorted,
  and the requested intensity percentile value is computed.
@@ -2400,55 +1772,19 @@ _thresh}
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt merge
-\backslash
-_thresh}
-\end_layout
-
-\end_inset
-
- variables are used to define larger objects for use in merging the original
+\series bold
+merge_thresh
+\series default
+ entry is used to define larger objects for use in merging the original
  objects.
- These variables define the threshold value used in the double thresholding
- merging technique.
+ It defines the threshold value used in the double thresholding merging
+ technique.
  Note that in order to use this merging technique, it must be requested
  for both the forecast and observation fields.
  These thresholds should be chosen to define larger objects that fully contain
  the originally defined objects.
- For example, for objects defined as 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$
-\backslash
-geq 5.0$
-\end_layout
-
-\end_inset
-
-, a merge threshold of 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$
-\backslash
-geq 2.5$
-\end_layout
-
-\end_inset
-
- will define larger objects that fully contain the original objects.
+ For example, for objects defined as >=5.0, a merge threshold of >=2.5 will
+ define larger objects that fully contain the original objects.
  Any two original objects contained within the same larger object will be
  merged.
  By default, the merge thresholds are set to be greater than or equal to
@@ -2457,22 +1793,11 @@ geq 2.5$
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt merge
-\backslash
-_flag}
-\end_layout
-
-\end_inset
-
- variable controls what type of merging techniques will be applied to the
- objects defined in each field.
+\series bold
+merge_flag 
+\series default
+entry controls what type of merging techniques will be applied to the objects
+ defined in each field.
  
 \end_layout
 
@@ -2515,10 +1840,9 @@ BOTH
 
 \begin_layout Standard
 By default, the double thresholding merging technique is applied.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2530,49 +1854,18 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Standard
-\begin_inset ERT
-status open
+\begin_layout LyX-Code
 
-\begin_layout Plain Layout
-
-{
-\backslash
-par
-\backslash
-tt
-\backslash
-noindent mask
-\backslash
-_missing
-\backslash
-_flag = NONE;}
-\end_layout
-
-\end_inset
-
-
+\series bold
+mask_missing_flag = NONE;
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt mask
-\backslash
-_missing
-\backslash
-_flag}
-\end_layout
-
-\end_inset
-
- variable specifies how missing data in the raw model and observation fields
+\series bold
+mask_missing_flag
+\series default
+ entry specifies how missing data in the raw model and observation fields
  will be treated.
  
 \end_layout
@@ -2622,10 +1915,9 @@ i.e.
 Prior to defining objects, it is recommended that the raw fields be made
  to look similar to each other by assigning a value of BOTH to this parameter.
  However, by default no masking is performed.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2637,47 +1929,29 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Standard
-\begin_inset ERT
-status open
+\begin_layout LyX-Code
 
-\begin_layout Plain Layout
-
-{
-\backslash
-par
-\backslash
-tt
-\backslash
-noindent match
-\backslash
-_flag = MERGE
-\backslash
-_BOTH;}
-\end_layout
-
-\end_inset
-
-
+\series bold
+match_flag = MERGE_BOTH;
 \end_layout
 
 \begin_layout Standard
 The 
-\family typewriter
-match_flag
-\family default
- variable controls how matching will be performed when comparing objects
- from the forecast field to objects from the observation field.
+\series bold
+match_flag 
+\series default
+entry controls how matching will be performed when comparing objects from
+ the forecast field to objects from the observation field.
  An interest value is computed for each possible pair of forecast/observation
  objects.
  The interest values are then thresholded to define which objects match.
  If two objects in one field happen to match the same object in the other
  field, then those two objects could be merged.
  The 
-\family typewriter
+\series bold
 match_flag
-\family default
- controls what type of merging is allowed in this context.
+\series default
+ entry controls what type of merging is allowed in this context.
  
 \end_layout
 
@@ -2720,10 +1994,9 @@ NO_MERGE
 
 \begin_layout Standard
 By default, additional merging is allowed in both fields.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2735,10 +2008,9 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 
-\family typewriter
-\series medium
+\series bold
 max_centroid_dist = 800/grid_res;
 \end_layout
 
@@ -2746,25 +2018,24 @@ max_centroid_dist = 800/grid_res;
 Computing the attributes for all possible pairs of objects can take some
  time depending on the numbers of objects.
  The 
-\family typewriter
+\series bold
 max_centroid_dist
-\family default
- variable is used to specify how far apart objects should be in order to
- conclude that they have no chance of matching.
+\series default
+ entry is used to specify how far apart objects should be in order to conclude
+ that they have no chance of matching.
  No pairwise attributes are computed for pairs of objects whose centroids
  are farther away than this distance, defined in terms of grid units.
- Setting this variable to a reasonable value will improve the execution
- time of the MODE tool.
+ Setting this entry to a reasonable value will improve the execution time
+ of the MODE tool.
  By default, the maximum centroid distance is defined in terms of the previously
  defined 
-\family typewriter
-grid_res
-\family default
- variable.
-\begin_inset Newline newline
-\end_inset
+\series bold
+grid_res 
+\series default
+entry.
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2777,105 +2048,75 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 mask = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-grid = "";
+\series bold
+   grid = "";
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
+\series bold
+   grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-poly = "";
+\series bold
+   poly = "";
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
+\series bold
+   poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
 \begin_layout Standard
-The 
-\family typewriter
+Defining a 
+\series bold
 grid
-\family default
- variable specifies a pre-defined NCEP grid with which to mask the raw forecast
- and observation fields.
- The predefined grids are specified as 
-\family typewriter
-"GNNN"
-\family default
- where 
-\family typewriter
-NNN
-\family default
- is the three digit designation for the grid.
- By default, no masking grid is applied.
- A list of the set of pre-defined masks included with the MODE tool is presented
- in Appendix B.
+\series default
+ and 
+\series bold
+poly
+\series default
+ masking region is described in Section 
+\series medium
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+ Applying a masking region when running MODE sets all grid points falling
+ outside of that region to missing data, effectively limiting the area of
+ which objects should be defined.
 \end_layout
 
 \begin_layout Standard
 The 
-\family typewriter
+\series bold
 grid_flag
-\family default
- variable specifies how the grid should be applied.
- 
+\series default
+ and 
+\series bold
+poly_flag
+\series default
+ entries specify how the grid and polyline masking should be applied:
 \end_layout
 
 \begin_layout Itemize
@@ -2915,108 +2156,10 @@ BOTH
 \end_layout
 
 \begin_layout Standard
-By default, the masking grid is not applied.
+By default, no masking grid or polyline is applied.
 \end_layout
 
 \begin_layout Standard
-Similar to the 
-\family typewriter
-grid
-\family default
- variable above, the 
-\family typewriter
-poly
-\family default
- variable is the name of a file that defines a verification masking region.
- These masking regions may be specified in two ways: as a lat/lon polygon
- or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
- or Gen-Circle_Mask tools.
-\end_layout
-
-\begin_layout Standard
-Several masking polygons used by NCEP are predefined in the installed 
-\family typewriter
-share/met/poly
-\family default
- directory.
- Creating a new polygon is as simple as creating a text file with a name
- for the polygon followed by the lat/lon points which define its boundary.
- Adding a new masking polygon requires no code changes and no recompiling.
- Internally, the lat/lon polygon points are converted into 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$(x, y)$
-\end_layout
-
-\end_inset
-
- values in the grid.
-\end_layout
-
-\begin_layout Standard
-Alternatively, any gridded data file that MET can read may be used to define
- a verification masking region.
- Users must specify a description of the field to be used from the input
- file and, optionally, may specify a threshold to be applied to that field.
- Any grid point where the resulting field is 0, the mask is turned off.
- Any grid point where it is non-zero, the mask is turned on.
-\end_layout
-
-\begin_layout Standard
-Similar to the 
-\family typewriter
-grid_flag
-\family default
- variable above, the 
-\family typewriter
-poly_flag
-\family default
- variable specifies how the masking polygon should be applied.
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-NONE
-\series default
- indicates the masking polygon should be applied to neither field.
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-FCST
-\series default
- indicates the masking polygon should be applied to the forecast field.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-OBS
-\series default
- indicates the masking polygon should be applied to the observation field.
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-BOTH
-\series default
- indicates that the masking polygon should be applied to both fields.
- 
-\end_layout
-
-\begin_layout Standard
-By default, the masking polygon is not applied.
-\begin_inset Newline newline
-\end_inset
-
-
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -3029,163 +2172,77 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 weight = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-centroid_dist = 2.0;
+\series bold
+   centroid_dist    = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-boundary_dist = 4.0;
+\series bold
+   boundary_dist    = 4.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-convex_hull_dist = 0.0;
+\series bold
+   convex_hull_dist = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-angle_diff = 1.0;
+\series bold
+   angle_diff       = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-area_ratio = 1.0;
+\series bold
+   area_ratio       = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-int_area_ratio = 2.0;
+\series bold
+   int_area_ratio   = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-complexity_ratio = 0.0;
+\series bold
+   complexity_ratio = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-inten_perc_ratio = 0.0;
+\series bold
+   inten_perc_ratio = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-inten_perc_value = 50;
+\series bold
+   inten_perc_value = 50;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 } 
 \end_layout
 
 \begin_layout Standard
 The 
-\family typewriter
+\series bold
 weight
-\family default
- variables listed above control how much weight is assigned to each pairwise
+\series default
+ entries listed above control how much weight is assigned to each pairwise
  attribute when computing a total interest value for object pairs.
  The weights listed above correspond to the 
 \series bold
@@ -3227,25 +2284,24 @@ intensity ratio
 
 \begin_layout Standard
 The 
-\family typewriter
+\series bold
 inten_perc_value
-\family default
- variable corresponds to the 
-\family typewriter
+\series default
+ entry corresponds to the 
+\series bold
 inten_perc_ratio
-\family default
+\series default
 .
  The 
-\family typewriter
+\series bold
 inten_perc_value
-\family default
+\series default
  should be set between 0 and 100 to define which percentile of intensity
  should be compared for pairs of objects.
  By default, the 50th percentile, or median value, is chosen.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -3258,544 +2314,218 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 interest_function = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-centroid_dist = (
+\series bold
+   centroid_dist = (
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.0, 1.0 )
+\series bold
+      ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 60.0/grid_res, 1.0 )
+\series bold
+      ( 60.0/grid_res, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 600.0/grid_res, 0.0 )
+\series bold
+      ( 600.0/grid_res, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-);
+\series bold
+   );
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-boundary_dist = (
+\series bold
+   boundary_dist = (
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.0, 1.0 )
+\series bold
+      ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 400.0/grid_res, 0.0 )
+\series bold
+      ( 400.0/grid_res, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-);
+\series bold
+   );
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-convex_hull_dist = (
+\series bold
+   convex_hull_dist = (
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.0, 1.0 )
+\series bold
+      ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 400.0/grid_res, 0.0 )
+\series bold
+      ( 400.0/grid_res, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-);
+\series bold
+   );
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-angle_diff = (
+\series bold
+   angle_diff = (
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.0, 1.0 )
+\series bold
+      ( 0.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 30.0, 1.0 )
+\series bold
+      ( 30.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 90.0, 0.0 )
+\series bold
+      ( 90.0, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-);
+\series bold
+   );
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-corner = 0.8;
+\series bold
+   corner = 0.8;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-ratio_if = (
+\series bold
+   ratio_if = (
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.0, 0.0 )
+\series bold
+      ( 0.0, 0.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( corner, 1.0 )
+\series bold
+      ( corner, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 1.0, 1.0 )
+\series bold
+      ( 1.0, 1.0 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-);
+\series bold
+   );
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-area_ratio = ratio_if;
+\series bold
+   area_ratio = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-int_area_ratio = (
+\series bold
+   int_area_ratio = (
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.00, 0.00 )
+\series bold
+      ( 0.00, 0.00 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.10, 0.50 )
+\series bold
+      ( 0.10, 0.50 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 0.25, 1.00 )
+\series bold
+      ( 0.25, 1.00 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.50in}
-\end_layout
-
-\end_inset
-
-( 1.00, 1.00 )
+\series bold
+      ( 1.00, 1.00 )
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-);
+\series bold
+   );
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-complexity_ratio = ratio_if;
+\series bold
+   complexity_ratio = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-inten_perc_ratio = ratio_if;
+\series bold
+   inten_perc_ratio = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
 \begin_layout Standard
-The set of interest function variables listed above define which values
- are of interest for each pairwise attribute measured.
+The set of interest function entries listed above define which values are
+ of interest for each pairwise attribute measured.
  The interest functions may be defined as a piecewise linear function or
  as an algebraic expression.
  A piecewise linear function is defined by specifying the corner points
@@ -3817,14 +2547,13 @@ http://www.dtcenter.org/met/users
 ) for more details.
  By default, many of these functions are defined in terms of the previously
  defined 
-\family typewriter
+\series bold
 grid_res
-\family default
- variable.
-\begin_inset Newline newline
-\end_inset
+\series default
+ entry.
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -3836,19 +2565,18 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 
-\family typewriter
-\series medium
+\series bold
 total_interest_thresh = 0.7;
 \end_layout
 
 \begin_layout Standard
 The 
-\family typewriter
+\series bold
 total_interest_thresh
-\family default
- variable should be set between 
+\series default
+ entry should be set between 
 \series bold
 0
 \series default
@@ -3865,10 +2593,9 @@ total_interest_thresh
  Increasing the threshold will decrease the number of matches while decreasing
  the threshold will increase the number of matches.
  By default, the total interest threshold is set to 0.7.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -3880,73 +2607,39 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 
-\family typewriter
-\series medium
+\series bold
 print_interest_thresh = 0.0;
 \end_layout
 
 \begin_layout Standard
 The 
-\family typewriter
+\series bold
 print_interest_thresh
-\family default
- variable determines which pairs of object attributes will be written to
- the output object attribute ASCII file.
+\series default
+ entry determines which pairs of object attributes will be written to the
+ output object attribute ASCII file.
  The user may choose to set the 
-\family typewriter
+\series bold
 print_interest_thresh
-\family default
+\series default
  to the same value as the 
-\family typewriter
+\series bold
 total_interest_thresh
-\family default
+\series default
 , meaning that only object pairs that actually match are written to the
  output file.
  By default, the print interest threshold is set to zero, meaning that all
  object pair attributes will be written as long as the distance between
  the object centroids is less than the 
-\family typewriter
+\series bold
 max_centroid_dist
-\family default
- variable.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-\series medium
-met_data_dir = "MET_BASE";
+\series default
+ entry.
 \end_layout
 
 \begin_layout Standard
-The MODE tool uses several static data files when generating plots.
- If it cannot find the data it needs in the expected directory, it will
- error out.
- The 
-\family typewriter
-met_data_dir
-\family default
- variable may be set to the installed share/met directory to find the static
- data files.
-\begin_inset Newline newline
-\end_inset
-
-
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -3959,216 +2652,120 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 fcst_raw_plot = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-color_table = "MET_BASE/colortables/met_default.ctable";
+\series bold
+   color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-plot_min = 0.0;
+\series bold
+   plot_min = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-plot_max = 0.0;
+\series bold
+   plot_max = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-colorbar_spacing = 1;
+\series bold
+   colorbar_spacing = 1;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 obs_raw_plot = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-color_table = "MET_BASE/colortables/met_default.ctable";
+\series bold
+   color_table = "MET_BASE/colortables/met_default.ctable";
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-plot_min = 0.0;
+\series bold
+   plot_min = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-plot_max = 0.0;
+\series bold
+   plot_max = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-colorbar_spacing = 1;
+\series bold
+   colorbar_spacing = 1;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 object_plot = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
+\series bold
+   
+\lang english
 color_table = "MET_BASE/colortables/mode_obj.ctable";
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
 \begin_layout Standard
-The 
-\family typewriter
+Specifying dictionaries to define the 
+\series bold
 color_table
-\family default
- variables indicate which color table files are to be used when generating
- the output PostScript plot.
- The forecast and observation raw field are plotted using values in the
- 
-\family typewriter
-fcst_raw
-\family default
- group and 
-\family typewriter
-obs_raw
-\family default
- group, while the objects identified are plotted using the values in the
- 
-\family typewriter
-object_plot
-\family default
- group.
- By default, these variables point to color tables in the MET distribution.
- Users are free to create their own color tables following the format in
- the examples.
- Note that the range defined for the default raw color table is 0 to 1.
- By convention, when a color table is defined with a range of 0 to 1, it
- will be scaled to match the actual range of the data present in raw field.
-\end_layout
-
-\begin_layout Standard
-The 
-\family typewriter
+\series default
+, 
+\series bold
 plot_min
-\family default
- and 
-\family typewriter
+\series default
+, and 
+\series bold
 plot_max
-\family default
- variables indicate the min and max data values to be plotted for the forecast
- and observation fields.
- If set to non-zero values, the forecast and observation raw color tables
- specified above will be rescaled to match the specified range.
+\series default
+ entries are described in Section 
+\series medium
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -4179,29 +2776,18 @@ The MODE tool generates a color bar to represent the contents of the colortable
  The values defined for each color in the color table are also plotted next
  to the color bar.
  The 
-\family typewriter
+\series bold
 colorbar_spacing
-\family default
- variable is used to define the frequency with which the color table values
+\series default
+ entry is used to define the frequency with which the color table values
  should be plotted.
  Setting this variable to 1, as shown above, indicates that every color
  table value should be plotted.
- Setting it to an integer 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$n > 1$
+ Setting it to an integer, n > 1, indicates that only every n-th color table
+ value should be plotted.
 \end_layout
 
-\end_inset
-
- indicates that only every nth color table value should be plotted.
-\begin_inset Newline newline
-\end_inset
-
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -4213,10 +2799,9 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 
-\family typewriter
-\series medium
+\series bold
 zero_border_size = 1;
 \end_layout
 
@@ -4225,15 +2810,14 @@ The MODE tool is not able to define objects that touch the edge of the grid.
  After the convolution step is performed the outer columns and rows of data
  are zeroed out to enable MODE to identify objects.
  The 
-\family typewriter
-zero_border_size
-\family default
- variable specifies how many outer columns and rows of data should be set
- to bad data.
-\begin_inset Newline newline
-\end_inset
+\series bold
+zero_border_size 
+\series default
+entry specifies how many outer columns and rows of data should be set to
+ bad data.
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -4245,19 +2829,18 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 
-\family typewriter
-\series medium
+\series bold
 plot_valid_flag = FALSE;
 \end_layout
 
 \begin_layout Standard
 When applied, the 
-\family typewriter
+\series bold
 plot_valid_flag
-\family default
- variable indicates that only the region containing valid data after masking
+\series default
+ entry indicates that only the region containing valid data after masking
  is applied should be plotted.
  
 \end_layout
@@ -4281,10 +2864,9 @@ TRUE
 
 \begin_layout Standard
 The default value of this flag is FALSE.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -4296,47 +2878,23 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 
-\family typewriter
-\series medium
+\series bold
 plot_gcarc_flag = FALSE;
 \end_layout
 
 \begin_layout Standard
 When applied, the 
-\family typewriter
+\series bold
 plot_gcarc_flag
-\family default
- variable indicates that the edges of polylines should be plotted using
- great circle arcs as opposed to straight lines in the grid.
+\series default
+ entry indicates that the edges of polylines should be plotted using great
+ circle arcs as opposed to straight lines in the grid.
  The default value of this flag is FALSE.
 \end_layout
 
-\begin_layout LyX-Code
-ps_plot_flag = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-ct_stats_flag = TRUE;
-\end_layout
-
 \begin_layout Standard
-These flags can be set to TRUE or FALSE to produce additional output, in
- the form of postscript plots (
-\family typewriter
-ps_plot_flag
-\family default
-) or contingency table counts and statistics (
-\family typewriter
-ct_stats_flag
-\family default
-).
- 
-\begin_inset Newline newline
-\end_inset
-
-
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -4349,106 +2907,82 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
+ps_plot_flag  = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ct_stats_flag = TRUE;
+\end_layout
+
+\begin_layout Standard
+These flags can be set to TRUE or FALSE to produce additional output, in
+ the form of PostScript plots and contingency table counts and statistics,
+ respectively.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 nc_pairs_flag = {
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-latlon = TRUE;
+\series bold
+   latlon     = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-raw = TRUE;
+\series bold
+   raw        = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-object_raw = TRUE;
+\series bold
+   object_raw = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-object_id = TRUE;
+\series bold
+   object_id  = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-cluster_id = TRUE;
+\series bold
+   cluster_id = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.25in}
-\end_layout
-
-\end_inset
-
-polylines = TRUE;
+\series bold
+   
+\lang english
+polylines  = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
@@ -4456,20 +2990,19 @@ polylines = TRUE;
 Each component of the pairs information in the NetCDF file can be turned
  on or off.
  The old syntax is still supported: 
-\family typewriter
+\series bold
 TRUE
-\family default
+\series default
  means accept the defaults, 
-\family typewriter
+\series bold
 FALSE
-\family default
- means no netcdf output is generated.
- Netcdf output can also be turned off by setting all the individual dictionary
+\series default
+ means no NetCDF output is generated.
+ NetCDF output can also be turned off by setting all the individual dictionary
  flags to false.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -4481,10 +3014,9 @@ height "1pt"
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout LyX-Code
 
-\family typewriter
-\series medium
+\series bold
 shift_right = 0;
 \end_layout
 
@@ -4496,63 +3028,6 @@ When MODE is run on global grids, this parameter specifies how many grid
  to be separated into two objects.
  Shifting the grid by integer number of grid units enables the user to control
  where that longitude cut line occurs.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-\series medium
-output_prefix = "";
-\end_layout
-
-\begin_layout Standard
-This option specifies a string to be used in the output file name.
- It can be useful for keeping results for different models or variables
- from overwriting each other.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-\series medium
-version = "v5.1";
-\end_layout
-
-\begin_layout Standard
-The 
-\series bold
-version
-\series default
- indicates the version of the MODE configuration file used.
- Future versions of MET may include changes to MODE and the MODE configuration
- file.
- This value should not be modified.
 \end_layout
 
 \begin_layout Subsection
@@ -4779,7 +3254,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format of CTS output file.
+Format of MODE CTS output file.
 \end_layout
 
 \end_inset
@@ -4800,11 +3275,11 @@ name "CTS_output"
 \begin_inset Tabular
 <lyxtabular version="3" rows="37" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.25in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4835,7 +3310,7 @@ MODE ASCII CONTINGENCY TABLE OUTPUT FORMAT
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4846,7 +3321,7 @@ Column Number
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4857,7 +3332,7 @@ MODE CTS Column Name
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4870,7 +3345,7 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4899,7 +3374,7 @@ Version number
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4928,7 +3403,7 @@ User provided text string designating model name
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4957,7 +3432,7 @@ Forecast lead time in HHMMSS format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4986,7 +3461,7 @@ Forecast valid start time in YYYYMMDDHH format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5015,7 +3490,7 @@ Forecast accumulation time in HHMMSS format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5045,7 +3520,7 @@ Observation lead time in HHMMSS format; when field2 is actually an observation,
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5074,7 +3549,7 @@ Observation valid start time in YYYYMMDDHH format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5103,7 +3578,7 @@ Observation accumulation time in HHMMSS format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5132,7 +3607,7 @@ Forecast convolution radius in grid squares
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5161,7 +3636,7 @@ Forecast convolution threshold
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5190,7 +3665,7 @@ Observation convolution radius in grid squares
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5219,7 +3694,7 @@ Observation convolution threshold
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5248,7 +3723,7 @@ Forecast variable
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5277,7 +3752,7 @@ Forecast vertical level
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5306,7 +3781,7 @@ Observation variable
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5335,7 +3810,7 @@ Observation vertical level
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5366,7 +3841,7 @@ Field type for this line:* RAW for the raw input fields* FILTER for the
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5395,7 +3870,7 @@ Total number of matched pairs
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5424,7 +3899,7 @@ Number of forecast yes and observation yes
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5453,7 +3928,7 @@ Number of forecast yes and observation no
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5482,7 +3957,7 @@ Number of forecast no and observation yes
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5511,7 +3986,7 @@ Number of forecast no and observation no
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5540,7 +4015,7 @@ Base rate
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5569,7 +4044,7 @@ Forecast mean
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5598,7 +4073,7 @@ Accuracy
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5627,7 +4102,7 @@ Frequency Bias
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5656,7 +4131,7 @@ Probability of detecting yes
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5685,7 +4160,7 @@ Probability of detecting no
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5714,7 +4189,7 @@ Probability of false detection
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5743,7 +4218,7 @@ False alarm ratio
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5772,7 +4247,7 @@ Critical Success Index
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5801,7 +4276,7 @@ Gilbert Skill Score
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5830,7 +4305,7 @@ Hanssen-Kuipers Discriminant
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5859,7 +4334,7 @@ Heidke Skill Score
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6043,13 +4518,44 @@ name "MODE_object_attribute"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="6" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top" width="1.1in">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="3.15in">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+mode ASCII OBJECT IDENTIFIER DESCRIPTIONS
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6060,7 +4566,7 @@ Object identifier (object_id)
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6071,7 +4577,7 @@ Valid Data Columns
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6277,17 +4783,17 @@ name "MODE_object_attribute_output"
 \begin_inset Tabular
 <lyxtabular version="3" rows="33" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.25in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \series bold
-MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
+mode ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
 \end_layout
 
 \end_inset
@@ -6312,7 +4818,7 @@ MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6323,7 +4829,7 @@ Column
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6334,7 +4840,7 @@ MODE Column Name
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6347,7 +4853,7 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6356,7 +4862,7 @@ Description
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6376,7 +4882,7 @@ Version number
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6385,7 +4891,7 @@ Version number
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6405,7 +4911,7 @@ User provided text string designating model name
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6414,7 +4920,7 @@ User provided text string designating model name
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6434,7 +4940,7 @@ Forecast lead time in HHMMSS format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6443,7 +4949,7 @@ Forecast lead time in HHMMSS format
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6463,7 +4969,7 @@ Forecast valid start time in YYYYMMDDHH format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6472,7 +4978,7 @@ Forecast valid start time in YYYYMMDDHH format
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6492,7 +4998,7 @@ Forecast accumulation time in HHMMSS format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6501,7 +5007,7 @@ Forecast accumulation time in HHMMSS format
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6522,7 +5028,7 @@ Observation lead time in HHMMSS format; when field2 is actually an observation,
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6531,7 +5037,7 @@ Observation lead time in HHMMSS format; when field2 is actually an observation,
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6551,7 +5057,7 @@ Observation valid start time in YYYYMMDDHH format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6560,7 +5066,7 @@ Observation valid start time in YYYYMMDDHH format
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6580,7 +5086,7 @@ Observation accumulation time in HHMMSS format
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6589,7 +5095,7 @@ Observation accumulation time in HHMMSS format
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6609,7 +5115,7 @@ Forecast convolution radius in grid squares
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6618,7 +5124,7 @@ Forecast convolution radius in grid squares
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6638,7 +5144,7 @@ Forecast convolution threshold
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6647,7 +5153,7 @@ Forecast convolution threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6667,7 +5173,7 @@ Observation convolution radius in grid squares
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6676,7 +5182,7 @@ Observation convolution radius in grid squares
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6696,7 +5202,7 @@ Observation convolution threshold
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6705,7 +5211,7 @@ Observation convolution threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6725,7 +5231,7 @@ Forecast variable
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6734,7 +5240,7 @@ Forecast variable
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6754,7 +5260,7 @@ Forecast vertical level
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6763,7 +5269,7 @@ Forecast vertical level
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6783,7 +5289,7 @@ Observation variable
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6792,7 +5298,7 @@ Observation variable
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6812,7 +5318,7 @@ Observation vertical level
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6821,7 +5327,7 @@ Observation vertical level
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6841,7 +5347,7 @@ Object numbered from 1 to the number of objects in each field
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6850,7 +5356,7 @@ Object numbered from 1 to the number of objects in each field
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6870,7 +5376,7 @@ Object category indicating to which cluster object it belongs
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6879,7 +5385,7 @@ Object category indicating to which cluster object it belongs
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6899,7 +5405,7 @@ Location of the centroid (in grid units)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6908,7 +5414,7 @@ Location of the centroid (in grid units)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6928,7 +5434,7 @@ Location of the centroid (in lat/lon degrees)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6937,7 +5443,7 @@ Location of the centroid (in lat/lon degrees)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6957,7 +5463,7 @@ Object axis angle (in degrees)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6966,7 +5472,7 @@ Object axis angle (in degrees)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6986,7 +5492,7 @@ Length of the enclosing rectangle (in grid units)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -6995,7 +5501,7 @@ Length of the enclosing rectangle (in grid units)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7015,7 +5521,7 @@ Width of the enclosing rectangle (in grid units)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7024,7 +5530,7 @@ Width of the enclosing rectangle (in grid units)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7044,7 +5550,7 @@ Object area (in grid squares)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7053,7 +5559,7 @@ Object area (in grid squares)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7074,7 +5580,7 @@ Area of the object containing non-zero data in the filtered field (in grid
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7083,7 +5589,7 @@ Area of the object containing non-zero data in the filtered field (in grid
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7104,7 +5610,7 @@ Area of the object containing data values in the filtered field that meet
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7113,7 +5619,7 @@ Area of the object containing data values in the filtered field that meet
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7134,7 +5640,7 @@ Radius of curvature of the object defined in terms of third order moments
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7143,7 +5649,7 @@ Radius of curvature of the object defined in terms of third order moments
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7163,7 +5669,7 @@ Center of curvature (in grid coordinates)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7172,7 +5678,7 @@ Center of curvature (in grid coordinates)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7193,7 +5699,7 @@ Ratio of the difference between the area of an object and the area of its
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7202,7 +5708,7 @@ Ratio of the difference between the area of an object and the area of its
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7223,7 +5729,7 @@ INTENSITY_10, _25, _50, _75, _90
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7232,7 +5738,7 @@ INTENSITY_10, _25, _50, _75, _90
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7309,7 +5815,7 @@ name "MODE_object_attribute_output_part_2"
 \begin_layout Plain Layout
 
 \series bold
-MODE ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
+mode ASCII OBJECT ATTRIBUTE OUTPUT FORMAT
 \end_layout
 
 \end_inset
@@ -7860,7 +6366,7 @@ name "NetCDF_dimensions_for_MODE_output"
 \begin_layout Plain Layout
 
 \series bold
-mode NetCDF OUTPUT FILE DIMENSIONS
+mode NETCDF DIMENSIONS
 \end_layout
 
 \end_inset
@@ -7900,7 +6406,7 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7909,7 +6415,7 @@ lat
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7921,7 +6427,7 @@ Dimension of the latitude (i.e.
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7930,7 +6436,7 @@ lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7942,7 +6448,7 @@ Dimension of the longitude (i.e.
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7963,7 +6469,7 @@ fcst_thresh_length
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7974,7 +6480,7 @@ Number of thresholds applied to the forecast
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -7995,7 +6501,7 @@ obs_thresh_length
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8006,7 +6512,7 @@ Number of thresholds applied to the observations
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8027,7 +6533,7 @@ fcst_simp
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8038,7 +6544,7 @@ Number of simple forecast objects
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8059,7 +6565,7 @@ fcst_simp_bdy
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8071,7 +6577,7 @@ Number of points used to define the boundaries of all of the simple forecast
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8080,7 +6586,7 @@ fcst_simp_hull
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8091,7 +6597,7 @@ Number of points used to define the hull of all of the simple forecast objects
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8100,7 +6606,7 @@ obs_simp
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8111,7 +6617,7 @@ Number of simple observation objects
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8120,7 +6626,7 @@ obs_simp_bdy
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8132,7 +6638,7 @@ Number of points used to define the boundaries of all of the simple observation
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8141,7 +6647,7 @@ obs_simp_hull
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8153,7 +6659,7 @@ Number of points used to define the hull of all of the simple observation
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8162,7 +6668,7 @@ fcst_clus
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8173,7 +6679,7 @@ Number of forecast clusters
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8182,7 +6688,7 @@ fcst_clus_hull
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8194,7 +6700,7 @@ Number of points used to define the hull of all of the cluster forecast
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8203,7 +6709,7 @@ obs_clus
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8284,13 +6790,13 @@ name "Variables_contained_in_MODE_NetCDF_output"
 <column alignment="left" valignment="top" width="1.25in">
 <column alignment="left" valignment="top" width="3in">
 <row>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \series bold
-mode NetCDF OUTPUT FILE VARIABLES
+mode NETCDF VARIABLES
 \end_layout
 
 \end_inset
@@ -8350,7 +6856,7 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8359,7 +6865,7 @@ lat
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8368,7 +6874,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8379,7 +6885,7 @@ Latitude
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8388,7 +6894,7 @@ lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8397,7 +6903,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8408,7 +6914,7 @@ Longitude
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8417,7 +6923,7 @@ fcst_raw
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8426,7 +6932,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8437,7 +6943,7 @@ Forecast raw values
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8446,7 +6952,7 @@ fcst_obj_raw
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8455,7 +6961,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8466,7 +6972,7 @@ Forecast Object Raw Values
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8475,7 +6981,7 @@ fcst_obj_id
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8484,7 +6990,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8495,7 +7001,7 @@ Simple forecast object id number for each grid point
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8504,7 +7010,7 @@ fcst_clus_id
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8513,7 +7019,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8524,7 +7030,7 @@ Cluster forecast object id number for each grid point
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8533,7 +7039,7 @@ obs_raw
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8542,7 +7048,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8553,7 +7059,7 @@ Observation Raw Values
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8562,7 +7068,7 @@ obs_obj_raw
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8571,7 +7077,7 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8582,7 +7088,7 @@ Observation Object Raw Values
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8591,7 +7097,7 @@ obs_obj_id
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8600,7 +7106,7 @@ obs_obj_id
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8611,7 +7117,7 @@ Simple observation object id number for each grid point
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8620,7 +7126,7 @@ obs_clus_id
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8629,7 +7135,7 @@ obs_clus_id
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8640,7 +7146,7 @@ Cluster observation object id number for each grid point
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8649,7 +7155,7 @@ fcst_conv_radius
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8658,7 +7164,7 @@ fcst_conv_radius
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8669,7 +7175,7 @@ Forecast convolution radius
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8678,7 +7184,7 @@ obs_conv_radius
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8687,7 +7193,7 @@ obs_conv_radius
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8698,7 +7204,7 @@ Observation convolution radius
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8707,7 +7213,7 @@ fcst_conv_threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8716,7 +7222,7 @@ fcst_conv_threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8727,7 +7233,7 @@ Forecast convolution threshold
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8736,7 +7242,7 @@ obs_conv_threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8745,7 +7251,7 @@ obs_conv_threshold
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8756,7 +7262,7 @@ Observation convolution threshold
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8765,7 +7271,7 @@ n_fcst_simp
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8774,7 +7280,7 @@ n_fcst_simp
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8785,7 +7291,7 @@ Number of simple forecast objects
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8794,7 +7300,7 @@ n_obs_simp
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8803,7 +7309,7 @@ n_obs_simp
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8814,7 +7320,7 @@ Number of simple observation objects
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8823,7 +7329,7 @@ n_clus
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8899,7 +7405,7 @@ name "Variables_contained_in_MODE_NetCDF_output_part_2"
 \begin_layout Plain Layout
 
 \series bold
-mode NetCDF OUTPUT FILE VARIABLES
+mode NETCDF VARIABLES
 \end_layout
 
 \end_inset
@@ -8928,6 +7434,8 @@ mode NetCDF OUTPUT FILE VARIABLES
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 
 \series bold
 NetCDF Variable
@@ -8939,6 +7447,8 @@ NetCDF Variable
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 
 \series bold
 Dimension
@@ -8950,6 +7460,8 @@ Dimension
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 
 \series bold
 Description
@@ -8963,6 +7475,8 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy_start
 \end_layout
 
@@ -8972,6 +7486,8 @@ fcst_simp_bdy_start
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp
 \end_layout
 
@@ -8981,6 +7497,8 @@ fcst_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Boundary Starting Index
 \end_layout
 
@@ -8992,6 +7510,8 @@ Forecast Simple Boundary Starting Index
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy_npts
 \end_layout
 
@@ -9001,6 +7521,8 @@ fcst_simp_bdy_npts
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp
 \end_layout
 
@@ -9010,6 +7532,8 @@ fcst_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Number of Forecast Simple Boundary Points
 \end_layout
 
@@ -9021,6 +7545,8 @@ Number of Forecast Simple Boundary Points
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy_lat
 \end_layout
 
@@ -9030,6 +7556,8 @@ fcst_simp_bdy_lat
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy
 \end_layout
 
@@ -9039,6 +7567,8 @@ fcst_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Boundary PoLatitude
 \end_layout
 
@@ -9050,6 +7580,8 @@ Forecast Simple Boundary PoLatitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy_lon
 \end_layout
 
@@ -9059,6 +7591,8 @@ fcst_simp_bdy_lon
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy
 \end_layout
 
@@ -9068,6 +7602,8 @@ fcst_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Boundary PoLongitude
 \end_layout
 
@@ -9079,6 +7615,8 @@ Forecast Simple Boundary PoLongitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy_x
 \end_layout
 
@@ -9088,6 +7626,8 @@ fcst_simp_bdy_x
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy
 \end_layout
 
@@ -9097,6 +7637,8 @@ fcst_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Boundary PoX-Coordinate
 \end_layout
 
@@ -9108,6 +7650,8 @@ Forecast Simple Boundary PoX-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy_y
 \end_layout
 
@@ -9117,6 +7661,8 @@ fcst_simp_bdy_y
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_bdy
 \end_layout
 
@@ -9126,6 +7672,8 @@ fcst_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Boundary PoY-Coordinate
 \end_layout
 
@@ -9137,6 +7685,8 @@ Forecast Simple Boundary PoY-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull_start
 \end_layout
 
@@ -9146,6 +7696,8 @@ fcst_simp_hull_start
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp
 \end_layout
 
@@ -9155,6 +7707,8 @@ fcst_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Convex Hull Starting Index
 \end_layout
 
@@ -9166,6 +7720,8 @@ Forecast Simple Convex Hull Starting Index
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull_npts
 \end_layout
 
@@ -9175,6 +7731,8 @@ fcst_simp_hull_npts
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp
 \end_layout
 
@@ -9184,6 +7742,8 @@ fcst_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Number of Forecast Simple Convex Hull Points
 \end_layout
 
@@ -9195,6 +7755,8 @@ Number of Forecast Simple Convex Hull Points
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull_lat
 \end_layout
 
@@ -9204,6 +7766,8 @@ fcst_simp_hull_lat
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull
 \end_layout
 
@@ -9213,6 +7777,8 @@ fcst_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Convex Hull Point Latitude
 \end_layout
 
@@ -9224,6 +7790,8 @@ Forecast Simple Convex Hull Point Latitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull_lon
 \end_layout
 
@@ -9233,6 +7801,8 @@ fcst_simp_hull_lon
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull
 \end_layout
 
@@ -9242,6 +7812,8 @@ fcst_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Convex Hull Point Longitude
 \end_layout
 
@@ -9253,6 +7825,8 @@ Forecast Simple Convex Hull Point Longitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull_x
 \end_layout
 
@@ -9262,6 +7836,8 @@ fcst_simp_hull_x
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull
 \end_layout
 
@@ -9271,6 +7847,8 @@ fcst_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Convex Hull Po nt X-Coordinate
 \end_layout
 
@@ -9282,6 +7860,8 @@ Forecast Simple Convex Hull Po nt X-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull_y
 \end_layout
 
@@ -9291,6 +7871,8 @@ fcst_simp_hull_y
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_simp_hull
 \end_layout
 
@@ -9300,6 +7882,8 @@ fcst_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Simple Convex Hull Point Y-Coordinate
 \end_layout
 
@@ -9311,6 +7895,8 @@ Forecast Simple Convex Hull Point Y-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy_start
 \end_layout
 
@@ -9320,6 +7906,8 @@ obs_simp_bdy_start
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp
 \end_layout
 
@@ -9329,6 +7917,8 @@ obs_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Boundary Starting Index
 \end_layout
 
@@ -9340,6 +7930,8 @@ Observation Simple Boundary Starting Index
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy_npts
 \end_layout
 
@@ -9349,6 +7941,8 @@ obs_simp_bdy_npts
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp
 \end_layout
 
@@ -9358,6 +7952,8 @@ obs_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Number of Observation Simple Boundary Points
 \end_layout
 
@@ -9369,6 +7965,8 @@ Number of Observation Simple Boundary Points
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy_lat
 \end_layout
 
@@ -9378,6 +7976,8 @@ obs_simp_bdy_lat
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy
 \end_layout
 
@@ -9387,6 +7987,8 @@ obs_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Boundary Point Latitude
 \end_layout
 
@@ -9398,6 +8000,8 @@ Observation Simple Boundary Point Latitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy_lon
 \end_layout
 
@@ -9407,6 +8011,8 @@ obs_simp_bdy_lon
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy
 \end_layout
 
@@ -9416,6 +8022,8 @@ obs_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Boundary Point Longitude
 \end_layout
 
@@ -9427,6 +8035,8 @@ Observation Simple Boundary Point Longitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy_x
 \end_layout
 
@@ -9436,6 +8046,8 @@ obs_simp_bdy_x
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy
 \end_layout
 
@@ -9445,6 +8057,8 @@ obs_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Boundary Point X-Coordinate
 \end_layout
 
@@ -9456,6 +8070,8 @@ Observation Simple Boundary Point X-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy_y
 \end_layout
 
@@ -9465,6 +8081,8 @@ obs_simp_bdy_y
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_bdy
 \end_layout
 
@@ -9474,6 +8092,8 @@ obs_simp_bdy
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Boundary Point Y-Coordinate
 \end_layout
 
@@ -9485,6 +8105,8 @@ Observation Simple Boundary Point Y-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull_start
 \end_layout
 
@@ -9494,6 +8116,8 @@ obs_simp_hull_start
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp
 \end_layout
 
@@ -9503,6 +8127,8 @@ obs_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Convex Hull Starting Index
 \end_layout
 
@@ -9514,6 +8140,8 @@ Observation Simple Convex Hull Starting Index
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull_npts
 \end_layout
 
@@ -9523,6 +8151,8 @@ obs_simp_hull_npts
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp
 \end_layout
 
@@ -9532,6 +8162,8 @@ obs_simp
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Number of Observation Simple Convex Hull Points
 \end_layout
 
@@ -9543,6 +8175,8 @@ Number of Observation Simple Convex Hull Points
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull_lat
 \end_layout
 
@@ -9552,6 +8186,8 @@ obs_simp_hull_lat
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull
 \end_layout
 
@@ -9561,6 +8197,8 @@ obs_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Convex Hull Point Latitude
 \end_layout
 
@@ -9572,6 +8210,8 @@ Observation Simple Convex Hull Point Latitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull_lon
 \end_layout
 
@@ -9581,6 +8221,8 @@ obs_simp_hull_lon
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull
 \end_layout
 
@@ -9590,6 +8232,8 @@ obs_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Convex Hull Point Longitude
 \end_layout
 
@@ -9601,6 +8245,8 @@ Observation Simple Convex Hull Point Longitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull_x
 \end_layout
 
@@ -9610,6 +8256,8 @@ obs_simp_hull_x
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull
 \end_layout
 
@@ -9619,6 +8267,8 @@ obs_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Convex Hull Point X-Coordinate
 \end_layout
 
@@ -9630,6 +8280,8 @@ Observation Simple Convex Hull Point X-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull_y
 \end_layout
 
@@ -9639,6 +8291,8 @@ obs_simp_hull_y
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_simp_hull
 \end_layout
 
@@ -9648,6 +8302,8 @@ obs_simp_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Simple Convex Hull Point Y-Coordinate
 \end_layout
 
@@ -9659,6 +8315,8 @@ Observation Simple Convex Hull Point Y-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull_start
 \end_layout
 
@@ -9668,6 +8326,8 @@ fcst_clus_hull_start
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus
 \end_layout
 
@@ -9677,6 +8337,8 @@ fcst_clus
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Cluster Convex Hull Starting Index
 \end_layout
 
@@ -9688,6 +8350,8 @@ Forecast Cluster Convex Hull Starting Index
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull_npts
 \end_layout
 
@@ -9697,6 +8361,8 @@ fcst_clus_hull_npts
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus
 \end_layout
 
@@ -9706,6 +8372,8 @@ fcst_clus
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Number of Forecast Cluster Convex Hull Points
 \end_layout
 
@@ -9717,6 +8385,8 @@ Number of Forecast Cluster Convex Hull Points
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull_lat
 \end_layout
 
@@ -9726,6 +8396,8 @@ fcst_clus_hull_lat
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull
 \end_layout
 
@@ -9735,6 +8407,8 @@ fcst_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Cluster Convex Hull Point Latitude
 \end_layout
 
@@ -9746,6 +8420,8 @@ Forecast Cluster Convex Hull Point Latitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull_lon
 \end_layout
 
@@ -9755,6 +8431,8 @@ fcst_clus_hull_lon
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull
 \end_layout
 
@@ -9764,6 +8442,8 @@ fcst_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Cluster Convex Hull Point Longitude
 \end_layout
 
@@ -9775,6 +8455,8 @@ Forecast Cluster Convex Hull Point Longitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull_x
 \end_layout
 
@@ -9784,6 +8466,8 @@ fcst_clus_hull_x
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull
 \end_layout
 
@@ -9793,6 +8477,8 @@ fcst_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Cluster Convex Hull Point X-Coordinate
 \end_layout
 
@@ -9804,6 +8490,8 @@ Forecast Cluster Convex Hull Point X-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull_y
 \end_layout
 
@@ -9813,6 +8501,8 @@ fcst_clus_hull_y
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 fcst_clus_hull
 \end_layout
 
@@ -9822,6 +8512,8 @@ fcst_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Forecast Cluster Convex Hull Point Y-Coordinate
 \end_layout
 
@@ -9833,6 +8525,8 @@ Forecast Cluster Convex Hull Point Y-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull_start
 \end_layout
 
@@ -9842,6 +8536,8 @@ obs_clus_hull_start
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus
 \end_layout
 
@@ -9851,6 +8547,8 @@ obs_clus
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Cluster Convex Hull Starting Index
 \end_layout
 
@@ -9862,6 +8560,8 @@ Observation Cluster Convex Hull Starting Index
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull_npts
 \end_layout
 
@@ -9871,6 +8571,8 @@ obs_clus_hull_npts
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus
 \end_layout
 
@@ -9880,6 +8582,8 @@ obs_clus
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Number of Observation Cluster Convex Hull Points
 \end_layout
 
@@ -9891,6 +8595,8 @@ Number of Observation Cluster Convex Hull Points
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull_lat
 \end_layout
 
@@ -9900,6 +8606,8 @@ obs_clus_hull_lat
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull
 \end_layout
 
@@ -9909,6 +8617,8 @@ obs_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Cluster Convex Hull Point Latitude
 \end_layout
 
@@ -9920,6 +8630,8 @@ Observation Cluster Convex Hull Point Latitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull_lon
 \end_layout
 
@@ -9929,6 +8641,8 @@ obs_clus_hull_lon
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull
 \end_layout
 
@@ -9938,6 +8652,8 @@ obs_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Cluster Convex Hull Point Longitude
 \end_layout
 
@@ -9949,6 +8665,8 @@ Observation Cluster Convex Hull Point Longitude
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull_x
 \end_layout
 
@@ -9958,6 +8676,8 @@ obs_clus_hull_x
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull
 \end_layout
 
@@ -9967,6 +8687,8 @@ obs_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Cluster Convex Hull Point X-Coordinate
 \end_layout
 
@@ -9978,6 +8700,8 @@ Observation Cluster Convex Hull Point X-Coordinate
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull_y
 \end_layout
 
@@ -9987,6 +8711,8 @@ obs_clus_hull_y
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 obs_clus_hull
 \end_layout
 
@@ -9996,6 +8722,8 @@ obs_clus_hull
 \begin_inset Text
 
 \begin_layout Plain Layout
+\noindent
+\align left
 Observation Cluster Convex Hull Point Y-Coordinate 
 \end_layout
 
@@ -10016,9 +8744,9 @@ Lastly, the MODE tool creates a PostScript plot summarizing the features-based
  The PostScript plot is generated using internal libraries and does not
  depend on an external plotting package.
  The generation of this PostScript output can be disabled using the 
-\family typewriter
+\series bold
 ps_plot_flag
-\family default
+\series default
  configuration file option.
 \end_layout
 
