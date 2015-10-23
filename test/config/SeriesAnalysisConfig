@@ -26,7 +26,7 @@ regrid = {
    vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -39,12 +39,12 @@ cnt_logic   = UNION;
 fcst = {
    cat_thresh = [ ${FCST_CAT_THRESH} ];
    field      = [ ${FCST_FIELD}      ];
-};
+}
 
 obs = {
    cat_thresh = [ ${OBS_CAT_THRESH} ];
    field      = [ ${OBS_FIELD}      ];
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +59,7 @@ boot = {
    n_rep    = 0;
    rng      = "mt19937";
    seed     = "1";
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -69,7 +69,7 @@ boot = {
 mask = {
    grid = "";
    poly = "${MASK_POLY}";
-};
+}
 
 //
 // Number of grid points to be processed concurrently.  Set smaller to use
@@ -100,7 +100,7 @@ output_stats = {
    pstd   = [ ${PSTD_STATS}   ];
    pjc    = [ ${PJC_STATS}    ];
    prc    = [ ${PRC_STATS}    ];
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

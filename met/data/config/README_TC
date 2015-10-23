@@ -282,7 +282,7 @@ dland_file = "MET_BASE/tc_data/dland_nw_hem_tenth_degree.nc";
 watch_warn = {
    file_name   = "MET_BASE/tc_data/wwpts_us.txt";
    time_offset = -14400;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //

@@ -29,7 +29,7 @@ regrid = {
    vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -49,12 +49,12 @@ fcst = {
    field = {
       name  = "APCP";
       level = "A03";
-   };
+   }
    
    conv_radius       = 60.0/grid_res; // in grid squares
    conv_thresh       = >=5.0;
 
-};
+}
 
 obs = fcst;
 
@@ -91,7 +91,7 @@ weight = {
 
    end_time_delta       = 1.0;
 
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -173,7 +173,7 @@ interest_function = {
 
    );
 
-};   //  interest functions
+}   //  interest functions
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -198,14 +198,14 @@ nc_output = {
    object_id    = true;
    cluster_id   = true;
 
-};
+}
 
 txt_output = {
 
    attributes_2d   = true;
    attributes_3d   = true;
 
-};
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////

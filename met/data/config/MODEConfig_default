@@ -26,7 +26,7 @@ regrid = {
    vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +44,7 @@ fcst = {
    field = {
       name  = "APCP";
       level = "A03";
-   };
+   }
 
    raw_thresh        = NA;
    conv_radius       = 60.0/grid_res; // in grid squares
@@ -55,7 +55,7 @@ fcst = {
    inten_perc_thresh = NA;
    merge_thresh      = >=1.25;
    merge_flag        = THRESH;
-};
+}
 obs = fcst;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ mask = {
    grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
    poly      = "";
    poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -178,18 +178,18 @@ fcst_raw_plot = {
    plot_min         = 0.0;
    plot_max         = 0.0;
    colorbar_spacing = 1;
-};
+}
 
 obs_raw_plot = {
    color_table      = "MET_BASE/colortables/met_default.ctable";
    plot_min         = 0.0;
    plot_max         = 0.0;
    colorbar_spacing = 1;
-};
+}
 
 object_plot = {
    color_table      = "MET_BASE/colortables/mode_obj.ctable";
-};
+}
 
 //
 // Number of grid boxes to fill with bad data values along the edge of the field
@@ -220,7 +220,7 @@ nc_pairs_flag   = {
    object_id    = TRUE;
    cluster_id   = TRUE;
    polylines    = TRUE;
-};
+}
 ct_stats_flag   = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////

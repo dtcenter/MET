@@ -28,7 +28,7 @@ regrid = {
    vld_thresh = 0.5;
    method     = UW_MEAN;
    width      = 5;
-};
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +45,6 @@ level         = "SFC";
 //
 // Maximum pixel age in minutes
 //
-max_minutes   = ${PIXEL_AGE};
+max_minutes   = ${PIXEL_AGE}
 
 ////////////////////////////////////////////////////////////////////////////////

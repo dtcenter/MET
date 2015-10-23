@@ -35,8 +35,8 @@ time_summary = {
   flag = TRUE;
   beg = "${BEG_TS}";
   end = "${END_TS}";
-  step = ${STEP_TS};
-  width = ${WIDTH_TS};
+  step = ${STEP_TS}
+  width = ${WIDTH_TS}
   grib_code = [ 11, 204, 211 ];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
 }
