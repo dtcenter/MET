@@ -104,8 +104,8 @@ This chapter contains a description of the Ensemble-Stat tool.
  spread, etc) from a set of several forecast model files to be used by the
  MET statistics tools.
  If observations are also included, ensemble statistics such as rank histograms,
- probability integral transform histograms, spread / skill variance, and
- continuous ranked probability score are produced.
+ probability integral transform histograms, spread/skill variance, and continuou
+s ranked probability score are produced.
  A climatology file may also be provided, and will be used as a reference
  forecast in several of the output statistics.
  Details about and equations for the statistics produced for ensembles are
@@ -144,9 +144,16 @@ t tool.
  the MET supported gridded file formats.
  If gridded files are not on the same grid, MET will do the regridding for
  you if you specify the desired output grid.
- Point observations should be in the NetCDF format produced by PB2NC, ASCII2NC,
- or MADIS2NC.
- 
+ The point observations must be formatted as the NetCDF output of the 
+\series default
+point reformatting tools described in Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Re-Formatting-of-Point"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -373,7 +380,7 @@ ens_file_list
 \series default
  is an ASCII file containing a list of ensemble member file names.
  This is not required when a file list is included on the command line,
- as in #2 above.
+ as described above.
  
 \end_layout
 
@@ -386,21 +393,15 @@ config_file
  is an EnsembleStatConfig file containing the desired configuration settings.
 \end_layout
 
-\begin_layout Description
-NOTE: The ensemble members and gridded observations must be on the same
- grid.
-\end_layout
+\begin_layout Standard
 
-\begin_layout Description
-Optional 
 \series bold
-arguments for ensemble_stat
+Optional arguments for ensemble_stat
 \end_layout
 
 \begin_layout Description
 4.
- To produce rank histogram information when you have gridded observations,
- use the 
+ To produce ensemble statistics using gridded observations, use the 
 \series bold
 -grid_obs file
 \series default
@@ -411,8 +412,7 @@ arguments for ensemble_stat
 
 \begin_layout Description
 5.
- To produce rank histogram information when you have point observations,
- use the 
+ To produce ensemble statistics using point observations, use the 
 \series bold
 -point_obs file
 \series default
@@ -428,12 +428,12 @@ arguments for ensemble_stat
 -ssvar_mean file
 \series default
  specifies an ensemble mean model data file.
- 
+ If not provided, the mean value of the input ensemble members will be used.
 \end_layout
 
 \begin_layout Description
 7.
- To filter observations by time, use 
+ To filter point observations by time, use 
 \series bold
 -obs_valid_beg
 \series default
@@ -465,7 +465,7 @@ time
 \series bold
 -outdir path
 \series default
- option to override the default output directory (/out/ensemble_stat).
+ option to override the default output directory (./).
  
 \end_layout
 
@@ -544,9 +544,7 @@ config/EnsembleStatConfig
 In this example, the Ensemble-Stat tool will process six forecast files
  specified in the file list into an ensemble forecast.
  Observations in both point and grid format will be included, and used to
- calculate ranks separately.
- These ranks can then be used to plot a rank histogram for each type of
- observation.
+ ensemble statistics separately.
  Ensemble Stat will create a NetCDF file containing requested ensemble fields
  and an output STAT file.
  
@@ -566,7 +564,8 @@ name "sub:ensemble_stat-output"
 \begin_layout Standard
 
 \series bold
-The Ensemble-Stat tool can calculate any of the following:
+The Ensemble-Stat tool can calculate any of the following fields from the
+ input ensemble members:
 \end_layout
 
 \begin_layout Standard
@@ -638,7 +637,7 @@ Probability Integral Transform (PIT) Histograms (if Observation Field Provided)
 \begin_layout Standard
 \paragraph_spacing single
 \noindent
-Spread / Skill variance (if Observation Field Provided)
+Spread/Skill variance (if Observation Field Provided)
 \end_layout
 
 \begin_layout Standard
@@ -652,19 +651,14 @@ Gridded fields of Ensemble forecast values to a NetCDF file
 \end_layout
 
 \begin_layout Standard
-Gridded field of Observation Ranks to a NetCDF file
+Gridded field of Observation Ranks to a NetCDF file (if Gridded Observations
+ Provided)
 \end_layout
 
 \begin_layout Standard
-Stat file with Rank/PIT Histogram and Ensemble information
-\end_layout
-
-\begin_layout Standard
-Observation Rank Matched Pairs
-\end_layout
-
-\begin_layout Standard
-SSVAR file containing spread / skill variance information
+STAT file and optional ASCII files with Ranked Histograms, Probability Integral
+ Transform (PIT) Histogram, Spread/Skill Information, and Ensemble Matched
+ Pair Information (if Point Observations Provided)
 \end_layout
 
 \begin_layout Standard
@@ -677,7 +671,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Header information for ensemble-stat output RHIST file.
+Header information for each file ensemble-stat outputs
 \end_layout
 
 \end_inset
@@ -685,7 +679,7 @@ Header information for ensemble-stat output RHIST file.
 
 \begin_inset CommandInset label
 LatexCommand label
-name "table_ES_header_info_es_out_RHIST"
+name "table_ES_header_info_es_out"
 
 \end_inset
 
@@ -696,7 +690,7 @@ name "table_ES_header_info_es_out_RHIST"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="29" columns="3">
+<lyxtabular version="3" rows="23" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -1349,7 +1343,7 @@ Error percent value used in confidence intervals
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1358,7 +1352,7 @@ Error percent value used in confidence intervals
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1367,11 +1361,174 @@ LINE_TYPE
 
 \end_inset
 </cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Output line types are listed in tables 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_RHIST"
+
+\end_inset
+
+ through 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out_SSVAR"
+
+\end_inset
+
+.
+ JHG, update links
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Format information for RHIST (Ranked Histogram) output line type.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_ES_header_info_es_out_RHIST"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+HEADER
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Header Column Name
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-RHIST
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Same as in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out"
+
+\end_inset
+
+ above.
 \end_layout
 
 \end_inset
@@ -1558,7 +1715,237 @@ RANK_?
 
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
 \begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Format information for PHIST (Probability Integral Transform Histogram)
+ output line type.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_ES_header_info_es_out_PHIST"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Header Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1-21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Same as in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_ES_header_info_es_out"
+
+\end_inset
+
+ above.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Count of observations
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BIN_SIZE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Probability interval width
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+N_BIN
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of probability intervals
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25-?
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+BIN_i
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Count of observations within each probability interval
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
 
 \end_layout
 
@@ -1577,7 +1964,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Header information for ensemble-stat output ORANK file.
+Format information for ORANK (Observation Rank) output line type.
 \end_layout
 
 \end_inset
@@ -1662,7 +2049,7 @@ Description
 Same as in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "table_ES_header_info_es_out_RHIST"
+reference "table_ES_header_info_es_out"
 
 \end_inset
 
@@ -2054,7 +2441,7 @@ Value of each ensemble member
 \begin_inset Text
 
 \begin_layout Plain Layout
-?
+Last-2
 \end_layout
 
 \end_inset
@@ -2162,244 +2549,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Header information for ensemble-stat output PHIST file.
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "table_ES_header_info_es_out_PHIST"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="3">
-<features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0.75in">
-<column alignment="left" valignment="top" width="1.5in">
-<column alignment="left" valignment="top" width="3.75in">
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Column Number
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Header Column Name
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\series bold
-Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1-21
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Same as in Table 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "table_ES_header_info_es_out_RHIST"
-
-\end_inset
-
- above.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-22
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-TOTAL
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Count of observations
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-23
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-BIN_SIZE
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Probability interval width
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-24
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-N_BIN
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Total number of probability intervals
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-25-?
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-BIN_i
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Count of observations within each probability interval
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float table
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Header information for ensemble-stat output SSVAR file.
+Format information for SSVAR (Spread/Skill Variance) output line type.
 \end_layout
 
 \end_inset
@@ -2484,7 +2634,7 @@ Description
 Same as in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "table_ES_header_info_es_out_RHIST"
+reference "table_ES_header_info_es_out"
 
 \end_inset
 
@@ -3569,10 +3719,6 @@ reference "sub:pb2nc-configuration-file"
 \end_inset
 
  for the PB2NC tool.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -3588,25 +3734,96 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-model = "WRF";
-\end_layout
 
-\begin_layout Standard
-
-\series medium
-The
 \series bold
- model
+model          = "WRF";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obtype         = "ANALYS";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
+ = 1; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_mean ...
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_window     = { beg = -5400; end =  5400; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ci_alpha       = [ 0.05 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+interp         = { field = BOTH; vld_thresh = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                   type = [ { method = NEAREST; width  = 1; } ]; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+duplicate_flag = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_quality    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+output_prefix  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version        = "VN.N";
+\end_layout
+
+\begin_layout Standard
+
 \series medium
- variable contains a short text string identifying the name to be assigned
- to the model being verified.
- This text string is written out as a header column of the STAT output so
- that verification statistics from multiple models may be differentiated.
- The value listed above is simply set to "WRF".
-\begin_inset Newline newline
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
 \end_inset
 
-
+.
 \end_layout
 
 \begin_layout Standard
@@ -3622,47 +3839,79 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 ens = {
 \end_layout
 
 \begin_layout LyX-Code
-ens_thresh = 1.0;
+
+\series bold
+   ens_thresh = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
-vld_thresh = 1.0;
+
+\series bold
+   vld_thresh = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
-field = [
+
+\series bold
+   field = [
 \end_layout
 
 \begin_layout LyX-Code
-{
+
+\series bold
+      {
 \end_layout
 
 \begin_layout LyX-Code
-name = "APCP";
+
+\series bold
+         name = "APCP";
 \end_layout
 
 \begin_layout LyX-Code
-level = "A03";
+
+\series bold
+         level = "A03";
 \end_layout
 
 \begin_layout LyX-Code
-cat_thresh = [ >0.0, >=5.0 ];
+
+\series bold
+         cat_thresh = [ >0.0, >=5.0 ];
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
+      }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
-\begin_layout LyX-Code
-];
-\end_layout
+\begin_layout Standard
 
-\begin_layout LyX-Code
-}
+\series medium
+The 
+\series bold
+ens
+\series medium
+ dictionary defines which ensemble fields should be processed.
 \end_layout
 
 \begin_layout Standard
@@ -3711,10 +3960,6 @@ field
  a threshold of >=5 can be used to compute the proportion of ensemble members
  predicting precipitation of at least 5mm at each grid point.
  
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -3730,61 +3975,27 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-fcst = {
+
+\series bold
+sid_exc            = [];
 \end_layout
 
 \begin_layout LyX-Code
-message_type = [ "ADPUPA" ];
-\end_layout
 
-\begin_layout LyX-Code
-sid_exc = [];
-\end_layout
-
-\begin_layout LyX-Code
+\series bold
 ens_ssvar_bin_size = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 ens_phist_bin_size = 0.05;
-\end_layout
-
-\begin_layout LyX-Code
-field = [
-\end_layout
-
-\begin_layout LyX-Code
-{
-\end_layout
-
-\begin_layout LyX-Code
-name = "APCP";
-\end_layout
-
-\begin_layout LyX-Code
-level = [ "A03" ];
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout LyX-Code
-];
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout LyX-Code
-obs = fcst;
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The 
+Setting up the 
 \series bold
 fcst
 \series medium
@@ -3792,44 +4003,38 @@ fcst
 \series bold
 obs
 \series medium
- variables should specify a list of ensemble field names and levels to be
- verified, with the corresponding observations (
-\series bold
-message_type
-\series medium
-).
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The Ensemble-Stat tool performs verification using observations for one
- message type at a time.
- The 
-\series bold
-message_type
-\series medium
- variable contains a comma-separated list of the message types to use for
- verification.
- By default, only surface and upper air observations are used for verification.
- At least one 
-\series bold
-message_type
-\series medium
- must be provided.
- See 
-\begin_inset Flex URL
-status open
-
-\begin_layout Plain Layout
-
-http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
-\end_layout
+ dictionaries of the configuration file is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
 
 \end_inset
 
- for a list of the possible types.
+.
+ The following are some special consideration for the Ensemble-Stat tool.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+ens
+\series default
+ and 
+\series bold
+fcst
+\series default
+ dictionaries do not need to include the same fields.
+ Users may specify any number of ensemble fields to be summarized, but generally
+ there are many fewer fields with verifying observations available.
+ The 
+\series bold
+ens 
+\series default
+dictionary specified the fields to be summarized while the 
+\series bold
+fcst 
+\series default
+dictionary specifies the fields to be verified.
 \end_layout
 
 \begin_layout Standard
@@ -3837,13 +4042,31 @@ http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 \series medium
 The 
 \series bold
-obs 
+obs
 \series medium
-can be set equal to 
+ dictionary looks very simliar to the 
 \series bold
 fcst
 \series medium
- to use the identical fields.
+ dictionary.
+ If verifying against point observations which are assigned GRIB1 codes,
+ the observation section must be defined following GRIB1 conventions.
+ When verifying GRIB1 forecast data, one can easily copy over the forecast
+ settings to the observation dictionary using 
+\series bold
+obs=fcst;
+\series medium
+.
+ However, when verifying non-GRIB1 forecast data, users will need to specify
+ the 
+\series bold
+fcst
+\series medium
+ and 
+\series bold
+obs
+\series medium
+ sections separately.
 \end_layout
 
 \begin_layout Standard
@@ -3853,8 +4076,14 @@ The
 \series bold
 sid_exc
 \series medium
- list of station ids used to exclude observations from those stations from
- use in verification.
+ entry, defined in the 
+\series bold
+obs
+\series medium
+ dictionary, contains a comma-separated list of the station id's to be excluded
+ from verification.
+ This option is typically used when an observation file contains some stations
+ known to have bad or unreliable data.
  
 \end_layout
 
@@ -3872,10 +4101,6 @@ ens_phist_bin_size
  specify the width of the categorical bins used to accumulate frequencies
  for spread-skill-variance or probability integral transform statistics,
  respectively.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -3891,415 +4116,39 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-obs_window = {
-\end_layout
 
-\begin_layout LyX-Code
-beg = -5400;
-\end_layout
-
-\begin_layout LyX-Code
-end = 5400;
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Each gridded forecast file has a valid time associated with it.
- The 
 \series bold
-beg 
-\series medium
-and 
-\series bold
-end
-\series medium
- variables define a time window in seconds around the valid time of the
- forecast file for the observations to be matched to it.
- For a forecast valid time, v, observations with a valid time falling in
- the time window [v+beg_ds, v+end_ds] will be used.
- These selections are overridden by the command line arguments 
-\series bold
--valid_beg
-\series medium
- and
-\series default
- 
-\series bold
--valid_end.
-\series medium
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-mask = {
-\end_layout
-
-\begin_layout LyX-Code
-grid = [ "FULL" ];
-\end_layout
-
-\begin_layout LyX-Code
-poly = [];
-\end_layout
-
-\begin_layout LyX-Code
-sid = [];
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series default
- 
-\series bold
-mask
-\series medium
- group contains information about the domain to be verified.
- It allows the user to place a "mask" over their existing grid to hide some
- areas from the verification and only use the remaining areas.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-grid 
-\series medium
-variable contains a comma-separated list of pre-defined NCEP grids over
- which to perform the verification.
- The predefined grids are specified as "
-\series bold
-GNNN
-\series medium
-" where 
-\series bold
-NNN
-\series medium
- is the three digit designation for the grid.
- Defining a new grid would require code changes and recompiling MET.
- Supplying a value of "
-\series bold
-FULL
-\series medium
-" indicates that the verification should be performed over the entire grid
- on which the data resides.
- The value listed above indicates that verification should be performed
- over the full grid.
- See Appendix 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:App_B-Map-Projections-Grids"
-
-\end_inset
-
- for a list of grids that will be accepted.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-poly
-\series medium
- variable contains a comma-separated list of files that define verification
- masking regions.
- These masking regions may be specified in two ways: as a lat/lon polygon
- or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
- or Gen-Circle-Mask tools.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Several masking polygons used by NCEP are predefined in the installed 
-\emph on
-share/met/config
-\emph default
- directory.
- Creating a new polygon is as simple as creating a text file with a name
- for the polygon followed by the lat/lon points which define its boundary.
- Adding a new masking polygon requires no code changes and no recompiling.
- Internally, the lat/lon polygon points are converted into x/y values in
- the grid.
- The lat/lon values for the observation points are also converted into x/y
- grid coordinates.
- The computations performed to check whether the observation point falls
- within the polygon defined is done in x/y grid space.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Alternatively, any gridded data file that MET can read may be used to define
- a verification masking region.
- Users must specify a description of the field to be used from the input
- file and, optionally, may specify a threshold to be applied to that field.
- Any grid point where the resulting field is 0, the mask is turned off.
- Any grid point where it is non-zero, the mask is turned on.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-sid
-\series medium
- variable contains a filename that contains a space-separated list of station
- ID's at which verification should be performed.
-
-\series default
- 
-\series medium
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-ci_alpha = [0.05];
-\end_layout
-
-\begin_layout LyX-Code
-interp = {
-\end_layout
-
-\begin_layout LyX-Code
-field = BOTH;
-\end_layout
-
-\begin_layout LyX-Code
-vld_thresh = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-type = [
-\end_layout
-
-\begin_layout LyX-Code
-{
-\end_layout
-
-\begin_layout LyX-Code
-method = UW_MEAN;
-\end_layout
-
-\begin_layout LyX-Code
-width = 1;
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout LyX-Code
-];
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-ci_alpha
-\series medium
- values are the significance levels for the confidence intervals.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-interp
-\series medium
- group controls interpolation of forecast and/or observation fields.
- Parameters for interpolation include the field to be interpolated, the
- minimum valid points to be included in the interpolation, the type of interpola
-tion to be performed, and the width of the grid to use in the interpolation.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-field
-\series medium
- variable controls how the interpolation should be applied.
- A value of FCST will smooth, e.g.
- apply the interpolation, to only the forecast field.
- A value of OBS applies interpolation to only the observation field.
- To smooth both the forecast and observation fields, set the value to BOTH.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-vld_thresh
-\series medium
- variable contains a number between 0 and 1.
- When performing interpolation over some neighborhood of points the ratio
- of the number of valid data points to the total number of points in the
- neighborhood is computed.
- If that ratio is greater than this threshold, the matched pair is discarded.
- Setting this threshold to 1, which is the default, requires that the entire
- neighborhood must contain valid data.
- This variable will typically come into play only along the boundaries of
- the verification region chosen.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-method
-\series medium
- variable contains a comma-separated list of interpolation methods to be
- used when interpolating forecast data to observation locations.
- The valid values which may be listed are MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN,
- LS_FIT, and BILIN for the minimum, maximum, median, unweighted mean, distance-w
-eighted mean, least squares fit, and bilinear interpolation.
- Providing multiple interpolation methods indicates that statistics should
- be computed multiple times using a different interpolation method each
- time.
- These methods are described in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:PS_Interpolation/matching-methods"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-width
-\series medium
- variable contains a comma-separated list of values to be used in defining
- the neighborhoods over which the interpolation is performed.
- The neighborhood is simply a square centered on the observation point.
- The 
-\series bold
-width
-\series medium
- value specifies the width of that square.
- A 
-\series bold
-width
-\series medium
- value of 1 is interpreted as the nearest neighbor model grid point to the
- observation point.
- A 
-\series bold
-width
-\series medium
- of 2 defines a 2 x 2 square of grid points around the observation point
- (the 4 closest model grid points), while a 
-\series bold
-width
-\series medium
- of 3 defines a 3 x 3 square of grid points around the observation point,
- and so on.
- The values listed above indicate that the nearest neighbor and the 4 closest
- grid points should be used to define the neighborhoods.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
 output_flag = {
 \end_layout
 
 \begin_layout LyX-Code
-rhist = BOTH;
+
+\series bold
+   rhist = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-phist = BOTH;
+
+\series bold
+   phist = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-orank = BOTH;
+
+\series bold
+   orank = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-ssvar = BOTH;
+
+\series bold
+   ssvar = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-};
+
+\series bold
+}
 \end_layout
 
 \begin_layout Standard
@@ -4319,20 +4168,51 @@ output_flag
  Setting the flag to BOTH indicates that the line type should be written
  to the STAT file as well as a separate ASCII file where the data is grouped
  by line type.
- Note that these two line types are easily derived from each other.
- Users are free to choose which measures are most desired.
- All of the line types are described in more detail in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:point_stat-output"
+ The output flags correspond to the following output line types:
+\end_layout
 
-\end_inset
+\begin_layout Description
 
-.
-\begin_inset Newline newline
-\end_inset
+\series medium
+1.
+ 
+\series bold
+RHIST
+\series medium
+ for Rankd Histogram Counts
+\end_layout
 
+\begin_layout Description
 
+\series medium
+2.
+
+\series bold
+ PHIST
+\series medium
+ for Probability Integral Transform Histogram Counts
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ 
+\series bold
+ORANK
+\series medium
+ for Ensemble Matched Pair Information when point observations are supplied
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ 
+\series bold
+SSVAR
+\series medium
+ for Binned Spread/Skill Variance Information
 \end_layout
 
 \begin_layout Standard
@@ -4348,51 +4228,75 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 ensemble_flag = {
 \end_layout
 
 \begin_layout LyX-Code
-mean = TRUE;
+
+\series bold
+   mean     = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-stdev = TRUE; 
+
+\series bold
+   stdev     = TRUE; 
 \end_layout
 
 \begin_layout LyX-Code
-minus = TRUE;
+
+\series bold
+   minus     = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-plus = TRUE;
+
+\series bold
+   plus      = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-min = TRUE;
+
+\series bold
+   min       = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-max = TRUE;
+
+\series bold
+   max       = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-range = TRUE;
+
+\series bold
+   range     = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-vld_count = TRUE;
+
+\series bold
+   vld_count = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-frequency = TRUE;
+
+\series bold
+   frequency = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-rank = TRUE;
+
+\series bold
+   rank      = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-};
+
+\series bold
+}
 \end_layout
 
 \begin_layout Standard
@@ -4403,8 +4307,8 @@ The
 ensemble_flag
 \series medium
  specifies which derived ensemble fields should be calculated and output.
- Setting the flag to TRUE produces output of the specified field, FALSE
- produces no output for that field type.
+ Setting the flag to TRUE produces output of the specified field, while
+ FALSE produces no output for that field type.
  The flags correspond to the following output line types:
 \end_layout
 
@@ -4441,17 +4345,16 @@ Ensemble Valid Data Count
 \end_layout
 
 \begin_layout Enumerate
-Ensemble Relative Frequency by threshold Fields
+Ensemble Relative Frequency for each categorical threshold (
+\series bold
+cat_thresh
+\series default
+) specified.
+ This is an uncalibrated probability forecast.
 \end_layout
 
 \begin_layout Enumerate
-Gridded Field of Observation Ranks written to netCDF file
-\series medium
-
-\begin_inset Newline newline
-\end_inset
-
-
+Observation Ranks for Input Gridded Observations
 \end_layout
 
 \begin_layout Standard
@@ -4467,18 +4370,26 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 rng = {
 \end_layout
 
 \begin_layout LyX-Code
-type = "mt19937";
+
+\series bold
+   type = "mt19937";
 \end_layout
 
 \begin_layout LyX-Code
-seed = "";
+
+\series bold
+   seed = "";
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
@@ -4499,11 +4410,10 @@ type
 \series bold
 seed
 \series medium
- to be used in the computation of bootstrap confidence intervals.
- Subsamples are chosen at random from the full set of matched pairs.
+ to be used.
+ In the case of a tie when determining the rank of an observation, the rank
+ is randomly chosen from all available possibilities.
  The randomness is determined by the random number generator specified.
- Users should refer to detailed documentation of the GNU Scientific Library
- for a listing of the random number generators available for use.
 \end_layout
 
 \begin_layout Standard
@@ -4513,141 +4423,28 @@ The
 \series bold
 seed
 \series medium
- variable may be set to a specific value to make the computation of bootstrap
- confidence intervals fully repeatable.
+ variable may be set to a specific value to make the assignment of ranks
+ fully repeatable.
  When left empty, as shown above, the random number generator seed is chosen
  automatically which will lead to slightly different bootstrap confidence
  intervals being computed each time the data is run.
- Specifying a value here ensures that the bootstrap confidence intervals
- will be computed the same over multiple runs of the same data.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-duplicate_flag = NONE;
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The reporting mechanism for this feature can be activated by specifying
- a verbosity level of three or higher.
- The report will show information about where duplicates were detected and
- which observations were used in those cases.
-
-\series default
- 
-\series medium
-Over multiple runs of the same data.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-obs_quality = [];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-This list of string values is used to filter point observations by their
- quality control strings.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-output_prefix = "";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-This option specifies a string to be used in the output file name.
- It can be useful for keeping results for different models or variables
- from overwriting each other.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-version = 
-\begin_inset Quotes eld
-\end_inset
-
-v#
-\begin_inset Quotes erd
-\end_inset
-
-;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
+Refer to the description of the 
 \series bold
-version
+boot
 \series medium
- indicates the version of the MET software used.
- This value should not be modified.
+ entry in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+ for more details.
 \end_layout
 
 \end_body
