@@ -1166,16 +1166,11 @@ reference "verification"
  gives an example of two traditional verification scores (Bias and CSI)
  along with bar plots showing the total numbers of objects for the forecast
  and observed fields, as well as bar plots showing their total areas.
- These data are from the same set of 13-km WRF model runs analyzed in Fig.
- 12-1
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-This needs to be linked
-\end_layout
+ These data are from the same set of 13-km WRF model runs analyzed in Figure
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "verification"
 
 \end_inset
 
@@ -1287,19 +1282,7 @@ reference "histogram"
  around the circle.
  The colors on the petals represent the proportion of centroid distances
  within each colored bin along each direction.
- For example, Fig
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Is the correct figure linked?
-\end_layout
-
-\end_inset
-
- 
+ For example, Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "histogram"
