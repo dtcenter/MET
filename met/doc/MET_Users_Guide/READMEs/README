@@ -180,7 +180,7 @@ regrid = {
    vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
-};
+}
 
 //
 // The "fcst" entry is a dictionary containing information about the field(s)
@@ -195,8 +195,12 @@ regrid = {
 //
 //      - Setting "name" and "level" is file-format specific.  See below.
 //
-//      - The "prob" entry is a boolean that specifies whether this field
-//        contains probabilities.
+//      - The "prob" entry is a boolean defined in the forecast dictionary.
+//        When set to TRUE, it indicates that the data should be treated as
+//        probabilities.  Probability fields should contain values in the range
+//        [0, 1] or [0, 100]. However, when MET encounters a probability field
+//        with a range [0, 100], it will automatically rescale it to be [0, 1]
+//        before applying the probabilistic verification methods.
 //
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
@@ -266,7 +270,7 @@ regrid = {
 //       - The "GRIB2_parm_cat" entry specifies the parameter category code.
 //       - The "GRIB2_parm" entry specifies the parameter code.
 //
-//    - NetCDF (from MET tools and Pinterp):
+//    - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
 //       - The "name" entry specifies the NetCDF variable name.
 //       - The "level" entry specifies the dimensions to be used:
 //          - (i,...,j,*,*) for a single field, where i,...,j specifies fixed
@@ -303,7 +307,7 @@ fcst = {
         cat_thresh = [ >0.0, >=5.0 ];
       }
    ];
-};
+}
 
 //
 // The "obs" entry specifies the same type of information as "fcst", but for
@@ -474,32 +478,57 @@ obs_window = {
 // used in the computation of statistics.  Masking regions may be specified
 // in the following ways:
 //
-//    - The "grid" entry is an array of named grids.  An empty list indicates
-//      that no masking grids should be used.  The standard NCEP grids are
-//      named "GNNN" where NNN indicates the three digit grid number.  Enter
-//      "FULL" to score over the entire domain.
+//    - The "grid" entry is an array of named grids.  It contains a
+//      comma-separated list of pre-defined NCEP grids over which to perform
+//      verification.  An empty list indicates that no masking grids should be
+//      used.  The standard NCEP grids are named "GNNN" where NNN indicates the
+//      three digit grid number.  Supplying a value of "FULL" indicates that the
+//      verification should be performed over the entire grid on which the data
+//      resides.
 //      http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
 //
-//    - The "poly" entry is an array of masking regions that may be specified
-//      in the following ways:
+//    - The "poly" entry contains a comma-separated list of files that define
+//      verification masking regions. These masking regions may be specified in
+//      two ways: as a lat/lon polygon or using a gridded data file such as the
+//      NetCDF output of the Gen-Vx-Mask tool.
 //
 //       - An ASCII file containing a lat/lon polygon.
 //         Latitude in degrees north and longitude in degrees east.
-//         By default, the first and last polygon points are connected.
+//         The first and last polygon points are connected.
 //         e.g. "MET_BASE/poly/EAST.poly" which consists of n points:
 //              "poly_name lat1 lon1 lat2 lon2... latn lonn"
 //
+//         Several masking polygons used by NCEP are predefined in the
+//         installed share/met/poly directory. Creating a new polygon is as
+//         simple as creating a text file with a name for the polygon followed
+//         by the lat/lon points which define its boundary. Adding a new masking
+//         polygon requires no code changes and no recompiling. Internally, the
+//         lat/lon polygon points are converted into x/y values in the grid. The
+//         lat/lon values for the observation points are also converted into x/y
+//         grid coordinates. The computations performed to check whether the
+//         observation point falls within the polygon defined is done in x/y
+//         grid space.
+//
 //       - The NetCDF output of the gen_vx_mask tool.
 //
-//       - A gridded data file on the same grid as the forecast data followed
-//         by a dictionary for the field to be used, and optionally, a
-//         threshold to be applied.
+//       - Any gridded data file that MET can read may be used to define a
+//         verification masking region. Users must specify a description of the
+//         field to be used from the input file and, optionally, may specify a
+//         threshold to be applied to that field. Once this threshold is applied,
+//         any grid point where the resulting field is 0, the mask is turned off.
+//         Any grid point where it is non-zero, the mask is turned on.
 //         e.g. "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 //
-//    - The "sid" entry is an array of station ID groups.  Each element is
-//      either the name of a single station ID or a station ID group file name.
-//      A station ID group file consists of a name for the group followed by a
-//      list of station ID's.
+//    - The "sid" entry is an array of strings. Each entry in that array is
+//      either the name of a single station id or a filename. If it is a single
+//      station id name, that station will be treated as its own masking region.
+//      If it is a filename, that file should contain a "name" for the station
+//      id group followed by a space-separated list of station id's to be used.
+//      That group "name" entry is what MET puts in the VX_MASK output column.
+//      This provides a way to define one or more groups of individual stations
+//      over which to compute statistics. This is an alternative to defining a
+//      masking region using a polyline or grid and is more convenient if you
+//      have a specific list of station id's you'd like to use.
 //
 mask = {
    grid    = [ "FULL" ];
@@ -509,42 +538,64 @@ mask = {
                {name = \"TMP\"; level = \"Z2\";} >273"
              ];
    sid     = [ "CONUS.stations" ];
-};
+}
 
 //
 // The "ci_alpha" entry is an array of floats specifying the values for alpha
 // to be used when computing confidence intervals.  Values of alpha must be
-// between 0 and 1.  A value of 0.05 corresponds to a 95% confidence interval.
+// between 0 and 1.  The confidence interval computed is 1 minus the alpha value.
+// Therefore, an alpha value of 0.05 corresponds to a 95% confidence interval.
 //
 ci_alpha = [ 0.05, 0.10 ];
 
 //
-// The "boot" entry is a dictionary that specifies how bootstrap confidence
-// intervals should be computed.  This dictionary may include the following
-// entries:
+// The "boot" entry defines the parameters to be used in calculation of
+// bootstrap confidence intervals. The interval variable indicates what method
+// should be used for computing bootstrap confidence intervals:
 //
 //    - The "interval" entry specifies the confidence interval method:
-//       - "BCA" for the BCa interval method is more accurate but slower.
-//       - "PCTILE" uses the percentile method and is quicker.
+//       - "BCA" for the BCa (bias-corrected percentile) interval method is
+//         highly accurate but computationally intensive.
+//       - "PCTILE" uses the percentile method which is somewhat less accurate
+//         but more efficient.
 //
 //    - The "rep_prop" entry specifies a proportion between 0 and 1 to define
 //      the replicate sample size to be used when computing percentile
 //      intervals.  The replicate sample size is set to boot_rep_prop * n,
 //      where n is the number of raw data points.
 //
-//    - The "n_rep" entry specifies the number of bootstrap replicates.  That
-//      is the number of times each set of matched pair data should be
-//      resampled when computing bootstrap confidence intervals.  A value of
-//      zero disables the computation of bootstrap confidence intervals and
-//      may speed up the runtime significantly.
+//      When computing bootstrap confidence intervals over n sets of matched
+//      pairs, the size of the subsample, m, may be chosen less than or equal to
+//      the size of the sample, n. This variable defines the size of m as a
+//      proportion relative to the size of n.  A value of 1 indicates that the
+//      size of the subsample, m, should be equal to the size of the sample, n.
 //
-//    - The "rng" entry specifies the name of the GSL random number generator.
+//    - The "n_rep" entry defines the number of subsamples that should be taken
+//      when computing bootstrap confidence intervals. This variable should be
+//      set large enough so that when confidence intervals are computed multiple
+//      times for the same set of data, the intervals do not change much.
+//      Setting this variable to zero disables the computation of bootstrap
+//      confidence intervals, which may be necessary to run MET in realtime or
+//      near-realtime over large domains since bootstrapping is computationally
+//      expensive. Setting this variable to 1000 indicates that bootstrap
+//      confidence interval should be computed over 1000 subsamples of the
+//      matched pairs.
+//
+//    - The "rng" entry defines the random number generator to be used in the
+//      computation of bootstrap confidence intervals. Subsamples are chosen at
+//      random from the full set of matched pairs. The randomness is determined
+//      by the random number generator specified. Users should refer to detailed
+//      documentation of the GNU Scientific Library for a listing of the random
+//      number generators available for use.
 //      http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Generator-Performance.html
 //
-//    - The "seed" entry specifies a seed value to be used when computing
-//      bootstrap confidence intervals.  If left unspecified, the seed will
-//      change for each run and the computed bootstrap confidence intervals
-//      will not be reproducible.
+//    - The "seed" entry may be set to a specific value to make the computation
+//      of bootstrap confidence intervals fully repeatable. When left empty
+//      the random number generator seed is chosen automatically which will lead
+//      to slightly different bootstrap confidence intervals being computed each
+//      time the data is run. Specifying a value here ensures that the bootstrap
+//      confidence intervals will be reproducable over multiple runs on the same
+//      computing platform.
 //
 boot = {
    interval = PCTILE;
@@ -552,31 +603,43 @@ boot = {
    n_rep    = 0;
    rng      = "mt19937";
    seed     = "";
-};
+}
 
 //
-// The "interp" entry is a dictionary that specifies what interpolation methods
-// should be applied.  This dictionary may include the following entries:
+// The "interp" entry is a dictionary that specifies what interpolation or
+// smoothing (for the Grid-Stat tools) methods should be applied.
+// This dictionary may include the following entries:
 //
 //    - The "field" entry specifies to which field(s) the interpolation method
-//      should be applied:
+//      should be applied.  This does not apply when doing point verification
+//      with the Point-Stat or Ensemble-Stat tools:
 //       - "FCST" to interpolate/smooth the forecast field.
 //       - "OBS" to interpolate/smooth the observation field.
 //       - "BOTH" to interpolate/smooth both the forecast and the observation.
 //
-//    - The "vld_thresh" entry specifies a proportion between 0 and 1 to define
-//      the required ratio of valid data points.  When interpolating, compute
-//      a ratio of the number of valid data points to the total number of
-//      points in the neighborhood.  If that ratio is less than this threshold,
-//      skip the current point.
+//    - The "vld_thresh" entry specifies a number between 0 and 1. When
+//      performing interpolation over some neighborhood of points the ratio of
+//      the number of valid data points to the total number of points in the
+//      neighborhood is computed. If that ratio is less than this threshold,
+//      the matched pair is discarded. Setting this threshold to 1, which is the
+//      default, requires that the entire neighborhood must contain valid data.
+//      This variable will typically come into play only along the boundaries of
+//      the verification region chosen.
 //
 //    - The "type" entry is an array of dictionaries, each specifying an
 //      interpolation method.  Interpolation is performed over a N by N box
 //      centered on each point, where N is the width specified.  Each of these
 //      dictionaries must include:
 //
-//      - The "width" entry specifies dimension of the interpolation box. For
-//        grid-to-grid comparisons, the width must be odd.
+//      - The "width" entry is an integer which specifies the dimension of the
+//        interpolation box. The neighborhood is simply a square containing the
+//        observation point. The width value specifies the width of that square.
+//        A width value of 1 is interpreted as the nearest neighbor model grid
+//        point to the observation point. A width of 2 defines a 2 x 2 square of
+//        grid points around the observation point (the 4 closest model grid
+//        points), while a width of 3 defines a 3 x 3 square of grid points
+//        around the observation point, and so on.  For grid-to-grid comparisons,
+//        the width must be odd.
 //
 //      - The "method" entry specifies the interpolation procedure to be
 //        applied to the points in the box:
@@ -600,7 +663,7 @@ interp = {
          width  = 1;
       }
    ];
-};
+}
 
 //
 // The "nbrhd" entry is a dictionary that is very similar to the "interp"
@@ -654,7 +717,7 @@ output_flag = {
    phist  = BOTH;  // Probability Integral Transform Histogram
    orank  = BOTH;  // Observation Rank
    ssvar  = BOTH;  // Spread Skill Variance
-};
+}
 
 //
 // The "nc_pairs_flag" can be set either to a boolean value or a dictionary
@@ -736,7 +799,7 @@ fcst_raw_plot = {
    color_table = "MET_BASE/colortables/met_default.ctable";
    plot_min = 0.0;
    plot_max = 0.0;
-};
+}
 
 //
 // The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
@@ -764,5 +827,3 @@ output_prefix  = "";
 // the MET code being run.  This value should generally not be modified.
 //
 version = "V5.1";
-
-////////////////////////////////////////////////////////////////////////////////
