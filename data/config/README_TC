@@ -424,7 +424,7 @@ water_only = FALSE;
 //    "-rirw_thresh" for both or "-rirw_thresh_adeck" and "-rirw_thresh_bdeck"
 //
 
-rapid_inten = {
+rirw = {
    track  = NONE;       // Specify which track types to search (NONE, ADECK, BDECK, or BOTH)
    adeck = {
       time   = "24";    // Rapid intensification/weakening time period in HHMMSS format.
