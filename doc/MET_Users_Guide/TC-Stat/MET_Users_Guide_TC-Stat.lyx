@@ -659,7 +659,7 @@ TCStatConfig
 \emph on
 "-column", "-storm_name", etc...)
 \emph default
- option within the JOB COMMAND LINE may further refine these selections.
+ option within the job command lines may further refine these selections.
  See Section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -667,7 +667,7 @@ reference "sub:tc_stat-configuration-file"
 
 \end_inset
 
- for options available for JOB COMMAND LINE and 
+ for options available for job command line and 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:IO_MET-TC-Config-Options"
@@ -776,6 +776,14 @@ init_mask = [ ];
 
 \begin_layout LyX-Code
 valid_mask = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+match_points = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+version = "vN.N";
 \end_layout
 
 \begin_layout Standard
@@ -1451,31 +1459,37 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-rapid_inten = {
+rirw = {
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-track =
+   track =
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-time =
+   time =
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-exact =
+   exact =
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-thresh = }
+   thresh = 
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
 \end_layout
 
 \begin_layout LyX-Code
@@ -1491,25 +1505,25 @@ e.g.: rapid_inten = {
 \begin_layout LyX-Code
 
 \series medium
-track = NONE;
+   track = NONE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-time = "24";
+   time = "24";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-exact = TRUE;
+   exact = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-thresh = >=30.0;
+   thresh = >=30.0;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1523,7 +1537,7 @@ thresh = >=30.0;
 \series medium
 The 
 \series bold
-rapid_inten
+rirw
 \series medium
  field specifies those track points for which rapid intensification (RI)
  or rapid weakening (RW) occurred, based on user defined RI/RW thresholds.
@@ -1624,12 +1638,8 @@ rirw_thresh_adeck
 \emph on
 rirw_thresh_bdeck
 \emph default
-" options within the JOB COMMAND LINE may further refine these selections.
- 
-\begin_inset Newline newline
-\end_inset
-
-
+" options within the job command lines may further refine these selections.
+ See README_TC in data/config for how to use these options.
 \end_layout
 
 \begin_layout Standard
@@ -1704,7 +1714,16 @@ landfall_beg
 \emph on
 "-landfall_window"
 \emph default
-
+ option with the job command lines may further refine these selections.
+ The "-landfall_window" job command option takes 1 or 2 arguments in HH[MMSS]
+ format.
+ Use 1 argument to define a symmetric time window.
+ For example, "-landfall_window 06" defines the time window +/- 6 hours
+ around the landfall time.
+ Use 2 arguments to define an asymmetric time window.
+ For example, "-landfall_window 00 12" defines the time window from the
+ landfall event to 12 hours after.
+ 
 \begin_inset Newline newline
 \end_inset
 
@@ -1724,38 +1743,6 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-match_points = TRUE;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-match_points
-\series medium
- flag specifies whether only those track points common to both the amodel
- and bmodel track should be retained.
- This option may be modified using the "-
-\emph on
-match_points
-\emph default
-" option within the job command lines.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
 
 \end_layout
 
@@ -1923,6 +1910,16 @@ The user may specify one or more analysis jobs to be performed on the TCST
  lines that remain after applying the filtering parameters listed above.
  Each entry in the joblist contains the task and additional filtering options
  for a single analysis to be performed.
+ There are three typs of jobs available including 
+\series default
+\shape italic
+filter, summary, and rirw.
+ 
+\shape default
+Please refer to the README_TC in data/config for details on how to call
+ each job.
+
+\series medium
  The format for an analysis job is as follows:
 \end_layout
 
@@ -1951,40 +1948,6 @@ e.g.: -job filter -amodel HWFI -dump_row ./tc_filter_job.tcst
 -job summary -line_type TCMPR -column TK_ERR -dump_row ./tc_summary_job.tcst
 \emph default
 
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-version = "v5.1";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-version
-\series medium
- string indicates the version of TC-Stat configuration file used.
- This version corresponds to the MET release.
- Future versions of MET may include changes to TC-Stat and the TC-Stat configura
-tion file.
- This value should generally not be modified.
 \begin_inset Newline newline
 \end_inset
 

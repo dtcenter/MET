@@ -461,7 +461,7 @@ For each adeck/bdeck track pair, match up their track points in time, lookup
 \end_layout
 
 \begin_layout Subsection
-TC_Pairs configuration file
+tc_pairs configuration file
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:TC_Pairs-configuration-file"
@@ -1653,7 +1653,7 @@ The version string indicates the version of TC-Pairs configuration file
 \end_layout
 
 \begin_layout Subsection
-TC_Pairs output
+tc_pairs output
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:TC_Pairs-output"
