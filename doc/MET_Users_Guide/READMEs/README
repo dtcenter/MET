@@ -778,7 +778,9 @@ obs_quality = [ "1", "2", "3", "9" ];
 
 //
 // The "met_data_dir" entry specifies the location of the internal MET data
-// sub-directory which contains data files used when generating plots.
+// sub-directory which contains data files used when generating plots.  It
+// should be set to the installed share/met directory so the MET tools can
+// locate the static data files they need at run time.
 //
 met_data_dir = "MET_BASE";
 
@@ -787,7 +789,8 @@ met_data_dir = "MET_BASE";
 // containing colortable plotting information for the plotting of the raw
 // forecast field:
 //
-//    - The "color_table" entry specifies the location and name of the colortable file.
+//    - The "color_table" entry specifies the location and name of the
+//      colortable file to be used.
 //
 //    - The "plot_min" and "plot_max" entries specify the range of data values.
 //      If they are both set to 0, the MET tools will automatically rescale
