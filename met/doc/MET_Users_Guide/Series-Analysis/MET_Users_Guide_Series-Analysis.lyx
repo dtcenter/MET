@@ -75,7 +75,7 @@
 \begin_body
 
 \begin_layout Chapter
-Series Analysis Tool
+Series-Analysis Tool
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:The-Series-Analysis"
@@ -105,7 +105,7 @@ The Series-Analysis Tool accumulates statistics separately for each horizontal
  possible.
  This differs from the Grid-Stat tool in that Grid-Stat verifies all grid
  locations together as a group.
- Thus, the Series Analysis Tool can be used to find verification information
+ Thus, the Series-Analysis Tool can be used to find verification information
  specific to certain locations or to identify differences.
  
 \end_layout
@@ -128,30 +128,13 @@ This section contains a description of how to configure and run the Series-Analy
 sis tool.
  This tool performs verification of gridded model fields using matching
  gridded observation fields.
- The series analysis tool will produce a variety of user-selected statistics.
+ The Series-Analysis tool will produce a variety of user-selected statistics.
  These statistics are a subset of those produced by the Grid-Stat tool,
  with options for statistic types, thresholds, and conditional verification
- options as discussed in the Chapter on Grid-Stat
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Tara, please insert cross reference to Grid-Stat chapter
-\end_layout
-
-\end_inset
-
- and documented in the configuration options 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Tara, please insert cross reference to configuration options
-\end_layout
+ options as discussed in the Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:The-Grid-Stat-Tool"
 
 \end_inset
 
@@ -219,7 +202,7 @@ series_analysis usage
 \begin_layout Standard
 
 \series medium
-The usage statement for the Series Analysis tool is shown below:
+The usage statement for the Series-Analysis tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -239,8 +222,8 @@ hskip 0.5in}
 
 \end_inset
 
--fcst file_1 ...
- file_n
+-fcst  file_1 ...
+ file_n | fcst_file_list
 \end_layout
 
 \begin_layout LyX-Code
@@ -256,8 +239,8 @@ hskip 0.5in}
 
 \end_inset
 
--obs file_1 ...
- file_n
+-obs   file_1 ...
+ file_n | obs_file_list
 \end_layout
 
 \begin_layout LyX-Code
@@ -274,7 +257,7 @@ hskip 0.5in}
 \end_inset
 
 [-both file_1 ...
- file_n]
+ file_n | both_file_list ]
 \end_layout
 
 \begin_layout LyX-Code
@@ -355,7 +338,7 @@ has some required arguments and accepts optional ones.
 \begin_layout Standard
 
 \series bold
-Required arguments ensemble_stat
+Required arguments series_stat
 \end_layout
 
 \begin_layout Description
@@ -363,7 +346,11 @@ Required arguments ensemble_stat
  The 
 \series bold
 -fcst file_1 ...
- file_n
+ file_n |
+\series default
+ 
+\series bold
+fcst_file_list
 \series default
  options specify the gridded forecast files or ASCII files containing lists
  of file names to be used.
@@ -374,7 +361,11 @@ Required arguments ensemble_stat
  The 
 \series bold
 -obs file_1 ...
- file_n
+ file_n |
+\series default
+ 
+\series bold
+obs_file_list
 \series default
  are the gridded observation files or ASCII files containing lists of file
  names to be used.
@@ -395,19 +386,13 @@ Required arguments ensemble_stat
 \series bold
 -config file
 \series default
- is a Series Analysis Configuration file containing the desired settings.
+ is a Series-Analysis Configuration file containing the desired settings.
 \end_layout
 
-\begin_layout Description
-NOTE: All fields must be on the same grid.
-\end_layout
+\begin_layout Standard
 
-\begin_layout Description
-Optional
-\series medium
- 
 \series bold
-arguments for series_analysis
+Optional arguments for series_analysis
 \end_layout
 
 \begin_layout Description
@@ -416,9 +401,15 @@ arguments for series_analysis
  the optional 
 \series bold
 -both file_1 ...
- file_n
+ file_n |
+\series default
+ 
+\series bold
+both_file_list
 \series default
  option to the same set of files.
+ This is useful when reading the NetCDF matched pair output of the Grid-Stat
+ tool which contains both forecast and observation data.
 \end_layout
 
 \begin_layout Description
@@ -452,34 +443,35 @@ series_analysis
 \end_layout
 
 \begin_layout LyX-Code
--fcst myfcstfilelist.txt 
+-fcst   myfcstfilelist.txt 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
--obs myobsfilelist.txt 
+-obs    myobsfilelist.txt 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
--config/SeriesAnalysisConfig 
+-config SeriesAnalysisConfig 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
--out out/my_series_statistics.nc -v 2 
+-out    out/my_series_statistics.nc
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 In this example, the Series-Analysis tool will process the list of forecast
- and observation files specified in the text file lists into statitiscs
+ and observation files specified in the text file lists into statistics
  for each grid location using settings specified in the configuration file.
- Series-Analysis will create a NetCDF file containing requested statistics.
+ Series-Analysis will create an output NetCDF file containing requested
+ statistics.
  
 \end_layout
 
@@ -575,10 +567,6 @@ share/met/config
 \series medium
 Note that environment variables may be used when editing configuration files,
  as described in the section 3.5.2 for the PB2NC tool.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -594,266 +582,96 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-model = 
-\begin_inset Quotes eld
-\end_inset
 
-WRF
-\begin_inset Quotes erd
-\end_inset
+\series bold
+model          = "WRF";
+\end_layout
 
-;
+\begin_layout LyX-Code
+
+\series bold
+obtype         = "ANALYS";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
+ = 1; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+fcst           = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs            = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_mean     = {}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ci_alpha       = [ 0.05 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                   rng = "mt19937"; seed = ""; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+mask           = { grid = [ "FULL" ]; poly = []; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+rank_corr_flag = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+tmp_dir        = "/tmp";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version        = "VN.N";
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The
-\series default
- 
-\series bold
-model 
-\series medium
-variable contains a short text string identifying the name to be assigned
- to the model being verified.
- The value listed above is simply set to 
-\begin_inset Quotes eld
-\end_inset
-
-WRF
-\begin_inset Quotes erd
-\end_inset
-
-.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-fcst = {
-\end_layout
-
-\begin_layout LyX-Code
-cat_thresh = [ <=273, >273 ];
-\end_layout
-
-\begin_layout LyX-Code
-field = [
-\end_layout
-
-\begin_layout LyX-Code
-{name=
-\begin_inset Quotes erd
-\end_inset
-
-TMP";
-\end_layout
-
-\begin_layout LyX-Code
-level = 
-\begin_inset Quotes eld
-\end_inset
-
-Z2
-\begin_inset Quotes erd
-\end_inset
-
-;
-\end_layout
-
-\begin_layout LyX-Code
-];
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout LyX-Code
-obs = fcst;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-fcst
-\series medium
- group contains information about the model forecast fields, levels and
- thresholds to use in verification.
- The 
-\series bold
-field
-\series medium
- variable contains a comma-separated list of model variables and corresponding
- vertical levels to be verified.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-For GRIB files, the GRIB code itself or the corresponding abbreviation may
- be used to specify which model fields are to be verified.
- A level indicator in the form 
-\series bold
-"ANNN", "ZNNN", "PNNN", "PNNN-NNN", "LNNN"
-\series default
-, 
-\series medium
-or
-\series default
- 
-\series bold
-"RNNN"
-\series default
- 
-\series medium
-must correspond to each field name.
- These indicate an accumulation interval, a single vertical level, a single
- pressure level, a range of pressure levels, a generic level, and a specific
- GRIB record number, respectively.
-
-\series default
- 
-\series bold
-"NNN"
-\series default
- 
-\series medium
-indicates the accumulation or level value.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-To specify verification fields for NetCDF files, the name of the NetCDF
- variable should appear in the name field.
- The level field should be of the form (i,...,j,*,*) for a single field.
- Here, i,...,j specifies fixed dimension values, and *,* specifies the two
- dimensions for the gridded field.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The values listed above indicate that specific humidity, temperature, height,
- wind speed, and the U and V components of the winds should all be verified
- at 500 mb.
- All variables are treated as scalar quantities with the exception of the
- U and V components of the wind.
- When the U component is followed by the V component, both with the same
- level indicator, they will be treated as vector quantities.
- A list of GRIB codes is available at 
-\begin_inset Flex URL
-status open
-
-\begin_layout Plain Layout
-
-http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-\end_layout
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
 
 \end_inset
 
 .
- Wind speed is typically not available in model files, but if it is, it
- will be used directly.
- However, if wind speed is unavailable but the U and V components of the
- wind are included, the wind speed will be calculated automatically by MET,
- provided that WIND is included in the 
-\series bold
-field 
-\series medium
-group.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-For each 
-\series bold
-name 
-\series medium
-listed in the forecast field, one or more thresholds must be specified for
- use in computing discrete statistics.
- The thresholds are specified using >, >=, ==, !=, <, <=.
- Multiple thresholds may be applied to each field code by providing a comma-sepa
-rated list.
- It is the user's responsibility to know the units for each model variable
- and to choose appropriate threshold values.
- For probabilistic forecast, thresholds must be specified using >= convention.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-To indicate that a forecast field should be treated as probabilities, set
- the prob field to TRUE.
- Probability fields should contain values in the range [0, 1] or [0, 100].
- However, when MET encounters a probability field with a range [0, 100],
- it will automatically rescale it to be [0, 1] before applying the probabilistic
- verification methods.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-obs
-\series default
- 
-\series medium
-group can be defined in the same way as the forecast group.
- However, for most users, setting obs=fcst to use the same settings will
- be most valuable.
- The variables are identical those in the 
-\series default
-fcst 
-\series medium
-except that they apply to the observation field.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-For each observation field, one or more thresholds can be specified for
- use in computing discrete statistics.
- Specification is done exactly as for
-\series default
- 
-\series bold
-cat_thresh
-\series default
-.
- 
-\series medium
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -869,174 +687,25 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-ci_alpha[] = [0.05];
+
+\series bold
+block_size = 1024;
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The
-\series default
- 
+Number of grid points to be processed concurrently.
+ Set smaller to use less memory but increase the number of passes through
+ the data.
+ The amount of memory the Series-Analysis tool consumes is determined by
+ the size of the grid, the length of the series, and the 
 \series bold
-ci_alpha
-\series default
- 
+block_size
 \series medium
-variable contains a comma-separated list of alpha values to be used when
- computing confidence intervals.
- The confidence interval computed is 1 minus the
-\series default
- 
-\series bold
-ci_alpha
-\series medium
- value.
- The value of 0.05 listed above indicates that the 95th percentile confidence
- interval should be computed.
- Refer to Section 4.2.3 for more information about confidence intervals and
- recommended values.
- 
-\end_layout
-
-\begin_layout LyX-Code
-boot = {
-\end_layout
-
-\begin_layout LyX-Code
-interval = PCTILE;
-\end_layout
-
-\begin_layout LyX-Code
-rep_prop = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-n_rep = 0;
-\end_layout
-
-\begin_layout LyX-Code
-rng = "mt19937";
-\end_layout
-
-\begin_layout LyX-Code
-seed = "";
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series default
- 
-\series bold
-boot
-\series default
- 
-\series medium
-group defines the parameters to be used in calculation of bootstrap confidence
- intervals.
- The
-\series default
- 
-\series bold
-interval
-\series default
- 
-\series medium
-variable indicates what method should be used for computing bootstrap confidence
- intervals.
- A value of BCA indicates that the highly accurate but computationally intensive
- BCa (bias-corrected percentile) method should be used.
- A value of PCTILE indicates that the somewhat less accurate but efficient
- percentile method should be used.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-rep_prop
-\series default
- 
-\series medium
-variable must be set to a value between 0 and 1.
- When computing bootstrap confidence intervals over n sets of matched pairs,
- the size of the subsample, m, may be chosen less than or equal to the size
- of the sample, n.
- This variable defines the size of m as a proportion relative to the size
- of n.
- A value of 1, as shown above, indicates that the size of the subsample,
- m, should be equal to the size of the sample, n.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-n_rep
-\series default
- 
-\series medium
-variable defines the number of subsamples that should be taken when computing
- bootstrap confidence intervals.
- This variable should be set large enough so that when confidence intervals
- are computed multiple times for the same set of data, the intervals do
- not change much.
- Setting this variable to zero disables the computation of bootstrap confidence
- intervals, which may be necessary to run MET in realtime or near-realtime
- over large domains since bootstrapping is computationally expensive.
- Setting this variable to 1000, as shown above, indicates that bootstrap
- confidence interval should be computed over 1000 subsamples of the matched
- pairs.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-rng
-\series default
- 
-\series medium
-variable defines the random number generator to be used in the computation
- of bootstrap confidence intervals.
- Subsamples are chosen at random from the full set of matched pairs.
- The randomness is determined by the random number generator specified.
- Users should refer to detailed documentation of the GNU Scientific Library
- for a listing of the random number generators available for use.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series default
- 
-\series bold
-seed
-\series default
- 
-\series medium
-variable may be set to a specific value to make the computation of bootstrap
- confidence intervals fully repeatable.
- When left empty, as shown above, the random number generator seed is chosen
- automatically which will lead to slightly different bootstrap confidence
- intervals being computed each time the data is run.
- Specifying a value here ensures that the bootstrap confidence intervals
- will be computed the same over multiple runs of the same data.
-\begin_inset Newline newline
-\end_inset
-
-
+ entry defined above.
+ The larger this entry is set the faster the tool will run, subject to the
+ amount of memory available on the machine.
 \end_layout
 
 \begin_layout Standard
@@ -1052,126 +721,19 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-mask = {
-\end_layout
 
-\begin_layout LyX-Code
-grid ="";
-\end_layout
-
-\begin_layout LyX-Code
-poly = "";
-\end_layout
-
-\begin_layout LyX-Code
-};
+\series bold
+vld_thresh = 1.0;
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The
-\series default
- 
-\series bold
-grid
-\series default
- 
-\series medium
-variable in the
-\series default
- 
-\series bold
-mask
-\series default
- 
-\series medium
-group contains a single NCEP grid over which to perform the series_analysis
- verification.
- The predefined grids are specified as
-\series default
- 
-\series bold
-
-\begin_inset Quotes eld
-\end_inset
-
-GNNN
-\begin_inset Quotes erd
-\end_inset
-
-
-\series default
- 
-\series medium
-where
-\series default
- 
-\series bold
-NNN
-\series default
- 
-\series medium
-is the three-digit designation for the grid.
- Defining a new grid would require code changes and recompiling MET.
- Supplying a value of 
-\begin_inset Quotes eld
-\end_inset
-
-FULL
-\begin_inset Quotes erd
-\end_inset
-
- indicates that the verification should be performed over the entire grid
- on which the data resides.
- The value listed above indicates that verification should be performed
- over the full grid.
- See Appendix B for a list of grids that will be accepted.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series default
- 
-\series bold
-poly
-\series default
- 
-\series medium
-variable contains a single of file that defines the verification masking
- regions.
- This masking regions may be specified in two ways: as a lat/lon polygon
- or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
- or Gen-Circle_mask tools.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Several masking polygons used by NCEP are predefined in the installed share/met/
-poly directory.
- Creating a new polygon is as simple as creating a text file with a name
- for the polygon followed by the lat/lon points which define its boundary.
- Adding a new masking polygon requires no code changes and no recompiling.
- Internally, the lat/lon polygon points are converted into x/y values in
- the grid.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Alternatively, any gridded data file that MET can read may be used to define
- a verification masking region.
- Users must specify a description of the field to be used from the input
- file and, optionally, may specify a threshold to be applied to that field.
- Any grid point where the resulting field is 0, the mask is turned off.
- Any grid point where it is non-zero, the mask is turned on.
-\begin_inset Newline newline
-\end_inset
-
-
+Ratio of valid matched pairs for the series of values at each grid point
+ required to compute statistics.
+ Set to a lower proportion to allow some missing values.
+ Setting it to 1.0 requires that every data point be valid over the series
+ to compute statistics.
 \end_layout
 
 \begin_layout Standard
@@ -1187,55 +749,87 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 output_stats = {
 \end_layout
 
 \begin_layout LyX-Code
-fho = [];
+
+\series bold
+   fho    = [];
 \end_layout
 
 \begin_layout LyX-Code
-ctc = [];
+
+\series bold
+   ctc    = [];
 \end_layout
 
 \begin_layout LyX-Code
-cts = [];
+
+\series bold
+   cts    = [];
 \end_layout
 
 \begin_layout LyX-Code
-mctc = [];
+
+\series bold
+   mctc   = [];
 \end_layout
 
 \begin_layout LyX-Code
-mcts = [];
+
+\series bold
+   mcts   = [];
 \end_layout
 
 \begin_layout LyX-Code
-cnt = ["RMSE", "FBAR", "OBAR"];
+
+\series bold
+   cnt    = ["RMSE", "FBAR", "OBAR"];
 \end_layout
 
 \begin_layout LyX-Code
-sl1l2 = [];
+
+\series bold
+   sl1l2  = [];
 \end_layout
 
 \begin_layout LyX-Code
-pct = [];
+
+\series bold
+   sal1l2 = [];
 \end_layout
 
 \begin_layout LyX-Code
-pstd = [];
+
+\series bold
+   pct    = [];
 \end_layout
 
 \begin_layout LyX-Code
-pjc = [];
+
+\series bold
+   pstd   = [];
 \end_layout
 
 \begin_layout LyX-Code
-prc = [];
+
+\series bold
+   pjc    = [];
 \end_layout
 
 \begin_layout LyX-Code
-};
+
+\series bold
+   prc    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
 \end_layout
 
 \begin_layout Standard
@@ -1252,226 +846,195 @@ output_stats
 array controls the type of output that the Series-Analysis tool generates.
  Each flag corresponds to an output line type in the STAT file and is used
  to specify the comma-separated list of statistics to be computed.
+ Use the column names from the tables listed below to spcify the statistics.
  The output flags correspond to the following types of output line types:
 \end_layout
 
 \begin_layout Enumerate
-FHO for Forecast, Hit, Observation Rates
-\end_layout
 
-\begin_layout Enumerate
-CTC for Contingency Table Counts
-\end_layout
-
-\begin_layout Enumerate
-CTS for Contingency Table Statistics
-\end_layout
-
-\begin_layout Enumerate
-MCTC for Multi-Category Contingency Table Counts
-\end_layout
-
-\begin_layout Enumerate
-MCTS for Multi-Category Contingency Table Statistics
-\end_layout
-
-\begin_layout Enumerate
-CNT for Continuous Statistics
-\end_layout
-
-\begin_layout Enumerate
-SL1L2 for Scalar L1L2 Partial Sums
-\end_layout
-
-\begin_layout Enumerate
-SAL1L2 for Scalar Anomoly L1L2 Partial Sums 
-\series medium
-climatological data is supplied
-\end_layout
-
-\begin_layout Enumerate
-PCT for Contingency Table Counts for Probabilistic forecasts
-\end_layout
-
-\begin_layout Enumerate
-PSTD for Contingency Table Statistics for Probabilistic forecasts
-\end_layout
-
-\begin_layout Enumerate
-PJC for Joint and Conditional factorization for Probabilistic forecasts
-\end_layout
-
-\begin_layout Enumerate
-PRC for Receiver Operating Characteristic for Probabilistic forecasts
-\series medium
-
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-block_size = 1024;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Number of grid points to be processed concurrently.
- Set smaller to use less memory but increase the number of passes through
- the data.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-vld_thresh = 1.0;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Ratio of valid matched pairs required to compute statistics for a grid point.
- Set to a lower proportion to allow some missing values.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-rank_corr_flag = TRUE;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
+\series bold
+FHO
 \series default
- rank_corr_flag 
-\series medium
-variable may be set to 
+ for Forecast, Hit, Observation Rates (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_FHO"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+CTC
 \series default
-TRUE 
-\series medium
-or
+ for Contingency Table Counts (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTC"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+CTS
 \series default
- FALSE 
-\series medium
-to indicate whether or not Kendall's Tau and Spearman's Rank correlation
- coefficients should be computed.
- The computation of these rank correlation coefficients is very slow when
- run over many matched pairs.
- By default, this flag is turned on, as shown above, but setting it to 
+ for Contingency Table Statistics (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CTS"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+MCTC
 \series default
-FALSE 
+ for Multi-Category Contingency Table Counts (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_MCTC"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+MCTS
+\series default
+ for Multi-Category Contingency Table Statistics (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_MCTS"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+CNT
+\series default
+ for Continuous Statistics (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_CNT"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+SL1L2
+\series default
+ for Scalar L1L2 Partial Sums (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SL1L2"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+SAL1L2
+\series default
+ for Scalar Anomoly L1L2 Partial Sums 
 \series medium
-should improve the runtime performance.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
+climatological data is supplied 
+\series default
+(See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_SAL1L2"
 
 \end_inset
 
-
+)
 \end_layout
 
-\begin_layout LyX-Code
-tmp_dir = "/tmp";
-\end_layout
+\begin_layout Enumerate
 
-\begin_layout Standard
-
-\series medium
-This parameter indicates the directory where Series-Analysis should write
- temporary files.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
+\series bold
+PCT
+\series default
+ for Contingency Table Counts for Probabilistic forecasts (See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PCT"
 
 \end_inset
 
-
+)
 \end_layout
 
-\begin_layout LyX-Code
-version = 
-\begin_inset Quotes eld
+\begin_layout Enumerate
+
+\series bold
+PSTD
+\series default
+ for Contingency Table Statistics for Probabilistic forecasts (See Table
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PSTD"
+
 \end_inset
 
-v5.1
-\begin_inset Quotes erd
-\end_inset
-
-;
+)
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
 
-\series medium
-The version indicates the version of the 
-\emph on
-series_analysis
-\emph default
- configuration file used.
- This value should not be modified.
+\series bold
+PJC
+\series default
+ for Joint and Conditional factorization for Probabilistic forecasts (See
+ Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PJC"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+PRC
+\series default
+ for Receiver Operating Characteristic for Probabilistic forecasts (See
+ Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_PS_format_info_PRC"
+
+\end_inset
+
+)
 \end_layout
 
 \end_body
