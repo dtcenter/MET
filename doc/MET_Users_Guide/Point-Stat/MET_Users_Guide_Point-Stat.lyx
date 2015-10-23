@@ -101,10 +101,10 @@ name "sec:PS_Introduction"
 \series medium
 The Point-Stat tool provides verification statistics for forecasts at observatio
 n points (as opposed to over gridded analyses).
- The Point-Stat tool matches gridded forecasts to point observation locations,
- using several different interpolation approaches.
- The tool then computes continuous as well as categorical verification statistic
-s.
+ The Point-Stat tool matches gridded forecasts to point observation locations
+ and supports several different interpolation options.
+ The tool then computes continuous, categorical, and probabilistic verification
+ statistics.
  The categorical and probabilistic statistics generally are derived by applying
  a threshold to the forecast and observation values.
  Confidence intervals - representing the uncertainty in the verification
@@ -216,6 +216,8 @@ In the vertical, if forecasts and observations are at the same vertical
  The vertical interpolation is done in natural log of pressure coordinates,
  except for specific humidity, which is interpolated using the natural log
  of specific humidity in natural log of pressure coordinates.
+ Vertical interpolation for heights above ground are done linear in height
+ coordinates.
  When forecasts are for the surface, no interpolation is done.
  They are matched to observations with message type ADPSFC or SFCSHP.
  
@@ -860,7 +862,6 @@ For each of the types of statistics mentioned above (categorical, continuous,
  squared error skill score (MSESS), the Anomaly Correlation (ANOM_CORR),
  scalar and vector anomolies (SAL1L2 and VAL1L2), continuous ranked probability
  skill score (CRPSS), Brier Skill Score (BSS) (Wilks, 2011; Mason, 2004).
- 
 \end_layout
 
 \begin_layout Standard
@@ -1377,7 +1378,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-point_obs netcdf_observation_file]
+[-point_obs file]
 \end_layout
 
 \begin_layout LyX-Code
@@ -1511,12 +1512,10 @@ config_file
  The contents of the configuration file are discussed below.
 \end_layout
 
-\begin_layout Description
-Optional 
+\begin_layout Standard
+
 \series bold
-arguments for 
-\emph on
-point_stat
+Optional arguments for point_stat
 \end_layout
 
 \begin_layout Description
@@ -1525,7 +1524,7 @@ point_stat
 4.
  The 
 \series bold
--point_obs netcdf_file
+-point_obs file
 \series medium
  may be used to pass additional NetCDF point observation files to be used
  in the verification.
@@ -1672,7 +1671,7 @@ scripts/config
 
 \series medium
 Note that environment variables may be used when editing configuration files,
- as described in the section 
+ as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:pb2nc-configuration-file"
@@ -1699,25 +1698,109 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-model = "WRF";
+
+\series bold
+model          = "WRF";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
+ = 1; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+climo_mean ...
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_window     = { beg = -5400; end =  5400; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+ci_alpha       = [ 0.05 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                   rng = "mt19937"; seed = ""; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+interp         = { vld_thresh = 1.0; type = [ { method = NEAREST; width 
+ = 1; } ]; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_quality    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+rank_corr_flag = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+duplicate_flag = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+tmp_dir        = "/tmp";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+output_prefix  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version        = "VN.N";
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The 
-\series bold
-model 
-\series medium
-variable contains a short text string identifying the name to be assigned
- to the model being verified.
- This text string is written out as a header column of the STAT output so
- that verification statistics from multiple models may be differentiated.
- The value listed above is simply set to "WRF".
-\begin_inset Newline newline
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
 \end_inset
 
-
+.
 \end_layout
 
 \begin_layout Standard
@@ -1732,250 +1815,26 @@ height "1pt"
 
 \end_layout
 
-\begin_layout LyX-Code
-fcst = {
-\end_layout
-
-\begin_layout LyX-Code
-wind_thresh = [ NA ];
-\end_layout
-
-\begin_layout LyX-Code
-message_type = [ "ADPUPA", "ADPSFC" ];
-\end_layout
-
-\begin_layout LyX-Code
-sid_exc = [];
-\end_layout
-
-\begin_layout LyX-Code
-lead_time = "12";
-\end_layout
-
-\begin_layout LyX-Code
-valid_time = "20070331_12";
-\end_layout
-
-\begin_layout LyX-Code
-field = [
-\end_layout
-
-\begin_layout LyX-Code
-{
-\end_layout
-
-\begin_layout LyX-Code
-name = "TMP";
-\end_layout
-
-\begin_layout LyX-Code
-level = [ "P750-900" ];
-\end_layout
-
-\begin_layout LyX-Code
-cat_thresh = [ <=273, >273 ];
-\end_layout
-
-\begin_layout LyX-Code
-},
-\end_layout
-
-\begin_layout LyX-Code
-name = "HGT";
-\end_layout
-
-\begin_layout LyX-Code
-level = [ "P500" ];
-\end_layout
-
-\begin_layout LyX-Code
-cat_thresh = [ >0.0 ];
-\end_layout
-
-\begin_layout LyX-Code
-},
-\end_layout
-
-\begin_layout LyX-Code
-{
-\end_layout
-
-\begin_layout LyX-Code
-name = "UGRD";
-\end_layout
-
-\begin_layout LyX-Code
-level = [ "P500" ];
-\end_layout
-
-\begin_layout LyX-Code
-cat_thresh = [ >5.0 ];
-\end_layout
-
-\begin_layout LyX-Code
-},
-\end_layout
-
-\begin_layout LyX-Code
-{
-\end_layout
-
-\begin_layout LyX-Code
-name = "VGRD";
-\end_layout
-
-\begin_layout LyX-Code
-level = [ "P500" ];
-\end_layout
-
-\begin_layout LyX-Code
-cat_thresh = [ >5.0 ];
-\end_layout
-
-\begin_layout LyX-Code
-} 
-\end_layout
-
-\begin_layout LyX-Code
-];
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout LyX-Code
-obs = fcst;
-\end_layout
-
 \begin_layout Standard
 
 \series medium
-or
-\end_layout
-
-\begin_layout LyX-Code
-fcst_field[] = [ "RAINC(0,*,*)", "QVAPOR(0,5,*,*)"
-\series medium
- ]; for NetCDF input
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
+Setting up the 
 \series bold
- fcst
+fcst
 \series medium
- group contains information about the model forecast fields, levels and
- threshold to use in verification.
- The 
-\series default
-field
-\series medium
- variable contains a comma-separated list of model variables and corresponding
- vertical levels to be verified.
- Each field is specified by giving its name an accumulation or vertical
- level indicators.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-For GRIB files, the GRIB code itself or the corresponding abbreviation may
- be used to specify which model fields are to be verified.
- A level indicator in the form 
+ and 
 \series bold
-"ANNN", "ZNNN", "PNNN", "PNNN-NNN", "LNNN"
+obs
 \series medium
-, or 
-\series bold
-"RNNN"
-\series medium
- must correspond to each field name.
- These indicate an accumulation interval, a single vertical level, a single
- pressure level, a range of pressure levels, a generic level, and a specific
- GRIB record number, respectively.
- 
-\series bold
-"NNN"
-\series medium
- indicates the accumulation or level value.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-To specify verification fields for NetCDF files, the name of the NetCDF
- variable should appear in the name field.
- The level field should be of the form (i,...,j,*,*) for a single field.
- Here, i,...,j specifies fixed dimension values, and *,* specifies the two
- dimensions for the gridded field.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The values listed above indicate that temperature, height, and the U and
- V components of the winds should all be verified.
- All variables are treated as scalar quantities with the exception of the
- U and V components of the wind.
- When the U component is followed by the V component, both with the same
- level indicator, they will be treated as vector quantities.
- A list of GRIB codes is available at 
-\begin_inset Flex URL
-status open
-
-\begin_layout Plain Layout
-
-http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-\end_layout
+ dictionaries of the configuration file is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
 
 \end_inset
 
 .
- Wind speed is typically not available in model files, but if it is, it
- will be used directly.
- However, if wind speed is unavailable but the U and V components of the
- wind are included, the wind speed will be calculated automatically by MET,
- provided that WIND is included in the 
-\series default
-field
-\series medium
- group.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-For each 
-\series bold
-name
-\series medium
- listed in the forecast field, one or more thresholds must be specified
- if categorical statistics have been requested.
- The thresholds are specified using ==, >=, >, !=, <, <=.
- Multiple thresholds may be applied to each field code by providing a comma-sepa
-rated list within the double quotes (e.g.
- >0, <=0) It is the user's responsibility to know the units for each model
- variable and to choose appropriate threshold values.
- For probabilistic forecast, thresholds must be specified using >= convention.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-To indicate that a forecast field should be treated as probabilities, set
- the 
-\series bold
-prob
-\series medium
- field to TRUE.
- Probability fields should contain values in the range [0, 1] or [0, 100].
- However, when MET encounters a probability field with a range [0, 100],
- it will automatically rescale it to be [0, 1] before applying the probabilistic
- verification methods.
+ The following are some special consideration for the Point-Stat tool.
 \end_layout
 
 \begin_layout Standard
@@ -1985,66 +1844,65 @@ The
 \series bold
 obs
 \series medium
- group can be defined in the same way as the forecast group.
- When verifying GRIB1 forecast files, setting obs=fcst to use the same settings
- will be most valuable, since point observations are specified using GRIB1
- conventions.
- The variables are identical to those in the 
+ dictionary looks very simliar to the 
 \series bold
-fcst 
+fcst
 \series medium
-except that they apply to the observation field.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-For each observation field, one or more thresholds can be specified for
- use in computing discrete statistics.
- Specification is done exactly as for 
+ dictionary.
+ However since point observation are assigned GRIB1 codes, the observation
+ section must be defined following GRIB1 conventions.
+ When verifying GRIB1 forecast data, one can easily copy over the forecast
+ settings to the observation dictionary using 
 \series bold
-cat_thresh.
-
+obs=fcst;
 \series medium
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-When verifying winds via either the u and v components or the speed and
- direction, it can be desirable to eliminate winds below a certain speed.
- The 
+.
+ However, when verifying non-GRIB1 forecast data, users will need to specify
+ the 
 \series bold
-wind_thresh
+fcst
 \series medium
  and 
 \series bold
-wind_logic
+obs
 \series medium
- options in the configuration files allow users to filter the winds based
- on speed, even when u and v winds are input.
+ sections separately.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+sid_exc
+\series medium
+ entry, defined in the 
+\series bold
+obs
+\series medium
+ dictionary, contains a comma-separated list of the station id's to be excluded
+ from verification.
+ This option is typically used when an observation file contains some stations
+ known to have bad or unreliable data.
  
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The Point-Stat tool performs verification using observations for one message
+The 
+\series bold
+message_type
+\series medium
+ entry, defined in the 
+\series bold
+obs
+\series medium
+ dictionary, contains a comma-separated list of the message types to use
+ for verification.
+ At least one entry must be provided.
+ The Point-Stat tool performs verification using observations for one message
  type at a time.
- The 
-\series bold
-message_type
-\series medium
- variable contains a comma-separated list of the message types to use for
- verification.
- By default, only surface and upper air observations are used for verification.
- At least one 
-\series bold
-message_type
-\series medium
- must be provided.
  See 
 \begin_inset Flex URL
 status open
@@ -2057,555 +1915,15 @@ http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 \end_inset
 
  for a list of the possible types.
- The 
+ If verifying GRIB1 forecsat data, it may be defined in the forecast dictionary
+ and the copied into the observation dictionary using 
 \series bold
-message_type
+obs=fcst;
 \series medium
- must be specified in the observation dictionary.
- Here it is defined in the forecast dictionary and then copies to the observatio
-n dictionary.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-sid_exc
-\series medium
- variable contains a list of the station id's to be excluded from verification.
- This option is typically used when an observation file contains some stations
- with bad or unreliable data.
- 
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-obs_window={
-\end_layout
-
-\begin_layout LyX-Code
-beg = -5400;
-\end_layout
-
-\begin_layout LyX-Code
-end = 5400;
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Each gridded forecast file has a valid time associated with it.
- The 
-\series bold
-beg
-\series medium
- and 
-\series bold
-end 
-\series medium
-variables define a time window in seconds around the valid time of the forecast
- file for the observations to be matched to it.
- For a forecast valid time, v, observations with a valid time falling in
- the time window [v+beg, v+end] will be used.
- 
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-mask = {
-\end_layout
-
-\begin_layout LyX-Code
-grid = [ "FULL" ];
-\end_layout
-
-\begin_layout LyX-Code
-poly = [];
-\end_layout
-
-\begin_layout LyX-Code
-sid = [];
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-mask
-\series medium
- group contains variables to define the verification grid.
- The 
-\series bold
-grid
-\series medium
- variable contains a comma-separated list of pre-defined NCEP grids over
- which to perform the Point-Stat verification.
- The predefined grids are specified as 
-\series bold
-"GNNN"
-\series medium
- where 
-\series bold
-NNN
-\series medium
- is the three digit designation for the grid.
- Defining a new grid would require code changes and recompiling MET.
- Supplying a value of 
-\series bold
-"FULL"
-\series medium
- indicates that the verification should be performed over the entire grid
- on which the data resides.
- The value listed above indicates that verification should be performed
- over the NCEP Grid number 212.
- See Appendix 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:App_B-Map-Projections-Grids"
-
-\end_inset
-
- for a list of grids that will be accepted.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-poly
-\series medium
- variable contains a comma-separated list of files that define verification
- masking regions.
- These masking regions may be specified in two ways: as a lat/lon polygon
- or using a gridded data file such as the NetCDF output of the Gen-Poly-Mask
- or Gen-Circle_Mask tools.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Several masking polygons used by NCEP are predefined in the share/met/poly
- installation directory.
- Creating a new polygon is as simple as creating a text file with a name
- for the polygon followed by the lat/lon points which define its boundary.
- Adding a new masking polygon requires no code changes and no recompiling.
- Internally, the lat/lon polygon points are converted into x/y values in
- the grid.
- The lat/lon values for the observation points are also converted into x/y
- grid coordinates.
- The computations performed to check whether the observation point falls
- within the polygon defined is done in x/y grid space.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Alternatively, any gridded data file that MET can read may be used to define
- a verification masking region.
- Users must specify a description of the field to be used from the input
- file and, optionally, may specify a threshold to be applied to that field.
- Once this threshold is applied, any grid point where the resulting field
- is 0, the mask is turned off.
- Any grid point where it is non-zero, the mask is turned on.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-sid
-\series medium
- variable is specified as an array of strings.
- Each entry in that array is either the name of a single station id or a
- filename.
- If it is a single station id name, that station will be treated as its
- own masking region, as in previous versions of MET.
- If it's a filename, that file should contain a "name" followed by a space-separ
-ated list of station id's.
- That first "name" entry is what MET puts in the VX_MASK output column.
- This provides a way to define one or more groups of individual stations
- over which to compute statistics.
- This is an alternative to defining a masking region using a polyline or
- grid and is more convenient if you have a specific list of station id's
- you'd like to use.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-ci_alpha[] = [0.05];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-ci_alpha
-\series medium
- variable contains a comma-separated list of alpha values to be used when
- computing confidence intervals.
- The confidence interval computed is 1 minus the 
-\series bold
-ci_alpha
-\series medium
- value.
- The value of 0.05 listed above indicates that the 95th percentile confidence
- interval should be computed.
- Refer to Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:PS_Statistical-confidence-intervals"
-
-\end_inset
-
- for more information about confidence intervals and recommended values.
- 
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-boot = {
-\end_layout
-
-\begin_layout LyX-Code
-interval = PCTILE;
-\end_layout
-
-\begin_layout LyX-Code
-rep_prop = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-n_rep = 1000;
-\end_layout
-
-\begin_layout LyX-Code
-rng = "mt19937";
-\end_layout
-
-\begin_layout LyX-Code
-seed = "";
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-boot
-\series medium
- group defines the parameters to be used in calculation of bootstrap confidence
- intervals.
- The 
-\series bold
-interval
-\series medium
- variable indicates what method should be used for computing bootstrap confidenc
-e intervals.
- A value of BCA indicates that the highly accurate but computationally intensive
- BCa (bias-corrected percentile) method should be used.
- A value of PCTILE indicates that the somewhat less accurate but efficient
- percentile method should be used.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-rep_prop
-\series medium
- variable must be set to a value between 0 and 1.
- When computing bootstrap confidence intervals over n sets of matched pairs,
- the size of the subsample, m, may be chosen less than or equal to the size
- of the sample, n.
- This variable defines the size of m as a proportion relative to the size
- of n.
- A value of 1, as shown above, indicates that the size of the subsample,
- m, should be equal to the size of the sample, n.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-n_rep
-\series medium
- variable defines the number of subsamples that should be taken when computing
- bootstrap confidence intervals.
- This variable should be set large enough so that when confidence intervals
- are computed multiple times for the same set of data, the intervals do
- not change much.
- Setting this variable to zero disables the computation of bootstrap confidence
- intervals, which may be necessary to run MET in realtime or near-realtime
- over large domains since bootstrapping is computationally expensive.
- Setting this variable to 1000, as shown above, indicates that bootstrap
- confidence interval should be computed over 1000 subsamples of the matched
- pairs.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series default
- 
-\series bold
-rng
-\series medium
- variable defines the random number generator to be used in the computation
- of bootstrap confidence intervals.
- Subsamples are chosen at random from the full set of matched pairs.
- The randomness is determined by the random number generator specified.
- Users should refer to detailed documentation of the GNU Scientific Library
- for a listing of the random number generators available for use.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-seed
-\series medium
- variable may be set to a specific value to make the computation of bootstrap
- confidence intervals fully repeatable.
- When left empty, as shown above, the random number generator seed is chosen
- automatically which will lead to slightly different bootstrap confidence
- intervals being computed each time the data is run.
- Specifying a value here ensures that the bootstrap confidence intervals
- will be computed the same over multiple runs of the same data.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-interp = {
-\end_layout
-
-\begin_layout LyX-Code
-vld_thresh = 1.0;
-\end_layout
-
-\begin_layout LyX-Code
-type = [
-\end_layout
-
-\begin_layout LyX-Code
-{
-\end_layout
-
-\begin_layout LyX-Code
-method = UW_MEAN;
-\end_layout
-
-\begin_layout LyX-Code
-width = 1;
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout LyX-Code
-];
-\end_layout
-
-\begin_layout LyX-Code
-};
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-interp
-\series medium
- group specifies the parameters for grid interpolation or smoothing.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-vld_thresh
-\series medium
- variable contains a number between 0 and 1.
- When performing interpolation over some neighborhood of points the ratio
- of the number of valid data points to the total number of points in the
- neighborhood is computed.
- If that ratio is less than this threshold, the matched pair is discarded.
- Setting this threshold to 1, which is the default, requires that the entire
- neighborhood must contain valid data.
- This variable will typically come into play only along the boundaries of
- the verification region chosen.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-method 
-\series medium
-variable contains a comma-separated list of interpolation methods to be
- used when interpolating forecast data to observation locations.
- The valid values which may be listed are MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN,
- LS_FIT, and BILIN for the minimum, maximum, median, unweighted mean, distance-w
-eighted mean, a least squares fit, and bilinear interpolation.
- Providing multiple interpolation methods indicates that statistics should
- be computed multiple times using a different interpolation method each
- time.
- These methods are described in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:PS_Interpolation/matching-methods"
-
-\end_inset
-
 .
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-The 
-\series bold
-width
-\series medium
- variable contains a comma-separated list of values to be used in defining
- the neighborhoods over which the interpolation is performed.
- The neighborhood is simply a square containing the observation point.
- The 
-\series bold
-width
-\series medium
- value specifies the 
-\series bold
-width
-\series medium
- of that square.
- A 
-\series bold
-width
-\series medium
- value of 1 is interpreted as the nearest neighbor model grid point to the
- observation point.
- A 
-\series default
-width
-\series medium
- of 2 defines a 2 x 2 square of grid points around the observation point
- (the 4 closest model grid points), while a 
-\series bold
-width
-\series medium
- of 3 defines a 3 x 3 square of grid points around the observation point,
- and so on.
- The values listed above indicate that the nearest neighbor and the 4 closest
- grid points should be used to define the neighborhoods.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2618,70 +1936,104 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 output_flag = {
 \end_layout
 
 \begin_layout LyX-Code
-fho = BOTH;
+
+\series bold
+   fho    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-ctc = BOTH;
+
+\series bold
+   ctc    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-cts = BOTH;
+
+\series bold
+   cts    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-mctc = BOTH;
+
+\series bold
+   mctc   = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-mcts = BOTH;
+
+\series bold
+   mcts   = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-cnt = BOTH;
+
+\series bold
+   cnt    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-sl1l2 = BOTH;
+
+\series bold
+   sl1l2  = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-sal1l2 = BOTH;
+
+\series bold
+   sal1l2 = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-vl1l2 = BOTH;
+
+\series bold
+   vl1l2  = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-val1l2 = BOTH;
+
+\series bold
+   val1l2 = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-pct = BOTH;
+
+\series bold
+   pct    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-pstd = BOTH;
+
+\series bold
+   pstd   = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-pjc = BOTH;
+
+\series bold
+   pjc    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-prc = BOTH;
+
+\series bold
+   prc    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
-mpr = BOTH;
+
+\series bold
+   mpr    = BOTH;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 };
 \end_layout
 
@@ -2891,192 +2243,14 @@ Note that writing out matched pair data (MPR lines) for a large number of
  cases is generally not recommended.
  The MPR lines create very large output files and are only intended for
  use on a small set of cases.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-obs_quality = [];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The is a list of quality control strings to be used for filtering the observatio
-ns.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-duplicate_flag = NONE;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The reporting mechanism for this feature can be activated by specifying
- a verbosity level of three or higher.
- The report will show information about where duplicates were detected and
- which observations were used in those cases.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-rank_corr_flag = TRUE;
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-rank_corr_flag
-\series medium
- variable may be set to TRUE or FALSE to indicate whether or not Kendall's
- Tau and Spearman's Rank correlation coefficients should be computed.
- The computation of these rank correlation coefficients is very slow when
- run over many matched pairs.
- By default, this flag is turned on, as shown above, but setting it to FALSE
- should improve the runtime performance.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-tmp_dir = "/tmp";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-This option specifies the directory where temp files should be written by
- the Point-Stat tool.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-output_prefix = "";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-This option specifies a string to be used in the output file name.
- It can be useful for keeping results for different models or variables
- from overwriting each other.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-version = "v5.1";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The version indicates the version of the 
-\emph on
-point_stat
-\emph default
- configuration file used.
- Future versions of MET may include changes to 
-\emph on
-point_stat
-\emph default
- and the 
-\emph on
-point_stat
-\emph default
- configuration file.
- This value should not be modified.
+If all line types corresponding to a particular verificaiton method are
+ set to NONE, the computation of those statistics will be skipped in the
+ code and thus make the Point-Stat tool run more efficiently.
+ For example, if FHO, CTC, and CTS are all set to NONE, the Point-Stat tool
+ will skip the categorical verification step.
 \end_layout
 
 \begin_layout Subsection
@@ -3877,17 +3051,6 @@ reference "table_PS_format_info_MPR"
 \end_inset
 
 .
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Originally referenced tables 4.2 to 4.16 but tables go past this.
- Does this reference need to reflect this? ~Lisa
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \end_inset
