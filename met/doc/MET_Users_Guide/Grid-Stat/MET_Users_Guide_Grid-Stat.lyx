@@ -4206,7 +4206,7 @@ name "table_GS_Dimensions_NetCDF_matched_pair_out"
 \begin_layout Plain Layout
 
 \series bold
-grid_stat NetCDF DIMENSIONS
+grid_stat NETCDF DIMENSIONS
 \end_layout
 
 \end_inset
@@ -4348,7 +4348,7 @@ name "table_GS_var_NetCDF_matched_pair_out"
 \begin_layout Plain Layout
 
 \series bold
-grid_stat NetCDF VARIABLES
+grid_stat NETCDF VARIABLES
 \end_layout
 
 \end_inset
@@ -4481,7 +4481,19 @@ For each model variable (VAR), vertical level (LVL), and masking region
 \begin_inset Text
 
 \begin_layout Plain Layout
-DIFF_FCSTVAR_FCSTLVL_ OBSVAR_OBSLVL_MASK
+DIFF_FCSTVAR
+\begin_inset Newline newline
+\end_inset
+
+_FCSTLVL
+\begin_inset Newline newline
+\end_inset
+
+_OBSVAR
+\begin_inset Newline newline
+\end_inset
+
+_OBSLVL_MASK
 \end_layout
 
 \begin_layout Plain Layout
