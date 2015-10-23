@@ -2041,7 +2041,7 @@ hskip 0.25in}
 
 \end_inset
 
-};
+}
 \end_layout
 
 \begin_layout LyX-Code
@@ -2189,7 +2189,7 @@ merge_flag = THRESH;
 \end_layout
 
 \begin_layout LyX-Code
-};
+}
 \end_layout
 
 \begin_layout LyX-Code
@@ -2845,7 +2845,7 @@ poly_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
 \end_layout
 
 \begin_layout LyX-Code
-};
+}
 \end_layout
 
 \begin_layout Standard
@@ -4027,7 +4027,7 @@ colorbar_spacing = 1;
 \end_layout
 
 \begin_layout LyX-Code
-};
+}
 \end_layout
 
 \begin_layout LyX-Code
@@ -4099,7 +4099,7 @@ colorbar_spacing = 1;
 \end_layout
 
 \begin_layout LyX-Code
-};
+}
 \end_layout
 
 \begin_layout LyX-Code
@@ -4123,7 +4123,7 @@ color_table = "MET_BASE/colortables/mode_obj.ctable";
 \end_layout
 
 \begin_layout LyX-Code
-};
+}
 \end_layout
 
 \begin_layout Standard
@@ -4449,7 +4449,7 @@ polylines = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-};
+}
 \end_layout
 
 \begin_layout Standard
