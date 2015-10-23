@@ -1272,15 +1272,18 @@ This section contains a description of how to configure and run the Point-Stat
  field using point observations.
  The gridded model field to be verified must be in one of the supported
  file formats.
- The point observations must be in NetCDF format as the output of the 
+ The point observations must be formatted as the NetCDF output of the 
 \series default
-PB2NC
+point reformatting tools described in Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Re-Formatting-of-Point"
+
+\end_inset
+
+.
+
 \series medium
- or 
-\series default
-ASCII2NC
-\series medium
- step.
  The Point-Stat tool provides the capability of interpolating the gridded
  forecast data to the observation points using a variety of methods as described
  in Section 
