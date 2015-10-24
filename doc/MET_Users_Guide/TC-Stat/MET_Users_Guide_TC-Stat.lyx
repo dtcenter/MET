@@ -183,70 +183,8 @@ reference "sub:tc_stat-configuration-file"
 \end_inset
 
  (configuration file).
- Additional filtering options that can be executed on the command line will
- give the minimum, maximum, or exact value for a particular column: 
-\end_layout
-
-\begin_layout Description
-
-\series bold
--column_min
-\series medium
- arguments: column_name value
-\end_layout
-
-\begin_layout Description
-
-\series bold
--column_max
-\series medium
- arguments: column_name value
-\end_layout
-
-\begin_layout Description
-
-\series bold
--column_eq
-\series medium
- arguments: column_name value
-\end_layout
-
-\begin_layout Description
-
-\series bold
--column_str 
-\series medium
-arguments: column_name string
-\end_layout
-
-\begin_layout Description
-
-\series bold
--column
-\series default
- AMAX_WIND-BMAX_WIND # difference 
-\end_layout
-
-\begin_layout Description
-
-\series bold
--column
-\series default
- abs(ALTK_ERR) # absolute value 
-\end_layout
-
-\begin_layout Description
-
-\series bold
--column
-\series default
- abs(AMAX_WIND-BMAX_WIND) # absolute value of a difference
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-If multiple options are listed, the job will be performed on their intersection.
+ If multiple filtering options are listed, the job will be performed on
+ their intersection.
 \end_layout
 
 \begin_layout Subsection
@@ -436,7 +374,23 @@ tc_stat
 \end_layout
 
 \begin_layout LyX-Code
-Usage: -lookin source
+Usage: tc_stat
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-lookin source
 \end_layout
 
 \begin_layout LyX-Code
@@ -711,7 +665,7 @@ d that users make a copy of these files prior to modifying their contents.
 \begin_layout Standard
 
 \series medium
-The contents of the default tc_stat configuration file are described below.
+The contents of the tc_stat configuration file are described below.
 \end_layout
 
 \begin_layout Standard
@@ -727,63 +681,93 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-storm_id = [ ];
+
+\series bold
+storm_id     = [];
 \end_layout
 
 \begin_layout LyX-Code
-basin = [ ];
+
+\series bold
+basin        = [];
 \end_layout
 
 \begin_layout LyX-Code
-cyclone = [ ];
+
+\series bold
+cyclone      = [];
 \end_layout
 
 \begin_layout LyX-Code
-storm_name = [ ];
+
+\series bold
+storm_name   = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_beg = " ";
+
+\series bold
+init_beg     = "";
 \end_layout
 
 \begin_layout LyX-Code
-init_eng = " ";
+
+\series bold
+init_eng     = "";
 \end_layout
 
 \begin_layout LyX-Code
-init_inc = [ ];
+
+\series bold
+init_inc     = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_exc = [ ];
+
+\series bold
+init_exc     = [];
 \end_layout
 
 \begin_layout LyX-Code
-valid_beg = " ";
+
+\series bold
+valid_beg    = "";
 \end_layout
 
 \begin_layout LyX-Code
-valid_eng = " ";
+
+\series bold
+valid_eng    = "";
 \end_layout
 
 \begin_layout LyX-Code
-init_hour = [ ];
+
+\series bold
+init_hour    = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_mask = [ ];
+
+\series bold
+init_mask    = [];
 \end_layout
 
 \begin_layout LyX-Code
-valid_mask = [ ];
+
+\series bold
+valid_mask   = [];
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 match_points = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-version = "vN.N";
+
+\series bold
+version      = "VN.N";
 \end_layout
 
 \begin_layout Standard
@@ -810,18 +794,14 @@ Note that the options specified in the first section of the configuration
  be applied to that job.
  For example, if model = [
 \emph on
-"GFSI","LGEM","DSHP"
+ "GFSI", "LGEM", "DSHP"
 \emph default
-] is set at the top, but the job in the joblist sets the -model option to
- 
+ ]; is set at the top, but the job in the joblist sets the -model option
+ to 
 \emph on
 "LGEM"
 \emph default
 , that job will only run using the LGEM model data.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -837,11 +817,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-amodel = [ ];
+
+\series bold
+amodel = [];
 \end_layout
 
 \begin_layout LyX-Code
-bmodel = [ ];
+
+\series bold
+bmodel = [];
 \end_layout
 
 \begin_layout Standard
@@ -881,10 +865,6 @@ bmodel
 "-bmodel"
 \emph default
  options within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -900,11 +880,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-valid_inc = [ ];
+
+\series bold
+valid_inc = [];
 \end_layout
 
 \begin_layout LyX-Code
-valid_exc = [ ];
+
+\series bold
+valid_exc = [];
 \end_layout
 
 \begin_layout Standard
@@ -930,10 +914,6 @@ valid_exc
 -valid_ex
 \emph default
 c" options within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -950,14 +930,14 @@ height "1pt"
 
 \begin_layout LyX-Code
 
+\series bold
+valid_hour = [];
 \end_layout
 
 \begin_layout LyX-Code
-valid_hour = [ ];
-\end_layout
 
-\begin_layout LyX-Code
-lead = [ ];
+\series bold
+lead       = [];
 \end_layout
 
 \begin_layout Standard
@@ -986,10 +966,6 @@ ely.
 -lead
 \emph default
 " options within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1005,7 +981,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-line_type = [ ];
+
+\series bold
+line_type = [];
 \end_layout
 
 \begin_layout Standard
@@ -1017,10 +995,6 @@ line_type
 \series medium
  field stratifies by the line_type column.
  Currently TCMPR is the only line_type option used in MET-TC.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1036,7 +1010,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-track_watch_warn = [ ];
+
+\series bold
+track_watch_warn = [];
 \end_layout
 
 \begin_layout Standard
@@ -1182,10 +1158,6 @@ init_str
  column_str_val
 \series medium
  field will stratify by a single or multiple types of warnings.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1201,11 +1173,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-column_thresh_name = [ ];
+
+\series bold
+column_thresh_name = [];
 \end_layout
 
 \begin_layout LyX-Code
-column_thresh_val = [ ];
+
+\series bold
+column_thresh_val  = [];
 \end_layout
 
 \begin_layout Standard
@@ -1235,10 +1211,6 @@ column_thresh_name
 -column_thresh name thresh
 \emph default
 " option within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1254,11 +1226,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-column_str_name = [ ];
+
+\series bold
+column_str_name = [];
 \end_layout
 
 \begin_layout LyX-Code
-column_str_val = [ ];
+
+\series bold
+column_str_val  = [];
 \end_layout
 
 \begin_layout Standard
@@ -1288,10 +1264,6 @@ column_str_name
 -column_str name val
 \emph default
 " option within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1307,11 +1279,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 init_thresh_name = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_thresh_val = [];
+
+\series bold
+init_thresh_val  = [];
 \end_layout
 
 \begin_layout Standard
@@ -1343,10 +1319,6 @@ init_thresh_name
 -init_thresh name val
 \emph default
 " option within the job command lines may further refine these selections.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1363,14 +1335,14 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\series medium
-i
-\series default
-nit_str_name = [];
+\series bold
+init_str_name = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_str_val = [];
+
+\series bold
+init_str_val  = [];
 \end_layout
 
 \begin_layout Standard
@@ -1422,7 +1394,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-water_only = ;
+
+\series bold
+water_only = FALSE;
 \end_layout
 
 \begin_layout Standard
@@ -1465,70 +1439,30 @@ rirw = {
 \begin_layout LyX-Code
 
 \series bold
-   track =
+   track  = NONE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   time =
+   time   = "24";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   exact =
+   exact  = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   thresh = 
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-}
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-e.g.: rapid_inten = {
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-   track = NONE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-   time = "24";
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-   exact = TRUE;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
    thresh = >=30.0;
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
+\series bold
 }
 \end_layout
 
@@ -1655,31 +1589,21 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-landfall = FALSE;
+
+\series bold
+landfall     = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
-landfall_beg = 
-\series medium
-"
-\series default
--24
-\series medium
-"
-\series default
-;
+
+\series bold
+landfall_beg = "-24";
 \end_layout
 
 \begin_layout LyX-Code
-landfall_end = 
-\series medium
-"
-\series default
-00
-\series medium
-"
-\series default
-;
+
+\series bold
+landfall_end = "00";
 \end_layout
 
 \begin_layout Standard
@@ -1724,10 +1648,6 @@ landfall_beg
  For example, "-landfall_window 00 12" defines the time window from the
  landfall event to 12 hours after.
  
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1747,6 +1667,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 event_equal = FALSE;
 \end_layout
 
@@ -1768,10 +1690,6 @@ event_equal
 event_equal
 \emph default
 " option within the job command lines.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1787,6 +1705,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 event_equal_lead = [];
 \end_layout
 
@@ -1807,10 +1727,6 @@ event_equal_lead
 -event_equal_lead
 \emph default
 " option within the job command lines.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1826,6 +1742,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 out_init_mask = "";
 \end_layout
 
@@ -1844,10 +1762,6 @@ out_init_mask
 out_init_mask
 \emph default
 " option within the job command lines.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1863,6 +1777,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 out_valid_mask = "";
 \end_layout
 
@@ -1900,7 +1816,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-jobs[] = [ ];
+
+\series bold
+jobs = [];
 \end_layout
 
 \begin_layout Standard
@@ -1945,13 +1863,7 @@ e.g.: -job filter -amodel HWFI -dump_row ./tc_filter_job.tcst
 
 \series medium
 \emph on
--job summary -line_type TCMPR -column TK_ERR -dump_row ./tc_summary_job.tcst
-\emph default
-
-\begin_inset Newline newline
-\end_inset
-
-
+      -job summary -line_type TCMPR -column TK_ERR -dump_row ./tc_summary_job.tcst
 \end_layout
 
 \begin_layout Standard

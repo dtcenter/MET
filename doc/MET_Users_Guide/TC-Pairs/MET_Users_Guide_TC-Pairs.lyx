@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation 0bp
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -271,7 +271,7 @@ tc_pairs
  has three required arguments and can take up to three optional arguments.
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
 
 \series bold
 Required arguments for tc_pairs
@@ -486,7 +486,7 @@ share/met/config/ directory
 \begin_layout Standard
 
 \series medium
-The contents of the default tc_stat configuration file are described below.
+The contents of the tc_pairs configuration file are described below.
 \end_layout
 
 \begin_layout Standard
@@ -502,63 +502,93 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-storm_id = [ ];
+
+\series bold
+storm_id     = [];
 \end_layout
 
 \begin_layout LyX-Code
-basin = [ ];
+
+\series bold
+basin        = [];
 \end_layout
 
 \begin_layout LyX-Code
-cyclone = [ ];
+
+\series bold
+cyclone      = [];
 \end_layout
 
 \begin_layout LyX-Code
-storm_name = [ ];
+
+\series bold
+storm_name   = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_beg = " ";
+
+\series bold
+init_beg     = "";
 \end_layout
 
 \begin_layout LyX-Code
-init_eng = " ";
+
+\series bold
+init_eng     = "";
 \end_layout
 
 \begin_layout LyX-Code
-init_inc = [ ];
+
+\series bold
+init_inc     = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_exc = [ ];
+
+\series bold
+init_exc     = [];
 \end_layout
 
 \begin_layout LyX-Code
-valid_beg = " ";
+
+\series bold
+valid_beg    = "";
 \end_layout
 
 \begin_layout LyX-Code
-valid_eng = " ";
+
+\series bold
+valid_eng    = "";
 \end_layout
 
 \begin_layout LyX-Code
-init_hour = [ ];
+
+\series bold
+init_hour    = [];
 \end_layout
 
 \begin_layout LyX-Code
-init_mask = [ ];
+
+\series bold
+init_mask    = [];
 \end_layout
 
 \begin_layout LyX-Code
-valid_mask = [ ];
+
+\series bold
+valid_mask   = [];
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 match_points = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
-version = "vN.N";
+
+\series bold
+version      = "VN.N";
 \end_layout
 
 \begin_layout Standard
@@ -573,25 +603,6 @@ reference "sub:IO_MET-TC-Config-Options"
 \end_inset
 
 .
- Note that the options specified in the first section of the configuration
- file, prior to the job list, will be applied to every job specified in
- the joblist.
- However, if an individual job specifies an option listed above, it will
- be applied to that job.
- For example, if model = [
-\emph on
-"GFSI","LGEM","DSHP"
-\emph default
-] is set at the top, but the job in the joblist sets the -model option to
- 
-\emph on
-"LGEM"
-\emph default
-, that job will only run using the LGEM model data.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -607,14 +618,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-model = [ ];
-\end_layout
 
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: model = ["DSHP", "LGEM", "HWRF"];
+\series bold
+model = [ "DSHP", "LGEM", "HWRF" ];
 \end_layout
 
 \begin_layout Standard
@@ -629,10 +635,6 @@ model
  This model identifier should match the model column in the ATCF format
  input file.
  An empty list indicates that all models in the input file(s) will be processed.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -648,14 +650,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-check_dup = TRUE or FALSE;
-\end_layout
 
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: check_dup = FALSE;
+\series bold
+check_dup = FALSE;
 \end_layout
 
 \begin_layout Standard
@@ -685,10 +682,6 @@ check_dup
 check_dup
 \series medium
  to FALSE will make parsing the track quicker.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -704,14 +697,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-interp12 = NONE, FILL, or REPLACE;
-\end_layout
 
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: interp12 = NONE;
+\series bold
+interp12 = NONE;
 \end_layout
 
 \begin_layout Standard
@@ -741,10 +729,6 @@ interp12
  modified ATCF entries will appear at the end of the TC-Pairs output file).
  This functionality expects both the 12-hour and 6-hour early (interpolated)
  ATCF IDs are listed in the model field.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -760,54 +744,50 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-consensus = [ ];
+
+\series bold
+consensus = [
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-e.g.: consensus = [
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
+\series bold
    {
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-      name = "CON1";
+\series bold
+      name     = "CON1";
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-      members =       ["MOD1","MOD2","MOD3"];
+\series bold
+      members  = [ "MOD1", "MOD2", "MOD3" ];
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-      required = [ true, false, false ];
+\series bold
+      required = [   true,  false, false  ];
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-      min_req = 2;
+\series bold
+      min_req  = 2;
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
+\series bold
    }
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
+\series bold
 ];
 \end_layout
 
@@ -862,10 +842,6 @@ field is the number of members required in order for the consensus to be
  time.
  If any member of the consensus has a non-valid position or intensity value,
  the consensus for that valid time will not be generated.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -881,14 +857,25 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-lag_time = [ ];
-\end_layout
 
-\begin_layout Standard
+\series bold
+lag_time = [ 
+\begin_inset Quotes eld
+\end_inset
 
-\series medium
-\emph on
-e.g.: lag_time = ["06","12"];
+06
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+12
+\begin_inset Quotes erd
+\end_inset
+
+ ];
 \end_layout
 
 \begin_layout Standard
@@ -898,15 +885,12 @@ The
 \series bold
 lag_time
 \series medium
- field is a comma-separated list of forecast lag times to be used (HH[MMSS]).
+ field is a comma-separated list of forecast lag times to be used in HH[MMSS]
+ format.
  For each adeck track identified, a lagged track will be derived for each
  entry.
  In the tc_pairs output, the original adeck record will be retained, with
  the lagged entry listed as the adeck name with "_LAG_HH" appended.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -922,18 +906,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-best_baseline = [ ];
-\end_layout
 
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-\emph on
-e.g.: best_baseline = ["BCLP", "BCD5", "BCLA"];
+\series bold
+best_baseline = [ "BCLP", "BCD5", "BCLA" ];
 \end_layout
 
 \begin_layout Standard
@@ -993,12 +968,9 @@ BTCLIPA
  mode.
  Used for Atlantic basin only.
  Specify model as BCLA.
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
-
-\series default
-
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1012,21 +984,8 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\end_layout
-
-\begin_layout LyX-Code
-oper_baseline = [ ];
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-\emph on
-e.g.: oper_baseline = ["OCLP","OCS5","OCD5"];
+\series bold
+oper_baseline = [ "OCLP", "OCS5", "OCD5" ];
 \end_layout
 
 \begin_layout Standard
@@ -1092,10 +1051,6 @@ DeMaria and Knaff, 2001
 \emph default
 ).
  Specify model as OCD5.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1111,14 +1066,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-match_points = TRUE or FALSE;
-\end_layout
 
-\begin_layout LyX-Code
-
-\series medium
-\emph on
-e.g.: match_points = TRUE;
+\series bold
+match_points = TRUE;
 \end_layout
 
 \begin_layout Standard
@@ -1155,14 +1105,11 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-dland_file = " ";
-\end_layout
 
-\begin_layout LyX-Code
-
-\series medium
+\series bold
+dland_file = "
 \emph on
-e.g.: dland_file="MET_BASE/tc_data/dland_global_tenth_degree.nc";
+MET_BASE/tc_data/dland_global_tenth_degree.nc";
 \end_layout
 
 \begin_layout Standard
@@ -1184,10 +1131,6 @@ tc_pairs code
 share/met/tc_data
 \series medium
  directory).
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1204,37 +1147,25 @@ height "1pt"
 
 \begin_layout LyX-Code
 
-\series medium
-w
-\series default
-atch_warn = [ ];
+\series bold
+watch_warn = {
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-\emph on
-e.g.: watch_warn = {
+\series bold
+   file_name   = "MET_BASE/tc_data/wwpts_us.txt";
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-\emph on
-file_name = "MET_BASE/tc_data/wwpts_us.txt";
+\series bold
+   time_offset = -14400;
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
-\emph on
-time_offset = -14400;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series medium
-\emph on
+\series bold
 }
 \end_layout
 
@@ -1289,26 +1220,6 @@ met_help@ucar.edu
 
  to obtain the most recent watch/warning file if the static file does not
  contain storms of interest.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
 \end_layout
 
 \begin_layout Subsection
@@ -1353,10 +1264,6 @@ placement H
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard

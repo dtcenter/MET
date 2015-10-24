@@ -110,16 +110,13 @@ The purpose of this User's Guide is to provide basic information to the
 \begin_layout Standard
 
 \series medium
-The User's Guide is organized as follows.
- Chapter 1 provides an overview of MET-TC and its components, as well as
- basic information on the software build.
- Chapter 2 describes the required input, including file format and the MET-TC
- output.
- Chapters 3 through 5 describe the TC-dland tool, TC-Pairs, and TC-Stat
- tools, respectively.
- These chapters cover the input and output, and practical usage including
+The following chapters provide an overview of MET-TC and its components,
+ as well as basic information on the software build.
+ The required input, including file format and the MET-TC are discussed
+ followed by a descritpion of the TC-dland tool, TC-Pairs, and TC-Stat tools.
+ Each chapter cover the input and output, and practical usage including
  a description of the configuration files.
- Chapter 6 gives a short overview of graphical utilities available within
+ This is followed by a short overview of graphical utilities available within
  the MET-TC release.
 \end_layout
 
@@ -249,10 +246,6 @@ BASIN, CY, YYYYMMDDHH, TECHNUM/MIN, TECH, TAU, LatN/S, LonE/W, VMAX, MSLP,
  TY, RAD, WINDCODE, RAD1, RAD2, RAD3, RAD4, POUTER, ROUTER, RMW, GUSTS,
  EYE, SUBREGION, MAXSEAS, INITIALS, DIR, SPEED, STORMNAME, DEPTH, SEAS,
  SEASCODE, SEAS1, SEAS2, SEAS3, SEAS4
-\end_layout
-
-\begin_layout Standard
-.
 \end_layout
 
 \begin_layout Standard
