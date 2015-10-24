@@ -2215,8 +2215,12 @@ name "sub:MTD_The-Config-File"
 \end_layout
 
 \begin_layout Standard
-Most of the entries in the MTD configuration file should be familiar from
- the corresponding file for MODE.
+The default configuration file for the MODE tool, MODEConfig_default, can
+ be found in the installed share/met/config directory.
+ Another version of the configuration file is provided in scripts/config.
+ We encourage users to make a copy of the configuration files prior to modifying
+ their contents.Most of the entries in the MTD configuration file should
+ be familiar from the corresponding file for MODE.
  This initial beta release of MTD does not offer all the tunable options
  that MODE has accumulated over the years, however.
  In this section, we will not bother to repeat explanations of config file
@@ -2226,141 +2230,178 @@ Most of the entries in the MTD configuration file should be familiar from
 \end_layout
 
 \begin_layout Standard
-The supported entries are as follows:
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+model          = "WRF";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obtype         = "ANALYS";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
+ = 1; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+met_data_dir   = "MET_BASE";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+output_prefix  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+version        = "VN.N";
 \end_layout
 
 \begin_layout Standard
-The 
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-bf fcst}
-\end_layout
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
 
 \end_inset
 
- and 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf obs}
-\end_layout
-
-\end_inset
-
- dictionaries are conceptually the same as the corresponding entries in
- the MODE config file, with the exception that there are fewer entries in
- the dictionaries.
- The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf field}
-\end_layout
-
-\end_inset
-
- sub-dictionary enables the user to choose the name of the data field and
- the level in the input gridded files.
- As in the case of MODE, the user can simply write
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-vskip 0.1in
-\end_layout
-
-\end_inset
-
-
+.
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-hbox{
-\backslash
-tt 
-\backslash
-hskip
-\backslash
-parindent obs = fcst;}
-\backslash
-vskip 0.1in
-\end_layout
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+grid_res = 4;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+fcst = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   field = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      name = "APCP";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      level = "A03";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   conv_radius       = 60.0/grid_res; // in grid squares
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   conv_thresh       = >=5.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs = fcst;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+total_interest_thresh = 0.7;
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-
-\backslash
-noindent 
-\end_layout
+\series medium
+The configuration options listed above are common to many MODE and are described
+ in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MODE-configuration-file"
 
 \end_inset
 
-to express the fact that the parameters defining the observation field are
- identical to those of the forecast field.
- The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf conv
-\backslash
-_radius}
+.
 \end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
 
 \end_inset
 
- and 
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-{
-\backslash
-bf conv
-\backslash
-_thresh}
 \end_layout
 
-\end_inset
-
- set the convolution radius and threshold, respectively.
- The syntax for expressing these quantities is the same as for MODE.
+\begin_layout LyX-Code
+min_volume = 2000;
 \end_layout
 
 \begin_layout Standard
@@ -2478,28 +2519,492 @@ _volume}
 
  too small will typically produce a very large number of small objects,
  slowing down the MTD run and increasing the size of the output files.
+\series medium
+The configuration options listed above are common to many MODE and are described
+ in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MODE-configuration-file"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+weight = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   space_centroid_dist  = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   time_centroid_delta  = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   speed_delta          = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   direction_diff       = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   volume_ratio         = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   axis_angle_diff      = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   start_time_delta     = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   end_time_delta       = 1.0; 
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+} 
 \end_layout
 
 \begin_layout Standard
 The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf total
-\backslash
-_interest
-\backslash
-_thresh}
-\end_layout
+\series bold
+weight
+\series default
+ entries listed above control how much weight is assigned to each pairwise
+ attribute when computing a total interest value for object pairs.
+ See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_mtd-3D-Pair-Attribute"
 
 \end_inset
 
- parameter gives the total interest threshold used in matching and merging.
- Conceptually, this is identical to the corresponding quantity in MODE.
+ for a description of each weight option.
+ When the total interest value is computed, the weighted sum is normalized
+ by the sum of the weights listed above.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+interest_function = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   space_centroid_dist = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (   0.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  50.0, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( 100.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   );
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   time_centroid_delta = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( -3.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( -2.0, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( -1.0, 0.8 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  0.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  1.0, 0.8 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  2.0, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  3.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   );
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   speed_delta = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( -10.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  -5.0, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (   0.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (   5.0, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  10.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ); 
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   direction_diff = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (   0.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  90.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( 180.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   );
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   volume_ratio = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  0.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  0.5, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  1.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  1.5, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  2.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   );
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   axis_angle_diff = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  0.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( 30.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      ( 90.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   ); 
+\end_layout
+
+\begin_layout LyX-Code
+   
+\series bold
+start_time_delta = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  0.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  3.0, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  5.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   );
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   end_time_delta = (
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  0.0, 1.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  3.0, 0.5 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      (  5.0, 0.0 )
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   );
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}; 
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+interested_function
+\series default
+ entries listed above control how much weight is assigned to each pairwise
+ attribute when computing a total interest value for object pairs.
+ See Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_mtd-3D-Pair-Attribute"
+
+\end_inset
+
+ for a description of each weight option.
+ The interest functions may be defined as a piecewise linear function or
+ as an algebraic expression.
+ A piecewise linear function is defined by specifying the corner points
+ of its graph.
+ An algebraic function may be defined in terms of several built-in mathematical
+ functions.
+ See Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:MODE_A-Scientific-and-statistical"
+
+\end_inset
+
+for how interest values are used by the fuzzy logic engine.
+ By default, many of these functions are defined in terms of the previously
+ defined 
+\series bold
+grid_res
+\series default
+ entry.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+nc_output = {
+\end_layout
+
+\begin_layout LyX-Code
+   latlon = true;
+\end_layout
+
+\begin_layout LyX-Code
+   raw = true;
+\end_layout
+
+\begin_layout LyX-Code
+   object_id = true;
+\end_layout
+
+\begin_layout LyX-Code
+   cluster_id = true;
+\end_layout
+
+\begin_layout LyX-Code
+}; 
 \end_layout
 
 \begin_layout Standard
@@ -2584,6 +3089,35 @@ _id}
  flags control the output of the object numbers and cluster numbers for
  the objects.
  This is similar to MODE.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+txt_output = {
+\end_layout
+
+\begin_layout LyX-Code
+   attributes_2d   = true;
+\end_layout
+
+\begin_layout LyX-Code
+   attributes_3d   = true;
+\end_layout
+
+\begin_layout LyX-Code
+}; 
 \end_layout
 
 \begin_layout Standard
@@ -2636,33 +3170,6 @@ _3d}
 \end_inset
 
  flag controls the output of single and pair 3D spacetime object attributes.
-\end_layout
-
-\begin_layout Standard
-The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf output
-\backslash
-_prefix}
-\end_layout
-
-\end_inset
-
- entry allows the user to customize the names of the output files for each
- run, if needed.
-\end_layout
-
-\begin_layout Standard
-Finally, the user can set weights and interest maps for the 3D attributes
- used in matching and merging spacetime objects.
- The syntax is identical to that in the MODE configuration file, although
- of course the collection of attributes is different.
 \end_layout
 
 \begin_layout Subsection
