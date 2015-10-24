@@ -2239,7 +2239,11 @@ The parameters that are set in the configuration file either add to or override
 \end_layout
 
 \begin_layout Subsection
-MODE-Analysis tool output
+
+\series bold
+mode_analysis
+\series default
+ output
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:mode-Analysis-tool-output"
