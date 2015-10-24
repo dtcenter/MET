@@ -711,7 +711,7 @@ d that users make a copy of these files prior to modifying their contents.
 \begin_layout Standard
 
 \series medium
-The contents of the default pb2nc configuration file are described below.
+The contents of the default tc_stat configuration file are described below.
 \end_layout
 
 \begin_layout Standard
@@ -2129,6 +2129,8 @@ name "table_columnar_output_summary_tc_stat"
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Column number
 \end_layout
 
@@ -2138,6 +2140,8 @@ Column number
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 Description
 \end_layout
 
