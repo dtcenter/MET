@@ -624,7 +624,7 @@ Optional arguments for plot_data_plane
 \begin_inset Newline newline
 \end_inset
 
- ("$(MET_BASE)/colortables/met_default.ctable")
+ ("MET_BASE/colortables/met_default.ctable")
 \end_layout
 
 \begin_layout Description
@@ -688,10 +688,6 @@ An example of the plot_data_plane calling sequence is shown below:
 
 \begin_layout LyX-Code
 plot_data_plane test.grb test.ps 'name="TMP"; level="Z2";'
-\end_layout
-
-\begin_layout LyX-Code
-
 \end_layout
 
 \begin_layout Standard
@@ -930,7 +926,7 @@ arguments for plot_mode_field
 -v level
 \series medium
  option indicates the desired level of verbosity.
- The value of "level" will override the default .
+ The value of "level" will override the default.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity will increase the amount of logging.
 \end_layout
