@@ -1908,18 +1908,21 @@ hskip 0.5in    [ -v      level ] }
 \end_layout
 
 \begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
+The MODE-TD tool has three required arguments and can accept several optional
+ arguments.
 \end_layout
 
-\end_inset
+\begin_layout Standard
 
+\series bold
+Required arguments for mtd
+\end_layout
+
+\begin_layout Standard
+
+1.
+ 
+\lang english
 
 \begin_inset ERT
 status open
@@ -1938,35 +1941,11 @@ _list}
  gives a list of forecast 2D data files to be processed by MTD.
  The files should have equally-spaced intervals of valid time.
  
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf Required}
-\end_layout
-
-\end_inset
-
-.
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+2.
+ 
 \begin_inset ERT
 status open
 
@@ -1988,35 +1967,11 @@ cb -fcst} option, the files should have equally-spaced intervals of valid
  time.
  This valid time spacing should be the same as for the forecast files.
  
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf Required}
-\end_layout
-
-\end_inset
-
-.
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+3.
+ 
 \begin_inset ERT
 status open
 
@@ -2040,35 +1995,17 @@ r run of MTD.
  Options set in this file will override any corresponding options set in
  the default configuration file.
  
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf Required}
-\end_layout
-
-\end_inset
-
-.
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+Optional arguments for mtd
+\end_layout
+
+\begin_layout Standard
+4.
+ 
 \begin_inset ERT
 status open
 
@@ -2085,35 +2022,11 @@ tt -log file}
  All output that appears on the screen during a MTD run will be duplicated
  in the log file.
  
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf Optional}
-\end_layout
-
-\end_inset
-
-.
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+5.
+ 
 \begin_inset ERT
 status open
 
@@ -2144,35 +2057,11 @@ tt -log}
  Increasing this value causes more diagnostic output to be written to the
  screen (and also to the log file, if one has been specified).
  
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf Optional}
-\end_layout
-
-\end_inset
-
-.
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-vskip 0.1in}
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+6.
+ 
 \begin_inset ERT
 status open
 
@@ -2187,20 +2076,6 @@ tt -outdir path}
 
  gives the name of the directory into which MTD will write its output files.
  If not specified, then MTD will write its output into the current directory.
- 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-bf Optional}
-\end_layout
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Subsection
