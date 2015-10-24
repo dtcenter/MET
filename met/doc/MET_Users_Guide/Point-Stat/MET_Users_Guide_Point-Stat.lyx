@@ -2253,11 +2253,7 @@ If all line types corresponding to a particular verificaiton method are
 \end_layout
 
 \begin_layout Subsection
-
-\emph on
-point_stat
-\emph default
- output
+point_stat output
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:point_stat-output"

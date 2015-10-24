@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip bigskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -239,10 +239,21 @@ In this users' guide, we will assume that the reader has a basic familiarity
 \end_layout
 
 \begin_layout Section
+Scientific and statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:MTD_Scientific-and-statistical"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Attributes
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:MTD_Attributes"
+name "sub:_MTD_Attributes"
 
 \end_inset
 
@@ -1742,7 +1753,7 @@ name "MTD_2d_example"
 \end_layout
 
 \begin_layout Section
-Using MTD
+Practical information
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Using-MTD"
@@ -1753,7 +1764,7 @@ name "sec:Using-MTD"
 \end_layout
 
 \begin_layout Subsection
-Data Files
+mtd input
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MTD_Data-Files"
@@ -1784,10 +1795,10 @@ As shown in the next section, filenames for each time used must be given.
 \end_layout
 
 \begin_layout Subsection
-The Command Line
+mtd usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_The-Command-Line"
+name "sub:MTD_usage"
 
 \end_inset
 
@@ -1795,7 +1806,10 @@ name "sub:MTD_The-Command-Line"
 \end_layout
 
 \begin_layout Standard
-The MTD usage statement is shown below.
+
+\series medium
+The usage statement for the MODE-TD tool is listed below:
+\series default
  The command-line switches may be given in any order.
 \end_layout
 
@@ -2190,7 +2204,7 @@ bf Optional}
 \end_layout
 
 \begin_layout Subsection
-The Config File
+mtd configuration file
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MTD_The-Config-File"
@@ -2652,7 +2666,7 @@ Finally, the user can set weights and interest maps for the 3D attributes
 \end_layout
 
 \begin_layout Subsection
-Output Files
+mtd output
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MTD_Output-Files"
@@ -2663,26 +2677,49 @@ name "sub:MTD_Output-Files"
 \end_layout
 
 \begin_layout Standard
-MTD creates several output files after each run.
+MTD creates several output files after each run in ASCII and NetCDF formats.
  There are text files giving 2D and 3D attributes of spacetime objects and
  information on matches and merges, as well as a NetCDF file giving the
  objects themselves, in case any further or specialized analysis of the
  objects needs to be done.
 \end_layout
 
-\begin_layout Subsection
-ASCII Attribute Files 
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:MTD_ASCII-Attribute-Files"
+\begin_layout Standard
+MODE, along with several other of the MET tools (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt wavelet
+\backslash
+_stat}
+\end_layout
 
 \end_inset
 
-
+ for example, and a few others), provides PostScript-based graphics output
+ to help visualize the output.
+ Unfortunately, no similar graphics capabilities are provided with MTD,
+ mainly because of the complexity of producing 3D plots.
+ This should not discourage the user from making their own plots, however.
+ There is enough information in the various output files created by MTD
+ to make a wide variety of plots.
+ Highly motivated users who write their own plotting scripts are encouraged
+ to submit them to the user-contributed code area of the MET website.
+ Due credit will be given, and others will benefit from their creations.
 \end_layout
 
 \begin_layout Standard
-In all, five ASCII output files are created:
+
+\series bold
+ASCII output
+\end_layout
+
+\begin_layout Standard
+Five ASCII output files are created:
 \end_layout
 
 \begin_layout Itemize
@@ -2715,11 +2752,38 @@ Each ASCII file is laid out in tabular format, with the first line consisting
 \end_layout
 
 \begin_layout Standard
-These columns are explained in Table 1.1.
+These columns are explained in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_mtd-header-columns"
+
+\end_inset
+
+.
  Each file contains additional columns that come after these.
- Columns for 3D single and pair attributes are shown in Tables 1.3 and 1.3
+ Columns for 2D constant-time attributes are shown in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_mtd-2D-Attributes"
+
+\end_inset
+
+.
+ Columns for 3D single and pair attributes are shown in Tables 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_mtd-3D-single-attributes"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_mtd-3D-Pair-Attribute"
+
+\end_inset
+
  respectively.
- Columns for 2D constant-time attributes are shown in Table 1.2.
 \end_layout
 
 \begin_layout Standard
@@ -2774,6 +2838,13 @@ Text Header Columns
 \end_inset
 
 
+\begin_inset CommandInset label
+LatexCommand label
+name "table_mtd-header-columns"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -2789,7 +2860,9 @@ Text Header Columns
 \begin_inset Text
 
 \begin_layout Plain Layout
-Text Output File Header Columns
+
+\series bold
+HEADER
 \end_layout
 
 \end_inset
@@ -2819,6 +2892,7 @@ Text Output File Header Columns
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Column
 \end_layout
@@ -2830,6 +2904,7 @@ Column
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Name
 \end_layout
@@ -2841,6 +2916,7 @@ Name
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Description
 \end_layout
@@ -3302,15 +3378,18 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 2D Attribute
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_mtd-2D-Attributes"
 
 \end_inset
 
@@ -3330,6 +3409,8 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 2D Attribute Columns
 \end_layout
 
@@ -3360,6 +3441,7 @@ status open
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Column
 \end_layout
@@ -3371,6 +3453,7 @@ Column
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Name
 \end_layout
@@ -3382,6 +3465,7 @@ Name
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Description
 \end_layout
@@ -3677,15 +3761,18 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 3D Single Attribute
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_mtd-3D-single-attributes"
 
 \end_inset
 
@@ -3705,6 +3792,8 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 3D Single Attribute Columns
 \end_layout
 
@@ -3735,6 +3824,7 @@ status open
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Column
 \end_layout
@@ -3746,6 +3836,7 @@ Column
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Name
 \end_layout
@@ -3757,6 +3848,7 @@ Name
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Description
 \end_layout
@@ -4393,15 +4485,18 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
 3D Pair Attribute
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_mtd-3D-Pair-Attribute"
 
 \end_inset
 
@@ -4421,6 +4516,8 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
+
+\series bold
 3D Pair Attribute Columns
 \end_layout
 
@@ -4451,6 +4548,7 @@ status open
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Column
 \end_layout
@@ -4462,6 +4560,7 @@ Column
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Name
 \end_layout
@@ -4473,6 +4572,7 @@ Name
 
 \begin_layout Plain Layout
 
+\series bold
 \emph on
 Description
 \end_layout
@@ -4873,7 +4973,9 @@ Total interest for this object pair
 
 \end_layout
 
-\begin_layout Section
+\begin_layout Standard
+
+\series bold
 NetCDF File
 \end_layout
 
@@ -4965,50 +5067,6 @@ bf Cluster ID}
 
  numbers.
  As above, only for cluster objects rather than simple objects.
-\end_layout
-
-\begin_layout Section
-Making Plots
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:MTD_Making-Plots"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-MODE, along with several other of the MET tools (
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt wavelet
-\backslash
-_stat}
-\end_layout
-
-\end_inset
-
- for example, and a few others), provides PostScript-based graphics output
- to help visualize the output.
- Unfortunately, no similar graphics capabilities are provided with MTD,
- mainly because of the complexity of producing 3D plots.
- The MET group is really not in the business of producing scientific visualizati
-on software.
-\end_layout
-
-\begin_layout Standard
-This should not discourage the user from making her own plots, however.
- There is enough information in the various output files created by MTD
- to make a wide variety of plots.
- Highly motivated users who write their own plotting scripts are encouraged
- to submit them to the user-contributed code area of the MET website.
- Due credit will be given, and others will benefit from their creations.
 \end_layout
 
 \end_body

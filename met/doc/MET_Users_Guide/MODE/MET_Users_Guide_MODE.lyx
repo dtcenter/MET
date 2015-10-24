@@ -1105,7 +1105,7 @@ MODE provides the capability to select a single model variable/level from
 \end_layout
 
 \begin_layout Subsection
-MODE usage
+mode usage
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MODE-usage"
@@ -1413,7 +1413,7 @@ d precipitation, the MODEConfig_nc file should specify that accumulated
 \end_layout
 
 \begin_layout Subsection
-MODE configuration file
+mode configuration file
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MODE-configuration-file"
@@ -2732,9 +2732,7 @@ object_plot = {
 \begin_layout LyX-Code
 
 \series bold
-   
-\lang english
-color_table = "MET_BASE/colortables/mode_obj.ctable";
+   color_table = "MET_BASE/colortables/mode_obj.ctable";
 \end_layout
 
 \begin_layout LyX-Code
@@ -2975,9 +2973,7 @@ nc_pairs_flag = {
 \begin_layout LyX-Code
 
 \series bold
-   
-\lang english
-polylines  = TRUE;
+   polylines  = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -3031,7 +3027,7 @@ When MODE is run on global grids, this parameter specifies how many grid
 \end_layout
 
 \begin_layout Subsection
-MODE output
+mode output
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MODE-output"
@@ -3043,6 +3039,10 @@ name "sub:MODE-output"
 
 \begin_layout Standard
 MODE produces output in ASCII, NetCDF, and PostScript formats.
+\end_layout
+
+\begin_layout Paragraph
+ASCII output
 \end_layout
 
 \begin_layout Standard
@@ -6310,6 +6310,10 @@ Total interest value computed for a pair of simple objects (unitless)
 
 \end_layout
 
+\begin_layout Paragraph
+NetCDF Output
+\end_layout
+
 \begin_layout Standard
 The MODE tool creates a NetCDF output file containing the object fields
  that are defined.
@@ -8873,6 +8877,14 @@ Observation Cluster Convex Hull Point Y-Coordinate
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Paragraph
+Postscript File
+\end_layout
+
+\begin_layout Standard
 Lastly, the MODE tool creates a PostScript plot summarizing the features-based
  approach used in the verification.
  The PostScript plot is generated using internal libraries and does not
