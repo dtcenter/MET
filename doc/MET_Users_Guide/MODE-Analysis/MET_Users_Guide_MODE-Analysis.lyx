@@ -98,30 +98,14 @@ name "sec:MODE-A_Introduction-1"
 \begin_layout Standard
 
 \series medium
-Many users may wish to summarize the many individual ASCII files produced
- by MODE.
- These MODE output files can be quite large; currently, these files contain
- 51 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-
-\series medium
-Randy: this number is correct as of version 5.1
-\end_layout
-
-\end_inset
-
-columns.
- This means that it is very difficult --- effectively impossible --- to
- interpret the results by simply browsing the files.
+Users may wish to summarize multiple ASCII files produced by MODE across
+ many cases.
+ The MODE output files contain many output columns making it very difficult
+ to interpret the results by simply browsing the files.
  Furthermore, for particular applications some data fields in the MODE output
  files may not be of interest.
- Because of these and similar considerations, the MET development team believed
- a tool providing basic summary statistics and filtering capabilities for
- these files would be helpful for many users.
- The MODE analysis tool provides these capabilities.
+ The MODE-Analysis tool provide a simple way to compute basic summary statistics
+ and filtering capabilities for these files.
  Users who are not proficient at writing scripts can use the tool directly,
  and even those using their own scripts can use this tool as a filter, to
  extract only the MODE output lines that are relevant for their application.
@@ -142,15 +126,15 @@ name "sec:MODE_A-Scientific-and-statistical"
 
 \series medium
 The MODE-Analysis tool operates in two modes, called ``summary'' and ``by
- case.'' In summary mode, the user provides (on the command line or via a
- configuration file) information regarding which fields (columns) are of
- interest, as well as matching criteria that determine which lines in each
- file are used and which are ignored.
+ case.'' In summary mode, the user specifies on the command linethe MODE
+ output columns of interest as well as filtering criteria that determine
+ which input lines should be used.
  For example, a user may be interested in forecast object areas, but only
  if the object was matched, and only if the object centroid is inside a
  particular region.
- The summary statistics generated (for each field) are the minimum, maximum,
- mean, standard deviation, and the 10th, 25th, 50th, 75th and 90th percentiles.
+ The summary statistics generated for each specified column of data are
+ the minimum, maximum, mean, standard deviation, and the 10th, 25th, 50th,
+ 75th and 90th percentiles.
  In addition, the user may specify a ``dump'' file: the individual MODE
  lines used to produce the statistics will be written to this file.
  This option provides the user with a filtering capability.
@@ -379,18 +363,10 @@ hskip 0.5in}
 [-config config_file] | [MODE LINE OPTIONS] 
 \end_layout
 
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
 \begin_layout Standard
-Required arguments for 
-\family typewriter
-mode_analysis:
+
+\series bold
+Required arguments for mode_analysis:
 \end_layout
 
 \begin_layout Standard
@@ -417,10 +393,14 @@ The MODE-Analysis tool can perform two basic types of jobs, which are identified
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -summary
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -bycase
 \end_layout
 
@@ -504,10 +484,6 @@ Analysis options
 The general analysis options described below provide a way for the user
  to indicate configuration files to be used, where to write lines used to
  perform the analysis, and over which fields to generate statistics.
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -523,6 +499,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -config filename
 \end_layout
 
@@ -537,11 +515,7 @@ reference "sub:mode_analysis-configuration-file"
 
 \end_inset
 
-
-\begin_inset Newline newline
-\end_inset
-
-
+.
 \end_layout
 
 \begin_layout Standard
@@ -557,6 +531,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -dump_row filename
 \end_layout
 
@@ -570,10 +546,6 @@ Any MODE lines kept from the input files are written to
 filename
 \family default
 .
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -589,6 +561,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -column column
 \end_layout
 
@@ -600,22 +574,6 @@ Specifies which columns in the MODE output files to generate statistics
  Fields may be indicated by name (case insensitive) or column number (beginning
  at one).
  This option can be repeated to specify multiple columns.
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-goodbreak
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -633,14 +591,14 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
-MODE line options
+MODE Command Line Options
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-MODE line options are used to create filters that determine which of the
- MODE output lines that are read in, are kept.
+MODE comand line options are used to create filters that determine which
+ of the MODE output lines that are read in, are kept.
  The MODE line options are numerous.
  They fall into seven categories: toggles, multiple set string options,
  multiple set integer options, integer max/min options, date/time max/min
@@ -687,7 +645,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
--fcst / -obs
+
+\series bold
+-fcst | -obs
 \end_layout
 
 \begin_layout Standard
@@ -695,12 +655,6 @@ height "1pt"
 \series medium
 This toggle indicates whether forecast or observed lines should be used
  for analysis.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -716,7 +670,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
--single / -pair
+
+\series bold
+-single | -pair
 \end_layout
 
 \begin_layout Standard
@@ -724,12 +680,6 @@ height "1pt"
 \series medium
 This toggle indicates whether single object or object pair lines should
  be used.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -745,7 +695,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
--simple / -cluster
+
+\series bold
+-simple | -cluster
 \end_layout
 
 \begin_layout Standard
@@ -753,12 +705,6 @@ height "1pt"
 \series medium
 This toggle indicates whether simple object or cluster object lines should
  be used.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -774,7 +720,9 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
--matched / -unmatched
+
+\series bold
+-matched | -unmatched
 \end_layout
 
 \begin_layout Standard
@@ -782,12 +730,6 @@ height "1pt"
 \series medium
 This toggle indicates whether matched or unmatched object lines should be
  used.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -819,12 +761,6 @@ The following options set various string attributes.
  Each of these options must be indicated as a string.
  String values that include spaces may be used by enclosing the string in
  quotation marks.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -840,6 +776,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -model value
 \end_layout
 
@@ -851,12 +789,6 @@ This option specifies which model to use;
 value
 \series medium
  must be a string.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -872,11 +804,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -fcst_thr value
 \end_layout
 
 \begin_layout LyX-Code
--obs_thr value
+
+\series bold
+-obs_thr  value
 \end_layout
 
 \begin_layout Standard
@@ -906,11 +842,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -fcst_var value
 \end_layout
 
 \begin_layout LyX-Code
--obs_var value
+
+\series bold
+-obs_var  value
 \end_layout
 
 \begin_layout Standard
@@ -918,12 +858,6 @@ height "1pt"
 \series medium
 These options indicate the names of variables to be used in the analysis
  for forecast and observed fields.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -939,11 +873,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -fcst_lev value
 \end_layout
 
 \begin_layout LyX-Code
--obs_lev value
+
+\series bold
+-obs_lev  value
 \end_layout
 
 \begin_layout Standard
@@ -951,12 +889,6 @@ height "1pt"
 \series medium
 These options indicate vertical levels for forecast and observed fields
  to be used in the analysis.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -986,12 +918,6 @@ The following options set various integer attributes.
  They can be set multiple times on the command line but must be separated
  by spaces.
  Each of the following options may only be indicated as an integer.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1007,11 +933,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -fcst_lead value
 \end_layout
 
 \begin_layout LyX-Code
--obs_lead value
+
+\series bold
+-obs_lead  value
 \end_layout
 
 \begin_layout Standard
@@ -1019,12 +949,6 @@ height "1pt"
 \series medium
 These options are integers of the form HH[MMSS] specifying an (hour-minute-secon
 d) lead time.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1040,11 +964,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -fcst_init value
 \end_layout
 
 \begin_layout LyX-Code
--obs_init value
+
+\series bold
+-obs_init  value
 \end_layout
 
 \begin_layout Standard
@@ -1052,12 +980,6 @@ height "1pt"
 \series medium
 These options are integers of the form HH[MMSS] specifying an (hour-minute-secon
 d) model initialization time of day.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1073,11 +995,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -fcst_accum value
 \end_layout
 
 \begin_layout LyX-Code
--obs_accum value
+
+\series bold
+-obs_accum  value
 \end_layout
 
 \begin_layout Standard
@@ -1085,12 +1011,6 @@ height "1pt"
 \series medium
 These options are integers of the form HHMMSS specifying an (hour-minute-second)
  accumulation time.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1106,11 +1026,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -fcst_rad value
 \end_layout
 
 \begin_layout LyX-Code
--obs_rad value
+
+\series bold
+-obs_rad  value
 \end_layout
 
 \begin_layout Standard
@@ -1118,12 +1042,6 @@ height "1pt"
 \series medium
 These options indicate the convolution radius used for forecast or observed
  objects, respectively.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1152,12 +1070,6 @@ These options set limits on various integer attributes.
  of the attribute.
  The option works similarly for minimum values.
  
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1173,10 +1085,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -area_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -area_max value
 \end_layout
 
@@ -1185,12 +1101,6 @@ height "1pt"
 \series medium
 These options are used to indicate minimum/maximum values for the area attribute
  to be used in the analysis.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1206,10 +1116,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -area_filter_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -area_filter_max value
 \end_layout
 
@@ -1220,12 +1134,6 @@ These options are used to indicate minimum/maximum values accepted for the
  area filter.
  The area filter refers to the number of non-zero values of the raw data
  found within the object.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1241,10 +1149,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -area_thresh_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -area_thresh_max value
 \end_layout
 
@@ -1255,12 +1167,6 @@ These options are used to indicate minimum/maximum values accepted for the
  area thresh.
  The area thresh refers to the number of values of the raw data found within
  the object that meet the object definition threshold criteria used.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1276,10 +1182,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -intersection_area_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -intersection_area_max value
 \end_layout
 
@@ -1288,12 +1198,6 @@ height "1pt"
 \series medium
 These options refer to the minimum/maximum values accepted for the intersection
  area attribute.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1309,10 +1213,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -union_area_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -union_area_max value
 \end_layout
 
@@ -1321,12 +1229,6 @@ height "1pt"
 \series medium
 These options refer to the minimum/maximum union area values accepted for
  analysis.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1342,10 +1244,14 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -symmetric_diff_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -symmetric_diff_max value
 \end_layout
 
@@ -1354,12 +1260,6 @@ height "1pt"
 \series medium
 These options refer to the minimum/maximum values for symmetric difference
  for objects to be used in the analysis.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1408,12 +1308,6 @@ Second, they may be indicated by a string of the form YYYYMMDD_HH.
 The third way of indicating date/time attributes is by a string of the form
  YYYYMMDD.
  Here, hours, minutes and seconds are assumed to be zero.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1429,23 +1323,21 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
--fcst_valid_min yyyymmdd[_hh[mmss]]
+
+\series bold
+-fcst_valid_min YYYYMMDD[_HH[MMSS]]
 \end_layout
 
 \begin_layout LyX-Code
--fcst_valid_max yyyymmdd[_hh[mmss]]
+
+\series bold
+-fcst_valid_max YYYYMMDD[_HH[MMSS]]
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 These options indicate minimum/maximum values for the forecast valid time.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1461,11 +1353,15 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
--obs_valid_min yyyymmdd[_hh[mmss]]
+
+\series bold
+-obs_valid_min YYYYMMDD[_HH[MMSS]]
 \end_layout
 
 \begin_layout LyX-Code
--obs_valid_max yyyymmdd[_hh[mmss]]
+
+\series bold
+-obs_valid_max YYYYMMDD[_HH[MMSS]]
 \end_layout
 
 \begin_layout Standard
@@ -1503,17 +1399,11 @@ Setting limits on various floating-point attributes.
  Please refer to Chapter 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "chap:The-Series-Analysis"
+reference "sub:MODE-output"
 
 \end_inset
 
  for a description of these attributes as needed.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -1529,18 +1419,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -centroid_x_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -centroid_x_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1553,18 +1445,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -centroid_y_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -centroid_y_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1579,20 +1473,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-centroid_lat_min value
+-centroid_lat_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -centroid_lat_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1605,18 +1497,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -centroid_lon_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -centroid_lon_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1629,18 +1523,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -axis_ang_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -axis_ang_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1653,18 +1549,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -length_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -length_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1677,18 +1575,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -width_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -width_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1701,18 +1601,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -curvature_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -curvature_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1725,18 +1627,20 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -curvature_x_min value
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -curvature_x_max value
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1751,30 +1655,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-curvature_y_min
-\series bold
- value
+-curvature_y_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-curvature_y_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-curvature_y_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1789,30 +1681,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-complexity_min
-\series bold
- value
+-complexity_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-complexity_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-complexity_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1827,30 +1707,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_10_min
-\series bold
- value
+-intensity_10_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_10_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intensity_10_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1865,30 +1733,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_25_min
-\series bold
- value
+-intensity_25_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_25_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intensity_25_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1903,30 +1759,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_50_min
-\series bold
- value
+-intensity_50_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_50_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intensity_50_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1941,30 +1785,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_75_min
-\series bold
- value
+-intensity_75_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_75_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intensity_75_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -1979,30 +1811,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_90_min
-\series bold
- value
+-intensity_90_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_90_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intensity_90_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2017,30 +1837,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_user_min
-\series bold
- value
+-intensity_user_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_user_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intensity_user_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2055,30 +1863,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_sum_min
-\series bold
- value
+-intensity_sum_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intensity_sum_max 
-\series bold
-value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intensity_sum_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2093,30 +1889,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-centroid_dist_min
-\series bold
- value
+-centroid_dist_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-centroid_dist_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-centroid_dist_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2131,30 +1915,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-boundary_dist_min
-\series bold
- value
+-boundary_dist_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-boundary_dist_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-boundary_dist_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2169,30 +1941,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-convex_hull_dist_min
-\series bold
- value
+-convex_hull_dist_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-convex_hull_dist_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-convex_hull_dist_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2207,30 +1967,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-angle_diff_min
-\series bold
- value
+-angle_diff_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-angle_diff_max 
-\series bold
-value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-angle_diff_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2245,30 +1993,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-area_ratio_min
-\series bold
- value
+-area_ratio_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-area_ratio_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-area_ratio_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2283,30 +2019,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intersection_over_area_min
-\series bold
- value
+-intersection_over_area_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-intersection_over_area_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-intersection_over_area_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2321,30 +2045,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-complexity_ratio_min 
-\series bold
-value
+-complexity_ratio_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-complexity_ratio_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-complexity_ratio_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2359,30 +2071,18 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-percentile_intensity_ratio_min
-\series bold
- value
+-percentile_intensity_ratio_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-percentile_intensity_ratio_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-percentile_intensity_ratio_max value
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -2397,27 +2097,13 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-interest_min
-\series bold
- value
+-interest_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--
-\series default
-interest_max
-\series bold
- value
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
+-interest_max value
 \end_layout
 
 \begin_layout Standard
@@ -2443,12 +2129,6 @@ Miscellaneous options
 \series medium
 These options are used to indicate parameters that did not fall into any
  of the previous categories.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -2464,6 +2144,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -mask_poly filename
 \end_layout
 
@@ -2473,12 +2155,6 @@ height "1pt"
 This option indicates the name of a polygon mask file to be used for filtering.
  The format for these files is the same as that of the polyline files for
  the other MET tools.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -2494,6 +2170,8 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 -help
 \end_layout
 
@@ -2501,12 +2179,6 @@ height "1pt"
 
 \series medium
 This option prints the usage message.
-\series default
-
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -2539,21 +2211,19 @@ name "sub:mode_analysis-configuration-file"
 \begin_layout Standard
 
 \series medium
-To use the MODE analysis tool, the user must un-comment the options in the
+To use the MODE-Analysis tool, the user must un-comment the options in the
  configuration file to apply them and comment out unwanted options.
  The options in the configuration file for 
-\family typewriter
 \series default
-mode_analysis
-\family default
- are the same as the MODE line options described in Section
+the MODE-Analysis tools are the same as the MODE command line options described
+ in Section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Wavelet_stat-usage"
+reference "sub:mode_analysis-usage"
 
 \end_inset
 
- .
+.
 \end_layout
 
 \begin_layout Standard
@@ -2582,20 +2252,22 @@ name "sub:mode-Analysis-tool-output"
 \begin_layout Standard
 
 \series medium
-The output of the MODE Analysis tool is a self-describing tabular format
+The output of the MODE-Analysis tool is a self-describing tabular format
  written to standard output.
  The length and contents of the table vary depending on whether 
-\family typewriter
-\series default
+\series bold
 -summary
-\family default
+\series medium
  or 
-\family typewriter
+\series bold
 -bycase
-\family default
+\series default
  is selected.
- The contents also change for -summary depending on the fields selected
- by the user for output.
+ The contents also change for
+\series bold
+ -summary
+\series default
+ depending on the number of columns specified by the user.
 \end_layout
 
 \end_body
