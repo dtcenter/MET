@@ -139,7 +139,14 @@ name "sec:TC-components"
 \series medium
 The MET-TC software is included as a module within the full Model Evaluation
  Tools (MET) v5.1.
- Figure 1.1 shows the basic stages of the MET-TC module.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Fig_MET-TC_Overview-Flowchart"
+
+\end_inset
+
+ shows the basic stages of the MET-TC module.
  The required input and output, as well as each separate tool are described
  in more detail in later chapters.
 \end_layout
@@ -169,6 +176,13 @@ Basic representation of the structure of the MET-TC module.
  Dark blue areas represent each executable and light blue areas represent
  required input and output to MET-TC.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig_MET-TC_Overview-Flowchart"
 
 \end_inset
 

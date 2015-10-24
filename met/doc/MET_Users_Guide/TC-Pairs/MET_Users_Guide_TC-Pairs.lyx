@@ -59,7 +59,7 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\paragraph_indentation default
+\paragraph_indentation 0bp
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -114,14 +114,7 @@ reference "sec:TC-Pairs_Practical-information"
 \end_inset
 
 .
- Testing across chapters Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Statistical-aspects"
-
-\end_inset
-
-
+ 
 \end_layout
 
 \begin_layout Section
@@ -491,6 +484,117 @@ share/met/config/ directory
 \end_layout
 
 \begin_layout Standard
+
+\series medium
+The contents of the default tc_stat configuration file are described below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+storm_id = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+basin = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+cyclone = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+storm_name = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+init_beg = " ";
+\end_layout
+
+\begin_layout LyX-Code
+init_eng = " ";
+\end_layout
+
+\begin_layout LyX-Code
+init_inc = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+init_exc = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+valid_beg = " ";
+\end_layout
+
+\begin_layout LyX-Code
+valid_eng = " ";
+\end_layout
+
+\begin_layout LyX-Code
+init_hour = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+init_mask = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+valid_mask = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+match_points = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+version = "vN.N";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The configuration options listed above are common to many MET tools and
+ are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_MET-TC-Config-Options"
+
+\end_inset
+
+.
+ Note that the options specified in the first section of the configuration
+ file, prior to the job list, will be applied to every job specified in
+ the joblist.
+ However, if an individual job specifies an option listed above, it will
+ be applied to that job.
+ For example, if model = [
+\emph on
+"GFSI","LGEM","DSHP"
+\emph default
+] is set at the top, but the job in the joblist sets the -model option to
+ 
+\emph on
+"LGEM"
+\emph default
+, that job will only run using the LGEM model data.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset line
 LatexCommand rule
 offset "0.5ex"
@@ -525,460 +629,6 @@ model
  This model identifier should match the model column in the ATCF format
  input file.
  An empty list indicates that all models in the input file(s) will be processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-storm_id = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: storm_id=["AL092010"];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-storm_id
-\series medium
- variable contains the specific storm identifier (or comma separated list
- of storm IDs) to be processed, represented by BBNNYYYY, where B is the
- two-letter basin, N is the two digit cyclone number, and Y is the four
- digit year.
- An empty list indicates all storms in the input file(s) will be processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-basin = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: basin = ["AL", "EP"];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-basin
-\series medium
- variable contains a comma-separated list of basins to be processed.
- The basin name is expected to be the two-letter identifier for the storm
- basin (eg: AL = Atlantic basin, EP = eastern North Pacific basin).
- Valid basins include: WP, IO, CP, EP, AL, SH.
- An empty list indicates all basins in the input file(s) will be processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-cyclone = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: cyclone = ["01",
-\emph default
- 
-\emph on
-"02"];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-cyclone
-\series medium
- variable contains the cyclone number (or a comma separated list of cyclone
- numbers) to be processed.
- Valid cyclone numbers are 01-99.
- An empty list indicates all storm names in the input file(s) will be processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-storm_name = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: storm_name = ["IRENE","EARL"];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-storm_name
-\series medium
- variable contains the specific named storm (or a comma separated list of
- storm names) to be processed.
- If the input file(s) span multiple years, which contain repeated storm
- names, use of the storm id field is recommend.
- An empty list indicates all storm names in the input file(s) will be processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-init_beg = " ";
-\end_layout
-
-\begin_layout LyX-Code
-init_end = " ";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: init_beg="20100701";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-init_end="20101031";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-init_beg
-\series medium
- and 
-\series bold
-init_end
-\series medium
- fields specify a model initialization time window (YYYYMMDD_[HH[MMSS]]).
- Tracks whose initial time meets the specified criteria will be used.
- An empty string indicates all initialization times in the input file(s)
- will be processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-init_inc = [ ];
-\end_layout
-
-\begin_layout LyX-Code
-init_exc = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: init_inc = ["20101031_06"];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-init_exc = ["20101031_12"];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-init_inc
-\series medium
- and 
-\series bold
-init_exc
-\series medium
- are comma separated lists of specific initialization times (YYYYMMDD_[HH[MMSS]]
-) to include (inc) or exclude (exc).
- Tracks whose initial time meets the specified criteria will be used.
- A blank field will result in all initialization times in the input file(s)
- being processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-valid_beg = " ";
-\end_layout
-
-\begin_layout LyX-Code
-valid_end = " ";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: valid_beg = "20100701_00"
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-valid_end = "20101031_18"
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-valid_beg
-\series medium
- and
-\series default
- 
-\series bold
-valid_end
-\series medium
- fields specify a valid time window (YYYYMMDD_[HH[MMSS]]).
- Tracks for which all valid times fall within the time window will be used.
- An empty string indicates all valid times in the input file(s) will be
- processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-init_hour = [ ];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: init_hour = ["00", "06", "12", "18"];
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The
-\series bold
- init_hour
-\series medium
- field specifies a comma-separated list of model initialization hours to
- be used (HH[MMSS]).
- An empty list indicates all initialization hours in the input file(s) will
- be processed.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-init_mask = " ";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: init_mask = "MET_BASE/poly/EP.poly";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-init_mask
-\series medium
- field specifies a lat/lon polyline defining a masking region to be applied.
- Tracks whose initial location falls within the initial mask region will
- be used.
- An empty string indicates no masking region will be applied.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-valid_mask = " ";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-\emph on
-e.g.: valid_mask = "MET_BASE/poly/EP.poly";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-valid_mask
-\series medium
- field specifies a lat/lon polyline defining a masking region to be applied.
- Tracks for which all locations fall within the valid mask will be used.
- An empty string indicates no masking region will be applied.
 \begin_inset Newline newline
 \end_inset
 
@@ -1122,37 +772,37 @@ e.g.: consensus = [
 \begin_layout LyX-Code
 
 \series medium
-{
+   {
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-name = "CON1";
+      name = "CON1";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-members = ["MOD1","MOD2","MOD3"];
+      members =       ["MOD1","MOD2","MOD3"];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-required = [ true, false, false ];
+      required = [ true, false, false ];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-min_req = 2;
+      min_req = 2;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-}
+   }
 \end_layout
 
 \begin_layout LyX-Code
@@ -1275,7 +925,11 @@ height "1pt"
 best_baseline = [ ];
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
 
 \series medium
 \emph on
@@ -1339,10 +993,33 @@ BTCLIPA
  mode.
  Used for Atlantic basin only.
  Specify model as BCLA.
+\begin_inset Newline newline
+\end_inset
+
+
+\series default
+
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
 oper_baseline = [ ];
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \begin_layout LyX-Code
@@ -1631,25 +1308,7 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
-version = " ";
-\end_layout
 
-\begin_layout LyX-Code
-
-\series medium
-\emph on
-e.g.: version = "v5.1";
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The version string indicates the version of TC-Pairs configuration file
- used.
- This version corresponds to the MET release.
- Future versions of MET may include changes to TC-Pairs and the TC-Pairs
- configuration file.
- This value should generally not be modified.
 \end_layout
 
 \begin_layout Subsection
