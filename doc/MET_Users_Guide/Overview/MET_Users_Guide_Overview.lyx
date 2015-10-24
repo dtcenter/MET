@@ -444,6 +444,7 @@ reference "Fig_Overview_MET_Overview_Flowchart"
 
 \series bold
 \begin_inset Float figure
+placement h
 wide false
 sideways false
 status open

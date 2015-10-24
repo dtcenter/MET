@@ -537,9 +537,9 @@ Least-Squares Fit
 \series medium
 To perform least squares interpolation of a gridded field at a location
  P, MET uses an 
-\emph on
+\series bold
 WxW
-\emph default
+\series default
  subgrid centered (as closely as possible) at P.
  Figure 
 \begin_inset CommandInset ref
@@ -614,9 +614,9 @@ gamma$
 
  are calculated from the data values at the vertices.
  Finally, the coordinates (
-\emph on
+\series bold
 x,y
-\emph default
+\series default
 ) of P are substituted into this expression to give z, our least squares
  interpolated data value at P.
 \begin_inset Newline newline
@@ -1467,9 +1467,9 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 point_stat
-\emph default
+\series default
  has some required arguments and can take many optional ones.
 \end_layout
 
@@ -1651,18 +1651,18 @@ name "sub:point_stat-configuration-file"
 
 \series medium
 The default configuration file for the Point-Stat tool named 
-\emph on
+\series bold
 PointStatConfig_default
-\emph default
+\series default
  can be found in the installed 
-\emph on
+\series bold
 share/met/config
-\emph default
+\series default
  directory.
  Another version is located in 
-\emph on
+\series bold
 scripts/config
-\emph default
+\series default
 .
  We encourage users to make a copy of these files prior to modifying their
  contents.
@@ -2266,9 +2266,9 @@ name "sub:point_stat-output"
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 point_stat
-\emph default
+\series default
  produces output in STAT and, optionally, ASCII format.
  The ASCII output duplicates the STAT output but has the data organized
  by line type.

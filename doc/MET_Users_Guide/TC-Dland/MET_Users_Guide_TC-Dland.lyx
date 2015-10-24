@@ -186,18 +186,18 @@ share/met/tc_data
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 dland_nw_hem_tenth_degree.nc
-\emph default
+\series default
 : TC-dland output from aland.dat using a 1/10th degree grid
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 dland_global_tenth_degree.nc
-\emph default
+\series default
 : TC-dland output from all three land data files (global coverage) using
  a 1/10th degree grid.
 \end_layout
@@ -333,10 +333,10 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 tc_dland
 \series medium
-\emph default
+\series default
  has one required arguments and accepts several optional ones.
 \end_layout
 
@@ -373,7 +373,7 @@ Optional arguments for tc_dland
 \series medium
 argument overrides the default grid (1/10th NH grid).
  Spec = 
-\emph on
+\series bold
 lat_ll lon_ll delta_lat delta_lon n_lat n_lon
 \end_layout
 

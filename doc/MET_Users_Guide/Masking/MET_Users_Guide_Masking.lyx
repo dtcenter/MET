@@ -370,10 +370,10 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 gen_vx_mask
 \series medium
-\emph default
+\series default
  has required arguments and can take optional ones.
  
 \end_layout
@@ -810,7 +810,7 @@ sample_fcst.grib
 \series bold
 CONUS_poly.nc
 \series default
-\emph on
+\series bold
 .
 \end_layout
 

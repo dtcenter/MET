@@ -284,14 +284,14 @@ The first place to look for help with individual commands is this user's
  guide or the usage statements that are provided with the tools.
  Usage statements for the individual MET tools are available by simply typing
  the name of the executable in MET's 
-\emph on
+\series bold
 bin/ 
-\emph default
+\series default
 directory.
  Example scripts available in the MET's 
-\emph on
+\series bold
 scripts/
-\emph default
+\series default
  directory show examples of how one might use these commands on example
  datasets.
  Here are suggestions on other things to check if you are having problems
