@@ -959,7 +959,11 @@ Finally, all these ingredients are collected into a single number called
 \emph on
 T
 \emph default
-, given by 
+, given by:
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -2532,19 +2536,14 @@ The set of interest function entries listed above define which values are
  of its graph.
  An algebraic function may be defined in terms of several built-in mathematical
  functions.
- See the documentation for the configuration file language on the MET User's
- website (
-\begin_inset Flex URL
-status open
-
-\begin_layout Plain Layout
-
-http://www.dtcenter.org/met/users
-\end_layout
+ See Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:MODE_A-Scientific-and-statistical"
 
 \end_inset
 
-) for more details.
+for how interest values are used by the fuzzy logic engine.
  By default, many of these functions are defined in terms of the previously
  defined 
 \series bold
