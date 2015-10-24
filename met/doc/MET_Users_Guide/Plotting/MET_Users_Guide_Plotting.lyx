@@ -1176,7 +1176,10 @@ reference "verification"
  For the forecast evaluation, we compared 3-hour accumulated precipitation
  for lead times of 3-24 hours to Stage II radar-gauge precipitation.
  Note that for the 3-hr lead time, indicated as the 0300 UTC valid time
- in Fig.
+ in 
+\series default
+Figure
+\series medium
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1244,7 +1247,10 @@ In addition to the traditional scores, MODE output allows more information
  to be gleaned about forecast performance.
  It is even useful when computing the traditional scores to understand how
  much the forecasts are displaced in terms of both distance and direction.
- Fig.
+ 
+\series default
+Figure
+\series medium
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1255,7 +1261,10 @@ reference "histogram"
 , for example, shows circle histograms for matched objects.
  The petals show the percentage of times the forecast object centroids are
  at a given angle from the observed object centroids.
- In Fig.
+ In 
+\series default
+Figure
+\series medium
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1264,7 +1273,10 @@ reference "histogram"
 \end_inset
 
  (top diagram) about 25% of the time the forecast object centroids are west
- of the observed object centroids, whereas in Fig.
+ of the observed object centroids, whereas in 
+\series default
+Figure
+\series medium
  
 \begin_inset CommandInset ref
 LatexCommand ref

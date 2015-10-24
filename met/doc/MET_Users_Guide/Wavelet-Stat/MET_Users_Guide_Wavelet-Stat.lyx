@@ -256,7 +256,7 @@ reference "NIMROD_binary_fcst"
  Note that the scale components are fields, and their sum adds up to the
  original binary field.
  For a forecast defined over square domain of 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -267,9 +267,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -280,23 +280,23 @@ n
 \end_inset
 
 
-\emph default
+\series default
  grid-points, the scale components are 
-\emph on
+\series bold
 n+1
-\emph default
+\series default
 : 
-\emph on
+\series bold
 n
-\emph default
+\series default
  mother wavelet components + the largest father wavelet (or scale-function)
  component.
  The 
-\emph on
+\series bold
 n
-\emph default
+\series default
  mother wavelet components have resolution equal to 
-\emph on
+\series bold
 1, 2, 4, ...
  2
 \begin_inset script superscript
@@ -308,10 +308,10 @@ n-1
 \end_inset
 
 
-\emph default
+\series default
  grid-points.
  The largest father wavelet component is a constant field over the 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -322,9 +322,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -335,7 +335,7 @@ n
 \end_inset
 
 
-\emph default
+\series default
  grid-point domain with value equal to the field mean.
  
 \end_layout
@@ -390,13 +390,13 @@ reference "NIMROD_binary_scale9"
 Note also that the means of the binary forecast and observation fields (i.e.
  their largest father wavelet components) are equal to the proportion of
  forecast and observed events above the threshold,
-\emph on
+\series bold
  (a+b)/n
-\emph default
+\series default
  and 
-\emph on
+\series bold
 (a+c)/n
-\emph default
+\series default
 , evaluated from the contingency table counts (Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -423,13 +423,13 @@ reference "NIMROD_3h_fcst"
 \begin_layout Description
 3.
  For each threshold (
-\emph on
+\series bold
 t
-\emph default
+\series default
 ) and for each scale component (
-\emph on
+\series bold
 j
-\emph default
+\series default
 ) of the binary forecast and observation, the Mean Squared Error (MSE) is
  then evaluated (Figure 
 \begin_inset CommandInset ref
@@ -465,9 +465,9 @@ hbox{MSE}(t,j)$
 .
  Therefore, the percentage that the MSE for each scale contributes to the
  total MSE may be computed: for a given threshold, 
-\emph on
+\series bold
 t
-\emph default
+\series default
 , 
 \begin_inset ERT
 status open
@@ -499,13 +499,13 @@ hbox{MSE}(t)$
 \begin_layout Description
 Note that the MSE of the original binary fields is equal to the proportion
  of the counts of misses (
-\emph on
+\series bold
 c/n
-\emph default
+\series default
 ) and false alarms (
-\emph on
+\series bold
 b/n
-\emph default
+\series default
 ) for the contingency table (Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -609,24 +609,24 @@ reference "sec:WS_Introduction"
  fields.
  This formula follows by considering the Murphy and Winkler (1987) framework,
  appling the Bayes' theorem to express the joint probabilities 
-\emph on
+\series bold
 b/n
-\emph default
+\series default
  and 
-\emph on
+\series bold
 c/n
-\emph default
+\series default
  as product of the marginal and conditional probability (e.g.
  Jolliffe and Stephenson, 2003; Wilks, 2006), and then noticing that for
  a random forecast the conditional probability is equal to the unconditional
  one, so that 
-\emph on
+\series bold
 b/n
-\emph default
+\series default
  and 
-\emph on
+\series bold
 c/n
-\emph default
+\series default
  are equal to the product of the corresponding marginal probabilities solely.
  
 \end_layout
@@ -634,13 +634,13 @@ c/n
 \begin_layout Description
 5.
  For each threshold (
-\emph on
+\series bold
 t
-\emph default
+\series default
 ) and scale component (
-\emph on
+\series bold
 j
-\emph default
+\series default
 ), the skill score based on the MSE of binary forecast and observation scale
  components is evaluated (Figure 
 \begin_inset CommandInset ref
@@ -653,9 +653,9 @@ reference "Intensity_Scale_skill_score_NIMROD"
  The standard skill score definition as in Jolliffe and Stephenson (2003)
  or Wilks (2006) is used, and random chance is used as reference forecast.
  The MSE for the random binary forecast is equipartitioned on the 
-\emph on
+\series bold
 n+1
-\emph default
+\series default
  scales to evaluate the skill score: 
 \begin_inset ERT
 status open
@@ -703,38 +703,38 @@ status open
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 2
-\emph default
+\series default
 x
-\emph on
+\series bold
 2
-\emph default
+\series default
  contingency table in terms of counts.
  The 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 ij
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  values in the table represent the counts in each forecast-observation category,
  where 
-\emph on
+\series bold
 i
-\emph default
+\series default
  represents the forecast and 
-\emph on
+\series bold
 j
-\emph default
+\series default
  represents the observations.
  
 \end_layout
@@ -875,7 +875,7 @@ Yes
 
 \begin_layout Plain Layout
 Hits=
-\emph on
+\series bold
 a
 \end_layout
 
@@ -886,7 +886,7 @@ a
 
 \begin_layout Plain Layout
 False Alarms = 
-\emph on
+\series bold
 b
 \end_layout
 
@@ -897,7 +897,7 @@ b
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 a+b
 \end_layout
 
@@ -927,7 +927,7 @@ No
 
 \begin_layout Plain Layout
 Misses=
-\emph on
+\series bold
 c
 \end_layout
 
@@ -938,7 +938,7 @@ c
 
 \begin_layout Plain Layout
 Correct rejections = 
-\emph on
+\series bold
 d
 \end_layout
 
@@ -949,7 +949,7 @@ d
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 c+d
 \end_layout
 
@@ -971,7 +971,7 @@ Total
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 a+c
 \end_layout
 
@@ -982,7 +982,7 @@ a+c
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 b+d
 \end_layout
 
@@ -993,7 +993,7 @@ b+d
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 a+b+c+d
 \end_layout
 
@@ -1368,9 +1368,9 @@ hbox {En2}(t,j)$
 .
  Therefore, the percentage that the En2 for each scale contributes the total
  En2 may be computed: for a given threshold, 
-\emph on
+\series bold
 t
-\emph default
+\series default
 , 
 \begin_inset ERT
 status open
@@ -1415,9 +1415,9 @@ For the NIMROD case illustrated, the scale structure is assessed again by
  associated to high occurrence, and under-estimate the percentage of events
  associated to low occurrence.
  The En2
-\emph on
+\series bold
 %
-\emph default
+\series default
  for the 64 mm/h thresholds is homogeneously under-estimated for all the
  scales, since the forecast does not have any event exceeding this threshold.
  
@@ -1540,7 +1540,7 @@ name "sub:WS_The-spatial-domain"
 The Intensity-Scale technique is constrained by the fact that orthogonal
  wavelets (discrete wavelet transforms) are usually performed dyadic domains,
  square domains of 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -1551,9 +1551,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1564,11 +1564,11 @@ n
 \end_inset
 
 
-\emph default
+\series default
  grid-points.
  The Wavelet-Stat tool handles this issue based on settings in the configuration
  file by defining tiles of dimensions 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -1579,9 +1579,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1592,14 +1592,14 @@ n
 \end_inset
 
 
-\emph default
+\series default
  over the input domain in the following ways:
 \end_layout
 
 \begin_layout Description
 1.
  User-Defined Tiling: The user may define one or more tiles of size 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -1610,9 +1610,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1623,7 +1623,7 @@ n
 \end_inset
 
 
-\emph default
+\series default
  over their domain to be applied.
  This is done by selecting the grid coordinates for the lower-left corner
  of the tile(s) and the tile dimension to be used.
@@ -1640,7 +1640,7 @@ n
 d tiling method listed above except that the tool automatically selects
  the location and size of the tile(s) to be applied.
  It figures out the maximum tile of dimension 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -1651,9 +1651,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1664,7 +1664,7 @@ n
 \end_inset
 
 
-\emph default
+\series default
  that fits within the domain and places the tile at the center of the domain.
  For domains that are very elongated in one direction, it defines as many
  of these tiles as possible that fit within the domain.
@@ -1673,7 +1673,7 @@ n
 \begin_layout Description
 3.
  Padding: If the domain size is only slightly smaller than 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -1684,9 +1684,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1697,10 +1697,10 @@ n
 \end_inset
 
 
-\emph default
+\series default
 , for certain variables (e.g.
  precipitation), it is advisable to expand the domain out to 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -1711,9 +1711,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1724,7 +1724,7 @@ n
 \end_inset
 
 
-\emph default
+\series default
  grid-points by adding extra rows and/or columns of fill data.
  For precipitation variables, a fill value of zero is used.
  For continuous variables, such as temperature, the fill value is defined
@@ -1753,7 +1753,7 @@ The Stat-Analysis tool aggregates the intensity scale technique results.
  daily runs for a season) on the same spatial domain, so that the scale
  components for each singular case will be the same number, and the domain,
  if not a square domain of
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1764,9 +1764,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -1777,7 +1777,7 @@ n
 \end_inset
 
 
-\emph default
+\series default
  grid-points, will be treated in the same fashion.
  Similarly, the intensity thresholds for each run should all be the same.
  
@@ -1939,9 +1939,9 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 wavelet_stat 
-\emph default
+\series default
 has both required arguments and optional ones.
  
 \end_layout
@@ -2090,14 +2090,14 @@ The default configuration file for the Wavelet-Stat tool,
 WaveletStatConfig_default
 \series default
 , can be found in the installed 
-\emph on
+\series bold
 share/met/config
-\emph default
+\series default
  directory.
  Another version of the configuration file is provided in 
-\emph on
+\series bold
 scripts/config
-\emph default
+\series default
 .
  
 \series medium
@@ -2310,7 +2310,7 @@ PAD
 \series default
  indicated that the data should be padded out to the nearest dimension of
  
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -2321,9 +2321,9 @@ n
 \end_inset
 
  
-\emph default
+\series default
 x
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -2562,9 +2562,9 @@ name "sub:wavelet_stat-output"
 
 \begin_layout Standard
 
-\emph on
+\series bold
 wavelet_stat
-\emph default
+\series default
  produces output in STAT and, optionally, ASCII and NetCDF and PostScript
  formats.
  The ASCII output duplicates the STAT output but has the data organized
@@ -2635,9 +2635,9 @@ reference "sub:point_stat-output"
 \end_inset
 
 (
-\emph on
+\series bold
 point_stat output
-\emph default
+\series default
 ) for a description of the common output for STAT files types.
  The information contained in the STAT and isc files are identical.
  However, for consistency with the STAT files produced by other tools, the
@@ -3862,9 +3862,9 @@ The frequency bias
 
 \begin_layout Standard
 The 
-\emph on
+\series bold
 Wavelet-Stat
-\emph default
+\series default
  tool creates a NetCDF output file containing the raw and decomposed values
  for the forecast, observation, and difference fields for each combination
  of variable and threshold value.
@@ -3983,7 +3983,7 @@ x
 
 \begin_layout Plain Layout
 Dimension of the tile which equals 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -4014,7 +4014,7 @@ y
 
 \begin_layout Plain Layout
 Dimension of the tile which equals
-\emph on
+\series bold
  2
 \begin_inset script superscript
 
@@ -4046,11 +4046,11 @@ scale
 \begin_layout Plain Layout
 Dimension for the number of scales.
  This is set to 
-\emph on
+\series bold
 n+2
-\emph default
+\series default
 , where 
-\emph on
+\series bold
 2
 \begin_inset script superscript
 
@@ -4061,7 +4061,7 @@ n
 \end_inset
 
 
-\emph default
+\series default
  is the tile dimension.
  The 2 extra scales are for the binary image and the wavelet averaged over
  the whole tile.
@@ -4304,9 +4304,9 @@ tile, x, y
 
 \begin_layout Plain Layout
 Raw values for the difference field (
-\emph on
+\series bold
 f-o
-\emph default
+\series default
 ) specified by 
 \begin_inset Quotes eld
 \end_inset
@@ -4425,9 +4425,9 @@ The PostScript plot begins with one summary page illustrating the tiling
  The remaining pages depict the Intensity-Scale method that was applied.
  For each combination of field, tile, and threshold, the binary difference
  field (
-\emph on
+\series bold
 f-o
-\emph default
+\series default
 ) is plotted followed by the difference field for each decomposed scale.
  Underneath each difference plot, the statistics applicable to that scale
  are listed.

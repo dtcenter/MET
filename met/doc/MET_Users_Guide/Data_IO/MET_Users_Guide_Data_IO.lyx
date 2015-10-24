@@ -272,9 +272,9 @@ The user may choose to: (1) combine the model accumulations to match the
  interval smaller than the accumulation period in the input files.
  However, if the input model and observation files already contain accumulated
  precipitation with the same desired accumulation period, then 
-\emph on
+\series bold
 pcp_combine
-\emph default
+\series default
  need not be run.
  Each time the Pcp-Combine tool is called, a NetCDF file is written containing
  the requested accumulation period.
@@ -285,9 +285,9 @@ pcp_combine
 
 \series medium
 The 
-\emph on
+\series bold
 Gen-Vx-Mask
-\emph default
+\series default
  tool is used to define a bitmapped masking region that can be used by the
  statistics tools as a verification subdomain.
  It is generally more efficient to use the NetCDF output of this tool to

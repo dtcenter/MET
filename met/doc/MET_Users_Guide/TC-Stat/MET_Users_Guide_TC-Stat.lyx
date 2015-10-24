@@ -291,7 +291,7 @@ The TC-Stat tool can also be used to generate frequency of superior performance
 \begin_layout Standard
 
 \series bold
-\emph on
+\series bold
 Frequency of Superior Performance
 \end_layout
 
@@ -311,7 +311,7 @@ The frequency of superior performance (FSP) looks at multiple model forecasts
 \begin_layout Standard
 
 \series bold
-\emph on
+\series bold
 Time-Series Independence
 \end_layout
 
@@ -343,10 +343,10 @@ name "sec:Practical-information-1"
 The following sections describe the usage statement, required arguments,
  and optional arguments for 
 \series default
-\emph on
+\series bold
 tc_stat
 \series medium
-\emph default
+\series default
 .
 \end_layout
 
@@ -366,10 +366,10 @@ name "sub:tc_stat-usage"
 \series medium
 The usage statement for 
 \series default
-\emph on
+\series bold
 tc_stat
 \series medium
-\emph default
+\series default
  is shown below:
 \end_layout
 
@@ -504,9 +504,9 @@ Required arguments for tc_stat
  
 \series medium
 argument indicates the location of the input TCST files generated from 
-\emph on
+\series bold
 tc_pairs
-\emph default
+\series default
 .
  This argument can be used one or more times to specify the name of a TCST
  file or top-level directory containing TCST files to be processed.
@@ -580,9 +580,9 @@ argument indicates the name of the configuration file to be used.
 
 \series medium
 An example of the 
-\emph on
+\series bold
 tc_stat 
-\emph default
+\series default
 calling sequence is shown below:
 \end_layout
 
@@ -594,25 +594,25 @@ tc_stat -lookin /home/tc_pairs/*al092010.tcst -config TCStatConfig
 
 \series medium
 In this example, the TC-Stat tool uses any TCST file (output from 
-\emph on
+\series bold
 tc_pairs
-\emph default
+\series default
 ) in the listed directory for the 9th Atlantic Basin storm in 2010.
  Filtering options and aggregated statistics are generated following configurati
 on options specified in the 
-\emph on
+\series bold
 TCStatConfig
-\emph default
+\series default
  file.
  Further, using flags (e.g.
  
-\emph on
+\series bold
 "-basin"
-\emph default
+\series default
 , 
-\emph on
+\series bold
 "-column", "-storm_name", etc...)
-\emph default
+\series default
  option within the job command lines may further refine these selections.
  See Section 
 \begin_inset CommandInset ref
@@ -646,13 +646,13 @@ name "sub:tc_stat-configuration-file"
 
 \series medium
 The default configuration file for the 
-\emph on
+\series bold
 TC-Stat
-\emph default
+\series default
  tool named 
-\emph on
+\series bold
 TCStatConfig_default
-\emph default
+\series default
  can be found in the installed 
 \series default
 share/met/config
@@ -793,14 +793,14 @@ Note that the options specified in the first section of the configuration
  However, if an individual job specifies an option listed above, it will
  be applied to that job.
  For example, if model = [
-\emph on
+\series bold
  "GFSI", "LGEM", "DSHP"
-\emph default
+\series default
  ]; is set at the top, but the job in the joblist sets the -model option
  to 
-\emph on
+\series bold
 "LGEM"
-\emph default
+\series default
 , that job will only run using the LGEM model data.
 \end_layout
 
@@ -857,13 +857,13 @@ bmodel
 \series medium
  specifies the reference dataset, generally the best track analysis.
  Using the 
-\emph on
+\series bold
 "-amodel"
-\emph default
+\series default
  and 
-\emph on
+\series bold
 "-bmodel"
-\emph default
+\series default
  options within the job command lines may further refine these selections.
 \end_layout
 
@@ -906,13 +906,13 @@ valid_exc
  valid times to include (inc) or exclude (exc).
  Time strings are defined by YYYYMMDD[_HH[MMSS]].
  Using the "
-\emph on
+\series bold
 -valid_inc
-\emph default
+\series default
 ", "
-\emph on
+\series bold
 -valid_ex
-\emph default
+\series default
 c" options within the job command lines may further refine these selections.
 \end_layout
 
@@ -958,13 +958,13 @@ ely.
  This field specifies a comma-separated list of initialization times, valid
  times, and lead times in HH[MMSS] format.
  Using the "
-\emph on
+\series bold
 -valid_hour
-\emph default
+\series default
 ", and "
-\emph on
+\series bold
 -lead
-\emph default
+\series default
 " options within the job command lines may further refine these selections.
 \end_layout
 
@@ -1027,9 +1027,9 @@ track_watch_warn
  entire track is verified.
  The value "ALL" matches HUWARN, HUWATCH, TSWARN, TSWATCH.
  Using the "
-\emph on
+\series bold
 -track_watch_warn
-\emph default
+\series default
 " option within the job command lines may further refine these selections.
 \end_layout
 
@@ -1076,7 +1076,7 @@ The following filtering options can be achieved by the following:
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 1.
  init_str_name = ["WATCH_WARN"];
 \end_layout
@@ -1085,7 +1085,7 @@ The following filtering options can be achieved by the following:
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 init_str_val = ["ALL"];
 \end_layout
 
@@ -1093,7 +1093,7 @@ init_str_val = ["ALL"];
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 2.
  column_str_name = ["WATCH_WARN"];
 \end_layout
@@ -1102,7 +1102,7 @@ init_str_val = ["ALL"];
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 column_str_val = ["ALL"];
 \end_layout
 
@@ -1110,7 +1110,7 @@ column_str_val = ["ALL"];
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 3.
  init_str_name = ["WATCH_WARN"];
 \end_layout
@@ -1119,7 +1119,7 @@ column_str_val = ["ALL"];
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 init_str_val = ["NA"];
 \end_layout
 
@@ -1127,7 +1127,7 @@ init_str_val = ["NA"];
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 4.
  column_str_name = ["WATCH_WARN"];
 \end_layout
@@ -1136,7 +1136,7 @@ init_str_val = ["NA"];
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 column_str_val = ["NA"];
 \end_layout
 
@@ -1207,9 +1207,9 @@ column_thresh_name
 \series medium
 .
  Using the "
-\emph on
+\series bold
 -column_thresh name thresh
-\emph default
+\series default
 " option within the job command lines may further refine these selections.
 \end_layout
 
@@ -1260,9 +1260,9 @@ column_str_name
 \series medium
 .
  Using the "
-\emph on
+\series bold
 -column_str name val
-\emph default
+\series default
 " option within the job command lines may further refine these selections.
 \end_layout
 
@@ -1315,9 +1315,9 @@ init_thresh_name
 \series medium
 .
  Using the "
-\emph on
+\series bold
 -init_thresh name val
-\emph default
+\series default
 " option within the job command lines may further refine these selections.
 \end_layout
 
@@ -1371,9 +1371,9 @@ init_str_name
 \series medium
 .
  Using the "
-\emph on
+\series bold
 -init_str name val
-\emph default
+\series default
 " option within the job command lines may further refine these selections.
 \begin_inset Newline newline
 \end_inset
@@ -1411,9 +1411,9 @@ water_only
 flag stratifies by only using points where both the amodel and bmodel tracks
  are over water.
  When 
-\emph on
+\series bold
 water_only = TRUE;
-\emph default
+\series default
  once land is encountered the remainder of the forecast track is not used
  for the verification, even if the track moves back over water.
 \end_layout
@@ -1480,17 +1480,17 @@ rirw
 track
 \series medium
  entry specifies that RI/RW is not turned on 
-\emph on
+\series bold
 (NONE
-\emph default
+\series default
 ), is computed based on the bmodel only (
-\emph on
+\series bold
 BDECK
-\emph default
+\series default
 ), is computed based on the amodel only (
-\emph on
+\series bold
 ADECK
-\emph default
+\series default
 ), or computed when both the amodel and bmodel (the union of the two) indicate
  RI/RW (BOTH).
  If 
@@ -1498,13 +1498,13 @@ ADECK
 track
 \series medium
  is set to 
-\emph on
+\series bold
 ADECK, BDECK,
-\emph default
+\series default
  or 
-\emph on
+\series bold
 BOTH
-\emph default
+\series default
 , only tracks exhibiting rapid intensification will be retained.
  Rapid intensification is officially defined as when the change in the maximum
  wind speed over a 24-hour period is greater than or equal to 30 kts.
@@ -1545,33 +1545,33 @@ thresh
 
 \series medium
 Using the "-
-\emph on
+\series bold
 rirw_track
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 rirw_time_adeck
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 rirw_time_bdeck
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 rirw_exact_adeck
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 rirw_exact_bdeck
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 rirw_thresh_adeck
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 rirw_thresh_bdeck
-\emph default
+\series default
 " options within the job command lines may further refine these selections.
  See README_TC in data/config for how to use these options.
 \end_layout
@@ -1626,18 +1626,18 @@ landfall_end
  Landfall is defined as the last bmodel track point before the distance
  to land switches from water to land.
  When 
-\emph on
+\series bold
 landfall_end
-\emph default
+\series default
  is set to 0, the track is retained from the 
-\emph on
+\series bold
 landfall_beg
-\emph default
+\series default
  to the time of landfall.
  Using the 
-\emph on
+\series bold
 "-landfall_window"
-\emph default
+\series default
  option with the job command lines may further refine these selections.
  The "-landfall_window" job command option takes 1 or 2 arguments in HH[MMSS]
  format.
@@ -1686,9 +1686,9 @@ event_equal
  A case is defined by comparing the following columns in the TCST files:
  BMODEL, BASIN, CYCLONE, INIT, LEAD, VALID.
  This option may be modified using the "-
-\emph on
+\series bold
 event_equal
-\emph default
+\series default
 " option within the job command lines.
 \end_layout
 
@@ -1723,9 +1723,9 @@ event_equal_lead
  times listed, enabling the verification at each lead time to be performed
  on a consistent dataset.
  This option may be modified using the "
-\emph on
+\series bold
 -event_equal_lead
-\emph default
+\series default
 " option within the job command lines.
 \end_layout
 
@@ -1758,9 +1758,9 @@ out_init_mask
  at the initialization time.
  If the track point falls outside the mask, discard the entire track.
  This option may be modified using the "-
-\emph on
+\series bold
 out_init_mask
-\emph default
+\series default
 " option within the job command lines.
 \end_layout
 
@@ -1793,9 +1793,9 @@ out_valid_mask
  at the valid time.
  If the track point falls outside the mask, discard the entire track.
  This option may be modified using the "-
-\emph on
+\series bold
 out_valid_mask
-\emph default
+\series default
 " option within the job command lines.
 \begin_inset Newline newline
 \end_inset
@@ -1844,7 +1844,7 @@ Please refer to the README_TC in data/config for details on how to call
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 -job job_name REQUIRED and OPTIONAL ARGUMENTS
 \end_layout
 
@@ -1855,14 +1855,14 @@ Please refer to the README_TC in data/config for details on how to call
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
 e.g.: -job filter -amodel HWFI -dump_row ./tc_filter_job.tcst
 \end_layout
 
 \begin_layout LyX-Code
 
 \series medium
-\emph on
+\series bold
       -job summary -line_type TCMPR -column TK_ERR -dump_row ./tc_summary_job.tcst
 \end_layout
 
@@ -1897,14 +1897,14 @@ The output generated from the TC-Stat tool contains statistics produced
  Additionally, it includes information about the analysis job that produced
  the output for each line.
  The output can be redirected to an output file using the "
-\emph on
+\series bold
 -out
-\emph default
+\series default
 " option.
  The format of output from each 
-\emph on
+\series bold
 tc_stat
-\emph default
+\series default
  job command is listed below.
 \end_layout
 
@@ -1920,9 +1920,9 @@ Job: Filter
 This job command finds and filters TCST lines down to those meeting the
  criteria selected by the filter's options.
  The filtered TCST lines are written to a file specified by the "-
-\emph on
+\series bold
 dump_row
-\emph default
+\series default
 " option.
  The TCST output from this job follows the TCST output description in Chapters
  
@@ -1953,9 +1953,9 @@ Job: Summary
 \series medium
 This job produces summary statistics for the column name specified by the
  "-
-\emph on
+\series bold
 column
-\emph default
+\series default
 " option.
  The output of the summary job consists of three rows: "JOB_LIST", which
  shows the job definition parameters used for this job.
@@ -1979,16 +1979,16 @@ reference "table_columnar_output_summary_tc_stat"
 \end_inset
 
  The "
-\emph on
+\series bold
 -by
-\emph default
+\series default
 " option can also be used one or more times to make this job more powerful.
  Rather than running the specified job once, it will be run once for each
  unique combination of the entries found in the column(s) specified with
  the "
-\emph on
+\series bold
 -by"
-\emph default
+\series default
  option.
  
 \end_layout

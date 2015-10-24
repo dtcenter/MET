@@ -632,10 +632,10 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 grid_stat
 \series medium
-\emph default
+\series default
  has some required arguments and accepts several optional ones.
 \end_layout
 
@@ -774,9 +774,9 @@ GridStatConfig
 
 \series medium
 A second example of the 
-\emph on
+\series bold
 grid_stat
-\emph default
+\series default
  calling sequence is listed below:
 \end_layout
 
@@ -807,17 +807,17 @@ In the second example, the Grid-Stat tool will verify the model data in
 sample_fcst.nc
 \series medium
  NetCDF output of 
-\emph on
+\series bold
 pcp_combine
-\emph default
+\series default
 , using the observations in the 
 \series default
 sample_obs.nc
 \series medium
  NetCDF output of 
-\emph on
+\series bold
 pcp_combine
-\emph default
+\series default
 , and applying the configuration options specified in the 
 \series default
 GridStatConfig
@@ -851,14 +851,14 @@ The default configuration file for the Grid-Stat tool, named
 GridStatConfig_default
 \series medium
 , can be found in the installed 
-\emph on
+\series bold
 share/met/config
-\emph default
+\series default
  directory.
  Other versions of the configuration file are included in 
-\emph on
+\series bold
 scripts/config
-\emph default
+\series default
 .
  We recommend that users make a copy of the default (or other) configuration
  file prior to modifying it.
@@ -1493,9 +1493,9 @@ name "sub:grid_stat-output"
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 grid_stat
-\emph default
+\series default
  produces output in STAT and, optionally, ASCII and NetCDF formats.
  The ASCII output duplicates the STAT output but has the data organized
  by line type.
@@ -1564,9 +1564,9 @@ reference "sub:point_stat-output"
 \end_inset
 
  (
-\emph on
+\series bold
 point_stat
-\emph default
+\series default
  output) for a description of the common output STAT and optional ASCII
  file line types.
  The formats of the three additional neighborhood line types for grid_stat
@@ -4548,15 +4548,15 @@ For each model variable (VAR), vertical level (LVL), masking region (MASK),
 
 \series medium
 The STAT output files described for 
-\emph on
+\series bold
 grid_stat
-\emph default
+\series default
  may be used as inputs to the Stat-Analysis tool.
  For more information on using the Stat-Analysis tool to create stratifications
  and aggregations of the STAT files produced by 
-\emph on
+\series bold
 grid_stat
-\emph default
+\series default
 , please see Chapter 
 \begin_inset CommandInset ref
 LatexCommand ref

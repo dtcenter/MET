@@ -161,29 +161,29 @@ status open
 \begin_layout Plain Layout
 2x2 contingency table in terms of counts.
  The 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 ij
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  values in the table represent the counts in each forecast-observation category,
  where 
-\emph on
+\series bold
 i
-\emph default
+\series default
  represents the forecast and 
-\emph on
+\series bold
 j
-\emph default
+\series default
  represents the observations.
  The "." symbols in the total cells represent sums across categories.
 \end_layout
@@ -293,7 +293,7 @@ f = 1 (e.g., "Yes")
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -313,7 +313,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -333,7 +333,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -383,7 +383,7 @@ f = 0 (e.g., "No")
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -403,7 +403,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -423,7 +423,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -472,7 +472,7 @@ Total
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -510,7 +510,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
@@ -548,7 +548,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 T = n
 \begin_inset script subscript
 
@@ -660,7 +660,7 @@ The counts, n
 \series medium
 By dividing the counts in the cells by the overall total, T, the joint proportio
 ns, 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
@@ -673,9 +673,9 @@ p
 \end_inset
 
 
-\emph default
+\series default
 , 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
@@ -688,9 +688,9 @@ p
 \end_inset
 
 
-\emph default
+\series default
 , 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
@@ -703,9 +703,9 @@ p
 \end_inset
 
 
-\emph default
+\series default
 , and
-\emph on
+\series bold
  p
 \begin_inset script subscript
 
@@ -718,10 +718,10 @@ p
 \end_inset
 
 
-\emph default
+\series default
  can be computed.
  Note that 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
@@ -767,7 +767,7 @@ p
 \end_inset
 
  = 1
-\emph default
+\series default
 .
  Similarly, if the counts are divided by the row (column) totals, conditional
  proportions, based on the forecasts (observations) can be computed.
@@ -786,9 +786,9 @@ The values in Table C-1 can also be used to compute the F, O, and H relative
  to the Base Rate.
  All of these statistics are defined in the subsections below.
  The Point-Stat tool also provides the total number of observations, 
-\emph on
+\series bold
 T
-\emph default
+\series default
 .
 \end_layout
 
@@ -808,9 +808,9 @@ TOTAL
 
 \series medium
 The total number of forecast-observation pairs, 
-\emph on
+\series bold
 T
-\emph default
+\series default
 .
 \end_layout
 
@@ -855,9 +855,9 @@ over {T}}$
 .
  This value is also known as the sample climatology, and is the relative
  frequency of occurrence of the event (i.e., 
-\emph on
+\series bold
 o = 1
-\emph default
+\series default
 ).
  The base rate is equivalent to the "O" value produced by the NCEP Verification
  System.
@@ -906,9 +906,9 @@ over {T}}$
 \begin_layout Standard
 This statistic is comparable to the base rate and is the relative frequency
  of occurrence of a forecast of the event (i.e., 
-\emph on
+\series bold
 f = 1
-\emph default
+\series default
 ).
  The mean forecast is equivalent to the "F" value computed by the NCEP Verificat
 ion System.
@@ -952,16 +952,16 @@ That is, it is the proportion of forecasts that were either hits or correct
  value of 1.
  Accuracy should be used with caution, especially for rare events, because
  it can be strongly influenced by large values of 
-\emph on
+\series bold
 n
-\emph default
+\series default
 
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
 \series medium
-\emph on
+\series bold
 00
 \end_layout
 
@@ -985,7 +985,11 @@ Called "FBIAS" in CTS output (Table 4-5)
 \series medium
 Frequency Bias is the ratio of the total number of forecasts of an event
  to the total number of observations of the event.
- It is defined as 
+ It is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1225,20 +1229,20 @@ over{n_{11}+n_{10}+n_{01}}}}.$$
 It is the ratio of the number of times the event was correctly forecasted
  to occur to the number of times it was either forecasted or occurred.
  CSI ignores the "correct rejections" category (i.e., 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 00
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
 ).
  CSI is also known as the Threat Score (TS).
  CSI can also be written as a nonlinear combination of POD and FAR, and
@@ -1260,7 +1264,11 @@ Called "GSS" in CTS output (Table 4-5)
 \series medium
 GSS is based on the CSI, corrected for the number of hits that would be
  expected by chance.
- In particular, 
+ In particular,
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1277,7 +1285,11 @@ over{n_{11}+n_{10}+n_{01}-C_1}}},$$
 
 \end_inset
 
- where 
+ where
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1382,7 +1394,11 @@ Called "HSS" in CTS output (Table 4-5)
 \series medium
 HSS is a skill score based on Accuracy, where the Accuracy is corrected
  by the number of correct forecasts that would be expected by chance.
- In particular, 
+ In particular,
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1399,7 +1415,11 @@ over{T-C_2}}},$$
 
 \end_inset
 
- where 
+ where
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1439,7 +1459,11 @@ Called "ODDS" in CTS output (Table 4-5)
 \series medium
 OR measures the ratio of the odds of a forecast of the event being correct
  to the odds of a forecast of the event being wrong.
- OR is defined as 
+ OR is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1588,7 +1612,11 @@ Called "EDS" in CTS output (Table 4-5)
 \series medium
 The extreme dependency score measures the association between forecast and
  observed rare events.
- EDS is defined as 
+ EDS is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1676,7 +1704,11 @@ Called "SEDS" in CTS output (Table 4-5)
 \series medium
 The symmetric extreme dependency score measures the association between
  forecast and observed rare events.
- SEDS is defined as 
+ SEDS is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1737,7 +1769,11 @@ Called "SEDI" in CTS output (Table 4-5)
 \series medium
 The symmetric extremal dependency idex measures the association between
  forecast and observed rare events.
- SEDI is defined as 
+ SEDI is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1855,9 +1891,9 @@ name "sec:App_C-continuous"
 \series medium
 For continuous variables, many verification measures are based on the forecast
  error (i.e.,
-\emph on
+\series bold
  f - o
-\emph default
+\series default
 ).
  However, it also is of interest to investigate characteristics of the forecasts
 , and the observations, as well as their relationship.
@@ -1874,17 +1910,17 @@ e rather than a single measure.
 The verification measures currently evaluated by the Point-Stat tool are
  defined and described in the subsections below.
  In these definitions, 
-\emph on
+\series bold
 f
-\emph default
+\series default
  represents the forecasts, 
-\emph on
+\series bold
 o
-\emph default
+\series default
  represents the observation, and 
-\emph on
+\series bold
 n
-\emph default
+\series default
  is the number of forecast-observation pairs.
 \end_layout
 
@@ -2084,12 +2120,16 @@ Called "PR_CORR" in CNT output (Table 4-6)
 
 \series medium
 The Pearson correlation coefficient, 
-\emph on
+\series bold
 r
-\emph default
+\series default
 , measures the strength of linear association between the forecasts and
  observations.
- The Pearson correlation coefficient is defined as: 
+ The Pearson correlation coefficient is defined as:
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -2126,9 +2166,9 @@ overline o)^2}}}$$
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 r
-\emph default
+\series default
  can range between -1 and 1; a value of 1 indicates perfect correlation
  and a value of -1 indicates perfect negative correlation.
  A value of 0 indicates that the forecasts and observations are not correlated.
@@ -2160,19 +2200,19 @@ The Spearman rank correlation coefficient (
  and observed values rather than the actual values.
  That is, the forecast and observed samples are ordered from smallest to
  largest and rank values (from 1 to 
-\emph on
+\series bold
 n
-\emph default
+\series default
 , where 
-\emph on
+\series bold
 n
-\emph default
+\series default
  is the total number of pairs) are assigned.
  The pairs of forecast-observed ranks are then used to compute a correlation
  coefficient, analogous to the Pearson correlation coefficient, 
-\emph on
+\series bold
 r
-\emph default
+\series default
 .
 \end_layout
 
@@ -2208,9 +2248,9 @@ sum_{i=1}^{n}d_i^2$$
 
 \series medium
 Like 
-\emph on
+\series bold
 r
-\emph default
+\series default
 , the Spearman rank correlation coefficient ranges between -1 and 1; a value
  of 1 indicates perfect correlation and a value of -1 indicates perfect
  negative correlation.
@@ -2239,7 +2279,11 @@ Kendall's Tau statistic (
 
 ) is a robust measure of the level of association between the forecast and
  observation pairs.
- It is defined as 
+ It is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \family roman
 \shape up
 \size normal
@@ -2299,13 +2343,13 @@ where NC is the number of "concordant" pairs and ND is the number of "discordant
  is computed by counting the number of pairs (with larger values) for which
  the value of oi for the current pair is exceeded (that is, pairs for which
  the values of 
-\emph on
+\series bold
 f
-\emph default
+\series default
  and 
-\emph on
+\series bold
 o
-\emph default
+\series default
  are both larger than the value for the current pair).
  Once this is done, Nc is computed by summing the counts for all pairs.
  The total number of possible pairs is ; thus, the number of discordant
@@ -2316,9 +2360,9 @@ o
 
 \series medium
 Like 
-\emph on
+\series bold
 r
-\emph default
+\series default
  and 
 \begin_inset Formula $\rho_{s}$
 \end_inset
@@ -2348,7 +2392,11 @@ Called "ME" in CNT output (Table 4-6)
 \series medium
 The Mean Error, ME, is a measure of overall bias for continuous variables;
  in particular ME = Bias.
- It is defined as 
+ It is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -2556,7 +2604,7 @@ overline{o})^{2}+s_{f}^{2}+s_{o}^{2}-2s_{f}s_{o}r_{fo}$
 \family default
 \shape default
 \size default
-\emph default
+\series default
 \bar default
 \strikeout default
 \uuline default
@@ -2806,13 +2854,17 @@ The Anomaly correlation coefficient is equivalent to the Pearson correlation
  adjusted according to a climatology value.
  The anomaly is the difference between the individual forecast or observation
  and the typical situation, as measured by a climatology (
-\emph on
+\series bold
 c
-\emph default
+\series default
 ) of some variety.
  It measures the strength of linear association between the forecast anomolies
  and observed anomalies.
- The Anomaly correlation coefficient is defined as: 
+ The Anomaly correlation coefficient is defined as:
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -3052,73 +3104,73 @@ Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR"
 
 \series medium
 These statistics are the moments for wind vector values, where 
-\emph on
+\series bold
 u
-\emph default
+\series default
  is the E-W wind component and 
-\emph on
+\series bold
 v
-\emph default
+\series default
  is the N-S wind component (
-\emph on
+\series bold
 u
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 f
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  is the forecast E-W wind component; 
-\emph on
+\series bold
 u
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 o
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  is the observed E-W wind component; 
-\emph on
+\series bold
 v
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 f
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  is the forecast N-S wind component; and 
-\emph on
+\series bold
 v
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 o
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  is the observed N-S wind component).
  The following measures are computed:
 \end_layout
@@ -3301,30 +3353,30 @@ Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR
 \series medium
 These statistics require climatological values for the wind vector components,
  
-\emph on
+\series bold
 u
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 c
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  and 
-\emph on
+\series bold
 v
-\emph default
+\series default
 
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 c
 \end_layout
 
@@ -3567,29 +3619,29 @@ status open
 \begin_layout Plain Layout
 nx2 contingency table in terms of counts.
  The 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 ij
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  values in the table represent the counts in each forecast-observation category,
  where 
-\emph on
+\series bold
 i
-\emph default
+\series default
  represents the forecast and 
-\emph on
+\series bold
 j 
-\emph default
+\series default
 represents the observations.
  The "." symbols in the total cells represent sums across categories.
 \end_layout
@@ -3661,9 +3713,9 @@ Total
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 o = 1
-\emph default
+\series default
  (e.g., "Yes")
 \end_layout
 
@@ -3674,9 +3726,9 @@ o = 1
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 o = 0
-\emph default
+\series default
  (e.g., "No")
 \end_layout
 
@@ -3698,20 +3750,20 @@ o = 0
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 1
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  = midpoint of (0 and threshold1)
 \end_layout
 
@@ -3722,13 +3774,13 @@ p
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 11
 \end_layout
 
@@ -3744,13 +3796,13 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 10
 \end_layout
 
@@ -3766,13 +3818,13 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 1.
 \end_layout
 
@@ -3783,7 +3835,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 11
 \end_layout
 
@@ -3794,7 +3846,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 10
 \end_layout
 
@@ -3812,7 +3864,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
@@ -3823,7 +3875,7 @@ p
 \end_inset
 
 
-\emph default
+\series default
  = midpoint of (threshold1 and threshold2)
 \end_layout
 
@@ -3834,13 +3886,13 @@ p
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 21
 \end_layout
 
@@ -3856,13 +3908,13 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 20
 \end_layout
 
@@ -3878,13 +3930,13 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 2.
 \end_layout
 
@@ -3895,7 +3947,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 21
 \end_layout
 
@@ -3906,7 +3958,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 20
 \end_layout
 
@@ -3936,7 +3988,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 .
  .
  .
@@ -3950,7 +4002,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 .
  .
  .
@@ -3964,7 +4016,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 .
  .
  .
@@ -3980,7 +4032,7 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
@@ -3991,11 +4043,11 @@ j
 \end_inset
 
 
-\emph default
+\series default
  = midpoint of (threshold
-\emph on
+\series bold
 i
-\emph default
+\series default
  and 1)
 \end_layout
 
@@ -4006,7 +4058,7 @@ i
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \end_layout
 
@@ -4017,13 +4069,13 @@ n
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 i0
 \end_layout
 
@@ -4039,13 +4091,13 @@ i0
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 nj = n
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 j1
 \end_layout
 
@@ -4056,7 +4108,7 @@ j1
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 j0
 \end_layout
 
@@ -4083,7 +4135,7 @@ Total
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 \begin_inset Formula $n_{.1}=\sum n_{i1}$
 \end_inset
 
@@ -4097,7 +4149,7 @@ Total
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 \begin_inset Formula $n_{.0}=\sum n_{i0}$
 \end_inset
 
@@ -4111,7 +4163,7 @@ Total
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 T = 
 \begin_inset Formula $\sum n_{i}$
 \end_inset
@@ -4253,9 +4305,9 @@ Brier score
 \series medium
 The Brier score is the mean squared probability error.
  In MET, the Brier Score (BS) is calculated from the 
-\emph on
+\series bold
 nx2
-\emph default
+\series default
  contingency table via the following equation: 
 \begin_inset ERT
 status open
@@ -4275,9 +4327,9 @@ frac{1}{T}[n_{.1}(p_1-1)^2+n_{.0}p_0]$$
 \end_inset
 
 ) and the corresponding observations (
-\emph on
+\series bold
 o
-\emph default
+\series default
 
 \begin_inset Formula $_{i}$
 \end_inset
@@ -4300,20 +4352,20 @@ sum(p_i-o_i)^2$
 .
  This equation is equivalent when the midpoints of the binned probability
  values are used as the 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 i
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  .
  
 \end_layout
@@ -4413,13 +4465,13 @@ OY_TP - Observed Yes Total Proportion.
 
 \series medium
 This is the cell probability for row 
-\emph on
+\series bold
 i
-\emph default
+\series default
 , column 
-\emph on
+\series bold
 j=1
-\emph default
+\series default
  (observed event), a part of the joint distribution (Wilks, 2011).
  Along with ON_TP, this set of measures provides information about the joint
  distribution of forecasts and events.
@@ -4454,13 +4506,13 @@ ON_TP - Observed No Total Proportion.
 
 \series medium
 This is the cell probability for row 
-\emph on
+\series bold
 i
-\emph default
+\series default
 , column 
-\emph on
+\series bold
 j=0
-\emph default
+\series default
  (observed non-event), a part of the joint distribution (Wilks, 2011).
  Along with OY_TP, this set of measures provides information about the joint
  distribution of forecasts and events.
@@ -4495,9 +4547,9 @@ Calibration
 Calibration is the conditional probability of an event given each probability
  forecast category (i.e.
  each row in the 
-\emph on
+\series bold
 nx2
-\emph default
+\series default
  contingency table).
  This set of measures is paired with refinement in the calibration-refinement
  factorization discussed in Wilks (2011).
@@ -4584,6 +4636,11 @@ Likelihood is the conditional probability for each forecast category (row)
  For example, 10% probability of precipitation forecasts should have a much
  smaller likelihood value than 90% probability of precipitation forecasts.
  
+\end_layout
+
+\begin_layout Standard
+
+\series medium
 \begin_inset ERT
 status open
 
@@ -4622,20 +4679,20 @@ Base Rate
 
 \series medium
 This is the probability of an event for each forecast category 
-\emph on
+\series bold
 p
 \begin_inset script subscript
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 i
 \end_layout
 
 \end_inset
 
 
-\emph default
+\series default
  (row), i.e.
  the conditional base rate.
  This set of measures if paired with likelihood in the likelihood-base rate
@@ -4695,6 +4752,9 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
  used in combination with the ROC, which is conditioned on the observations,
  to provide a "complete" representation of the performance of probabilistic
  forecasts.
+\begin_inset Newline newline
+\end_inset
+
  
 \series default
 
@@ -5119,9 +5179,9 @@ The ignorance score (IGN) is the negative logarithm of a predictive probability
  This approximation may not be valid, especially for discontinuous forecasts
  like precipitation, and also for very skewed forecasts.
  For a single normal distribution 
-\emph on
+\series bold
 N
-\emph default
+\series default
  with parameters 
 \begin_inset Formula $\mu$
 \end_inset
@@ -5434,7 +5494,7 @@ rangle _{s}$
 \family default
 \shape default
 \size default
-\emph default
+\series default
 \bar default
 \strikeout default
 \uuline default
@@ -5459,7 +5519,11 @@ Called "FSS" in NBRCNT output (Table 5-4)
 \begin_layout Standard
 
 \series medium
-The Fractions Skill Score (FSS) is defined as 
+The Fractions Skill Score (FSS) is defined as
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 

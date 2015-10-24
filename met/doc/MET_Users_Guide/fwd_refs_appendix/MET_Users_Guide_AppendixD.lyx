@@ -201,7 +201,11 @@ theta$
 
 \end_inset
 
-, is given by the normal approximation 
+, is given by the normal approximation
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -444,22 +448,22 @@ right)^2}$
 \begin_layout Standard
 Mostly, the normal approximation is used as an asymptotic approximation.
  That is, the interval (D.1) may only be appropriate for large 
-\emph on
+\series bold
 n
-\emph default
+\series default
 .
  For small 
-\emph on
+\series bold
 n
-\emph default
+\series default
 , the mean has an interval based on the Student’s 
-\emph on
+\series bold
 t
-\emph default
+\series default
  distribution with 
-\emph on
+\series bold
 n-1
-\emph default
+\series default
  degrees of freedom.
  Essentially, 
 \begin_inset ERT
@@ -475,9 +479,9 @@ alpha/2}$
 \end_inset
 
  of (D.1) is replaced with the quantile of this 
-\emph on
+\series bold
 t
-\emph default
+\series default
  distribution.
  That is, the interval is given by 
 \begin_inset ERT
@@ -842,22 +846,22 @@ right]}$
 \end_inset
 
  where 
-\emph on
+\series bold
 F
-\emph default
+\series default
  is the 
-\emph on
+\series bold
 probability
-\emph default
+\series default
  forecast and 
-\emph on
+\series bold
 O
-\emph default
+\series default
  is the observation.
  See Bradley 
-\emph on
+\series bold
 et al
-\emph default
+\series default
  (2008) for derivation and details.
 \end_layout
 
@@ -903,13 +907,13 @@ frac{F(1-F)}{n_F}}},$
 \end_inset
 
  where 
-\emph on
+\series bold
 H
-\emph default
+\series default
  is the hit rate, 
-\emph on
+\series bold
 F
-\emph default
+\series default
  the false alarm rate, 
 \begin_inset ERT
 status open
@@ -1045,7 +1049,11 @@ hat p)/n}}$
  .
  However, this only applies when the sample size is large.
  A better approximation to the CI for proportions is given by Wilson’s interval,
- which is 
+ which is
+\begin_inset Newline newline
+\end_inset
+
+ 
 \begin_inset ERT
 status open
 
@@ -1195,9 +1203,9 @@ hbox{th}}$
 \end_inset
 
  quantile of the chi-square distribution with 
-\emph on
+\series bold
 n-1
-\emph default
+\series default
  degrees of freedom.
  Taking the square roots of the limits in (D.4) yields the CI for the forecast/ob
 servation standard deviation.

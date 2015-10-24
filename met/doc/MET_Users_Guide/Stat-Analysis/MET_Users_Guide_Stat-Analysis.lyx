@@ -1430,9 +1430,9 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 stat_analysis
-\emph default
+\series default
  has some required arguments and accepts several optional ones.
  
 \end_layout
@@ -1476,7 +1476,7 @@ reference "sub:wavelet_stat-configuration-file"
 
 \series bold
 Required arguments for 
-\emph on
+\series bold
 stat_analysis
 \end_layout
 
@@ -1600,9 +1600,9 @@ level
 
 \series medium
 An example of the 
-\emph on
+\series bold
 stat_analysis
-\emph default
+\series default
  calling sequence is shown below.
 \end_layout
 
@@ -1621,22 +1621,22 @@ stat_analysis -lookin ../out/point_stat
 \series medium
 In this example, the Stat-Analysis tool will search for valid STAT lines
  located in the 
-\emph on
+\series bold
 ../out/point_stat
-\emph default
+\series default
  directory that meet the options specified in the configuration file, 
-\emph on
+\series bold
 config/STATAnalysisConfig
-\emph default
+\series default
 .
  
 \end_layout
 
 \begin_layout Subsection
 
-\emph on
+\series bold
 stat_analysis
-\emph default
+\series default
  configuration file
 \begin_inset CommandInset label
 LatexCommand label
@@ -1651,13 +1651,13 @@ name "sub:stat_analysis-configuration-file"
 
 \series medium
 The default configuration file for the Stat-Analysis tool named 
-\emph on
+\series bold
 STATAnalysisConfig_default
-\emph default
+\series default
  can be found in the installed 
-\emph on
+\series bold
 share/met/config
-\emph default
+\series default
  directory.
  The version used for the example run in Chapter 
 \begin_inset CommandInset ref
@@ -1667,9 +1667,9 @@ reference "chap:Software-Installation/Getting-St"
 \end_inset
 
  is also available in 
-\emph on
+\series bold
 scripts/config
-\emph default
+\series default
 .
  Like the other configuration files described in this document, it is recommende
 d that users make a copy of these files prior to modifying their contents.
@@ -1736,14 +1736,14 @@ jobs
  However, if an individual job specifies a particular option that was specified
  above, it will be applied for that job.
  For example, if the 
-\emph on
+\series bold
 model
-\emph default
+\series default
 [] option is set at the top to ["Run 1", "Run2"], but a job in the joblist
  sets the 
-\emph on
+\series bold
 -model
-\emph default
+\series default
  option as "Run1", that job will be performed only on "Run1" data.
 \end_layout
 
@@ -1844,9 +1844,9 @@ The user may specify a comma-separated list of model names to be used for
  If multiple models are listed, the analyses will be performed on their
  union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 model
-\emph default
+\series default
 " option within the job command lines.
 \end_layout
 
@@ -1881,13 +1881,13 @@ The user may specify a comma-separated list of forecast and observation
  lead times in HH[MMSS] format to be used for any analyses to be performed.
  If multiple times are listed, the analyses will be performed on their union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 fcst_lead
-\emph default
+\series default
 " and "-
-\emph on
+\series bold
 obs_lead
-\emph default
+\series default
 " options within the job command lines.
 \end_layout
 
@@ -1947,33 +1947,33 @@ The user may specify the beginning, ending, and instantaneous valid times
  If multiple valid times fall within the valid time window, the analyses
  will be performed on their union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 fcst_valid_beg
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 fcst_valid_end
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 obs_valid_beg
-\emph default
+\series default
 ", "-
-\emph on
+\series bold
 obs_valid_end
-\emph default
+\series default
 ", 
 \begin_inset Quotes eld
 \end_inset
 
 
-\emph on
+\series bold
 fcst_valid_hour
-\emph default
+\series default
 " and "-
-\emph on
+\series bold
 obs_valid_hour
-\emph default
+\series default
 " options within the job command line.
 \end_layout
 
@@ -2033,14 +2033,14 @@ The user may specify the beginning, ending, or exact model initialization
  If multiple init times fall within the init time window, the analyses will
  be performed on their union.
  These selections may be further refined by using the 
-\emph on
+\series bold
 "-fcst_init_beg", "-fcst_init_end", "-obs_init_beg", "-obs_init_end", fcst_init_
 hour"
-\emph default
+\series default
  and 
-\emph on
+\series bold
 "-obs_init_hour"
-\emph default
+\series default
  options within the job command line.
 \end_layout
 
@@ -2076,13 +2076,13 @@ The user may specify a comma-separated list of forecast and observation
  If multiple variable types are listed, the analyses will be performed on
  their union.
  These selections may be further refined by using the "
-\emph on
+\series bold
 -fcst_var
-\emph default
+\series default
 " and "
-\emph on
+\series bold
 -obs_var
-\emph default
+\series default
 " options within the job command lines.
 \end_layout
 
@@ -2118,13 +2118,13 @@ The user may specify a comma-separated list of forecast and observation
  If multiple level types are listed, the analyses will be performed on their
  union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 fcst_lev
-\emph default
+\series default
 " and "-
-\emph on
+\series bold
 obs_lev
-\emph default
+\series default
 " options within the job command lines.
 \end_layout
 
@@ -2154,9 +2154,9 @@ The user may specify a comma-separated list of observation types to be used
  If multiple observation types are listed, the analyses will be performed
  on their union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 obtype
-\emph default
+\series default
 " option within the job command line.
 \end_layout
 
@@ -2186,9 +2186,9 @@ The user may specify a comma-separated list of verification masking regions
  If multiple verification masking regions are listed, the analyses will
  be performed on their union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 vx_mask
-\emph default
+\series default
 " option within the job command line.
  
 \end_layout
@@ -2219,9 +2219,9 @@ The user may specify a comma-separated list of interpolation methods to
  If multiple interpolation methods are listed, the analyses will be performed
  on their union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 interp_mthd
-\emph default
+\series default
 " option within the job command line.
 \end_layout
 
@@ -2251,9 +2251,9 @@ The user may specify a comma-separated list of interpolation points to be
  If multiple interpolation points are listed, the analyses will be performed
  on their union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 interp_pnts
-\emph default
+\series default
 " option within the job command line.
 \end_layout
 
@@ -2295,13 +2295,13 @@ The user may specify comma-separated lists of forecast, observation, and
  If multiple thresholds are listed, the analyses will be performed on their
  union.
  These selections may be further refined by using the "
-\emph on
+\series bold
 -fcst_thresh", "-obs_thresh"
-\emph default
+\series default
 , and 
-\emph on
+\series bold
 "-cov_thresh"
-\emph default
+\series default
  options within the job command lines.
 \end_layout
 
@@ -2330,9 +2330,9 @@ The user may specify a comma-separated list alpha confidence values to be
  used for all analyses.
  If alpha values are listed, the analyses will be performed on their union.
  These selections may be further refined by using the "
-\emph on
+\series bold
 -alpha
-\emph default
+\series default
 " option within the job command line.
 \end_layout
 
@@ -2362,9 +2362,9 @@ The user may specify a comma-separated list of line types to be used for
  If multiple line types are listed, the analyses will be performed on their
  union.
  These selections may be further refined by using the "-
-\emph on
+\series bold
 line_type
-\emph default
+\series default
 " option within the job command line.
  
 \end_layout
@@ -2446,9 +2446,9 @@ The user may specify one or more analysis jobs to be performed on the STAT
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 -job job_name
-\emph default
+\series default
  REQUIRED and OPTIONAL ARGUMENTS
 \end_layout
 
@@ -2456,9 +2456,9 @@ The user may specify one or more analysis jobs to be performed on the STAT
 
 \series medium
 All possible tasks for 
-\emph on
+\series bold
 job_name
-\emph default
+\series default
  are listed in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3197,9 +3197,9 @@ The output generated by the Stat-Analysis tool contains statistics produced
  for each line.
  Generally, the output is printed to the screen.
  However, it can be redirected to an output file using the "
-\emph on
+\series bold
 -out
-\emph default
+\series default
 " option.
  The format of output from each STAT job command is described below.
 \end_layout
@@ -3234,9 +3234,9 @@ Job: filter
 This job command finds and filters STAT lines down to those meeting criteria
  specified by the filter's options.
  The filtered STAT lines are written to a file specified by the "-
-\emph on
+\series bold
 dump_row
-\emph default
+\series default
 " option.
  
 \end_layout
@@ -3279,30 +3279,30 @@ Job: summary
 \series medium
 This job produces summary statistics for the column name and line type specified
  by the "-
-\emph on
+\series bold
 column
-\emph default
+\series default
 " and "-
-\emph on
+\series bold
 line_type
-\emph default
+\series default
 " options.
  The output of this job type consists of three lines.
  The first line contains "
-\emph on
+\series bold
 JOB_LIST
-\emph default
+\series default
 ", followed by a colon, then the filtering and job definition parameters
  used for this job.
  The second line contains "
-\emph on
+\series bold
 COL_NAME
-\emph default
+\series default
 ", followed by a colon, then the column names for the data in the next line.
  The third line contains the word "
-\emph on
+\series bold
 SUMMARY
-\emph default
+\series default
 ", followed by a colon, then the total, mean with confidence intervals,
  standard deviation with confidence intervals, minimum value, percentiles
  (10th, 25th, 50th, 75th, and 90th) and the maximum value.
@@ -3389,9 +3389,9 @@ Description
 
 \begin_layout Plain Layout
 
-\emph on
+\series bold
 SUMMARY
-\emph default
+\series default
 : (job type)
 \end_layout
 
@@ -3620,9 +3620,9 @@ Job: aggregate
 
 \series medium
 This job aggregates output from the STAT line type specified using the "-
-\emph on
+\series bold
 line_type
-\emph default
+\series default
 " argument.
  The output of this job type is in the same format as the line type specified
  (see Sections 
@@ -3649,14 +3649,14 @@ reference "sub:wavelet_stat-output"
 ).
  Again the output consists of three lines.
  The first line contains "
-\emph on
+\series bold
 JOB_LIST
-\emph default
+\series default
 ", as described above.
  The second line contains "
-\emph on
+\series bold
 COL_NAME
-\emph default
+\series default
 ", followed by a colon, then the column names for the line type selected.
  The third line contains the name of the line type selected followed by
  the statistics for that line type.
@@ -3672,28 +3672,28 @@ Job: aggregate_stat
 
 \series medium
 This job is similar to the "
-\emph on
+\series bold
 aggregate
-\emph default
+\series default
 " job listed above, however the format of its output is determined by the
  "-
-\emph on
+\series bold
 out_line_type
-\emph default
+\series default
 " argument.
  Again the output consists of three lines for "
-\emph on
+\series bold
 JOB_LIST", "COL_NAME
-\emph default
+\series default
 ", and the name of the output STAT line, as described above.
  Valid combinations of the "
-\emph on
+\series bold
 -line_type
-\emph default
+\series default
 " and "-
-\emph on
+\series bold
 out_line_type
-\emph default
+\series default
 " arguments are listed in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3944,13 +3944,13 @@ FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC
 
 \begin_layout Plain Layout
 (must specify "-
-\emph on
+\series bold
 out_fcst_thresh
-\emph default
+\series default
 " and "-
-\emph on
+\series bold
 out_obs_thresh
-\emph default
+\series default
 " arguments)
 \end_layout
 
@@ -3980,18 +3980,18 @@ Job: go_index
 \series medium
 The output from this job consists of three lines, the first two of which
  contain "
-\emph on
+\series bold
 JOB_LIST
-\emph default
+\series default
 " and "
-\emph on
+\series bold
 COL_NAME
-\emph default
+\series default
 ", as described above.
  The third line contains "
-\emph on
+\series bold
 GO_INDEX
-\emph default
+\series default
 " followed by a colon and then the value computed for the GO Index.
  
 \end_layout

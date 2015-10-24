@@ -100,15 +100,15 @@ This chapter provides a description of the Method for Object-Based Diagnostic
  Evaluation (MODE) tool, which was developed at the Research Applications
  Laboratory, NCAR/Boulder, USA.
  More information about MODE can be found in Davis 
-\emph on
+\series bold
 et al.
 
-\emph default
+\series default
  (2006a, b) and Brown 
-\emph on
+\series bold
 et al.
 
-\emph default
+\series default
  (2007).
 \end_layout
 
@@ -228,39 +228,39 @@ phi (u,v)
 
 \begin_layout Standard
 In this formula, 
-\emph on
+\series bold
 f
-\emph default
+\series default
  is the raw data field, 
 \begin_inset Formula $\phi$
 \end_inset
 
  is the filter function, and 
-\emph on
+\series bold
 C
-\emph default
+\series default
  is the resulting convolved field.
  The variables (
-\emph on
+\series bold
 x, y
-\emph default
+\series default
 ) and (
-\emph on
+\series bold
 u, v
-\emph default
+\series default
 ) are grid coordinates.
  The filter function 
 \begin_inset Formula $\phi$
 \end_inset
 
  is a simple circular filter determined by a radius of influence 
-\emph on
+\series bold
 R
-\emph default
+\series default
 , and a height 
-\emph on
+\series bold
 H
-\emph default
+\series default
 :
 \end_layout
 
@@ -311,13 +311,13 @@ cr
 
 \begin_layout Standard
 The parameters 
-\emph on
+\series bold
 R
-\emph default
+\series default
  and 
-\emph on
+\series bold
 H
-\emph default
+\series default
  are not independent.
  They are related by the requirement that the integral of 
 \begin_inset Formula $\phi$
@@ -344,30 +344,30 @@ pi R^2H=1.$$
 
 \begin_layout Standard
 Thus, the radius of influence 
-\emph on
+\series bold
 R
-\emph default
+\series default
  is the only tunable parameter in the convolution process.
  Once 
-\emph on
+\series bold
 R
-\emph default
+\series default
  is chosen, 
-\emph on
+\series bold
 H
-\emph default
+\series default
  is determined by the above equation.
 \end_layout
 
 \begin_layout Standard
 Once the convolved field 
-\emph on
+\series bold
 C
-\emph default
+\series default
  is in hand, it is thresholded to create a mask field 
-\emph on
+\series bold
 M
-\emph default
+\series default
 :
 \end_layout
 
@@ -433,15 +433,15 @@ $T$
 
  is the threshold.
  The objects are the connected regions where 
-\emph on
+\series bold
 M = 1
-\emph default
+\series default
 .
  Finally, the raw data are restored to object interiors to obtain the object
  field 
-\emph on
+\series bold
 F
-\emph default
+\series default
 :
 \end_layout
 
@@ -461,13 +461,13 @@ $$F(x,y)=M(x,y)f(x,y).$$
 
 \begin_layout Standard
 Thus, two parameters --- the radius of influence 
-\emph on
+\series bold
 R
-\emph default
+\series default
 , and the threshold 
-\emph on
+\series bold
 T
-\emph default
+\series default
  --- control the entire process of resolving objects in the raw data field.
 \end_layout
 
@@ -938,9 +938,9 @@ alpha_n)$
 
 \begin_layout Standard
 Next, scalar weights 
-\emph on
+\series bold
 w
-\emph default
+\series default
 
 \begin_inset Formula $_{i}$
 \end_inset
@@ -956,9 +956,9 @@ w
 \begin_layout Standard
 Finally, all these ingredients are collected into a single number called
  the total interest, 
-\emph on
+\series bold
 T
-\emph default
+\series default
 , given by:
 \begin_inset Newline newline
 \end_inset

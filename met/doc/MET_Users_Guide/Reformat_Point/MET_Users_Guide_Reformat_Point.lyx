@@ -315,10 +315,10 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 pb2nc
 \series medium
-\emph default
+\series default
  has both required and optional arguments.
  
 \end_layout
@@ -562,9 +562,9 @@ reference "sec:Install_Sample-test-cases"
 \end_inset
 
  is available in 
-\emph on
+\series bold
 scripts/config
-\emph default
+\series default
 .
  It is recommended that users make a copy of configuration files prior to
  modifying their contents.
@@ -2517,10 +2517,10 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 ascii2nc
 \series medium
-\emph default
+\series default
  has two required arguments and can take several optional ones.
  
 \end_layout
@@ -2651,9 +2651,9 @@ option directs output and errors to the specified log file.
 
 \series medium
 An example of the 
-\emph on
+\series bold
 ascii2nc
-\emph default
+\series default
  calling sequence is shown below:
 \end_layout
 
@@ -3211,9 +3211,9 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-\emph on
+\series bold
 madis2nc
-\emph default
+\series default
  has required arguments and can also take optional ones.
  
 \end_layout

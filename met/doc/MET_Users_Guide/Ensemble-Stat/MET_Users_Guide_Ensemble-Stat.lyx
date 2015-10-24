@@ -340,9 +340,9 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 ensemble_stat
-\emph default
+\series default
  
 \series medium
 has required arguments and can take many optional ones.
@@ -565,13 +565,13 @@ name "sub:ensemble_stat-configuration-file"
 
 \series medium
 The default configuration file for the Ensemble-Stat tool named 
-\emph on
+\series bold
 EnsembleStatConfig_default
-\emph default
+\series default
  can be found in the installed 
-\emph on
+\series bold
 share/met/config
-\emph default
+\series default
  directory.
  Another version is located in scripts/config.
  We encourage users to make a copy of these files prior to modifying their

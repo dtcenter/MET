@@ -93,7 +93,10 @@ Several MET tools exist for the purpose of reformatting gridded fields.
  Both the input and output file formats of these reformatting tools are
  described in this chapter.
  These tools are represented by the reformatting column of MET flowchart
- depicted in Fig.
+ depicted in 
+\series default
+Figure
+\series medium
  
 \begin_inset CommandInset ref
 LatexCommand ref

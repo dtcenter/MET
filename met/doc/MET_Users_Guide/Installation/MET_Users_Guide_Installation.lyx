@@ -972,9 +972,9 @@ The
 scripts/Rscripts
 \series medium
  directory contains a handful of sample R scripts, include 
-\emph on
+\series bold
 plot_tcmpr.R
-\emph default
+\series default
 , which provides graphic utilities for MET-TC.
  For more information on the graphics capabilities, see Section 
 \begin_inset CommandInset ref

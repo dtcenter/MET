@@ -138,9 +138,9 @@ This section describes how to configure and run the TC-Pairs tool.
  Output from the TC-dland tool (NetCDF gridded distance file) is also a
  required input for the TC-Pairs tool.
  It is recommended to run 
-\emph on
+\series bold
 tc_pairs
-\emph default
+\series default
  on a storm-by-storm basis, rather than over multiple storms or seasons
  to avoid memory issues.
 \end_layout
@@ -264,10 +264,10 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
+\series bold
 tc_pairs
 \series medium
-\emph default
+\series default
  has three required arguments and can take up to three optional arguments.
 \end_layout
 
@@ -403,9 +403,9 @@ In this example, the TC-Pairs tool matches the model track (aal092010.dat)
  in 2010.
  The track matching and subsequent error information is generated with configura
 tion options specified in the 
-\emph on
+\series bold
 TCPairsConfig
-\emph default
+\series default
  file.
 \end_layout
 
@@ -948,13 +948,13 @@ BTCLIP
 BTCLIP5
 \series medium
 : 5-day CLIPER (
-\emph on
+\series bold
 Aberson, 1998
-\emph default
+\series default
 )/SHIFOR (
-\emph on
+\series bold
 DeMaria and Knaff, 2001
-\emph default
+\series default
 ) in best track mode for either Atlantic or eastern North Pacific basins.
  Specify model as BCS5.
 \end_layout
@@ -1025,13 +1025,13 @@ OCLIP
 OCLIP5
 \series medium
 : 5-day CLIPER (
-\emph on
+\series bold
 Aberson, 1998
-\emph default
+\series default
 )/ SHIFOR (
-\emph on
+\series bold
 DeMaria and Knaff, 2001
-\emph default
+\series default
 ) in operational mode, rerun using CARQ data.
  Specify model as OCS5.
 \end_layout
@@ -1042,13 +1042,13 @@ DeMaria and Knaff, 2001
 OCLIPD5
 \series medium
 : 5-day CLIPER (
-\emph on
+\series bold
 Aberson, 1998
-\emph default
+\series default
 )/ DECAY-SHIFOR (
-\emph on
+\series bold
 DeMaria and Knaff, 2001
-\emph default
+\series default
 ).
  Specify model as OCD5.
 \end_layout
@@ -1108,7 +1108,7 @@ height "1pt"
 
 \series bold
 dland_file = "
-\emph on
+\series bold
 MET_BASE/tc_data/dland_global_tenth_degree.nc";
 \end_layout
 
@@ -1121,9 +1121,9 @@ dland_file
 \series medium
  string specifies the path of the NetCDF format file (default file: dland_global
 _tenth_degree.nc) to be used for the distance to land check in the 
-\emph on
+\series bold
 tc_pairs code
-\emph default
+\series default
 .
  This file is generated using tc_dland (default file provided in installed
  
@@ -1189,9 +1189,9 @@ file_name
  when a watch or warning is in affect during the forecast initialization
  and verification times.
  The default file is named 
-\emph on
+\series bold
 wwpts_us.txt
-\emph default
+\series default
 , which is found in the installed 
 \series bold
 share/met/tc_data/
