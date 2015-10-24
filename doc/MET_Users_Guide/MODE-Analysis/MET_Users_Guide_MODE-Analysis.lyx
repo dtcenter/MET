@@ -369,45 +369,28 @@ hskip 0.5in}
 Required arguments for mode_analysis:
 \end_layout
 
-\begin_layout Standard
-
-\series medium
-The MODE-Analysis tool requires specification of a ``job type'' and a filename
- or directory indicated by the 
-\series bold
--lookin
-\series default
- option.
+\begin_layout Description
+1.
  The 
 \series bold
 -lookin
 \series default
- option may be called multiple times.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The MODE-Analysis tool can perform two basic types of jobs, which are identified
- as follows: 
-\end_layout
-
-\begin_layout LyX-Code
-
+ 
 \series bold
--summary
+path
+\series default
+ specifies the name of a specific STAT file (any file ending in .stat) or
+ the name of a directory where the Stat-Analysis tool will search for STAT
+ files.
+ This option may be used multiple times to specify multiple locations.
 \end_layout
 
-\begin_layout LyX-Code
-
-\series bold
--bycase
-\end_layout
-
-\begin_layout Standard
-
+\begin_layout Description
+2.
+ 
 \series medium
-Exactly one of these job types must be specified.
+The MODE-Analysis tool can perform two basic types of jobs -summary or -bycase.
+ Exactly one of these job types must be specified.
  
 \end_layout
 
@@ -450,20 +433,15 @@ Specifying
 
 \begin_layout Standard
 
-\series medium
-The output for each of these jobs types is described in later sections.
-\end_layout
-
-\begin_layout Standard
-Optional arguments for 
 \series bold
-mode_analysis
-\series default
- 
+Optional arguments for mode_analysis 
 \end_layout
 
 \begin_layout Standard
 
+\series bold
+3.
+ 
 \series medium
 The 
 \series bold
@@ -475,6 +453,9 @@ mode_analysis
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Analysis options
 \end_layout
 
@@ -591,6 +572,7 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
+\bar under
 MODE Command Line Options
 \end_layout
 
@@ -609,8 +591,10 @@ MODE comand line options are used to create filters that determine which
 \begin_layout Standard
 
 \series bold
+\bar under
 Toggles
 \series default
+\bar default
  
 \end_layout
 
@@ -747,6 +731,7 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
+\bar under
 Multiple-set string options
 \series default
  
@@ -906,8 +891,10 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
+\bar under
 Multiple-set integer options
 \series default
+\bar default
  
 \end_layout
 
@@ -1059,7 +1046,10 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
-Integer max/min options 
+\bar under
+Integer max/min options
+\bar default
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1277,7 +1267,10 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
-Date/time max/min options 
+\bar under
+Date/time max/min options
+\bar default
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1386,6 +1379,7 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
+\bar under
 Floating-point max/min options 
 \end_layout
 
@@ -2121,6 +2115,7 @@ height "1pt"
 \begin_layout Standard
 
 \series bold
+\bar under
 Miscellaneous options
 \end_layout
 
