@@ -22,7 +22,7 @@ obtype = "ANALYS";
 // Verification grid
 //
 regrid = {
-   to_grid = ${TO_GRID}
+   to_grid = ${TO_GRID};
    method  = BUDGET;
    width   = 2;
 }

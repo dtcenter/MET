@@ -53,7 +53,7 @@ fcst = {
    inten_perc_value  = 100;
    inten_perc_thresh = >=0.0;
    merge_thresh      = >=3.5;
-   merge_flag        = ${MERGE_FLAG}
+   merge_flag        = ${MERGE_FLAG};
 }
 obs = fcst;
 obs = {
@@ -68,12 +68,12 @@ obs = {
 //
 // Handle missing data
 //
-mask_missing_flag = ${MASK_MISSING}
+mask_missing_flag = ${MASK_MISSING};
 
 //
 // Match objects between the forecast and observation fields
 //
-match_flag = ${MATCH_FLAG}
+match_flag = ${MATCH_FLAG};
 
 //
 // Maximum centroid distance for objects to be compared
@@ -89,7 +89,7 @@ mask = {
    grid      = "";
    grid_flag = NONE; // Apply to NONE, FCST, OBS, or BOTH
    poly      = "${MASK_POLY}";
-   poly_flag = ${POLY_FLAG} // Apply to NONE, FCST, OBS, or BOTH
+   poly_flag = ${POLY_FLAG}; // Apply to NONE, FCST, OBS, or BOTH
 }
 
 ////////////////////////////////////////////////////////////////////////////////
