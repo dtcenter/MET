@@ -1083,8 +1083,17 @@ This section contains a description of how MODE can be configured and run.
  model data using gridded observations.
  The input gridded model and observation datasets must be in one of the
  MET supported gridded file formats.
- In both cases, the input model and observation dataset must be on a common
- grid.
+ 
+\series medium
+The requirement of having all gridded fields using the same grid specification
+ has been removed with METv5.1.
+ The Grid-Stat tool performs no interpolation when the input model, observation,
+ and climatology datasets must be on a common grid.
+ MET will interpolate these files to a common grid if one is specified.
+ There is a regrid option in the configuration file that allows the user
+ to define the grid upon which the scores will be computed.
+
+\series default
  The gridded analysis data may be based on observations, such as Stage II
  or Stage IV data for verifying accumulated precipitation, or a model analysis
  field may be used.

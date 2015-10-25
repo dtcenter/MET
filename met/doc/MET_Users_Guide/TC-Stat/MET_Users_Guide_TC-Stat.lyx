@@ -291,7 +291,7 @@ The TC-Stat tool can also be used to generate frequency of superior performance
 \begin_layout Standard
 
 \series bold
-\series bold
+\bar under
 Frequency of Superior Performance
 \end_layout
 
@@ -311,7 +311,7 @@ The frequency of superior performance (FSP) looks at multiple model forecasts
 \begin_layout Standard
 
 \series bold
-\series bold
+\bar under
 Time-Series Independence
 \end_layout
 
@@ -342,10 +342,8 @@ name "sec:Practical-information-1"
 \series medium
 The following sections describe the usage statement, required arguments,
  and optional arguments for 
-\series default
 \series bold
 tc_stat
-\series medium
 \series default
 .
 \end_layout
@@ -365,10 +363,8 @@ name "sub:tc_stat-usage"
 
 \series medium
 The usage statement for 
-\series default
 \series bold
 tc_stat
-\series medium
 \series default
  is shown below:
 \end_layout
@@ -653,9 +649,7 @@ TC-Stat
 \series bold
 TCStatConfig_default
 \series default
- can be found in the installed 
-\series default
-share/met/config
+ can be found in the installed share/met/config
 \series medium
  directory.
  Like the other configuration files described in this document, it is recommende
@@ -1075,7 +1069,6 @@ The following filtering options can be achieved by the following:
 
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 1.
  init_str_name = ["WATCH_WARN"];
@@ -1084,7 +1077,6 @@ The following filtering options can be achieved by the following:
 \begin_deeper
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 init_str_val = ["ALL"];
 \end_layout
@@ -1092,7 +1084,6 @@ init_str_val = ["ALL"];
 \end_deeper
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 2.
  column_str_name = ["WATCH_WARN"];
@@ -1101,7 +1092,6 @@ init_str_val = ["ALL"];
 \begin_deeper
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 column_str_val = ["ALL"];
 \end_layout
@@ -1109,7 +1099,6 @@ column_str_val = ["ALL"];
 \end_deeper
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 3.
  init_str_name = ["WATCH_WARN"];
@@ -1118,7 +1107,6 @@ column_str_val = ["ALL"];
 \begin_deeper
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 init_str_val = ["NA"];
 \end_layout
@@ -1126,7 +1114,6 @@ init_str_val = ["NA"];
 \end_deeper
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 4.
  column_str_name = ["WATCH_WARN"];
@@ -1135,7 +1122,6 @@ init_str_val = ["NA"];
 \begin_deeper
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 column_str_val = ["NA"];
 \end_layout
@@ -1843,7 +1829,6 @@ Please refer to the README_TC in data/config for details on how to call
 
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 -job job_name REQUIRED and OPTIONAL ARGUMENTS
 \end_layout
@@ -1854,14 +1839,12 @@ Please refer to the README_TC in data/config for details on how to call
 
 \begin_layout LyX-Code
 
-\series medium
 \series bold
 e.g.: -job filter -amodel HWFI -dump_row ./tc_filter_job.tcst
 \end_layout
 
 \begin_layout LyX-Code
 
-\series medium
 \series bold
       -job summary -line_type TCMPR -column TK_ERR -dump_row ./tc_summary_job.tcst
 \end_layout
