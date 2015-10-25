@@ -200,7 +200,7 @@ reference "chap:App_C-Verification-Measures"
 
 \begin_layout Subsubsection*
 
-\shape slanted
+\bar under
 Measures for categorical variables
 \end_layout
 
@@ -223,6 +223,8 @@ reference "chap:App_C-Verification-Measures"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Measures for continuous variables
 \end_layout
 
@@ -275,6 +277,8 @@ c difference).
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Measures for probabilistic forecasts and dichotomous outcomes
 \end_layout
 
@@ -312,6 +316,8 @@ Probabilistic forecast values are assumed to have a range of either 0 to
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Use of a climatology field for comparative verification
 \end_layout
 
@@ -336,6 +342,8 @@ reference "sub:Climatology"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Use of analysis fields for verification
 \end_layout
 
@@ -488,7 +496,10 @@ This section contains information about configuring and running the Grid-Stat
  The Grid-Stat tool verifies gridded model data using gridded observations.
  The input gridded model and observation datasets must be in one of the
  MET supported file formats.
- The input model and observation datasets must be on a common grid.
+ The requirement of having all gridded fields using the same grid specification
+ has been removed with METv5.1.
+ There is a regrid option in the configuration file that allows the user
+ to define the grid upon which the scores will be computed.
  The gridded observation data may be a gridded analysis based on observations
  such as Stage II or Stage IV data for verifying accumulated precipitation,
  or a model analysis field may be used.
@@ -500,8 +511,8 @@ This section contains information about configuring and running the Grid-Stat
 \series medium
 The Grid-Stat tool provides the capability of verifying one or more model
  variables/levels using multiple thresholds for each model variable/level.
- The Grid-Stat tool performs no interpolation because the input model, observati
-on, and climatology datasets must be on a common grid.
+ The Grid-Stat tool performs no interpolation when the input model, observation,
+ and climatology datasets must be on a common grid.
  MET will interpolate these files to a common grid if one is specified.
  The interpolation parameters may be used to perform a smoothing operation
  on the forecast field prior to verifying it to investigate how the scale
@@ -634,7 +645,6 @@ hskip 0.5in}
 
 \series bold
 grid_stat
-\series medium
 \series default
  has some required arguments and accepts several optional ones.
 \end_layout
@@ -810,17 +820,13 @@ sample_fcst.nc
 \series bold
 pcp_combine
 \series default
-, using the observations in the 
-\series default
-sample_obs.nc
+, using the observations in the sample_obs.nc
 \series medium
  NetCDF output of 
 \series bold
 pcp_combine
 \series default
-, and applying the configuration options specified in the 
-\series default
-GridStatConfig
+, and applying the configuration options specified in the GridStatConfig
 \series medium
  file.
  Because the model and observation files contain only a single field of
@@ -1492,7 +1498,6 @@ name "sub:grid_stat-output"
 
 \begin_layout Standard
 
-\series medium
 \series bold
 grid_stat
 \series default
@@ -1500,9 +1505,7 @@ grid_stat
  The ASCII output duplicates the STAT output but has the data organized
  by line type.
  The output files are written to the default output directory or the directory
- specified by the 
-\series default
--outdir
+ specified by the -outdir
 \series medium
  command-line option.
  
