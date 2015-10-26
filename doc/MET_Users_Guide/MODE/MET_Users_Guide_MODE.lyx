@@ -2341,187 +2341,49 @@ interest_function = {
 \begin_layout LyX-Code
 
 \series bold
-   centroid_dist = (
+   centroid_dist    = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-      ( 0.0, 1.0 )
+   boundary_dist    = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-      ( 60.0/grid_res, 1.0 )
+   convex_hull_dist = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-      ( 600.0/grid_res, 0.0 )
+   angle_diff       = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   );
+   corner           = 0.8;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   boundary_dist = (
+   ratio_if         = ( ( 0.0, 0.0 ) ( corner, 1.0 ) ( 1.0, 1.0 ) );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-      ( 0.0, 1.0 )
+   area_ratio       = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-      ( 400.0/grid_res, 0.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   );
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   convex_hull_dist = (
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 0.0, 1.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 400.0/grid_res, 0.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   );
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   angle_diff = (
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 0.0, 1.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 30.0, 1.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 90.0, 0.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   );
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   corner = 0.8;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   ratio_if = (
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 0.0, 0.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( corner, 1.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 1.0, 1.0 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   );
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   area_ratio = ratio_if;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   int_area_ratio = (
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 0.00, 0.00 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 0.10, 0.50 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 0.25, 1.00 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-      ( 1.00, 1.00 )
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   );
+   int_area_ratio   = (...);
 \end_layout
 
 \begin_layout LyX-Code
