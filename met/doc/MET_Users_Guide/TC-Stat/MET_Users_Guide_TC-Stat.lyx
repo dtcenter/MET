@@ -461,7 +461,13 @@ hskip 0.5in}
 
 \series medium
 TC-Stat has one required argument and accepts optional ones.
- The usage statement for the TC-Stat tool includes the "job" term, which
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for the TC-Stat tool includes the "job" term, which
  refers to the set of tasks to be performed after applying user-specified
  filtering options.
  The filtering options are used to pare down the TC-Pairs output to only
@@ -492,6 +498,7 @@ reference "sub:tc_stat-configuration-file"
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for tc_stat
 \end_layout
 

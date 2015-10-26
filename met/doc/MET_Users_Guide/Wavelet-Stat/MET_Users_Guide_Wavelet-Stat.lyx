@@ -340,10 +340,14 @@ n
  
 \end_layout
 
-\begin_layout Description
-Note that the wavelet transform is a linear operator: this implies that
- the difference of the spatial scale components of the binary forecast and
- observation fields (Figure 
+\begin_layout Standard
+
+\series bold
+Note
+\series default
+ that the wavelet transform is a linear operator: this implies that the
+ difference of the spatial scale components of the binary forecast and observati
+on fields (Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "NIMROD_binary_fcst"
@@ -386,8 +390,12 @@ reference "NIMROD_binary_scale9"
  160km displaced almost its entire length.
 \end_layout
 
-\begin_layout Description
-Note also that the means of the binary forecast and observation fields (i.e.
+\begin_layout Standard
+
+\series bold
+Note
+\series default
+ also that the means of the binary forecast and observation fields (i.e.
  their largest father wavelet components) are equal to the proportion of
  forecast and observed events above the threshold,
 \series bold
@@ -496,9 +504,13 @@ hbox{MSE}(t)$
  its entire length.
 \end_layout
 
-\begin_layout Description
-Note that the MSE of the original binary fields is equal to the proportion
- of the counts of misses (
+\begin_layout Standard
+
+\series bold
+Note
+\series default
+ that the MSE of the original binary fields is equal to the proportion of
+ the counts of misses (
 \series bold
 c/n
 \series default
@@ -678,7 +690,7 @@ hbox {random}$
 
 \end_layout
 
-\begin_layout Description
+\begin_layout Standard
 The Intensity-Scale (IS) skill score evaluates the forecast skill as a function
  of the precipitation intensity and of the spatial scale of the error.
  Positive values of the IS skill score are associated to a skillful forecast,
@@ -694,6 +706,7 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function
 
 \begin_layout Standard
 \begin_inset Float table
+placement h
 wide false
 sideways false
 status open
@@ -1942,13 +1955,14 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-wavelet_stat has both required arguments and optional ones.
+wavelet_stat has three required arguments and accepts several optional ones.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for wavelet_stat
 \end_layout
 
@@ -2104,11 +2118,10 @@ scripts/config
 We recommend that users make a copy of the default (or other) configuration
  file prior to modifying it.
  The contents are described in more detail below.
-\end_layout
 
-\begin_layout Standard
-Note that environment variables may be used when editing configuration files,
- as described in the section 
+\series default
+ Note that environment variables may be used when editing configuration
+ files, as described in the section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:pb2nc-configuration-file"
@@ -3920,8 +3933,8 @@ name "table_NetCDF_dim_Wave_output"
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="1.6in">
-<column alignment="left" valignment="top" width="5.25in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="4.5in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -4137,9 +4150,9 @@ name "_table_variables_wave_NetCDF_output"
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
 <features rotate="0" tabularvalignment="middle">
-<column alignment="left" valignment="top" width="2in">
-<column alignment="left" valignment="top">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="2.2in">
+<column alignment="left" valignment="top" width="1.3in">
+<column alignment="left" valignment="top" width="2.5in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text

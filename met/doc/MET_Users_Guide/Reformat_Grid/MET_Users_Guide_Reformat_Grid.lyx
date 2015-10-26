@@ -505,6 +505,7 @@ out_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for the pcp_combine
 \end_layout
 
@@ -597,6 +598,7 @@ level
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for the pcp_combine sum command
 \end_layout
 
@@ -728,6 +730,7 @@ reg_exp
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for the pcp_combine add command
 \end_layout
 
@@ -771,6 +774,7 @@ An arbitrary number of additional files and accumulations can be provided.
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for the pcp_combine subtract command
 \end_layout
 
@@ -1602,6 +1606,7 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for regrid_data_plane
 \end_layout
 
@@ -2101,16 +2106,15 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-\emph on
-shift_data_plane
-\emph default
- has some required arguments and can also take optional ones.
+shift_data_plane has five required arguments and can also take optional
+ ones.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for shift_data_plane
 \end_layout
 
@@ -2542,16 +2546,15 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-\emph on
-modis_regrid
-\emph default
- has some required arguments and can also take optional ones.
+modis_regrid tool has some required arguments and can also take optional
+ ones.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for modis_regrid
 \end_layout
 

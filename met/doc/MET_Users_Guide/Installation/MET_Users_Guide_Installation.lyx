@@ -162,16 +162,12 @@ name "sec:Install_Programming-languages"
 \begin_layout Standard
 
 \series medium
-The MET package is written primarily in C/C++ in order to be compatible
- with an extensive verification code base in C/C++ already in existence.
- In addition, the object-based MODE verification tool relies heavily on
- the object-oriented aspects of C++.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Knowledge of C/C++ is not necessary to use the MET package.
+The MET package, including MET-TC, is written primarily in C/C++ in order
+ to be compatible with an extensive verification code base in C/C++ already
+ in existence.
+ In addition, the object-based MODE and MODE-TD verification tools relies
+ heavily on the object-oriented aspects of C++.
+ Knowledge of C/C++ is not necessary to use the MET package.
  The MET package has been designed to be highly configurable through the
  use of ASCII configuration files, enabling a great deal of flexibility
  without the need for source code modifications.
@@ -1158,11 +1154,7 @@ Configure and execute the build
 \end_layout
 
 \begin_layout Standard
-Example:
-\end_layout
-
-\begin_layout Standard
-
+Example: 
 \series medium
 To configure MET to install all of the available tools in the "bin" subdirectory
  of your current directory, you would use the following commands:

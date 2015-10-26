@@ -646,12 +646,13 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-grid_stat has some required arguments and accepts several optional ones.
+grid_stat has three required arguments and accepts several optional ones.
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for grid_stat
 \end_layout
 
@@ -783,11 +784,9 @@ GridStatConfig
 \begin_layout Standard
 
 \series medium
-A second example of the 
-\series bold
-grid_stat
+A second example of the
 \series default
- calling sequence is listed below:
+ grid_stat calling sequence is listed below:
 \end_layout
 
 \begin_layout Standard
@@ -1533,8 +1532,16 @@ HHMMSSL
 YYYYMMDD_HHMMSSV
 \series medium
  indicates the forecast valid time.
- The output ASCII files are named similarly: 
-\series default
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The output ASCII files are named similarly: 
+\end_layout
+
+\begin_layout Standard
 grid_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
 \series medium
  where 
