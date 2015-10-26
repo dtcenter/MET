@@ -321,6 +321,7 @@ pb2nc has both required and optional arguments.
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for pb2nc
 \end_layout
 
@@ -361,6 +362,7 @@ config_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for pb2nc
 \end_layout
 
@@ -2506,17 +2508,14 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-ascii2nc
-\series default
- has two required arguments and can take several optional ones.
+ascii2nc has two required arguments and can take several optional ones.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for ascii2nc
 \end_layout
 
@@ -2545,6 +2544,7 @@ netcdf_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for ascii2nc
 \end_layout
 
@@ -3018,7 +3018,11 @@ The usage statement for MADIS2NC tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: madis2nc
+
+\series bold
+Usage:
+\series default
+ madis2nc
 \end_layout
 
 \begin_layout LyX-Code
@@ -3198,17 +3202,14 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-madis2nc
-\series default
- has required arguments and can also take optional ones.
+madis2nc has required arguments and can also take optional ones.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for madis2nc
 \end_layout
 
@@ -3249,6 +3250,7 @@ netcdf_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for madis2nc
 \end_layout
 

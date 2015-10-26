@@ -357,8 +357,10 @@ indicates the NetCDF output file containing the computed distances to land.
 
 \begin_layout Description
 
+\bar under
+Optional 
 \series bold
-Optional arguments for tc_dland
+arguments for tc_dland
 \end_layout
 
 \begin_layout Description

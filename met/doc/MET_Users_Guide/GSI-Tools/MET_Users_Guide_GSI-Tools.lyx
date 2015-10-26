@@ -346,6 +346,9 @@ gsi_file_1 [gsi_file2 ...
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Optional arguments for gsid2mpr
 \end_layout
 
@@ -2315,6 +2318,9 @@ ens_file_list
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Optional arguments for gsidens2orank
 \end_layout
 

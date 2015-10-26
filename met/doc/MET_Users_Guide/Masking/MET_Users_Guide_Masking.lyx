@@ -462,9 +462,11 @@ out_file
 \end_layout
 
 \begin_layout Description
-Optional
+
+\bar under
+Optional 
 \series bold
- arguments for gen_vx_mask
+arguments for gen_vx_mask
 \end_layout
 
 \begin_layout Description

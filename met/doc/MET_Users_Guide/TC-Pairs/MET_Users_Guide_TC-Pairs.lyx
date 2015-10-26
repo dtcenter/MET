@@ -338,6 +338,7 @@ argument indicates the name of the configuration file to be used.
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for tc_pairs
 \end_layout
 

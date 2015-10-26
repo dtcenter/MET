@@ -302,6 +302,7 @@ ps_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for plot_point_obs
 \end_layout
 
@@ -613,6 +614,7 @@ field_string
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for plot_data_plane
 \end_layout
 
@@ -904,6 +906,8 @@ mode_nc_file_list
 \end_layout
 
 \begin_layout Description
+
+\bar under
 Optional 
 \series bold
 arguments for plot_mode_field

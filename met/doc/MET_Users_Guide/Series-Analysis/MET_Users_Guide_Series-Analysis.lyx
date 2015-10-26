@@ -394,6 +394,7 @@ obs_file_list
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for series_analysis
 \end_layout
 
@@ -569,7 +570,14 @@ share/met/config
 
 \series medium
 Note that environment variables may be used when editing configuration files,
- as described in the section 3.5.2 for the PB2NC tool.
+ as described in the Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
 \end_layout
 
 \begin_layout Standard

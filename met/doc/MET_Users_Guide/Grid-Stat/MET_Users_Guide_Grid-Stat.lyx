@@ -688,6 +688,7 @@ config_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for grid_stat
 \end_layout
 
@@ -1566,7 +1567,11 @@ nbrcnt
 The format of the STAT and ASCII output of the Grid-Stat tool are the same
  as the format of the STAT and ASCII output of the Point-Stat tool with
  the exception of the three additional neighborhood line types.
- Please refer to the tables in section 
+ Please refer to the tables in 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:point_stat-output"

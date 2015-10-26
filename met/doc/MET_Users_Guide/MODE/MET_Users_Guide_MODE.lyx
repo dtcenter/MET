@@ -58,8 +58,8 @@
 \bottommargin 1in
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation skip
-\defskip bigskip
+\paragraph_separation indent
+\paragraph_indentation 0bp
 \quotes_language english
 \papercolumns 1
 \papersides 1
@@ -1296,6 +1296,7 @@ config_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for mode
 \end_layout
 
@@ -3056,6 +3057,10 @@ MODE produces output in ASCII, NetCDF, and PostScript formats.
 
 \begin_layout Paragraph
 ASCII output
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3070,195 +3075,12 @@ The MODE tool creates two ASCII output files.
  have been applied.
  The fourth, and last, line contains data comparing the derived object fields
  scored using traditional measures.
- This file uses the following naming convention: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$$
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hbox{
-\backslash
-tt mode
-\backslash
-_PREFIX
-\backslash
-_FCST
-\backslash
-_VAR
-\backslash
-_LVL
-\backslash
-_vs
-\backslash
-_OBS
-\backslash
-_VAR
-\backslash
-_LVL
-\backslash
-_HHMMSSL
-\backslash
-_YYYYMMDD
-\backslash
-_HHMMSSV
-\backslash
-_HHMMSSA
-\backslash
-_cts.txt}
-\end_layout
-
-\begin_layout Plain Layout
-
-$$
-\end_layout
-
+\begin_inset Newline newline
 \end_inset
 
-where 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt PREFIX}
-\end_layout
-
-\end_inset
-
- indicates the user-defined output prefix, 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt FCST
-\backslash
-_VAR
-\backslash
-_LVL}
-\end_layout
-
-\end_inset
-
- is the forecast variable and vertical level being used, 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt OBS
-\backslash
-_VAR
-\backslash
-_LVL}
-\end_layout
-
-\end_inset
-
- is the observation variable and vertical level being used, 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt HHMMSSL}
-\end_layout
-
-\end_inset
-
- indicates the forecast lead time, 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt YYYYMMDD
-\backslash
-_HHMMSSV}
-\end_layout
-
-\end_inset
-
- indicates the forecast valid time, and 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt HHMMSSA}
-\end_layout
-
-\end_inset
-
- indicates the accumulation period.
- The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt cts}
-\end_layout
-
-\end_inset
-
- string stands for contingency table statistics.
- The generation of this file can be disabled using the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt ct
-\backslash
-_stats
-\backslash
-_flag}
-\end_layout
-
-\end_inset
-
- option in the configuration file.
- This CTS output file differs somewhat from the CTS output of the Point-Stat
- and Grid-Stat tools.
- The columns of this output file are summarized in table 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "CTS_output"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
+ 
 \begin_inset Float table
+placement H
 wide false
 sideways false
 status open
@@ -4388,6 +4210,194 @@ Odds Ratio
 \end_layout
 
 \begin_layout Standard
+This first file uses the following naming convention:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{
+\backslash
+tt mode
+\backslash
+_PREFIX
+\backslash
+_FCST
+\backslash
+_VAR
+\backslash
+_LVL
+\backslash
+_vs
+\backslash
+_OBS
+\backslash
+_VAR
+\backslash
+_LVL
+\backslash
+_HHMMSSL
+\backslash
+_YYYYMMDD
+\backslash
+_HHMMSSV
+\backslash
+_HHMMSSA
+\backslash
+_cts.txt}
+\end_layout
+
+\begin_layout Plain Layout
+
+$$
+\end_layout
+
+\end_inset
+
+where 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt PREFIX}
+\end_layout
+
+\end_inset
+
+ indicates the user-defined output prefix, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt FCST
+\backslash
+_VAR
+\backslash
+_LVL}
+\end_layout
+
+\end_inset
+
+ is the forecast variable and vertical level being used, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt OBS
+\backslash
+_VAR
+\backslash
+_LVL}
+\end_layout
+
+\end_inset
+
+ is the observation variable and vertical level being used, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt HHMMSSL}
+\end_layout
+
+\end_inset
+
+ indicates the forecast lead time, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt YYYYMMDD
+\backslash
+_HHMMSSV}
+\end_layout
+
+\end_inset
+
+ indicates the forecast valid time, and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt HHMMSSA}
+\end_layout
+
+\end_inset
+
+ indicates the accumulation period.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt cts}
+\end_layout
+
+\end_inset
+
+ string stands for contingency table statistics.
+ The generation of this file can be disabled using the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt ct
+\backslash
+_stats
+\backslash
+_flag}
+\end_layout
+
+\end_inset
+
+ option in the configuration file.
+ This CTS output file differs somewhat from the CTS output of the Point-Stat
+ and Grid-Stat tools.
+ The columns of this output file are summarized in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "CTS_output"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 The second ASCII file the MODE tool generates contains all of the attributes
  for simple objects, the merged cluster objects, and pairs of objects.
  Each line in this file contains the same number of columns, though those
@@ -4481,6 +4491,7 @@ reference "MODE_object_attribute"
 
 \begin_layout Standard
 \begin_inset Float table
+placement H
 wide false
 sideways false
 status open
@@ -4769,7 +4780,7 @@ reference "MODE_object_attribute_output"
 
 \end_inset
 
- & 
+ and 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "MODE_object_attribute_output_part_2"
@@ -4781,6 +4792,7 @@ reference "MODE_object_attribute_output_part_2"
 
 \begin_layout Standard
 \begin_inset Float table
+placement H
 wide false
 sideways false
 status open
@@ -5803,13 +5815,10 @@ The percentile of intensity chosen for use in the percentile intensity ratio
 
 \begin_layout Standard
 \begin_inset Float table
+placement H
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
@@ -6325,6 +6334,10 @@ Total interest value computed for a pair of simple objects (unitless)
 
 \begin_layout Paragraph
 NetCDF Output
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -6372,6 +6385,7 @@ reference "Variables_contained_in_MODE_NetCDF_output_part_2"
 
 \begin_layout Standard
 \begin_inset Float table
+placement H
 wide false
 sideways false
 status open
@@ -6801,6 +6815,7 @@ Number of points used to define the hull of all of the cluster observation
 
 \begin_layout Standard
 \begin_inset Float table
+placement H
 wide false
 sideways false
 status open
@@ -7417,6 +7432,7 @@ Number of cluster objects
 
 \begin_layout Standard
 \begin_inset Float table
+placement H
 wide false
 sideways false
 status open
@@ -7429,7 +7445,15 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Variables contained in MODE NetCDF output, continued
+Variables contained in MODE NetCDF output - Simple Objects, continued from
+ Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Variables_contained_in_MODE_NetCDF_output"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -7448,7 +7472,7 @@ name "Variables_contained_in_MODE_NetCDF_output_part_2"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="38" columns="3">
+<lyxtabular version="3" rows="26" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="1.25in">
@@ -8395,7 +8419,7 @@ Observation Simple Convex Hull Point X-Coordinate
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8406,7 +8430,7 @@ obs_simp_hull_y
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8417,13 +8441,140 @@ obs_simp_hull
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 \noindent
 \align left
 Observation Simple Convex Hull Point Y-Coordinate
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Variables contained in MODE NetCDF output - Clustered Objects, continued
+ from Table
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Variables_contained_in_MODE_NetCDF_output_part_2"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Variables_contained_in_MODE_NetCDF_output_part_3"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="14" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top" width="1.25in">
+<column alignment="center" valignment="top" width="1.25in">
+<column alignment="center" valignment="top" width="3in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+mode NETCDF VARIABLES
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\noindent
+\align left
+
+\series bold
+NetCDF Variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\noindent
+\align left
+
+\series bold
+Dimension
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\noindent
+\align left
+
+\series bold
+Description
 \end_layout
 
 \end_inset
@@ -8895,6 +9046,10 @@ Observation Cluster Convex Hull Point Y-Coordinate
 
 \begin_layout Paragraph
 Postscript File
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

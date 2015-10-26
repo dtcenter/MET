@@ -424,8 +424,11 @@ Many of the tools generate gridded NetCDF output.
  Generally, this output acts as input to other MET tools or plotting programs.
  The point observation preprocessing tools produce NetCDF output as input
  to the statistics tools.
- Full details of the contents of the NetCDF files is found in the section
- below.
+ Full details of the contents of the NetCDF files is found in the 
+\series default
+Section
+\series medium
+below.
  
 \begin_inset CommandInset ref
 LatexCommand ref
