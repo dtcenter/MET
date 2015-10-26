@@ -401,6 +401,7 @@ config_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for ensemble_stat
 \end_layout
 

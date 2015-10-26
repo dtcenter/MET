@@ -77,6 +77,13 @@
 
 \series medium
 References
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:References"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Description

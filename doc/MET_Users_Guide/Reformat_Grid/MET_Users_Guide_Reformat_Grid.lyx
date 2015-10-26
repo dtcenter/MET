@@ -528,6 +528,7 @@ Required arguments for the pcp_combine
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for pcp_combine
 \end_layout
 
@@ -672,6 +673,7 @@ argument indicates the name for the NetCDF file to be written.
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for pcp_combine sum command
 \end_layout
 
@@ -1663,6 +1665,7 @@ The
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for regrid_data_plane
 \end_layout
 
@@ -2188,6 +2191,7 @@ The
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for shift_data_plane
 \end_layout
 
@@ -2641,6 +2645,7 @@ Required arguments for modis_regrid
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for modis_regrid
 \end_layout
 

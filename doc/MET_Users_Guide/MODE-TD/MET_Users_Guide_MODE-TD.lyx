@@ -736,7 +736,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename axis_3d_fig.png
-	scale 55
+	scale 65
 
 \end_inset
 
@@ -1382,7 +1382,7 @@ $(x, y)$
 \end_layout
 
 \begin_layout Subsection
-Matching & Merging
+Matching and Merging
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MTD_Matching-&-Merging"
@@ -2039,6 +2039,7 @@ r run of MTD.
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for mtd
 \end_layout
 

@@ -1998,6 +1998,7 @@ config_file
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for wavelet_stat
 \end_layout
 
@@ -2121,7 +2122,7 @@ We recommend that users make a copy of the default (or other) configuration
 
 \series default
  Note that environment variables may be used when editing configuration
- files, as described in the section 
+ files, as described in the Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:pb2nc-configuration-file"

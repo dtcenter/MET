@@ -289,7 +289,15 @@ http://www.dtcenter.org/met/users/
  Note that the MET development group also accepts contributed analysis and
  plotting scripts which may be posted on the MET website for use by the
  community.
- 
+ It should be noted there are References plus a List of Tables and Figures
+ between Chapter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Plotting-and-Graphics"
+
+\end_inset
+
+ and Appendices.
 \end_layout
 
 \begin_layout Standard

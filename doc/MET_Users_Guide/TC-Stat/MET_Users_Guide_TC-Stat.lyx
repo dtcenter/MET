@@ -101,7 +101,11 @@ name "sec:TC-Stat_Introduction"
 The TC-Stat tool ties together results from the TC-Pairs tool by providing
  summary statistics and filtering jobs on TCST output files.
  The TC-Stat tool requires TCST output from the TC-Pairs tool.
- See section 
+ See 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:TC_Pairs-output"
@@ -111,7 +115,11 @@ reference "sub:TC_Pairs-output"
  of this users guide for information on the TCST output format of the TC-Pairs
  tool.
  A filtering job using TC-Stat provides the ability to filter the input
- data by various conditions and thresholds described in section 
+ data by various conditions and thresholds described in 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:tc_stat-configuration-file"
@@ -122,15 +130,22 @@ reference "sub:tc_stat-configuration-file"
  A summary job produces summary statistics including frequency of superior
  performance, time-series independence calculations, and confidence intervals
  on the mean.
- These statistical aspects are described in section 
+ These statistical aspects are described in 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Statistical-aspects"
 
 \end_inset
 
-, and practical use information for the TC-Stat tool is described in section
- 
+, and practical use information for the TC-Stat tool is described in 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Practical-information-1"
@@ -175,7 +190,11 @@ The TC-Stat tool can be used to simply filter specific lines of the TCST
 \begin_layout Standard
 
 \series medium
-Filtering options are outlined below in section 
+Filtering options are outlined below in 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:tc_stat-configuration-file"
@@ -485,7 +504,11 @@ reference "table_columnar_output_summary_tc_stat"
 
 \end_inset
 
- and the filtering options are described in section 
+ and the filtering options are described in 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:tc_stat-configuration-file"
@@ -520,9 +543,35 @@ tc_pairs
  Multiple tcst files may be specified by using a wild card (*).
 \end_layout
 
+\begin_layout Description
+2.
+ Either a configuration file must be specified with the 
+\series bold
+-config
+\series default
+ option, or a 
+\series bold
+JOB COMMAND LINE
+\series default
+ must be denoted.
+ The 
+\series bold
+JOB COMMAND LINE
+\series default
+ options are described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:tc_stat-configuration-file"
+
+\end_inset
+
+,
+\end_layout
+
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for tc_stat
 \end_layout
 
@@ -1989,6 +2038,7 @@ reference "table_columnar_output_summary_tc_stat"
 
 \begin_layout Standard
 \begin_inset Float table
+placement h
 wide false
 sideways false
 status open
@@ -2026,12 +2076,34 @@ name "table_columnar_output_summary_tc_stat"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="14" columns="2">
+<lyxtabular version="3" rows="15" columns="2">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+tc_stat Summary Job Output Options
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2042,7 +2114,7 @@ Column number
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2055,7 +2127,7 @@ Description
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2064,7 +2136,7 @@ Description
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout

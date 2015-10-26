@@ -1461,7 +1461,11 @@ reference "table_WS_format_info_ISC"
 
 \end_inset
 
- and the filtering options are described in section 
+ and the filtering options are described in 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:wavelet_stat-configuration-file"
@@ -1509,19 +1513,20 @@ JOB COMMAND LINE
 \series bold
 JOB COMMAND LINE
 \series default
- is described in section 
+ is described in Section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:MODE-configuration-file"
 
 \end_inset
 
-,
+
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Optional arguments for stat_analysis
 \end_layout
 
@@ -1746,7 +1751,11 @@ model
  
 \series medium
 Also note that environment variables may be used when editing configuration
- files, as described in the section 
+ files, as described in the 
+\series default
+Section
+\series medium
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:pb2nc-configuration-file"
@@ -3219,6 +3228,7 @@ key, and that job will be run once for each unique search key found.
 \begin_layout Standard
 
 \series bold
+\bar under
 Job: filter
 \end_layout
 
@@ -3265,6 +3275,7 @@ reference "sub:wavelet_stat-output"
 \begin_layout Standard
 
 \series bold
+\bar under
 Job: summary
 \end_layout
 
@@ -3607,6 +3618,7 @@ Maximum value
 \begin_layout Standard
 
 \series bold
+\bar under
 Job: aggregate
 \end_layout
 
@@ -3659,6 +3671,7 @@ COL_NAME
 \begin_layout Standard
 
 \series bold
+\bar under
 Job: aggregate_stat
 \end_layout
 

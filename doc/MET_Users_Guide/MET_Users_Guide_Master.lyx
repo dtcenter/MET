@@ -108,7 +108,7 @@ Boulder, Colorado
 \begin_layout Date
 
 \series bold
-September 2015
+October 2015
 \end_layout
 
 \begin_layout Standard
@@ -485,6 +485,13 @@ filename "fwd_refs_appendix/MET_Users_Guide_Refs.lyx"
 
 \begin_layout Standard
 \begin_inset FloatList table
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:list-of-figures"
 
 \end_inset
 
