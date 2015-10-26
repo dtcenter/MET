@@ -542,7 +542,11 @@ The usage statement for the Grid-Stat tool is listed below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: grid_stat
+
+\series bold
+Usage:
+\series default
+ grid_stat
 \end_layout
 
 \begin_layout LyX-Code
@@ -642,11 +646,7 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-grid_stat
-\series default
- has some required arguments and accepts several optional ones.
+grid_stat has some required arguments and accepts several optional ones.
 \end_layout
 
 \begin_layout Standard

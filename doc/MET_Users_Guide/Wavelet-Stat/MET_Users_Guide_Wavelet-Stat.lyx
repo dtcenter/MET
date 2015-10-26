@@ -1832,7 +1832,11 @@ The usage statement for the Wavelet-Stat tool is shown below:
 
 \begin_layout LyX-Code
 \paragraph_spacing single
-Usage: wavelet_stat
+
+\series bold
+Usage:
+\series default
+ wavelet_stat
 \end_layout
 
 \begin_layout LyX-Code
@@ -1938,11 +1942,7 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-wavelet_stat 
-\series default
-has both required arguments and optional ones.
+wavelet_stat has both required arguments and optional ones.
  
 \end_layout
 

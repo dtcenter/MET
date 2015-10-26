@@ -301,8 +301,11 @@ Gen-Vx-Mask
 \begin_layout Standard
 
 \series medium
-The PB2NC tool is used to reformat the input PrepBufr files containing point
- observations.
+The 
+\series bold
+PB2NC
+\series medium
+ tool is used to reformat the input PrepBufr files containing point observations.
  This tool stratifies the observations as requested in a configuration file
  and writes out the remaining observations in a NetCDF format.
  The NetCDF output of the PB2NC tool is used as input to the verification
@@ -312,8 +315,12 @@ The PB2NC tool is used to reformat the input PrepBufr files containing point
 \begin_layout Standard
 
 \series medium
-The ASCII2NC tool simply reformats ASCII point observations into the NetCDF
- format needed by the Point-Stat tool.
+The 
+\series bold
+ASCII2NC
+\series medium
+ tool simply reformats ASCII point observations into the NetCDF format needed
+ by the Point-Stat tool.
  The output NetCDF file from the ASCII2NC tool has a format that is identical
  to the format of the output from the PB2NC tool.
 \end_layout
@@ -342,7 +349,22 @@ The MET package currently produces output in the following basic file formats:
 \series medium
 The STAT format consists of tabular ASCII data that can be easily read by
  many analysis tools and software packages.
- MET produces STAT output for the Grid-Stat, Point-Stat, and Wavelet-Stat
+ MET produces STAT output for the 
+\series bold
+Grid-Stat
+\series medium
+, 
+\series bold
+Point-Stat
+\series medium
+, 
+\series bold
+Ensemble-Stat
+\series medium
+ and 
+\series bold
+Wavelet-Stat
+\series medium
  tools.
  STAT is a specialized ASCII format containing one record on each line.
  However, a single STAT file may contain multiple line types.
@@ -368,8 +390,12 @@ For this reason, ASCII output is also available as an alternative for the
 \begin_layout Standard
 
 \series medium
-The MODE tool creates two ASCII output files as well (although they are
- not in a STAT format).
+The 
+\series bold
+MODE
+\series medium
+ tool creates two ASCII output files as well (although they are not in a
+ STAT format).
  It generates an ASCII file containing contingency table counts and statistics
  comparing the model and observation fields being compared.
  The MODE tool also generates a second ASCII file containing all of the
@@ -379,8 +405,16 @@ The MODE tool creates two ASCII output files as well (although they are
 \end_layout
 
 \begin_layout Standard
-The TC-Pairs and TC-Stat modules produce ASCII output, similar in style
- to the STAT files, but with TC relevant fields.
+The 
+\series bold
+TC-Pairs
+\series default
+ and 
+\series bold
+TC-Stat
+\series default
+ modules produce ASCII output, similar in style to the STAT files, but with
+ TC relevant fields.
 \end_layout
 
 \begin_layout Standard
@@ -405,8 +439,8 @@ reference "sec:IO_Data-format-summary"
 \begin_layout Standard
 
 \series medium
-The MODE, Wavelet-Stat,and plotting tools produce PostScript plots summarizing
- the features-based approach used in the verification.
+The MODE, Wavelet-Stat and plotting tools produce PostScript plots summarizing
+ the spatial approach used in the verification.
  The PostScript plots are generated using internal libraries and do not
  depend on an external plotting package.
  The MODE plots contain several summary pages at the beginning, but the

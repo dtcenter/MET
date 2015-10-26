@@ -1328,7 +1328,11 @@ The usage statement for the Stat-Analysis tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: stat_analysis
+
+\series bold
+Usage:
+\series default
+ stat_analysis
 \end_layout
 
 \begin_layout LyX-Code
@@ -1428,12 +1432,7 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-\series bold
-stat_analysis
-\series default
- has some required arguments and accepts several optional ones.
+stat_analysis has some required arguments and accepts several optional ones.
  
 \end_layout
 
@@ -1475,9 +1474,7 @@ reference "sub:wavelet_stat-configuration-file"
 \begin_layout Standard
 
 \series bold
-Required arguments for 
-\series bold
-stat_analysis
+Required arguments for stat_analysis
 \end_layout
 
 \begin_layout Description
@@ -2445,7 +2442,6 @@ The user may specify one or more analysis jobs to be performed on the STAT
 
 \begin_layout Standard
 
-\series medium
 \series bold
 -job job_name
 \series default

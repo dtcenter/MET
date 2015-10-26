@@ -370,7 +370,11 @@ tc_stat
 \end_layout
 
 \begin_layout LyX-Code
-Usage: tc_stat
+
+\series bold
+Usage:
+\series default
+ tc_stat
 \end_layout
 
 \begin_layout LyX-Code

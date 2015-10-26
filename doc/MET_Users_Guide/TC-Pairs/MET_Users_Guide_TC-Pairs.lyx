@@ -163,7 +163,11 @@ The usage statement for tc_pairs is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: tc_pairs
+
+\series bold
+Usage:
+\series default
+ tc_pairs
 \end_layout
 
 \begin_layout LyX-Code
@@ -266,7 +270,6 @@ hskip 0.5in}
 
 \series bold
 tc_pairs
-\series medium
 \series default
  has three required arguments and can take up to three optional arguments.
 \end_layout
@@ -1107,9 +1110,7 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-dland_file = "
-\series bold
-MET_BASE/tc_data/dland_global_tenth_degree.nc";
+dland_file = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 \end_layout
 
 \begin_layout Standard

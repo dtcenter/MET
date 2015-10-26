@@ -1033,7 +1033,8 @@ reference "sec:Installation-of-optional"
 
 \begin_layout Standard
 
-\series medium
+\series bold
+\bar under
 Set Environment Variables
 \end_layout
 
@@ -1150,6 +1151,9 @@ For ease of use, you should define these in your .cshrc or equivalent file.
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Configure and execute the build
 \end_layout
 
@@ -1697,6 +1701,9 @@ Disable compilation of gsi_tools
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Make Targets
 \end_layout
 

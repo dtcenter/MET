@@ -157,7 +157,11 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: gen_vx_mask
+
+\series bold
+Usage:
+\series default
+ gen_vx_mask
 \end_layout
 
 \begin_layout LyX-Code
@@ -369,12 +373,7 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-gen_vx_mask
-\series medium
-\series default
- has required arguments and can take optional ones.
+gen_vx_mask has required arguments and can take optional ones.
  
 \end_layout
 
@@ -808,10 +807,7 @@ sample_fcst.grib
  0 for all grid points outside.
  It will write an output NetCDF file named 
 \series bold
-CONUS_poly.nc
-\series default
-\series bold
-.
+CONUS_poly.nc.
 \end_layout
 
 \end_body

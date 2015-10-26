@@ -128,7 +128,11 @@ The usage statement for the plot_point_obs utility is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: plot_point_obs
+
+\series bold
+Usage:
+\series default
+ plot_point_obs
 \end_layout
 
 \begin_layout LyX-Code
@@ -260,12 +264,9 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-\emph on
 plot_point_obs
-\emph default
- has required arguments and can take optional ones.
+\series medium
+ has two required arguments and can take optional ones.
  
 \end_layout
 
@@ -276,9 +277,9 @@ Required arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
+1.
 
 \series medium
-1.
  The 
 \series bold
 nc_file
@@ -287,9 +288,9 @@ nc_file
 \end_layout
 
 \begin_layout Description
+2.
 
 \series medium
-2.
  The 
 \series bold
 ps_file
@@ -304,9 +305,9 @@ Optional arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
+3.
 
 \series medium
-3.
  The 
 \series bold
 -gc code
@@ -315,9 +316,9 @@ Optional arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
+4.
 
 \series medium
-4.
  The 
 \series bold
 -msg_typ name
@@ -326,9 +327,9 @@ Optional arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
+5.
 
 \series medium
-5.
  The 
 \series bold
 -data_file name
@@ -338,9 +339,9 @@ Optional arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
+6.
 
 \series medium
-6.
  The 
 \series bold
 -dotsize val
@@ -350,9 +351,9 @@ Optional arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
+7.
 
 \series medium
-7.
  The 
 \series bold
 -log file
@@ -366,9 +367,9 @@ Optional arguments for plot_point_obs
 \end_layout
 
 \begin_layout Description
+8.
 
 \series medium
-8.
  The 
 \series bold
 -v level
@@ -383,9 +384,9 @@ Optional arguments for plot_point_obs
 
 \series medium
 An example of the 
-\emph on
+\series default
 plot_point_obs
-\emph default
+\series medium
  calling sequence is shown below:
 \end_layout
 
@@ -425,7 +426,11 @@ The usage statement for the plot_data_plane utility is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: plot_data_plane
+
+\series bold
+Usage:
+\series default
+ plot_data_plane
 \end_layout
 
 \begin_layout LyX-Code
@@ -557,12 +562,9 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-\emph on
 plot_data_plane
-\emph default
- has required arguments and can take optional ones.
+\series medium
+ has two required arguments and can take optional ones.
  
 \end_layout
 
@@ -573,9 +575,9 @@ Required arguments for plot_data_plane
 \end_layout
 
 \begin_layout Description
+1.
 
 \series medium
-1.
  The 
 \series bold
 input_filename
@@ -584,9 +586,9 @@ input_filename
 \end_layout
 
 \begin_layout Description
+2.
 
 \series medium
-2.
  The 
 \series bold
 output_filename
@@ -596,9 +598,9 @@ output_filename
 \end_layout
 
 \begin_layout Description
+3.
 
 \series medium
-3.
  The 
 \series bold
 field_string
@@ -613,9 +615,9 @@ Optional arguments for plot_data_plane
 \end_layout
 
 \begin_layout Description
+4.
 
 \series medium
-4.
  The 
 \series bold
 -color_table color_table_name
@@ -628,9 +630,9 @@ Optional arguments for plot_data_plane
 \end_layout
 
 \begin_layout Description
+5.
 
 \series medium
-5.
  The 
 \series bold
 -plot_range min max
@@ -639,9 +641,9 @@ Optional arguments for plot_data_plane
 \end_layout
 
 \begin_layout Description
+6.
 
 \series medium
-6.
  The 
 \series bold
 -title title_string
@@ -651,9 +653,9 @@ Optional arguments for plot_data_plane
 \end_layout
 
 \begin_layout Description
+7.
 
 \series medium
-7.
  The 
 \series bold
 -log file
@@ -667,9 +669,9 @@ Optional arguments for plot_data_plane
 \end_layout
 
 \begin_layout Description
+8.
 
 \series medium
-8.
  The 
 \series bold
 -v level
@@ -732,7 +734,11 @@ The usage statement for the plot_mode_field utility is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: plot_mode_field
+
+\series bold
+Usage:
+\series default
+ plot_mode_field
 \end_layout
 
 \begin_layout LyX-Code
@@ -832,23 +838,22 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-\emph on
 plot_mode_field
-\emph default
- has required arguments and can take optional ones.
+\series medium
+ has four required arguments and can take optional ones.
  
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 Required arguments for plot_mode_field
 \end_layout
 
 \begin_layout Description
+1.
 
 \series medium
-1.
  The 
 \series bold
 mode_nc_file_list
@@ -858,9 +863,9 @@ mode_nc_file_list
 \end_layout
 
 \begin_layout Description
+2.
 
 \series medium
-2.
  The 
 \series bold
 -raw | -simple | -cluster
@@ -872,9 +877,9 @@ mode_nc_file_list
 \end_layout
 
 \begin_layout Description
+3.
 
 \series medium
-3.
  The 
 \series bold
 -obs | -fcst
@@ -885,9 +890,9 @@ mode_nc_file_list
 \end_layout
 
 \begin_layout Description
+4.
 
 \series medium
-4.
  The 
 \series bold
 -config file
@@ -902,9 +907,9 @@ arguments for plot_mode_field
 \end_layout
 
 \begin_layout Description
+5.
 
 \series medium
-5.
  The 
 \series bold
 -log file
@@ -918,9 +923,9 @@ arguments for plot_mode_field
 \end_layout
 
 \begin_layout Description
+6.
 
 \series medium
-6.
  The 
 \series bold
 -v level
@@ -935,9 +940,9 @@ arguments for plot_mode_field
 
 \series medium
 An example of the 
-\emph on
+\series default
 plot_mode_field
-\emph default
+\series medium
  calling sequence is shown below:
 \end_layout
 

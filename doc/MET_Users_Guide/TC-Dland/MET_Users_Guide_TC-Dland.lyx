@@ -185,7 +185,6 @@ share/met/tc_data
 
 \begin_layout Standard
 
-\series medium
 \series bold
 dland_nw_hem_tenth_degree.nc
 \series default
@@ -194,7 +193,6 @@ dland_nw_hem_tenth_degree.nc
 
 \begin_layout Standard
 
-\series medium
 \series bold
 dland_global_tenth_degree.nc
 \series default
@@ -232,7 +230,11 @@ name "sub:tc_dland-usage"
 \end_layout
 
 \begin_layout LyX-Code
-Usage: tc_dland
+
+\series bold
+Usage:
+\series default
+ tc_dland
 \end_layout
 
 \begin_layout LyX-Code
@@ -335,7 +337,6 @@ hskip 0.5in}
 
 \series bold
 tc_dland
-\series medium
 \series default
  has one required arguments and accepts several optional ones.
 \end_layout
