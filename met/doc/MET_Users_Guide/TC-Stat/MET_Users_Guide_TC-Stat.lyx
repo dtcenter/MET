@@ -74,10 +74,10 @@
 \begin_body
 
 \begin_layout Chapter
-TC-Stat
+TC-Stat Tool
 \begin_inset CommandInset label
 LatexCommand label
-name "chap:TC-Stat"
+name "chap:TC-Stat-tool"
 
 \end_inset
 
@@ -1971,7 +1971,7 @@ dump_row
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "chap:TC-dland-tool"
+reference "chap:TC-Dland-tool"
 
 \end_inset
 
