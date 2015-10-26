@@ -265,7 +265,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename fig4.1.png
-	scale 50
+	scale 60
 
 \end_inset
 
@@ -305,7 +305,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename fig4.2.jpg
-	scale 25
+	scale 30
 
 \end_inset
 
@@ -714,6 +714,8 @@ reference "chap:App_C-Verification-Measures"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Measures for categorical variables
 \end_layout
 
@@ -747,6 +749,8 @@ reference "chap:App_C-Verification-Measures"
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Measures for continuous variables
 \end_layout
 
@@ -799,6 +803,8 @@ c difference).
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Measures for probabilistic forecasts and dichotomous outcomes
 \end_layout
 
@@ -836,7 +842,11 @@ Probabilistic forecast values are assumed to have a range of either 0 to
 \end_layout
 
 \begin_layout Subsubsection*
+
+\bar under
 Measures for comparison against climatology
+\bar default
+
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:Climatology"
@@ -1469,12 +1479,13 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-point_stat has some required arguments and can take many optional ones.
+point_stat has three required arguments and can take many optional ones.
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for point_stat
 \end_layout
 
@@ -2272,12 +2283,18 @@ point_stat
  by line type.
  The output files will be written to the default output directory or the
  directory specified using the "-outdir" command line option.
- The output STAT file will be named using the following naming convention:
- 
+\end_layout
+
+\begin_layout Standard
+The output STAT file will be named using the following naming convention:
+\end_layout
+
+\begin_layout Standard
+
 \series bold
-point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat
+point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat 
 \series medium
- where 
+where 
 \series bold
 PREFIX
 \series medium
@@ -2290,7 +2307,17 @@ HHMMSSL
 YYYYMMDD_HHMMSS
 \series medium
  indicates the forecast valid time.
- The output ASCII files are named similarly: 
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The output ASCII files are named similarly: 
+\end_layout
+
+\begin_layout Standard
+
 \series bold
 point_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt
 \series medium

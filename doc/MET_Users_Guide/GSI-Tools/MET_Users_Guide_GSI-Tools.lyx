@@ -317,11 +317,18 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-gsid2mpr has both required and optional arguments.
+gsid2mpr has one required argument and and accepts 
+\series default
+several 
+\series medium
+optional ones.
  
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Required arguments for gsid2mpr
 \end_layout
 
@@ -2253,11 +2260,18 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-gsidens2orank has both required and optional arguments.
+gsidens2orank has three required arguments and accept 
+\series default
+several 
+\series medium
+optional ones.
  
 \end_layout
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Required arguments for gsidens2orank
 \end_layout
 

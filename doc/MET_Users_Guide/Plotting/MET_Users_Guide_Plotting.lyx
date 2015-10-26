@@ -273,6 +273,7 @@ plot_point_obs
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for plot_point_obs
 \end_layout
 
@@ -571,6 +572,7 @@ plot_data_plane
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for plot_data_plane
 \end_layout
 
@@ -847,6 +849,7 @@ plot_mode_field
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for plot_mode_field
 \end_layout
 

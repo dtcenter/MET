@@ -364,8 +364,14 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
+The MODE-Analysis tool has two required arguments and can accept several
+ optional arguments.
+\end_layout
+
+\begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for mode_analysis:
 \end_layout
 

@@ -373,14 +373,16 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-gen_vx_mask has required arguments and can take optional ones.
+gen_vx_mask has three required arguments and can take optional ones.
  
 \end_layout
 
 \begin_layout Description
 
+\bar under
+Required 
 \series bold
-Required arguments for gen_vx_mask
+arguments for gen_vx_mask
 \end_layout
 
 \begin_layout Description

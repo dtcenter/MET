@@ -334,16 +334,13 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-tc_dland
-\series default
- has one required arguments and accepts several optional ones.
+tc_dland has one required arguments and accepts several optional ones.
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for tc_dland
 \end_layout
 

@@ -267,16 +267,13 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-tc_pairs
-\series default
- has three required arguments and can take up to three optional arguments.
+tc_pairs has three required arguments and can accept several optional arguments.
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for tc_pairs
 \end_layout
 

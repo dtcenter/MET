@@ -331,13 +331,15 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-series_analysis has some required arguments and accepts optional ones.
+series_analysis has four required arguments and accepts several optional
+ ones.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments series_stat
 \end_layout
 
@@ -506,6 +508,7 @@ reference "Glibert_precip"
 
 \begin_layout Standard
 \begin_inset Float figure
+placement h
 wide false
 sideways false
 status open

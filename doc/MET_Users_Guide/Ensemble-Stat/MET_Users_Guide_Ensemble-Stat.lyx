@@ -345,13 +345,18 @@ hskip 0.5in}
 \begin_layout Standard
 ensemble_stat 
 \series medium
-has required arguments and can take many optional ones.
+has three required arguments and accepts 
+\series default
+several 
+\series medium
+optional ones.
  
 \end_layout
 
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments ensemble_stat
 \end_layout
 

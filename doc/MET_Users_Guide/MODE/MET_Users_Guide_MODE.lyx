@@ -1260,6 +1260,7 @@ The MODE tool has three required arguments and can accept several optional
 \begin_layout Standard
 
 \series bold
+\bar under
 Required arguments for mode
 \end_layout
 
