@@ -182,8 +182,10 @@ The usage statement for the Pcp-Combine tool is shown below:
 
 \begin_layout LyX-Code
 
+\series bold
+Usage:
 \series medium
-Usage: 
+ 
 \series default
 pcp_combine
 \end_layout
@@ -271,18 +273,8 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-The arguments to 
-\emph on
-pcp_combine
-\emph default
- vary depending on the mode in which it is run.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-Listed below are the arguments for the 
+The arguments to pcp_combine vary depending on the mode in which it is run.
+ Listed below are the arguments for the 
 \series default
 sum
 \series medium
@@ -517,9 +509,9 @@ Required arguments for the pcp_combine
 \end_layout
 
 \begin_layout Description
+1.
 
 \series medium
-1.
  The Pcp-Combine tool must be run with exactly one of the 
 \series default
 -sum, -add
@@ -539,9 +531,9 @@ Optional arguments for pcp_combine
 \end_layout
 
 \begin_layout Description
+2.
 
 \series medium
-1.
  The 
 \series bold
 -field string
@@ -550,9 +542,9 @@ Optional arguments for pcp_combine
 \end_layout
 
 \begin_layout Description
+3.
 
 \series medium
-2.
  The 
 \series bold
 -name variable_name
@@ -562,9 +554,9 @@ Optional arguments for pcp_combine
 \end_layout
 
 \begin_layout Description
+4.
 
 \series medium
-3.
  The 
 \series bold
 -log file
@@ -577,9 +569,9 @@ Optional arguments for pcp_combine
 \end_layout
 
 \begin_layout Description
+5.
 
 \series medium
-4.
  The 
 \series bold
 -v level
@@ -609,9 +601,9 @@ Required arguments for the pcp_combine sum command
 \end_layout
 
 \begin_layout Description
+1.
 
 \series medium
-1.
  The 
 \series bold
 init_time
@@ -626,9 +618,9 @@ init_time
 \end_layout
 
 \begin_layout Description
+2.
 
 \series medium
-2.
  The 
 \series bold
 in_accum
@@ -641,9 +633,9 @@ in_accum
 \end_layout
 
 \begin_layout Description
+3.
 
 \series medium
-3.
  The 
 \series bold
 valid_time
@@ -653,9 +645,9 @@ valid_time
 \end_layout
 
 \begin_layout Description
+4.
 
 \series medium
-4.
  The 
 \series bold
 out_accum
@@ -665,9 +657,9 @@ out_accum
 \end_layout
 
 \begin_layout Description
+5.
 
 \series medium
-5.
  The 
 \series bold
 out_file 
@@ -682,9 +674,9 @@ Optional arguments for pcp_combine sum command
 \end_layout
 
 \begin_layout Description
+6.
 
 \series medium
-1.
  The
 \series bold
  -pcpdir path
@@ -706,9 +698,9 @@ path
 \end_layout
 
 \begin_layout Description
+7.
 
 \series medium
-2.
  The 
 \series bold
 -pcprx reg_exp
@@ -740,9 +732,9 @@ Required arguments for the pcp_combine add command
 \end_layout
 
 \begin_layout Description
+1.
 
 \series medium
-1.
  The 
 \series bold
 in_file1
@@ -753,9 +745,9 @@ in_file1
 \end_layout
 
 \begin_layout Description
+2.
 
 \series medium
-2.
  The 
 \series bold
 in_accum1
@@ -783,9 +775,9 @@ Required arguments for the pcp_combine subtract command
 \end_layout
 
 \begin_layout Description
+3.
 
 \series medium
-1.
  The 
 \series bold
 in_file1
@@ -795,9 +787,9 @@ in_file1
 \end_layout
 
 \begin_layout Description
+4.
 
 \series medium
-2.
  The 
 \series bold
 in_accum1
@@ -826,9 +818,9 @@ P500
 \end_layout
 
 \begin_layout Description
+5.
 
 \series medium
-3.
  The 
 \series bold
 in_file2
@@ -838,9 +830,9 @@ in_file2
 \end_layout
 
 \begin_layout Description
+6.
 
 \series medium
-4.
  The 
 \series bold
 in_accum2
@@ -1955,7 +1947,11 @@ The usage statement for the shift_data_plane utility is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: shift_data_plane
+
+\series bold
+Usage:
+\series default
+ shift_data_plane
 \end_layout
 
 \begin_layout LyX-Code
@@ -2408,7 +2404,11 @@ The usage statement for the modis_regrid utility is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: modis_regrid
+
+\series bold
+Usage:
+\series default
+ modis_regrid
 \end_layout
 
 \begin_layout LyX-Code

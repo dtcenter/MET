@@ -174,7 +174,11 @@ The usage statement for the Ensemble Stat tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: ensemble_stat
+
+\series bold
+Usage:
+\series default
+ ensemble_stat
 \end_layout
 
 \begin_layout LyX-Code
@@ -339,11 +343,7 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-ensemble_stat
-\series default
- 
+ensemble_stat 
 \series medium
 has required arguments and can take many optional ones.
  

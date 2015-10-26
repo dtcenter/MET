@@ -1813,7 +1813,15 @@ The usage statement for the MODE-TD tool is listed below:
  The command-line switches may be given in any order.
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
+
+\series bold
+Usage:
+\series default
+ mtd
+\end_layout
+
+\begin_layout LyX-Code
 \begin_inset ERT
 status open
 
@@ -1821,90 +1829,111 @@ status open
 
 {
 \backslash
-par
-\backslash
-tt
-\backslash
-obeylines
-\backslash
-obeyspaces mtd
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hskip 0.5in    -fcst     file
-\backslash
-_1 ...
- file
-\backslash
-_n | file
-\backslash
-_list 
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hskip 0.5in    -obs      file
-\backslash
-_1 ...
- file
-\backslash
-_n | file
-\backslash
-_list 
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hskip 0.5in    -single   file
-\backslash
-_1 ...
- file
-\backslash
-_n | file
-\backslash
-_list 
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hskip 0.5in    -config   config
-\backslash
-_file 
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hskip 0.5in    [ -outdir path ] 
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hskip 0.5in    [ -log    file ] 
-\end_layout
-
-\begin_layout Plain Layout
-
-
-\backslash
-hskip 0.5in    [ -v      level ] }
+hskip 0.5in}
 \end_layout
 
 \end_inset
 
+-fcst    file_1 ...
+ file_n | file_list
+\end_layout
 
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-obs     file_1 ...
+ file_n | file_list
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-single  file_1 ...
+ file_n | file_list
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-config  config_file
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-outdir path]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-log    file]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-v      level]
 \end_layout
 
 \begin_layout Standard
@@ -1920,10 +1949,11 @@ Required arguments for mtd
 
 \begin_layout Standard
 
+\series bold
 1.
- 
-\lang english
 
+\series default
+ 
 \begin_inset ERT
 status open
 
@@ -1944,7 +1974,11 @@ _list}
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 2.
+
+\series default
  
 \begin_inset ERT
 status open
@@ -1970,7 +2004,11 @@ cb -fcst} option, the files should have equally-spaced intervals of valid
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 3.
+
+\series default
  
 \begin_inset ERT
 status open
@@ -2004,7 +2042,11 @@ Optional arguments for mtd
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 4.
+
+\series default
  
 \begin_inset ERT
 status open
@@ -2025,7 +2067,11 @@ tt -log file}
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 5.
+
+\series default
  
 \begin_inset ERT
 status open
@@ -2060,7 +2106,11 @@ tt -log}
 \end_layout
 
 \begin_layout Standard
+
+\series bold
 6.
+
+\series default
  
 \begin_inset ERT
 status open
@@ -2076,6 +2126,54 @@ tt -outdir path}
 
  gives the name of the directory into which MTD will write its output files.
  If not specified, then MTD will write its output into the current directory.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+An example of the mtd calling sequence is listed below:
+\end_layout
+
+\begin_layout LyX-Code
+mtd -fcst fcst_files/*.grb 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+   -obs obs_files/*.grb 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+   -config MTDConfig_default 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+   -outdir out_dir/mtd 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+   -v 1 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+In this example, the MODE-TD tool will 
+\series default
+read in a list of
+\series medium
+ forecast GRIB file in the fcst_files directory and a similarly spaced observati
+on GRIB files in the obs_files director.
+ It uses a configuration file called MTDConfig_default and writes the output
+ to out_dir/mtd directory.
+ 
 \end_layout
 
 \begin_layout Subsection

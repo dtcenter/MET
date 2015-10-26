@@ -1133,7 +1133,11 @@ The usage statement for the MODE tool is listed below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: mode
+
+\series bold
+Usage:
+\series default
+ mode
 \end_layout
 
 \begin_layout LyX-Code

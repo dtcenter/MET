@@ -372,8 +372,9 @@ n package to the NWP community.
  and modeling communities.
  MET also utilizes and replicates the capabilities of existing systems for
  verification of NWP forecasts.
- For example, the MET package replicates existing NCEP operational verification
- capabilities (e.g., I/O, methods, statistics, data types).
+ For example, the MET package replicates existing National Center for Environmen
+tal Prediction (NCEP) operational verification capabilities (e.g., I/O, methods,
+ statistics, data types).
  MET development will take into account the needs of the NWP community -
  including operational centers and the research and development community.
  Some of the MET capabilities include traditional verification approaches
@@ -442,9 +443,39 @@ reference "Fig_Overview_MET_Overview_Flowchart"
 
 \begin_layout Standard
 
+\series medium
+The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC,
+ Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and Ensemble Stat tools.
+ The PB2NC tool is used to create NetCDF files from input PrepBufr files
+ containing point observations.
+ Likewise, the ASCII2NC tool is used to create NetCDF files from input ASCII
+ point observations.
+ Many types of data from the MADIS network can be formatted for use in MET
+ by the MADIS2NC tool.
+ MODIS and WWMCA files are regridded and formatted into NetCDF files by
+ their respective tools.
+ These NetCDF files are then used in the statistical analysis step.
+ The Gen-Vx-Mask and Pcp-Combine are optional.
+ The Gen-Vx-Mask tool will create a bitmapped masking area in one of two
+ ways.
+ The first is from a user specified polygon, i.e.
+ a text file containing a series of latitudes / longitudes.
+ This mask can then be used to efficiently limit verification to the interior
+ of a user specified region.
+ Similarly, the Gen-Vx-Mask tool can create a circular masking region, frequency
+ used with radar observations.
+ The Pcp-Combine tool accumulates precipitation amounts into the time interval
+ selected by the user - if a user would like to verify over a different
+ time interval than is included in their forecast or observational dataset.
+ The Ensemble-Stat tool will combine many forecasts into an ensemble mean
+ or probability forecast.
+ Additionally, if observations are included ensemble rank histogram and
+ probability integral transform information is produced.
+ 
 \series bold
+
 \begin_inset Float figure
-placement h
+placement t
 wide false
 sideways false
 status open
@@ -452,11 +483,9 @@ status open
 \begin_layout Plain Layout
 \noindent
 \align center
-
-\series bold
 \begin_inset Graphics
 	filename fig1.1.png
-	scale 25
+	scale 26
 
 \end_inset
 
@@ -489,39 +518,6 @@ name "Fig_Overview_MET_Overview_Flowchart"
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The reformatting stage of MET consists of the Gen-Vx-Mask, PB2NC, ASCII2NC,
- Pcp-Combine, MADIS2NC, MODIS regrid, WWMCA Regrid, and Ensemble Stat tools.
- The PB2NC tool is used to create NetCDF files from input PrepBufr files
- containing point observations.
- Likewise, the ASCII2NC tool is used to create NetCDF files from input ASCII
- point observations.
- Many types of data from the MADIS network can be formatted for use in MET
- by the MADIS2NC tool.
- MODIS and WWMCA files are regridded and formatted into NetCDF files by
- their respective tools.
- These NetCDF files are then used in the statistical analysis step.
- The Gen-Vx-Mask and Pcp-Combine are optional.
- The Gen-Vx-Mask tool will create a bitmapped masking area in one of two
- ways.
- The first is from a user specified polygon, i.e.
- a text file containing a series of latitudes / longitudes.
- This mask can then be used to efficiently limit verification to the interior
- of a user specified region.
- Similarly, the Gen-Vx-Mask tool can create a circular masking region, frequency
- used with radar observations.
- The Pcp-Combine tool accumulates precipitation amounts into the time interval
- selected by the user - if a user would like to verify over a different
- time interval than is included in their forecast or observational dataset.
- The Ensemble-Stat tool will combine many forecasts into an ensemble mean
- or probability forecast.
- Additionally, if observations are included ensemble rank histogram and
- probability integral transform information is produced.
- 
 \end_layout
 
 \begin_layout Standard
@@ -662,9 +658,8 @@ Results from the statistical analysis stage are output in ASCII, NetCDF
  files which are tabular ASCII files ending with a ".stat" suffix.
  In earlier versions of MET, this output format was called VSDB (Verification
  System DataBase).
- VSDB, which was developed by the National Centers for Environmental Prediction
- (NCEP), is a specialized ASCII format that can be easily read and used
- by graphics and analysis software.
+ VSDB, which was developed by the NCEP, is a specialized ASCII format that
+ can be easily read and used by graphics and analysis software.
  The STAT output format of the Point-Stat, Grid-Stat, and Wavelet-Stat tools
  is an extension of the VSDB format developed by NCEP.
  Additional columns of data and output line types have been added to store

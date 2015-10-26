@@ -1317,7 +1317,11 @@ The usage statement for the Point-Stat tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: point_stat
+
+\series bold
+Usage:
+\series default
+ point_stat
 \end_layout
 
 \begin_layout LyX-Code
@@ -1465,12 +1469,7 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series medium
-\series bold
-point_stat
-\series default
- has some required arguments and can take many optional ones.
+point_stat has some required arguments and can take many optional ones.
 \end_layout
 
 \begin_layout Standard
@@ -2265,7 +2264,6 @@ name "sub:point_stat-output"
 
 \begin_layout Standard
 
-\series medium
 \series bold
 point_stat
 \series default

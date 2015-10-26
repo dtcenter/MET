@@ -90,8 +90,8 @@ name "chap:Re-Formatting-of-Point"
 \series medium
 There are several formats of point observations that may preprocessed using
  the suite of reformatting tools in MET.
- These include PrepBufr data from NCEP, SURFRAD data from NOAA, Aeronet
- Data from NASA, MADIS data from NOAA, little_r from WRF simulations, and
+ These include PrepBufr data from NCEP, SURFRAD data from NOAA, AERONET
+ data from NASA, MADIS data from NOAA, little_r from WRF simulations, and
  user defined data in a generic ASCII format.
  These steps are represented by the first columns in the MET flowchart depicted
  in Figure 
@@ -314,12 +314,7 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
-\series bold
-pb2nc
-\series medium
-\series default
- has both required and optional arguments.
+pb2nc has both required and optional arguments.
  
 \end_layout
 
@@ -1902,7 +1897,7 @@ http://aeronet.gsfc.nasa.gov/
 
 ).
  WWSIS data are available by request from National Renewable Energy Laboratory
- in Boulder, CO.
+ (NREL) in Boulder, CO.
 \end_layout
 
 \begin_layout Standard
@@ -1927,10 +1922,6 @@ reference "table_reform-point_ascii2nc_format"
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 
@@ -2383,7 +2374,11 @@ Once the ASCII point observations have been formatted as expected, the ASCII
 \end_layout
 
 \begin_layout LyX-Code
-Usage: ascii2nc
+
+\series bold
+Usage:
+\series default
+ ascii2nc
 \end_layout
 
 \begin_layout LyX-Code
@@ -2519,7 +2514,6 @@ hskip 0.5in}
 
 \series bold
 ascii2nc
-\series medium
 \series default
  has two required arguments and can take several optional ones.
  
@@ -3210,7 +3204,6 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\series medium
 \series bold
 madis2nc
 \series default

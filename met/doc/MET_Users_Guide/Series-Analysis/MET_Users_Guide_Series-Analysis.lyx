@@ -206,7 +206,11 @@ The usage statement for the Series-Analysis tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-Usage: series_analysis
+
+\series bold
+Usage:
+\series default
+ series_analysis
 \end_layout
 
 \begin_layout LyX-Code
@@ -326,12 +330,8 @@ hskip 0.5in}
 
 \begin_layout Standard
 
-\emph on
-series_analysis
-\emph default
- 
 \series medium
-has some required arguments and accepts optional ones.
+series_analysis has some required arguments and accepts optional ones.
  
 \end_layout
 
