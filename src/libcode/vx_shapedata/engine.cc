@@ -287,7 +287,7 @@ void ModeFuzzyEngine::clear_colors() {
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd) 
+void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
 
@@ -391,7 +391,7 @@ void ModeFuzzyEngine::do_fcst_filter() {
    mlog << Debug(3) << "Applying raw filter threshold "
         << conf_info.fcst_raw_thresh.get_str()
         << " to the forecast field.\n";
-   
+
    //
    // Filter out the data which doesn't meet the fcst_raw_thresh
    //
@@ -426,7 +426,7 @@ void ModeFuzzyEngine::do_obs_filter() {
    mlog << Debug(3) << "Applying raw filter threshold "
         << conf_info.obs_raw_thresh.get_str()
         << " to the observation field.\n";
-   
+
    //
    // Filter out the data which doesn't meet the obs_raw_thresh
    //
@@ -464,7 +464,7 @@ void ModeFuzzyEngine::do_fcst_convolution() {
 
    mlog << Debug(3) << "Applying circular convolution of radius "
         << r << " to the forecast field.\n";
-   
+
    //
    // Apply a circular convolution to the filtered field
    //
@@ -556,7 +556,7 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
    // Apply the intensity threshold
    //
    if(conf_info.fcst_inten_perc_thresh.get_type() != thresh_na) {
-      
+
       fcst_mask->threshold_intensity(fcst_filter,
                                      conf_info.fcst_inten_perc_value,
                                      conf_info.fcst_inten_perc_thresh);
@@ -787,7 +787,7 @@ void ModeFuzzyEngine::do_matching() {
    //
    do_fcst_clus_splitting();
    do_obs_clus_splitting();
-   
+
    //
    // Compute the cluster single and pair features
    //
@@ -994,11 +994,10 @@ void ModeFuzzyEngine::do_match_merge() {
    // Assign the colors
    //
    if(collection.n_sets > ctable.n_entries()) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_match_merge() -> "
-           << "not enough colors ... need at least " << (collection.n_sets)
-           << "\n\n";
-      exit(1);
+      mlog << Warning << "\nModeFuzzyEngine::do_match_merge() -> "
+           << "more object matches (" << collection.n_sets
+           << ") than defined object colors (" << ctable.n_entries()
+           << ") ... reusing some colors!\n\n";
    }
 
    for(j=0; j<n_fcst; j++) {
@@ -1007,7 +1006,7 @@ void ModeFuzzyEngine::do_match_merge() {
       for(k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_fcst(j+1)) {
-            fcst_color[j] = ctable.nearest(k+1);
+            fcst_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
          }
       }
@@ -1019,7 +1018,7 @@ void ModeFuzzyEngine::do_match_merge() {
       for(k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_obs(j+1)) {
-            obs_color[j] = ctable.nearest(k+1);
+            obs_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
          }
       }
@@ -1763,10 +1762,10 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    // Assign the colors
    //
    if(collection.n_sets > ctable.n_entries()) {
-      mlog << Error << "\nModeFuzzyEngine::do_match_fcst_merge() -> "
-           << "not enough colors ... need at least " << (collection.n_sets)
-           << "\n\n";
-      exit(1);
+      mlog << Warning << "\nModeFuzzyEngine::do_match_fcst_merge() -> "
+           << "more object matches (" << collection.n_sets
+           << ") than defined object colors (" << ctable.n_entries()
+           << ") ... reusing some colors!\n\n";
    }
 
    for(j=0; j<n_fcst; j++) {
@@ -1775,7 +1774,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
       for(k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_fcst(j+1)) {
-            fcst_color[j] = ctable.nearest(k+1);
+            fcst_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
          }
       }
@@ -1788,7 +1787,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
       for(k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_obs(j+1)) {
-            obs_color[j] = ctable.nearest(k+1);
+            obs_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
          }
       }
@@ -1930,10 +1929,10 @@ void ModeFuzzyEngine::do_match_only() {
    // Assign the colors
    //
    if(collection.n_sets > ctable.n_entries()) {
-      mlog << Error << "\nModeFuzzyEngine::do_match_only() -> "
-           << "not enough colors ... need at least " << (collection.n_sets)
-           << "\n\n";
-      exit(1);
+      mlog << Warning << "\nModeFuzzyEngine::do_match_only() -> "
+           << "more object matches (" << collection.n_sets
+           << ") than defined object colors (" << ctable.n_entries()
+           << ") ... reusing some colors!\n\n";
    }
 
    for(j=0; j<n_fcst; j++) {
@@ -1941,7 +1940,7 @@ void ModeFuzzyEngine::do_match_only() {
 
       for(k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_fcst(j+1)) {
-            fcst_color[j] = ctable.nearest(k+1);
+            fcst_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
          }
       }
@@ -1952,7 +1951,7 @@ void ModeFuzzyEngine::do_match_only() {
 
       for(k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_obs(j+1)) {
-            obs_color[j] = ctable.nearest(k+1);
+            obs_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
          }
       }
