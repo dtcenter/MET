@@ -103,7 +103,7 @@ ModePsFile & ModePsFile::operator=(const ModePsFile &)
 {
 
 // if ( this == &m )  return ( * this );
-// 
+//
 // assign(m);
 
 mlog << Error << "\n\n  ModePsFile::operator=(const ModePsFile &) -> should never be called!\n\n";
@@ -1046,21 +1046,6 @@ if ( eng_type == FFEng ) {
 
 }
 
-const int n_colors  = ct->n_entries();
-
-
-if ( split == 1 )  {   //  single object field
-
-   if ( wd.n_objects() >= n_colors )  {
-
-      mlog << Warning
-           << "More objects than colors! ... re-using some colors!\n\n";
-
-   }
-
-}
-
-
    //
    // Convert the ShapeData object to PPM
    //
@@ -1081,16 +1066,10 @@ for(x=L; x<(XY_box.right()); x++) {
             // Should be no bad data left at this point
             //
 
-              if ( is_bad_data(v) )  c = fill_color;
-         else if ( v_int == 0 )      c = white;
-         else if ( v_int > 0 ) { // Single object field
-
-            v_int = (v_int - 1)%n_colors;
-
-            if ( fcst )  c = eng.fcst_color [v_int];
-            else         c = eng.obs_color  [v_int];
-
-         }
+              if ( is_bad_data(v) )     c = fill_color;
+         else if ( v_int == 0 )         c = white;
+         else if ( v_int > 0 &&  fcst ) c = eng.fcst_color[v_int - 1];
+         else if ( v_int > 0 && !fcst ) c = eng.obs_color[v_int - 1];
 
       } else if ( split == 2 )  { // Cluster object field
 
