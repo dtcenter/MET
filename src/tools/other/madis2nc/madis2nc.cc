@@ -494,6 +494,7 @@ void get_nc_var_val(NcVar *&var, const long *cur,
 
 void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
                     float &d) {
+   double fill_value;
 
    //
    // Retrieve the float value from the NetCDF variable.
@@ -505,6 +506,12 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
       exit(1);
    }
 
+   //
+   // Check fill value
+   //
+   if(get_var_att_double(var, in_fillValue_str, fill_value) &&
+      is_eq(d, fill_value)) d = bad_data_float;
+
    return;
 }
 
@@ -512,6 +519,7 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
 
 void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
                     double &d) {
+   double fill_value;
 
    //
    // Retrieve the double value from the NetCDF variable.
@@ -522,6 +530,12 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
            << "\" variable.\n\n";
       exit(1);
    }
+
+   //
+   // Check fill value
+   //
+   if(get_var_att_double(var, in_fillValue_str, fill_value) &&
+      is_eq(d, fill_value)) d = bad_data_double;
 
    return;
 }
@@ -543,6 +557,8 @@ void get_nc_var_val(NcVar *&var, const long *cur, const long *dim,
 
    return;
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -930,7 +946,7 @@ void process_madis_metar(NcFile *&f_in) {
       get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
 
       //
-      // Check masking regions
+      // Check masking regions.
       //
       if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
 
@@ -953,6 +969,7 @@ void process_madis_metar(NcFile *&f_in) {
       // Process the observation time.
       //
       get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      if(is_bad_data(tmp_dbl)) continue;
       unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
       hdr_vld = tmp_str;
       put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
@@ -1145,7 +1162,7 @@ void process_madis_raob(NcFile *&f_in) {
       get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
 
       //
-      // Check masking regions
+      // Check masking regions.
       //
       if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
 
@@ -1166,6 +1183,7 @@ void process_madis_raob(NcFile *&f_in) {
       // Process the observation time.
       //
       get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      if(is_bad_data(tmp_dbl)) continue;
       unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
       hdr_vld = tmp_str;
       put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
@@ -1528,7 +1546,7 @@ void process_madis_profiler(NcFile *&f_in) {
    char tmp_str[max_str_len];
    ConcatString hdr_typ, hdr_sid, hdr_vld;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
-   float pressure, pressure_fill_value;
+   float pressure;
 
    //
    // Input header variables:
@@ -1544,11 +1562,6 @@ void process_madis_profiler(NcFile *&f_in) {
    // Variables for vertical level information
    //
    NcVar *in_pressure_var = get_nc_var(f_in, "pressure");
-
-   //
-   // Read the fill value for pressure
-   //
-   get_nc_var_att(in_pressure_var, "_FillValue", pressure_fill_value);
 
    //
    // Retrieve applicable dimensions
@@ -1609,7 +1622,7 @@ void process_madis_profiler(NcFile *&f_in) {
       get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
 
       //
-      // Check masking regions
+      // Check masking regions.
       //
       if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
 
@@ -1630,6 +1643,7 @@ void process_madis_profiler(NcFile *&f_in) {
       // Process the observation time.
       //
       get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      if(is_bad_data(tmp_dbl)) continue;
       unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
       hdr_vld = tmp_str;
       put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
@@ -1648,7 +1662,6 @@ void process_madis_profiler(NcFile *&f_in) {
       // Get the pressure for the current level
       //
       get_nc_var_val(in_pressure_var, cur, dim, pressure);
-      if( is_eq(pressure, pressure_fill_value) ) pressure = bad_data_float;
 
       //
       // Loop through the mandatory levels
@@ -1706,7 +1719,7 @@ void process_madis_maritime(NcFile *&f_in) {
    char tmp_str[max_str_len];
    ConcatString hdr_typ, hdr_sid, hdr_vld;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
-   float pressure, pressure_fill_value;
+   float pressure;
 
    //
    // Input header variables:
@@ -1722,11 +1735,6 @@ void process_madis_maritime(NcFile *&f_in) {
    // Variables for vertical level information
    //
    NcVar *in_pressure_var = get_nc_var(f_in, "stationPress");
-
-   //
-   // Read the fill value for pressure
-   //
-   get_nc_var_att(in_pressure_var, "_FillValue", pressure_fill_value);
 
    //
    // Retrieve applicable dimensions
@@ -1787,7 +1795,7 @@ void process_madis_maritime(NcFile *&f_in) {
       get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
 
       //
-      // Check masking regions
+      // Check masking regions.
       //
       if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
 
@@ -1808,6 +1816,7 @@ void process_madis_maritime(NcFile *&f_in) {
       // Process the observation time.
       //
       get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      if(is_bad_data(tmp_dbl)) continue;
       unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
       hdr_vld = tmp_str;
       put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
@@ -1826,7 +1835,6 @@ void process_madis_maritime(NcFile *&f_in) {
       // Get the pressure for the current level
       //
       get_nc_var_val(in_pressure_var, cur, dim, pressure);
-      if( is_eq(pressure, pressure_fill_value) ) pressure = bad_data_float;
 
       //
       // Set the pressure and height for this level
@@ -1968,7 +1976,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       get_nc_var_val(in_hdr_elv_var, cur, dim, hdr_arr[2]);
 
       //
-      // Check masking regions
+      // Check masking regions.
       //
       if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
 
@@ -1987,6 +1995,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       // Process the observation time.
       //
       get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl);
+      if(is_bad_data(tmp_dbl)) continue;
       unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
       hdr_vld = tmp_str;
       put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
@@ -2242,6 +2251,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       // Process the observation time.
       //
       get_nc_var_val(in_hdr_vld_var, cur, dim, tmp_dbl1);
+      if(is_bad_data(tmp_dbl1)) continue;
 
       //
       // Process the number of levels
