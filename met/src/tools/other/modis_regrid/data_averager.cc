@@ -154,13 +154,13 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  return;
 
 const int n = two_to_one(x, y);
 
+if ( Counts[n] == 0 )      DataOk[n] = true;
+
 if ( is_bad_data(value) )  DataOk[n] = false;
 
 Sum[n] += value;
 
 Counts[n] += 1;
-
-DataOk[n] = true;
 
 return;
 
