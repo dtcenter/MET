@@ -842,6 +842,16 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
 
+      //  check for dx != dy
+      if( !is_eq((double)gfld->igdtmpl[14] / 1000000.0,
+                 (double)gfld->igdtmpl[15] / 1000000.0) ){
+         mlog << Warning << "\nMetGrib2DataFile::read_grib2_grid() -> "
+              << "MET does not currently support Polar Stereographic grids where dx ("
+              << (double)gfld->igdtmpl[14] / 1000000.0 << ") != dy ("
+              << (double)gfld->igdtmpl[15] / 1000000.0
+              << ") and may produce unexpected results!\n\n";
+      }
+
       //  store the grid information
       Raw_Grid->set(data);
 
@@ -916,6 +926,16 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       data.r_km         = 6371.20;
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
+
+      //  check for dx != dy
+      if( !is_eq((double)gfld->igdtmpl[14] / 1000000.0,
+                 (double)gfld->igdtmpl[15] / 1000000.0) ){
+         mlog << Warning << "\nMetGrib2DataFile::read_grib2_grid() -> "
+              << "MET does not currently support Lambert Conformal grids where dx ("
+              << (double)gfld->igdtmpl[14] / 1000000.0 << ") != dy ("
+              << (double)gfld->igdtmpl[15] / 1000000.0
+              << ") and may produce unexpected results!\n\n";
+      }
 
       //  store the grid information
       Raw_Grid->set(data);

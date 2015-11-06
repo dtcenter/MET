@@ -334,6 +334,16 @@ data.lon_orient = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.lambert_conf.lov
    // Grid spacing in km (given in the GRIB file in m)
 data.d_km = (double) char3_to_int(gds.grid_type.lambert_conf.dx)/1000.0;
 
+   // Check for dx != dy
+if(!is_eq((double) char3_to_int(gds.grid_type.lambert_conf.dx)/1000.0,
+          (double) char3_to_int(gds.grid_type.lambert_conf.dy)/1000.0)) {
+   mlog << Warning << "\ngds_to_lambert() -> "
+        << "MET does not currently support Lambert Conformal grids where dx ("
+        << (double) char3_to_int(gds.grid_type.lambert_conf.dx)/1000.0 << ") != dy ("
+        << (double) char3_to_int(gds.grid_type.lambert_conf.dy)/1000.0
+        << ") and may produce unexpected results!\n\n";
+}
+
    // Radius of the earth
 data.r_km = grib_earth_radius_km;
 
@@ -392,6 +402,16 @@ data.lon_orient = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.stereographic.lo
 
    // Grid spacing in km (given in the GRIB file in m)
 data.d_km = (double) char3_to_int(gds.grid_type.stereographic.dx)/1000.0;
+
+   // Check for dx != dy
+if(!is_eq((double) char3_to_int(gds.grid_type.stereographic.dx)/1000.0,
+          (double) char3_to_int(gds.grid_type.stereographic.dy)/1000.0)) {
+   mlog << Warning << "\ngds_to_stereographic() -> "
+        << "MET does not currently support Polar Stereographic grids where dx ("
+        << (double) char3_to_int(gds.grid_type.stereographic.dx)/1000.0 << ") != dy ("
+        << (double) char3_to_int(gds.grid_type.stereographic.dy)/1000.0
+        << ") and may produce unexpected results!\n\n";
+}
 
    // Radius of the earth
 data.r_km = grib_earth_radius_km;
