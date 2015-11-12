@@ -1769,6 +1769,10 @@ level
 \begin_layout Standard
 For more details on setting the 
 \series bold
+to_grid
+\series default
+, 
+\series bold
 -method
 \series default
 , 
