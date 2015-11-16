@@ -217,7 +217,7 @@ return;
 double MaskPoly::lat(int i) const {
 
 if ( i < 0 || i >= Npoints ) {
-      
+
    mlog << Error << "\nMaskPoly::lat(int i) const -> "
         << "range check error \"" << i << "\"\n\n";
 
@@ -228,7 +228,7 @@ if ( i < 0 || i >= Npoints ) {
    //
    //   done
    //
-   
+
 return ( Lat[i] );
 
 }
@@ -242,7 +242,7 @@ double MaskPoly::lon(int i) const {
 double adj_lon;
 
 if ( i < 0 || i >= Npoints ) {
-      
+
    mlog << Error << "\nMaskPoly::lon(int i) const -> "
         << "range check error \"" << i << "\"\n\n";
 
@@ -256,7 +256,7 @@ adj_lon -= 360.0*floor((adj_lon + 180.0)/360.0);
    //
    //   done
    //
-   
+
 return ( adj_lon );
 
 }
@@ -269,7 +269,7 @@ void MaskPoly::load(const char * filename)
 
 {
 
-int j;
+int j, n_read;
 char line[512];
 double a, b;
 ifstream in;
@@ -296,25 +296,48 @@ if ( !in )  {
 FileName = filename;
 
    //
+   //  initialize
+   //
+
+n_read = 0;
+Name   = "";
+
+while ( in.getline(line, sizeof(line)) ) {
+
+   //
+   //  increment line counter
+   //
+
+   n_read++;
+
+   //
+   //  skip blank lines
+   //
+
+   if ( check_reg_exp(ws_line_reg_exp, line) ) continue;
+
+   //
    //  get name
    //
 
-in.getline(line, sizeof(line));
+   if ( Name.length() == 0 ) {
 
-Name = line;
+      Name = line;
+
+      continue;
+
+   }
 
    //
    //  get points
    //
-
-while ( in.getline(line, sizeof(line)) ) {
 
    j = sscanf(line, "%lf%lf", &a, &b);
 
    if ( j != 2 )  {
 
       mlog << Error << "\nMaskPoly::load() -> "
-           << "read error in mask poly file \""
+           << "read error on line number " << n_read << " of mask poly file \""
            << filename << "\"\n\n";
 
       exit ( 1 );
@@ -338,7 +361,7 @@ while ( in.getline(line, sizeof(line)) ) {
    }
 
    b = -b;   //  toggle from degrees_west to degrees_east
-   
+
    b -= 360.0*floor((b + 180.0)/360.0);
 
    Lon.add ( b );
@@ -357,14 +380,14 @@ in.close();
    //
 
 if ( fabs(Lon.max() - Lon.min()) > 180.0 ) {
-   
+
    LonShift = 180.0;
-   
+
    for ( j=0; j<Npoints; j++ ) {
-      
+
       b  = Lon[j] + LonShift;
       b -= 360.0*floor((b + 180.0)/360.0);
-      
+
       Lon.set(j, b);
         U.set(j, b);
    }
@@ -425,12 +448,12 @@ return ( status != 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-   // 
+   //
    //  This routine tests whether or not the point
    //  ( x_test, y_test ) is inside the region determined
    //  by the points ( x[i], y[i] ),  0 <= i < n.
-   // 
-   //  If the test point is not inside the region, a zero value is 
+   //
+   //  If the test point is not inside the region, a zero value is
    //  returned, otherwise the value tells how many times the region
    //  wraps around the test point, and the sign tells the direction
    //  in which the winding occurs: + CCW, - CW.

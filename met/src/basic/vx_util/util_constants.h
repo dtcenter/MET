@@ -62,6 +62,7 @@ static const char all_interp_mthd_str[] =
 static const char yyyymmdd_hhmmss_reg_exp[] =
    "[0-9]\\{8,8\\}_[0-9]\\{6,6\\}";
 static const char ws_reg_exp[] = "[ \t\r\n]";
+static const char ws_line_reg_exp[] = "^[ \t\r\n]*$";
 static const char sep_str[] = "--------------------------------------------------------------------------------";
 
 // Bootstrap methods
