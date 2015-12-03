@@ -2285,7 +2285,7 @@ object area ratio
 \series default
 , the 
 \series bold
-intersection divided by the union area ratio
+intersection divided by the minimum object area ratio
 \series default
 , the 
 \series bold
@@ -6074,7 +6074,8 @@ _OVER_AREA
 \begin_inset Text
 
 \begin_layout Plain Layout
-Ratio of intersection area to union area (unitless)
+Ratio of intersection area to the lesser of the forecast and observation
+ object areas (unitless)
 \end_layout
 
 \end_inset
