@@ -102,9 +102,10 @@ void PairDataEnsemble::clear() {
    mn_na.clear();
 
    if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
-   
+
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
+   crpss          = bad_data_double;
 
    return;
 }
@@ -142,7 +143,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    var_na   = pd.var_na;
    mn_na    = pd.mn_na;
 
-   n_obs    = pd.n_obs;   
+   n_obs    = pd.n_obs;
 
    if(pd.ssvar_bins){
       ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
@@ -153,6 +154,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
+   crpss          = pd.crpss;
 
    set_ens_size(pd.n_ens);
 
@@ -293,10 +295,10 @@ void PairDataEnsemble::compute_phist() {
       }
 
       // Determine the bin
-      bin = (is_eq(pit_na[i], 1.0) ? 
+      bin = (is_eq(pit_na[i], 1.0) ?
              phist_na.n_elements() - 1 :
              floor(pit_na[i]/phist_bin_size));
- 
+
       // Increment the histogram counts
       phist_na.set(bin, phist_na[bin]+1);
 
@@ -310,6 +312,7 @@ void PairDataEnsemble::compute_phist() {
 void PairDataEnsemble::compute_stats() {
    int i, j;
    double crps, ign, pit;
+   double crps_climo, ccbar, oobar, cobar;
    NumArray cur;
 
    // Initialize
@@ -340,6 +343,37 @@ void PairDataEnsemble::compute_stats() {
       pit_na.add(pit);
 
    } // end for i
+
+   // Compute CRPS Skill Score
+
+   // Get the average ensemble CRPS value
+   crps = crps_na.mean();
+
+   // Check for bad data
+   if(is_bad_data(crps) ||
+      cmn_na.n_elements() != o_na.n_elements() ||
+      cmn_na.n_elements() == 0 ||
+      cmn_na.has(bad_data_double)) {
+      crpss = bad_data_double;
+   }
+   else {
+
+      // Compute the climatological CRPS
+      ccbar = oobar = cobar = 0.0;
+      for(i=0; i<n_obs; i++) {
+         ccbar += cmn_na[i] * cmn_na[i];
+         oobar += o_na[i]   * o_na[i];
+         cobar += cmn_na[i] * o_na[i];
+      }
+      ccbar /= n_obs;
+      oobar /= n_obs;
+      cobar /= n_obs;
+      crps_climo = ccbar + oobar - 2.0*cobar;
+
+      // Compute skill score
+      crpss = (is_eq(crps_climo, 0.0) ?
+               bad_data_double : (crps_climo - crps)/crps_climo);
+   }
 
    return;
 }
@@ -466,40 +500,6 @@ void PairDataEnsemble::compute_ssvar() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-double PairDataEnsemble::crpss() const {
-   int i, n;
-   double crps, ref, crpss, ccbar, oobar, cobar;
-
-   // Get the average ensemble CRPS value
-   crps = crps_na.mean();
-
-   // Check for bad data
-   if(is_bad_data(crps) ||
-      cmn_na.n_elements() != o_na.n_elements() ||
-      cmn_na.n_elements() == 0) return(bad_data_double);
-
-   // Compute the climatology MSE relative to the observations
-   ccbar = oobar = cobar = 0.0;
-   n = o_na.n_elements();
-   for(i=0; i<n; i++) {
-      if(is_bad_data(cmn_na[i])) return(bad_data_double);
-      ccbar += cmn_na[i]*cmn_na[i];
-      oobar += o_na[i]*o_na[i];
-      cobar += (cmn_na[i] - o_na[i])*(cmn_na[i] - o_na[i]);
-   }
-   ccbar /= n;
-   oobar /= n;
-   cobar /= n;
-   ref = ccbar + oobar - 2.0*cobar;
-
-   // Compute skill score
-   crpss = (is_eq(ref, 0.0) ? bad_data_double : (ref - crps)/ref);
-
-   return(crpss);
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 // Code for class VxPairDataEnsemble
 //
@@ -540,14 +540,14 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 void VxPairDataEnsemble::init_from_scratch() {
 
    fcst_info    = (VarInfo *) 0;
-   climo_info   = (VarInfo *) 0;   
+   climo_info   = (VarInfo *) 0;
    obs_info     = (VarInfo *) 0;
    pd           = (PairDataEnsemble ***) 0;
 
    n_msg_typ    = 0;
    n_mask       = 0;
    n_interp     = 0;
-   
+
    clear();
 
    return;
@@ -567,10 +567,10 @@ void VxPairDataEnsemble::clear() {
    fcst_dpa.clear();
    climo_mn_dpa.clear();
    climo_sd_dpa.clear();
-   
+
    sid_exc_filt.clear();
    obs_qty_filt.clear();
-   
+
    fcst_ut = (unixtime) 0;
    beg_ut  = (unixtime) 0;
    end_ut  = (unixtime) 0;
@@ -612,7 +612,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    fcst_dpa     = vx_pd.fcst_dpa;
    climo_mn_dpa = vx_pd.climo_mn_dpa;
    climo_sd_dpa = vx_pd.climo_sd_dpa;
-   
+
    set_pd_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
    for(i=0; i<vx_pd.n_msg_typ; i++) {
@@ -939,7 +939,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check the station ID exclusion list
    if(sid_exc_filt.n_elements() && sid_exc_filt.has(hdr_sid_str)) return;
-   
+
    // Check whether the GRIB code for the observation matches
    // the specified code
    if(obs_info_grib->code() != nint(obs_arr[1])) return;
@@ -1032,7 +1032,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                 obs_lvl : obs_hgt);
       find_vert_lvl(climo_sd_dpa, to_lvl, csd_lvl_blw, csd_lvl_abv);
    }
-   
+
    // When verifying a vertical level forecast against a surface message type,
    // set the observation level value to bad data so that it's not used in the
    // duplicate logic.
@@ -1123,7 +1123,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
          for(k=0; k<n_interp; k++) {
 
             // Process each of the observations
-            for(l=0; l<pd[i][j][k].n_obs; l++) { 
+            for(l=0; l<pd[i][j][k].n_obs; l++) {
 
                // Interpolate using the observation pressure level or height
                to_lvl = (fcst_info->level().type() == LevelType_Pres ?

@@ -62,7 +62,7 @@ struct StatHdrInfo {
    unixtime obs_valid_beg, obs_valid_end;
 
    StatHdrInfo();
-   
+
    void clear();
    void add(const STATLine &line);
    StatHdrColumns get_shc(const ConcatString &cur_case,
@@ -122,6 +122,7 @@ struct AggrRHISTInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
    double crps_num, crps_den, ign_num, ign_den;
+   double crpss_fcst_num, crpss_climo_num, crpss_den;
 };
 
 struct AggrPHISTInfo {
@@ -205,7 +206,7 @@ extern void aggr_mpr_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrMPRInfo> &,
                int &, int &);
-               
+
 extern void aggr_isc_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrISCInfo> &,
@@ -257,7 +258,7 @@ extern void mpr_to_mcts(
 extern void mpr_to_cnt(
                STATAnalysisJob &, const AggrMPRInfo &,
                CNTInfo &, const char *, gsl_rng *);
-               
+
 
 extern void mpr_to_psum(STATAnalysisJob &, const AggrMPRInfo &,
                SL1L2Info &);
@@ -267,7 +268,7 @@ extern void mpr_to_pct(
                PCTInfo &);
 
 ////////////////////////////////////////////////////////////////////////
-               
+
 extern double compute_vif(NumArray &);
 
 extern void write_case_cols(const ConcatString &, AsciiTable &,
