@@ -169,7 +169,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    else {
       shc.set_model(css);
    }
-   
+
    // FCST_LEAD
    css = write_css_hhmmss(fcst_lead);
    if(fcst_lead.n_elements() > 1) {
@@ -177,13 +177,13 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << "For case \"" << cur_case << "\", found "
            << fcst_lead.n_elements()
            << " unique FCST_LEAD values: " << css << "\n";
-   }   
+   }
    if(hdr_name.has("FCST_LEAD", index)) {
       shc.set_fcst_lead_sec(timestring_to_sec(hdr_value[index]));
    }
    else {
       shc.set_fcst_lead_sec(fcst_lead.max());
-   }   
+   }
 
    // FCST_VALID_BEG, FCST_VALID_END
    if(hdr_name.has("FCST_VALID_BEG", index)) {
@@ -198,7 +198,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    else {
       shc.set_fcst_valid_end(fcst_valid_end);
    }
-   
+
    // OBS_LEAD
    css = write_css_hhmmss(obs_lead);
    if(obs_lead.n_elements() > 1) {
@@ -206,7 +206,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << "For case \"" << cur_case << "\", found "
            << obs_lead.n_elements()
            << " unique OBS_LEAD values: " << css << "\n";
-   }   
+   }
    if(hdr_name.has("OBS_LEAD", index)) {
       shc.set_obs_lead_sec(timestring_to_sec(hdr_value[index]));
    }
@@ -227,7 +227,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    else {
       shc.set_obs_valid_end(obs_valid_end);
    }
-   
+
    // FCST_VAR
    css = write_css(fcst_var);
    if(fcst_var.n_elements() > 1) {
@@ -257,7 +257,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    else {
       shc.set_fcst_lev(css);
    }
-   
+
    // OBS_VAR
    css = write_css(obs_var);
    if(obs_var.n_elements() > 1) {
@@ -345,7 +345,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    else {
       wdth = nint(sqrt(interp_pnts[0]));
    }
-   
+
    if(hdr_name.has("INTERP_PNTS", index)) {
       wdth = nint(sqrt(atof(hdr_value[index])));
    }
@@ -459,7 +459,7 @@ void AggrTimeSeriesInfo::sort() {
    ri_sort.hdr      = hdr;
    ri_sort.fcst_var = fcst_var;
    ri_sort.obs_var  = obs_var;
-   
+
    // Sort by valid time
    if(valid_ts.n_elements() == f_na.n_elements()) {
 
@@ -507,7 +507,7 @@ void AggrTimeSeriesInfo::sort() {
 
 ConcatString write_css(const StringArray &sa) {
    ConcatString css;
-   
+
    for(int i=0; i<sa.n_elements(); i++) {
       css << (i == 0 ? "" : ",") << sa[i];
    }
@@ -519,7 +519,7 @@ ConcatString write_css(const StringArray &sa) {
 
 ConcatString write_css(const ThreshArray &ta) {
    ConcatString css;
-   
+
    for(int i=0; i<ta.n_elements(); i++) {
       css << (i == 0 ? "" : ",") << ta[i].get_str();
    }
@@ -531,7 +531,7 @@ ConcatString write_css(const ThreshArray &ta) {
 
 ConcatString write_css(const NumArray &na) {
    ConcatString css;
-   
+
    for(int i=0; i<na.n_elements(); i++) {
       css << (i == 0 ? "" : ",") << na[i];
    }
@@ -543,7 +543,7 @@ ConcatString write_css(const NumArray &na) {
 
 ConcatString write_css_hhmmss(const NumArray &na) {
    ConcatString css;
-   
+
    for(int i=0; i<na.n_elements(); i++) {
       css << (i == 0 ? "" : ",") << sec_to_hhmmss(na[i]);
    }
@@ -568,7 +568,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
    unixtime ut;
    int n, n_ties;
    map<ConcatString, AggrCTCInfo>::iterator it;
-   
+
    //
    // Process the STAT lines
    //
@@ -694,7 +694,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
          // Keep track of the unique header column entries
          //
          m[key].hdr.add(line);
-         
+
          n_out++;
       }
    } // end while
@@ -822,7 +822,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
          }
          //
          // Increment counts in the existing map entry
-         //         
+         //
          else {
 
             //
@@ -886,7 +886,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
          // Keep track of the unique header column entries
          //
          m[key].hdr.add(line);
-         
+
          n_out++;
       }
    } // end while
@@ -940,7 +940,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
 }
 
 ////////////////////////////////////////////////////////////////////////
-  
+
 void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
                     map<ConcatString, AggrPCTInfo> &m,
                     int &n_in, int &n_out) {
@@ -1135,7 +1135,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j, 
+void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
                      map<ConcatString, AggrPSumInfo> &m,
                      int &n_in, int &n_out) {
    STATLine line;
@@ -1229,7 +1229,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
 
             m[key].sl1l2_info  += cur_sl1l2;
             m[key].vl1l2_info  += cur_vl1l2;
-            m[key].nbrcnt_info += cur_nbrcnt;                                          
+            m[key].nbrcnt_info += cur_nbrcnt;
          }
 
          //
@@ -1274,7 +1274,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
          n_out++;
       }
    } // end while
-   
+
    //
    // Loop over the map entries and adjust for VIF
    //
@@ -1291,7 +1291,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
               << " unique valid times.\n\n";
          j.vif_flag = 0;
       }
-     
+
       //
       // Compute the auto-correlations for VIF
       //
@@ -1375,7 +1375,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                convert_u_v_to_unit(cur.ufabar, cur.vfabar, uf, vf);
                convert_u_v_to_unit(cur.uoabar, cur.voabar, uo, vo);
                break;
-               
+
             default:
                mlog << Error << "\naggr_wind_lines() -> "
                     << "should only encounter vector partial sum line types.\n"
@@ -1405,7 +1405,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          else {
             m[key].vl1l2_info += cur;
-         } 
+         }
 
          //
          // Append the unit vectors
@@ -1494,7 +1494,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            
+
             //
             // Clear contents
             //
@@ -1504,7 +1504,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             aggr.vf_na.clear();
             aggr.uo_na.clear();
             aggr.vo_na.clear();
-            
+
             //
             // Initialize values
             //
@@ -1529,7 +1529,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
             // Add data for existing header entry
             //
             if(m[key].hdr_sa.has(hdr, i)) {
-              
+
                //
                // Check for duplicate UGRD lines
                //
@@ -1568,7 +1568,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                m[key].uo_na.add(uo);
                m[key].vo_na.add(vo);
             }
-         } 
+         }
 
          //
          // Keep track of the unique header column entries
@@ -1599,7 +1599,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
       // Loop over the pairs for the current map entry
       //
       for(i=0; i<it->second.hdr_sa.n_elements(); i++) {
-         
+
          //
          // Check for missing UGRD data
          //
@@ -1610,7 +1610,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                  << it->second.hdr_sa[i] << "\n\n";
             continue;
          }
-         
+
          //
          // Check for missing VGRD data
          //
@@ -1681,7 +1681,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
                  << it->second.uo_na[i] << ", " << it->second.vo_na[i]
                  << ") vector for header:\n"
                  << it->second.hdr_sa[i] << "\n";
-            continue;            
+            continue;
          }
 
          //
@@ -1897,7 +1897,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
             aggr.hdr.clear();
             m[key] = aggr;
          }
-         
+
          //
          // After reading the first ISC line, setup the isc_info
          // object to store the data.  Also, store the number
@@ -2102,6 +2102,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
    RHISTData cur;
    ConcatString key;
    int i;
+   double crps_fcst, crps_climo;
    map<ConcatString, AggrRHISTInfo>::iterator it;
 
    //
@@ -2141,6 +2142,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          if(m.count(key) == 0) {
             aggr.crps_num = aggr.crps_den = 0.0;
             aggr.ign_num  = aggr.ign_den  = 0.0;
+            aggr.crpss_fcst_num = aggr.crpss_climo_num = aggr.crpss_den = 0.0;
             aggr.ens_pd.rhist_na = cur.rhist_na;
             aggr.hdr.clear();
             m[key] = aggr;
@@ -2149,7 +2151,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          // Increment counts in the existing map entry
          //
          else {
-           
+
             //
             // Check for N_RANK remaining constant
             //
@@ -2186,6 +2188,16 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          }
 
          //
+         // Store running sums for CRPSS
+         //
+         if(!is_bad_data(cur.crps) && !is_bad_data(cur.crpss)) {
+            crps_climo = cur.crps / (1.0 - cur.crpss);
+            m[key].crpss_fcst_num  += cur.total * cur.crps;
+            m[key].crpss_climo_num += cur.total * crps_climo;
+            m[key].crpss_den       += cur.total;
+         }
+
+         //
          // Keep track of the unique header column entries
          //
          m[key].hdr.add(line);
@@ -2195,7 +2207,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
    } // end while
 
    //
-   // Loop over the map entries and compute CRPS and IGN
+   // Loop over the map entries and compute CRPS, IGN, and CRPSS
    //
    for(it = m.begin(); it != m.end(); it++) {
 
@@ -2213,6 +2225,16 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
       }
       else {
          it->second.ens_pd.ign_na.add(bad_data_double);
+      }
+
+      // Compute weighted-mean for CRPSS
+      if(it->second.crpss_den > 0 && !is_eq(it->second.crpss_climo_num, 0.0)) {
+         crps_fcst  = it->second.crpss_fcst_num/it->second.crpss_den;
+         crps_climo = it->second.crpss_climo_num/it->second.crpss_den;
+         it->second.ens_pd.crpss = (crps_climo - crps_fcst)/crps_climo;
+      }
+      else {
+         it->second.ens_pd.crpss = bad_data_double;
       }
 
    } // end for it
@@ -2276,7 +2298,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
          // Increment counts in the existing map entry
          //
          else {
-           
+
             //
             // Check for BIN_SIZE remaining constant
             //
@@ -2317,7 +2339,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
    AggrORANKInfo aggr;
    ORANKData cur;
    ConcatString key;
-   int i, n_bin;
+   int i, n_valid, n_bin;
    double crps, ign, pit;
    map<ConcatString, AggrORANKInfo>::iterator it;
 
@@ -2384,20 +2406,22 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
 
          //
          // Store the observation, ensemble mean, climatology,
-         // and ensemble member values
+         // ensemble member values, and valid ensemble count
          //
          m[key].ens_pd.add_obs(0.0, 0.0, cur.obs, cur.climo, bad_data_double);
          m[key].ens_pd.mn_na.add(cur.ens_mean);
-         for(i=0; i<m[key].ens_pd.n_ens; i++) {
+         for(i=0, n_valid=0; i<m[key].ens_pd.n_ens; i++) {
             m[key].ens_pd.add_ens(i, cur.ens_na[i]);
+            if(!is_bad_data(cur.ens_na[i])) n_valid++;
          }
+         m[key].ens_pd.v_na.add(n_valid);
 
          //
          // Increment the RHIST counts
          //
          i = cur.rank - 1;
          m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + 1);
-         
+
          //
          // Increment the PHIST counts
          //
@@ -2407,14 +2431,6 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
                  floor(cur.pit / m[key].ens_pd.phist_bin_size));
             m[key].ens_pd.phist_na.set(i, m[key].ens_pd.phist_na[i] + 1);
          }
-
-         //
-         // Store the CRPS and IGN values
-         //
-         compute_crps_ign_pit(cur.obs, cur.ens_na, crps, ign, pit);
-         m[key].ens_pd.crps_na.add(crps);
-         m[key].ens_pd.ign_na.add(ign);
-         m[key].ens_pd.pit_na.add(pit);
 
          //
          // Keep track of the unique header column entries
@@ -2466,7 +2482,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(fcst_var.empty()) fcst_var = line.get_item(fcst_var_offset);
          if(obs_var.empty())  obs_var  = line.get_item(obs_var_offset);
-         
+
          if(fcst_var != line.get_item(fcst_var_offset) ||
             obs_var  != line.get_item(obs_var_offset)) {
             mlog << Error << "\naggr_ssvar_lines() -> "
@@ -2601,7 +2617,7 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
          if(!m[key].valid_ts.has(valid_ut)) {
             m[key].init_ts.add(init_ut);
             m[key].valid_ts.add(valid_ut);
-         }         
+         }
          //
          // Add times for a series of initialization times:
          // - Store multiple initialization times for a single valid time
@@ -2650,7 +2666,7 @@ void mpr_to_ctc(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Initialize
    //
    cts_info.clear();
-   
+
    //
    // Update the contingency table counts
    //
@@ -2680,7 +2696,7 @@ void mpr_to_cts(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Initialize
    //
    cts_info.clear();
-   
+
    //
    // If there are no matched pairs to process, return
    //
@@ -2756,7 +2772,7 @@ void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Initialize
    //
    mcts_info.clear();
-   
+
    //
    // If there are no matched pairs to process, return
    //
@@ -2806,7 +2822,7 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Initialize
    //
    cnt_info.clear();
-   
+
    //
    // If there are no matched pairs to process, return
    //
@@ -2857,7 +2873,7 @@ void mpr_to_psum(STATAnalysisJob &j, const AggrMPRInfo &info,
    double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
    double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
    double abs_err_sum;
-   
+
    //
    // Initialize the SL1L2Info object and counts
    //
@@ -2975,7 +2991,7 @@ double compute_vif(NumArray &na) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_precip_var_name(const ConcatString &s) {
-  
+
    bool match = has_prefix(pinterp_precipitation_names,
                            n_pinterp_precipitation_names, s) ||
                 has_prefix(grib_precipitation_abbr,

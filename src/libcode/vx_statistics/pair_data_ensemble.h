@@ -76,6 +76,8 @@ class PairDataEnsemble : public PairBase {
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
       double     phist_bin_size;  // Ensemble PIT histogram bin width
 
+      double     crpss;           // Continuous ranked probability skill score
+
       //////////////////////////////////////////////////////////////////
 
       void clear();
@@ -88,8 +90,6 @@ class PairDataEnsemble : public PairBase {
       void compute_phist();
       void compute_stats();
       void compute_ssvar();
-
-      double crpss() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ class VxPairDataEnsemble {
       // Information about the fields to be compared
       //
       //////////////////////////////////////////////////////////////////
-      
+
       VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
       VarInfo *climo_info;       // Climatology field, allocated by VarInfoFactory
       VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory

@@ -2852,7 +2852,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
       pd_ptr->rhist_na.n_elements());
 
    at.set_entry(r, c+4,  // Continuous Ranked Probability Skill Score
-      pd_ptr->crpss());
+      pd_ptr->crpss);
 
    //
    // Write RANK_i count for each bin
