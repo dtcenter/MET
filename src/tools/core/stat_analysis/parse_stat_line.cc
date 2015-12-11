@@ -369,7 +369,7 @@ void parse_rhist_line_current(STATLine &l, RHISTData &r_data) {
    r_data.crps   = atof(l.get_item(rhist_crps_offset));
    r_data.ign    = atof(l.get_item(rhist_ign_offset));
    r_data.n_rank = atoi(l.get_item(rhist_n_rank_offset));
-   r_data.crpss  = atoi(l.get_item(rhist_crpss_offset));
+   r_data.crpss  = atof(l.get_item(rhist_crpss_offset));
 
    r_data.rhist_na.clear();
 
