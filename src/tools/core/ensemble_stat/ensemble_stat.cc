@@ -639,8 +639,11 @@ void process_point_vx() {
       }
    } // end for i
 
-   // Process the ensemble mean, if spread/skill is activated
-   if(conf_info.ens_ssvar_flag) process_point_ens(-1, n_miss);
+   // Process the ensemble mean for SSVAR or ORANK
+   if(conf_info.ens_ssvar_flag ||
+      conf_info.output_flag[i_orank] != STATOutputType_None) {
+      process_point_ens(-1, n_miss);
+   }
 
    // Compute the scores and write them out
    process_point_scores();
