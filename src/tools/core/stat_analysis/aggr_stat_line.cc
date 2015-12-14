@@ -2190,7 +2190,8 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Store running sums for CRPSS
          //
-         if(!is_bad_data(cur.crps) && !is_bad_data(cur.crpss)) {
+         if(!is_bad_data(cur.crps) && !is_bad_data(cur.crpss) &&
+            !is_eq(cur.crpss, 1.0)) {
             crps_climo = cur.crps / (1.0 - cur.crpss);
             m[key].crpss_fcst_num  += cur.total * cur.crps;
             m[key].crpss_climo_num += cur.total * crps_climo;
