@@ -141,9 +141,7 @@ static const StereographicData ncep_st_grids [] = {
       //
 
    // { "G028", 'S', -60.0,  20.826, -145.0,   0.0,  0.0, -100.0, 381.0,    ncep_earth_radius_km,   65,  65 },
-   // { "G224", 'S',  60.0,  20.826, -120.0,   0.0,  0.0,  105.0, 381.0,    ncep_earth_radius_km,   65,  65 },
-      { "G224", 'S', -60.0,   -90.0,    0.0,  32.0, 32.0,  -75.0, 381.0,    ncep_earth_radius_km,   65,  65 },
-
+      { "G224", 'S',  60.0,  20.826, -120.0,   0.0,  0.0,  105.0, 381.0,    ncep_earth_radius_km,   65,  65 }
 };
 
 static const int n_ncep_st_grids = sizeof(ncep_st_grids)/sizeof(*ncep_st_grids);
@@ -578,16 +576,6 @@ if ( (H != 'N') && (H != 'S') )  {
    exit ( 1 );
 
 }
-
-if ( H == 'S' )  {
-
-   mlog << Error << "\nparse_stereographic_grid() -> "
-        << "South hemisphere grids not yet supported\n\n";
-
-   exit ( 1 );
-
-}
-
 
    //
    //  load up the struct
