@@ -359,11 +359,25 @@ void StringArray::add_css(const char *text)
 
 {
 
-StringArray sa;
+   //
+   // Skip parsing for the special case of '*,*' which may appear
+   // in the FCST_LEV and OBS_LEV columns of the MET output.
+   //
 
-sa.parse_css(text);
+if ( strstr(text, "*,*") != NULL ) {
 
-add(sa);
+   add(text);
+
+}
+else {
+
+   StringArray sa;
+
+   sa.parse_css(text);
+
+   add(sa);
+
+}
 
 return;
 
