@@ -30,6 +30,9 @@ listNcDiffAttrExcl = c("FileOrigins");
 #  Testing System Utilities
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 strNcDiffExec = system("which ncdiff", intern=T);
+if(length(strNcDiffExec) == 0) {
+  strNcDiffExec = "/usr/local/nco/bin/ncdiff";
+}
 strNcDumpExec = system("which ncdump", intern=T);
 strDiffExec   = system("which diff",   intern=T);
 strEgrepExec  = system("which egrep",  intern=T);
