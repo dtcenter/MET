@@ -32,6 +32,20 @@
     </output>
   </test>
 
+  <!-- Test -no_check_dup option -->
+  <test name="gsid2mpr_DUP">
+    <exec>&MET_DIR;/bin/gsid2mpr</exec>
+    <param> \
+      &INPUT_DIR;/gsi_data/GSIdiags4EnKF/diag_conv_ges.mem001 \
+      -set_hdr MODEL GSI_MEM001 \
+      -outdir &OUTPUT_DIR;/gsid2mpr \
+      -swap -no_check_dup -suffix _DUP_mpr.txt -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/gsid2mpr/diag_conv_ges.mem001_DUP_mpr.txt</stat>
+    </output>
+  </test>
+
   <!-- Test multiple input files and -suffix option with radiance obs -->
   <test name="gsid2mpr_RAD">
     <exec>&MET_DIR;/bin/gsid2mpr</exec>
@@ -48,7 +62,7 @@
     </output>
   </test>
 
-  <!-- Test conventional obs with no ensemble mean provided -->  
+  <!-- Test conventional obs with no ensemble mean provided -->
   <test name="gsidens2orank_CONV_NO_MEAN">
     <exec>&MET_DIR;/bin/gsidens2orank</exec>
     <param> \
