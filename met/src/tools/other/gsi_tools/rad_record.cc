@@ -400,7 +400,6 @@ if ( n_read < 72 )  {
 
 }
 
-// cout << "  read_rad_params() -> n_read = " << n_read << '\n';
 
 unsigned char * b = buf;
 
@@ -591,7 +590,6 @@ int month, day, year, hour;
 
 read_rad_params();
 
-// cout << "\n\n(iextra, jextra) = (" << R_params.iextra << ", " << R_params.jextra << ")\n\n";
 
 k = R_params.idate;   //  YYYYMMDDHH
 
@@ -622,6 +620,12 @@ for (k=0; k<Nchannels; ++k)  {
 }
 
    //
+   //  current file position
+   //
+
+off_t cur_pos = ::lseek(Fd, 0L, SEEK_CUR);
+
+   //
    //  loop through the records to inventory the file.
    //  count the number of records and number of pairs.
    //
@@ -638,10 +642,10 @@ while ( (*this) >> r )  {
 Npair = Nrec * Nchannels;
 
    //
-   //  rewind to the beginning of the file.
+   //  rewind to the previous file position
    //
 
-::lseek(Fd, 0L, SEEK_SET);
+::lseek(Fd, cur_pos, SEEK_SET);
 
    //
    //  done

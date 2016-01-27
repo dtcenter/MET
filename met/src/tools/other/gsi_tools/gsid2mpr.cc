@@ -78,14 +78,14 @@ int main(int argc, char * argv []) {
    cline.set_usage(usage);
 
    // Add options
-   cline.add(set_swap,      "-swap",         0);
-   cline.add(set_swap,      "-no_check_dup", 0);
-   cline.add(set_channel,   "-channel",      1);
-   cline.add(set_hdr,       "-set_hdr",      2);
-   cline.add(set_suffix,    "-suffix",       1);
-   cline.add(set_outdir,    "-outdir",       1);
-   cline.add(set_logfile,   "-log",          1);
-   cline.add(set_verbosity, "-v",            1);
+   cline.add(set_swap,         "-swap",         0);
+   cline.add(set_no_check_dup, "-no_check_dup", 0);
+   cline.add(set_channel,      "-channel",      1);
+   cline.add(set_hdr,          "-set_hdr",      2);
+   cline.add(set_suffix,       "-suffix",       1);
+   cline.add(set_outdir,       "-outdir",       1);
+   cline.add(set_logfile,      "-log",          1);
+   cline.add(set_verbosity,    "-v",            1);
 
    // Parse the command line
    cline.parse();
@@ -144,7 +144,7 @@ void process_conv(const char *conv_filename, const char *output_filename) {
    }
 
    // Setup output AsciiTable
-   at.set_size(f.n_pair(),
+   at.set_size(f.n_pair() + 1,
                n_header_columns + n_mpr_columns + n_conv_extra_cols);
    setup_table(at);
 
@@ -282,7 +282,7 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    }
 
    // Setup output AsciiTable
-   at.set_size(f.n_rec() * i_channel.n_elements(),
+   at.set_size(f.n_rec() * i_channel.n_elements() + 1,
                n_header_columns + n_mpr_columns + n_rad_extra_cols);
    setup_table(at);
 
