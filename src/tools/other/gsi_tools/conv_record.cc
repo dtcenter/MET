@@ -333,6 +333,11 @@ hour  = idate%100;
 
 Date = mdyhms_to_unix(month, day, year, hour, 0, 0);
 
+   //
+   //  current file position
+   //
+
+off_t cur_pos = ::lseek(Fd, 0L, SEEK_CUR);
 
    //
    //  loop through the records to inventory the file.
@@ -349,10 +354,10 @@ while ( (*this) >> r )  {
 }
 
    //
-   //  rewind to the beginning of the file.
+   //  rewind to the previous file position
    //
 
-::lseek(Fd, 0L, SEEK_SET);
+::lseek(Fd, cur_pos, SEEK_SET);
 
    //
    //  done
