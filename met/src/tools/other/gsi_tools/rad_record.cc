@@ -367,8 +367,12 @@ Nchannels = 0;
 Date = 0;
 
 Ndiag = 0;
+Nrec  = 0;
+Npair = 0;
 
 N1 = N2 = 0;
+
+
 
 return;
 
@@ -616,6 +620,28 @@ for (k=0; k<Nchannels; ++k)  {
    read_channel(k);
 
 }
+
+   //
+   //  loop through the records to inventory the file.
+   //  count the number of records and number of pairs.
+   //
+
+RadRecord r;
+Nrec = 0;
+
+while ( (*this) >> r )  {
+
+   Nrec++;
+
+}
+
+Npair = Nrec * Nchannels;
+
+   //
+   //  rewind to the beginning of the file.
+   //
+
+::lseek(Fd, 0L, SEEK_SET);
 
    //
    //  done
