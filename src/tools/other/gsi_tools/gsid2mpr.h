@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    06/09/15  Bullock         New
+//   001    01/26/16  Halley Gotway   Add -no_check_dup option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,6 +129,7 @@ static const int retr_extra_begin  = 11;
 ////////////////////////////////////////////////////////////////////////
 
 static bool           swap_endian = false;
+static bool           check_dup = true;
 static NumArray       channel;
 static StringArray    hdr_name;
 static StringArray    hdr_value;

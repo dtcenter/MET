@@ -231,6 +231,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-no_check_dup]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-channel n]
 \end_layout
 
@@ -369,6 +385,18 @@ Optional arguments for gsid2mpr
 3.
  The 
 \series bold
+-no_check_dup
+\series medium
+ option disables the checking for duplicate matched pairs which slows down
+ the tool considerably for large files.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
 -channel n
 \series medium
  option overrides the default processing of all radiance channels with the
@@ -378,7 +406,7 @@ Optional arguments for gsid2mpr
 \begin_layout Description
 
 \series medium
-4.
+5.
  The 
 \series bold
 -set_hdr col_name value
@@ -389,7 +417,7 @@ Optional arguments for gsid2mpr
 \begin_layout Description
 
 \series medium
-5.
+6.
  The 
 \series bold
 -suffix string
@@ -400,7 +428,7 @@ Optional arguments for gsid2mpr
 \begin_layout Description
 
 \series medium
-5.
+7.
  The 
 \series bold
 -outdir path
@@ -411,7 +439,7 @@ Optional arguments for gsid2mpr
 \begin_layout Description
 
 \series medium
-6.
+8.
  The 
 \series bold
 -log file
@@ -423,7 +451,7 @@ Optional arguments for gsid2mpr
 \begin_layout Description
 
 \series medium
-7.
+9.
  The 
 \series bold
 -v level

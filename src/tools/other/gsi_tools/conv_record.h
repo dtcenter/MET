@@ -49,6 +49,9 @@ class ConvFile {
 
       int RecPadSize;
 
+      int Nrec;
+      int Npair;
+
    public:
 
       ConvFile();
@@ -72,6 +75,9 @@ class ConvFile {
 
       unixtime date() const;
 
+      int n_rec() const;
+      int n_pair() const;
+
          //
          //  do stuff
          //
@@ -88,6 +94,10 @@ inline bool ConvFile::get_swap_endian() const { return ( SwapEndian ); }
 inline int ConvFile::get_rec_pad_size() const { return ( RecPadSize ); }
 
 inline unixtime ConvFile::date() const { return ( Date ); }
+
+inline int ConvFile::n_rec() const { return ( Nrec ); }
+
+inline int ConvFile::n_pair() const { return ( Npair ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -138,7 +148,6 @@ class ConvRecord : public GsiRecord {
       float * rdiag;   //  not allocated
 
       ConcatString date_string () const;
-
 
       ConcatString station_name (int index) const;             //  zero-based
 

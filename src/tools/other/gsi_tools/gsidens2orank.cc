@@ -131,6 +131,7 @@ int main(int argc, char * argv []) {
 
    // Process each ensemble member
    for(int i=0; i<ens_file_list.n_elements(); i++) {
+
       mlog << Debug(1)
            << "\nReading Ensemble Member: " << cline[i] << " ... "
            << (i + 1) << " of " << cline.n() << "\n";
@@ -199,10 +200,16 @@ void process_conv(const char *conv_filename, int i_mem) {
       exit(1);
    }
 
+   mlog << Debug(2) << "Processing " << f.n_rec() << " records from "
+        << conv_filename << ".\n";
+
    // Process each record
    n_in = 0;
    while(f >> r) {
       for(i=0; i<(r.ii); i++)  {
+
+         mlog << Debug(3) << "Processing record " << n_in+1
+              << " of " << f.n_rec() << ".\n";
 
          // Parse the current conventional data
          d = parse_conv_data(r, i);
@@ -329,8 +336,11 @@ void process_rad(const char *rad_filename, int i_mem) {
    // Process all channels, if not otherwise specified
    if(channel.n_elements() == 0) {
       for(i=0; i<f.n_channels(); i++) i_channel.add(i+1);
+
       mlog << Debug(2)
-           << "Processing all " << i_channel.n_elements() << " channels.\n";
+           << "Processing all " << i_channel.n_elements()
+           << " channels from " << f.n_rec() << " records from "
+           << rad_filename << ".\n";
    }
    else {
 
@@ -352,14 +362,19 @@ void process_rad(const char *rad_filename, int i_mem) {
       }
 
       mlog << Debug(2)
-         << "Processing " << i_channel.n_elements() << " of "
-         << channel.n_elements() << " requested channels: "
-         << cs << "\n";
+           << "Processing " << i_channel.n_elements() << " of "
+           << channel.n_elements() << " requested channels ("
+           << cs << ") from " << f.n_rec() << " records from "
+           << rad_filename << ".\n";
    }
 
    // Process each record
    n_in = 0;
    while(f >> r) {
+
+      mlog << Debug(3) << "Processing record " << n_in+1
+           << " of " << f.n_rec() << ".\n";
+
       for(i=0; i<i_channel.n_elements(); i++) {
 
          // Parse the current radiance data

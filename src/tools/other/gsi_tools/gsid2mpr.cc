@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    06/09/15  Bullock         New
+//   001    01/26/16  Halley Gotway   Add -no_check_dup option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,6 +57,7 @@ static bool is_dup(const char *);
 
 static void usage();
 static void set_swap(const StringArray &);
+static void set_no_check_dup(const StringArray &);
 static void set_channel(const StringArray &);
 static void set_hdr(const StringArray &);
 static void set_suffix(const StringArray &);
@@ -76,13 +78,14 @@ int main(int argc, char * argv []) {
    cline.set_usage(usage);
 
    // Add options
-   cline.add(set_swap,      "-swap",    0);
-   cline.add(set_channel,   "-channel", 1);
-   cline.add(set_hdr,       "-set_hdr", 2);
-   cline.add(set_suffix,    "-suffix",  1);
-   cline.add(set_outdir,    "-outdir",  1);
-   cline.add(set_logfile,   "-log",     1);
-   cline.add(set_verbosity, "-v",       1);
+   cline.add(set_swap,      "-swap",         0);
+   cline.add(set_swap,      "-no_check_dup", 0);
+   cline.add(set_channel,   "-channel",      1);
+   cline.add(set_hdr,       "-set_hdr",      2);
+   cline.add(set_suffix,    "-suffix",       1);
+   cline.add(set_outdir,    "-outdir",       1);
+   cline.add(set_logfile,   "-log",          1);
+   cline.add(set_verbosity, "-v",            1);
 
    // Parse the command line
    cline.parse();
@@ -133,15 +136,6 @@ void process_conv(const char *conv_filename, const char *output_filename) {
    ConvRecord r;
    ConvData d, d_v;
 
-   // Setup output AsciiTable
-   at.set_size(1, n_header_columns + n_mpr_columns + n_conv_extra_cols);
-   setup_table(at);
-
-   // Write header row
-   write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
-   write_header_row(conv_extra_columns, n_conv_extra_cols, 0, at, 0,
-                    n_header_columns + n_mpr_columns);
-
    // Open input file
    if(!(f.open(conv_filename, swap_endian))) {
       mlog << Error << "\nprocess_conv() -> "
@@ -149,24 +143,28 @@ void process_conv(const char *conv_filename, const char *output_filename) {
       exit(1);
    }
 
-   mlog << Debug(1)
-        << "\nWriting: " << output_filename << "\n";
+   // Setup output AsciiTable
+   at.set_size(f.n_pair(),
+               n_header_columns + n_mpr_columns + n_conv_extra_cols);
+   setup_table(at);
 
-   // Open output file
-   out.open(output_filename);
-   if(!out) {
-      mlog << Error << "\nprocess_conv() -> "
-           << "can't open output file \"" << output_filename << "\"\n\n";
-      exit(1);
-   }
+   // Write header row
+   write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
+   write_header_row(conv_extra_columns, n_conv_extra_cols, 0, at, 0,
+                    n_header_columns + n_mpr_columns);
+
+   mlog << Debug(2) << "Processing " << f.n_rec() << " records from "
+        << conv_filename << ".\n";
 
    // Process each record
    n_in  = 0;
    n_out = 1; // 1 for header line
    while(f >> r) {
 
+      mlog << Debug(3) << "Processing record " << n_in+1
+           << " of " << f.n_rec() << ".\n";
+
       uv_flag = (str_trim(r.variable) == "uv");
-      at.add_rows((uv_flag ? 2 : 1)*r.ii); // double for uv lines
 
       for(i=0; i<(r.ii); i++)  {
 
@@ -180,12 +178,19 @@ void process_conv(const char *conv_filename, const char *output_filename) {
             d_v.var   = "v";
             d_v.guess = d_v.guess_v;
             d_v.obs   = d_v.obs_v;
-            if(!is_dup(get_conv_key(d)))   write_mpr_row_conv(at, n_out++, d);
-            if(!is_dup(get_conv_key(d_v))) write_mpr_row_conv(at, n_out++, d_v);
+
+            if(!check_dup || (check_dup && !is_dup(get_conv_key(d)))) {
+               write_mpr_row_conv(at, n_out++, d);
+            }
+            if(!check_dup || (check_dup && !is_dup(get_conv_key(d_v)))) {
+               write_mpr_row_conv(at, n_out++, d_v);
+            }
          }
          // Handle other variable types
          else {
-            if(!is_dup(get_conv_key(d))) write_mpr_row_conv(at, n_out++, d);
+            if(!check_dup || (check_dup && !is_dup(get_conv_key(d)))) {
+               write_mpr_row_conv(at, n_out++, d);
+            }
          }
       }
 
@@ -194,6 +199,17 @@ void process_conv(const char *conv_filename, const char *output_filename) {
 
    mlog << Debug(2) << "Read " << n_in << " records and wrote "
         << n_out << " lines.\n";
+
+   mlog << Debug(1)
+        << "\nWriting: " << output_filename << "\n";
+
+   // Open output file
+   out.open(output_filename);
+   if(!out) {
+      mlog << Error << "\nprocess_conv() -> "
+           << "can't open output file \"" << output_filename << "\"\n\n";
+      exit(1);
+   }
 
    // Format and write AsciiTable to output file
    setup_table(at);
@@ -224,27 +240,6 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    RadRecord r;
    RadData d;
 
-   // Setup output AsciiTable
-   at.set_size(1, n_header_columns + n_mpr_columns + n_rad_extra_cols);
-   setup_table(at);
-
-   // Write header row
-   write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
-   write_header_row(rad_extra_columns, n_rad_extra_cols, 0, at, 0,
-                    n_header_columns + n_mpr_columns);
-
-   // Update header columns for microwave
-   if(is_micro(rad_filename)) {
-       write_header_row(micro_extra_columns, n_micro_extra_cols, 0, at, 0,
-                        n_header_columns + n_mpr_columns + micro_extra_begin);
-   }
-
-   // Update header columns for retrievals
-   if(is_retr(rad_filename)) {
-       write_header_row(retr_extra_columns, n_retr_extra_cols, 0, at, 0,
-                        n_header_columns + n_mpr_columns + retr_extra_begin);
-   }
-
    // Open input file
    if(!(f.open(rad_filename, swap_endian))) {
       mlog << Error << "\nprocess_rad() -> "
@@ -252,22 +247,13 @@ void process_rad(const char *rad_filename, const char *output_filename) {
       exit(1);
    }
 
-   mlog << Debug(1)
-        << "\nWriting: " << output_filename << "\n";
-
-   // Open output file
-   out.open(output_filename);
-   if(!out) {
-      mlog << Error << "\nprocess_rad() -> "
-           << "can't open output file \"" << output_filename << "\"\n\n";
-      exit(1);
-   }
-
    // Process all channels, if not otherwise specified
    if(channel.n_elements() == 0) {
       for(i=0; i<f.n_channels(); i++) i_channel.add(i+1);
       mlog << Debug(2)
-           << "Processing all " << i_channel.n_elements() << " channels.\n";
+           << "Processing all " << i_channel.n_elements()
+           << " channels from " << f.n_rec() << " records from "
+           << rad_filename << ".\n";
    }
    else {
 
@@ -289,9 +275,32 @@ void process_rad(const char *rad_filename, const char *output_filename) {
       }
 
       mlog << Debug(2)
-         << "Processing " << i_channel.n_elements() << " of "
-         << channel.n_elements() << " requested channels: "
-         << cs << "\n";
+           << "Processing " << i_channel.n_elements() << " of "
+           << channel.n_elements() << " requested channels ("
+           << cs << ") from " << f.n_rec() << " records from "
+           << rad_filename << ".\n";
+   }
+
+   // Setup output AsciiTable
+   at.set_size(f.n_rec() * i_channel.n_elements(),
+               n_header_columns + n_mpr_columns + n_rad_extra_cols);
+   setup_table(at);
+
+   // Write header row
+   write_header_row(mpr_columns, n_mpr_columns, 1, at, 0, 0);
+   write_header_row(rad_extra_columns, n_rad_extra_cols, 0, at, 0,
+                    n_header_columns + n_mpr_columns);
+
+   // Update header columns for microwave
+   if(is_micro(rad_filename)) {
+       write_header_row(micro_extra_columns, n_micro_extra_cols, 0, at, 0,
+                        n_header_columns + n_mpr_columns + micro_extra_begin);
+   }
+
+   // Update header columns for retrievals
+   if(is_retr(rad_filename)) {
+       write_header_row(retr_extra_columns, n_retr_extra_cols, 0, at, 0,
+                        n_header_columns + n_mpr_columns + retr_extra_begin);
    }
 
    // Process each record
@@ -299,13 +308,17 @@ void process_rad(const char *rad_filename, const char *output_filename) {
    n_out = 1; // 1 for header line
    while(f >> r)  {
 
-      at.add_rows(i_channel.n_elements());
+      mlog << Debug(3) << "Processing record " << n_in+1
+           << " of " << f.n_rec() << ".\n";
+
       for(i=0; i<i_channel.n_elements(); i++) {
          d = parse_rad_data(r, i_channel[i]-1,
                             f.channel_val(i_channel[i]-1),
                             f.use_channel(i_channel[i]-1));
 
-         if(!is_dup(get_rad_key(d))) write_mpr_row_rad(at, n_out++, d);
+         if(!check_dup || (check_dup && !is_dup(get_rad_key(d)))) {
+            write_mpr_row_rad(at, n_out++, d);
+         }
       }
 
       n_in++;
@@ -313,6 +326,17 @@ void process_rad(const char *rad_filename, const char *output_filename) {
 
    mlog << Debug(2) << "Read " << n_in << " records and wrote "
         << n_out << " lines.\n";
+
+   mlog << Debug(1)
+        << "\nWriting: " << output_filename << "\n";
+
+   // Open output file
+   out.open(output_filename);
+   if(!out) {
+      mlog << Error << "\nprocess_rad() -> "
+           << "can't open output file \"" << output_filename << "\"\n\n";
+      exit(1);
+   }
 
    // Format and write AsciiTable to output file
    setup_table(at);
@@ -487,6 +511,7 @@ void usage() {
         << "Usage: " << program_name << "\n"
         << "\tgsi_file_1 [gsi_file_2 ... gsi_file_n]\n"
         << "\t[-swap]\n"
+        << "\t[-no_check_dup]\n"
         << "\t[-channel n]\n"
         << "\t[-set_hdr col_name value]\n"
         << "\t[-suffix string]\n"
@@ -498,6 +523,8 @@ void usage() {
         << "(conventional or radiance) to be reformatted (required).\n"
         << "\t\t\"-swap\" to switch the endianness when reading the "
         << "input binary files (optional).\n"
+        << "\t\t\"-no_check_dup\" to skip the checking for duplicate "
+        << "matched pairs (optional).\n"
         << "\t\t\"-channel n\" overrides the default processing of all "
         << "radiance channels with a comma-separated list (optional).\n"
         << "\t\t\"-set_hdr col_name value\" specifies what should be "
@@ -519,6 +546,12 @@ void usage() {
 
 void set_swap(const StringArray & a) {
    swap_endian = true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_no_check_dup(const StringArray & a) {
+   check_dup = false;
 }
 
 ////////////////////////////////////////////////////////////////////////

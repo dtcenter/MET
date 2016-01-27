@@ -115,6 +115,8 @@ class RadFile {
       int N2;
 
       int Ndiag;
+      int Nrec;
+      int Npair;
 
    public:
 
@@ -124,6 +126,8 @@ class RadFile {
       bool open(const char * path, bool _swap_endian = true, int _rec_pad_size = 4);
 
       void close();
+
+      void rewind();
 
          //
          //  set stuff
@@ -148,6 +152,8 @@ class RadFile {
       int use_channel(const int) const;
 
       int n_diag() const;
+      int n_rec()  const;
+      int n_pair() const;
 
       int n1() const;
       int n2() const;
@@ -176,6 +182,8 @@ inline unixtime RadFile::date() const { return ( Date ); }
 inline int RadFile::n_channels() const { return ( Nchannels ); }
 
 inline int RadFile::n_diag() const { return ( Ndiag ); }
+inline int RadFile::n_rec()  const { return ( Nrec  ); }
+inline int RadFile::n_pair() const { return ( Npair ); }
 
 inline int RadFile::n1() const { return ( N1 ); }
 inline int RadFile::n2() const { return ( N2 ); }

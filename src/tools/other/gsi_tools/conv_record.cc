@@ -273,6 +273,9 @@ SwapEndian = true;
 
 RecPadSize = 4;
 
+Nrec  = 0;
+Npair = 0;
+
 Filename.clear();
 
 return;
@@ -329,6 +332,27 @@ day   = (idate/100)%100;
 hour  = idate%100;
 
 Date = mdyhms_to_unix(month, day, year, hour, 0, 0);
+
+
+   //
+   //  loop through the records to inventory the file.
+   //  count the number of records and number of pairs.
+   //  two pairs for "uv" variable and 1 for all others.
+   //
+
+ConvRecord r;
+Nrec = Npair = 0;
+
+while ( (*this) >> r )  {
+   Nrec++;
+   Npair += ((str_trim(r.variable) == "uv") ? 2 : 1) * r.ii;
+}
+
+   //
+   //  rewind to the beginning of the file.
+   //
+
+::lseek(Fd, 0L, SEEK_SET);
 
    //
    //  done
