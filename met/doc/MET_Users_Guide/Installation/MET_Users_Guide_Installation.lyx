@@ -600,6 +600,17 @@ http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2
 \end_inset
 
 ).
+ Please note that compiling the GRIB2C library with the 
+\series bold
+-D__64BIT__
+\series medium
+ option requires that MET also be configured with 
+\series bold
+CFLAGS="-D__64BIT__"
+\series medium
+.
+ Compiling MET and the GRIB2C library inconsistently may result in a segmentatio
+n fault when reading GRIB2 files.
 \end_layout
 
 \begin_layout Description
