@@ -24,11 +24,13 @@ using namespace std;
 #include <cstdio>
 #include <limits.h>
 #include <cmath>
+#include <regex.h>
 
 #include "vx_log.h"
 
 #include "get_filenames.h"
 #include "filename_suffix.h"
+#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -134,9 +136,18 @@ while ( (entry = readdir(directory)) != NULL )  {
 
    } else if ( S_ISREG(sbuf.st_mode) )  {
 
-      cur_suffix = filename_suffix(entry_path);
+      // check if the file name ends with one of the suffixes by applying a regular expression
+      for( int i=0; i<= suffix.n_elements()-1; i++ ){
+         char** mat = NULL;
+         char regex[strlen(suffix[i]) +1];
+         strcpy (regex,suffix[i]);
+         strcat (regex,"$");
+         if( 1 == regex_apply(regex, 1, entry_path, mat) ){
+            a.add(entry_path);
+            break;
+         }
 
-      if ( suffix.has(cur_suffix) )  a.add(entry_path);
+      }
 
    }
 
