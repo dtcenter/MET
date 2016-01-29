@@ -24,12 +24,10 @@ using namespace std;
 #include <cstdio>
 #include <limits.h>
 #include <cmath>
-#include <regex.h>
 
 #include "vx_log.h"
 
 #include "get_filenames.h"
-#include "filename_suffix.h"
 #include "string_fxns.h"
 
 
