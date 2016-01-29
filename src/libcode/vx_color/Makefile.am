@@ -10,8 +10,8 @@ include ${top_srcdir}/Make-include
 
 # YACC/LEX flags
 
-AM_YFLAGS	= -d -p color
-#AM_YFLAGS	= --defines=color_parser_yacc.h -p color
+#AM_YFLAGS	= -d -p color
+AM_YFLAGS	= --defines=color_parser_yacc.h -p color
 AM_LFLAGS	= --prefix=color --outfile=lex.yy.c
 
 # The library
