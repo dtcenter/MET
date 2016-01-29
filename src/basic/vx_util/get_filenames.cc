@@ -28,7 +28,7 @@ using namespace std;
 #include "vx_log.h"
 
 #include "get_filenames.h"
-#include "filename_suffix.h"
+#include "string_fxns.h"
 
 
 ////////////////////////////////////////////////////////////////////////
