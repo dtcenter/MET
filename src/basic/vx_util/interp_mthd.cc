@@ -34,6 +34,7 @@ ConcatString interpmthd_to_string(const InterpMthd m) {
       case(InterpMthd_Bilin):   out = interpmthd_bilin_str;   break;
       case(InterpMthd_Nearest): out = interpmthd_nearest_str; break;
       case(InterpMthd_Budget):  out = interpmthd_budget_str;  break;
+      case(InterpMthd_Force):   out = interpmthd_force_str;   break;
 
       case(InterpMthd_None):
       default:                  out = interpmthd_none_str;    break;
@@ -57,6 +58,7 @@ InterpMthd string_to_interpmthd(const char *mthd_str) {
    else if(strcmp(mthd_str, interpmthd_bilin_str)   == 0) m = InterpMthd_Bilin;
    else if(strcmp(mthd_str, interpmthd_nearest_str) == 0) m = InterpMthd_Nearest;
    else if(strcmp(mthd_str, interpmthd_budget_str)  == 0) m = InterpMthd_Budget;
+   else if(strcmp(mthd_str, interpmthd_force_str)   == 0) m = InterpMthd_Force;
    else                                                   m = InterpMthd_None;
 
    return(m);

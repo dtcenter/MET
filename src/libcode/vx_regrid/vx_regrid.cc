@@ -45,11 +45,14 @@ switch ( info.method )  {
       out = met_regrid_budget (in, from_grid, to_grid, info);
       break;
 
+   case InterpMthd_Force:
+      out = met_regrid_force (in, from_grid, to_grid, info);
+      break;
+
    default:
-      mlog << Error
-           << "met_regrid() -> bad interpolation method ... "
-           << interpmthd_to_string(info.method) 
-           << '\n';
+      mlog << Error << "\nmet_regrid() -> "
+           << "bad interpolation method ... "
+           << interpmthd_to_string(info.method) << "\n\n";
       exit(1);
       break;
 
@@ -127,5 +130,32 @@ return ( to_data );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+DataPlane met_regrid_force (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+
+{
+
+   //
+   //  check grid dimensions
+   //
+
+if ( from_grid.nx() != to_grid.nx() || from_grid.ny() != to_grid.ny() ) {
+
+   mlog << Error << "\nmet_regrid_force() -> "
+        << "the " << interpmthd_to_string(info.method)
+        << " interpolation method may only be used when the grid "
+        << "dimensions match: ("
+        << from_grid.nx() << ", " << from_grid.ny() << ") != ("
+        << to_grid.nx() << ", " << to_grid.ny() << ")\n\n";
+   exit(1);
+
+}
+
+return ( from_data );
+
+}
 
 ////////////////////////////////////////////////////////////////////////

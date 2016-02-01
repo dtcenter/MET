@@ -70,11 +70,11 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    s = dict->lookup_string(conf_key);
 
    if(dict->last_lookup_status()) {
-   
+
       // Check that it's non-empty and contains no whitespace
       if(s.empty() || check_reg_exp(ws_reg_exp, s) == true) {
          mlog << Error << "\nparse_conf_string() -> "
@@ -98,7 +98,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_file_type, false);
 
@@ -115,7 +115,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
               << conf_key_file_type << "\".\n\n";
          exit(1);
       }
-   } 
+   }
 
    return(t);
 }
@@ -134,16 +134,16 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Get the output flag dictionary
    out_dict = dict->lookup_dictionary(conf_key_output_flag);
-   
+
    // Loop over the output flag dictionary entries
    for(i=0; i<out_dict->n_entries(); i++) {
 
       // Get the line type for the current entry
       line_type = string_to_statlinetype((*out_dict)[i]->name());
-     
+
       // Get the integer flag value for the current entry
       v = out_dict->lookup_int((*out_dict)[i]->name());
 
@@ -162,7 +162,7 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
       // Store entry line type and corresponding output type
       output_map[line_type] = output_type;
    }
-   
+
    return(output_map);
 }
 
@@ -249,14 +249,14 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Check that this dictionary is an array
    if(!dict->is_array()) {
       mlog << Error << "\nparse_conf_i_vx_dict() -> "
            << "This function must be passed a Dictionary array.\n\n";
       exit(1);
    }
-   
+
    // Loop over the fields to be verified
    for(i=0,total=0; i<dict->n_entries(); i++) {
 
@@ -293,7 +293,7 @@ StringArray parse_conf_message_type(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    sa = dict->lookup_string_array(conf_key_message_type);
 
    // Check that at least one message type is provided
@@ -318,7 +318,7 @@ StringArray parse_conf_sid_exc(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    sa = dict->lookup_string_array(conf_key_sid_exc);
 
    // Parse station ID's to exclude from each entry
@@ -326,7 +326,7 @@ StringArray parse_conf_sid_exc(Dictionary *dict) {
       parse_sid_mask(sa[i], cur, mask_name);
       sid_exc_sa.add(cur);
    }
-   
+
    mlog << Debug(4) << "parse_conf_sid_exc() -> "
         << "Station ID exclusion list contains "
         << sid_exc_sa.n_elements() << " entries.\n";
@@ -356,7 +356,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
    // Check for an empty length string
    if(mask_sid_str.empty()) return;
-   
+
    // Replace any instances of MET_BASE with it's expanded value
    tmp_file = replace_path(mask_sid_str);
 
@@ -409,7 +409,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       mask_sid.add(mask_sid_str);
       mask_name = mask_sid_str;
    }
-   
+
    return;
 }
 
@@ -440,7 +440,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    na = dict->lookup_num_array(conf_key_ci_alpha);
 
    // Check that at least one alpha value is provided
@@ -474,7 +474,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
          << "empty dictionary!\n\n";
     exit(1);
   }
-   
+
   TimeSummaryInfo info;
 
   // Conf: time_summary.flag
@@ -495,7 +495,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
          << ") must be greater than 0!\n\n";
     exit(1);
   }
-  
+
   // Conf: time_summary.width
   info.width = dict->lookup_int(conf_key_time_summary_width);
   if (info.width <= 0) {
@@ -505,10 +505,10 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
          << ") must be greater than 0!\n\n";
     exit(1);
   }
-  
+
   // Conf: time_summary.grib_code
   info.grib_code = dict->lookup_int_array(conf_key_time_summary_grib_code);
-  
+
   // Conf: time_summary.type
   info.type = dict->lookup_string_array(conf_key_time_summary_type);
 
@@ -534,7 +534,7 @@ map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
 
    // Loop through the array entries
    for(i=0; i<msg_typ_dict->n_entries(); i++) {
-      
+
       // Lookup the key and value
       key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
       val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
@@ -563,7 +563,7 @@ BootInfo parse_conf_boot(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Conf: boot.interval
    v = dict->lookup_int(conf_key_boot_interval);
 
@@ -622,10 +622,10 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Conf: regrid
    regrid_dict = dict->lookup_dictionary(conf_key_regrid);
-   
+
    // Parse to_grid as an integer
    v = regrid_dict->lookup_int(conf_key_to_grid, false);
 
@@ -657,7 +657,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
       info.method = InterpMthd_Nearest;
    }
 
-   // Check the bilinear and budget special cases   
+   // Check the bilinear and budget special cases
    if((info.method == InterpMthd_Bilin ||
        info.method == InterpMthd_Budget) &&
       info.width != 2) {
@@ -813,7 +813,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Conf: nbrhd
    nbrhd_dict = dict->lookup_dictionary(conf_key_nbrhd);
 
@@ -849,7 +849,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
          exit(1);
       }
    }
-   
+
    // Conf: cov_thresh
    info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh);
 
@@ -871,7 +871,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
          exit(1);
       }
    }
-   
+
    return(info);
 }
 
@@ -889,7 +889,7 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
 
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_duplicate_flag);
-      
+
    // Convert integer to enumerated DuplicateType
         if(v == conf_const.lookup_int(conf_val_none))   t = DuplicateType_None;
    else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType_Unique;
@@ -914,7 +914,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Read the temporary directory
    s = dict->lookup_string(conf_key_tmp_dir);
 
@@ -940,7 +940,7 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_grid_decomp_flag);
 
@@ -970,7 +970,7 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Get the integer flag value for the current entry
    v = dict->lookup_int(conf_key_wavelet_type);
 
@@ -1002,14 +1002,14 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-   
+
    // Get the color table
    info.color_table = dict->lookup_string(conf_key_color_table);
 
    // Get the minimum plot value, 0 if not present
    info.plot_min = dict->lookup_double(conf_key_plot_min, false);
    if(is_bad_data(info.plot_min)) info.plot_min = 0.0;
-   
+
    // Get the maximum plot value, 0 if not present
    info.plot_max = dict->lookup_double(conf_key_plot_max, false);
    if(is_bad_data(info.plot_max)) info.plot_max = 0.0;
@@ -1024,7 +1024,7 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
            << "the colorbar_spacing (" << info.colorbar_spacing
            << ") must be set >= 1.\n\n";
       exit(1);
-   }   
+   }
 
    return(info);
 }
@@ -1050,7 +1050,7 @@ void parse_conf_range_int(Dictionary *dict, int &beg, int &end) {
            << ") must be >= the beginning value (" << beg << ").\n\n";
       exit(1);
    }
-   
+
    return;
 }
 
@@ -1083,7 +1083,7 @@ void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
 
 void check_climo_n_vx(Dictionary *dict, const int n_vx) {
    int n;
-   
+
    // Check for a valid number of climatology mean fields
    n = parse_conf_n_vx(dict->lookup_array(conf_key_climo_mean_field, false));
    if(n != 0 && n != n_vx) {
@@ -1113,7 +1113,7 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 
 InterpMthd int_to_interpmthd(int i) {
    InterpMthd m;
-   
+
         if(i == conf_const.lookup_int(interpmthd_min_str))     m = InterpMthd_Min;
    else if(i == conf_const.lookup_int(interpmthd_max_str))     m = InterpMthd_Max;
    else if(i == conf_const.lookup_int(interpmthd_median_str))  m = InterpMthd_Median;
@@ -1124,6 +1124,7 @@ InterpMthd int_to_interpmthd(int i) {
    else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))   m = InterpMthd_Nbrhd;
    else if(i == conf_const.lookup_int(interpmthd_nearest_str)) m = InterpMthd_Nearest;
    else if(i == conf_const.lookup_int(interpmthd_budget_str))  m = InterpMthd_Budget;
+   else if(i == conf_const.lookup_int(interpmthd_force_str))   m = InterpMthd_Force;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
@@ -1672,7 +1673,7 @@ ConcatString griddecomptype_to_string(GridDecompType type) {
          exit(1);
          break;
    }
-   
+
    return(s);
 }
 
@@ -1696,7 +1697,7 @@ ConcatString wavelettype_to_string(WaveletType type) {
          exit(1);
          break;
    }
-   
+
    return(s);
 }
 

@@ -43,6 +43,7 @@ BILIN          = 7;
 NBRHD          = 8;
 NEAREST        = 9;
 BUDGET         = 10;
+FORCE          = 11;
 
 // Interpolation types
 NONE           = 1;
