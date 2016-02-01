@@ -33,7 +33,7 @@ enum InterpMthd {
    InterpMthd_Bilin, 
    InterpMthd_Nearest,
    InterpMthd_Budget,
-
+   InterpMthd_Force
 };
 
 //
@@ -50,6 +50,7 @@ static const char interpmthd_nbrhd_str[]   = "NBRHD";
 static const char interpmthd_bilin_str[]   = "BILIN";
 static const char interpmthd_nearest_str[] = "NEAREST";
 static const char interpmthd_budget_str[]  = "BUDGET";
+static const char interpmthd_force_str[]   = "FORCE";
 
 ///////////////////////////////////////////////////////////////////////////////
 

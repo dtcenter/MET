@@ -170,7 +170,10 @@ obtype = "ANALYS";
 //
 //   - The "method" entry defines the regridding method to be used.
 //      - Valid regridding methods:
-//        MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN, LS_FIT, BILIN, NEAREST, BUDGET
+//        MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN, LS_FIT, BILIN, NEAREST, BUDGET, FORCE
+//
+//        Use FORCE to compare input values directly with no interpolation as
+//        long as the grid x and y dimensions match. 
 //
 //   - The "width" entry specifies a regridding width, when applicable.
 //      - width = 4;        To regrid using a 4x4 box.
