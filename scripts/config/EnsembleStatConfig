@@ -23,9 +23,9 @@ obtype = "MC_PCP";
 //
 regrid = {
    to_grid    = NONE;
-   vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
+   vld_thresh = 0.5;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,9 +98,9 @@ climo_mean = {
    field     = [];
 
    regrid = {
-      vld_thresh = 0.5;
       method     = NEAREST;
       width      = 1;
+      vld_thresh = 0.5;
    }
 
    time_interp_method = DW_MEAN;

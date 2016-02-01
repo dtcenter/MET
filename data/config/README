@@ -177,9 +177,9 @@ obtype = "ANALYS";
 //
 regrid = {
    to_grid    = NONE;
-   vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
+   vld_thresh = 0.5;
 }
 
 //
@@ -438,9 +438,9 @@ climo_mean = {
    field     = [];
 
    regrid = {
-      vld_thresh = 0.5;
       method     = NEAREST;
       width      = 1;
+      vld_thresh = 0.5;
    }
 
    time_interp_method = DW_MEAN;
@@ -679,9 +679,9 @@ interp = {
 //      coverage field.
 //
 nbrhd = {
-   vld_thresh = 1.0;
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
+   vld_thresh = 1.0;
 }
 
 //

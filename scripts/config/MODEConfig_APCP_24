@@ -23,9 +23,9 @@ obtype = "MC_PCP";
 //
 regrid = {
    to_grid    = NONE;
-   vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
+   vld_thresh = 0.5;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
