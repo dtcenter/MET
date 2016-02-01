@@ -18,9 +18,9 @@ model = "NGAC";
 //
 regrid = {
    to_grid    = NONE;
-   vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
+   vld_thresh = 0.5;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,9 +78,9 @@ climo_mean = {
    // Method for regridding climatology data to the verification grid.
    //
    regrid = {
-      vld_thresh = 0.5;
       method     = NEAREST;
       width      = 1;
+      vld_thresh = 0.5;
    }
 
    //

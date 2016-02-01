@@ -101,9 +101,9 @@ interp = {
 // Neighborhood methods
 //
 nbrhd = {
-   vld_thresh = 1.0;
    width      = [ 3, 5 ];
    cov_thresh = [ >=0.5 ];
+   vld_thresh = 1.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
