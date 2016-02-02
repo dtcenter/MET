@@ -73,8 +73,11 @@ class TCPairsConfInfo {
       // Time-lagged track definition
       NumArray LagTime;
 
-      // CLIPER/SHIFOR baseline model definition
+      // CLIPER/SHIFOR baseline model definition along with BEST
+      // and operational technique names
+      StringArray BestTechnique;
       StringArray BestBaseline;
+      StringArray OperTechnique;
       StringArray OperBaseline;
 
       // Only retain TrackPoints in both the ADECK and BDECK tracks

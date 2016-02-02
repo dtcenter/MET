@@ -71,7 +71,7 @@ check_dup = FALSE;
 interp12 = REPLACE;
 
 //
-// Specify how consensus forecasts should be defined
+// Specify how consensus forecasts should be defined.
 //
 consensus = [];
 
@@ -81,11 +81,14 @@ consensus = [];
 lag_time = [];
 
 //
-// CLIPER/SHIFOR baseline forecasts to be derived from the BEST
-// and operational (CARQ) tracks.
+// CLIPER/SHIFOR baseline forecasts to be derived from the BEST and
+// operational tracks, along with the BEST and operational track
+// technique names. 
 //
-best_baseline = [];
-oper_baseline = [];
+best_technique = [ "BEST" ];
+best_baseline  = [];
+oper_technique = [ "CARQ" ];
+oper_baseline  = [];
 
 //
 // Specify if only those track points common to both the ADECK and BDECK

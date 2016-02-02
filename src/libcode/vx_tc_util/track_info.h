@@ -44,6 +44,9 @@ class TrackInfo {
       void extend(int);
       
       bool         IsSet;
+      bool         IsBestTrack;
+      bool         IsOperTrack;
+      bool         IsAnlyTrack;
 
       // Storm and model identification
       ConcatString StormId;
@@ -105,6 +108,10 @@ class TrackInfo {
          //  get stuff
          //
 
+      bool is_best_track() const;
+      bool is_oper_track() const;
+      bool is_anly_track() const; 
+
       int lead_index(int)       const;
       int valid_index(unixtime) const;
 
@@ -133,7 +140,7 @@ class TrackInfo {
       
       bool has(const ATCFLine &) const;
       
-      bool is_match(const ATCFLine &) const;
+      bool is_match(const ATCFLine &);
       bool is_match(const TrackInfo &) const;
       
       bool is_interp() const;
@@ -142,15 +149,18 @@ class TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void TrackInfo::set_basin(const char *s)        { Basin = s;           };
-inline void TrackInfo::set_cyclone(const char *s)      { Cyclone = s;         };
-inline void TrackInfo::set_storm_name(const char *s)   { StormName = s;       };
-inline void TrackInfo::set_technique_number(int i)     { TechniqueNumber = i; };
-inline void TrackInfo::set_technique(const char *s)    { Technique = s;       };
-inline void TrackInfo::set_initials(const char *s)     { Initials = s;        };
-inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        };
-inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    };
-inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    };
+inline bool TrackInfo::is_best_track() const           { return(IsBestTrack); }
+inline bool TrackInfo::is_oper_track() const           { return(IsOperTrack); }
+inline bool TrackInfo::is_anly_track() const           { return(IsAnlyTrack); }
+inline void TrackInfo::set_basin(const char *s)        { Basin = s;           }
+inline void TrackInfo::set_cyclone(const char *s)      { Cyclone = s;         }
+inline void TrackInfo::set_storm_name(const char *s)   { StormName = s;       }
+inline void TrackInfo::set_technique_number(int i)     { TechniqueNumber = i; }
+inline void TrackInfo::set_technique(const char *s)    { Technique = s;       }
+inline void TrackInfo::set_initials(const char *s)     { Initials = s;        }
+inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        }
+inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    }
+inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                 }
 inline const ConcatString & TrackInfo::basin()            const { return(Basin);                   }

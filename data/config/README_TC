@@ -247,15 +247,21 @@ lag_time = [];
 
 //
 // Specify comma-separated lists of CLIPER/SHIFOR baseline forecasts to be
-// derived from the BEST and operational (CARQ) tracks.
+// derived from the BEST and operational tracks, as defined by the 
+// best_technique and oper_technique settings.
+//
 // Derived from BEST tracks: BCLP, BCS5, BCD5, BCLA
-// Derived from CARQ tracks: OCLP, OCS5, OCD5, OCDT
+// Derived from OPER tracks: OCLP, OCS5, OCD5, OCDT
 //
-// e.g. base_baseline = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
-//      oper_baseline = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
+// e.g. best_technique = [ "BEST" ];
+//      base_baseline  = [ "BCLP", "BCS5", "BCD5", "BCLA" ];
+//      oper_technique = [ "CARQ" ];
+//      oper_baseline  = [ "OCLP", "OCS5", "OCD5", "OCDT" ];
 //
-best_baseline = [];
-oper_baseline = [];
+best_technique = [ "BEST" ];
+best_baseline  = [];
+oper_technique = [ "CARQ" ];
+oper_baseline  = [];
 
 //
 // Specify whether only those track points common to both the ADECK and BDECK
