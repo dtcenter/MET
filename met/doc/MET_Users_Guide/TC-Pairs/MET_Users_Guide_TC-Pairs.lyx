@@ -909,7 +909,13 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-best_baseline = [ "BCLP", "BCD5", "BCLA" ];
+best_technique = [ "BEST" ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+best_baseline  = [ "BCLP", "BCD5", "BCLA" ];
 \end_layout
 
 \begin_layout Standard
@@ -917,10 +923,27 @@ best_baseline = [ "BCLP", "BCD5", "BCLA" ];
 \series medium
 The 
 \series bold
+best_technique
+\series medium
+ field specifies a comma-separated list of technique name(s) to be interpreted
+ as BEST track data.
+ The default value (BEST) should suffice for most users.
+ The 
+\series bold
 best_baseline
 \series medium
  field specifies a comma-separated list of CLIPER/SHIFOR baseline forecasts
  to be derived from the best tracks.
+ Specifying multiple 
+\series bold
+best_technique
+\series medium
+ values and at least one 
+\series bold
+best_baseline
+\series medium
+ value results in a warning since the derived baseline forecast technique
+ names may be used multiple times.
 \end_layout
 
 \begin_layout Standard
@@ -986,7 +1009,13 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-oper_baseline = [ "OCLP", "OCS5", "OCD5" ];
+oper_technique = [ "CARQ" ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+oper_baseline  = [ "OCLP", "OCS5", "OCD5" ];
 \end_layout
 
 \begin_layout Standard
@@ -994,17 +1023,34 @@ oper_baseline = [ "OCLP", "OCS5", "OCD5" ];
 \series medium
 The 
 \series bold
+oper_technique
+\series medium
+ field specifies a comma-separated list of technique name(s) to be interpreted
+ as operational track data.
+ The default value (CARQ) should suffice for most users.
+ The 
+\series bold
 oper_baseline
 \series medium
  field specifies a comma-separated list of CLIPER/SHIFOR baseline forecasts
- to be derived from the operational (CARQ) tracks.
+ to be derived from the operational tracks.
+ Specifying multiple 
+\series bold
+oper_technique
+\series medium
+ values and at least one 
+\series bold
+oper_baseline
+\series medium
+ value results in a warning since the derived baseline forecast technique
+ names may be used multiple times.
 \end_layout
 
 \begin_layout Standard
 
 \series medium
 The following are valid baselines for the 
-\series default
+\series bold
 oper_baseline
 \series medium
  field:

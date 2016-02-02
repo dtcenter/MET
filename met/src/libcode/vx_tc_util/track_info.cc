@@ -75,6 +75,9 @@ void TrackInfo::init_from_scratch() {
 void TrackInfo::clear() {
 
    IsSet           = false;
+   IsBestTrack     = false;
+   IsOperTrack     = false;
+   IsAnlyTrack     = false;
 
    StormId.clear();
    Basin.clear();
@@ -110,6 +113,9 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    int i;
 
    out << prefix << "StormId         = \"" << (StormId ? StormId.text() : "(nul)") << "\"\n";
+   out << prefix << "IsBestTrack     = " << bool_to_string(IsBestTrack) << "\n";
+   out << prefix << "IsOperTrack     = " << bool_to_string(IsOperTrack) << "\n";
+   out << prefix << "IsAnlyTrack     = " << bool_to_string(IsAnlyTrack) << "\n";
    out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
    out << prefix << "Cyclone         = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\"\n";
    out << prefix << "StormName       = \"" << (StormName ? StormName.text() : "(nul)") << "\"\n";
@@ -141,6 +147,9 @@ ConcatString TrackInfo::serialize() const {
 
    s << "TrackInfo: "
      << "StormId = \"" << (StormId ? StormId.text() : "(nul)") << "\""
+     << ", IsBest = " << bool_to_string(IsBestTrack)
+     << ", IsOper = " << bool_to_string(IsOperTrack)
+     << ", IsAnly = " << bool_to_string(IsAnlyTrack)
      << ", Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
      << ", Cyclone = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\""
      << ", StormName = \"" << (StormName ? StormName.text() : "(nul)") << "\""
@@ -182,6 +191,9 @@ void TrackInfo::assign(const TrackInfo &t) {
    clear();
 
    IsSet           = true;
+   IsBestTrack     = t.IsBestTrack;
+   IsOperTrack     = t.IsOperTrack;
+   IsAnlyTrack     = t.IsAnlyTrack;
 
    StormId         = t.StormId;
    Basin           = t.Basin;
@@ -252,6 +264,11 @@ void TrackInfo::initialize(const ATCFLine &l) {
 
    IsSet           = true;
 
+   IsBestTrack     = l.is_best_track();
+   IsOperTrack     = l.is_oper_track();
+
+   // IsAnlyTrack is determined by subsequent track data points.
+
    Basin           = l.basin();
    Cyclone         = l.cyclone_number();
    StormName       = l.storm_name();
@@ -259,11 +276,9 @@ void TrackInfo::initialize(const ATCFLine &l) {
    Technique       = l.technique();
    Initials        = l.initials();
 
-   // For BEST tracks, keep InitTime unset
-   if(Technique) {
-      if(strcasecmp(Technique, BestTrackStr) == 0) InitTime = (unixtime) 0;
-      else                                         set_init(l.warning_time());
-   }
+   // For BEST tracks, keep InitTime unset.
+   if(IsBestTrack) InitTime = (unixtime) 0;
+   else            set_init(l.warning_time());
 
    // Set the valid time range
    MinValidTime = MaxValidTime = l.valid();
@@ -476,41 +491,52 @@ bool TrackInfo::has(const ATCFLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::is_match(const ATCFLine &l) const {
+bool TrackInfo::is_match(const ATCFLine &l) {
    bool match = true;
    int diff;
 
-   // Make sure technique is defined
+   // Make sure the technique is defined.
    if(!Technique) return(false);
-   
-   // Apply matching logic for BEST tracks
-   if(strcasecmp(Technique, BestTrackStr) == 0) {
 
-      // Check basin, cyclone, and technique
-      // No need to check storm name or initials
-      if(Basin     != l.basin()          ||
-         Cyclone   != l.cyclone_number() ||
-         Technique != l.technique())
-         match = false;
+   // Make sure the basin, cyclone, and technique stay constant.
+   if(Basin     != l.basin() ||
+      Cyclone   != l.cyclone_number() ||
+      Technique != l.technique()) return(false);
+
+   // Check for an analysis track where the technique number matches,
+   // the lead time remains zero, and the valid time changes. 
+   if(!IsBestTrack && !IsAnlyTrack && NPoints > 0) {
+
+      if(TechniqueNumber          == l.technique_number() &&
+         Point[NPoints-1].lead()  == 0 &&
+         l.lead()                 == 0 &&
+         Point[NPoints-1].valid() != l.valid()) {
+
+         // Set analysis track flag and reset InitTime to 0.
+         IsAnlyTrack = true;
+         InitTime    = (unixtime) 0;
+      }
+   }
+
+   // Apply matching logic for BEST and analysis tracks
+   if(IsBestTrack || IsAnlyTrack) {
 
       // Subsequent track point times cannot differ by too much
       if(NPoints > 0) {
          diff = (int) (l.warning_time() - Point[NPoints-1].valid());
-         if(abs(diff) >
-            MaxBestTrackTimeInc)
-            match = false;
+         if(abs(diff) > MaxBestTrackTimeInc) match = false;
       }
+
+      // Analysis tracks technique numbers must stay constant.
+      if(IsAnlyTrack && !IsBestTrack &&
+         TechniqueNumber != l.technique_number()) match = false;
    }
-   
-   // Apply matching logic for non-BEST tracks
+
+   // Apply matching logic for non-BEST, non-analysis tracks
    else {
 
-      // Check basin, cyclone, technique number, technique
-      // and check that the init time remains constant
-      if(Basin           != l.basin()            ||
-         Cyclone         != l.cyclone_number()   ||
-         TechniqueNumber != l.technique_number() ||
-         Technique       != l.technique()        ||
+      // Check that the technique number and init time stay constant.
+      if(TechniqueNumber != l.technique_number() ||
          InitTime        != l.warning_time())
          match = false;
    }
@@ -533,12 +559,11 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
 
    // Check that technique is defined
    if(!Technique || !t.technique()) return(false);
-   
-   // If neither is a BEST track, check that the init times matches
-   if(strcasecmp(Technique,     BestTrackStr) != 0 &&
-      strcasecmp(t.technique(), BestTrackStr) != 0 &&
-      InitTime != t.init())
+ 
+   // If neither is an analysis track, check that the init times match
+   if(!IsAnlyTrack && !t.is_anly_track() && InitTime != t.init()) {
       match = false;
+   }
 
    return(match);
 }

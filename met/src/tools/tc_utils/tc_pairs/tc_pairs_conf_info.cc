@@ -73,7 +73,9 @@ void TCPairsConfInfo::clear() {
    Interp12 = Interp12Type_Replace;
    NConsensus = 0;
    LagTime.clear();
+   BestTechnique.clear();
    BestBaseline.clear();
+   OperTechnique.clear();
    OperBaseline.clear();
    MatchPoints = false;
    DLandFile.clear();
@@ -213,11 +215,35 @@ void TCPairsConfInfo::process_config() {
    for(i=0; i<sa.n_elements(); i++)
       LagTime.add(timestring_to_sec(sa[i]));
 
+   // Conf: BestTechnique
+   BestTechnique = Conf.lookup_string_array(conf_key_best_technique);
+   BestTechnique.set_ignore_case(true);
+
    // Conf: BestBaseline
    BestBaseline = Conf.lookup_string_array(conf_key_best_baseline);
 
+   if(BestTechnique.n() > 1 && BestBaseline.n() > 0) {
+      mlog << Warning
+           << "\nTCPairsConfInfo::process_config() -> "
+           << "deriving \"best_baseline\" models from multiple "
+           << "\"best_technique\" models may cause the baseline "
+           << "technique names to be used multiple times.\n\n";
+   }
+ 
+   // Conf: OperTechnique
+   OperTechnique = Conf.lookup_string_array(conf_key_oper_technique);
+   OperTechnique.set_ignore_case(true);
+
    // Conf: OperBaseline
    OperBaseline = Conf.lookup_string_array(conf_key_oper_baseline);
+
+   if(OperTechnique.n() > 1 && OperBaseline.n() > 0) {
+      mlog << Warning
+           << "\nTCPairsConfInfo::process_config() -> "
+           << "deriving \"oper_baseline\" models from multiple "
+           << "\"oper_technique\" models may cause the baseline "
+           << "technique names to be used multiple times.\n\n";
+   }
 
    // Conf: MatchPoints
    MatchPoints = Conf.lookup_bool(conf_key_match_points);

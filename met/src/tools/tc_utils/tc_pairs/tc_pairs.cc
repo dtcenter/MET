@@ -378,7 +378,7 @@ void process_track_files(const StringArray &files,
    // Initialize counts
    tot_read = tot_add = 0;
 
-   // Process each of the ADECK ATCF files
+   // Process each of the input ATCF files
    for(i=0; i<files.n_elements(); i++) {
 
       // Open the current file
@@ -403,6 +403,16 @@ void process_track_files(const StringArray &files,
          if(strlen(model_suffix[i]) > 0) {
             cs << cs_erase << line.technique() << model_suffix[i];
             line.set_technique(cs);
+         }
+
+         // Check for BEST track technqiue
+         if(conf_info.BestTechnique.has(line.technique())) {
+            line.set_best_track(true);
+         }
+
+         // Check for operational track technqiue
+         if(conf_info.OperTechnique.has(line.technique())) {
+            line.set_oper_track(true);
          }
 
          // Check the keep status if requested
@@ -1017,7 +1027,7 @@ int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
       if(!case_list.has(cur_case)) case_list.add(cur_case);
 
       // Only derive baselines from the CARQ model
-      if(strcmp(atracks[i].technique(), OperTrackStr) != 0) continue;
+      if(!atracks[i].is_oper_track()) continue;
 
       // Loop over the operational baseline methods
       for(j=0; j<conf_info.OperBaseline.n_elements(); j++) {
@@ -1038,7 +1048,7 @@ int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
    for(i=0; i<btracks.n_tracks(); i++) {
 
       // Only derive baselines from the BEST tracks
-      if(strcmp(btracks[i].technique(), BestTrackStr) != 0) continue;
+      if(!btracks[i].is_best_track()) continue;
 
       // Derive baseline model for each track point
       for(j=0; j<btracks[i].n_points(); j++) {

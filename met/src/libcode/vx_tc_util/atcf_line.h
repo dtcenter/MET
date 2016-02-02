@@ -25,12 +25,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-static const char  BestTrackStr[]  = "BEST";
-static const char  OperTrackStr[]  = "CARQ";
-
-////////////////////////////////////////////////////////////////////////
-
 enum WatchWarnType {
    TropicalStormWatch, // Tropical Storm Watch
    TropicalStormWarn,  // Tropical Storm Warning
@@ -144,6 +138,8 @@ class ATCFLine : public DataLine {
       void assign(const ATCFLine &);
 
       ConcatString Technique;
+      bool         IsBestTrack;
+      bool         IsOperTrack;
 
    public:
 
@@ -166,10 +162,15 @@ class ATCFLine : public DataLine {
          //
 
       void set_technique(const ConcatString &);
+      void set_best_track(const bool);
+      void set_oper_track(const bool);
 
          //
          // retrieve column values
          //
+
+      bool          is_best_track()    const;
+      bool          is_oper_track()    const;
 
       ConcatString  get_item     (int) const;
       ConcatString  get_line        () const;
@@ -222,7 +223,11 @@ class ATCFLine : public DataLine {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void ATCFLine::set_technique(const ConcatString &s) { Technique = s; }
+inline void ATCFLine::set_technique(const ConcatString &s) { Technique   = s;     }
+inline void ATCFLine::set_best_track(const bool tf)        { IsBestTrack = tf;    } 
+inline void ATCFLine::set_oper_track(const bool tf)        { IsOperTrack = tf;    } 
+inline bool ATCFLine::is_best_track() const                { return(IsBestTrack); }
+inline bool ATCFLine::is_oper_track() const                { return(IsOperTrack); }
 
 ////////////////////////////////////////////////////////////////////////
 

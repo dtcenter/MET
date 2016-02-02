@@ -94,6 +94,8 @@ void ATCFLine::assign(const ATCFLine &l) {
    DataLine::assign(l);
 
    Technique = l.Technique;
+   IsBestTrack = l.IsBestTrack;
+   IsOperTrack = l.IsOperTrack;
 
    return;
 }
@@ -115,6 +117,8 @@ void ATCFLine::dump(ostream &out, int indent_depth) const {
    out << prefix << "Valid           = " << unix_to_yyyymmdd_hhmmss(valid()) << "\n";
    cs = technique();
    out << prefix << "Technique       = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
+   out << prefix << "IsBestTrack     = \"" << (IsBestTrack ? "TRUE" : "FALSE") << "\"\n";
+   out << prefix << "IsOperTrack     = \"" << (IsOperTrack ? "TRUE" : "FALSE") << "\"\n";
    out << prefix << "Lat             = " << lat() << "\n";
    out << prefix << "Lon             = " << lon() << "\n";
    out << prefix << "Vmax            = " << v_max() << "\n";
@@ -156,6 +160,8 @@ void ATCFLine::dump(ostream &out, int indent_depth) const {
 void ATCFLine::clear() {
    DataLine::clear();
    Technique.clear();
+   IsBestTrack = false;
+   IsOperTrack = false;
 
    return;
 }
@@ -502,18 +508,17 @@ unixtime ATCFLine::valid() const {
    double   fp = forecast_period();
    int      tn = technique_number();
    unixtime ut = 0;
-   
+ 
    // Compute the valid time if WarningTime and ForecastPeriod are valid
    if(wt > 0 && !is_bad_data(fp)) {
       ut = wt + sec_per_hour * fp;
    }
-   
+
    // Add minutes for the BEST track
-   if(strcasecmp(technique(), BestTrackStr) == 0 &&
-      !is_bad_data(tn)) {
+   if(is_best_track() && !is_bad_data(tn)) {
       ut += sec_per_minute * tn;
    }
-   
+
    return(ut);
 }
 
@@ -524,7 +529,7 @@ int ATCFLine::lead() const {
    int    s  = bad_data_int;
 
    // Lead time for the BEST track is 0
-   if(strcasecmp(technique(), BestTrackStr) == 0) {
+   if(is_best_track()) {
       s = 0;
    }
    else if(!is_bad_data(fp)) {
