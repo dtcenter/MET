@@ -32,7 +32,7 @@ rmFile = function(file, warn=FALSE){
 #   corresponding to the critieria name in stat_analysis.  The value for each criteria will
 #   be put in double quotes.  The job must contain any additional parameters required,
 #   except for dump_row.  The specified dump_row and output file will be used, along with
-#   the optionally specified lookin folder pattern.  The show parameter (default TRUE) 
+#   the optionally specified lookin folder pattern.  The show parameter (default TRUE)
 #   controls the display of the command and output.  This function assumes that the string
 #   strSaExec is set to the stat_analysis executable to call.
 #
@@ -56,7 +56,7 @@ runStatAnalysis = function(crit, job, fileDump, fileOut, dirLookin, show=TRUE){
 		strCmdSa = paste(strCmdSa, "  -", strCrit, " \"", crit[[strCrit]], "\" \\", "\n", sep="");
 	}
 	strCmdSa = paste(strCmdSa, "  -dump_row ", fileDump, " \\", "\n",
-							   "  -out ", fileOut, " \\", "\n", 
+							   "  -out ", fileOut, " \\", "\n",
 							   "  -job ", job, sep="");
 	if( TRUE == show ){ cat(strCmdSa, "\n"); }
 	strSaOut = system(strCmdSa, intern=(TRUE != show));
@@ -71,15 +71,15 @@ runStatAnalysis = function(crit, job, fileDump, fileOut, dirLookin, show=TRUE){
 #  fileStat: string containing path and filename of stat file to write
 readStatAnalysisOutput = function(fileOut, fileStat){
 
-	# append the contents of the stat_analysis output file to the specified stat file 
+	# append the contents of the stat_analysis output file to the specified stat file
 	rmFile(fileStat);
 	for(strFile in fileOut){
-		strCmdFmtStat = paste("cat", strFile, 
+		strCmdFmtStat = paste("cat", strFile,
 				"| perl -e\'while(<>){",
 					"next if (", ifelse(fileExists(fileStat), 2, 1), " > $i++) or /^\\s+$/;",
 					"s/^ *[^ ]+ +//;",
 					"print \"$_\";",
-				"}\'", 
+				"}\'",
 				">>", fileStat);
 		system(strCmdFmtStat);
 	}
@@ -113,7 +113,7 @@ isStatEmpty = function(stat){
 compListStr = function(l1, l2, warn, verb){
 	listMiss = l2[ !(l2 %in% l1) ];
 	if( 0 < length(listMiss) ){
-		if( 1 <= verb ){ 
+		if( 1 <= verb ){
 			cat("WARNING:", warn, length(listMiss), "\n");
 			if( 2 <= verb ){ for(strMiss in listMiss){ cat("   ", strMiss, "\n");	} }
 		} else {
@@ -140,7 +140,7 @@ compMapStr = function(m1, m2, warn, verb){
 		if( strAttr == "RunCommand" ){ next; }
 		if( strAttr == "MET_version" ){ next; }
 		if( m1[[strAttr]] != m2[[strAttr]] ){
-			if( 1 <= verb ){ 
+			if( 1 <= verb ){
 				cat("WARNING:", warn, strAttr, "\n");
 			} else {
 				quit(status=1);
@@ -173,7 +173,7 @@ getStatHeaders = function(ver, lty){
 #
 # INPUTS:
 #      lty: MET stat line type to consider
-#      ver: MET version to consider 
+#      ver: MET version to consider
 isLtyVarLength = function(lty, ver){
 	strHeaderFile = paste(strDirHdr, "/met_", ver, ".hdr", sep="");
 	strMultiCmd = paste("egrep '_VAR_' ", strHeaderFile, " | awk '{print $1}'", sep="");
@@ -191,7 +191,7 @@ isLtyVarLength = function(lty, ver){
 #   lines of the specified type, lty.  A data frame is constructed by writing the headers
 #   for the specified version of MET and then the specified lines from the stat file into
 #   a temp file.  The strDirTmp constant is assumed to point at the tmp location and
-#   listMetOutDir is assumed to contain.  A data frame is loaded with the data and 
+#   listMetOutDir is assumed to contain.  A data frame is loaded with the data and
 #   returned.
 #
 # INPUTS:
@@ -242,7 +242,7 @@ readStatData = function(stat, ver, lty, rmTmp=TRUE){
 # getStatMetVer() assumes that the input string contains the path and filename of a MET
 #   output stat file that will be parsed for a MET version number.  It is further assumed
 #   that the MET version number is the first token on the second line of the file.  If
-#   successful, the version number is returned in the format V_v[_vv[..]], e.g. 2_0 or 
+#   successful, the version number is returned in the format V_v[_vv[..]], e.g. 2_0 or
 #   3_0_1.
 #
 # INPUTS:
@@ -256,8 +256,8 @@ getStatMetVer = function(stat){
 # getStatLty() assumes that the input string contains the path and file name of a MET
 #   output stat file that will be parsed to build a list of unique sorted line types
 #   present in the file, which are returned.  In the case of line types of variable
-#   length, one item is returned for each group of a particular line type that have the 
-#   same length using the format {line_type}#{length}, e.g. PSTD#35 for a group of PSTD 
+#   length, one item is returned for each group of a particular line type that have the
+#   same length using the format {line_type}#{length}, e.g. PSTD#35 for a group of PSTD
 #   lines with length 35.
 #
 # INPUTS:
@@ -281,7 +281,7 @@ getStatLty = function(stat){
 
 		# for lines of variable length, add an entry for each distinct length
 		strCmdLtyLin = paste(
-				"LT=$(cat ", stat, " | egrep ' ", strLty, " ' | wc -l); ", 
+				"LT=$(cat ", stat, " | egrep ' ", strLty, " ' | wc -l); ",
 				"for L in $(seq 1 $LT); do ",
 				"  echo $(cat ", stat, " | egrep ' ", strLty, " ' | head -$L | tail -1 | wc -w); ",
 				"done | sort -u", sep="");
@@ -328,16 +328,16 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	listV2Hdr = getStatHeaders(strV2, strLtyPar);
 	listV1HdrExt = listV1Hdr[ !(listV1Hdr %in% listV2Hdr) ];
 	listV2HdrExt = listV2Hdr[ !(listV2Hdr %in% listV1Hdr) ];
-	if( 0 < length(listV1HdrExt) ){ 
+	if( 0 < length(listV1HdrExt) ){
 		if( 1 <= verb ){
-			cat("WARNING: version", strV1, "contains extra headers:", 
+			cat("WARNING: version", strV1, "contains extra headers:",
 				paste(listV1HdrExt, collapse=" "), "\n");
 		}
 		return (list("hdr" = FALSE));
 	}
 	if( 0 < length(listV2HdrExt) ){
 		if( 1 <= verb ){
-			cat("WARNING: version", strV2, "contains extra headers:", 
+			cat("WARNING: version", strV2, "contains extra headers:",
 				paste(listV2HdrExt, collapse=" "), "\n");
 		}
 		return (list("hdr" = FALSE));
@@ -345,7 +345,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	boolTestHdr = ( (1 > length(listV1HdrExt)) & (1 > length(listV2HdrExt)) );
 	listHdr = listV1Hdr[listV1Hdr %in% listV2Hdr];
 
-	# build the complete path and file names of the stat files and read them into data frames 
+	# build the complete path and file names of the stat files and read them into data frames
 	dfV1 = readStatData(stat1, strV1, lty);
 	dfV2 = readStatData(stat2, strV2, lty);
 
@@ -354,7 +354,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	boolTestNrow = ( listNrow[1] == listNrow[2] );
 	if( FALSE == boolTestNrow ){
 		if( 1 <= verb ){
-			cat("WARNING: differing number of rows", listNrow[1], "vs.", listNrow[2], 
+			cat("WARNING: differing number of rows", listNrow[1], "vs.", listNrow[2],
 				"for row type", lty, "between versions",	strV1, "vs.", strV2, "\n");
 		}
 		return (list("nrow" = FALSE));
@@ -362,12 +362,12 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 
 	# compare the information in the first 20 header columns
 	for(intCol in 2:21){
-		listMatch = apply(data.frame(dfV1[,intCol], dfV2[,intCol]), 1, 
+		listMatch = apply(data.frame(dfV1[,intCol], dfV2[,intCol]), 1,
 				function(a){ a[1] == a[2] });
 		intNumDiff = sum( !listMatch[ !is.na(listMatch) ] );
 		if( 0 < intNumDiff ){
 			if( 1 <= verb ){
-				cat("WARNING: header information mismatch in column ", 
+				cat("WARNING: header information mismatch in column ",
 						listHeaderCols[intCol], "\n", sep="");
 			}
 			return (list("hdr" = FALSE));
@@ -409,10 +409,10 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 		intNumDiff = sum(listDiff != 0);
 		if( 0 < intNumDiff ){
 			if( 1 <= verb ){
-				cat("WARNING: found", 
+				cat("WARNING: found",
 					format(intNumDiff, width="5", justify="right"), "differences in row type",
-					format(lty, width="12", justify="left"), 
-					"column", format(strCol, width=12, justify="left"), 
+					format(lty, width="12", justify="left"),
+					"column", format(strCol, width=12, justify="left"),
 					" - max abs:", format(max(abs(listDiff)), scientific=F), "\n");
 			}
 			if( 2 <= verb ){
@@ -425,14 +425,14 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 				cat(paste(dfV1[listDiff != 0,][[strCol]], "vs.", dfV2[listDiff != 0,][[strCol]], "\n"), sep="");
 			}
 
-			if( TRUE  == boolBc ){ boolTestNumBc	= FALSE; } 
+			if( TRUE  == boolBc ){ boolTestNumBc	= FALSE; }
 			if( FALSE == boolBc ){ boolTestNum		= FALSE; }
 
 		}
 	}
 
 	listRet = list(
-		"num"		= boolTestNum, 
+		"num"		= boolTestNum,
 		"num_bc"	= boolTestNumBc,
 		"tot_comp" 	= intTotComp,
 		"tot_diff"	= intTotDiff,
@@ -446,8 +446,8 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 # compareStat() assumes that the specified strings stat1 and stat2 contain the paths and
 #   file names of MET output stat files.  The stat files are compared and a list data
 #   structure is returned containing all line types compared with failed tests for each
-#   one: hdr, nrow, num, num_bc and lty.  See compareStatLty() documentation.  An lty 
-#   test failure indicates that there is a mis-match in the line types present in the 
+#   one: hdr, nrow, num, num_bc and lty.  See compareStatLty() documentation.  An lty
+#   test failure indicates that there is a mis-match in the line types present in the
 #   two files.
 #
 # INPUTS:
@@ -461,6 +461,16 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	# verify that the files exist
 	if( ! fileExists(stat1) ){ cat("ERROR: stat file does not exist:", stat1, "\n"); return (NA); }
 	if( ! fileExists(stat2) ){ cat("ERROR: stat file does not exist:", stat2, "\n"); return (NA); }
+
+	# run diff command, use -w to ignore white space to check for a match
+	strCmd = paste(strDiffExec, stat1, stat2);
+	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
+	if( 0 == length(strCmdOut) ){
+		listTest$tot_hist = "ALL";
+		listTest$tot_comp = "ALL";
+		listTest$tot_diff = 0;
+		return( listTest );
+	}
 
 	# if the files are MODE files, convert them to temporary stat files
 	if( TRUE == grepl("^.*[^a-z]mode[^a-z].*\\.txt$", stat1, perl=T) ){
@@ -544,7 +554,7 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	return( listTest );
 }
 
-# printCompReport() assumes that the specified list is the data structure returned 
+# printCompReport() assumes that the specified list is the data structure returned
 #   by the function compareStat().  Depending on the verbosity level, a report of
 #   line types that passed and failed is printed.  If verbosity is 0, then quit is
 #   called when the first failure is encountered.
@@ -594,7 +604,7 @@ printCompReport = function(listTest, verb=0, hist=""){
 
 # compareNc() assumes that the specified strings nc1 and nc2 contain the paths and
 #   file names of MET output NetCDF files.  The netcdf files are compared and, if the
-#   specified verbosity level is greater than zero, warning messages are printed 
+#   specified verbosity level is greater than zero, warning messages are printed
 #   describing the differences.  If the verbosity level is zero, the function exits
 #   R with non-zero status when the first difference is found, otherwise it returns.
 #
@@ -715,7 +725,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
       		valDiff = max(c(0, abs(dataNcVar)), na.rm=T);
 			boolDiff = (dblDiffThresh < valDiff);
 			if( TRUE == boolDiff & 1 <= verb ){
-				cat("WARNING: found", 
+				cat("WARNING: found",
 					format(intNumDiff, width="5", justify="right"), "differences in var",
 					format(strVar, width="37", justify="left"),
 					" - max abs:", format(valDiff, scientific=F), "\n");
@@ -774,7 +784,7 @@ compareDiff = function(file1, file2, verb=0){
 	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
 			cat("WARNING: diff error:", strCmdOut, sep="\n");
-			return();  
+			return();
 		} else {
 			quit(status=1);
 		}
@@ -782,6 +792,6 @@ compareDiff = function(file1, file2, verb=0){
 	else if( 1 <= verb ){ cat("passed diff\n"); }
 }
 
-listHeaderCols = c("VERSION", "MODEL", "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END", "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END", 
-                   "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV", "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS", "FCST_THRESH", 
+listHeaderCols = c("VERSION", "MODEL", "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END", "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
+                   "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV", "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS", "FCST_THRESH",
 				   "OBS_THRESH", "COV_THRESH", "ALPHA", "LINE_TYPE");
