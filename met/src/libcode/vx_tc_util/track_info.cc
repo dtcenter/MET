@@ -560,8 +560,10 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
    // Check that technique is defined
    if(!Technique || !t.technique()) return(false);
  
-   // If neither is an analysis track, check that the init times match
-   if(!IsAnlyTrack && !t.is_anly_track() && InitTime != t.init()) {
+   // Check that init times match for non-BEST, non-analysis tracks
+   if(!IsBestTrack && !t.is_best_track() &&
+      !IsAnlyTrack && !t.is_anly_track() && 
+      InitTime != t.init()) {
       match = false;
    }
 
