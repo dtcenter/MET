@@ -96,8 +96,6 @@ tc_stat = Sys.which("tc_stat");
 if(nchar(tc_stat) == 0) {
   cat("ERROR: Cannot find the tc_stat tool in your path.\n");
   quit(status=1);
-} else {
-  cat("Using tc_stat tool:", tc_stat);
 }
 
 ########################################################################
@@ -313,7 +311,7 @@ if(nchar(tcst_file) == 0) {
                   "-v 3");
 
   # Run the tc_stat command and check the return status
-  cat("CALLING: ", run_cmd, "\n");
+  cat("CALLING:", run_cmd, "\n");
   status = system(run_cmd);
   if(status != 0) {
     cat("ERROR: Bad return value ", status , "\n");
