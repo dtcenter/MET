@@ -16,7 +16,7 @@ model = [];
 
 //
 // Storm identifiers
-//    
+//
 storm_id = [];
 
 //
@@ -49,7 +49,7 @@ valid_beg = "";
 valid_end = "";
 
 //
-// Model initialization hours 
+// Model initialization hours
 //
 init_hour = [];
 
@@ -60,7 +60,7 @@ init_mask  = "";
 valid_mask = "";
 
 //
-// Specify if the code should check for duplicate ATCF lines 
+// Specify if the code should check for duplicate ATCF lines
 //
 check_dup = FALSE;
 
@@ -83,12 +83,18 @@ lag_time = [];
 //
 // CLIPER/SHIFOR baseline forecasts to be derived from the BEST and
 // operational tracks, along with the BEST and operational track
-// technique names. 
+// technique names.
 //
 best_technique = [ "BEST" ];
 best_baseline  = [];
 oper_technique = [ "CARQ" ];
 oper_baseline  = [];
+
+//
+// Specify the datasets to be searched for analysis tracks (NONE, ADECK, BDECK,
+// or BOTH).
+//
+anly_track = BDECK;
 
 //
 // Specify if only those track points common to both the ADECK and BDECK

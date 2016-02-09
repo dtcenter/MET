@@ -186,7 +186,7 @@ struct TimeSummaryInfo {
 //
 
 enum BootIntervalType {
-   BootIntervalType_None,      // Default 
+   BootIntervalType_None,      // Default
    BootIntervalType_BCA,       // Bias-Corrected and adjusted method
    BootIntervalType_Percentile // Percentile method
 };
@@ -212,7 +212,7 @@ struct BootInfo {
 struct InterpInfo {
    FieldType   field;      // How to apply interpolation options
    double      vld_thresh; // Valid data interpolation threshold
-   int         n_interp;   // Number of interpolation types   
+   int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
 };
@@ -731,6 +731,7 @@ static const char conf_key_best_technique[]           = "best_technique";
 static const char conf_key_best_baseline[]            = "best_baseline";
 static const char conf_key_oper_technique[]           = "oper_technique";
 static const char conf_key_oper_baseline[]            = "oper_baseline";
+static const char conf_key_anly_track[]               = "anly_track";
 static const char conf_key_match_points[]             = "match_points";
 static const char conf_key_dland_file[]               = "dland_file";
 static const char conf_key_track_watch_warn[]         = "track_watch_warn";
