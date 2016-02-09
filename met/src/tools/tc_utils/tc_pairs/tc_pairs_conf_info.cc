@@ -46,7 +46,7 @@ void TCPairsConfInfo::init_from_scratch() {
 
    // Initialize pointers
    Consensus = (ConsensusInfo *) 0;
-  
+
    clear();
 
    return;
@@ -77,6 +77,7 @@ void TCPairsConfInfo::clear() {
    BestBaseline.clear();
    OperTechnique.clear();
    OperBaseline.clear();
+   AnlyTrack = TrackType_None;
    MatchPoints = false;
    DLandFile.clear();
    WatchWarnFile.clear();
@@ -93,7 +94,7 @@ void TCPairsConfInfo::read_config(const char *default_file_name,
 
    // Read the config file constants
    Conf.read(replace_path(config_const_filename));
-  
+
    // Read the default config file
    Conf.read(default_file_name);
 
@@ -117,7 +118,7 @@ void TCPairsConfInfo::process_config() {
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
    check_met_version(Version);
-   
+
    // Conf: Model
    Model = Conf.lookup_string_array(conf_key_model);
 
@@ -141,12 +142,12 @@ void TCPairsConfInfo::process_config() {
    sa = Conf.lookup_string_array(conf_key_init_inc);
    for(i=0; i<sa.n_elements(); i++)
       InitInc.add(timestring_to_unix(sa[i]));
-   
+
    // Conf: InitExc
    sa = Conf.lookup_string_array(conf_key_init_exc);
    for(i=0; i<sa.n_elements(); i++)
       InitExc.add(timestring_to_unix(sa[i]));
-   
+
    // Conf: InitHour
    sa = Conf.lookup_string_array(conf_key_init_hour);
    for(i=0; i<sa.n_elements(); i++)
@@ -229,7 +230,7 @@ void TCPairsConfInfo::process_config() {
            << "\"best_technique\" models may cause the baseline "
            << "technique names to be used multiple times.\n\n";
    }
- 
+
    // Conf: OperTechnique
    OperTechnique = Conf.lookup_string_array(conf_key_oper_technique);
    OperTechnique.set_ignore_case(true);
@@ -244,6 +245,9 @@ void TCPairsConfInfo::process_config() {
            << "\"oper_technique\" models may cause the baseline "
            << "technique names to be used multiple times.\n\n";
    }
+
+   // Conf: AnlyTrack
+   AnlyTrack = int_to_tracktype(Conf.lookup_int(conf_key_anly_track));
 
    // Conf: MatchPoints
    MatchPoints = Conf.lookup_bool(conf_key_match_points);

@@ -42,10 +42,12 @@ class TrackInfo {
       void init_from_scratch();
       void assign(const TrackInfo &);
       void extend(int);
-      
+
       bool         IsSet;
       bool         IsBestTrack;
       bool         IsOperTrack;
+
+      bool         CheckAnly;
       bool         IsAnlyTrack;
 
       // Storm and model identification
@@ -64,7 +66,7 @@ class TrackInfo {
       unixtime     MinValidTime;
       unixtime     MaxValidTime;
 
-      // TrackPoints                    
+      // TrackPoints
       TrackPoint  *Point;
       int          NPoints;
       int          NAlloc;
@@ -90,9 +92,10 @@ class TrackInfo {
          //  set stuff
          //
 
-      void initialize(const ATCFLine &);
+      void initialize(const ATCFLine &, bool check_anly);
 
       void set_storm_id();
+      void set_storm_id(const char *);
       void set_basin(const char *);
       void set_cyclone(const char *);
       void set_storm_name(const char *);
@@ -103,14 +106,14 @@ class TrackInfo {
       void set_valid_min(const unixtime);
       void set_valid_max(const unixtime);
       void set_point(int, const TrackPoint &);
-      
+
          //
          //  get stuff
          //
 
       bool is_best_track() const;
       bool is_oper_track() const;
-      bool is_anly_track() const; 
+      bool is_anly_track() const;
 
       int lead_index(int)       const;
       int valid_index(unixtime) const;
@@ -135,14 +138,14 @@ class TrackInfo {
          //
 
       void add(const TrackPoint &);
-      bool add(const ATCFLine &, bool check_dup);
+      bool add(const ATCFLine &, bool check_dup = false, bool check_anly = false);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
-      
+
       bool has(const ATCFLine &) const;
-      
+
       bool is_match(const ATCFLine &);
       bool is_match(const TrackInfo &) const;
-      
+
       bool is_interp() const;
 
 };
@@ -152,6 +155,7 @@ class TrackInfo {
 inline bool TrackInfo::is_best_track() const           { return(IsBestTrack); }
 inline bool TrackInfo::is_oper_track() const           { return(IsOperTrack); }
 inline bool TrackInfo::is_anly_track() const           { return(IsAnlyTrack); }
+inline void TrackInfo::set_storm_id(const char *s)     { StormId = s;         }
 inline void TrackInfo::set_basin(const char *s)        { Basin = s;           }
 inline void TrackInfo::set_cyclone(const char *s)      { Cyclone = s;         }
 inline void TrackInfo::set_storm_name(const char *s)   { StormName = s;       }
@@ -226,7 +230,7 @@ class TrackInfoArray {
 
       void add(const TrackInfo &);
       void set(int, const TrackInfo &);
-      bool add(const ATCFLine &, bool = true);
+      bool add(const ATCFLine &, bool check_dup = false, bool check_anly = false);
       bool has(const ATCFLine &) const;
 
 };

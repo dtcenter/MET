@@ -96,7 +96,7 @@ static void   process_command_line (int, char **);
 static void   process_tracks       ();
 static void   process_track_files  (const StringArray &,
                                     const StringArray &,
-                                    TrackInfoArray &, bool);
+                                    TrackInfoArray &, bool, bool);
 static bool   is_keeper            (const ATCFLine &);
 static void   filter_tracks        (TrackInfoArray &);
 static void   derive_interp12      (TrackInfoArray &);
@@ -264,7 +264,9 @@ void process_tracks() {
         << "Processing " << adeck_files.n_elements()
         << " ADECK file(s).\n";
    process_track_files(adeck_files, adeck_files_model_suffix,
-                       adeck_tracks, true);
+                       adeck_tracks, true,
+                       (conf_info.AnlyTrack == TrackType_ADeck ||
+                        conf_info.AnlyTrack == TrackType_Both));
    mlog << Debug(2)
         << "Found " << adeck_tracks.n_tracks()
         << " ADECK track(s).\n";
@@ -280,7 +282,9 @@ void process_tracks() {
         << "Processing " << bdeck_files.n_elements()
         << " BDECK file(s).\n";
    process_track_files(bdeck_files, bdeck_files_model_suffix,
-                       bdeck_tracks, false);
+                       bdeck_tracks, false,
+                       (conf_info.AnlyTrack == TrackType_BDeck ||
+                        conf_info.AnlyTrack == TrackType_Both));
    mlog << Debug(2)
         << "Found " << bdeck_tracks.n_tracks()
         << " BDECK track(s).\n";
@@ -366,7 +370,8 @@ void process_tracks() {
 
 void process_track_files(const StringArray &files,
                          const StringArray &model_suffix,
-                         TrackInfoArray &tracks, bool check_keep) {
+                         TrackInfoArray &tracks, bool check_keep,
+                         bool check_anly) {
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
    ConcatString cs;
@@ -419,7 +424,7 @@ void process_track_files(const StringArray &files,
          if(check_keep && !is_keeper(line)) continue;
 
          // Attempt to add the current line to the TrackInfoArray
-         if(tracks.add(line, conf_info.CheckDup)) {
+         if(tracks.add(line, conf_info.CheckDup, check_anly)) {
             cur_add++;
             tot_add++;
          }

@@ -28,14 +28,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 TrackPairInfo::TrackPairInfo() {
-  
+
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TrackPairInfo::~TrackPairInfo() {
-  
+
    clear();
 }
 
@@ -65,7 +65,7 @@ void TrackPairInfo::init_from_scratch() {
 
    // Initialize pointers
    Line = (TCStatLine *) 0;
-  
+
    clear();
 
    return;
@@ -187,7 +187,7 @@ ConcatString TrackPairInfo::serialize_r(int n, int indent_depth) const {
        << ", CrossTrackErr = " << CrossTrackErr[i]
        << "\n";
    }
-   
+
    return(s);
 }
 
@@ -283,23 +283,23 @@ void TrackPairInfo::initialize(const TrackInfo &a, const TrackInfo &b) {
 void TrackPairInfo::initialize(const TCStatLine &l) {
 
    // Initialize the ADECK TrackInfo
+   ADeck.set_storm_id(l.storm_id());
    ADeck.set_basin(l.basin());
    ADeck.set_cyclone(l.cyclone());
    ADeck.set_storm_name(l.storm_name());
    ADeck.set_technique(l.amodel());
    ADeck.set_initials(l.initials());
    ADeck.set_init(l.init());
-   ADeck.set_storm_id();
 
    // Initialize the BDECK TrackInfo
+   BDeck.set_storm_id(l.storm_id());
    BDeck.set_basin(l.basin());
    BDeck.set_cyclone(l.cyclone());
    BDeck.set_storm_name(l.storm_name());
    BDeck.set_technique(l.bmodel());
    BDeck.set_initials(l.initials());
    BDeck.set_init((unixtime) 0);
-   BDeck.set_storm_id();
-   
+
    return;
 }
 
@@ -349,7 +349,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
    QuadInfo wind;
    ConcatString cs;
    int i, j;
-   
+
    // Check the line type
    if(l.type() != TCStatLineType_TCMPR) return;
 
@@ -358,7 +358,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
    // Initialize the ADECK/BDECK tracks
    if(NPoints == 1) initialize(l);
-   
+
    // Loop over the ADECK/BDECK tracks
    const char deck[] = { 'A', 'B' };
    for(i=0; i<2; i++) {
@@ -422,11 +422,11 @@ void TrackPairInfo::add(const TCStatLine &l) {
          tp->set_wind(j, wind);
       } // end for j
    } // end for i
-   
+
    // Add the TrackPoints to the ADECK/BDECK tracks
    ADeck.add(apoint);
    BDeck.add(bpoint);
-   
+
    ADeckDLand.add(atof(l.get_item("ADLAND")));
    BDeckDLand.add(atof(l.get_item("BDLAND")));
    TrackErr.add(atof(l.get_item("TK_ERR")));
@@ -454,7 +454,7 @@ unixtime TrackPairInfo::valid(int i) const {
 
    // Use the ADeck valid time, if defined.
    t = (ADeck[i].valid() > 0 ? ADeck[i].valid() : BDeck[i].valid());
-   
+
    return(t);
 }
 
@@ -497,7 +497,7 @@ void TrackPairInfo::add_watch_warn(const ConcatString &storm_id,
    // Add watch/warning information to the ADECK and BDECK tracks
    ADeck.add_watch_warn(storm_id, ww_type, ww_ut);
    BDeck.add_watch_warn(storm_id, ww_type, ww_ut);
-   
+
    return;
 }
 
@@ -550,10 +550,10 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
    int i, j, n_rej;
    unixtime delta_ut;
    int acur, aprv, bcur, bprv;
- 
+
    // Nothing to do.
    if(track_type == TrackType_None) return(0);
- 
+
    // Check threshold type for non-exact intensity differences.
    if(!exact_adeck &&
       st_adeck.get_type() != thresh_lt && st_adeck.get_type() != thresh_le &&
@@ -573,7 +573,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
            << st_bdeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
    }
-   
+
    // Loop over the track points
    for(i=0, n_rej=0; i<NPoints; i++) {
 

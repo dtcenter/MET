@@ -38,7 +38,7 @@ class TCPairsConfInfo {
       void init_from_scratch();
 
    public:
-     
+
       // TCPairs configuration object
       MetConfig Conf;
 
@@ -62,10 +62,10 @@ class TCPairsConfInfo {
 
       // Check for duplicate ATCFLines
       bool CheckDup;
-      
+
       // 12-hour track interpolation logic
       Interp12Type Interp12;
-      
+
       // Consensus model definition
       int NConsensus;           // Number of consensus models
       ConsensusInfo *Consensus; // Consensus model definition
@@ -79,6 +79,9 @@ class TCPairsConfInfo {
       StringArray BestBaseline;
       StringArray OperTechnique;
       StringArray OperBaseline;
+
+      // Analysis track datasets
+      TrackType AnlyTrack;
 
       // Only retain TrackPoints in both the ADECK and BDECK tracks
       bool MatchPoints;
@@ -94,12 +97,12 @@ class TCPairsConfInfo {
 
       // Config file version
       ConcatString Version;
-      
+
       TCPairsConfInfo();
      ~TCPairsConfInfo();
 
       void clear();
-      
+
       void read_config(const char *, const char *);
       void process_config();
 };

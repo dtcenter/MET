@@ -28,14 +28,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 TrackInfo::TrackInfo() {
-  
+
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TrackInfo::~TrackInfo() {
-  
+
    clear();
 }
 
@@ -64,7 +64,7 @@ TrackInfo & TrackInfo::operator=(const TrackInfo & t) {
 void TrackInfo::init_from_scratch() {
 
    Point = (TrackPoint *) 0;
-  
+
    clear();
 
    return;
@@ -77,6 +77,7 @@ void TrackInfo::clear() {
    IsSet           = false;
    IsBestTrack     = false;
    IsOperTrack     = false;
+   CheckAnly       = false;
    IsAnlyTrack     = false;
 
    StormId.clear();
@@ -115,6 +116,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "StormId         = \"" << (StormId ? StormId.text() : "(nul)") << "\"\n";
    out << prefix << "IsBestTrack     = " << bool_to_string(IsBestTrack) << "\n";
    out << prefix << "IsOperTrack     = " << bool_to_string(IsOperTrack) << "\n";
+   out << prefix << "CheckAnly       = " << bool_to_string(CheckAnly) << "\n";
    out << prefix << "IsAnlyTrack     = " << bool_to_string(IsAnlyTrack) << "\n";
    out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
    out << prefix << "Cyclone         = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\"\n";
@@ -128,7 +130,7 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
    out << prefix << "NTrackLines     = " << TrackLines.n_elements() << "\n";
-      
+
    for(i=0; i<NPoints; i++) {
       out << prefix << "TrackPoint[" << i+1 << "]:" << "\n";
       Point[i].dump(out, indent_depth+1);
@@ -149,6 +151,7 @@ ConcatString TrackInfo::serialize() const {
      << "StormId = \"" << (StormId ? StormId.text() : "(nul)") << "\""
      << ", IsBest = " << bool_to_string(IsBestTrack)
      << ", IsOper = " << bool_to_string(IsOperTrack)
+     << ", CheckAnly = " << bool_to_string(CheckAnly)
      << ", IsAnly = " << bool_to_string(IsAnlyTrack)
      << ", Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
      << ", Cyclone = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\""
@@ -193,6 +196,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    IsSet           = true;
    IsBestTrack     = t.IsBestTrack;
    IsOperTrack     = t.IsOperTrack;
+   CheckAnly       = t.CheckAnly;
    IsAnlyTrack     = t.IsAnlyTrack;
 
    StormId         = t.StormId;
@@ -210,7 +214,7 @@ void TrackInfo::assign(const TrackInfo &t) {
    if(t.NPoints == 0) return;
 
    extend(t.NPoints);
-   
+
    for(i=0; i<t.NPoints; i++) Point[i] = t.Point[i];
 
    NPoints = t.NPoints;
@@ -227,7 +231,7 @@ void TrackInfo::extend(int n) {
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
 
-   // Check how many allocations are required  
+   // Check how many allocations are required
    k = n/TrackInfoAllocInc;
    if(n%TrackInfoAllocInc) k++;
    n = k*TrackInfoAllocInc;
@@ -260,13 +264,14 @@ void TrackInfo::extend(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackInfo::initialize(const ATCFLine &l) {
+void TrackInfo::initialize(const ATCFLine &l, bool check_anly) {
 
    IsSet           = true;
 
    IsBestTrack     = l.is_best_track();
    IsOperTrack     = l.is_oper_track();
 
+   CheckAnly       = check_anly;
    // IsAnlyTrack is determined by subsequent track data points.
 
    Basin           = l.basin();
@@ -285,7 +290,7 @@ void TrackInfo::initialize(const ATCFLine &l) {
 
    // Create the storm id
    set_storm_id();
-   
+
    return;
 }
 
@@ -406,17 +411,17 @@ void TrackInfo::add(const TrackPoint &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::add(const ATCFLine &l, bool check_dup) {
+bool TrackInfo::add(const ATCFLine &l, bool check_dup, bool check_anly) {
    bool found = false;
    bool status = false;
    int i;
 
    // Initialize TrackInfo with ATCFLine, if necessary
-   if(!IsSet) initialize(l);
+   if(!IsSet) initialize(l, check_anly);
 
    // Check if TrackPoint doesn't match this TrackInfo
    if(!is_match(l)) return(false);
-   
+
    // Check if the storm name needs to be set or has changed
    ConcatString name = l.storm_name();
    if(StormName.length() == 0) StormName = name;
@@ -504,8 +509,8 @@ bool TrackInfo::is_match(const ATCFLine &l) {
       Technique != l.technique()) return(false);
 
    // Check for an analysis track where the technique number matches,
-   // the lead time remains zero, and the valid time changes. 
-   if(!IsBestTrack && !IsAnlyTrack && NPoints > 0) {
+   // the lead time remains zero, and the valid time changes.
+   if(CheckAnly && !IsBestTrack && !IsAnlyTrack && NPoints > 0) {
 
       if(TechniqueNumber          == l.technique_number() &&
          Point[NPoints-1].lead()  == 0 &&
@@ -540,7 +545,7 @@ bool TrackInfo::is_match(const ATCFLine &l) {
          InitTime        != l.warning_time())
          match = false;
    }
-   
+
    return(match);
 }
 
@@ -559,10 +564,10 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
 
    // Check that technique is defined
    if(!Technique || !t.technique()) return(false);
- 
+
    // Check that init times match for non-BEST, non-analysis tracks
    if(!IsBestTrack && !t.is_best_track() &&
-      !IsAnlyTrack && !t.is_anly_track() && 
+      !IsAnlyTrack && !t.is_anly_track() &&
       InitTime != t.init()) {
       match = false;
    }
@@ -574,7 +579,7 @@ bool TrackInfo::is_match(const TrackInfo &t) const {
 
 bool TrackInfo::is_interp() const {
    const char *s = Technique;
-   
+
    s += (strlen(Technique) - 1);
 
    // Return true if the last character of the model name is 'I'
@@ -791,7 +796,7 @@ void TrackInfoArray::set(int n, const TrackInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfoArray::add(const ATCFLine &l, bool check_dup) {
+bool TrackInfoArray::add(const ATCFLine &l, bool check_dup, bool check_anly) {
    bool found  = false;
    bool status = false;
    int i;
@@ -811,7 +816,7 @@ bool TrackInfoArray::add(const ATCFLine &l, bool check_dup) {
    for(i=NTracks-1; i>=0; i--) {
       if(Track[i].is_match(l)) {
          found = true;
-         status = Track[i].add(l, check_dup);
+         status = Track[i].add(l, check_dup, check_anly);
          break;
       }
    }
@@ -819,7 +824,7 @@ bool TrackInfoArray::add(const ATCFLine &l, bool check_dup) {
    // Otherwise, create a new track
    if(!found) {
       extend(NTracks + 1);
-      status = Track[NTracks++].add(l, check_dup);
+      status = Track[NTracks++].add(l, check_dup, check_anly);
    }
 
    return(status);
@@ -932,7 +937,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
          // Get the index of the TrackPoint for this lead time
          i_pnt = tracks.Track[j].lead_index(nint(lead_list[i]));
-         
+
          // Check for missing TrackPoint in a required member
          if(i_pnt < 0) {
             if(req_list.has(tracks.Track[j].technique())) {
@@ -940,13 +945,13 @@ TrackInfo consensus(const TrackInfoArray &tracks,
                break;
             }
             continue;
-         }        
+         }
 
          // Increment the TrackPoint count and sums
          pcnt++;
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
-         
+
          // Store the longitude values
          plon.add(tracks.Track[j][i_pnt].lon());
       }
