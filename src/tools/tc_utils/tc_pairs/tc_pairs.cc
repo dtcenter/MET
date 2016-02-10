@@ -20,6 +20,9 @@
 //                                    each lead time.
 //   002    07/15/14  Halley Gotway   Simplify Interp12 logic.
 //   003    07/15/14  Halley Gotway   Fix bug in init_beg/end logic.
+//   004    02/10/16  Halley Gotway   Prior to calling acerr_ rescale
+//                    longitudes from [-180, 180] to [0, 360] for tracks
+//                    crossing the international date line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1410,7 +1413,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    int ut_inc, n_ut;
    float alat[mxp], alon[mxp], blat[mxp], blon[mxp];
    float crtk[mxp], altk[mxp];
-   double lat_err, lon_err, lat_avg;
+   double lat_err, lon_err, lat_avg, lon_min, lon_max;
 
    // Initialize
    vld_err.clear();
@@ -1450,7 +1453,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    }
 
    // Loop through the valid times
-   for(i=0; i<n_ut; i++) {
+   for(i=0, lon_min=180, lon_max=-180; i<n_ut; i++) {
 
       // Add the current valid time
       ut = ut_min+(i*ut_inc);
@@ -1468,18 +1471,18 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
       i_bdeck = bdeck.valid_index(ut);
 
       // Populate array arguments
-      if(i_adeck >= 0) alat[i] = adeck[i_adeck].lat();
-      else             alat[i] = bad_data_float;
-      if(i_adeck >= 0) alon[i] = adeck[i_adeck].lon();
-      else             alon[i] = bad_data_float;
-      if(i_bdeck >= 0) blat[i] = bdeck[i_bdeck].lat();
-      else             blat[i] = bad_data_float;
-      if(i_bdeck >= 0) blon[i] = bdeck[i_bdeck].lon();
-      else             blon[i] = bad_data_float;
+      alat[i] = (i_adeck >= 0 ? adeck[i_adeck].lat() : bad_data_float);
+      alon[i] = (i_adeck >= 0 ? adeck[i_adeck].lon() : bad_data_float);
+      blat[i] = (i_bdeck >= 0 ? bdeck[i_bdeck].lat() : bad_data_float);
+      blon[i] = (i_bdeck >= 0 ? bdeck[i_bdeck].lon() : bad_data_float);
 
       // Check for good data
       if(is_bad_data(alat[i]) || is_bad_data(blat[i]) ||
          is_bad_data(alon[i]) || is_bad_data(blon[i])) continue;
+
+      // Keep track of min/max longitudes
+      lon_min = (min(alon[i], blon[i]) < lon_min ? min(alon[i], blon[i]) : lon_min);
+      lon_max = (max(alon[i], blon[i]) > lon_max ? max(alon[i], blon[i]) : lon_max);
 
       // Compute lat/lon errors
       lat_err = alat[i] - blat[i];
@@ -1490,6 +1493,15 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
       x_err.set(i, nautical_miles_per_deg*lon_err*cosd(lat_avg));
       y_err.set(i, nautical_miles_per_deg*lat_err);
       tk_err.set(i, sqrt(x_err[i]*x_err[i] + y_err[i]*y_err[i]));
+   }
+
+   // If the range of longitudes is large, rescale from [-180, 180] to [0, 360]
+   // prior to computing along and cross-track errors.
+   if((lon_max - lon_min) >= 180) {
+      for(i=0; i<n_ut; i++) {
+         alon[i] = rescale_deg(alon[i], 0, 360);
+         blon[i] = rescale_deg(blon[i], 0, 360);
+      }
    }
 
    // Call the ACERR subroutine for along and cross track errors
