@@ -648,7 +648,9 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    info.width      = regrid_dict->lookup_int(conf_key_width);
 
    // Check the nearest neighbor special case
-   if(info.method != InterpMthd_Nearest && info.width == 1) {
+   if(info.width  == 1 &&
+      info.method != InterpMthd_Nearest &&
+      info.method != InterpMthd_Force) {
       mlog << Warning << "\nparse_conf_regrid() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(info.method) << "\" to \""
