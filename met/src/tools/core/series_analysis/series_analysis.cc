@@ -428,6 +428,19 @@ void get_series_entry(int i_series, VarInfo *info,
 
          // Regrid, if necessary
          if(!(mtddf->grid() == grid)) {
+
+            // Check if regridding is disabled
+            if(!conf_info.regrid_info.enable) {
+               mlog << Error << "\nget_series_entry() -> "
+                    << "The grid of the current series entry does not "
+                    << "match the verification grid and regridding is "
+                    << "disabled:\n" << mtddf->grid().serialize()
+                    << " !=\n" << grid.serialize()
+                    << "\nSpecify regridding logic in the config file "
+                    << "\"regrid\" section.\n\n";
+               exit(1);
+            }
+
             mlog << Debug(1)
                  << "Regridding field " << info->magic_str()
                  << " to the verification grid.\n";
@@ -484,7 +497,7 @@ void process_scores() {
    mlog << Debug(2)
         << "Computing statistics using a block size of "
         << conf_info.block_size << ", requiring " << n_reads
-        << " passes through the " << grid.nx() << " x "
+        << " pass(es) through the " << grid.nx() << " x "
         << grid.ny() << " grid.\n";
 
    // Loop over the data reads
