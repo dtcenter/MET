@@ -71,7 +71,7 @@ static StringArray  obs_filenames;
 
 static StringArray  single_filenames;
 
-static ConcatString local_config_filename;
+static ConcatString local_config_filename = "";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,6 +137,15 @@ MtdConfigInfo config;
 ConcatString default_config_filename;
 ConcatString path;
 
+if ( local_config_filename.empty() )  {
+
+   mlog << Error
+        << "\n  " << program_name << ": must specify a configuration "
+        << "file using the \"-config\" command line option.\n\n";
+
+   exit ( 1 );
+
+}
 
 default_config_filename = replace_path(default_config_path);
 
@@ -211,7 +220,7 @@ mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
 if ( fcst_raw.nt() != obs_raw.nt() )  {
 
    mlog << Error
-        << "\n\n  " << program_name << ": forecast and observation must have the same number of times ("
+        << "\n  " << program_name << ": forecast and observation must have the same number of times ("
         << fcst_raw.nt() << " != " << obs_raw.nt() << ")!\n\n";
 
    exit ( 1 );
@@ -221,7 +230,7 @@ if ( fcst_raw.nt() != obs_raw.nt() )  {
 if ( fcst_raw.delta_t() != obs_raw.delta_t() )  {
 
    mlog << Error
-        << "\n\n  " << program_name << ": forecast time difference is different than observation time difference ("
+        << "\n  " << program_name << ": forecast time difference is different than observation time difference ("
         << fcst_raw.delta_t() << " seconds != " << obs_raw.delta_t() << " seconds)!\n\n";
 
    exit ( 1 );
@@ -377,7 +386,7 @@ MtdIntFile fo, oo;
 
 if ( have_pairs )  {
 
-   // mlog << Debug(5) << "\n\n  Calculating pair attributes ... (Nf = "
+   // mlog << Debug(5) << "\n  Calculating pair attributes ... (Nf = "
    //      << (fcst_obj.n_objects()) << ", No = "
    //      << (obs_obj.n_objects())  << ")\n\n";
 
