@@ -8406,7 +8406,16 @@ FFBAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean(f2)
+Mean(f
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -8435,7 +8444,16 @@ OOBAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean(o2)
+Mean(o
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -8752,7 +8770,16 @@ FFABAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean((f-c)2)
+Mean((f-c)
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -8781,7 +8808,16 @@ OOABAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean((o-c)2)
+Mean((o-c)
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -9010,7 +9046,7 @@ UFBAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean(uf)24
+Mean(uf)
 \end_layout
 
 \end_inset
@@ -9155,7 +9191,25 @@ UVFFBAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean(uf2+vf2)
+Mean(uf
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
++vf
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -9184,7 +9238,25 @@ UVOOBAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean(uo2+vo2)
+Mean(uo
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
++vo
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -9530,7 +9602,25 @@ UVFFABAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean((uf-uc)2+(vf-vc)2)
+Mean((uf-uc)
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
++(vf-vc)
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
@@ -9559,7 +9649,25 @@ UVOOABAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean((uo-uc)2+(vo-vc)2)
+Mean((uo-uc)
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
++(vo-vc)
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+)
 \end_layout
 
 \end_inset
