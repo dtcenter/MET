@@ -163,7 +163,7 @@ double r0, theta0;
 
 r0 = lc_func(data.lat_pin, Cone);
 
-theta0 = Cone*(Lon_orient - data.lon_pin);
+theta0 = Cone*(Lon_orient - Lon_LL);
 
 Bx = data.x_pin - Alpha*r0*sind(theta0);
 By = data.y_pin + Alpha*r0*cosd(theta0);
@@ -486,7 +486,7 @@ void LambertGrid::shift_right(int N)
 
 if ( N == 0 )  return;
 
-mlog << Error 
+mlog << Error
      << "\n\n  LambertGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";
 
