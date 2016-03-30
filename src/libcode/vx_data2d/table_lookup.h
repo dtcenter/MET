@@ -18,6 +18,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "concat_string.h"
 
@@ -46,8 +47,11 @@ class Grib1TableEntry {
 
       int code;
       int table_number;
+      int center;
+      int subcenter;
 
-      ConcatString parm_name;
+
+    ConcatString parm_name;
 
       ConcatString full_name;
 
@@ -136,6 +140,8 @@ class TableFlatFile {
       void extend_grib1(int);
       void extend_grib2(int);
 
+      int get_table_files(const char *dir, const char *prefix, const char *postfix, std::vector<ConcatString> &a);
+
       Grib1TableEntry ** g1e;   //  elements ... allocated
       Grib2TableEntry ** g2e;   //  elements ... allocated
 
@@ -176,17 +182,21 @@ class TableFlatFile {
 
 
       bool lookup_grib1(int code, int table_number, Grib1TableEntry &);
+      bool lookup_grib1(int code, int table_number, int center, int subcenter, Grib1TableEntry &);
 
       bool lookup_grib1(int code,               Grib1TableEntry &);   //  assumes table_number is 2
       bool lookup_grib1(const char * parm_name, Grib1TableEntry &);   //  assumes table_number is 2
 
       bool lookup_grib1(const char * parm_name, int table_number, int code,
                         Grib1TableEntry &, int & n_matches);
+      bool lookup_grib1(const char * parm_name, int table_number, int code,int center, int subcenter,
+                        Grib1TableEntry &, int & n_matches);
 
       bool lookup_grib2(int a, int b, int c, Grib2TableEntry &);
       bool lookup_grib2(const char * parm_name, Grib2TableEntry &, int & n_matches);
       bool lookup_grib2(const char * parm_name, int a, int b, int c, Grib2TableEntry &, int & n_matches);
 
+      void readUserGrib1Tables();
 };
 
 
