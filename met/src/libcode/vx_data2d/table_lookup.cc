@@ -18,10 +18,13 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 #include <vector>
+#include <dirent.h>
 
 #include "table_lookup.h"
 #include "vx_util.h"
 #include "vx_math.h"
+#include <cerrno>
+#include <sys/stat.h>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,7 +42,7 @@ TableFlatFile GribTable (0);
 
 static const char table_data_dir   [] = "MET_BASE/table_files";      //  relative to MET_BASE
 
-static const char grib1_table_file [] = "nceptab_flat.txt";          //  relative to table_data_dir
+//static const char grib1_table_file [] = "nceptab_flat.txt";          //  relative to table_data_dir
 
 static const char grib2_table_file [] = "grib2_vars_flat.txt";       //  relative to table_data_dir
 
@@ -127,7 +130,7 @@ void Grib1TableEntry::clear()
 
 {
 
-code = table_number = -1;
+code = table_number = center = subcenter = -1;
 
 parm_name.clear();
 
@@ -151,6 +154,8 @@ clear();
 
 code = e.code;
 table_number = e.table_number;
+center = e.center;
+subcenter = e.subcenter;
 
 parm_name = e.parm_name;
 
@@ -174,7 +179,9 @@ Indent prefix(depth);
 
 out << prefix << "Index values = (" 
               << code << ", "
-              << table_number << ")\n";
+              << table_number << ", "
+              << center << ", "
+              << subcenter <<  ")\n";
 
 out << prefix << "parm_name = " << parm_name.contents() << "\n";
 
@@ -190,81 +197,94 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Grib1TableEntry::parse_line(const char * line)
+bool Grib1TableEntry::parse_line(const char * line) {
 
-{
+   clear();
 
-clear();
+   int j, n;
+   int *i[5];
+   const char i_delim[] = "{} \"";
+   const char s_delim[] = "\"";
+   const char *c = (const char *) 0;
+   char *line2 = (char *) 0;
+   char *L = (char *) 0;
 
-int j, n;
-int * i[3];
-const char i_delim [] = "{} \"";
-const char s_delim [] = "\"";
-const char * c = (const char *) 0;
-char * line2 = (char *) 0;
-char * L = (char *) 0;
 
-n = strlen(line);
+   n = strlen(line);
 
-line2 = new char [1 + n];
+   line2 = new char[1 + n];
 
-memset(line2, 0, 1 + n);
+   memset(line2, 0, 1 + n);
 
-strncpy(line2, line, n);
+   strncpy(line2, line, n);
 
-L = line2;
+   L = line2;
 
-clear();
+   clear();
 
-i[0] = &code;
-i[1] = &table_number;
+   i[0] = &code;
+   i[1] = &table_number;
+   i[2] = &center;
+   i[3] = &subcenter;
 
    //
-   //  grab the first 2 ints
+   //  grab the first 3 ints
    //
 
-for (j=0; j<2; ++j)  {
+   for (j = 0; j < 4; ++j) {
 
-   c = strtok(L, i_delim);
+      c = strtok(L, i_delim);
 
-   *(i[j]) = atoi(c);
+      *(i[j]) = atoi(c);
 
-   L = (char *) 0;
+      L = (char *) 0;
 
-}   //  while
+   }   //  while
 
    //
    //  parm_name
    //
 
-c = strtok(0, s_delim);
+   c = strtok(0, s_delim);
 
-parm_name = c;
+   parm_name = c;
 
-c = strtok(0, s_delim);
+   c = strtok(0, s_delim);
 
    //
    //  full_name
    //
 
-c = strtok(0, s_delim);
+   c = strtok(0, s_delim);
 
-full_name = c;
+   full_name = c;
 
-c = strtok(0, s_delim);
+   c = strtok(0, s_delim);
 
    //
    //  units (may be empty)
    //
 
-c = strtok(0, s_delim);
+   c = strtok(0, s_delim);
 
-if ( *c == ' ' )  units.clear();
-else              units = c;
+   if (c)
+   {
+      if (*c == ' ') {
+         units.clear();
+      }
+      else {
+         units = c;
+      }
+   }
+   else
+   {
+      return (false) ;
 
-   //
-   //  done
-   //
+   }
+
+      //
+      //  done
+      //
 
 delete [] line2;  line2 = (char *) 0;
 
@@ -524,24 +544,37 @@ TableFlatFile::TableFlatFile(int)
 init_from_scratch();
 
 ConcatString path;
+ConcatString path1;
+
+   readUserGrib1Tables();
+
+
+   path1 << cs_erase << table_data_dir;
+
+   path1 = replace_path(path1);
+   vector<ConcatString> filtered_file_names = vector<ConcatString>();
+
+   get_table_files(path1, "grib1", ".txt", filtered_file_names);
 
    //
    //  read the default grib1 table file, expanding MET_BASE
    //
+   for (unsigned int i = 0;i < filtered_file_names.size();i++)
+   {
 
-path << cs_erase << table_data_dir << '/' << grib1_table_file;
+      path << cs_erase << table_data_dir << '/' << filtered_file_names[i];
 
-path = replace_path(path);
+      path = replace_path(path);
 
-if ( ! read(path) )  {
+      if (!read(path)) {
 
-   mlog << Error
-        << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
+         mlog << Error
+         << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
 
-   exit ( 1 );
+         exit(1);
 
-}
-
+      }
+   }
    //
    //  read the default grib2 table file, expanding MET_BASE
    //
@@ -564,6 +597,32 @@ if ( ! read(path) )  {
    //  done
    //
 
+}
+
+void TableFlatFile::readUserGrib1Tables() {
+   ConcatString path_to_user_tables;
+   ConcatString path;
+   char *ptr;
+   vector<ConcatString> filtered_file_names_user = vector<ConcatString>();
+
+   if((ptr = getenv("USER_GRIB_TABLES")) != NULL)
+   {
+      path_to_user_tables = ptr;
+
+      get_table_files(path_to_user_tables, "grib1", ".txt", filtered_file_names_user);
+
+      for (unsigned int i = 0; i < filtered_file_names_user.size(); i++) {
+
+         path << cs_erase << path_to_user_tables << '/' << filtered_file_names_user[i];
+
+         if (!read(path)) {
+
+            mlog << Error
+            << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
+
+         }
+      }
+   }
 }
 
 
@@ -859,6 +918,8 @@ line.read_line(in);
 
 line.chomp('\n');
 
+line.ws_strip();
+
      if ( line == "GRIB1" )  { return ( read_grib1(in, filename, n_lines - 1) ); }
 else if ( line == "GRIB2" )  { return ( read_grib2(in, filename, n_lines - 1) ); }
 else {
@@ -1033,6 +1094,41 @@ return ( true );
 
 }
 
+int TableFlatFile::get_table_files(const char *dir, const char *prefix, const char *postfix, vector<ConcatString> &files)
+{
+   DIR *dp;
+   struct dirent *dirp;
+   size_t prefix_lenght = strlen(prefix);
+   size_t postfix_lenght = strlen(postfix);
+   size_t max_lenght = prefix_lenght;
+
+   if(max_lenght < postfix_lenght)
+   {
+      max_lenght=postfix_lenght;
+   }
+
+   dp = opendir( dir );
+   if(dp == NULL)
+   {
+      mlog << Error << "Error(" << errno << ") opening " << dir << "\n";
+      return errno;
+   }
+
+   while ((dirp = readdir(dp)) != NULL)
+   {
+      char filename[512];
+      struct stat st;
+      snprintf(filename, sizeof(filename), "%s/%s", dir, dirp->d_name);
+      lstat(filename, &st);
+      if( !S_ISDIR(st.st_mode) && strlen(dirp->d_name) > max_lenght && strncmp(prefix,dirp->d_name,prefix_lenght) == 0  && strcmp(dirp->d_name+ strlen(dirp->d_name) - postfix_lenght, postfix) == 0)
+      {
+         files.push_back(dirp->d_name);
+      }
+   }
+   closedir(dp);
+   return 0;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1059,6 +1155,32 @@ for (j=0; j<N_grib1_elements; ++j)  {
 
 return ( false );
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TableFlatFile::lookup_grib1(int code, int table_number, int center, int subcenter, Grib1TableEntry & e)
+{
+   int j;
+
+   e.clear();
+
+   for (j=0; j<N_grib1_elements; ++j)  {
+
+      if( g1e[j]->subcenter == -1 ){
+         subcenter = -1;
+      }
+
+      if ( (g1e[j]->code == code) && (g1e[j]->table_number == table_number)
+              && (g1e[j]->center == center)  && (g1e[j]->subcenter == subcenter))  {
+
+         e = *(g1e[j]);
+
+         return ( true );
+
+      }
+   }
+   return ( false );
 }
 
 
@@ -1126,6 +1248,63 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
            << "  parm_name: "      << e.parm_name
            << ", table_number = "  << e.table_number
            << ", code = "          << e.code << "\n\n";
+
+   }
+
+   return (n_matches > 0);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int code,int center, int subcenter,
+                  Grib1TableEntry & e, int & n_matches)
+{
+
+   //  clear the by-reference arguments
+   e.clear();
+   n_matches = 0;
+
+   //  build a list of matches
+   vector<Grib1TableEntry*> matches;
+   for(int j=0; j < N_grib1_elements; j++){
+      if( g1e[j]->subcenter == -1){
+         subcenter = -1;
+      }
+
+      if( g1e[j]->parm_name != parm_name ||
+          (bad_data_int != table_number && g1e[j]->table_number != table_number) ||
+          (bad_data_int != code         && g1e[j]->code         != code        ) ||
+          (bad_data_int != center         && g1e[j]->center != center        )   ||
+          (bad_data_int != subcenter         && g1e[j]->subcenter != subcenter)   )
+         continue;
+
+      if( n_matches++ == 0 ) e = *(g1e[j]);
+      matches.push_back( g1e[j] );
+
+   }
+
+   //  if there are multiple matches, print a descriptive warning
+   if( 1 < n_matches ){
+
+      ConcatString msg;
+      msg << "Multiple GRIB1 table entries match lookup criteria ("
+      << "parm_name = " << parm_name;
+      if( bad_data_int != table_number ) msg << ", table_number = " << table_number;
+      if( bad_data_int != code         ) msg << ", code = "         << code;
+      msg << "):\n";
+      mlog << Warning << "\n" << msg;
+
+      for(vector<Grib1TableEntry*>::iterator it = matches.begin();
+          it < matches.end(); it++)
+         mlog << Warning << "  parm_name: "      << (*it)->parm_name
+         << ", table_number = "  << (*it)->table_number
+         << ", code = "          << (*it)->code << "\n";
+
+      mlog << Warning << "Using: "
+      << "  parm_name: "      << e.parm_name
+      << ", table_number = "  << e.table_number
+      << ", code = "          << e.code << "\n\n";
 
    }
 
