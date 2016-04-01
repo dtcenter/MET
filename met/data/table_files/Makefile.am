@@ -21,8 +21,53 @@ tablefilesdir = $(pkgdatadir)/table_files
 tablefiles_DATA = \
 	grib2_vars_flat.txt \
 	nceptab_flat.txt \
-	stat_column_description.txt
+	stat_column_description.txt \
+	grib1_af_131_57.txt \
+	grib1_cptec_254_64.txt \
+	grib1_dwd_201_146.txt \
+	grib1_dwd_201_78.txt \
+	grib1_dwd_202_146.txt \
+	grib1_dwd_202_78.txt \
+	grib1_dwd_203_146.txt \
+	grib1_dwd_203_78.txt \
+	grib1_dwd_204_146.txt \
+	grib1_dwd_204_78.txt \
+	grib1_dwd_205_146.txt \
+	grib1_dwd_205_78.txt \
+	grib1_dwd_2_146.txt \
+	grib1_dwd_2_78.txt \
+	grib1_ecmwf_128_98.txt \
+	grib1_ecmwf_129_98.txt \
+	grib1_ecmwf_130_98.txt \
+	grib1_ecmwf_131_98.txt \
+	grib1_ecmwf_132_98.txt \
+	grib1_ecmwf_133_98.txt \
+	grib1_ecmwf_140_98.txt \
+	grib1_ecmwf_150_98.txt \
+	grib1_ecmwf_151_98.txt \
+	grib1_ecmwf_160_98.txt \
+	grib1_ecmwf_162_98.txt \
+	grib1_ecmwf_170_98.txt \
+	grib1_ecmwf_171_98.txt \
+	grib1_ecmwf_172_98.txt \
+	grib1_ecmwf_173_98.txt \
+	grib1_ecmwf_174_98.txt \
+	grib1_ecmwf_180_98.txt \
+	grib1_ecmwf_190_98.txt \
+	grib1_ecmwf_200_98.txt \
+	grib1_ecmwf_210_98.txt \
+	grib1_ecmwf_211_98.txt \
+	grib1_ecmwf_228_98.txt \
+	grib1_ncep_128_7.txt \
+	grib1_ncep_129_7.txt \
+	grib1_ncep_130_7.txt \
+	grib1_ncep_131_7.txt \
+	grib1_ncep_132_7.txt \
+	grib1_ncep_133_7.txt \
+	grib1_ncep_140_7.txt \
+	grib1_ncep_141_7.txt \
+	grib1_ncep_2_7.txt
 
 EXTRA_DIST = ${tablefiles_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in
