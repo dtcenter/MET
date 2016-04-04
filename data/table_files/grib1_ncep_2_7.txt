@@ -1,15 +1,271 @@
-GRIB1
+GRIB1  
+0 2 7 0 "var0" "undefined" ""
+1 2 7 0 "PRES" "Pressure" "Pa"
+2 2 7 0 "PRMSL" "Pressure reduced to MSL" "Pa"
+3 2 7 0 "PTEND" "Pressure tendency" "Pa/s"
+4 2 7 0 "var4" "undefined" ""
+5 2 7 0 "var5" "undefined" ""
+6 2 7 0 "GP" "Geopotential" "m^2/s^2"
+7 2 7 0 "HGT" "Geopotential height" "gpm"
+8 2 7 0 "DIST" "Geometric height" "m"
+9 2 7 0 "HSTDV" "Std dev of height" "m"
+10 2 7 0 "HVAR" "Variance of height" "m^2"
+11 2 7 0 "TMP" "Temp." "K"
+12 2 7 0 "VTMP" "Virtual temp." "K"
+13 2 7 0 "POT" "Potential temp." "K"
+14 2 7 0 "EPOT" "Pseudo-adiabatic pot. temp." "K"
+15 2 7 0 "TMAX" "Max. temp." "K"
+16 2 7 0 "TMIN" "Min. temp." "K"
+17 2 7 0 "DPT" "Dew point temp." "K"
+18 2 7 0 "DEPR" "Dew point depression" "K"
+19 2 7 0 "LAPR" "Lapse rate" "K/m"
+20 2 7 0 "VISIB" "Visibility" "m"
+21 2 7 0 "RDSP1" "Radar spectra (1)" "non-dim"
+22 2 7 0 "RDSP2" "Radar spectra (2)" "non-dim"
+23 2 7 0 "RDSP3" "Radar spectra (3)" "non-dim"
+24 2 7 0 "var24" "undefined" ""
+25 2 7 0 "TMPA" "Temp. anomaly" "K"
+26 2 7 0 "PRESA" "Pressure anomaly" "Pa"
+27 2 7 0 "GPA" "Geopotential height anomaly" "gpm"
+28 2 7 0 "WVSP1" "Wave spectra (1)" "non-dim"
+29 2 7 0 "WVSP2" "Wave spectra (2)" "non-dim"
+30 2 7 0 "WVSP3" "Wave spectra (3)" "non-dim"
+31 2 7 0 "WDIR" "Wind direction" "deg"
+32 2 7 0 "WIND" "Wind speed" "m/s"
+33 2 7 0 "UGRD" "u wind" "m/s"
+34 2 7 0 "VGRD" "v wind" "m/s"
+35 2 7 0 "STRM" "Stream function" "m^2/s"
+36 2 7 0 "VPOT" "Velocity potential" "m^2/s"
+37 2 7 0 "MNTSF" "Montgomery stream function" "m^2/s^2"
+38 2 7 0 "SGCVV" "Sigma coord. vertical velocity" "/s"
+39 2 7 0 "VVEL" "Pressure vertical velocity" "Pa/s"
+40 2 7 0 "DZDT" "Geometric vertical velocity" "m/s"
+41 2 7 0 "ABSV" "Absolute vorticity" "/s"
+42 2 7 0 "ABSD" "Absolute divergence" "/s"
+43 2 7 0 "RELV" "Relative vorticity" "/s"
+44 2 7 0 "RELD" "Relative divergence" "/s"
+45 2 7 0 "VUCSH" "Vertical u shear" "/s"
+46 2 7 0 "VVCSH" "Vertical v shear" "/s"
+47 2 7 0 "DIRC" "Direction of current" "deg"
+48 2 7 0 "SPC" "Speed of current" "m/s"
+49 2 7 0 "UOGRD" "u of current" "m/s"
+50 2 7 0 "VOGRD" "v of current" "m/s"
+51 2 7 0 "SPFH" "Specific humidity" "kg/kg"
+52 2 7 0 "RH" "Relative humidity" "%"
+53 2 7 0 "MIXR" "Humidity mixing ratio" "kg/kg"
+54 2 7 0 "PWAT" "Precipitable water" "kg/m^2"
+55 2 7 0 "VAPP" "Vapor pressure" "Pa"
+56 2 7 0 "SATD" "Saturation deficit" "Pa"
+57 2 7 0 "EVP" "Evaporation" "kg/m^2"
+58 2 7 0 "CICE" "Cloud Ice" "kg/kg"
+59 2 7 0 "PRATE" "Precipitation rate" "kg/m^2/s"
+60 2 7 0 "TSTM" "Thunderstorm probability" "%"
+61 2 7 0 "APCP" "Total precipitation" "kg/m^2"
+62 2 7 0 "NCPCP" "Large scale precipitation" "kg/m^2"
+63 2 7 0 "ACPCP" "Convective precipitation" "kg/m^2"
+64 2 7 0 "SRWEQ" "Snowfall rate water equiv." "kg/m^2/s"
+65 2 7 0 "WEASD" "Accum. snow" "kg/m^2"
+66 2 7 0 "SNOD" "Snow depth" "m"
+67 2 7 0 "MIXHT" "Mixed layer depth" "m"
+68 2 7 0 "TTHDP" "Transient thermocline depth" "m"
+69 2 7 0 "MTHD" "Main thermocline depth" "m"
+70 2 7 0 "MTHA" "Main thermocline anomaly" "m"
+71 2 7 0 "TCDC" "Total cloud cover" "%"
+72 2 7 0 "CDCON" "Convective cloud cover" "%"
+73 2 7 0 "LCDC" "Low level cloud cover" "%"
+74 2 7 0 "MCDC" "Mid level cloud cover" "%"
+75 2 7 0 "HCDC" "High level cloud cover" "%"
+76 2 7 0 "CWAT" "Cloud water" "kg/m^2"
+77 2 7 0 "var77" "undefined" ""
+78 2 7 0 "SNOC" "Convective snow" "kg/m^2"
+79 2 7 0 "SNOL" "Large scale snow" "kg/m^2"
+80 2 7 0 "WTMP" "Water temp." "K"
+81 2 7 0 "LAND" "Land-sea mask" "1=land; 0=sea"
+82 2 7 0 "DSLM" "Deviation of sea level from mean" "m"
+83 2 7 0 "SFCR" "Surface roughness" "m"
+84 2 7 0 "ALBDO" "Albedo" "%"
+85 2 7 0 "TSOIL" "Soil temp." "K"
+86 2 7 0 "SOILM" "Soil moisture content" "kg/m^2"
+87 2 7 0 "VEG" "Vegetation" "%"
+88 2 7 0 "SALTY" "Salinity" "kg/kg"
+89 2 7 0 "DEN" "Density" "kg/m^3"
+90 2 7 0 "RUNOF" "Runoff" "kg/m^2"
+91 2 7 0 "ICEC" "Ice concentration" "ice=1;no ice=0"
+92 2 7 0 "ICETK" "Ice thickness" "m"
+93 2 7 0 "DICED" "Direction of ice drift" "deg"
+94 2 7 0 "SICED" "Speed of ice drift" "m/s"
+95 2 7 0 "UICE" "u of ice drift" "m/s"
+96 2 7 0 "VICE" "v of ice drift" "m/s"
+97 2 7 0 "ICEG" "Ice growth rate" "m/s"
+98 2 7 0 "ICED" "Ice divergence" "/s"
+99 2 7 0 "SNOM" "Snow melt" "kg/m^2"
+100 2 7 0 "HTSGW" "Sig height of wind waves and swell" "m"
+101 2 7 0 "WVDIR" "Direction of wind waves" "deg"
+102 2 7 0 "WVHGT" "Sig height of wind waves" "m"
+103 2 7 0 "WVPER" "Mean period of wind waves" "s"
+104 2 7 0 "SWDIR" "Direction of swell waves" "deg"
+105 2 7 0 "SWELL" "Sig height of swell waves" "m"
+106 2 7 0 "SWPER" "Mean period of swell waves" "s"
+107 2 7 0 "DIRPW" "Primary wave direction" "deg"
+108 2 7 0 "PERPW" "Primary wave mean period" "s"
+109 2 7 0 "DIRSW" "Secondary wave direction" "deg"
+110 2 7 0 "PERSW" "Secondary wave mean period" "s"
+111 2 7 0 "NSWRS" "Net short wave (surface)" "W/m^2"
+112 2 7 0 "NLWRS" "Net long wave (surface)" "W/m^2"
+113 2 7 0 "NSWRT" "Net short wave (top)" "W/m^2"
+114 2 7 0 "NLWRT" "Net long wave (top)" "W/m^2"
+115 2 7 0 "LWAVR" "Long wave" "W/m^2"
+116 2 7 0 "SWAVR" "Short wave" "W/m^2"
+117 2 7 0 "GRAD" "Global radiation" "W/m^2"
+118 2 7 0 "var118" "undefined" ""
+119 2 7 0 "var119" "undefined" ""
+120 2 7 0 "var120" "undefined" ""
+121 2 7 0 "LHTFL" "Latent heat flux" "W/m^2"
+122 2 7 0 "SHTFL" "Sensible heat flux" "W/m^2"
+123 2 7 0 "BLYDP" "Boundary layer dissipation" "W/m^2"
+124 2 7 0 "UFLX" "Zonal momentum flux" "N/m^2"
+125 2 7 0 "VFLX" "Meridional momentum flux" "N/m^2"
+126 2 7 0 "WMIXE" "Wind mixing energy" "J"
+127 2 7 0 "IMGD" "Image data" "integer"
+128 2 7 0 "MSLSA" "Mean sea level pressure (Std Atm)" "Pa"
+129 2 7 0 "MSLMA" "Mean sea level pressure (MAPS)" "Pa"
+130 2 7 0 "MSLET" "Mean sea level pressure (ETA model)" "Pa"
+131 2 7 0 "LFTX" "Surface lifted index" "K"
+132 2 7 0 "4LFTX" "Best (4-layer) lifted index" "K"
+133 2 7 0 "KX" "K index" "K"
+134 2 7 0 "SX" "Sweat index" "K"
+135 2 7 0 "MCONV" "Horizontal moisture divergence" "kg/kg/s"
+136 2 7 0 "VSSH" "Vertical speed shear" "1/s"
+137 2 7 0 "TSLSA" "3-hr pressure tendency" "Pa/s"
+138 2 7 0 "BVF2" "Brunt-Vaisala frequency^2" "1/s^2"
+139 2 7 0 "PVMW" "Potential vorticity (mass-weighted)" "1/s/m"
+140 2 7 0 "CRAIN" "Categorical rain" "yes=1;no=0"
+141 2 7 0 "CFRZR" "Categorical freezing rain" "yes=1;no=0"
+142 2 7 0 "CICEP" "Categorical ice pellets" "yes=1;no=0"
+143 2 7 0 "CSNOW" "Categorical snow" "yes=1;no=0"
+144 2 7 0 "SOILW" "Volumetric soil moisture" "fraction"
+145 2 7 0 "PEVPR" "Potential evaporation rate" "W/m^2"
+146 2 7 0 "CWORK" "Cloud work function" "J/kg"
+147 2 7 0 "U-GWD" "Zonal gravity wave stress" "N/m^2"
+148 2 7 0 "V-GWD" "Meridional gravity wave stress" "N/m^2"
+149 2 7 0 "PV___" "Potential vorticity" "m^2/s/kg"
+150 2 7 0 "var150" "undefined" ""
+151 2 7 0 "var151" "undefined" ""
+152 2 7 0 "var152" "undefined" ""
+153 2 7 0 "MFXDV" "Moisture flux divergence" "gr/gr*m/s/m"
+154 2 7 0 "var154" "undefined" ""
+155 2 7 0 "GFLUX" "Ground heat flux" "W/m^2"
+156 2 7 0 "CIN" "Convective inhibition" "J/kg"
+157 2 7 0 "CAPE" "Convective Avail. Pot. Energy" "J/kg"
+158 2 7 0 "TKE" "Turbulent kinetic energy" "J/kg"
+159 2 7 0 "CONDP" "Lifted parcel condensation pressure" "Pa"
+160 2 7 0 "CSUSF" "Clear sky upward solar flux" "W/m^2"
+161 2 7 0 "CSDSF" "Clear sky downward solar flux" "W/m^2"
+162 2 7 0 "CSULF" "Clear sky upward long wave flux" "W/m^2"
+163 2 7 0 "CSDLF" "Clear sky downward long wave flux" "W/m^2"
+164 2 7 0 "CFNSF" "Cloud forcing net solar flux" "W/m^2"
+165 2 7 0 "CFNLF" "Cloud forcing net long wave flux" "W/m^2"
+166 2 7 0 "VBDSF" "Visible beam downward solar flux" "W/m^2"
+167 2 7 0 "VDDSF" "Visible diffuse downward solar flux" "W/m^2"
+168 2 7 0 "NBDSF" "Near IR beam downward solar flux" "W/m^2"
+169 2 7 0 "NDDSF" "Near IR diffuse downward solar flux" "W/m^2"
+170 2 7 0 "USTR" "U wind stress" "N/m^2"
+171 2 7 0 "VSTR" "V wind stress" "N/m^2"
+172 2 7 0 "MFLX" "Momentum flux" "N/m^2"
+173 2 7 0 "LMH" "Mass point model surface" "integer"
+174 2 7 0 "LMV" "Velocity point model surface" "integer"
+175 2 7 0 "SGLYR" "Nearby model level" "integer"
+176 2 7 0 "NLAT" "Latitude" "deg"
+177 2 7 0 "ELON" "Longitude" "deg"
+178 2 7 0 "UMAS" "Mass weighted u" "gm/m*K*s"
+179 2 7 0 "VMAS" "Mass weighted v" "gm/m*K*s"
+180 2 7 0 "XPRATE" "corrected precip" "kg/m^2/s"
+181 2 7 0 "LPSX" "x-gradient of log pressure" "1/m"
+182 2 7 0 "LPSY" "y-gradient of log pressure" "1/m"
+183 2 7 0 "HGTX" "x-gradient of height" "m/m"
+184 2 7 0 "HGTY" "y-gradient of height" "m/m"
+185 2 7 0 "STDZ" "Std dev of Geop. hgt." "m"
+186 2 7 0 "STDU" "Std dev of zonal wind" "m/s"
+187 2 7 0 "STDV" "Std dev of meridional wind" "m/s"
+188 2 7 0 "STDQ" "Std dev of spec. hum." "gm/gm"
+189 2 7 0 "STDT" "Std dev of temp." "K"
+190 2 7 0 "CBUW" "Covar. u and omega" "m/s*Pa/s"
+191 2 7 0 "CBVW" "Covar. v and omega" "m/s*Pa/s"
+192 2 7 0 "CBUQ" "Covar. u and specific hum" "m/s*gm/gm"
+193 2 7 0 "CBVQ" "Covar. v and specific hum" "m/s*gm/gm"
+194 2 7 0 "CBTW" "Covar. T and omega" "K*Pa/s"
+195 2 7 0 "CBQW" "Covar. spec. hum and omega" "gm/gm*Pa/s"
+196 2 7 0 "CBMZW" "Covar. v and u" "m^2/s^2"
+197 2 7 0 "CBTZW" "Covar. u and T" "K*m/s"
+198 2 7 0 "CBTMW" "Covar. v and T" "K*m/s"
+199 2 7 0 "STDRH" "Std dev of Rel. Hum." "%"
+200 2 7 0 "SDTZ" "Std dev of time tend of geop. hgt" "m"
+201 2 7 0 "ICWAT" "Ice-free water surface" "%"
+202 2 7 0 "SDTU" "Std dev of time tend of zonal wind" "m/s"
+203 2 7 0 "SDTV" "Std dev of time tend of merid wind" "m/s"
+204 2 7 0 "DSWRF" "Downward solar radiation flux" "W/m^2"
+205 2 7 0 "DLWRF" "Downward long wave flux" "W/m^2"
+206 2 7 0 "SDTQ" "Std dev of time tend of spec. hum" "gm/gm"
+207 2 7 0 "MSTAV" "Moisture availability" "%"
+208 2 7 0 "SFEXC" "Exchange coefficient" "kg*m/m^3/s"
+209 2 7 0 "MIXLY" "No. of mixed layers next to sfc" "integer"
+210 2 7 0 "SDTT" "Std dev of time tend of temp." "K"
+211 2 7 0 "USWRF" "Upward solar radiation flux" "W/m^2"
+212 2 7 0 "ULWRF" "Upward long wave flux" "W/m^2"
+213 2 7 0 "CDLYR" "Non-convective cloud" "%"
+214 2 7 0 "CPRAT" "Convective precip. rate" "kg/m^2/s"
+215 2 7 0 "TTDIA" "Temp. tendency by all physics" "K/s"
+216 2 7 0 "TTRAD" "Temp. tendency by all radiation" "K/s"
+217 2 7 0 "TTPHY" "Temp. tendency by nonrad physics" "K/s"
+218 2 7 0 "PREIX" "Precipitation index" "fraction"
+219 2 7 0 "TSD1D" "Std dev of IR T over 1x1 deg area" "K"
+220 2 7 0 "NLSGP" "Natural log of surface pressure" "ln(kPa)"
+221 2 7 0 "SDTRH" "Std dev of time tend of rel hum" "%"
+222 2 7 0 "5WAVH" "5-wave geopotential height" "gpm"
+223 2 7 0 "CNWAT" "Plant canopy surface water" "kg/m^2"
+224 2 7 0 "PLTRS" "Max. stomato plant resistance" "s/m"
+225 2 7 0 "RHCLD" "RH-type cloud cover" "%"
+226 2 7 0 "BMIXL" "Blackadar's mixing length scale" "m"
+227 2 7 0 "AMIXL" "Asymptotic mixing length scale" "m"
+228 2 7 0 "PEVAP" "Pot. evaporation" "kg/m^2"
+229 2 7 0 "SNOHF" "Snow melt heat flux" "W/m^2"
+230 2 7 0 "SNOEV" "Snow sublimation heat flux" "W/m^2"
+231 2 7 0 "MFLUX" "Convective cloud mass flux" "Pa/s"
+232 2 7 0 "DTRF" "Downward total radiation flux" "W/m^2"
+233 2 7 0 "UTRF" "Upward total radiation flux" "W/m^2"
+234 2 7 0 "BGRUN" "Baseflow-groundwater runoff" "kg/m^2"
+235 2 7 0 "SSRUN" "Storm surface runoff" "kg/m^2"
+236 2 7 0 "var236" "undefined" ""
+237 2 7 0 "OZONE" "Total column ozone" "Dobson"
+238 2 7 0 "SNOWC" "Snow cover" "%"
+239 2 7 0 "SNOT" "Snow temp." "K"
+240 2 7 0 "GLCR" "Permanent snow points" "mask"
+241 2 7 0 "LRGHR" "Large scale condensation heating" "K/s"
+242 2 7 0 "CNVHR" "Deep convective heating" "K/s"
+243 2 7 0 "CNVMR" "Deep convective moistening" "kg/kg/s"
+244 2 7 0 "SHAHR" "Shallow convective heating" "K/s"
+245 2 7 0 "SHAMR" "Shallow convective moistening" "kg/kg/s"
+246 2 7 0 "VDFHR" "Vertical diffusion heating" "K/s"
+247 2 7 0 "VDFUA" "Vertical diffusion zonal accel" "m/s^2"
+248 2 7 0 "VDFVA" "Vertical diffusion meridional accel" "m/s^2"
+249 2 7 0 "VDFMR" "Vertical diffusion moistening" "kg/kg/s"
+250 2 7 0 "SWHR" "Solar radiative heating" "K/s"
+251 2 7 0 "LWHR" "Longwave radiative heating" "K/s"
+252 2 7 0 "CD" "Drag coefficient" "non-dim"
+253 2 7 0 "FRICV" "Friction velocity" "m/s"
+254 2 7 0 "RI" "Richardson number" "non-dim"
+255 2 7 0 "var255" "undefined" ""
 0 2 7 1 "var0" "undefined" ""
 1 2 7 1 "PRES" "Pressure" "Pa"
 2 2 7 1 "PRMSL" "Pressure reduced to MSL" "Pa"
 3 2 7 1 "PTEND" "Pressure tendency" "Pa/s"
-4 2 7 1 "var4" "undefined" ""
-5 2 7 1 "var5" "undefined" ""
+4 2 7 1 "PVORT" "Pot. vorticity" "km^2/kg/s"
+5 2 7 1 "ICAHT" "ICAO Standard Atmosphere Reference Height" "M"
 6 2 7 1 "GP" "Geopotential" "m^2/s^2"
 7 2 7 1 "HGT" "Geopotential height" "gpm"
 8 2 7 1 "DIST" "Geometric height" "m"
 9 2 7 1 "HSTDV" "Std dev of height" "m"
-10 2 7 1 "HVAR" "Variance of height" "m^2"
+10 2 7 1 "TOZNE" "Total ozone" "Dobson"
 11 2 7 1 "TMP" "Temp." "K"
 12 2 7 1 "VTMP" "Virtual temp." "K"
 13 2 7 1 "POT" "Potential temp." "K"
@@ -19,11 +275,11 @@ GRIB1
 17 2 7 1 "DPT" "Dew point temp." "K"
 18 2 7 1 "DEPR" "Dew point depression" "K"
 19 2 7 1 "LAPR" "Lapse rate" "K/m"
-20 2 7 1 "VISIB" "Visibility" "m"
+20 2 7 1 "VIS" "Visibility" "m"
 21 2 7 1 "RDSP1" "Radar spectra (1)" "non-dim"
 22 2 7 1 "RDSP2" "Radar spectra (2)" "non-dim"
 23 2 7 1 "RDSP3" "Radar spectra (3)" "non-dim"
-24 2 7 1 "var24" "undefined" ""
+24 2 7 1 "PLI" "Parcel lifted index (to 500 hPa)" "K"
 25 2 7 1 "TMPA" "Temp. anomaly" "K"
 26 2 7 1 "PRESA" "Pressure anomaly" "Pa"
 27 2 7 1 "GPA" "Geopotential height anomaly" "gpm"
@@ -57,7 +313,7 @@ GRIB1
 55 2 7 1 "VAPP" "Vapor pressure" "Pa"
 56 2 7 1 "SATD" "Saturation deficit" "Pa"
 57 2 7 1 "EVP" "Evaporation" "kg/m^2"
-58 2 7 1 "CICE" "Cloud Ice" "kg/kg"
+58 2 7 1 "CICE" "Cloud Ice" "kg/m^2"
 59 2 7 1 "PRATE" "Precipitation rate" "kg/m^2/s"
 60 2 7 1 "TSTM" "Thunderstorm probability" "%"
 61 2 7 1 "APCP" "Total precipitation" "kg/m^2"
@@ -76,11 +332,11 @@ GRIB1
 74 2 7 1 "MCDC" "Mid level cloud cover" "%"
 75 2 7 1 "HCDC" "High level cloud cover" "%"
 76 2 7 1 "CWAT" "Cloud water" "kg/m^2"
-77 2 7 1 "var77" "undefined" ""
+77 2 7 1 "BLI" "Best lifted index (to 500 hPa)" "K"
 78 2 7 1 "SNOC" "Convective snow" "kg/m^2"
 79 2 7 1 "SNOL" "Large scale snow" "kg/m^2"
 80 2 7 1 "WTMP" "Water temp." "K"
-81 2 7 1 "LAND" "Land-sea mask" "1=land; 0=sea"
+81 2 7 1 "LAND" "Land cover (land=1;sea=0)" "fraction"
 82 2 7 1 "DSLM" "Deviation of sea level from mean" "m"
 83 2 7 1 "SFCR" "Surface roughness" "m"
 84 2 7 1 "ALBDO" "Albedo" "%"
@@ -89,8 +345,8 @@ GRIB1
 87 2 7 1 "VEG" "Vegetation" "%"
 88 2 7 1 "SALTY" "Salinity" "kg/kg"
 89 2 7 1 "DEN" "Density" "kg/m^3"
-90 2 7 1 "RUNOF" "Runoff" "kg/m^2"
-91 2 7 1 "ICEC" "Ice concentration" "ice=1;no ice=0"
+90 2 7 1 "WATR" "Water runoff" "kg/m^2"
+91 2 7 1 "ICEC" "Ice concentration (ice=1;no ice=0)" "fraction"
 92 2 7 1 "ICETK" "Ice thickness" "m"
 93 2 7 1 "DICED" "Direction of ice drift" "deg"
 94 2 7 1 "SICED" "Speed of ice drift" "m/s"
@@ -117,16 +373,16 @@ GRIB1
 115 2 7 1 "LWAVR" "Long wave" "W/m^2"
 116 2 7 1 "SWAVR" "Short wave" "W/m^2"
 117 2 7 1 "GRAD" "Global radiation" "W/m^2"
-118 2 7 1 "var118" "undefined" ""
-119 2 7 1 "var119" "undefined" ""
-120 2 7 1 "var120" "undefined" ""
+118 2 7 1 "BRTMP" "Brightness temperature" "K"
+119 2 7 1 "LWRAD" "Radiance with respect to wave no." "W/m/sr"
+120 2 7 1 "SWRAD" "Radiance with respect ot wave len." "W/m^3/sr"
 121 2 7 1 "LHTFL" "Latent heat flux" "W/m^2"
 122 2 7 1 "SHTFL" "Sensible heat flux" "W/m^2"
 123 2 7 1 "BLYDP" "Boundary layer dissipation" "W/m^2"
 124 2 7 1 "UFLX" "Zonal momentum flux" "N/m^2"
 125 2 7 1 "VFLX" "Meridional momentum flux" "N/m^2"
 126 2 7 1 "WMIXE" "Wind mixing energy" "J"
-127 2 7 1 "IMGD" "Image data" "integer"
+127 2 7 1 "IMGD" "Image data" ""
 128 2 7 1 "MSLSA" "Mean sea level pressure (Std Atm)" "Pa"
 129 2 7 1 "MSLMA" "Mean sea level pressure (MAPS)" "Pa"
 130 2 7 1 "MSLET" "Mean sea level pressure (ETA model)" "Pa"
@@ -135,8 +391,8 @@ GRIB1
 133 2 7 1 "KX" "K index" "K"
 134 2 7 1 "SX" "Sweat index" "K"
 135 2 7 1 "MCONV" "Horizontal moisture divergence" "kg/kg/s"
-136 2 7 1 "VSSH" "Vertical speed shear" "1/s"
-137 2 7 1 "TSLSA" "3-hr pressure tendency" "Pa/s"
+136 2 7 1 "VWSH" "Vertical speed shear" "1/s"
+137 2 7 1 "TSLSA" "3-hr pressure tendency (Std Atmos Red)" "Pa/s"
 138 2 7 1 "BVF2" "Brunt-Vaisala frequency^2" "1/s^2"
 139 2 7 1 "PVMW" "Potential vorticity (mass-weighted)" "1/s/m"
 140 2 7 1 "CRAIN" "Categorical rain" "yes=1;no=0"
@@ -148,12 +404,12 @@ GRIB1
 146 2 7 1 "CWORK" "Cloud work function" "J/kg"
 147 2 7 1 "U-GWD" "Zonal gravity wave stress" "N/m^2"
 148 2 7 1 "V-GWD" "Meridional gravity wave stress" "N/m^2"
-149 2 7 1 "PV___" "Potential vorticity" "m^2/s/kg"
-150 2 7 1 "var150" "undefined" ""
-151 2 7 1 "var151" "undefined" ""
-152 2 7 1 "var152" "undefined" ""
-153 2 7 1 "MFXDV" "Moisture flux divergence" "gr/gr*m/s/m"
-154 2 7 1 "var154" "undefined" ""
+149 2 7 1 "PV" "Potential vorticity" "m^2/s/kg"
+150 2 7 1 "COVMZ" "Covariance between u and v" "m^2/s^2"
+151 2 7 1 "COVTZ" "Covariance between u and T" "K*m/s"
+152 2 7 1 "COVTM" "Covariance between v and T" "K*m/s"
+153 2 7 1 "CLWMR" "Cloud water" "kg/kg"
+154 2 7 1 "O3MR" "Ozone mixing ratio" "kg/kg"
 155 2 7 1 "GFLUX" "Ground heat flux" "W/m^2"
 156 2 7 1 "CIN" "Convective inhibition" "J/kg"
 157 2 7 1 "CAPE" "Convective Avail. Pot. Energy" "J/kg"
@@ -169,77 +425,77 @@ GRIB1
 167 2 7 1 "VDDSF" "Visible diffuse downward solar flux" "W/m^2"
 168 2 7 1 "NBDSF" "Near IR beam downward solar flux" "W/m^2"
 169 2 7 1 "NDDSF" "Near IR diffuse downward solar flux" "W/m^2"
-170 2 7 1 "USTR" "U wind stress" "N/m^2"
-171 2 7 1 "VSTR" "V wind stress" "N/m^2"
+170 2 7 1 "RWMR" "Rain water mixing ratio" "kg/kg"
+171 2 7 1 "SNMR" "Snow mixing ratio" "kg/kg"
 172 2 7 1 "MFLX" "Momentum flux" "N/m^2"
-173 2 7 1 "LMH" "Mass point model surface" "integer"
-174 2 7 1 "LMV" "Velocity point model surface" "integer"
-175 2 7 1 "SGLYR" "Nearby model level" "integer"
-176 2 7 1 "NLAT" "Latitude" "deg"
-177 2 7 1 "ELON" "Longitude" "deg"
-178 2 7 1 "UMAS" "Mass weighted u" "gm/m*K*s"
-179 2 7 1 "VMAS" "Mass weighted v" "gm/m*K*s"
-180 2 7 1 "XPRATE" "corrected precip" "kg/m^2/s"
+173 2 7 1 "LMH" "Mass point model surface" "non-dim"
+174 2 7 1 "LMV" "Velocity point model surface" "non-dim"
+175 2 7 1 "MLYNO" "Model layer number (from bottom up)" "non-dim"
+176 2 7 1 "NLAT" "Latitude (-90 to +90)" "deg"
+177 2 7 1 "ELON" "East longitude (0-360)" "deg"
+178 2 7 1 "ICMR" "Ice mixing ratio" "kg/kg"
+179 2 7 1 "GRMR" "Graupel mixing ratio" "kg/kg"
+180 2 7 1 "GUST" "Surface wind gust" "m/s"
 181 2 7 1 "LPSX" "x-gradient of log pressure" "1/m"
 182 2 7 1 "LPSY" "y-gradient of log pressure" "1/m"
 183 2 7 1 "HGTX" "x-gradient of height" "m/m"
 184 2 7 1 "HGTY" "y-gradient of height" "m/m"
-185 2 7 1 "STDZ" "Std dev of Geop. hgt." "m"
-186 2 7 1 "STDU" "Std dev of zonal wind" "m/s"
-187 2 7 1 "STDV" "Std dev of meridional wind" "m/s"
-188 2 7 1 "STDQ" "Std dev of spec. hum." "gm/gm"
-189 2 7 1 "STDT" "Std dev of temp." "K"
-190 2 7 1 "CBUW" "Covar. u and omega" "m/s*Pa/s"
-191 2 7 1 "CBVW" "Covar. v and omega" "m/s*Pa/s"
-192 2 7 1 "CBUQ" "Covar. u and specific hum" "m/s*gm/gm"
-193 2 7 1 "CBVQ" "Covar. v and specific hum" "m/s*gm/gm"
-194 2 7 1 "CBTW" "Covar. T and omega" "K*Pa/s"
-195 2 7 1 "CBQW" "Covar. spec. hum and omega" "gm/gm*Pa/s"
-196 2 7 1 "CBMZW" "Covar. v and u" "m^2/s^2"
-197 2 7 1 "CBTZW" "Covar. u and T" "K*m/s"
-198 2 7 1 "CBTMW" "Covar. v and T" "K*m/s"
-199 2 7 1 "STDRH" "Std dev of Rel. Hum." "%"
-200 2 7 1 "SDTZ" "Std dev of time tend of geop. hgt" "m"
+185 2 7 1 "TURB" "Turbulence SIGMET/AIRMET" "non-dim"
+186 2 7 1 "ICNG" "Icing SIGMET/AIRMET" "non-dim"
+187 2 7 1 "LTNG" "Lightning" "non-dim"
+188 2 7 1 "DRIP" "Rate of water dropping from canopy to gnd" "kg/m^2"
+189 2 7 1 "VPTMP" "Virtual pot. temp." "K"
+190 2 7 1 "HLCY" "Storm relative helicity" "m^2/s^2"
+191 2 7 1 "PROB" "Prob. from ensemble" "non-dim"
+192 2 7 1 "PROBN" "Prob. from ensemble norm. to clim. expect." "non-dim"
+193 2 7 1 "POP" "Prob. of precipitation" "%"
+194 2 7 1 "CPOFP" "Prob. of frozen precipitation" "%"
+195 2 7 1 "CPOZP" "Prob. of freezing precipitation" "%"
+196 2 7 1 "USTM" "u-component of storm motion" "m/s"
+197 2 7 1 "VSTM" "v-component of storm motion" "m/s"
+198 2 7 1 "NCIP" "No. concen. ice particles" ""
+199 2 7 1 "EVBS" "Direct evaporation from bare soil" "W/m^2"
+200 2 7 1 "EVCW" "Canopy water evaporation" "W/m^2"
 201 2 7 1 "ICWAT" "Ice-free water surface" "%"
-202 2 7 1 "SDTU" "Std dev of time tend of zonal wind" "m/s"
-203 2 7 1 "SDTV" "Std dev of time tend of merid wind" "m/s"
-204 2 7 1 "DSWRF" "Downward solar radiation flux" "W/m^2"
+202 2 7 1 "CWDI" "Convective weather detection index" ""
+203 2 7 1 "VAFTAD" "VAFTAD??" "??"
+204 2 7 1 "DSWRF" "Downward short wave flux" "W/m^2"
 205 2 7 1 "DLWRF" "Downward long wave flux" "W/m^2"
-206 2 7 1 "SDTQ" "Std dev of time tend of spec. hum" "gm/gm"
+206 2 7 1 "UVI" "Ultraviolet index" "W/m^2"
 207 2 7 1 "MSTAV" "Moisture availability" "%"
-208 2 7 1 "SFEXC" "Exchange coefficient" "kg*m/m^3/s"
-209 2 7 1 "MIXLY" "No. of mixed layers next to sfc" "integer"
-210 2 7 1 "SDTT" "Std dev of time tend of temp." "K"
-211 2 7 1 "USWRF" "Upward solar radiation flux" "W/m^2"
+208 2 7 1 "SFEXC" "Exchange coefficient" "(kg/m^3)(m/s)"
+209 2 7 1 "MIXLY" "No. of mixed layers next to surface" "integer"
+210 2 7 1 "TRANS" "Transpiration" "W/m^2"
+211 2 7 1 "USWRF" "Upward short wave flux" "W/m^2"
 212 2 7 1 "ULWRF" "Upward long wave flux" "W/m^2"
 213 2 7 1 "CDLYR" "Non-convective cloud" "%"
 214 2 7 1 "CPRAT" "Convective precip. rate" "kg/m^2/s"
 215 2 7 1 "TTDIA" "Temp. tendency by all physics" "K/s"
 216 2 7 1 "TTRAD" "Temp. tendency by all radiation" "K/s"
-217 2 7 1 "TTPHY" "Temp. tendency by nonrad physics" "K/s"
-218 2 7 1 "PREIX" "Precipitation index" "fraction"
-219 2 7 1 "TSD1D" "Std dev of IR T over 1x1 deg area" "K"
-220 2 7 1 "NLSGP" "Natural log of surface pressure" "ln(kPa)"
-221 2 7 1 "SDTRH" "Std dev of time tend of rel hum" "%"
+217 2 7 1 "TTPHY" "Temp. tendency by non-radiation physics" "K/s"
+218 2 7 1 "PREIX" "Precip index (0.0-1.00)" "fraction"
+219 2 7 1 "TSD1D" "Std. dev. of IR T over 1x1 deg area" "K"
+220 2 7 1 "NLGSP" "Natural log of surface pressure" "ln(kPa)"
+221 2 7 1 "HPBL" "Planetary boundary layer height" "m"
 222 2 7 1 "5WAVH" "5-wave geopotential height" "gpm"
 223 2 7 1 "CNWAT" "Plant canopy surface water" "kg/m^2"
-224 2 7 1 "PLTRS" "Max. stomato plant resistance" "s/m"
-225 2 7 1 "RHCLD" "RH-type cloud cover" "%"
+224 2 7 1 "SOTYP" "Soil type (Zobler)" "0..9"
+225 2 7 1 "VGTYP" "Vegetation type (as in SiB)" "0..13"
 226 2 7 1 "BMIXL" "Blackadar's mixing length scale" "m"
 227 2 7 1 "AMIXL" "Asymptotic mixing length scale" "m"
 228 2 7 1 "PEVAP" "Pot. evaporation" "kg/m^2"
-229 2 7 1 "SNOHF" "Snow melt heat flux" "W/m^2"
-230 2 7 1 "SNOEV" "Snow sublimation heat flux" "W/m^2"
+229 2 7 1 "SNOHF" "Snow phase-change heat flux" "W/m^2"
+230 2 7 1 "5WAVA" "5-wave geopot. height anomaly" "gpm"
 231 2 7 1 "MFLUX" "Convective cloud mass flux" "Pa/s"
 232 2 7 1 "DTRF" "Downward total radiation flux" "W/m^2"
 233 2 7 1 "UTRF" "Upward total radiation flux" "W/m^2"
 234 2 7 1 "BGRUN" "Baseflow-groundwater runoff" "kg/m^2"
 235 2 7 1 "SSRUN" "Storm surface runoff" "kg/m^2"
-236 2 7 1 "var236" "undefined" ""
-237 2 7 1 "OZONE" "Total column ozone" "Dobson"
+236 2 7 1 "SIPD" "Supercooled large droplet (SLD) icing pot. diagn." ""
+237 2 7 1 "O3TOT" "Total ozone" "kg/m^2"
 238 2 7 1 "SNOWC" "Snow cover" "%"
 239 2 7 1 "SNOT" "Snow temp." "K"
-240 2 7 1 "GLCR" "Permanent snow points" "mask"
+240 2 7 1 "COVTW" "Covariance T and w" "K*m/s"
 241 2 7 1 "LRGHR" "Large scale condensation heating" "K/s"
 242 2 7 1 "CNVHR" "Deep convective heating" "K/s"
 243 2 7 1 "CNVMR" "Deep convective moistening" "kg/kg/s"
@@ -255,259 +511,515 @@ GRIB1
 253 2 7 1 "FRICV" "Friction velocity" "m/s"
 254 2 7 1 "RI" "Richardson number" "non-dim"
 255 2 7 1 "var255" "undefined" ""
-0 2 14 1 "var0", "undefined" ""
-1 2 14 1 "PRES", "Pressure" "Pa"
-2 2 14 1 "PRMSL", "Pressure reduced to MSL" "Pa"
-3 2 14 1 "PTEND", "Pressure tendency" "Pa/s"
-4 2 14 1 "PVORT", "Pot. vorticity" "km^2/kg/s"
-5 2 14 1 "ICAHT", "ICAO Standard Atmosphere Reference Height" "M"
-6 2 14 1 "GP", "Geopotential" "m^2/s^2"
-7 2 14 1 "HGT", "Geopotential height" "gpm"
-8 2 14 1 "DIST", "Geometric height" "m"
-9 2 14 1 "HSTDV", "Std dev of height" "m"
-10 2 14 1 "TOZNE", "Total ozone" "Dobson"
-11 2 14 1 "TMP", "Temp." "K"
-12 2 14 1 "VTMP", "Virtual temp." "K"
-13 2 14 1 "POT", "Potential temp." "K"
-14 2 14 1 "EPOT", "Pseudo-adiabatic pot. temp." "K"
-15 2 14 1 "TMAX", "Max. temp." "K"
-16 2 14 1 "TMIN", "Min. temp." "K"
-17 2 14 1 "DPT", "Dew point temp." "K"
-18 2 14 1 "DEPR", "Dew point depression" "K"
-19 2 14 1 "LAPR", "Lapse rate" "K/m"
-20 2 14 1 "VIS", "Visibility" "m"
-21 2 14 1 "RDSP1", "Radar spectra (1)" "non-dim"
-22 2 14 1 "RDSP2", "Radar spectra (2)" "non-dim"
-23 2 14 1 "RDSP3", "Radar spectra (3)" "non-dim"
-24 2 14 1 "PLI", "Parcel lifted index (to 500 hPa)" "K"
-25 2 14 1 "TMPA", "Temp. anomaly" "K"
-26 2 14 1 "PRESA", "Pressure anomaly" "Pa"
-27 2 14 1 "GPA", "Geopotential height anomaly" "gpm"
-28 2 14 1 "WVSP1", "Wave spectra (1)" "non-dim"
-29 2 14 1 "WVSP2", "Wave spectra (2)" "non-dim"
-30 2 14 1 "WVSP3", "Wave spectra (3)" "non-dim"
-31 2 14 1 "WDIR", "Wind direction" "deg"
-32 2 14 1 "WIND", "Wind speed" "m/s"
-33 2 14 1 "UGRD", "u wind" "m/s"
-34 2 14 1 "VGRD", "v wind" "m/s"
-35 2 14 1 "STRM", "Stream function" "m^2/s"
-36 2 14 1 "VPOT", "Velocity potential" "m^2/s"
-37 2 14 1 "MNTSF", "Montgomery stream function" "m^2/s^2"
-38 2 14 1 "SGCVV", "Sigma coord. vertical velocity" "/s"
-39 2 14 1 "VVEL", "Pressure vertical velocity" "Pa/s"
-40 2 14 1 "DZDT", "Geometric vertical velocity" "m/s"
-41 2 14 1 "ABSV", "Absolute vorticity" "/s"
-42 2 14 1 "ABSD", "Absolute divergence" "/s"
-43 2 14 1 "RELV", "Relative vorticity" "/s"
-44 2 14 1 "RELD", "Relative divergence" "/s"
-45 2 14 1 "VUCSH", "Vertical u shear" "/s"
-46 2 14 1 "VVCSH", "Vertical v shear" "/s"
-47 2 14 1 "DIRC", "Direction of current" "deg"
-48 2 14 1 "SPC", "Speed of current" "m/s"
-49 2 14 1 "UOGRD", "u of current" "m/s"
-50 2 14 1 "VOGRD", "v of current" "m/s"
-51 2 14 1 "SPFH", "Specific humidity" "kg/kg"
-52 2 14 1 "RH", "Relative humidity" "%"
-53 2 14 1 "MIXR", "Humidity mixing ratio" "kg/kg"
-54 2 14 1 "PWAT", "Precipitable water" "kg/m^2"
-55 2 14 1 "VAPP", "Vapor pressure" "Pa"
-56 2 14 1 "SATD", "Saturation deficit" "Pa"
-57 2 14 1 "EVP", "Evaporation" "kg/m^2"
-58 2 14 1 "CICE", "Cloud Ice" "kg/m^2"
-59 2 14 1 "PRATE", "Precipitation rate" "kg/m^2/s"
-60 2 14 1 "TSTM", "Thunderstorm probability" "%"
-61 2 14 1 "APCP", "Total precipitation" "kg/m^2"
-62 2 14 1 "NCPCP", "Large scale precipitation" "kg/m^2"
-63 2 14 1 "ACPCP", "Convective precipitation" "kg/m^2"
-64 2 14 1 "SRWEQ", "Snowfall rate water equiv." "kg/m^2/s"
-65 2 14 1 "WEASD", "Accum. snow" "kg/m^2"
-66 2 14 1 "SNOD", "Snow depth" "m"
-67 2 14 1 "MIXHT", "Mixed layer depth" "m"
-68 2 14 1 "TTHDP", "Transient thermocline depth" "m"
-69 2 14 1 "MTHD", "Main thermocline depth" "m"
-70 2 14 1 "MTHA", "Main thermocline anomaly" "m"
-71 2 14 1 "TCDC", "Total cloud cover" "%"
-72 2 14 1 "CDCON", "Convective cloud cover" "%"
-73 2 14 1 "LCDC", "Low level cloud cover" "%"
-74 2 14 1 "MCDC", "Mid level cloud cover" "%"
-75 2 14 1 "HCDC", "High level cloud cover" "%"
-76 2 14 1 "CWAT", "Cloud water" "kg/m^2"
-77 2 14 1 "BLI", "Best lifted index (to 500 hPa)" "K"
-78 2 14 1 "SNOC", "Convective snow" "kg/m^2"
-79 2 14 1 "SNOL", "Large scale snow" "kg/m^2"
-80 2 14 1 "WTMP", "Water temp." "K"
-81 2 14 1 "LAND", "Land cover (land=1;sea=0)" "fraction"
-82 2 14 1 "DSLM", "Deviation of sea level from mean" "m"
-83 2 14 1 "SFCR", "Surface roughness" "m"
-84 2 14 1 "ALBDO", "Albedo" "%"
-85 2 14 1 "TSOIL", "Soil temp." "K"
-86 2 14 1 "SOILM", "Soil moisture content" "kg/m^2"
-87 2 14 1 "VEG", "Vegetation" "%"
-88 2 14 1 "SALTY", "Salinity" "kg/kg"
-89 2 14 1 "DEN", "Density" "kg/m^3"
-90 2 14 1 "WATR", "Water runoff" "kg/m^2"
-91 2 14 1 "ICEC", "Ice concentration (ice=1;no ice=0)" "fraction"
-92 2 14 1 "ICETK", "Ice thickness" "m"
-93 2 14 1 "DICED", "Direction of ice drift" "deg"
-94 2 14 1 "SICED", "Speed of ice drift" "m/s"
-95 2 14 1 "UICE", "u of ice drift" "m/s"
-96 2 14 1 "VICE", "v of ice drift" "m/s"
-97 2 14 1 "ICEG", "Ice growth rate" "m/s"
-98 2 14 1 "ICED", "Ice divergence" "/s"
-99 2 14 1 "SNOM", "Snow melt" "kg/m^2"
-100 2 14 1 "HTSGW", "Sig height of wind waves and swell" "m"
-101 2 14 1 "WVDIR", "Direction of wind waves" "deg"
-102 2 14 1 "WVHGT", "Sig height of wind waves" "m"
-103 2 14 1 "WVPER", "Mean period of wind waves" "s"
-104 2 14 1 "SWDIR", "Direction of swell waves" "deg"
-105 2 14 1 "SWELL", "Sig height of swell waves" "m"
-106 2 14 1 "SWPER", "Mean period of swell waves" "s"
-107 2 14 1 "DIRPW", "Primary wave direction" "deg"
-108 2 14 1 "PERPW", "Primary wave mean period" "s"
-109 2 14 1 "DIRSW", "Secondary wave direction" "deg"
-110 2 14 1 "PERSW", "Secondary wave mean period" "s"
-111 2 14 1 "NSWRS", "Net short wave (surface)" "W/m^2"
-112 2 14 1 "NLWRS", "Net long wave (surface)" "W/m^2"
-113 2 14 1 "NSWRT", "Net short wave (top)" "W/m^2"
-114 2 14 1 "NLWRT", "Net long wave (top)" "W/m^2"
-115 2 14 1 "LWAVR", "Long wave" "W/m^2"
-116 2 14 1 "SWAVR", "Short wave" "W/m^2"
-117 2 14 1 "GRAD", "Global radiation" "W/m^2"
-118 2 14 1 "BRTMP", "Brightness temperature" "K"
-119 2 14 1 "LWRAD", "Radiance with respect to wave no." "W/m/sr"
-120 2 14 1 "SWRAD", "Radiance with respect ot wave len." "W/m^3/sr"
-121 2 14 1 "LHTFL", "Latent heat flux" "W/m^2"
-122 2 14 1 "SHTFL", "Sensible heat flux" "W/m^2"
-123 2 14 1 "BLYDP", "Boundary layer dissipation" "W/m^2"
-124 2 14 1 "UFLX", "Zonal momentum flux" "N/m^2"
-125 2 14 1 "VFLX", "Meridional momentum flux" "N/m^2"
-126 2 14 1 "WMIXE", "Wind mixing energy" "J"
-127 2 14 1 "IMGD", "Image data" ""
-128 2 14 1 "TMPF", "TEMPERATURE (Fahrenheit)" "F"
-129 2 14 1 "MAXK", "DAYTIME MAX TEMP (MAX) (Kelvin)" "K"
-130 2 14 1 "MAXF", "DAYTIME MAX TEMP (MAX) (deg F)" "F"
-131 2 14 1 "NMAXK", "NORMAL MAX TEMPERATURE (Kelvin)" "K"
-132 2 14 1 "NMAXF", "NORMAL MAX TEMPERATURE (deg F)" "F"
-133 2 14 1 "DMAXK", "DEPARTURE FROM NORMAL MAX (K)" "K"
-134 2 14 1 "DMAXF", "DEPARTURE FROM NORMAL MAX (deg F)" "F"
-135 2 14 1 "MINK", "NIGHTTIME MIN TEMP (MIN) (Kelvin)" "K"
-136 2 14 1 "MINF", "NIGHTTIME MIN TEMP (MIN) (deg F)" "F"
-137 2 14 1 "NMINK", "NORMAL MIN TEMPERATURE (Kelvin)" "K"
-138 2 14 1 "NMINF", "NORMAL NIGHTTIME MIN TEMP (deg F)" "F"
-139 2 14 1 "DMINK", "DEPARTURE FROM NORMAL MIN (K)" "K"
-140 2 14 1 "DMINF", "DEPARTURE FROM NORMAL MIN (deg F)" "F"
-141 2 14 1 "DWPF", "DEW POINT TEMPERATURE (deg F)" "F"
-142 2 14 1 "DPDF", "DEW POINT DEPRESSION (deg F)" "F"
-143 2 14 1 "HTINF", "HEAT INDEX (deg F)" "F"
-144 2 14 1 "WNCHF", "WIND CHILL (deg F)" "F"
-145 2 14 1 "var145", "undefined" ""
-146 2 14 1 "POP", "PROB OF 0.01 IN. OF PRECIP (PoP)" "%"
-147 2 14 1 "PQPF2", "PROB OF QPF >= 0.10 INCHES" "%"
-148 2 14 1 "PQPF3", "PROB OF QPF >= 0.25 INCHES" "%"
-149 2 14 1 "PQPF4", "PROB OF QPF >= 0.50 INCHES" "%"
-150 2 14 1 "PQPF5", "PROB OF QPF >= 1.00 INCHES" "%"
-151 2 14 1 "PQPF6", "PROB OF QPF >= 2.00 INCHES" "%"
-152 2 14 1 "PQPF7", "PROB OF QPF >= 3.00 INCHES FUTURE" "%"
-153 2 14 1 "BQPF", "BEST CATEGORY OF QPF" "num"
-154 2 14 1 "NPOP", "NML REL. FREQ. OF 0.01 IN OF PCP" "%"
-155 2 14 1 "DPOP", "DEPARTURE FROM NML OF 0.01 POP" "%"
-156 2 14 1 "PCPM", "EXPECTED VALUE OF PRECIPITATION" "mm"
-157 2 14 1 "PCPI", "EXPECTED VALUE OF PRECIPITATION" "in"
-158 2 14 1 "CPCPM", "CONDITIONAL EXPECTED PRECIP AMT" "mm"
-159 2 14 1 "CPCPI", "CONDITIONAL EXPECTED PRECIP AMT" "in"
-160 2 14 1 "PSNA1", "PROB OF SNOW AMOUNT >= 0.10" "%"
-161 2 14 1 "PSNA2", "PROB OF SNOW AMOUNT >= 2 INCHES" "%"
-162 2 14 1 "PSNA3", "PROB OF SNOW AMOUNT >= 4 INCHES" "%"
-163 2 14 1 "PSNA4", "PROB OF SNOW AMOUNT >= 6 INCHES" "%"
-164 2 14 1 "PSNA5", "PROB OF SNOW AMOUNT >= 8 INCHES" "%"
-165 2 14 1 "BSNA", "BEST CATEGORY FOR SNOW AMOUNT" "num"
-166 2 14 1 "SNWM", "EXPECTED VALUE OF SNOW AMOUNT" "mm"
-167 2 14 1 "SNWI", "EXPECTED VALUE OF SNOW AMOUNT" "in"
-168 2 14 1 "MWSPK", "INFLATED MAX WIND SPEED (knots)" "kts"
-169 2 14 1 "IWSPM", "INFLATED WIND SPEED (meter/sec)" "m/s"
-170 2 14 1 "SKNT", "INFLATED WIND SPEED (knots)" "kts"
-171 2 14 1 "PWSP1", "PROB OF MAX WIND SPEED 0-12 kts" "%"
-172 2 14 1 "PWSP2", "PROB OF MAX WIND SPEED 13-21 kts" "%"
-173 2 14 1 "PWSP3", "PROB OF MAX WIND SPEED 22-31 kts" "%"
-174 2 14 1 "PWSP4", "PROB OF MAX WIND SPEED >=32 kts" "%"
-175 2 14 1 "WSPDC", "CATEGORICAL MAX WIND SPEED" "num"
-176 2 14 1 "XSPDM", "EXPECTED VALUE OF MAX WIND SPEED" "m/s"
-177 2 14 1 "XSPDK", "EXPECTED VALUE OF MAX WIND SPEED" "kts"
-178 2 14 1 "PWDRN", "PROB OF WIND DIRECTION NORTH" "%"
-179 2 14 1 "PWDRNE", "PROB OF WIND DIRECTION NORTHEAST" "%"
-180 2 14 1 "PWDRE", "PROB OF WIND DIRECTION EAST" "%"
-181 2 14 1 "PWDRSE", "PROB OF WIND DIRECTION SOUTHEAST" "%"
-182 2 14 1 "PWDRS", "PROB OF WIND DIRECTION SOUTH" "%"
-183 2 14 1 "PWDRSW", "PROB OF WIND DIRECTION SOUTHWEST" "%"
-184 2 14 1 "PWDRW", "PROB OF WIND DIRECTION WEST" "%"
-185 2 14 1 "PWDRNW", "PROB OF WIND DIRECTION NORTHWEST" "%"
-186 2 14 1 "WDIRC", "CATEGORICAL WIND DIRECTION" "num"
-187 2 14 1 "var187", "undefined" ""
-188 2 14 1 "PSKCL", "PROB OF TOTAL SKY" ""
-189 2 14 1 "PSKFW", "PROB OF TOTAL SKY" ""
-190 2 14 1 "PSKSC", "PROB OF TOTAL SKY" ""
-191 2 14 1 "PSKBK", "PROB OF TOTAL SKY" ""
-192 2 14 1 "PSKOV", "PROB OF TOTAL SKY" ""
-193 2 14 1 "SKYC", "CATEGORICAL TOTAL SKY COVER" "num"
-194 2 14 1 "MSKCL", "PROB MEAN SKY CVR" ""
-195 2 14 1 "MSKOV", "PROB MEAN SKY CVR" ""
-196 2 14 1 "MSKMC", "PROB MEAN SKY CVR" ""
-197 2 14 1 "MSKPC", "PROB MEAN SKY CVR" ""
-198 2 14 1 "MSKMO", "PROB MEAN SKY CVR" ""
-199 2 14 1 "MSKYC", "CATEGORICAL MEAN SKY COVER" "num"
-200 2 14 1 "PCIG1", "PROB OF CIG HGT < 200 FT" "%"
-201 2 14 1 "PCIG2", "PROB OF CIG HGT 200-400 FT" "%"
-202 2 14 1 "PCIG3", "PROB OF CIG HGT 500-900 FT" "%"
-203 2 14 1 "PCIG4", "PROB OF CIG HGT 1000-3000 FT" "%"
-204 2 14 1 "PCIG5", "PROB OF CIG HGT 3100-6500 FT" "%"
-205 2 14 1 "PCIG6", "PROB OF CIG HGT 6600-12000 FT" "%"
-206 2 14 1 "PCIG7", "PROB OF CIG HGT > 12000 FT" "%"
-207 2 14 1 "BCIG", "BEST CATEGORY OF CEILING HEIGHT" "num"
-208 2 14 1 "PVIS1", "PROB OF VIS <=1/4 MILE" "%"
-209 2 14 1 "PVIS2", "PROB OF VIS <=1/2 MILE" "%"
-210 2 14 1 "PVIS3", "PROB OF VIS <=7/8 MILE" "%"
-211 2 14 1 "PVIS4", "PROB OF VIS <=2 3/4 MILES" "%"
-212 2 14 1 "PVIS5", "PROB OF VIS <=5 MILES" "%"
-213 2 14 1 "PVIS6", "PROB OF VIS <=6 MILES" "%"
-214 2 14 1 "VISC", "CATEGORICAL VISIBILITY" "num"
-215 2 14 1 "POBVN", "PROB OF OBSTRUCTION TO VIS" ""
-216 2 14 1 "POBVH", "PROB OF OBSTRUCTION TO VIS" ""
-217 2 14 1 "POBVM", "PROB OF OBSTRUCTION TO VIS" ""
-218 2 14 1 "POBVF", "PROB OF OBSTRUCTION TO VIS" ""
-219 2 14 1 "POVBL", "PROB OF BLOWING OBVIS" "%"
-220 2 14 1 "OBVC", "BEST CATEGORY OF OBVIS" "num"
-221 2 14 1 "var221", "undefined" ""
-222 2 14 1 "NTSM", "NORMAL PROB OF THUNDERSTORMS" "%"
-223 2 14 1 "CSVR", "COND PROB OF SEVERE WEATHER" "%"
-224 2 14 1 "USVR", "UNCOND PROB OF SEVERE WX" "%"
-225 2 14 1 "NSVR", "NORMAL PROB OF SEVERE WX" "%"
-226 2 14 1 "UHAI", "UNCONDITIONAL PROB OF HAIL" "%"
-227 2 14 1 "UTOR", "UNCONDITIONAL PROB OF TORNADO" "%"
-228 2 14 1 "UTSW", "UNCOND PROB OF DAMAGING WIND" "%"
-229 2 14 1 "CFZI", "COND PROB FRZING PRECIP (INSTANT)" "%"
-230 2 14 1 "UFZI", "UNCND PROB FRZING PRECIP (INSTNT)" "%"
-231 2 14 1 "CZNI", "COND PROB FROZEN PRECIP (INSTANT)" "%"
-232 2 14 1 "UZNI", "UNCND PROB FROZEN PRECIP (INSTNT)" "%"
-233 2 14 1 "CLQI", "COND PROB LIQUID PRECIP (INSTANT)" "%"
-234 2 14 1 "ULQI", "UNCND PROB LIQUID PRECIP (INSTNT)" "%"
-235 2 14 1 "PTYPI", "CATEGORICAL PRECIP TYPE (INSTANT)" "num"
-236 2 14 1 "CPOZP", "COND PROB OF FRZING PRECIP" "%"
-237 2 14 1 "UPOZP", "UNCOND PROB OF FRZING PRECIP" "%"
-238 2 14 1 "CPOS", "COND PROB OF SNOW (CPoS)" "%"
-239 2 14 1 "UPOS", "UNCOND PROB OF SNOW (CPoS)" "%"
-240 2 14 1 "CPORS", "COND PROB OF RAIN/SNOW MIXED" "%"
-241 2 14 1 "UPORS", "UNCOND PROB OF RAIN/SNOW MIXED" "%"
-242 2 14 1 "CPORA", "COND PROB OF RAIN" "%"
-243 2 14 1 "var243", "undefined" ""
-244 2 14 1 "BPCPT", "BEST CATEGORY OF PRECIP TYPE" "num"
-245 2 14 1 "POPOH", "POPO PRECIP OCCURRING AT AN HOUR" "%"
-246 2 14 1 "POPOP", "POPO PRECIP DURING A PERIOD" "%"
-247 2 14 1 "CPDRZ", "COND PROB OF DRIZZLE" "%"
-248 2 14 1 "CPSTY", "COND PROB OF CONT (STEADY) PRECIP" "%"
-249 2 14 1 "CPSHW", "COND PROB OF SHOWERS" "%"
-250 2 14 1 "BPCHR", "BEST CAT PRECIP CHARACTERISTIC" "num"
-251 2 14 1 "SUNSH", "PERCENT OF POSSIBLE SUNSHINE" "%"
-252 2 14 1 "HRSUN", "HOURS OF SUNSHINE" "hrs"
-253 2 14 1 "SCQP", "SCAN 0-3H CATEGORICAL QPF" "num"
-254 2 14 1 "SCTS", "SCAN 0-3H C-G LIGHTNING PROB" "%"
-255 2 14 1 "var255", "undefined" ""
+0 2 7 2 "var0" "undefined" ""
+1 2 7 2 "PRES" "Pressure" "Pa",
+2 2 7 2 "PRMSL" "Pressure reduced to MSL" "Pa",
+3 2 7 2 "PTEND" "Pressure tendency" "Pa/s",
+4 2 7 2 "var4" "undefined" ""
+5 2 7 2 "var5" "undefined" ""
+6 2 7 2 "GP" "Geopotential" "m^2/s^2",
+7 2 7 2 "HGT" "Geopotential height" "gpm",
+8 2 7 2 "DIST" "Geometric height" "m",
+9 2 7 2 "HSTDV" "Std dev of height" "m",
+10 2 7 2 "HVAR" "Variance of height" "m^2",
+11 2 7 2 "TMP" "Temp." "K",
+12 2 7 2 "VTMP" "Virtual temp." "K",
+13 2 7 2 "POT" "Potential temp." "K",
+14 2 7 2 "EPOT" "Pseudo-adiabatic pot. temp." "K",
+15 2 7 2 "TMAX" "Max. temp." "K",
+16 2 7 2 "TMIN" "Min. temp." "K",
+17 2 7 2 "DPT" "Dew point temp." "K",
+18 2 7 2 "DEPR" "Dew point depression" "K",
+19 2 7 2 "LAPR" "Lapse rate" "K/m",
+20 2 7 2 "VISIB" "Visibility" "m",
+21 2 7 2 "RDSP1" "Radar spectra (1)" "non-dim",
+22 2 7 2 "RDSP2" "Radar spectra (2)" "non-dim",
+23 2 7 2 "RDSP3" "Radar spectra (3)" "non-dim",
+24 2 7 2 "var24" "undefined" ""
+25 2 7 2 "TMPA" "Temp. anomaly" "K",
+26 2 7 2 "PRESA" "Pressure anomaly" "Pa",
+27 2 7 2 "GPA" "Geopotential height anomaly" "gpm",
+28 2 7 2 "WVSP1" "Wave spectra (1)" "non-dim",
+29 2 7 2 "WVSP2" "Wave spectra (2)" "non-dim",
+30 2 7 2 "WVSP3" "Wave spectra (3)" "non-dim",
+31 2 7 2 "WDIR" "Wind direction" "deg",
+32 2 7 2 "WIND" "Wind speed" "m/s",
+33 2 7 2 "UGRD" "u wind" "m/s",
+34 2 7 2 "VGRD" "v wind" "m/s",
+35 2 7 2 "STRM" "Stream function" "m^2/s",
+36 2 7 2 "VPOT" "Velocity potential" "m^2/s",
+37 2 7 2 "MNTSF" "Montgomery stream function" "m^2/s^2",
+38 2 7 2 "SGCVV" "Sigma coord. vertical velocity" "/s",
+39 2 7 2 "VVEL" "Pressure vertical velocity" "Pa/s",
+40 2 7 2 "DZDT" "Geometric vertical velocity" "m/s",
+41 2 7 2 "ABSV" "Absolute vorticity" "/s",
+42 2 7 2 "ABSD" "Absolute divergence" "/s",
+43 2 7 2 "RELV" "Relative vorticity" "/s",
+44 2 7 2 "RELD" "Relative divergence" "/s",
+45 2 7 2 "VUCSH" "Vertical u shear" "/s",
+46 2 7 2 "VVCSH" "Vertical v shear" "/s",
+47 2 7 2 "DIRC" "Direction of current" "deg",
+48 2 7 2 "SPC" "Speed of current" "m/s",
+49 2 7 2 "UOGRD" "u of current" "m/s",
+50 2 7 2 "VOGRD" "v of current" "m/s",
+51 2 7 2 "SPFH" "Specific humidity" "kg/kg",
+52 2 7 2 "RH" "Relative humidity" "%",
+53 2 7 2 "MIXR" "Humidity mixing ratio" "kg/kg",
+54 2 7 2 "PWAT" "Precipitable water" "kg/m^2",
+55 2 7 2 "VAPP" "Vapor pressure" "Pa",
+56 2 7 2 "SATD" "Saturation deficit" "Pa",
+57 2 7 2 "EVP" "Evaporation" "kg/m^2",
+58 2 7 2 "CICE" "Cloud Ice" "kg/kg",
+59 2 7 2 "PRATE" "Precipitation rate" "kg/m^2/s",
+60 2 7 2 "TSTM" "Thunderstorm probability" "%",
+61 2 7 2 "APCP" "Total precipitation" "kg/m^2",
+62 2 7 2 "NCPCP" "Large scale precipitation" "kg/m^2",
+63 2 7 2 "ACPCP" "Convective precipitation" "kg/m^2",
+64 2 7 2 "SRWEQ" "Snowfall rate water equiv." "kg/m^2/s",
+65 2 7 2 "WEASD" "Accum. snow" "kg/m^2",
+66 2 7 2 "SNOD" "Snow depth" "m",
+67 2 7 2 "MIXHT" "Mixed layer depth" "m",
+68 2 7 2 "TTHDP" "Transient thermocline depth" "m",
+69 2 7 2 "MTHD" "Main thermocline depth" "m",
+70 2 7 2 "MTHA" "Main thermocline anomaly" "m",
+71 2 7 2 "TCDC" "Total cloud cover" "%",
+72 2 7 2 "CDCON" "Convective cloud cover" "%",
+73 2 7 2 "LCDC" "Low level cloud cover" "%",
+74 2 7 2 "MCDC" "Mid level cloud cover" "%",
+75 2 7 2 "HCDC" "High level cloud cover" "%",
+76 2 7 2 "CWAT" "Cloud water" "kg/m^2",
+77 2 7 2 "var77" "undefined" ""
+78 2 7 2 "SNOC" "Convective snow" "kg/m^2",
+79 2 7 2 "SNOL" "Large scale snow" "kg/m^2",
+80 2 7 2 "WTMP" "Water temp." "K",
+81 2 7 2 "LAND" "Land-sea mask" "1=land; 0=sea",
+82 2 7 2 "DSLM" "Deviation of sea level from mean" "m",
+83 2 7 2 "SFCR" "Surface roughness" "m",
+84 2 7 2 "ALBDO" "Albedo" "%",
+85 2 7 2 "TSOIL" "Soil temp." "K",
+86 2 7 2 "SOILM" "Soil moisture content" "kg/m^2",
+87 2 7 2 "VEG" "Vegetation" "%",
+88 2 7 2 "SALTY" "Salinity" "kg/kg",
+89 2 7 2 "DEN" "Density" "kg/m^3",
+90 2 7 2 "RUNOF" "Runoff" "kg/m^2",
+91 2 7 2 "ICEC" "Ice concentration" "ice=1;no ice=0",
+92 2 7 2 "ICETK" "Ice thickness" "m",
+93 2 7 2 "DICED" "Direction of ice drift" "deg",
+94 2 7 2 "SICED" "Speed of ice drift" "m/s",
+95 2 7 2 "UICE" "u of ice drift" "m/s",
+96 2 7 2 "VICE" "v of ice drift" "m/s",
+97 2 7 2 "ICEG" "Ice growth rate" "m/s",
+98 2 7 2 "ICED" "Ice divergence" "/s",
+99 2 7 2 "SNOM" "Snow melt" "kg/m^2",
+100 2 7 2 "HTSGW" "Sig height of wind waves and swell" "m",
+101 2 7 2 "WVDIR" "Direction of wind waves" "deg",
+102 2 7 2 "WVHGT" "Sig height of wind waves" "m",
+103 2 7 2 "WVPER" "Mean period of wind waves" "s",
+104 2 7 2 "SWDIR" "Direction of swell waves" "deg",
+105 2 7 2 "SWELL" "Sig height of swell waves" "m",
+106 2 7 2 "SWPER" "Mean period of swell waves" "s",
+107 2 7 2 "DIRPW" "Primary wave direction" "deg",
+108 2 7 2 "PERPW" "Primary wave mean period" "s",
+109 2 7 2 "DIRSW" "Secondary wave direction" "deg",
+110 2 7 2 "PERSW" "Secondary wave mean period" "s",
+111 2 7 2 "NSWRS" "Net short wave (surface)" "W/m^2",
+112 2 7 2 "NLWRS" "Net long wave (surface)" "W/m^2",
+113 2 7 2 "NSWRT" "Net short wave (top)" "W/m^2",
+114 2 7 2 "NLWRT" "Net long wave (top)" "W/m^2",
+115 2 7 2 "LWAVR" "Long wave" "W/m^2",
+116 2 7 2 "SWAVR" "Short wave" "W/m^2",
+117 2 7 2 "GRAD" "Global radiation" "W/m^2",
+118 2 7 2 "var118" "undefined" ""
+119 2 7 2 "var119" "undefined" ""
+120 2 7 2 "var120" "undefined" ""
+121 2 7 2 "LHTFL" "Latent heat flux" "W/m^2",
+122 2 7 2 "SHTFL" "Sensible heat flux" "W/m^2",
+123 2 7 2 "BLYDP" "Boundary layer dissipation" "W/m^2",
+124 2 7 2 "UFLX" "Zonal momentum flux" "N/m^2",
+125 2 7 2 "VFLX" "Meridional momentum flux" "N/m^2",
+126 2 7 2 "WMIXE" "Wind mixing energy" "J",
+127 2 7 2 "IMGD" "Image data" "integer",
+128 2 7 2 "MSLSA" "Mean sea level pressure (Std Atm)" "Pa",
+129 2 7 2 "MSLMA" "Mean sea level pressure (MAPS)" "Pa",
+130 2 7 2 "MSLET" "Mean sea level pressure (ETA model)" "Pa",
+131 2 7 2 "LFTX" "Surface lifted index" "K",
+132 2 7 2 "4LFTX" "Best (4-layer) lifted index" "K",
+133 2 7 2 "KX" "K index" "K",
+134 2 7 2 "SX" "Sweat index" "K",
+135 2 7 2 "MCONV" "Horizontal moisture divergence" "kg/kg/s",
+136 2 7 2 "VSSH" "Vertical speed shear" "1/s",
+137 2 7 2 "TSLSA" "3-hr pressure tendency" "Pa/s",
+138 2 7 2 "BVF2" "Brunt-Vaisala frequency^2" "1/s^2",
+139 2 7 2 "PVMW" "Potential vorticity (mass-weighted)" "1/s/m",
+140 2 7 2 "CRAIN" "Categorical rain" "yes=1;no=0",
+141 2 7 2 "CFRZR" "Categorical freezing rain" "yes=1;no=0",
+142 2 7 2 "CICEP" "Categorical ice pellets" "yes=1;no=0",
+143 2 7 2 "CSNOW" "Categorical snow" "yes=1;no=0",
+144 2 7 2 "SOILW" "Volumetric soil moisture" "fraction",
+145 2 7 2 "PEVPR" "Potential evaporation rate" "W/m^2",
+146 2 7 2 "CWORK" "Cloud work function" "J/kg",
+147 2 7 2 "U-GWD" "Zonal gravity wave stress" "N/m^2",
+148 2 7 2 "V-GWD" "Meridional gravity wave stress" "N/m^2",
+149 2 7 2 "PV___" "Potential vorticity" "m^2/s/kg",
+150 2 7 2 "var150" "undefined" ""
+151 2 7 2 "var151" "undefined" ""
+152 2 7 2 "var152" "undefined" ""
+153 2 7 2 "MFXDV" "Moisture flux divergence" "gr/gr*m/s/m",
+154 2 7 2 "var154" "undefined" ""
+155 2 7 2 "GFLUX" "Ground heat flux" "W/m^2",
+156 2 7 2 "CIN" "Convective inhibition" "J/kg",
+157 2 7 2 "CAPE" "Convective Avail. Pot. Energy" "J/kg",
+158 2 7 2 "TKE" "Turbulent kinetic energy" "J/kg",
+159 2 7 2 "CONDP" "Lifted parcel condensation pressure" "Pa",
+160 2 7 2 "CSUSF" "Clear sky upward solar flux" "W/m^2",
+161 2 7 2 "CSDSF" "Clear sky downward solar flux" "W/m^2",
+162 2 7 2 "CSULF" "Clear sky upward long wave flux" "W/m^2",
+163 2 7 2 "CSDLF" "Clear sky downward long wave flux" "W/m^2",
+164 2 7 2 "CFNSF" "Cloud forcing net solar flux" "W/m^2",
+165 2 7 2 "CFNLF" "Cloud forcing net long wave flux" "W/m^2",
+166 2 7 2 "VBDSF" "Visible beam downward solar flux" "W/m^2",
+167 2 7 2 "VDDSF" "Visible diffuse downward solar flux" "W/m^2",
+168 2 7 2 "NBDSF" "Near IR beam downward solar flux" "W/m^2",
+169 2 7 2 "NDDSF" "Near IR diffuse downward solar flux" "W/m^2",
+170 2 7 2 "USTR" "U wind stress" "N/m^2",
+171 2 7 2 "VSTR" "V wind stress" "N/m^2",
+172 2 7 2 "MFLX" "Momentum flux" "N/m^2",
+173 2 7 2 "LMH" "Mass point model surface" "integer",
+174 2 7 2 "LMV" "Velocity point model surface" "integer",
+175 2 7 2 "SGLYR" "Nearby model level" "integer",
+176 2 7 2 "NLAT" "Latitude" "deg",
+177 2 7 2 "ELON" "Longitude" "deg",
+178 2 7 2 "UMAS" "Mass weighted u" "gm/m*K*s",
+179 2 7 2 "VMAS" "Mass weighted v" "gm/m*K*s",
+180 2 7 2 "XPRATE" "corrected precip" "kg/m^2/s",
+181 2 7 2 "LPSX" "x-gradient of log pressure" "1/m",
+182 2 7 2 "LPSY" "y-gradient of log pressure" "1/m",
+183 2 7 2 "HGTX" "x-gradient of height" "m/m",
+184 2 7 2 "HGTY" "y-gradient of height" "m/m",
+185 2 7 2 "STDZ" "Std dev of Geop. hgt." "m",
+186 2 7 2 "STDU" "Std dev of zonal wind" "m/s",
+187 2 7 2 "STDV" "Std dev of meridional wind" "m/s",
+188 2 7 2 "STDQ" "Std dev of spec. hum." "gm/gm",
+189 2 7 2 "STDT" "Std dev of temp." "K",
+190 2 7 2 "CBUW" "Covar. u and omega" "m/s*Pa/s",
+191 2 7 2 "CBVW" "Covar. v and omega" "m/s*Pa/s",
+192 2 7 2 "CBUQ" "Covar. u and specific hum" "m/s*gm/gm",
+193 2 7 2 "CBVQ" "Covar. v and specific hum" "m/s*gm/gm",
+194 2 7 2 "CBTW" "Covar. T and omega" "K*Pa/s",
+195 2 7 2 "CBQW" "Covar. spec. hum and omega" "gm/gm*Pa/s",
+196 2 7 2 "CBMZW" "Covar. v and u" "m^2/s^2",
+197 2 7 2 "CBTZW" "Covar. u and T" "K*m/s",
+198 2 7 2 "CBTMW" "Covar. v and T" "K*m/s",
+199 2 7 2 "STDRH" "Std dev of Rel. Hum." "%",
+200 2 7 2 "SDTZ" "Std dev of time tend of geop. hgt" "m",
+201 2 7 2 "ICWAT" "Ice-free water surface" "%",
+202 2 7 2 "SDTU" "Std dev of time tend of zonal wind" "m/s",
+203 2 7 2 "SDTV" "Std dev of time tend of merid wind" "m/s",
+204 2 7 2 "DSWRF" "Downward solar radiation flux" "W/m^2",
+205 2 7 2 "DLWRF" "Downward long wave flux" "W/m^2",
+206 2 7 2 "SDTQ" "Std dev of time tend of spec. hum" "gm/gm",
+207 2 7 2 "MSTAV" "Moisture availability" "%",
+208 2 7 2 "SFEXC" "Exchange coefficient" "kg*m/m^3/s",
+209 2 7 2 "MIXLY" "No. of mixed layers next to sfc" "integer",
+210 2 7 2 "SDTT" "Std dev of time tend of temp." "K",
+211 2 7 2 "USWRF" "Upward solar radiation flux" "W/m^2",
+212 2 7 2 "ULWRF" "Upward long wave flux" "W/m^2",
+213 2 7 2 "CDLYR" "Non-convective cloud" "%",
+214 2 7 2 "CPRAT" "Convective precip. rate" "kg/m^2/s",
+215 2 7 2 "TTDIA" "Temp. tendency by all physics" "K/s",
+216 2 7 2 "TTRAD" "Temp. tendency by all radiation" "K/s",
+217 2 7 2 "TTPHY" "Temp. tendency by nonrad physics" "K/s",
+218 2 7 2 "PREIX" "Precipitation index" "fraction",
+219 2 7 2 "TSD1D" "Std dev of IR T over 1x1 deg area" "K",
+220 2 7 2 "NLSGP" "Natural log of surface pressure" "ln(kPa)",
+221 2 7 2 "SDTRH" "Std dev of time tend of rel hum" "%",
+222 2 7 2 "5WAVH" "5-wave geopotential height" "gpm",
+223 2 7 2 "CNWAT" "Plant canopy surface water" "kg/m^2",
+224 2 7 2 "PLTRS" "Max. stomato plant resistance" "s/m",
+225 2 7 2 "RHCLD" "RH-type cloud cover" "%",
+226 2 7 2 "BMIXL" "Blackadar's mixing length scale" "m",
+227 2 7 2 "AMIXL" "Asymptotic mixing length scale" "m",
+228 2 7 2 "PEVAP" "Pot. evaporation" "kg/m^2",
+229 2 7 2 "SNOHF" "Snow melt heat flux" "W/m^2",
+230 2 7 2 "SNOEV" "Snow sublimation heat flux" "W/m^2",
+231 2 7 2 "MFLUX" "Convective cloud mass flux" "Pa/s",
+232 2 7 2 "DTRF" "Downward total radiation flux" "W/m^2",
+233 2 7 2 "UTRF" "Upward total radiation flux" "W/m^2",
+234 2 7 2 "BGRUN" "Baseflow-groundwater runoff" "kg/m^2",
+235 2 7 2 "SSRUN" "Storm surface runoff" "kg/m^2",
+236 2 7 2 "var236" "undefined" ""
+237 2 7 2 "OZONE" "Total column ozone" "Dobson",
+238 2 7 2 "SNOWC" "Snow cover" "%",
+239 2 7 2 "SNOT" "Snow temp." "K",
+240 2 7 2 "GLCR" "Permanent snow points" "mask",
+241 2 7 2 "LRGHR" "Large scale condensation heating" "K/s",
+242 2 7 2 "CNVHR" "Deep convective heating" "K/s",
+243 2 7 2 "CNVMR" "Deep convective moistening" "kg/kg/s",
+244 2 7 2 "SHAHR" "Shallow convective heating" "K/s",
+245 2 7 2 "SHAMR" "Shallow convective moistening" "kg/kg/s",
+246 2 7 2 "VDFHR" "Vertical diffusion heating" "K/s",
+247 2 7 2 "VDFUA" "Vertical diffusion zonal accel" "m/s^2",
+248 2 7 2 "VDFVA" "Vertical diffusion meridional accel" "m/s^2",
+249 2 7 2 "VDFMR" "Vertical diffusion moistening" "kg/kg/s",
+250 2 7 2 "SWHR" "Solar radiative heating" "K/s",
+251 2 7 2 "LWHR" "Longwave radiative heating" "K/s",
+252 2 7 2 "CD" "Drag coefficient" "non-dim",
+253 2 7 2 "FRICV" "Friction velocity" "m/s",
+254 2 7 2 "RI" "Richardson number" "non-dim",
+255 2 7 2 "var255" "undefined" ""
+0 2 7 14 "var0" "undefined" ""
+1 2 7 14 "PRES" "Pressure" "Pa"
+2 2 7 14 "PRMSL" "Pressure reduced to MSL" "Pa"
+3 2 7 14 "PTEND" "Pressure tendency" "Pa/s"
+4 2 7 14 "PVORT" "Pot. vorticity" "km^2/kg/s"
+5 2 7 14 "ICAHT" "ICAO Standard Atmosphere Reference Height" "M"
+6 2 7 14 "GP" "Geopotential" "m^2/s^2"
+7 2 7 14 "HGT" "Geopotential height" "gpm"
+8 2 7 14 "DIST" "Geometric height" "m"
+9 2 7 14 "HSTDV" "Std dev of height" "m"
+10 2 7 14 "TOZNE" "Total ozone" "Dobson"
+11 2 7 14 "TMP" "Temp." "K"
+12 2 7 14 "VTMP" "Virtual temp." "K"
+13 2 7 14 "POT" "Potential temp." "K"
+14 2 7 14 "EPOT" "Pseudo-adiabatic pot. temp." "K"
+15 2 7 14 "TMAX" "Max. temp." "K"
+16 2 7 14 "TMIN" "Min. temp." "K"
+17 2 7 14 "DPT" "Dew point temp." "K"
+18 2 7 14 "DEPR" "Dew point depression" "K"
+19 2 7 14 "LAPR" "Lapse rate" "K/m"
+20 2 7 14 "VIS" "Visibility" "m"
+21 2 7 14 "RDSP1" "Radar spectra (1)" "non-dim"
+22 2 7 14 "RDSP2" "Radar spectra (2)" "non-dim"
+23 2 7 14 "RDSP3" "Radar spectra (3)" "non-dim"
+24 2 7 14 "PLI" "Parcel lifted index (to 500 hPa)" "K"
+25 2 7 14 "TMPA" "Temp. anomaly" "K"
+26 2 7 14 "PRESA" "Pressure anomaly" "Pa"
+27 2 7 14 "GPA" "Geopotential height anomaly" "gpm"
+28 2 7 14 "WVSP1" "Wave spectra (1)" "non-dim"
+29 2 7 14 "WVSP2" "Wave spectra (2)" "non-dim"
+30 2 7 14 "WVSP3" "Wave spectra (3)" "non-dim"
+31 2 7 14 "WDIR" "Wind direction" "deg"
+32 2 7 14 "WIND" "Wind speed" "m/s"
+33 2 7 14 "UGRD" "u wind" "m/s"
+34 2 7 14 "VGRD" "v wind" "m/s"
+35 2 7 14 "STRM" "Stream function" "m^2/s"
+36 2 7 14 "VPOT" "Velocity potential" "m^2/s"
+37 2 7 14 "MNTSF" "Montgomery stream function" "m^2/s^2"
+38 2 7 14 "SGCVV" "Sigma coord. vertical velocity" "/s"
+39 2 7 14 "VVEL" "Pressure vertical velocity" "Pa/s"
+40 2 7 14 "DZDT" "Geometric vertical velocity" "m/s"
+41 2 7 14 "ABSV" "Absolute vorticity" "/s"
+42 2 7 14 "ABSD" "Absolute divergence" "/s"
+43 2 7 14 "RELV" "Relative vorticity" "/s"
+44 2 7 14 "RELD" "Relative divergence" "/s"
+45 2 7 14 "VUCSH" "Vertical u shear" "/s"
+46 2 7 14 "VVCSH" "Vertical v shear" "/s"
+47 2 7 14 "DIRC" "Direction of current" "deg"
+48 2 7 14 "SPC" "Speed of current" "m/s"
+49 2 7 14 "UOGRD" "u of current" "m/s"
+50 2 7 14 "VOGRD" "v of current" "m/s"
+51 2 7 14 "SPFH" "Specific humidity" "kg/kg"
+52 2 7 14 "RH" "Relative humidity" "%"
+53 2 7 14 "MIXR" "Humidity mixing ratio" "kg/kg"
+54 2 7 14 "PWAT" "Precipitable water" "kg/m^2"
+55 2 7 14 "VAPP" "Vapor pressure" "Pa"
+56 2 7 14 "SATD" "Saturation deficit" "Pa"
+57 2 7 14 "EVP" "Evaporation" "kg/m^2"
+58 2 7 14 "CICE" "Cloud Ice" "kg/m^2"
+59 2 7 14 "PRATE" "Precipitation rate" "kg/m^2/s"
+60 2 7 14 "TSTM" "Thunderstorm probability" "%"
+61 2 7 14 "APCP" "Total precipitation" "kg/m^2"
+62 2 7 14 "NCPCP" "Large scale precipitation" "kg/m^2"
+63 2 7 14 "ACPCP" "Convective precipitation" "kg/m^2"
+64 2 7 14 "SRWEQ" "Snowfall rate water equiv." "kg/m^2/s"
+65 2 7 14 "WEASD" "Accum. snow" "kg/m^2"
+66 2 7 14 "SNOD" "Snow depth" "m"
+67 2 7 14 "MIXHT" "Mixed layer depth" "m"
+68 2 7 14 "TTHDP" "Transient thermocline depth" "m"
+69 2 7 14 "MTHD" "Main thermocline depth" "m"
+70 2 7 14 "MTHA" "Main thermocline anomaly" "m"
+71 2 7 14 "TCDC" "Total cloud cover" "%"
+72 2 7 14 "CDCON" "Convective cloud cover" "%"
+73 2 7 14 "LCDC" "Low level cloud cover" "%"
+74 2 7 14 "MCDC" "Mid level cloud cover" "%"
+75 2 7 14 "HCDC" "High level cloud cover" "%"
+76 2 7 14 "CWAT" "Cloud water" "kg/m^2"
+77 2 7 14 "BLI" "Best lifted index (to 500 hPa)" "K"
+78 2 7 14 "SNOC" "Convective snow" "kg/m^2"
+79 2 7 14 "SNOL" "Large scale snow" "kg/m^2"
+80 2 7 14 "WTMP" "Water temp." "K"
+81 2 7 14 "LAND" "Land cover (land=1;sea=0)" "fraction"
+82 2 7 14 "DSLM" "Deviation of sea level from mean" "m"
+83 2 7 14 "SFCR" "Surface roughness" "m"
+84 2 7 14 "ALBDO" "Albedo" "%"
+85 2 7 14 "TSOIL" "Soil temp." "K"
+86 2 7 14 "SOILM" "Soil moisture content" "kg/m^2"
+87 2 7 14 "VEG" "Vegetation" "%"
+88 2 7 14 "SALTY" "Salinity" "kg/kg"
+89 2 7 14 "DEN" "Density" "kg/m^3"
+90 2 7 14 "WATR" "Water runoff" "kg/m^2"
+91 2 7 14 "ICEC" "Ice concentration (ice=1;no ice=0)" "fraction"
+92 2 7 14 "ICETK" "Ice thickness" "m"
+93 2 7 14 "DICED" "Direction of ice drift" "deg"
+94 2 7 14 "SICED" "Speed of ice drift" "m/s"
+95 2 7 14 "UICE" "u of ice drift" "m/s"
+96 2 7 14 "VICE" "v of ice drift" "m/s"
+97 2 7 14 "ICEG" "Ice growth rate" "m/s"
+98 2 7 14 "ICED" "Ice divergence" "/s"
+99 2 7 14 "SNOM" "Snow melt" "kg/m^2"
+100 2 7 14 "HTSGW" "Sig height of wind waves and swell" "m"
+101 2 7 14 "WVDIR" "Direction of wind waves" "deg"
+102 2 7 14 "WVHGT" "Sig height of wind waves" "m"
+103 2 7 14 "WVPER" "Mean period of wind waves" "s"
+104 2 7 14 "SWDIR" "Direction of swell waves" "deg"
+105 2 7 14 "SWELL" "Sig height of swell waves" "m"
+106 2 7 14 "SWPER" "Mean period of swell waves" "s"
+107 2 7 14 "DIRPW" "Primary wave direction" "deg"
+108 2 7 14 "PERPW" "Primary wave mean period" "s"
+109 2 7 14 "DIRSW" "Secondary wave direction" "deg"
+110 2 7 14 "PERSW" "Secondary wave mean period" "s"
+111 2 7 14 "NSWRS" "Net short wave (surface)" "W/m^2"
+112 2 7 14 "NLWRS" "Net long wave (surface)" "W/m^2"
+113 2 7 14 "NSWRT" "Net short wave (top)" "W/m^2"
+114 2 7 14 "NLWRT" "Net long wave (top)" "W/m^2"
+115 2 7 14 "LWAVR" "Long wave" "W/m^2"
+116 2 7 14 "SWAVR" "Short wave" "W/m^2"
+117 2 7 14 "GRAD" "Global radiation" "W/m^2"
+118 2 7 14 "BRTMP" "Brightness temperature" "K"
+119 2 7 14 "LWRAD" "Radiance with respect to wave no." "W/m/sr"
+120 2 7 14 "SWRAD" "Radiance with respect ot wave len." "W/m^3/sr"
+121 2 7 14 "LHTFL" "Latent heat flux" "W/m^2"
+122 2 7 14 "SHTFL" "Sensible heat flux" "W/m^2"
+123 2 7 14 "BLYDP" "Boundary layer dissipation" "W/m^2"
+124 2 7 14 "UFLX" "Zonal momentum flux" "N/m^2"
+125 2 7 14 "VFLX" "Meridional momentum flux" "N/m^2"
+126 2 7 14 "WMIXE" "Wind mixing energy" "J"
+127 2 7 14 "IMGD" "Image data" ""
+128 2 7 14 "MSLSA" "Mean sea level pressure (Std Atm)" "Pa"
+129 2 7 14 "MSLMA" "Mean sea level pressure (MAPS)" "Pa"
+130 2 7 14 "MSLET" "Mean sea level pressure (ETA model)" "Pa"
+131 2 7 14 "LFTX" "Surface lifted index" "K"
+132 2 7 14 "4LFTX" "Best (4-layer) lifted index" "K"
+133 2 7 14 "KX" "K index" "K"
+134 2 7 14 "SX" "Sweat index" "K"
+135 2 7 14 "MCONV" "Horizontal moisture divergence" "kg/kg/s"
+136 2 7 14 "VWSH" "Vertical speed shear" "1/s"
+137 2 7 14 "TSLSA" "3-hr pressure tendency (Std Atmos Red)" "Pa/s"
+138 2 7 14 "BVF2" "Brunt-Vaisala frequency^2" "1/s^2"
+139 2 7 14 "PVMW" "Potential vorticity (mass-weighted)" "1/s/m"
+140 2 7 14 "CRAIN" "Categorical rain" "yes=1;no=0"
+141 2 7 14 "CFRZR" "Categorical freezing rain" "yes=1;no=0"
+142 2 7 14 "CICEP" "Categorical ice pellets" "yes=1;no=0"
+143 2 7 14 "CSNOW" "Categorical snow" "yes=1;no=0"
+144 2 7 14 "SOILW" "Volumetric soil moisture" "fraction"
+145 2 7 14 "PEVPR" "Potential evaporation rate" "W/m^2"
+146 2 7 14 "CWORK" "Cloud work function" "J/kg"
+147 2 7 14 "U-GWD" "Zonal gravity wave stress" "N/m^2"
+148 2 7 14 "V-GWD" "Meridional gravity wave stress" "N/m^2"
+149 2 7 14 "PV" "Potential vorticity" "m^2/s/kg"
+150 2 7 14 "COVMZ" "Covariance between u and v" "m^2/s^2"
+151 2 7 14 "COVTZ" "Covariance between u and T" "K*m/s"
+152 2 7 14 "COVTM" "Covariance between v and T" "K*m/s"
+153 2 7 14 "CLWMR" "Cloud water" "kg/kg"
+154 2 7 14 "O3MR" "Ozone mixing ratio" "kg/kg"
+155 2 7 14 "GFLUX" "Ground heat flux" "W/m^2"
+156 2 7 14 "CIN" "Convective inhibition" "J/kg"
+157 2 7 14 "CAPE" "Convective Avail. Pot. Energy" "J/kg"
+158 2 7 14 "TKE" "Turbulent kinetic energy" "J/kg"
+159 2 7 14 "CONDP" "Lifted parcel condensation pressure" "Pa"
+160 2 7 14 "CSUSF" "Clear sky upward solar flux" "W/m^2"
+161 2 7 14 "CSDSF" "Clear sky downward solar flux" "W/m^2"
+162 2 7 14 "CSULF" "Clear sky upward long wave flux" "W/m^2"
+163 2 7 14 "CSDLF" "Clear sky downward long wave flux" "W/m^2"
+164 2 7 14 "CFNSF" "Cloud forcing net solar flux" "W/m^2"
+165 2 7 14 "CFNLF" "Cloud forcing net long wave flux" "W/m^2"
+166 2 7 14 "VBDSF" "Visible beam downward solar flux" "W/m^2"
+167 2 7 14 "VDDSF" "Visible diffuse downward solar flux" "W/m^2"
+168 2 7 14 "NBDSF" "Near IR beam downward solar flux" "W/m^2"
+169 2 7 14 "NDDSF" "Near IR diffuse downward solar flux" "W/m^2"
+170 2 7 14 "RWMR" "Rain water mixing ratio" "kg/kg"
+171 2 7 14 "SNMR" "Snow mixing ratio" "kg/kg"
+172 2 7 14 "MFLX" "Momentum flux" "N/m^2"
+173 2 7 14 "LMH" "Mass point model surface" "non-dim"
+174 2 7 14 "LMV" "Velocity point model surface" "non-dim"
+175 2 7 14 "MLYNO" "Model layer number (from bottom up)" "non-dim"
+176 2 7 14 "NLAT" "Latitude (-90 to +90)" "deg"
+177 2 7 14 "ELON" "East longitude (0-360)" "deg"
+178 2 7 14 "ICMR" "Ice mixing ratio" "kg/kg"
+179 2 7 14 "GRMR" "Graupel mixing ratio" "kg/kg"
+180 2 7 14 "GUST" "Surface wind gust" "m/s"
+181 2 7 14 "LPSX" "x-gradient of log pressure" "1/m"
+182 2 7 14 "LPSY" "y-gradient of log pressure" "1/m"
+183 2 7 14 "HGTX" "x-gradient of height" "m/m"
+184 2 7 14 "HGTY" "y-gradient of height" "m/m"
+185 2 7 14 "TURB" "Turbulence SIGMET/AIRMET" "non-dim"
+186 2 7 14 "ICNG" "Icing SIGMET/AIRMET" "non-dim"
+187 2 7 14 "LTNG" "Lightning" "non-dim"
+188 2 7 14 "DRIP" "Rate of water dropping from canopy to gnd" "kg/m^2"
+189 2 7 14 "VPTMP" "Virtual pot. temp." "K"
+190 2 7 14 "HLCY" "Storm relative helicity" "m^2/s^2"
+191 2 7 14 "PROB" "Prob. from ensemble" "non-dim"
+192 2 7 14 "PROBN" "Prob. from ensemble norm. to clim. expect." "non-dim"
+193 2 7 14 "POP" "Prob. of precipitation" "%"
+194 2 7 14 "CPOFP" "Prob. of frozen precipitation" "%"
+195 2 7 14 "CPOZP" "Prob. of freezing precipitation" "%"
+196 2 7 14 "USTM" "u-component of storm motion" "m/s"
+197 2 7 14 "VSTM" "v-component of storm motion" "m/s"
+198 2 7 14 "NCIP" "No. concen. ice particles" ""
+199 2 7 14 "EVBS" "Direct evaporation from bare soil" "W/m^2"
+200 2 7 14 "EVCW" "Canopy water evaporation" "W/m^2"
+201 2 7 14 "ICWAT" "Ice-free water surface" "%"
+202 2 7 14 "CWDI" "Convective weather detection index" ""
+203 2 7 14 "VAFTAD" "VAFTAD??" "??"
+204 2 7 14 "DSWRF" "Downward short wave flux" "W/m^2"
+205 2 7 14 "DLWRF" "Downward long wave flux" "W/m^2"
+206 2 7 14 "UVI" "Ultraviolet index" "W/m^2"
+207 2 7 14 "MSTAV" "Moisture availability" "%"
+208 2 7 14 "SFEXC" "Exchange coefficient" "(kg/m^3)(m/s)"
+209 2 7 14 "MIXLY" "No. of mixed layers next to surface" "integer"
+210 2 7 14 "TRANS" "Transpiration" "W/m^2"
+211 2 7 14 "USWRF" "Upward short wave flux" "W/m^2"
+212 2 7 14 "ULWRF" "Upward long wave flux" "W/m^2"
+213 2 7 14 "CDLYR" "Non-convective cloud" "%"
+214 2 7 14 "CPRAT" "Convective precip. rate" "kg/m^2/s"
+215 2 7 14 "TTDIA" "Temp. tendency by all physics" "K/s"
+216 2 7 14 "TTRAD" "Temp. tendency by all radiation" "K/s"
+217 2 7 14 "TTPHY" "Temp. tendency by non-radiation physics" "K/s"
+218 2 7 14 "PREIX" "Precip index (0.0-1.00)" "fraction"
+219 2 7 14 "TSD1D" "Std. dev. of IR T over 1x1 deg area" "K"
+220 2 7 14 "NLGSP" "Natural log of surface pressure" "ln(kPa)"
+221 2 7 14 "HPBL" "Planetary boundary layer height" "m"
+222 2 7 14 "5WAVH" "5-wave geopotential height" "gpm"
+223 2 7 14 "CNWAT" "Plant canopy surface water" "kg/m^2"
+224 2 7 14 "SOTYP" "Soil type (Zobler)" "0..9"
+225 2 7 14 "VGTYP" "Vegetation type (as in SiB)" "0..13"
+226 2 7 14 "BMIXL" "Blackadar's mixing length scale" "m"
+227 2 7 14 "AMIXL" "Asymptotic mixing length scale" "m"
+228 2 7 14 "PEVAP" "Pot. evaporation" "kg/m^2"
+229 2 7 14 "SNOHF" "Snow phase-change heat flux" "W/m^2"
+230 2 7 14 "5WAVA" "5-wave geopot. height anomaly" "gpm"
+231 2 7 14 "MFLUX" "Convective cloud mass flux" "Pa/s"
+232 2 7 14 "DTRF" "Downward total radiation flux" "W/m^2"
+233 2 7 14 "UTRF" "Upward total radiation flux" "W/m^2"
+234 2 7 14 "BGRUN" "Baseflow-groundwater runoff" "kg/m^2"
+235 2 7 14 "SSRUN" "Storm surface runoff" "kg/m^2"
+236 2 7 14 "SIPD" "Supercooled large droplet (SLD) icing pot. diagn." ""
+237 2 7 14 "O3TOT" "Total ozone" "kg/m^2"
+238 2 7 14 "SNOWC" "Snow cover" "%"
+239 2 7 14 "SNOT" "Snow temp." "K"
+240 2 7 14 "COVTW" "Covariance T and w" "K*m/s"
+241 2 7 14 "LRGHR" "Large scale condensation heating" "K/s"
+242 2 7 14 "CNVHR" "Deep convective heating" "K/s"
+243 2 7 14 "CNVMR" "Deep convective moistening" "kg/kg/s"
+244 2 7 14 "SHAHR" "Shallow convective heating" "K/s"
+245 2 7 14 "SHAMR" "Shallow convective moistening" "kg/kg/s"
+246 2 7 14 "VDFHR" "Vertical diffusion heating" "K/s"
+247 2 7 14 "VDFUA" "Vertical diffusion zonal accel" "m/s^2"
+248 2 7 14 "VDFVA" "Vertical diffusion meridional accel" "m/s^2"
+249 2 7 14 "VDFMR" "Vertical diffusion moistening" "kg/kg/s"
+250 2 7 14 "SWHR" "Solar radiative heating" "K/s"
+251 2 7 14 "LWHR" "Longwave radiative heating" "K/s"
+252 2 7 14 "CD" "Drag coefficient" "non-dim"
+253 2 7 14 "FRICV" "Friction velocity" "m/s"
+254 2 7 14 "RI" "Richardson number" "non-dim"
+255 2 7 14 "var255" "undefined" ""
