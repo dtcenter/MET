@@ -10,7 +10,7 @@ GRIB1
 8 2 7 0 "DIST" "Geometric height" "m"
 9 2 7 0 "HSTDV" "Std dev of height" "m"
 10 2 7 0 "HVAR" "Variance of height" "m^2"
-11 2 7 0 "TMP" "Temp." "K"
+11 2 7 0 "TMP" "Temperature" "K"
 12 2 7 0 "VTMP" "Virtual temp." "K"
 13 2 7 0 "POT" "Potential temp." "K"
 14 2 7 0 "EPOT" "Pseudo-adiabatic pot. temp." "K"
@@ -32,8 +32,8 @@ GRIB1
 30 2 7 0 "WVSP3" "Wave spectra (3)" "non-dim"
 31 2 7 0 "WDIR" "Wind direction" "deg"
 32 2 7 0 "WIND" "Wind speed" "m/s"
-33 2 7 0 "UGRD" "u wind" "m/s"
-34 2 7 0 "VGRD" "v wind" "m/s"
+33 2 7 0 "UGRD" "u-component of wind" "m/s"
+34 2 7 0 "VGRD" "v-component of wind" "m/s"
 35 2 7 0 "STRM" "Stream function" "m^2/s"
 36 2 7 0 "VPOT" "Velocity potential" "m^2/s"
 37 2 7 0 "MNTSF" "Montgomery stream function" "m^2/s^2"
@@ -266,7 +266,7 @@ GRIB1
 8 2 7 1 "DIST" "Geometric height" "m"
 9 2 7 1 "HSTDV" "Std dev of height" "m"
 10 2 7 1 "TOZNE" "Total ozone" "Dobson"
-11 2 7 1 "TMP" "Temp." "K"
+11 2 7 1 "TMP" "Temperature" "K"
 12 2 7 1 "VTMP" "Virtual temp." "K"
 13 2 7 1 "POT" "Potential temp." "K"
 14 2 7 1 "EPOT" "Pseudo-adiabatic pot. temp." "K"
@@ -288,8 +288,8 @@ GRIB1
 30 2 7 1 "WVSP3" "Wave spectra (3)" "non-dim"
 31 2 7 1 "WDIR" "Wind direction" "deg"
 32 2 7 1 "WIND" "Wind speed" "m/s"
-33 2 7 1 "UGRD" "u wind" "m/s"
-34 2 7 1 "VGRD" "v wind" "m/s"
+33 2 7 1 "UGRD" "u-component of wind" "m/s"
+34 2 7 1 "VGRD" "v-component of wind" "m/s"
 35 2 7 1 "STRM" "Stream function" "m^2/s"
 36 2 7 1 "VPOT" "Velocity potential" "m^2/s"
 37 2 7 1 "MNTSF" "Montgomery stream function" "m^2/s^2"
@@ -446,7 +446,7 @@ GRIB1
 188 2 7 1 "DRIP" "Rate of water dropping from canopy to gnd" "kg/m^2"
 189 2 7 1 "VPTMP" "Virtual pot. temp." "K"
 190 2 7 1 "HLCY" "Storm relative helicity" "m^2/s^2"
-191 2 7 1 "PROB" "Prob. from ensemble" "non-dim"
+191 2 7 1 "PROB" "Prob. from ensemble" "numeric"
 192 2 7 1 "PROBN" "Prob. from ensemble norm. to clim. expect." "non-dim"
 193 2 7 1 "POP" "Prob. of precipitation" "%"
 194 2 7 1 "CPOFP" "Prob. of frozen precipitation" "%"
@@ -522,7 +522,7 @@ GRIB1
 8 2 7 2 "DIST" "Geometric height" "m",
 9 2 7 2 "HSTDV" "Std dev of height" "m",
 10 2 7 2 "HVAR" "Variance of height" "m^2",
-11 2 7 2 "TMP" "Temp." "K",
+11 2 7 2 "TMP" "Temperature" "K",
 12 2 7 2 "VTMP" "Virtual temp." "K",
 13 2 7 2 "POT" "Potential temp." "K",
 14 2 7 2 "EPOT" "Pseudo-adiabatic pot. temp." "K",
@@ -544,8 +544,8 @@ GRIB1
 30 2 7 2 "WVSP3" "Wave spectra (3)" "non-dim",
 31 2 7 2 "WDIR" "Wind direction" "deg",
 32 2 7 2 "WIND" "Wind speed" "m/s",
-33 2 7 2 "UGRD" "u wind" "m/s",
-34 2 7 2 "VGRD" "v wind" "m/s",
+33 2 7 2 "UGRD" "u-component of wind" "m/s",
+34 2 7 2 "VGRD" "v-component of wind" "m/s",
 35 2 7 2 "STRM" "Stream function" "m^2/s",
 36 2 7 2 "VPOT" "Velocity potential" "m^2/s",
 37 2 7 2 "MNTSF" "Montgomery stream function" "m^2/s^2",
@@ -778,7 +778,7 @@ GRIB1
 8 2 7 14 "DIST" "Geometric height" "m"
 9 2 7 14 "HSTDV" "Std dev of height" "m"
 10 2 7 14 "TOZNE" "Total ozone" "Dobson"
-11 2 7 14 "TMP" "Temp." "K"
+11 2 7 14 "TMP" "Temperature" "K"
 12 2 7 14 "VTMP" "Virtual temp." "K"
 13 2 7 14 "POT" "Potential temp." "K"
 14 2 7 14 "EPOT" "Pseudo-adiabatic pot. temp." "K"
@@ -800,8 +800,8 @@ GRIB1
 30 2 7 14 "WVSP3" "Wave spectra (3)" "non-dim"
 31 2 7 14 "WDIR" "Wind direction" "deg"
 32 2 7 14 "WIND" "Wind speed" "m/s"
-33 2 7 14 "UGRD" "u wind" "m/s"
-34 2 7 14 "VGRD" "v wind" "m/s"
+33 2 7 14 "UGRD" "u-component of wind" "m/s"
+34 2 7 14 "VGRD" "v-component of wind" "m/s"
 35 2 7 14 "STRM" "Stream function" "m^2/s"
 36 2 7 14 "VPOT" "Velocity potential" "m^2/s"
 37 2 7 14 "MNTSF" "Montgomery stream function" "m^2/s^2"
@@ -958,7 +958,7 @@ GRIB1
 188 2 7 14 "DRIP" "Rate of water dropping from canopy to gnd" "kg/m^2"
 189 2 7 14 "VPTMP" "Virtual pot. temp." "K"
 190 2 7 14 "HLCY" "Storm relative helicity" "m^2/s^2"
-191 2 7 14 "PROB" "Prob. from ensemble" "non-dim"
+191 2 7 14 "PROB" "Prob. from ensemble" "numeric"
 192 2 7 14 "PROBN" "Prob. from ensemble norm. to clim. expect." "non-dim"
 193 2 7 14 "POP" "Prob. of precipitation" "%"
 194 2 7 14 "CPOFP" "Prob. of frozen precipitation" "%"
