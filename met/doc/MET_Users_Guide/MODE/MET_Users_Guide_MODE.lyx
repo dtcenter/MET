@@ -100,15 +100,31 @@ This chapter provides a description of the Method for Object-Based Diagnostic
  Evaluation (MODE) tool, which was developed at the Research Applications
  Laboratory, NCAR/Boulder, USA.
  More information about MODE can be found in Davis 
-\series bold
-et al.
+\begin_inset ERT
+status open
 
-\series default
+\begin_layout Plain Layout
+
+{
+\backslash
+it et al.}
+\end_layout
+
+\end_inset
+
  (2006a, b) and Brown 
-\series bold
-et al.
+\begin_inset ERT
+status open
 
-\series default
+\begin_layout Plain Layout
+
+{
+\backslash
+it et al.}
+\end_layout
+
+\end_inset
+
  (2007).
 \end_layout
 
@@ -218,7 +234,7 @@ sum_{u, v}
 \backslash
 phi (u,v) 
 \backslash
-, f(x-u)(y-v).$$
+, f(x-u, y-v).$$
 \end_layout
 
 \end_inset
@@ -228,39 +244,99 @@ phi (u,v)
 
 \begin_layout Standard
 In this formula, 
-\series bold
-f
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$f$
+\end_layout
+
+\end_inset
+
  is the raw data field, 
-\begin_inset Formula $\phi$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+phi$
+\end_layout
+
 \end_inset
 
  is the filter function, and 
-\series bold
-C
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$C$
+\end_layout
+
+\end_inset
+
  is the resulting convolved field.
- The variables (
-\series bold
-x, y
-\series default
-) and (
-\series bold
-u, v
-\series default
-) are grid coordinates.
+ The variables 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(x, y)$
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$(u, v)$
+\end_layout
+
+\end_inset
+
+ are grid coordinates.
  The filter function 
-\begin_inset Formula $\phi$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+phi$
+\end_layout
+
 \end_inset
 
  is a simple circular filter determined by a radius of influence 
-\series bold
-R
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$R$
+\end_layout
+
+\end_inset
+
 , and a height 
-\series bold
-H
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$H$
+\end_layout
+
+\end_inset
+
 :
 \end_layout
 
@@ -311,16 +387,39 @@ cr
 
 \begin_layout Standard
 The parameters 
-\series bold
-R
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$R$
+\end_layout
+
+\end_inset
+
  and 
-\series bold
-H
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$H$
+\end_layout
+
+\end_inset
+
  are not independent.
  They are related by the requirement that the integral of 
-\begin_inset Formula $\phi$
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+phi$
+\end_layout
+
 \end_inset
 
  over the grid be unity: 
@@ -334,7 +433,7 @@ status open
 
 $$
 \backslash
-pi R^2H=1.$$
+pi R^2 H=1.$$
 \end_layout
 
 \end_inset
@@ -344,30 +443,65 @@ pi R^2H=1.$$
 
 \begin_layout Standard
 Thus, the radius of influence 
-\series bold
-R
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$R$
+\end_layout
+
+\end_inset
+
  is the only tunable parameter in the convolution process.
  Once 
-\series bold
-R
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$R$
+\end_layout
+
+\end_inset
+
  is chosen, 
-\series bold
-H
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$H$
+\end_layout
+
+\end_inset
+
  is determined by the above equation.
 \end_layout
 
 \begin_layout Standard
 Once the convolved field 
-\series bold
-C
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$C$
+\end_layout
+
+\end_inset
+
  is in hand, it is thresholded to create a mask field 
-\series bold
-M
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$M$
+\end_layout
+
+\end_inset
+
 :
 \end_layout
 
@@ -433,15 +567,29 @@ $T$
 
  is the threshold.
  The objects are the connected regions where 
-\series bold
-M = 1
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$M = 1$
+\end_layout
+
+\end_inset
+
 .
  Finally, the raw data are restored to object interiors to obtain the object
  field 
-\series bold
-F
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$F$
+\end_layout
+
+\end_inset
+
 :
 \end_layout
 
@@ -461,13 +609,27 @@ $$F(x,y)=M(x,y)f(x,y).$$
 
 \begin_layout Standard
 Thus, two parameters --- the radius of influence 
-\series bold
-R
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$R$
+\end_layout
+
+\end_inset
+
 , and the threshold 
-\series bold
-T
-\series default
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$T$
+\end_layout
+
+\end_inset
+
  --- control the entire process of resolving objects in the raw data field.
 \end_layout
 
