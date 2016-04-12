@@ -376,7 +376,7 @@ void Grib2TableEntry::clear()
 
 {
 
-index_a = index_b = index_c = -1;
+index_a = index_b = index_c = mtab_set = mtab_low = mtab_high = cntr = ltab = -1;
 
 parm_name.clear();
 
@@ -401,6 +401,11 @@ clear();
 index_a = e.index_a;
 index_b = e.index_b;
 index_c = e.index_c;
+mtab_high = e.mtab_high;
+mtab_low = e.mtab_low;
+mtab_set = e.mtab_set;
+cntr = e.cntr;
+ltab = e.ltab;
 
 parm_name = e.parm_name;
 
@@ -424,6 +429,11 @@ Indent prefix(depth);
 
 out << prefix << "Index values = (" 
               << index_a << ", "
+              << mtab_set << ", "
+              << mtab_low << ", "
+              << mtab_high << ", "
+              << cntr << ", "
+              << ltab << ", "
               << index_b << ", "
               << index_c << ")\n";
 
@@ -448,8 +458,8 @@ bool Grib2TableEntry::parse_line(const char * line)
 clear();
 
 int j, n;
-int * i[3];
-ConcatString * s[3];
+int * i[8];
+ConcatString * s[8];
 const char i_delim [] = "{} \"";
 const char s_delim [] = "\"";
 const char * c = (const char *) 0;
@@ -467,18 +477,23 @@ L = line2;
 clear();
 
 i[0] = &index_a;
-i[1] = &index_b;
-i[2] = &index_c;
+i[1] = &mtab_set;
+i[2] = &mtab_low;
+i[3] = &mtab_high;
+i[4] = &cntr;
+i[5] = &ltab;
+i[6] = &index_b;
+i[7] = &index_c;
 
 s[0] = &parm_name;
 s[1] = &full_name;
 s[2] = &units;
 
    //
-   //  grab the first 3 ints
+   //  grab the first 8 ints
    //
 
-for (j=0; j<3; ++j)  {
+for (j=0; j<8; ++j)  {
 
    c = strtok(L, i_delim);
 
@@ -537,16 +552,14 @@ init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-TableFlatFile::TableFlatFile(int)
+TableFlatFile::TableFlatFile(int) {
 
-{
+   init_from_scratch();
 
-init_from_scratch();
+   ConcatString path;
+   ConcatString path1;
 
-ConcatString path;
-ConcatString path1;
-
-   readUserGrib1Tables();
+   readUserGribTables("grib1");
 
 
    path1 << cs_erase << table_data_dir;
@@ -559,8 +572,7 @@ ConcatString path1;
    //
    //  read the default grib1 table file, expanding MET_BASE
    //
-   for (unsigned int i = 0;i < filtered_file_names.size();i++)
-   {
+   for (unsigned int i = 0; i < filtered_file_names.size(); i++) {
 
       path << cs_erase << table_data_dir << '/' << filtered_file_names[i];
 
@@ -578,28 +590,41 @@ ConcatString path1;
    //
    //  read the default grib2 table file, expanding MET_BASE
    //
+   path1.clear();
 
-path << cs_erase << table_data_dir << '/' << grib2_table_file;
+   readUserGribTables("grib2");
 
-path = replace_path(path);
+   path1 << cs_erase << table_data_dir;
 
-if ( ! read(path) )  {
+   path1 = replace_path(path1);
 
-   mlog << Error
-        << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
+   filtered_file_names.clear();
+   get_table_files(path1, "grib2", ".txt", filtered_file_names);
 
-   exit ( 1 );
+   for (unsigned int i = 0; i < filtered_file_names.size(); i++) {
+      if (filtered_file_names[i] != grib2_table_file) { //exclude the old grib2 table file
 
-}
+         path << cs_erase << table_data_dir << '/' << filtered_file_names[i];
 
+         path = replace_path(path);
 
+         if (!read(path)) {
+
+            mlog << Error
+            << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
+
+            exit(1);
+
+         }
+      }
+   }
    //
    //  done
    //
 
 }
 
-void TableFlatFile::readUserGrib1Tables() {
+void TableFlatFile::readUserGribTables(const char * table_type) {
    ConcatString path_to_user_tables;
    ConcatString path;
    char *ptr;
@@ -609,7 +634,7 @@ void TableFlatFile::readUserGrib1Tables() {
    {
       path_to_user_tables = ptr;
 
-      get_table_files(path_to_user_tables, "grib1", ".txt", filtered_file_names_user);
+      get_table_files(path_to_user_tables, table_type, ".txt", filtered_file_names_user);
 
       for (unsigned int i = 0; i < filtered_file_names_user.size(); i++) {
 
@@ -624,6 +649,8 @@ void TableFlatFile::readUserGrib1Tables() {
       }
    }
 }
+
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1357,6 +1384,34 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool TableFlatFile::lookup_grib2(int a, int b, int c, int mtab_set, int mtab_low, int mtab_high, int cntr, int ltab, Grib2TableEntry & e)
+{
+   int j;
+
+   e.clear();
+
+   for (j=0; j<N_grib2_elements; ++j)  {
+
+      if ( (g2e[j]->index_a == a) && (g2e[j]->index_b == b) && (g2e[j]->index_c == c) &&
+              (g2e[j]->mtab_high == mtab_high) && (g2e[j]->mtab_low == mtab_low) &&
+              (g2e[j]->mtab_set == mtab_set) && (g2e[j]->cntr == cntr) && (g2e[j]->ltab == ltab))  {
+
+         e = *(g2e[j]);
+
+         return ( true );
+
+      }
+
+   }
+
+   return ( false );
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
                                  Grib2TableEntry & e, int & n_matches)
 
@@ -1416,6 +1471,84 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
 ////////////////////////////////////////////////////////////////////////
 
 
+bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c, int mtab_set, int mtab_low, int mtab_high, int cntr, int ltab, Grib2TableEntry & e, int & n_matches)
+{
+   //  clear the by-reference arguments
+   e.clear();
+   n_matches = 0;
+
+   //  build a list of matches
+   vector<Grib2TableEntry*> matches;
+   for(int j=0; j<N_grib2_elements; ++j){
+
+      if( g2e[j]->parm_name != parm_name ||
+          (bad_data_int != a && g2e[j]->index_a != a) ||
+          (bad_data_int != b && g2e[j]->index_b != b) ||
+          (bad_data_int != c && g2e[j]->index_c != c) ||
+              (bad_data_int != mtab_set && g2e[j]-> mtab_set != mtab_set) ||
+              (bad_data_int != mtab_low && g2e[j]-> mtab_low != mtab_low) ||
+              (bad_data_int != mtab_high && g2e[j]-> mtab_high != mtab_high) ||
+              (bad_data_int != cntr && g2e[j]-> cntr != cntr) ||
+              (bad_data_int != ltab && g2e[j]-> ltab != ltab))
+         continue;
+
+      if( n_matches++ == 0 ) e = *(g2e[j]);
+      matches.push_back( g2e[j] );
+
+   }
+
+   //  if there are multiple matches, print a descriptive warning
+   if( 1 < n_matches ){
+
+      ConcatString msg;
+      msg << "Multiple GRIB2 table entries match lookup criteria ("
+      << "parm_name = " << parm_name;
+      if( bad_data_int != a ) msg << ", index_a = " << a;
+      if( bad_data_int != mtab_set ) msg << ", mtab_set = " << mtab_set;
+      if( bad_data_int != mtab_low ) msg << ", mtab_low = " << mtab_low;
+      if( bad_data_int != mtab_high ) msg << ", mtab_high = " << mtab_high;
+      if( bad_data_int != cntr ) msg << ", cntr = " << cntr;
+      if( bad_data_int != ltab ) msg << ", ltab = " << ltab;
+      if( bad_data_int != b ) msg << ", index_b = " << b;
+      if( bad_data_int != c ) msg << ", index_c = " << c;
+      msg << "):\n";
+      mlog << Warning << "\n" << msg;
+
+      for(vector<Grib2TableEntry*>::iterator it = matches.begin();
+          it < matches.end(); it++)
+         mlog << Warning << "  parm_name: " << (*it)->parm_name
+         << ", index_a = "  << (*it)->index_a
+         << ", mtab_set = "  << (*it)->mtab_set
+         << ", mtab_low = "  << (*it)->mtab_low
+         << ", mtab_high = "  << (*it)->mtab_high
+         << ", cntr = "  << (*it)->cntr
+         << ", ltab = "  << (*it)->ltab
+         << ", index_b = "  << (*it)->index_b
+         << ", index_c = "  << (*it)->index_c
+         << "\n";
+
+      mlog << Warning << "Using: "
+      << "  parm_name: " << e.parm_name
+      << ", index_a = "  << e.index_a
+      << ", mtab_set = "  << e.mtab_set
+      << ", mtab_low = "  << e.mtab_low
+      << ", mtab_high = "  << e.mtab_high
+      << ", cntr = "  << e.cntr
+      << ", ltab = "  << e.ltab
+      << ", index_b = "  << e.index_b
+      << ", index_c = "  << e.index_c
+      << "\n\n";
+
+   }
+
+   return (n_matches > 0);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool TableFlatFile::lookup_grib2(const char * parm_name, Grib2TableEntry & e, int & n_matches)
 
 {
@@ -1423,6 +1556,10 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, Grib2TableEntry & e, in
    return lookup_grib2(parm_name, bad_data_int, bad_data_int, bad_data_int, e, n_matches);
 
 }
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////
