@@ -9119,7 +9119,7 @@ The first page of PostScript output contains a great deal of summary information
 \begin_layout Standard
 The second and third pages of the PostScript output file display enlargements
  of the forecast and observation raw and object fields, respectively.
- The fourth page displays the forecast object with the outlines of the observati
+  The fourth page displays the forecast object with the outlines of the observati
 on objects overlaid, and vice versa.
  The fifth page contains summary information about the pairs of matched
  cluster objects.
