@@ -105,7 +105,7 @@ void STATLine::dump(ostream & out, int depth) const
 int month, day, year, hour, minute, second;
 char junk[256];
 Indent prefix(depth);
-SingleThresh st;
+ThreshArray ta;
 
 
 DataLine::dump(out, depth);
@@ -165,14 +165,14 @@ out << prefix << "Vx Mask        = \"" << vx_mask()    << "\"\n";
 out << prefix << "Interp Mthd    = \"" << interp_mthd()<< "\"\n";
 out << prefix << "Interp Pnts    = \"" << interp_pnts()<< "\"\n";
 
-st = fcst_thresh();
-out << prefix << "Fcst Thresh    = \"" << st.get_str() << "\"\n";
+ta = fcst_thresh();
+out << prefix << "Fcst Thresh    = \"" << ta.get_str() << "\"\n";
 
-st = obs_thresh();
-out << prefix << "Obs Thresh     = \"" << st.get_str() << "\"\n";
+ta = obs_thresh();
+out << prefix << "Obs Thresh     = \"" << ta.get_str() << "\"\n";
 
-st = cov_thresh();
-out << prefix << "Cov Thresh     = \"" << st.get_str() << "\"\n";
+ta = cov_thresh();
+out << prefix << "Cov Thresh     = \"" << ta.get_str() << "\"\n";
 
 out << prefix << "Alpha          = \"" << alpha() << "\"\n";
 
@@ -564,20 +564,37 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleThresh STATLine::fcst_thresh() const
+ThreshArray STATLine::fcst_thresh() const
 
 {
 
-SingleThresh st;
+ThreshArray ta;
 
 const char * c = get_item(fcst_thresh_offset);
 
-st.set(c);
+ta.add_css(c);
 
-return ( st );
+return ( ta );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+ThreshArray STATLine::obs_thresh() const
+
+{
+
+ThreshArray ta;
+
+const char * c = get_item(obs_thresh_offset);
+
+ta.add_css(c);
+
+return ( ta );
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -604,35 +621,17 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-SingleThresh STATLine::obs_thresh() const
+ThreshArray STATLine::cov_thresh() const
 
 {
 
-SingleThresh st;
-
-const char * c = get_item(obs_thresh_offset);
-
-st.set(c);
-
-return ( st );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-SingleThresh STATLine::cov_thresh() const
-
-{
-
-SingleThresh st;
+ThreshArray ta;
 
 const char * c = get_item(cov_thresh_offset);
 
-st.set(c);
+ta.add_css(c);
 
-return ( st );
+return ( ta );
 
 }
 
