@@ -513,6 +513,11 @@ void read_pds(const GribRecord &r, int &bms_flag,
           accum = 0;
           break;
 
+      case 136: // Climatological Standard Deviation
+          valid_ut = init_ut;
+          accum = 0;
+          break;
+
       default:
          mlog << Error << "\nread_pds() -> "
               << "unexpected time range indicator of "
