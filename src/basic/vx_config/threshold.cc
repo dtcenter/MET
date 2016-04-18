@@ -458,7 +458,8 @@ bool SingleThresh::operator==(const SingleThresh &st) const
 
 if ( !node || !(st.node) )  return ( false );
 
-return ( node->s == (st.node->s) );
+return ( node->type() == st.node->type() &&
+         is_eq(node->value(), st.node->value()) );
 
 }
 
@@ -664,7 +665,7 @@ ConcatString t;
 
 if ( node )  t = node->s;
 else         t = na_str;
-  
+
 return(t);
 
 }
