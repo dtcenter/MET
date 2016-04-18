@@ -28,6 +28,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString timestring(const unixtime t);
+static bool         check_thresh_column(const ThreshArray &list,
+                                        const ThreshArray &item);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -116,13 +118,13 @@ void STATAnalysisJob::clear() {
 
    fcst_valid_beg = fcst_valid_end = (unixtime) 0;
    fcst_valid_hour.clear();
-   
+
    obs_valid_beg  = obs_valid_end  = (unixtime) 0;
    obs_valid_hour.clear();
-   
+
    fcst_init_beg  = fcst_init_end  = (unixtime) 0;
    fcst_init_hour.clear();
-   
+
    obs_init_beg   = obs_init_end   = (unixtime) 0;
    obs_init_hour.clear();
 
@@ -189,7 +191,7 @@ void STATAnalysisJob::clear() {
    ramp_window_end = default_ramp_window;
    swing_width     = bad_data_double;
 
-   // Set to default values   
+   // Set to default values
    out_alpha      = default_alpha;
    out_bin_size   = default_bin_size;
    boot_interval  = default_boot_interval;
@@ -212,7 +214,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    clear();
 
    precision            = aj.precision;
-   
+
    job_type             = aj.job_type;
 
    model                = aj.model;
@@ -223,15 +225,15 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    fcst_valid_beg       = aj.fcst_valid_beg;
    fcst_valid_end       = aj.fcst_valid_end;
    fcst_valid_hour      = aj.fcst_valid_hour;
-   
+
    obs_valid_beg        = aj.obs_valid_beg;
    obs_valid_end        = aj.obs_valid_end;
    obs_valid_hour       = aj.obs_valid_hour;
-   
+
    fcst_init_beg        = aj.fcst_init_beg;
    fcst_init_end        = aj.fcst_init_end;
    fcst_init_hour       = aj.fcst_init_hour;
-   
+
    obs_init_beg         = aj.obs_init_beg;
    obs_init_end         = aj.obs_init_end;
    obs_init_hour        = aj.obs_init_hour;
@@ -260,7 +262,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    line_type            = aj.line_type;
    column               = aj.column;
    weight               = aj.weight;
-   
+
    column_thresh_map    = aj.column_thresh_map;
    column_str_map       = aj.column_str_map;
 
@@ -288,9 +290,9 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    ramp_thresh_fcst     = aj.ramp_thresh_fcst;
    ramp_thresh_obs      = aj.ramp_thresh_obs;
    ramp_window_beg      = aj.ramp_window_beg;
-   ramp_window_end      = aj.ramp_window_end;  
+   ramp_window_end      = aj.ramp_window_end;
    swing_width          = aj.swing_width;
-   
+
    boot_interval        = aj.boot_interval;
    boot_rep_prop        = aj.boot_rep_prop;
    n_boot_rep           = aj.n_boot_rep;
@@ -565,10 +567,10 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
 
       // Check that fcst_valid_beg = fcst_valid_end
       if(L.fcst_valid_beg() != L.fcst_valid_end()) return(0);
-      
+
       if(!fcst_valid_hour.has(L.fcst_valid_hour())) return(0);
    }
-   
+
    //
    // fcst_init_beg
    //
@@ -592,7 +594,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
 
       if(!fcst_init_hour.has(L.fcst_init_hour())) return(0);
    }
-   
+
    //
    // obs_lead (in seconds)
    //
@@ -623,7 +625,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
 
       if(!obs_valid_hour.has(L.obs_valid_hour())) return(0);
    }
-   
+
    //
    // obs_init_beg
    //
@@ -708,21 +710,21 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    // fcst_thresh
    //
    if(fcst_thresh.n_elements() > 0) {
-      if(!fcst_thresh.has(L.fcst_thresh())) return(0);
+      if(!check_thresh_column(fcst_thresh, L.fcst_thresh())) return(0);
    }
 
    //
    // obs_thresh
    //
-   if(obs_thresh.n_elements() > 0) {     
-      if(!obs_thresh.has(L.obs_thresh())) return(0);
+   if(obs_thresh.n_elements() > 0) {
+      if(!check_thresh_column(obs_thresh, L.obs_thresh())) return(0);
    }
 
    //
    // cov_thresh
    //
    if(cov_thresh.n_elements() > 0) {
-      if(!cov_thresh.has(L.cov_thresh())) return(0);
+      if(!check_thresh_column(cov_thresh, L.cov_thresh())) return(0);
    }
 
    //
@@ -750,12 +752,12 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    for(map<ConcatString,ThreshArray>::const_iterator thr_it = column_thresh_map.begin();
        thr_it != column_thresh_map.end(); thr_it++) {
-      
+
       //
       // Determine the column offset
       //
       c = determine_column_offset(L, thr_it->first, false);
-   
+
       //
       // Check that the column was found
       //
@@ -766,7 +768,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       if(!thr_it->second.check_dbl(atof(L.get_item(c)))) return(0);
    }
-   
+
    //
    // column_str
    //
@@ -782,7 +784,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       // Check that the column was found
       //
       if(is_bad_data(c)) return(0);
-   
+
       //
       // Check if the current value is in the list for the column
       //
@@ -954,7 +956,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-fcst_valid_hour") == 0) {
          fcst_valid_hour.add_css_sec(jc_array[i+1]);
          i++;
-      }      
+      }
       else if(strcmp(jc_array[i], "-obs_valid_beg") == 0) {
          obs_valid_beg = timestring_to_unix(jc_array[i+1]);
          i++;
@@ -966,7 +968,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-obs_valid_hour") == 0) {
          obs_valid_hour.add_css_sec(jc_array[i+1]);
          i++;
-      }      
+      }
       else if(strcmp(jc_array[i], "-fcst_init_beg") == 0) {
          fcst_init_beg = timestring_to_unix(jc_array[i+1]);
          i++;
@@ -978,7 +980,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-fcst_init_hour") == 0) {
          fcst_init_hour.add_css_sec(jc_array[i+1]);
          i++;
-      }      
+      }
       else if(strcmp(jc_array[i], "-obs_init_beg") == 0) {
          obs_init_beg = timestring_to_unix(jc_array[i+1]);
          i++;
@@ -1075,7 +1077,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i+=2;
       }
       else if(strcmp(jc_array[i], "-column_str") == 0) {
-         
+
          // Parse the column name and value
          col_name = to_upper(jc_array[i+1]);
          col_value.clear();
@@ -1099,7 +1101,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << "no match found for header column named: \""
                  << to_upper(jc_array[i+1]) << "\"\n\n";
             throw(1);
-         }  
+         }
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;
@@ -1433,7 +1435,7 @@ void STATAnalysisJob::open_dump_row_file() {
 void STATAnalysisJob::close_dump_row_file() {
 
    if(dr_out) {
-      
+
       //
       // Write any remaining lines
       //
@@ -1486,7 +1488,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    // Check for a single output line type
    //
    out_sa = (out_line_type.n_elements() > 0 ?
-             out_line_type : line_type);   
+             out_line_type : line_type);
    out_lt = (out_sa.n_elements() == 1 ?
              string_to_statlinetype(out_sa[0]) : no_stat_line_type);
 
@@ -1597,7 +1599,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
 void STATAnalysisJob::close_stat_file() {
 
    if(stat_out) {
-      
+
       //
       // Write any remaining lines
       //
@@ -1620,7 +1622,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
    // Nothing to do with no dump file
    //
    if(!dr_out) return;
-   
+
    //
    // Write a header before the first line
    //
@@ -1698,7 +1700,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
             case(stat_ssvar):
                write_header_row(ssvar_columns, n_ssvar_columns, 1, dump_at, 0, 0);
                break;
-               
+
             // Just write a STAT header line for indeterminant line types
             case(stat_mctc):
             case(stat_mcts):
@@ -1717,7 +1719,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
                     << "unexpected line type value " << line_type[0] << "\n\n";
                throw(1);
          } // end switch
-      }      
+      }
       //
       // Otherwise, just write a STAT header line
       //
@@ -1735,7 +1737,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
      dump_at.set_entry(n_dump%dump_at.nrows(), i, line.get_item(i));
    }
    n_dump++;
-   
+
    //
    // Write the buffer, if full
    //
@@ -1913,7 +1915,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          js << "-fcst_thresh " << fcst_thresh[i].get_str() << " ";
       }
    }
-   
+
    // obs_thresh
    if(obs_thresh.n_elements() > 0) {
       for(i=0; i<obs_thresh.n_elements(); i++) {
@@ -1964,22 +1966,22 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // column_thresh
    for(map<ConcatString,ThreshArray>::const_iterator thr_it = column_thresh_map.begin();
        thr_it != column_thresh_map.end(); thr_it++) {
-      
+
       for(i=0; i<thr_it->second.n_elements(); i++) {
          js << "-column_thresh " << thr_it->first << " " << thr_it->second[i].get_str() << " ";
       }
    }
-   
+
    // column_str
    for(map<ConcatString,StringArray>::const_iterator str_it = column_str_map.begin();
        str_it != column_str_map.end(); str_it++) {
-      
+
       for(i=0; i<str_it->second.n_elements(); i++) {
          js << "-column_str " << str_it->first << " " << str_it->second[i] << " ";
       }
    }
-  
-   // column_case 
+
+   // column_case
    if(column_case.n_elements() > 0) {
       for(i=0; i<column_case.n_elements(); i++)
          js << "-by " << column_case[i] << " ";
@@ -1997,7 +1999,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
    // out_stat
    if(stat_file) js << "-out_stat " << stat_file << " ";
-   
+
    // mask_grid
    if(mask_grid) js << "-mask_grid " << mask_grid << " ";
 
@@ -2136,7 +2138,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
         js << "-out_bin_size " << out_bin_size << " ";
       }
    }
-   
+
    // Jobs which perform bootstrapping
    if(line_type.n_elements() > 0) {
       type = string_to_statlinetype(line_type[0]);
@@ -2311,6 +2313,26 @@ ConcatString timestring(const unixtime t) {
             hour, minute, second);
 
    return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool check_thresh_column(const ThreshArray &list, const ThreshArray &item) {
+
+   // Return true for an empty search list.
+   if(list.n_elements() == 0) return(true);
+
+   // If the item is a single threshold, search for it in the list.
+   if(item.n_elements() == 1) {
+      return(list.has(item[0]));
+   }
+
+   // Otherwise, check that the list and item exactly match.
+   else {
+      return(list == item);
+   }
+
+   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////

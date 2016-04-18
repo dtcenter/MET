@@ -59,17 +59,17 @@ class STATLine : public DataLine {
 
       const char * version        () const;
       const char * model          () const;
-      
+
       int          fcst_lead      () const;
       unixtime     fcst_valid_beg () const;
       unixtime     fcst_valid_end () const;
       int          fcst_valid_hour() const;
-      
+
       int          obs_lead       () const;
       unixtime     obs_valid_beg  () const;
       unixtime     obs_valid_end  () const;
       int          obs_valid_hour () const;
-      
+
       const char * fcst_var       () const;
       const char * fcst_lev       () const;
       const char * obs_var        () const;
@@ -78,10 +78,10 @@ class STATLine : public DataLine {
       const char * vx_mask        () const;
       const char * interp_mthd    () const;
       int          interp_pnts    () const;
-      SingleThresh fcst_thresh    () const;
-      SingleThresh obs_thresh     () const;
-      SingleThresh cov_thresh     () const;
+      ThreshArray  fcst_thresh    () const;
+      ThreshArray  obs_thresh     () const;
       SetLogic     thresh_logic   () const;
+      ThreshArray  cov_thresh     () const;
       double       alpha          () const;
       const char * line_type      () const;
 
@@ -92,7 +92,7 @@ class STATLine : public DataLine {
       unixtime fcst_init_beg   () const; // fcst_valid_beg - fcst_lead
       unixtime fcst_init_end   () const; // fcst_valid_beg - fcst_lead
       int      fcst_init_hour  () const; // fcst_init_beg%sec_per_day
-      
+
       unixtime obs_init_beg    () const; // obs_valid_beg - obs_lead
       unixtime obs_init_end    () const; // obs_valid_beg - obs_lead
       int      obs_init_hour   () const; // obs_init_beg%sec_per_day
