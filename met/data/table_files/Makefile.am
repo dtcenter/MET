@@ -66,7 +66,12 @@ tablefiles_DATA = \
 	grib1_ncep_133_7.txt \
 	grib1_ncep_140_7.txt \
 	grib1_ncep_141_7.txt \
-	grib1_ncep_2_7.txt
+	grib1_ncep_2_7.txt \
+	grib2_all.txt \
+	grib2_bom.txt \
+	grib2_galwem.txt \
+	grib2_mrms.txt \
+	grib2_ndfd.txt
 
 EXTRA_DIST = ${tablefiles_DATA}
 
