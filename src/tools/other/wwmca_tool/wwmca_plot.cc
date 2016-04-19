@@ -286,8 +286,18 @@ RenderInfo info;
 PSfile plot;
 double x_ll, y_ll;
 
+char filename_hemi;
+unixtime filename_valid;
 
-if ( !(f_cp.read(filename)) )  {
+if ( !(is_afwa_cloud_pct_filename(filename, filename_hemi, filename_valid)) )  {
+
+   mlog << Error << "\n" << program_name << ": unexpected input file naming convention \"" << filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( !(f_cp.read(filename, filename_hemi)) )  {
 
    mlog << Error << "\n" << program_name << ": unable to open input file \"" << filename << "\"\n\n";
 
@@ -296,7 +306,7 @@ if ( !(f_cp.read(filename)) )  {
 }
 
 if ( f_cp.hemisphere() == 'N' )  grid = &nh;
-else                          grid = &sh;
+else                             grid = &sh;
 
 Nx = grid->nx();
 Ny = grid->ny();
@@ -310,7 +320,7 @@ pt_filename = new char [strlen(filename) + 10];
 // create pixel time filename and read it in
 set_pixel_time_filename(filename, pt_filename);
 
-if ( !(f_pt.read(pt_filename)) )  {
+if ( !(f_pt.read(pt_filename, filename_hemi)) )  {
 
    mlog << Error << "\n" << program_name << ": unable to open pixel time file \"" << pt_filename << "\"\n\n";
 
@@ -329,8 +339,6 @@ output_filename << short_name << ".ps";
    //
 
 make_image(f_cp, f_pt, image);
-
-// image.write("a.pgm");
 
    //
    //  open the output file

@@ -42,25 +42,23 @@ void WwmcaRegridder::do_output(const char * output_filename)
 NcFile * ncfile   = (NcFile *) 0;
 NcDim  * lat_dim  = (NcDim *)  0;
 NcDim  * lon_dim  = (NcDim *)  0;
-NcVar  * lat_var  = (NcVar *)  0;
-NcVar  * lon_var  = (NcVar *)  0;
 NcVar  * data_var = (NcVar *)  0;
-unixtime valid_time = 0LL;
-unixtime issue_time = 0LL;
-int month, day, year, hour, minute, second;
-int x, y;
-float f[2];
-double lat, lon;
+unixtime init_time  = (unixtime) 0;
+unixtime valid_time = (unixtime) 0;
+int accum_time, x, y;
+float f;
 InterpolationValue iv;
-char junk[256];
 ConcatString s;
 const int Nx = ToGrid->nx();
 const int Ny = ToGrid->ny();
 
+   //
+   //  list output file name
+   //
 
-valid_time = cp_nh->valid();
+mlog << Debug(1)
+     << "Writing output file: " << output_filename << "\n";
 
-issue_time = valid_time;
 
    //
    //  open the netcdf file
@@ -70,7 +68,7 @@ ncfile = new NcFile (output_filename, NcFile::Replace);
 
 if ( !(ncfile->is_valid()) )  {
 
-   mlog << Error << "\nWwmcaRegridder::do_lambert_output(const char * output_filename) -> Netcdf file is not valid!\n\n";
+   mlog << Error << "\nWwmcaRegridder::do_output(const char * output_filename) -> Netcdf file is not valid!\n\n";
 
    exit ( 1 );
 
@@ -86,109 +84,75 @@ write_netcdf_global(ncfile, output_filename, "wwmca_regrid");
    //  dimensions
    //
 
-ncfile->add_dim("lat", ToGrid->ny());
-ncfile->add_dim("lon", ToGrid->nx());
+lat_dim = ncfile->add_dim("lat", ToGrid->ny());
+lon_dim = ncfile->add_dim("lon", ToGrid->nx());
 
-lat_dim = ncfile->get_dim("lat");
-lon_dim = ncfile->get_dim("lon");
+   //
+   //  lat/lon variables
+   //
 
-ncfile->add_var("lat",  ncFloat, lat_dim, lon_dim);
-lat_var = ncfile->get_var("lat");
+write_netcdf_latlon(ncfile, lat_dim, lon_dim, *ToGrid);
 
    //
    //  variable attributes
    //
 
-lat_var->add_att("units",      "degrees_north");
-lat_var->add_att("long_name",  "Latitude");
-lat_var->add_att("_FillValue", fill_value);   //  don't use NC_FILL_FLOAT, I guess ...
-
-ncfile->add_var("lon",  ncFloat, lat_dim, lon_dim);
-lon_var = ncfile->get_var("lon");
-
-lon_var->add_att("units",      "degrees_east");
-lon_var->add_att("long_name",  "Longitude");
-lon_var->add_att("_FillValue", fill_value);
-
 s = Config->lookup_string(conf_key_variable_name);
 
-ncfile->add_var((const char *) s, ncFloat, lat_dim, lon_dim);
-data_var = ncfile->get_var((const char *) s);
+data_var = ncfile->add_var((const char *) s, ncFloat, lat_dim, lon_dim);
 
 s = Config->lookup_string(conf_key_units);
 
-data_var->add_att("units",      (const char *) s);
+data_var->add_att("units", (const char *) s);
 
 s = Config->lookup_string(conf_key_long_name);
 
-data_var->add_att("long_name",  (const char *) s);
+data_var->add_att("long_name", (const char *) s);
 
 s = Config->lookup_string(conf_key_level);
 
-data_var->add_att("level",      (const char *) s);
+data_var->add_att("level", (const char *) s);
 
-data_var->add_att("_FillValue",  fill_value);
+data_var->add_att("_FillValue", fill_value);
 
+   //
+   //  variable timing attributes
+   //
 
-unix_to_mdyhms(issue_time, month, day, year, hour, minute, second);
+s = Config->lookup_string("valid_time");
 
-sprintf(junk, "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
+valid_time = ( s.length() > 0 ?
+               timestring_to_unix((const char *) s) :
+               cp_nh->valid() );
 
-data_var->add_att("init_time",  junk);
+if ( valid_time == (unixtime) 0 )  {
 
-s = unixtime_to_string(issue_time);
+   mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
+        << "valid time not defined in the filename or configuration file, writing 0.\n\n";
 
-data_var->add_att("init_time_ut",  s.text());
+   exit ( 1 );
 
+}
 
-unix_to_mdyhms(valid_time, month, day, year, hour, minute, second);
+s = Config->lookup_string("init_time");
 
-sprintf(junk, "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
+init_time = ( s.length() > 0 ?
+              timestring_to_unix((const char *) s) :
+              valid_time );
 
-data_var->add_att("valid_time",  junk);
+s = Config->lookup_string("accum_time");
 
-s = unixtime_to_string(valid_time);
+accum_time = ( s.length() > 0 ?
+               timestring_to_sec((const char *) s) :
+               0);
 
-data_var->add_att("valid_time_ut",  s.text());
-
-
-data_var->add_att("accum_time",  "1 hour");
+write_netcdf_var_times(data_var, init_time, valid_time, accum_time);
 
    //
    //  global attributes
    //
 
 grid_output(ToGrid->info(), ncfile);
-
-   //
-   //  fill in lat/lon values
-   //
-
-for (x=0; x<Nx; ++x)  {
-
-   for (y=0; y<Ny; ++y)  {
-
-      ToGrid->xy_to_latlon((double) x, (double) y, lat, lon);
-
-      if ( west_longitude_positive )  lon = -lon;   //  east -> west
-
-
-      f[0] = (float) lat;
-
-      lat_var->set_cur(y, x);
-
-      lat_var->put(f, 1, 1);
-
-
-      f[0] = (float) lon;
-
-      lon_var->set_cur(y, x);
-
-      lon_var->put(f, 1, 1);
-
-   }
-
-}
 
    //
    //  fill in data values
@@ -200,12 +164,12 @@ for (x=0; x<Nx; ++x)  {
 
       iv = get_interpolated_value(x, y);
 
-      if ( iv.ok )  f[0] = (float) (iv.value);
-      else          f[0] = fill_value;
+      if ( iv.ok )  f = (float) (iv.value);
+      else          f = fill_value;
 
       data_var->set_cur(y, x);
 
-      data_var->put(f, 1, 1);
+      data_var->put(&f, 1, 1);
 
    }
 
