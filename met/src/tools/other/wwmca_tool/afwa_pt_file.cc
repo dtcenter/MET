@@ -67,12 +67,6 @@ static const int pt_hour_end_pos           =   9;
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool is_afwa_pixel_time_filename(const char * filename, char & Hemisphere, unixtime & Valid);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class AfwaPixelTimeFile
    //
@@ -191,19 +185,36 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool AfwaPixelTimeFile::read(const char * filename)
+bool AfwaPixelTimeFile::read(const char * filename, const char hemisphere)
 
 {
 
+mlog << Debug(1)
+     << "Reading input file: " << filename << "\n";
+
 clear();
 
-if ( !(is_afwa_pixel_time_filename(filename, Hemisphere, Valid)) )  {
+char filename_hemi;
 
-   clear();
+Hemisphere = hemisphere;
 
-   mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> can't parse filename \"" << filename << "\"\n\n";
+if ( is_afwa_pixel_time_filename(filename, filename_hemi, Valid) )  {
 
-   return ( false );
+   if ( Hemisphere != filename_hemi )  {
+
+      mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> "
+           << "inconsistent hemisphere definition (" << Hemisphere
+           << " != " << filename_hemi << ") for filename \"" << filename
+           << "\"\n\n";
+
+      return ( false );
+
+   }
+
+}
+else  {
+
+   Valid = (unixtime) 0;
 
 }
 
@@ -217,8 +228,6 @@ if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
    mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> can't open file \"" << filename << "\"\n\n";
 
-   //  exit ( 1 );
-
    return ( false );
 
 }
@@ -230,8 +239,6 @@ Buf = new unsigned char [bytes];
 if ( ::read(fd, Buf, bytes) != bytes )  {
 
    mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> read error on file \"" << filename << "\"\n\n";
-
-   //  exit ( 1 );
 
    return ( false );
 

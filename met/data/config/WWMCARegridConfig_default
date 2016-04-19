@@ -33,12 +33,21 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// NetCDF output information
+// NetCDF output variable information.
 //
 variable_name = "Cloud_Pct";
 units         = "percent";
 long_name     = "cloud cover percent";
 level         = "SFC";
+
+//
+// NetCDF output variable timing information:
+//   - init_time and valid_time in YYYYMMDD[_HH[MMSS]] format
+//   - accum_time in HH[MMSS] format
+//
+init_time     = "";
+valid_time    = "";
+accum_time    = "01";
 
 ////////////////////////////////////////////////////////////////////////////////
 

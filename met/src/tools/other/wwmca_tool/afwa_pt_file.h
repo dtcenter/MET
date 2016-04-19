@@ -52,7 +52,7 @@ class AfwaPixelTimeFile : public AfwaDataFile {
 
       virtual int operator()(int x, int y) const;
 
-      virtual bool read(const char * filename);
+      virtual bool read(const char * filename, const char hemisphere);
 
 };
 
@@ -61,6 +61,12 @@ class AfwaPixelTimeFile : public AfwaDataFile {
 
 
 inline int AfwaPixelTimeFile::operator()(int x, int y) const { return ( pixel_age_sec(x, y) ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern bool is_afwa_pixel_time_filename(const char * filename, char & Hemisphere, unixtime & Valid);
 
 
 ////////////////////////////////////////////////////////////////////////

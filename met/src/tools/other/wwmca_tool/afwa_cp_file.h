@@ -52,7 +52,7 @@ class AfwaCloudPctFile : public AfwaDataFile {
 
       virtual int operator()(int x, int y) const;
 
-      virtual bool read(const char * filename);
+      virtual bool read(const char * filename, const char hemisphere);
 
 };
 
@@ -61,6 +61,12 @@ class AfwaCloudPctFile : public AfwaDataFile {
 
 
 inline int AfwaCloudPctFile::operator()(int x, int y) const { return ( cloud_pct(x, y) ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern bool is_afwa_cloud_pct_filename(const char * filename, char & Hemisphere, unixtime & Valid);
 
 
 ////////////////////////////////////////////////////////////////////////

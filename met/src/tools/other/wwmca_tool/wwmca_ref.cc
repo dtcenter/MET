@@ -217,7 +217,7 @@ void WwmcaRegridder::set_cp_nh_file(const char * filename)
 
 AfwaCloudPctFile * f = new AfwaCloudPctFile;
 
-if ( !(f->read(filename)) )  {
+if ( !(f->read(filename, 'N')) )  {
 
    mlog << Error << "\nWwmcaRegridder::set_cp_nh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
 
@@ -241,7 +241,7 @@ void WwmcaRegridder::set_cp_sh_file(const char * filename)
 
 AfwaCloudPctFile * f = new AfwaCloudPctFile;
 
-if ( !(f->read(filename)) )  {
+if ( !(f->read(filename, 'S')) )  {
 
    mlog << Error << "\nWwmcaRegridder::set_cp_sh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
 
@@ -265,7 +265,7 @@ void WwmcaRegridder::set_pt_nh_file(const char * filename)
 
 AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
 
-if ( !(f->read(filename)) )  {
+if ( !(f->read(filename, 'N')) )  {
 
    mlog << Error << "\nWwmcaRegridder::set_pt_nh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
 
@@ -289,7 +289,7 @@ void WwmcaRegridder::set_pt_sh_file(const char * filename)
 
 AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
 
-if ( !(f->read(filename)) )  {
+if ( !(f->read(filename, 'S')) )  {
 
    mlog << Error << "\nWwmcaRegridder::set_pt_sh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
 
@@ -483,7 +483,7 @@ if ( I.width() == 1 )  {
    iv.set_bad();
 
    if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x0, from_y0) / 60;
-  
+
    if ( cloud->xy_is_ok(from_x0, from_y0) && pixel_age_minutes < max_minutes )  {
 
       iv.set_good( (double) ((*cloud)(from_x0, from_y0)) );
@@ -514,7 +514,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
       if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x0, from_y0) / 60;
       else          pixel_age_minutes = 0;
-   
+
       if ( !(cloud->xy_is_ok(from_x, from_y) &&
              pixel_age_minutes < max_minutes) )  {
 
@@ -617,7 +617,7 @@ if ( I.width() == 1 )  {
    pixel_age_minutes = 0;
 
    iv.set_bad();
-  
+
    if ( pixel_this )  pixel_age_minutes = pixel_this->pixel_age_sec(from_x0, from_y0) / 60;
 
    if ( cloud_this->xy_is_ok(from_x0, from_y0) && pixel_age_minutes < max_minutes )  {
@@ -925,7 +925,7 @@ void WwmcaRegridder::get_grid()
 {
 
 Grid G = parse_vx_grid(parse_conf_regrid(Config), (Grid *) 0, (Grid *) 0);
-   
+
 ToGrid = new Grid(G);
 
    //

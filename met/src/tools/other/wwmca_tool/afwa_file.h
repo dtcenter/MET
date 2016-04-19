@@ -79,7 +79,7 @@ class AfwaDataFile {
       // pure virtual member functions
       //
 
-      virtual bool read(const char * filename) = 0;
+      virtual bool read(const char * filename, const char hemisphere) = 0;
 
       virtual int operator()(int x, int y) const = 0;
 
