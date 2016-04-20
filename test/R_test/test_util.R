@@ -114,7 +114,7 @@ compListStr = function(l1, l2, warn, verb){
 	listMiss = l2[ !(l2 %in% l1) ];
 	if( 0 < length(listMiss) ){
 		if( 1 <= verb ){
-			cat("WARNING:", warn, length(listMiss), "\n");
+			cat("ERROR:", warn, length(listMiss), "\n");
 			if( 2 <= verb ){ for(strMiss in listMiss){ cat("   ", strMiss, "\n");	} }
 		} else {
 			quit(status=1);
@@ -141,7 +141,7 @@ compMapStr = function(m1, m2, warn, verb){
 		if( strAttr == "MET_version" ){ next; }
 		if( m1[[strAttr]] != m2[[strAttr]] ){
 			if( 1 <= verb ){
-				cat("WARNING:", warn, strAttr, "\n");
+				cat("ERROR:", warn, strAttr, "\n");
 			} else {
 				quit(status=1);
 			}
@@ -330,14 +330,14 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	listV2HdrExt = listV2Hdr[ !(listV2Hdr %in% listV1Hdr) ];
 	if( 0 < length(listV1HdrExt) ){
 		if( 1 <= verb ){
-			cat("WARNING: version", strV1, "contains extra headers:",
+			cat("ERROR: version", strV1, "contains extra headers:",
 				paste(listV1HdrExt, collapse=" "), "\n");
 		}
 		return (list("hdr" = FALSE));
 	}
 	if( 0 < length(listV2HdrExt) ){
 		if( 1 <= verb ){
-			cat("WARNING: version", strV2, "contains extra headers:",
+			cat("ERROR: version", strV2, "contains extra headers:",
 				paste(listV2HdrExt, collapse=" "), "\n");
 		}
 		return (list("hdr" = FALSE));
@@ -354,7 +354,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	boolTestNrow = ( listNrow[1] == listNrow[2] );
 	if( FALSE == boolTestNrow ){
 		if( 1 <= verb ){
-			cat("WARNING: differing number of rows", listNrow[1], "vs.", listNrow[2],
+			cat("ERROR: differing number of rows", listNrow[1], "vs.", listNrow[2],
 				"for row type", lty, "between versions",	strV1, "vs.", strV2, "\n");
 		}
 		return (list("nrow" = FALSE));
@@ -367,7 +367,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 		intNumDiff = sum( !listMatch[ !is.na(listMatch) ] );
 		if( 0 < intNumDiff ){
 			if( 1 <= verb ){
-				cat("WARNING: header information mismatch in column ",
+				cat("ERROR: header information mismatch in column ",
 						listHeaderCols[intCol], "\n", sep="");
 			}
 			return (list("hdr" = FALSE));
@@ -409,7 +409,7 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 		intNumDiff = sum(listDiff != 0);
 		if( 0 < intNumDiff ){
 			if( 1 <= verb ){
-				cat("WARNING: found",
+				cat("ERROR: found",
 					format(intNumDiff, width="5", justify="right"), "differences in row type",
 					format(lty, width="12", justify="left"),
 					"column", format(strCol, width=12, justify="left"),
@@ -502,11 +502,11 @@ compareStat = function(stat1, stat2, verb=0, strict=0){
 	listV1Lty = getStatLty(stat1);
 	listV2Lty = getStatLty(stat2);
 	for(strLty in listV1Lty[ !(listV1Lty %in% listV2Lty) ]){
-		if( 1 <= verb ){ cat("WARNING: line type", strLty, "not found in stat2\n"); }
+		if( 1 <= verb ){ cat("ERROR: line type", strLty, "not found in stat2\n"); }
 		listTest[[strLty]] = c("lty");
 	}
 	for(strLty in listV2Lty[ !(listV2Lty %in% listV1Lty) ]){
-		if( 1 <= verb ){ cat("WARNING: line type", strLty, "not found in stat1\n"); }
+		if( 1 <= verb ){ cat("ERROR: line type", strLty, "not found in stat1\n"); }
 		listTest[[strLty]] = c("lty");
 	}
 
@@ -594,7 +594,7 @@ printCompReport = function(listTest, verb=0, hist=""){
 			if( 1 <= verb ){ cat("passed", strLty, "\n"); }
 		} else {
 			if( 1 <= verb ){
-				cat("WARNING: failed tests for ", strLty, ": ", paste(listTest[[strLty]], collapse=", "), "\n", sep="");
+				cat("ERROR: failed tests for ", strLty, ": ", paste(listTest[[strLty]], collapse=", "), "\n", sep="");
 			} else {
 				quit(status=2);
 			}
@@ -639,7 +639,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	# if there are differences in the header, warn and quit
 	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
-			cat("WARNING: NetCDF headers differ:\n", paste(strCmdOut, collapse='\n'), "\n", sep='');
+			cat("ERROR: NetCDF headers differ:\n", paste(strCmdOut, collapse='\n'), "\n", sep='');
 			return();
 		} else {
 			quit(status=1);
@@ -654,7 +654,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	# if the ncdiff file failed for some reason, warn and quit
 	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
-			cat("WARNING: ncdiff error ", strCmdOut, "\n");
+			cat("ERROR: ncdiff error ", strCmdOut, "\n");
 
 			# if there is a variable mismatch, print a side-by-side table of variable names in the NetCDF files
 			if( TRUE == grepl("variable .* is in list one and not in list two", strCmdOut) ){
@@ -674,7 +674,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	}
 	if( ! fileExists(strNcDiff) ){
 		if( 1 <= verb ){
-			cat("WARNING: ncdiff output file does not exist\n");
+			cat("ERROR: ncdiff output file does not exist\n");
 			return();
 		} else {
 			quit(status=1);
@@ -725,7 +725,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
       		valDiff = max(c(0, abs(dataNcVar)), na.rm=T);
 			boolDiff = (dblDiffThresh < valDiff);
 			if( TRUE == boolDiff & 1 <= verb ){
-				cat("WARNING: found",
+				cat("ERROR: found",
 					format(intNumDiff, width="5", justify="right"), "differences in var",
 					format(strVar, width="37", justify="left"),
 					" - max abs:", format(valDiff, scientific=F), "\n");
@@ -736,7 +736,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
 			dataNcVar2 = get.var.ncdf(ncFile2, ncFile2$var[[ strVar ]]);
 			listDiff = (as.character(dataNcVar1) != as.character(dataNcVar2));
 			boolDiff = (0 < sum(listDiff));
-			if( TRUE == boolDiff & 1 <= verb ){ cat("WARNING:", sum(listDiff), "string difference(s) found in var", strVar, "\n"); }
+			if( TRUE == boolDiff & 1 <= verb ){ cat("ERROR:", sum(listDiff), "string difference(s) found in var", strVar, "\n"); }
 		}
 
 		# quit or print a message depending on the presence of a difference and verbosity
@@ -783,7 +783,7 @@ compareDiff = function(file1, file2, verb=0){
 	# if the diff failed, warn and quit
 	if( 0 < length(strCmdOut) ){
 		if( 1 <= verb ){
-			cat("WARNING: diff error:", strCmdOut, sep="\n");
+			cat("ERROR: diff error:", strCmdOut, sep="\n");
 			return();
 		} else {
 			quit(status=1);
