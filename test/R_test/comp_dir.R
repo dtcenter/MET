@@ -55,7 +55,7 @@ if( 1 <= verb ){ cat("dir1:", strDir1, "contains", length(listTest1Files), "file
 listMiss = listTest2Files[ !(listTest2Files %in% listTest1Files) ];
 if( 0 < length(listMiss) ){
 	if( 1 <= verb ){ 
-		cat("WARNING: folder", strDir1, "missing", length(listMiss), "files\n");
+		cat("ERROR: folder", strDir1, "missing", length(listMiss), "files\n");
 		for(strMiss in listMiss){ cat("   ", strMiss, "\n"); }
 	} else {
 		quit(status=1);
@@ -66,7 +66,7 @@ if( 0 < length(listMiss) ){
 listMiss = listTest1Files[ !(listTest1Files %in% listTest2Files) ];
 if( 0 < length(listMiss) ){
 	if( 1 <= verb ){ 
-		cat("WARNING: folder", strDir2, "missing", length(listMiss), "files\n");
+		cat("ERROR: folder", strDir2, "missing", length(listMiss), "files\n");
 		for(strMiss in listMiss){ cat("   ", strMiss, "\n"); }
 	} else {
 		quit(status=1);
