@@ -19,8 +19,6 @@
 tablefilesdir = $(pkgdatadir)/table_files
 
 tablefiles_DATA = \
-	grib2_vars_flat.txt \
-	nceptab_flat.txt \
 	stat_column_description.txt \
 	grib1_af_131_57.txt \
 	grib1_cptec_254_64.txt \
