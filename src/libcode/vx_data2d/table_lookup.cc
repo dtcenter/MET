@@ -42,9 +42,6 @@ TableFlatFile GribTable (0);
 
 static const char table_data_dir   [] = "MET_BASE/table_files";      //  relative to MET_BASE
 
-//static const char grib1_table_file [] = "nceptab_flat.txt";          //  relative to table_data_dir
-
-static const char grib2_table_file [] = "grib2_vars_flat.txt";       //  relative to table_data_dir
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -599,24 +596,25 @@ TableFlatFile::TableFlatFile(int) {
    path1 = replace_path(path1);
 
    filtered_file_names.clear();
+
    get_table_files(path1, "grib2", ".txt", filtered_file_names);
 
-   for (unsigned int i = 0; i < filtered_file_names.size(); i++) {
-      if (filtered_file_names[i] != grib2_table_file) { //exclude the old grib2 table file
+   for (unsigned int i = 0; i < filtered_file_names.size(); i++)
+   {
 
-         path << cs_erase << table_data_dir << '/' << filtered_file_names[i];
+      path << cs_erase << table_data_dir << '/' << filtered_file_names[i];
 
-         path = replace_path(path);
+      path = replace_path(path);
 
-         if (!read(path)) {
+      if (!read(path)) {
 
-            mlog << Error
+         mlog << Error
             << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
 
-            exit(1);
+         exit(1);
 
-         }
       }
+
    }
    //
    //  done
