@@ -286,18 +286,7 @@ RenderInfo info;
 PSfile plot;
 double x_ll, y_ll;
 
-char filename_hemi;
-unixtime filename_valid;
-
-if ( !(is_afwa_cloud_pct_filename(filename, filename_hemi, filename_valid)) )  {
-
-   mlog << Error << "\n" << program_name << ": unexpected input file naming convention \"" << filename << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( !(f_cp.read(filename, filename_hemi)) )  {
+if ( !(f_cp.read(filename, bad_data_char)) )  {
 
    mlog << Error << "\n" << program_name << ": unable to open input file \"" << filename << "\"\n\n";
 
@@ -320,7 +309,7 @@ pt_filename = new char [strlen(filename) + 10];
 // create pixel time filename and read it in
 set_pixel_time_filename(filename, pt_filename);
 
-if ( !(f_pt.read(pt_filename, filename_hemi)) )  {
+if ( !(f_pt.read(pt_filename, bad_data_char)) )  {
 
    mlog << Error << "\n" << program_name << ": unable to open pixel time file \"" << pt_filename << "\"\n\n";
 
@@ -328,7 +317,7 @@ if ( !(f_pt.read(pt_filename, filename_hemi)) )  {
 
 }
 
-if (pt_filename)  {delete [] pt_filename; pt_filename = (char *) 0; }
+if (pt_filename)  { delete [] pt_filename; pt_filename = (char *) 0; }
 
 if ( output_directory.length() > 0 )  output_filename << output_directory << '/';
 

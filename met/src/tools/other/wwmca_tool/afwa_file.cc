@@ -122,7 +122,9 @@ if ( grid )  { delete grid;  grid = (const Grid *) 0; }
 
 Filename.clear();
 
-Hemisphere = 'N';
+Hemisphere = bad_data_char;
+
+Init = (unixtime) 0;
 
 Valid = (unixtime) 0;
 
@@ -143,6 +145,8 @@ clear();
 Filename = a.Filename;
 
 Hemisphere = a.Hemisphere;
+
+Init = a.Init;
 
 Valid = a.Valid;
 
@@ -168,6 +172,66 @@ return;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool AfwaDataFile::read(const char * filename, const char input_hemi)
+
+{
+
+clear();
+
+char file_hemi = bad_data_char;
+
+mlog << Debug(1)
+     << "Reading input file: " << filename << "\n";
+
+   //  Parse the filename
+
+parse_af_filename(filename, file_hemi, Init, Valid);
+
+   //  Determine the hemisphere
+
+if ( is_bad_data(input_hemi) && is_bad_data(file_hemi) )  {
+
+   mlog << Warning << "\nAfwaDataFile::read(const char *) -> "
+        << "cannot determine the hemisphere, assuming northern.\n\n";
+
+   Hemisphere = 'N';
+
+}
+else if ( !is_bad_data(input_hemi) && !is_bad_data(file_hemi)  &&
+          input_hemi != file_hemi )  {
+
+   mlog << Warning << "\nAfwaDataFile::read(const char *) -> "
+        << "the command line hemisphere (" << input_hemi
+        << ") and filename hemisphere (" << file_hemi
+        << ") do not match for \"" << filename
+        << "\", using command line value.\n\n";
+
+   Hemisphere = input_hemi;
+
+}
+else if ( !is_bad_data(input_hemi) )  Hemisphere = input_hemi;
+else                                  Hemisphere = file_hemi;
+
+   //  Check for unset valid time
+
+if ( Valid == (unixtime) 0 )  {
+
+   mlog << Warning << "\nAfwaDataFile::read(const char *) -> "
+        << "unable to parse timing information from filename \"" << filename
+        << "\"\n\n";
+
+}
+
+if ( Hemisphere == 'N' )  grid = new Grid(wwmca_north_data);
+else                      grid = new Grid(wwmca_south_data);
+
+return ( true );
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -217,6 +281,92 @@ return ( n );
 ////////////////////////////////////////////////////////////////////////
 
 
+void parse_af_filename(const char * filename, char & Hemisphere,
+                       unixtime & Init, unixtime & Valid)
+
+{
+
+int j;
+StringArray tokens;
+unixtime file_ut  = (unixtime) 0;
+unixtime file_sec = bad_data_int;
+
+   //  Initialize
+
+Hemisphere = bad_data_char;
+Valid = (unixtime) 0;
+Init  = (unixtime) 0;
+
+if ( !filename )  return;
+
+   //  Tokenize the filename
+
+tokens.parse_delim(get_short_name(filename), "_.");
+
+   //  Loop through and interpret the tokens
+
+for (j=0; j<tokens.n_elements(); ++j)  {
+
+   //  Unixtime in the form YYYYMMDDHH[MMSS]
+   if ( is_number(tokens[j]) && strlen(tokens[j]) >= 10 )
+      file_ut = timestring_to_unix(tokens[j]);
+
+   //  Lead time in hours as a 1 - 4 digit number
+   else if ( is_number(tokens[j]) && strlen(tokens[j]) <= 4)
+      file_sec = atoi(tokens[j]) * sec_per_hour;
+
+   else if ( strcasecmp(tokens[j], "NH") == 0 )  Hemisphere = 'N';
+
+   else if ( strcasecmp(tokens[j], "SH") == 0 )  Hemisphere = 'S';
+
+}
+
+if ( is_bad_data(Hemisphere) )  {
+
+   mlog << Warning << "\nparse_af_filename() -> "
+        << "cannot determine the hemisphere from filename \""
+        << filename << "\"\n\n";
+
+}
+else  {
+
+   mlog << Debug(2)
+        << "Parsed hemisphere (" << Hemisphere << ") from filename.\n";
+
+}
+
+   //  Interpret the timestamp of the file
+if ( file_ut != (unixtime) 0 )  {
+
+   //  If lead time undefined, store file time as valid time
+   if ( is_bad_data(file_sec) )  {
+
+      Init  = file_ut;
+      Valid = file_ut;
+
+      mlog << Debug(2) << "Parsed valid time ("
+           << unix_to_yyyymmdd_hhmmss(Valid) << ") from filename.\n";
+
+   }
+
+   //  Otherwise, store file time as initialization time
+   else  {
+
+      Init  = file_ut;
+      Valid = file_ut + file_sec;
+
+      mlog << Debug(2) << "Parsed initialization ("
+           << unix_to_yyyymmdd_hhmmss(Init) << "), lead ("
+           << sec_to_hhmmss(Valid-Init) << "), and valid ("
+           << unix_to_yyyymmdd_hhmmss(Valid) << ") times from filename.\n";
+
+   }
+}
+
+return;
+
+}
 
 
+////////////////////////////////////////////////////////////////////////
 

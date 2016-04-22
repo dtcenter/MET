@@ -53,14 +53,6 @@ const int Nx = ToGrid->nx();
 const int Ny = ToGrid->ny();
 
    //
-   //  list output file name
-   //
-
-mlog << Debug(1)
-     << "Writing output file: " << output_filename << "\n";
-
-
-   //
    //  open the netcdf file
    //
 
@@ -121,24 +113,69 @@ data_var->add_att("_FillValue", fill_value);
 
 s = Config->lookup_string("valid_time");
 
-valid_time = ( s.length() > 0 ?
-               timestring_to_unix((const char *) s) :
-               cp_nh->valid() );
+if ( s.length() > 0 )  {
+
+   valid_time = timestring_to_unix((const char *) s);
+
+   mlog << Debug(2) << "Parsed valid time ("
+        << unix_to_yyyymmdd_hhmmss(valid_time)
+        << ") from config file.\n";
+
+   if ( cp_nh->valid() != (unixtime) 0 &&
+        cp_nh->valid() != valid_time )  {
+
+      mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
+           << "the config file valid time ("
+           << unix_to_yyyymmdd_hhmmss(valid_time)
+           << ") and data file valid time ("
+           << unix_to_yyyymmdd_hhmmss(cp_nh->valid())
+           << ") do not match, using config file time.\n\n";
+
+   }
+
+}
+else  {
+
+   valid_time = cp_nh->valid();
+
+}
 
 if ( valid_time == (unixtime) 0 )  {
 
    mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
-        << "valid time not defined in the filename or configuration file, writing 0.\n\n";
-
-   exit ( 1 );
+        << "valid time not defined in the data file or config file, writing "
+        << unix_to_yyyymmdd_hhmmss((unixtime) 0) << ".\n\n";
 
 }
 
 s = Config->lookup_string("init_time");
 
-init_time = ( s.length() > 0 ?
-              timestring_to_unix((const char *) s) :
-              valid_time );
+if ( s.length() > 0 )  {
+
+   init_time = timestring_to_unix((const char *) s);
+
+   mlog << Debug(2) << "Parsed initialization time ("
+        << unix_to_yyyymmdd_hhmmss(init_time)
+        << ") from config file.\n";
+
+   if ( cp_nh->init() != (unixtime) 0 &&
+        cp_nh->init() != init_time )  {
+
+      mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
+           << "the config file initialization time ("
+           << unix_to_yyyymmdd_hhmmss(init_time)
+           << ") and data file initialization time ("
+           << unix_to_yyyymmdd_hhmmss(cp_nh->init())
+           << ") do not match, using config file time.\n\n";
+
+   }
+
+}
+else  {
+
+   init_time = cp_nh->init();
+
+}
 
 s = Config->lookup_string("accum_time");
 
@@ -180,6 +217,13 @@ for (x=0; x<Nx; ++x)  {
    //
 
 if ( ncfile )  { delete ncfile;  ncfile = (NcFile *) 0; }
+
+   //
+   //  list output file name
+   //
+
+mlog << Debug(1)
+     << "Writing output file: " << output_filename << "\n";
 
 return;
 
