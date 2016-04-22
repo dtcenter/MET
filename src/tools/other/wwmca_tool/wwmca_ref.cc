@@ -78,11 +78,11 @@ void WwmcaRegridder::init_from_scratch()
 NHgrid = new Grid (wwmca_north_data);
 SHgrid = new Grid (wwmca_south_data);
 
-cp_nh = (const AfwaCloudPctFile *) 0;
-cp_sh = (const AfwaCloudPctFile *) 0;
+cp_nh = (const AFCloudPctFile *) 0;
+cp_sh = (const AFCloudPctFile *) 0;
 
-pt_nh = (const AfwaPixelTimeFile *) 0;
-pt_sh = (const AfwaPixelTimeFile *) 0;
+pt_nh = (const AFPixelTimeFile *) 0;
+pt_sh = (const AFPixelTimeFile *) 0;
 
 ToGrid = (const Grid *) 0;
 
@@ -106,14 +106,11 @@ void WwmcaRegridder::clear()
 
 {
 
-// if ( NHgrid )  { delete NHgrid;  NHgrid = (const Grid *) 0; }
-// if ( SHgrid )  { delete SHgrid;  SHgrid = (const Grid *) 0; }
+if ( cp_nh )  { delete cp_nh;  cp_nh = (const AFCloudPctFile *) 0; }
+if ( cp_sh )  { delete cp_sh;  cp_sh = (const AFCloudPctFile *) 0; }
 
-if ( cp_nh )  { delete cp_nh;  cp_nh = (const AfwaCloudPctFile *) 0; }
-if ( cp_sh )  { delete cp_sh;  cp_sh = (const AfwaCloudPctFile *) 0; }
-
-if ( pt_nh )  { delete pt_nh;  pt_nh = (const AfwaPixelTimeFile *) 0; }
-if ( pt_sh )  { delete pt_sh;  pt_sh = (const AfwaPixelTimeFile *) 0; }
+if ( pt_nh )  { delete pt_nh;  pt_nh = (const AFPixelTimeFile *) 0; }
+if ( pt_sh )  { delete pt_sh;  pt_sh = (const AFPixelTimeFile *) 0; }
 
 if ( ToGrid )  { delete ToGrid;  ToGrid = (const Grid *) 0; }
 
@@ -215,17 +212,18 @@ void WwmcaRegridder::set_cp_nh_file(const char * filename)
 
 {
 
-AfwaCloudPctFile * f = new AfwaCloudPctFile;
+AFCloudPctFile * f = new AFCloudPctFile;
 
 if ( !(f->read(filename, 'N')) )  {
 
-   mlog << Error << "\nWwmcaRegridder::set_cp_nh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_cp_nh_file(const char *) -> "
+        << "unable to open cloud pct file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-cp_nh = (const AfwaCloudPctFile *) f;  f = (AfwaCloudPctFile *) 0;
+cp_nh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) 0;
 
 return;
 
@@ -239,17 +237,18 @@ void WwmcaRegridder::set_cp_sh_file(const char * filename)
 
 {
 
-AfwaCloudPctFile * f = new AfwaCloudPctFile;
+AFCloudPctFile * f = new AFCloudPctFile;
 
 if ( !(f->read(filename, 'S')) )  {
 
-   mlog << Error << "\nWwmcaRegridder::set_cp_sh_file(const char *) -> unable to open afwa cloud pct file \"" << filename << "\"\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_cp_sh_file(const char *) -> "
+        << "unable to open cloud pct file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-cp_sh = (const AfwaCloudPctFile *) f;  f = (AfwaCloudPctFile *) 0;
+cp_sh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) 0;
 
 return;
 
@@ -263,17 +262,17 @@ void WwmcaRegridder::set_pt_nh_file(const char * filename)
 
 {
 
-AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
+AFPixelTimeFile * f = new AFPixelTimeFile;
 
 if ( !(f->read(filename, 'N')) )  {
 
-   mlog << Error << "\nWwmcaRegridder::set_pt_nh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_pt_nh_file(const char *) -> unable to open pixel time file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-pt_nh = (const AfwaPixelTimeFile *) f;  f = (AfwaPixelTimeFile *) 0;
+pt_nh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) 0;
 
 return;
 
@@ -287,17 +286,18 @@ void WwmcaRegridder::set_pt_sh_file(const char * filename)
 
 {
 
-AfwaPixelTimeFile * f = new AfwaPixelTimeFile;
+AFPixelTimeFile * f = new AFPixelTimeFile;
 
 if ( !(f->read(filename, 'S')) )  {
 
-   mlog << Error << "\nWwmcaRegridder::set_pt_sh_file(const char *) -> unable to open afwa pixel time file \"" << filename << "\"\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_pt_sh_file(const char *) -> "
+        << "unable to open pixel time file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-pt_sh = (const AfwaPixelTimeFile *) f;  f = (AfwaPixelTimeFile *) 0;
+pt_sh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) 0;
 
 return;
 
@@ -323,7 +323,9 @@ get_interpolator();
 
 if ( !interp )  {
 
-   mlog << Error << "\nWwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad interpolator specification in config file\"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_config(wwmca_regrid_Conf &) -> "
+        << "bad interpolator specification in config file\""
+        << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -337,7 +339,9 @@ get_grid();
 
 if ( !ToGrid )  {
 
-   mlog << Error << "\nWwmcaRegridder::set_config(wwmca_regrid_Conf &) -> bad \"to\" grid specification in config file\"" << ConfigFilename << "\"\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_config(wwmca_regrid_Conf &) -> "
+        << "bad \"to\" grid specification in config file\""
+        << ConfigFilename << "\"\n\n";
 
    exit ( 1 );
 
@@ -357,7 +361,9 @@ find_grid_hemisphere();
 
 if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !cp_nh ) {
 
-   mlog << Error << "\nWwmcaRegridder::set_config() -> missing northern hemisphere data must be specified using the \"-nh\" argument\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_config() -> "
+        << "missing northern hemisphere data must be specified using the "
+        << "\"-nh\" argument\n\n";
 
    exit ( 1 );
 
@@ -365,7 +371,9 @@ if ( ( Hemi == north_hemisphere || Hemi == both_hemispheres ) && !cp_nh ) {
 
 if ( ( Hemi == south_hemisphere || Hemi == both_hemispheres ) && !cp_sh ) {
 
-   mlog << Error << "\nWwmcaRegridder::set_config() -> missing southern hemisphere data must be specified using the \"-sh\" argument\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_config() -> "
+        << "missing southern hemisphere data must be specified using the "
+        << "\"-sh\" argument\n\n";
 
    exit ( 1 );
 
@@ -424,7 +432,8 @@ switch ( Hemi )  {
 
    default:
       gridhemisphere_to_string(Hemi, junk);
-      mlog << Error << "\nWwmcaRegridder::get_interpolated_value(int x, int y) const -> bad hemisphere ... " << junk << "\n\n";
+      mlog << Error << "\nWwmcaRegridder::get_interpolated_value(int x, int y) const -> "
+           << "bad hemisphere ... " << junk << "\n\n";
       exit ( 1 );
       break;
 
@@ -439,7 +448,7 @@ return ( value );
 ////////////////////////////////////////////////////////////////////////
 
 
-InterpolationValue WwmcaRegridder::do_single_hemi(int to_x0, int to_y0, const Grid * From, const AfwaCloudPctFile * cloud, const AfwaPixelTimeFile * pixel) const
+InterpolationValue WwmcaRegridder::do_single_hemi(int to_x0, int to_y0, const Grid * From, const AFCloudPctFile * cloud, const AFPixelTimeFile * pixel) const
 
 {
 
@@ -561,10 +570,10 @@ double t;
 int from_x0, from_y0;
 int xx, yy, sub_x, sub_y, from_x, from_y, wm1o2;
 InterpolationValue iv;
-const AfwaCloudPctFile   * cloud_this  = (const AfwaCloudPctFile *) 0;
-const AfwaCloudPctFile   * cloud_other = (const AfwaCloudPctFile *) 0;
-const AfwaPixelTimeFile  * pixel_this  = (const AfwaPixelTimeFile *) 0;
-const AfwaPixelTimeFile  * pixel_other = (const AfwaPixelTimeFile *) 0;
+const AFCloudPctFile   * cloud_this  = (const AFCloudPctFile *) 0;
+const AFCloudPctFile   * cloud_other = (const AFCloudPctFile *) 0;
+const AFPixelTimeFile  * pixel_this  = (const AFPixelTimeFile *) 0;
+const AFPixelTimeFile  * pixel_other = (const AFPixelTimeFile *) 0;
 const Grid * From_this  = (const Grid *) 0;
 const Grid * From_other = (const Grid *) 0;
 int pixel_age_minutes;

@@ -42,9 +42,9 @@ using namespace std;
 #include "vx_grid.h"
 #include "vx_plot_util.h"
 
-#include "afwa_file.h"
-#include "afwa_cp_file.h"
-#include "afwa_pt_file.h"
+#include "af_file.h"
+#include "af_cp_file.h"
+#include "af_pt_file.h"
 #include "wwmca_grids.h"
 
 
@@ -107,7 +107,7 @@ static void process(const char * filename);
 
 static void set_pixel_time_filename(const char *, char *);
 
-static void make_image(const AfwaCloudPctFile &, const AfwaPixelTimeFile &, PxmBase &);
+static void make_image(const AFCloudPctFile &, const AFPixelTimeFile &, PxmBase &);
 
 static Color value_to_color(int value);
 
@@ -276,8 +276,8 @@ void process(const char * filename)
 
 {
 
-AfwaCloudPctFile f_cp;
-AfwaPixelTimeFile f_pt;
+AFCloudPctFile f_cp;
+AFPixelTimeFile f_pt;
 ConcatString short_name;
 ConcatString output_filename;
 char * pt_filename = (char *) 0;
@@ -453,7 +453,7 @@ void set_pixel_time_filename(const char * cp_name, char * pt_name)
 ////////////////////////////////////////////////////////////////////////
 
 
-void make_image(const AfwaCloudPctFile & f_cp, const AfwaPixelTimeFile & f_pt, PxmBase & image)
+void make_image(const AFCloudPctFile & f_cp, const AFPixelTimeFile & f_pt, PxmBase & image)
 
 {
 

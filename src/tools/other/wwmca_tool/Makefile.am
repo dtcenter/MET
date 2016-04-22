@@ -16,9 +16,9 @@ bin_PROGRAMS    = wwmca_regrid \
 wwmca_regrid_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
 	wwmca_grids.h \
 	wwmca_regrid.cc \
-	afwa_file.cc afwa_file.h \
-	afwa_cp_file.cc afwa_cp_file.h \
-	afwa_pt_file.cc afwa_pt_file.h \
+	af_file.cc af_file.h \
+	af_cp_file.cc af_cp_file.h \
+	af_pt_file.cc af_pt_file.h \
 	interp_base.cc interp_base.h \
 	min_interp.cc min_interp.h \
 	max_interp.cc max_interp.h \
@@ -59,9 +59,9 @@ wwmca_regrid_LDADD = -lvx_pxm \
 wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
 	wwmca_grids.h \
 	wwmca_plot.cc \
-	afwa_file.cc afwa_file.h \
-	afwa_cp_file.cc afwa_cp_file.h \
-	afwa_pt_file.cc afwa_pt_file.h \
+	af_file.cc af_file.h \
+	af_cp_file.cc af_cp_file.h \
+	af_pt_file.cc af_pt_file.h \
 	interp_base.cc interp_base.h \
 	min_interp.cc min_interp.h \
 	max_interp.cc max_interp.h \

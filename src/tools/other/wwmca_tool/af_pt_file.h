@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __AFWA_PIXEL_TIME_FILE_H__
-#define  __AFWA_PIXEL_TIME_FILE_H__
+#ifndef  __AF_PIXEL_TIME_FILE_H__
+#define  __AF_PIXEL_TIME_FILE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -23,28 +23,28 @@
 #include "vx_util.h"
 #include "vx_grid.h"
 
-#include "afwa_file.h"
+#include "af_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class AfwaPixelTimeFile : public AfwaDataFile {
+class AFPixelTimeFile : public AFDataFile {
 
    private:
 
       void init_from_scratch();
 
-      void assign(const AfwaPixelTimeFile &);
+      void assign(const AFPixelTimeFile &);
 
       unsigned char * Buf;
 
    public:
 
-      AfwaPixelTimeFile();
-      virtual ~AfwaPixelTimeFile();
-      AfwaPixelTimeFile(const AfwaPixelTimeFile &);
-      AfwaPixelTimeFile & operator=(const AfwaPixelTimeFile &);
+      AFPixelTimeFile();
+      virtual ~AFPixelTimeFile();
+      AFPixelTimeFile(const AFPixelTimeFile &);
+      AFPixelTimeFile & operator=(const AFPixelTimeFile &);
 
       void clear();
 
@@ -60,19 +60,13 @@ class AfwaPixelTimeFile : public AfwaDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int AfwaPixelTimeFile::operator()(int x, int y) const { return ( pixel_age_sec(x, y) ); }
+inline int AFPixelTimeFile::operator()(int x, int y) const { return ( pixel_age_sec(x, y) ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool is_afwa_pixel_time_filename(const char * filename, char & Hemisphere, unixtime & Valid);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#endif   /*  __AFWA_PIXEL_TIME_FILE_H__  */
+#endif   /*  __AF_PIXEL_TIME_FILE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

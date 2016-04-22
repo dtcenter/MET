@@ -21,9 +21,9 @@
 
 #include <netcdf.hh>
 
-#include "afwa_file.h"
-#include "afwa_cp_file.h"
-#include "afwa_pt_file.h"
+#include "af_file.h"
+#include "af_cp_file.h"
+#include "af_pt_file.h"
 #include "interp_base.h"
 
 #include "vx_config.h"
@@ -73,8 +73,8 @@ class WwmcaRegridder {
 
 
       InterpolationValue do_single_hemi(int to_x, int to_y, const Grid * From,
-                                        const AfwaCloudPctFile * cloud,
-                                        const AfwaPixelTimeFile * pixel) const;
+                                        const AFCloudPctFile * cloud,
+                                        const AFPixelTimeFile * pixel) const;
 
       InterpolationValue do_both_hemi(int to_x, int to_y) const;
 
@@ -86,11 +86,11 @@ class WwmcaRegridder {
       const Grid * NHgrid;           //  allocated
       const Grid * SHgrid;           //  allocated
 
-      const AfwaCloudPctFile * cp_nh;   //  allocated
-      const AfwaCloudPctFile * cp_sh;   //  allocated
+      const AFCloudPctFile * cp_nh;  //  allocated
+      const AFCloudPctFile * cp_sh;  //  allocated
 
-      const AfwaPixelTimeFile * pt_nh;   //  allocated
-      const AfwaPixelTimeFile * pt_sh;   //  allocated
+      const AFPixelTimeFile * pt_nh; //  allocated
+      const AFPixelTimeFile * pt_sh; //  allocated
 
       const Grid * ToGrid;           //  allocated
 

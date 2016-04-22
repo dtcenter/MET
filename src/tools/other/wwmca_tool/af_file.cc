@@ -27,7 +27,7 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_cal.h"
 
-#include "afwa_file.h"
+#include "af_file.h"
 #include "wwmca_grids.h"
 
 
@@ -35,14 +35,14 @@ using namespace std;
 
 
    //
-   //  Code for class AfwaDataFile
+   //  Code for class AFDataFile
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaDataFile::AfwaDataFile()
+AFDataFile::AFDataFile()
 
 {
 
@@ -54,7 +54,7 @@ init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaDataFile::~AfwaDataFile()
+AFDataFile::~AFDataFile()
 
 {
 
@@ -66,7 +66,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaDataFile::AfwaDataFile(const AfwaDataFile & a)
+AFDataFile::AFDataFile(const AFDataFile & a)
 
 {
 
@@ -82,7 +82,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaDataFile & AfwaDataFile::operator=(const AfwaDataFile & a)
+AFDataFile & AFDataFile::operator=(const AFDataFile & a)
 
 {
 
@@ -98,7 +98,7 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
-void AfwaDataFile::init_from_scratch()
+void AFDataFile::init_from_scratch()
 
 {
 
@@ -114,7 +114,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void AfwaDataFile::clear()
+void AFDataFile::clear()
 
 {
 
@@ -136,7 +136,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void AfwaDataFile::assign(const AfwaDataFile & a)
+void AFDataFile::assign(const AFDataFile & a)
 
 {
 
@@ -161,7 +161,7 @@ switch ( Hemisphere )  {
       break;
 
    default:
-      mlog << Error << "\nAfwaDataFile::assign(const AfwaDataFile &) -> bad hemisphere ... " << Hemisphere << "\n\n";
+      mlog << Error << "\nAFDataFile::assign(const AFDataFile &) -> bad hemisphere ... " << Hemisphere << "\n\n";
       exit ( 1 );
       break;
 
@@ -176,7 +176,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool AfwaDataFile::read(const char * filename, const char input_hemi)
+bool AFDataFile::read(const char * filename, const char input_hemi)
 
 {
 
@@ -195,7 +195,7 @@ parse_af_filename(filename, file_hemi, Init, Valid);
 
 if ( is_bad_data(input_hemi) && is_bad_data(file_hemi) )  {
 
-   mlog << Warning << "\nAfwaDataFile::read(const char *) -> "
+   mlog << Warning << "\nAFDataFile::read(const char *) -> "
         << "cannot determine the hemisphere, assuming northern.\n\n";
 
    Hemisphere = 'N';
@@ -204,7 +204,7 @@ if ( is_bad_data(input_hemi) && is_bad_data(file_hemi) )  {
 else if ( !is_bad_data(input_hemi) && !is_bad_data(file_hemi)  &&
           input_hemi != file_hemi )  {
 
-   mlog << Warning << "\nAfwaDataFile::read(const char *) -> "
+   mlog << Warning << "\nAFDataFile::read(const char *) -> "
         << "the command line hemisphere (" << input_hemi
         << ") and filename hemisphere (" << file_hemi
         << ") do not match for \"" << filename
@@ -220,7 +220,7 @@ else                                  Hemisphere = file_hemi;
 
 if ( Valid == (unixtime) 0 )  {
 
-   mlog << Warning << "\nAfwaDataFile::read(const char *) -> "
+   mlog << Warning << "\nAFDataFile::read(const char *) -> "
         << "unable to parse timing information from filename \"" << filename
         << "\"\n\n";
 
@@ -236,7 +236,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool AfwaDataFile::xy_is_ok(int x, int y) const
+bool AFDataFile::xy_is_ok(int x, int y) const
 
 {
 
@@ -255,13 +255,13 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-int AfwaDataFile::two_to_one(int x, int y) const
+int AFDataFile::two_to_one(int x, int y) const
 
 {
 
-if ( (x < 0) || (x >= afwa_nx) || (y < 0) || (y >= afwa_ny) )  {
+if ( (x < 0) || (x >= af_nx) || (y < 0) || (y >= af_ny) )  {
 
-   mlog << Error << "\nAfwaDataFile::two_to_one(int, int) const -> range check error\n\n";
+   mlog << Error << "\nAFDataFile::two_to_one(int, int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -269,9 +269,9 @@ if ( (x < 0) || (x >= afwa_nx) || (y < 0) || (y >= afwa_ny) )  {
 
 int n, yy;
 
-yy = afwa_ny - 1 - y;
+yy = af_ny - 1 - y;
 
-n = yy*afwa_nx + x;
+n = yy*af_nx + x;
 
 return ( n );
 

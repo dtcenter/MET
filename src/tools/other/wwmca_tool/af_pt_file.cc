@@ -27,52 +27,33 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_cal.h"
 
-#include "afwa_file.h"
-#include "afwa_cp_file.h"
+#include "af_file.h"
+#include "af_pt_file.h"
 #include "wwmca_grids.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-// cloud percent records are 1 byte each
-static const int cloud_pct_record_size    =   1;
+// pixel age time records are 4 bytes each
+static const int pixel_time_record_size = 4;
 
-// the maximum length for a datetime string
-static const int max_string_length         = 256;
-
-// the lengths of the filename parts
-static const int cp_filename_length        =  35;
-static const int cp_filename_prefix_length =  22;
-static const int cp_hemisphere_length      =   3;
-
-// the starting and ending positions for the date and time string from the filename
-static const int cp_datetime_start_pos     =  25;
-static const int cp_datetime_end_pos       =  34;
-
-// the date and time pieces starting and ending positions from the datetime string
-static const int cp_year_start_pos         =   0;
-static const int cp_year_end_pos           =   3;
-static const int cp_month_start_po         =   4;
-static const int cp_month_end_pos          =   5;
-static const int cp_day_start_pos          =   6;
-static const int cp_day_end_pos            =   7;
-static const int cp_hour_start_pos         =   8;
-static const int cp_hour_end_pos           =   9;
+// awfa pixel age time begins at December 31, 1967 00:00:00
+static const unixtime af_start = mdyhms_to_unix(12, 31, 1967, 0, 0, 0);
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
    //
-   //  Code for class AfwaCloudPctFile
+   //  Code for class AFPixelTimeFile
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaCloudPctFile::AfwaCloudPctFile()
+AFPixelTimeFile::AFPixelTimeFile()
 
 {
 
@@ -84,7 +65,7 @@ init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaCloudPctFile::~AfwaCloudPctFile()
+AFPixelTimeFile::~AFPixelTimeFile()
 
 {
 
@@ -96,7 +77,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaCloudPctFile::AfwaCloudPctFile(const AfwaCloudPctFile & a)
+AFPixelTimeFile::AFPixelTimeFile(const AFPixelTimeFile & a)
 
 {
 
@@ -112,7 +93,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-AfwaCloudPctFile & AfwaCloudPctFile::operator=(const AfwaCloudPctFile & a)
+AFPixelTimeFile & AFPixelTimeFile::operator=(const AFPixelTimeFile & a)
 
 {
 
@@ -128,7 +109,7 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
-void AfwaCloudPctFile::init_from_scratch()
+void AFPixelTimeFile::init_from_scratch()
 
 {
 
@@ -144,13 +125,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void AfwaCloudPctFile::clear()
+void AFPixelTimeFile::clear()
 
 {
 
 if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) 0; }
 
-AfwaDataFile::clear();
+AFDataFile::clear();
 
 return;
 
@@ -160,7 +141,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void AfwaCloudPctFile::assign(const AfwaCloudPctFile & a)
+void AFPixelTimeFile::assign(const AFPixelTimeFile & a)
 
 {
 
@@ -168,11 +149,11 @@ clear();
 
 if ( !(a.Buf) )  return;
 
-Buf = new unsigned char [afwa_nx*afwa_ny*cloud_pct_record_size];
+Buf = new unsigned char [af_nx*af_ny*pixel_time_record_size];
 
-memset(Buf, 0, afwa_nx*afwa_ny*cloud_pct_record_size);
+memset(Buf, 0, af_nx*af_ny*pixel_time_record_size);
 
-AfwaDataFile::assign(a);
+AFDataFile::assign(a);
 
 return;
 
@@ -182,7 +163,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool AfwaCloudPctFile::read(const char * filename, const char input_hemi)
+bool AFPixelTimeFile::read(const char * filename, const char input_hemi)
 
 {
 
@@ -190,27 +171,27 @@ clear();
 
    //  Call parent to parse metadata
 
-AfwaDataFile::read(filename, input_hemi);
+AFDataFile::read(filename, input_hemi);
 
 int fd = -1;
 int bytes;
 
 if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
-   mlog << Error << "\nAfwaCloudPctFile::read(const char *) -> "
+   mlog << Error << "\nAFPixelTimeFile::read(const char *) -> "
         << "can't open file \"" << filename << "\"\n\n";
 
    return ( false );
 
 }
 
-bytes = afwa_nx*afwa_ny*cloud_pct_record_size;
+bytes = af_nx*af_ny*pixel_time_record_size;
 
 Buf = new unsigned char [bytes];
 
 if ( ::read(fd, Buf, bytes) != bytes )  {
 
-   mlog << Error << "\nAfwaCloudPctFile::read(const char *) -> "
+   mlog << Error << "\nAFPixelTimeFile::read(const char *) -> "
         << "read error on file \"" << filename << "\"\n\n";
 
    return ( false );
@@ -218,6 +199,7 @@ if ( ::read(fd, Buf, bytes) != bytes )  {
 }
 
 Filename = get_short_name(filename);
+
 
    //
    //  done
@@ -233,15 +215,31 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-int AfwaCloudPctFile::cloud_pct(int x, int y) const
+int AFPixelTimeFile::pixel_age_sec(int x, int y) const
 
 {
 
 int k, n;
+unixtime t = 0;
 
 n = two_to_one(x, y);   //  this function does range checking on x and y for us
 
-k = (int) (Buf[n]);
+int *ibuf = (int *)Buf;
+
+int minutes = ibuf[n];
+
+if ( native_endian != big_endian )  shuffle_4(&minutes);
+
+if (minutes == 0)  k = 0;
+else {
+
+   t = 60LL * minutes;      // convert minutes to long long in seconds
+
+   t += af_start;           // convert af time to unixtime
+
+   k = (int) (Valid - t);   // subtract from the filetime (Valid) to get pixel age in seconds
+
+}
 
 return ( k );
 
