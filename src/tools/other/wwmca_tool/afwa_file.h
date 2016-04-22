@@ -51,6 +51,8 @@ class AfwaDataFile {
 
       char Hemisphere;  //  'N' or 'S'
 
+      unixtime Init;
+
       unixtime Valid;
 
    public:
@@ -70,6 +72,8 @@ class AfwaDataFile {
 
       int nx() const;
       int ny() const;
+
+      unixtime init() const;
 
       unixtime valid() const;
 
@@ -92,8 +96,16 @@ class AfwaDataFile {
 inline int AfwaDataFile::nx() const { return ( afwa_nx ); }
 inline int AfwaDataFile::ny() const { return ( afwa_ny ); }
 
+inline unixtime AfwaDataFile::init       () const { return ( Init ); }
 inline unixtime AfwaDataFile::valid      () const { return ( Valid ); }
 inline char     AfwaDataFile::hemisphere () const { return ( Hemisphere ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern void parse_af_filename(const char * filename, char & Hemisphere,
+                              unixtime & Valid, unixtime & Init);
 
 
 ////////////////////////////////////////////////////////////////////////

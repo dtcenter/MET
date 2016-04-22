@@ -185,48 +185,23 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool AfwaPixelTimeFile::read(const char * filename, const char hemisphere)
+bool AfwaPixelTimeFile::read(const char * filename, const char input_hemi)
 
 {
 
-mlog << Debug(1)
-     << "Reading input file: " << filename << "\n";
-
 clear();
 
-char filename_hemi;
+   //  Call parent to parse metadata
 
-Hemisphere = hemisphere;
-
-if ( is_afwa_pixel_time_filename(filename, filename_hemi, Valid) )  {
-
-   if ( Hemisphere != filename_hemi )  {
-
-      mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> "
-           << "inconsistent hemisphere definition (" << Hemisphere
-           << " != " << filename_hemi << ") for filename \"" << filename
-           << "\"\n\n";
-
-      return ( false );
-
-   }
-
-}
-else  {
-
-   Valid = (unixtime) 0;
-
-}
-
-if ( Hemisphere == 'N' )  grid = new Grid(wwmca_north_data);
-else                      grid = new Grid(wwmca_south_data);
+AfwaDataFile::read(filename, input_hemi);
 
 int fd = -1;
 int bytes;
 
 if ( (fd = open(filename, O_RDONLY)) < 0 )  {
 
-   mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> can't open file \"" << filename << "\"\n\n";
+   mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> "
+        << "can't open file \"" << filename << "\"\n\n";
 
    return ( false );
 
@@ -238,7 +213,8 @@ Buf = new unsigned char [bytes];
 
 if ( ::read(fd, Buf, bytes) != bytes )  {
 
-   mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> read error on file \"" << filename << "\"\n\n";
+   mlog << Error << "\nAfwaPixelTimeFile::read(const char *) -> "
+        << "read error on file \"" << filename << "\"\n\n";
 
    return ( false );
 
@@ -293,80 +269,4 @@ return ( k );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for misc functions
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  example: WWMCA_PIXL_TIME_MEANS_NH_2009081718
-   //
-
-bool is_afwa_pixel_time_filename(const char * filename, char & Hemisphere, unixtime & Valid)
-
-{
-
-if ( !filename )  return ( false );
-
-const char * short_name = get_short_name(filename);
-
-
-if ( (int)strlen(short_name) != pt_filename_length )  return ( false );
-
-if ( strncmp(short_name, "WWMCA_PIXL_TIME_MEANS_", pt_filename_prefix_length) != 0 )  return ( false );
-
-     if ( strncmp(short_name + pt_filename_prefix_length, "NH_", pt_hemisphere_length) == 0 )  Hemisphere = 'N';
-else if ( strncmp(short_name + pt_filename_prefix_length, "SH_", pt_hemisphere_length) == 0 )  Hemisphere = 'S';
-else return ( false );
-
-int j;
-
-for (j=pt_datetime_start_pos; j<=pt_datetime_end_pos; ++j)  {
-
-   if ( !isdigit(short_name[j]) )  return ( false );
-
-}
-
-int month, day, year, hour;
-char junk[max_string_length];
-const char * c = short_name + pt_datetime_start_pos;
-
-substring(c, junk, pt_year_start_pos, pt_year_end_pos);
-
-year = atoi(junk);
-
-substring(c, junk, pt_month_start_po, pt_month_end_pos);
-
-month = atoi(junk);
-
-substring(c, junk, pt_day_start_pos, pt_day_end_pos);
-
-day = atoi(junk);
-
-substring(c, junk, pt_hour_start_pos, pt_hour_end_pos);
-
-hour = atoi(junk);
-
-
-Valid = mdyhms_to_unix(month, day, year, hour, 0, 0);
-
-   //
-   //  ok
-   //
-
-return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-
 

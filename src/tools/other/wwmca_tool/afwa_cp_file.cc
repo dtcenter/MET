@@ -182,41 +182,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool AfwaCloudPctFile::read(const char * filename, const char hemisphere)
+bool AfwaCloudPctFile::read(const char * filename, const char input_hemi)
 
 {
 
-mlog << Debug(1)
-     << "Reading input file: " << filename << "\n";
-
 clear();
 
-char filename_hemi;
+   //  Call parent to parse metadata
 
-Hemisphere = hemisphere;
-
-if ( is_afwa_cloud_pct_filename(filename, filename_hemi, Valid) )  {
-
-   if ( Hemisphere != filename_hemi )  {
-
-      mlog << Error << "\nAfwaCloudPctFile::read(const char *) -> "
-           << "inconsistent hemisphere definition (" << Hemisphere
-           << " != " << filename_hemi << ") for filename \"" << filename
-           << "\"\n\n";
-
-      return ( false );
-
-   }
-
-}
-else  {
-
-   Valid = (unixtime) 0;
-
-}
-
-if ( Hemisphere == 'N' )  grid = new Grid(wwmca_north_data);
-else                      grid = new Grid(wwmca_south_data);
+AfwaDataFile::read(filename, input_hemi);
 
 int fd = -1;
 int bytes;
@@ -275,80 +249,4 @@ return ( k );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for misc functions
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  example: WWMCA_TOTAL_CLOUD_PCT_NH_2009081718
-   //
-
-bool is_afwa_cloud_pct_filename(const char * filename, char & Hemisphere, unixtime & Valid)
-
-{
-
-if ( !filename )  return ( false );
-
-const char * short_name = get_short_name(filename);
-
-
-if ( (int)strlen(short_name) != cp_filename_length )  return ( false );
-
-if ( strncmp(short_name, "WWMCA_TOTAL_CLOUD_PCT_", cp_filename_prefix_length) != 0 )  return ( false );
-
-     if ( strncmp(short_name + cp_filename_prefix_length, "NH_", cp_hemisphere_length) == 0 )  Hemisphere = 'N';
-else if ( strncmp(short_name + cp_filename_prefix_length, "SH_", cp_hemisphere_length) == 0 )  Hemisphere = 'S';
-else return ( false );
-
-int j;
-
-for (j=cp_datetime_start_pos; j<=cp_datetime_end_pos; ++j)  {
-
-   if ( !isdigit(short_name[j]) )  return ( false );
-
-}
-
-int month, day, year, hour;
-char junk[max_string_length];
-const char * c = short_name + cp_datetime_start_pos;
-
-substring(c, junk, cp_year_start_pos, cp_year_end_pos);
-
-year = atoi(junk);
-
-substring(c, junk, cp_month_start_po, cp_month_end_pos);
-
-month = atoi(junk);
-
-substring(c, junk, cp_day_start_pos, cp_day_end_pos);
-
-day = atoi(junk);
-
-substring(c, junk, cp_hour_start_pos, cp_hour_end_pos);
-
-hour = atoi(junk);
-
-
-Valid = mdyhms_to_unix(month, day, year, hour, 0, 0);
-
-   //
-   //  ok
-   //
-
-return ( true );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-
 
