@@ -287,7 +287,37 @@ unixtime yyyymmddhh_to_unix(const char * text)
 
 {
 
-int month, day, year, hour;
+ConcatString str;
+
+str << text << "0000";
+
+return ( yyyymmddhhmmss_to_unix(str) );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime yyyymmddhhmm_to_unix(const char * text)
+
+{
+
+ConcatString str;
+
+str << text << "00";
+
+return ( yyyymmddhhmmss_to_unix(str) );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime yyyymmddhhmmss_to_unix(const char * text)
+
+{
+
+int month, day, year, hour, minute, second;
 unixtime t;
 char junk[32];
 
@@ -308,8 +338,15 @@ substring_vx_cal(text, junk, 8, 9);
 
 hour = atoi(junk);
 
+substring_vx_cal(text, junk, 10, 11);
 
-t = mdyhms_to_unix(month, day, year, hour, 0, 0);
+minute = atoi(junk);
+
+substring_vx_cal(text, junk, 12, 13);
+
+second = atoi(junk);
+
+t = mdyhms_to_unix(month, day, year, hour, minute, second);
 
 return ( t );
 
@@ -402,6 +439,8 @@ t = (unixtime) 0;
 else if ( strlen(text) == 0         )  t = (unixtime) 0;
 else if ( is_yyyymmdd_hhmmss (text) )  t = yyyymmdd_hhmmss_to_unix (text);
 else if ( is_yyyymmdd_hh     (text) )  t = yyyymmdd_hh_to_unix     (text);
+else if ( is_yyyymmddhhmmss  (text) )  t = yyyymmddhhmmss_to_unix  (text);
+else if ( is_yyyymmddhhmm    (text) )  t = yyyymmddhhmm_to_unix    (text);
 else if ( is_yyyymmddhh      (text) )  t = yyyymmddhh_to_unix      (text);
 else if ( is_yyyymmdd        (text) )  t = yyyymmdd_to_unix        (text);
 else {
@@ -438,6 +477,30 @@ bool is_yyyymmddhh(const char * text)
 {
 
 return ( check_reg_exp("^[0-9]\\{10\\}$", text) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_yyyymmddhhmm(const char * text)
+
+{
+
+return ( check_reg_exp("^[0-9]\\{12\\}$", text) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_yyyymmddhhmmss(const char * text)
+
+{
+
+return ( check_reg_exp("^[0-9]\\{14\\}$", text) );
 
 }
 

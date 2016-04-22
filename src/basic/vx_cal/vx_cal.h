@@ -101,6 +101,8 @@ extern  void         unix_to_yyyymmddhh(unixtime, char *);
 extern  ConcatString unix_to_yyyymmddhh(unixtime);
 
 extern  unixtime yyyymmddhh_to_unix(const char *);
+extern  unixtime yyyymmddhhmm_to_unix(const char *);
+extern  unixtime yyyymmddhhmmss_to_unix(const char *);
 
 extern  void         make_timestring(unixtime, char *);
 extern  ConcatString make_timestring(unixtime);
@@ -121,6 +123,10 @@ extern bool check_reg_exp(const char *, const char *);
 extern  bool is_yyyymmdd(const char * text);
 
 extern  bool is_yyyymmddhh(const char * text);
+
+extern  bool is_yyyymmddhhmm(const char * text);
+
+extern  bool is_yyyymmddhhmmss(const char * text);
 
 extern  bool is_yyyymmdd_hh(const char * text);
 
@@ -167,6 +173,7 @@ static const long long  bad_data_ll           = -9999LL;
 static const float      bad_data_float        = -9999.f;
 static const double     bad_data_double       = -9999.0;
 static const char       bad_data_str[]        = "-9999";
+static const char       bad_data_char         = '\0';
 static const char       na_str[]              = "NA";
 
 
