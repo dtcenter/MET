@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __AFWA_DATA_FILE_H__
-#define  __AFWA_DATA_FILE_H__
+#ifndef  __AF_DATA_FILE_H__
+#define  __AF_DATA_FILE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -27,20 +27,20 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int afwa_nx = 1024;
-static const int afwa_ny = 1024;
+static const int af_nx = 1024;
+static const int af_ny = 1024;
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class AfwaDataFile {
+class AFDataFile {
 
    protected:
 
       void init_from_scratch();
 
-      void assign(const AfwaDataFile &);
+      void assign(const AFDataFile &);
 
       int two_to_one(int, int) const;
 
@@ -57,10 +57,10 @@ class AfwaDataFile {
 
    public:
 
-      AfwaDataFile();
-      virtual ~AfwaDataFile();
-      AfwaDataFile(const AfwaDataFile &);
-      AfwaDataFile & operator=(const AfwaDataFile &);
+      AFDataFile();
+      virtual ~AFDataFile();
+      AFDataFile(const AFDataFile &);
+      AFDataFile & operator=(const AFDataFile &);
 
       void clear();
 
@@ -93,12 +93,12 @@ class AfwaDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int AfwaDataFile::nx() const { return ( afwa_nx ); }
-inline int AfwaDataFile::ny() const { return ( afwa_ny ); }
+inline int AFDataFile::nx() const { return ( af_nx ); }
+inline int AFDataFile::ny() const { return ( af_ny ); }
 
-inline unixtime AfwaDataFile::init       () const { return ( Init ); }
-inline unixtime AfwaDataFile::valid      () const { return ( Valid ); }
-inline char     AfwaDataFile::hemisphere () const { return ( Hemisphere ); }
+inline unixtime AFDataFile::init       () const { return ( Init ); }
+inline unixtime AFDataFile::valid      () const { return ( Valid ); }
+inline char     AFDataFile::hemisphere () const { return ( Hemisphere ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ extern void parse_af_filename(const char * filename, char & Hemisphere,
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __AFWA_DATA_FILE_H__  */
+#endif   /*  __AF_DATA_FILE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

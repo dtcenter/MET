@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __AFWA_CLOUD_PCT_FILE_H__
-#define  __AFWA_CLOUD_PCT_FILE_H__
+#ifndef  __AF_CLOUD_PCT_FILE_H__
+#define  __AF_CLOUD_PCT_FILE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -23,28 +23,28 @@
 #include "vx_util.h"
 #include "vx_grid.h"
 
-#include "afwa_file.h"
+#include "af_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class AfwaCloudPctFile : public AfwaDataFile {
+class AFCloudPctFile : public AFDataFile {
 
    private:
 
       void init_from_scratch();
 
-      void assign(const AfwaCloudPctFile &);
+      void assign(const AFCloudPctFile &);
 
       unsigned char * Buf;
 
    public:
 
-      AfwaCloudPctFile();
-      virtual ~AfwaCloudPctFile();
-      AfwaCloudPctFile(const AfwaCloudPctFile &);
-      AfwaCloudPctFile & operator=(const AfwaCloudPctFile &);
+      AFCloudPctFile();
+      virtual ~AFCloudPctFile();
+      AFCloudPctFile(const AFCloudPctFile &);
+      AFCloudPctFile & operator=(const AFCloudPctFile &);
 
       void clear();
 
@@ -60,19 +60,13 @@ class AfwaCloudPctFile : public AfwaDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int AfwaCloudPctFile::operator()(int x, int y) const { return ( cloud_pct(x, y) ); }
+inline int AFCloudPctFile::operator()(int x, int y) const { return ( cloud_pct(x, y) ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool is_afwa_cloud_pct_filename(const char * filename, char & Hemisphere, unixtime & Valid);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#endif   /*  __AFWA_CLOUD_PCT_FILE_H__  */
+#endif   /*  __AF_CLOUD_PCT_FILE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
