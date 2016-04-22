@@ -38,28 +38,6 @@ using namespace std;
 // cloud percent records are 1 byte each
 static const int cloud_pct_record_size    =   1;
 
-// the maximum length for a datetime string
-static const int max_string_length         = 256;
-
-// the lengths of the filename parts
-static const int cp_filename_length        =  35;
-static const int cp_filename_prefix_length =  22;
-static const int cp_hemisphere_length      =   3;
-
-// the starting and ending positions for the date and time string from the filename
-static const int cp_datetime_start_pos     =  25;
-static const int cp_datetime_end_pos       =  34;
-
-// the date and time pieces starting and ending positions from the datetime string
-static const int cp_year_start_pos         =   0;
-static const int cp_year_end_pos           =   3;
-static const int cp_month_start_po         =   4;
-static const int cp_month_end_pos          =   5;
-static const int cp_day_start_pos          =   6;
-static const int cp_day_end_pos            =   7;
-static const int cp_hour_start_pos         =   8;
-static const int cp_hour_end_pos           =   9;
-
 
 ////////////////////////////////////////////////////////////////////////
 
