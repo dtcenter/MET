@@ -212,6 +212,7 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
 
 int parse_conf_n_vx(Dictionary *dict) {
    int i, total;
+   StringArray lvl;
 
    if(!dict) return(0);
 
@@ -225,8 +226,12 @@ int parse_conf_n_vx(Dictionary *dict) {
    // Loop over the fields to be verified
    for(i=0,total=0; i<dict->n_entries(); i++) {
 
+      // Get the level array, which may or may not be defined.
+      // If defined, use its length.  If not, use a length of 1.
+      lvl = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level, false);
+
       // Increment count by the length of the level array
-      total += (*dict)[i]->dict_value()->lookup_string_array(conf_key_level).n_elements();
+      total += (lvl.n_elements() > 0 ? lvl.n_elements() : 1);
    }
 
    return(total);
@@ -242,7 +247,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    Dictionary i_dict;
    DictionaryEntry entry;
    StringArray lvl;
-   int i, total;
+   int i, total, n_lvl;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_i_vx_dict() -> "
@@ -260,9 +265,11 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    // Loop over the fields to be verified
    for(i=0,total=0; i<dict->n_entries(); i++) {
 
-      // Increment count by the length of the level array
-      lvl    = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level);
-      total += lvl.n_elements();
+      // Get the level array, which may or may not be defined.
+      // If defined, use its length.  If not, use a length of 1.
+      lvl    = (*dict)[i]->dict_value()->lookup_string_array(conf_key_level, false);
+      n_lvl  = (lvl.n_elements() > 0 ? lvl.n_elements() : 1);
+      total += n_lvl;
 
       // Check if we're in the correct entry
       if(total > index) {
@@ -271,10 +278,10 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
          i_dict = *((*dict)[i]->dict_value());
 
          // Set up the new entry, taking only a single level value
-         entry.set_string(conf_key_level, lvl[index-(total-lvl.n_elements())]);
-
-         // Store the new entry
-         i_dict.store(entry);
+         if(lvl.n_elements() > 0) {
+            entry.set_string(conf_key_level, lvl[index-(total-n_lvl)]);
+            i_dict.store(entry);
+         }
 
          break;
       }
