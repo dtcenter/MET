@@ -21,6 +21,7 @@
 //   003    02/25/15  Halley Gotway   Add automated regridding.
 //   004    08/04/15  Halley Gotway   Add conditional continuous verification.
 //   005    09/21/15  Halley Gotway   Add climatology and SAL1L2 output.
+//   006    04/20/16  Halley Gotway   Add -paired command line option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -51,14 +52,15 @@ using namespace std;
 
 static void process_command_line(int, char **);
 
+static Met2dDataFile *get_mtddf(const StringArray &, const GrdFileType);
+
 static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
-static void get_series_entry(int, VarInfo *,
-                             const ConcatString &, const GrdFileType,
-                             StringArray &, DataPlane &);
-static void get_series_entry(int, VarInfo *,
-                             const StringArray &, const GrdFileType,
-                             StringArray &, DataPlane &);
+static void get_series_entry(int, VarInfo *, const StringArray &,
+                             const GrdFileType, StringArray &,
+                             DataPlane &);
+static bool read_single_entry(VarInfo *, const ConcatString &,
+                              const GrdFileType, DataPlane &, Grid &);
 
 static void process_scores();
 
@@ -97,6 +99,7 @@ static void clean_up();
 static void usage();
 static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
+static void set_paired(const StringArray &);
 static void set_both_files(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
@@ -144,6 +147,7 @@ void process_command_line(int argc, char **argv) {
    // Add the options function calls
    cline.add(set_fcst_files,  "-fcst",  -1);
    cline.add(set_obs_files,   "-obs",   -1);
+   cline.add(set_paired,      "-paired", 0);
    cline.add(set_both_files,  "-both",  -1);
    cline.add(set_config_file, "-config", 1);
    cline.add(set_out_file,    "-out",    1);
@@ -200,20 +204,10 @@ void process_command_line(int argc, char **argv) {
    // Parse the forecast and observation file lists
    fcst_files = parse_file_list(fcst_files, ftype);
    obs_files  = parse_file_list(obs_files,  otype);
-   
-   // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_files[0], ftype))) {
-      mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_files[0] << "\"\n\n";
-      exit(1);
-   }
 
-   // Read observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_files[0], otype))) {
-      mlog << Error << "\nTrouble reading observation file \""
-           << obs_files[0] << "\"\n\n";
-      exit(1);
-   }
+   // Get mtddf
+   fcst_mtddf = get_mtddf(fcst_files, ftype);
+   obs_mtddf  = get_mtddf(obs_files,  otype);
 
    // Store the input data file types
    ftype = fcst_mtddf->file_type();
@@ -235,10 +229,14 @@ void process_command_line(int argc, char **argv) {
 
    // List the lengths of the series options
    mlog << Debug(1)
-        << "Length of configuration \"fcst.field\" = " << conf_info.get_n_fcst() << "\n"
-        << "Length of configuration \"obs.field\"  = " << conf_info.get_n_obs() << "\n"
-        << "Length of forecast file list         = " << fcst_files.n_elements() << "\n"
-        << "Length of observation file list      = " << obs_files.n_elements() << "\n";
+        << "Length of configuration \"fcst.field\" = "
+        << conf_info.get_n_fcst() << "\n"
+        << "Length of configuration \"obs.field\"  = "
+        << conf_info.get_n_obs() << "\n"
+        << "Length of forecast file list         = "
+        << fcst_files.n_elements() << "\n"
+        << "Length of observation file list      = "
+        << obs_files.n_elements() << "\n";
 
    // Deteremine the length of the series to be analyzed.  Series is
    // defined by the first parameter of length greater than one:
@@ -283,13 +281,71 @@ void process_command_line(int argc, char **argv) {
            << "all have length one.\n";
    }
 
-   // Initialize the series file names
-   for(i=0; i<n_series; i++) {
-      found_fcst_files.add("");
-      found_obs_files.add("");
+   // If paired, check for consistent settings.
+   if(paired) {
+
+      // The number of forecast and observation files must match.
+      if(fcst_files.n_elements() != obs_files.n_elements()) {
+         mlog << Error << "\nprocess_command_line() -> "
+              << "when using the \"-paired\" command line option, the "
+              << "number of forecast (" << fcst_files.n_elements()
+              << ") and observation (" << obs_files.n_elements()
+              << ") files must match.\n\n";
+         usage();
+      }
+
+      // The number of files must match the series length.
+      if(fcst_files.n_elements() != n_series) {
+         mlog << Error << "\nprocess_command_line() -> "
+              << "when using the \"-paired\" command line option, the "
+              << "the file list length (" << fcst_files.n_elements()
+              << ") and series length (" << n_series
+              << ") must match.\n\n";
+         usage();
+      }
+
+      // Set the series file names to the input file lists
+      for(i=0; i<n_series; i++) {
+         found_fcst_files.add(fcst_files[i]);
+         found_obs_files.add(obs_files[i]);
+      }
+   }
+   // If not paired, initialize the series file names.
+   else {
+      for(i=0; i<n_series; i++) {
+         found_fcst_files.add("");
+         found_obs_files.add("");
+      }
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+Met2dDataFile *get_mtddf(const StringArray &file_list, const GrdFileType type) {
+   int i;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   // Find the first file that actually exists
+   for(i=0; i<file_list.n_elements(); i++) {
+      if(file_exists(file_list[i])) break;
+   }
+
+   // Check for no valid files
+   if(i == fcst_files.n_elements()) {
+      mlog << Error << "\nTrouble reading forecast files.\n\n";
+      exit(1);
+   }
+
+   // Read first valid file
+   if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i], type))) {
+      mlog << Error << "\nTrouble reading data file \""
+           << file_list[i] << "\"\n\n";
+      exit(1);
+   }
+
+   return(mtddf);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -335,25 +391,37 @@ void get_series_data(int i_series,
          break;
 
       case SeriesType_Fcst_Files:
-         get_series_entry(i_series, fcst_info, fcst_files[i_series],
+         found_fcst_files.set(i_series, fcst_files[i_series]);
+         get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp);
-         obs_info->set_valid(fcst_dp.valid());
-         mlog << Debug(3)
-              << "Setting the observation valid time search criteria "
-              << "using the forecast valid time of "
-              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
+         if(paired) {
+            found_obs_files.set(i_series, obs_files[i_series]);
+         }
+         else {
+            obs_info->set_valid(fcst_dp.valid());
+            mlog << Debug(3)
+                 << "Setting the observation valid time search criteria "
+                 << "using the forecast valid time of "
+                 << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
+         }
          get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp);
          break;
 
       case SeriesType_Obs_Files:
-         get_series_entry(i_series, obs_info, obs_files[i_series],
+         found_obs_files.set(i_series, obs_files[i_series]);
+         get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp);
-         fcst_info->set_valid(obs_dp.valid());
-         mlog << Debug(3)
-              << "Setting the forecast valid time search criteria "
-              << "using the observation valid time of "
-              << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
+         if(paired) {
+            found_fcst_files.set(i_series, fcst_files[i_series]);
+         }
+         else {
+            fcst_info->set_valid(obs_dp.valid());
+            mlog << Debug(3)
+                 << "Setting the forecast valid time search criteria "
+                 << "using the observation valid time of "
+                 << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
+         }
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp);
          break;
@@ -370,20 +438,17 @@ void get_series_data(int i_series,
    // rescaled from [0, 100] to [0, 1]
    if(conf_info.fcst_info[0]->p_flag()) rescale_probability(fcst_dp);
 
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void get_series_entry(int i_series, VarInfo *info,
-                      const ConcatString &file,
-                      const GrdFileType type,
-                      StringArray &found_files, DataPlane &dp) {
-   StringArray search_files;
-
-   search_files.add(file);
-
-   get_series_entry(i_series, info, search_files, type, found_files, dp);
+   // Check that non-zero valid times match
+   if(fcst_dp.valid() != (unixtime) 0 &&
+      obs_dp.valid()  != (unixtime) 0 &&
+      fcst_dp.valid() != obs_dp.valid()) {
+      mlog << Warning << "\nget_series_data() -> "
+           << "Forecast and observation valid times do not match "
+           << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
+           << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
+           << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str() << ".\n\n";
+   }
 
    return;
 }
@@ -395,82 +460,125 @@ void get_series_entry(int i_series, VarInfo *info,
                       const GrdFileType type,
                       StringArray &found_files, DataPlane &dp) {
    int i, j;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-   ConcatString cur_file;
    bool found = false;
+   Grid cur_grid;
 
-   // Search for match in the file list
-   for(i=0; i<search_files.n_elements(); i++) {
+   // Initialize
+   dp.clear();
 
-      // Start the search with the value of i_series
-      j = (i_series + i) % search_files.n_elements();
+   // If not already found, search for a matching file
+   if(strlen(found_files[i_series]) == 0) {
 
-      // Check if the file for this series entry has already been found
-      if(strlen(found_files[i_series]) > 0)
-         cur_file = found_files[i_series];
-      else
-         cur_file = search_files[j];
+      // Loop through the file list
+      for(i=0; i<search_files.n_elements(); i++) {
 
-      mlog << Debug(3)
-           << "Searching file " << cur_file << "\n";
+         // Start the search with the value of i_series
+         j = (i_series + i) % search_files.n_elements();
 
-      // Open the data file
-      mtddf = mtddf_factory.new_met_2d_data_file(cur_file, type);
+         mlog << Debug(3)
+              << "Searching file " << search_files[j] << "\n";
 
-      // Attempt to read the gridded data from the current file
-      found = mtddf->data_plane(*info, dp);
+         // Read gridded data from the current file.
+         found = read_single_entry(info, search_files[j], type,
+                                   dp, cur_grid);
 
-      // Check if the series entry was found
-      if(found) {
-         mlog << Debug(2)
-              << "Found data for " << info->magic_str()
-              << " in " << search_files[j] << "\n";
-
-         // Regrid, if necessary
-         if(!(mtddf->grid() == grid)) {
-
-            // Check if regridding is disabled
-            if(!conf_info.regrid_info.enable) {
-               mlog << Error << "\nget_series_entry() -> "
-                    << "The grid of the current series entry does not "
-                    << "match the verification grid and regridding is "
-                    << "disabled:\n" << mtddf->grid().serialize()
-                    << " !=\n" << grid.serialize()
-                    << "\nSpecify regridding logic in the config file "
-                    << "\"regrid\" section.\n\n";
-               exit(1);
-            }
-
-            mlog << Debug(1)
-                 << "Regridding field " << info->magic_str()
-                 << " to the verification grid.\n";
-            dp = met_regrid(dp, mtddf->grid(), grid,
-                            conf_info.regrid_info);
+         // If found, store the file and break out of the loop
+         if(found) {
+            found_files.set(i_series, search_files[j]);
+            break;
          }
-
-         // Store the found file
-         found_files.set(i_series, cur_file);
       }
 
-      // Close the data file
-      delete mtddf; mtddf = (Met2dDataFile *) 0;
-
-      // Break out of the loop
-      if(found) break;
+      // Check to see if a match was found
+      if(!found) {
+         mlog << Error << "\nget_series_entry() -> "
+              << "Could not find data for " << info->magic_str()
+              << " in file list:\n";
+         for(i=0; i<search_files.n_elements(); i++)
+            mlog << Error << "   " << search_files[i] << "\n";
+         mlog << Error << "\n";
+         exit(1);
+      }
    }
 
-   // Check if the data plane was found
-   if(!found) {
-      mlog << Error << "\nget_series_entry() -> "
-           << "Could not find data for " << info->magic_str()
-           << " in file list:\n";
-      for(i=0; i<search_files.n_elements(); i++)
-         mlog << Error << "   " << search_files[i] << "\n";
-      mlog << Error << "\n";
-      exit(1);
+   // If not already done, read the data
+   if(dp.nx() == 0 && dp.ny() == 0) {
+      found = read_single_entry(info, found_files[i_series], type,
+                                dp, cur_grid);
+   }
+
+   // Check for a match
+   if(found) {
+      mlog << Debug(2)
+           << "Found data for " << info->magic_str()
+           << " in file: " << found_files[i_series] << "\n";
+
+      // Regrid, if necessary
+      if(!(cur_grid == grid)) {
+
+         // Check if regridding is disabled
+         if(!conf_info.regrid_info.enable) {
+            mlog << Error << "\nget_series_entry() -> "
+                 << "The grid of the current series entry does not "
+                 << "match the verification grid and regridding is "
+                 << "disabled:\n" << cur_grid.serialize()
+                 << " !=\n" << grid.serialize()
+                 << "\nSpecify regridding logic in the config file "
+                 << "\"regrid\" section.\n\n";
+            exit(1);
+         }
+
+         mlog << Debug(1)
+              << "Regridding field " << info->magic_str()
+              << " to the verification grid.\n";
+         dp = met_regrid(dp, cur_grid, grid,
+                         conf_info.regrid_info);
+      }
+   }
+   // No match here results in a warning.
+   else {
+      mlog << Warning << "\nget_series_entry() -> "
+           << "No match found for " << info->magic_str()
+           << " in file: " << found_files[i_series] << "\n\n";
+
+      // Return a field of bad data values
+      dp.set_size(grid.nx(), grid.ny());
+      dp.set_constant(bad_data_double);
+      dp.set_init((unixtime) 0);
+      dp.set_valid((unixtime) 0);
+      dp.set_lead(bad_data_double);
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
+                       const GrdFileType type, DataPlane &dp, Grid &cur_grid) {
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   bool found = false;
+
+   // Check that the file exists
+   if(!file_exists(cur_file)) {
+      mlog << Warning << "\nread_single_entry() -> "
+           << "File does not exist: " << cur_file << "\n\n";
+      return(false);
+   }
+
+   // Open the data file
+   mtddf = mtddf_factory.new_met_2d_data_file(cur_file, type);
+
+   // Attempt to read the gridded data from the current file
+   found = mtddf->data_plane(*info, dp);
+
+   // Store the current grid
+   if(found) cur_grid = mtddf->grid();
+
+   // Close the data file
+   delete mtddf; mtddf = (Met2dDataFile *) 0;
+
+   return(found);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -530,7 +638,7 @@ void process_scores() {
                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                   i_series, fcst_dp.valid(), grid);
 
-         cmn_flag = (cmn_dp.nx() == fcst_dp.nx() && cmn_dp.ny() == fcst_dp.ny()); 
+         cmn_flag = (cmn_dp.nx() == fcst_dp.nx() && cmn_dp.ny() == fcst_dp.ny());
          mlog << Debug(3)
               << "Found " << (cmn_flag ? 1 : 0)
               << " climatology mean field(s) for forecast "
@@ -2024,6 +2132,12 @@ void set_fcst_files(const StringArray & a) {
 
 void set_obs_files(const StringArray & a) {
    obs_files = a;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_paired(const StringArray & a) {
+   paired = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
