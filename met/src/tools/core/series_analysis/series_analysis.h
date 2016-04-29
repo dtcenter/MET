@@ -69,8 +69,9 @@ static const char * default_config_filename =
 // Input files
 static StringArray fcst_files, found_fcst_files;
 static StringArray obs_files,  found_obs_files;
-static GrdFileType ftype = FileType_None;
-static GrdFileType otype = FileType_None;
+static GrdFileType ftype  = FileType_None;
+static GrdFileType otype  = FileType_None;
+static bool        paired = false;
 
 // Output file
 static ConcatString out_file;
