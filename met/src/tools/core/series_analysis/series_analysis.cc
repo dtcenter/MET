@@ -99,8 +99,8 @@ static void clean_up();
 static void usage();
 static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
-static void set_paired(const StringArray &);
 static void set_both_files(const StringArray &);
+static void set_paired(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
 static void set_log_file(const StringArray &);
@@ -147,8 +147,8 @@ void process_command_line(int argc, char **argv) {
    // Add the options function calls
    cline.add(set_fcst_files,  "-fcst",  -1);
    cline.add(set_obs_files,   "-obs",   -1);
-   cline.add(set_paired,      "-paired", 0);
    cline.add(set_both_files,  "-both",  -1);
+   cline.add(set_paired,      "-paired", 0);
    cline.add(set_config_file, "-config", 1);
    cline.add(set_out_file,    "-out",    1);
    cline.add(set_log_file,    "-log",    1);
@@ -2087,6 +2087,7 @@ void usage() {
         << "\t-fcst  file_1 ... file_n | fcst_file_list\n"
         << "\t-obs   file_1 ... file_n | obs_file_list\n"
         << "\t[-both file_1 ... file_n | both_file_list]\n"
+        << "\t[-paired]\n"
         << "\t-out file\n"
         << "\t-config file\n"
         << "\t[-log file]\n"
@@ -2106,6 +2107,9 @@ void usage() {
 
         << "\t\t\"-both\" sets the \"-fcst\" and \"-obs\" options to "
         << "the same set of files (optional).\n"
+
+        << "\t\t\"-paired\" to indicate that the input -fcst and -obs "
+        << "file lists are already paired (optional).\n"
 
         << "\t\t\"-out file\" is the NetCDF output file containing "
         << "computed statistics (required).\n"
@@ -2136,15 +2140,15 @@ void set_obs_files(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_paired(const StringArray & a) {
-   paired = true;
+void set_both_files(const StringArray & a) {
+   set_fcst_files(a);
+   set_obs_files(a);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_both_files(const StringArray & a) {
-   set_fcst_files(a);
-   set_obs_files(a);
+void set_paired(const StringArray & a) {
+   paired = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
