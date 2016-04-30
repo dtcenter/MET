@@ -261,7 +261,23 @@ hskip 0.5in}
 \end_inset
 
 [-both file_1 ...
- file_n | both_file_list ]
+ file_n | both_file_list]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-paired]
 \end_layout
 
 \begin_layout LyX-Code
@@ -419,13 +435,22 @@ both_file_list
 6.
  The 
 \series bold
+-paired
+\series default
+ option indicates that the -fcst and -obs file lists are already paired.
+\end_layout
+
+\begin_layout Description
+7.
+ The 
+\series bold
 -log file
 \series default
  outputs log messages to the specified file.
 \end_layout
 
 \begin_layout Description
-7.
+8.
  The 
 \series bold
 -v level
