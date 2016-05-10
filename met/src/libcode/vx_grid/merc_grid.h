@@ -46,6 +46,10 @@ class MercatorGrid : public GridRep {
       void xy_to_uv(double x, double y, double & u, double & v) const;
       void uv_to_xy(double u, double v, double & x, double & y) const;
 
+      double uv_closedpolyline_area(const double * u, const double * v, int n) const;
+
+      double xy_closedpolyline_area(const double * x, const double * y, int n) const;
+
       double f(double) const;
 
       double df(double) const;
@@ -81,6 +85,8 @@ class MercatorGrid : public GridRep {
       void latlon_to_xy(double lat, double lon, double & x, double & y) const;
 
       void xy_to_latlon(double x, double y, double & lat, double & lon) const;
+
+      double calc_area(int x, int y) const;
 
       int nx() const;
       int ny() const;
