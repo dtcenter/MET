@@ -149,6 +149,35 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double LatLonGrid::calc_area(int x, int y) const
+
+{
+
+double area = 0.0;
+double lat_bottom, lon_left;
+double delta_lon_rad = delta_lon/deg_per_rad;
+double lat_top_rad, lat_bottom_rad;
+
+
+xy_to_latlon((double) x, (double) y, lat_bottom, lon_left);
+
+
+lat_top_rad     = (lat_bottom + delta_lat)/deg_per_rad;
+lat_bottom_rad  = lat_bottom/deg_per_rad;
+
+area = ( sin(lat_top_rad) - sin(lat_bottom_rad) )*delta_lon_rad;
+
+area = fabs(area)*earth_radius_km*earth_radius_km;
+
+
+return ( area );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int LatLonGrid::nx() const
 
 {

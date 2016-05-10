@@ -40,6 +40,8 @@ static double st_inv_func (double r, bool is_north_hemisphere);
 
 static void reduce(double & angle);
 
+static double stereographic_segment_area(double u0, double v0, double u1, double v1);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -247,6 +249,38 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double StereographicGrid::calc_area(int x, int y) const
+
+{
+
+double u[4], v[4];
+double sum;
+
+
+// xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
+// xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
+// xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
+// xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
+
+
+xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
+xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
+xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
+xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
+
+
+sum = uv_closedpolyline_area(u, v, 4);
+
+sum *= earth_radius_km*earth_radius_km;
+
+return ( sum );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int StereographicGrid::nx() const
 
 {
@@ -264,6 +298,75 @@ int StereographicGrid::ny() const
 {
 
 return ( Ny );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double StereographicGrid::uv_closedpolyline_area(const double *u, const double *v, int n) const
+
+{
+
+int j, k;
+double sum;
+
+
+sum = 0.0;
+
+for (j=0; j<n; ++j)  {
+
+   k = (j + 1)%n;
+
+   sum += stereographic_segment_area(u[j], v[j], u[k], v[k]);
+
+}   //  for j
+
+sum = fabs(sum);
+
+return ( sum );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double StereographicGrid::xy_closedpolyline_area(const double *x, const double *y, int n) const
+
+{
+
+int j;
+double sum;
+double *u = (double *) 0;
+double *v = (double *) 0;
+
+u = new double [n];
+v = new double [n];
+
+if ( !u || !v )  {
+
+   cerr << "\n\n  StereographicGrid::xy_closedpolyline_area() -> memory allocation error\n\n";
+
+   exit ( 1 );
+
+}
+
+for (j=0; j<n; ++j)  {
+
+   xy_to_uv(x[j], y[j], u[j], v[j]);
+
+}
+
+sum = uv_closedpolyline_area(u, v, n);
+
+sum *= earth_radius_km*earth_radius_km;
+
+delete [] u;  u = (double *) 0;
+delete [] v;  v = (double *) 0;
+
+return ( sum );
 
 }
 
@@ -555,6 +658,35 @@ void reduce(double & angle)
 angle -= 360.0*floor( (angle/360.0) + 0.5 );
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double stereographic_segment_area(double u0, double v0, double u1, double v1)
+
+{
+
+cerr << "\n\n  warning -> stereographic_segment_area() -> hasn't been tested yet!\n\n";
+
+double b, answer, t1, t2;
+
+b =   u0*u0 + v0*v0 + u1*u1 + v1*v1
+    + u0*u0*v1*v1 + u1*u1*v0*v0
+    - 2.0*( u0*u1 + v0*v1 + u0*v0*u1*v1 );
+
+b = 1.0/sqrt(b);
+
+t1 =  b*( u1*u1 + v1*v1 - u0*u1 - v0*v1 );
+t2 = -b*( u0*u0 + v0*v0 - u0*u1 - v0*v1 );
+
+answer = atan(t1) - atan(t2);
+
+answer *= 2.0*b*( u0*v1 - u1*v0 );
+
+return ( answer );
 
 }
 
