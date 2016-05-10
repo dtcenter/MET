@@ -173,7 +173,7 @@ obtype = "ANALYS";
 //        MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN, LS_FIT, BILIN, NEAREST, BUDGET, FORCE
 //
 //        Use FORCE to compare input values directly with no interpolation as
-//        long as the grid x and y dimensions match. 
+//        long as the grid x and y dimensions match.
 //
 //   - The "width" entry specifies a regridding width, when applicable.
 //      - width = 4;        To regrid using a 4x4 box.
@@ -387,13 +387,13 @@ fcst = {
 //          }
 //       ];
 //     }
-
+//
 //    - The "sid_exc" entry is an array of station ID groups indicating which
 //      station ID's should be excluded from the verification tasks.  Each element
-//      is either the name of a single station ID or a station ID group file name.
-//      A station ID group file consists of a name for the group followed by a
-//      list of station ID's.  All of the station ID's indicated will be placed
-//      into one long list of station ID's to be excluded.
+//      is either the name of a single station ID or the full path to a station ID
+//      group file name.  A station ID group file consists of a name for the group
+//      followed by a list of station ID's.  All of the station ID's indicated will
+//      be placed into one long list of station ID's to be excluded.
 //    - As with "message_type" above, the "sid_exc" setting can be placed in the
 //      in the "field" array element to control which station ID's are excluded
 //      for each verification task.
