@@ -85,12 +85,188 @@ name "chap:App_E-WWMCA-Tools"
 \end_layout
 
 \begin_layout Standard
-Hello.
- 
+There are two WWMCA tools available.
+ The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt wwmca
+\backslash
+_plot}
+\end_layout
+
+\end_inset
+
+ tool makes a PostScript plot of one or more WWMCA cloud percent files and
+ the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt wwmca
+\backslash
+_regrid}
+\end_layout
+
+\end_inset
+
+ tool regrids WWMCA cloud percent files and reformats them into netCDF files
+ that the other MET tools can read.
 \end_layout
 
 \begin_layout Standard
+The WWNCA tools get valid time and hemisphere (north or south) information
+ from the file names, so it's important for both of the WWMCA tools that
+ these file names not be changed.
+\end_layout
 
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vskip 0.1in
+\backslash
+centerline{
+\backslash
+hbox to 3.0in{
+\backslash
+hrulefill}}
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The usage statement for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt wwmca
+\backslash
+_plot}
+\end_layout
+
+\end_inset
+
+ is 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vskip 0.1in
+\backslash
+centerline{
+\backslash
+tt wwmca
+\backslash
+_plot [ -outdir path ] wwmca
+\backslash
+_cloud
+\backslash
+_pct
+\backslash
+_file
+\backslash
+_list}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt wwmca
+\backslash
+_cloud
+\backslash
+_pct
+\backslash
+_file
+\backslash
+_list}
+\end_layout
+
+\end_inset
+
+ represents one or more WWMCA cloud percent files given on the command line.
+ As with any command given to a UNIX shell, the user can use metacharacters
+ as a shorthand way to specify many filenames.
+\end_layout
+
+\begin_layout Standard
+The optional 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt -outdir}
+\end_layout
+
+\end_inset
+
+ argument specifies a directory where the output PostScript plots will be
+ placed.
+ If not specified, then the plots will be put in the current (working) directory.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Wplotfig"
+
+\end_inset
+
+ shows an example of the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+tt wwmca
+\backslash
+_plot}
+\end_layout
+
+\end_inset
+
+ output.
 \end_layout
 
 \begin_layout Standard
@@ -131,6 +307,13 @@ _plot}
 
  tool.
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Wplotfig"
 
 \end_inset
 
