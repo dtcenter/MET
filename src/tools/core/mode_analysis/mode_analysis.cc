@@ -90,6 +90,8 @@ static void set_config_filename(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray & a);
 
+static void show_version(const StringArray & a);
+
 static void set_summary ();
 static void set_bycase  ();
 
@@ -241,6 +243,8 @@ cline.add(set_out_filename, "-out", 1);
 cline.add(set_config_filename, "-config", 1);
 cline.add(set_logfile, "-log", 1);
 cline.add(set_verbosity, "-v", 1);
+
+cline.add(show_version, "-version", 0);
 
    //
    //  parse the command line
@@ -714,5 +718,21 @@ mlog.set_verbosity_level(atoi(a[0]));
 return;
 
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void show_version(const StringArray &)
+
+{
+
+cerr << "\n\n  " << met_version << "\n\n";
+
+exit ( 0 );
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
