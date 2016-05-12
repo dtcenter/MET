@@ -120,6 +120,8 @@ static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
+static void show_version(const StringArray &);
+
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
@@ -183,6 +185,8 @@ void process_command_line(int argc, char **argv)
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
+
+   cline.add(show_version, "-version", 0);
 
    //
    // parse the command line
@@ -2413,5 +2417,21 @@ void set_verbosity(const StringArray & a)
 {
    mlog.set_verbosity_level(atoi(a[0]));
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void show_version(const StringArray & a)
+
+{
+
+cout << "\n\n  " << met_version << "\n\n";
+
+exit ( 0 );
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////

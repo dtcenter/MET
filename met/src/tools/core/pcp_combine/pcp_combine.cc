@@ -182,6 +182,9 @@ static void set_pcprx(const StringArray &);
 static void set_user_dict(const StringArray & a);
 static void set_name(const StringArray & a);
 
+static void show_version(const StringArray &);
+
+
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[])
@@ -253,6 +256,8 @@ void process_command_line(int argc, char **argv)
    cline.add(set_name,      "-varname",  1);
    cline.add(set_logfile,   "-log",      1);
    cline.add(set_verbosity, "-v",        1);
+
+   cline.add(show_version,  "-version",  0);
 
    //
    // parse the command line
@@ -1415,5 +1420,21 @@ void set_name(const StringArray & a)
    field_name = a[0];
    name_flag  = true;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void show_version(const StringArray &)
+
+{
+
+cout << "\n\n  " << met_version << "\n\n";
+
+exit ( 0 );
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
