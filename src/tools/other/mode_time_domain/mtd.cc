@@ -88,6 +88,8 @@ static void set_verbosity (const StringArray &);
 static void set_logfile   (const StringArray &);
 static void set_outdir    (const StringArray &);
 
+static void show_version  (const StringArray &);
+
 static StringArray parse_file_list(const StringArray &, const GrdFileType);
 
 static ConcatString make_output_prefix(const MtdConfigInfo &, unixtime start_time);
@@ -115,6 +117,8 @@ cline.add(set_config,    "-config",  1);
 cline.add(set_verbosity, "-v",       1);
 cline.add(set_logfile,   "-log",     1);
 cline.add(set_outdir,    "-outdir",  1);
+
+cline.add(show_version,  "-version", 0);
 
 cline.parse();
 
@@ -828,6 +832,22 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
 exit ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void show_version (const StringArray &)
+
+{
+
+cout << "\n\n  " << met_version << "\n\n";
+
+exit ( 0 );
+
+return;
 
 }
 
