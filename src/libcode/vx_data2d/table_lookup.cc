@@ -174,7 +174,7 @@ void Grib1TableEntry::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "Index values = (" 
+out << prefix << "Index values = ("
               << code << ", "
               << table_number << ", "
               << center << ", "
@@ -230,7 +230,9 @@ bool Grib1TableEntry::parse_line(const char * line) {
 
    for (j = 0; j < 4; ++j) {
 
-      c = strtok(L, i_delim);
+      if(!(c = strtok(L, i_delim))) return (false);
+
+      if(!is_number(c))             return (false);
 
       *(i[j]) = atoi(c);
 
@@ -242,21 +244,21 @@ bool Grib1TableEntry::parse_line(const char * line) {
    //  parm_name
    //
 
-   c = strtok(0, s_delim);
+   if(!(c = strtok(0, s_delim))) return (false);
 
    parm_name = c;
 
-   c = strtok(0, s_delim);
+   if(!(c = strtok(0, s_delim))) return (false);
 
    //
    //  full_name
    //
 
-   c = strtok(0, s_delim);
+   if(!(c = strtok(0, s_delim))) return (false);
 
    full_name = c;
 
-   c = strtok(0, s_delim);
+   if(!(c = strtok(0, s_delim))) return (false);
 
    //
    //  units (may be empty)
@@ -424,7 +426,7 @@ void Grib2TableEntry::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "Index values = (" 
+out << prefix << "Index values = ("
               << index_a << ", "
               << mtab_set << ", "
               << mtab_low << ", "
@@ -492,7 +494,9 @@ s[2] = &units;
 
 for (j=0; j<8; ++j)  {
 
-   c = strtok(L, i_delim);
+   if(!(c = strtok(L, i_delim))) return (false);
+
+   if(!is_number(c))             return (false);
 
    *(i[j]) = atoi(c);
 
@@ -506,8 +510,8 @@ for (j=0; j<8; ++j)  {
 
 for (j=0; j<3; ++j)  {
 
-   c = strtok(L, s_delim);
-   c = strtok(L, s_delim);
+   if(!(c = strtok(L, s_delim))) return (false);
+   if(!(c = strtok(L, s_delim))) return (false);
 
    *(s[j]) = c;
 
@@ -577,8 +581,8 @@ TableFlatFile::TableFlatFile(int) {
 
       if (!read(path)) {
 
-         mlog << Error
-         << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
+         mlog << Error << "\nTableFlatFile::TableFlatFile(int) -> "
+              << "unable to read table file \"" << path << "\"\n\n";
 
          exit(1);
 
@@ -608,8 +612,8 @@ TableFlatFile::TableFlatFile(int) {
 
       if (!read(path)) {
 
-         mlog << Error
-            << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
+         mlog << Error << "\nTableFlatFile::TableFlatFile(int) ->"
+              << "unable to read table file \"" << path << "\"\n\n";
 
          exit(1);
 
@@ -701,7 +705,7 @@ void TableFlatFile::clear()
 
 int j;
 
-if ( g1e )  { 
+if ( g1e )  {
 
    for (j=0; j<N_grib1_elements; ++j)  {
 
@@ -714,7 +718,7 @@ if ( g1e )  {
 }
 
 
-if ( g2e )  { 
+if ( g2e )  {
 
    for (j=0; j<N_grib2_elements; ++j)  {
 
@@ -915,8 +919,8 @@ int n_lines;
 
 if ( empty(filename) )  {
 
-   mlog << Error 
-        << "TableFlatFile::read(const char *) -> empty filename!\n\n";
+   mlog << Error << "\nTableFlatFile::read(const char *) ->"
+        << "empty filename!\n\n";
 
    exit ( 1 );
 
@@ -928,8 +932,8 @@ in.open(filename);
 
 if ( !in )  {
 
-   mlog << Error 
-        << "TableFlatFile::read(const char *) -> unable to open input file \"" << filename << "\"\n\n";
+   mlog << Error << "\nTableFlatFile::read(const char *) -> "
+        << "unable to open input file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -949,8 +953,8 @@ line.ws_strip();
 else if ( line == "GRIB2" )  { return ( read_grib2(in, filename, n_lines - 1) ); }
 else {
 
-   mlog << Error 
-        << "TableFlatFile::read(const char *) -> unable unrecognized format spec \""
+   mlog << Error << "\nTableFlatFile::read(const char *) -> "
+        << "unable unrecognized format spec \""
         << line << "\" in file \"" << filename << "\"\n\n";
 
    exit ( 1 );
@@ -986,9 +990,9 @@ bool status = false;
 extend_grib1(N_grib1_elements + n);
 
    //
-   //  shuffle all the old elements to the end of the array, 
+   //  shuffle all the old elements to the end of the array,
    //
-   //   so that the new stuff gets prepended 
+   //   so that the new stuff gets prepended
    //
 
 for (j=(N_grib1_elements - 1); j>=0; --j)  {
@@ -1009,8 +1013,8 @@ for (j=0; j<n; ++j)  {
 
    if ( ! status )  {
 
-      mlog << Error
-           << "\n\n  TableFlatFile::read_grib1(istream &) -> trouble reading file \"" << filename << "\"\n\n";
+      mlog << Error << "\nTableFlatFile::read_grib1(istream &) -> "
+           << "trouble reading file \"" << filename << "\"\n\n";
 
       exit ( 1 );
 
@@ -1022,9 +1026,9 @@ for (j=0; j<n; ++j)  {
 
    if ( ! status )  {
 
-      mlog << Error
-           << "\n\n  TableFlatFile::read_grib1(istream &) -> trouble parsing line \""
-           << line << "\" from input file \"" << filename << "\"\n\n";
+      mlog << Error << "\nTableFlatFile::read_grib1(istream &) -> "
+           << "trouble parsing line number " << j+2 << " from input file \""
+           << filename << "\"\n\n";
 
       exit ( 1 );
 
@@ -1062,9 +1066,9 @@ bool status = false;
 extend_grib2(N_grib2_elements + n);
 
    //
-   //  shuffle all the old elements to the end of the array, 
+   //  shuffle all the old elements to the end of the array,
    //
-   //   so that the new stuff gets prepended 
+   //   so that the new stuff gets prepended
    //
 
 for (j=(N_grib2_elements - 1); j>=0; --j)  {
@@ -1085,8 +1089,8 @@ for (j=0; j<n; ++j)  {
 
    if ( ! status )  {
 
-      mlog << Error
-           << "\n\n  TableFlatFile::read_grib2(istream &) -> trouble reading file \"" << filename << "\"\n\n";
+      mlog << Error << "\nTableFlatFile::read_grib2(istream &) -> "
+           << "trouble reading file \"" << filename << "\"\n\n";
 
       exit ( 1 );
 
@@ -1098,9 +1102,9 @@ for (j=0; j<n; ++j)  {
 
    if ( ! status )  {
 
-      mlog << Error
-           << "\n\n  TableFlatFile::read_grib2(istream &) -> trouble parsing line \""
-           << line << "\" from input file \"" << filename << "\"\n\n";
+      mlog << Error << "\nTableFlatFile::read_grib2(istream &) -> "
+           << "trouble parsing line number " << j+2 << " from input file \""
+           << filename << "\"\n\n";
 
       exit ( 1 );
 
@@ -1135,7 +1139,7 @@ int TableFlatFile::get_table_files(const char *dir, const char *prefix, const ch
    dp = opendir( dir );
    if(dp == NULL)
    {
-      mlog << Error << "Error(" << errno << ") opening " << dir << "\n";
+      mlog << Error << "\nError(" << errno << ") opening " << dir << "\n\n";
       return errno;
    }
 
