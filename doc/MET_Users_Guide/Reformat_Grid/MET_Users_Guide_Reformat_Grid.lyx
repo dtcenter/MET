@@ -2794,36 +2794,14 @@ name "WWMCA-Tool-Documentation"
 \begin_layout Standard
 There are two WWMCA tools available.
  The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt wwmca
-\backslash
-_plot}
-\end_layout
-
-\end_inset
-
+\series bold
+wmmca_plot
+\series default
  tool makes a PostScript plot of one or more WWMCA cloud percent files and
  the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt wwmca
-\backslash
-_regrid}
-\end_layout
-
-\end_inset
-
+\series bold
+wwmca_regrid
+\series default
  tool regrids WWMCA cloud percent files and reformats them into netCDF files
  that the other MET tools can read.
 \end_layout
@@ -2860,20 +2838,9 @@ vskip 0.1in
 
 \begin_layout Standard
 The usage statement for 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt wwmca
-\backslash
-_plot}
-\end_layout
-
-\end_inset
-
+\series bold
+wmmca_plot
+\series default
  is 
 \end_layout
 
@@ -2909,26 +2876,9 @@ _list}
 
 \begin_layout Standard
 Here, 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt wwmca
-\backslash
-_cloud
-\backslash
-_pct
-\backslash
-_file
-\backslash
-_list}
-\end_layout
-
-\end_inset
-
+\series bold
+wwmca_cloud_pct_file_list
+\series default
  represents one or more WWMCA cloud percent files given on the command line.
  As with any command given to a UNIX shell, the user can use metacharacters
  as a shorthand way to specify many filenames.
@@ -2936,18 +2886,9 @@ _list}
 
 \begin_layout Standard
 The optional 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt -outdir}
-\end_layout
-
-\end_inset
-
+\series bold
+-outdir
+\series default
  argument specifies a directory where the output PostScript plots will be
  placed.
  If not specified, then the plots will be put in the current (working) directory.
@@ -2959,20 +2900,9 @@ reference "Wplotfig"
 \end_inset
 
  shows an example of the 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-tt wwmca
-\backslash
-_plot}
-\end_layout
-
-\end_inset
-
+\series bold
+wmmca_plot
+\series default
  output.
 \end_layout
 
@@ -2986,7 +2916,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename /home/lisag/met_documentation/MET_Users_Guide/fwd_refs_appendix/WWMCA_TOTAL_CLOUD_PCT_NH_2009083022.pdf
+	filename /home/lisag/met_documentation/MET_Users_Guide/Reformat_Grid/WWMCA_TOTAL_CLOUD_PCT_NH_2009083022.pdf
 
 \end_inset
 
