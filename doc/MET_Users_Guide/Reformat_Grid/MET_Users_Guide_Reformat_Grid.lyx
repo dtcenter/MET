@@ -2781,7 +2781,7 @@ name "temp_MODIS"
 \end_layout
 
 \begin_layout Section
-WWMCA Tools 
+WWMCA Tools
 \begin_inset CommandInset label
 LatexCommand label
 name "WWMCA-Tools"
