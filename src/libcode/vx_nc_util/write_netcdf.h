@@ -16,18 +16,18 @@
 #include "netcdf.hh"
 
 #include "vx_grid.h"
-// #include "vx_wrfdata.h"
+#include "vx_config.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void write_netcdf_global    (NcFile *, const char *, const char *,
-                                    const char *model_name = (const char *) 0,
-                                    const char *obtype     = (const char *) 0);
-extern void write_netcdf_proj      (NcFile *, const Grid &);
-extern void write_netcdf_latlon    (NcFile *, NcDim *, NcDim *, const Grid &);
-extern void write_netcdf_grid_wgt  (NcFile *, NcDim *, NcDim *, const DataPlane &); 
-extern void write_netcdf_var_times (NcVar *, const DataPlane &);
-extern void write_netcdf_var_times (NcVar *, const unixtime, const unixtime, const int);
+extern void write_netcdf_global     (NcFile *, const char *, const char *,
+                                     const char *model_name = (const char *) 0,
+                                     const char *obtype     = (const char *) 0);
+extern void write_netcdf_proj       (NcFile *, const Grid &);
+extern void write_netcdf_latlon     (NcFile *, NcDim *, NcDim *, const Grid &);
+extern void write_netcdf_grid_weight(NcFile *, NcDim *, NcDim *, const GridWeightType, const DataPlane &); 
+extern void write_netcdf_var_times  (NcVar *, const DataPlane &);
+extern void write_netcdf_var_times  (NcVar *, const unixtime, const unixtime, const int);
 
 ////////////////////////////////////////////////////////////////////////
 

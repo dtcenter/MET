@@ -98,6 +98,7 @@ void GridStatConfInfo::clear() {
    interp_thresh = bad_data_double;
    interp_wdth.clear();
    nc_info.set_all_true();
+   grid_weight_flag = GridWeightType_None;
    rank_corr_flag = false;
    tmp_dir.clear();
    output_prefix.clear();
@@ -481,6 +482,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Conf: nc_pairs_flag
    parse_nc_info();
+
+   // Conf: grid_weight_flag
+   grid_weight_flag = parse_conf_grid_weight_flag(&conf);
 
    // Conf: rank_corr_flag
    rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);

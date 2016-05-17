@@ -105,7 +105,9 @@ class EnsembleStatConfInfo {
       bool                 ensemble_flag[n_nc]; // Boolean for each ensemble field type
       ConcatString         rng_type;            // GSL random number generator
       ConcatString         rng_seed;            // GSL RNG seed value
+      GridWeightType       grid_weight_flag;    // Grid weighting flag
       DuplicateType        duplicate_flag;      // Duplicate observation behavior
+
       ConcatString         output_prefix;       // String to customize output file names
       ConcatString         version;             // Config file version
 

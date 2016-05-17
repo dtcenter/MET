@@ -51,12 +51,12 @@ class PairDataPoint : public PairBase {
       bool add_pair(const char *, double, double, double, double,
                     unixtime, double, double, double, double,
                     const char *, double, double,
-                    double wgt = default_grid_wgt);
+                    double wgt = default_grid_weight);
 
       void set_pair(int, const char *, double, double, double, double,
                     unixtime, double, double, double, double,
                     const char *, double, double,
-                    double wgt = default_grid_wgt);
+                    double wgt = default_grid_weight);
 };
 
 ////////////////////////////////////////////////////////////////////////

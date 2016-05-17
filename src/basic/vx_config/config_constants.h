@@ -279,6 +279,18 @@ enum DuplicateType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for grid_weight_flag configuration parameter
+//
+
+enum GridWeightType {
+   GridWeightType_None,    // Apply no grid box weighting
+   GridWeightType_Cos_Lat, // Apply cosine latitude weighting
+   GridWeightType_Area     // Apply true grid box area weighting
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for grid_decomp_flag configuration parameter
 //
 
@@ -413,6 +425,7 @@ static const char conf_key_nbrhd[]             = "nbrhd";
 static const char conf_key_cov_thresh[]        = "cov_thresh";
 static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
 static const char conf_key_nc_pairs_flag[]     = "nc_pairs_flag";
+static const char conf_key_grid_weight_flag[]  = "grid_weight_flag";
 static const char conf_key_duplicate_flag[]    = "duplicate_flag";
 static const char conf_key_rank_corr_flag[]    = "rank_corr_flag";
 static const char conf_key_tmp_dir[]           = "tmp_dir";
@@ -799,6 +812,10 @@ static const char conf_val_replace[] = "REPLACE";
 // Bootstrapping interval type
 static const char conf_val_pctile[] = "PCTILE";
 static const char conf_val_bca[]    = "BCA";
+
+// Grid weight flag values
+static const char conf_val_cos_lat[] = "COS_LAT";
+static const char conf_val_area[]    = "AREA";
 
 // Duplicate flag values
 static const char conf_val_unique[] = "UNIQUE";

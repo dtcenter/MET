@@ -53,7 +53,7 @@ void EnsembleStatConfInfo::init_from_scratch() {
    msg_typ     = (StringArray *)        0;
    sid_exc     = (StringArray *)        0;
    obs_qty     = (StringArray *)        0;
-   mask_dp     = (DataPlane *)          0;   
+   mask_dp     = (DataPlane *)          0;
    interp_mthd = (InterpMthd *)         0;
 
    clear();
@@ -88,6 +88,7 @@ void EnsembleStatConfInfo::clear() {
    rng_type.clear();
    rng_seed.clear();
    duplicate_flag = DuplicateType_None;
+   grid_weight_flag = GridWeightType_None;
    output_prefix.clear();
    version.clear();
 
@@ -139,7 +140,7 @@ void EnsembleStatConfInfo::read_config(const char *default_file_name,
 
 void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           GrdFileType otype) {
-   int i;  
+   int i;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *ens_dict  = (Dictionary *) 0;
@@ -169,7 +170,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: beg_ds and end_ds
    ens_dict = conf.lookup_dictionary(conf_key_obs_window);
    parse_conf_range_int(ens_dict, beg_ds, end_ds);
-   
+
    // Conf: output_flag
    output_map = parse_conf_output_flag(&conf);
 
@@ -238,7 +239,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Only parse thresholds if relative frequencies are requested
       if(ensemble_flag[i_nc_freq]) {
-        
+
          // Conf: cat_thresh
          ens_ta[i] = i_ens_dict.lookup_thresh_array(conf_key_cat_thresh);
 
@@ -269,7 +270,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: ens.vld_thresh
    vld_data_thresh = conf.lookup_double(conf_key_ens_vld_thresh);
-   
+
    // Check that the valid data threshold is between 0 and 1.
    if(vld_data_thresh <= 0.0 || vld_data_thresh > 1.0) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
@@ -365,7 +366,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
             !is_eq(vx_pd[i].fcst_info->level().lower(), vx_pd[i].fcst_info->level().upper()) &&
             (vx_pd[i].obs_info->level().lower() < vx_pd[i].fcst_info->level().lower() ||
              vx_pd[i].obs_info->level().upper() > vx_pd[i].fcst_info->level().upper())) {
-           
+
             mlog << Warning
                  << "\nEnsembleStatConfInfo::process_config() -> "
                  << "The range of requested observation pressure levels "
@@ -397,9 +398,12 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    rng_type = conf.lookup_string(conf_key_rng_type);
    rng_seed = conf.lookup_string(conf_key_rng_seed);
 
+   // Conf: grid_weight_flag
+   grid_weight_flag = parse_conf_grid_weight_flag(&conf);
+
    // Conf: duplicate_flag
    duplicate_flag = parse_conf_duplicate_flag(&conf);
-   
+
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
@@ -408,7 +412,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_masks(const Grid &grid) {   
+void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
    StringArray mask_grid, mask_poly, sid_list;
    ConcatString s;

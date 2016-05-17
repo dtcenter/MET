@@ -158,6 +158,7 @@ class GridStatConfInfo {
 
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
       GridStatNcOutInfo nc_info;            // Output NetCDF pairs file contents
+      GridWeightType    grid_weight_flag;   // Grid weighting flag
       bool              rank_corr_flag;     // Flag for computing rank correlations
 
       ConcatString      tmp_dir;            // Directory for temporary files

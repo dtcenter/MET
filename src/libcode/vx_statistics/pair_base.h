@@ -100,18 +100,18 @@ class PairBase {
       bool add_obs(const char *, double, double, double, double,
                    unixtime, double, double, double, const char *,
                    double, double,
-                   double wgt = default_grid_wgt);
+                   double wgt = default_grid_weight);
 
       void add_obs(double, double, double, double, double,
-                   double wgt = default_grid_wgt);
+                   double wgt = default_grid_weight);
 
       void set_obs(int, const char *, double, double, double, double,
                    unixtime, double, double, double,
                    const char *, double, double,
-                   double wgt = default_grid_wgt);
+                   double wgt = default_grid_weight);
 
       void set_obs(int, double, double, double, double, double,
-                   double wgt = default_grid_wgt);
+                   double wgt = default_grid_weight);
 
       void print_duplicate_report();
 };
