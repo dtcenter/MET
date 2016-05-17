@@ -50,11 +50,13 @@ class PairDataPoint : public PairBase {
 
       bool add_pair(const char *, double, double, double, double,
                     unixtime, double, double, double, double,
-                    const char *, double, double);
+                    const char *, double, double,
+                    double wgt = default_grid_wgt);
 
       void set_pair(int, const char *, double, double, double, double,
                     unixtime, double, double, double, double,
-                    const char *, double, double);
+                    const char *, double, double,
+                    double wgt = default_grid_wgt);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -174,7 +176,8 @@ class VxPairDataPoint {
       void set_interp(int, InterpMthd, int);
 
       void add_obs(float *, const char *, const char *, unixtime,
-                   const char *, float *, Grid &);
+                   const char *, float *, Grid &,
+                   const DataPlane * = 0);
 
       void find_vert_lvl(const DataPlaneArray &, double, int &, int &);
 

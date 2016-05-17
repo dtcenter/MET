@@ -55,6 +55,7 @@ class PairBase {
       NumArray    lon_na;  // Longitude [n_obs]
       NumArray    x_na;    // X [n_obs]
       NumArray    y_na;    // Y [n_obs]
+      NumArray    wgt_na;  // Weight [n_obs]
       TimeArray   vld_ta;  // Valid time [n_obs]
       NumArray    lvl_na;  // Level [n_obs]
       NumArray    elv_na;  // Elevation [n_obs]
@@ -98,13 +99,19 @@ class PairBase {
 
       bool add_obs(const char *, double, double, double, double,
                    unixtime, double, double, double, const char *,
-                   double, double);
-      void add_obs(double, double, double, double, double);
+                   double, double,
+                   double wgt = default_grid_wgt);
+
+      void add_obs(double, double, double, double, double,
+                   double wgt = default_grid_wgt);
 
       void set_obs(int, const char *, double, double, double, double,
-                   unixtime, double, double, double, const char *,
-                   double, double);
-      void set_obs(int, double, double, double, double, double);
+                   unixtime, double, double, double,
+                   const char *, double, double,
+                   double wgt = default_grid_wgt);
+
+      void set_obs(int, double, double, double, double, double,
+                   double wgt = default_grid_wgt);
 
       void print_duplicate_report();
 };

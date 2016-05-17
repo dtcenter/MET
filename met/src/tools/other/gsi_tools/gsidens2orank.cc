@@ -261,7 +261,9 @@ void process_conv_data(ConvData &d, int i_mem) {
       conv_data.push_back(d);
 
       // Store the current observation info
-      ens_pd.add_obs(d.sid, d.lat, d.lon, bad_data_double, bad_data_double,
+      // Store default weight value of 1
+      ens_pd.add_obs(d.sid, d.lat, d.lon,
+                     bad_data_double, bad_data_double,
                      d.obs_ut, d.prs, d.elv, d.obs, na_str,
                      bad_data_double, bad_data_double);
 
@@ -416,7 +418,9 @@ void process_rad_data(RadData &d, int i_mem) {
       rad_data.push_back(d);
 
       // Store the current observation info
-      ens_pd.add_obs(na_str, d.lat, d.lon, bad_data_double, bad_data_double,
+      // Store default weight value of 1
+      ens_pd.add_obs(na_str, d.lat, d.lon,
+                     bad_data_double, bad_data_double,
                      d.obs_ut, bad_data_double, d.elv, d.obs, na_str,
                      bad_data_double, bad_data_double);
 

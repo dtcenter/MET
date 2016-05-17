@@ -160,6 +160,7 @@ ensemble_flag = {
    vld_count = TRUE;
    frequency = TRUE;
    rank      = TRUE;
+   weight    = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

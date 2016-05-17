@@ -79,6 +79,7 @@
 //   032    08/04/15  Halley Gotway  Add conditional continuous verification.
 //   033    09/04/15  Halley Gotway  Add climatology and SAL1L2 and VAL1L2
 //                                   output line types.
+//   034    05/10/16  Halley Gotway  Add grid weighting.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -141,6 +142,11 @@ static void do_nbrcnt(NBRCNTInfo &, int, int, int,
 static void write_nc(const GridStatNcOutInfo &,
                      const DataPlane &, const DataPlane &,
                      const DataPlane &, int, InterpMthd, int);
+
+static void write_nbrhd_nc(const GridStatNcOutInfo &,
+                           const DataPlane &, const DataPlane &, int,
+                           const SingleThresh &, const SingleThresh &,
+                           int);
 
 static void add_var_att(NcVar *, const char *, const char *);
 
@@ -247,14 +253,17 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(ftype, otype);
-   
+
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.regrid_info,
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
+   // Compute weight for each grid point
+   parse_grid_wgt(grid, wgt_dp);
+
    // Set the model name
    shc.set_model(conf_info.model);
-   
+
    // Set the obtype column
    shc.set_obtype(conf_info.obtype);
 
@@ -276,7 +285,7 @@ void setup_first_pass(const DataPlane &dp) {
 
    // Unset the flag
    is_first_pass = false;
-  
+
    // Process masks grids and polylines in the config file
    conf_info.process_masks(grid);
 
@@ -314,10 +323,10 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    max_prob_col = get_n_pjc_columns(n_prob);
    max_mctc_col = get_n_mctc_columns(n_cat);
 
-   // Determine the maximum number of data columns 
+   // Determine the maximum number of data columns
    max_col = ( max_prob_col > max_stat_col ? max_prob_col : max_stat_col );
    max_col = ( max_mctc_col > max_col      ? max_mctc_col : max_col );
-   
+
    // Add the header columns
    max_col += n_header_columns + 1;
 
@@ -489,6 +498,11 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
       write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
    }
 
+   // Add grid weight variable
+   if(nc_info.do_weight) {
+      write_netcdf_grid_wgt(nc_out, lat_dim, lon_dim, wgt_dp);
+   }
+
    return;
 }
 
@@ -540,12 +554,12 @@ void process_scores() {
    // Climatology mean
    DataPlane cmn_dp;
 
-   // Forecast, observation, and climatology pairs
-   NumArray f_na, o_na, c_na;
+   // Forecast, observation, climatology, and weights
+   NumArray f_na, o_na, c_na, w_na;
 
    // Thresholded fractional coverage pairs
    NumArray fthr_na, othr_na;
-   
+
    // Objects to handle vector winds
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
@@ -593,7 +607,7 @@ void process_scores() {
               << "\n\n";
          continue;
       }
-      
+
       // Regrid, if necessary
       if(!(fcst_mtddf->grid() == grid)) {
          mlog << Debug(1)
@@ -680,7 +694,7 @@ void process_scores() {
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
            << " climatology mean field(s) for forecast "
            << conf_info.fcst_info[i]->magic_str() << ".\n";
-      
+
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
 
@@ -756,6 +770,7 @@ void process_scores() {
             apply_mask(fcst_dp_smooth, mask_dp, f_na);
             apply_mask(obs_dp_smooth,  mask_dp, o_na);
             apply_mask(cmn_dp,         mask_dp, c_na);
+            apply_mask(wgt_dp,         mask_dp, w_na);
 
             // Set the mask name
             shc.set_mask(conf_info.mask_name[k]);
@@ -966,6 +981,7 @@ void process_scores() {
                apply_mask(fu_dp_smooth,   mask_dp, fu_na);
                apply_mask(ou_dp_smooth,   mask_dp, ou_na);
                apply_mask(cmnu_dp,        mask_dp, cmnu_na);
+               apply_mask(wgt_dp,         mask_dp, w_na);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na, cmnu_na, c_na);
@@ -1063,10 +1079,10 @@ void process_scores() {
          } // end for k
 
          // Write out the smoothed forecast, observation, and difference
-         // fields in netCDF format for each GRIB code if requested in
+         // fields in netCDF format for each verification task if requested in
          // the config file
          if(!(conf_info.nc_info.all_false())) {
-            write_nc(conf_info.nc_info, 
+            write_nc(conf_info.nc_info,
                      fcst_dp_smooth, obs_dp_smooth, cmn_dp, i,
                      conf_info.interp_mthd[j],
                      conf_info.interp_wdth[j]);
@@ -1129,6 +1145,7 @@ void process_scores() {
                   apply_mask(fcst_dp_thresh, mask_dp, fthr_na);
                   apply_mask(obs_dp_smooth,  mask_dp, o_na);
                   apply_mask(obs_dp_thresh,  mask_dp, othr_na);
+                  apply_mask(wgt_dp,         mask_dp, w_na);
 
                   mlog << Debug(2) << "Processing "
                        << conf_info.fcst_info[i]->magic_str()
@@ -1209,6 +1226,16 @@ void process_scores() {
                      }
                   } // end compute NBRCNT
                } // end for m
+
+               // Write out the neighborhood fractional coverage fields
+               // if requested in the config file
+               if(conf_info.nc_info.do_nbrhd) {
+                  write_nbrhd_nc(conf_info.nc_info,
+                     fcst_dp_smooth, obs_dp_smooth, i,
+                     conf_info.fcat_ta[i][k], conf_info.ocat_ta[i][k],
+                     conf_info.nbrhd_wdth[j]);
+               }
+
             } // end for k
          } // end for j
       } // end if
@@ -1223,7 +1250,7 @@ void process_scores() {
    if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  0; }
    if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) 0; }
    if(pct_info)    { delete [] pct_info;    pct_info    = (PCTInfo *)    0; }
-   
+
    return;
 }
 
@@ -1339,7 +1366,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       cnt_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
       cnt_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
       cnt_info[i].logic   = conf_info.cnt_logic[i_vx];
-   
+
       //
       // Setup the CNTInfo alpha values
       //
@@ -1376,7 +1403,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       }
       else {
          compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na, cc_na,
-            precip_flag, conf_info.rank_corr_flag, 
+            precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
             cnt_info[i], conf_info.tmp_dir);
       }
@@ -1398,7 +1425,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
    //
    // Process each filtering threshold
    //
-   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) { 
+   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) {
 
       //
       // Store thresholds
@@ -1406,7 +1433,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
       s_info[i].fthresh = conf_info.fcnt_ta[i_vx][i];
       s_info[i].othresh = conf_info.ocnt_ta[i_vx][i];
       s_info[i].logic   = conf_info.cnt_logic[i_vx];
-      
+
       //
       // Compute partial sums
       //
@@ -1630,12 +1657,12 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    float *obs_data  = (float *) 0;
    float *diff_data = (float *) 0;
    float *cmn_data  = (float *) 0;
-   
+
    NcVar *fcst_var = (NcVar *) 0;
    NcVar *obs_var  = (NcVar *) 0;
    NcVar *diff_var = (NcVar *) 0;
    NcVar *cmn_var  = (NcVar *) 0;
-   
+
    // Get the interpolation strings
    mthd_str = interpmthd_to_string(mthd);
    if(wdth > 1) smooth_str << "_" << mthd_str << "_" << wdth*wdth;
@@ -1651,7 +1678,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    for(i=0; i<conf_info.get_n_mask(); i++) {
 
       // Build the forecast variable name
-      cs << cs_erase 
+      cs << cs_erase
          << conf_info.fcst_info[i_vx]->name() << "_"
          << conf_info.fcst_info[i_vx]->level_name() << "_"
          << conf_info.mask_name[i];
@@ -1899,6 +1926,161 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
    if(diff_data) { delete [] diff_data; diff_data = (float *) 0; }
    if(cmn_data)  { delete [] cmn_data;  cmn_data  = (float *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
+               const DataPlane &fcst_dp, const DataPlane &obs_dp, int i_vx,
+               const SingleThresh &fcst_st, const SingleThresh &obs_st,
+               int wdth) {
+   int i, n, x, y;
+   int fcst_flag, obs_flag;
+   double fval, oval;
+   ConcatString fcst_var_name, obs_var_name;
+   ConcatString att_str, mthd_str, nbrhd_str;
+
+   float *fcst_data = (float *) 0;
+   float *obs_data  = (float *) 0;
+
+   NcVar *fcst_var = (NcVar *) 0;
+   NcVar *obs_var  = (NcVar *) 0;
+
+   // Get the interpolation strings
+   mthd_str = interpmthd_to_string(InterpMthd_Nbrhd);
+   if(wdth > 1) nbrhd_str << "_" << mthd_str << "_" << wdth*wdth;
+
+   // Allocate memory for the forecast and observation fields
+   fcst_data = new float [grid.nx()*grid.ny()];
+   obs_data  = new float [grid.nx()*grid.ny()];
+
+   // Process each of the masking regions
+   for(i=0; i<conf_info.get_n_mask(); i++) {
+
+      // Build the forecast variable name
+      fcst_var_name << cs_erase << "FCST_"
+                    << conf_info.fcst_info[i_vx]->name() << "_"
+                    << conf_info.fcst_info[i_vx]->level_name() << "_"
+                    << conf_info.mask_name[i] << "_"
+                    << fcst_st.get_abbr_str() << nbrhd_str;
+
+      // Build the observation variable name
+      obs_var_name << cs_erase << "OBS_"
+                   << conf_info.obs_info[i_vx]->name() << "_"
+                   << conf_info.obs_info[i_vx]->level_name() << "_"
+                   << conf_info.mask_name[i] << "_"
+                   << obs_st.get_abbr_str() << nbrhd_str;
+
+      // Figure out which fields should be written
+      fcst_flag = !fcst_var_sa.has(fcst_var_name);
+      obs_flag  = !obs_var_sa.has(obs_var_name);
+
+      // Check for nothing to do
+      if(!fcst_flag && !obs_flag) continue;
+
+      // Add the forecast variable
+      if(fcst_flag) {
+
+         // Define the forecast variable
+         fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
+                                    lat_dim, lon_dim);
+
+         // Add to the list of previously defined variables
+         fcst_var_sa.add(fcst_var_name);
+
+         // Add variable attributes for the forecast field
+         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
+                 << " at "
+                 << conf_info.fcst_info[i_vx]->level_name();
+         add_var_att(fcst_var, "long_name", att_str);
+         add_var_att(fcst_var, "level", shc.get_fcst_lev());
+         add_var_att(fcst_var, "units", conf_info.fcst_info[i_vx]->units());
+         write_netcdf_var_times(fcst_var, fcst_dp);
+         fcst_var->add_att("_FillValue", bad_data_float);
+         add_var_att(fcst_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att(fcst_var, "smoothing_method", mthd_str);
+         add_var_att(fcst_var, "threshold", fcst_st.get_abbr_str());
+         fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
+      } // end fcst_flag
+
+      // Add the observation variable
+      if(obs_flag) {
+
+         // Define the observation variable
+         obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
+                                    lat_dim, lon_dim);
+
+         // Add to the list of previously defined variables
+         obs_var_sa.add(obs_var_name);
+
+         // Add variable attributes for the observation field
+         add_var_att(obs_var, "name", shc.get_obs_var());
+         att_str << cs_erase << conf_info.obs_info[i_vx]->name()
+                 << " at "
+                 << conf_info.obs_info[i_vx]->level_name();
+         add_var_att(obs_var, "long_name", att_str);
+         add_var_att(obs_var, "level", shc.get_obs_lev());
+         add_var_att(obs_var, "units", conf_info.obs_info[i_vx]->units());
+         write_netcdf_var_times(obs_var, obs_dp);
+         obs_var->add_att("_FillValue", bad_data_float);
+         add_var_att(obs_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att(obs_var, "smoothing_method", mthd_str);
+         add_var_att(obs_var, "threshold", obs_st.get_abbr_str());
+         obs_var->add_att("smoothing_neighborhood", wdth*wdth);
+      } // end obs_flag
+
+      // Store the forecast and observation values
+      for(x=0; x<grid.nx(); x++) {
+         for(y=0; y<grid.ny(); y++) {
+
+            n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+
+            // Check whether the mask is on or off for this point
+            if(!conf_info.mask_dp[i].s_is_on(x, y)) {
+               fcst_data[n] = bad_data_float;
+               obs_data[n]  = bad_data_float;
+               continue;
+            }
+
+            // Retrieve the data values
+            fval   = fcst_dp.get(x, y);
+            oval   = obs_dp.get(x, y);
+
+            // Store the values
+            fcst_data[n] = (is_bad_data(fval)   ? bad_data_float : fval);
+            obs_data[n]  = (is_bad_data(oval)   ? bad_data_float : oval);
+
+         } // end for y
+      } // end for x
+
+      // Write out the forecast field
+      if(fcst_flag) {
+         if(!fcst_var->put(&fcst_data[0], grid.ny(), grid.nx())) {
+            mlog << Error << "\nwrite_nbrhd_nc() -> "
+                 << "error with the fcst_var->put for forecast variable "
+                 << fcst_var_name << "\n\n";
+            exit(1);
+         }
+      }
+
+      // Write out the observation field
+      if(obs_flag) {
+         if(!obs_var->put(&obs_data[0], grid.ny(), grid.nx())) {
+            mlog << Error << "\nwrite_nbrhd_nc() -> "
+                 << "error with the obs_var->put for observation variable "
+                 << obs_var_name << "\n\n";
+            exit(1);
+         }
+      }
+
+   } // end for i
+
+   // Deallocate and clean up
+   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }
+   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
 
    return;
 }

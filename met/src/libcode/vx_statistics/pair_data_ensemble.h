@@ -204,7 +204,9 @@ class VxPairDataEnsemble {
       void set_phist_bin_size(double);
 
       void add_obs(float *, const char *, const char *, unixtime,
-                   const char *, float *, Grid &);
+                   const char *, float *, Grid &,
+                   const DataPlane * = 0);
+
       void add_ens(int, bool mn);
 
       void find_vert_lvl(const DataPlaneArray &, double, int &, int &);

@@ -66,7 +66,7 @@ PairDataPoint & PairDataPoint::operator=(const PairDataPoint &pd) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataPoint::init_from_scratch() {
-  
+
    clear();
 
    return;
@@ -102,7 +102,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                pd.lvl_na[i], pd.elv_na[i],
                pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
-               pd.cmn_na[i], pd.csd_na[i]);
+               pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
    }
 
    return;
@@ -114,10 +114,10 @@ bool PairDataPoint::add_pair(const char *sid, double lat, double lon,
                              double x, double y, unixtime ut,
                              double lvl, double elv,
                              double f, double o, const char *qc,
-                             double cmn, double csd) {
+                             double cmn, double csd, double wgt) {
 
    if(!PairBase::add_obs(sid, lat, lon, x, y, ut, lvl, elv,
-                         o, qc, cmn, csd) ) return(false);
+                         o, qc, cmn, csd, wgt) ) return(false);
 
    f_na.add(f);
 
@@ -131,7 +131,7 @@ void PairDataPoint::set_pair(int i_obs, const char *sid,
                              double x, double y, unixtime ut,
                              double lvl, double elv,
                              double f, double o, const char *qc,
-                             double cmn, double csd) {
+                             double cmn, double csd, double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_pair() -> "
@@ -142,7 +142,7 @@ void PairDataPoint::set_pair(int i_obs, const char *sid,
    }
 
    PairBase::set_obs(i_obs, sid, lat, lon, x, y, ut, lvl, elv,
-                     o, qc, cmn, csd);
+                     o, qc, cmn, csd, wgt);
 
    f_na.set(i_obs, f);
 
@@ -192,7 +192,7 @@ void VxPairDataPoint::init_from_scratch() {
    fcst_info    = (VarInfo *) 0;
    climo_info   = (VarInfo *) 0;
    obs_info     = (VarInfoGrib *) 0;
-  
+
    pd           = (PairDataPoint ***) 0;
    rej_typ      = (int ***) 0;
    rej_mask     = (int ***) 0;
@@ -202,7 +202,7 @@ void VxPairDataPoint::init_from_scratch() {
    n_msg_typ    = 0;
    n_mask       = 0;
    n_interp     = 0;
-   
+
    clear();
 
    return;
@@ -566,18 +566,18 @@ void VxPairDataPoint::set_interp(int i_interp, InterpMthd mthd,
 void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
                               const char *hdr_sid_str, unixtime hdr_ut,
                               const char *obs_qty, float *obs_arr,
-                              Grid &gr) {
+                              Grid &gr, const DataPlane *wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
-   double fcst_v, cmn_v, csd_v, obs_v;
+   double fcst_v, cmn_v, csd_v, obs_v, wgt_v;
    int f_lvl_blw, f_lvl_abv;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
 
    // Increment the number of tries count
    n_try++;
-   
+
    // Check the station ID exclusion list
    if(sid_exc_filt.n_elements() && sid_exc_filt.has(hdr_sid_str)) {
       rej_sid_exc++;
@@ -678,7 +678,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
          return;
       }
    }
-   
+
    // For a single forecast field
    if(fcst_dpa.n_planes() == 1) {
       f_lvl_blw = 0;
@@ -813,10 +813,15 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, k,
                       to_lvl, csd_lvl_blw, csd_lvl_abv);
 
+            // Compute weight for current point
+            wgt_v = ( wgt_dp == (DataPlane *) 0 ?
+                      default_grid_wgt : wgt_dp->get(x, y) );
+
             // Add the forecast, climatological, and observation data
+            // Weight is from the nearest grid point
             if(!pd[i][j][k].add_pair(hdr_sid_str, hdr_lat, hdr_lon,
                   obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
-                  fcst_v, obs_v, obs_qty, cmn_v, csd_v)) {
+                  fcst_v, obs_v, obs_qty, cmn_v, csd_v, wgt_v)) {
                inc_count(rej_dup, i, j, k);
             }
 
