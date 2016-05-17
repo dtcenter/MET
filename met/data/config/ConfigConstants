@@ -71,6 +71,11 @@ STAT           = 3;
 PCTILE         = 1;
 BCA            = 2;
 
+// Grid weight flag settings
+NONE           = 1;
+COS_LAT        = 2;
+AREA           = 3;
+
 // Duplicate flag settings
 NONE           = 1;
 UNIQUE         = 2;

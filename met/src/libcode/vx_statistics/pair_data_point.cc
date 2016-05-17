@@ -815,7 +815,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Compute weight for current point
             wgt_v = ( wgt_dp == (DataPlane *) 0 ?
-                      default_grid_wgt : wgt_dp->get(x, y) );
+                      default_grid_weight : wgt_dp->get(x, y) );
 
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point

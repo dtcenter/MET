@@ -110,14 +110,35 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// JHG, need to work here... support multiple options for defining the weight
-// value for each grid point.  For now, just set them all to the default (1.0).
+void parse_grid_weight(const Grid &grid, const GridWeightType t,
+                       DataPlane &wgt_dp) {
+   int x, y;
+   double w, lat, lon;
 
-void parse_grid_wgt(const Grid &grid, DataPlane &wgt_dp) {
-
+   // Initialize
    wgt_dp.clear();
    wgt_dp.set_size(grid.nx(), grid.ny());
-   wgt_dp.set_constant(default_grid_wgt);
+
+   // Compute weight for each grid point
+   for(x=0; x<grid.nx(); x++) {
+      for(y=0; y<grid.ny(); y++) {
+
+         if(t == GridWeightType_Cos_Lat) {
+            grid.xy_to_latlon(x, y, lat, lon);
+            w = cosd(lat);
+         }
+         else if(t == GridWeightType_Area) {
+            w = grid.calc_area(x, y);
+         }
+         else {
+            w = default_grid_weight;
+         }
+
+         // Store the current weight
+         wgt_dp.set(w, x, y);
+
+      } // end for y
+   } // end for x
 
    return;
 }

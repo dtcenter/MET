@@ -886,6 +886,35 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
+   GridWeightType t;
+   int v;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_grid_weight_flag);
+
+   // Convert integer to enumerated GridWeightType
+        if(v == conf_const.lookup_int(conf_val_none))    t = GridWeightType_None;
+   else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType_Cos_Lat;
+   else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType_Area;
+   else {
+      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_grid_weight_flag << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    DuplicateType t;
    int v;

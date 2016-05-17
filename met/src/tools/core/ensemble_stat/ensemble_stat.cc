@@ -316,7 +316,7 @@ void process_command_line(int argc, char **argv)
                         (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
 
    // Compute weight for each grid point
-   parse_grid_wgt(grid, wgt_dp);
+   parse_grid_weight(grid, conf_info.grid_weight_flag, wgt_dp);
 
    // Set the model name
    shc.set_model(conf_info.model);
@@ -1619,7 +1619,8 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 
    // Add grid weight variable
    if(conf_info.ensemble_flag[i_nc_weight]) {
-      write_netcdf_grid_wgt(nc_out, lat_dim, lon_dim, wgt_dp);
+      write_netcdf_grid_weight(nc_out, lat_dim, lon_dim,
+                               conf_info.grid_weight_flag, wgt_dp);
    }
 
    // Append to the list of output files
