@@ -1444,6 +1444,24 @@ nc_pairs_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   climo  = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   weight = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   nbrhd  = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
@@ -1477,12 +1495,32 @@ diff
  entries control the creation of output variables for the latitude and longitude
 , the raw forecast and observed fields, and the forecast minus observation
  difference fields.
+ The 
+\series bold
+climo
+\series default
+,
+\series bold
+ weight
+\series medium
+, and 
+\series bold
+nbrhd
+\series medium
+ entries control the creation of output variables for the climatological
+ mean field, the grid area weights applied, and the fractional coverage
+ fields computed for neighborhood verification methods.
  Setting these entries to 
 \series default
 TRUE
 \series medium
  indicates that they should be written, while setting them to FALSE disables
  their creation.
+ Note that enabling 
+\series bold
+nbrhd
+\series medium
+ output may lead to very large output files.
 \end_layout
 
 \begin_layout Subsection
