@@ -744,10 +744,29 @@ nc_pairs_flag = TRUE;
 ps_plot_flag = TRUE;
 
 //
+// The "grid_weight_flag" specifies how grid weighting should be applied
+// during the computation of continuous statistics and partial sums.  It is
+// meant to account for grid box area distortion and is often applied to global
+// Lat/Lon grids.  It is only applied for grid-to-grid verification in Grid-Stat
+// and Ensemble-Stat and is not applied for grid-to-point verification.
+// Three grid weighting options are currently supported:
+//
+//    - "NONE" to disable grid weighting using a constant weight (default).
+//    - "COS_LAT" to define the weight as the cosine the grid point latitude.
+//      This an approximation for grid box area used by NCEP and WMO.
+//    - "AREA" to define the weight as the true area of the grid box (km^2).
+//
+// The weights are ultimately computed as the weight at each grid point divided
+// by the sum of the weights for the current masking region.
+//
+grid_weight_flag = NONE;
+
+//
 // The "rank_corr_flag" entry is a boolean to indicate whether Kendall's Tau
 // and Spearman's Rank Correlation Coefficients (in the CNT line type) should
 // be computed.  Computing them over large datasets is computationally
 // intensive and slows down the runtime significantly.
+//
 rank_corr_flag = FALSE;
 
 //

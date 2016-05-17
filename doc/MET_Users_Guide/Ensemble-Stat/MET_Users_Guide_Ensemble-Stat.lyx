@@ -1177,6 +1177,12 @@ ensemble_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   weight    = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
@@ -1235,7 +1241,13 @@ cat_thresh
 \end_layout
 
 \begin_layout Enumerate
-Observation Ranks for Input Gridded Observations
+Observation Ranks for input gridded observations are written to a separate
+ NetCDF output file.
+\end_layout
+
+\begin_layout Enumerate
+The grid area weights applied are written to the Observation Rank output
+ file.
 \end_layout
 
 \begin_layout Standard
