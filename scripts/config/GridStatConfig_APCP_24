@@ -169,13 +169,16 @@ nc_pairs_flag   = {
    raw    = TRUE;
    diff   = TRUE;
    climo  = TRUE;
+   weight = FALSE;
+   nbrhd  = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-rank_corr_flag = FALSE;
-tmp_dir        = "/tmp";
-output_prefix  = "APCP_24";
-version        = "V5.1";
+grid_weight_flag = NONE;
+rank_corr_flag   = FALSE;
+tmp_dir          = "/tmp";
+output_prefix    = "APCP_24";
+version          = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////
