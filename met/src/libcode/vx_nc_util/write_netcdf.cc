@@ -145,6 +145,10 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
       exit(1);
    }
 
+   // Clean up
+   if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
+   if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
+
    return;
 }
 
@@ -202,6 +206,51 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
            << "error with lon_var->put\n\n";
       exit(1);
    }
+
+   // Clean up
+   if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
+   if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void write_netcdf_grid_wgt(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
+                           const DataPlane &wgt_dp) {
+   int i, x, y;
+   double lat, lon;
+   NcVar *wgt_var  = (NcVar *) 0;
+   float *wgt_data = (float *) 0;
+
+   // Define variable
+   wgt_var = f_out->add_var("GRID_WEIGHT", ncFloat, lat_dim, lon_dim);
+
+   // Add variable attributes
+   wgt_var->add_att("long_name", "grid weights");
+   wgt_var->add_att("units", "NA");
+   wgt_var->add_att("standard_name", "weight");
+
+   // Allocate space for weight values
+   wgt_data = new float [wgt_dp.nx()*wgt_dp.ny()];
+
+   // Store weight values
+   for(x=0; x<wgt_dp.nx(); x++) {
+      for(y=0; y<wgt_dp.ny(); y++) {
+         i = DefaultTO.two_to_one(wgt_dp.nx(), wgt_dp.ny(), x, y);
+         wgt_data[i] = (float) wgt_dp(x, y);
+      }
+   }
+
+   // Write the weights
+   if(!wgt_var->put(&wgt_data[0], wgt_dp.ny(), wgt_dp.nx())) {
+      mlog << Error << "\nwrite_netcdf_grid_wgt() -> "
+           << "error with wgt_var->put\n\n";
+      exit(1);
+   }
+
+   // Clean up
+   if(wgt_data) { delete [] wgt_data; wgt_data = (float *) 0; }
 
    return;
 }

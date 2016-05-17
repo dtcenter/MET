@@ -25,6 +25,7 @@ extern void write_netcdf_global    (NcFile *, const char *, const char *,
                                     const char *obtype     = (const char *) 0);
 extern void write_netcdf_proj      (NcFile *, const Grid &);
 extern void write_netcdf_latlon    (NcFile *, NcDim *, NcDim *, const Grid &);
+extern void write_netcdf_grid_wgt  (NcFile *, NcDim *, NcDim *, const DataPlane &); 
 extern void write_netcdf_var_times (NcVar *, const DataPlane &);
 extern void write_netcdf_var_times (NcVar *, const unixtime, const unixtime, const int);
 
