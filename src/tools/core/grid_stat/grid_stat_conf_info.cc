@@ -57,7 +57,7 @@ void GridStatConfInfo::init_from_scratch() {
    fwind_ta    = (ThreshArray *)  0;
    owind_ta    = (ThreshArray *)  0;
    wind_logic  = (SetLogic *)     0;
-   mask_dp     = (DataPlane *)    0;   
+   mask_dp     = (DataPlane *)    0;
    interp_mthd = (InterpMthd *)   0;
 
    clear();
@@ -104,7 +104,7 @@ void GridStatConfInfo::clear() {
    version.clear();
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
-   
+
    // Deallocate memory
    if(fcat_ta)     { delete [] fcat_ta;     fcat_ta     = (ThreshArray *) 0; }
    if(ocat_ta)     { delete [] ocat_ta;     ocat_ta     = (ThreshArray *) 0; }
@@ -117,7 +117,7 @@ void GridStatConfInfo::clear() {
    if(owind_ta)    { delete [] owind_ta;    owind_ta    = (ThreshArray *) 0; }
    if(wind_logic)  { delete [] wind_logic;  wind_logic  = (SetLogic *)    0; }
 
-   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)   0; }   
+   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)   0; }
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)  0; }
 
    // Clear fcst_info
@@ -133,7 +133,7 @@ void GridStatConfInfo::clear() {
          if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
       delete obs_info; obs_info = (VarInfo **) 0;
    }
-   
+
    // Reset count
    n_vx = 0;
 
@@ -171,7 +171,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    BootInfo boot_info;
    InterpInfo interp_info;
    NbrhdInfo nbrhd_info;
-   
+
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
@@ -250,10 +250,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Initialize pointers
    for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
-   
+
    // Parse the fcst and obs field information
    for(i=0; i<n_vx; i++) {
-    
+
       // Allocate new VarInfo objects
       fcst_info[i] = info_factory.new_var_info(ftype);
       obs_info[i]  = info_factory.new_var_info(otype);
@@ -291,7 +291,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
               << "The observation field cannot contain probabilities.\n\n";
          exit(1);
       }
-   } // end for i   
+   } // end for i
 
    // If VL1L2 or VAL1L2 is requested, check the specified fields and turn
    // on the vflag when UGRD is followed by VGRD at the same level
@@ -427,7 +427,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
             max_n_oprob_thresh = ocat_ta[i].n_elements();
       }
    } // end for i
-   
+
    // Conf: ci_alpha
    ci_alpha = parse_conf_ci_alpha(&conf);
 
@@ -553,6 +553,8 @@ nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
 nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
 nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
 nc_info.do_climo  = d->lookup_bool(conf_key_climo_flag);
+nc_info.do_weight = d->lookup_bool(conf_key_weight);
+nc_info.do_nbrhd  = d->lookup_bool(conf_key_nbrhd);
 
 
    //

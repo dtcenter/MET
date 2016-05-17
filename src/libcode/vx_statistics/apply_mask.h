@@ -28,6 +28,8 @@ static const char   default_mask_dict[]   = "name=\"NA\"; level=\"NA\";";
 
 extern Grid parse_vx_grid(const RegridInfo, const Grid *, const Grid *);
 
+extern void parse_grid_wgt(const Grid &, DataPlane &);
+
 extern void parse_grid_mask(const ConcatString &, const Grid &,
                             DataPlane &, ConcatString &);
 extern void parse_poly_mask(const ConcatString &, const Grid &,

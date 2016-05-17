@@ -39,17 +39,18 @@ static const STATLineType txt_file_type[n_txt] = {
 };
 
 // Indices for the ensemble flag types in the configuration file
-static const int i_nc_mean  = 0;
-static const int i_nc_stdev = 1;
-static const int i_nc_minus = 2;
-static const int i_nc_plus  = 3;
-static const int i_nc_min   = 4;
-static const int i_nc_max   = 5;
-static const int i_nc_range = 6;
-static const int i_nc_vld   = 7;
-static const int i_nc_freq  = 8;
-static const int i_nc_orank = 9;
-static const int n_nc       = 10;
+static const int i_nc_mean   = 0;
+static const int i_nc_stdev  = 1;
+static const int i_nc_minus  = 2;
+static const int i_nc_plus   = 3;
+static const int i_nc_min    = 4;
+static const int i_nc_max    = 5;
+static const int i_nc_range  = 6;
+static const int i_nc_vld    = 7;
+static const int i_nc_freq   = 8;
+static const int i_nc_orank  = 9;
+static const int i_nc_weight = 10;
+static const int n_nc        = 11;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -96,10 +97,10 @@ class EnsembleStatConfInfo {
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
       StringArray *        mask_sid;            // Masking station id's [n_mask_sid]
       NumArray             ci_alpha;            // Alpha value for confidence intervals
-      FieldType            interp_field;        // How to apply interpolation options      
+      FieldType            interp_field;        // How to apply interpolation options
       double               interp_thresh;       // Proportion of valid data values
       InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]
-      IntArray             interp_wdth;         // Array for interpolation widths [n_interp]      
+      IntArray             interp_wdth;         // Array for interpolation widths [n_interp]
       STATOutputType       output_flag[n_txt];  // Flag for each output line type
       bool                 ensemble_flag[n_nc]; // Boolean for each ensemble field type
       ConcatString         rng_type;            // GSL random number generator

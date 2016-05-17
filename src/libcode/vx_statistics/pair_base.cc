@@ -60,7 +60,7 @@ void PairBase::clear() {
 
    mask_dp_ptr  = (DataPlane *)   0;  // Not allocated
    mask_sid_ptr = (StringArray *) 0;  // Not allocated
-   
+
    interp_mthd = InterpMthd_None;
    interp_dpth = bad_data_int;
 
@@ -76,6 +76,7 @@ void PairBase::clear() {
    o_qc_sa.clear();
    cmn_na.clear();
    csd_na.clear();
+   wgt_na.clear();
 
    n_obs = 0;
 
@@ -210,11 +211,10 @@ int PairBase::has_obs_rec(const char *sid,
 ////////////////////////////////////////////////////////////////////////
 
 bool PairBase::add_obs(const char *sid,
-                       double lat, double lon,
-                       double x, double y, unixtime ut,
-                       double lvl, double elv,
+                       double lat, double lon, double x, double y,
+                       unixtime ut, double lvl, double elv,
                        double o, const char *qc,
-                       double cmn, double csd) {
+                       double cmn, double csd, double wgt) {
 
    if( check_unique ){
 
@@ -304,6 +304,7 @@ bool PairBase::add_obs(const char *sid,
    o_qc_sa.add(qc);
    cmn_na.add(cmn);
    csd_na.add(csd);
+   wgt_na.add(wgt);
 
    // Increment the number of pairs
    n_obs += 1;
@@ -429,7 +430,7 @@ void PairBase::print_duplicate_report(){
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::add_obs(double x, double y, double o,
-                       double cmn, double csd) {
+                       double cmn, double csd, double wgt) {
 
    sid_sa.add(na_str);
    lat_na.add(bad_data_double);
@@ -443,6 +444,7 @@ void PairBase::add_obs(double x, double y, double o,
    o_qc_sa.add(na_str);
    cmn_na.add(cmn);
    csd_na.add(csd);
+   wgt_na.add(wgt);
 
    // Increment the number of observations
    n_obs += 1;
@@ -453,11 +455,10 @@ void PairBase::add_obs(double x, double y, double o,
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::set_obs(int i_obs, const char *sid,
-                       double lat, double lon,
-                       double x, double y, unixtime ut,
-                       double lvl, double elv,
+                       double lat, double lon, double x, double y,
+                       unixtime ut, double lvl, double elv,
                        double o, const char *qc,
-                       double cmn, double csd) {
+                       double cmn, double csd, double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairBase::set_obs() -> "
@@ -479,14 +480,15 @@ void PairBase::set_obs(int i_obs, const char *sid,
    o_qc_sa.set(i_obs, qc);
    cmn_na.set(i_obs, cmn);
    csd_na.set(i_obs, csd);
+   wgt_na.set(i_obs, wgt);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_obs(int i_obs, double x, double y, double o,
-                       double cmn, double csd) {
+void PairBase::set_obs(int i_obs, double x, double y,
+                       double o, double cmn, double csd, double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairBase::set_obs() -> "
@@ -508,6 +510,7 @@ void PairBase::set_obs(int i_obs, double x, double y, double o,
    o_qc_sa.set(i_obs, na_str);
    cmn_na.set(i_obs, cmn);
    csd_na.set(i_obs, csd);
+   wgt_na.set(i_obs, wgt);
 
    return;
 }

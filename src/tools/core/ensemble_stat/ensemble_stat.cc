@@ -39,6 +39,7 @@
 //                    from the config file to the output files.
 //   013    03/02/15  Halley Gotway  Add automated regridding.
 //   014    09/11/15  Halley Gotway  Add climatology.
+//   015    05/10/16  Halley Gotway  Add grid weighting.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -313,6 +314,9 @@ void process_command_line(int argc, char **argv)
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.regrid_info, &(ens_mtddf->grid()),
                         (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
+
+   // Compute weight for each grid point
+   parse_grid_wgt(grid, wgt_dp);
 
    // Set the model name
    shc.set_model(conf_info.model);
@@ -1193,8 +1197,9 @@ void process_grid_vx() {
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
-      if(conf_info.ensemble_flag[i_nc_orank] &&
-         nc_out == (NcFile *) 0)
+      if((conf_info.ensemble_flag[i_nc_orank] ||
+          conf_info.ensemble_flag[i_nc_weight]) &&
+          nc_out == (NcFile *) 0)
          setup_nc_file(fcst_dp[j].valid(), fcst_dp[j].lead(),
                        "_orank.nc");
 
@@ -1471,7 +1476,8 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
          cmn = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
 
          // Add the observation point
-         pd.add_obs(x, y, obs_dp.get(x, y), cmn, bad_data_double);
+         pd.add_obs(x, y, obs_dp.get(x, y),
+                    cmn, bad_data_double, wgt_dp(x, y));
       } // end for y
    } // end for x
 
@@ -1605,11 +1611,16 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
-   lat_dim = nc_out->add_dim("lat",   (long) grid.ny());
-   lon_dim = nc_out->add_dim("lon",   (long) grid.nx());
+   lat_dim = nc_out->add_dim("lat", (long) grid.ny());
+   lon_dim = nc_out->add_dim("lon", (long) grid.nx());
 
    // Add the lat/lon variables
    write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+
+   // Add grid weight variable
+   if(conf_info.ensemble_flag[i_nc_weight]) {
+      write_netcdf_grid_wgt(nc_out, lat_dim, lon_dim, wgt_dp);
+   }
 
    // Append to the list of output files
    out_nc_file_list.add(out_nc_file);

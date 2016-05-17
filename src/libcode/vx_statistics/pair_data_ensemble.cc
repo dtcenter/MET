@@ -918,11 +918,11 @@ void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
 void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                                  const char *hdr_sid_str, unixtime hdr_ut,
                                  const char *obs_qty, float *obs_arr,
-                                 Grid &gr) {
+                                 Grid &gr, const DataPlane * wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
-   double cmn_v, csd_v, obs_v;
+   double cmn_v, csd_v, obs_v, wgt_v;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
 
@@ -1098,11 +1098,16 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, k,
                       to_lvl, csd_lvl_blw, csd_lvl_abv);
 
+            // Compute weight for current point
+            wgt_v = ( wgt_dp == (DataPlane *) 0 ?
+                      default_grid_wgt : wgt_dp->get(x, y) );
+
             // Add the observation value
+            // Weight is from the nearest grid point
             pd[i][j][k].add_obs(hdr_sid_str, hdr_lat, hdr_lon,
-                                obs_x, obs_y, hdr_ut, obs_lvl,
-                                obs_hgt, obs_v, obs_qty,
-                                cmn_v, csd_v);
+                                obs_x, obs_y, hdr_ut,
+                                obs_lvl, obs_hgt, obs_v, obs_qty,
+                                cmn_v, csd_v, wgt_v);
          } // end for k
       } // end for j
    } // end for i

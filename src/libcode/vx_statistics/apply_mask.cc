@@ -38,7 +38,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
 
    // Check if regridding is disabled
    if(!info.enable) {
- 
+
       // Check for a grid mismatch
       if(!(*fgrid == *ogrid)) {
          mlog << Error << "\nparse_vx_grid() -> "
@@ -82,7 +82,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
       else if(sa.n_elements() > 1 && parse_grid_def(sa, vx_grid)) {
          mlog << Debug(3)
               << "Use the grid defined by string \"" << info.name << "\".\n";
-      }      
+      }
       // Extract the grid from a gridded data file
       else {
 
@@ -105,7 +105,21 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    mlog << Debug(3)
         << "Grid Definition: " << vx_grid.serialize() << "\n";
 
-   return(vx_grid);   
+   return(vx_grid);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// JHG, need to work here... support multiple options for defining the weight
+// value for each grid point.  For now, just set them all to the default (1.0).
+
+void parse_grid_wgt(const Grid &grid, DataPlane &wgt_dp) {
+
+   wgt_dp.clear();
+   wgt_dp.set_size(grid.nx(), grid.ny());
+   wgt_dp.set_constant(default_grid_wgt);
+
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -203,7 +217,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
               << "\n\n";
          exit(1);
       }
-      
+
       // Create a new VarInfo object
       info = info_factory.new_var_info(mtddf->file_type());
 

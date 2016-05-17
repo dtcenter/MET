@@ -12,11 +12,12 @@
 //
 //   Description:
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    11/11/08  Halley Gotway   New
-//   001    05/03/10  Halley Gotway   Add fcst/obs/diff variable name
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000    11/11/08  Halley Gotway  New
+//   001    05/03/10  Halley Gotway  Add fcst/obs/diff variable name
 //                    arrays to keep track of NetCDF variables.
+//   002    05/10/16  Halley Gotway  Add grid weighting.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -152,6 +153,9 @@ static int          i_txt_row[n_txt];
 // Grid variables
 static Grid grid;
 static bool is_first_pass = true;
+
+// Weight for each grid point
+static DataPlane wgt_dp;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;

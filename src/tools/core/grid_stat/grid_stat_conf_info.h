@@ -70,6 +70,10 @@ struct GridStatNcOutInfo {
 
    bool do_climo;
 
+   bool do_weight;
+
+   bool do_nbrhd;
+
       //////////////////
 
    GridStatNcOutInfo();
