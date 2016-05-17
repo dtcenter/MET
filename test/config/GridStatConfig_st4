@@ -137,13 +137,21 @@ output_flag = {
 //
 // NetCDF matched pairs output file
 //
-nc_pairs_flag = TRUE;
+nc_pairs_flag   = {
+   latlon = TRUE;
+   raw    = TRUE;
+   diff   = TRUE;
+   climo  = TRUE;
+   weight = FALSE;
+   nbrhd  = FALSE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-rank_corr_flag = FALSE;
-tmp_dir        = "/tmp";
-output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.1";
+grid_weight_flag = NONE;
+rank_corr_flag   = FALSE;
+tmp_dir          = "/tmp";
+output_prefix    = "${OUTPUT_PREFIX}";
+version          = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////

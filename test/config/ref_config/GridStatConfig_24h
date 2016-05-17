@@ -89,7 +89,7 @@ interp = {
 nbrhd = {
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
-   vld_thresh = 1.0;  
+   vld_thresh = 1.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,9 +124,10 @@ nc_pairs_flag = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-rank_corr_flag = FALSE;
-tmp_dir        = "/tmp";
-output_prefix  = "${MODEL}_F${FCST_TIME}_24h";
-version        = "V5.1";
+grid_weight_flag = NONE;
+rank_corr_flag   = FALSE;
+tmp_dir          = "/tmp";
+output_prefix    = "${MODEL}_F${FCST_TIME}_24h";
+version          = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////

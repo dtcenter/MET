@@ -58,7 +58,7 @@ ens = {
 fcst = {
    message_type = [ "ADPSFC" ];
    sid_exc      = [];
-  
+
    field = [
       {
          name  = "TMP";
@@ -130,7 +130,7 @@ output_flag = {
 //
 ensemble_flag = {
    mean      = TRUE;
-   stdev     = TRUE; 
+   stdev     = TRUE;
    minus     = TRUE;
    plus      = TRUE;
    min       = TRUE;
@@ -139,6 +139,7 @@ ensemble_flag = {
    vld_count = TRUE;
    frequency = TRUE;
    rank      = TRUE;
+   weight    = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,8 +154,9 @@ rng = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-duplicate_flag = NONE;
-output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.1";
+grid_weight_flag = NONE;
+duplicate_flag   = NONE;
+output_prefix    = "${OUTPUT_PREFIX}";
+version          = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////

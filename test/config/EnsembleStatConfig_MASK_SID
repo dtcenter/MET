@@ -53,7 +53,7 @@ ens = {
 fcst = {
    message_type = [ "ADPSFC" ];
    sid_exc      = [];
-  
+
    field = [
       {
          name  = "APCP";
@@ -129,6 +129,7 @@ ensemble_flag = {
    vld_count = FALSE;
    frequency = FALSE;
    rank      = FALSE;
+   weight    = FALSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,8 +144,9 @@ rng = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-duplicate_flag = NONE;
-output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.1";
+grid_weight_flag = NONE;
+duplicate_flag   = NONE;
+output_prefix    = "${OUTPUT_PREFIX}";
+version          = "V5.1";
 
 ////////////////////////////////////////////////////////////////////////////////
