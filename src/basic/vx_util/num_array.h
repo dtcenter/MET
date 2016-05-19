@@ -94,6 +94,8 @@ class NumArray {
 
       NumArray subset(int, int) const;
 
+      NumArray subset(const NumArray &) const;
+
 };
 
 

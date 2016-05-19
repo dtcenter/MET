@@ -386,7 +386,7 @@ extend(Nelements + sa.n_elements());
 int j;
 
 for (j=0; j<sa.n_elements(); j++)  {
-   
+
    add(atof(sa[j]));
 
 }
@@ -414,7 +414,7 @@ extend(Nelements + sa.n_elements());
 int j;
 
 for (j=0; j<sa.n_elements(); j++)  {
-   
+
    add(timestring_to_sec(sa[j]));
 
 }
@@ -640,7 +640,7 @@ for(j=0; j<Nelements; j++) {
    count++;
 }
 
-if(count == 0) mn = bad_data_double; 
+if(count == 0) mn = bad_data_double;
 else           mn = s/count;
 
 if(count > 1) {
@@ -829,7 +829,7 @@ return(s);
 NumArray NumArray::subset(int beg, int end) const
 
 {
-   
+
 NumArray subset;
 
 // Check bounds
@@ -843,6 +843,33 @@ if ( beg < 0 || beg >= Nelements ||
 
 // Store subset
 for(int i=beg; i<=end; i++) subset.add(e[i]);
+
+return ( subset );
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+NumArray NumArray::subset(const NumArray &keep) const
+
+{
+
+NumArray subset;
+
+// Check bounds
+if ( keep.n_elements() != Nelements )  {
+   mlog << Error << "\nNumArray::subset(const NumArray &) -> "
+        << "the number of elements do not match\n\n";
+   exit ( 1 );
+}
+
+// Store subset
+for(int i=0; i<=Nelements; i++)  {
+   if(keep[i])  subset.add(e[i]);
+}
 
 return ( subset );
 
