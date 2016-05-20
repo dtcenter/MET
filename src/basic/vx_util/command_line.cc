@@ -22,6 +22,7 @@ using namespace std;
 #include "string_fxns.h"
 #include "command_line.h"
 #include "is_number.h"
+#include "util_constants.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -722,6 +723,8 @@ for (j=0; j<N; ++j)  {
 
       if ( (strcmp(name, "-help") == 0) || (strcmp(name, "--help") == 0) )  do_help();   //  doesn't return
 
+      if ( (strcmp(name, "-version") == 0) || (strcmp(name, "--version") == 0) )  show_version();   //  doesn't return
+
       option_index = options.lookup(args[j]);
 
       if ( option_index >= 0 )  return ( j );
@@ -791,6 +794,22 @@ else {
 
 }
 
+
+exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CommandLine::show_version() const
+
+{
+
+cout << "\n\n  " << met_version << "\n\n";
 
 exit ( 1 );
 
