@@ -80,6 +80,7 @@
 //   033    09/04/15  Halley Gotway  Add climatology and SAL1L2 and VAL1L2
 //                                   output line types.
 //   034    05/10/16  Halley Gotway  Add grid weighting.
+//   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -159,8 +160,6 @@ static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 
-static void show_version(const StringArray &);
-
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
@@ -203,8 +202,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_outdir,    "-outdir", 1);
    cline.add(set_logfile,   "-log",    1);
    cline.add(set_verbosity, "-v",      1);
-
-   cline.add(show_version,  "-version", 0);
 
    // Parse the command line
    cline.parse();
@@ -2215,20 +2212,3 @@ void set_verbosity(const StringArray & a)
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-
-void show_version(const StringArray &)
-
-{
-
-cerr << "\n\n  " << met_version << "\n\n";
-
-exit ( 0 );
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
