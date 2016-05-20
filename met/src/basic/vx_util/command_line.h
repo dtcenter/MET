@@ -129,6 +129,8 @@ class CommandLine {
 
       void do_help() const;
 
+      void show_version() const;
+
       void get_n_args(StringArray &, const int Nargs, const char * switch_name, const int pos);
 
       int  get_unlimited_args(StringArray &, const int pos);
