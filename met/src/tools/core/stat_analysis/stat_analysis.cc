@@ -124,7 +124,7 @@ int main(int argc, char * argv []) {
       conf.read(replace_path(config_const_filename));
       conf.read(default_config_file);
       conf.read(config_file);
-      
+
       //
       // Sanity check the command line and config file options
       //
@@ -255,7 +255,7 @@ void parse_command_line(int &argc, char **argv) {
    command_line_job_options.erase();
 
    for(i=0; i<cline.n(); i++) {
-     
+
       //
       // store current argument
       //
@@ -442,12 +442,12 @@ void process_search_dirs() {
    // Apply the GO Index filtering criteria for a command line job.
    //
    if(default_job.job_type == stat_job_go_index) {
-      
+
       //
       // Read config file constants followed by the config file which
       // defines the GO Index.
       //
-      go_conf.read(replace_path(config_const_filename));      
+      go_conf.read(replace_path(config_const_filename));
       go_conf.read(replace_path(go_index_config_file));
 
       //
@@ -455,7 +455,7 @@ void process_search_dirs() {
       // search job.
       //
       set_job_from_config(go_conf, go_job);
-      
+
       //
       // Amend the default job with GO Index filtering criteria.
       //
@@ -504,6 +504,8 @@ void process_search_dirs() {
       if(j > max_len) max_len = j;
    }
    max_len += 3;
+
+   mlog << Debug(2) << "Processing " << n << " STAT files.\n";
 
    for(i=0; i<n; i++) {
       if(mlog.verbosity_level() > 2) {
@@ -619,7 +621,7 @@ void process_job(const char * jobstring, int n_job) {
       job.parse_job_command(go_job.get_jobstring());
 
    } // end if go_index
-   
+
    //
    // Amend the current job using any command line options
    //
@@ -627,7 +629,7 @@ void process_job(const char * jobstring, int n_job) {
         << "\nAmending Job " << n_job << " with command line options: \""
         << command_line_job_options << "\"\n";
    job.parse_job_command(command_line_job_options);
-   
+
    //
    // Get the full jobstring
    //
