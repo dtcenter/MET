@@ -82,7 +82,7 @@ class MetGrib1DataFile : public Met2dDataFile {
 
       bool read_record(const int, const bool read_plane = true);
 
-      int read_record(const VarInfoGrib &);   //  returns match count (>=0), or -1 on error
+      int read_record( VarInfoGrib &);   //  returns match count (>=0), or -1 on error
 
       bool data_plane(VarInfo &, DataPlane &);
 
