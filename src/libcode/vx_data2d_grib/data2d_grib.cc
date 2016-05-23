@@ -333,7 +333,7 @@ return (true);
 ////////////////////////////////////////////////////////////////////////
 
 
-int MetGrib1DataFile::read_record(const VarInfoGrib & v)
+int MetGrib1DataFile::read_record( VarInfoGrib & v)
 
 {
 
@@ -425,19 +425,21 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    bool status = false;
    int n_planes = 0;
    DataPlaneArray plane_array;
+   VarInfoGrib *vinfo_grib = (VarInfoGrib *) &vinfo;
+
 
    // Call data_plane_array() to retrieve all matching records
-   n_planes = data_plane_array(vinfo, plane_array);
+   n_planes = data_plane_array(*vinfo_grib, plane_array);
 
    // Check for at least one match
    if(n_planes > 0) {
 
       // Check if first data_plane is an exact match
       // or this isn't pressure or vertical levels
-      if( ( is_eq(plane_array.lower(0), vinfo.level().lower()) &&
-            is_eq(plane_array.upper(0), vinfo.level().upper()) ) ||
-          ( vinfo.level().type() != LevelType_Pres &&
-            vinfo.level().type() != LevelType_Vert )
+      if( ( is_eq(plane_array.lower(0), vinfo_grib->level ().lower()) &&
+            is_eq(plane_array.upper(0), vinfo_grib->level().upper()) ) ||
+          ( vinfo_grib->level().type() != LevelType_Pres &&
+            vinfo_grib->level().type() != LevelType_Vert )
         ) {
 
          // Store the first data_plane
