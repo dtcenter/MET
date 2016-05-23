@@ -39,7 +39,7 @@ enum ThreshType {
 
 static const int n_thresh_type = 7;
 static const char * const thresh_type_str[n_thresh_type] = {
-   "na", "<", "<=", "=", "!=", ">", ">="
+   "na", "<", "<=", "==", "!=", ">", ">="
 };
 static const char * const thresh_abbr_str[n_thresh_type] = {
    "na", "lt", "le", "eq", "ne", "gt", "ge"
