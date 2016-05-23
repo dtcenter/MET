@@ -318,7 +318,7 @@ if ( DS.n_elements() != 1 )  {
 
    mlog << Error 
         << "\n"
-        << "  parse failed!\n"
+        << "parse failed!\n"
         << "\n";
 
    exit ( 1 );
@@ -358,7 +358,7 @@ bool MetConfig::read_string(const char * s)
 if ( empty(s) )  {
 
    mlog << Error
-        << "\n\n  MetConfig::read_string(const char *) -> empty input string!\n\n";
+        << "\nMetConfig::read_string(const char *) -> empty input string!\n\n";
 
    exit ( 1 );
 
@@ -372,7 +372,7 @@ out.open(temp_filename);
 if ( ! out )  {
 
    mlog << Error
-        << "\n\n  MetConfig::read_string(const char *) -> unable to open temp file \""
+        << "\nMetConfig::read_string(const char *) -> unable to open temp file \""
         << temp_filename << "\"\n\n";
 
    exit ( 1 );
