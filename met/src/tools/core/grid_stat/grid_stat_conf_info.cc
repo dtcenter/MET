@@ -267,6 +267,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       fcst_info[i]->set_dict(i_fdict);
       obs_info[i]->set_dict(i_odict);
 
+      //fill in code data
+      obs_info[i]->add_grib_code (i_odict);
+      fcst_info[i]->add_grib_code (i_fdict);
+
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
