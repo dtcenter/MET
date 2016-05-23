@@ -246,6 +246,12 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,     false);
    int field_parm_cat      = dict.lookup_int   (conf_key_GRIB2_parm_cat, false);
    int field_parm          = dict.lookup_int   (conf_key_GRIB2_parm,     false);
+   int mtab_high           = dict.lookup_int (conf_key_GRIB2_mtab_high, false);
+   int mtab_low            = dict.lookup_int   (conf_key_GRIB2_mtab_low, false);
+   int cntr                = dict.lookup_int   (conf_key_GRIB2_cntr, false);
+   int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab, false);
+   int mtab_set            = dict.lookup_int   (conf_key_GRIB2_mtab_set, false);
+
 
    //  if the name is specified, use it
    if( !field_name.empty() ){
@@ -254,7 +260,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       set_req_name( field_name );
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm,
+      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm, mtab_set, mtab_low, mtab_high, cntr, ltab,
                                   tab, tab_match) &&
           field_name != "PROB" ){
          mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 field abbreviation '"
@@ -277,7 +283,9 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, tab) ){
+      if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, mtab_set, mtab_low, mtab_high, cntr, ltab,tab) ){
+
+         //if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, tab) ){
          mlog << Error << "\nVarInfoGrib2::set_dict() - no parameter found with matching "
               << "GRIB2_disc ("     << field_disc     << ") "
               << "GRIB2_parm_cat (" << field_parm_cat << ") "
@@ -326,7 +334,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
    //  look up the probability field abbreviation
-   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat, field_parm,
+   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat, field_parm, mtab_set, mtab_low, mtab_high, cntr, ltab,
                                tab, tab_match) ){
       mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 probability field "
            << "abbreviation '" << prob_name << "'\n\n";
