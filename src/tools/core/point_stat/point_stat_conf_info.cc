@@ -265,6 +265,10 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       vx_pd[i].fcst_info->set_dict(i_fdict);
       vx_pd[i].obs_info->set_dict(i_odict);
 
+      //fill in code data
+      vx_pd[i].obs_info->add_grib_code (i_odict);
+      vx_pd[i].fcst_info->add_grib_code (i_fdict);
+
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
