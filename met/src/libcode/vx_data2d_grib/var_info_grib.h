@@ -33,10 +33,7 @@ static const char * const CONFIG_GRIB_PCode   = "GRIB_Prob_Code";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// Default GRIB version 1 parameters
-// For details, refer to:
-//    http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-static const int default_grib_ptv = 2;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +51,12 @@ class VarInfoGrib : public VarInfo
       int LvlType;  // Level type from 0 to 201
 
       int PCode;    // Parameter number for probability from 0 to 255
+
+      int Center;    // Identification of center
+      int Subcenter; // Identification of subsenter
+
+      int FieldRec;
+
 
       void init_from_scratch();
       void assign(const VarInfoGrib &);
@@ -76,6 +79,9 @@ class VarInfoGrib : public VarInfo
       int         code()      const;
       int         lvl_type()  const;
       int         p_code()    const;
+      int         center()    const;
+      int         subcenter()    const;
+      int         field_rec()    const;
 
          //
          // set stuff
@@ -83,11 +89,15 @@ class VarInfoGrib : public VarInfo
 
       void set_magic(const ConcatString &);
       void set_dict(Dictionary &);
+      void add_grib_code (Dictionary &);
 
       void set_ptv(int);
       void set_code(int);
       void set_lvl_type(int);
       void set_p_code(int);
+      void set_center(int);
+      void set_subcenter(int);
+      void set_field_rec(int);
 
          //
          // do stuff
@@ -108,6 +118,9 @@ inline int         VarInfoGrib::ptv()       const { return(PTV);          }
 inline int         VarInfoGrib::code()      const { return(Code);         }
 inline int         VarInfoGrib::lvl_type()  const { return(LvlType);      }
 inline int         VarInfoGrib::p_code()    const { return(PCode);        }
+inline int         VarInfoGrib::center()    const { return(Center);        }
+inline int         VarInfoGrib::subcenter()    const { return(Subcenter);        }
+inline int         VarInfoGrib::field_rec()    const { return(FieldRec);        }
 
 ///////////////////////////////////////////////////////////////////////////////
 
