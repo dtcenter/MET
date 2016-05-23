@@ -516,7 +516,7 @@ void process_search_dirs() {
 
          mlog << " " << i+1 << " of " << n << "\n";
 
-         if((j%5) == 4) mlog << '\n';
+         if((i%5) == 4) mlog << '\n';
 
       }
 
