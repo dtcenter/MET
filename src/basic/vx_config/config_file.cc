@@ -298,6 +298,13 @@ int parse_status;
 
 parse_status = configparse();
 
+if ( configin )  {
+
+   fclose(configin);
+   configin = (FILE *) 0;
+ 
+}
+
 if ( parse_status != 0 )  {
 
    return ( false );
