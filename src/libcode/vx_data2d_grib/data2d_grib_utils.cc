@@ -16,6 +16,7 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
+#include <vx_data2d.h>
 
 #include "data2d_grib_utils.h"
 #include "angles.h"
@@ -26,29 +27,130 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern bool is_prelim_match(const VarInfoGrib &, const GribRecord &);
+extern bool is_prelim_match( VarInfoGrib &, const GribRecord &);
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_prelim_match(const VarInfoGrib & vinfo, const GribRecord & g)
+bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
 {
 
-int j, k, bms_flag, accum, lower, upper;
-unixtime ut, init_ut, valid_ut;
+   int j, k, bms_flag, accum, lower, upper, center, subsenter,vinfo_ptv, vinfo_center, vinfo_subcenter;
+   unixtime ut, init_ut, valid_ut ;
 
-int p_code;
-double p_thresh_lo, p_thresh_hi;
+   int p_code, code_for_lookup= vinfo.field_rec ();
+   double p_thresh_lo, p_thresh_hi;
 
-Section1_Header *pds = (Section1_Header *) g.pds;
+   Section1_Header *pds = (Section1_Header *) g.pds;
+
+   ConcatString field_name = vinfo.name();
+
+   //clean up the code - exept for code 33 and 34 (UGRID and VGRID) and name WIND when we derive wind speed and direction
+   bool is_lookup_for_wind_components = (vinfo.code () == ugrd_grib_code || vinfo.code () == vgrd_grib_code) && field_name == "WIND";
+   if ( is_lookup_for_wind_components)
+   {
+      //set field_name to null to force lookup by code
+      field_name.clear ();
+      code_for_lookup = vinfo.code ();
+   }
+      vinfo.set_code (bad_data_int);
+      vinfo.units ().clear ();
+      vinfo.long_name ().clear ();
+
 
    //
    //  check ptv
    //
 
-k = (int) (pds->ptv);
+   k = (int) (pds->ptv);
+   center = pds->center_id;
+   subsenter = pds->sub_center;
+   vinfo_center = vinfo.center();
+   vinfo_ptv = vinfo.ptv ();
+   vinfo_subcenter = vinfo.subcenter ();
+   bool is_one_param_present = (vinfo.ptv() != bad_data_int || vinfo.center() != bad_data_int || vinfo.subcenter() != bad_data_int );
 
-if ( vinfo.ptv() != k )  return ( false );
+   // fill others with default values
+   if( is_one_param_present )
+   {
+      if(vinfo.ptv() == bad_data_int) vinfo_ptv = k;
+      if(vinfo.center() == bad_data_int) vinfo_center = center;
+      if(vinfo.subcenter() == bad_data_int) vinfo_subcenter = subsenter;
+   }
+   else
+      //use values from the header
+   {
+      vinfo_ptv = k;
+      vinfo_center = center;
+      vinfo_subcenter = subsenter;
+   }
+
+
+if ( vinfo_ptv != k || vinfo_center != center || vinfo_subcenter != subsenter)  return ( false );
+
+   // if p_flag is 'on' (probability field) and the request name is set - get the real name of the field from the begining of a request name
+   if( vinfo.p_flag () && !vinfo.req_name().empty())
+   {
+      field_name=vinfo.req_name().split ("(")[0];
+   }
+
+   // if it is one of APCP names - (APCP_Z0) - use 'APCP' only
+   if (field_name.length () > 4 && strncmp ("APCP", field_name, 4) == 0)
+   {
+      StringArray name_arr = field_name.split ("_");
+      if (name_arr.Nelements == 2 && (strlen (name_arr[1]) == 2 || strlen (name_arr[1]) == 6))
+      {
+         field_name = "APCP";
+      }
+
+   }
+
+   Grib1TableEntry tab;
+   int tab_match = -1;
+
+//  if the name is specified, use it
+   if( !field_name.empty() ){
+
+      //  look up the name in the grib tables
+      if( !GribTable.lookup_grib1(field_name, vinfo_ptv, code_for_lookup, vinfo_center, vinfo_subcenter, tab, tab_match) )
+      {
+         //if did not find with params from the header - try default
+         if( !GribTable.lookup_grib1(field_name, default_grib1_ptv, code_for_lookup, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
+         {
+            mlog << Error << "\nis_prelim_match() - unrecognized GRIB1 field abbreviation '"
+            << field_name << "' for table version " << vinfo_ptv << "\n\n";
+            exit(1);
+         }
+
+      }
+
+   }
+
+      //  if the field name is not specified, look for and use indexes
+   else {
+
+      //  if either the field name or the indices are specified, bail
+      if( bad_data_int == vinfo_ptv || bad_data_int == code_for_lookup ){
+         mlog << Error << "\nis_prelim_match() - either name or GRIB1_ptv "
+         << "and GRIB1_rec must be specified in field information\n\n";
+         exit(1);
+      }
+
+      //  use the specified indexes to look up the field name
+      if( !GribTable.lookup_grib1(code_for_lookup, vinfo_ptv, vinfo_center, vinfo_subcenter,tab) ){
+         //if did not find with params from the header - try default
+         if( !GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv, default_grib1_center, default_grib1_subcenter,tab) )
+         {
+            mlog << Error << "\ns_prelim_match() - no parameter found with matching "
+            << "GRIB1_ptv (" << vinfo_ptv << ") "
+            << "GRIB1_rec (" << vinfo.field_rec() << ")\n\n";
+            exit (1);
+         }
+      }
+   }
+   vinfo.set_code      ( tab.code         );
+   vinfo.set_units     ( tab.units        );
+   vinfo.set_long_name ( tab.full_name    );
 
    //
    //  store lower and upper level values
@@ -67,7 +169,7 @@ if ( vinfo.level().type() == LevelType_RecNumber )  {
   if ( lower == g.rec_num &&
        vinfo.code() == g.gribcode() )  return ( true );
   else                                 return ( false );
-  
+
 }
 
    //
@@ -192,7 +294,7 @@ return ( true );
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_exact_match(const VarInfoGrib & vinfo, const GribRecord & g)
+bool is_exact_match( VarInfoGrib & vinfo, const GribRecord & g)
 
 {
 
@@ -245,7 +347,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_range_match(const VarInfoGrib & vinfo, const GribRecord & g)
+bool is_range_match( VarInfoGrib & vinfo, const GribRecord & g)
 
 {
   
