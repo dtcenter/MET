@@ -375,10 +375,17 @@ static const char conf_key_valid_time[]        = "valid_time"; // YYYYMMDD[_HH[M
 static const char conf_key_lead_time[]         = "lead_time";  // HH[MMSS]
 static const char conf_key_name[]              = "name";
 static const char conf_key_GRIB1_ptv[]         = "GRIB1_ptv";
+static const char conf_key_GRIB1_center[]      = "GRIB1_center";
+static const char conf_key_GRIB1_subcenter[]   = "GRIB1_subcenter";
 static const char conf_key_GRIB1_rec[]         = "GRIB1_rec";
 static const char conf_key_GRIB2_disc[]        = "GRIB2_disc";
 static const char conf_key_GRIB2_parm_cat[]    = "GRIB2_parm_cat";
 static const char conf_key_GRIB2_parm[]        = "GRIB2_parm";
+static const char conf_key_GRIB2_mtab_high[]   = "GRIB2_mtab_high";
+static const char conf_key_GRIB2_mtab_low[]    = "GRIB2_mtab_low";
+static const char conf_key_GRIB2_cntr[]        = "GRIB2_cntr";
+static const char conf_key_GRIB2_ltab[]        = "GRIB2_mtab_ltab";
+static const char conf_key_GRIB2_mtab_set[]    = "GRIB2_mtab_set";
 static const char conf_key_level[]             = "level";
 static const char conf_key_GRIB_lvl_typ[]      = "GRIB_lvl_typ";
 static const char conf_key_GRIB_lvl_val1[]     = "GRIB_lvl_val1";
@@ -850,6 +857,16 @@ static const char conf_val_engine[] = "ENGINE";
 static const char conf_val_merge_both[] = "MERGE_BOTH";
 static const char conf_val_merge_fcst[] = "MERGE_FCST";
 static const char conf_val_no_merge[]   = "NO_MERGE";
+
+////////////////////////////////////////////////////////////////////////
+
+// Default GRIB version 1 parameters
+// For details, refer to:
+//    http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+static const int default_grib1_ptv = 2;
+static const int default_grib1_center = 7;
+static const int default_grib1_subcenter = 1;
+
 
 ////////////////////////////////////////////////////////////////////////
 
