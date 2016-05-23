@@ -1193,15 +1193,17 @@ bool TableFlatFile::lookup_grib1(int code, int table_number, int center, int sub
    int j;
 
    e.clear();
+   int matching_subsenter;
 
    for (j=0; j<N_grib1_elements; ++j)  {
 
-      if( g1e[j]->subcenter == -1 ){
-         subcenter = -1;
+      matching_subsenter = subcenter;
+      if( g1e[j]->subcenter == -1){
+         matching_subsenter = -1;
       }
 
       if ( (g1e[j]->code == code) && (g1e[j]->table_number == table_number)
-              && (g1e[j]->center == center)  && (g1e[j]->subcenter == subcenter))  {
+              && (g1e[j]->center == center)  && (g1e[j]->subcenter == matching_subsenter))  {
 
          e = *(g1e[j]);
 
@@ -1296,16 +1298,18 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
 
    //  build a list of matches
    vector<Grib1TableEntry*> matches;
+   int matching_subsenter;
    for(int j=0; j < N_grib1_elements; j++){
+      matching_subsenter = subcenter;
       if( g1e[j]->subcenter == -1){
-         subcenter = -1;
+         matching_subsenter = -1;
       }
 
       if( g1e[j]->parm_name != parm_name ||
           (bad_data_int != table_number && g1e[j]->table_number != table_number) ||
           (bad_data_int != code         && g1e[j]->code         != code        ) ||
           (bad_data_int != center         && g1e[j]->center != center        )   ||
-          (bad_data_int != subcenter         && g1e[j]->subcenter != subcenter)   )
+          (bad_data_int != matching_subsenter         && g1e[j]->subcenter != matching_subsenter)   )
          continue;
 
       if( n_matches++ == 0 ) e = *(g1e[j]);
@@ -1395,8 +1399,8 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c, int mtab_set, int mtab_low
    for (j=0; j<N_grib2_elements; ++j)  {
 
       if ( (g2e[j]->index_a == a) && (g2e[j]->index_b == b) && (g2e[j]->index_c == c) &&
-              (g2e[j]->mtab_high == mtab_high) && (g2e[j]->mtab_low == mtab_low) &&
-              (g2e[j]->mtab_set == mtab_set) && (g2e[j]->cntr == cntr) && (g2e[j]->ltab == ltab))  {
+              (g2e[j]->mtab_high >= mtab_high) && (g2e[j]->mtab_low <= mtab_low) &&
+               (g2e[j]->cntr == cntr) && (g2e[j]->ltab == ltab))  {
 
          e = *(g2e[j]);
 
@@ -1487,9 +1491,8 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c, in
           (bad_data_int != a && g2e[j]->index_a != a) ||
           (bad_data_int != b && g2e[j]->index_b != b) ||
           (bad_data_int != c && g2e[j]->index_c != c) ||
-              (bad_data_int != mtab_set && g2e[j]-> mtab_set != mtab_set) ||
-              (bad_data_int != mtab_low && g2e[j]-> mtab_low != mtab_low) ||
-              (bad_data_int != mtab_high && g2e[j]-> mtab_high != mtab_high) ||
+              (bad_data_int != mtab_low && g2e[j]-> mtab_low > mtab_low) ||
+              (bad_data_int != mtab_high && g2e[j]-> mtab_high < mtab_high) ||
               (bad_data_int != cntr && g2e[j]-> cntr != cntr) ||
               (bad_data_int != ltab && g2e[j]-> ltab != ltab))
          continue;
@@ -1506,11 +1509,11 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c, in
       msg << "Multiple GRIB2 table entries match lookup criteria ("
       << "parm_name = " << parm_name;
       if( bad_data_int != a ) msg << ", index_a = " << a;
-      if( bad_data_int != mtab_set ) msg << ", mtab_set = " << mtab_set;
-      if( bad_data_int != mtab_low ) msg << ", mtab_low = " << mtab_low;
-      if( bad_data_int != mtab_high ) msg << ", mtab_high = " << mtab_high;
-      if( bad_data_int != cntr ) msg << ", cntr = " << cntr;
-      if( bad_data_int != ltab ) msg << ", ltab = " << ltab;
+      if( bad_data_int != mtab_set ) msg << ", grib2_mtab_set = " << mtab_set;
+      if( bad_data_int != mtab_low ) msg << ", grib2_mtab_low = " << mtab_low;
+      if( bad_data_int != mtab_high ) msg << ", grib2_mtab_high = " << mtab_high;
+      if( bad_data_int != cntr ) msg << ", grib2_cntr = " << cntr;
+      if( bad_data_int != ltab ) msg << ", grib2_ltab = " << ltab;
       if( bad_data_int != b ) msg << ", index_b = " << b;
       if( bad_data_int != c ) msg << ", index_c = " << c;
       msg << "):\n";
@@ -1520,11 +1523,11 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c, in
           it < matches.end(); it++)
          mlog << Warning << "  parm_name: " << (*it)->parm_name
          << ", index_a = "  << (*it)->index_a
-         << ", mtab_set = "  << (*it)->mtab_set
-         << ", mtab_low = "  << (*it)->mtab_low
-         << ", mtab_high = "  << (*it)->mtab_high
-         << ", cntr = "  << (*it)->cntr
-         << ", ltab = "  << (*it)->ltab
+         << ", grib2_mtab_set = "  << (*it)->mtab_set
+         << ", grib2_mtab_low = "  << (*it)->mtab_low
+         << ", grib2_mtab_high = "  << (*it)->mtab_high
+         << ", grib2_cntr = "  << (*it)->cntr
+         << ", grib2_ltab = "  << (*it)->ltab
          << ", index_b = "  << (*it)->index_b
          << ", index_c = "  << (*it)->index_c
          << "\n";
@@ -1532,11 +1535,11 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c, in
       mlog << Warning << "Using: "
       << "  parm_name: " << e.parm_name
       << ", index_a = "  << e.index_a
-      << ", mtab_set = "  << e.mtab_set
-      << ", mtab_low = "  << e.mtab_low
-      << ", mtab_high = "  << e.mtab_high
-      << ", cntr = "  << e.cntr
-      << ", ltab = "  << e.ltab
+      << ", grib2_mtab_set = "  << e.mtab_set
+      << ", grib2_mtab_low = "  << e.mtab_low
+      << ", grib2_mtab_high = "  << e.mtab_high
+      << ", grib2_cntr = "  << e.cntr
+      << ", grib2_ltab = "  << e.ltab
       << ", index_b = "  << e.index_b
       << ", index_c = "  << e.index_c
       << "\n\n";
