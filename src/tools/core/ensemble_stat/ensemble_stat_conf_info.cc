@@ -348,6 +348,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          vx_pd[i].fcst_info->set_dict(i_fcst_dict);
          vx_pd[i].obs_info->set_dict(i_obs_dict);
 
+         vx_pd[i].obs_info->add_grib_code (i_obs_dict);
+         vx_pd[i].fcst_info->add_grib_code (i_fcst_dict);
+
+
          // Dump the contents of the current VarInfo
          if(mlog.verbosity_level() >= 5) {
             mlog << Debug(5)
