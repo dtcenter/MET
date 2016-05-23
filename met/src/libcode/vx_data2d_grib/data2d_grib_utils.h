@@ -26,9 +26,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool is_exact_match(const VarInfoGrib &, const GribRecord &);
+extern bool is_exact_match( VarInfoGrib &, const GribRecord &);
 
-extern bool is_range_match(const VarInfoGrib &, const GribRecord &);
+extern bool is_range_match( VarInfoGrib &, const GribRecord &);
 
 extern bool get_data_plane(const GribRecord &, DataPlane &);
 
