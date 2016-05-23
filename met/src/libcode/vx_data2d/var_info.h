@@ -61,6 +61,7 @@ class VarInfo
       void clear();
 
       virtual void dump(ostream &) const;
+      virtual void add_grib_code (Dictionary &);
 
          //
          // get stuff
