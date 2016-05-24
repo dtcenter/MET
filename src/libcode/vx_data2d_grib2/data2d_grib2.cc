@@ -686,10 +686,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
          //  use the index to look up the parameter name
          Grib2TableEntry tab;
-         if( !GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm, gfld->idsect[2], gfld->idsect[2], gfld->idsect[2], gfld->idsect[0], gfld->idsect[3],tab) ){
+         if( !GribTable.lookup_grib2(rec->Discipline, rec->ParmCat, rec->Parm,
+                                     gfld->idsect[2], gfld->idsect[0], gfld->idsect[3], tab) ){
             mlog << Debug(4) << "MetGrib2DataFile::read_grib2_record_list() - unrecognized GRIB2 "
-                 << "field indexes -  disc: " << rec->Discipline << "  parm_cat: " << rec->ParmCat
-                 << " parm: " << rec->Parm << "\n";
+                 << "field indexes - disc: " << rec->Discipline << ", master table: " << gfld->idsect[2]
+                 << ", center: " << gfld->idsect[0] << ", local table: " << gfld->idsect[3]
+                 << ", parm_cat: " << rec->ParmCat << ", parm: " << rec->Parm << "\n";
             rec->ParmName = str_format("DISC%d_CAT%d_PARM%d", rec->Discipline, rec->ParmCat, rec->Parm);
          } else {
             rec->ParmName = tab.parm_name.text();

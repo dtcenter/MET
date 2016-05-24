@@ -242,15 +242,13 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
    int tab_match = -1;
    Grib2TableEntry tab;
-   ConcatString field_name = dict.lookup_string(conf_key_name,           false);
-   int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,     false);
-   int field_parm_cat      = dict.lookup_int   (conf_key_GRIB2_parm_cat, false);
-   int field_parm          = dict.lookup_int   (conf_key_GRIB2_parm,     false);
-   int mtab_high           = dict.lookup_int (conf_key_GRIB2_mtab_high, false);
-   int mtab_low            = dict.lookup_int   (conf_key_GRIB2_mtab_low, false);
-   int cntr                = dict.lookup_int   (conf_key_GRIB2_cntr, false);
-   int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab, false);
-   int mtab_set            = dict.lookup_int   (conf_key_GRIB2_mtab_set, false);
+   ConcatString field_name = dict.lookup_string(conf_key_name,            false);
+   int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,      false);
+   int field_parm_cat      = dict.lookup_int   (conf_key_GRIB2_parm_cat,  false);
+   int field_parm          = dict.lookup_int   (conf_key_GRIB2_parm,      false);
+   int cntr                = dict.lookup_int   (conf_key_GRIB2_cntr,      false);
+   int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab,      false);
+   int mtab                = dict.lookup_int   (conf_key_GRIB2_mtab,      false);
 
 
    //  if the name is specified, use it
@@ -260,7 +258,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       set_req_name( field_name );
 
       //  look up the name in the grib tables
-      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm, mtab_set, mtab_low, mtab_high, cntr, ltab,
+      if( !GribTable.lookup_grib2(field_name, field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
                                   tab, tab_match) &&
           field_name != "PROB" ){
          mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 field abbreviation '"
@@ -283,7 +281,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       }
 
       //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, mtab_set, mtab_low, mtab_high, cntr, ltab,tab) ){
+      if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,tab) ){
 
          //if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, tab) ){
          mlog << Error << "\nVarInfoGrib2::set_dict() - no parameter found with matching "
@@ -334,7 +332,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
    //  look up the probability field abbreviation
-   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat, field_parm, mtab_set, mtab_low, mtab_high, cntr, ltab,
+   if( !GribTable.lookup_grib2(prob_name, field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
                                tab, tab_match) ){
       mlog << Error << "\nVarInfoGrib2::set_dict() - unrecognized GRIB2 probability field "
            << "abbreviation '" << prob_name << "'\n\n";
@@ -409,7 +407,7 @@ bool VarInfoGrib2::is_wind_direction() const {
 ////////////////////////////////////////////////////////////////////////
 
 LevelType VarInfoGrib2::g2_lty_to_level_type(int lt) {
-   LevelType t = LevelType_None; 
+   LevelType t = LevelType_None;
 
    //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
    switch( lt ){
