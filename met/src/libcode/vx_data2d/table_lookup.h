@@ -198,10 +198,10 @@ class TableFlatFile {
                         Grib1TableEntry &, int & n_matches);
 
       bool lookup_grib2(int a, int b, int c, Grib2TableEntry &);
-      bool lookup_grib2(int a, int b, int c, int mtab_set, int mtab_low, int mtab_high, int cntr, int ltab, Grib2TableEntry &);
+      bool lookup_grib2(int a, int b, int c, int mtab, int cntr, int ltab, Grib2TableEntry &);
       bool lookup_grib2(const char * parm_name, Grib2TableEntry &, int & n_matches);
       bool lookup_grib2(const char * parm_name, int a, int b, int c, Grib2TableEntry &, int & n_matches);
-      bool lookup_grib2(const char * parm_name, int a, int b, int c, int mtab_set, int mtab_low, int mtab_high, int cntr, int ltab, Grib2TableEntry &, int & n_matches);
+      bool lookup_grib2(const char * parm_name, int a, int b, int c, int mtab, int cntr, int ltab, Grib2TableEntry &, int & n_matches);
 
       void readUserGribTables(const char * table_type);
 
