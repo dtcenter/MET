@@ -22,6 +22,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static const char missing_str[]        = "MISSING";
+static const char ugrd_abbr_str[]      = "UGRD";
+static const char vgrd_abbr_str[]      = "VGRD";
 static const char ugrd_vgrd_abbr_str[] = "UGRD_VGRD";
 static const char wdir_abbr_str[]      = "WDIR";
 
