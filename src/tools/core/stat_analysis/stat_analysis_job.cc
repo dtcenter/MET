@@ -806,8 +806,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
            << "For MPR to WDIR conversion, searching for UGRD and VGRD MPR lines.\n";
 
       j.fcst_var.clear();
-      j.fcst_var.add("UGRD");
-      j.fcst_var.add("VGRD");
+      j.fcst_var.add(ugrd_abbr_str);
+      j.fcst_var.add(vgrd_abbr_str);
 
       aggr_mpr_wind_lines(f, j, wind_map, n_in, n_out);
       write_job_aggr_wind(j, in_lt, wind_map, out_at);

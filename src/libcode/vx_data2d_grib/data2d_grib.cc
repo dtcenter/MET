@@ -111,7 +111,7 @@ return ( * this );
 void MetGrib1DataFile::grib1_init_from_scratch()
 
 {
-  
+
 GF = (GribFile *) 0;
 
 Plane.clear();
@@ -371,11 +371,11 @@ for (j=0; j<(GF->n_records()); ++j)  {
    //
    //  if an exact match is found, return only the current record
    //
-       
+
    if ( is_exact_match(v, CurrentRecord) )  {
 
       count = 1;
-      
+
       j_match = j;
 
       break;
@@ -385,7 +385,7 @@ for (j=0; j<(GF->n_records()); ++j)  {
    //
    //  otherwise, continue looking for range matches
    //
-   
+
    if ( is_range_match(v, CurrentRecord) )  {
 
       if ( j_match < 0 )  j_match = j;
@@ -553,20 +553,20 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
          mlog << Debug(3) << "MetGrib1DataFile::data_plane_array() -> "
               << "Attempt to derive winds from U and V components.\n";
-        
+
          // Initialize the current VarInfo object
          vinfo_grib_winds = *vinfo_grib;
-        
+
          // Retrieve U-wind, doing a rotation if necessary
          mlog << Debug(3) << "MetGrib1DataFile::data_plane_array() -> "
               << "Reading U-wind records.\n";
-         vinfo_grib_winds.set_code(ugrd_grib_code);
+         vinfo_grib_winds.set_name(ugrd_abbr_str);
          data_plane_array(vinfo_grib_winds, u_plane_array);
 
          // Retrieve V-wind, doing a rotation if necessary
          mlog << Debug(3) << "MetGrib1DataFile::data_plane_array() -> "
               << "Reading V-wind records.\n";
-         vinfo_grib_winds.set_code(vgrd_grib_code);
+         vinfo_grib_winds.set_name(vgrd_abbr_str);
          data_plane_array(vinfo_grib_winds, v_plane_array);
 
          // Derive wind speed or direction
@@ -585,7 +585,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
             // Check that the current level values match
             if(!is_eq(u_plane_array.lower(i), v_plane_array.lower(i)) ||
                !is_eq(u_plane_array.upper(i), v_plane_array.upper(i))) {
-                 
+
                mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
                     << "when deriving winds for level " << i+1
                     << ", the U-wind levels ("
@@ -596,7 +596,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                plane_array.clear();
                return(0);
             }
-              
+
             // Derive wind direction
             if(vinfo_grib->code() == wdir_grib_code) {
                derive_wdir(u_plane_array[i], v_plane_array[i], cur_plane);
@@ -619,7 +619,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
         << " GRIB records matching VarInfo \""
         << vinfo.magic_str() << "\" in GRIB file \""
         << filename() << "\".\n";
-        
+
    return(plane_array.n_planes());
 }
 
@@ -633,29 +633,29 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 void MetGrib1DataFile::rotate_winds(VarInfoGrib &vinfo_grib, DataPlane &plane) {
    VarInfoGrib vinfo_grib_winds = vinfo_grib;
    DataPlane u2d, v2d, u2d_rot, v2d_rot;
-        
+
    // For U-wind, retrieve the corresponding V-wind, and rotate
    if(vinfo_grib.is_u_wind()) {
-           
+
       mlog << Debug(3) << "MetGrib1DataFile::rotate_winds() -> "
            << "Have U-wind record, reading V-wind record.\n";
-      vinfo_grib_winds.set_code(vgrd_grib_code);
+      vinfo_grib_winds.set_name(vgrd_abbr_str);
       data_plane_scalar(vinfo_grib_winds, v2d);
       rotate_uv_grid_to_earth(plane, v2d, grid(), u2d_rot, v2d_rot);
       plane = u2d_rot;
    }
-         
+
    // For V-wind, retrieve the corresponding U-wind, and rotate
    else if(vinfo_grib.is_v_wind()) {
 
       mlog << Debug(3) << "MetGrib1DataFile::rotate_winds() -> "
            << "Have V-wind record, reading U-wind record.\n";
-      vinfo_grib_winds.set_code(ugrd_grib_code);
+      vinfo_grib_winds.set_name(ugrd_abbr_str);
       data_plane_scalar(vinfo_grib_winds, u2d);
       rotate_uv_grid_to_earth(u2d, plane, grid(), u2d_rot, v2d_rot);
       plane = v2d_rot;
    }
-         
+
    // For wind direction, rotate
    else if(vinfo_grib.is_wind_direction()) {
       mlog << Debug(3) << "MetGrib1DataFile::rotate_winds() -> "
@@ -663,7 +663,7 @@ void MetGrib1DataFile::rotate_winds(VarInfoGrib &vinfo_grib, DataPlane &plane) {
       rotate_wdir_grid_to_earth(plane, grid(), u2d);
       plane = u2d;
    }
-   
+
    return;
 }
 

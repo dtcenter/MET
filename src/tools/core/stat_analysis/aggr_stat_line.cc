@@ -1456,7 +1456,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          j.dump_stat_line(line);
 
          parse_mpr_line(line, cur);
-         is_ugrd = (cur.fcst_var == "UGRD");
+         is_ugrd = (cur.fcst_var == ugrd_abbr_str);
          uf      = (is_ugrd ? cur.fcst        : bad_data_double);
          uo      = (is_ugrd ? cur.obs         : bad_data_double);
          vf      = (is_ugrd ? bad_data_double : cur.fcst);
