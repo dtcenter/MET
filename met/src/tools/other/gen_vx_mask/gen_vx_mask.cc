@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/09/14  Halley Gotway   New
+//   001    05/25/16  Halley Gotway   Allow -value to be set negative
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -109,6 +110,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_name,         "-name",         1);
    cline.add(set_logfile,      "-log",          1);
    cline.add(set_verbosity,    "-v",            1);
+
+   cline.allow_numbers();
 
    // Parse the command line
    cline.parse();
