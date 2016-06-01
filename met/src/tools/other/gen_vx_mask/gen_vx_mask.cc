@@ -15,7 +15,9 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/09/14  Halley Gotway   New
-//   001    05/25/16  Halley Gotway   Allow -value to be set negative
+//   001    05/25/16  Halley Gotway   Allow -value to be set negative.
+//   002    06/01/16  Halley Gotway   Pass -input_field timing
+//                    timing information through to the output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -652,6 +654,12 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
       exit(1);
    }
 
+   // Pass timing information through
+   dp.set_init (dp_data.init());
+   dp.set_valid(dp_data.valid());
+   dp.set_lead (dp_data.lead());
+   dp.set_accum(dp_data.accum());
+
    // Set the output data plane size
    dp.set_size(grid.nx(), grid.ny());
 
@@ -765,6 +773,11 @@ void write_netcdf(const DataPlane &dp) {
    cs << cs_erase << masktype_to_string(mask_type);
    if(thresh.get_type() != thresh_na) cs << thresh.get_str();
    mask_var->add_att("mask_type", cs);
+
+   // Write out the times
+   if(dp.init() != (unixtime) 0 || dp.valid() != (unixtime) 0) {
+      write_netcdf_var_times(mask_var, dp);
+   }
 
    // Allocate memory to store the mask values for each grid point
    mask_data = new float [grid.nx()*grid.ny()];
