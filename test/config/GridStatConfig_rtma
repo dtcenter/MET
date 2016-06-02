@@ -140,7 +140,7 @@ nc_pairs_flag   = {
    diff   = TRUE;
    climo  = TRUE;
    weight = FALSE;
-   nbrhd  = FALSE;
+   nbrhd  = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
