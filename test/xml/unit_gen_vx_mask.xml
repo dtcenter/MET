@@ -295,4 +295,25 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- DATA: Threshold the values of one field to set the values of     -->
+  <!--       another field to bad data.                                 -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_DATA_INPUT_FIELD">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_INPUT_FIELD_APCP_24_where_TMP_Z2_le300.nc \
+      -type data \
+      -input_field 'name="APCP"; level="A24";' \
+      -mask_field  'name="TMP";  level="Z2";' -thresh 'gt300' -value -9999 \
+      -name "APCP_24_where_TMP_Z2_le300"
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/DATA_INPUT_FIELD_APCP_24_where_TMP_Z2_le300.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
