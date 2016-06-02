@@ -437,7 +437,14 @@ both_file_list
 \series bold
 -paired
 \series default
- option indicates that the -fcst and -obs file lists are already paired.
+ option indicates that the -fcst and -obs file lists are already paired,
+ meaning there is a one-to-one correspondence between the files in those
+ lists.
+ This option affects how missing data is handled.
+ When -paired is not used, missing or incomplete files result in a runtime
+ error with no output file being created.
+ When -paired is used, missing or incomplete files result in a warning with
+ output being created using the available data.
 \end_layout
 
 \begin_layout Description
