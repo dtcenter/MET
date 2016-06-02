@@ -3232,7 +3232,7 @@ The
 
 \series bold
 \bar under
-Required arguments for wwmca_regrid JHG work here!
+Required arguments for wwmca_regrid
 \end_layout
 
 \begin_layout Description
@@ -3241,21 +3241,11 @@ Required arguments for wwmca_regrid JHG work here!
 1.
  The 
 \series bold
-wwmca_cloud_pct_file_list
+-out filename
 \series medium
  argument 
 \series default
-represents one or more WWMCA cloud percent files given on the command line.
- As with any command given to a UNIX shell, the user can use metacharacters
- as a shorthand way to specify many filenames.
- For each input file specified, one output PostScript plot will be created.
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-\bar under
-Optional arguments for wwmca_plot
+specifies the name of the output netCDF file.
 \end_layout
 
 \begin_layout Description
@@ -3264,12 +3254,10 @@ Optional arguments for wwmca_plot
 2.
  The 
 \series bold
--outdir path
+-config filename
 \series medium
- option specifies
-\series default
- the directory where the output PostScript plots will be placed.
- If not specified, then the plots will be put in the current (working) directory.
+ argument indicates the name of the configuration file to be used.
+ The contents of the configuration file are discussed below.
 \end_layout
 
 \begin_layout Description
@@ -3278,17 +3266,39 @@ Optional arguments for wwmca_plot
 3.
  The 
 \series bold
--max minutes
+-nh cp_filename [pt_filename]
 \series medium
- option
-\series default
- specifies the maximum pixel age in minutes to be plotted.
+ argument specifies the northern hemisphere WWMCA binary file and, optionally,
+ may be followed by a binary pixel age file.
+ This is required if the output grid includes any portion of the northern
+ hemisphere.
 \end_layout
 
 \begin_layout Description
 
 \series medium
 4.
+ The 
+\series bold
+-sh cp_filename [pt_filename]
+\series medium
+ argument specifies the southern hemisphere WWMCA binary file and, optionally,
+ may be followed by a binary pixel age file.
+ This is required if the output grid includes any portion of the southern
+ hemisphere.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Optional arguments for wwmca_regrid
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
  The 
 \series bold
 -log file
@@ -3304,7 +3314,7 @@ Optional arguments for wwmca_plot
 \begin_layout Description
 
 \series medium
-5.
+6.
  The 
 \series bold
 -v level
@@ -3313,61 +3323,6 @@ Optional arguments for wwmca_plot
  The value of "level" will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity will increase the amount of logging.
-\end_layout
-
-\begin_layout Standard
-Here, the 
-\series bold
--out
-\series default
- switch tells 
-\series bold
-wwmca_regrid
-\series default
- what to name the output netCDF file.
- The 
-\series bold
--config
-\series default
- switch gives the name of the config file that 
-\series bold
-wwmca_regrid
-\series default
- should use—like many of the MET tools, 
-\series bold
-wwmca_regrid
-\series default
- uses a configuration file to specify user-changeable parameters as described
- below.
-\end_layout
-
-\begin_layout Standard
-The 
-\series bold
--nh
-\series default
- and 
-\series bold
--sh
-\series default
- options give names of the WWMCA binary files that 
-\series bold
-wwmca_regrid
-\series default
- should use as input.
- Northern hemisphere files are specified with 
-\series bold
--nh
-\series default
-, and southern hemisphere files with 
-\series bold
--sh
-\series default
-.
- At least one of these must be given, but in many cases both need not be
- given.
- Optionally, each WWMCA binary file may be followed by another WWMCA binary
- file which specifies the pixel age.
 \end_layout
 
 \begin_layout Standard
@@ -3395,7 +3350,7 @@ To
 \begin_inset Quotes erd
 \end_inset
 
- grid, and corresponding regridding logic, is specified using the 
+ grid and corresponding regridding logic are specified using the 
 \series bold
 regrid
 \series default
@@ -3408,16 +3363,16 @@ To
 \begin_inset Quotes erd
 \end_inset
 
- grid is entirely confined to one hemisphere, then only theWWMCA data file
+ grid is entirely confined to one hemisphere, then only the WWMCA data file
  for that hemisphere need be given.
- It’s only when the “To” grid or the interpolation box used straddles the
- equator that data files for both hemispheres need be given.
+ If the “To” grid or the interpolation box used straddles the equator the
+ data files for both hemispheres need be given.
  Once the “To” grid is specified in the config file, the 
 \series bold
 wwmca_regrid
 \series default
- tool will know which input data files it needs, and will complain if it’s
- not given the right ones.
+ tool will know which input data files it needs and will complain if it
+ is not given the right ones.
 \end_layout
 
 \begin_layout Subsection
