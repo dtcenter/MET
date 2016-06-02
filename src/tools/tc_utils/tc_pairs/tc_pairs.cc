@@ -23,6 +23,9 @@
 //   004    02/10/16  Halley Gotway   Prior to calling acerr_ rescale
 //                    longitudes from [-180, 180] to [0, 360] for tracks
 //                    crossing the international date line.
+//   005    02/10/16  Halley Gotway   Add support for analysis tracks.
+//   006    06/01/16  Halley Gotway   Apply interp12 logic to tracks
+//                    with ATCF id's ending in '3'.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -702,22 +705,27 @@ void filter_tracks(TrackInfoArray &tracks) {
 // Apply the following logic to derive 12-hour interpolated tracks:
 //
 // - The interp12 parameter is set to NONE, FILL, or REPLACE.
-// - Loop through the TrackInfoArray looking for models ending in '2'.
+// - Loop through the TrackInfoArray looking for models ending in '2'
+//   or '3'.
 // - For each track ending in '2', search for a corresponding one
 //   ending in 'I'.
 // - If not found, copy the '2' track, rename it 'I', and add it to
 //   the track list.
 // - If found and interp12 is set to REPLACE, copy the '2' track,
 //   rename it 'I', and replace the existing 'I' track.
+// - For each track ending in '3', search for a corresponding one ending
+//   in '2'.
+// - If not found, apply the same logic listed above.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void derive_interp12(TrackInfoArray &tracks) {
    int i, j, n_add, n_replace;
-   ConcatString track_case, imodel;
+   ConcatString track_case, amodel;
    StringArray track_case_list;
    TrackInfo interp_track;
    const char *sep = ":";
+   char c;
 
    // If Interp12 logic set to NONE, Nothing to do.
    if(conf_info.Interp12 == Interp12Type_None) return;
@@ -737,22 +745,36 @@ void derive_interp12(TrackInfoArray &tracks) {
    // Loop through the track array and apply the interp12 logic
    for(i=0, n_add=0, n_replace=0; i<tracks.n_tracks(); i++) {
 
-      // Skip AMODEL names not ending in '2'
-      if(*(tracks[i].technique() +
-           strlen(tracks[i].technique()) - 1) != '2') continue;
+      // Skip AMODEL names not ending in '2' or '3'
+      c = *(tracks[i].technique() + strlen(tracks[i].technique()) - 1);
+      if(c != '2' && c != '3') continue;
 
-      // Swap the '2' for an 'I' in the AMODEL
-      imodel = tracks[i].technique();
-      imodel.chomp('2');
-      imodel << 'I';
+      // Search for corresponding track with AMODEL name ending in '2'
+      if(c == '3') {
+         amodel = tracks[i].technique();
+         amodel.chomp('3');
+         amodel << '2';
+         track_case << cs_erase
+                    << amodel << sep
+                    << tracks[i].storm_id() << sep
+                    << (tracks[i].init() > 0 ?
+                       unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
+         if(track_case_list.has(track_case)) continue;
+      }
 
-      // Create a copy the '2' track and rename it to 'I'.
+      // Swap the '2' or '3' for an 'I' in the AMODEL
+      amodel = tracks[i].technique();
+      amodel.chomp('2');
+      amodel.chomp('3');
+      amodel << 'I';
+
+      // Create a copy the '2' or '3' track and rename it to 'I'.
       interp_track = tracks[i];
-      interp_track.set_technique(imodel);
+      interp_track.set_technique(amodel);
 
       // Search for corresponding track with AMODEL name ending in 'I'
       track_case << cs_erase
-                 << imodel << sep
+                 << amodel << sep
                  << tracks[i].storm_id() << sep
                  << (tracks[i].init() > 0 ?
                     unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
