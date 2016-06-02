@@ -2771,10 +2771,6 @@ name "temp_MODIS"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -2804,32 +2800,40 @@ wwmca_regrid
 \series default
  tool regrids WWMCA cloud percent files and reformats them into netCDF files
  that the other MET tools can read.
+ In version 5.2, the 
+\series bold
+wwmca_regrid
+\series default
+ tool was generalized to more broadly support any data stored in the WWMCA
+ binary format.
 \end_layout
 
 \begin_layout Standard
-The WWNCA tools get valid time and hemisphere (north or south) information
- from the file names, so it's important for both of the WWMCA tools that
- these file names not be changed.
+The WWMCA tools attempt to parse timing and hemisphere information from
+ the file names.
+ They tokenize the filename using underscores (_) and dots (.) and examine
+ each element.
+ A string of 10 or more numbers is interpreted as the valid time in YYYYMMDDHH[M
+MSS] format.
+ The string NH indicates the northern hemisphere while SH indicates the
+ southern hemisphere.
+ While WWMCA data is an analysis and has no forecast lead time, other datasets
+ following this format may.
+ Therefore, a string of 1 to 4 numbers is interpreted as the forecast lead
+ time in hours.
+ While parsing the filename provides default values for this timing information,
+ they can be overridden by explicting setting their values in the 
+\series bold
+wwmca_regrid
+\series default
+ configuration file.
 \end_layout
 
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-vskip 0.1in
-\backslash
-centerline{
-\backslash
-hbox to 3.0in{
-\backslash
-hrulefill}}
-\backslash
-vskip 0.1in
-\end_layout
+\begin_layout Subsection
+wwmca_plot usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:wwmca_plot-usage"
 
 \end_inset
 
@@ -2837,73 +2841,199 @@ vskip 0.1in
 \end_layout
 
 \begin_layout Standard
-The usage statement for 
+
+\series medium
+The usage statement for the 
 \series bold
 wmmca_plot
-\series default
- is 
+\series medium
+ tool is shown below:
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
+
+\series bold
+Usage:
+\series medium
+ wwmca_plot
+\end_layout
+
+\begin_layout LyX-Code
 \begin_inset ERT
 status open
 
 \begin_layout Plain Layout
 
-
+{
 \backslash
-vskip 0.1in
-\backslash
-centerline{
-\backslash
-tt wwmca
-\backslash
-_plot [ -outdir path ] wwmca
-\backslash
-_cloud
-\backslash
-_pct
-\backslash
-_file
-\backslash
-_list}
+hskip 0.5in}
 \end_layout
 
 \end_inset
 
+[-outdir path]
+\end_layout
 
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-max max_minutes]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-v level]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+wwmca_cloud_pct_file_list
 \end_layout
 
 \begin_layout Standard
-Here, 
+
+\series medium
+The
+\series bold
+ wmmca_plot
+\series medium
+ tool has some required arguments and can also take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Required arguments for wwmca_plot
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
 \series bold
 wwmca_cloud_pct_file_list
+\series medium
+ argument 
 \series default
- represents one or more WWMCA cloud percent files given on the command line.
+represents one or more WWMCA cloud percent files given on the command line.
  As with any command given to a UNIX shell, the user can use metacharacters
  as a shorthand way to specify many filenames.
+ For each input file specified, one output PostScript plot will be created.
 \end_layout
 
 \begin_layout Standard
-The optional 
+
 \series bold
--outdir
+\bar under
+Optional arguments for wwmca_plot
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+-outdir path
+\series medium
+ option specifies
 \series default
- argument specifies a directory where the output PostScript plots will be
- placed.
+ the directory where the output PostScript plots will be placed.
  If not specified, then the plots will be put in the current (working) directory.
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "Wplotfig"
+\end_layout
 
-\end_inset
+\begin_layout Description
 
- shows an example of the 
+\series medium
+3.
+ The 
 \series bold
-wmmca_plot
+-max minutes
+\series medium
+ option
 \series default
- output.
+ specifies the maximum pixel age in minutes to be plotted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+-log file
+\series medium
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
+-v level
+\series medium
+ option indicates the desired level of verbosity.
+ The value of "level" will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
 \end_layout
 
 \begin_layout Standard
@@ -2916,7 +3046,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename /home/lisag/met_documentation/MET_Users_Guide/Reformat_Grid/WWMCA_TOTAL_CLOUD_PCT_NH_2009083022.pdf
+	filename WWMCA_TOTAL_CLOUD_PCT_NH_2009083022.pdf
 
 \end_inset
 
@@ -2962,17 +3092,227 @@ name "Wplotfig"
 
 \end_layout
 
+\begin_layout Subsection
+wwmca_regrid usage
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:wwmca_regrid-usage"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
-The usage statement for 
+
+\series medium
+The usage statement for the 
 \series bold
-wwmca_regrid
-\series default
- is 
+wmmca_regrid
+\series medium
+ tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
-wwmca_regrid -out filename config filename [ -nh filename ] [ -sh filename
- ] 
+
+\series bold
+Usage:
+\series medium
+ wwmca_regrid
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-out filename
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-config filename
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-nh cp_filename [pt_filename]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-sh cp_filename [pt_filename]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-v level]
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The
+\series bold
+ wmmca_regrid
+\series medium
+ tool has some required arguments and can also take optional ones.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Required arguments for wwmca_regrid JHG work here!
+\end_layout
+
+\begin_layout Description
+
+\series medium
+1.
+ The 
+\series bold
+wwmca_cloud_pct_file_list
+\series medium
+ argument 
+\series default
+represents one or more WWMCA cloud percent files given on the command line.
+ As with any command given to a UNIX shell, the user can use metacharacters
+ as a shorthand way to specify many filenames.
+ For each input file specified, one output PostScript plot will be created.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Optional arguments for wwmca_plot
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+-outdir path
+\series medium
+ option specifies
+\series default
+ the directory where the output PostScript plots will be placed.
+ If not specified, then the plots will be put in the current (working) directory.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
+ The 
+\series bold
+-max minutes
+\series medium
+ option
+\series default
+ specifies the maximum pixel age in minutes to be plotted.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+-log file
+\series medium
+ option directs output and errors to the specified log file.
+ All messages will be written to that file as well as cout and cerr.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ The 
+\series bold
+-v level
+\series medium
+ option indicates the desired level of verbosity.
+ The value of "level" will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity will increase the amount of logging.
 \end_layout
 
 \begin_layout Standard
@@ -2995,10 +3335,10 @@ wwmca_regrid
 \series default
  should use—like many of the MET tools, 
 \series bold
-wwmca-regrid
+wwmca_regrid
 \series default
- uses a configuration file to specify user-changeable parameters.
- The format of this file will be explained below.
+ uses a configuration file to specify user-changeable parameters as described
+ below.
 \end_layout
 
 \begin_layout Standard
@@ -3010,7 +3350,7 @@ The
 \series bold
 -sh
 \series default
- options give names of WWMCA cloud percent files that 
+ options give names of the WWMCA binary files that 
 \series bold
 wwmca_regrid
 \series default
@@ -3026,23 +3366,52 @@ wwmca_regrid
 .
  At least one of these must be given, but in many cases both need not be
  given.
- 
+ Optionally, each WWMCA binary file may be followed by another WWMCA binary
+ file which specifies the pixel age.
 \end_layout
 
 \begin_layout Standard
 In any regridding problem, there are two grids involved: the “From” grid,
  which is the grid the input data are on, and the “To” grid, which is the
  grid the data are to be moved onto.
- For 
+ In 
 \series bold
 wwmca_regrid
 \series default
-, the “To” grid is specified in the config file.
- If this grid is entirely confined to one hemisphere, then only theWWMCA
- data file for that hemisphere need be given.
- It’s only when the “To” grid straddles the equator that data files for
- both hemispheres need be given (though the interpolation width parameter
- in the config file can change this—see below).
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+From
+\begin_inset Quotes erd
+\end_inset
+
+ grid is pre-defined by the hemisphere of the WWMCA binary files being processed.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+To
+\begin_inset Quotes erd
+\end_inset
+
+ grid, and corresponding regridding logic, is specified using the 
+\series bold
+regrid
+\series default
+ section of the configuration file.
+ If the 
+\begin_inset Quotes eld
+\end_inset
+
+To
+\begin_inset Quotes erd
+\end_inset
+
+ grid is entirely confined to one hemisphere, then only theWWMCA data file
+ for that hemisphere need be given.
+ It’s only when the “To” grid or the interpolation box used straddles the
+ equator that data files for both hemispheres need be given.
  Once the “To” grid is specified in the config file, the 
 \series bold
 wwmca_regrid
@@ -3051,388 +3420,178 @@ wwmca_regrid
  not given the right ones.
 \end_layout
 
-\begin_layout Standard
-Now let’s talk about the details of the config file.
- The config file has the same C-like syntax that all the other MET config
- files use.
- The first (and most complicated) thing to specify is the “To” grid.
- This is given by the 
-\series bold
-To_grid
-\series default
- parameter.
- If you are using one of the standard NCEP grids, for example grid #218,
- you can simply write 
-\end_layout
-
-\begin_layout LyX-Code
-To grid = "G218";
-\end_layout
-
-\begin_layout Standard
-and that will work.
- Failing that, youmust give the parameters that specify the grid and it’s
- projection.
- Four projections are supported: Lambert Conformal, Polar Stereographic,
- Plate Carrée, and Mercator.
- 
-\end_layout
-
-\begin_layout Standard
-To specify a Lambert Grid, the syntax is 
-\end_layout
-
-\begin_layout LyX-Code
-lambert Nx Ny lat_ll lon_ll lon_orient D_km R_km standard_lat_1 [ standard_lat_2
- ]
-\end_layout
-
-\begin_layout Standard
-Here, 
-\series bold
-Nx
-\series default
- and 
-\series bold
-Ny
-\series default
- are the number of points in, respectively, the 
-\series bold
-x
-\series default
- and 
-\series bold
-y
-\series default
- grid directions.
- These two numbers give the overall size of the grid.
- 
-\series bold
-lat_ll
-\series default
- and 
-\series bold
-lon_ll
-\series default
- are the latitude and longitude, in degrees, of the lower left point of
- the grid.
- North latitude and east longitude are considered positive.
- 
-\series bold
-lon_orient
-\series default
- is the orientation longitude of the grid.
- It’s the meridian of longitude that’s parallel to one of the vertical grid
- directions.
- 
-\series bold
-D_km
-\series default
- and 
-\series bold
-R_km
-\series default
- are the grid resolution and the radius of the Earth, both in kilometers.
- 
-\series bold
-standard_lat_1
-\series default
- and 
-\series bold
-standard_lat_2
-\series default
- are the standard parallels of the Lambert projection.
- If the two latitudes are the same, then only one need be given.
-\end_layout
-
-\begin_layout Standard
-As an example of specifying a Lambert grid, Suppose you have a Lambert grid
- with 614 points in the x direction, 428 points in the y direction.
- The lower left corner of the grid is at latitude 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$12.190^
-\backslash
-circ$
-\end_layout
+\begin_layout Subsection
+wwmca_regrid configuration file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:wwmca_regrid-configuration-file"
 
 \end_inset
 
- north and longitude 
-\begin_inset ERT
-status open
 
-\begin_layout Plain Layout
-
-$133.459^
-\backslash
-circ$
-\end_layout
-
-\end_inset
-
- west.
- The orientation longitude is 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$95^
-\backslash
-circ$
-\end_layout
-
-\end_inset
-
- west.
- The grid spacing is 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$12.19058^
-\backslash
-circ$
-\end_layout
-
-\end_inset
-
- km.
- The radius of the Earth is the default value used in many grib files: 6367.47
- km.
- Both standard parallels are at 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$25^
-\backslash
-circ$
-\end_layout
-
-\end_inset
-
- north.
- To specify this grid in the config file, you would write 
-\end_layout
-
-\begin_layout LyX-Code
-To grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0"; 
 \end_layout
 
 \begin_layout Standard
-That’s for a lambert grid.
- For a Polar Stereographic grid, the syntax is
-\end_layout
 
-\begin_layout LyX-Code
-Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S 
-\end_layout
-
-\begin_layout Standard
-Here, 
-\series bold
-Nx, Ny, lat_ll, lon_ll, lon_orient, D_km
-\series default
- and 
-\series bold
-R_km
-\series default
- have the same meaning as in the Lambert case.
- 
-\series bold
-lat_scale
-\series default
- is the latitude where the grid scale 
-\series bold
-D_km
-\series default
- is true, while 
-\series bold
-N|S
-\series default
- means to write either 
-\series bold
-N
-\series default
- or 
-\series bold
-S
-\series default
- depending on whether the stereographic projection is from the north pole
- or the south pole.
- 
-\end_layout
-
-\begin_layout Standard
-For Plate Carrée grids, the syntax is 
-\end_layout
-
-\begin_layout LyX-Code
-latlon Nx Ny lat_ll lon_ll delta_lat delta_lon 
-\end_layout
-
-\begin_layout Standard
-The parameters 
-\series bold
-Nx, Ny, lat_ll
-\series default
- and 
-\series bold
-lon_ll
-\series default
- are as before.
- 
-\series bold
-delta_lat
-\series default
- and 
-\series bold
-delta_lon
-\series default
- are the latitude and longitude increments of the grid—i.e., the change in
- latitude or longitude between one grid point and an adjacent grid point.
- 
-\end_layout
-
-\begin_layout Standard
-For a Mercator grid, the syntax is 
-\end_layout
-
-\begin_layout LyX-Code
-mercator Nx Ny lat_ll lon_ll lat_ur lon_ur 
-\end_layout
-
-\begin_layout Standard
-The parameters 
-\series bold
-Nx, Ny, lat_ll
-\series default
- and 
-\series bold
-lon_ll
-\series default
- are again as before, while 
-\series bold
-lat_ur
-\series default
- and 
-\series bold
-lon_ur
-\series default
- are the latitude and longitude of the upper right corner of the grid.
- 
-\end_layout
-
-\begin_layout Standard
-Thankfully, the rest of the parameters in the config file are easier to
- specify.
-\end_layout
-
-\begin_layout Standard
-The next two config file parameters have to do with specifying the interpolation
- scheme used.
- The 
-\series bold
-interp_method
-\series default
- parameter specifies which interpolation method is to be used.
- Four methods are supported: average, maximum, minimum and nearest neighbor.
- As an example, to specify the “average” method, one would write
-\end_layout
-
-\begin_layout LyX-Code
-interp_method = "average"; 
-\end_layout
-
-\begin_layout Standard
-The other interpolation parameter is 
-\series bold
-interp_width
-\series default
-.
- This specifies the width of the interpolation box used in the above interpolati
-on method.
- An example value could be 
-\end_layout
-
-\begin_layout LyX-Code
-interp_width = 5; 
-\end_layout
-
-\begin_layout Standard
-The value must be odd and ≥ 1.
- If a value of 1 is specified, then nearest neighbor interpolation will
- be used regardless of the value assigned to 
-\series bold
-interp_method
-\series default
-.
-\end_layout
-
-\begin_layout Standard
-The fact that an interpolation box is used has one subtle implication—the
- “To” grid is effectively fattened by half the width of the interpolation
- box.
- This means that even for a “To” grid that is entirely contained in one
- hemisphere, if it comes close to the equator, this virtual fattening may
- be enough to push it over the equator, and the user will then have to provide
- inputWWMCA files for both hemispheres, even though the “To” grid doesn’t
- cross the equator.
- The 
+\series medium
+The default configuration file for the 
 \series bold
 wwmca_regrid
-\series default
- tool should detect this situation and complain to the user if not given
- the correct input files.
- 
-\end_layout
-
-\begin_layout Standard
-The next variable, 
+\series medium
+ tool named 
 \series bold
-good_percent
+WWMCARegridConfig_default
 \series default
-, tells what fraction of the values in the interpolation square need to
- be “good” in order for the interpolation scheme to return a “good” result.
- Example: 
-\end_layout
-
-\begin_layout LyX-Code
-good percent = 0; 
+ can be found in the installed 
+\series bold
+share/met/config
+\series default
+ directory.
+ We encourage users to make a copy of this file prior to modifying its contents.
+ The contents of the configuration file are described in the subsections
+ below.
 \end_layout
 
 \begin_layout Standard
-The rest of the config file parameters have to do with how the output netCDF
- file represents the data.
- These should be selfexplanatory, so I’ll just give an example:
+
+\series medium
+Note that environment variables may be used when editing configuration files,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:pb2nc-configuration-file"
+
+\end_inset
+
+ for the PB2NC tool.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout LyX-Code
-variable name = "Cloud Pct"; 
+
+\series bold
+regrid = { to_grid = 
+\begin_inset Quotes eld
+\end_inset
+
+G212
+\begin_inset Quotes erd
+\end_inset
+
+; vld_thresh = 0.5; method = UW_MEAN; width = 5; }
+\end_layout
+
+\begin_layout Standard
+See the 
+\series bold
+regrid
+\series default
+ entry in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:IO_Configuration-File-Details"
+
+\end_inset
+
+ for a description of the configuration file entries that control regridding.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout LyX-Code
-long name = "cloud cover percent"; 
+
+\series bold
+variable_name = "Cloud_Pct";
 \end_layout
 
 \begin_layout LyX-Code
-grib code = 100; // not sure about this ...
- 
+
+\series bold
+units         = "percent";
 \end_layout
 
 \begin_layout LyX-Code
-units = "percent"; 
+
+\series bold
+long_name     = "cloud cover percent";
 \end_layout
 
 \begin_layout LyX-Code
-level = "SFC"; 
+
+\series bold
+level         = "SFC"; 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The settings listed above are strings which control the output netCDF variable
+ name and specify attributes for that variable.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+init_time  = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+valid_time = "";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+accum_time = "01";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The settings listed above are strings which specify the timing information
+ for the data being processed.
+ The accumulation time is specified in HH[MMSS] format and, by default,
+ is set to a value of 1 hour.
+ The initializaiton and valid time strings are specified in YYYYMMDD[_HH[MMSS]]
+ format.
+ However, by default they are set to empty strings.
+ If empty, the timing information parsed from the filename will be used.
+ If not empty, these values override the times parsed from the filename.
 \end_layout
 
 \end_body
