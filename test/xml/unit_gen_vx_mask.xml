@@ -316,4 +316,21 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- BOX: Specify size using height and width                         -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_BOX">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_BASE;/poly/MLB_Stadiums.txt \
+      &OUTPUT_DIR;/gen_vx_mask/BOX_5_by_10_mask.nc \
+      -type box -height 5 -width 10 -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/BOX_5_by_10_mask.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

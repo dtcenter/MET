@@ -18,6 +18,7 @@
 //   001    05/25/16  Halley Gotway   Allow -value to be set negative.
 //   002    06/01/16  Halley Gotway   Pass -input_field timing
 //                    timing information through to the output.
+//   003    06/02/16  Halley Gotway   Add box masking type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -66,6 +67,7 @@ int main(int argc, char *argv[]) {
 
    // Apply combination logic if the current mask is binary
    if(mask_type == MaskType_Poly ||
+      mask_type == MaskType_Box  ||
       mask_type == MaskType_Grid ||
       thresh.get_type() != thresh_na) {
       dp_out = combine(dp_data, dp_mask, set_logic);
@@ -74,7 +76,6 @@ int main(int argc, char *argv[]) {
    else {
       dp_out = dp_mask;
    }
-
 
    // Write out the mask file to NetCDF
    write_netcdf(dp_out);
@@ -108,6 +109,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_intersection, "-intersection", 0);
    cline.add(set_symdiff,      "-symdiff",      0);
    cline.add(set_thresh,       "-thresh",       1);
+   cline.add(set_height,       "-height",       1);
+   cline.add(set_width,        "-width",        1);
    cline.add(set_value,        "-value",        1);
    cline.add(set_name,         "-name",         1);
    cline.add(set_logfile,      "-log",          1);
@@ -188,7 +191,8 @@ void process_mask_file(DataPlane &dp) {
    GrdFileType ftype = FileType_None;
 
    // Process the mask file as a lat/lon polyline file
-   if(mask_type == MaskType_Poly ||
+   if(mask_type == MaskType_Poly   ||
+      mask_type == MaskType_Box    ||
       mask_type == MaskType_Circle ||
       mask_type == MaskType_Track) {
 
@@ -196,7 +200,7 @@ void process_mask_file(DataPlane &dp) {
       poly_mask.load(mask_filename);
 
       mlog << Debug(2)
-           << "Parsed Mask Polyline:\t" << poly_mask.name()
+           << "Parsed Lat/Lon Mask File:\t" << poly_mask.name()
            << " containing " << poly_mask.n_points() << " points\n";
    }
    // Otherwise, process the mask file as a gridded data file
@@ -250,6 +254,9 @@ void process_mask_file(DataPlane &dp) {
    switch(mask_type) {
       case MaskType_Poly:
          apply_poly_mask(dp);
+         break;
+      case MaskType_Box:
+         apply_box_mask(dp);
          break;
       case MaskType_Circle:
          apply_circle_mask(dp);
@@ -392,6 +399,80 @@ static void apply_poly_mask(DataPlane &dp) {
    // List number of points inside the mask
    mlog << Debug(3)
         << "Polyline Masking:\t" << n_in << " of " << grid.nx() * grid.ny()
+        << " points inside\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void apply_box_mask(DataPlane &dp) {
+   int i, x_ll, y_ll, x, y, n_in;
+   double cen_x, cen_y;
+   bool inside;
+
+   // Process the height and width
+   if(is_bad_data(height) && is_bad_data(width)) {
+      mlog << Error << "\napply_box_mask() -> "
+           << "the \"-height\" and/or \"-width\" options must be "
+           << "specified for box masking.\n\n";
+      exit(1);
+   }
+   else if(is_bad_data(height) && !is_bad_data(width)) {
+      height = width;
+   }
+   else if(!is_bad_data(height) && is_bad_data(width)) {
+      width = height;
+   }
+
+   // Process each lat/lon point
+   for(i=0; i<poly_mask.n_points(); i++) {
+
+      // Convert box lat/lon to grid x/y
+      grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), cen_x, cen_y);
+
+      // Get the lower-left x, y
+      get_xy_ll(cen_x, cen_y, width, height, x_ll, y_ll);
+
+      // Set mask value for points within the box
+      for(x=x_ll; x<x_ll+width; x++) {
+         if(x < 0 || x >= dp.nx()) continue;
+
+         for(y=y_ll; y<y_ll+height; y++) {
+            if(y < 0 || y >= dp.ny()) continue;
+
+            // Set the mask
+            dp.set(1, x, y);
+
+         } // end for y
+      } // end for x
+   } // end for i
+
+   // Loop through the field, handle the complement, and count up points
+   for(x=0, n_in=0; x<dp.nx(); x++) {
+      for(y=0; y<dp.ny(); y++) {
+
+         inside = (dp(x, y) == 1);
+
+         // Check the complement
+         if(complement) inside = !inside;
+
+         // Increment count
+         n_in += inside;
+
+         // Store the current mask value
+         dp.set(inside, x, y);
+      }
+   }
+
+   if(complement) {
+      mlog << Debug(3)
+           << "Applying complement of box mask.\n";
+   }
+
+   mlog << Debug(3)
+        << "Box Masking (" << height << " x " << width << "):\t"
+        << n_in << " of " << grid.nx() * grid.ny()
         << " points inside\n";
 
    return;
@@ -551,7 +632,7 @@ static void apply_grid_mask(DataPlane &dp) {
    bool inside;
    double lat, lon, mask_x, mask_y;
 
-   // Check each grid point being inside the polyline
+   // Check each grid point being inside the masking grid
    for(x=0,n_in=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
@@ -815,6 +896,7 @@ MaskType string_to_masktype(const char *s) {
    MaskType t;
 
         if(strcasecmp(s, "poly")   == 0) t = MaskType_Poly;
+   else if(strcasecmp(s, "box")    == 0) t = MaskType_Box;
    else if(strcasecmp(s, "circle") == 0) t = MaskType_Circle;
    else if(strcasecmp(s, "track")  == 0) t = MaskType_Track;
    else if(strcasecmp(s, "grid")   == 0) t = MaskType_Grid;
@@ -835,6 +917,7 @@ const char * masktype_to_string(const MaskType t) {
 
    switch(t) {
       case MaskType_Poly:   s = "poly";           break;
+      case MaskType_Box:    s = "box";           break;
       case MaskType_Circle: s = "circle";         break;
       case MaskType_Track:  s = "track";          break;
       case MaskType_Grid:   s = "grid";           break;
@@ -863,6 +946,8 @@ void usage() {
         << "\t[-complement]\n"
         << "\t[-union|-intersection|-symdiff]\n"
         << "\t[-thresh string]\n"
+        << "\t[-height n]\n"
+        << "\t[-width n]\n"
         << "\t[-value n]\n"
         << "\t[-name string]\n"
         << "\t[-log file]\n"
@@ -873,7 +958,7 @@ void usage() {
         << "\t\t   If " << program_name << " output, automatically read mask data.\n"
 
         << "\t\t\"mask_file\" defines the masking region (required).\n"
-        << "\t\t   ASCII Lat/Lon file for \"poly\", \"circle\", and \"track\" masking.\n"
+        << "\t\t   ASCII Lat/Lon file for \"poly\", \"box\", \"circle\", and \"track\" masking.\n"
         << "\t\t   Gridded data file for \"grid\" and \"data\" masking.\n"
 
         << "\t\t\"out_file\" is the output NetCDF mask file to be "
@@ -881,7 +966,7 @@ void usage() {
 
         << "\t\t\"-type string\" overrides the default masking type ("
         << masktype_to_string(default_mask_type) << ") (optional).\n"
-        << "\t\t   May be set to \"poly\", \"circle\", \"track\", \"grid\", or \"data\".\n"
+        << "\t\t   May be set to \"poly\", \"box\", \"circle\", \"track\", \"grid\", or \"data\".\n"
 
         << "\t\t\"-input_field string\" to read existing mask data from \"input_file\" (optional).\n"
 
@@ -895,6 +980,9 @@ void usage() {
         << "\t\t\"-thresh string\" defines the threshold to be applied (optional).\n"
         << "\t\t   Distance (km) for \"circle\" and \"track\" masking.\n"
         << "\t\t   Raw input values for \"data\" masking.\n"
+
+        << "\t\t\"-height n\" and \"-width n\" set the size in grid units "
+        << "for \"box\" masking (optional).\n"
 
         << "\t\t\"-value n\" overrides the default output mask data value ("
         << default_mask_val << ") (optional).\n"
@@ -959,6 +1047,18 @@ void set_symdiff(const StringArray & a) {
 
 void set_thresh(const StringArray & a) {
    thresh.set(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_height(const StringArray & a) {
+   height = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_width(const StringArray & a) {
+   width = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
