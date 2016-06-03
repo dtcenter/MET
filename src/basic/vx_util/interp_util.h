@@ -49,6 +49,9 @@ extern double interp_ls_fit (const DataPlane &, int, int, int, double, double,
                              double);
 extern double interp_bilin  (const DataPlane &, double, double);
 
+extern void   get_xy_ll     (double x, double y, int w, int h,
+                             int &x_ll, int &y_ll);
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Utility functions for horizontal and vertical interpolation

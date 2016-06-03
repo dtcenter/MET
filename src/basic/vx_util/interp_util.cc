@@ -351,6 +351,33 @@ double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Determine the lower-left (x, y) based on height and width parity.
+//
+////////////////////////////////////////////////////////////////////////
+
+void get_xy_ll(double x, double y, int w, int h, int &x_ll, int &y_ll) {
+
+   // Range check
+   if(w <= 0 || h <= 0) {
+      mlog << Error << "\nget_xy_ll() -> "
+           << "the height (" << h << ") and width (" << w
+           << ") must be set >= 0\n\n";
+      exit(1);
+   }
+
+   // Define left-most x based on the parity of width
+   if(w%2 == 1) x_ll = nint(x) - (w - 1)/2;
+   else         x_ll = nint(floor(x) - (w/2 - 1));
+
+   // Define lower-most y based on the parity of height
+   if(h%2 == 1) y_ll = nint(y) - (h - 1)/2;
+   else         y_ll = nint(floor(y) - (h/2 - 1));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Utility functions for horizontal and vertical interpolation
 //
 ////////////////////////////////////////////////////////////////////////
@@ -361,18 +388,8 @@ double compute_horz_interp(const DataPlane &dp,
    double v;
    int x_ll, y_ll;
 
-   // The neighborhood width is odd, find the lower-left corner of
-   // the neighborhood
-   if(wdth%2 == 1) {
-      x_ll = nint(obs_x) - (wdth - 1)/2;
-      y_ll = nint(obs_y) - (wdth - 1)/2;
-   }
-   // The neighborhood width is even, find the lower-left corner of
-   // the neighborhood
-   else {
-      x_ll = nint(floor(obs_x) - (wdth/2 - 1));
-      y_ll = nint(floor(obs_y) - (wdth/2 - 1));
-   }
+   // Get the lower-left x, y
+   get_xy_ll(obs_x, obs_y, wdth, wdth, x_ll, y_ll);
 
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
@@ -545,7 +562,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
          use_min = ((to_ut - dp1.valid()) <=
                     (dp2.valid() - to_ut));
          w1 = (use_min ? 1.0 : 0.0);
-         w2 = (use_min ? 0.0 : 1.0);         
+         w2 = (use_min ? 0.0 : 1.0);
          break;
 
       case(InterpMthd_Median):  // Median
@@ -575,7 +592,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
 
          // Check for bad data
          if(!is_bad_data(v1) && !is_bad_data(v2)) {
-            
+
             // Minimum
                  if(mthd == InterpMthd_Min) v = min(v1, v2);
             // Maximum
