@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/09/14  Halley Gotway   New
+//   001    06/02/16  Halley Gotway   Add box masking type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,6 +42,7 @@ static const char *program_name = "gen_vx_mask";
 
 enum MaskType {
    MaskType_Poly,   // Polyline masking region
+   MaskType_Box,    // Box masking type
    MaskType_Circle, // Circle masking region
    MaskType_Track,  // Track masking region
    MaskType_Grid,   // Grid masking type
@@ -75,6 +77,8 @@ static ConcatString input_field_str, mask_field_str;
 static SetLogic set_logic = SetLogic_None;
 static bool complement = false;
 static SingleThresh thresh;
+static int height = bad_data_double;
+static int width = bad_data_double;
 static double mask_val = default_mask_val;
 static ConcatString mask_name;
 
@@ -97,6 +101,7 @@ static void      get_data_plane(Met2dDataFile *mtddf_ptr,
 static bool      get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr,
                                       DataPlane &dp);
 static void      apply_poly_mask(DataPlane &dp);
+static void      apply_box_mask(DataPlane &dp);
 static void      apply_circle_mask(DataPlane &dp);
 static void      apply_track_mask(DataPlane &dp);
 static void      apply_grid_mask(DataPlane &dp);
@@ -112,6 +117,8 @@ static void      set_union(const StringArray &);
 static void      set_intersection(const StringArray &);
 static void      set_symdiff(const StringArray &);
 static void      set_thresh(const StringArray &);
+static void      set_height(const StringArray &);
+static void      set_width(const StringArray &);
 static void      set_value(const StringArray &);
 static void      set_name(const StringArray &);
 static void      set_logfile(const StringArray &);

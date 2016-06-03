@@ -321,6 +321,38 @@ hskip 0.5in}
 
 \end_inset
 
+[-height n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-width n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-value n]
 \end_layout
 
@@ -418,6 +450,14 @@ poly
 \begin_inset Quotes eld
 \end_inset
 
+box
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
 circle
 \begin_inset Quotes erd
 \end_inset
@@ -478,6 +518,7 @@ arguments for gen_vx_mask
 -type string
 \series medium
  option can be used to override the default masking type (poly).
+ See description of supported types below.
 \end_layout
 
 \begin_layout Description
@@ -545,6 +586,21 @@ arguments for gen_vx_mask
 10.
  The 
 \series bold
+-height n 
+\series medium
+and 
+\series bold
+-width n
+\series medium
+ options set the size in grid units for "box" masking.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+11.
+ The 
+\series bold
 -value n
 \series medium
  option can be used to override the default output mask data value (1).
@@ -553,7 +609,7 @@ arguments for gen_vx_mask
 \begin_layout Description
 
 \series medium
-11.
+12.
  The 
 \series bold
 -name string
@@ -564,7 +620,7 @@ arguments for gen_vx_mask
 \begin_layout Description
 
 \series medium
-12.
+13.
  The 
 \series bold
 -log file
@@ -580,7 +636,7 @@ arguments for gen_vx_mask
 \begin_layout Description
 
 \series medium
-13.
+14.
  The 
 \series bold
 -v level
@@ -618,6 +674,38 @@ poly
 
 \series medium
 2.
+ Box (
+\series bold
+box
+\series medium
+) masking reads an input ASCII file containing Lat/Lon locations and draws
+ a box around each point.
+ The height and width of the box is specified by the 
+\series bold
+-height 
+\series default
+and
+\series bold
+ -width
+\series default
+ command line option
+\series medium
+s in grid units.
+ For a square, only one of 
+\series bold
+-height 
+\series default
+or
+\series bold
+ -width
+\series medium
+ needs to be used.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+3.
  Circle (
 \series bold
 circle
@@ -640,7 +728,7 @@ circle
 \begin_layout Description
 
 \series medium
-3.
+4.
  Track (
 \series bold
 track
@@ -665,7 +753,7 @@ circle
 \begin_layout Description
 
 \series medium
-4.
+5.
  Grid (
 \series bold
 grid
@@ -680,7 +768,7 @@ grid
 \begin_layout Description
 
 \series medium
-5.
+6.
  Data (
 \series bold
 data
@@ -702,15 +790,15 @@ selects grid points which meet that threshold criteria.
 \end_layout
 
 \begin_layout Standard
-The polyline, circle, and track masking methods all read an ASCII file containin
-g Lat/Lon locations.
+The polyline, box, circle, and track masking methods all read an ASCII file
+ containing Lat/Lon locations.
  Those files must contain a string, which defines the name of the masking
  region, followed by a series of whitespace-separated latitude (degrees
  north) and longitude (degree east) values.
 \end_layout
 
 \begin_layout Standard
-The Gen-Vx-Mask tool read the 
+The Gen-Vx-Mask tool reads the 
 \series bold
 input_file
 \series default
