@@ -22,27 +22,53 @@
 
   <test name="ascii2nc_AERONET_daily">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>VLD_FREQ</name>   <value>0</value></pair>
+      <pair><name>VLD_THRESH</name> <value>0.0</value></pair>
+    </env>
     <param> \
       &DATA_DIR_OBS;/aeronet/150918_150918_Table_Mountain.lev15 \
       &DATA_DIR_OBS;/aeronet/150918_150918_DRAGON_DenverLaCasa.lev15 \
       -config &CONFIG_DIR;/Ascii2NcConfig_aeronet \
       &OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15.nc</point_nc>
     </output>
   </test>
 
+  <test name="ascii2nc_AERONET_vld_thresh">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>VLD_FREQ</name>   <value>300</value></pair>
+      <pair><name>VLD_THRESH</name> <value>0.5</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/aeronet/150918_150918_Table_Mountain.lev15 \
+      &DATA_DIR_OBS;/aeronet/150918_150918_DRAGON_DenverLaCasa.lev15 \
+      -config &CONFIG_DIR;/Ascii2NcConfig_aeronet \
+      &OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15_vld_thresh.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/aeronet/150918_150918_Boulder.lev15_vld_thresh.nc</point_nc>
+    </output>
+  </test>
+
   <test name="ascii2nc_AERONET_monthly">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>VLD_FREQ</name>   <value>0</value></pair>
+      <pair><name>VLD_THRESH</name> <value>0.0</value></pair>
+    </env>
     <param> \
       &DATA_DIR_OBS;/aeronet/150901_150930_Table_Mountain.lev15 \
       &DATA_DIR_OBS;/aeronet/150901_150930_DRAGON_DenverLaCasa.lev15 \
       -config &CONFIG_DIR;/Ascii2NcConfig_aeronet \
       &OUTPUT_DIR;/aeronet/150901_150930_Boulder.lev15.nc \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/aeronet/150901_150930_Boulder.lev15.nc</point_nc>
     </output>

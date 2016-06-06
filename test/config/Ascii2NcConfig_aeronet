@@ -20,8 +20,8 @@ time_summary = {
   width = 3600;
   grib_code = [129];
   type = [ "mean" ];
-  vld_freq = 0;
-  vld_thresh = 0.0;
+  vld_freq = ${VLD_FREQ};
+  vld_thresh = ${VLD_THRESH};
 }
 
 //
