@@ -874,8 +874,8 @@ version = "V5.1";
 // with high temporal resolution. The "flag" entry toggles the "time_summary"
 // on (TRUE) and off (FALSE).  Obs may be summarized across the user specified
 // time period defined by the "beg" and "end" entries.  The "step" entry defines
-// the time between intervals in seconds.  The "width" entry specifies the width of
-// the summary interval in seconds.
+// the time between intervals in seconds.  The "width" entry specifies the width
+// of the summary interval in seconds.
 //
 // e.g. beg = "00";
 //      end = "235959";
@@ -887,10 +887,19 @@ version = "V5.1";
 // 00:04:59 of the current day.  The second interval will be from 0:00:00
 // through 00:09:59. And so on.
 //
-// The summaries will only be calculated for the specified grib codes.
+// The summaries will only be calculated for the specified GRIB codes.
 // The supported summaries are "min" (minimum), "max" (maximum), "range",
 // "mean", "stdev" (standard deviation), "median" and "p##" (percentile, with
 // the desired percentile value specified in place of ##).
+//
+// The "vld_freq" and "vld_thresh" options may be used to require that a certain
+// ratio of observations must be present and contain valid data within the time
+// window in order for a summary value to be computed.  The "vld_freq" entry
+// defines the expected observation frequency in seconds.  For example, when
+// summarizing 1-minute data (vld_freq = 60) over a 30 minute time window,
+// setting "vld_thresh = 0.5" requires that at least 15 of the 30 expected
+// observations be present and valid for a summary value to be written.  The
+// default "vld_thresh = 0.0" setting will skip over this logic.
 //
 time_summary = {
   flag = FALSE;
@@ -900,6 +909,8 @@ time_summary = {
   width = 600;
   grib_code = [ 11, 204, 211 ];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
+  vld_freq = 0;
+  vld_thresh = 0.0;
 }
 
 //

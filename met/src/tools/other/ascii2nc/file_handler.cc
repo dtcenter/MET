@@ -217,9 +217,13 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
   vector< Observation > summary_obs;
 
   // Sort the observations.  This will put them in chronological order, with
-  // secondary sorts on things like the station id
+  // secondary sorts of things like the station id
 
   sort(_observations.begin(), _observations.end());
+
+  // Check for zero observations
+
+  if (_observations.size() == 0) return true;
 
   // Extract the desired time intervals from the summary information.
   // The vector will be in chronological order by start time, but could
@@ -316,6 +320,32 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
            calc_iter != calculators.end(); ++calc_iter)
       {
         SummaryCalc *calc = *calc_iter;
+
+        // Compute the expected number of observations and check valid data ratio
+
+        if (summary_info.vld_freq > 0 && summary_info.vld_thresh > 0)
+        {
+          int n_expect = max(1, nint(summary_info.width / summary_info.vld_freq));
+          int n_valid  = (*curr_values->second).n_valid();
+
+          if (((double) n_valid / n_expect) < summary_info.vld_thresh)
+          {
+
+            mlog << Debug(4)
+                 << "Skipping time summary since the ratio of valid data "
+                 << n_valid << "/" << n_expect << " < " << summary_info.vld_thresh
+                 << " for " << curr_values->first.getHeaderType() << ", "
+                 << calc->getType() << ", "
+                 << summary_info.width << " seconds, "
+                 << curr_values->first.getStationId() << ", "
+                 << unix_to_yyyymmdd_hhmmss(time_interval->getBaseTime()) << ", "
+                 << curr_values->first.getLatitude() << ", "
+                 << curr_values->first.getLongitude() << ", "
+                 << curr_values->first.getElevation() << ", "
+                 << curr_values->first.getGribCode() << "\n";
+            continue;
+          }
+        }
 
         summary_obs.push_back(Observation(_getSummaryHeaderType(curr_values->first.getHeaderType(),
                                                                 calc->getType(),

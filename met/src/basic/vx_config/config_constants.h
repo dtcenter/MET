@@ -177,6 +177,9 @@ struct TimeSummaryInfo {
   StringArray type;        // List of types of summaries to perform
                            //   Valid summaries are "min", "max", "range",
                            //   "mean", "stdev", "median" and "p##".
+  double      vld_thresh;  // Valid data time window threshold
+  int         vld_freq;    // Expected observation frequency in seconds
+                           //   used to compute the ratio of valid data.
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -403,13 +406,11 @@ static const char conf_key_mask_grid[]         = "mask.grid";
 static const char conf_key_mask_poly[]         = "mask.poly";
 static const char conf_key_mask_sid[]          = "mask.sid";
 static const char conf_key_ci_alpha[]          = "ci_alpha";
-static const char conf_key_time_summary_flag[] = "time_summary.flag";
-static const char conf_key_time_summary_beg[]  = "time_summary.beg";
-static const char conf_key_time_summary_end[]  = "time_summary.end";
-static const char conf_key_time_summary_step[] = "time_summary.step";
-static const char conf_key_time_summary_width[] = "time_summary.width";
-static const char conf_key_time_summary_grib_code[] = "time_summary.grib_code";
-static const char conf_key_time_summary_type[] = "time_summary.type";
+static const char conf_key_time_summary[]      = "time_summary";
+static const char conf_key_flag[]              = "flag";
+static const char conf_key_step[]              = "step";
+static const char conf_key_grib_code[]         = "grib_code";
+static const char conf_key_vld_freq[]          = "vld_freq";
 static const char conf_key_message_type_map[]  = "message_type_map";
 static const char conf_key_key[]               = "key";
 static const char conf_key_val[]               = "val";

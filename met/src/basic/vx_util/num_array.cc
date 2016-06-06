@@ -806,6 +806,24 @@ return(max_v);
 ////////////////////////////////////////////////////////////////////////
 
 
+int NumArray::n_valid() const
+
+{
+
+int j, n;
+
+for(j=0, n=0; j<Nelements; j++) {
+   if(!is_bad_data(e[j])) n++;
+}
+
+return(n);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString NumArray::serialize() const
 
 {
