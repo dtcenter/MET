@@ -91,6 +91,7 @@ class NumArray {
       ConcatString serialize() const;
 
       int n_elements() const;
+      int n_valid() const;
 
       NumArray subset(int, int) const;
 

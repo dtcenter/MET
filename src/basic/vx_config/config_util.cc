@@ -475,51 +475,67 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
 ////////////////////////////////////////////////////////////////////////
 
 TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
-  if (!dict)
-  {
-    mlog << Error << "\nparse_conf_time_summary() -> "
-         << "empty dictionary!\n\n";
-    exit(1);
-  }
+   Dictionary *ts_dict = (Dictionary *) 0;
+   TimeSummaryInfo info;
 
-  TimeSummaryInfo info;
+   if(!dict) {
+      mlog << Error << "\nparse_conf_time_summary() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
 
-  // Conf: time_summary.flag
-  info.flag = dict->lookup_bool(conf_key_time_summary_flag);
+   // Conf: time_summary
+   ts_dict = dict->lookup_dictionary(conf_key_time_summary);
 
-  // Conf: time_summary.beg
-  info.beg = timestring_to_sec(dict->lookup_string(conf_key_time_summary_beg));
+   // Conf: flag
+   info.flag = ts_dict->lookup_bool(conf_key_flag);
 
-  // Conf: time_summary.end
-  info.end = timestring_to_sec(dict->lookup_string(conf_key_time_summary_end));
+   // Conf: beg
+   info.beg = timestring_to_sec(ts_dict->lookup_string(conf_key_beg));
 
-  // Conf: time_summary.step
-  info.step = dict->lookup_int(conf_key_time_summary_step);
-  if (info.step <= 0) {
-    mlog << Error << "\nparse_conf_time_summary() -> "
-         << "The \"" << conf_key_time_summary_step
-         << "\" parameter (" << info.step
-         << ") must be greater than 0!\n\n";
-    exit(1);
-  }
+   // Conf: end
+   info.end = timestring_to_sec(ts_dict->lookup_string(conf_key_end));
 
-  // Conf: time_summary.width
-  info.width = dict->lookup_int(conf_key_time_summary_width);
-  if (info.width <= 0) {
-    mlog << Error << "\nparse_conf_time_summary() -> "
-         << "The \"" << conf_key_time_summary_width
-         << "\" parameter (" << info.width
-         << ") must be greater than 0!\n\n";
-    exit(1);
-  }
+   // Conf: step
+   info.step = ts_dict->lookup_int(conf_key_step);
+   if(info.step <= 0) {
+      mlog << Error << "\nparse_conf_time_summary() -> "
+           << "The \"" << conf_key_step << "\" parameter (" << info.step
+           << ") must be greater than 0!\n\n";
+      exit(1);
+   }
 
-  // Conf: time_summary.grib_code
-  info.grib_code = dict->lookup_int_array(conf_key_time_summary_grib_code);
+   // Conf: width
+   info.width = ts_dict->lookup_int(conf_key_width);
+   if(info.width <= 0) {
+     mlog << Error << "\nparse_conf_time_summary() -> "
+          << "The \"" << conf_key_width << "\" parameter (" << info.width
+          << ") must be greater than 0!\n\n";
+     exit(1);
+   }
 
-  // Conf: time_summary.type
-  info.type = dict->lookup_string_array(conf_key_time_summary_type);
+   // Conf: grib_code
+   info.grib_code = ts_dict->lookup_int_array(conf_key_grib_code);
 
-  return(info);
+   // Conf: type
+   info.type = ts_dict->lookup_string_array(conf_key_type);
+
+   // Conf: vld_freq
+   info.vld_freq = ts_dict->lookup_int(conf_key_vld_freq);
+
+   // Conf: vld_thresh
+   info.vld_thresh = ts_dict->lookup_double(conf_key_vld_thresh);
+
+   // Check that the interpolation threshold is between 0 and 1.
+   if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
+      mlog << Error << "\nparse_conf_time_summary() -> "
+           << "The \"" << conf_key_time_summary << "."
+           << conf_key_vld_thresh << "\" parameter (" << info.vld_thresh
+           << ") must be set between 0 and 1.\n\n";
+      exit(1);
+   }
+
+   return(info);
 }
 
 ////////////////////////////////////////////////////////////////////////

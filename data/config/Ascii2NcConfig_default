@@ -20,6 +20,8 @@ time_summary = {
   width = 600;
   grib_code = [ 11, 204, 211 ];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
+  vld_freq = 0;
+  vld_thresh = 0.0;
 }
 
 //
