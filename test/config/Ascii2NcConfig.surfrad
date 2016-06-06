@@ -14,7 +14,7 @@
 // Define beginning and ending time window in HH[MMSS].
 // Step (the time between intervals) in seconds.
 // Width of the time intervals in seconds.
-// 
+//
 // e.g. beg = "00";
 //      end = "235959";
 //      step = 300;
@@ -39,6 +39,8 @@ time_summary = {
   width = ${WIDTH_TS};
   grib_code = [ 11, 204, 211 ];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
+  vld_freq = 0;
+  vld_thresh = 0.0;
 }
 
 //

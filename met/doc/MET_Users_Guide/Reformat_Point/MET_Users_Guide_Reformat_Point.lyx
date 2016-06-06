@@ -2391,7 +2391,7 @@ hskip 0.5in}
 
 \end_inset
 
-ascii_file [ascii_file2 ...
+ascii_file1 [ascii_file2 ...
  ascii_filen]
 \end_layout
 
@@ -2527,7 +2527,8 @@ Required arguments for ascii2nc
 \series bold
 ascii_file
 \series medium
- argument indicates the name of the ASCII point observation file to be processed.
+ argument indicates the name of the ASCII point observation file(s) to be
+ processed.
 \end_layout
 
 \begin_layout Description
@@ -2754,44 +2755,56 @@ time_summary = {
 \begin_layout LyX-Code
 
 \series bold
-   flag      = FALSE;
+   flag       = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   beg       = "000000";
+   beg        = "000000";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   end       = "235959";
+   end        = "235959";
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   step      = 300;
+   step       = 300;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   width     = 600;
+   width      = 600;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   grib_code = [ 11, 204, 211 ];
+   grib_code  = [ 11, 204, 211 ];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   type      = [ "min", "max", "range", "mean", "stdev", "median", "p80"
+   type       = [ "min", "max", "range", "mean", "stdev", "median", "p80"
  ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_freq   = 0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
@@ -2845,6 +2858,53 @@ The summaries will only be calculated for the specified GRIB codes.
  the desired percentile value specified in place of ##).
  If multiple summaries are selected in a single run, a string indicating
  the summary method applied will be appended to the output message type.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+vld_freq
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+vld_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ entries specify the required ratio of valid data for an output time summary
+ value to be computed.
+ This option is only applied when these entries are set to non-zero values.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+vld_freq
+\begin_inset Quotes erd
+\end_inset
+
+ entry specifies the expected frequency of obesrvations in seconds.
+ The width of the time window is divided by this frequency to compute the
+ expected number of observations for the time window.
+ The actual number of valid observations is divided by the expected number
+ to compute the ratio of valid data.
+ An output time summary value will only be written if that ratio is greater
+ than or equal to the 
+\begin_inset Quotes eld
+\end_inset
+
+vld_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ entry.
+ Detailed information about which observations are excluded is provided
+ at debug level 4.
 \end_layout
 
 \begin_layout Standard
