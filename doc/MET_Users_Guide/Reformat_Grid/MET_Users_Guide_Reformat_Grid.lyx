@@ -128,8 +128,31 @@ on intervals from two or more gridded files into a single NetCDF file containing
  This tool enables users to define identical forecast and observation or
  analysis precipitation accumulation intervals prior to running the MET
  statistics tools.
- The "sum" command can only be run on GRIB1 or GRIB2 files while the "add"
- and "subtract" commands can be run on any gridded file.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+sum
+\begin_inset Quotes erd
+\end_inset
+
+ command can only be run on GRIB1 or GRIB2 files while the 
+\begin_inset Quotes eld
+\end_inset
+
+add
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+subtract
+\begin_inset Quotes erd
+\end_inset
+
+ commands can be run on any gridded file.
  Use of Pcp-Combine on a single file will result in that file being written
  out in NetCDF format, with no changes to the data values.
  The files being combined must all be on a common grid.
@@ -976,17 +999,33 @@ sample_obs.nc
 \series medium
 Example 2 shows an example of using the Pcp-Combine tool to sum observation
  data.
- The "
+ The 
 \series default
+
+\begin_inset Quotes eld
+\end_inset
+
 init_time
 \series medium
-" has been set to all zeros to indicate that when searching through the
- files in precipitation directory, the initialization time should be ignored.
- The "
+
+\begin_inset Quotes erd
+\end_inset
+
+ has been set to all zeros to indicate that when searching through the files
+ in precipitation directory, the initialization time should be ignored.
+ The 
 \series default
+
+\begin_inset Quotes eld
+\end_inset
+
 in_accum
 \series medium
-" has been changed from 3 to 1 to indicate that the input observation files
+
+\begin_inset Quotes erd
+\end_inset
+
+ has been changed from 3 to 1 to indicate that the input observation files
  contain 1-hourly accumulations of precipitation.
  Lastly, 
 \series default
@@ -2789,30 +2828,18 @@ name "WWMCA-Tool-Documentation"
 
 \begin_layout Standard
 There are two WWMCA tools available.
- The 
-\series bold
-wmmca_plot
-\series default
- tool makes a PostScript plot of one or more WWMCA cloud percent files and
- the 
-\series bold
-wwmca_regrid
-\series default
- tool regrids WWMCA cloud percent files and reformats them into netCDF files
- that the other MET tools can read.
- In version 5.2, the 
-\series bold
-wwmca_regrid
-\series default
- tool was generalized to more broadly support any data stored in the WWMCA
- binary format.
+ The WWMCA-Plot tool makes a PostScript plot of one or more WWMCA cloud
+ percent files and the WWMCA-Regrid tool regrids binary WWMCA data files
+ and reformats them into netCDF files that the other MET tools can read.
+ In version 5.2, the WWMCA-Regrid tool was generalized to more broadly support
+ any data stored in the WWMCA binary format.
 \end_layout
 
 \begin_layout Standard
 The WWMCA tools attempt to parse timing and hemisphere information from
  the file names.
  They tokenize the filename using underscores (_) and dots (.) and examine
- each element.
+ each element which need be in no particular order.
  A string of 10 or more numbers is interpreted as the valid time in YYYYMMDDHH[M
 MSS] format.
  The string NH indicates the northern hemisphere while SH indicates the
@@ -2822,10 +2849,7 @@ MSS] format.
  Therefore, a string of 1 to 4 numbers is interpreted as the forecast lead
  time in hours.
  While parsing the filename provides default values for this timing information,
- they can be overridden by explicting setting their values in the 
-\series bold
-wwmca_regrid
-\series default
+ they can be overridden by explicting setting their values in the WWMCA-Regrid
  configuration file.
 \end_layout
 
@@ -2843,11 +2867,7 @@ name "sub:wwmca_plot-usage"
 \begin_layout Standard
 
 \series medium
-The usage statement for the 
-\series bold
-wmmca_plot
-\series medium
- tool is shown below:
+The usage statement for the WWMCA-Plot tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -2939,13 +2959,9 @@ wwmca_cloud_pct_file_list
 \end_layout
 
 \begin_layout Standard
-
+wmmca_plot
 \series medium
-The
-\series bold
- wmmca_plot
-\series medium
- tool has some required arguments and can also take optional ones.
+ has some required arguments and can also take optional ones.
  
 \end_layout
 
@@ -3031,7 +3047,15 @@ Optional arguments for wwmca_plot
 -v level
 \series medium
  option indicates the desired level of verbosity.
- The value of "level" will override the default setting of 2.
+ The value of 
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity will increase the amount of logging.
 \end_layout
@@ -3106,11 +3130,7 @@ name "sub:wwmca_regrid-usage"
 \begin_layout Standard
 
 \series medium
-The usage statement for the 
-\series bold
-wmmca_regrid
-\series medium
- tool is shown below:
+The usage statement for the WWMCA-Regrid tool is shown below:
 \end_layout
 
 \begin_layout LyX-Code
@@ -3166,7 +3186,7 @@ hskip 0.5in}
 
 \end_inset
 
--nh cp_filename [pt_filename]
+-nh filename [pt_filename]
 \end_layout
 
 \begin_layout LyX-Code
@@ -3182,7 +3202,7 @@ hskip 0.5in}
 
 \end_inset
 
--sh cp_filename [pt_filename]
+-sh filename [pt_filename]
 \end_layout
 
 \begin_layout LyX-Code
@@ -3218,14 +3238,9 @@ hskip 0.5in}
 \end_layout
 
 \begin_layout Standard
-
+wmmca_regrid
 \series medium
-The
-\series bold
- wmmca_regrid
-\series medium
- tool has some required arguments and can also take optional ones.
- 
+ has some required arguments and can also take optional ones.
 \end_layout
 
 \begin_layout Standard
@@ -3266,12 +3281,12 @@ specifies the name of the output netCDF file.
 3.
  The 
 \series bold
--nh cp_filename [pt_filename]
+-nh filename [pt_filename]
 \series medium
  argument specifies the northern hemisphere WWMCA binary file and, optionally,
  may be followed by a binary pixel age file.
- This is required if the output grid includes any portion of the northern
- hemisphere.
+ This switch is required if the output grid includes any portion of the
+ northern hemisphere.
 \end_layout
 
 \begin_layout Description
@@ -3280,12 +3295,12 @@ specifies the name of the output netCDF file.
 4.
  The 
 \series bold
--sh cp_filename [pt_filename]
+-sh filename [pt_filename]
 \series medium
  argument specifies the southern hemisphere WWMCA binary file and, optionally,
  may be followed by a binary pixel age file.
- This is required if the output grid includes any portion of the southern
- hemisphere.
+ This switch is required if the output grid includes any portion of the
+ southern hemisphere.
 \end_layout
 
 \begin_layout Standard
@@ -3320,7 +3335,15 @@ Optional arguments for wwmca_regrid
 -v level
 \series medium
  option indicates the desired level of verbosity.
- The value of "level" will override the default setting of 2.
+ The value of 
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity will increase the amount of logging.
 \end_layout
@@ -3331,7 +3354,7 @@ In any regridding problem, there are two grids involved: the “From” grid,
  grid the data are to be moved onto.
  In 
 \series bold
-wwmca_regrid
+WWMCA-Regrid
 \series default
  the 
 \begin_inset Quotes eld
@@ -3367,12 +3390,9 @@ To
  for that hemisphere need be given.
  If the “To” grid or the interpolation box used straddles the equator the
  data files for both hemispheres need be given.
- Once the “To” grid is specified in the config file, the 
-\series bold
-wwmca_regrid
-\series default
- tool will know which input data files it needs and will complain if it
- is not given the right ones.
+ Once the “To” grid is specified in the config file, the WWMCA-Regrid tool
+ will know which input data files it needs and will complain if it is not
+ given the right ones.
 \end_layout
 
 \begin_layout Subsection
@@ -3390,8 +3410,8 @@ name "sub:wwmca_regrid-configuration-file"
 
 \series medium
 The default configuration file for the 
-\series bold
-wwmca_regrid
+\series default
+WWMCA-Regrid
 \series medium
  tool named 
 \series bold
