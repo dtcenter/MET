@@ -587,7 +587,11 @@ Optional arguments for pcp_combine
 -log file
 \series medium
  option directs output and errors to the specified log file.
- All messages will be written to that file as well as cout and cerr.
+ All messages will be written to that file as well as 
+\series default
+standard out and error
+\series medium
+.
  Thus, users can save the messages without having to redirect the output
  on the command line.
  The default behavior is no logfile.
@@ -1773,7 +1777,11 @@ The
 -log file
 \series medium
  option directs output and errors to the specified log file.
- All messages will be written to that file as well as cout and cerr.
+ All messages will be written to that file as well as 
+\series default
+standard out and error
+\series medium
+.
  Thus, users can save the messages without having to redirect the output
  on the command line.
  The default behavior is no logfile.
@@ -2275,7 +2283,11 @@ The
 -log file
 \series medium
  option directs output and errors to the specified log file.
- All messages will be written to that file as well as cout and cerr.
+ All messages will be written to that file as well as 
+\series default
+standard out and error
+\series medium
+.
  Thus, users can save the messages without having to redirect the output
  on the command line.
  The default behavior is no logfile.
@@ -2593,8 +2605,7 @@ hskip 0.5in}
 \begin_layout Standard
 
 \series medium
-modis_regrid tool has some required arguments and can also take optional
- ones.
+modis_regrid has some required arguments and can also take optional ones.
  
 \end_layout
 
@@ -3031,7 +3042,11 @@ Optional arguments for wwmca_plot
 -log file
 \series medium
  option directs output and errors to the specified log file.
- All messages will be written to that file as well as cout and cerr.
+ All messages will be written to that file as well as 
+\series default
+standard out and error
+\series medium
+.
  Thus, users can save the messages without having to redirect the output
  on the command line.
  The default behavior is no logfile.
@@ -3319,7 +3334,11 @@ Optional arguments for wwmca_regrid
 -log file
 \series medium
  option directs output and errors to the specified log file.
- All messages will be written to that file as well as cout and cerr.
+ All messages will be written to that file as well as 
+\series default
+standard out and error
+\series medium
+.
  Thus, users can save the messages without having to redirect the output
  on the command line.
  The default behavior is no logfile.

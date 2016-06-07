@@ -359,7 +359,7 @@ argument indicates the path of the output file base.
 -log file
 \series default
  option directs output and errors to the specified log file.
- All messages will be written to that file as well as cout and cerr.
+ All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
  The default behavior is no logfile.

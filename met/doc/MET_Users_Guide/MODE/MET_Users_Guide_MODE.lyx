@@ -1506,7 +1506,7 @@ option indicates the directory where output files should be written.
  -log file
 \series default
  option directs output and errors to the specified log file.
- All messages will be written to that file as well as cout and cerr.
+ All messages will be written to that file as well as standard out and error.
  Thus, users can save the messages without having to redirect the output
  on the command line.
  The default behavior is no logfile.
@@ -9119,8 +9119,8 @@ The first page of PostScript output contains a great deal of summary information
 \begin_layout Standard
 The second and third pages of the PostScript output file display enlargements
  of the forecast and observation raw and object fields, respectively.
-  The fourth page displays the forecast object with the outlines of the observati
-on objects overlaid, and vice versa.
+  The fourth page displays the forecast object with the outlines of the
+ observation objects overlaid, and vice versa.
  The fifth page contains summary information about the pairs of matched
  cluster objects.
 \end_layout
