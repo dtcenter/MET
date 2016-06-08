@@ -32,6 +32,34 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_GRIB1_REC">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_REC_61_APCP_12.ps \
+      'GRIB1_rec = 61; level = "A12";' \
+      -title "GRIB1 NAM 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_REC_61_APCP_12.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB1_CODE">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_CODE_61_APCP_12.ps \
+      'GRIB1_code = 61; level = "A12";' \
+      -title "GRIB1 NAM 12-hour APCP" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB1_CODE_61_APCP_12.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_GRIB2">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
