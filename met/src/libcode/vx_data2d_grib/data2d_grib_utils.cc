@@ -132,7 +132,7 @@ if ( vinfo_ptv != k || vinfo_center != center || vinfo_subcenter != subsenter)  
       //  if either the field name or the indices are specified, bail
       if( bad_data_int == vinfo_ptv || bad_data_int == code_for_lookup ){
          mlog << Error << "\nis_prelim_match() - either name or GRIB1_ptv "
-         << "and GRIB1_rec must be specified in field information\n\n";
+         << "and GRIB1_rec or GRIB_code must be specified in field information\n\n";
          exit(1);
       }
 
@@ -143,7 +143,7 @@ if ( vinfo_ptv != k || vinfo_center != center || vinfo_subcenter != subsenter)  
          {
             mlog << Error << "\ns_prelim_match() - no parameter found with matching "
             << "GRIB1_ptv (" << vinfo_ptv << ") "
-            << "GRIB1_rec (" << vinfo.field_rec() << ")\n\n";
+            << "GRIB1_code (" << vinfo.field_rec() << ")\n\n";
             exit (1);
          }
       }
