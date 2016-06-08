@@ -381,6 +381,7 @@ static const char conf_key_GRIB1_ptv[]         = "GRIB1_ptv";
 static const char conf_key_GRIB1_center[]      = "GRIB1_center";
 static const char conf_key_GRIB1_subcenter[]   = "GRIB1_subcenter";
 static const char conf_key_GRIB1_rec[]         = "GRIB1_rec";
+static const char conf_key_GRIB1_code[]        = "GRIB1_code";
 static const char conf_key_GRIB2_disc[]        = "GRIB2_disc";
 static const char conf_key_GRIB2_parm_cat[]    = "GRIB2_parm_cat";
 static const char conf_key_GRIB2_parm[]        = "GRIB2_parm";
