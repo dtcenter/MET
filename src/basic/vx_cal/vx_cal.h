@@ -86,6 +86,8 @@ extern  void     substring_vx_cal       (const char * text, char * out, int firs
 extern  void         sec_to_hhmmss      (int, char *);
 extern  ConcatString sec_to_hhmmss      (int);
 
+extern  ConcatString sec_to_hhmmss_colon(int);
+
 extern  int      hhmmss_to_sec          (const char *);
 
 extern  void         unix_to_yyyymmdd_hhmmss(unixtime, char *);

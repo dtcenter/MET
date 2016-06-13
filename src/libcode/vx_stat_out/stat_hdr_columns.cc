@@ -299,17 +299,8 @@ ConcatString StatHdrColumns::get_fcst_thresh_str() const {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_lead_str() {
-   int hr, min, sec;
-   char tmp_str[max_str_len];
 
-   // Convert lead_sec to hour, minute, second
-   sec_to_hms(fcst_lead_sec, hr, min, sec);
-
-   // Format the time HHMMSS
-   sprintf(tmp_str, "%.2i%.2i%.2i", hr, min, sec);
-
-   // Set lead_str
-   fcst_lead_str = tmp_str;
+   fcst_lead_str = sec_to_hhmmss(fcst_lead_sec);
 
    return;
 }
@@ -317,18 +308,8 @@ void StatHdrColumns::set_fcst_lead_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_valid_beg_str() {
-   int yr, mon, day, hr, min, sec;
-   char tmp_str[max_str_len];
 
-   // Convert fcst_valid_beg to month, day, year, hour, minute, second
-   unix_to_mdyhms(fcst_valid_beg, mon, day, yr, hr, min, sec);
-
-   // Format the time YYYYMMDD_HHMMSS
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-           yr, mon, day, hr, min, sec);
-
-   // Set fcst_valid_beg_str
-   fcst_valid_beg_str = tmp_str;
+   fcst_valid_beg_str = unix_to_yyyymmdd_hhmmss(fcst_valid_beg);
 
    return;
 }
@@ -336,18 +317,8 @@ void StatHdrColumns::set_fcst_valid_beg_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_valid_end_str() {
-   int yr, mon, day, hr, min, sec;
-   char tmp_str[max_str_len];
 
-   // Convert fcst_valid_end to month, day, year, hour, minute, second
-   unix_to_mdyhms(fcst_valid_end, mon, day, yr, hr, min, sec);
-
-   // Format the time YYYYMMDD_HHMMSS
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-           yr, mon, day, hr, min, sec);
-
-   // Set fcst_valid_end_str
-   fcst_valid_end_str = tmp_str;
+   fcst_valid_end_str = unix_to_yyyymmdd_hhmmss(fcst_valid_end);
 
    return;
 }
@@ -355,17 +326,8 @@ void StatHdrColumns::set_fcst_valid_end_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_lead_str() {
-   int hr, min, sec;
-   char tmp_str[max_str_len];
 
-   // Convert lead_sec to hour, minute, second
-   sec_to_hms(obs_lead_sec, hr, min, sec);
-
-   // Format the time HHMMSS
-   sprintf(tmp_str, "%.2i%.2i%.2i", hr, min, sec);
-
-   // Set lead_str
-   obs_lead_str = tmp_str;
+   obs_lead_str = sec_to_hhmmss(obs_lead_sec);
 
    return;
 }
@@ -373,18 +335,8 @@ void StatHdrColumns::set_obs_lead_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_valid_beg_str() {
-   int yr, mon, day, hr, min, sec;
-   char tmp_str[max_str_len];
 
-   // Convert obs_valid_beg to month, day, year, hour, minute, second
-   unix_to_mdyhms(obs_valid_beg, mon, day, yr, hr, min, sec);
-
-   // Format the time YYYYMMDD_HHMMSS
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-           yr, mon, day, hr, min, sec);
-
-   // Set obs_valid_beg_str
-   obs_valid_beg_str = tmp_str;
+   obs_valid_beg_str = unix_to_yyyymmdd_hhmmss(obs_valid_beg);
 
    return;
 }
@@ -392,18 +344,8 @@ void StatHdrColumns::set_obs_valid_beg_str() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_valid_end_str() {
-   int yr, mon, day, hr, min, sec;
-   char tmp_str[max_str_len];
 
-   // Convert obs_valid_end to month, day, year, hour, minute, second
-   unix_to_mdyhms(obs_valid_end, mon, day, yr, hr, min, sec);
-
-   // Format the time YYYYMMDD_HHMMSS
-   sprintf(tmp_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-           yr, mon, day, hr, min, sec);
-
-   // Set obs_valid_end_str
-   obs_valid_end_str = tmp_str;
+   obs_valid_end_str = unix_to_yyyymmdd_hhmmss(obs_valid_end);
 
    return;
 }

@@ -52,10 +52,15 @@ void sec_to_hms(int in_sec, int & hour, int & minute, int & second)
 
 {
 
-hour    = (in_sec/3600);
-minute  = (in_sec%3600)/60;
-second  = (in_sec%3600)%60;
-   
+if ( in_sec == bad_data_int )  {
+   hour = minute = second = bad_data_int;
+}
+else  {
+   hour   = (in_sec/3600);
+   minute = (in_sec%3600)/60;
+   second = (in_sec%3600)%60;
+}
+
 return;
    
 }

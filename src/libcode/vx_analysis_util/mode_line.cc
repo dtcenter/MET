@@ -215,7 +215,7 @@ const char * c = (const char *) 0;
 
 c = get_item(fcst_lead_column);
 
-s = hhmmss_to_sec(c);
+s = timestring_to_sec(c);
 
 return ( s );
 
@@ -269,7 +269,7 @@ v = timestring_to_unix(c);
 
 c = get_item(fcst_lead_column);
 
-l = hhmmss_to_sec(c);
+l = timestring_to_sec(c);
 
 return ( v - l );
 
@@ -300,7 +300,7 @@ const char * c = (const char *) 0;
 
 c = get_item(fcst_accum_column);
 
-s = hhmmss_to_sec(c);
+s = timestring_to_sec(c);
 
 return ( s );
 
@@ -319,7 +319,7 @@ const char * c = (const char *) 0;
 
 c = get_item(obs_lead_column);
 
-s = hhmmss_to_sec(c);
+s = timestring_to_sec(c);
 
 return ( s );
 
@@ -373,7 +373,7 @@ v = timestring_to_unix(c);
 
 c = get_item(obs_lead_column);
 
-l = hhmmss_to_sec(c);
+l = timestring_to_sec(c);
 
 return ( v - l );
 
@@ -404,7 +404,7 @@ const char * c = (const char *) 0;
 
 c = get_item(obs_accum_column);
 
-s = hhmmss_to_sec(c);
+s = timestring_to_sec(c);
 
 return ( s );
 

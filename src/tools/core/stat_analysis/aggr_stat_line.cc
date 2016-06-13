@@ -2607,7 +2607,7 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Parse the init and valid times
          //
-         lead_sec = hhmmss_to_sec(line.get_item(fcst_lead_offset));
+         lead_sec = timestring_to_sec(line.get_item(fcst_lead_offset));
          valid_ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
          init_ut  = valid_ut - lead_sec;
 

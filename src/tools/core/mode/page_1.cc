@@ -481,14 +481,11 @@ text_y -= 2.0*TextSep;
    //
    // Accumulation time
    //
-// write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Accum:");
-sec_to_hms(eng.fcst_raw->data.accum(), hr, minute, sec);
-snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+
+strcpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()));
 t1.write_xy1_to_cell(9, 1, dx, dy, 0.0, 0.0, junk);
-// write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, junk);
-sec_to_hms(eng.obs_raw->data.accum(), hr, minute, sec);
-snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
-// write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, junk);
+
+strcpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()));
 t1.write_xy1_to_cell(9, 2, dx, dy, 0.0, 0.0, junk);
 nextline();
 
@@ -1061,7 +1058,7 @@ roman();
 
 return;
 
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////
 

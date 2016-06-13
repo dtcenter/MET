@@ -2678,45 +2678,38 @@ void write_header(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
 ///////////////////////////////////////////////////////////////////////
 
 void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
-   int mon, day, yr, hr, min, sec;
-   char tmp_str[max_str_len];
 
    // Version
-   at.set_entry(row, mode_version_offset, met_version);
+   at.set_entry(row, mode_version_offset,
+                met_version);
 
    // Model Name
-   at.set_entry(row, mode_model_offset, eng.conf_info.model);
+   at.set_entry(row, mode_model_offset,
+                eng.conf_info.model);
 
    // Forecast lead time
-   sec_to_hms(eng.fcst_raw->data.lead(), hr, min, sec);
-   sprintf(tmp_str, hms_fmt, hr, min, sec);
-   at.set_entry(row, mode_fcst_lead_offset, tmp_str);
+   at.set_entry(row, mode_fcst_lead_offset,
+                sec_to_hhmmss(eng.fcst_raw->data.lead()));
 
    // Forecast valid time
-   unix_to_mdyhms(eng.fcst_raw->data.valid(), mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, ymd_hms_fmt, yr, mon, day, hr, min, sec);
-   at.set_entry(row, mode_fcst_valid_offset, tmp_str);
-
+   at.set_entry(row, mode_fcst_valid_offset,
+                unix_to_yyyymmdd_hhmmss(eng.fcst_raw->data.valid()));
 
    // Forecast accumulation time
-   sec_to_hms(eng.fcst_raw->data.accum(), hr, min, sec);
-   sprintf(tmp_str, hms_fmt, hr, min, sec);
-   at.set_entry(row, mode_fcst_accum_offset, tmp_str);
+   at.set_entry(row, mode_fcst_accum_offset,
+                sec_to_hhmmss(eng.fcst_raw->data.accum()));
 
    // Observation lead time
-   sec_to_hms(eng.obs_raw->data.lead(), hr, min, sec);
-   sprintf(tmp_str, hms_fmt, hr, min, sec);
-   at.set_entry(row, mode_obs_lead_offset, tmp_str);
+   at.set_entry(row, mode_obs_lead_offset,
+                sec_to_hhmmss(eng.obs_raw->data.lead()));
 
    // Observation valid time
-   unix_to_mdyhms(eng.obs_raw->data.valid(), mon, day, yr, hr, min, sec);
-   sprintf(tmp_str, ymd_hms_fmt, yr, mon, day, hr, min, sec);
-   at.set_entry(row, mode_obs_valid_offset, tmp_str);
+   at.set_entry(row, mode_obs_valid_offset,
+                unix_to_yyyymmdd_hhmmss(eng.obs_raw->data.valid()));
 
    // Observation accumulation time
-   sec_to_hms(eng.obs_raw->data.accum(), hr, min, sec);
-   sprintf(tmp_str, hms_fmt, hr, min, sec);
-   at.set_entry(row, mode_obs_accum_offset, tmp_str);
+   at.set_entry(row, mode_obs_accum_offset,
+                sec_to_hhmmss(eng.obs_raw->data.accum()));
 
    // Forecast convolution radius
    at.set_entry(row, mode_fcst_rad_offset,

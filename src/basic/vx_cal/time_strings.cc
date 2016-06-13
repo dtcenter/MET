@@ -34,13 +34,19 @@ void sec_to_hhmmss(int in_sec, char *str)
 
 int hour, minute, second;
 
-sec_to_hms(in_sec, hour, minute, second);
-
-if(in_sec < 0) {
-   sprintf(str, "-%.2i%.2i%.2i", abs(hour), abs(minute), abs(second));
+if ( in_sec == bad_data_int )  {
+   strcpy(str, na_str);
 }
-else {
-   sprintf(str, "%.2i%.2i%.2i", hour, minute, second);
+else  {
+
+   sec_to_hms(in_sec, hour, minute, second);
+
+   if(in_sec < 0) {
+      sprintf(str, "-%.2i%.2i%.2i", abs(hour), abs(minute), abs(second));
+   }
+   else {
+      sprintf(str, "%.2i%.2i%.2i", hour, minute, second);
+   }
 }
 
 return;
@@ -62,6 +68,36 @@ sec_to_hhmmss(in_sec, junk);
 ConcatString str = junk;
 
 return ( str );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString sec_to_hhmmss_colon(int in_sec)
+
+{
+
+ConcatString s;
+int hour, minute, second;
+
+if ( in_sec == bad_data_int )  {
+   s = na_str;
+}
+else  {
+
+   sec_to_hms(in_sec, hour, minute, second);
+
+   if(in_sec < 0) {
+      s.format("-%.2i:%.2i:%.2i", abs(hour), abs(minute), abs(second));
+   }
+   else {
+      s.format("%.2i:%.2i:%.2i", hour, minute, second);
+   }
+}
+
+return(s);
 
 }
 
@@ -101,7 +137,7 @@ int year, month, day, hour, minute, second;
 
 unix_to_mdyhms(u, month, day, year, hour, minute, second);
 
-sprintf(str, "%.4i%.2i%.2i_%.2i%.2i%.2i", 
+sprintf(str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
         year, month, day, hour, minute, second);
 
 return;
@@ -570,8 +606,9 @@ ConcatString sec_to_timestring(int s)
 
 ConcatString str;
 
-  if ( s % 3600 == 0 ) str = HH ( s / 3600 );
-else                   str = sec_to_hhmmss ( s );
+if      ( s == bad_data_int) str = na_str;
+else if ( s % 3600 == 0 )    str = HH ( s / 3600 );
+else                         str = sec_to_hhmmss ( s );
 
 return ( str );
 
@@ -584,7 +621,7 @@ return ( str );
 bool is_hhmmss(const char * text)
 
 {
-  
+
 // Allow negative times and 2 or 3 digits for the number of hours
 return ( check_reg_exp("^-*[0-9]\\{6,7\\}$", text) );
 

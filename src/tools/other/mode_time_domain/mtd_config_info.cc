@@ -730,37 +730,11 @@ table.set_entry(row, c++, model.text());
 
    //  fcst lead
 
-k = fcst_info->lead();
-
-if ( k >= 0 )  {
-
-   sec_to_hms(fcst_info->lead(), hour, minute, second);
-
-   snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
-
-} else {
-
-   snprintf(junk, sizeof(junk), "%d", k);
-
-}
-
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, sec_to_hhmmss(fcst_info->lead()));
 
    //  fcst valid
 
-if ( fcst_info->valid() == 0 )  {
-
-   snprintf(junk, sizeof(junk), "%s", na_str);
-
-} else {
-
-   unix_to_mdyhms(fcst_info->valid(), month, day, year, hour, minute, second);
-
-   snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
-
-}
-
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(fcst_info->valid()));
 
    //  fcst time delta ... don't know this
 
@@ -772,37 +746,11 @@ table.set_entry(row, c++, junk);
 
    //  obs lead
 
-k = obs_info->lead();
-
-if ( k >= 0 )  {
-
-   sec_to_hms(obs_info->lead(), hour, minute, second);
-
-   snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
-
-} else {
-
-   snprintf(junk, sizeof(junk), "%d", k);
-
-}
-
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, sec_to_hhmmss(obs_info->lead()));
 
    //  obs valid
 
-if ( obs_info->valid() == 0 )  {
-
-   snprintf(junk, sizeof(junk), "%s", na_str);
-
-} else {
-
-   unix_to_mdyhms(obs_info->valid(), month, day, year, hour, minute, second);
-
-   snprintf(junk, sizeof(junk), ymd_hms_format, year, month, day, hour, minute, second);
-
-}
-
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(obs_info->valid()));
 
    //  obs time delta ... don't know this
 
@@ -814,16 +762,7 @@ table.set_entry(row, c++, junk);
 
    //  time delta
 
-if ( delta_t_seconds < 0 )  table.set_entry(row, c++, delta_t_seconds);
-else {
-
-   sec_to_hms(delta_t_seconds, hour, minute, second);
-
-   snprintf(junk, sizeof(junk), hms_format, hour, minute, second);
-
-   table.set_entry(row, c++, junk);
-
-}
+table.set_entry(row, c++, sec_to_hhmmss(delta_t_seconds));
 
    //  fcst radius
 
