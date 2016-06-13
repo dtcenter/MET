@@ -36,13 +36,6 @@ typedef MtdFloatFile Raw;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char hms_format     [] = "%02d%02d%02d";
-static const char ymd_hms_format [] = "%04d%02d%02d_%02d%02d%02d";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 class SingleAtt3D {
 
       friend SingleAtt3D calc_3d_single_atts(const Object & mask, const Raw & raw, const char * model, int obj_number);

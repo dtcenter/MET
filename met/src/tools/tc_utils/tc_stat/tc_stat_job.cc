@@ -1656,7 +1656,7 @@ void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
             // summary job output is sorted nicely.
             if(strcasecmp(CaseColumn[k], "LEAD") == 0 &&
                cur != na_str &&
-               abs(lead = hhmmss_to_sec(cur)) < 100*sec_per_hour) {
+               abs(lead = timestring_to_sec(cur)) < 100*sec_per_hour) {
 
                // Handle positive and negative lead times
                key << (lead < 0 ? ":-0" : ":0")
@@ -2553,7 +2553,7 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
          // summary job output is sorted nicely.
          if(strcasecmp(CaseColumn[j], "LEAD") == 0 &&
             cur != na_str &&
-            abs(lead = hhmmss_to_sec(cur)) < 100*sec_per_hour) {
+            abs(lead = timestring_to_sec(cur)) < 100*sec_per_hour) {
 
             // Handle positive and negative lead times
             key << (lead < 0 ? ":-0" : ":0")

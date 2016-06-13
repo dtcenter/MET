@@ -151,7 +151,7 @@ Met2dDataFileFactory mtddf_factory;
    // If the merge config file was not set, use the match config file
    if(merge_config_file.length() == 0)
         merge_config_file = match_config_file;
-   
+
    // List the config files
    mlog << Debug(1)
         << "Default Config File: " << default_config_file << "\n"
@@ -227,7 +227,7 @@ void ModeExecutive::setup_fcst_obs_data()
            << "can't get data from file \"" << fcst_file << "\"\n\n";
       exit(1);
    }
-   
+
       // Regrid, if necessary
 
    if ( !(fcst_mtddf->grid() == grid) )  {
@@ -281,7 +281,7 @@ void ModeExecutive::setup_fcst_obs_data()
 
    if(engine.conf_info.fcst_info->level().type() == LevelType_Accum &&
       engine.conf_info.obs_info->level().type()  == LevelType_Accum &&
-      Fcst_sd.data.accum()                != Obs_sd.data.accum()) {
+      Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
       mlog << Warning << "\nsetup_fcst_obs_data() -> "
            << "Forecast and observation accumulation times do not match "
@@ -307,7 +307,7 @@ void ModeExecutive::setup_fcst_obs_data()
       engine.conf_info.mask_missing_flag == FieldType_Both)
       mask_bad_data(Fcst_sd.data, Obs_sd.data);
 
-      // Mask out the missing data between fields   
+      // Mask out the missing data between fields
 
    if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
       engine.conf_info.mask_missing_flag == FieldType_Both)
@@ -468,7 +468,7 @@ void ModeExecutive::process_output()
 
    // Create output stats files and plots
 
-write_obj_stats();   
+write_obj_stats();
 
 if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
 
@@ -571,11 +571,6 @@ void ModeExecutive::build_outfile_name(const char *suffix, ConcatString &str)
 
 {
 
-   int mon, day, yr, hr, min, sec;
-   int l_hr, l_min, l_sec;
-   int a_hr, a_min, a_sec;
-   char tmp_str[max_str_len];
-
    //
    // Create output file name
    //
@@ -588,16 +583,10 @@ void ModeExecutive::build_outfile_name(const char *suffix, ConcatString &str)
       str << "_" << engine.conf_info.output_prefix;
 
    // Append the timing information
-   sec_to_hms(engine.fcst_raw->data.lead(), l_hr, l_min, l_sec);
-   unix_to_mdyhms(engine.fcst_raw->data.valid(),
-                  mon, day, yr, hr, min, sec);
-   sec_to_hms(engine.fcst_raw->data.accum(), a_hr, a_min, a_sec);
-   snprintf(tmp_str, sizeof(tmp_str), 
-           "%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV_%.2i%.2i%.2iA",
-           l_hr, l_min, l_sec,
-           yr, mon, day, hr, min, sec,
-           a_hr, a_min, a_sec);
-   str << "_" << tmp_str;
+   str << "_"
+       << sec_to_hhmmss(engine.fcst_raw->data.lead()) << "L_"
+       << unix_to_yyyymmdd_hhmmss(engine.fcst_raw->data.valid()) << "V_"
+       << sec_to_hhmmss(engine.fcst_raw->data.accum()) << "A";
 
    // Append the suffix
    str << suffix;
@@ -830,8 +819,8 @@ if ( info.all_false() )  return;
       //
 
    if ( !fcst_radius_var->put(&engine.conf_info.fcst_conv_radius) || !obs_radius_var->put(&engine.conf_info.obs_conv_radius) )  {
-   
-         mlog << Error 
+
+         mlog << Error
               << "write_obj_netcdf() -> "
               << "error writing fcst/obs convolution radii\n\n";
 
@@ -842,7 +831,7 @@ if ( info.all_false() )  return;
    if (    ! fcst_thresh_var->put((const char *) fcst_thresh, fcst_thresh.length())
         || !  obs_thresh_var->put((const char *)  obs_thresh,  obs_thresh.length()) )  {
 
-         mlog << Error 
+         mlog << Error
               << "write_obj_netcdf() -> "
               << "error writing fcst/obs thresholds\n\n";
 
@@ -864,7 +853,7 @@ if ( info.all_false() )  return;
    nc_add_string(f_out, engine.conf_info.obs_info->units(),        "obs_units",     "obs_units_length");
 
 
-  
+
    // Add forecast variable attributes
 
    if ( info.do_raw )  {
@@ -1145,7 +1134,7 @@ void ModeExecutive::write_poly_netcdf(NcFile * f_out)
    n_fcst_simp_var = f_out->add_var("n_fcst_simp", ncInt);
    n_obs_simp_var  = f_out->add_var("n_obs_simp",  ncInt);
    n_clus_var      = f_out->add_var("n_clus", ncInt);
-   
+
    //
    // Write the number of forecast and observation objects
    //
@@ -1175,7 +1164,7 @@ void ModeExecutive::write_poly_netcdf(NcFile * f_out)
       write_poly_netcdf(f_out, FcstClusHullPoly);
       write_poly_netcdf(f_out, ObsClusHullPoly);
    }
-   
+
    return;
 }
 
@@ -1208,10 +1197,10 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    NcVar  *poly_lon_var       = (NcVar     *)  0;
    NcVar  *poly_x_var         = (NcVar     *)  0;
    NcVar  *poly_y_var         = (NcVar     *)  0;
-   
+
    // Dimension names
    ConcatString obj_dim_name,   poly_dim_name;
-   
+
    // Variable names
    ConcatString start_var_name, start_long_name;
    ConcatString npts_var_name,  npts_long_name;
@@ -1241,7 +1230,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
          poly_name  = "simp_bdy";
          poly_long  = "Simple Boundary";
          break;
-         
+
       case FcstSimpHullPoly:
          n_poly     = engine.n_fcst;
          field_name = "fcst";
@@ -1273,7 +1262,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
          poly_name  = "clus_hull";
          poly_long  = "Cluster Convex Hull";
          break;
-         
+
       default:
          return;
    }
@@ -1287,8 +1276,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       obj_dim_name << cs_erase << field_name << "_simp";
    }
    poly_dim_name   << cs_erase << field_name << "_" << poly_name;
-   
-   // Setup variable name strings   
+
+   // Setup variable name strings
    start_var_name  << cs_erase << field_name << "_" << poly_name << "_start";
    start_long_name << cs_erase << field_long << " " << poly_long << " Starting Index";
    npts_var_name   << cs_erase << field_name << "_" << poly_name << "_npts";
@@ -1301,7 +1290,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    x_long_name     << cs_erase << field_long << " " << poly_long << " Point X-Coordinate";
    y_var_name      << cs_erase << field_name << "_" << poly_name << "_y";
    y_long_name     << cs_erase << field_long << " " << poly_long << " Point Y-Coordinate";
-   
+
    // Allocate pointers for the polylines to be written
    poly = new Polyline * [n_poly];
 
@@ -1317,7 +1306,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
          case ObsSimpBdyPoly:
             poly[i] = &engine.obs_single[i].boundary[0];
             break;
-         
+
          case FcstSimpHullPoly:
             poly[i] = &engine.fcst_single[i].convex_hull;
             break;
@@ -1333,7 +1322,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
          case ObsClusHullPoly:
             poly[i] = &engine.obs_clus[i].convex_hull;
             break;
-         
+
          default:
             break;
       }
@@ -1496,7 +1485,7 @@ void ModeExecutive::write_ct_stats()
    cts_at.set_size(4, i);                        // Set table size
    justify_mode_cols(cts_at);                    // Justify columns
    cts_at.set_precision(                         // Set the precision
-      engine.conf_info.conf.output_precision()); 
+      engine.conf_info.conf.output_precision());
    cts_at.set_bad_data_value(bad_data_double);   // Set the bad data value
    cts_at.set_bad_data_str(na_str);              // Set the bad data string
    cts_at.set_delete_trailing_blank_rows(1);     // No trailing blank rows

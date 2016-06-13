@@ -102,8 +102,6 @@ void STATLine::dump(ostream & out, int depth) const
 
 {
 
-int month, day, year, hour, minute, second;
-char junk[256];
 Indent prefix(depth);
 ThreshArray ta;
 
@@ -115,43 +113,23 @@ out << prefix << "\n";
 out << prefix << "Version        = "   << version()     << "\n";
 out << prefix << "Model          = \"" << model()       << "\"\n";
 
-sec_to_hms(fcst_lead(), hour, minute, second);
-sprintf(junk, "%02d:%02d:%02d", hour, minute, second);
 out << prefix << "Fcst Lead      = "   << fcst_lead()
-    << "  ( " << junk << " )\n";
+    << "  ( " << sec_to_hhmmss(fcst_lead()) << " )\n";
 
-unix_to_mdyhms(fcst_valid_beg(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Fcst Valid Beg = "   << fcst_valid_beg()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(fcst_valid_beg()) << " )\n";
 
-unix_to_mdyhms(fcst_valid_end(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Fcst Valid End = "   << fcst_valid_end()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(fcst_valid_end()) << " )\n";
 
-sec_to_hms(obs_lead(), hour, minute, second);
-sprintf(junk, "%02d:%02d:%02d", hour, minute, second);
 out << prefix << "Obs Lead       = "   << obs_lead()
-    << "  ( " << junk << " )\n";
+    << "  ( " << sec_to_hhmmss(obs_lead()) << " )\n";
 
-unix_to_mdyhms(obs_valid_beg(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Obs Valid Beg  = "   << obs_valid_beg()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(obs_valid_beg()) << " )\n";
 
-unix_to_mdyhms(obs_valid_end(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Obs Valid End  = "   << obs_valid_end()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(obs_valid_end()) << " )\n";
 
 out << prefix << "Fcst Var       = \"" << fcst_var()   << "\"\n";
 out << prefix << "Fcst Level     = \"" << fcst_lev()   << "\"\n";
@@ -176,36 +154,19 @@ out << prefix << "Cov Thresh     = \"" << ta.get_str() << "\"\n";
 
 out << prefix << "Alpha          = \"" << alpha() << "\"\n";
 
-statlinetype_to_string(Type, junk);
-out << prefix << "Line Type      = \"" << junk << "\"\n";
+out << prefix << "Line Type      = \"" << statlinetype_to_string(Type) << "\"\n";
 
-unix_to_mdyhms(fcst_init_beg(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Fcst Init Beg  = "   << fcst_init_beg()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(fcst_init_beg()) << " )\n";
 
-unix_to_mdyhms(fcst_init_end(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Fcst Init End  = "   << fcst_init_end()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(fcst_init_end()) << " )\n";
 
-unix_to_mdyhms(obs_init_beg(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Obs Init Beg   = "   << obs_init_beg()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(obs_init_beg()) << " )\n";
 
-unix_to_mdyhms(obs_init_end(),
-               month, day, year, hour, minute, second);
-sprintf(junk, "%s %d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year, hour, minute, second);
 out << prefix << "Obs Init End   = "   << obs_init_end()
-    << "  ( " << junk << " )\n";
+    << "  ( " << unix_to_yyyymmdd_hhmmss(obs_init_end()) << " )\n";
 
 out << prefix << "Fcst Init Hour = \"" << fcst_init_hour() << "\"\n";
 out << prefix << "Obs Init Hour  = \"" << obs_init_hour() << "\"\n";

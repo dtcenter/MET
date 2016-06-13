@@ -693,9 +693,6 @@ void setup_ps_file(unixtime valid_ut, int lead_sec) {
 
 void build_outfile_name(unixtime valid_ut, int lead_sec,
                         const char *suffix, ConcatString &str) {
-   int mon, day, yr, hr, min, sec;
-   int l_hr, l_min, l_sec;
-   ConcatString date_str;
 
    //
    // Create output file name
@@ -709,11 +706,9 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
       str << "_" << conf_info.output_prefix;
 
    // Append the timing information
-   sec_to_hms(lead_sec, l_hr, l_min, l_sec);
-   unix_to_mdyhms(valid_ut, mon, day, yr, hr, min, sec);
-   date_str.format("%.2i%.2i%.2iL_%.4i%.2i%.2i_%.2i%.2i%.2iV",
-           l_hr, l_min, l_sec, yr, mon, day, hr, min, sec);
-   str << "_" << date_str;
+   str << "_"
+       << sec_to_hhmmss(lead_sec) << "L_"
+       << unix_to_yyyymmdd_hhmmss(valid_ut) << "V";
 
    // Append the suffix
    str << suffix;
@@ -2118,8 +2113,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Lead Time:");
-   sec_to_hms(fcst_dp.lead(), hr, minute, sec);
-   label.format("%.2i:%.2i:%.2i", hr, minute, sec);
+   label = sec_to_hhmmss_colon(fcst_dp.lead());
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
    v_tab -= plot_text_sep;
 
@@ -2128,8 +2122,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Accum Time:");
-   sec_to_hms(fcst_dp.accum(), hr, minute, sec);
-   label.format("%.2i:%.2i:%.2i", hr, minute, sec);
+   label = sec_to_hhmmss_colon(fcst_dp.accum());
    ps_out->write_centered_text(1, 1, h_tab_b, v_tab, 0.0, 0.5, label);
    v_tab -= plot_text_sep;
 
