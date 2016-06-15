@@ -266,6 +266,37 @@ Currently, very few graphics are included.
  website.
 \end_layout
 
+\begin_layout Standard
+
+\series bold
+Q.
+ How do I find the version of the tool I am using?
+\end_layout
+
+\begin_layout Standard
+A.
+ 
+\series medium
+Type the name of the tool followed by 
+\series bold
+-version
+\series medium
+.
+ For example, type 
+\begin_inset Quotes eld
+\end_inset
+
+
+\series bold
+pb2nc -version
+\series medium
+
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Section
 Troubleshooting
 \begin_inset CommandInset label
