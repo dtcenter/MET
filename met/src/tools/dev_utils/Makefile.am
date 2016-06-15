@@ -8,6 +8,8 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
+SUBDIRS	=shapefiles
+
 # The programs
 
 bin_PROGRAMS    = chk4copyright \

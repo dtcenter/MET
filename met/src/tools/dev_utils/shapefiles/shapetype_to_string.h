@@ -7,32 +7,47 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Warning:
+   //
+   //     This file is machine generated.
+   //
+   //     Do not edit by hand.
+   //
+   //
+   //     Created by enum_to_string from file "shp_file.h"
+   //
+   //     on June 15, 2016   2:50 pm MDT
+   //
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __COMMA_STRING_H__
-#define  __COMMA_STRING_H__
+#ifndef  __SHAPETYPE_TO_STRING_H__
+#define  __SHAPETYPE_TO_STRING_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 #include "concat_string.h"
+#include "shp_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void comma_string(long long i, char * output);
-
-extern ConcatString comma_string(long long i);
+extern ConcatString shapetype_to_string(const ShapeType);
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __COMMA_STRING_H__
+#endif   /*  __SHAPETYPE_TO_STRING_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
