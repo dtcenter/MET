@@ -1047,6 +1047,7 @@ AC_CONFIG_FILES([Makefile
 
 if test -n "$MET_DEVELOPMENT"; then
    AC_CONFIG_FILES([src/tools/dev_utils/Makefile
+                    src/tools/dev_utils/shapefiles/Makefile
                     internal_tests/Makefile
                     internal_tests/basic/Makefile
                     internal_tests/basic/vx_config/Makefile
