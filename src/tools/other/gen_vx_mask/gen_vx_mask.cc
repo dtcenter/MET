@@ -415,7 +415,7 @@ static void apply_box_mask(DataPlane &dp) {
    if(is_bad_data(height) && is_bad_data(width)) {
       mlog << Error << "\napply_box_mask() -> "
            << "the \"-height\" and/or \"-width\" options must be "
-           << "specified for box masking.\n\n";
+           << "specified in grid units for box masking.\n\n";
       exit(1);
    }
    else if(is_bad_data(height) && !is_bad_data(width)) {
@@ -489,8 +489,8 @@ static void apply_circle_mask(DataPlane &dp) {
    if(thresh.get_type() == thresh_na) {
       mlog << Warning
            << "\napply_circle_mask() -> since \"-thresh\" was not used "
-           << "to specify a threshold for circle masking, the minimum "
-           << "distance to the points will be written.\n\n";
+           << "to specify a threshold in kilometers for circle masking, "
+           << "the minimum distance to the points will be written.\n\n";
    }
 
    // For each grid point, compute mimumum distance to polyline points
