@@ -25,7 +25,7 @@ using namespace std;
 
 static ConcatString program_name;
 
-static const int buf_size = 500000;
+static const int buf_size = 600000;
 
 static unsigned char buf[buf_size];
 
@@ -49,6 +49,7 @@ if ( argc != 2 )  usage();
 
 int fd = -1;
 int n_read, bytes;
+int pos;
 ConcatString input_filename = argv[1];
 ShpFileHeader h;
 ShpRecordHeader rh;
@@ -93,9 +94,13 @@ cout << "\n";
    //  records
    //
 
+pos = (int) lseek(fd, 0, SEEK_CUR);
+
 while ( (n_read = read(fd, buf, 8)) == 8 )  {
 
    rh.set(buf);
+
+   cout << "File position = " << pos << "\n";
 
    cout << "Record Header ... \n";
 
@@ -133,6 +138,8 @@ while ( (n_read = read(fd, buf, 8)) == 8 )  {
    }
 
    cout << "\n";
+
+   pos = (int) lseek(fd, 0, SEEK_CUR);
 
 }   //  while
 

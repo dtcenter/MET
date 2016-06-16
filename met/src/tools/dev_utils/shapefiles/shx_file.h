@@ -24,7 +24,9 @@ typedef ShpFileHeader ShxFileHeader;   //  they're the same
 
 struct ShxRecord {
 
-   int offset;
+   int offset_16;
+
+   int offset_bytes;
 
    int content_length_16;
 

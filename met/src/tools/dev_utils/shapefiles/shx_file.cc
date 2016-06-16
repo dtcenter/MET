@@ -36,9 +36,10 @@ int * i = (int *) buf;
 shuffle_4(buf);
 shuffle_4(buf + 4);
 
-offset            = i[0];
+offset_16         = i[0];
 content_length_16 = i[1];
 
+offset_bytes         = 2*offset_16;
 content_length_bytes = 2*content_length_16;
 
    //
@@ -59,7 +60,7 @@ void ShxRecord::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "offset         = " << offset               << "\n";
+out << prefix << "offset         = " << offset_bytes         << "\n";
 out << prefix << "content_length = " << content_length_bytes << "\n";
 
    //
