@@ -367,46 +367,40 @@ void ModeExecutive::do_match_merge()
 
 {
 
-      // Do matching and merging
+   mlog << Debug(2)
+        << "Identified: " << engine.n_fcst << " forecast objects "
+        << "and " << engine.n_obs << " observation objects.\n";
 
-   if ( engine.conf_info.ps_plot_flag || !(engine.conf_info.nc_info.all_false()) )  {
+   mlog << Debug(2)
+        << "Performing merging ("
+        << mergetype_to_string(engine.conf_info.fcst_merge_flag)
+        << ") in the forecast field.\n";
 
-      mlog << Debug(2)
-           << "Identified: " << engine.n_fcst << " forecast objects "
-           << "and " << engine.n_obs << " observation objects.\n";
+   // Do the forecast merging
 
-      mlog << Debug(2)
-           << "Performing merging ("
-           << mergetype_to_string(engine.conf_info.fcst_merge_flag)
-           << ") in the forecast field.\n";
+   engine.do_fcst_merging(default_config_file, merge_config_file);
 
-         // Do the forecast merging
+   mlog << Debug(2)
+        << "Performing merging ("
+        << mergetype_to_string(engine.conf_info.obs_merge_flag)
+        << ") in the observation field.\n";
 
-      engine.do_fcst_merging(default_config_file, merge_config_file);
+   // Do the observation merging
 
-      mlog << Debug(2)
-           << "Performing merging ("
-           << mergetype_to_string(engine.conf_info.obs_merge_flag)
-           << ") in the observation field.\n";
+   engine.do_obs_merging(default_config_file, merge_config_file);
 
-         // Do the observation merging
+   mlog << Debug(2)
+        << "Remaining: " << engine.n_fcst << " forecast objects "
+        << "and " << engine.n_obs << " observation objects.\n";
 
-      engine.do_obs_merging(default_config_file, merge_config_file);
+   mlog << Debug(2)
+        << "Performing matching ("
+        << matchtype_to_string(engine.conf_info.match_flag)
+        << ") between the forecast and observation fields.\n";
 
-      mlog << Debug(2)
-           << "Remaining: " << engine.n_fcst << " forecast objects "
-           << "and " << engine.n_obs << " observation objects.\n";
+   // Do the matching of objects between fields
 
-      mlog << Debug(2)
-           << "Performing matching ("
-           << matchtype_to_string(engine.conf_info.match_flag)
-           << ") between the forecast and observation fields.\n";
-
-         // Do the matching of objects between fields
-
-      engine.do_matching();
-
-   }   //  if engine.conf_info.ps_plot_flag || engine.conf_info.nc_pairs_flag
+   engine.do_matching();
 
 return;
 
