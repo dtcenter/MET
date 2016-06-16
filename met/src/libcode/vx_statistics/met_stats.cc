@@ -2212,7 +2212,7 @@ void PCTInfo::compute_stats() {
       bss = bad_data_double;
    }
    else {
-      bss = (brier.v - briercl.v)/briercl.v;
+      bss = 1.0 - (brier.v / briercl.v);
    }
 
    return;
