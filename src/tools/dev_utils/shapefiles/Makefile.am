@@ -13,7 +13,7 @@ include ${top_srcdir}/Make-include
 bin_PROGRAMS	= dump_shp \
 	dump_shx \
 	dump_dbf \
-	reformat_country_shapefile
+	make_mapfiles
 
 dump_shp_SOURCES = dump_shp.cc \
 	shapetype_to_string.cc shapetype_to_string.h \
@@ -51,15 +51,17 @@ dump_dbf_LDADD = -lvx_config \
 	-lvx_log \
 	-lm
 
-reformat_country_shapefile_SOURCES = reformat_country_shapefile.cc \
+make_mapfiles_SOURCES = make_mapfiles.cc \
 	shapetype_to_string.cc shapetype_to_string.h \
 	shp_file.cc shp_file.h \
+	shx_file.cc shx_file.h \
 	dbf_file.cc dbf_file.h
 
-reformat_country_shapefile_CPPFLAGS = ${MET_CPPFLAGS}
-reformat_country_shapefile_LDFLAGS = ${MET_LDFLAGS}
-reformat_country_shapefile_LDADD = -lvx_config \
+make_mapfiles_CPPFLAGS = ${MET_CPPFLAGS}
+make_mapfiles_LDFLAGS = ${MET_LDFLAGS}
+make_mapfiles_LDADD = -lvx_config \
 	-lvx_util \
+	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
 	-lm

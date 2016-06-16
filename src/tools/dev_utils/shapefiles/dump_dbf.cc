@@ -165,7 +165,7 @@ void usage()
 
 {
 
-cerr << "\n\n  usage:  " << program_name << " shp_filename\n\n";
+cerr << "\n\n  usage:  " << program_name << " dbf_filename\n\n";
 
 exit ( 1 );
 
