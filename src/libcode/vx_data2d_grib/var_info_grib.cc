@@ -217,15 +217,10 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
    int field_subcenter     = dict.lookup_int   (conf_key_GRIB1_subcenter, false);
    Grib1TableEntry  tab;
 
-   bool is_one_param_present = (field_ptv != bad_data_int || field_center != bad_data_int || field_subcenter != bad_data_int );
-
-   // fill others with default values
-   if( is_one_param_present )
-   {
-      if(field_ptv       == bad_data_int) field_ptv       = default_grib1_ptv;
-      if(field_center    == bad_data_int) field_center    = default_grib1_center;
-      if(field_subcenter == bad_data_int) field_subcenter = default_grib1_subcenter;
-   }
+   // if not specified, fill others with default values
+   if(field_ptv       == bad_data_int) field_ptv       = default_grib1_ptv;
+   if(field_center    == bad_data_int) field_center    = default_grib1_center;
+   if(field_subcenter == bad_data_int) field_subcenter = default_grib1_subcenter;
 
    //  if the name is specified, use it
    if( !field_name.empty() ){

@@ -181,8 +181,8 @@ ConcatString get_grib_level_str(int grib_level, unsigned char *level_info)
 
    } else if(grib_level_list[match].flag == 2) {
 
-      str << cs_erase 
-          << grib_level_list[match].abbr << '_' 
+      str << cs_erase
+          << grib_level_list[match].abbr << '_'
           << ((int) level_info[0])       << '_'
           << ((int) level_info[1]);
 
@@ -227,7 +227,9 @@ int str_to_grib_code(const char *c, int ptv)
    //  look up the name in the grib tables
    int n_matches;
    Grib1TableEntry tab;
-   if( !GribTable.lookup_grib1(c, ptv, bad_data_int, tab, n_matches) )
+   if( !GribTable.lookup_grib1(c, ptv, bad_data_int,
+                               default_grib1_center, default_grib1_subcenter,
+                               tab, n_matches) )
       return bad_data_int;
 
    return tab.code;
