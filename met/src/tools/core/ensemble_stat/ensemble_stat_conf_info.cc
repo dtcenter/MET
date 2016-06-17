@@ -139,7 +139,8 @@ void EnsembleStatConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_config(GrdFileType etype,
-                                          GrdFileType otype) {
+                                          GrdFileType otype,
+                                          bool point_vx) {
    int i;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -321,7 +322,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
          // Allocate new VarInfo objects
          vx_pd[i].fcst_info = info_factory.new_var_info(etype);
-         vx_pd[i].obs_info  = info_factory.new_var_info(otype);
+
+         // Point observations are specified following GRIB conventions
+         if(point_vx) vx_pd[i].obs_info = new VarInfoGrib;
+         else         vx_pd[i].obs_info = info_factory.new_var_info(otype);
 
          // Get the current dictionaries
          i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
@@ -348,8 +352,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          vx_pd[i].fcst_info->set_dict(i_fcst_dict);
          vx_pd[i].obs_info->set_dict(i_obs_dict);
 
-         //fill in code data
-         vx_pd[i].obs_info->add_grib_code (i_obs_dict);
+         // Set the GRIB code for point observations
+         if(point_vx) vx_pd[i].obs_info->add_grib_code(i_obs_dict);
 
          // Dump the contents of the current VarInfo
          if(mlog.verbosity_level() >= 5) {

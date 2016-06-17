@@ -306,7 +306,7 @@ void process_command_line(int argc, char **argv)
    }
 
    // Process the configuration
-   conf_info.process_config(etype, otype);
+   conf_info.process_config(etype, otype, point_obs_flag);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.regrid_info, &(ens_mtddf->grid()),

@@ -89,7 +89,7 @@ class VarInfoGrib : public VarInfo
 
       void set_magic(const ConcatString &);
       void set_dict(Dictionary &);
-      void add_grib_code (Dictionary &);
+      void add_grib_code(Dictionary &);
 
       void set_ptv(int);
       void set_code(int);
