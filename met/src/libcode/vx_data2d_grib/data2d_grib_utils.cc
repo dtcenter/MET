@@ -35,7 +35,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
 {
 
-   int j, k, bms_flag, accum, lower, upper, center, subsenter,vinfo_ptv, vinfo_center, vinfo_subcenter;
+   int j, k, bms_flag, accum, lower, upper;
+   int ptv, center, subcenter, vinfo_ptv, vinfo_center, vinfo_subcenter;
    unixtime ut, init_ut, valid_ut ;
 
    int p_code, code_for_lookup= vinfo.field_rec ();
@@ -62,31 +63,21 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    //  check ptv
    //
 
-   k = (int) (pds->ptv);
+   ptv = (int) (pds->ptv);
    center = pds->center_id;
-   subsenter = pds->sub_center;
+   subcenter = pds->sub_center;
+
+   vinfo_ptv = vinfo.ptv();
    vinfo_center = vinfo.center();
-   vinfo_ptv = vinfo.ptv ();
-   vinfo_subcenter = vinfo.subcenter ();
-   bool is_one_param_present = (vinfo.ptv() != bad_data_int || vinfo.center() != bad_data_int || vinfo.subcenter() != bad_data_int );
+   vinfo_subcenter = vinfo.subcenter();
 
-   // fill others with default values
-   if( is_one_param_present )
-   {
-      if(vinfo.ptv() == bad_data_int) vinfo_ptv = k;
-      if(vinfo.center() == bad_data_int) vinfo_center = center;
-      if(vinfo.subcenter() == bad_data_int) vinfo_subcenter = subsenter;
-   }
-   else
-      //use values from the header
-   {
-      vinfo_ptv = k;
-      vinfo_center = center;
-      vinfo_subcenter = subsenter;
-   }
+   // If not specified, use the parameters from the current GRIB record
+   if(is_bad_data(vinfo_ptv))       vinfo_ptv       = ptv;
+   if(is_bad_data(vinfo_center))    vinfo_center    = center;
+   if(is_bad_data(vinfo_subcenter)) vinfo_subcenter = subcenter;
 
-
-if ( vinfo_ptv != k || vinfo_center != center || vinfo_subcenter != subsenter)  return ( false );
+   // Check for matching parameters
+   if ( vinfo_ptv != ptv || vinfo_center != center || vinfo_subcenter != subcenter)  return ( false );
 
    // if p_flag is 'on' (probability field) and the request name is set - get the real name of the field from the begining of a request name
    if( vinfo.p_flag () && !vinfo.req_name().empty())
@@ -305,7 +296,7 @@ int lower, upper, grib_lower, grib_upper, grib_type_num;
    //
 
 if ( !is_prelim_match(vinfo, g) ) return ( false );
-  
+
    //
    //  store requested lower and upper limits
    //
@@ -350,7 +341,7 @@ return ( true );
 bool is_range_match( VarInfoGrib & vinfo, const GribRecord & g)
 
 {
-  
+
 int lower, upper, grib_lower, grib_upper, grib_type_num;
 
    //
@@ -689,7 +680,7 @@ for ( j=0; j<n_grib_level_list; ++j ) {
    //
    //  check that a level type was found
    //
-   
+
 if ( j == n_grib_level_list )  {
    mlog << Error << "\nread_pds_level() -> "
         << " can't find the level type for GRIB record!\n\n";
