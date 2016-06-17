@@ -161,8 +161,6 @@ void VarInfo::dump(ostream &out) const {
    return;
 }
 
-void VarInfo::add_grib_code (Dictionary &dict){ return;}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_req_name(const char *str) {

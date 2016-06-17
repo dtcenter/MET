@@ -61,7 +61,7 @@ void PointStatConfInfo::init_from_scratch() {
    mask_dp     = (DataPlane *)       0;
    interp_mthd = (InterpMthd *)      0;
    vx_pd       = (VxPairDataPoint *) 0;
-   
+
    clear();
 
    return;
@@ -101,7 +101,7 @@ void PointStatConfInfo::clear() {
    boot_seed.clear();
    interp_thresh = bad_data_double;
    interp_wdth.clear();
-   duplicate_flag = DuplicateType_None;   
+   duplicate_flag = DuplicateType_None;
    rank_corr_flag = false;
    tmp_dir.clear();
    output_prefix.clear();
@@ -136,7 +136,7 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename));
-  
+
    // Read the default config file
    conf.read(default_file_name);
 
@@ -162,7 +162,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
-   
+
    // Initialize
    clear();
 
@@ -238,13 +238,13 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    msg_typ    = new StringArray     [n_vx];
    sid_exc    = new StringArray     [n_vx];
    obs_qty    = new StringArray     [n_vx];
-   
+
    // Parse the fcst and obs field information
    for(i=0; i<n_vx; i++) {
-     
+
       // Allocate new VarInfo objects
       vx_pd[i].fcst_info = info_factory.new_var_info(ftype);
-      vx_pd[i].obs_info  = new VarInfoGrib;      
+      vx_pd[i].obs_info  = new VarInfoGrib;
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fdict, i);
@@ -265,19 +265,19 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       vx_pd[i].fcst_info->set_dict(i_fdict);
       vx_pd[i].obs_info->set_dict(i_odict);
 
-      //fill in code data
-      vx_pd[i].obs_info->add_grib_code (i_odict);
+      // Set the GRIB code for point observations
+      vx_pd[i].obs_info->add_grib_code(i_odict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
               << "Parsed forecast field number " << i+1 << ":\n";
-         vx_pd[i].fcst_info->dump(cout);        
+         vx_pd[i].fcst_info->dump(cout);
          mlog << Debug(5)
               << "Parsed observation field number " << i+1 << ":\n";
          vx_pd[i].obs_info->dump(cout);
       }
-      
+
       // No support for wind direction
       if(vx_pd[i].fcst_info->is_wind_direction() ||
          vx_pd[i].obs_info->is_wind_direction()) {
@@ -353,7 +353,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    max_n_fprob_thresh = 0;
    max_n_oprob_thresh = 0;
 
-   // Parse and sanity check thresholds   
+   // Parse and sanity check thresholds
    for(i=0; i<n_vx; i++) {
 
       // Get the current dictionaries
@@ -527,7 +527,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
    // Parse out the masking poly areas
    for(i=0,j=mask_grid.n_elements(); i<mask_poly.n_elements(); i++,j++) {
       parse_poly_mask(mask_poly[i], grid, mask_dp[j], s);
-      mask_name.add(s);                    
+      mask_name.add(s);
    }
 
    // Allocate space to store the station ID masks
@@ -553,7 +553,7 @@ void PointStatConfInfo::set_vx_pd() {
 
       // Get the message types for the current verification task
       n_msg_typ = get_n_msg_typ(i);
-     
+
       // Set up the dimensions for the vx_pd object
       vx_pd[i].set_pd_size(n_msg_typ, n_mask, n_interp);
 
@@ -594,10 +594,10 @@ int PointStatConfInfo::get_n_msg_typ(int i) const {
            << "range check error for i = " << i << "\n\n";
       exit(1);
    }
-   
+
    return(msg_typ[i].n_elements());
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::n_txt_row(int i_txt_row) {

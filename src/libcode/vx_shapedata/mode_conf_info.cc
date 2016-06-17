@@ -238,9 +238,6 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
    fcst_info->set_dict(*(fcst_dict->lookup_dictionary(conf_key_field)));
    obs_info->set_dict(*(obs_dict->lookup_dictionary(conf_key_field)));
 
-   obs_info->add_grib_code (*(obs_dict->lookup_dictionary(conf_key_field)));
-   fcst_info->add_grib_code (*(fcst_dict->lookup_dictionary(conf_key_field)));
-
       // Dump the contents of the VarInfo objects
 
    if(mlog.verbosity_level() >= 5) {

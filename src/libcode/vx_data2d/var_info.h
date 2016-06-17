@@ -61,7 +61,6 @@ class VarInfo
       void clear();
 
       virtual void dump(ostream &) const;
-      virtual void add_grib_code (Dictionary &);
 
          //
          // get stuff
@@ -96,6 +95,7 @@ class VarInfo
 
       virtual void set_magic(const ConcatString &);
       virtual void set_dict(Dictionary &);
+      virtual void add_grib_code(Dictionary &);
 
       void set_req_name(const char *);
       void set_name(const char *);
@@ -135,6 +135,8 @@ class VarInfo
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+
+inline void VarInfo::add_grib_code(Dictionary &d)   { return;                   }
 
 inline ConcatString VarInfo::magic_str()      const { return(MagicStr);         }
 inline ConcatString VarInfo::req_name()       const { return(ReqName);          }
