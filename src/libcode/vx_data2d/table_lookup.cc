@@ -1330,9 +1330,13 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
 
       for(vector<Grib1TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
-         mlog << Warning << "  parm_name: "      << (*it)->parm_name
+      {
+         mlog << Warning << "  parm_name: " << (*it)->parm_name
          << ", table_number = "  << (*it)->table_number
-         << ", code = "          << (*it)->code << "\n";
+         << ", code = "          << (*it)->code
+         << ", center = "        << (*it)->center
+         << ", subcenter = "     << (*it)->subcenter << "\n";
+      }
 
       mlog << Warning << "Using: "
       << "  parm_name: "      << e.parm_name
