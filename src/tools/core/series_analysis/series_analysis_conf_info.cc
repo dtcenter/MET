@@ -217,7 +217,6 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
       // Set the current dictionaries
       fcst_info[i]->set_dict(i_fdict);
-      fcst_info[i]-> add_grib_code (i_fdict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
