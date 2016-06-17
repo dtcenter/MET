@@ -203,36 +203,37 @@ void VarInfoGrib::set_magic(const ConcatString & s) {
 
 void VarInfoGrib::add_grib_code (Dictionary &dict)
 {
-   ConcatString field_name = dict.lookup_string(conf_key_name,      false);
+   ConcatString field_name = dict.lookup_string(conf_key_name,            false);
    int tab_match = -1;
-   int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv, false);
-   int field_code           = dict.lookup_int   (conf_key_GRIB1_code, false);
-   // if field_code is not found - try to look for the depricated name (GRIB1_rec)
+   int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv,       false);
+   int field_code          = dict.lookup_int   (conf_key_GRIB1_code,      false);
+
+   // if field_code is not found - try to look for the deprecated name (GRIB1_rec)
    if(field_code == bad_data_int)
    {
-      field_code           = dict.lookup_int   (conf_key_GRIB1_rec, false);
+      field_code           = dict.lookup_int   (conf_key_GRIB1_rec,       false);
    }
-   int field_center        = dict.lookup_int   (conf_key_GRIB1_center, false);
+   int field_center        = dict.lookup_int   (conf_key_GRIB1_center,    false);
    int field_subcenter     = dict.lookup_int   (conf_key_GRIB1_subcenter, false);
    Grib1TableEntry  tab;
 
    bool is_one_param_present = (field_ptv != bad_data_int || field_center != bad_data_int || field_subcenter != bad_data_int );
+
    // fill others with default values
    if( is_one_param_present )
    {
-      if(field_ptv == bad_data_int) field_ptv = default_grib1_ptv;
-      if(field_center == bad_data_int) field_center = default_grib1_center;
+      if(field_ptv       == bad_data_int) field_ptv       = default_grib1_ptv;
+      if(field_center    == bad_data_int) field_center    = default_grib1_center;
       if(field_subcenter == bad_data_int) field_subcenter = default_grib1_subcenter;
    }
 
-
-//  if the name is specified, use it
+   //  if the name is specified, use it
    if( !field_name.empty() ){
 
       //  look up the name in the grib tables
       if( !GribTable.lookup_grib1(field_name, field_ptv, field_code, field_center, field_subcenter, tab, tab_match) )
       {
-         //if did not find with params from the header - try default
+         //  if did not find with params from the header - try default
          if( !GribTable.lookup_grib1(field_name, default_grib1_ptv, field_code, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
          {
             mlog << Error << "\nVarInfoGrib::add_grib_code() - unrecognized GRIB1 field abbreviation '"
@@ -279,26 +280,26 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    int tab_match = -1;
    Grib1TableEntry tab;
-   ConcatString field_name = dict.lookup_string(conf_key_name,      false);
-   int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv, false);
-   int field_code           = dict.lookup_int   (conf_key_GRIB1_code, false);
-   // if field_code is not found - try to look for the depricated name (GRIB1_rec)
+   ConcatString field_name = dict.lookup_string(conf_key_name,            false);
+   int field_ptv           = dict.lookup_int   (conf_key_GRIB1_ptv,       false);
+   int field_code          = dict.lookup_int   (conf_key_GRIB1_code,      false);
+
+   //  if field_code is not found - look for the deprecated name (GRIB1_rec)
    if(field_code == bad_data_int)
    {
-      field_code           = dict.lookup_int   (conf_key_GRIB1_rec, false);
+      field_code           = dict.lookup_int   (conf_key_GRIB1_rec,       false);
    }
-   int field_center        = dict.lookup_int   (conf_key_GRIB1_center, false);
+   int field_center        = dict.lookup_int   (conf_key_GRIB1_center,    false);
    int field_subcenter     = dict.lookup_int   (conf_key_GRIB1_subcenter, false);
 
-
    if( !field_name.empty() ){
-      set_name      ( field_name       );
-      set_req_name  ( field_name       );
+      set_name     ( field_name );
+      set_req_name ( field_name );
    }
-   set_field_rec (field_code);
-   set_center (field_center);
-   set_subcenter (field_subcenter);
-   set_ptv (field_ptv);
+   set_field_rec   (field_code);
+   set_center      (field_center);
+   set_subcenter   (field_subcenter);
+   set_ptv         (field_ptv);
 
    //  call the parent to set the level information
    set_level_info_grib(dict);
@@ -316,16 +317,16 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    //  gather information from the prob dictionary
    ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
-   field_ptv              = dict_prob->lookup_int   (conf_key_GRIB1_ptv, false);
+   field_ptv              = dict_prob->lookup_int   (conf_key_GRIB1_ptv,  false);
    field_code             = dict_prob->lookup_int   (conf_key_GRIB1_code, false);
-   // if field_code is not found - try to look for the depricated name (GRIB1_rec)
+
+   //  if field_code is not found - look for the deprecated name (GRIB1_rec)
    if(field_code == bad_data_int)
    {
-      field_code           = dict_prob->lookup_int   (conf_key_GRIB1_rec, false);
+      field_code          = dict_prob->lookup_int   (conf_key_GRIB1_rec, false);
    }
    double thresh_lo       = dict_prob->lookup_double(conf_key_thresh_lo, false);
    double thresh_hi       = dict_prob->lookup_double(conf_key_thresh_hi, false);
-
 
    //  look up the probability field abbreviation
    if( !GribTable.lookup_grib1(prob_name, field_ptv, field_code, tab, tab_match) ){
@@ -334,9 +335,9 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
       exit(1);
    }
 
-   set_p_flag      ( true      );
-   set_p_code      ( tab.code  );
-   set_p_units     ( tab.units );
+   set_p_flag  ( true      );
+   set_p_code  ( tab.code  );
+   set_p_units ( tab.units );
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
