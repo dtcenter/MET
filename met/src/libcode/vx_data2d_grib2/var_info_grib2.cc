@@ -28,6 +28,7 @@ using namespace std;
 
 #include "var_info_grib2.h"
 
+#include "grib_strings.h"
 #include "math_constants.h"
 #include "vx_math.h"
 #include "vx_log.h"
@@ -375,33 +376,37 @@ bool VarInfoGrib2::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_u_wind() const {
-   return Discipline == 0 &&
-          ParmCat    == 2 &&
-          Parm       == 2;
+   return(ReqName == ugrd_abbr_str ||
+          (Discipline == 0 &&
+           ParmCat    == 2 &&
+           Parm       == 2));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_v_wind() const {
-   return Discipline == 0 &&
-          ParmCat    == 2 &&
-          Parm       == 3;
+   return(ReqName == vgrd_abbr_str ||
+          (Discipline == 0 &&
+           ParmCat    == 2 &&
+           Parm       == 3));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_wind_speed() const {
-   return Discipline == 0 &&
-          ParmCat    == 2 &&
-          Parm       == 1;
+   return(ReqName == wind_abbr_str ||
+          (Discipline == 0 &&
+           ParmCat    == 2 &&
+           Parm       == 1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::is_wind_direction() const {
-   return Discipline == 0 &&
-          ParmCat    == 2 &&
-          Parm       == 0;
+   return(ReqName == wdir_abbr_str ||
+          (Discipline == 0 &&
+           ParmCat    == 2 &&
+           Parm       == 0));
 }
 
 ////////////////////////////////////////////////////////////////////////
