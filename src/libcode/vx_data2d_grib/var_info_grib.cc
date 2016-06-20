@@ -381,25 +381,25 @@ bool VarInfoGrib::is_specific_humidity() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_u_wind() const {
-   return(Code == ugrd_grib_code);
+   return(Code == ugrd_grib_code || ReqName == ugrd_abbr_str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_v_wind() const {
-   return(Code == vgrd_grib_code);
+   return(Code == vgrd_grib_code || ReqName == vgrd_abbr_str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_wind_speed() const {
-   return(Code == wind_grib_code);
+   return(Code == wind_grib_code || ReqName == wind_abbr_str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_wind_direction() const {
-   return(Code == wdir_grib_code);
+   return(Code == wdir_grib_code || ReqName == wdir_abbr_str);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

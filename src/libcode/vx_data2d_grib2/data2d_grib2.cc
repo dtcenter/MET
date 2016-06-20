@@ -27,6 +27,7 @@ using namespace std;
 #include <list>
 
 #include "data2d_grib2.h"
+#include "grib_strings.h"
 #include "vx_data2d.h"
 #include "vx_math.h"
 #include "vx_log.h"
@@ -85,8 +86,8 @@ void MetGrib2DataFile::grib2_init_from_scratch() {
 
    ScanMode = -1;
 
-   PairMap["UGRD"] = "VGRD";
-   PairMap["VGRD"] = "UGRD";
+   PairMap[ugrd_abbr_str] = vgrd_abbr_str;
+   PairMap[vgrd_abbr_str] = ugrd_abbr_str;
 
    return;
 }
@@ -481,9 +482,9 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
    //  read the data_plane objects for each constituent
    DataPlaneArray array_u, array_v;
    VarInfoGrib2 vinfo_cons(*vinfo);
-   vinfo_cons.set_name( "UGRD" );
+   vinfo_cons.set_name( ugrd_abbr_str );
    data_plane_array(vinfo_cons, array_u);
-   vinfo_cons.set_name( "VGRD" );
+   vinfo_cons.set_name( vgrd_abbr_str );
    data_plane_array(vinfo_cons, array_v);
 
    //  derive wind speed or direction
