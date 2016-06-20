@@ -23,9 +23,9 @@ map2012dir = $(pkgdatadir)/map/update_2012
 map2012_DATA = \
 	admin_detail_data \
 	country_data \
-	country_detail_data
+	country_detail_data \
 	major_lakes_data
 
 EXTRA_DIST = ${map2012_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in
