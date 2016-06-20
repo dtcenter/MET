@@ -24,6 +24,7 @@ map2012_DATA = \
 	admin_detail_data \
 	country_data \
 	country_detail_data
+	major_lakes_data
 
 EXTRA_DIST = ${map2012_DATA}
 
