@@ -3,13 +3,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char country_name_tag    [] = "CNTRY_NAME";
-static const char   admin_name_tag    [] = "ADMIN_NAME";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 using namespace std;
 
 #include <iostream>
@@ -29,6 +22,13 @@ using namespace std;
 #include "shx_file.h"
 #include "dbf_file.h"
 #include "int_array.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static ConcatString country_name_tag;
+static ConcatString admin_name_tag;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -116,11 +116,13 @@ cline.add(set_separate_files, "-separate_files", 0);
 
 cline.parse();
 
-if ( cline.n() != 3 )  usage();
+if ( cline.n() != 5 )  usage();
 
 const ConcatString shp_filename = cline[0];
 const ConcatString shx_filename = cline[1];
 const ConcatString dbf_filename = cline[2];
+country_name_tag                = cline[3];
+admin_name_tag                  = cline[4];
 
 
    //
@@ -175,8 +177,8 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name 
-     << "[ -outdir path ] [ -separate_files ] shp_file shx_file dbf_file\n\n";
+cerr << "\n\n   usage:  " << program_name
+     << "[ -outdir path ] [ -separate_files ] shp_file shx_file dbf_file country_field admin_field\n\n";
 
 exit ( 1 );
 
@@ -608,7 +610,7 @@ for (j=0; j<n_records; ++j)  {
 
    anno = create_anno_string(records[j]);
 
-   write_record(f, gr, rec_num, anno);   
+   write_record(f, gr, rec_num, anno);
 
 }   //  for j
 
@@ -684,7 +686,7 @@ for (k=0; k<(names.n()); ++k)  {
 
       if ( names[k] == records[j].country )  i.add(j);
 
-   }   
+   }
 
    output_filename.erase();
 
@@ -780,7 +782,7 @@ for (k=0; k<(i.n_elements()); ++k)  {
 
    anno = create_anno_string(records[j]);
 
-   write_record(f, gr, rec_num, anno);   
+   write_record(f, gr, rec_num, anno);
 
 }   //  for k
 
