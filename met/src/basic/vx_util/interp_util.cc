@@ -610,3 +610,134 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void dp_interp_min (const DataPlane & fat, DataPlane & out, int width, double fraction)
+
+{
+
+   //
+   //  we expect that the size of the "out" dataplane has already been set
+   //
+
+int x, y, x_fat_ll, y_fat_ll;
+const int wm1o2 = (width - 1)/2;
+double v;
+
+
+for (x=0; x<(out.nx()); ++x)  {
+
+   x_fat_ll = x*width;
+
+   for (x=0; x<(out.nx()); ++x)  {
+
+      y_fat_ll = y*width;
+
+      v = interp_min(fat, x_fat_ll, y_fat_ll, width, fraction);
+
+      out.put(v, x, y);
+
+   }   //  for x
+
+}   //  for x
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void dp_interp_max (const DataPlane & fat, DataPlane & out, int width, double fraction)
+
+{
+
+   //
+   //  we expect that the size of the "out" dataplane has already been set
+   //
+
+int x, y, x_fat_ll, y_fat_ll;
+const int wm1o2 = (width - 1)/2;
+double v;
+
+
+for (x=0; x<(out.nx()); ++x)  {
+
+   x_fat_ll = x*width;
+
+   for (x=0; x<(out.nx()); ++x)  {
+
+      y_fat_ll = y*width;
+
+      v = interp_max(fat, x_fat_ll, y_fat_ll, width, fraction);
+
+      out.put(v, x, y);
+
+   }   //  for x
+
+}   //  for x
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int width, double fraction)
+
+{
+
+   //
+   //  we expect that the size of the "out" dataplane has already been set
+   //
+
+int x, y, x_fat_ll, y_fat_ll;
+const int wm1o2 = (width - 1)/2;
+double v;
+
+
+for (x=0; x<(out.nx()); ++x)  {
+
+   x_fat_ll = x*width;
+
+   for (x=0; x<(out.nx()); ++x)  {
+
+      y_fat_ll = y*width;
+
+      v = interp_uw_mean(fat, x_fat_ll, y_fat_ll, width, fraction);
+
+      out.put(v, x, y);
+
+   }   //  for x
+
+}   //  for x
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+

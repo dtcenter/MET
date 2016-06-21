@@ -35,14 +35,9 @@ static const char * default_config_filename = "MET_BASE/config/WWMCARegridConfig
 
 
    //
-   //  default values for command-line switches
+   //  Default values for command-line switches
    //
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-static ConcatString program_name;
 
 static ConcatString cp_nh_filename;
 static ConcatString cp_sh_filename;
@@ -55,6 +50,8 @@ static ConcatString output_filename;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static ConcatString program_name;
 
 static CommandLine cline;
 
@@ -100,6 +97,7 @@ cline.set_usage(usage);
 
 cline.add(set_nh_filename, "-nh",    -1);
 cline.add(set_sh_filename, "-sh",    -1);
+
 cline.add(set_outfile,     "-out",    1);
 cline.add(set_config,      "-config", 1);
 cline.add(set_logfile,     "-log",    1);
@@ -138,7 +136,7 @@ config.read(config_filename);
    //  dump the contents of the config file
    //
 
-if(mlog.verbosity_level() >= 5) config.dump(cout);
+if ( mlog.verbosity_level() >= 5 ) config.dump(cout);
 
    //
    //  load up regridder

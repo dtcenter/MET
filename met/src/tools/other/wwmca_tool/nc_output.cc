@@ -47,7 +47,7 @@ unixtime init_time  = (unixtime) 0;
 unixtime valid_time = (unixtime) 0;
 int accum_time, x, y;
 float f;
-InterpolationValue iv;
+double v;
 ConcatString s;
 const int Nx = ToGrid->nx();
 const int Ny = ToGrid->ny();
@@ -195,14 +195,18 @@ grid_output(ToGrid->info(), ncfile);
    //  fill in data values
    //
 
+DataPlane dp;
+
+get_interpolated_data(dp);
+
 for (x=0; x<Nx; ++x)  {
 
    for (y=0; y<Ny; ++y)  {
 
-      iv = get_interpolated_value(x, y);
+      v = dp(x, y);
 
-      if ( iv.ok )  f = (float) (iv.value);
-      else          f = fill_value;
+      if ( is_bad_data(v) ) f = fill_value;
+      else                  f = (float) v;
 
       data_var->set_cur(y, x);
 

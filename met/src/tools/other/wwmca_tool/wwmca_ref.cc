@@ -86,9 +86,9 @@ pt_sh = (const AFPixelTimeFile *) 0;
 
 ToGrid = (const Grid *) 0;
 
-interp = (Interpolator *) 0;
-
 Config = (MetConfig *) 0;
+
+interp_func = 0;
 
 
 
@@ -114,8 +114,6 @@ if ( pt_sh )  { delete pt_sh;  pt_sh = (const AFPixelTimeFile *) 0; }
 
 if ( ToGrid )  { delete ToGrid;  ToGrid = (const Grid *) 0; }
 
-if ( interp )  { delete interp;  interp = (Interpolator *) 0; }
-
 Hemi = no_hemisphere;
 
 grid_strings.clear();
@@ -123,6 +121,15 @@ grid_strings.clear();
 Config = (MetConfig *) 0;
 
 ConfigFilename.clear();
+
+Width = 0;
+
+Method = InterpMthd_None;
+
+interp_func = 0;
+
+Fraction = 0.0;   //  is this a good default value?
+
 
 return;
 
@@ -181,13 +188,10 @@ if ( ToGrid ) {
 
 
 
-if ( interp ) {
+out << prefix << "Interpolation Method   = " << interpmthd_to_string(Method) << "\n";
+out << prefix << "Interpolation Width    = " << Width    << "\n";
+out << prefix << "Interpolation Fraction = " << Fraction << "\n";
 
-   out << prefix << "interp ...\n";
-
-   interp->dump(out, depth + 1);
-
-} else out << prefix << "interp = (nul)\n";
 
 out << prefix << "ConfigFilename = ";
 
@@ -319,17 +323,43 @@ ConfigFilename = config_filename;
    //  set interpolator
    //
 
-get_interpolator();
+const RegridInfo regrid_info = parse_conf_regrid(Config);
 
-if ( !interp )  {
+Width = regrid_info.width;
 
-   mlog << Error << "\nWwmcaRegridder::set_config(wwmca_regrid_Conf &) -> "
-        << "bad interpolator specification in config file\""
-        << ConfigFilename << "\"\n\n";
+Method = InterpMthd_Nearest;
 
-   exit ( 1 );
+Fraction = regrid_info.vld_thresh;
 
-}
+if ( Width > 1 )  {
+
+   Method = regrid_info.method;
+
+   switch ( Method )  {
+
+      case InterpMthd_Min:
+         interp_func = &dp_interp_min;
+         break;
+
+      case InterpMthd_Max:
+         interp_func = &dp_interp_max;
+         break;
+
+      case InterpMthd_UW_Mean:
+         interp_func = &dp_interp_uw_mean;
+         break;
+
+      default:
+         mlog << Error
+              << "\n\n  WwmcaRegridder::set_config(MetConfig & wc, const char * config_filename) -> "
+              << "bad interpolation method ... " << interpmthd_to_string(Method) << "\n\n";
+         exit ( 1 );
+         break;
+
+   }   //  switch
+
+}   //  if
+
 
    //
    //  set "to" grid
@@ -392,23 +422,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-InterpolationValue WwmcaRegridder::operator()(int x, int y) const
-
-{
-
-InterpolationValue value;
-
-value = get_interpolated_value(x, y);
-
-return ( value );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-InterpolationValue WwmcaRegridder::get_interpolated_value(int to_x, int to_y) const
+void WwmcaRegridder::get_interpolated_data(DataPlane & dp) const
 
 {
 
@@ -419,20 +433,20 @@ InterpolationValue value;
 switch ( Hemi )  {
 
    case north_hemisphere:
-      value = do_single_hemi(to_x, to_y, NHgrid, cp_nh, pt_nh);
+      do_single_hemi(dp, NHgrid, cp_nh, pt_nh);
       break;
 
    case south_hemisphere:
-      value = do_single_hemi(to_x, to_y, SHgrid, cp_sh, pt_sh);
+      do_single_hemi(dp, SHgrid, cp_sh, pt_sh);
       break;
 
    case both_hemispheres:
-      value = do_both_hemi(to_x, to_y);
+      do_both_hemi(dp);
       break;
 
    default:
       gridhemisphere_to_string(Hemi, junk);
-      mlog << Error << "\nWwmcaRegridder::get_interpolated_value(int x, int y) const -> "
+      mlog << Error << "\nWwmcaRegridder::get_interpolated_data(DataPlane &) const -> "
            << "bad hemisphere ... " << junk << "\n\n";
       exit ( 1 );
       break;
@@ -440,7 +454,7 @@ switch ( Hemi )  {
 }   //  switch
 
 
-return ( value );
+return;
 
 }
 
@@ -448,17 +462,14 @@ return ( value );
 ////////////////////////////////////////////////////////////////////////
 
 
-InterpolationValue WwmcaRegridder::do_single_hemi(int to_x0, int to_y0, const Grid * From, const AFCloudPctFile * cloud, const AFPixelTimeFile * pixel) const
+void WwmcaRegridder::do_single_hemi(DataPlane & dp, const Grid * From, const AFCloudPctFile * cloud, const AFPixelTimeFile * pixel) const
 
 {
 
-Interpolator & I = *interp;
-InterpolationValue iv;
-int from_x0, from_y0, from_x, from_y;
-int sub_x, sub_y;
-int wm1o2;
-int xx, yy;
-double lat, lon, dx, dy, t;
+double v;
+int from_x, from_y;
+int x, y, xx, yy;
+double lat, lon, dx, dy;
 int pixel_age_minutes;
 const double max_minutes = Config->lookup_double(conf_key_max_minutes);
 
@@ -470,45 +481,120 @@ if ( !cloud )  {
 }
 
 
-   //
-   //  load interpolation subgrid
-   //
+dp.set_size(ToGrid->nx(), ToGrid->ny());
 
-ToGrid->xy_to_latlon((double) to_x0, (double) to_y0, lat, lon);
-
-From->latlon_to_xy(lat, lon, dx, dy);
-
-from_x0 = nint(dx);
-from_y0 = nint(dy);
 
    //
    //  Width = 1?  then do nearest neighbor interpolation
    //
 
-if ( I.width() == 1 )  {
+if ( Width == 1 )  {
 
-   pixel_age_minutes = 0;
+   for (x=0; x<(dp.nx()); ++x)  {
 
-   iv.set_bad();
+      for (y=0; y<(dp.ny()); ++y)  {
 
-   if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x0, from_y0) / 60;
+         ToGrid->xy_to_latlon((double) x, (double) y, lat, lon);
 
-   if ( cloud->xy_is_ok(from_x0, from_y0) && pixel_age_minutes < max_minutes )  {
+         From->latlon_to_xy(lat, lon, dx, dy);
 
-      iv.set_good( (double) ((*cloud)(from_x0, from_y0)) );
+         from_x = nint(dx);
+         from_y = nint(dy);
 
-   }
+         pixel_age_minutes = 0;
 
-   return ( iv );
+         v = bad_data_double;
 
-}
+         if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x, from_y) / 60;
+
+         if ( cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes )  {
+
+            v = (double) ((*cloud)(from_x, from_y));
+
+         }
+
+         dp.put(v, x, y);
+
+      }   //  for y
+
+   }   //  for x
+
+   return;
+
+}   //  if Width == 1
 
    //
    //  Width > 1
    //
 
-wm1o2 = I.wm1o2();
+DataPlane fat;
+int x_fat, y_fat;
 
+
+fat.set_size(Width*(dp.nx()), Width*(dp.ny()));
+
+const int wm1o2 = (Width - 1)/2;
+
+const double t = 1.0/wm1o2;
+
+
+for (x=0; x<(dp.nx()); ++x)  {
+
+   for (y=0; y<(dp.ny()); ++y)  {
+
+      for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
+
+         x_fat = Width*x + wm1o2 + xx;
+
+         for (yy=-wm1o2; yy<=wm1o2; ++yy)  {
+
+            y_fat = Width*y + wm1o2 + yy;
+
+            ToGrid->xy_to_latlon(x + t*xx, y + t*yy, lat, lon);
+
+            From->latlon_to_xy(lat, lon, dx, dy);
+
+            from_x = nint(dx);
+            from_y = nint(dy);
+
+            if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x, from_y) / 60;
+            else          pixel_age_minutes = 0;
+
+            if ( !(cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes) )  {
+
+               v = bad_data_double;
+
+            } else {
+
+               v = (double) ((*cloud)(from_x, from_y));
+
+            }
+
+            fat.put(v, x_fat, y_fat);
+
+         }   //  for yy
+
+      }   //  for xx
+
+   }   //  for y
+
+}   //  for x
+
+
+interp_func(fat, dp, Width, Fraction);
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
 
    from_x = xx + from_x0;
@@ -524,8 +610,7 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
       if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x0, from_y0) / 60;
       else          pixel_age_minutes = 0;
 
-      if ( !(cloud->xy_is_ok(from_x, from_y) &&
-             pixel_age_minutes < max_minutes) )  {
+      if ( !(cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes) )  {
 
          I.put_bad(sub_x, sub_y);
 
@@ -546,12 +631,13 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
    //
 
 iv = I(dx - from_x0, dy - from_y0);
+*/
 
    //
    //  done
    //
 
-return ( iv );
+return;
 
 }
 
@@ -559,32 +645,27 @@ return ( iv );
 ////////////////////////////////////////////////////////////////////////
 
 
-InterpolationValue WwmcaRegridder::do_both_hemi(int to_x0, int to_y0) const
+void WwmcaRegridder::do_both_hemi(DataPlane & dp) const
 
 {
 
-Interpolator & I = *interp;
-double lat0, lon0, lat, lon;
-double dx, dy, dx0, dy0;
-double t;
-int from_x0, from_y0;
-int xx, yy, sub_x, sub_y, from_x, from_y, wm1o2;
-InterpolationValue iv;
-const AFCloudPctFile   * cloud_this  = (const AFCloudPctFile *) 0;
-const AFCloudPctFile   * cloud_other = (const AFCloudPctFile *) 0;
-const AFPixelTimeFile  * pixel_this  = (const AFPixelTimeFile *) 0;
-const AFPixelTimeFile  * pixel_other = (const AFPixelTimeFile *) 0;
-const Grid * From_this  = (const Grid *) 0;
-const Grid * From_other = (const Grid *) 0;
+double lat, lon;
+double dx, dy;
+double v;
+int x, y, xx, yy, from_x, from_y;
+const AFCloudPctFile   * cloud = 0;
+const AFPixelTimeFile  * pixel = 0;
+const Grid             * From  = 0;
 int pixel_age_minutes;
 const double max_minutes = Config->lookup_double(conf_key_max_minutes);
 
 
+dp.set_size(ToGrid->nx(), ToGrid->ny());
 
    //
    //  load interpolation subgrid
    //
-
+/*
 ToGrid->xy_to_latlon((double) to_x0, (double) to_y0, lat0, lon0);
 
 if ( lat0 >= 0.0 )  {
@@ -615,27 +696,58 @@ From_this->latlon_to_xy(lat0, lon0, dx0, dy0);
 
 from_x0 = nint(dx0);
 from_y0 = nint(dy0);
-
+*/
 
    //
    //  Width = 1?  then do nearest neighbor interpolation
    //
 
-if ( I.width() == 1 )  {
+if ( Width == 1 )  {
 
-   pixel_age_minutes = 0;
+   for (x=0; x<(dp.nx()); ++x)  {
 
-   iv.set_bad();
+      for (y=0; y<(dp.ny()); ++y)  {
 
-   if ( pixel_this )  pixel_age_minutes = pixel_this->pixel_age_sec(from_x0, from_y0) / 60;
+         ToGrid->xy_to_latlon((double) x, (double) y, lat, lon);
 
-   if ( cloud_this->xy_is_ok(from_x0, from_y0) && pixel_age_minutes < max_minutes )  {
+         if ( lat >= 0.0 )  {
 
-      iv.set_good( (double) (cloud_this->cloud_pct(from_x0, from_y0)) );
+            cloud  = cp_nh;
+            pixel  = pt_nh;
+            From   = NHgrid;
 
-   }
+         } else {
 
-   return ( iv );
+            cloud  = cp_sh;
+            pixel  = pt_sh;
+            From   = SHgrid;
+
+         }
+
+         From->latlon_to_xy(lat, lon, dx, dy);
+
+         from_x = nint(dx);
+         from_y = nint(dy);
+
+         pixel_age_minutes = 0;
+
+         v = bad_data_double;
+
+         if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x, from_y) / 60;
+
+         if ( cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes )  {
+
+            v = (double) (cloud->cloud_pct(from_x, from_y));
+
+         }
+
+         dp.put(v, x, y);
+
+      }   //  for y
+
+   }   //  for x
+
+   return;
 
 }   //  if Width == 1
 
@@ -643,6 +755,85 @@ if ( I.width() == 1 )  {
    //  Width > 1
    //
 
+
+DataPlane fat;
+int x_fat, y_fat;
+
+
+fat.set_size(Width*(dp.nx()), Width*(dp.ny()));
+
+const int wm1o2 = (Width - 1)/2;
+
+const double t = 1.0/wm1o2;
+
+
+for (x=0; x<(dp.nx()); ++x)  {
+
+   for (y=0; y<(dp.ny()); ++y)  {
+
+      for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
+
+         x_fat = Width*x + wm1o2 + xx;
+
+         for (yy=-wm1o2; yy<=wm1o2; ++yy)  {
+
+            y_fat = Width*y + wm1o2 + yy;
+
+            ToGrid->xy_to_latlon(x + t*xx, y + t*yy, lat, lon);
+
+            if ( lat >= 0.0 )  {
+
+               cloud  = cp_nh;
+               pixel  = pt_nh;
+               From   = NHgrid;
+
+            } else {
+
+               cloud  = cp_sh;
+               pixel  = pt_sh;
+               From   = SHgrid;
+
+            }
+
+            From->latlon_to_xy(lat, lon, dx, dy);
+
+            from_x = nint(dx);
+            from_y = nint(dy);
+
+            pixel_age_minutes = 0;
+
+            v = bad_data_double;
+
+            if ( pixel )  pixel_age_minutes = pixel->pixel_age_sec(from_x, from_y) / 60;
+
+            if ( cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes )  {
+
+               v = (double) (cloud->cloud_pct(from_x, from_y));
+
+            }
+
+            fat.put(v, x_fat, y_fat);
+
+         }   //  for yy
+
+      }   //  for xx
+
+   }   //  for y
+
+}   //  for x
+
+
+interp_func(fat, dp, Width, Fraction);
+
+
+
+
+
+
+
+
+
+/*
 wm1o2 = I.wm1o2();
 
 for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
@@ -708,12 +899,13 @@ for (xx=-wm1o2; xx<=wm1o2; ++xx)  {
    //
 
 iv = I(dx0 - from_x0, dy0 - from_y0);
+*/
 
    //
    //  done
    //
 
-return ( iv );
+return;
 
 }
 
@@ -731,8 +923,8 @@ bool nh_used                 = false;
 bool sh_used                 = false;
 const int Nx                 = ToGrid->nx();
 const int Ny                 = ToGrid->ny();
-const RegridInfo regrid_info = parse_conf_regrid(Config);
-const int Width              = regrid_info.width;
+// const RegridInfo regrid_info = parse_conf_regrid(Config);
+// const int Width              = regrid_info.width;
 
 
 Hemi = no_hemisphere;
@@ -828,98 +1020,6 @@ for (j=0; j<720; ++j)  {
 
 if ( nh_used )  Hemi = north_hemisphere;
 if ( sh_used )  Hemi = south_hemisphere;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void WwmcaRegridder::get_interpolator()
-
-{
-
-Ave_Interp ave;
-Nearest_Interp nearest;
-Min_Interp mini;
-Max_Interp maxi;
-const RegridInfo regrid_info = parse_conf_regrid(Config);
-const int width              = regrid_info.width;
-const InterpMthd method      = regrid_info.method;
-
-const int n_good_needed = nint(ceil((regrid_info.vld_thresh)*width*width));
-
-
-   //
-   //  get to work
-   //
-
-if ( method == InterpMthd_UW_Mean )  {
-
-   ave.set_size(width);
-
-   ave.set_ngood_needed(n_good_needed);
-
-   interp = ave.copy();
-
-   return;
-
-}
-
-
-else if ( width == 1 )  {
-
-   nearest.set_size(width);
-
-   nearest.set_ngood_needed(n_good_needed);
-
-   interp = nearest.copy();
-
-   return;
-
-}
-
-else if ( method == InterpMthd_Min )  {
-
-   mini.set_size(width);
-
-   mini.set_ngood_needed(n_good_needed);
-
-   interp = mini.copy();
-
-   return;
-
-}
-
-
-else if ( method == InterpMthd_Max )  {
-
-   maxi.set_size(width);
-
-   maxi.set_ngood_needed(n_good_needed);
-
-   interp = maxi.copy();
-
-   return;
-
-}
-
-else  {
-
-   mlog << Error << "\nWwmcaRegridder::get_interpolator() -> "
-        << "unsupported interpolation option \""
-        << interpmthd_to_string(method) << "\".\n\n";
-
-   exit ( 1 );
-
-}
-
-
-   //
-   //  done
-   //
 
 return;
 

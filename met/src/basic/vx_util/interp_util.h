@@ -39,18 +39,21 @@ static const int dw_mean_pow = 2;
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern double interp_min    (const DataPlane &, int, int, int, double);
-extern double interp_max    (const DataPlane &, int, int, int, double);
-extern double interp_median (const DataPlane &, int, int, int, double);
-extern double interp_uw_mean(const DataPlane &, int, int, int, double);
-extern double interp_dw_mean(const DataPlane &, int, int, int, double, double,
-                             int, double);
-extern double interp_ls_fit (const DataPlane &, int, int, int, double, double,
-                             double);
-extern double interp_bilin  (const DataPlane &, double, double);
+extern double interp_min     (const DataPlane &, int x_ll, int y_ll, int w, double);
+extern double interp_max     (const DataPlane &, int x_ll, int y_ll, int w, double);
+extern double interp_median  (const DataPlane &, int x_ll, int y_ll, int w, double);
+extern double interp_uw_mean (const DataPlane &, int x_ll, int y_ll, int w, double);
 
-extern void   get_xy_ll     (double x, double y, int w, int h,
-                             int &x_ll, int &y_ll);
+extern void  dp_interp_min     (const DataPlane & fat, DataPlane & out, int w, double);
+extern void  dp_interp_max     (const DataPlane & fat, DataPlane & out, int w, double);
+extern void  dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int w, double);
+
+extern double interp_dw_mean (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, int i_pow, double);
+extern double interp_ls_fit  (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obx_y, double);
+
+extern double interp_bilin   (const DataPlane &, double obs_x, double obs_y);
+
+extern void   get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
 
 ////////////////////////////////////////////////////////////////////////
 //

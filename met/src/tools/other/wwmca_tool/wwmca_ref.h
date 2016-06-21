@@ -24,10 +24,10 @@
 #include "af_file.h"
 #include "af_cp_file.h"
 #include "af_pt_file.h"
-#include "interp_base.h"
 
 #include "vx_config.h"
 #include "vx_grid.h"
+#include "interp_util.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -48,6 +48,12 @@ enum GridHemisphere {
 ////////////////////////////////////////////////////////////////////////
 
 
+typedef void InterpFunction (const DataPlane & fat, DataPlane & out, int w, double);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 class WwmcaRegridder {
 
    private:
@@ -58,11 +64,9 @@ class WwmcaRegridder {
       void init_from_scratch();
 
 
-      InterpolationValue get_interpolated_value(int to_x, int to_y) const;
+      void get_interpolated_data(DataPlane &) const;
 
       void find_grid_hemisphere();
-
-      void get_interpolator();
 
       void get_grid();
 
@@ -72,11 +76,20 @@ class WwmcaRegridder {
       void parse_mercator_grid();
 
 
-      InterpolationValue do_single_hemi(int to_x, int to_y, const Grid * From,
-                                        const AFCloudPctFile * cloud,
-                                        const AFPixelTimeFile * pixel) const;
+      void do_single_hemi(DataPlane &, const Grid * From,
+                                       const AFCloudPctFile * cloud,
+                                       const AFPixelTimeFile * pixel) const;
 
-      InterpolationValue do_both_hemi(int to_x, int to_y) const;
+      void do_both_hemi(DataPlane &) const;
+
+
+      InterpMthd Method;   //  interpolation
+
+      int Width;           //  interpolation
+
+      double Fraction;     //  fraction of good data needed for interpolation
+
+      InterpFunction * interp_func;
 
 
       StringArray grid_strings;
@@ -93,8 +106,6 @@ class WwmcaRegridder {
       const AFPixelTimeFile * pt_sh; //  allocated
 
       const Grid * ToGrid;           //  allocated
-
-      Interpolator * interp;         //  allocated
 
       MetConfig * Config;            //  not allocated
 
@@ -123,11 +134,6 @@ class WwmcaRegridder {
 
       void do_output(const char * output_filename);
 
-         //
-         //  get interpolated value for "to" grid point (x, y)
-         //
-
-      InterpolationValue operator()(int x, int y) const;
 
 };
 
