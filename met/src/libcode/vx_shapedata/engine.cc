@@ -1340,6 +1340,12 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
    }
 
    //
+   // Copy over fcst_info and obs_info
+   //
+   *(fcst_engine->conf_info.fcst_info) = *(conf_info.fcst_info);
+   *(fcst_engine->conf_info.obs_info)  = *(conf_info.fcst_info);
+
+   //
    // Copy over the forecast threshold values
    //
    fcst_engine->conf_info.fcst_raw_thresh        = conf_info.fcst_raw_thresh;
@@ -1508,6 +1514,12 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
       path = replace_path(obs_engine->conf_info.object_pi.color_table);
       obs_engine->ctable.read(path);
    }
+
+   //
+   // Copy over fcst_info and obs_info
+   //
+   *(obs_engine->conf_info.fcst_info) = *(conf_info.obs_info);
+   *(obs_engine->conf_info.obs_info)  = *(conf_info.obs_info);
 
    //
    // Copy over the observation threshold values
