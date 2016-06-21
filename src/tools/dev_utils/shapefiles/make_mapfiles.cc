@@ -177,7 +177,7 @@ void usage()
 
 {
 
-cerr << "\n\n   usage:  " << program_name
+cerr << "\n\n   usage:  " << program_name << ' '
      << "[ -outdir path ] [ -separate_files ] shp_file shx_file dbf_file country_field admin_field\n\n";
 
 exit ( 1 );
