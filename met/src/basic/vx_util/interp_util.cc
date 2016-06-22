@@ -629,7 +629,7 @@ for (x=0; x<(out.nx()); ++x)  {
 
    x_fat_ll = x*width;
 
-   for (x=0; x<(out.nx()); ++x)  {
+   for (y=0; y<(out.ny()); ++y)  {
 
       y_fat_ll = y*width;
 
@@ -672,7 +672,7 @@ for (x=0; x<(out.nx()); ++x)  {
 
    x_fat_ll = x*width;
 
-   for (x=0; x<(out.nx()); ++x)  {
+   for (y=0; y<(out.ny()); ++y)  {
 
       y_fat_ll = y*width;
 
@@ -715,7 +715,7 @@ for (x=0; x<(out.nx()); ++x)  {
 
    x_fat_ll = x*width;
 
-   for (x=0; x<(out.nx()); ++x)  {
+   for (y=0; y<(out.ny()); ++y)  {
 
       y_fat_ll = y*width;
 
