@@ -97,6 +97,8 @@ class NumArray {
 
       NumArray subset(const NumArray &) const;
 
+      double wmean(const NumArray &) const;
+
 };
 
 
