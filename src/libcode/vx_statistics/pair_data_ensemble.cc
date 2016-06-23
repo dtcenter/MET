@@ -311,7 +311,7 @@ void PairDataEnsemble::compute_phist() {
 
 void PairDataEnsemble::compute_stats() {
    int i, j;
-   double crps, ign, pit;
+   double crps, ign, pit, w, w_sum;
    double crps_climo, ccbar, oobar, cobar;
    NumArray cur;
 
@@ -337,7 +337,7 @@ void PairDataEnsemble::compute_stats() {
       // Compute the stats
       compute_crps_ign_pit(o_na[i], cur, crps, ign, pit);
 
-      // Store the stats
+      // Store the stats and weight for the current point
       crps_na.add(crps);
       ign_na.add(ign);
       pit_na.add(pit);
@@ -347,7 +347,7 @@ void PairDataEnsemble::compute_stats() {
    // Compute CRPS Skill Score
 
    // Get the average ensemble CRPS value
-   crps = crps_na.mean();
+   crps = crps_na.wmean(wgt_na);
 
    // Check for bad data
    if(is_bad_data(crps) ||
@@ -358,16 +358,17 @@ void PairDataEnsemble::compute_stats() {
    }
    else {
 
+      // Get the sum of the weights
+      w_sum = wgt_na.sum();
+
       // Compute the climatological CRPS
       ccbar = oobar = cobar = 0.0;
       for(i=0; i<n_obs; i++) {
-         ccbar += cmn_na[i] * cmn_na[i];
-         oobar += o_na[i]   * o_na[i];
-         cobar += cmn_na[i] * o_na[i];
+         w      = wgt_na[i]/w_sum;
+         ccbar += w * cmn_na[i] * cmn_na[i];
+         oobar += w * o_na[i]   * o_na[i];
+         cobar += w * cmn_na[i] * o_na[i];
       }
-      ccbar /= n_obs;
-      oobar /= n_obs;
-      cobar /= n_obs;
       crps_climo = ccbar + oobar - 2.0*cobar;
 
       // Compute skill score
@@ -418,6 +419,7 @@ void PairDataEnsemble::compute_ssvar() {
       pt.var = var;
       pt.f   = mn_na[i];
       pt.o   = o_na[i];
+      pt.w   = wgt_na[i];
 
       // Determine the bin for the current point and add it to the list
       // Bins are defined starting at 0 and are left-closed, right-open
@@ -455,15 +457,16 @@ void PairDataEnsemble::compute_ssvar() {
 
       ssvar_pt_list* pts = &( bins[*set_it] );
       var = 0;
-      double f = 0, o = 0, fo = 0, ff = 0, oo = 0;
+      double f = 0, o = 0, fo = 0, ff = 0, oo = 0, w = 0;
 
       for(j=0; j < (int)pts->size(); j++){
-         var +=   (*pts)[j].var;
-         f   +=   (*pts)[j].f;
-         o   +=   (*pts)[j].o;
-         fo  += ( (*pts)[j].f * (*pts)[j].o );
-         ff  += ( (*pts)[j].f * (*pts)[j].f );
-         oo  += ( (*pts)[j].o * (*pts)[j].o );
+         var += (*pts)[j].w * (*pts)[j].var;
+         f   += (*pts)[j].w * (*pts)[j].f;
+         o   += (*pts)[j].w * (*pts)[j].o;
+         fo  += (*pts)[j].w * (*pts)[j].f * (*pts)[j].o;
+         ff  += (*pts)[j].w * (*pts)[j].f * (*pts)[j].f;
+         oo  += (*pts)[j].w * (*pts)[j].o * (*pts)[j].o;
+         w   += (*pts)[j].w;
       }
 
       ssvar_bins[i].n_bin    = n_bin;
@@ -472,14 +475,14 @@ void PairDataEnsemble::compute_ssvar() {
 
       ssvar_bins[i].var_min  = atof( (*set_it).data() );
       ssvar_bins[i].var_max  = ssvar_bins[i].var_min + ssvar_bin_size;
-      ssvar_bins[i].var_mean = var / (double)pts->size();
+      ssvar_bins[i].var_mean = var / w;
 
       ssvar_bins[i].sl1l2_info.scount = pts->size();
-      ssvar_bins[i].sl1l2_info.fbar   = f  / (double)pts->size();
-      ssvar_bins[i].sl1l2_info.obar   = o  / (double)pts->size();
-      ssvar_bins[i].sl1l2_info.fobar  = fo / (double)pts->size();
-      ssvar_bins[i].sl1l2_info.ffbar  = ff / (double)pts->size();
-      ssvar_bins[i].sl1l2_info.oobar  = oo / (double)pts->size();
+      ssvar_bins[i].sl1l2_info.fbar   = f  / w;
+      ssvar_bins[i].sl1l2_info.obar   = o  / w;
+      ssvar_bins[i].sl1l2_info.fobar  = fo / w;
+      ssvar_bins[i].sl1l2_info.ffbar  = ff / w;
+      ssvar_bins[i].sl1l2_info.oobar  = oo / w;
 
       if( i < 100 ){
          mlog << Debug(4) << "  SSVAR[ "

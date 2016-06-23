@@ -125,20 +125,24 @@ static void do_cts   (CTSInfo *&, int,
 static void do_mcts  (MCTSInfo &, int,
                       const NumArray &, const NumArray &);
 static void do_cnt   (CNTInfo *&, int,
-                      const NumArray &, const NumArray &, const NumArray &);
+                      const NumArray &, const NumArray &,
+                      const NumArray &, const NumArray &);
 static void do_sl1l2 (SL1L2Info *&, int,
-                      const NumArray &, const NumArray &, const NumArray &);
+                      const NumArray &, const NumArray &,
+                      const NumArray &, const NumArray &);
 static void do_vl1l2 (VL1L2Info *&, int,
                       const NumArray &, const NumArray &,
                       const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &);
+                      const NumArray &, const NumArray &,
+                      const NumArray &);
 static void do_pct   (PCTInfo *&, int,
                       const NumArray &, const NumArray &, const NumArray &);
 static void do_nbrcts(NBRCTSInfo *&, int, int, int,
                       const NumArray &, const NumArray &);
 static void do_nbrcnt(NBRCNTInfo &, int, int, int,
                       const NumArray &, const NumArray &,
-                      const NumArray &, const NumArray &);
+                      const NumArray &, const NumArray &,
+                      const NumArray &);
 
 static void write_nc(const GridStatNcOutInfo &,
                      const DataPlane &, const DataPlane &,
@@ -869,7 +873,7 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) cnt_info[m].clear();
 
                // Compute CNT
-               do_cnt(cnt_info, i, f_na, o_na, c_na);
+               do_cnt(cnt_info, i, f_na, o_na, c_na, w_na);
 
                // Loop through the continuous thresholds
                for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
@@ -897,7 +901,7 @@ void process_scores() {
                for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
 
                // Compute SL1L2 and SAL1L2
-               do_sl1l2(sl1l2_info, i, f_na, o_na, c_na);
+               do_sl1l2(sl1l2_info, i, f_na, o_na, c_na, w_na);
 
                // Loop through the continuous thresholds
                for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
@@ -971,13 +975,15 @@ void process_scores() {
                }
 
                // Apply the current mask to the U-wind fields
-               apply_mask(fu_dp_smooth,   mask_dp, fu_na);
-               apply_mask(ou_dp_smooth,   mask_dp, ou_na);
-               apply_mask(cmnu_dp,        mask_dp, cmnu_na);
-               apply_mask(wgt_dp,         mask_dp, w_na);
+               apply_mask(fu_dp_smooth, mask_dp, fu_na);
+               apply_mask(ou_dp_smooth, mask_dp, ou_na);
+               apply_mask(cmnu_dp,      mask_dp, cmnu_na);
+               apply_mask(wgt_dp,       mask_dp, w_na);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na, cmnu_na, c_na);
+               do_vl1l2(vl1l2_info, i,
+                        fu_na, f_na, ou_na, o_na,
+                        cmnu_na, c_na, w_na);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
@@ -1205,8 +1211,8 @@ void process_scores() {
                      // Initialize
                      nbrcnt_info.clear();
 
-                     do_nbrcnt(nbrcnt_info, i, j, k, f_na, o_na,
-                               fthr_na, othr_na);
+                     do_nbrcnt(nbrcnt_info, i, j, k,
+                               f_na, o_na, fthr_na, othr_na, w_na);
 
                      // Write out NBRCNT
                      if(nbrcnt_info.sl1l2_info.scount > 0 &&
@@ -1342,9 +1348,9 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 
 void do_cnt(CNTInfo *&cnt_info, int i_vx,
             const NumArray &f_na, const NumArray &o_na,
-            const NumArray &c_na) {
+            const NumArray &c_na, const NumArray &w_na) {
    int i, j;
-   NumArray ff_na, oo_na, cc_na;
+   PairDataPoint pd_all, pd;
 
    mlog << Debug(2) << "Computing Continuous Statistics.\n";
 
@@ -1369,17 +1375,23 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       }
 
       //
-      // Apply continuous filtering thresholds
+      // Store pairs in PairDataPoint object
       //
-      subset_pairs(f_na, cnt_info[i].fthresh,
-                   o_na, cnt_info[i].othresh,
-                   c_na, cnt_info[i].logic,
-                   ff_na, oo_na, cc_na);
+      pd_all.clear();
+      for(j=0; j<o_na.n_elements(); j++) {
+         pd_all.add_pair(f_na[j], o_na[j], c_na[j], w_na[j]);
+      }
+
+      //
+      // Apply continuous filtering thresholds to subset pairs
+      //
+      pd = subset_pairs(pd_all, cnt_info[i].fthresh, cnt_info[i].othresh,
+                        cnt_info[i].logic);
 
       //
       // Check for no matched pairs to process
       //
-      if(ff_na.n_elements() == 0) continue;
+      if(pd.n_obs == 0) continue;
 
       //
       // Compute the stats, normal confidence intervals, and
@@ -1389,13 +1401,15 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
                          conf_info.obs_info[i_vx]->is_precipitation());
 
       if(conf_info.boot_interval == BootIntervalType_BCA) {
-         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na, cc_na,
+         compute_cnt_stats_ci_bca(rng_ptr,
+            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep,
             cnt_info[i], conf_info.tmp_dir);
       }
       else {
-         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na, cc_na,
+         compute_cnt_stats_ci_perc(rng_ptr,
+            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
             cnt_info[i], conf_info.tmp_dir);
@@ -1409,7 +1423,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
 
 void do_sl1l2(SL1L2Info *&s_info, int i_vx,
               const NumArray &f_na, const NumArray &o_na,
-              const NumArray &c_na) {
+              const NumArray &c_na, const NumArray &w_na) {
    int i;
 
    mlog << Debug(2)
@@ -1430,7 +1444,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
       //
       // Compute partial sums
       //
-      s_info[i].set(f_na, o_na, c_na);
+      s_info[i].set(f_na, o_na, c_na, w_na);
 
    } // end for i
 
@@ -1442,7 +1456,8 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx,
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const NumArray &uf_na, const NumArray &vf_na,
               const NumArray &uo_na, const NumArray &vo_na,
-              const NumArray &uc_na, const NumArray &vc_na) {
+              const NumArray &uc_na, const NumArray &vc_na,
+              const NumArray &w_na) {
    int i;
 
    // Check that the number of pairs are the same
@@ -1470,7 +1485,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       //
       // Compute partial sums
       //
-      v_info[i].set(uf_na, vf_na, uo_na, vo_na, uc_na, vc_na);
+      v_info[i].set(uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, w_na);
 
    } // end for i
 
@@ -1586,7 +1601,8 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
 void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
                int i_vx, int i_wdth, int i_thresh,
                const NumArray &f_na, const NumArray &o_na,
-               const NumArray &fthr_na, const NumArray &othr_na) {
+               const NumArray &fthr_na, const NumArray &othr_na,
+               const NumArray &w_na) {
    int i;
 
    //
@@ -1615,7 +1631,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    //
    if(conf_info.boot_interval == BootIntervalType_BCA) {
       compute_nbrcnt_stats_ci_bca(rng_ptr, f_na, o_na,
-         fthr_na, othr_na,
+         fthr_na, othr_na, w_na,
          conf_info.n_boot_rep,
          nbrcnt_info,
          conf_info.output_flag[i_nbrcnt] != STATOutputType_None,
@@ -1623,7 +1639,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    }
    else {
       compute_nbrcnt_stats_ci_perc(rng_ptr, f_na, o_na,
-         fthr_na, othr_na,
+         fthr_na, othr_na, w_na,
          conf_info.n_boot_rep, conf_info.boot_rep_prop,
          nbrcnt_info,
          conf_info.output_flag[i_nbrcnt] != STATOutputType_None,

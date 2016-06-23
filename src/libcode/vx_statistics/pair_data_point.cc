@@ -1030,3 +1030,63 @@ void VxPairDataPoint::inc_count(int ***&rej, int i, int j, int k) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Begin miscellaneous functions
+//
+////////////////////////////////////////////////////////////////////////
+
+PairDataPoint subset_pairs(const PairDataPoint &pd,
+                           const SingleThresh &ft, const SingleThresh &ot,
+                           const SetLogic type) {
+   int i;
+   PairDataPoint out_pd;
+
+   bool cflag = set_climo_flag(pd.f_na, pd.cmn_na);
+   bool wflag = set_climo_flag(pd.f_na, pd.wgt_na);
+
+   // Loop over the pairs
+   for(i=0; i<pd.n_obs; i++) {
+
+      // Check for bad data
+      if(is_bad_data(pd.f_na[i]) ||
+         is_bad_data(pd.o_na[i]) ||
+         (cflag && is_bad_data(pd.cmn_na[i])) ||
+         (wflag && is_bad_data(pd.wgt_na[i]))) continue;
+
+      // Keep pairs which meet the threshold criteria
+      if(check_fo_thresh(pd.f_na[i], ft, pd.o_na[i], ot, type)) {
+         out_pd.add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+                         pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
+                         pd.lvl_na[i], pd.elv_na[i],
+                         pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
+                         pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+      }
+   } // end for
+
+   mlog << Debug(3)
+        << "Using " << out_pd.n_obs << " of " << pd.n_obs
+        << " pairs for forecast filtering threshold " << ft.get_str()
+        << ", observation filtering threshold " << ot.get_str()
+        << ", and field logic " << setlogic_to_string(type) << ".\n";
+
+   return(out_pd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
+
+   // The climo values must have non-zero, consistent length and
+   // cannot all be bad data
+   if(c_na.n_elements() != f_na.n_elements() ||
+      c_na.n_elements() < 1 ||
+      is_bad_data(c_na.max())) return(false);
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// End miscellaneous functions
+//
+////////////////////////////////////////////////////////////////////////

@@ -884,12 +884,12 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
 void do_cnt(int n, const NumArray &f_na, const NumArray &o_na,
             const NumArray &c_na) {
    int i, j;
-   NumArray ff_na, oo_na, cc_na;
    CNTInfo cnt_info;
+   PairDataPoint pd_all, pd;
 
    mlog << Debug(4) << "Computing Continuous Statistics.\n";
 
-   // Loop over the continuous thresholds and compute stats
+   // Process each filtering threshold
    for(i=0; i<conf_info.fcnt_ta.n_elements(); i++) {
 
       // Initialize
@@ -906,14 +906,18 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na,
          cnt_info.alpha[j] = conf_info.ci_alpha[j];
       }
 
-      // Apply continuous filtering thresholds
-      subset_pairs(f_na, cnt_info.fthresh,
-                   o_na, cnt_info.othresh,
-                   c_na, conf_info.cnt_logic,
-                   ff_na, oo_na, cc_na);
+      // Store pairs in PairDataPoint object
+      pd_all.clear();
+      for(j=0; j<o_na.n_elements(); j++) {
+         pd_all.add_pair(f_na[j], o_na[j], c_na[j]);
+      }
+
+      // Apply continuous filtering thresholds to subset pairs
+      pd = subset_pairs(pd_all, cnt_info.fthresh, cnt_info.othresh,
+                        cnt_info.logic);
 
       // Check for no matched pairs to process
-      if(ff_na.n_elements() == 0) continue;
+      if(pd.n_obs == 0) continue;
 
       // Compute the stats, normal confidence intervals, and
       // bootstrap confidence intervals
@@ -921,13 +925,15 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na,
                          conf_info.obs_info[0]->is_precipitation());
 
       if(conf_info.boot_interval == BootIntervalType_BCA) {
-         compute_cnt_stats_ci_bca(rng_ptr, ff_na, oo_na, cc_na,
+         compute_cnt_stats_ci_bca(rng_ptr,
+            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep,
             cnt_info, conf_info.tmp_dir);
       }
       else {
-         compute_cnt_stats_ci_perc(rng_ptr, ff_na, oo_na, cc_na,
+         compute_cnt_stats_ci_perc(rng_ptr,
+            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
             cnt_info, conf_info.tmp_dir);
@@ -949,8 +955,12 @@ void do_sl1l2(int n, const NumArray &f_na, const NumArray &o_na,
               const NumArray &c_na) {
    int i, j;
    SL1L2Info s_info;
+   NumArray w_na;
 
    mlog << Debug(4) << "Computing Scalar Partial Sums.\n";
+
+   // Set weights to constant value
+   for(i=0; i<f_na.n_elements(); i++) w_na.add(default_grid_weight);
 
    // Loop over the continuous thresholds and compute scalar partial sums
    for(i=0; i<conf_info.fcnt_ta.n_elements(); i++) {
@@ -961,7 +971,7 @@ void do_sl1l2(int n, const NumArray &f_na, const NumArray &o_na,
       s_info.logic   = conf_info.cnt_logic;
 
       // Compute partial sums
-      s_info.set(f_na, o_na, c_na);
+      s_info.set(f_na, o_na, c_na, w_na);
 
       // Add statistic value for each possible SL1L2 column
       for(j=0; j<conf_info.output_stats[stat_sl1l2].n_elements(); j++) {

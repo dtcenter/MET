@@ -224,7 +224,7 @@ class SL1L2Info {
 
       // Compute sums
       void set(const NumArray &f_na, const NumArray &o_na,
-               const NumArray &c_na);
+               const NumArray &c_na, const NumArray &w_na);
 
       void zero_out();
       void clear();
@@ -270,7 +270,8 @@ class VL1L2Info {
       // Compute sums
       void set(const NumArray &uf_na, const NumArray &vf_na,
                const NumArray &uo_na, const NumArray &vo_na,
-               const NumArray &uc_na, const NumArray &vc_na);
+               const NumArray &uc_na, const NumArray &vc_na,
+               const NumArray &w_na);
 
       void zero_out();
       void clear();
@@ -524,13 +525,15 @@ extern void   compute_cntinfo(const SL1L2Info &, int, CNTInfo &);
 
 extern void   compute_cntinfo(const NumArray &, const NumArray &,
                               const NumArray &, const NumArray &,
+                              const NumArray &,
                               int, int, int, CNTInfo &);
 extern void   compute_i_cntinfo(const NumArray &, const NumArray &,
-                                const NumArray &, int,
-                                int, int, int, CNTInfo &);
+                                const NumArray &, const NumArray &,
+                                int, int, int, int, CNTInfo &);
 
 extern void   compute_ctsinfo(const NumArray &, const NumArray &,
-                              const NumArray &, int, int, CTSInfo &);
+                              const NumArray &,
+                              int, int, CTSInfo &);
 extern void   compute_i_ctsinfo(const NumArray &, const NumArray &,
                                 int, int, CTSInfo &);
 
@@ -544,10 +547,11 @@ extern void   compute_pctinfo(const NumArray &, const NumArray &,
 
 extern void   compute_nbrcntinfo(const NumArray &, const NumArray &,
                                  const NumArray &, const NumArray &,
-                                 const NumArray &,
+                                 const NumArray &, const NumArray &,
                                  NBRCNTInfo &, int);
 extern void   compute_i_nbrcntinfo(const NumArray &, const NumArray &,
                                    const NumArray &, const NumArray &,
+                                   const NumArray &,
                                    int, NBRCNTInfo &);
 
 extern void   compute_mean_stdev(const NumArray &, const NumArray &,
@@ -556,15 +560,6 @@ extern void   compute_mean_stdev(const NumArray &, const NumArray &,
 extern void   compute_i_mean_stdev(const NumArray &,
                                    int, double, int,
                                    CIInfo &, CIInfo &);
-
-extern void   subset_pairs(const NumArray &, const SingleThresh &,
-                           const NumArray &, const SingleThresh &,
-                           const NumArray &, const SetLogic,
-                           NumArray &, NumArray &, NumArray &);
-
-extern bool   check_fo_thresh(const double, const SingleThresh &,
-                              const double, const SingleThresh &,
-                              const SetLogic);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -53,7 +53,8 @@ extern void compute_mcts_stats_ci_bca(const gsl_rng *,
    int, MCTSInfo &, int, int, const char *);
 
 extern void compute_cnt_stats_ci_bca(const gsl_rng *,
-   const NumArray &, const NumArray &, const NumArray &,
+   const NumArray &, const NumArray &,
+   const NumArray &, const NumArray &,
    int, int, int, CNTInfo &, const char *);
 
 extern void compute_cts_stats_ci_perc(const gsl_rng *,
@@ -65,7 +66,8 @@ extern void compute_mcts_stats_ci_perc(const gsl_rng *,
    int, double, MCTSInfo &, int, int, const char *);
 
 extern void compute_cnt_stats_ci_perc(const gsl_rng *,
-   const NumArray &, const NumArray &, const NumArray &,
+   const NumArray &, const NumArray &,
+   const NumArray &, const NumArray &,
    int, int, int, double, CNTInfo &, const char *);
 
 extern void compute_nbrcts_stats_ci_bca(const gsl_rng *,
@@ -74,7 +76,7 @@ extern void compute_nbrcts_stats_ci_bca(const gsl_rng *,
 
 extern void compute_nbrcnt_stats_ci_bca(const gsl_rng *,
    const NumArray &, const NumArray &,
-   const NumArray &, const NumArray &,   
+   const NumArray &, const NumArray &, const NumArray &,
    int, NBRCNTInfo &, int, const char *);
 
 extern void compute_nbrcts_stats_ci_perc(const gsl_rng *,
@@ -83,7 +85,7 @@ extern void compute_nbrcts_stats_ci_perc(const gsl_rng *,
 
 extern void compute_nbrcnt_stats_ci_perc(const gsl_rng *,
    const NumArray &, const NumArray &,
-   const NumArray &, const NumArray &,
+   const NumArray &, const NumArray &, const NumArray &,
    int, double, NBRCNTInfo &, int, const char *);
 
 extern void compute_mean_stdev_ci_bca(const gsl_rng *, const NumArray &,

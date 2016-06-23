@@ -244,7 +244,7 @@ void process_command_line(int argc, char **argv) {
    ftype = fcst_mtddf->file_type();
 
    // Process the configuration
-   conf_info.process_config(ftype);   
+   conf_info.process_config(ftype);
 
    // Set the model name
    shc.set_model(conf_info.model);
@@ -484,7 +484,7 @@ void process_fcst_climo_files() {
    int n_fcst;
    DataPlaneArray fcst_dpa, cmn_dpa;
    unixtime file_ut, beg_ut, end_ut;
-   
+
    // Loop through each of the fields to be verified and extract
    // the forecast and climatological fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
@@ -760,7 +760,7 @@ void process_obs_file(int i_nc) {
 
          // Check for no forecast fields
          if(conf_info.vx_pd[j].fcst_dpa.n_planes() == 0) continue;
-      
+
          // Attempt to add the observation to the conf_info.vx_pd object
          conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
                                     hdr_ut, obs_qty_str, obs_arr, grid);
@@ -1249,7 +1249,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
 
    mlog << Debug(2)
         << "Computing Multi-Category Statistics.\n";
-   
+
    //
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
@@ -1294,10 +1294,10 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-   
+
 void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
    int i, j;
-   NumArray f_na, o_na, c_na;
+   PairDataPoint pd;
 
    mlog << Debug(2)
         << "Computing Continuous Statistics.\n";
@@ -1323,17 +1323,15 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
       }
 
       //
-      // Apply continuous filtering thresholds
+      // Apply continuous filtering thresholds to subset pairs
       //
-      subset_pairs(pd_ptr->f_na, cnt_info[i].fthresh,
-                   pd_ptr->o_na, cnt_info[i].othresh,
-                   pd_ptr->cmn_na, conf_info.cnt_logic[i_vx],
-                   f_na, o_na, c_na);
+      pd = subset_pairs(*pd_ptr, cnt_info[i].fthresh, cnt_info[i].othresh,
+                        conf_info.cnt_logic[i_vx]);
 
       //
       // Check for no matched pairs to process
       //
-      if(f_na.n_elements() == 0) continue;
+      if(pd.n_obs == 0) continue;
 
       //
       // Compute the stats, normal confidence intervals, and bootstrap
@@ -1343,13 +1341,15 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx, PairDataPoint *pd_ptr) {
                          conf_info.vx_pd[i_vx].obs_info->is_precipitation());
 
       if(conf_info.boot_interval == boot_bca_flag) {
-         compute_cnt_stats_ci_bca(rng_ptr, f_na, o_na, c_na,
+         compute_cnt_stats_ci_bca(rng_ptr,
+            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
-            conf_info.n_boot_rep, 
+            conf_info.n_boot_rep,
             cnt_info[i], conf_info.tmp_dir);
       }
       else {
-         compute_cnt_stats_ci_perc(rng_ptr, f_na, o_na, c_na,
+         compute_cnt_stats_ci_perc(rng_ptr,
+            pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep, conf_info.boot_rep_prop,
             cnt_info[i], conf_info.tmp_dir);
@@ -1370,7 +1370,7 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
    //
    // Process each filtering threshold
    //
-   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) { 
+   for(i=0; i<conf_info.fcnt_ta[i_vx].n_elements(); i++) {
 
       //
       // Store thresholds
@@ -1383,7 +1383,8 @@ void do_sl1l2(SL1L2Info *&s_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       // Compute partial sums
       //
-      s_info[i].set(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na);
+      s_info[i].set(pd_ptr->f_na, pd_ptr->o_na,
+                    pd_ptr->cmn_na, pd_ptr->wgt_na);
 
    } // end for i
 
@@ -1421,7 +1422,8 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       //
       v_info[i].set(ugrd_pd_ptr->f_na,   vgrd_pd_ptr->f_na,
                     ugrd_pd_ptr->o_na,   vgrd_pd_ptr->o_na,
-                    ugrd_pd_ptr->cmn_na, vgrd_pd_ptr->cmn_na);
+                    ugrd_pd_ptr->cmn_na, vgrd_pd_ptr->cmn_na,
+                    ugrd_pd_ptr->wgt_na);
    } // end for i
 
    return;

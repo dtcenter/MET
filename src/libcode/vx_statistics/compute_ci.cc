@@ -44,10 +44,10 @@ static void read_ldf(const char *, int, NumArray &);
 void compute_normal_ci(double v, double alpha, double se,
                        double &cl, double &cu) {
    double cv_normal_l, cv_normal_u;
-   
+
    cv_normal_l = normal_cdf_inv(alpha/2.0, 0.0, 1.0);
    cv_normal_u = normal_cdf_inv(1.0 - (alpha/2.0), 0.0, 1.0);
-   
+
    cl = v + cv_normal_l * se;
    cu = v + cv_normal_u * se;
 
@@ -830,7 +830,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
       // Initialize column counter
       //
       c = 1;
-      
+
       //
       // Compute bootstrap interval for acc
       //
@@ -926,6 +926,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
                               const NumArray &f_na,
                               const NumArray &o_na,
                               const NumArray &c_na,
+                              const NumArray &w_na,
                               int precip_flag, int rank_flag,
                               int b, CNTInfo &cnt_info,
                               const char *tmp_dir) {
@@ -962,8 +963,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Compute continuous stats from the raw data with the
    // normal_ci_flag set
    //
-   compute_cntinfo(f_na, o_na, c_na, i_na, precip_flag, rank_flag, 1,
-                   cnt_info);
+   compute_cntinfo(f_na, o_na, c_na, w_na, i_na,
+                   precip_flag, rank_flag, 1, cnt_info);
 
    //
    // Do not compute bootstrap CI's if n<=1 or b==0
@@ -1003,7 +1004,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_cntinfo(f_na, o_na, c_na, i, precip_flag, 0, 0, cnt_tmp);
+         compute_i_cntinfo(f_na, o_na, c_na, w_na,
+                           i, precip_flag, 0, 0, cnt_tmp);
          write_cntinfo(cnt_i_out, cnt_tmp);
       }
 
@@ -1018,8 +1020,8 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
          // Compute continuous stats for each replicate with the
          // rank_flag and normal_ci_flag unset
          //
-         compute_cntinfo(f_na, o_na, c_na, ir_na, precip_flag, 0, 0,
-                         cnt_tmp);
+         compute_cntinfo(f_na, o_na, c_na, w_na, ir_na,
+                         precip_flag, 0, 0, cnt_tmp);
          write_cntinfo(cnt_r_out, cnt_tmp);
       }
 
@@ -1033,7 +1035,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // Initialize column counter
       //
       c = 1;
-   
+
       //
       // Compute bootstrap interval for fbar
       //
@@ -1606,7 +1608,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
                                  cts_info[i].odds.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for lodds 
+         // Compute bootstrap interval for lodds
          //
          s = cts_info[i].lodds.v;
          read_ldf(cts_r_file[i], c++, sr_na);
@@ -1917,6 +1919,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                const NumArray &f_na,
                                const NumArray &o_na,
                                const NumArray &c_na,
+                               const NumArray &w_na,
                                int precip_flag, int rank_flag,
                                int b, double m_prop, CNTInfo &cnt_info,
                                const char *tmp_dir) {
@@ -1958,9 +1961,8 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Compute continuous stats from the raw data with the
    // normal_ci_flag set
    //
-   compute_cntinfo(f_na, o_na, c_na, i_na,
-                   precip_flag, rank_flag, 1,
-                   cnt_info);
+   compute_cntinfo(f_na, o_na, c_na, w_na, i_na,
+                   precip_flag, rank_flag, 1, cnt_info);
 
    //
    // Do not compute bootstrap CI's if n<=1 or b== 0
@@ -2001,9 +2003,8 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
          // Compute continuous stats for each replicate with the
          // rank_flag and normal_ci_flag unset
          //
-         compute_cntinfo(f_na, o_na, c_na, ir_na,
-                         precip_flag, 0, 0,
-                         cnt_tmp);
+         compute_cntinfo(f_na, o_na, c_na, w_na, ir_na,
+                         precip_flag, 0, 0, cnt_tmp);
          write_cntinfo(cnt_r_out, cnt_tmp);
       }
 
@@ -2434,7 +2435,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
          // Initialize column counter
          //
          c = 1;
-         
+
          //
          // Compute bootstrap interval for baser
          //
@@ -2724,6 +2725,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
 void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
                                  const NumArray &f_na, const NumArray &o_na,
                                  const NumArray &f_thr_na, const NumArray &o_thr_na,
+                                 const NumArray &w_na,
                                  int b, NBRCNTInfo &nbrcnt_info,
                                  int nbrcnt_flag,
                                  const char *tmp_dir) {
@@ -2759,7 +2761,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Compute continuous stats from the raw data
    //
-   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, i_na,
+   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, i_na,
                       nbrcnt_info, nbrcnt_flag);
 
    //
@@ -2801,7 +2803,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
       // point removed and write out to a temp file
       //
       for(i=0; i<n; i++) {
-         compute_i_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na,
+         compute_i_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na,
                               i, nbrcnt_tmp);
          write_nbrcntinfo(nbrcnt_i_out, nbrcnt_tmp);
       }
@@ -2816,7 +2818,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
          //
          // Compute continuous stats for each replicate
          //
-         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, ir_na,
+         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, ir_na,
                             nbrcnt_tmp, 1);
          write_nbrcntinfo(nbrcnt_r_out, nbrcnt_tmp);
       }
@@ -3206,7 +3208,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
                                   nbrcts_info[i].cts_info.odds.v_bcu[j]);
 
          //
-         // Compute bootstrap interval for lodds 
+         // Compute bootstrap interval for lodds
          //
          s = nbrcts_info[i].cts_info.lodds.v;
          read_ldf(nbrcts_r_file[i], c++, sr_na);
@@ -3325,6 +3327,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
 void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
                                   const NumArray &f_na, const NumArray &o_na,
                                   const NumArray &f_thr_na, const NumArray &o_thr_na,
+                                  const NumArray &w_na,
                                   int b, double m_prop,
                                   NBRCNTInfo &nbrcnt_info,
                                   int nbrcnt_flag,
@@ -3361,7 +3364,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Compute continuous stats from the raw data
    //
-   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, i_na,
+   compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, i_na,
                       nbrcnt_info, nbrcnt_flag);
 
    //
@@ -3403,7 +3406,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
          //
          // Compute continuous stats for each replicate
          //
-         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, ir_na,
+         compute_nbrcntinfo(f_na, o_na, f_thr_na, o_thr_na, w_na, ir_na,
                             nbrcnt_tmp, 1);
          write_nbrcntinfo(nbrcnt_r_out, nbrcnt_tmp);
       }

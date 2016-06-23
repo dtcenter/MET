@@ -1262,6 +1262,45 @@ void check_mctc_thresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool check_fo_thresh(const double f, const SingleThresh &ft,
+                     const double o, const SingleThresh &ot,
+                     const SetLogic type) {
+   bool status = true;
+   bool fcheck = ft.check(f);
+   bool ocheck = ot.check(o);
+   SetLogic t  = type;
+
+   // If either of the thresholds is NA, reset the logic to intersection
+   // because an NA threshold is always true.
+   if(ft.get_type() == thresh_na || ot.get_type() == thresh_na) {
+      t = SetLogic_Intersection;
+   }
+
+   switch(t) {
+      case(SetLogic_Union):
+         if(!fcheck && !ocheck) status = false;
+         break;
+
+      case(SetLogic_Intersection):
+         if(!fcheck || !ocheck) status = false;
+         break;
+
+      case(SetLogic_SymDiff):
+         if(fcheck == ocheck) status = false;
+         break;
+
+      default:
+         mlog << Error << "\ncheck_fo_thresh() -> "
+              << "Unexpected SetLogic value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 const char * statlinetype_to_string(const STATLineType t) {
    const char *s = (const char *) 0;
 
