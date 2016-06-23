@@ -1982,7 +1982,9 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
       if(tok.n_elements() > 3) hms.parse_delim(tok[3], ":");
       else                     hms.parse_delim("00:00:00", ":");
       ref_ut = mdyhms_to_unix(atoi(ymd[1]), atoi(ymd[2]), atoi(ymd[0]),
-                              atoi(hms[0]), atoi(hms[1]), atoi(hms[2]));
+                              atoi(hms[0]),
+                              hms.n_elements() > 1 ? atoi(hms[1]) : 0,
+                              hms.n_elements() > 2 ? atoi(hms[2]) : 0);
    }
 
    mlog << Debug(4) << "parse_cf_time_string() -> "
