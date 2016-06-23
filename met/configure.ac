@@ -971,9 +971,7 @@ AC_CONFIG_FILES([Makefile
                  data/colortables/NCL_colortables/Makefile
                  data/config/Makefile
                  data/map/Makefile
-                 data/map/legacy/Makefile
-                 data/map/update_2012/Makefile
-                 data/map/update_2012/admin_by_country/Makefile
+                 data/map/admin_by_country/Makefile
                  data/poly/Makefile
                  data/poly/HMT_masks/Makefile
                  data/ps/Makefile
