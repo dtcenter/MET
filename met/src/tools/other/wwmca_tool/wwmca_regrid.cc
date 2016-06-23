@@ -234,7 +234,7 @@ void set_sh_filename(const StringArray & a)
 {
 
 if ( a.n_elements() != 1 && a.n_elements() != 2 )  {
-   mlog << Error << "\nset_nh_filename() -> "
+   mlog << Error << "\nset_sh_filename() -> "
         << "unexpected number of arguments (" << a.n_elements()
         << ").\n\n";
    exit ( 1 );
