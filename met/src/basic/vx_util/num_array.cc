@@ -895,3 +895,34 @@ return ( subset );
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::wmean(const NumArray &wgt) const
+
+{
+
+if ( wgt.n_elements() != Nelements )  {
+   mlog << Error << "\nNumArray::wmean(const NumArray &) -> "
+        << "the number of elements do not match\n\n";
+   exit ( 1 );
+}
+
+int j, count;
+double w, s, wmn;
+
+for(j=0, count=0, w=0.0, s=0.0; j<Nelements; j++) {
+   if(is_bad_data(e[j]) || is_bad_data(wgt[j])) continue;
+   s += wgt[j]*e[j];
+   w += wgt[j];
+   count++;
+}
+
+if(count == 0) wmn = bad_data_double;
+else           wmn = s/w;
+
+return(wmn);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
