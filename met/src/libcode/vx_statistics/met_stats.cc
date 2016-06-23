@@ -18,14 +18,11 @@ using namespace std;
 #include <cmath>
 
 #include "met_stats.h"
+#include "pair_data_point.h"
 #include "compute_ci.h"
 #include "grib_strings.h"
 #include "vx_util.h"
 #include "vx_log.h"
-
-////////////////////////////////////////////////////////////////////////
-
-extern bool set_cflag(const NumArray &, const NumArray &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1065,25 +1062,12 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
-                    const NumArray &in_c_na) {
+void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
+                    const NumArray &c_na, const NumArray &w_na) {
    int i;
-   double f, o, c;
-   double f_sum, o_sum, fo_sum, ff_sum, oo_sum;
-   double fa_sum, oa_sum, foa_sum, ffa_sum, ooa_sum;
-   double abs_err_sum;
-   NumArray f_na, o_na, c_na;
-   bool cflag;
-
-   // Initialize
-   zero_out();
-
-   // Apply filtering thresholds to subset the matched pairs
-   subset_pairs(in_f_na, fthresh, in_o_na, othresh, in_c_na,
-                logic, f_na, o_na, c_na);
-
-   // Check for no matched pairs to process
-   if(f_na.n_elements() == 0) return;
+   double f, o, c, w, w_sum;
+   PairDataPoint pd_all, pd;
+   bool cflag, wflag;
 
    // Check for mismatch
    if(f_na.n_elements() != o_na.n_elements()) {
@@ -1094,40 +1078,60 @@ void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
       exit(1);
    }
 
-   // Flag to process climo
-   cflag = set_cflag(f_na, c_na);
+   // Initialize
+   zero_out();
 
-   // Initialize the counts and sums
-   f_sum  = o_sum  = fo_sum  = ff_sum  = oo_sum  = 0.0;
-   fa_sum = oa_sum = foa_sum = ffa_sum = ooa_sum = 0.0;
-   abs_err_sum = 0.0;
+   // Flag to process climo and weights
+   cflag = set_climo_flag(f_na, c_na);
+   wflag = set_climo_flag(f_na, w_na);
+
+   //
+   // Store pairs in PairDataPoint object
+   //
+   for(i=0; i<o_na.n_elements(); i++) {
+      c = (cflag ? c_na[i] : bad_data_double);
+      w = (wflag ? w_na[i] : default_grid_weight);
+      pd_all.add_pair(f_na[i], o_na[i], c, w);
+   }
+
+   //
+   // Apply continuous filtering thresholds to subset pairs
+   //
+   pd = subset_pairs(pd_all, fthresh, othresh, logic);
+
+   // Check for no matched pairs to process
+   if(pd.n_obs == 0) return;
+
+   // Get the sum of the weights
+   w_sum = w_na.sum();
 
    // Loop through the pair data and compute sums
-   for(i=0; i<f_na.n_elements(); i++) {
+   for(i=0; i<pd.n_obs; i++) {
 
-      f = f_na[i];
-      o = o_na[i];
-      c = (cflag ? c_na[i] : bad_data_double);
+      f = pd.f_na[i];
+      o = pd.o_na[i];
+      c = pd.cmn_na[i];
+      w = pd.wgt_na[i]/w_sum;
 
       // Skip bad data values in the forecast or observation fields
       if(is_bad_data(f) || is_bad_data(o)) continue;
 
       // SL1L2 sums
-      f_sum       += f;
-      o_sum       += o;
-      fo_sum      += f*o;
-      ff_sum      += f*f;
-      oo_sum      += o*o;
-      abs_err_sum += fabs(f-o);
+      fbar  += w*f;
+      obar  += w*o;
+      fobar += w*f*o;
+      ffbar += w*f*f;
+      oobar += w*o*o;
+      mae   += w*fabs(f-o);
       scount++;
 
       // SAL1L2 sums
       if(!is_bad_data(c)) {
-         fa_sum  += f-c;
-         oa_sum  += o-c;
-         foa_sum += (f-c)*(o-c);
-         ffa_sum += (f-c)*(f-c);
-         ooa_sum += (o-c)*(o-c);
+         fabar  += w*(f-c);
+         oabar  += w*(o-c);
+         foabar += w*(f-c)*(o-c);
+         ffabar += w*(f-c)*(f-c);
+         ooabar += w*(o-c)*(o-c);
          sacount++;
       }
    }
@@ -1138,23 +1142,8 @@ void SL1L2Info::set(const NumArray &in_f_na, const NumArray &in_o_na,
       exit(1);
    }
 
-   // Compute the mean SL1L2 values
-   fbar  = f_sum/scount;
-   obar  = o_sum/scount;
-   fobar = fo_sum/scount;
-   ffbar = ff_sum/scount;
-   oobar = oo_sum/scount;
-   mae   = abs_err_sum/scount;
-
    // Compute the mean SAL1L2 values
-   if(sacount > 0) {
-      fabar  = fa_sum/sacount;
-      oabar  = oa_sum/sacount;
-      foabar = foa_sum/sacount;
-      ffabar = ffa_sum/sacount;
-      ooabar = ooa_sum/sacount;
-   }
-   else {
+   if(sacount == 0) {
       fabar  = bad_data_double;
       oabar  = bad_data_double;
       foabar = bad_data_double;
@@ -1414,41 +1403,45 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VL1L2Info::set(const NumArray &uf_na, const NumArray &vf_na,
-                    const NumArray &uo_na, const NumArray &vo_na,
-                    const NumArray &uc_na, const NumArray &vc_na) {
+void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
+                    const NumArray &uo_in_na, const NumArray &vo_in_na,
+                    const NumArray &uc_in_na, const NumArray &vc_in_na,
+                    const NumArray &w_in_na) {
    int i;
-   double uf, vf, uo, vo, uc, vc, fwind, owind;
-   bool climo_flag;
+   double uf, vf, uo, vo, uc, vc, fwind, owind, w, w_sum;
+   NumArray uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, w_na;
+   bool cflag, wflag;
 
    // Initialize
    zero_out();
 
    // Check that the number of pairs are the same
-   if(uf_na.n_elements() != uo_na.n_elements() ||
-      uf_na.n_elements() != vf_na.n_elements() ||
-      vf_na.n_elements() != vo_na.n_elements()) {
+   if(uf_in_na.n_elements() != uo_in_na.n_elements() ||
+      uf_in_na.n_elements() != vf_in_na.n_elements() ||
+      vf_in_na.n_elements() != vo_in_na.n_elements()) {
       mlog << Error << "\nVL1L2Info::set() -> "
            << "unequal number of UGRD and VGRD pairs ("
-           << uf_na.n_elements() << " != " << uo_na.n_elements()
+           << uf_in_na.n_elements() << " != " << uo_in_na.n_elements()
            << ")\n\n";
       exit(1);
    }
 
    // Check for climatology values
-   climo_flag = (uc_na.n_elements() == uf_na.n_elements() &&
-                 vc_na.n_elements() == vf_na.n_elements());
+   cflag = (uc_in_na.n_elements() == uf_in_na.n_elements() &&
+            vc_in_na.n_elements() == vf_in_na.n_elements());
+   wflag = set_climo_flag(uf_in_na, w_in_na);
 
-   // Loop through the pair data and compute sums
-   for(i=0; i<uf_na.n_elements(); i++) {
+   // Loop through the pair data and filter
+   for(i=0; i<uf_in_na.n_elements(); i++) {
 
       // Retrieve the U,V values
-      uf = uf_na[i];
-      vf = vf_na[i];
-      uo = uo_na[i];
-      vo = vo_na[i];
-      uc = (climo_flag ? uc_na[i] : bad_data_double);
-      vc = (climo_flag ? vc_na[i] : bad_data_double);
+      uf = uf_in_na[i];
+      vf = vf_in_na[i];
+      uo = uo_in_na[i];
+      vo = vo_in_na[i];
+      uc = (cflag ? uc_in_na[i] : bad_data_double);
+      vc = (cflag ? vc_in_na[i] : bad_data_double);
+      w  = (wflag ?  w_in_na[i] : default_grid_weight);
 
       // Compute wind speeds
       fwind = convert_u_v_to_wind(uf, vf);
@@ -1459,32 +1452,53 @@ void VL1L2Info::set(const NumArray &uf_na, const NumArray &vf_na,
          is_bad_data(uo)    || is_bad_data(vo) ||
          is_bad_data(fwind) || is_bad_data(owind)) continue;
 
-      // Apply wind speed thresholds
-      if(!check_fo_thresh(fwind, fthresh, owind, othresh,
-                          logic)) continue;
+      // Check wind speed thresholds
+      if(check_fo_thresh(fwind, fthresh, owind, othresh, logic)) {
+         uf_na.add(uf);
+         vf_na.add(vf);
+         uo_na.add(uo);
+         vo_na.add(vo);
+         uc_na.add(uc);
+         vc_na.add(vc);
+         w_na.add(w);
+      }
+   }
 
-      // Add this pair to the VL1L2 and VAL1L2 counts
+   // Get the sum of the weights
+   w_sum = w_na.sum();
+
+   // Loop through the filtered pair data compute partial sums
+   for(i=0; i<uf_na.n_elements(); i++) {
+
+      // Retrieve the U,V values
+      uf = uf_in_na[i];
+      vf = vf_in_na[i];
+      uo = uo_in_na[i];
+      vo = vo_in_na[i];
+      uc = uc_in_na[i];
+      vc = vc_in_na[i];
+      w  = w_in_na[i]/w_sum;
 
       // VL1L2 sums
       vcount  += 1;
-      ufbar   += uf;
-      vfbar   += vf;
-      uobar   += uo;
-      vobar   += vo;
-      uvfobar += uf*uo+vf*vo;
-      uvffbar += uf*uf+vf*vf;
-      uvoobar += uo*uo+vo*vo;
+      ufbar   += w*uf;
+      vfbar   += w*vf;
+      uobar   += w*uo;
+      vobar   += w*vo;
+      uvfobar += w*(uf*uo+vf*vo);
+      uvffbar += w*(uf*uf+vf*vf);
+      uvoobar += w*(uo*uo+vo*vo);
 
       // VAL1L2 sums
       if(!is_bad_data(uc) && !is_bad_data(vc)) {
          vacount  += 1;
-         ufabar   += uf-uc;
-         vfabar   += vf-vc;
-         uoabar   += uo-uc;
-         voabar   += vo-vc;
-         uvfoabar += (uf-uc)*(uo-uc)+(vf-vc)*(vo-vc);
-         uvffabar += (uf-uc)*(uf-uc)+(vf-vc)*(vf-vc);
-         uvooabar += (uo-uc)*(uo-uc)+(vo-vc)*(vo-vc);
+         ufabar   += w*(uf-uc);
+         vfabar   += w*(vf-vc);
+         uoabar   += w*(uo-uc);
+         voabar   += w*(vo-vc);
+         uvfoabar += w*((uf-uc)*(uo-uc)+(vf-vc)*(vo-vc));
+         uvffabar += w*((uf-uc)*(uf-uc)+(vf-vc)*(vf-vc));
+         uvooabar += w*((uo-uc)*(uo-uc)+(vo-vc)*(vo-vc));
       }
    } // end for i
 
@@ -1495,9 +1509,8 @@ void VL1L2Info::set(const NumArray &uf_na, const NumArray &vf_na,
         << othresh.get_str() << ", and field logic "
         << setlogic_to_string(logic) << ".\n";
 
-   // Compute means
+   // Check for 0 points
    if(vcount == 0) {
-      // Set to bad data
       ufbar   = bad_data_double;
       vfbar   = bad_data_double;
       uobar   = bad_data_double;
@@ -1506,19 +1519,8 @@ void VL1L2Info::set(const NumArray &uf_na, const NumArray &vf_na,
       uvffbar = bad_data_double;
       uvoobar = bad_data_double;
    }
-   else {
-      // Compute the mean VL1L2 values
-      ufbar   /= vcount;
-      vfbar   /= vcount;
-      uobar   /= vcount;
-      vobar   /= vcount;
-      uvfobar /= vcount;
-      uvffbar /= vcount;
-      uvoobar /= vcount;
-   }
 
    if(vacount == 0) {
-      // Set to bad data
       ufabar   = bad_data_double;
       vfabar   = bad_data_double;
       uoabar   = bad_data_double;
@@ -1526,16 +1528,6 @@ void VL1L2Info::set(const NumArray &uf_na, const NumArray &vf_na,
       uvfoabar = bad_data_double;
       uvffabar = bad_data_double;
       uvooabar = bad_data_double;
-   }
-   else {
-      // Compute the mean VAL1L2 values
-      ufabar   /= vacount;
-      vfabar   /= vacount;
-      uoabar   /= vacount;
-      voabar   /= vacount;
-      uvfoabar /= vacount;
-      uvffabar /= vacount;
-      uvooabar /= vacount;
    }
 
    return;
@@ -2617,14 +2609,15 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
-                     const NumArray &c_na, const NumArray &i_na,
+                     const NumArray &c_na, const NumArray &w_na,
+                     const NumArray &i_na,
                      int precip_flag, int rank_flag, int normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
-   double f, o, c, v;
-   double f_sum, o_sum, ff_sum, oo_sum, fo_sum;
-   double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
-   double err, err_sum, abs_err_sum, err_sq_sum, den;
+   double f, o, c, v, w, w_sum;
+   double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
+   double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
+   double err, err_bar, abs_err_bar, err_sq_bar, den;
    NumArray err_na, dev_na;
    bool cflag;
 
@@ -2642,15 +2635,20 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Flag to process climo
    //
-   cflag = set_cflag(f_na, c_na);
+   cflag = set_climo_flag(f_na, c_na);
+
+   //
+   // Get the sum of the weights
+   //
+   w_sum = w_na.sum();
 
    //
    // Compute the continuous statistics from the fcst and obs arrays
    //
    n       = 0;
-   f_sum   = o_sum       = ff_sum     = oo_sum  = fo_sum  = 0.0;
-   fa_sum  = oa_sum      = ffa_sum    = ooa_sum = foa_sum = 0.0;
-   err_sum = abs_err_sum = err_sq_sum = 0.0;
+   f_bar   = o_bar       = ff_bar     = oo_bar  = fo_bar  = 0.0;
+   fa_bar  = oa_bar      = ffa_bar    = ooa_bar = foa_bar = 0.0;
+   err_bar = abs_err_bar = err_sq_bar = 0.0;
    for(i=0; i<i_na.n_elements(); i++) {
 
       //
@@ -2661,6 +2659,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       f = f_na[j];
       o = o_na[j];
       c = (cflag ? c_na[j] : bad_data_double);
+      w = w_na[i]/w_sum;
 
       //
       // Should be no bad data, but checking to be sure
@@ -2674,22 +2673,22 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       err = f-o;
       err_na.add(err);
 
-      f_sum       += f;
-      o_sum       += o;
-      ff_sum      += f*f;
-      oo_sum      += o*o;
-      fo_sum      += f*o;
-      err_sum     += err;
-      abs_err_sum += fabs(err);
-      err_sq_sum  += err*err;
+      f_bar       += w*f;
+      o_bar       += w*o;
+      ff_bar      += w*f*f;
+      oo_bar      += w*o*o;
+      fo_bar      += w*f*o;
+      err_bar     += w*err;
+      abs_err_bar += w*fabs(err);
+      err_sq_bar  += w*err*err;
       n++;
 
       if(cflag) {
-         fa_sum  += f-c;
-         oa_sum  += o-c;
-         foa_sum += (f-c)*(o-c);
-         ffa_sum += (f-c)*(f-c);
-         ooa_sum += (o-c)*(o-c);
+         fa_bar  += w*(f-c);
+         oa_bar  += w*(o-c);
+         foa_bar += w*(f-c)*(o-c);
+         ffa_bar += w*(f-c)*(f-c);
+         ooa_bar += w*(o-c)*(o-c);
       }
    } // end for i
 
@@ -2701,14 +2700,14 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute forecast mean and standard deviation
    //
-   cnt_info.fbar.v   = f_sum/n;
-   cnt_info.fstdev.v = compute_stdev(f_sum, ff_sum, n);
+   cnt_info.fbar.v   = f_bar;
+   cnt_info.fstdev.v = compute_stdev(f_bar*n, ff_bar*n, n);
 
    //
    // Compute observation mean and standard deviation
    //
-   cnt_info.obar.v   = o_sum/n;
-   cnt_info.ostdev.v = compute_stdev(o_sum, oo_sum, n);
+   cnt_info.obar.v   = o_bar;
+   cnt_info.ostdev.v = compute_stdev(o_bar*n, oo_bar*n, n);
 
    //
    // Compute multiplicative bias
@@ -2721,26 +2720,26 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute Pearson correlation coefficient
    //
-   v = (n*ff_sum - f_sum*f_sum)*(n*oo_sum - o_sum*o_sum);
+   v = (n*n*ff_bar - n*n*f_bar*f_bar)*(n*n*oo_bar - n*n*o_bar*o_bar);
    if(v < 0 || is_eq(v, 0.0)) {
       cnt_info.pr_corr.v = bad_data_double;
    }
    else {
       den = sqrt(v);
-      cnt_info.pr_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
+      cnt_info.pr_corr.v = ((n*n*fo_bar) - (n*n*f_bar*o_bar))/den;
    }
 
    //
    // Compute Anomaly Correlation
    //
    if(cflag) {
-      v = (n*ffa_sum - fa_sum*fa_sum)*(n*ooa_sum - oa_sum*oa_sum);
+      v = (n*n*ffa_bar - n*n*fa_bar*fa_bar)*(n*n*ooa_bar - n*n*oa_bar*oa_bar);
       if(v < 0 || is_eq(v, 0.0)) {
          cnt_info.anom_corr.v = bad_data_double;
       }
       else {
          den = sqrt(v);
-         cnt_info.anom_corr.v = ((n*foa_sum) - (fa_sum*oa_sum))/den;
+         cnt_info.anom_corr.v = ((n*n*foa_bar) - (n*n*fa_bar*oa_bar))/den;
       }
    }
    else {
@@ -2768,8 +2767,8 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute mean error and standard deviation of the mean error
    //
-   cnt_info.me.v     = err_sum/n;
-   cnt_info.estdev.v = compute_stdev(err_sum, err_sq_sum, n);
+   cnt_info.me.v     = err_bar;
+   cnt_info.estdev.v = compute_stdev(n*err_bar, n*err_sq_bar, n);
 
    //
    // Compute mean error squared
@@ -2779,12 +2778,12 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute mean absolute error
    //
-   cnt_info.mae.v = abs_err_sum/n;
+   cnt_info.mae.v = abs_err_bar;
 
    //
    // Compute mean squared error
    //
-   cnt_info.mse.v = err_sq_sum/n;
+   cnt_info.mse.v = err_sq_bar;
 
    //
    // Compute mean squared error skill score
@@ -2803,7 +2802,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute root mean squared error
    //
-   cnt_info.rmse.v = sqrt(err_sq_sum/n);
+   cnt_info.rmse.v = sqrt(err_sq_bar);
 
    //
    // Only compute the Kendall Tau and Spearman's Rank corrleation
@@ -2812,7 +2811,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    if(rank_flag) {
       int concordant, discordant, extra_f, extra_o;
       int n_zero_zero, n_f_rank, n_o_rank, n_f_rank_ties, n_o_rank_ties;
-      NumArray f_na2, o_na2, f_na_rank, o_na_rank;
+      NumArray f_na2, o_na2, f_na_rank, o_na_rank, w_na2;
 
       //
       // If verifying precipitation, mask out the (0, 0) cases.
@@ -2826,15 +2825,13 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
             //
             j = nint(i_na[i]);
 
-            f = f_na[j];
-            o = o_na[j];
-
             //
             // Only copy them over if f > 0 or o > 0
             //
-            if(f > 0.0001 || o > 0.0001) {
-               f_na2.add(f);
-               o_na2.add(o);
+            if(f_na[j] > 0.0001 || o_na[j] > 0.0001) {
+               f_na2.add(f_na[j]);
+               o_na2.add(o_na[j]);
+               w_na2.add(w_na[j]);
             }
             else {
                n_zero_zero++;
@@ -2851,6 +2848,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
             j = nint(i_na[i]);
             f_na2.add(f_na[j]);
             o_na2.add(o_na[j]);
+            w_na2.add(w_na[j]);
          }
          n_zero_zero = 0;
       }
@@ -2881,32 +2879,38 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       cnt_info.orank_ties = n_o_rank_ties;
 
       //
+      // Get the sum of the weights
+      //
+      w_sum = w_na2.sum();
+
+      //
       // Compute sums for the ranks for use in computing Spearman's
       // Rank correlation coefficient
       //
-      f_sum = o_sum = ff_sum = oo_sum = fo_sum = 0.0;
+      f_bar = o_bar = ff_bar = oo_bar = fo_bar = 0.0;
       for(i=0; i<n_f_rank; i++) {
 
          f = f_na_rank[i];
          o = o_na_rank[i];
+         w = w_na2[i]/w_sum;
 
-         f_sum  += f;
-         o_sum  += o;
-         ff_sum += f*f;
-         oo_sum += o*o;
-         fo_sum += f*o;
+         f_bar  += w*f;
+         o_bar  += w*o;
+         ff_bar += w*f*f;
+         oo_bar += w*o*o;
+         fo_bar += w*f*o;
       } // end for i
 
       //
       // Compute Spearman's Rank correlation coefficient
       //
-      v = (n*ff_sum - f_sum*f_sum)*(n*oo_sum - o_sum*o_sum);
+      v = (n*n*ff_bar - n*n*f_bar*f_bar)*(n*n*oo_bar - n*n*o_bar*o_bar);
       if(v < 0 || is_eq(v, 0.0)) {
          cnt_info.sp_corr.v = bad_data_double;
       }
       else {
          den = sqrt(v);
-         cnt_info.sp_corr.v = ((n*fo_sum) - (f_sum*o_sum))/den;
+         cnt_info.sp_corr.v = ((n*n*fo_bar) - (n*n*f_bar*o_bar))/den;
       }
 
       //
@@ -2964,11 +2968,11 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
-                       const NumArray &c_na, int skip,
-                       int precip_flag, int rank_flag, int normal_ci_flag,
-                       CNTInfo &cnt_info) {
+                       const NumArray &c_na, const NumArray &w_na,
+                       int skip, int precip_flag, int rank_flag,
+                       int normal_ci_flag, CNTInfo &cnt_info) {
    int i, n, count;
-   NumArray f_na_i, o_na_i, c_na_i, i_na_i;
+   NumArray f_na_i, o_na_i, c_na_i, w_na_i, i_na_i;
    bool cflag;
 
    //
@@ -2994,7 +2998,7 @@ void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Flag to process climo
    //
-   cflag = set_cflag(f_na, c_na);
+   cflag = set_climo_flag(f_na, c_na);
 
    //
    // Copy over the forecast, observation, and index values except
@@ -3005,11 +3009,12 @@ void compute_i_cntinfo(const NumArray &f_na, const NumArray &o_na,
       f_na_i.add(f_na[i]);
       o_na_i.add(o_na[i]);
       if(cflag) c_na_i.add(c_na[i]);
+      w_na_i.add(w_na[i]);
       i_na_i.add(count);
       count++;
    }
 
-   compute_cntinfo(f_na_i, o_na_i, c_na_i, i_na_i,
+   compute_cntinfo(f_na_i, o_na_i, c_na_i, w_na_i, i_na_i,
                    precip_flag, rank_flag, normal_ci_flag,
                    cnt_info);
 
@@ -3253,7 +3258,7 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    n_pair = f_na.n_elements();
 
    // Flag to process climo
-   cflag = set_cflag(f_na, c_na);
+   cflag = set_climo_flag(f_na, c_na);
 
    //
    // Store the thresholds as an array of doubles
@@ -3327,11 +3332,11 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
 
 void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
                         const NumArray &f_thr_na, const NumArray &o_thr_na,
-                        const NumArray &i_na,
+                        const NumArray &w_na, const NumArray &i_na,
                         NBRCNTInfo &nbrcnt_info, int nbrcnt_flag) {
    int i, j, n;
-   double f, o, ff_sum, oo_sum, fo_sum;
-   double f_thr_sum, o_thr_sum;
+   double f, o, w, w_sum, ff_bar, oo_bar, fo_bar;
+   double f_thr_bar, o_thr_bar;
 
    //
    // Check that the input arrays have the same length
@@ -3352,10 +3357,15 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    n = i_na.n_elements();
 
    //
+   // Get the sum of the weights
+   //
+   w_sum = w_na.sum();
+
+   //
    // Compute the continuous statistics from the fcst and obs arrays
    //
-   ff_sum = oo_sum = fo_sum = 0.0;
-   f_thr_sum = o_thr_sum = 0.0;
+   ff_bar = oo_bar = fo_bar = 0.0;
+   f_thr_bar = o_thr_bar = 0.0;
    for(i=0; i<n; i++) {
 
       //
@@ -3365,13 +3375,14 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
 
       f = f_na[j];
       o = o_na[j];
+      w = w_na[i]/w_sum;
 
-      ff_sum += f*f;
-      oo_sum += o*o;
-      fo_sum += f*o;
+      ff_bar += w*f*f;
+      oo_bar += w*o*o;
+      fo_bar += w*f*o;
 
-      f_thr_sum += f_thr_na[j];
-      o_thr_sum += o_thr_na[j];
+      f_thr_bar += w*f_thr_na[j];
+      o_thr_bar += w*o_thr_na[j];
    } // end for i
 
    //
@@ -3382,15 +3393,15 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute the f*o, f*f, and o*o means
    //
-   nbrcnt_info.sl1l2_info.fobar = fo_sum/n;
-   nbrcnt_info.sl1l2_info.ffbar = ff_sum/n;
-   nbrcnt_info.sl1l2_info.oobar = oo_sum/n;
+   nbrcnt_info.sl1l2_info.fobar = fo_bar;
+   nbrcnt_info.sl1l2_info.ffbar = ff_bar;
+   nbrcnt_info.sl1l2_info.oobar = oo_bar;
 
    //
    // Compute f_rate and o_rate
    //
-   nbrcnt_info.f_rate.v = f_thr_sum/n;
-   nbrcnt_info.o_rate.v = o_thr_sum/n;
+   nbrcnt_info.f_rate.v = f_thr_bar;
+   nbrcnt_info.o_rate.v = o_thr_bar;
 
    //
    // Only compute stats if requested
@@ -3406,10 +3417,10 @@ void compute_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
 
 void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
                           const NumArray &f_thr_na, const NumArray &o_thr_na,
-                          int skip,
+                          const NumArray &w_na, int skip,
                           NBRCNTInfo &nbrcnt_info) {
    int i, n, count;
-   NumArray f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, i_na_i;
+   NumArray f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, w_na_i, i_na_i;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -3441,12 +3452,13 @@ void compute_i_nbrcntinfo(const NumArray &f_na, const NumArray &o_na,
       o_na_i.add(o_na[i]);
       f_thr_na_i.add(f_thr_na[i]);
       o_thr_na_i.add(o_thr_na[i]);
+      w_na_i.add(w_na[i]);
       i_na_i.add(count);
       count++;
    }
 
-   compute_nbrcntinfo(f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, i_na_i,
-                      nbrcnt_info, 1);
+   compute_nbrcntinfo(f_na_i, o_na_i, f_thr_na_i, o_thr_na_i, w_na_i,
+                      i_na_i, nbrcnt_info, 1);
 
    return;
 }
@@ -3579,108 +3591,6 @@ void compute_i_mean_stdev(const NumArray &v_na,
                       mean_ci, stdev_ci);
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void subset_pairs(const NumArray &f_na, const SingleThresh &ft,
-                  const NumArray &o_na, const SingleThresh &ot,
-                  const NumArray &c_na, const SetLogic type,
-                  NumArray &ff_na, NumArray &oo_na, NumArray &cc_na) {
-   int i;
-   bool cflag;
-
-   if(f_na.n_elements() != o_na.n_elements()) {
-      mlog << Error << "\nsubset_pairs() -> "
-           << "the number of forecast values (" << f_na.n_elements()
-           << ") must equal the number of observed values ("
-           << o_na.n_elements() << ")\n\n";
-      exit(1);
-   }
-
-   // Flag to process climo
-   cflag = set_cflag(f_na, c_na);
-
-   // Initialize
-   ff_na.clear();
-   oo_na.clear();
-   cc_na.clear();
-
-   // Loop through the matched pairs
-   for(i=0; i<f_na.n_elements(); i++) {
-
-      // Skip bad data
-      if((is_bad_data(f_na[i]) || is_bad_data(o_na[i])) ||
-         (cflag                && is_bad_data(c_na[i]))) continue;
-
-      // Add points which meet the thresholding logic
-      if(check_fo_thresh(f_na[i], ft, o_na[i], ot, type)) {
-         ff_na.add(f_na[i]);
-         oo_na.add(o_na[i]);
-         if(cflag) cc_na.add(c_na[i]);
-      }
-   }
-
-   mlog << Debug(3)
-        << "Using " << ff_na.n_elements() << " of " << f_na.n_elements()
-        << " pairs for forecast filtering threshold " << ft.get_str()
-        << ", observation filtering threshold " << ot.get_str()
-        << ", and field logic " << setlogic_to_string(type) << ".\n";
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool check_fo_thresh(const double f, const SingleThresh &ft,
-                     const double o, const SingleThresh &ot,
-                     const SetLogic type) {
-   bool status = true;
-   bool fcheck = ft.check(f);
-   bool ocheck = ot.check(o);
-   SetLogic t  = type;
-
-   // If either of the thresholds is NA, reset the logic to intersection
-   // because an NA threshold is always true.
-   if(ft.get_type() == thresh_na || ot.get_type() == thresh_na) {
-      t = SetLogic_Intersection;
-   }
-
-   switch(t) {
-      case(SetLogic_Union):
-         if(!fcheck && !ocheck) status = false;
-         break;
-
-      case(SetLogic_Intersection):
-         if(!fcheck || !ocheck) status = false;
-         break;
-
-      case(SetLogic_SymDiff):
-         if(fcheck == ocheck) status = false;
-         break;
-
-      default:
-         mlog << Error << "\ncheck_fo_thresh() -> "
-              << "Unexpected SetLogic value of " << type << ".\n\n";
-         exit(1);
-         break;
-   }
-
-   return(status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool set_cflag(const NumArray &f_na, const NumArray &c_na) {
-
-   // The climo values must be non-zero and match the forecast values
-   if(c_na.n_elements() != f_na.n_elements() ||
-      c_na.n_elements() < 1) return(false);
-
-   // The first climo value must be valid
-   if(is_bad_data(c_na[0]))  return(false);
-
-   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////

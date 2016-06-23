@@ -2818,6 +2818,8 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
                 CNTInfo &cnt_info, const char *tmp_dir,
                 gsl_rng *rng_ptr) {
    bool precip_flag = false;
+   NumArray w_na;
+   int i;
 
    //
    // Initialize
@@ -2842,20 +2844,25 @@ void mpr_to_cnt(STATAnalysisJob &j, const AggrMPRInfo &info,
    cnt_info.alpha[0] = j.out_alpha;
 
    //
+   // Set weights to default values
+   //
+   for(i=0; i<info.f_na.n_elements(); i++) w_na.add(default_grid_weight);
+
+   //
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
    if(j.boot_interval == boot_bca_flag) {
 
       compute_cnt_stats_ci_bca(rng_ptr,
-         info.f_na, info.o_na, info.c_na,
+         info.f_na, info.o_na, info.c_na, w_na,
          precip_flag, j.rank_corr_flag, j.n_boot_rep,
          cnt_info, tmp_dir);
    }
    else {
 
       compute_cnt_stats_ci_perc(rng_ptr,
-         info.f_na, info.o_na, info.c_na,
+         info.f_na, info.o_na, info.c_na, w_na,
          precip_flag, j.rank_corr_flag, j.n_boot_rep, j.boot_rep_prop,
          cnt_info, tmp_dir);
    }

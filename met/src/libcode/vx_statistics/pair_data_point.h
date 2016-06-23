@@ -53,11 +53,23 @@ class PairDataPoint : public PairBase {
                     const char *, double, double,
                     double wgt = default_grid_weight);
 
+      bool add_pair(double, double, double,
+                    double wgt = default_grid_weight);
+
       void set_pair(int, const char *, double, double, double, double,
                     unixtime, double, double, double, double,
                     const char *, double, double,
                     double wgt = default_grid_weight);
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline bool PairDataPoint::add_pair(double f, double o, double c, double w) {
+   return(add_pair(na_str, bad_data_double, bad_data_double,
+                   bad_data_double, bad_data_double, (unixtime) 0,
+                   bad_data_double, bad_data_double, f, o, na_str,
+                   c, bad_data_double, w));
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -194,6 +206,19 @@ class VxPairDataPoint {
       double compute_interp(const DataPlaneArray &, double, double, int,
                             double, int, int);
 };
+
+////////////////////////////////////////////////////////////////////////
+//
+// Miscellanous functions
+//
+////////////////////////////////////////////////////////////////////////
+
+// Apply conditional thresholds to subset the pairs
+PairDataPoint subset_pairs(const PairDataPoint &,
+                           const SingleThresh &, const SingleThresh &,
+                           const SetLogic);
+
+extern bool   set_climo_flag(const NumArray &, const NumArray &);
 
 ////////////////////////////////////////////////////////////////////////
 

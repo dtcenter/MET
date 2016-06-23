@@ -31,6 +31,7 @@ struct ens_ssvar_pt {
    double var;
    double f;
    double o;
+   double w;
 };
 
 typedef deque<ens_ssvar_pt>       ssvar_pt_list;

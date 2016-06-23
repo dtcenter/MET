@@ -2843,10 +2843,10 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
       nint(pd_ptr->rhist_na.sum()));
 
    at.set_entry(r, c+1,  // Continuous Ranked Probability Score
-      pd_ptr->crps_na.mean());
+      pd_ptr->crps_na.wmean(pd_ptr->wgt_na));
 
    at.set_entry(r, c+2,  // Ignorance Score
-      pd_ptr->ign_na.mean());
+      pd_ptr->ign_na.wmean(pd_ptr->wgt_na));
 
    at.set_entry(r, c+3,  // Total Number of Ranks
       pd_ptr->rhist_na.n_elements());
