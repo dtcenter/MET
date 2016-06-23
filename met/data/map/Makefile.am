@@ -16,6 +16,16 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS 		= legacy update_2012
+SUBDIRS 		= admin_by_country
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+mapdir = $(pkgdatadir)/map
+
+map_DATA = \
+	admin_detail_data \
+	country_data \
+	country_detail_data \
+	major_lakes_data
+
+EXTRA_DIST = ${map_DATA}
+
+MAINTAINERCLEANFILES 	= Makefile.in

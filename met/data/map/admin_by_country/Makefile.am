@@ -16,7 +16,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-mapadmindir = $(pkgdatadir)/map/update_2012/admin_by_country
+mapadmindir = $(pkgdatadir)/map/admin_by_country
 
 mapadmin_DATA = *_data
 
