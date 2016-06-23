@@ -11,16 +11,9 @@ map_data = {
    line_dash  = "";
 
    source = [
-      {
-        file_name = "MET_BASE/map/legacy/world_data_minus_usa";
-      },
-      {
-        file_name = "MET_BASE/map/legacy/country_data_minus_usa";
-      },
-      {
-        file_name = "MET_BASE/map/legacy/usa_state_data";
-      }
-
+      { file_name = "MET_BASE/map/country_detail_data"; },
+      { file_name = "MET_BASE/map/admin_by_country/admin_United_States_data"; },
+      { file_name = "MET_BASE/map/major_lakes_data"; }
    ];
 }
 
