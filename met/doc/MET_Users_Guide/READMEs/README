@@ -851,4 +851,4 @@ output_prefix  = "";
 // The configuration file version number should match the version number of
 // the MET code being run.  This value should generally not be modified.
 //
-version = "V5.1";
+version = "V5.2";

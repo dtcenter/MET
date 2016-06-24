@@ -102,6 +102,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.1";
+version        = "V5.2";
 
 ////////////////////////////////////////////////////////////////////////////////

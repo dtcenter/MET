@@ -113,6 +113,6 @@ rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 //output_prefix  = "${OUTPUT_PREFIX}";
 output_prefix  = "GRIB2_SREF_TRMM_prob";
-version        = "V5.1";
+version        = "V5.2";
 
 ////////////////////////////////////////////////////////////////////////////////

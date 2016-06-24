@@ -17,7 +17,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char met_version[]          = "V5.1";
+static const char met_version[]          = "V5.2";
 static const char met_base_str[]         = "MET_BASE";
 static const char default_met_data_dir[] = "MET_BASE";
 static const char txt_file_ext[]         = ".txt";

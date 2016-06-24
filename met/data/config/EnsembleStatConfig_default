@@ -179,6 +179,6 @@ grid_weight_flag = NONE;
 obs_quality      = [];
 duplicate_flag   = NONE;
 output_prefix    = "";
-version          = "V5.1";
+version          = "V5.2";
 
 ////////////////////////////////////////////////////////////////////////////////

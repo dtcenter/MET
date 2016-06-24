@@ -128,6 +128,6 @@ duplicate_flag = ${DUPLICATE_FLAG};
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.1";
+version        = "V5.2";
 
 ////////////////////////////////////////////////////////////////////////////////
