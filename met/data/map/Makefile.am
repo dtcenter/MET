@@ -20,11 +20,7 @@ SUBDIRS 		= admin_by_country
 
 mapdir = $(pkgdatadir)/map
 
-map_DATA = \
-	admin_detail_data \
-	country_data \
-	country_detail_data \
-	major_lakes_data
+map_DATA = *_data
 
 EXTRA_DIST = ${map_DATA}
 
