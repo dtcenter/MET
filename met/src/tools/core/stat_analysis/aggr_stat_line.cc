@@ -2140,62 +2140,48 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
-            aggr.crps_num = aggr.crps_den = 0.0;
-            aggr.ign_num  = aggr.ign_den  = 0.0;
-            aggr.crpss_fcst_num = aggr.crpss_climo_num = aggr.crpss_den = 0.0;
-            aggr.ens_pd.rhist_na = cur.rhist_na;
+            aggr.ens_pd.clear();
+            aggr.crps_climo_na.clear();
             aggr.hdr.clear();
+            for(i=0; i<cur.n_rank; i++) aggr.ens_pd.rhist_na.add(0);
             m[key] = aggr;
          }
-         //
-         // Increment counts in the existing map entry
-         //
-         else {
-
-            //
-            // Check for N_RANK remaining constant
-            //
-            if(m[key].ens_pd.rhist_na.n_elements() != cur.n_rank) {
-               mlog << Error << "\naggr_rhist_lines() -> "
-                    << "the \"N_RANK\" column must remain constant ("
-                    << m[key].ens_pd.rhist_na.n_elements() << " != " << cur.n_rank
-                    << ").  Try setting \"-column_eq N_RANK n\".\n\n";
-               throw(1);
-            }
-
-            //
-            // Aggregate the ranked histogram counts
-            //
-            for(i=0; i<m[key].ens_pd.rhist_na.n_elements(); i++) {
-               m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rhist_na[i]);
-            }
-         } // end else
 
          //
-         // Store running sums for CRPS
-         //
-         if(!is_bad_data(cur.crps)) {
-            m[key].crps_num += cur.total * cur.crps;
-            m[key].crps_den += cur.total;
+         // Check for N_RANK remaining constant
+          //
+         if(m[key].ens_pd.rhist_na.n_elements() != cur.n_rank) {
+            mlog << Error << "\naggr_rhist_lines() -> "
+                 << "the \"N_RANK\" column must remain constant ("
+                 << m[key].ens_pd.rhist_na.n_elements() << " != " << cur.n_rank
+                 << ").  Try setting \"-column_eq N_RANK n\".\n\n";
+            throw(1);
          }
 
          //
-         // Store running sums for IGN
+         // Store the current statistics and weight
          //
-         if(!is_bad_data(cur.ign)) {
-            m[key].ign_num += cur.total * cur.ign;
-            m[key].ign_den += cur.total;
-         }
+         m[key].ens_pd.crps_na.add(cur.crps);
+         m[key].ens_pd.ign_na.add(cur.ign);
+         m[key].ens_pd.wgt_na.add(cur.total);
 
          //
-         // Store running sums for CRPSS
+         // Compute and store climatological CRPS
          //
          if(!is_bad_data(cur.crps) && !is_bad_data(cur.crpss) &&
             !is_eq(cur.crpss, 1.0)) {
             crps_climo = cur.crps / (1.0 - cur.crpss);
-            m[key].crpss_fcst_num  += cur.total * cur.crps;
-            m[key].crpss_climo_num += cur.total * crps_climo;
-            m[key].crpss_den       += cur.total;
+            m[key].crps_climo_na.add(crps_climo);
+         }
+         else {
+            m[key].crps_climo_na.add(bad_data_double);
+         }
+
+         //
+         // Aggregate the ranked histogram counts
+         //
+         for(i=0; i<m[key].ens_pd.rhist_na.n_elements(); i++) {
+            m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rhist_na[i]);
          }
 
          //
@@ -2208,30 +2194,15 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
    } // end while
 
    //
-   // Loop over the map entries and compute CRPS, IGN, and CRPSS
+   // Loop over the map entries and compute CRPSS
    //
    for(it = m.begin(); it != m.end(); it++) {
 
-      // Compute weighted-mean for CRPS
-      if(it->second.crps_den > 0) {
-         it->second.ens_pd.crps_na.add(it->second.crps_num/it->second.crps_den);
-      }
-      else {
-         it->second.ens_pd.crps_na.add(bad_data_double);
-      }
+      crps_fcst  = it->second.ens_pd.crps_na.wmean(it->second.ens_pd.wgt_na);
+      crps_climo = it->second.crps_climo_na.wmean(it->second.ens_pd.wgt_na);
 
-      // Compute weighted-mean for IGN
-      if(it->second.ign_den > 0) {
-         it->second.ens_pd.ign_na.add(it->second.ign_num/it->second.ign_den);
-      }
-      else {
-         it->second.ens_pd.ign_na.add(bad_data_double);
-      }
-
-      // Compute weighted-mean for CRPSS
-      if(it->second.crpss_den > 0 && !is_eq(it->second.crpss_climo_num, 0.0)) {
-         crps_fcst  = it->second.crpss_fcst_num/it->second.crpss_den;
-         crps_climo = it->second.crpss_climo_num/it->second.crpss_den;
+      if(!is_bad_data(crps_fcst) && !is_bad_data(crps_climo) &&
+         !is_eq(crps_climo, 0.0)) {
          it->second.ens_pd.crpss = (crps_climo - crps_fcst)/crps_climo;
       }
       else {

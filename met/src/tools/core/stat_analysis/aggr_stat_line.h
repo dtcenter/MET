@@ -121,8 +121,7 @@ struct AggrISCInfo {
 struct AggrRHISTInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
-   double crps_num, crps_den, ign_num, ign_den;
-   double crpss_fcst_num, crpss_climo_num, crpss_den;
+   NumArray crps_climo_na;
 };
 
 struct AggrPHISTInfo {
