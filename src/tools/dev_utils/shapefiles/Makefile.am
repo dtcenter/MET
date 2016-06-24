@@ -79,8 +79,3 @@ if ENABLE_DEVELOPMENT
 	-rm -f shapetype_to_string.h
 endif
 
-# Build chk4copyright when making a distribution so that we can
-#  add missing copyrights to the source files
-
-dist-hook: chk4copyright
-
