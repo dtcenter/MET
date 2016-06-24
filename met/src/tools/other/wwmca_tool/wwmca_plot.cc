@@ -16,7 +16,7 @@ static const int gray_max         = 255;
 static const double h_margin      = 40.0;
 static const double v_margin      = 80.0;
 
-static const char map_filename [] = "MET_BASE/map/legacy/world_data";
+static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
 
 
 ////////////////////////////////////////////////////////////////////////
