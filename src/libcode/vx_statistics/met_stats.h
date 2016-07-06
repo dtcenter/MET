@@ -515,6 +515,8 @@ extern void   dbl_to_str(double, char *, int);
 
 extern double compute_stdev(double, double, int);
 
+extern double compute_corr(double, double, double, double, double, int);
+
 extern double compute_afss(double, double);
 
 extern double compute_ufss(double);
