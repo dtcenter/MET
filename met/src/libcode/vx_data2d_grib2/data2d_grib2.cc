@@ -740,14 +740,17 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       case 1:     r_km = gfld->igdtmpl[2] / 1000.0; break;
       case 6:     r_km = 6371.229;  break;
       default:
-         mlog << Error << "\nMetGrib2DataFile::data_plane() - unexpected earth shape ("
-              << gfld->igdtmpl[0] << ")\n\n";
-         exit(1);
+         mlog << Debug(3)
+              << "Unexpected earth shape (" << gfld->igdtmpl[0]
+              << ").  Assuming spherical earth with radius "
+              << grib_earth_radius_km
+              << " km for internal consistentcy.\n";
+         r_km = grib_earth_radius_km;
    }
 
    //  switch radius of the earth for internal consistency
    if( !is_eq(r_km, grib_earth_radius_km) ) {
-      mlog << Debug(4)
+      mlog << Debug(3)
            << "Switching the GRIB2 radius of the earth value of "
            << r_km << " km to " << grib_earth_radius_km
            << " km for internal consistency.\n";
