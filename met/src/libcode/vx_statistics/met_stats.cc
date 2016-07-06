@@ -1103,7 +1103,7 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
    if(pd.n_obs == 0) return;
 
    // Get the sum of the weights
-   w_sum = w_na.sum();
+   w_sum = pd.wgt_na.sum();
 
    // Loop through the pair data and compute sums
    for(i=0; i<pd.n_obs; i++) {
@@ -1157,7 +1157,7 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
-   double fbar, obar, ffbar, fobar, oobar, v, den, corr;
+   double fbar, obar, ffbar, fobar, oobar, den;
    int n;
 
    // Set the quantities that can't be derived from SL1L2Info to bad data
@@ -1197,28 +1197,19 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    cnt_info.mbias.v = (is_eq(obar, 0.0) ? bad_data_double : fbar/obar);
 
    // Correlation coefficient
-   v = (ffbar*n*n - fbar*fbar*n*n) * (oobar*n*n - obar*obar*n*n);
-
-   if(v < 0 || is_eq(v, 0.0)) {
-      corr = bad_data_double;
-   }
-   else {
-      den = sqrt(v);
-      corr = ((fobar*n*n) - (fbar*obar*n*n)) / den;
-
-      // Check the computed range
-           if(corr >  1) corr =  1.0;
-      else if(corr < -1) corr = -1.0;
-   }
 
    // Handle SAL1L2 data
    if(aflag) {
       cnt_info.pr_corr.v   = bad_data_double;
-      cnt_info.anom_corr.v = corr;
+      cnt_info.anom_corr.v = compute_corr( fbar*n,  obar*n,
+                                          ffbar*n, oobar*n,
+                                          fobar*n, n);
    }
    // Handle SL1L2 data
    else {
-      cnt_info.pr_corr.v   = corr;
+      cnt_info.pr_corr.v   = compute_corr( fbar*n,  obar*n,
+                                          ffbar*n, oobar*n,
+                                          fobar*n, n);
       cnt_info.anom_corr.v = bad_data_double;
    }
 
@@ -1471,13 +1462,13 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
    for(i=0; i<uf_na.n_elements(); i++) {
 
       // Retrieve the U,V values
-      uf = uf_in_na[i];
-      vf = vf_in_na[i];
-      uo = uo_in_na[i];
-      vo = vo_in_na[i];
-      uc = uc_in_na[i];
-      vc = vc_in_na[i];
-      w  = w_in_na[i]/w_sum;
+      uf = uf_na[i];
+      vf = vf_na[i];
+      uo = uo_na[i];
+      vo = vo_na[i];
+      uc = uc_na[i];
+      vc = vc_na[i];
+      w  = w_na[i]/w_sum;
 
       // VL1L2 sums
       vcount  += 1;
@@ -2495,22 +2486,50 @@ void dbl_to_str(double v, char *v_str, int precision) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Compute standard deviation from sums of squares
+//
+////////////////////////////////////////////////////////////////////////
 
 double compute_stdev(double sum, double sum_sq, int n) {
-   double sigma, v;
+   double s, v;
 
    if(n <= 1) {
-      sigma = bad_data_double;
+      s = bad_data_double;
    }
    else {
 
       v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
 
-      if(v < 0) sigma = bad_data_double;
-      else      sigma = sqrt(v);
+           if(is_eq(v, 0.0)) s = 0.0;
+      else if(v < 0)         s = bad_data_double;
+      else                   s = sqrt(v);
    }
 
-   return(sigma);
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute correlation from sums of squares
+//
+////////////////////////////////////////////////////////////////////////
+
+double compute_corr(double f, double o, double ff, double oo, double fo,
+                    int n) {
+   double v, c;
+
+   v = (n*ff - f*f)*(n*oo - o*o);
+
+   // Check for divide by zero
+   if(v < 0 || is_eq(v, 0.0)) c = bad_data_double;
+   else                       c = ((n*fo) - (f*o))/sqrt(v);
+
+   // Check the computed range
+        if(c >  1) c =  1.0;
+   else if(c < -1) c = -1.0;
+
+   return(c);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2614,7 +2633,7 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
                      int precip_flag, int rank_flag, int normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
-   double f, o, c, v, w, w_sum;
+   double f, o, c, w, w_sum;
    double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
    double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
    double err, err_bar, abs_err_bar, err_sq_bar, den;
@@ -2720,27 +2739,17 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
    //
    // Compute Pearson correlation coefficient
    //
-   v = (n*n*ff_bar - n*n*f_bar*f_bar)*(n*n*oo_bar - n*n*o_bar*o_bar);
-   if(v < 0 || is_eq(v, 0.0)) {
-      cnt_info.pr_corr.v = bad_data_double;
-   }
-   else {
-      den = sqrt(v);
-      cnt_info.pr_corr.v = ((n*n*fo_bar) - (n*n*f_bar*o_bar))/den;
-   }
+   cnt_info.pr_corr.v = compute_corr( f_bar*n,  o_bar*n,
+                                     ff_bar*n, oo_bar*n,
+                                     fo_bar*n, n);
 
    //
    // Compute Anomaly Correlation
    //
    if(cflag) {
-      v = (n*n*ffa_bar - n*n*fa_bar*fa_bar)*(n*n*ooa_bar - n*n*oa_bar*oa_bar);
-      if(v < 0 || is_eq(v, 0.0)) {
-         cnt_info.anom_corr.v = bad_data_double;
-      }
-      else {
-         den = sqrt(v);
-         cnt_info.anom_corr.v = ((n*n*foa_bar) - (n*n*fa_bar*oa_bar))/den;
-      }
+      cnt_info.anom_corr.v = compute_corr( fa_bar*n,  oa_bar*n,
+                                          ffa_bar*n, ooa_bar*n,
+                                          foa_bar*n, n);
    }
    else {
       cnt_info.anom_corr.v = bad_data_double;
@@ -2904,14 +2913,9 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       //
       // Compute Spearman's Rank correlation coefficient
       //
-      v = (n*n*ff_bar - n*n*f_bar*f_bar)*(n*n*oo_bar - n*n*o_bar*o_bar);
-      if(v < 0 || is_eq(v, 0.0)) {
-         cnt_info.sp_corr.v = bad_data_double;
-      }
-      else {
-         den = sqrt(v);
-         cnt_info.sp_corr.v = ((n*n*fo_bar) - (n*n*f_bar*o_bar))/den;
-      }
+      cnt_info.sp_corr.v = compute_corr( f_bar*n,  o_bar*n,
+                                        ff_bar*n, oo_bar*n,
+                                        fo_bar*n, n);
 
       //
       // Compute Kendall Tau Rank correlation coefficient:
@@ -3503,17 +3507,7 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
    //
    // Compute the standard deviation
    //
-   if(n <= 1) {
-      stdev_ci.v = bad_data_double;
-   }
-   else {
-
-      v = (sum_sq - sum*sum/(double) n)/((double) (n - 1));
-
-      if(is_eq(v, 0.0)) stdev_ci.v = 0.0;
-      else if(v < 0)    stdev_ci.v = bad_data_double;
-      else              stdev_ci.v = sqrt(v);
-   }
+   stdev_ci.v = compute_stdev(sum, sum_sq, n);
 
    //
    // Compute the normal confidence interval for the mean
