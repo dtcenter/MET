@@ -2522,12 +2522,16 @@ double compute_corr(double f, double o, double ff, double oo, double fo,
    v = (n*ff - f*f)*(n*oo - o*o);
 
    // Check for divide by zero
-   if(v < 0 || is_eq(v, 0.0)) c = bad_data_double;
-   else                       c = ((n*fo) - (f*o))/sqrt(v);
+   if(v < 0 || is_eq(v, 0.0)) {
+      c = bad_data_double;
+   }
+   else {
+      c = ((n*fo) - (f*o))/sqrt(v);
 
-   // Check the computed range
-        if(c >  1) c =  1.0;
-   else if(c < -1) c = -1.0;
+      // Check the computed range
+           if(c >  1) c =  1.0;
+      else if(c < -1) c = -1.0;
+   }
 
    return(c);
 }
