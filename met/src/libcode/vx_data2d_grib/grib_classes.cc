@@ -1861,12 +1861,15 @@ file << "   nma:         " << (int) h.nma        << "\n";
 file << "   century:     " << (int) h.century    << "\n";
 file << "   sub_center:  " << (int) h.sub_center << "\n";
 
+file << "   ens_application:  " << (int) (h.ens_application)  << "\n";
+file << "   ens_type:         " << (int) (h.ens_type)         << "\n";
+file << "   ens_number:       " << (int) (h.ens_number)       << "\n";
+
 file << "   d_value:     " << char2_to_int(h.d_value) << "\n\n";
 
 return ( file );
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
