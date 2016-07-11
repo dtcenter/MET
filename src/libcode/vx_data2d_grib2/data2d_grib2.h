@@ -56,6 +56,8 @@ typedef struct {
    unixtime ValidTime;
    int LeadTime;
    int Accum;
+   int  ens_type;
+   int ens_number;
 } Grib2Record;
 
 
