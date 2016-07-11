@@ -150,6 +150,12 @@ struct Section1_Header {                     //    PDS
    unsigned char      sub_center;            //   26
    unsigned char      d_value[2];            //   27 - 28
 
+   unsigned char      a_value[12];           //   29 - 40
+
+   unsigned char      ens_application;       //   41
+   unsigned char      ens_type;              //   42
+   unsigned char      ens_number;            //   43
+
 };
 
 
