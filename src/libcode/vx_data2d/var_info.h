@@ -35,6 +35,7 @@ class VarInfo
       ConcatString Units;     // Units for parameter
       LevelInfo    Level;     // Level information
       ConcatString LongName;  // Description string
+      ConcatString Ensemble;  // Ensemble information
 
       bool         PFlag;     // Flag for probability
       ConcatString PName;     // Name for probability
@@ -76,6 +77,7 @@ class VarInfo
       ConcatString req_level_name() const;
       ConcatString level_name()     const;
       ConcatString long_name()      const;
+      ConcatString ens()            const;
 
       bool         p_flag()         const;
       ConcatString p_name()         const;
@@ -104,6 +106,7 @@ class VarInfo
       void set_req_level_name(const char *);
       void set_level_name(const char *);
       void set_long_name(const char *);
+      void set_ens(const char *);
 
       void set_p_flag(bool);
       void set_p_name(const char *);
@@ -146,6 +149,7 @@ inline LevelInfo    VarInfo::level()          const { return(Level);            
 inline ConcatString VarInfo::req_level_name() const { return(Level.req_name()); }
 inline ConcatString VarInfo::level_name()     const { return(Level.name());     }
 inline ConcatString VarInfo::long_name()      const { return(LongName);         }
+inline ConcatString VarInfo::ens()            const { return(Ensemble);         }
 
 inline bool         VarInfo::p_flag()         const { return(PFlag);            }
 inline ConcatString VarInfo::p_name()         const { return(PName);            }

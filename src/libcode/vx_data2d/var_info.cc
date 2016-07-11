@@ -99,6 +99,7 @@ void VarInfo::assign(const VarInfo &v) {
    Init      = v.init();
    Valid     = v.valid();
    Lead      = v.lead();
+   Ensemble  = v.ens ();
 
    return;
 }
@@ -126,6 +127,7 @@ void VarInfo::clear() {
    Init  = (unixtime) 0;
    Valid = (unixtime) 0;
    Lead  = bad_data_int;
+   Ensemble.clear ();
 
    return;
 }
@@ -154,6 +156,7 @@ void VarInfo::dump(ostream &out) const {
        << "  VFlag    = " << VFlag << "\n"
        << "  Init     = " << init_str << " (" << Init << ")\n"
        << "  Valid    = " << valid_str << " (" << Valid << ")\n"
+       << "  Ensemble = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
        << "  Lead     = " << lead_str << " (" << Lead << ")\n";
 
    Level.dump(out);
@@ -172,6 +175,13 @@ void VarInfo::set_req_name(const char *str) {
 
 void VarInfo::set_name(const char *str) {
    Name = str;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_ens(const char *str) {
+   Ensemble = str;
    return;
 }
 
