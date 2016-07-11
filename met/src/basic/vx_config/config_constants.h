@@ -392,6 +392,7 @@ static const char conf_key_level[]             = "level";
 static const char conf_key_GRIB_lvl_typ[]      = "GRIB_lvl_typ";
 static const char conf_key_GRIB_lvl_val1[]     = "GRIB_lvl_val1";
 static const char conf_key_GRIB_lvl_val2[]     = "GRIB_lvl_val2";
+static const char conf_key_GRIB_ens[]          = "GRIB_ens";
 static const char conf_key_message_type[]      = "message_type";
 static const char conf_key_sid_exc[]           = "sid_exc";
 static const char conf_key_obs_qty[]           = "obs_quality";
@@ -461,6 +462,9 @@ static const char conf_key_polylines_flag[]    = "polylines";
 
 static const char conf_key_do_2d_att_flag   [] = "attributes_2d";
 static const char conf_key_do_3d_att_flag   [] = "attributes_3d";
+
+static const char conf_key_grib_ens_hi_res_ctl [] = "hi_res_ctl";
+static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
 
 //
 // Climatology parameter key names
