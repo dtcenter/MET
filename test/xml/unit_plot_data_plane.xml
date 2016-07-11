@@ -60,6 +60,34 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_GRIB1_ENS">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gefs/enspost_grb1.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens17.ps \
+      'name="PRMSL";level="L0";GRIB_ens="+17";' \
+      -title "GRIB1 GEFS  PRMSL ENS +17" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens17.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB1_ENS_HI">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gefs/enspost_grb1.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens_hi.ps \
+      'name="PRMSL";level="L0";GRIB_ens="hi_res_ctl";' \
+      -title "GRIB1 GEFS  PRMSL ENS hi_res_ctl" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb1.t00z.prmsl_ens_hi.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_GRIB2">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
@@ -71,6 +99,35 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/nam_2012040900_F012_GRIB2_TMP_P500.ps</ps>
+    </output>
+  </test>
+
+
+  <test name="plot_data_plane_GRIB2_ENS">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens1.ps \
+      'name="PRMSL";level="L0";GRIB_ens="+1";' \
+      -title "GRIB1 GEFS  PRMSL ENS +1" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens1.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_ENS_LOW">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gefs/enspost_grb2.t00z.prmsl \
+      &OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens_low.ps \
+      'name="PRMSL";level="L0";GRIB_ens="low_res_ctl";' \
+      -title "GRIB1 GEFS  PRMSL ENS low_res_ctl" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/enspost_grb2.t00z.prmsl_ens_low.ps</ps>
     </output>
   </test>
 
