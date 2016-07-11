@@ -329,6 +329,37 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
    double lvl1 = vinfo->level().lower();
    double lvl2 = vinfo->level().upper();
 
+   int vinfo_ens_type=bad_data_int, vinfo_ens_number=bad_data_int;
+   ConcatString vinfo_ens = vinfo->ens();
+   if( vinfo_ens.length() > 0){
+      if( vinfo_ens == conf_key_grib_ens_hi_res_ctl ){
+         vinfo_ens_type = 0;
+         vinfo_ens_number = 0;
+      } else if( vinfo_ens == conf_key_grib_ens_low_res_ctl ){
+         vinfo_ens_type = 1;
+         vinfo_ens_number = 0;
+      } else {
+         char sign = vinfo_ens.text()[0];
+         if( sign == '+') {
+            vinfo_ens_type = 3;
+         } else if ( sign == '-' ) {
+            vinfo_ens_type = 2;
+         }
+         char* ens_number_str  = new char[vinfo_ens.length()  ];
+         strncpy(ens_number_str, vinfo_ens.text()+1, (size_t) vinfo_ens.length());
+         ens_number_str[vinfo_ens.length()-1] = (char) 0;
+
+         //  if the  string is numeric
+         if( check_reg_exp("^[0-9]*$", ens_number_str) ) vinfo_ens_number= atoi(ens_number_str);
+      }
+      // if one of the parameters was not set - error
+      if( is_bad_data(vinfo_ens_number) || is_bad_data(vinfo_ens_type) ){
+         mlog << Error << "\nfind_record_matches() - unrecognized GRIB_ens value '"
+         << vinfo_ens << "' Should be '" << conf_key_grib_ens_hi_res_ctl << "' or '" << conf_key_grib_ens_low_res_ctl << "' or '+/-' followed by the number "  << "\n\n";
+         exit(1);
+      }
+   }
+
    //  check each record for a match against the VarInfo
    for( vector<Grib2Record*>::iterator it = RecList.begin();
         it < RecList.end();
@@ -345,6 +376,24 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
           (vinfo->valid()               && vinfo->valid() != (*it)->ValidTime) ||
           (vinfo->init()                && vinfo->init()  != (*it)->InitTime)  ){
          continue;
+      }
+
+      // if this is ensemble record - test for ensemble information
+      if((*it)->PdsTmpl == 1 ||  (*it)->PdsTmpl == 11){
+
+         int ens_type = (*it)->ens_type;
+         int ens_number = (*it)->ens_number;
+
+         // if both of ens info properties are valid in vinfo - use them to match value
+         if( !is_bad_data(vinfo_ens_number) && !is_bad_data(vinfo_ens_type)){
+            ens_number = vinfo_ens_number;
+            ens_type = vinfo_ens_type;
+         }
+
+
+         if( (*it)->ens_number != ens_number || (*it)->ens_type != ens_type){
+            continue;
+         }
       }
 
       //  test for a record number match
@@ -548,10 +597,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
          //  validate the PDS template number
          if(  0 != gfld->ipdtnum &&     //  analysis or forecast
+              1 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer at a point in time
               2 != gfld->ipdtnum &&     //  ensemble mean
               5 != gfld->ipdtnum &&     //  probability forecast
               8 != gfld->ipdtnum &&     //  accumulation forecast
               9 != gfld->ipdtnum &&     //  probabilistic accumultion forecast
+             11 != gfld->ipdtnum &&     //  individual ensemble forecast, control and perturbed, at a horizontal level or in a horizontal layer, in a continuous or non-continuous time interval
              12 != gfld->ipdtnum &&     //  derived accumulation forecast (?)
              48 != gfld->ipdtnum ){     //  aerosol data
             mlog << Warning << "\nMetGrib2DataFile::data_plane() - unexpected PDS template number ("
@@ -594,6 +645,12 @@ void MetGrib2DataFile::read_grib2_record_list() {
                mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - found unexpected "
                     << "time reference indicator of " << gfld->ipdtmpl[4] << ".\n\n";
                exit(1);
+         }
+
+         //init ensemble data if appropriet
+         if( 1  == gfld->ipdtnum || 11  == gfld->ipdtnum ){
+            rec->ens_number = gfld->ipdtmpl[16];
+            rec->ens_type = gfld->ipdtmpl[15];
          }
 
          //  depending on the template number, determine the reference times
