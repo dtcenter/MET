@@ -266,6 +266,9 @@ regrid = {
 //       - The "GRIB_lvl_typ" entry specifies the level type.
 //       - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries specify the first
 //         and second level values.
+//       - The "GRIB_ens" entry is a string which specifies NCEP's usage of the 
+//         extended PDS for ensembles.  Set to "hi_res_ctl", "low_res_ctl", "+n",
+//         or "-n", for the n-th ensemble member.  
 //       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version
 //         number.
 //       - The "GRIB1_code" entry specifies the GRIB1 record number.
