@@ -75,6 +75,14 @@ class ModeConfInfo {
 
       void parse_nc_info  ();
 
+      void set_conv_radius_by_index(int);
+      void set_conv_thresh_by_index(int);
+
+      int n_conv_threshs () const;
+      int n_conv_radii   () const;
+
+      int n_runs() const;   //  # threshs times # radii
+
          // Store data parsed from the MODE configuration object
 
       MetConfig conf;                          // MODE configuration object
@@ -85,34 +93,40 @@ class ModeConfInfo {
       RegridInfo       regrid_info;            // Regridding information
 
       VarInfo *        fcst_info;              // allocated
-      VarInfo *        obs_info;               // allocated
+      VarInfo *         obs_info;              // allocated
 
       SingleThresh     fcst_raw_thresh;        // Values not meeting threshold set to bad data
-      SingleThresh     obs_raw_thresh;
+      SingleThresh      obs_raw_thresh;
+
+      IntArray         fcst_conv_radius_array; // list of convolution radii in grid squares
+      IntArray          obs_conv_radius_array;
 
       int              fcst_conv_radius;       // Convolution radius in grid squares
-      int              obs_conv_radius;
+      int               obs_conv_radius;
+
+      ThreshArray      fcst_conv_thresh_array; // list of conv thresholds to use
+      ThreshArray       obs_conv_thresh_array; // list of conv thresholds to use
 
       SingleThresh     fcst_conv_thresh;       // Convolution threshold to define objects
-      SingleThresh     obs_conv_thresh;
+      SingleThresh      obs_conv_thresh;
 
       double           fcst_vld_thresh;        // Minimum ratio of valid data points in the convolution area
-      double           obs_vld_thresh;
+      double            obs_vld_thresh;
 
       SingleThresh     fcst_area_thresh;       // Discard objects whose area doesn't meet threshold
-      SingleThresh     obs_area_thresh;
+      SingleThresh      obs_area_thresh;
 
       int              fcst_inten_perc_value;  // Intensity percentile of interest
-      int              obs_inten_perc_value;
+      int               obs_inten_perc_value;
 
       SingleThresh     fcst_inten_perc_thresh; // Discard objects whose percentile intensity doesn't meet threshold
-      SingleThresh     obs_inten_perc_thresh;
+      SingleThresh      obs_inten_perc_thresh;
 
       SingleThresh     fcst_merge_thresh;      // Lower convolution threshold used for double merging method
-      SingleThresh     obs_merge_thresh;
+      SingleThresh      obs_merge_thresh;
 
       MergeType        fcst_merge_flag;        // Define which merging methods should be employed
-      MergeType        obs_merge_flag;
+      MergeType         obs_merge_flag;
 
       FieldType        mask_missing_flag;      // Mask missing data between fcst and obs      
 
@@ -171,6 +185,17 @@ class ModeConfInfo {
       ConcatString     version;                // Config file version
 
 };
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int ModeConfInfo::n_conv_radii() const { return ( fcst_conv_radius_array.n_elements() ); }   //  should be the same as
+                                                                                                    //  obs_conv_radius_array.n_elements()
+
+
+inline int ModeConfInfo::n_conv_threshs() const { return ( fcst_conv_thresh_array.n_elements() ); }   //  should be the same as
+                                                                                                      //  obs_conv_thresh_array.n_elements()
+
 
 ////////////////////////////////////////////////////////////////////////
 

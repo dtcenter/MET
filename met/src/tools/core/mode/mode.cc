@@ -119,36 +119,47 @@ int main(int argc, char *argv[])
    //
    // Set handler to be called for memory allocation error
    //
-   set_new_handler(oom);
+
+set_new_handler(oom);
 
    //
    // Process the command line arguments
    //
-   process_command_line(argc, argv);
+
+process_command_line(argc, argv);
 
    //
    // Process the forecast and observation files
    //
 
-   // mode_exec.process_fcst_obs_files();
+int t_index, r_index;   //  indices into the convolution threshold and radius arrays
 
-   mode_exec.setup_fcst_obs_data();
 
-   mode_exec.do_conv_thresh();
+// mode_exec.process_fcst_obs_files();
 
-   mode_exec.do_match_merge();
+mode_exec.setup_fcst_obs_data();
+
+
+for (r_index=0; r_index<(mode_exec.n_conv_radii()); ++r_index)  {
+
+   for (t_index=0; t_index<(mode_exec.n_conv_threshs()); ++t_index)  {
+
+      mode_exec.do_conv_thresh(r_index, t_index);
+
+      mode_exec.do_match_merge();
+
+      mode_exec.process_output();
+
+   }
+
+}
 
 
    //
-   // Write output files
-   //
-   mode_exec.process_output();
-
-   //
-   // Clean up
+   //  done
    //
 
-   return(0);
+return ( 0 );
 
 }
 

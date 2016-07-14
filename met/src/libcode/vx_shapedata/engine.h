@@ -167,8 +167,13 @@ class ModeFuzzyEngine {
 
       void set(const ShapeData &fcst_wd, const ShapeData &obs_wd);
 
-      void set_fcst(const ShapeData &fcst_wd);
-      void set_obs(const ShapeData &obs_wd);
+      void set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd);
+
+      void set_fcst (const ShapeData & fcst_wd);
+      void set_obs  (const ShapeData &  obs_wd);
+
+      void set_fcst_no_conv (const ShapeData & fcst_wd);
+      void set_obs_no_conv  (const ShapeData &  obs_wd);
 
       int two_to_one(int, int) const;
 

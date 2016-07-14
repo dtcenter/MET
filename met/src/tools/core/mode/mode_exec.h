@@ -81,6 +81,14 @@ class ModeExecutive {
 
       void init();
 
+      int n_conv_radii   () const;
+      int n_conv_threshs () const;
+
+      int n_runs() const;
+
+      int R_index;   //  indices into the convolution radius and threshold arrays
+      int T_index;   //    for the current run
+
          //
          // Input configuration files
          //
@@ -109,7 +117,7 @@ class ModeExecutive {
       ShapeData Fcst_sd, Obs_sd;
 
       void setup_fcst_obs_data();
-      void do_conv_thresh();
+      void do_conv_thresh(const int r_index, const int t_index);
       void do_match_merge();
 
       void process_masks(ShapeData &, ShapeData &);
@@ -119,7 +127,11 @@ class ModeExecutive {
 
       void compute_ct_stats();
 
-      void build_outfile_name(const char *, ConcatString &);
+      void build_outfile_prefix (ConcatString &);
+
+      void build_simple_outfile_name  (const char *, ConcatString &);
+      void build_outfile_name         (const char *, ConcatString &);
+
       void write_obj_stats();
       void write_obj_netcdf(const ModeNcOutInfo &);
       void write_poly_netcdf(NcFile *);
@@ -127,6 +139,15 @@ class ModeExecutive {
       void write_ct_stats();
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int ModeExecutive::n_conv_radii   () const { return ( engine.conf_info.n_conv_radii   () ); }
+inline int ModeExecutive::n_conv_threshs () const { return ( engine.conf_info.n_conv_threshs () ); }
+
+inline int ModeExecutive::n_runs () const { return ( engine.conf_info.n_runs () ); }
 
 
 ////////////////////////////////////////////////////////////////////////

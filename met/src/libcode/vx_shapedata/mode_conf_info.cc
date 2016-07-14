@@ -82,8 +82,14 @@ void ModeConfInfo::clear()
    fcst_raw_thresh.clear();
    obs_raw_thresh.clear();
 
+   fcst_conv_radius_array.clear();
+    obs_conv_radius_array.clear();
+
    fcst_conv_radius = bad_data_int;
-   obs_conv_radius = bad_data_int;
+   obs_conv_radius  = bad_data_int;
+
+   fcst_conv_thresh_array.clear();
+   obs_conv_thresh_array.clear();
 
    fcst_conv_thresh.clear();
    obs_conv_thresh.clear();
@@ -193,11 +199,12 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
 {
 
-   VarInfoFactory info_factory;
-   Dictionary *fcst_dict = (Dictionary *) 0;
-   Dictionary *obs_dict  = (Dictionary *) 0;
-   Dictionary *dict      = (Dictionary *) 0;
-   PlotInfo plot_info;
+int j, n;
+VarInfoFactory info_factory;
+Dictionary *fcst_dict = (Dictionary *) 0;
+Dictionary *obs_dict  = (Dictionary *) 0;
+Dictionary *dict      = (Dictionary *) 0;
+PlotInfo plot_info;
 
       // Dump the contents of the config file
 
@@ -261,27 +268,60 @@ void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: fcst.raw_thresh and obs.raw_thresh
 
    fcst_raw_thresh = fcst_dict->lookup_thresh(conf_key_raw_thresh);
-   obs_raw_thresh  = obs_dict->lookup_thresh(conf_key_raw_thresh);
+    obs_raw_thresh =  obs_dict->lookup_thresh(conf_key_raw_thresh);
 
       // Conf: fcst.conv_radius and obs.conv_radius
 
-   fcst_conv_radius = nint(fcst_dict->lookup_double(conf_key_conv_radius));
-   obs_conv_radius  = nint(obs_dict->lookup_double(conf_key_conv_radius));
+   fcst_conv_radius_array = fcst_dict->lookup_int_array(conf_key_conv_radius);
+    obs_conv_radius_array =  obs_dict->lookup_int_array(conf_key_conv_radius);
+
+   if ( fcst_conv_radius_array.n_elements() != obs_conv_radius_array.n_elements() )  {
+
+      mlog << Error
+           << " fcst and obs convolution radius arrays need to be the same size\n\n";
+
+      exit ( 1 );
+
+   }
 
       // Check that fcst_conv_radius and obs_conv_radius are non-negative
 
-   if(fcst_conv_radius < 0 || obs_conv_radius < 0) {
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "fcst_conv_radius (" << fcst_conv_radius
-           << ") and obs_conv_radius (" << obs_conv_radius
-           << ") must be non-negative\n\n";
-      exit(1);
+   n = fcst_conv_radius_array.n_elements();   //  same as obs_conv_radius_array.n_elements()
+
+   for (j=0; j<n; ++j)  {
+
+      if(fcst_conv_radius_array[j] < 0 || obs_conv_radius_array[j] < 0) {
+
+         mlog << Error << "\nModeConfInfo::process_config() -> "
+              << "fcst_conv_radius (" << fcst_conv_radius_array[j]
+              << ") and obs_conv_radius (" << obs_conv_radius_array[j]
+              << ") must be non-negative\n\n";
+
+         exit(1);
+
+      }
+
    }
+
+   if ( fcst_conv_radius_array.n_elements() == 1 )  fcst_conv_radius = fcst_conv_radius_array[0];
+   if (  obs_conv_radius_array.n_elements() == 1 )   obs_conv_radius =  obs_conv_radius_array[0];
 
       // Conf: fcst.conv_thresh and obs.conv_thresh
 
-   fcst_conv_thresh = fcst_dict->lookup_thresh(conf_key_conv_thresh);
-   obs_conv_thresh  = obs_dict->lookup_thresh(conf_key_conv_thresh);
+   fcst_conv_thresh_array = fcst_dict->lookup_thresh_array(conf_key_conv_thresh);
+    obs_conv_thresh_array =  obs_dict->lookup_thresh_array(conf_key_conv_thresh);
+
+   if ( fcst_conv_thresh_array.n_elements() != obs_conv_thresh_array.n_elements() )  {
+
+      mlog << Error
+           << " fcst and obs convolution threshold arrays need to be the same size\n\n";
+
+      exit ( 1 );
+
+   }
+
+   if ( fcst_conv_thresh_array.n_elements() == 1 )  fcst_conv_thresh = fcst_conv_thresh_array[0];
+   if (  obs_conv_thresh_array.n_elements() == 1 )   obs_conv_thresh =  obs_conv_thresh_array[0];
 
       // Conf: fcst.vld_thresh and obs.vld_thresh
 
@@ -578,6 +618,77 @@ nc_info.do_polylines  = d->lookup_bool(conf_key_polylines_flag);
    //
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_conv_radius_by_index(int k)
+
+{
+
+   //
+   //  we already know that the fcst and obs radius arrays have
+   //    the same number of elements
+   //
+
+if ( (k < 0) || (k >= fcst_conv_radius_array.n_elements()) )  {
+
+   cerr << "\n\n  ModeConfInfo::set_conv_radius_by_index(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+fcst_conv_radius = fcst_conv_radius_array[k];
+ obs_conv_radius =  obs_conv_radius_array[k];
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_conv_thresh_by_index(int k)
+
+{
+
+   //
+   //  we already know that the fcst and obs threshold arrays have
+   //    the same number of elements
+   //
+
+if ( (k < 0) || (k >= fcst_conv_thresh_array.n_elements()) )  {
+
+   cerr << "\n\n  ModeConfInfo::set_conv_thresh_by_index(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+fcst_conv_thresh = fcst_conv_thresh_array[k];
+ obs_conv_thresh =  obs_conv_thresh_array[k];
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ModeConfInfo::n_runs() const
+
+{
+
+const int nr = n_conv_radii();
+const int nt = n_conv_threshs();
+
+return ( nr*nt );
 
 }
 
