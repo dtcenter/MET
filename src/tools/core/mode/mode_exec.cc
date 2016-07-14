@@ -126,6 +126,8 @@ out_dir.clear();
 
 data_min = data_max = 0.0;
 
+R_index = T_index = 0;
+
    //  done
    //
 
@@ -144,6 +146,7 @@ void ModeExecutive::init()
 GrdFileType ftype, otype;
 Met2dDataFileFactory mtddf_factory;
 
+R_index = T_index = 0;
 
    // Create the default config file name
    default_config_file = replace_path(default_config_filename);
@@ -341,19 +344,47 @@ return;
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::do_conv_thresh()
+void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
 
 {
 
-      // Set up the engine with these raw fields
+static int local_r_index = -1;
 
-   mlog << Debug(2)
-        << "Identifying objects in the forecast and observation fields...\n";
+R_index = r_index;
+T_index = t_index;
+
+engine.conf_info.set_conv_radius_by_index(R_index);
+engine.conf_info.set_conv_thresh_by_index(T_index);
+
+   //
+   //  Set up the engine with these raw fields
+   //
+
+mlog << Debug(2)
+     << "Identifying objects in the forecast and observation fields...\n";
+
+if ( r_index != local_r_index )  {   //  need to do convolution
+
    engine.set(Fcst_sd, Obs_sd);
 
-      // Compute the contingency table statistics for the fields
+} else {   //  don't need to do convolution
 
-   if ( engine.conf_info.ct_stats_flag )  compute_ct_stats();
+   engine.set_no_conv(Fcst_sd, Obs_sd);
+
+}
+
+   //
+   //  Compute the contingency table statistics for the fields, if needed
+   //
+
+if ( engine.conf_info.ct_stats_flag )  compute_ct_stats();
+
+
+   //
+   //  done
+   //
+
+local_r_index = r_index;
 
 return;
 
@@ -561,32 +592,95 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::build_outfile_name(const char *suffix, ConcatString &str)
+
+void ModeExecutive::build_outfile_prefix(ConcatString &str)
 
 {
 
    //
-   // Create output file name
+   // Create leading part of output file name
    //
 
    // Append the output directory and program name
-   str << cs_erase << out_dir << "/" << program_name;
+
+str << cs_erase 
+    << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
-   if(engine.conf_info.output_prefix.nonempty())
-      str << "_" << engine.conf_info.output_prefix;
+
+if(engine.conf_info.output_prefix.nonempty())
+   str << "_" << engine.conf_info.output_prefix;
 
    // Append the timing information
-   str << "_"
-       << sec_to_hhmmss(engine.fcst_raw->data.lead()) << "L_"
-       << unix_to_yyyymmdd_hhmmss(engine.fcst_raw->data.valid()) << "V_"
-       << sec_to_hhmmss(engine.fcst_raw->data.accum()) << "A";
+
+str << "_"
+    << sec_to_hhmmss(engine.fcst_raw->data.lead())            << "L_"
+    << unix_to_yyyymmdd_hhmmss(engine.fcst_raw->data.valid()) << "V_"
+    << sec_to_hhmmss(engine.fcst_raw->data.accum())           << "A";
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeExecutive::build_simple_outfile_name(const char *suffix, ConcatString &str)
+
+{
+
+build_outfile_prefix(str);
 
    // Append the suffix
-   str << suffix;
+
+str << suffix;
+
+return;
+
+}
+
+
+//////////////////////////////////////////////////////////////////////
+
+
+void ModeExecutive::build_outfile_name(const char *suffix, ConcatString &str)
+
+{
+
+if ( engine.conf_info.n_runs() == 1 )  {
+
+   build_simple_outfile_name(suffix, str);
 
    return;
+
 }
+
+
+build_outfile_prefix(str);
+
+   //
+   //  append the radius and threshold indices
+   //
+
+char junk[256];
+
+snprintf(junk, sizeof(junk), "R%d_T%d", R_index + 1, T_index + 1);
+
+str << '_' << junk;
+
+   // Append the suffix
+
+str << suffix;
+
+return;
+
+}
+
 
 //////////////////////////////////////////////////////////////////////
 

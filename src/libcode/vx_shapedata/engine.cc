@@ -297,6 +297,8 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
    clear_colors();
    ctable.clear();
 
+   collection.clear();
+
    set_fcst(fcst_wd);
    set_obs(obs_wd);
 
@@ -307,6 +309,33 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
    return;
 
 }
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd)
+
+{
+
+   ConcatString path;
+
+   clear_features();
+   clear_colors();
+   ctable.clear();
+
+   collection.clear();
+
+   set_fcst_no_conv (fcst_wd);
+   set_obs_no_conv  ( obs_wd);
+
+   path = replace_path(conf_info.object_pi.color_table);
+
+   ctable.read(path);
+
+   return;
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -370,6 +399,70 @@ void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
 ///////////////////////////////////////////////////////////////////////
 
 
+void ModeFuzzyEngine::set_fcst_no_conv(const ShapeData &fcst_wd)
+
+{
+
+   // *fcst_raw = fcst_wd;
+
+   need_fcst_filter     = false;
+   need_fcst_conv       = false;
+   need_fcst_thresh     = true;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
+
+   // mlog << Debug(3) << "Applying zero border of width "
+   //      << conf_info.zero_border_size
+   //      << " to the forecast field.\n";
+   //
+   // int k = conf_info.zero_border_size;
+   // fcst_raw->zero_border(k, bad_data_double);
+
+   // do_fcst_filter();
+   // do_fcst_convolution();
+   do_fcst_thresholding();
+   do_fcst_splitting();
+
+   return;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
+
+   // *obs_raw = obs_wd;
+
+   need_obs_filter     = false;
+   need_obs_conv       = false;
+   need_obs_thresh     = true;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
+
+   // mlog << Debug(3) << "Applying zero border of width "
+   //      << conf_info.zero_border_size
+   //      << " to the observation field.\n";
+   //  
+   // int k = conf_info.zero_border_size;
+   // obs_raw->zero_border(k, bad_data_double);
+
+   // do_obs_filter();
+   // do_obs_convolution();
+   do_obs_thresholding();
+   do_obs_splitting();
+
+   return;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+
+
 int ModeFuzzyEngine::two_to_one(int n_f, int n_o) const {
    int n;
 
@@ -392,16 +485,18 @@ void ModeFuzzyEngine::do_fcst_filter() {
         << conf_info.fcst_raw_thresh.get_str()
         << " to the forecast field.\n";
 
-   //
-   // Filter out the data which doesn't meet the fcst_raw_thresh
-   //
+      //
+      // Filter out the data which doesn't meet the fcst_raw_thresh
+      //
+
    fcst_filter->filter(conf_info.fcst_raw_thresh);
 
-   //
-   // Threshold the fcst_filter field applying the fcst_conv_thresh
-   //
-   *fcst_thresh = *fcst_filter;
-   fcst_thresh->threshold(conf_info.fcst_conv_thresh);
+      //
+      // Threshold the fcst_filter field applying the fcst_conv_thresh
+      //
+
+   // *fcst_thresh = *fcst_filter;
+   // fcst_thresh->threshold(conf_info.fcst_conv_thresh);
 
    need_fcst_filter     = false;
    need_fcst_conv       = true;
@@ -430,13 +525,15 @@ void ModeFuzzyEngine::do_obs_filter() {
    //
    // Filter out the data which doesn't meet the obs_raw_thresh
    //
+
    obs_filter->filter(conf_info.obs_raw_thresh);
 
    //
    // Threshold the obs_filter field applying the obs_conv_thresh
    //
-   *obs_thresh = *obs_filter;
-   obs_thresh->threshold(conf_info.obs_conv_thresh);
+
+   // *obs_thresh = *obs_filter;
+   // obs_thresh->threshold(conf_info.obs_conv_thresh);
 
    need_obs_filter     = false;
    need_obs_conv       = true;
@@ -525,6 +622,9 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
 
    *fcst_mask = *fcst_conv;
 
+   *fcst_thresh = *fcst_filter;
+   fcst_thresh->threshold(conf_info.fcst_conv_thresh);
+
    //
    // Threshold the convolved field
    //
@@ -590,6 +690,9 @@ void ModeFuzzyEngine::do_obs_thresholding() {
    if(!need_obs_thresh) return;
 
    *obs_mask = *obs_conv;
+
+   *obs_thresh = *obs_filter;
+   obs_thresh->threshold(conf_info.obs_conv_thresh);
 
    //
    // Threshold the convolved field
