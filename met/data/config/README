@@ -266,9 +266,9 @@ regrid = {
 //       - The "GRIB_lvl_typ" entry specifies the level type.
 //       - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries specify the first
 //         and second level values.
-//       - The "GRIB_ens" entry is a string which specifies NCEP's usage of the 
+//       - The "GRIB_ens" entry is a string which specifies NCEP's usage of the
 //         extended PDS for ensembles.  Set to "hi_res_ctl", "low_res_ctl", "+n",
-//         or "-n", for the n-th ensemble member.  
+//         or "-n", for the n-th ensemble member.
 //       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version
 //         number.
 //       - The "GRIB1_code" entry specifies the GRIB1 record number.
@@ -1334,6 +1334,18 @@ unmatched = FALSE;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// The "quilt" entry is a boolean to indicate whether all permutations of
+// convolution radii and thresholds should be run.  If set to false, the number
+// of forecast and observation convolution radii and thresholds must all match.
+// One configuration of MODE will be run for each group of settings in those
+// lists.  If set to true, the number of forecast and observation convolution
+// radii must match and the number of forecast and observation convolution
+// thresholds must match.  For N radii and M thresholds, NxM configurations of
+// MODE will be run.
+//
+quilt = false;
+
+//
 // The object definition settings for MODE are contained within the "fcst" and
 // "obs" entries:
 //
@@ -1388,7 +1400,7 @@ fcst = {
 }
 
 //
-// The grid_res variable is the nominal spacing for each grid square in kilometers.
+// The "grid_res" entry is the nominal spacing for each grid square in kilometers.
 // The variable is not used directly in the code, but subsequent variables in the
 // configuration files are defined in terms of it.  Therefore, setting the appropriately
 // will help ensure that appropriate default values are used for these variables.

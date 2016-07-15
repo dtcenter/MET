@@ -37,11 +37,10 @@ grid_res = 4;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-   //
-   //
-   //
-
-quilt = false;
+//
+// Run all permutations of radius and threshold
+//
+quilt = FALSE;
 
 //
 // Forecast and observation fields to be verified

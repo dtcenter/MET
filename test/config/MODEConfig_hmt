@@ -37,6 +37,11 @@ grid_res = 9;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Run all permutations of radius and threshold
+//
+quilt = FALSE;
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -44,7 +49,7 @@ fcst = {
       name  = "APCP_06";
       level = "(*,*)";
    }
-   
+
    raw_thresh        = >=0.0;
    conv_radius       = 2; // in grid squares
    conv_thresh       = >=5.0;
