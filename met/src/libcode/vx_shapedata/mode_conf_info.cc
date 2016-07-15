@@ -164,6 +164,8 @@ void ModeConfInfo::clear()
 
    version.clear();
 
+   quilt = false;
+
    // Deallocate memory
    if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
    if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
@@ -229,6 +231,10 @@ PlotInfo plot_info;
       // Conf: regrid
 
    regrid_info = parse_conf_regrid(&conf);
+
+      //  quilt
+
+   quilt = conf.lookup_bool(conf_key_quilt);
 
       // Conf: fcst and obs
 

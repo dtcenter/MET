@@ -370,6 +370,7 @@ static const char conf_key_beg[]               = "beg";
 static const char conf_key_end[]               = "end";
 static const char conf_key_fcst[]              = "fcst";
 static const char conf_key_obs[]               = "obs";
+static const char conf_key_quilt[]             = "quilt";
 static const char conf_key_fcst_field[]        = "fcst.field";
 static const char conf_key_obs_field[]         = "obs.field";
 static const char conf_key_file_type[]         = "file_type";

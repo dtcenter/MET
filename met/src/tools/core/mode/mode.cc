@@ -99,6 +99,9 @@ static const char * default_out_dir = ".";
 ///////////////////////////////////////////////////////////////////////
 
 
+static void do_quilt    ();
+static void do_straight ();
+
 static void process_command_line(int, char **);
 
 static void usage();
@@ -112,7 +115,7 @@ static void set_verbosity         (const StringArray &);
 ///////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv [])
 
 {
 
@@ -132,12 +135,90 @@ process_command_line(argc, argv);
    // Process the forecast and observation files
    //
 
-int t_index, r_index;   //  indices into the convolution threshold and radius arrays
+const ModeConfInfo & conf = mode_exec.engine.conf_info;
 
 
 // mode_exec.process_fcst_obs_files();
 
 mode_exec.setup_fcst_obs_data();
+
+
+if ( conf.quilt )  {
+
+   do_quilt();
+
+} else {
+
+   do_straight();
+
+}
+
+
+   //
+   //  done
+   //
+
+return ( 0 );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void do_straight()
+
+{
+
+const ModeConfInfo & conf = mode_exec.engine.conf_info;
+
+
+if ( conf.n_conv_threshs() != conf.n_conv_radii() )  {
+
+   mlog << Error
+        << "\n\n  " 
+        << program_name 
+        << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
+
+   exit ( 1 );
+
+}
+
+
+int index;
+const int N = conf.n_conv_threshs();
+
+
+for (index=0; index<N; ++index)  {
+
+   mode_exec.do_conv_thresh(index, index);
+
+   mode_exec.do_match_merge();
+
+   mode_exec.process_output();
+
+}
+
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void do_quilt()
+
+{
+
+int t_index, r_index;   //  indices into the convolution threshold and radius arrays
 
 
 for (r_index=0; r_index<(mode_exec.n_conv_radii()); ++r_index)  {
@@ -154,14 +235,14 @@ for (r_index=0; r_index<(mode_exec.n_conv_radii()); ++r_index)  {
 
 }
 
-
    //
    //  done
    //
 
-return ( 0 );
+return;
 
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 
