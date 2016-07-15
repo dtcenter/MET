@@ -128,7 +128,7 @@ on intervals from two or more gridded files into a single NetCDF file containing
  This tool enables users to define identical forecast and observation or
  analysis precipitation accumulation intervals prior to running the MET
  statistics tools.
- The 
+ This tool supports three types of commands, 
 \begin_inset Quotes eld
 \end_inset
 
@@ -136,7 +136,7 @@ sum
 \begin_inset Quotes erd
 \end_inset
 
- command can only be run on GRIB1 or GRIB2 files while the 
+, 
 \begin_inset Quotes eld
 \end_inset
 
@@ -152,9 +152,43 @@ subtract
 \begin_inset Quotes erd
 \end_inset
 
- commands can be run on any gridded file.
- Use of Pcp-Combine on a single file will result in that file being written
- out in NetCDF format, with no changes to the data values.
+, which may be run on any gridded data files supported by MET.
+ By default, the 
+\begin_inset Quotes eld
+\end_inset
+
+sum
+\begin_inset Quotes erd
+\end_inset
+
+ command searches for 
+\series bold
+APCP
+\series medium
+, the GRIB string for accumulated preciptation.
+ Use the 
+\begin_inset Quotes eld
+\end_inset
+
+-field
+\begin_inset Quotes erd
+\end_inset
+
+ option to override this default when processing fields other than 
+\series bold
+APCP
+\series medium
+ or non-GRIB files.
+ Running the 
+\begin_inset Quotes eld
+\end_inset
+
+add
+\begin_inset Quotes erd
+\end_inset
+
+ command on a single file will result in that file being written out in
+ NetCDF format, with no changes to the data values.
  The files being combined must all be on a common grid.
  The Pcp-Combine tool does not support automated regridding.
  When running the 
@@ -564,6 +598,11 @@ Optional arguments for pcp_combine
 -field string
 \series medium
  option defines the data to be extracted from the input files.
+ Use this option when processing fields other than 
+\series bold
+APCP
+\series medium
+ or non-GRIB files.
 \end_layout
 
 \begin_layout Description
