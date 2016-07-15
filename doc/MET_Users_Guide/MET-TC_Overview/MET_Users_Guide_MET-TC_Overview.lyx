@@ -217,7 +217,7 @@ name "sec:TC_Input-data-format"
 \begin_layout Standard
 
 \series medium
-his chapter discusses the input and output file formats expected and produced
+This chapter discusses the input and output file formats expected and produced
  by MET-TC.
  When discussing the input data, it is expected that users have run model
  output through vortex tracking software in order to obtain position and
