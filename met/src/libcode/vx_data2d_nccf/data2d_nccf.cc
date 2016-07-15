@@ -64,7 +64,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
-  
+
    _file  = (NcCfFile *) 0;
 
    close();
@@ -88,7 +88,7 @@ bool MetNcCFDataFile::open(const char * _filename) {
    close();
 
    _file = new NcCfFile;
-   
+
    if(!_file->open(_filename)) {
       mlog << Error << "\nMetNcCFDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
@@ -136,7 +136,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   if (strcmp(vinfo_nc->req_name(), na_str) == 0)
   {
     // Store the name of the first data variable
-    
+
     for (int i = 0; i < _file->Nvars; ++i)
     {
       if (strcmp(_file->Var[i].name, nccf_lat_var_name) != 0 &&
@@ -147,7 +147,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       }
     }
   }
-   
+
   // Read the data
 
   NcVarInfo *info = (NcVarInfo *) 0;
@@ -191,7 +191,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
            << data_time_str << " != " << req_time_str << ")\n\n";
       status = false;
     }
-    
+
     // Set the VarInfo object's name, long_name, level, and units strings
 
     if (info->name_att.length() > 0)
@@ -207,7 +207,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
     if (info->units_att.length() > 0)
       vinfo.set_units(info->units_att);
-    
+
     //  print a report
     double plane_min, plane_max;
     plane.data_range(plane_min, plane_max);
@@ -220,8 +220,8 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
          << "      init time: " << unix_to_yyyymmdd_hhmmss(plane.init()) << "\n"
          << "     accum time: " << sec_to_hhmmss(plane.accum()) << "\n";
   }
-  
-  
+
+
 
   return status;
 }
@@ -236,7 +236,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
 
    // Initialize
    plane_array.clear();
-   
+
    // Can only read a single 2D data plane from a MET NetCDF file
    status = data_plane(vinfo, plane);
 
@@ -255,9 +255,9 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 
    if( NULL == _file->find_var_name( vinfo.name() ) ) return -1;
 
-   if( ( vinfo.valid() && _file->ValidTime[0] != vinfo.valid() ) ||
-       ( vinfo.init()  && _file->InitTime     != vinfo.init()  ) ||
-       ( vinfo.lead()  && _file->lead_time()  != vinfo.lead()  ) )
+   if( ( vinfo.valid() != 0         && _file->ValidTime[0] != vinfo.valid() ) ||
+       ( vinfo.init()  != 0         && _file->InitTime     != vinfo.init()  ) ||
+       ( !is_bad_data(vinfo.lead()) && _file->lead_time()  != vinfo.lead()  ) )
       return -1;
 
    return 0;
