@@ -1739,6 +1739,54 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+quilt = FALSE;
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+quilt
+\series default
+ entry indicates whether all permutations of convolution radii and thresholds
+ should be run.
+\end_layout
+
+\begin_layout Itemize
+If 
+\series bold
+FALSE
+\series default
+, the number of forecast and observation convolution radii and thresholds
+ must all match.
+ One configuration of MODE will be run for each group of settings in those
+ lists.
+\end_layout
+
+\begin_layout Itemize
+If 
+\series bold
+TRUE
+\series default
+, the number of forecast and observation convolution radii must match and
+ the number of forecast and observation convolution thresholds must match.
+ For N radii and M thresholds, NxM configurations of MODE will be run.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 fcst = {
 \end_layout
 
@@ -1885,6 +1933,12 @@ conv_radius
 grid_res
 \series default
  entry.
+ Multiple convolution radii may be specified as an array (e.g.
+ 
+\series bold
+conv_radius = [ 5, 10, 15 ];
+\series default
+).
 \end_layout
 
 \begin_layout Standard
@@ -1895,6 +1949,21 @@ conv_thresh
 entry specifies the threshold values to be applied to the convolved field
  to define objects.
  By default, objects are defined using a convolution threshold of 5.0.
+ Multiple convolution thresholds may be specified as an array (e.g.
+ 
+\series bold
+conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
+\series default
+).
+\end_layout
+
+\begin_layout Standard
+Multiple convolution radii and thresholds and processed using the logic
+ defined by the 
+\series bold
+quilt
+\series default
+ entry.
 \end_layout
 
 \begin_layout Standard
