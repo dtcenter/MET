@@ -1354,9 +1354,13 @@ quilt = false;
 //
 //    - The "conv_radius" entry specifies the convolution radius in grid
 //      squares.  The larger the convolution radius, the smoother the objects.
+//      Multiple convolution radii may be specified as an array:
+//        conv_radius = [ 5, 10, 15 ];
 //
 //    - The "conv_thresh" entry specifies the convolution threshold used to
 //      define MODE objects.  The lower the threshold, the larger the objects.
+//      Multiple convolution thresholds may be specified as an array:
+//         conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
 //
 //    - The "vld_thresh" entry is described above.
 //
