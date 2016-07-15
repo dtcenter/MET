@@ -428,7 +428,7 @@ const DictionaryEntry * _e = (const DictionaryEntry *) 0;
 
 _e = Dictionary::lookup(name);
 
-if ( !e || (_e->type() != expected_type) )  {
+if ( !_e || (_e->type() != expected_type) )  {
 
    LastLookupStatus = false;
 

@@ -95,6 +95,8 @@ class ModeConfInfo {
       VarInfo *        fcst_info;              // allocated
       VarInfo *         obs_info;              // allocated
 
+      bool             quilt;                  //  default: false
+
       SingleThresh     fcst_raw_thresh;        // Values not meeting threshold set to bad data
       SingleThresh      obs_raw_thresh;
 
