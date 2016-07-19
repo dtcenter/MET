@@ -389,6 +389,27 @@ Point-Stat won't run
 \begin_layout Standard
 
 \series bold
+Error while loading shared libraries
+\end_layout
+
+\begin_layout Description
+* Add the lib dir to your LD_LIBRARY_PATH.
+ For example, if you receive the following error: 
+\begin_inset Quotes eld
+\end_inset
+
+./mode_analysis: error while loading shared libraries: libgsl.so.19: cannot
+ open shared object file: No such file or directory
+\begin_inset Quotes erd
+\end_inset
+
+, you should add the path to the gsl lib (for example, /home/user/MET/gsl-2.1/lib
+) to your LD_LIBRARY_PATH.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
 General troubleshooting
 \end_layout
 
