@@ -129,7 +129,7 @@ This User's Guide was prepared by the developers of the MET, including Tressa
 \end_layout
 
 \begin_layout Section*
-New for MET v5.1
+New for MET v5.2
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:New-for-MET"
@@ -142,60 +142,9 @@ name "sec:New-for-MET"
 \begin_layout Standard
 
 \series medium
-METv5.1 includes several new tools and enhancements.
- The six new tools are MODE Time Domain (mtd), regrid_data_plane, shift_data_pla
-ne, gen_vx_mask, gsid2mpr, and gsidens2mpr.
- Major enhancments for this release include automated regridding of data,
- generalized definition of thresholds, conditional continuous statistics,
- and the expanded use of climatology data.
+METv5.2 includes several enhancements to existing tools, including improved
+ GRIB1/2 table support, grid box area weighting, and usability features.
  Additional details on these changes are listed below.
-\end_layout
-
-\begin_layout Subsection*
-Major Upgrades:
-\end_layout
-
-\begin_layout Standard
-New tools:
-\end_layout
-
-\begin_layout Description
-1.
- The mtd (MODE Time Domain) tool runs on time-series of gridded data fields
- to define 3-dimensional space-time objects.
- 
-\end_layout
-
-\begin_layout Description
-2.
- The regrid_data_plane tool regrids one or more gridded data fields to the
- user-defined output grid.
- 
-\end_layout
-
-\begin_layout Description
-3.
- The shift_data_plane tool reads a single gridded data field and applies
- a rigid shift defined by source and destination lat/lon values.
-\end_layout
-
-\begin_layout Description
-4.
- The gen_vx_mask tool replaces the gen_poly_mask and gen_circle_mask tools
- and adds support for track masking and accumulating multiple masks together.
-\end_layout
-
-\begin_layout Description
-5.
- The gsid2mpr tool reads one or more binary GSI diagnostic files and reformats
- them into the MPR line type for further analysis by the Stat-Analysis tool.
-\end_layout
-
-\begin_layout Description
-6.
- The gsidens2orank tool reads an ensemble of binary GSI diagnostic files
- and reformats them into the ORANK line type for further analysis by the
- Stat-Analysis tool.
 \end_layout
 
 \begin_layout Subsection*
@@ -203,335 +152,520 @@ Enhancements to Existing Tools:
 \end_layout
 
 \begin_layout Itemize
+
+\series medium
 Distribute the latest set of bugfixes, details not listed here.
 \end_layout
 
 \begin_layout Itemize
+
+\series medium
+Update all tools to support 
+\begin_inset Quotes eld
+\end_inset
+
+-version
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+-help
+\begin_inset Quotes erd
+\end_inset
+
+ command line options.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Update map data used for plotting and provide both low (default) and high
+ resolution verions.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add new 
+\begin_inset Quotes eld
+\end_inset
+
+FORCE
+\begin_inset Quotes erd
+\end_inset
+
+ interpolation method to compare gridded datasets whose grid dimensions
+ match but full grid definitions do not.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+GRIB1 and GRIB2 files
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Enhance GRIB1/2 table support by updating GRIB table definitions and enhancing
+ logic when reading GRIB files.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Support ${USER_GRIB_TABLES} environment variable to define the location
+ of custom, user-defined GRIB tables.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add configuration file support for 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB1_center
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB1_subcenter
+\begin_inset Quotes erd
+\end_inset
+
+ to specify the GRIB1 center and sub-center values to be found.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add configuration file support for 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB2_cntr
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB2_ltab
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB2_mtab
+\begin_inset Quotes erd
+\end_inset
+
+ to specify the GRIB2 center, local table, and master table values to be
+ found.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enhance MET to parse ensemble information from the extended PDS following
+ NCEP's usage.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB_ens
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to specify which ensemble member should be extracted.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Rename 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB1_rec
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB1_code
+\begin_inset Quotes erd
+\end_inset
+
+ to more accurately reflect its function.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
 ASCII2NC
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Add support for Western Wind and Solar Integration Study (WWSIS) data.
-\end_layout
 
-\begin_layout Itemize
-Add support for AOT AERONET observations.
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+vld_freq
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+vld_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ entries to the 
+\begin_inset Quotes eld
+\end_inset
+
+time_summary
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to specify the expected frequency of observations
+ and omit output when not enough valid data is present.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-MADIS2NC
+
+\series medium
+Gen-Vx-Mask
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Add support for acarsProfiles data, as provided to MET by AER.
+
+\series medium
+Add support for 
+\begin_inset Quotes eld
+\end_inset
+
+box
+\begin_inset Quotes erd
+\end_inset
+
+ masking type to mask out a square of configurable width around each lat/lon
+ location.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-TC-Pairs
-\end_layout
 
-\begin_deeper
-\begin_layout Itemize
-Reduce the minimum number of required input ATCF columns from 18 to 8.
-\end_layout
-
-\begin_layout Itemize
-Add 16 columns to the TCST output line type for the ADECK and BDECK values
- for RADP, RRP, MRD, GUSTS, EYE, DIR, SPEED, and DEPTH.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-TC-Stat
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Add rapid intensification and weakening (RIRW) event category job type.
-\end_layout
-
-\begin_layout Itemize
-Replace references to "rapid_inten" with "rirw" to shorten command line
- and config file options.
-\end_layout
-
-\begin_layout Itemize
-Redefine config file options landfall _beg and landfall_end as timestring
- in HH[MMSS] format rather than an integer number of seconds, but make it
- backward compatible.
-  Interpret integers as seconds and strings as timestrings.
-\end_layout
-
-\begin_layout Itemize
-Add support for reading and filtering extra columns of data at the end of
- the input ASCII files.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Stat-Analysis
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-When passed a directory, search for .stat files.
-  When passed a file name, read it regardless of the extension.
-\end_layout
-
-\begin_layout Itemize
-Add support for reading and filtering extra columns of data at the end of
- the input ASCII files.
-\end_layout
-
-\begin_layout Itemize
-Add new ramp job type based on DYDT logic or the swinging door algorithm.
-\end_layout
-
-\begin_layout Itemize
-Add swinging door algorithm to the new vx_time_series library.
-\end_layout
-
-\begin_layout Itemize
-Add -out_stat output to write aggregated actual STAT lines.
-  Including -set_hdr option.
-\end_layout
-
-\begin_layout Itemize
-Add support for ORANK to SSVAR aggregate_stat job type.
-\end_layout
-
-\begin_layout Itemize
-Add -out_cnt_logic and -out_wind_logic job command options to handle conditional
- continuous verification.
-\end_layout
-
-\begin_layout Itemize
-Add -out_thresh job command option as a shortcut for -out_fcst_thresh and
- -out_obs_thresh.
-\end_layout
-
-\begin_layout Itemize
-Add -out_wind_thresh job command option as a shortcut for -out_fcst_wind_thresh
- and -out_obs_wind_thresh.
-\end_layout
-
-\begin_layout Itemize
-Add -column_thresh job command option to be consistent with other tools,
- but retain -column_min, -column_max, and -column_eq for backward compatibility.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-PCP-Combine
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Rename -varname command line option to -name to be consistent with other
- MET tools.
-\end_layout
-
-\begin_layout Itemize
-Rename -config command line option to -field to be consistent with other
- MET tools.
- Silently support -config for backward compatibility.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
+\series medium
 Grid-Stat
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Add SAL1L2 and VAL1L2 output line types.
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+grid_weight_flag
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to apply grid box area weighting for grid-to-grid
+ verification.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+weight
+\begin_inset Quotes erd
+\end_inset
+
+ to the 
+\begin_inset Quotes eld
+\end_inset
+
+nc_pairs_flag
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to write out the grid box area weights.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+nbrhd
+\begin_inset Quotes erd
+\end_inset
+
+ to the 
+\begin_inset Quotes eld
+\end_inset
+
+nc_pairs_flag
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to write out the fractional coverage fields computed
+ for neighborhood verification.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
+
+\series medium
+Ensemble-Stat
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+grid_weight_flag
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to apply grid box area weighting for grid-to-grid
+ verification.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+weight
+\begin_inset Quotes erd
+\end_inset
+
+ to the 
+\begin_inset Quotes eld
+\end_inset
+
+ensemble_flag
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to write out the grid box area weights.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+MODE
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Enhance MODE to run multiple convolution radii and thresholds in a single
+ call.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enable the 
+\begin_inset Quotes eld
+\end_inset
+
+conv_radius
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+conv_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ configuration options to be specified as single values or arrays.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+quilt
+\begin_inset Quotes erd
+\end_inset
+
+ configuration option to specify whether all permutations of convolution
+ radii and threshold should be run.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
 Series-Analysis
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Add SAL1L2 output statistics types.
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+-paired
+\begin_inset Quotes erd
+\end_inset
+
+ command line option to enable missing data to result in a warning rather
+ than an error.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Automated regridding
+
+\series medium
+WWMCA-Regrid
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Add automated regridding support to the MET statistics tools to regrid to
- verify on the forecast grid, observation grid, or an independent, user-defined
- grid.
+
+\series medium
+Enhance logic to read a many datasets written in the WWMCA binary format.
+ - Add 
+\begin_inset Quotes eld
+\end_inset
+
+init_time
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+valid_time
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+accum_time
+\begin_inset Quotes erd
+\end_inset
+
+ configuration options to override the default values parsed from the input
+ filename.
 \end_layout
 
 \begin_layout Itemize
-Add regrid dictionary to the config files to define how regridding should
- be performed.
-\end_layout
 
-\begin_layout Itemize
-Add vx_regrid library to support automated regridding.
+\series medium
+Refactor tool to use regridding functionality common to many MET tools.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Generalized thresholding
+
+\series medium
+TC-Pairs
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Generalized definition of thresholds across all the MET tools.
-  Use && or || to string together event definition logic.
-\end_layout
 
-\end_deeper
-\begin_layout Itemize
-Conditional continuous verification
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Add support for conditional continuous verification to Point-Stat, Grid-Stat,
- Series-Analysis.
+\series medium
+Refine Interp12 logic to also apply logic to models ending with '3'.
 \end_layout
 
 \begin_layout Itemize
-Add cnt_thresh and cnt_logic config file options to specify what filtering
- thresholds should be applied.
-\end_layout
 
-\end_deeper
-\begin_layout Itemize
-Climatology Data
-\end_layout
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_deeper
-\begin_layout Itemize
-Add support for reading climatology data to Point-Stat, Grid-Stat, Ensemble-Stat
-, and Series-Analysis.
-\end_layout
+best_technique
+\begin_inset Quotes erd
+\end_inset
 
-\begin_layout Itemize
-Add climo_mean dictionary to the config files for these tools to specify
- the climatology data to be read.
-\end_layout
+ and 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Itemize
-Remove the -climo command line option from Point-Stat since the new functionalit
-y replaces the old.
+oper_technique
+\begin_inset Quotes erd
+\end_inset
+
+ configuration options to specify the model names for BEST and operational
+ tracks.
 \end_layout
 
 \begin_layout Itemize
-Add anomaly correlation (ANOM_CORR) to the CNT line type.
-\end_layout
 
-\begin_layout Itemize
-Add the climatology value (CLIMO) to ORANK line type.
-\end_layout
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Itemize
-Add the climatology-based Brier score (BRIERCL) and the Brier Skill Score
- (BSS) to the PSTD line type.
-\end_layout
+anly_track
+\begin_inset Quotes erd
+\end_inset
 
-\begin_layout Itemize
-Add the Continuous Ranked Probability Skill Score (CRPSS) to the RHIST line
- type.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-ConfigConstants
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Add exit_on_warning option.
-  If true, any warning message results in an error and returning of bad
- status.
-\end_layout
-
-\begin_layout Itemize
-Add output_precision option to specify the number of non-zero decimal places
- to be written to ASCII output files.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-File I/O Changes
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Improved logic when writing large unixtime values to NetCDF files.
-  Write them as strings rather than integers, which caused integer overflow.
-\end_layout
-
-\begin_layout Itemize
-Better handling of timing information and lat/lon dimensions from CF-compliant
- NetCDF files.
-\end_layout
-
-\begin_layout Itemize
-When writing gridded NetCDF output, write lat/lon variables for lat/lon
- grids as 1-dimensional.
-  For all other projection types, continue writing 2-dimensional lat/lon
- variables.
-\end_layout
-
-\begin_layout Itemize
-Add obtype configuration entry to Grid-Stat, Ensemble-Stat, Wavelet-Stat,
- MODE, and Series-Analysis.
-  It's string value is written to the output files.
-\end_layout
-
-\begin_layout Itemize
-Add Rscript to scripts directory named gspairs2mpr.R to read Grid-Stat NetCDF
- matches pairs and write MPR output lines.
-\end_layout
-
-\begin_layout Itemize
-Update the vx_data2d_pinterp library to also read the output of the wrf_interp
- utility.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Summary of changes to existing line types
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-CNT: Add columns for anomaly correlation (ANOM_CORR), mean error squared
- (ME2), and the mean squared error skill score (MSESS) plus confidence limits.
-\end_layout
-
-\begin_layout Itemize
-PSTD: Add columns for climatological brier score (BRIERCL) and brier skill
- score (BSS).
-\end_layout
-
-\begin_layout Itemize
-ORANK: Add columns for ensemble mean (ENS_MEAN) and climatology (CLIMO)
- columns.
-\end_layout
-
-\begin_layout Itemize
-RHIST: Add column continuous ranked probability skill score (CRPSS).
-\end_layout
-
-\begin_layout Itemize
-TCMPR: Add 16 columns for the ADECK and BDECK values for RADP, RRP, MRD,
- GUSTS, EYE, DIR, SPEED, and DEPTH.
+ configuration options to specify whether model analysis tracks should be
+ found in the ADECK, BDECK, or both.
+ 
 \end_layout
 
 \end_deeper
