@@ -1,4 +1,4 @@
-Model Evaluation Tools METv5.2 (July 2016)
+Model Evaluation Tools METv5.2 (August 2016)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -342,7 +342,72 @@ Release Notes
 Version 5.2 Release Notes:
 -------------------------
 
-- TO BE ADDED.
+- What's New:
+    - METv5.2 includes several enhancements to existing tools.
+
+- Enhancements to Existing Tools:
+    - Distribute the latest set of bugfixes, details not listed here.
+    - Update all tools to support "-version" and "-help" command line options.
+    - Update map data used for plotting and provide both low (default) and high
+      resolution verions.
+    - Add new "FORCE" interpolation method to compare gridded datasets whose
+      grid dimensions match but full grid definitions do not.
+    - GRIB1 and GRIB2 files
+      - Enhance GRIB1/2 table support by updating GRIB table definitions and
+        enhancing logic when reading GRIB files.
+      - Support ${USER_GRIB_TABLES} environment variable to define the location
+        of custom, user-defined GRIB tables.
+      - Add configuration file support for "GRIB1_center" and "GRIB1_subcenter"
+        to specify the GRIB1 center and sub-center values to be found.
+      - Add configuration file support for "GRIB2_cntr", "GRIB2_ltab", and
+        "GRIB2_mtab" to specify the GRIB2 center, local table, and master table
+        values to be found.
+      - Enhance MET to parse ensemble information from the extended PDS
+        following NCEP's usage.
+      - Add "GRIB_ens" configuration option to specify which ensemble member
+        should be extracted.
+      - Rename "GRIB1_rec" configuration option to "GRIB1_code" to more
+        accurately reflect its function.
+    - ASCII2NC
+      - Add "vld_freq" and "vld_thresh" to the "time_summary" configuration
+        option to specify the expected frequency of observations and omit output
+        when not enough valid data is present.
+    - Gen-Vx-Mask
+      - Add support for "box" masking type to mask out a square of configurable
+        width around each lat/lon location.
+    - Grid-Stat
+      - Add "grid_weight_flag" configuration option to apply grid box area
+        weighting for grid-to-grid verification.
+      - Add "nc_pairs_flag.weight" configuration option to write out the
+        grid box area weights.
+      - Add "nc_pairs_flag.nbrhd" configuration option to write out the
+        fractional coverage fields computed for neighborhood verification.
+    - Ensemble-Stat
+      - Add "grid_weight_flag" configuration option to apply grid box area
+        weighting for grid-to-grid verification.
+      - Add "ensemble_flag.weight" configuration option to write out the grid
+        box area weights.
+    - MODE
+      - Enhance MODE to run multiple convolution radii and thresholds in a
+        single call.
+      - Enable the "conv_radius" and "conv_thresh" configuration options to be
+        specified as single values or arrays.
+      - Add "quilt" configuration option to specify whether all permutations of
+        convolution radii and threshold should be run.
+    - Series-Analysis
+      - Add "-paired" command line option to enable missing data to result
+        in a warning rather than an error.
+    - WWMCA-Regrid
+      - Enhance logic to read a many datasets written in the WWMCA binary format.
+      - Add "init_time", "valid_time", and "accum_time" configuration options to
+        override the default values parsed from the input filename.
+      - Refactor tool to use regridding functionality common to many MET tools.
+    - TC-Pairs
+      - Refine Interp12 to also apply logic to models ending with '3'.
+      - Add "best_technique" and "oper_technique" configuration options to
+        specify the model names for BEST and operational tracks.
+      - Add "anly_track" configuration options to specify whether model analysis
+        tracks should be found in the ADECK, BDECK, or both.
 
 Version 5.1 Release Notes:
 -------------------------
