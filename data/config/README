@@ -469,7 +469,7 @@ mask_missing_flag = BOTH;
 // entry) and ending ("end" entry) time offset values in seconds.  It defines
 // the time window over which observations are retained for scoring. These time
 // offsets are defined relative to a reference time t, as [t+beg, t+end].
-// In PB2NC, the reference time is the PrepBufr files grib1_center time.  In
+// In PB2NC, the reference time is the PrepBufr files center time.  In
 // Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 //
 obs_window = {
