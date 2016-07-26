@@ -23,6 +23,10 @@ else
     libvx_config_a_SOURCES = config.tab.cc config.tab.h config_scanner.cc
 endif
 
+# Files not to be distributed 
+
+nodist_libvx_config_a_SOURCES = config.tab.yy config_scanner.ll
+
 libvx_config_a_SOURCES += \
               configobjecttype_to_string.cc configobjecttype_to_string.h \
               grdfiletype_to_string.cc grdfiletype_to_string.h \
@@ -69,3 +73,4 @@ endif
 EXTRA_DIST = config.tab.cc \
 	config.tab.h \
 	config_scanner.cc
+
