@@ -592,7 +592,7 @@ out_valid_mask = "";
 //          Optional Args:
 //             -rirw_window width in HH[MMSS] format to define a symmetric time window
 //             -rirw_window beg end in HH[MMSS] format to define an asymmetric time window
-//              Default search time winow is 0 0, requiring exact match
+//              Default search time window is 0 0, requiring exact match
 //             -rirw_time or -rirw_time_adeck and -rirw_time_bdeck to override defaults
 //             -rirw_exact or -rirw_exact_adeck and -rirw_exact_bdeck to override defaults
 //             -rirw_thresh or -rirw_thresh_adeck and -rirw_thresh_bdeck to override defaults
