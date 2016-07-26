@@ -23,10 +23,6 @@ else
     libvx_color_a_SOURCES = color_parser_yacc.cc color_parser_yacc.h color_scanner.cc
 endif
 
-# Files not to be distributed
-
-nodist_libvx_color_a_SOURCES = color_parser_yacc.yy color_scanner.ll
-
 libvx_color_a_SOURCES += \
               color.cc color.h \
               color_list.cc color_list.h \
