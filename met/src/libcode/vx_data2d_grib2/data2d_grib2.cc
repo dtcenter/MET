@@ -622,8 +622,16 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->LvlTyp       = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
-         rec->LvlVal1      = gfld->ipdtmpl[11];
-         rec->LvlVal2      = 255 != gfld->ipdtmpl[12] ? gfld->ipdtmpl[14] : rec->LvlVal1;
+
+         //  check for ground or water surface
+         if( 1 == rec->LvlTyp ) {
+            rec->LvlVal1 = 0;
+            rec->LvlVal2 = 0;
+         } else {
+            rec->LvlVal1 = gfld->ipdtmpl[11];
+            rec->LvlVal2 = 255 != gfld->ipdtmpl[12] ? gfld->ipdtmpl[14] : rec->LvlVal1;
+         }
+
          rec->RangeTyp     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
          rec->RangeVal     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
          rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
