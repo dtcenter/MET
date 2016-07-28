@@ -136,24 +136,24 @@
     </param>
     <output>
 
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_cts_R1_T1.txt</stat>
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R1_T1.txt</stat>
-      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R1_T1.nc</exist>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_cts.txt</stat>
+
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_obj.txt</stat>
+
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1_obj.nc</exist>
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2_obj.nc</exist>
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1_obj.nc</exist>
+      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_obj.nc</exist>
+
       <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T1.ps</ps>
-
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_cts_R1_T2.txt</stat>
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R1_T2.txt</stat>
-      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R1_T2.nc</exist>
       <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R1_T2.ps</ps>
-
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_cts_R2_T1.txt</stat>
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R2_T1.txt</stat>
-      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R2_T1.nc</exist>
       <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T1.ps</ps>
-
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_cts_R2_T2.txt</stat>
-      <stat>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R2_T2.txt</stat>
-      <exist>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_obj_R2_T2.nc</exist>
       <ps>&OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2.ps</ps>
 
     </output>
