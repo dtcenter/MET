@@ -375,7 +375,8 @@ v = new double [n];
 
 if ( !u || !v )  {
 
-   cerr << "\n\n  LambertGrid::xy_closedpolyline_area() -> memory allocation error\n\n";
+   mlog << Error << "\nLambertGrid::xy_closedpolyline_area() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -591,8 +592,7 @@ void LambertGrid::shift_right(int N)
 
 if ( N == 0 )  return;
 
-mlog << Error
-     << "\n\n  LambertGrid::shift_right(int) -> "
+mlog << Error << "\nLambertGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";
 
 exit ( 1 );
@@ -749,7 +749,8 @@ do {
 
 if ( i >= 14 )  {
 
-   cerr << "\n\n  lambert_segment_area() -> array bounds error\n\n";
+   mlog << Error << "\nlambert_segment_area() -> "
+        << "array bounds error\n\n";
 
    exit ( 1 );
 
@@ -818,7 +819,8 @@ rep = new LambertGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const LambertData &) -> memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const LambertData &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 

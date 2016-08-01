@@ -283,8 +283,8 @@ PlotInfo plot_info;
 
    if ( fcst_conv_radius_array.n_elements() != obs_conv_radius_array.n_elements() )  {
 
-      mlog << Error
-           << " fcst and obs convolution radius arrays need to be the same size\n\n";
+      mlog << Error << "\nModeConfInfo::process_config() -> "
+           << "fcst and obs convolution radius arrays need to be the same size\n\n";
 
       exit ( 1 );
 
@@ -319,8 +319,8 @@ PlotInfo plot_info;
 
    if ( fcst_conv_thresh_array.n_elements() != obs_conv_thresh_array.n_elements() )  {
 
-      mlog << Error
-           << " fcst and obs convolution threshold arrays need to be the same size\n\n";
+      mlog << Error << "\nModeConfInfo::process_config() -> "
+           << "fcst and obs convolution threshold arrays need to be the same size\n\n";
 
       exit ( 1 );
 
@@ -570,9 +570,9 @@ e = conf.lookup(conf_key_nc_pairs_flag);
 
 if ( !e )  {
 
-   mlog << Error
-        << "\n\n  ModeConfInfo::parse_nc_info() -> lookup failed for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
+   mlog << Error << "\nModeConfInfo::parse_nc_info() -> "
+        << "lookup failed for key \"" << conf_key_nc_pairs_flag
+        << "\"\n\n";
 
    exit ( 1 );
 
@@ -596,11 +596,9 @@ if ( type == BooleanType )  {
 
 if ( type != DictionaryType )  {
 
-   mlog << Error
-        << "\n\n  ModeConfInfo::parse_nc_info() -> bad type ("
-        << configobjecttype_to_string(type)
-        << ") for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
+   mlog << Error << "\nModeConfInfo::parse_nc_info() -> "
+        << "bad type (" << configobjecttype_to_string(type)
+        << ") for key \"" << conf_key_nc_pairs_flag << "\"\n\n";
 
    exit ( 1 );
 
@@ -642,7 +640,8 @@ void ModeConfInfo::set_conv_radius_by_index(int k)
 
 if ( (k < 0) || (k >= fcst_conv_radius_array.n_elements()) )  {
 
-   cerr << "\n\n  ModeConfInfo::set_conv_radius_by_index(int) -> range check error\n\n";
+   mlog << Error << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -670,7 +669,8 @@ void ModeConfInfo::set_conv_thresh_by_index(int k)
 
 if ( (k < 0) || (k >= fcst_conv_thresh_array.n_elements()) )  {
 
-   cerr << "\n\n  ModeConfInfo::set_conv_thresh_by_index(int) -> range check error\n\n";
+   mlog << Error << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
