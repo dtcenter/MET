@@ -407,7 +407,8 @@ v = new double [n];
 
 if ( !u || !v )  {
 
-   cerr << "\n\n  MercatorGrid::xy_closedpolyline_area() -> memory allocation error\n\n";
+   mlog << Error << "\nMercatorGrid::xy_closedpolyline_area() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -600,8 +601,7 @@ void MercatorGrid::shift_right(int N)
 
 if ( N == 0 )  return;
 
-mlog << Error
-     << "\n\n  MercatorGrid::shift_right(int) -> "
+mlog << Error << "\nMercatorGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";
 
 exit ( 1 );
@@ -687,8 +687,6 @@ return ( a );
 double mercator_segment_area(double u0, double v0, double u1, double v1)
 
 {
-
-// cerr << "\n\n  warning -> mercator_segment_area() -> hasn't been tested yet!\n\n";
 
 double delta_u, delta_v;
 double u1_prime;
@@ -796,7 +794,8 @@ rep = new MercatorGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const MercatorData &) -> memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const MercatorData &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 

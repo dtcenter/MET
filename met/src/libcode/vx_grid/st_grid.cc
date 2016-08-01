@@ -95,13 +95,13 @@ switch ( data.hemisphere )  {
    case 'S':  IsNorthHemisphere = false;  break;
 
    default:
-      mlog << Error << "\nStereographicGrid::StereographicGrid(const StereographicData &) -> bad hemisphere ...\""
-           << (data.hemisphere) << "\"\n\n";
+      mlog << Error << "\nStereographicGrid::StereographicGrid(const StereographicData &) -> "
+           << "bad hemisphere ...\"" << (data.hemisphere) << "\"\n\n";
       exit ( 1 );
       break;
 
 }   //  switch
- 
+
 Name = data.name;
 
    //
@@ -347,7 +347,8 @@ v = new double [n];
 
 if ( !u || !v )  {
 
-   cerr << "\n\n  StereographicGrid::xy_closedpolyline_area() -> memory allocation error\n\n";
+   mlog << Error << "\nStereographicGrid::xy_closedpolyline_area() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -563,8 +564,7 @@ void StereographicGrid::shift_right(int N)
 
 if ( N == 0 )  return;
 
-mlog << Error
-     << "\n\n  StereographicGrid::shift_right(int) -> "
+mlog << Error << "\nStereographicGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";
 
 exit ( 1 );
@@ -669,8 +669,6 @@ double stereographic_segment_area(double u0, double v0, double u1, double v1)
 
 {
 
-cerr << "\n\n  warning -> stereographic_segment_area() -> hasn't been tested yet!\n\n";
-
 double b, answer, t1, t2;
 
 b =   u0*u0 + v0*v0 + u1*u1 + v1*v1
@@ -754,7 +752,8 @@ rep = new StereographicGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const StereographicData &) -> memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const StereographicData &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
