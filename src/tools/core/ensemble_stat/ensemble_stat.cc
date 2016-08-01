@@ -1194,9 +1194,8 @@ void process_grid_vx() {
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
-      if((conf_info.ensemble_flag[i_nc_orank] ||
-          conf_info.ensemble_flag[i_nc_weight]) &&
-          nc_out == (NcFile *) 0)
+      if(conf_info.ensemble_flag[i_nc_orank] &&
+         nc_out == (NcFile *) 0)
          setup_nc_file(fcst_dp[j].valid(), fcst_dp[j].lead(),
                        "_orank.nc");
 
