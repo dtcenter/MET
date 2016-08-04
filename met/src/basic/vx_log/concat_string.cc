@@ -797,7 +797,7 @@ return;
 void ConcatString::set_upper()
 
 {
-  
+
 for (int i=0; i<Length; ++i)  s[i] = toupper(s[i]);
 
 return;
@@ -822,11 +822,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * ConcatString::contents() const
+const char * ConcatString::contents(const char *str) const
 
 {
 
-if ( Length == 0 )  return ( "(nul)" );
+if ( Length == 0 )  return ( ( str ? str : "(nul)" ) );
 
 return ( s );
 
