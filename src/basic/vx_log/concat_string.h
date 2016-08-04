@@ -110,7 +110,7 @@ class ConcatString {
 
       const char * text() const;
 
-      const char * contents() const;   //  returns "(nul)" if the string is empty
+      const char * contents(const char *str = 0) const;   //  returns str or "(nul)" if the string is empty
 
       int length() const;   //  not including trailing nul
 
@@ -165,7 +165,7 @@ class ConcatString {
       //  replace all occurences of target with replacement
       //  if "replacement" is an environment variable, use it's value
       void replace(const char * target, const char * replacement, bool check_env = true);
-      
+
       void set_upper();
       void set_lower();
 
