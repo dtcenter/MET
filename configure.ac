@@ -1058,9 +1058,13 @@ if test -n "$MET_DEVELOPMENT"; then
                     internal_tests/libcode/vx_data2d_nc_met/Makefile
                     internal_tests/libcode/vx_data2d_nccf/Makefile
                     internal_tests/libcode/vx_geodesy/Makefile
+                    internal_tests/libcode/vx_grid/Makefile
                     internal_tests/libcode/vx_plot_util/Makefile
                     internal_tests/libcode/vx_ps/Makefile
-                    internal_tests/libcode/vx_tc_util/Makefile])
+                    internal_tests/libcode/vx_tc_util/Makefile
+                    internal_tests/tools/Makefile
+                    internal_tests/tools/other/Makefile
+                    internal_tests/tools/other/mode_time_domain/Makefile])
 fi
 
 AC_OUTPUT
