@@ -11,25 +11,18 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util.h"
-#include "grid.h"
+#include "vx_grid.h"
 #include "nav.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-   const Grid grid(st4_ihop_data);   //  stereographic
-// const Grid grid(wrf_ihop_data);   //  lambert conformal
-// const Grid grid(g204_data);       //  mercator
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int main()
+int main(int argc, char *argv[])
 
 {
 
+Grid grid;
 int x, y;
 double lat_corner, lon_corner;
 double lat_right, lon_right;
@@ -38,6 +31,19 @@ double area, area_approx;
 double dist_bottom, dist_left;
 double frac_diff, max_frac_diff;
 
+
+if(argc < 2) {
+   cerr << "\n" << argv[0]
+        << ": Must specify grid name to process!\n\n";
+   exit(1);
+}
+
+
+if(!find_grid_by_name(argv[1], grid)) {
+   cerr << "\n" << argv[0]
+        << ": Grid \"" << argv[1] << "\" not found!\n\n";
+   exit(1);
+}
 
 
 max_frac_diff = 0.0;
@@ -73,7 +79,7 @@ for (x=0; x<(grid.nx()); ++x)  {
 
 
 
-cout << "\n\n  max frac diff = " << max_frac_diff << "\n\n";
+cout << "\n\n  Grid \"" << argv[1] << "\" max frac diff = " << max_frac_diff << "\n\n";
 
 
 
