@@ -125,7 +125,7 @@ ci_alpha  = [ 0.05 ];
 boot = {
    interval = PCTILE;
    rep_prop = 1.0;
-   n_rep    = 1000;
+   n_rep    = 0;
    rng      = "mt19937";
    seed     = "";
 }
@@ -173,7 +173,7 @@ output_flag = {
 
 obs_quality    = [];
 duplicate_flag = NONE;
-rank_corr_flag = TRUE;
+rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
 version        = "V5.2";

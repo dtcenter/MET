@@ -128,7 +128,7 @@ output_stats = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-rank_corr_flag = TRUE;
+rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 version        = "V5.2";
 
