@@ -332,7 +332,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
          // Conf: message_type
-         msg_typ[i] = parse_conf_message_type(&i_obs_dict);
+         msg_typ[i] = parse_conf_message_type(&i_obs_dict, point_vx);
+
+         // If no message type specified, store the obtype value.
+         if(msg_typ[i].n_elements() == 0) msg_typ[i].add(obtype);
 
          // Conf: sid_exc
          sid_exc[i] = parse_conf_sid_exc(&i_obs_dict);
