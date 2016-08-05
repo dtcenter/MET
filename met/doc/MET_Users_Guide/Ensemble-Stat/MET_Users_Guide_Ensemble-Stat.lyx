@@ -911,7 +911,7 @@ fcst
 \series bold
 ens 
 \series default
-dictionary specified the fields to be summarized while the 
+dictionary specifies the fields to be summarized while the 
 \series bold
 fcst 
 \series default
