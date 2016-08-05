@@ -22,6 +22,6 @@ CXX_FLAGS = $(CXX_FLAGS) $(ARCH_FLAGS)
 
 ACLOCAL_AMFLAGS		= -I m4
 
-SUBDIRS 		= basic libcode
+SUBDIRS 		= basic libcode tools
 
 MAINTAINERCLEANFILES 	= Makefile.in 
