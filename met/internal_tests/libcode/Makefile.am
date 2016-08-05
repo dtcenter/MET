@@ -22,6 +22,7 @@ SUBDIRS	= vx_data2d \
 	vx_data2d_nccf \
 	vx_data2d_factory \
 	vx_geodesy \
+	vx_grid \
 	vx_ps \
 	vx_plot_util \
 	vx_tc_util
