@@ -172,7 +172,7 @@ obj.write(output_filename);
 double dx, dy;
 double norm;
 
-att = calc_3d_single_atts(obj, raw, model, 0);
+att = calc_3d_single_atts(obj, raw, model);
 
 dx = vx_target - att.Xvelocity;
 dy = vy_target - att.Yvelocity;
