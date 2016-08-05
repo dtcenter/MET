@@ -292,7 +292,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-StringArray parse_conf_message_type(Dictionary *dict) {
+StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
    StringArray sa;
 
    if(!dict) {
@@ -304,7 +304,7 @@ StringArray parse_conf_message_type(Dictionary *dict) {
    sa = dict->lookup_string_array(conf_key_message_type);
 
    // Check that at least one message type is provided
-   if(sa.n_elements() == 0) {
+   if(error_out && sa.n_elements() == 0) {
       mlog << Error << "\nparse_conf_message_type() -> "
            << "At least one message type must be provided.\n\n";
       exit(1);
