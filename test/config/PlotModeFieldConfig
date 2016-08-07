@@ -45,10 +45,9 @@ map_info = {
    line_width = 1.0;
 
    source = [
-
       { 
 
-         file_name = "MET_BASE/map/country_detail_data";
+         file_name = "MET_BASE/map/country_data";
 
          line_width = 0.5;
 
@@ -58,7 +57,7 @@ map_info = {
 
       { 
 
-         file_name = "MET_BASE/map/admin_by_country/admin_United_States_data";
+         file_name = "MET_BASE/map/usa_state_data";
 
       }, 
 
