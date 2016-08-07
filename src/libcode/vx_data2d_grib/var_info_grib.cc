@@ -246,7 +246,7 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
       //  if either the field name or the indices are specified, bail
       if( bad_data_int == field_ptv || bad_data_int == field_code ){
          mlog << Error << "\nVarInfoGrib::add_grib_code() - either name or GRIB1_ptv "
-         << "and GRIB1_code must be specified in field information\n\n";
+         << "and GRIB1_rec or GRIB1_code must be specified in field information\n\n";
          exit(1);
       }
 
@@ -287,34 +287,12 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
    int field_center        = dict.lookup_int   (conf_key_GRIB1_center,    false);
    int field_subcenter     = dict.lookup_int   (conf_key_GRIB1_subcenter, false);
 
-   ConcatString ens        = dict.lookup_string (conf_key_GRIB_ens,       false);
+   ConcatString ens        = dict.lookup_string (conf_key_GRIB_ens, false);
 
-   //  if the field name is not specified, do a table lookup
-   if( field_name.empty() ){
-
-      //  if either the field name or the indices are specified, bail
-      if( is_bad_data(field_code) || is_bad_data(field_ptv) ){
-         mlog << Error << "\nVarInfoGrib::set_dict() -> "
-              << "either name or GRIB1_code and GRIB1_ptv must be specified in field "
-              << "information\n\n";
-         exit(1);
-      }
-
-      //  use the specified indexes to look up the field name
-      if( !GribTable.lookup_grib1(field_code, field_ptv, tab) ){
-         mlog << Error << "\nVarInfoGrib::set_dict() -> "
-              << "no parameter found with matching "
-              << "GRIB1_code (" << field_code << ") "
-              << "GRIB1_ptv  (" << field_ptv  << ")\n\n";
-         exit(1);
-      }
-
-      //  use the lookup parameter name
-      field_name = tab.parm_name;
+   if( !field_name.empty() ){
+      set_name     ( field_name );
+      set_req_name ( field_name );
    }
-
-   set_name        (field_name);
-   set_req_name    (field_name);
    set_field_rec   (field_code);
    set_center      (field_center);
    set_subcenter   (field_subcenter);
