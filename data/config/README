@@ -947,12 +947,12 @@ message_type_map = [
 //
 //    - The "ens_thresh" entry specifies a proportion between 0 and 1 to define
 //      the required ratio of valid input ensemble member files.  If the ratio
-//      of valid input ensemble files to expected ones is too lower, the tool
+//      of valid input ensemble files to expected ones is too low, the tool
 //      will error out.
 //
 //    - The "vld_thresh" entry specifies a proportion between 0 and 1 to
 //      define the required ratio of valid data points.  When computing
-//      ensemble products, if the ratio of valid data values is too lower, the
+//      ensemble products, if the ratio of valid data values is too low, the
 //      ensemble product will be set to bad data for that point.
 //
 //    - The "field" entry is as described above.  However, in this case, the
