@@ -41,6 +41,7 @@
 //   014    09/11/15  Halley Gotway  Add climatology.
 //   015    05/10/16  Halley Gotway  Add grid weighting.
 //   016    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
+//   017    08/09/16  Halley Gotway  Fixed n_ens_vld vs n_vx_vld bug.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -70,13 +71,18 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line  (int, char **);
+static void process_n_vld         ();
 static void process_ensemble      ();
 static void process_vx            ();
+static bool get_data_plane        (const char *, GrdFileType, VarInfo *,
+                                   DataPlane &, bool regrid = false);
+static bool get_data_plane_array  (const char *, GrdFileType, VarInfo *,
+                                   DataPlaneArray &, bool regrid = false);
 
 static void process_point_vx      ();
 static void process_point_climo   ();
 static void process_point_obs     (int);
-static int  process_point_ens     (int, int);
+static int  process_point_ens     (int, int &);
 static void process_point_scores  ();
 
 static void process_grid_vx       ();
@@ -105,7 +111,7 @@ static void write_orank_var_float(int, int, int, float *, DataPlane &,
 static void write_orank_var_int(int, int, int, int *, DataPlane &,
                                 const char *, const char *);
 
-static void add_var_att(int, NcVar *, bool is_int, DataPlane &,
+static void add_var_att(VarInfo *, NcVar *, bool is_int, DataPlane &,
                         const char *, const char *);
 
 static void finish_txt_files();
@@ -132,7 +138,10 @@ int main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Process the ensemble
+   // Check for valid ensemble data
+   process_n_vld();
+
+   // Process the ensemble fields
    process_ensemble();
 
    // Only perform verification if requested
@@ -146,14 +155,13 @@ int main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv)
-
-{
-
+void process_command_line(int argc, char **argv) {
    int i;
    struct stat results;
    CommandLine cline;
    ConcatString default_config_file;
+   Met2dDataFile *ens_mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *obs_mtddf = (Met2dDataFile *) 0;
 
    // Set default output directory
    out_dir = ".";
@@ -161,8 +169,7 @@ void process_command_line(int argc, char **argv)
    //
    // check for zero arguments
    //
-   if (argc == 1)
-      usage();
+   if(argc == 1) usage();
 
    //
    // parse the command line into tokens
@@ -233,7 +240,7 @@ void process_command_line(int argc, char **argv)
             //
             // Add each of the ensemble members to the list of files.
             //
-            for(i = 1; i <= n_ens; i++) ens_file_list.add(cline[i]);
+            for(i=1; i<=n_ens; i++) ens_file_list.add(cline[i]);
          }
          else {
             usage();
@@ -364,9 +371,6 @@ void process_command_line(int argc, char **argv)
       }
    }
 
-   // Set n_rank as one more than the number of valid forecasts
-   n_rank = ens_file_vld.sum() + 1;
-
    // Set flag to indicate whether verification is to be performed
    if((point_obs_flag || grid_obs_flag) &&
       (conf_info.get_n_vx() > 0) &&
@@ -395,7 +399,7 @@ void process_command_line(int argc, char **argv)
       else if(!vx_flag) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "ignoring input -ssvar_mean file because "
-              << "no observations have been specified\n\n";
+              << "no verification has been requested\n\n";
       }
       else {
          conf_info.ens_ssvar_flag = 1;
@@ -407,7 +411,7 @@ void process_command_line(int argc, char **argv)
       if(!vx_flag) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "disabling ensemble spread/skill calculation "
-              << "because no observations have been specified\n\n";
+              << "because no verification has been requested\n\n";
       }
       else {
          conf_info.ens_ssvar_flag = 1;
@@ -422,15 +426,219 @@ void process_command_line(int argc, char **argv)
    }
    conf_info.ens_ssvar_mean = ens_ssvar_mean;
 
+   // Deallocate memory for data files
+   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
+   if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void process_n_vld() {
+   int i, j, n_vld;
+   DataPlane dp;
+   DataPlaneArray dpa;
+   struct stat results;
+
+   // Initialize
+   n_ens_vld.clear();
+   n_vx_vld.clear();
+
+   // Loop through the ensemble fields to be processed
+   for(i=0; i<conf_info.get_n_ens_var(); i++) {
+
+      // Loop through the ensemble files
+      for(j=0, n_vld=0; j<ens_file_list.n_elements(); j++) {
+
+         // Check for valid file
+         if(!ens_file_vld[j]) continue;
+
+         // Check for valid data
+         if(!get_data_plane(ens_file_list[j], etype,
+                            conf_info.ens_info[i], dp)) {
+            mlog << Warning << "\nprocess_n_vld() -> "
+                 << "ensemble field \""
+                 << conf_info.ens_info[i]->magic_str()
+                 << "\" not found in file \"" << ens_file_list[j]
+                 << "\"\n\n";
+         }
+         else {
+
+            // Increment the valid counter
+            n_vld++;
+         }
+      } // end for j
+
+      // Check for enough valid data
+      if((double) n_vld/n_ens < conf_info.vld_ens_thresh) {
+         mlog << Error << "\nprocess_n_vld() -> "
+              << n_ens - n_vld << " missing ensemble fields exceeds the "
+              << "maximum allowable specified by \"ens.ens_thresh\" "
+              << "in the configuration file.\n\n";
+         exit(1);
+      }
+
+      // Store the valid data count
+      n_ens_vld.add(n_vld);
+
+   } // end for i
+
+   // Loop through the verification fields to be processed
+   for(i=0; i<conf_info.get_n_vx(); i++) {
+
+      // Loop through the ensemble files
+      for(j=0, n_vld=0; j<ens_file_list.n_elements(); j++) {
+
+         // Check for valid file
+         if(!ens_file_vld[j]) continue;
+
+         // Check for valid data fields.
+         // Call data_plane_array to handle multiple levels.
+         if(!get_data_plane_array(ens_file_list[j], etype,
+                                  conf_info.vx_pd[i].fcst_info, dpa)) {
+            mlog << Warning << "\nprocess_n_vld() -> "
+                 << "no data found for forecast field \""
+                 << conf_info.vx_pd[i].fcst_info->magic_str()
+                 << "\" in file \"" << ens_file_list[j]
+                 << "\"\n\n";
+         }
+         else {
+
+            // Store the lead times for the first verification field
+            if(i==0) ens_lead_na.add(dpa[0].lead());
+
+            // Increment the valid counter
+            n_vld++;
+         }
+      } // end for j
+
+      // Check for enough valid data
+      if((double) n_vld/n_ens < conf_info.vld_ens_thresh) {
+         mlog << Error << "\nprocess_n_vld() -> "
+              << n_ens - n_vld << " missing forecast fields exceeds the "
+              << "maximum allowable specified by \"ens.ens_thresh\" "
+              << "in the configuration file.\n\n";
+         exit(1);
+      }
+
+      // Store the valid data count
+      n_vx_vld.add(n_vld);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_data_plane(const char *infile, GrdFileType ftype,
+                    VarInfo *info, DataPlane &dp,
+                    bool regrid) {
+   bool found;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   // Read the current ensemble file
+   if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
+      mlog << Error << "\nget_data_plane() -> "
+           << "Trouble reading file \"" << infile << "\"\n\n";
+      exit(1);
+   }
+
+   // Read the gridded data field
+   if(found = mtddf->data_plane(*info, dp)) {
+
+      // Regrid, if requested and necessary
+      if(regrid && !(mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding field \"" << info->magic_str()
+              << "\" to the verification grid.\n";
+         dp = met_regrid(dp, mtddf->grid(), grid, conf_info.regrid_info);
+      }
+
+      // Store the valid time, if not already set
+      if(ens_valid_ut == (unixtime) 0) {
+         ens_valid_ut = dp.valid();
+      }
+      // Check to make sure that the valid time doesn't change
+      else if(ens_valid_ut != dp.valid()) {
+         mlog << Warning << "\nget_data_plane() -> "
+              << "The valid time has changed, "
+              << unix_to_yyyymmdd_hhmmss(ens_valid_ut)
+              << " != " << unix_to_yyyymmdd_hhmmss(dp.valid())
+              << " in \"" << infile << "\"\n\n";
+      }
+
+   } // end if found
+
+   // Deallocate the data file pointer, if necessary
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+
+   return(found);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_data_plane_array(const char *infile, GrdFileType ftype,
+                          VarInfo *info, DataPlaneArray &dpa,
+                          bool regrid) {
+   int n, i;
+   bool found;
+   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+
+   // Read the current ensemble file
+   if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
+      mlog << Error << "\nget_data_plane_array() -> "
+           << "Trouble reading file \"" << infile << "\"\n\n";
+      exit(1);
+   }
+
+   // Read the gridded data field
+   n = mtddf->data_plane_array(*info, dpa);
+
+   // Check for at least one field
+   if(found = (n > 0)) {
+
+      // Regrid, if requested and necessary
+      if(regrid && !(mtddf->grid() == grid)) {
+         mlog << Debug(1)
+              << "Regridding " << dpa.n_planes()
+              << " field(s) \"" << info->magic_str()
+              << "\" to the verification grid.\n";
+
+         // Loop through the forecast fields
+         for(i=0; i<dpa.n_planes(); i++) {
+            dpa[i] = met_regrid(dpa[i], mtddf->grid(), grid,
+                                conf_info.regrid_info);
+         }
+      }
+
+      // Store the valid time, if not already set
+      if(ens_valid_ut == (unixtime) 0) {
+         ens_valid_ut = dpa[0].valid();
+      }
+      // Check to make sure that the valid time doesn't change
+      else if(ens_valid_ut != dpa[0].valid()) {
+         mlog << Warning << "\nget_data_plane_array() -> "
+              << "The valid time has changed, "
+              << unix_to_yyyymmdd_hhmmss(ens_valid_ut)
+              << " != " << unix_to_yyyymmdd_hhmmss(dpa[0].valid())
+              << " in \"" << infile << "\"\n\n";
+      }
+
+   } // end if found
+
+   // Deallocate the data file pointer, if necessary
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+
+   return(found);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void process_ensemble() {
-   int i, j, n_miss, n_vld;
-   bool found = false;
-   double t;
+   int i, j;
+   bool reset;
    DataPlane ens_dp;
 
    // Loop through each of the ensemble fields to be processed
@@ -441,121 +649,38 @@ void process_ensemble() {
            << conf_info.ens_info[i]->magic_str() << "\n";
 
       // Loop through each of the input forecast files
-      for(j=0, n_miss=0, n_vld=0; j<ens_file_list.n_elements(); j++) {
+      for(j=0, reset=true; j<ens_file_list.n_elements(); j++) {
 
-         // If the current forecast file is valid, read the field
-         if(ens_file_vld[j]) {
+         // Skip bad data files
+         if(!ens_file_vld[j]) continue;
 
-            // Deallocate the data file pointer, if necessary
-            if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
-
-            // Read the current ensemble file
-            if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j], etype))) {
-               mlog << Error << "\nprocess_ensemble() -> "
-                    << "Trouble reading ensemble file \""
-                    << ens_file_list[j] << "\"\n\n";
-               exit(1);
-            }
-
-            // Read the gridded data from the current ensemble file
-            found = ens_mtddf->data_plane(*conf_info.ens_info[i], ens_dp);
-
-            // Track the missing and valid counts
-            if(!found) {
-               mlog << Warning << "\nprocess_ensemble() -> "
-                    << conf_info.ens_info[i]->magic_str()
-                    << " not found in file \"" << ens_file_list[j]
-                    << "\"\n\n";
-               n_miss++;
-               continue;
-            }
-            else {
-               n_vld++;
-            }
-
-            // Regrid, if necessary
-            if(!(ens_mtddf->grid() == grid)) {
-               mlog << Debug(1)
-                    << "Regridding ensemble field "
-                    << conf_info.ens_info[i]->magic_str()
-                    << " to the verification grid.\n";
-               ens_dp = met_regrid(ens_dp, ens_mtddf->grid(), grid,
-                                   conf_info.regrid_info);
-            }
-
-            // Store the ensemble valid time, if not already set
-            if(ens_valid_ut == (unixtime) 0) {
-               ens_valid_ut = ens_dp.valid();
-            }
-            // Check to make sure that the valid time doesn't change
-            else {
-
-               if(ens_valid_ut != ens_dp.valid()) {
-
-                  mlog << Warning << "\nprocess_ensemble() -> "
-                       << "The valid time has changed, "
-                       << unix_to_yyyymmdd_hhmmss(ens_valid_ut)
-                       << " != " << unix_to_yyyymmdd_hhmmss(ens_dp.valid())
-                       << " in \"" << ens_file_list[j] << "\"\n\n";
-               }
-            }
-
-            // Store the lead time
-            ens_lead_na.add(ens_dp.lead());
-         }
-         else {
-
-            mlog << Warning << "\nprocess_ensemble() -> "
-                 << "Cannot read ensemble file \""
-                 << ens_file_list[j] << "\"\n\n";
-            found = false;
-            n_miss++;
-         }
-
-         // Check if the number of missing fields exceeds the threshold
-         t = 1.0 - conf_info.vld_ens_thresh;
-         if((double) n_miss/n_ens > t) {
-            mlog << Error << "\nprocess_ensemble_files() -> "
-                 << n_miss << " missing fields exceeds the maximum "
-                 << "allowable specified by \"ens.ens_thresh\" "
-                 << "in the configuration file.\n\n";
-            exit(1);
-         }
-
-         // Continue if the current field is missing
-         if(!found) continue;
+         // Read the current field
+         if(!get_data_plane(ens_file_list[j], etype,
+                            conf_info.ens_info[i], ens_dp,
+                            true)) continue;
 
          // Create a NetCDF file to store the ensemble output
          if(nc_out == (NcFile *) 0)
             setup_nc_file(ens_dp.valid(), ens_dp.lead(), "_ens.nc");
 
          // Reset the running sums and counts
-         if(n_vld == 1) clear_counts(ens_dp, i);
+         if(reset) {
+            clear_counts(ens_dp, i);
+            reset = false;
+         }
 
          // Apply current data to the running sums and counts
          track_counts(ens_dp, i);
 
       } // end for j
 
-      // Check if the number of missing fields exceeds the threshold
-      t = 1.0 - conf_info.vld_ens_thresh;
-      if((double) n_miss/n_ens > t) {
-         mlog << Error << "\nprocess_ensemble_files() -> "
-              << n_miss << " missing fields exceeds the maximum "
-              << "allowable specified by \"ens.ens_thresh\" "
-              << "in the configuration file.\n\n";
-         exit(1);
-      }
-
-      // Store the number of valid members for the current field
-      n_ens_vld.add(n_vld);
-
       // Write out the ensemble information to a NetCDF file
       write_ens_nc(i, ens_dp);
 
       // Store the ensemble output file for spread/skill analysis
-      conf_info.ens_ssvar_file = out_nc_file_list[ out_nc_file_list.n_elements() - 1 ];
-   }
+      conf_info.ens_ssvar_file = out_nc_file_list[out_nc_file_list.n_elements() - 1];
+
+   } // end for i
 
    // Close the output NetCDF file
    if(nc_out) { nc_out->close(); delete nc_out; nc_out = (NcFile *) 0; }
@@ -582,7 +707,7 @@ void process_vx() {
       conf_info.process_masks(grid);
 
       // Setup the GCPairData objects
-      conf_info.set_vx_pd(n_ens_vld);
+      conf_info.set_vx_pd(n_vx_vld);
 
       // Process the point observations
       if(point_obs_flag) process_point_vx();
@@ -597,11 +722,11 @@ void process_vx() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_vx() {
-   int i, n_miss, miss_flag;
-   double t;
+   int i, n_miss;
 
-   // Set the matching time window.  If obs_valid_beg_ut and obs_valid_end_ut
-   // were not set on the command line, use beg_ds and end_ds.
+   // Set the matching time window.  If obs_valid_beg_ut and
+   // obs_valid_end_ut were not set on the command line,
+   // use beg_ds and end_ds.
    if(obs_valid_beg_ut == (unixtime) 0) {
       obs_valid_beg_ut = ens_valid_ut + conf_info.beg_ds;
    }
@@ -628,20 +753,14 @@ void process_point_vx() {
    for(i=0, n_miss=0; i<ens_file_list.n_elements(); i++) {
 
       // If the current forecast file is valid, process it
-      if(ens_file_vld[i]) miss_flag = process_point_ens(i, n_miss);
-      else                miss_flag = 1;
-
-      // Increment the missing count
-      n_miss += miss_flag;
-
-      // Check if the number of missing fields exceeds the threshold
-      t = 1.0 - conf_info.vld_ens_thresh;
-      if((double) n_miss/n_ens > t) {
-         mlog << Error << "\nprocess_point_vx() -> "
-              << n_miss << " missing fields exceeds the maximum "
-              << "allowable specified in the configuration file.\n\n";
-         exit(1);
+      if(!ens_file_vld[i]) {
+         n_miss++;
+         continue;
       }
+      else {
+         process_point_ens(i, n_miss);
+      }
+
    } // end for i
 
    // Process the ensemble mean for SSVAR or ORANK
@@ -846,7 +965,7 @@ void process_point_obs(int i_nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int process_point_ens(int i_ens, int n_miss) {
+int process_point_ens(int i_ens, int &n_miss) {
    int i, j, n_fcst;
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
@@ -883,45 +1002,16 @@ int process_point_ens(int i_ens, int n_miss) {
          info = conf_info.vx_pd[i].fcst_info;
       }
 
-      // Deallocate the data file pointer, if necessary
-      if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
-
-      // Read the current ensemble file
-      if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file, info->file_type()))) {
-         mlog << Error << "\nprocess_point_ens() -> "
-              << "Trouble reading " << file_type << " file \""
-              << ens_file << "\"\n\n";
-         exit(1);
-      }
-
       // Read the gridded data from the input forecast file
-      n_fcst = ens_mtddf->data_plane_array(*info, fcst_dpa);
-
-      // Check for zero fields
-      if(n_fcst == 0) {
-         mlog << Error << "\nprocess_point_ens() -> "
-              << "no fields matching " << info->magic_str()
-              << " found in file: " << ens_file << "\n\n";
-         exit(1);
-      }
-
-      // Regrid, if necessary
-      if(!(ens_mtddf->grid() == grid)) {
-         mlog << Debug(1)
-              << "Regridding " << fcst_dpa.n_planes()
-              << " ensemble field(s) " << info->magic_str()
-              << " to the verification grid.\n";
-
-         // Loop through the forecast fields
-         for(j=0; j<fcst_dpa.n_planes(); j++) {
-            fcst_dpa[j] = met_regrid(fcst_dpa[j], ens_mtddf->grid(), grid,
-                                     conf_info.regrid_info);
-         }
+      if(!get_data_plane_array(ens_file, info->file_type(), info,
+                               fcst_dpa, true)) {
+         n_miss++;
+         continue;
       }
 
       // Dump out the number of levels found
       mlog << Debug(2) << "For " << info->magic_str()
-           << " found " << n_fcst<< " forecast levels.\n";
+           << " found " << fcst_dpa.n_planes() << " forecast levels.\n";
 
       // Clean up the allocated VarInfo object, if necessary
       if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) delete info;
@@ -1136,49 +1226,18 @@ void process_grid_vx() {
 
          // If the current ensemble file is valid, read the field
          if(ens_file_vld[j]) {
-
-            // Deallocate the data file pointer, if necessary
-            if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
-
-            // Read the current ensemble file
-            if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[j], etype))) {
-               mlog << Error << "\nprocess_grid_vx() -> "
-                    << "Trouble reading ensemble file \""
-                    << ens_file_list[j] << "\"\n\n";
-               exit(1);
-            }
-
-            // Read the gridded data from the current ensemble file
-            found = ens_mtddf->data_plane(*conf_info.vx_pd[i].fcst_info,
-                                          fcst_dp[j]);
-
-            // Count the number of missing files
-            if(!found) {
-               n_miss++;
-               continue;
-            }
-
-            // Regrid, if necessary
-            if(!(ens_mtddf->grid() == grid)) {
-               mlog << Debug(1)
-                    << "Regridding ensemble field "
-                    << conf_info.vx_pd[i].fcst_info->magic_str()
-                    << " to the verification grid.\n";
-               fcst_dp[j] = met_regrid(fcst_dp[j], ens_mtddf->grid(), grid,
-                                       conf_info.regrid_info);
-            }
+            found = get_data_plane(ens_file_list[j], etype,
+                                   conf_info.vx_pd[i].fcst_info,
+                                   fcst_dp[j], true);
          }
          else {
-            n_miss++;
+            found = false;
          }
 
-         // Check if the number of missing fields exceeds the threshold
-         t = 1.0 - conf_info.vld_ens_thresh;
-         if((double) n_miss/n_ens > t) {
-            mlog << Error << "\nprocess_grid_vx() -> "
-                 << n_miss << " missing fields exceeds the maximum "
-                 << "allowable specified in the configuration file.\n\n";
-            exit(1);
+         // Count the number of missing files
+         if(!found) {
+            n_miss++;
+            continue;
          }
       } // end for j
 
@@ -1202,36 +1261,13 @@ void process_grid_vx() {
       // Read the observation file
       for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
 
-         // Deallocate the data file pointer, if necessary
-         if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
-
-         // Read the current gridded observation file
-         if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[j], otype))) {
-            mlog << Error << "\nprocess_grid_vx() -> "
-                 << "Trouble reading gridded observation file \""
-                 << grid_obs_file_list[j] << "\"\n\n";
-            exit(1);
-         }
-
-         // Read the gridded data from the current observation file
-         found = obs_mtddf->data_plane(*conf_info.vx_pd[i].obs_info, obs_dp);
+         found = get_data_plane(grid_obs_file_list[j], otype,
+                                conf_info.vx_pd[i].obs_info, obs_dp,
+                                true);
 
          // If found, break out of the loop
          if(!found) n_miss++;
-         else {
-
-            // Regrid, if necessary
-            if(!(obs_mtddf->grid() == grid)) {
-               mlog << Debug(1)
-                    << "Regridding observation field "
-                    << conf_info.vx_pd[i].obs_info->magic_str()
-                    << " to the verification grid.\n";
-               obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
-                                   conf_info.regrid_info);
-            }
-
-            break;
-         }
+         else       break;
       }
 
       // Check if the observation field was found
@@ -1273,19 +1309,11 @@ void process_grid_vx() {
             info = conf_info.vx_pd[i].fcst_info;
          }
 
-         // Deallocate the data file pointer, if necessary
-         if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
-
-         // Read the current gridded observation file
-         if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(mn_file))) {
-            mlog << Error << "\nprocess_grid_vx() -> "
-                 << "Trouble reading gridded ensemble mean file \""
-                 << mn_file << "\"\n\n";
-            exit(1);
-         }
-
          // Read the gridded data from the mean file
-         if(!ens_mtddf->data_plane(*info, emn_dp)) {
+         found = get_data_plane(mn_file, FileType_None, info,
+                                emn_dp, true);
+
+         if(!found) {
             mlog << Error << "\nprocess_grid_vx() -> "
                  << "Trouble reading field " << info->magic_str()
                  << " from file " << mn_file << "\n\n";
@@ -1356,7 +1384,7 @@ void process_grid_vx() {
 
             // Initialize
             pd.clear();
-            pd.set_ens_size(n_ens_vld[i]);
+            pd.set_ens_size(n_vx_vld[i]);
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
@@ -1628,11 +1656,8 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, n_bin, max_col, max_n_ens_vld;
+   int  i, n_bin, n_vld, max_col;
    ConcatString tmp_str;
-
-   // Get the maximum number of valid ensemble members
-   max_n_ens_vld = n_ens_vld.max();
 
    // Check to see if the text files have already been set up
    if(stat_at.nrows() > 0 || stat_at.ncols() > 0) return;
@@ -1647,13 +1672,16 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Compute the number of PHIST bins
-   n_bin  = ceil(1.0 / conf_info.ens_phist_bin_size.min());
+   n_bin    = ceil(1.0 / conf_info.ens_phist_bin_size.min());
+
+   // Store the maximum number of valid verification fields
+   n_vld    = n_vx_vld.max();
 
    // Get the maximum number of data columns
-   max_col =  max(get_n_orank_columns(max_n_ens_vld+1),
-                  get_n_rhist_columns(max_n_ens_vld));
-   max_col =  max(max_col, get_n_phist_columns(n_bin));
-   max_col =  max(max_col, n_ssvar_columns);
+   max_col  =  max(get_n_orank_columns(n_vld+1),
+                   get_n_rhist_columns(n_vld));
+   max_col  =  max(max_col, get_n_phist_columns(n_bin));
+   max_col  =  max(max_col, n_ssvar_columns);
    max_col += n_header_columns;
 
    // Initialize file stream
@@ -1704,7 +1732,7 @@ void setup_txt_files() {
          switch(i) {
 
             case(i_rhist):
-               max_col = get_n_rhist_columns(n_rank) + n_header_columns + 1;
+               max_col = get_n_rhist_columns(n_vld+1) + n_header_columns + 1;
                break;
 
             case(i_phist):
@@ -1712,7 +1740,7 @@ void setup_txt_files() {
                break;
 
             case(i_orank):
-               max_col = get_n_orank_columns(max_n_ens_vld) + n_header_columns + 1;
+               max_col = get_n_orank_columns(n_vld) + n_header_columns + 1;
                break;
 
             default:
@@ -1728,7 +1756,7 @@ void setup_txt_files() {
          switch(i) {
 
             case(i_rhist):
-               write_rhist_header_row(1, n_rank, txt_at[i], 0, 0);
+               write_rhist_header_row(1, n_vld+1, txt_at[i], 0, 0);
                break;
 
             case(i_phist):
@@ -1736,7 +1764,7 @@ void setup_txt_files() {
                break;
 
             case(i_orank):
-               write_orank_header_row(1, max_n_ens_vld, txt_at[i], 0, 0);
+               write_orank_header_row(1, n_vld, txt_at[i], 0, 0);
                break;
 
             default:
@@ -1806,7 +1834,7 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_nc(int i_vx, DataPlane &dp) {
+void write_ens_nc(int i_ens, DataPlane &dp) {
    int i, j;
    double t, v;
    char type_str[max_str_len];
@@ -1844,7 +1872,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
       ens_vld[i] = nint(count_na[i]);
 
       // Check for too much missing data
-      if((double) (count_na[i]/n_ens_vld[i_vx]) < t) {
+      if((double) (count_na[i]/n_ens_vld[i_ens]) < t) {
          ens_mean[i]  = bad_data_float;
          ens_stdev[i] = bad_data_float;
          ens_minus[i] = bad_data_float;
@@ -1870,56 +1898,56 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
 
    // Add the ensemble mean if requested
    if(conf_info.ensemble_flag[i_nc_mean]) {
-      write_ens_var_float(i_vx, ens_mean, dp,
+      write_ens_var_float(i_ens, ens_mean, dp,
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation if requested
    if(conf_info.ensemble_flag[i_nc_stdev]) {
-      write_ens_var_float(i_vx, ens_stdev, dp,
+      write_ens_var_float(i_ens, ens_stdev, dp,
                           "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation if requested
    if(conf_info.ensemble_flag[i_nc_minus]) {
-      write_ens_var_float(i_vx, ens_minus, dp,
+      write_ens_var_float(i_ens, ens_minus, dp,
                           "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation if requested
    if(conf_info.ensemble_flag[i_nc_plus]) {
-      write_ens_var_float(i_vx, ens_plus, dp,
+      write_ens_var_float(i_ens, ens_plus, dp,
                           "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value if requested
    if(conf_info.ensemble_flag[i_nc_min]) {
-      write_ens_var_float(i_vx, ens_min, dp,
+      write_ens_var_float(i_ens, ens_min, dp,
                           "ENS_MIN",
                           "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value if requested
    if(conf_info.ensemble_flag[i_nc_max]) {
-      write_ens_var_float(i_vx, ens_max, dp,
+      write_ens_var_float(i_ens, ens_max, dp,
                           "ENS_MAX",
                           "Ensemble Maximum");
    }
 
    // Add the ensemble range if requested
    if(conf_info.ensemble_flag[i_nc_range]) {
-      write_ens_var_float(i_vx, ens_range, dp,
+      write_ens_var_float(i_ens, ens_range, dp,
                           "ENS_RANGE",
                           "Ensemble Range");
    }
 
    // Add the ensemble valid data count if requested
    if(conf_info.ensemble_flag[i_nc_vld]) {
-      write_ens_var_int(i_vx, ens_vld, dp,
+      write_ens_var_int(i_ens, ens_vld, dp,
                         "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
@@ -1928,15 +1956,15 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
    if(conf_info.ensemble_flag[i_nc_freq]) {
 
       // Loop through each threshold
-      for(i=0; i<conf_info.ens_ta[i_vx].n_elements(); i++) {
+      for(i=0; i<conf_info.ens_ta[i_ens].n_elements(); i++) {
 
-         sprintf(type_str, "ENS_FREQ_%s", conf_info.ens_ta[i_vx][i].get_abbr_str().contents());
+         sprintf(type_str, "ENS_FREQ_%s", conf_info.ens_ta[i_ens][i].get_abbr_str().contents());
 
          // Store the data
          for(j=0; j<count_na.n_elements(); j++) {
 
             // Check for too much missing data
-            if((double) (count_na[j]/n_ens_vld[i_vx]) < t) {
+            if((double) (count_na[j]/n_ens_vld[i_ens]) < t) {
                ens_freq[j] = bad_data_float;
             }
             else {
@@ -1946,7 +1974,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
          } // end for j
 
          // Write the ensemble relative frequency
-         write_ens_var_float(i_vx, ens_freq, dp,
+         write_ens_var_float(i_ens, ens_freq, dp,
                              type_str,
                              "Ensemble Relative Frequency");
 
@@ -1969,7 +1997,7 @@ void write_ens_nc(int i_vx, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
+void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
    NcVar *ens_var = (NcVar *) 0;
@@ -1977,8 +2005,8 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << conf_info.ens_info[i_vx]->name() << "_"
-                << conf_info.ens_info[i_vx]->level_name() << "_"
+                << conf_info.ens_info[i_ens]->name() << "_"
+                << conf_info.ens_info[i_ens]->level_name() << "_"
                 << type_str;
    ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
 
@@ -1989,16 +2017,17 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
    //
    if(strcmp(type_str, "ENS_MEAN") == 0) {
       name_str << cs_erase
-               << conf_info.ens_info[i_vx]->name();
+               << conf_info.ens_info[i_ens]->name();
    }
    else {
       name_str << cs_erase
-               << conf_info.ens_info[i_vx]->name() << "_"
+               << conf_info.ens_info[i_ens]->name() << "_"
                << type_str;
    }
 
    // Add the variable attributes
-   add_var_att(i_vx, ens_var, false, dp, name_str, long_name_str);
+   add_var_att(conf_info.ens_info[i_ens], ens_var, false, dp,
+               name_str, long_name_str);
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
@@ -2013,7 +2042,7 @@ void write_ens_var_float(int i_vx, float *ens_data, DataPlane &dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(int i_vx, int *ens_data, DataPlane &dp,
+void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
    NcVar *ens_var = (NcVar *) 0;
@@ -2021,18 +2050,19 @@ void write_ens_var_int(int i_vx, int *ens_data, DataPlane &dp,
 
    // Construct the variable name
    ens_var_name << cs_erase
-                << conf_info.ens_info[i_vx]->name() << "_"
-                << conf_info.ens_info[i_vx]->level_name() << "_"
+                << conf_info.ens_info[i_ens]->name() << "_"
+                << conf_info.ens_info[i_ens]->level_name() << "_"
                 << type_str;
    ens_var = nc_out->add_var(ens_var_name, ncInt, lat_dim, lon_dim);
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.ens_info[i_vx]->name() << "_"
+            << conf_info.ens_info[i_ens]->name() << "_"
             << type_str;
 
    // Add the variable attributes
-   add_var_att(i_vx, ens_var, true, dp, name_str, long_name_str);
+   add_var_att(conf_info.ens_info[i_ens], ens_var, true, dp,
+               name_str, long_name_str);
 
    // Write the data
    if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
@@ -2137,7 +2167,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.ens_info[i_vx]->name() << "_"
+            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << type_str << "_"
             << conf_info.mask_name[i_mask];
 
@@ -2153,7 +2183,8 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    nc_var = nc_out->add_var(var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_vx, nc_var, false, dp, name_str, long_name_str);
+   add_var_att(conf_info.vx_pd[i_vx].fcst_info, nc_var, false, dp,
+               name_str, long_name_str);
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
@@ -2189,7 +2220,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.ens_info[i_vx]->name() << "_"
+            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
             << type_str << "_"
             << conf_info.mask_name[i_mask];
 
@@ -2205,7 +2236,8 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    nc_var = nc_out->add_var(var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(i_vx, nc_var, true, dp, name_str, long_name_str);
+   add_var_att(conf_info.vx_pd[i_vx].fcst_info, nc_var, true, dp,
+               name_str, long_name_str);
 
    // Write the data
    if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
@@ -2220,21 +2252,21 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att(int i_vx, NcVar *nc_var, bool is_int, DataPlane &dp,
+void add_var_att(VarInfo *info, NcVar *nc_var, bool is_int, DataPlane &dp,
                  const char *name_str, const char *long_name_str) {
    ConcatString att_str;
 
    // Construct the long name
    att_str << cs_erase
-           << conf_info.ens_info[i_vx]->name() << " at "
-           << conf_info.ens_info[i_vx]->level_name() << " "
+           << info->name() << " at "
+           << info->level_name() << " "
            << long_name_str;
 
    // Add variable attributes
    nc_var->add_att("name", name_str);
    nc_var->add_att("long_name", att_str);
-   nc_var->add_att("level", conf_info.ens_info[i_vx]->level_name());
-   nc_var->add_att("units", conf_info.ens_info[i_vx]->units());
+   nc_var->add_att("level", info->level_name());
+   nc_var->add_att("units", info->units());
 
    if(is_int) nc_var->add_att("_FillValue", bad_data_int);
    else       nc_var->add_att("_FillValue", bad_data_float);
@@ -2297,10 +2329,6 @@ void clean_up() {
       }
       delete [] thresh_count_na; thresh_count_na = (NumArray *) 0;
    }
-
-   // Deallocate memory for data files
-   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
-   if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

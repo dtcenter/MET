@@ -95,9 +95,10 @@ static const int obs_arr_len = 5;
 ////////////////////////////////////////////////////////////////////////
 
 // Input Ensemble files
-static int          n_ens;         // Number of input ensemble members
-static IntArray     n_ens_vld;     // Number of members with valid data for each field
-static int          n_rank;        // Number of ranks = max(n_ens_vld) + 1
+static int          n_ens;         // Number of ensemble members
+static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens]
+static IntArray     n_vx_vld;      // Number of members with valid data for each verification field [n_vx]
+
 static StringArray  ens_file_list;
 static IntArray     ens_file_vld;
 static GrdFileType  etype = FileType_None;
@@ -166,8 +167,6 @@ static DataPlane wgt_dp;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *ens_mtddf = (Met2dDataFile *) 0;
-static Met2dDataFile *obs_mtddf = (Met2dDataFile *) 0;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = (gsl_rng *) 0;
