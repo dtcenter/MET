@@ -133,13 +133,18 @@ Dependencies
 NOTE: The required libraries should be compiled with the same set of compilers
       to be used in compiling MET.
 
-How to compile and run? (Updated for METv5.0)
+How to compile and run?
 -----------------------
 
 For more detailed instructions on building MET and for a list of supported
 platforms and compilers, please refer to the MET User's Guide in the doc/
 sub-directory, or the MET Online Tutorial:
   http://www.dtcenter.org/met/users/support/online_tutorial
+
+- Set the $CXX and $F77 environment variables to specify the C++ and FORTRAN
+  compilers to be used.  If not set, configure will search for compilers and the
+  ones if finds may or may not be compatible with those used to compile the needed
+  third party libraries.
 
 - Set environment variables to point to the locations of the needed third party
   libraries.  For each library, there are three possible environment variables.
@@ -193,74 +198,21 @@ sub-directory, or the MET Online Tutorial:
 
 - Configure the installation for your system using the configure script.  The
   configure script has command line options to specify where to install MET and
-  which MET utilities to install.  Include any of the following options that
-  apply to your system:
+  which MET utilities to install.  Type "./configure --help" for a detailed list
+  of options, including the following:
 
   --prefix=PREFIX
       By default, MET will install all the files in "/usr/local/bin".  You can
       specify an installation prefix other than "/usr/local" using "--prefix",
       for instance "--prefix=$HOME" or "--prefix=`pwd`".
 
+  --enable and --disable options for each of the MET tools.
+
+  By default, compilation of GRIB2 support, the MODIS-Regrid tool, and
+  MODE-Graphics are disabled.  Use the following options to enable them:
+
   --enable-grib2
       Enable compilation of utilities using GRIB2
-
-  --disable-block4
-      Disable use of BLOCK4 in the compilation. Use this
-      if you have trouble using PrepBufr files.
-
-  --disable-ascii2nc
-      Disable compilation of ascii2nc
-
-  --disable-ensemble_stat
-      Disable compilation of ensemble_stat
-
-  --disable-gen_vx_mask
-      Disable compilation of gen_vx_mask
-
-  --disable-grid_stat
-      Disable compilation of grid_stat
-
-  --disable-madis2nc
-      Disable compilation of madis2nc
-
-  --disable-mode
-      Disable compilation of mode
-
-  --disable-mode_analysis
-      Disable compilation of mode_analysis
-
-  --disable-pb2nc
-      Disable compilation of pb2nc
-
-  --disable-pcp_combine
-      Disable compilation of pcp_combine
-
-  --disable-plot_data_plane
-      Disable compilation of plot_data_plane
-
-  --disable-regrid_data_plane
-      Disable compilation of regrid_data_plane
-
-  --disable-shift_data_plane
-      Disable compilation of shift_data_plane
-
-  --disable-plot_point_obs
-      Disable compilation of plot_point_obs
-
-  --disable-point_stat
-      Disable compilation of point_stat
-
-  --disable-stat_analysis
-      Disable compilation of stat_analysis
-
-  --disable-wavelet_stat
-      Disable compilation of wavelet_stat
-
-  --disable-series_analysis
-      Disable compilation of series_analysis
-
-  --disable-wwmca
-      Disable compilation of wwmca
 
   --enable-modis
       Enable compilation of modis
@@ -268,16 +220,7 @@ sub-directory, or the MET Online Tutorial:
   --enable-mode_graphics
       Enable compilation of mode_graphics
 
-  --disable-mode_time_domain
-      Disable compilation of mode_time_domain
-
-  --disable-tc_utils
-      Disable compilation of tc_utils
-
-  --disable-gsi_tools
-      Disable compilation of gsi_tools
-
-  So, to configure MET to install all of the available tools in the "bin"
+  To configure MET to install all of the available tools in the "bin"
   subdirectory of your current directory, you would use the following command:
 
   ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-mode_graphics
