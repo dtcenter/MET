@@ -204,17 +204,11 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Determine the number of ensemble fields (name/level) to be processed
    n_ens_var = parse_conf_n_vx(ens_dict);
 
-   // Check for a valid number of ensemble fields
-   if(n_ens_var == 0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "At least one field must be specified for \""
-           << conf_key_ens_field << "\".\n\n";
-      exit(1);
-   }
-
    // Allocate space based on the number of ensemble fields
-   ens_info = new VarInfo * [n_ens_var];
-   ens_ta   = new ThreshArray [n_ens_var];
+   if(n_ens_var > 0) {
+      ens_info = new VarInfo *   [n_ens_var];
+      ens_ta   = new ThreshArray [n_ens_var];
+   }
 
    // Initialize pointers
    for(i=0; i<n_ens_var; i++) ens_info[i] = (VarInfo *) 0;
@@ -477,7 +471,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::set_vx_pd(const IntArray &n_ens_vld) {
+void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
    int i, j, n_msg_typ;
 
    // EnsPairData is stored in the vx_pd objects in the following order:
@@ -491,7 +485,7 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &n_ens_vld) {
       vx_pd[i].set_pd_size(n_msg_typ, n_mask, n_interp);
 
       // Set up the ensemble size
-      vx_pd[i].set_ens_size(n_ens_vld[i]);
+      vx_pd[i].set_ens_size(ens_size[i]);
 
       // Set the ensemble spread/skill information
       vx_pd[i].ens_ssvar_flag = ens_ssvar_flag;
