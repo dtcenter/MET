@@ -2312,7 +2312,6 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
    ORANKData cur;
    ConcatString key;
    int i, n_valid, n_bin;
-   double crps, ign, pit;
    map<ConcatString, AggrORANKInfo>::iterator it;
 
    //

@@ -2328,11 +2328,7 @@ bool check_thresh_column(const ThreshArray &list, const ThreshArray &item) {
    }
 
    // Otherwise, check that the list and item exactly match.
-   else {
-      return(list == item);
-   }
-
-   return(true);
+   return(list == item);
 }
 
 ////////////////////////////////////////////////////////////////////////

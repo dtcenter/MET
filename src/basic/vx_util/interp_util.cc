@@ -621,7 +621,6 @@ void dp_interp_min (const DataPlane & fat, DataPlane & out, int width, double fr
    //
 
 int x, y, x_fat_ll, y_fat_ll;
-const int wm1o2 = (width - 1)/2;
 double v;
 
 
@@ -664,7 +663,6 @@ void dp_interp_max (const DataPlane & fat, DataPlane & out, int width, double fr
    //
 
 int x, y, x_fat_ll, y_fat_ll;
-const int wm1o2 = (width - 1)/2;
 double v;
 
 
@@ -707,7 +705,6 @@ void dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int width, doubl
    //
 
 int x, y, x_fat_ll, y_fat_ll;
-const int wm1o2 = (width - 1)/2;
 double v;
 
 

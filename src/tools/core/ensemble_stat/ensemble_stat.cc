@@ -439,7 +439,6 @@ void process_n_vld() {
    int i, j, n_vld;
    DataPlane dp;
    DataPlaneArray dpa;
-   struct stat results;
 
    // Initialize
    n_ens_vld.clear();
@@ -966,7 +965,7 @@ void process_point_obs(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 int process_point_ens(int i_ens, int &n_miss) {
-   int i, j, n_fcst;
+   int i;
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
    VarInfo *info = (VarInfo *) 0;
@@ -1179,7 +1178,6 @@ void process_point_scores() {
 void process_grid_vx() {
    int i, j, k, l, n_miss;
    bool found;
-   double t;
    DataPlane *fcst_dp = (DataPlane *) 0;
    DataPlane *fcst_dp_smooth = (DataPlane *) 0;
    DataPlane  obs_dp, obs_dp_smooth;

@@ -219,7 +219,6 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                               const GridWeightType t, const DataPlane &wgt_dp) {
    int i, x, y;
-   double lat, lon;
    NcVar *wgt_var  = (NcVar *) 0;
    float *wgt_data = (float *) 0;
 
