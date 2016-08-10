@@ -714,10 +714,7 @@ void MtdConfigInfo::write_header_cols(AsciiTable & table, const int row) const
 
 {
 
-int k;
 int c = 0;
-int month, day, year, hour, minute, second;
-char junk[512];
 ConcatString s;
 
    //  version
