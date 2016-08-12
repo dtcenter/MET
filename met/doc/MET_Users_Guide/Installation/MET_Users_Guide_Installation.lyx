@@ -611,6 +611,10 @@ CFLAGS="-D__64BIT__"
 .
  Compiling MET and the GRIB2C library inconsistently may result in a segmentatio
 n fault when reading GRIB2 files.
+ MET expects the GRIB2C library to be named libgrib2c.a, which may be set
+ in the GRIB2C makefile as 
+\series bold
+LIB=libgrib2c.a.
 \end_layout
 
 \begin_layout Description
