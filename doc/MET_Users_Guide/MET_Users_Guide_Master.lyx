@@ -108,26 +108,6 @@ Boulder, Colorado
 \begin_layout Date
 
 \series bold
-Barbara Brown, Randy Bullock, Tressa Fowler, John Halley Gotway, Tara Jensen
- and Kathryn Newman
-\begin_inset Newline newline
-\end_inset
-
-
-\emph on
-with contributions from Barbara Casati, Eric Gilleland, and Lacey Holland
-\end_layout
-
-\begin_layout Title
-\begin_inset VSpace 0.5in
-\end_inset
-
-
-\end_layout
-
-\begin_layout Date
-
-\series bold
 August 2016
 \end_layout
 
@@ -578,6 +558,19 @@ filename "fwd_refs_appendix/MET_Users_Guide_AppendixD.lyx"
 \end_layout
 
 \begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "fwd_refs_appendix/MET_Users_Guide_AppendixE.lyx"
+
+\end_inset
+
 
 \end_layout
 
