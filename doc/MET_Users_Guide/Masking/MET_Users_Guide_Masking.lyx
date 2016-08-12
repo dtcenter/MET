@@ -75,7 +75,7 @@
 \begin_body
 
 \begin_layout Chapter
-Regional Verification using Masking
+Regional Verification using Masking and Tiles
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Masking"
@@ -904,6 +904,49 @@ sample_fcst.grib
  It will write an output NetCDF file named 
 \series bold
 CONUS_poly.nc.
+\end_layout
+
+\begin_layout Section
+Feature-Relative Methods
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Feature-Relative-Methods"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This section contains a description of several methods that may be used
+ to perform feature-relative (or event -based) evaluation.
+ The methodology pertains to examining the environment surrounding a particular
+ feature or event such as a tropical, extra-tropical cyclone, convective
+ cell, snow-band, etc.
+ Several approaches are available for these types of investigations including
+ applying masking described above (e.g.
+ circle or box) or using the 
+\begin_inset Quotes eld
+\end_inset
+
+FORCE
+\begin_inset Quotes erd
+\end_inset
+
+ interpolation method in the regrid configuration option (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+).
+ These methods generally require additional scripting, including potentially
+ storm-track identification, outside of MET to be paired with the features
+ of the MET tools.
+ 
 \end_layout
 
 \end_body

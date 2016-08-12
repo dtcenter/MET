@@ -164,8 +164,8 @@ The Stat-Analysis tool (i) aggregates results over a user-specified time;
 status open
 
 \begin_layout Plain Layout
-The GO Index is a summary measure for NWP models that is used by the Air
- Force Weather Agency.
+The GO Index is a summary measure for NWP models that is used by the US
+ Air Force.
  It combines verification statistics for several forecast variables and
  lead times.
  

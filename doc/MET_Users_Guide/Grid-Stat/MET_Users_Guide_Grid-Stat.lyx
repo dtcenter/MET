@@ -393,6 +393,35 @@ reference "chap:App_D-Confidence-Intervals"
 \end_layout
 
 \begin_layout Subsection
+Grid weighting
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Grid-weighting"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+When computing continuous statistics on a regular large scale or global
+ latitude-longitude grid, weighting may be applied in order to compensate
+ for the meridian convergence toward higher latitudes.
+ Grid square area weighting or weighting based on the cosine of the latitude
+ are two configuration options in both point-stat and grid-stat.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+for more information.
+\end_layout
+
+\begin_layout Subsection
 Neighborhood methods
 \begin_inset CommandInset label
 LatexCommand label
