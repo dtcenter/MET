@@ -198,9 +198,45 @@ regrid = {
 //
 //      - Setting "name" and "level" is file-format specific.  See below.
 //
-//      - The "prob" entry is a boolean defined in the forecast dictionary.
-//        When set to TRUE, it indicates that the data should be treated as
-//        probabilities.  Probability fields should contain values in the range
+//      - The "prob" entry in the forecast dictionary defines probability
+//        information.  It may either be set as a boolean (i.e. TRUE or FALSE)
+//        or as a dictionary defining probabilistic field information.
+//
+//        When set as a boolean to TRUE, it indicates that the "fcst.field" data
+//        should be treated as probabilities.  For example, when verifying the
+//        probabilistic NetCDF output of Ensemble-Stat, one could configure the
+//        Grid-Stat or Point-Stat tools as follows:
+//
+//           fcst = {
+//              field = [ { name  = "APCP_24_A24_ENS_FREQ_gt0.0";
+//                          level = "(*,*)";
+//                          prob  = TRUE; } ];
+//           }
+//
+//        Setting "prob = TRUE" indicates that the "APCP_24_A24_ENS_FREQ_gt0.0"
+//        data should be processed as probabilities.
+//
+//        When set as a dictionary, it defines the probabilistic field to be
+//        used.  For example, when verifying GRIB files containing probabilistic
+//        data,  one could configure the Grid-Stat or Point-Stat tools as
+//        follows:
+//
+//           fcst = {
+//              field = [ { name = "PROB"; level = "A24";
+//                          prob = { name = "APCP"; thresh_lo = 2.54; } },
+//                        { name = "PROB"; level = "P850";
+//                          prob = { name = "TMP"; thresh_hi = 273; } } ];
+//           }
+//
+//        The example above selects two probabilistic fields.  In both, "name"
+//        is set to "PROB", the GRIB abbreviation for probabilities. The "level"
+//        entry defines the level information (i.e. "A24" for a 24-hour
+//        accumulation and "P850" for 850mb).  The "prob" dictionary defines the
+//        event for which the probability is defined.  The "thresh_lo"
+//        (i.e. APCP > 2.54) and/or "thresh_hi" (i.e. TMP < 273) entries are
+//         used to define the event threshold(s).
+//
+//        Probability fields should contain values in the range
 //        [0, 1] or [0, 100]. However, when MET encounters a probability field
 //        with a range [0, 100], it will automatically rescale it to be [0, 1]
 //        before applying the probabilistic verification methods.
@@ -267,7 +303,7 @@ regrid = {
 //       - The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries specify the first
 //         and second level values.
 //       - The "GRIB_ens" entry is a string which specifies NCEP's usage of the
-//         extended PDS for ensembles.  Set to "hi_res_ctl", "low_res_ctl", "+n", 
+//         extended PDS for ensembles.  Set to "hi_res_ctl", "low_res_ctl", "+n",
 //         or "-n", for the n-th ensemble member.
 //       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version
 //         number.
