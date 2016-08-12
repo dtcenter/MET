@@ -167,7 +167,18 @@ name "sec:IO_Input-data-formats"
 
 \series medium
 The MET package can handle gridded input data in one of three formats: GRIB
- version 1, GRIB version 2, or netCDF classic format.
+ version 1, GRIB version 2, or netCDF classic format (CF compliant).
+ MET supports standard NCEP, UKMet Office and ECMWF grib tables along with
+ custom, user defined grib tables and the extended PDS including ensemble
+ member metadata.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+ for more information.
  Point observation files may be supplied in either PrepBufr, ASCII, or MADIS
  format.
  Note that MET does not require the Unified Post-Processor to be used, but

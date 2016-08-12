@@ -184,6 +184,7 @@ Update all tools to support
 \series medium
 Update map data used for plotting and provide both low (default) and high
  resolution verions.
+ The data comes from a 2016 GIS database.
 \end_layout
 
 \begin_layout Itemize
@@ -894,7 +895,7 @@ The following notice shall be displayed on any scholarly works associated
 "Model Evaluation Tools (MET) was developed at the National Center for Atmospher
 ic Research (NCAR) through grants from the National Science Foundation (NSF),
  the National Oceanic and Atmospheric Administration (NOAA), the United
- States Air Force (AF), and the United States Department of Energy (DOE).
+ States Air Force (USAF), and the United States Department of Energy (DOE).
  NCAR is sponsored by the United States National Science Foundation." 
 \end_layout
 
@@ -913,7 +914,7 @@ If MET-TC is used, the following notice shall be displayed on any scholarly
  National Oceanic and Atmospheric Administration (NOAA) through the Hurricane
  Forecast Improvement Project (HFIP).
  Model Evaluation Tools (MET) was developed through a grant from the United
- States Air Force Weather Agency (AFWA).
+ States Air Force (USAF).
  NCAR is sponsored by the United States National Science Foundation."
 \end_layout
 
@@ -951,7 +952,7 @@ name "chap:Acknowledgments"
 
 \series medium
 We thank the the National Science Foundation (NSF), the National Oceanic
- and Atmospheric Administration (NOAA), the United States Air Force (AF),
+ and Atmospheric Administration (NOAA), the United States Air Force (USAF),
  and the United States Department of Energy (DOE) for their support of this
  work.
  Funding for the development of MET-TC is from the National Oceanic and
