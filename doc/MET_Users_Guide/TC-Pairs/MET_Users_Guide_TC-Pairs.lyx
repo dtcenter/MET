@@ -714,9 +714,9 @@ interp12
  processing should be performed for interpolated forecasts.
  The NONE option indicates no changes are made to the interpolated forecasts.
  The FILL and REPLACE (default) options determine when the 12-hour interpolated
- forecast (normally indicated with a "2" at the end of the ATCF ID) will
- be renamed with the 6-hour interpolated ATCF ID (normally indicated with
- the letter "I" at the end of the ATCF ID).
+ forecast (normally indicated with a "2" or "3" at the end of the ATCF ID)
+ will be renamed with the 6-hour interpolated ATCF ID (normally indicated
+ with the letter "I" at the end of the ATCF ID).
  The FILL option renames the 12-hour interpolated forecasts with the 6-hour
  interpolated forecast ATCF ID only when the 6-hour interpolated forecasts
  is missing (in the case of a 6-hour interpolated forecast which only occurs
