@@ -1,0 +1,154 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Ensemble-Stat configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "WRF";
+
+//
+// Output observation type to be written
+//
+obtype = "ANALYS";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Ensemble product fields to be processed
+//
+ens = {
+   ens_thresh = 1.0;
+   vld_thresh = 1.0;
+
+   field = [
+      {
+         name       = "TMP";
+         level      = [ "Z2" ];
+         cat_thresh = [ <=273, >273 ];
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+
+   message_type = [ "ADPSFC" ];
+   sid_exc      = [];
+
+   field = [
+      {
+         name        = "TMP";
+         level       = [ "Z2" ];
+         obs_quality = [ ${OBS_QUALITY} ];
+      }
+   ];
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid = [ "FULL" ];
+   poly = [ ];
+   sid  = [ ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   rhist = BOTH;
+   phist = BOTH;
+   orank = BOTH;
+   ssvar = BOTH;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Ensemble product output types
+//
+ensemble_flag = {
+   mean      = TRUE;
+   stdev     = TRUE;
+   minus     = TRUE;
+   plus      = TRUE;
+   min       = TRUE;
+   max       = TRUE;
+   range     = TRUE;
+   vld_count = TRUE;
+   frequency = TRUE;
+   rank      = TRUE;
+   weight    = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Random number generator
+//
+rng = {
+   type = "mt19937";
+   seed = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+grid_weight_flag = NONE;
+duplicate_flag   = NONE;
+output_prefix    = "${OUTPUT_PREFIX}";
+version          = "V5.2";
+
+////////////////////////////////////////////////////////////////////////////////

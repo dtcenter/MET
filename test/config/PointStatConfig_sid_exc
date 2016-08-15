@@ -1,0 +1,102 @@
+////////////////////////////////////////////////////////////////////////////////
+
+model = "WRF";
+
+////////////////////////////////////////////////////////////////////////////////
+
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+obs_window = {
+   beg = ${BEG_DS};
+   end = ${END_DS};
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+
+fcst = {
+
+   sid_exc = [ ];
+   
+   field = [
+      { name = "UGRD"; level = "Z10"; message_type = "ADPSFC"; },
+      { name = "VGRD"; level = "Z10"; message_type = "ADPSFC";
+        sid_exc = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ]; }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid = [ "DTC165" ];
+   poly = [ ];
+   sid  = [ ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 200;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+interp = {
+  
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+output_flag = {
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   mpr    = BOTH;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+duplicate_flag = SINGLE;
+rank_corr_flag = TRUE;
+tmp_dir        = "/tmp";
+output_prefix  = "${OUTPUT_PREFIX}";
+version        = "V5.2";
+
+////////////////////////////////////////////////////////////////////////////////
