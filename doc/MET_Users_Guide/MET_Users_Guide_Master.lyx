@@ -97,11 +97,22 @@ Developmental Testbed Center
 \end_inset
 
 Boulder, Colorado
-\end_layout
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Author
+
+\series default
+
+\begin_inset VSpace 0.5in
+\end_inset
+
 
 \series bold
+
+\begin_inset Newline newline
+\end_inset
+
+
 \shape italic
 Barbara Brown, Randy Bullock, Tressa Fowler, John Halley Gotway,
 \begin_inset Newline newline
