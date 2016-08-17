@@ -1516,7 +1516,7 @@ JOB COMMAND LINE
  is described in Section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MODE-configuration-file"
+reference "sub:stat_analysis-configuration-file"
 
 \end_inset
 
@@ -3011,7 +3011,7 @@ aggregate_stat
 \end_layout
 
 \begin_layout Standard
-The Stat-Analysis tool writes it output to either standard out or the file
+The Stat-Analysis tool writes its output to either standard out or the file
  specified using the 
 \series bold
 -out
