@@ -960,7 +960,6 @@ n
 
 \begin_layout Plain Layout
 
-\series medium
 \series bold
 00
 \end_layout
@@ -1103,7 +1102,7 @@ over{n_{.0}}}.$$
 
 \series medium
 It is the proportion of non-events that were forecast to be events.
- POFD is also often called the False Alarm Rate2.
+ POFD is also often called the False Alarm Rate.
  POFD ranges from 0 to 1; a perfect forecast would have POFD = 0.
 \end_layout
 
@@ -2165,7 +2164,6 @@ overline o)^2}}}$$
 
 \begin_layout Standard
 
-\series medium
 \series bold
 r
 \series default
@@ -2602,9 +2600,9 @@ overline{o})^{2}+s_{f}^{2}+s_{o}^{2}-2s_{f}s_{o}r_{fo}$
 
 
 \family default
+\series default
 \shape default
 \size default
-\series default
 \bar default
 \strikeout default
 \uuline default
@@ -5492,9 +5490,9 @@ rangle _{s}$
 
 
 \family default
+\series default
 \shape default
 \size default
-\series default
 \bar default
 \strikeout default
 \uuline default
