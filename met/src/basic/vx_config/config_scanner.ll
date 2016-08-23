@@ -148,7 +148,7 @@ REAL_NUMBER  (("-"?){DIGITS}{EXP})|(("-"?)"."{DIGITS}{OPT_EXP})|(("-"?){DIGITS}"
 
 
 "["                                 { ++Column;  is_lhs = false;  dict_stack->push_array();  return ( configtext[0] ); }
-"{"                                 { ++Column;  is_lhs = false;  dict_stack->push();        return ( configtext[0] ); }
+"{"                                 { ++Column;  is_lhs = true;   dict_stack->push();        return ( configtext[0] ); }
 
 "]"                                 { ++Column;  return ( configtext[0] ); }
 "}"                                 { ++Column;  return ( configtext[0] ); }
@@ -163,7 +163,7 @@ REAL_NUMBER  (("-"?){DIGITS}{EXP})|(("-"?)"."{DIGITS}{OPT_EXP})|(("-"?){DIGITS}"
 "^"                                 { ++Column;  return ( configtext[0] ); }
 
 "="                                 { ++Column;  return ( configtext[0] ); }
-";"                                 { ++Column;  return ( configtext[0] ); }
+";"                                 { ++Column;  is_lhs = true;  return ( configtext[0] ); }
 ","                                 { ++Column;  return ( configtext[0] ); }
 
 
@@ -499,6 +499,8 @@ if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return 
 const DictionaryEntry * e = dict_stack->lookup(configtext);
 
 if ( e && (e->is_number()) && (! is_lhs) )  {
+
+   // cout << "=================== id = \"" << configtext << "\"    is_lhs = " << (is_lhs ? "true" : "false") << "\n";
 
    if ( e->type() == IntegerType )  {
 
