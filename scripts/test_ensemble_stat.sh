@@ -1,4 +1,4 @@
-#!/bin/sh
+#/bin/sh
 
 echo
 echo "*** Running Ensemble-Stat on APCP using GRIB forecasts, point observations, and gridded observations ***"
