@@ -1,0 +1,98 @@
+
+
+
+########################################################################
+
+
+TEST_OUT_DIR = ../out
+
+
+TOOLS_DIR    = ../src/tools
+
+CORE_DIR     = $(TOOLS_DIR)/core
+
+OTHER_DIR    = $(TOOLS_DIR)/other
+
+MK_DIR       = ./mk
+
+
+########################################################################
+
+
+   ##
+   ##  Read the config.h file (genereated by autoconf) to see which tools
+   ##
+   ##    were built
+   ##
+
+
+TESTS = $(shell grep "define ENABLE_" ../config.h | cut -d" " -f2 | cut -b8- | tr A-Z a-z)
+
+
+########################################################################
+
+
+all: ${TESTS}
+	@ echo
+
+
+########################################################################
+
+
+include $(MK_DIR)/pcp_combine.mk
+include $(MK_DIR)/mode.mk
+include $(MK_DIR)/ascii2nc.mk
+include $(MK_DIR)/ensemble_stat.mk
+include $(MK_DIR)/gen_vx_mask.mk
+include $(MK_DIR)/grib2.mk
+include $(MK_DIR)/grid_stat.mk
+include $(MK_DIR)/gsi_tools.mk
+include $(MK_DIR)/madis2nc.mk
+include $(MK_DIR)/mode_analysis.mk
+include $(MK_DIR)/mode_time_domain.mk
+include $(MK_DIR)/modis.mk
+include $(MK_DIR)/pb2nc.mk
+include $(MK_DIR)/plot_data_plane.mk
+include $(MK_DIR)/plot_point_obs.mk
+include $(MK_DIR)/point_stat.mk
+include $(MK_DIR)/regrid_data_plane.mk
+include $(MK_DIR)/series_analysis.mk
+include $(MK_DIR)/shift_data_plane.mk
+include $(MK_DIR)/stat_analysis.mk
+include $(MK_DIR)/tc_utils.mk
+include $(MK_DIR)/wavelet_stat.mk
+include $(MK_DIR)/wwmca.mk
+
+
+########################################################################
+
+
+FOO_EXEC = $(OTHER_DIR)/randy/bullock
+
+foo: $(FOO_EXEC)
+
+
+
+########################################################################
+########################################################################
+########################################################################
+
+
+which:
+	@ echo ${TESTS}
+
+
+########################################################################
+
+
+clean:
+	@ echo
+	rm -f ${TESTS}
+	rm -f ${TEST_OUT_DIR}/mode/*
+	rm -f ${TEST_OUT_DIR}/pcp_combine/*
+
+
+########################################################################
+
+
+

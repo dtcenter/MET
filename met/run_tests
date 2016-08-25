@@ -8,3 +8,4 @@ echo MET_BASE = $MET_BASE
 
 cd scripts
 ./test_all.sh
+#make all
