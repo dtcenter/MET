@@ -4,6 +4,12 @@
 ########################################################################
 
 
+WAVELET_STAT_EXEC = ${CORE_DIR}/wavelet_stat/wavelet_stat
+
+
+########################################################################
+
+
    ##
    ##  wavelet_stat
    ##
@@ -11,7 +17,7 @@
    ##
 
 
-wavelet_stat: ${CORE_DIR}/wavelet_stat/wavelet_stat
+wavelet_stat: ${WAVELET_STAT_EXEC}
 	touch wavelet_stat
 
 

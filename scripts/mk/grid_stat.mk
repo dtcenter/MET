@@ -4,6 +4,12 @@
 ########################################################################
 
 
+GRID_STAT_EXEC = ${CORE_DIR}/grid_stat/grid_stat
+
+
+########################################################################
+
+
    ##
    ##  grid_stat
    ##
@@ -11,7 +17,7 @@
    ##
 
 
-grid_stat: ${CORE_DIR}/grid_stat/grid_stat
+grid_stat: ${GRID_STAT_EXEC}
 	touch grid_stat
 
 

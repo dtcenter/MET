@@ -4,6 +4,12 @@
 ########################################################################
 
 
+MODE_EXEC = ${CORE_DIR}/mode/mode
+
+
+########################################################################
+
+
    ##
    ##  mode
    ##
@@ -11,11 +17,11 @@
    ##
 
 
-mode: ${CORE_DIR}/mode/mode pcp_combine
+mode: ${MODE_EXEC} pcp_combine
 	@ make pcp_combine
 	@ echo
 	@ echo "*** Running MODE on APCP using netCDF input for both forecast and observation ***"
-	${CORE_DIR}/mode/mode \
+	${MODE_EXEC} \
    	${TEST_OUT_DIR}/pcp_combine/sample_fcst_12L_2005080712V_12A.nc \
    	${TEST_OUT_DIR}/pcp_combine/sample_obs_2005080712V_12A.nc \
    	config/MODEConfig_APCP_12 \
@@ -23,7 +29,7 @@ mode: ${CORE_DIR}/mode/mode pcp_combine
 	@
 	@ echo
 	@ echo "*** Running MODE on APCP using a GRIB forecast and netCDF observation ***"
-	${CORE_DIR}/mode/mode \
+	${MODE_EXEC} \
    	../data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
    	${TEST_OUT_DIR}/pcp_combine/sample_obs_2005080800V_24A.nc \
    	config/MODEConfig_APCP_24 \
@@ -31,7 +37,7 @@ mode: ${CORE_DIR}/mode/mode pcp_combine
 	@
 	@ echo
 	@ echo "*** Running MODE on RH at 500mb using GRIB input for both forecast and observation ***"   
-	${CORE_DIR}/mode/mode \
+	${MODE_EXEC} \
    	../data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \
    	../data/sample_fcst/2005080712/wrfprs_ruc13_00.tm00_G212 \
    	config/MODEConfig_RH \

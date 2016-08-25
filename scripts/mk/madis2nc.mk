@@ -4,6 +4,12 @@
 ########################################################################
 
 
+MADIS2NC_EXEC = ${OTHER_DIR}/madis2nc/madis2nc
+
+
+########################################################################
+
+
    ##
    ##  madis2nc
    ##
@@ -11,7 +17,7 @@
    ##
 
 
-madis2nc: ${OTHER_DIR}/madis2nc/madis2nc
+madis2nc: ${MADIS2NC_EXEC}
 	touch madis2nc
 
 
