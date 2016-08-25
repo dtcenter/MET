@@ -34,7 +34,7 @@ wavelet_stat: ${WAVELET_STAT_EXEC} pcp_combine
    	config/WaveletStatConfig_APCP_12_NC \
    	-outdir ${TEST_OUT_DIR}/wavelet_stat -v 2
 	@ 
-	touch wavelet_stat
+	@ touch wavelet_stat
 
 
 ########################################################################

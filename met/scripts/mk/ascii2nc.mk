@@ -32,7 +32,7 @@ ascii2nc: ${ASCII2NC_EXEC}
    	${TEST_OUT_DIR}/ascii2nc/precip24_2010010112.nc \
    	-v 2
 	@
-	touch ascii2nc
+	@ touch ascii2nc
 
 
 ########################################################################

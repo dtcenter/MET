@@ -18,7 +18,7 @@ MTD_EXEC = ${OTHER_DIR}/mode_time_domain/mtd
 
 
 mode_time_domain: ${MTD_EXEC}
-	touch mode_time_domain
+	@ touch mode_time_domain
 
 
 ########################################################################

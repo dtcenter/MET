@@ -27,7 +27,7 @@ ensemble_stat: ${ENSEMBLE_STAT_EXEC}
    	-point_obs ${TEST_OUT_DIR}/ascii2nc/precip24_2010010112.nc \
    	-outdir ${TEST_OUT_DIR}/ensemble_stat -v 2
 	@
-	touch ensemble_stat
+	@ touch ensemble_stat
 
 
 ########################################################################

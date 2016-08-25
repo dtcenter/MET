@@ -42,7 +42,7 @@ mode: ${MODE_EXEC} pcp_combine
    	config/MODEConfig_RH \
    	-outdir ${TEST_OUT_DIR}/mode -v 2
 	@
-	touch mode
+	@ touch mode
 
 
 ########################################################################

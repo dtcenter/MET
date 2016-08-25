@@ -27,7 +27,7 @@ point_stat: ${POINT_STAT_EXEC} pb2nc ascii2nc
    	-point_obs ${TEST_OUT_DIR}/ascii2nc/sample_ascii.nc \
    	-outdir ${TEST_OUT_DIR}/point_stat -v 2
 	@ 
-	touch point_stat
+	@ touch point_stat
 
 
 ########################################################################
