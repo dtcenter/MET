@@ -4,6 +4,12 @@
 ########################################################################
 
 
+GEN_VX_MASK_EXEC = ${OTHER_DIR}/gen_vx_mask/gen_vx_mask
+
+
+########################################################################
+
+
    ##
    ##  gen_vx_mask
    ##
@@ -11,7 +17,7 @@
    ##
 
 
-gen_vx_mask: ${OTHER_DIR}/gen_vx_mask/gen_vx_mask
+gen_vx_mask: ${GEN_VX_MASK_EXEC}
 	touch gen_vx_mask
 
 

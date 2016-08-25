@@ -4,6 +4,12 @@
 ########################################################################
 
 
+MODIS_REGRID_EXEC = ${OTHER_DIR}/modis_regrid/modis_regrid
+
+
+########################################################################
+
+
    ##
    ##  modis
    ##
@@ -11,7 +17,7 @@
    ##
 
 
-modis: ${OTHER_DIR}/modis_regrid/modis_regrid
+modis: ${MODIS_REGRID_EXEC}
 	touch modis
 
 

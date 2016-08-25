@@ -88,8 +88,20 @@ which:
 clean:
 	@ echo
 	rm -f ${TESTS}
+	rm -f ${TEST_OUT_DIR}/ascii2nc/*
+	rm -f ${TEST_OUT_DIR}/ensemble_stat/*
+	rm -f ${TEST_OUT_DIR}/gen_vx_mask/*
+	rm -f ${TEST_OUT_DIR}/grid_stat/*
+	rm -f ${TEST_OUT_DIR}/madis2nc/*
 	rm -f ${TEST_OUT_DIR}/mode/*
+	rm -f ${TEST_OUT_DIR}/mode_analysis/*
+	rm -f ${TEST_OUT_DIR}/pb2nc/*
 	rm -f ${TEST_OUT_DIR}/pcp_combine/*
+	rm -f ${TEST_OUT_DIR}/plot_data_plane/*
+	rm -f ${TEST_OUT_DIR}/plot_point_obs/*
+	rm -f ${TEST_OUT_DIR}/point_stat/*
+	rm -f ${TEST_OUT_DIR}/stat_analysis/*
+	rm -f ${TEST_OUT_DIR}/wavelet_stat/*
 
 
 ########################################################################

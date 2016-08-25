@@ -4,6 +4,12 @@
 ########################################################################
 
 
+POINT_STAT_EXEC = ${CORE_DIR}/point_stat/point_stat
+
+
+########################################################################
+
+
    ##
    ##  point_stat
    ##
@@ -11,7 +17,7 @@
    ##
 
 
-point_stat: ${CORE_DIR}/point_stat/point_stat
+point_stat: ${POINT_STAT_EXEC}
 	touch point_stat
 
 
