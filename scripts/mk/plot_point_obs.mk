@@ -24,7 +24,7 @@ plot_point_obs: ${PLOT_POINT_OBS_EXEC} pb2nc
    	${TEST_OUT_DIR}/pb2nc/sample_pb.nc \
    	${TEST_OUT_DIR}/plot_point_obs/sample_pb.ps
 	@ 
-	touch plot_point_obs
+	@ touch plot_point_obs
 
 
 ########################################################################

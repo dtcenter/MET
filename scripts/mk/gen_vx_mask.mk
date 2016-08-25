@@ -33,7 +33,7 @@ gen_vx_mask: ${GEN_VX_MASK_EXEC}
    	${TEST_OUT_DIR}/gen_vx_mask/CONUS_circles.nc \
 	 -type circle -thresh le150 -v 2
 	@ 
-	touch gen_vx_mask
+	@ touch gen_vx_mask
 
 
 ########################################################################

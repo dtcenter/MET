@@ -60,7 +60,7 @@ pcp_combine: ${PCP_COMBINE_EXEC}
    	${TEST_OUT_DIR}/pcp_combine/sample_obs_2005080800V_24A.nc \
 	-pcpdir ../data/sample_obs/ST2ml
 	@
-	touch pcp_combine
+	@ touch pcp_combine
 
 
 ########################################################################

@@ -36,7 +36,7 @@ plot_data_plane: ${PLOT_DATA_PLANE_EXEC} pcp_combine
   	-title "NC MET 12-hour APCP" \
   	-v 1
 	@ 
-	touch plot_data_plane
+	@ touch plot_data_plane
 
 
 ########################################################################

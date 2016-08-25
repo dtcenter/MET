@@ -26,7 +26,7 @@ pb2nc: ${PB2NC_EXEC}
  	config/PB2NCConfig_G212 \
  	-v 2
 	@
-	touch pb2nc
+	@ touch pb2nc
 
 
 ########################################################################

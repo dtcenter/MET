@@ -50,7 +50,7 @@ grid_stat: ${GRID_STAT_EXEC} pcp_combine
    	config/GridStatConfig_all \
    	-outdir ${TEST_OUT_DIR}/grid_stat -v 2
 	@ 
-	touch grid_stat
+	@ touch grid_stat
 
 
 ########################################################################

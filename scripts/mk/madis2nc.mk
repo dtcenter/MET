@@ -25,7 +25,7 @@ madis2nc: ${MADIS2NC_EXEC}
   	${TEST_OUT_DIR}/madis2nc/metar_2012040912_F000.nc \
   	-type metar -rec_beg 2000 -rec_end 6000 -v 2
 	@ 
-	touch madis2nc
+	@ touch madis2nc
 
 
 ########################################################################

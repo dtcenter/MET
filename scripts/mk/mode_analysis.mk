@@ -50,7 +50,7 @@ mode_analysis: ${MODE_ANALYSIS_EXEC} mode
    	-out      ${TEST_OUT_DIR}/mode_analysis/job_summary_bycase.out \
    	-v 2
 	@ 
-	touch mode_analysis
+	@ touch mode_analysis
 
 
 ########################################################################

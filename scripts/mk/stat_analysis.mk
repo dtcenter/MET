@@ -28,7 +28,7 @@ stat_analysis: ${STAT_ANALYSIS_EXEC} grid_stat wavelet_stat ensemble_stat
    	-out ${TEST_OUT_DIR}/stat_analysis/stat_analysis.out \
    	-v 2
 	@ 
-	touch stat_analysis
+	@ touch stat_analysis
 
 
 ########################################################################
