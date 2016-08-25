@@ -18,7 +18,6 @@ MODE_EXEC = ${CORE_DIR}/mode/mode
 
 
 mode: ${MODE_EXEC} pcp_combine
-	@ make pcp_combine
 	@ echo
 	@ echo "*** Running MODE on APCP using netCDF input for both forecast and observation ***"
 	${MODE_EXEC} \

@@ -18,6 +18,14 @@ MK_DIR       = ./mk
 
 ########################################################################
 
+   ##
+   ##  some of the config files need this
+   ##
+
+export TEST_OUT_DIR
+
+########################################################################
+
 
    ##
    ##  Read the config.h file (genereated by autoconf) to see which tools
@@ -39,8 +47,6 @@ all: ${TESTS}
 ########################################################################
 
 
-include $(MK_DIR)/pcp_combine.mk
-include $(MK_DIR)/mode.mk
 include $(MK_DIR)/ascii2nc.mk
 include $(MK_DIR)/ensemble_stat.mk
 include $(MK_DIR)/gen_vx_mask.mk
@@ -48,10 +54,12 @@ include $(MK_DIR)/grib2.mk
 include $(MK_DIR)/grid_stat.mk
 include $(MK_DIR)/gsi_tools.mk
 include $(MK_DIR)/madis2nc.mk
+include $(MK_DIR)/mode.mk
 include $(MK_DIR)/mode_analysis.mk
 include $(MK_DIR)/mode_time_domain.mk
 include $(MK_DIR)/modis.mk
 include $(MK_DIR)/pb2nc.mk
+include $(MK_DIR)/pcp_combine.mk
 include $(MK_DIR)/plot_data_plane.mk
 include $(MK_DIR)/plot_point_obs.mk
 include $(MK_DIR)/point_stat.mk
