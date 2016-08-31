@@ -880,11 +880,33 @@ run_tests
 \end_layout
 
 \begin_layout LyX-Code
-
-\series medium
 scripts/
 \end_layout
 
+\begin_deeper
+\begin_layout LyX-Code
+config/
+\end_layout
+
+\begin_layout LyX-Code
+examples/
+\end_layout
+
+\begin_layout LyX-Code
+mk/
+\end_layout
+
+\begin_layout LyX-Code
+Rscripts/
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+include/
+\end_layout
+
+\end_deeper
+\end_deeper
 \begin_layout LyX-Code
 
 \series medium
