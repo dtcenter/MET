@@ -764,6 +764,13 @@ Once you have downloaded the MET tarball and unzipped and unpacked its contents,
  the top-level MET directory structure follows this outline:
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout LyX-Code
 
 \series medium
