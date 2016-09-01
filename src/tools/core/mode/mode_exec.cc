@@ -348,13 +348,18 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
 
 {
 
+ModeConfInfo & conf = engine.conf_info;
+
 static int local_r_index = -1;
 
 R_index = r_index;
 T_index = t_index;
 
-engine.conf_info.set_conv_radius_by_index(R_index);
-engine.conf_info.set_conv_thresh_by_index(T_index);
+conf.set_conv_radius_by_index  (R_index);
+conf.set_conv_thresh_by_index  (T_index);
+
+if ( conf.need_fcst_merge_thresh () )  conf.set_fcst_merge_thresh_by_index (T_index);
+if ( conf.need_obs_merge_thresh  () )  conf.set_obs_merge_thresh_by_index  (T_index);
 
    //
    //  Set up the engine with these raw fields
@@ -377,7 +382,7 @@ if ( r_index != local_r_index )  {   //  need to do convolution
    //  Compute the contingency table statistics for the fields, if needed
    //
 
-if ( engine.conf_info.ct_stats_flag )  compute_ct_stats();
+if ( conf.ct_stats_flag )  compute_ct_stats();
 
 
    //

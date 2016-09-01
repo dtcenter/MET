@@ -91,6 +91,9 @@ void ModeConfInfo::clear()
    fcst_conv_thresh_array.clear();
    obs_conv_thresh_array.clear();
 
+   fcst_merge_thresh_array.clear();
+   obs_merge_thresh_array.clear();
+
    fcst_conv_thresh.clear();
    obs_conv_thresh.clear();
 
@@ -106,8 +109,8 @@ void ModeConfInfo::clear()
    fcst_inten_perc_thresh.clear();
    obs_inten_perc_thresh.clear();
 
-   fcst_merge_thresh.clear();
-   obs_merge_thresh.clear();
+   // fcst_merge_thresh.clear();
+   // obs_merge_thresh.clear();
 
    fcst_merge_flag = MergeType_None;
    obs_merge_flag = MergeType_None;
@@ -349,15 +352,58 @@ PlotInfo plot_info;
    fcst_inten_perc_thresh = fcst_dict->lookup_thresh(conf_key_inten_perc_thresh);
    obs_inten_perc_thresh  = obs_dict->lookup_thresh(conf_key_inten_perc_thresh);
 
-      // Conf: fcst.merge_thresh and obs.merge_thresh
-
-   fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
-   obs_merge_thresh  = obs_dict->lookup_thresh(conf_key_merge_thresh);
-
       // Conf: fcst.merge_flag and obs.merge_flag
 
    fcst_merge_flag = int_to_mergetype(fcst_dict->lookup_int(conf_key_merge_flag));
    obs_merge_flag  = int_to_mergetype(obs_dict->lookup_int(conf_key_merge_flag));
+
+      // Conf: fcst.merge_thresh and obs.merge_thresh
+
+   // fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
+   // obs_merge_thresh  = obs_dict->lookup_thresh(conf_key_merge_thresh);
+
+      // Conf: fcst.merge_thresh and obs.merge_thresh
+
+   fcst_merge_thresh_array = fcst_dict->lookup_thresh_array(conf_key_merge_thresh);
+    obs_merge_thresh_array =  obs_dict->lookup_thresh_array(conf_key_merge_thresh);
+
+   if ( need_fcst_merge_thresh() && (fcst_merge_thresh_array.n_elements() != fcst_conv_thresh_array.n_elements()) )  {
+
+      mlog << Error << "\nModeConfInfo::process_config() -> "
+           << "fcst conv thresh and fcst merge thresh arrays need to be the same size\n\n";
+
+      exit ( 1 );
+
+   }
+
+
+   if ( need_obs_merge_thresh() && (obs_merge_thresh_array.n_elements() != obs_conv_thresh_array.n_elements()) )  {
+
+      mlog << Error << "\nModeConfInfo::process_config() -> "
+           << "obs conv thresh and obs merge thresh arrays need to be the same size\n\n";
+
+      exit ( 1 );
+
+   }
+
+//    if ( fcst_merge_thresh_array.n_elements() != fcst_conv_thresh_array.n_elements() )  {
+// 
+//       mlog << Error << "\nModeConfInfo::process_config() -> "
+//            << "convolution threshold arrays and merge threshold arrays need to be the same size\n\n";
+// 
+//       exit ( 1 );
+// 
+//    }
+
+   if ( fcst_merge_thresh_array.n_elements() == 1 )  fcst_merge_thresh = fcst_merge_thresh_array[0];
+   if (  obs_merge_thresh_array.n_elements() == 1 )   obs_merge_thresh =  obs_merge_thresh_array[0];
+
+
+
+
+
+
+
 
       // Conf: mask_missing_flag
 
@@ -678,6 +724,52 @@ if ( (k < 0) || (k >= fcst_conv_thresh_array.n_elements()) )  {
 
 fcst_conv_thresh = fcst_conv_thresh_array[k];
  obs_conv_thresh =  obs_conv_thresh_array[k];
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
+
+{
+
+if ( (k < 0) || (k >= fcst_merge_thresh_array.n_elements()) )  {
+
+   mlog << Error << "\nModeConfInfo::set_fcst_merge_thresh_by_index(int) -> "
+        << "range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+fcst_merge_thresh = fcst_merge_thresh_array[k];
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
+
+{
+
+if ( (k < 0) || (k >= obs_merge_thresh_array.n_elements()) )  {
+
+   mlog << Error << "\nModeConfInfo::set_obs_merge_thresh_by_index(int) -> "
+        << "range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+ obs_merge_thresh =  obs_merge_thresh_array[k];
 
 return;
 
