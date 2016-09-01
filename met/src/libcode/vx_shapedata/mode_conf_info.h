@@ -75,11 +75,17 @@ class ModeConfInfo {
 
       void parse_nc_info  ();
 
-      void set_conv_radius_by_index(int);
-      void set_conv_thresh_by_index(int);
+      void set_conv_radius_by_index  (int);
+      void set_conv_thresh_by_index (int);
 
-      int n_conv_threshs () const;
-      int n_conv_radii   () const;
+      void set_fcst_merge_thresh_by_index (int);
+      void set_obs_merge_thresh_by_index  (int);
+
+      int n_conv_threshs  () const;
+      int n_conv_radii    () const;
+
+      int n_fcst_merge_threshs () const;
+      int n_obs_merge_threshs  () const;
 
       int n_runs() const;   //  # threshs times # radii
 
@@ -124,8 +130,11 @@ class ModeConfInfo {
       SingleThresh     fcst_inten_perc_thresh; // Discard objects whose percentile intensity doesn't meet threshold
       SingleThresh      obs_inten_perc_thresh;
 
-      SingleThresh     fcst_merge_thresh;      // Lower convolution threshold used for double merging method
-      SingleThresh      obs_merge_thresh;
+      ThreshArray      fcst_merge_thresh_array;      // Lower convolution threshold used for double merging method
+      ThreshArray       obs_merge_thresh_array;
+
+      SingleThresh      fcst_merge_thresh;      // Lower convolution threshold used for double merging method
+      SingleThresh       obs_merge_thresh;
 
       MergeType        fcst_merge_flag;        // Define which merging methods should be employed
       MergeType         obs_merge_flag;
@@ -186,7 +195,11 @@ class ModeConfInfo {
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version
 
+      bool             need_fcst_merge_thresh () const;   //  mergetype is both or thresh
+      bool             need_obs_merge_thresh  () const;   //  mergetype is both or thresh
+
 };
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -199,8 +212,18 @@ inline int ModeConfInfo::n_conv_threshs() const { return ( fcst_conv_thresh_arra
                                                                                                       //  obs_conv_thresh_array.n_elements()
 
 
+inline int ModeConfInfo::n_fcst_merge_threshs () const { return ( fcst_merge_thresh_array.n_elements() ); }
+inline int ModeConfInfo::n_obs_merge_threshs  () const { return (  obs_merge_thresh_array.n_elements() ); }
+
+
+inline bool ModeConfInfo::need_fcst_merge_thresh () const { return ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Thresh) ); }
+inline bool ModeConfInfo::need_obs_merge_thresh  () const { return ( ( obs_merge_flag == MergeType_Both) || ( obs_merge_flag == MergeType_Thresh) ); }
+
+
 ////////////////////////////////////////////////////////////////////////
 
+
 #endif   /*  __MODE_CONF_INFO_H__  */
+
 
 ////////////////////////////////////////////////////////////////////////
