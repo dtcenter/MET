@@ -1413,7 +1413,10 @@ quilt = false;
 //      are discarded.
 //
 //    - The "merge_thresh" entry specifies a lower convolution threshold used
-//      when the double-thresholding merging method is applied.
+//      when the double-threshold merging method is applied.  The number of
+//      merge thresholds must match the number of convolution thresholds.
+//      Multiple merge thresholds may be specified as an array:
+//         merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
 //
 //    - The "merge_flag" entry specifies the merging methods to be applied:
 //       - "NONE" for no merging
