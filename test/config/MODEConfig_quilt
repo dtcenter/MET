@@ -55,7 +55,7 @@ fcst = {
    area_thresh       = >=0.0;
    inten_perc_value  = 100;
    inten_perc_thresh = >=0.0;
-   merge_thresh      = >=3.5;
+   merge_thresh      = [ >=3.5, >=3.5 ];
    merge_flag        = ${MERGE_FLAG};
 }
 obs = fcst;
