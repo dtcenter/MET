@@ -265,7 +265,7 @@ return ( adj_lon );
 ////////////////////////////////////////////////////////////////////////
 
 
-void MaskPoly::load(const char * filename, bool toggle_lon)
+void MaskPoly::load(const char * filename)
 
 {
 
@@ -360,7 +360,7 @@ while ( in.getline(line, sizeof(line)) ) {
 
    }
 
-   if ( toggle_lon ) b = -b; //  toggle longitude from degrees_west to degrees_east
+   b = -b;   //  toggle from degrees_west to degrees_east
 
    b -= 360.0*floor((b + 180.0)/360.0);
 
