@@ -2228,7 +2228,8 @@ int STATAnalysisJob::is_in_mask_grid(double lat, double lon) const {
    //
    if(mask_grid) {
 
-      grid_mask.latlon_to_xy(lat, lon, x, y);
+      // Convert degrees_east to degrees_west.
+      grid_mask.latlon_to_xy(lat, -1.0*lon, x, y);
       x_int = nint(x);
       y_int = nint(y);
 
