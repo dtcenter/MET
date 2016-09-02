@@ -197,7 +197,7 @@ void process_mask_file(DataPlane &dp) {
       mask_type == MaskType_Track) {
 
       poly_mask.clear();
-      poly_mask.load(mask_filename);
+      poly_mask.load(mask_filename, true);
 
       mlog << Debug(2)
            << "Parsed Lat/Lon Mask File:\t" << poly_mask.name()
