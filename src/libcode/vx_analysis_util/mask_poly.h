@@ -84,7 +84,7 @@ class MaskPoly {
          //  do stuff
          //
 
-      void load(const char * filename, bool toggle_lon = false);
+      void load(const char * filename);
 
       bool latlon_is_inside      (double lat, double lon) const;
       bool latlon_is_inside_dege (double lat, double lon) const;
