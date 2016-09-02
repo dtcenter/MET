@@ -172,8 +172,10 @@ void do_straight()
 
 const ModeConfInfo & conf = mode_exec.engine.conf_info;
 
+const int NCT = conf.n_conv_threshs();
+const int NCR = conf.n_conv_radii();
 
-if ( conf.n_conv_threshs() != conf.n_conv_radii() )  {
+if ( NCT != NCR )  {
 
    mlog << Error
         << "\n\n  " 
@@ -184,12 +186,9 @@ if ( conf.n_conv_threshs() != conf.n_conv_radii() )  {
 
 }
 
-
 int index;
-const int N = conf.n_conv_threshs();
 
-
-for (index=0; index<N; ++index)  {
+for (index=0; index<NCT; ++index)  {
 
    mode_exec.do_conv_thresh(index, index);
 
@@ -198,8 +197,6 @@ for (index=0; index<N; ++index)  {
    mode_exec.process_output();
 
 }
-
-
 
 
    //
