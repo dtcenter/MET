@@ -186,10 +186,7 @@ if ( NCT != NCR )  {
 
 }
 
-
 int index;
-// const int N = conf.n_conv_threshs();
-
 
 for (index=0; index<NCT; ++index)  {
 
@@ -200,8 +197,6 @@ for (index=0; index<NCT; ++index)  {
    mode_exec.process_output();
 
 }
-
-
 
 
    //
