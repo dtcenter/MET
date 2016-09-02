@@ -1745,10 +1745,9 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
 
          //
          // Check the grid and poly masks if specified.
-         // Convert degrees_east to degrees_west.
          //
-         if(!j.is_in_mask_grid(cur.obs_lat, (-1.0)*cur.obs_lon) ||
-            !j.is_in_mask_poly(cur.obs_lat, (-1.0)*cur.obs_lon))
+         if(!j.is_in_mask_grid(cur.obs_lat, cur.obs_lon) ||
+            !j.is_in_mask_poly(cur.obs_lat, cur.obs_lon))
             continue;
 
          //
