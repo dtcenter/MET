@@ -2039,6 +2039,21 @@ merge_thresh
  merged.
  By default, the merge thresholds are set to be greater than or equal to
  1.25.
+ Multiple merge thresholds may be specified as an array (e.g.
+ 
+\series bold
+merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
+\series default
+).
+ The number of 
+\series bold
+merge_thresh
+\series default
+ entries must match the number of 
+\series bold
+conv_thresh
+\series default
+ entries.
 \end_layout
 
 \begin_layout Standard
