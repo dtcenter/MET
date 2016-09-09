@@ -383,11 +383,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Color ColorTable::nearest(double t) const
+Color ColorTable::nearest(double t_in) const
 
 {
 
 Color color;
+
+double t = ( is_bad_data(t_in) ? bad_data_double : t_in );
 
 if ( Nentries == 0 )  return ( black );
 
@@ -447,11 +449,13 @@ return ( color );
 ////////////////////////////////////////////////////////////////////////
 
 
-Color ColorTable::interp(double z) const
+Color ColorTable::interp(double z_in) const
 
 {
 
 Color color;
+
+double z = ( is_bad_data(z_in) ? bad_data_double : z_in );
 
    //
    //  check for empty colortable
