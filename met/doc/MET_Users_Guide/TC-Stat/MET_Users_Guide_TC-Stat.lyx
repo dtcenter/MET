@@ -114,8 +114,13 @@ reference "sub:TC_Pairs-output"
 
  of this users guide for information on the TCST output format of the TC-Pairs
  tool.
- A filtering job using TC-Stat provides the ability to filter the input
- data by various conditions and thresholds described in 
+ The TC-Stat tool supports several analysis job types.
+ The 
+\series bold
+filter
+\series medium
+ job stratifies the TCST data using various conditions and thresholds described
+ in 
 \series default
 Section
 \series medium
@@ -127,10 +132,27 @@ reference "sub:tc_stat-configuration-file"
 \end_inset
 
 .
- A summary job produces summary statistics including frequency of superior
- performance, time-series independence calculations, and confidence intervals
- on the mean.
- These statistical aspects are described in 
+ The 
+\series bold
+summary
+\series medium
+ job produces summary statistics including frequency of superior performance,
+ time-series independence calculations, and confidence intervals on the
+ mean.
+ The 
+\series bold
+rirw
+\series medium
+ job processes TCMPR lines, identifies adeck and bdeck rapid intensification
+ or weakening events, populates a 2x2 contingency table, and derives contingency
+ table statistics.
+ The 
+\series bold
+probri
+\series medium
+ job process PROBRI lines, populates an Nx2 probabilistic contingency table,
+ and derives probabilistic statistics.
+ The statistical aspects are described in 
 \series default
 Section
 \series medium
@@ -170,7 +192,7 @@ name "sec:Statistical-aspects"
 Filter TCST lines
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Filter-TCST-lines"
+name "sub:tc_stat-filter"
 
 \end_inset
 
@@ -210,7 +232,7 @@ reference "sub:tc_stat-configuration-file"
 Summary statistics for columns
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:TC-Pairs_Summary-statistics-for"
+name "sub:tc_stat-summary"
 
 \end_inset
 
@@ -343,6 +365,95 @@ The time-series independence evaluates effective forecast separation time
  This calculation expects the columns in the summary job to be a time series.
  The output includes the forecast hour interval and the number of hours
  to independence.
+\end_layout
+
+\begin_layout Subsection
+Rapid Intensification/Weakening
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:tc_stat-rirw"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The TC-Stat tool can be used to read TCMPR lines and compare the occurence
+ of rapid intensification (i.e.
+ increase in intensity) or weakening (i.e.
+ decrease in intensity) between the adeck and bdeck.
+ The rapid intensification or weakening is defined by the change of maximum
+ wind speed (i.e.
+ 
+\series bold
+AMAX_WIND
+\series medium
+ and 
+\series bold
+BMAX_WIND
+\series medium
+ columns) over a specified amount of time.
+ Accurately forecasting large changes in intensity is a challenging problem
+ and this job helps quantify a model's ability to do so.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Users may specify several job command options to configure the behavior
+ of this job.
+ Using these configurable options, the TC-Stat tool analyzes paired tracks
+ and for each track point (i.e.
+ each TCMPR line) determines whether rapid intensification or weakening
+ occurred.
+ For each point in time, it uses the forecast and Best track event occurence
+ to populate a 2x2 contingency table.
+ The job may be configured to require that forecast and Best track events
+ occur at exactly the same time to be considered a hit.
+ Alternatively, the job may be configured to define a hit as long as the
+ forecast and Best track events occurred within a configurable time window.
+ Using this relaxed matching criteria false alarms may be considered hits
+ and misses may be considered correct negatives as long as the adeck and
+ bdeck events were close enough in time.
+ Each rirw job applies a single intensity change threshold.
+ Therefore, assessing a model's performance with rapid intensification and
+ weakening requires that two separate jobs be run.
+\end_layout
+
+\begin_layout Subsection
+Probability of Rapid Intensification
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:tc_stat-probri"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The TC-Stat tool can be used to accumulate multiple PROBRI lines and derive
+ probabilistic statistics summarizing performance.
+ The PROBRI line contains a probabilistic forecast for a specified intensity
+ change along with the actual intensity change that occurred in the Best
+ track.
+ Accurately forecast the likelihood of large changes in intensity is a challengi
+ng problem and this job helps quanity a model's ability to do so.
+\end_layout
+
+\begin_layout Standard
+Users may specify several job command options to configure the behavior
+ of this job.
+ The TC-Stat tools reads the input PROBI lines, applies the configurable
+ options to extract a forecast probability value and Best track event, and
+ bins those probabilistic pairs into an Nx2 contingency table.
+ This job writes up to four probabilstic output line types summarizing the
+ performance.
 \end_layout
 
 \begin_layout Section
@@ -663,11 +774,11 @@ TCStatConfig
  Further, using flags (e.g.
  
 \series bold
-"-basin"
+-basin
 \series default
 , 
 \series bold
-"-column", "-storm_name", etc...)
+-column, -storm_name, etc...)
 \series default
  option within the job command lines may further refine these selections.
  See Section 
@@ -912,11 +1023,11 @@ bmodel
  specifies the reference dataset, generally the best track analysis.
  Using the 
 \series bold
-"-amodel"
+-amodel
 \series default
  and 
 \series bold
-"-bmodel"
+-bmodel
 \series default
  options within the job command lines may further refine these selections.
 \end_layout
@@ -959,15 +1070,15 @@ valid_exc
  fields stratify by valid times, based on a comma-separated list of specific
  valid times to include (inc) or exclude (exc).
  Time strings are defined by YYYYMMDD[_HH[MMSS]].
- Using the "
+ Using the
 \series bold
--valid_inc
+ -valid_inc
 \series default
-", "
+ and 
 \series bold
--valid_ex
+-valid_exc
 \series default
-c" options within the job command lines may further refine these selections.
+ options within the job command lines may further refine these selections.
 \end_layout
 
 \begin_layout Standard
@@ -1011,15 +1122,15 @@ fields stratify by the initialization time, valid time, and lead time, respectiv
 ely.
  This field specifies a comma-separated list of initialization times, valid
  times, and lead times in HH[MMSS] format.
- Using the "
+ Using the 
 \series bold
 -valid_hour
 \series default
-", and "
+ and 
 \series bold
 -lead
 \series default
-" options within the job command lines may further refine these selections.
+ options within the job command lines may further refine these selections.
 \end_layout
 
 \begin_layout Standard
@@ -1080,11 +1191,11 @@ track_watch_warn
  If any of the watch/warning statuses are present in a forecast track, the
  entire track is verified.
  The value "ALL" matches HUWARN, HUWATCH, TSWARN, TSWATCH.
- Using the "
+ Using the 
 \series bold
 -track_watch_warn
 \series default
-" option within the job command lines may further refine these selections.
+ option within the job command lines may further refine these selections.
 \end_layout
 
 \begin_layout Standard
@@ -1252,11 +1363,11 @@ column_thresh_val
 column_thresh_name
 \series medium
 .
- Using the "
+ Using the 
 \series bold
 -column_thresh name thresh
 \series default
-" option within the job command lines may further refine these selections.
+ option within the job command lines may further refine these selections.
 \end_layout
 
 \begin_layout Standard
@@ -1305,11 +1416,11 @@ column_str_val
 column_str_name
 \series medium
 .
- Using the "
+ Using the 
 \series bold
 -column_str name val
 \series default
-" option within the job command lines may further refine these selections.
+ option within the job command lines may further refine these selections.
 \end_layout
 
 \begin_layout Standard
@@ -1360,11 +1471,11 @@ init_thresh_val
 init_thresh_name
 \series medium
 .
- Using the "
+ Using the 
 \series bold
 -init_thresh name val
 \series default
-" option within the job command lines may further refine these selections.
+ option within the job command lines may further refine these selections.
 \end_layout
 
 \begin_layout Standard
@@ -1416,11 +1527,11 @@ should match that of the
 init_str_name
 \series medium
 .
- Using the "
+ Using the 
 \series bold
 -init_str name val
 \series default
-" option within the job command lines may further refine these selections.
+ option within the job command lines may further refine these selections.
 \begin_inset Newline newline
 \end_inset
 
@@ -1590,35 +1701,35 @@ thresh
 \begin_layout Standard
 
 \series medium
-Using the "-
+Using the -
 \series bold
 rirw_track
 \series default
-", "-
+, -
 \series bold
 rirw_time_adeck
 \series default
-", "-
+, -
 \series bold
 rirw_time_bdeck
 \series default
-", "-
+, -
 \series bold
 rirw_exact_adeck
 \series default
-", "-
+, -
 \series bold
 rirw_exact_bdeck
 \series default
-", "-
+, -
 \series bold
 rirw_thresh_adeck
 \series default
-", "-
+, -
 \series bold
 rirw_thresh_bdeck
 \series default
-" options within the job command lines may further refine these selections.
+ options within the job command lines may further refine these selections.
  See README_TC in data/config for how to use these options.
 \end_layout
 
@@ -1682,17 +1793,26 @@ landfall_beg
  to the time of landfall.
  Using the 
 \series bold
-"-landfall_window"
+-landfall_window
 \series default
  option with the job command lines may further refine these selections.
- The "-landfall_window" job command option takes 1 or 2 arguments in HH[MMSS]
- format.
+ The 
+\series bold
+-landfall_window
+\series default
+ job command option takes 1 or 2 arguments in HH[MMSS] format.
  Use 1 argument to define a symmetric time window.
- For example, "-landfall_window 06" defines the time window +/- 6 hours
- around the landfall time.
+ For example, 
+\series bold
+-landfall_window 06
+\series default
+ defines the time window +/- 6 hours around the landfall time.
  Use 2 arguments to define an asymmetric time window.
- For example, "-landfall_window 00 12" defines the time window from the
- landfall event to 12 hours after.
+ For example, 
+\series bold
+-landfall_window 00 12
+\series default
+ defines the time window from the landfall event to 12 hours after.
  
 \end_layout
 
@@ -1731,11 +1851,11 @@ event_equal
  amodel entries.
  A case is defined by comparing the following columns in the TCST files:
  BMODEL, BASIN, CYCLONE, INIT, LEAD, VALID.
- This option may be modified using the "-
+ This option may be modified using the -
 \series bold
 event_equal
 \series default
-" option within the job command lines.
+ option within the job command lines.
 \end_layout
 
 \begin_layout Standard
@@ -1768,11 +1888,11 @@ event_equal_lead
  The event equalization is performed only using cases common to all lead
  times listed, enabling the verification at each lead time to be performed
  on a consistent dataset.
- This option may be modified using the "
+ This option may be modified using the 
 \series bold
 -event_equal_lead
 \series default
-" option within the job command lines.
+ option within the job command lines.
 \end_layout
 
 \begin_layout Standard
@@ -1803,11 +1923,11 @@ out_init_mask
  field applies polyline masking logic to the location of the amodel track
  at the initialization time.
  If the track point falls outside the mask, discard the entire track.
- This option may be modified using the "-
+ This option may be modified using the -
 \series bold
 out_init_mask
 \series default
-" option within the job command lines.
+ option within the job command lines.
 \end_layout
 
 \begin_layout Standard
@@ -1838,11 +1958,11 @@ out_valid_mask
  field applies polyline masking logic to the location of the amodel track
  at the valid time.
  If the track point falls outside the mask, discard the entire track.
- This option may be modified using the "-
+ This option may be modified using the -
 \series bold
 out_valid_mask
 \series default
-" option within the job command lines.
+ option within the job command lines.
 \begin_inset Newline newline
 \end_inset
 
@@ -1900,13 +2020,28 @@ Please refer to the README_TC in data/config for details on how to call
 \begin_layout LyX-Code
 
 \series bold
-e.g.: -job filter -amodel HWFI -dump_row ./tc_filter_job.tcst
+e.g.: -job filter  -line_type TCMPR  -amodel HWFI   -dump_row ./tc_filter_job.tcst
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-      -job summary -line_type TCMPR -column TK_ERR -dump_row ./tc_summary_job.tcst
+      -job summary -line_type TCMPR  -column TK_ERR -dump_row ./tc_summary_job.tcs
+t
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thres
+h ge20
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+      -job probri  -line_type PROBRI -column_thresh RI_WINDOW ==24 -probri_prob_
+thresh ==0.25
 \end_layout
 
 \begin_layout Standard
@@ -1939,11 +2074,11 @@ The output generated from the TC-Stat tool contains statistics produced
  by the analysis.
  Additionally, it includes information about the analysis job that produced
  the output for each line.
- The output can be redirected to an output file using the "
+ The output can be redirected to an output file using the 
 \series bold
 -out
 \series default
-" option.
+ option.
  The format of output from each 
 \series bold
 tc_stat
@@ -1962,11 +2097,11 @@ Job: Filter
 \series medium
 This job command finds and filters TCST lines down to those meeting the
  criteria selected by the filter's options.
- The filtered TCST lines are written to a file specified by the "-
+ The filtered TCST lines are written to a file specified by the -
 \series bold
 dump_row
 \series default
-" option.
+ option.
  The TCST output from this job follows the TCST output description in Chapters
  
 \begin_inset CommandInset ref
@@ -1995,11 +2130,11 @@ Job: Summary
 
 \series medium
 This job produces summary statistics for the column name specified by the
- "-
+ -
 \series bold
 column
 \series default
-" option.
+ option.
  The output of the summary job consists of three rows: "JOB_LIST", which
  shows the job definition parameters used for this job.
  "COL_NAME", followed by the summary statistics that are applied.
@@ -2021,16 +2156,16 @@ reference "table_columnar_output_summary_tc_stat"
 
 \end_inset
 
- The "
+ The 
 \series bold
 -by
 \series default
-" option can also be used one or more times to make this job more powerful.
+ option can also be used one or more times to make this job more powerful.
  Rather than running the specified job once, it will be run once for each
  unique combination of the entries found in the column(s) specified with
- the "
+ the 
 \series bold
--by"
+-by
 \series default
  option.
  
@@ -2396,6 +2531,226 @@ Frequency of superior performance
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Job: RIRW
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The RIRW job produces contingency table counts and statistics defined by
+ identifying rapid intensification or weakening events in the adeck and
+ bdeck track.
+
+\series default
+ 
+\series medium
+Users may specify several job command options to configure the beahvior
+ of this job:
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+The 
+\series bold
+-rirw_time HH[MMSS]
+\series medium
+ option (or 
+\series bold
+-rirw_time_adeck
+\series medium
+ and 
+\series bold
+-rirw_time_bdeck
+\series medium
+ to specify different settings) defines the time window of interest.
+ The default is 24 hours.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+The 
+\series bold
+-rirw_exact bool 
+\series medium
+option (or 
+\series bold
+-rirw_exact_adeck
+\series medium
+ and 
+\series bold
+-rirw_exact_bdeck
+\series medium
+ to specify different settings) is a boolean defining whether the exact
+ intensity change or maximum intensity change over that time window should
+ be used.
+ For rapid intesification, the maximum increase in computed.
+ For rapid weakening, the maximum decrease is used.
+ The default is true.
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+-rirw_thresh threshold
+\series medium
+ option (or 
+\series bold
+-rirw_thresh_adeck
+\series medium
+ and 
+\series bold
+-rirw_thresh_bdeck
+\series medium
+ to specify different settings) defines the intensity change event threshold.
+ The default is greater than or equal to 30 kts.
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+-rirw_window
+\series medium
+ option may be passed one or two arguments in 
+\series bold
+HH[MMSS]
+\series medium
+ format to define how close adeck and bdeck events must be to be considered
+ hits or correct negatives.
+ One timestring defines a symmetric time window while two timestrings define
+ an asymmetric time winow.
+ The default is 0, requiring an exact match in time.
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+-out_line_type
+\series medium
+ option defines the output data that should written.
+ This job can write contingency table counts (CTC), contingeny table statistics
+ (CTS), and RIRW matched pairs (MPR).
+ The default is CTC and CTS, but the MPR output provides great amount of
+ detail.
+\end_layout
+
+\begin_layout Standard
+Users may also specify the 
+\series bold
+-out_alpha
+\series default
+ option to define the alpha value for the confidence intervals in the CTS
+ output line type.
+ In addition, the 
+\series bold
+-by column_name 
+\series default
+option is a convenient way of running the same job across multiple stratificatio
+ns of data.
+ For example, 
+\series bold
+-by AMODEL
+\series default
+ runs the same job for each unique AMODEL name in the data.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Job: PROBRI
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The PROBRI job produces probabilistic contingency table counts and statistics
+ defined by placing forecast probabilities and Best track rapid intensification
+ events into an Nx2 contingency table.
+ Users may specify several job command options to configure the behavior
+ of this job:
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+The 
+\series bold
+-prob_exact bool 
+\series medium
+option is a boolean defining whether the exact or maximum Best track intensity
+ change over the time window should be used.
+ If true, the values in the 
+\series bold
+BDELTA
+\series medium
+ column are used.
+ If false, the values in the 
+\series bold
+BDELTA_MAX
+\series medium
+ column are used.
+ The default is true.
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+-probri_bdelta_thresh threshold
+\series medium
+ option defines the intensity change event threshold.
+ The default is greater than or equal to 30 kts.
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+-probri_prob_thresh threshold_list
+\series medium
+ option defines the probability thresholds used to create the output Nx2
+ contingency table.
+ The default is probability bins of width 0.1.
+ These probabilities may be specfied as a list (>0.00,>0.25,>0.50,>0.75,>1.00)
+ or using shorthand notation (==0.25) for bins of equal width.
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+-out_line_type
+\series medium
+ option defines the output data that should written.
+ This job can write PCT, PSTD, PJC, and PRC output line types.
+ The default is PCT and PSTD.
+\end_layout
+
+\begin_layout Standard
+Users may also specify the 
+\series bold
+-out_alpha
+\series default
+ option to define the alpha value for the confidence intervals in the PSTD
+ output line type.
+ Multiple values in the 
+\series bold
+RI_WINDOW 
+\series default
+column cannot be combined in a single PROBRI job since Best track intensity
+ threshold should change for each.
+ Using the 
+\series bold
+-by RI_WINDOW
+\series default
+ option or 
+\series bold
+-column_thresh RI_WINDOW ==24
+\series default
+ option provide convenient ways avoiding this problem.
 \end_layout
 
 \end_body
