@@ -16,6 +16,7 @@ using namespace std;
 #include <cmath>
 
 #include "thresh_array.h"
+#include "vx_math.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -402,14 +403,124 @@ int ThreshArray::check_bins(double v) const {
 
 bool ThreshArray::check_dbl(double v) const {
    int i;
-   
+
    //
    // Check if the value satisifes all the thresholds in the array
    //
    for(i=0; i<Nelements; i++) if(!t[i].check(v)) return(false);
-   
+
    return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// External utility for parsing probability thresholds.
+//
+////////////////////////////////////////////////////////////////////////
 
+ThreshArray string_to_prob_thresh(const char *s) {
+   ThreshArray ta;
+   double v;
+   int i;
+
+   // Parse the input string as a comma-separated list
+   ta.add_css(s);
+
+   // Handle special case of a single threshold of type equality
+   if(ta.n_elements() == 1 && ta[0].get_type() == thresh_eq) {
+
+      // Store the threshold value
+      v = ta[0].get_value();
+
+      // Threshold value must be between 0 and 1
+      if(v <= 0 || v >=1) {
+         mlog << Error << "\nThreshArray string_to_prob_thresh(const char *s) -> "
+              << "threshold value (" << v
+              << ") must be between 0 and 1.\n\n";
+         exit(1);
+      }
+
+      // Construct list of probability thresholds
+      ta.clear();
+      for(i=0; i*v<1.0; i++) ta.add(i*v, thresh_ge);
+      ta.add(1.0, thresh_ge);
+   }
+
+   // Check probability thresholds
+   check_prob_thresh(ta);
+
+   return(ta);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Convert array of proability thresholds to a string.
+//
+////////////////////////////////////////////////////////////////////////
+
+ConcatString prob_thresh_to_string(const ThreshArray &ta) {
+   ConcatString s;
+   ThreshArray prob_ta;
+   bool status = true;
+
+   // Check for at least three thresholds
+   if(ta.n_elements() < 3) status = false;
+
+   // Use the second threshold to construct probability threshold array
+   if(status) {
+      s << "==" << ta[1].get_value();
+      prob_ta = string_to_prob_thresh(s);
+      status = (ta == prob_ta);
+   }
+
+   // If not an array of probabilities, return comma-separated string
+   if(!status) s = ta.get_str();
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void check_prob_thresh(const ThreshArray &ta) {
+   int i, n;
+
+   n = ta.n_elements();
+
+   // Check for at least 3 thresholds beginning with 0 and ending with 1.
+   if(n < 3 ||
+      !is_eq(ta[0].get_value(),   0.0) ||
+      !is_eq(ta[n-1].get_value(), 1.0)) {
+
+      mlog << Error << "\ncheck_prob_thresh() -> "
+           << "When verifying a probability field, you must "
+           << "select at least 3 thresholds beginning with 0.0 "
+           << "and ending with 1.0.\n\n";
+      exit(1);
+   }
+
+   for(i=0; i<n; i++) {
+
+      // Check that all threshold types are greater than or equal to
+      if(ta[i].get_type() != thresh_ge) {
+         mlog << Error << "\ncheck_prob_thresh() -> "
+              << "When verifying a probability field, all "
+              << "thresholds must be greater than or equal to, "
+              << "using \"ge\" or \">=\".\n\n";
+         exit(1);
+      }
+
+      // Check that all thresholds are in [0, 1].
+      if(ta[i].get_value() < 0.0 ||
+         ta[i].get_value() > 1.0) {
+
+         mlog << Error << "\ncheck_prob_thresh() -> "
+              << "When verifying a probability field, all "
+              << "thresholds must be between 0 and 1.\n\n";
+         exit(1);
+      }
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////

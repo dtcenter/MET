@@ -68,24 +68,13 @@ static const char * default_config_filename =
 
 // Input files
 static StringArray     adeck_source, adeck_model_suffix;
+static StringArray     edeck_source, edeck_model_suffix;
 static StringArray     bdeck_source, bdeck_model_suffix;
 static ConcatString    config_file;
 static TCPairsConfInfo conf_info;
 
 // Optional arguments
-static ConcatString out_base, out_file;
-
-////////////////////////////////////////////////////////////////////////
-//
-// Variables for Output Files
-//
-////////////////////////////////////////////////////////////////////////
-
-// Output file stream
-static ofstream *out = (ofstream *) 0;
-
-// Output AsciiTable
-static AsciiTable out_at;
+static ConcatString out_base;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -93,6 +82,7 @@ static AsciiTable out_at;
 //
 ////////////////////////////////////////////////////////////////////////
 
+static StringArray  out_files;
 static DataPlane    dland_dp;
 static Grid         dland_grid;
 static ConcatString wwarn_file;

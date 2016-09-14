@@ -23,23 +23,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-int parse_thresh_index(const char *col_name) {
-   int i;
-   const char *ptr = (const char *) 0;
-
-   if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
-   else {
-      mlog << Error << "\nparse_thresh_index() -> "
-           << "unexpected column name specified: \""
-           << col_name << "\"\n\n";
-      throw(1);
-   }
-
-   return(i);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void parse_row_col(const char *col_name, int &r, int &c) {
    const char *ptr = (const char *) 0;
 

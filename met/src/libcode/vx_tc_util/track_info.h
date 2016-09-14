@@ -19,7 +19,7 @@
 #include "vx_math.h"
 #include "vx_util.h"
 
-#include "atcf_line.h"
+#include "atcf_track_line.h"
 #include "track_point.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ class TrackInfo {
          //  set stuff
          //
 
-      void initialize(const ATCFLine &, bool check_anly);
+      void initialize(const ATCFTrackLine &, bool check_anly);
 
       void set_storm_id();
       void set_storm_id(const char *);
@@ -138,12 +138,12 @@ class TrackInfo {
          //
 
       void add(const TrackPoint &);
-      bool add(const ATCFLine &, bool check_dup = false, bool check_anly = false);
+      bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
-      bool has(const ATCFLine &) const;
+      bool has(const ATCFTrackLine &) const;
 
-      bool is_match(const ATCFLine &);
+      bool is_match(const ATCFTrackLine &);
       bool is_match(const TrackInfo &) const;
 
       bool is_interp() const;
@@ -230,8 +230,8 @@ class TrackInfoArray {
 
       void add(const TrackInfo &);
       void set(int, const TrackInfo &);
-      bool add(const ATCFLine &, bool check_dup = false, bool check_anly = false);
-      bool has(const ATCFLine &) const;
+      bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
+      bool has(const ATCFTrackLine &) const;
 
 };
 
@@ -244,6 +244,9 @@ inline int TrackInfoArray::n_tracks() const { return(NTracks); }
 extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int, const StringArray &);
 extern bool has_storm_id(const StringArray &, const ConcatString &basin,
                          const ConcatString &cyclone, unixtime init);
+extern void latlon_to_xytk_err(double alat, double alon,
+                               double blat, double blon,
+                               double &x_err, double &y_err, double &tk_err);
 
 ////////////////////////////////////////////////////////////////////////
 

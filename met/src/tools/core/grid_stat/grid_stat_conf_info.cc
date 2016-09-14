@@ -377,7 +377,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       }
 
       // Verifying a probability field
-      if(fcst_info[i]->p_flag() == 1) check_prob_thresh(fcat_ta[i]);
+      if(fcst_info[i]->p_flag() == 1) {
+         fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
+      }
 
       // Check for equal threshold length for non-probability fields
       if(!fcst_info[i]->p_flag() &&

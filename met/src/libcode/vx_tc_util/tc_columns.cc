@@ -21,6 +21,9 @@ using namespace std;
 #include "track_point.h"
 #include "track_info.h"
 
+#include "prob_ri_pair_info.h"
+#include "prob_ri_info.h"
+
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -119,6 +122,67 @@ int get_tc_mpr_col_offset(const char *col_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int get_prob_ri_col_offset(const char *col_name) {
+   int i;
+   ConcatString s;
+   int offset = bad_data_int;
+
+   // Search the TC header columns first
+   for(i=0; i<n_tc_header_cols; i++) {
+      if(strcasecmp(tc_header_cols[i], col_name) == 0) {
+         offset = i;
+         break;
+      }
+   }
+
+   // If not found, search the PROBRI columns:
+   //    ALAT,        ALON,
+   //    BLAT,        BLON,
+   //    INITIALS,
+   //    TK_ERR,      X_ERR,      Y_ERR,
+   //    ADLAND,      BDLAND,
+   //    RI_BEG,      RI_END,     RI_WINDOW,
+   //    AWIND_END,
+   //    BWIND_BEG,   BWIND_END,
+   //    BDELTA,      BDELTA_MAX,
+   //    BLEVEL_BEG,  BLEVEL_END,
+   //    N_THRESH,    [THRESH_,   PROB_]
+
+   // Check the static columns
+   if(is_bad_data(offset)) {
+
+      for(i=0; i<n_prob_ri_cols; i++) {
+
+         // Check for a match
+         if(strcasecmp(prob_ri_cols[i], col_name) == 0) {
+            offset = n_tc_header_cols + i;
+            break;
+         }
+      }
+   }
+
+   // Check the variable columns
+   if(is_bad_data(offset)) {
+
+      // THRESH_i
+      if(strncasecmp(prob_ri_cols[21], col_name,
+                     strlen(prob_ri_cols[21])) == 0) {
+         i      = parse_thresh_index(col_name);
+         offset = n_tc_header_cols + 21 + 2*(i-1) + 0;
+      }
+      // PROB_i
+      else if(strncasecmp(prob_ri_cols[22], col_name,
+                          strlen(prob_ri_cols[22])) == 0) {
+         i      = parse_thresh_index(col_name);
+         offset = n_tc_header_cols + 21 + 2*(i-1) + 1;
+      }
+   }
+
+   return(offset);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void open_tc_txt_file(ofstream *&out, const char *file_name) {
 
    // Create and open the output file stream
@@ -198,13 +262,44 @@ void write_tc_mpr_header_row(int hdr_flag, AsciiTable &at,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_prob_ri_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
+                              int r, int c) {
+   int i;
+   ConcatString s;
+   char tmp_str[max_str_len];
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_tc_header_cols; i++)
+         at.set_entry(r, c++, tc_header_cols[i]);
+   }
+
+   // Write the static PROBRI header columns
+   for(i=0; i<n_prob_ri_cols-2; i++) {
+      at.set_entry(r, c++, prob_ri_cols[i]);
+   }
+
+   // Write the variable PROBRI header columns
+   for(i=0; i<n_thresh; i++) {
+      sprintf(tmp_str, "%s%i", prob_ri_cols[21], i+1);
+      at.set_entry(r, c++, tmp_str); // THRESH_i
+
+      sprintf(tmp_str, "%s%i", prob_ri_cols[22], i+1);
+      at.set_entry(r, c++, tmp_str); // PROB_i
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
                       AsciiTable &at, int &i_row) {
    int i;
 
    // TCMPR line type
    hdr.set_line_type("TCMPR");
-   
+
    // Loop through the TrackPairInfo points
    for(i=0; i<p.n_points(); i++) {
 
@@ -216,7 +311,7 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
 
       // Valid time for the ADECK and/or BDECK
       hdr.set_valid(p.valid(i));
-     
+
       // Write the header columns
       write_tc_header_cols(hdr, at, i_row);
 
@@ -226,7 +321,36 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
       // Increment the row counter
       i_row++;
    }
-  
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_prob_ri_row(TcHdrColumns &hdr, const ProbRIPairInfo &p,
+                       AsciiTable &at, int &i_row) {
+
+   // PROBRI line type
+   hdr.set_line_type("PROBRI");
+
+   // Timing information
+   hdr.set_init (p.prob_ri().init());
+   hdr.set_lead (p.prob_ri().valid() - p.prob_ri().init());
+   hdr.set_valid(p.prob_ri().valid());
+
+   // Write one line for all the probabilities
+   write_tc_header_cols(hdr, at, i_row);
+   write_prob_ri_cols(p, -1, at, i_row, n_tc_header_cols);
+   i_row++;
+
+   // For multiple probabilities, write the last one to a separate line
+   if(p.prob_ri().n_prob() > 1) {
+      write_tc_header_cols(hdr, at, i_row);
+      write_prob_ri_cols(p, p.prob_ri().n_prob()-1, at, i_row,
+                         n_tc_header_cols);
+      i_row++;
+   }
+
    return;
 }
 
@@ -324,7 +448,68 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, p.bdeck()[i].speed());
    at.set_entry(r, c++, systemsdepth_to_string(p.adeck()[i].depth()));
    at.set_entry(r, c++, systemsdepth_to_string(p.bdeck()[i].depth()));
-   
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_prob_ri_cols(const ProbRIPairInfo &p, int i,
+                        AsciiTable &at, int r, int c) {
+   int j;
+   double v;
+
+   // Write PROBRI columns
+   at.set_entry(r, c++, p.prob_ri().lat());
+   at.set_entry(r, c++, p.prob_ri().lon());
+   at.set_entry(r, c++, p.blat());
+   at.set_entry(r, c++, p.blon());
+   if(p.prob_ri().initials()) at.set_entry(r, c++, na_str);
+   else                       at.set_entry(r, c++, p.prob_ri().initials());
+   at.set_entry(r, c++, p.track_err());
+   at.set_entry(r, c++, p.x_err());
+   at.set_entry(r, c++, p.y_err());
+   at.set_entry(r, c++, p.adland());
+   at.set_entry(r, c++, p.bdland());
+   at.set_entry(r, c++, p.prob_ri().ri_beg());
+   at.set_entry(r, c++, p.prob_ri().ri_end());
+   at.set_entry(r, c++, p.prob_ri().ri_window());
+   at.set_entry(r, c++, p.prob_ri().value());
+   at.set_entry(r, c++, p.bbegv());
+   at.set_entry(r, c++, p.bendv());
+
+   // BDELTA is end minus begin
+   v = (is_bad_data(p.bbegv()) || is_bad_data(p.bendv()) ?
+        bad_data_double : p.bendv() - p.bbegv());
+   at.set_entry(r, c++, v);
+
+   // BDELTA_MAX
+   if(is_bad_data(p.bbegv()) || is_bad_data(p.bendv()) ||
+      is_bad_data(p.bminv()) || is_bad_data(p.bmaxv())) {
+      v = bad_data_double;
+   }
+   else if(p.bbegv() <= p.bendv()) v = p.bendv() - p.bminv();
+   else                            v = p.bendv() - p.bmaxv();
+   at.set_entry(r, c++, v);
+
+   at.set_entry(r, c++, cyclonelevel_to_string(p.bbeglev()));
+   at.set_entry(r, c++, cyclonelevel_to_string(p.bendlev()));
+
+   // Write all the probabilities (i == -1)
+   if(i<0) {
+      at.set_entry(r, c++, p.prob_ri().n_prob());
+      for(j=0; j<p.prob_ri().n_prob(); j++) {
+         at.set_entry(r, c++, p.prob_ri().prob_item(j));
+         at.set_entry(r, c++, p.prob_ri().prob(j));
+      }
+   }
+   // Write the i-th probability
+   else {
+      at.set_entry(r, c++, 1);
+      at.set_entry(r, c++, p.prob_ri().prob_item(i));
+      at.set_entry(r, c++, p.prob_ri().prob(i));
+   }
+
    return;
 }
 

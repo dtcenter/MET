@@ -60,7 +60,7 @@ class TCPairsConfInfo {
       MaskPoly  InitMask;
       MaskPoly  ValidMask;
 
-      // Check for duplicate ATCFLines
+      // Check for duplicate ATCFTrackLines
       bool CheckDup;
 
       // 12-hour track interpolation logic

@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
    // Process the input data
    process_search_dirs();
-   
+
    // Process the jobs in the config file
    process_jobs();
 
@@ -89,7 +89,7 @@ void process_command_line(int argc, char **argv) {
 
    // Allow for unrecognized command line switches
    cline.allow_unrecognized_switches();
-   
+
    // Set the usage function
    cline.set_usage(usage);
 
@@ -98,7 +98,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_out,       "-out",     1);
    cline.add(set_logfile,   "-log",     1);
    cline.add(set_verbosity, "-v",       1);
-   cline.add(set_config,    "-config",  1);   
+   cline.add(set_config,    "-config",  1);
 
    // Parse the command line
    cline.parse();
@@ -124,10 +124,10 @@ void process_command_line(int argc, char **argv) {
 
    // Check if a config file has been specified
    if(config_file.nonempty()) {
-     
+
       // Default config file
       default_config_file = replace_path(default_config_filename);
-           
+
       // List the config files
       mlog << Debug(1)
            << "Config File Default: " << default_config_file << "\n"
@@ -136,7 +136,7 @@ void process_command_line(int argc, char **argv) {
       // Read the config files
       conf_info.read_config(default_config_file, config_file);
    }
-   
+
    return;
 }
 
@@ -158,7 +158,7 @@ void process_search_dirs() {
            << "no TCST files found in the directories specified!\n\n";
       exit(1);
    }
-   
+
    return;
 }
 
@@ -188,7 +188,7 @@ void process_jobs() {
 
       // Otherwise, get the current config file job
       else {
-      
+
          // Initialize jobstring to the default filtering job
          jobstring = conf_info.Filter.serialize();
 
@@ -212,10 +212,10 @@ void process_jobs() {
 
       // Initialize counts
       memset(&n, 0, sizeof(TCLineCounts));
-           
+
       // Do the job
       cur_job->do_job(tcst_files, n);
-      
+
       mlog << Debug(2)
            << "Job " << i+1 << " used " << n.NKeep << " out of "
            << n.NRead << " lines read.\n";
@@ -250,10 +250,10 @@ void process_jobs() {
            << "Rejected for event equal       = " << n.RejEventEqual     << "\n"
            << "Rejected for out init mask     = " << n.RejOutInitMask    << "\n"
            << "Rejected for out valid mask    = " << n.RejOutValidMask   << "\n";
-           
+
       // Deallocate current job
       if(cur_job) { delete cur_job; cur_job = (TCStatJob *) 0; }
-      
+
    } // end for i
 
    // Close the output file
@@ -285,10 +285,10 @@ void open_out_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void close_out_file() {
-  
+
    // Close the output file
    if(tc_stat_out != (ofstream *) 0) {
-      
+
       // List the file being closed
       mlog << Debug(1)
            << "\nCreating output file: " << out_file << "\n";
@@ -314,7 +314,7 @@ void usage() {
         << "\t[-out file]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
-        << "\t[-config file] | [JOB COMMAND LINE]\n\n"        
+        << "\t[-config file] | [JOB COMMAND LINE]\n\n"
 
         << "\twhere\t\"-lookin source\" is used one or more times to "
         << "specify a file or top-level directory containing TC-MET "
@@ -335,10 +335,10 @@ void usage() {
 
         << "\t\t\"JOB COMMAND LINE\" specifies all the arguments "
         << "necessary to perform a single job.\n\n"
-        
+
         << "\tNOTE: Refer to a TCStatConfig file for details "
         << "on how to specify the JOB COMMAND LINE.\n\n"
-        
+
         << flush;
 
    exit(1);

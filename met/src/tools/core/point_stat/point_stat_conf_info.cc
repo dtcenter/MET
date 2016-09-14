@@ -397,7 +397,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       }
 
       // Verifying a probability field
-      if(vx_pd[i].fcst_info->p_flag()) check_prob_thresh(fcat_ta[i]);
+      if(vx_pd[i].fcst_info->p_flag()) {
+         fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
+      }
 
       // Check for equal threshold length for non-probability fields
       if(!vx_pd[i].fcst_info->p_flag() &&

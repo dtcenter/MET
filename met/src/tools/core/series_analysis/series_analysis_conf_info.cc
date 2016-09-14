@@ -311,7 +311,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
            << "Parsed observed categorical thresholds: "  << ocat_ta.get_str() << "\n";
 
       // Verifying a probability field
-      if(fcst_info[0]->p_flag()) check_prob_thresh(fcat_ta);
+      if(fcst_info[0]->p_flag() == 1) {
+         fcat_ta = string_to_prob_thresh(fcat_ta.get_str());
+      }
 
       // Verifying non-probability fields
       if(!fcst_info[0]->p_flag() &&

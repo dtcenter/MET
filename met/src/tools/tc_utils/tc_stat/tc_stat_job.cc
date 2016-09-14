@@ -33,13 +33,15 @@ using namespace std;
 static const char *TCStatJobType_FilterStr  = "filter";
 static const char *TCStatJobType_SummaryStr = "summary";
 static const char *TCStatJobType_RIRWStr    = "rirw";
+static const char *TCStatJobType_ProbRIStr  = "probri";
 
 ////////////////////////////////////////////////////////////////////////
 
 // Functions for parsing command line options
-extern void parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
-extern void parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
-extern void setup_table        (AsciiTable &, int, int);
+extern void         parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
+extern void         parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
+extern void         setup_table        (AsciiTable &, int, int);
+extern ConcatString build_map_key      (const char *, const TCStatLine &, const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -68,6 +70,10 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
 
       case TCStatJobType_RIRW:
          job = new TCStatJobRIRW;
+         break;
+
+      case TCStatJobType_ProbRI:
+         job = new TCStatJobProbRI;
          break;
 
       case NoTCStatJobType:
@@ -188,7 +194,7 @@ void TCStatJob::clear() {
    Precision = default_precision;
 
    JobType = NoTCStatJobType;
-   
+
    AModel.clear();
    BModel.clear();
    StormId.clear();
@@ -218,6 +224,10 @@ void TCStatJob::clear() {
    DumpFile.clear();
    close_dump_file();
    JobOut = (ofstream *) 0;
+
+   StatFile.clear();
+   close_stat_file();
+   StatOut = (ofstream *) 0;
 
    // Set to default values
    WaterOnly       = default_water_only;
@@ -281,6 +291,9 @@ void TCStatJob::assign(const TCStatJob & j) {
 
    DumpFile = j.DumpFile;
    open_dump_file();
+
+   StatFile = j.StatFile;
+   open_stat_file();
 
    WaterOnly = j.WaterOnly;
 
@@ -378,25 +391,25 @@ void TCStatJob::dump(ostream & out, int depth) const {
    TrackWatchWarn.dump(out, depth + 1);
 
    out << prefix << "ColumnThreshMap ...\n";
-   for(thr_it = ColumnThreshMap.begin(); thr_it != ColumnThreshMap.end(); thr_it++) {
+   for(thr_it=ColumnThreshMap.begin(); thr_it!= ColumnThreshMap.end(); thr_it++) {
       out << prefix << thr_it->first << ": \n";
       thr_it->second.dump(out, depth + 1);
    }
 
    out << prefix << "ColumnStrMap ...\n";
-   for(str_it = ColumnStrMap.begin(); str_it != ColumnStrMap.end(); str_it++) {
+   for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
 
    out << prefix << "InitThreshMap ...\n";
-   for(thr_it = InitThreshMap.begin(); thr_it != InitThreshMap.end(); thr_it++) {
+   for(thr_it=InitThreshMap.begin(); thr_it!= InitThreshMap.end(); thr_it++) {
       out << prefix << thr_it->first << ": \n";
       thr_it->second.dump(out, depth + 1);
    }
 
    out << prefix << "InitStrMap ...\n";
-   for(str_it = InitStrMap.begin(); str_it != InitStrMap.end(); str_it++) {
+   for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
       out << prefix << str_it->first << ": \n";
       str_it->second.dump(out, depth + 1);
    }
@@ -440,6 +453,8 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
    out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
 
+   out << prefix << "StatFile = " << (StatFile ? StatFile.text() : na_str) << "\n";
+
    out.flush();
 
    return;
@@ -447,7 +462,7 @@ void TCStatJob::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
+bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
                                 TCLineCounts &n) const {
    bool keep = true;
    int i, i_init, offset;
@@ -463,11 +478,11 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
       keep = false;
 
       // Loop through the points to see if any are to be kept
-      for(i=0; i<tpi.n_points(); i++) {
+      for(i=0; i<pair.n_points(); i++) {
 
          // Get the current watch/warning type
-         WatchWarnType ww_type = tpi.watch_warn(i);
-         
+         WatchWarnType ww_type = pair.watch_warn(i);
+
          // Check for the current watch/warn status in the list and the
          // special string ALL:
          //    HUWARN, TSWARN, HUWATCH, TSWATCH
@@ -484,24 +499,24 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
    } // end if
 
    // Update counts
-   if(!keep) n.RejTrackWatchWarn += tpi.n_points();
+   if(!keep) n.RejTrackWatchWarn += pair.n_points();
 
    // Get the index of the track initialization point
-   i_init = tpi.i_init();
+   i_init=pair.i_init();
 
    // Check for bad track initialization point
    if(is_bad_data(i_init)) {
       if(InitThreshMap.size() > 0) {
          keep = false;
-         n.RejInitThresh += tpi.n_points();
+         n.RejInitThresh += pair.n_points();
       }
       else if(InitStrMap.size() > 0) {
          keep = false;
-         n.RejInitStr += tpi.n_points();
+         n.RejInitStr += pair.n_points();
       }
       else if(OutInitMask.n_points() > 0) {
          keep = false;
-         n.RejOutInitMask += tpi.n_points();
+         n.RejOutInitMask += pair.n_points();
       }
    }
 
@@ -509,10 +524,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
    if(keep == true) {
 
       // Loop through the numeric column thresholds
-      for(thr_it = InitThreshMap.begin(); thr_it != InitThreshMap.end(); thr_it++) {
-         
+      for(thr_it=InitThreshMap.begin(); thr_it!= InitThreshMap.end(); thr_it++) {
+
          // Get the numeric init column value
-         v_dbl = get_column_double(*tpi.line(i_init), thr_it->first);
+         v_dbl = get_column_double(*pair.line(i_init), thr_it->first);
 
          // Check the column threshold
          if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) {
@@ -521,21 +536,21 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
            break;
          }
       }
-   } 
+   }
 
    // Check InitStr
    if(keep == true) {
 
-      for(str_it = InitStrMap.begin(); str_it != InitStrMap.end(); str_it++) {
+      for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
 
          // Determine the column offset and retrieve the value
-         offset = determine_column_offset(*(tpi.line(i_init)), str_it->first);
-         v_str  = tpi.line(i_init)->get_item(offset);
+         offset = determine_column_offset(*(pair.line(i_init)), str_it->first);
+         v_str  = pair.line(i_init)->get_item(offset);
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
             keep = false;
-            n.RejInitStr += tpi.n_points();
+            n.RejInitStr += pair.n_points();
             break;
          }
       }
@@ -548,11 +563,11 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
       if(OutInitMask.n_points() > 0) {
 
          // Check if ADECK init location falls inside the mask
-         if(is_bad_data(tpi.adeck()[i_init].lat()) ||
-            is_bad_data(tpi.adeck()[i_init].lon()) ||
+         if(is_bad_data(pair.adeck()[i_init].lat()) ||
+            is_bad_data(pair.adeck()[i_init].lon()) ||
             !OutInitMask.latlon_is_inside(
-               tpi.adeck()[i_init].lat(),
-               tpi.adeck()[i_init].lon())) {
+               pair.adeck()[i_init].lat(),
+               pair.adeck()[i_init].lon())) {
             keep = false;
             n.RejOutInitMask++;
          }
@@ -560,7 +575,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &tpi,
    }
 
    // Update counts
-   if(!keep) n.NKeep -= tpi.n_points();
+   if(!keep) n.NKeep -= pair.n_points();
 
    return(keep);
 }
@@ -624,8 +639,8 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    if(keep == true) {
 
       // Loop through the numeric column thresholds
-      for(thr_it = ColumnThreshMap.begin(); thr_it != ColumnThreshMap.end(); thr_it++) {
-         
+      for(thr_it=ColumnThreshMap.begin(); thr_it!= ColumnThreshMap.end(); thr_it++) {
+
          // Get the numeric column value
          v_dbl = get_column_double(line, thr_it->first);
 
@@ -637,13 +652,13 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
          }
       }
    }
-   
+
    // Check ColumnStrMap
    if(keep == true) {
 
       // Loop through the column string matching
-      for(str_it = ColumnStrMap.begin(); str_it != ColumnStrMap.end(); str_it++) {
-         
+      for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
+
          // Determine the column offset and retrieve the value
          offset = determine_column_offset(line, str_it->first);
          v_str  = line.get_item(offset);
@@ -832,6 +847,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-out_init_mask"     ) == 0) { set_mask(OutInitMask, a[i+1]);             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_valid_mask"    ) == 0) { set_mask(OutValidMask, a[i+1]);            a.shift_down(i, 1); }
       else if(strcasecmp(c, "-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();       a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_stat"          ) == 0) { StatFile = a[i+1]; open_stat_file();       a.shift_down(i, 1); }
       else                                               {                                            b.add(a[i]);        }
    }
 
@@ -889,9 +905,47 @@ void TCStatJob::close_dump_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump_track_pair(const TrackPairInfo &tpi, ofstream *out) {
+void TCStatJob::open_stat_file() {
 
-   if(!out || tpi.n_points() == 0) return;
+   close_stat_file();
+
+   if(StatFile.empty()) return;
+
+   StatOut = new ofstream;
+   StatOut->open(StatFile);
+
+   if(!StatOut) {
+      mlog << Error << "\nTCStatJob::open_stat_file()-> "
+           << "can't open the output file \"" << StatFile
+           << "\" for writing!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::close_stat_file() {
+
+   if(StatOut) {
+
+      mlog << Debug(1)
+           << "Creating output statistics file: " << StatFile << "\n";
+
+      StatOut->close();
+      delete StatOut;
+      StatOut = (ofstream *) 0;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
+
+   if(!out || pair.n_points() == 0) return;
 
    TcHdrColumns tchc;
    AsciiTable out_at;
@@ -902,7 +956,7 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi, ofstream *out) {
    else                        hdr_row = 0;
 
    // Initialize the output AsciiTable
-   out_at.set_size(tpi.n_points() + hdr_row,
+   out_at.set_size(pair.n_points() + hdr_row,
                    n_tc_header_cols + n_tc_mpr_cols);
 
    // Write the TCMPR header row
@@ -917,12 +971,12 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi, ofstream *out) {
 
    // Setup header columns
    tchc.clear();
-   tchc.set_adeck_model(tpi.adeck().technique());
-   tchc.set_bdeck_model(tpi.bdeck().technique());
-   tchc.set_storm_id(tpi.adeck().storm_id());
-   tchc.set_basin(tpi.bdeck().basin());
-   tchc.set_cyclone(tpi.bdeck().cyclone());
-   tchc.set_storm_name(tpi.bdeck().storm_name());
+   tchc.set_adeck_model(pair.adeck().technique());
+   tchc.set_bdeck_model(pair.bdeck().technique());
+   tchc.set_storm_id(pair.adeck().storm_id());
+   tchc.set_basin(pair.bdeck().basin());
+   tchc.set_cyclone(pair.bdeck().cyclone());
+   tchc.set_storm_name(pair.bdeck().storm_name());
 
    if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
    else                            tchc.set_init_mask(na_str);
@@ -931,7 +985,60 @@ void TCStatJob::dump_track_pair(const TrackPairInfo &tpi, ofstream *out) {
 
    // Write the TrackPairInfo object
    i_row = hdr_row;
-   write_tc_mpr_row(tchc, tpi, out_at, i_row);
+   write_tc_mpr_row(tchc, pair, out_at, i_row);
+
+   // Write the AsciiTable to the file
+   *out << out_at;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::dump_pair(const ProbRIPairInfo &pair, ofstream *out) {
+
+   if(!out) return;
+
+   TcHdrColumns tchc;
+   AsciiTable out_at;
+   int i_row, hdr_row;
+   int n = pair.prob_ri().n_prob();
+
+   // Determine if we need to write a header row
+   if((int) out->tellp() == 0) hdr_row = 1;
+   else                        hdr_row = 0;
+
+   // Initialize the output AsciiTable
+   out_at.set_size(1 + hdr_row,
+                   n_tc_header_cols + get_n_prob_ri_cols(n));
+
+   // Write the TCMPR header row
+   write_prob_ri_header_row(1, n, out_at, 0, 0);
+
+   // Setup the output AsciiTable
+   justify_tc_stat_cols(out_at);
+   out_at.set_precision(get_precision());
+   out_at.set_bad_data_value(bad_data_double);
+   out_at.set_bad_data_str(na_str);
+   out_at.set_delete_trailing_blank_rows(1);
+
+   // Setup header columns
+   tchc.clear();
+   tchc.set_adeck_model(pair.prob_ri().technique());
+   tchc.set_bdeck_model(pair.bmodel());
+   tchc.set_storm_id(pair.prob_ri().storm_id());
+   tchc.set_basin(pair.prob_ri().basin());
+   tchc.set_cyclone(pair.prob_ri().cyclone());
+   tchc.set_storm_name(pair.storm_name());
+
+   if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
+   else                            tchc.set_init_mask(na_str);
+   if(OutValidMask.n_points() > 0) tchc.set_valid_mask(OutValidMask.name());
+   else                            tchc.set_valid_mask(na_str);
+
+   // Write the ProbRIPairInfo object
+   i_row = hdr_row;
+   write_prob_ri_row(tchc, pair, out_at, i_row);
 
    // Write the AsciiTable to the file
    *out << out_at;
@@ -995,25 +1102,25 @@ ConcatString TCStatJob::serialize() const {
       s << "-line_type " << LineType[i] << " ";
    for(i=0; i<TrackWatchWarn.n_elements(); i++)
       s << "-track_watch_warn " << TrackWatchWarn[i] << " ";
-   for(thr_it = ColumnThreshMap.begin(); thr_it != ColumnThreshMap.end(); thr_it++) {
+   for(thr_it=ColumnThreshMap.begin(); thr_it!= ColumnThreshMap.end(); thr_it++) {
       for(i=0; i<thr_it->second.n_elements(); i++) {
          s << "-column_thresh " << thr_it->first << " "
            << thr_it->second[i].get_str() << " ";
       }
    }
-   for(str_it = ColumnStrMap.begin(); str_it != ColumnStrMap.end(); str_it++) {
+   for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
       for(i=0; i<str_it->second.n_elements(); i++) {
          s << "-column_str " << str_it->first << " "
            << str_it->second[i] << " ";
       }
    }
-   for(thr_it = InitThreshMap.begin(); thr_it != InitThreshMap.end(); thr_it++) {
+   for(thr_it=InitThreshMap.begin(); thr_it!= InitThreshMap.end(); thr_it++) {
       for(i=0; i<thr_it->second.n_elements(); i++) {
          s << "-init_thresh " << thr_it->first << " "
            << thr_it->second[i].get_str() << " ";
       }
    }
-   for(str_it = InitStrMap.begin(); str_it != InitStrMap.end(); str_it++) {
+   for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
       for(i=0; i<str_it->second.n_elements(); i++) {
          s << "-init_str " << str_it->first << " "
            << str_it->second[i] << " ";
@@ -1064,31 +1171,20 @@ ConcatString TCStatJob::serialize() const {
       s << "-out_valid_mask " << OutValidMask.file_name() << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
+   if(StatFile.length() > 0)
+      s << "-stat_row " << StatFile << " ";
 
    return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
-
-   // Add the input file list
-   TCSTFiles.add_files(file_list);
-
-   // Apply the event equalization logic to build a list of common cases
-   if(EventEqual == true) process_event_equal();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
 //
-// Apply event equalization logic to build list of common cases.
+// Event equalize track data to build list of common cases.
 //
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::process_event_equal() {
-   TrackPairInfo tpi;
+void TCStatJob::event_equalize_tracks() {
+   TrackPairInfo pair;
    TCLineCounts n;
    ConcatString key, val;
    StringArray case_list;
@@ -1107,14 +1203,14 @@ void TCStatJob::process_event_equal() {
    TCSTFiles.rewind();
 
    // Process each of the track pairs
-   while(TCSTFiles >> tpi) {
+   while(TCSTFiles >> pair) {
 
       // Subset the track pair down to points to be used
-      subset_track_pair(tpi, n);
+      subset_track_pair(pair, n);
 
       // Skip tracks missing any of the required lead times
       for(i=0, skip=false; i<EventEqualLead.n_elements(); i++) {
-         if(tpi.adeck().lead_index(EventEqualLead[i]) < 0) {
+         if(pair.adeck().lead_index(EventEqualLead[i]) < 0) {
             skip = true;
             break;
          }
@@ -1122,11 +1218,11 @@ void TCStatJob::process_event_equal() {
       if(skip) continue;
 
       // Add event equalization information for each track point
-      for(i=0; i<tpi.n_lines(); i++) {
+      for(i=0; i<pair.n_lines(); i++) {
 
          // Store the current map key and value
-         key = tpi.adeck().technique(); // ADECK model name
-         val = tpi.line(i)->header();   // Track line header
+         key = pair.adeck().technique(); // ADECK model name
+         val = pair.line(i)->header();   // Track line header
 
          // Add a new map entry, if necessary
          if(case_map.count(key) == 0) {
@@ -1145,7 +1241,79 @@ void TCStatJob::process_event_equal() {
    if(case_map.size() > 0) EventEqualCases = case_map.begin()->second;
 
    // Loop over the map entries and build a list of common cases
-   for(it = case_map.begin(); it != case_map.end(); it++) {
+   for(it=case_map.begin(); it!= case_map.end(); it++) {
+      EventEqualCases = intersection(EventEqualCases, it->second);
+      models << it->first << " ";
+   } // end for it
+
+   mlog << Debug(3)
+        << "For event equalization, identified "
+        << EventEqualCases.n_elements() << " common cases for "
+        << (int) case_map.size() << " models: " << models << "\n";
+
+   for(i=0; i<EventEqualCases.n_elements(); i++) {
+      mlog << Debug(4)
+           << "[Case " << i+1 << " of " << EventEqualCases.n_elements()
+           << "] " << EventEqualCases[i] << "\n";
+   }
+
+   // Set flag to indicate that event equalization has been applied.
+   EventEqualSet = true;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Event equalize TCStatLine data to build list of common cases.
+//
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::event_equalize_lines() {
+   TCLineCounts n;
+   TCStatLine line;
+   ConcatString key, val;
+   StringArray case_list;
+   ConcatString models;
+   int i;
+
+   // Event equalization case map
+   map<ConcatString,StringArray,cs_cmp> case_map;
+   map<ConcatString,StringArray,cs_cmp>::iterator it;
+
+   mlog << Debug(3)
+        << "Applying event equalization logic.\n";
+
+   // Rewind to the beginning of the track pair input
+   TCSTFiles.rewind();
+
+   // Process each of the lines
+   while(TCSTFiles >> line) {
+
+      // Check if this line should be kept
+      if(!is_keeper_line(line, n)) continue;
+
+      // Store the current map key and value
+      key = line.amodel(); // ADECK model name
+      val = line.header(); // Track line header
+
+      // Add a new map entry, if necessary
+      if(case_map.count(key) == 0) {
+         case_list.clear();
+         case_map[key] = case_list;
+      }
+
+      // Add the current header to the case map
+      if(!case_map[key].has(val)) case_map[key].add(val);
+
+   } // end while
+
+   // Initialize to the first map entry
+   EventEqualCases.clear();
+   if(case_map.size() > 0) EventEqualCases = case_map.begin()->second;
+
+   // Loop over the map entries and build a list of common cases
+   for(it=case_map.begin(); it!= case_map.end(); it++) {
       EventEqualCases = intersection(EventEqualCases, it->second);
       models << it->first << " ";
    } // end for it
@@ -1169,19 +1337,19 @@ void TCStatJob::process_event_equal() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
+void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCLineCounts &n) {
    int i, n_rej;
 
    // Check for no points
-   if(tpi.n_points() == 0) return;
+   if(pair.n_points() == 0) return;
 
    // Increment the read and keep counts
-   n.NRead += tpi.n_points();
-   n.NKeep += tpi.n_points();
+   n.NRead += pair.n_points();
+   n.NKeep += pair.n_points();
 
    // Determine if the whole track can be discarded
-   if(!is_keeper_track(tpi, n)) {
-      tpi.clear();
+   if(!is_keeper_track(pair, n)) {
+      pair.clear();
       return;
    }
 
@@ -1189,7 +1357,7 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    if(WaterOnly == true) {
 
       // Determine the rapid intensification points
-      n_rej = tpi.check_water_only();
+      n_rej = pair.check_water_only();
 
       // Update counts
       n.RejWaterOnly += n_rej;
@@ -1200,10 +1368,10 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    if(RIRWTrack != TrackType_None) {
 
       // Determine the rapid intensification points
-      n_rej = tpi.check_rirw(RIRWTrack,
-                             RIRWTimeADeck, RIRWTimeBDeck, 
-                             RIRWExactADeck, RIRWExactBDeck,
-                             RIRWThreshADeck, RIRWThreshBDeck);
+      n_rej = pair.check_rirw(RIRWTrack,
+                              RIRWTimeADeck, RIRWTimeBDeck,
+                              RIRWExactADeck, RIRWExactBDeck,
+                              RIRWThreshADeck, RIRWThreshBDeck);
 
       // Update counts
       n.RejRIRW += n_rej;
@@ -1214,7 +1382,7 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    if(Landfall == true) {
 
       // Determine the landfall points
-      n_rej = tpi.check_landfall(LandfallBeg, LandfallEnd);
+      n_rej = pair.check_landfall(LandfallBeg, LandfallEnd);
 
       // Update counts
       n.RejLandfall += n_rej;
@@ -1222,18 +1390,18 @@ void TCStatJob::subset_track_pair(TrackPairInfo &tpi, TCLineCounts &n) {
    }
 
    // Loop over the track points to check line by line
-   for(i=0; i<tpi.n_lines(); i++) {
+   for(i=0; i<pair.n_lines(); i++) {
 
       // Skip marked lines
-      if(!tpi.keep(i)) continue;
+      if(!pair.keep(i)) continue;
 
       // Check if this line should be discarded
-      if(!is_keeper_line(*tpi.line(i), n)) tpi.set_keep(i, 0);
+      if(!is_keeper_line(*pair.line(i), n)) pair.set_keep(i, 0);
    }
 
    // Subset the points marked for retention
-   tpi = tpi.keep_subset();
-   
+   pair = pair.keep_subset();
+
    return;
 }
 
@@ -1310,7 +1478,7 @@ void TCStatJobFilter::assign(const TCStatJobFilter & j) {
 
 void TCStatJobFilter::do_job(const StringArray &file_list,
                              TCLineCounts &n) {
-   TrackPairInfo tpi;
+   TrackPairInfo pair;
 
    // Check that the -dump_row option has been supplied
    if(!DumpOut) {
@@ -1321,8 +1489,11 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
       exit(1);
    }
 
-   // Call the parent's do_job() to do event equalization
-   TCStatJob::do_job(file_list, n);
+   // Add the input file list
+   TCSTFiles.add_files(file_list);
+
+   // Apply the event equalization logic to build a list of common cases
+   if(EventEqual == true) event_equalize_tracks();
 
    // Check for no common cases
    if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
@@ -1336,18 +1507,18 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
       TCSTFiles.rewind();
 
       // Process each of the track pairs
-      while(TCSTFiles >> tpi) {
+      while(TCSTFiles >> pair) {
 
          // Process the track pair down to points to be used
-         subset_track_pair(tpi, n);
+         subset_track_pair(pair, n);
 
          // Write out the retained lines
-         if(tpi.n_points() > 0) {
+         if(pair.n_points() > 0) {
 
             mlog << Debug(4)
-                 << "Processing track pair: " << tpi.case_info() << "\n";
+                 << "Processing pair: " << pair.case_info() << "\n";
 
-            if(DumpOut) dump_track_pair(tpi, DumpOut);
+            if(DumpOut) dump_pair(pair, DumpOut);
          }
       } // end while
    } // end else
@@ -1566,7 +1737,7 @@ ConcatString TCStatJobSummary::serialize() const {
 
 void TCStatJobSummary::do_job(const StringArray &file_list,
                               TCLineCounts &n) {
-   TrackPairInfo tpi;
+   TrackPairInfo pair;
 
    // Check that the -column option has been supplied
    if(Column.n_elements() == 0) {
@@ -1577,8 +1748,11 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
       exit(1);
    }
 
-   // Call the parent's do_job() to do event equalization
-   TCStatJob::do_job(file_list, n);
+   // Add the input file list
+   TCSTFiles.add_files(file_list);
+
+   // Apply the event equalization logic to build a list of common cases
+   if(EventEqual == true) event_equalize_tracks();
 
    // Check for no common cases
    if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
@@ -1592,21 +1766,21 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
       TCSTFiles.rewind();
 
       // Process each of the track pairs
-      while(TCSTFiles >> tpi) {
+      while(TCSTFiles >> pair) {
 
          // Process the track pair down to points to be used
-         subset_track_pair(tpi, n);
+         subset_track_pair(pair, n);
 
          // Write out the retained lines
-         if(tpi.n_points() > 0) {
+         if(pair.n_points() > 0) {
 
             mlog << Debug(4)
-                 << "Processing track pair: " << tpi.case_info() << "\n";
+                 << "Processing pair: " << pair.case_info() << "\n";
 
             // Process the track pair info for the summary job
-            process_track_pair(tpi);
+            process_pair(pair);
 
-            if(DumpOut) dump_track_pair(tpi, DumpOut);
+            if(DumpOut) dump_pair(pair, DumpOut);
          }
       } // end while
    } // end else
@@ -1623,8 +1797,8 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
-   int i, j, k, lead;
+void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
+   int i, j;
    map<ConcatString,SummaryMapData,cs_cmp> cur_map;
    ConcatString key, cur;
    SummaryMapData data;
@@ -1634,51 +1808,25 @@ void TCStatJobSummary::process_track_pair(TrackPairInfo &tpi) {
    cur_map.clear();
 
    // Loop over TCStatLines and construct a summary map
-   for(i=0; i<tpi.n_lines(); i++) {
+   for(i=0; i<pair.n_lines(); i++) {
 
       // Add summary info to the current map
       for(j=0; j<Column.n_elements(); j++) {
 
          // Build the key and get the current column value
-         key = Column[j];
-         val = get_column_double(*tpi.line(i), Column[j]);
-
-         // Add case information to the key
-         for(k=0; k<CaseColumn.n_elements(); k++) {
-
-            cur = tpi.line(i)->get_item(CaseColumn[k]);
-
-            // For bad data, use the NA string
-            if(is_bad_data(atoi(cur))) cur = na_str;
-
-            // Special handling for lead time:
-            // Switch 2-digit hours to 3-digit hours so that the
-            // summary job output is sorted nicely.
-            if(strcasecmp(CaseColumn[k], "LEAD") == 0 &&
-               cur != na_str &&
-               abs(lead = timestring_to_sec(cur)) < 100*sec_per_hour) {
-
-               // Handle positive and negative lead times
-               key << (lead < 0 ? ":-0" : ":0")
-                   << sec_to_hhmmss(abs(lead));
-            }
-            // Otherwise, just append the current case info
-            else {
-               key << ":" << cur;
-            }
-
-         } // end for k
+         key = build_map_key(Column[j], *pair.line(i), CaseColumn);
+         val = get_column_double(*pair.line(i), Column[j]);
 
          // Add map entry for this key, if necessary
          if(cur_map.count(key) == 0) cur_map[key] = data;
 
          // Add values for this key
          cur_map[key].Val.add(val);
-         cur_map[key].Hdr.add(tpi.line(i)->header());
-         cur_map[key].AModel.add(tpi.line(i)->amodel());
-         cur_map[key].Init.add(tpi.line(i)->init());
-         cur_map[key].Lead.add(tpi.line(i)->lead());
-         cur_map[key].Valid.add(tpi.line(i)->valid());
+         cur_map[key].Hdr.add(pair.line(i)->header());
+         cur_map[key].AModel.add(pair.line(i)->amodel());
+         cur_map[key].Init.add(pair.line(i)->init());
+         cur_map[key].Lead.add(pair.line(i)->lead());
+         cur_map[key].Valid.add(pair.line(i)->valid());
 
       } // end for j
    } // end for i
@@ -1695,7 +1843,7 @@ void TCStatJobSummary::add_map(map<ConcatString,SummaryMapData,cs_cmp>&m) {
    map<ConcatString,SummaryMapData,cs_cmp>::iterator it;
 
    // Loop over the input map entries
-   for(it = m.begin(); it != m.end(); it++) {
+   for(it=m.begin(); it!= m.end(); it++) {
 
       // Current map key is not yet defined in SummaryMap
       if(SummaryMap.count(it->first) == 0) {
@@ -1747,7 +1895,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    // Setup the output table
    out_at.set_size((int) SummaryMap.size() + 1,
                    CaseColumn.n_elements() + 22);
-   
+
    // Left-justify case info and right-justify summary output
    for(i=0; i<out_at.ncols(); i++) {
       if(i < CaseColumn.n_elements()) out_at.set_column_just(i, LeftJust);
@@ -1798,7 +1946,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    // Compute the frequency of superior performance
    compute_fsp(fsp_total, fsp_best, fsp_ties);
 
-   // Loop over the map entries and popluate the output table
+   // Loop over the map entries and populate the output table
    for(it=SummaryMap.begin(),r=1; it!=SummaryMap.end(); it++,r++) {
 
       // Initialize column index
@@ -2038,6 +2186,7 @@ TCStatJobType string_to_tcstatjobtype(const char *s) {
         if(strcasecmp(s, TCStatJobType_FilterStr)  == 0) t = TCStatJobType_Filter;
    else if(strcasecmp(s, TCStatJobType_SummaryStr) == 0) t = TCStatJobType_Summary;
    else if(strcasecmp(s, TCStatJobType_RIRWStr)    == 0) t = TCStatJobType_RIRW;
+   else if(strcasecmp(s, TCStatJobType_ProbRIStr)  == 0) t = TCStatJobType_ProbRI;
    else                                                  t = NoTCStatJobType;
 
    return(t);
@@ -2052,6 +2201,7 @@ ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
       case TCStatJobType_Filter:  s = TCStatJobType_FilterStr;  break;
       case TCStatJobType_Summary: s = TCStatJobType_SummaryStr; break;
       case TCStatJobType_RIRW:    s = TCStatJobType_RIRWStr;    break;
+      case TCStatJobType_ProbRI:  s = TCStatJobType_ProbRIStr;  break;
       default:                    s = na_str;                   break;
    }
 
@@ -2091,7 +2241,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
    for(i=0; i<init.n_elements()-1; i++) {
 
       // Make sure the time spacing remains fixed
-      if(dinit != (init[i+1] - init[i])) {
+      if(dinit!= (init[i+1] - init[i])) {
          mlog << Debug(4)
               << "Skipping time-series computations since the "
               << "initialization time spacing changed: " << dinit
@@ -2211,7 +2361,7 @@ void parse_thresh_option(const char *col_name, const char *col_val,
    ConcatString cs = to_upper(col_name);
    ThreshArray ta;
    ta.add_css(col_val);
-   
+
    // Add data to the map
    if(m.count(cs) > 0) m[col_name].add(ta);
    else                m.insert(pair<ConcatString, ThreshArray>(cs, ta));
@@ -2227,7 +2377,7 @@ void parse_string_option(const char *col_name, const char *col_val,
    StringArray sa;
    sa.set_ignore_case(1);
    sa.add_css(col_val);
-   
+
    // Add data to the map
    if(m.count(cs) > 0) m[col_name].add(sa);
    else                m.insert(pair<ConcatString, StringArray>(cs, sa));
@@ -2277,7 +2427,7 @@ TCStatJobRIRW & TCStatJobRIRW::operator=(const TCStatJobRIRW &j) {
 
 void TCStatJobRIRW::init_from_scratch() {
    int i;
-   
+
    for(i=0; i<4; i++) DumpOutCTC[i] = (ofstream *) 0;
 
    TCStatJob::init_from_scratch();
@@ -2298,7 +2448,7 @@ void TCStatJobRIRW::clear() {
    TCStatJob::clear();
 
    JobType = TCStatJobType_RIRW;
-   
+
    // Disable rapid intensification/weakening filtering logic.
    RIRWTrack = TrackType_None;
 
@@ -2308,10 +2458,8 @@ void TCStatJobRIRW::clear() {
    for(i=0; i<4; i++) DumpFileCTC[i].clear();
    close_dump_file();
 
-   // Set to default value
-   OutAlpha = default_tc_alpha;
-   
    // Set to default values
+   OutAlpha = default_tc_alpha;
    OutLineType.clear();
    OutLineType.add(stat_ctc_str);
    OutLineType.add(stat_cts_str);
@@ -2325,11 +2473,10 @@ void TCStatJobRIRW::assign(const TCStatJobRIRW & j) {
 
    TCStatJob::assign(j);
 
-   TCStatJob::assign(j);
-
-   CaseColumn = j.CaseColumn;
-   RIRWMap = j.RIRWMap;
-   OutAlpha = j.OutAlpha;
+   CaseColumn  = j.CaseColumn;
+   OutAlpha    = j.OutAlpha;
+   OutLineType = j.OutLineType;
+   RIRWMap     = j.RIRWMap;
 
    return;
 }
@@ -2346,7 +2493,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
 
    // Clear the OutLineType if the user has specified it
    if(a.has("-out_line_type")) OutLineType.clear();
-   
+
    // Loop over the StringArray elements
    for(i=0; i<a.n_elements(); i++) {
 
@@ -2456,7 +2603,7 @@ ConcatString TCStatJobRIRW::serialize() const {
    // Add RIRW job-specific options
    for(i=0; i<CaseColumn.n_elements(); i++)
       s << "-by " << CaseColumn[i] << " ";
-   
+
    for(i=0; i<OutLineType.n_elements(); i++)
       s << "-out_line_type " << OutLineType[i] << " ";
 
@@ -2470,11 +2617,14 @@ ConcatString TCStatJobRIRW::serialize() const {
 
 void TCStatJobRIRW::do_job(const StringArray &file_list,
                            TCLineCounts &n) {
-   TrackPairInfo tpi;
+   TrackPairInfo pair;
 
-   // Call the parent's do_job() to do event equalization
-   TCStatJob::do_job(file_list, n);
-   
+   // Add the input file list
+   TCSTFiles.add_files(file_list);
+
+   // Apply the event equalization logic to build a list of common cases
+   if(EventEqual == true) event_equalize_tracks();
+
    // Check for no common cases
    if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
@@ -2487,22 +2637,22 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
       TCSTFiles.rewind();
 
       // Process each of the track pairs
-      while(TCSTFiles >> tpi) {
+      while(TCSTFiles >> pair) {
 
          // Process the track pair down to points to be used
-         subset_track_pair(tpi, n);
+         subset_track_pair(pair, n);
 
-         if(tpi.n_points() > 0) {
+         if(pair.n_points() > 0) {
 
             mlog << Debug(4)
-                 << "Processing track pair: " << tpi.case_info() << "\n";
+                 << "Processing pair: " << pair.case_info() << "\n";
 
             // Process the track pair info for the RI/RW job
-            process_track_pair(tpi);
-         }   
+            process_pair(pair);
+         }
       } // end while
    } // end else
-   
+
    // Close the dump file
    close_dump_file();
 
@@ -2515,86 +2665,61 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
+void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    int i, j, a, b, cur_dt, min_dt, i_min_dt, lead;
    map<ConcatString,RIRWMapData,cs_cmp> cur_map;
    ConcatString key, cur, cat;
    RIRWMapData data;
-   TrackPairInfo tpi_pt;
+   TrackPairInfo pair_pt;
    int acur, aprv, adlt;
    int bcur, bprv, bdlt;
    const char *sep = ":";
 
    // Initialize the map
    cur_map.clear();
-   
+
    // Apply the rapid intensification/weakening logic
-   tpi.check_rirw(TrackType_Both,
-                  RIRWTimeADeck, RIRWTimeBDeck, 
-                  RIRWExactADeck, RIRWExactBDeck,
-                  RIRWThreshADeck, RIRWThreshBDeck);
+   pair.check_rirw(TrackType_Both,
+                   RIRWTimeADeck, RIRWTimeBDeck,
+                   RIRWExactADeck, RIRWExactBDeck,
+                   RIRWThreshADeck, RIRWThreshBDeck);
 
    // Loop over the track points and populate the contigency table
-   for(i=0; i<tpi.n_points(); i++) {
+   for(i=0; i<pair.n_points(); i++) {
 
-      // Initialize the map key so it's never empty
-      key = "RIRW";
-
-      // Build case information for the map key
-      for(j=0; j<CaseColumn.n_elements(); j++) {
-
-         cur = tpi.line(i)->get_item(CaseColumn[j]);
-
-         // For bad data, use the NA string
-         if(is_bad_data(atoi(cur))) cur = na_str;
-
-         // Special handling for lead time:
-         // Switch 2-digit hours to 3-digit hours so that the
-         // summary job output is sorted nicely.
-         if(strcasecmp(CaseColumn[j], "LEAD") == 0 &&
-            cur != na_str &&
-            abs(lead = timestring_to_sec(cur)) < 100*sec_per_hour) {
-
-            // Handle positive and negative lead times
-            key << (lead < 0 ? ":-0" : ":0")
-                << sec_to_hhmmss(abs(lead));
-         }
-         // Otherwise, just append the current case info
-         else {
-            key << ":" << cur;
-         }
-      } // end for j
+      // Build the map key
+      key = build_map_key("RIRW", *pair.line(i), CaseColumn);
 
       // Add map entry for this key, if necessary
       if(cur_map.count(key) == 0) cur_map[key] = data;
 
       // Get the ADeck and BDeck events
-      a = nint(tpi.adeck_rirw(i));
-      b = nint(tpi.bdeck_rirw(i));
+      a = nint(pair.adeck_rirw(i));
+      b = nint(pair.bdeck_rirw(i));
 
       // Store current info
-      lead = tpi.adeck()[i].lead();
-      acur = tpi.adeck()[i].v_max();
-      aprv = tpi.adeck_prv_int(i);
+      lead = pair.adeck()[i].lead();
+      acur = pair.adeck()[i].v_max();
+      aprv = pair.adeck_prv_int(i);
       adlt = (is_bad_data(acur) || is_bad_data(aprv) ? bad_data_int : acur - aprv);
-      bcur = tpi.bdeck()[i].v_max();
-      bprv = tpi.bdeck_prv_int(i);
+      bcur = pair.bdeck()[i].v_max();
+      bprv = pair.bdeck_prv_int(i);
       bdlt = (is_bad_data(bcur) || is_bad_data(bprv) ? bad_data_int : bcur - bprv);
-      
+
       // Check time window when the ADECK and BDECK are both valid but disagree.
       // Try to switch misses to hits and false alarms to correct negatives.
       if(!is_bad_data(a) && !is_bad_data(b) && a != b &&
          (RIRWWindowBeg != 0 || RIRWWindowEnd != 0)) {
 
          // Loop through the ADECK track points
-         for(j=0, min_dt=bad_data_int, i_min_dt=bad_data_int; j<tpi.n_points(); j++) {
+         for(j=0, min_dt=bad_data_int, i_min_dt=bad_data_int; j<pair.n_points(); j++) {
 
             // Skip ADECK points that are too far away in time
-            cur_dt = tpi.valid(i) - tpi.valid(j);
+            cur_dt = pair.valid(i) - pair.valid(j);
             if(cur_dt < RIRWWindowBeg || cur_dt > RIRWWindowEnd) continue;
 
             // Skip ADECK points that don't agree with the BDECK category
-            if(nint(tpi.adeck_rirw(j)) != b) continue;
+            if(nint(pair.adeck_rirw(j)) != b) continue;
 
             // Find closest match in time
             if(is_bad_data(min_dt))              { min_dt = cur_dt; i_min_dt = j; }
@@ -2604,8 +2729,8 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
          // Switch the category if a match was found within the window
          if(!is_bad_data(min_dt)) {
             a = b;
-            acur = tpi.adeck()[i_min_dt].v_max();
-            aprv = tpi.adeck_prv_int(i_min_dt);
+            acur = pair.adeck()[i_min_dt].v_max();
+            aprv = pair.adeck_prv_int(i_min_dt);
             adlt = acur - aprv;
             mlog << Debug(4)
                  << "Switching "
@@ -2613,16 +2738,16 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
                  << (b == 1 ? "FY_OY" : "FN_ON")
                  << " since ADECK "  << (b == 1 ? "event" : "non-event")
                  << " (" << aprv << " to " << acur << " = " << adlt << ") occurred at "
-                 << unix_to_yyyymmdd_hhmmss(tpi.valid(i_min_dt)) << " ("
+                 << unix_to_yyyymmdd_hhmmss(pair.valid(i_min_dt)) << " ("
                  << sec_to_hhmmss(min_dt) << " offset within "
                  << sec_to_hhmmss(RIRWWindowBeg) << " to " << sec_to_hhmmss(RIRWWindowEnd)
-                 << " window) for " << tpi.case_info() << ", "
-                 << "VALID = " << unix_to_yyyymmdd_hhmmss(tpi.valid(i)) << ", "
+                 << " window) for " << pair.case_info() << ", "
+                 << "VALID = " << unix_to_yyyymmdd_hhmmss(pair.valid(i)) << ", "
                  << "LEAD = " << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << "\n";
          }
       }
 
-      // Determine the contingency table category      
+      // Determine the contingency table category
       if(is_bad_data(a) || is_bad_data(b)) {
          cat = na_str;
       }
@@ -2639,15 +2764,15 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
 
          // Write the current point to the correct dump file
          if(DumpOutCTC[0]) {
-            
-            // Create a track for the current point
-            tpi_pt.clear();
-            tpi_pt.add(*tpi.line(i));
 
-                 if(a == 1 && b == 1) dump_track_pair(tpi_pt, DumpOutCTC[0]);
-            else if(a == 1 && b == 0) dump_track_pair(tpi_pt, DumpOutCTC[1]);
-            else if(a == 0 && b == 1) dump_track_pair(tpi_pt, DumpOutCTC[2]);
-            else if(a == 0 && b == 0) dump_track_pair(tpi_pt, DumpOutCTC[3]);
+            // Create a track for the current point
+            pair_pt.clear();
+            pair_pt.add(*pair.line(i));
+
+                 if(a == 1 && b == 1) dump_pair(pair_pt, DumpOutCTC[0]);
+            else if(a == 1 && b == 0) dump_pair(pair_pt, DumpOutCTC[1]);
+            else if(a == 0 && b == 1) dump_pair(pair_pt, DumpOutCTC[2]);
+            else if(a == 0 && b == 0) dump_pair(pair_pt, DumpOutCTC[3]);
          }
       }
 
@@ -2658,12 +2783,12 @@ void TCStatJobRIRW::process_track_pair(TrackPairInfo &tpi) {
       //    BMAX_WIND_PRV BMAX_WIND_CUR BMAX_WIND_DLT BRIRW
       //    CATEGORY
       cur << cs_erase
-          << tpi.line(i)->amodel() << sep
-          << tpi.line(i)->bmodel() << sep
-          << tpi.line(i)->storm_id() << sep
-          << unix_to_yyyymmdd_hhmmss(tpi.line(i)->init()) << sep
+          << pair.line(i)->amodel() << sep
+          << pair.line(i)->bmodel() << sep
+          << pair.line(i)->storm_id() << sep
+          << unix_to_yyyymmdd_hhmmss(pair.line(i)->init()) << sep
           << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << sep
-          << unix_to_yyyymmdd_hhmmss(tpi.line(i)->valid()) << sep
+          << unix_to_yyyymmdd_hhmmss(pair.line(i)->valid()) << sep
           << aprv << sep << acur << sep << adlt << sep
           << (is_bad_data(a) ? na_str : bool_to_string(a)) << sep
           << bprv << sep << bcur << sep << bdlt << sep
@@ -2684,7 +2809,7 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
    map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
 
    // Loop over the input map entries
-   for(it = m.begin(); it != m.end(); it++) {
+   for(it=m.begin(); it!= m.end(); it++) {
 
       // Current map key is not yet defined in RIRWMap
       if(RIRWMap.count(it->first) == 0) {
@@ -2735,15 +2860,15 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
 
 void TCStatJobRIRW::do_output(ostream &out) {
    ConcatString line;
- 
+
    // Build a simple output line
    line << "JOB_LIST: " << serialize() << "\n";
    out  << line;
-   
+
    if(OutLineType.has(stat_ctc_str)) do_ctc_output(out);
    if(OutLineType.has(stat_cts_str)) do_cts_output(out);
    if(OutLineType.has(stat_mpr_str)) do_mpr_output(out);
-   
+
    return;
 }
 
@@ -2753,19 +2878,19 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
    int i, r, c;
-   AsciiTable out_at; 
+   AsciiTable out_at;
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   9 + CaseColumn.n_elements() + n_ctc_columns);   
+                   9 + CaseColumn.n_elements() + n_ctc_columns);
    setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
-   
+
    // Initialize row and column indices
    r = c = 0;
 
    // Write the header row
    out_at.set_entry(r, c++, "COL_NAME:");
-   
+
    // Write the RI/RW event definition headers
    out_at.set_entry(r, c++, "ATIME");
    out_at.set_entry(r, c++, "BTIME");
@@ -2775,7 +2900,7 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    out_at.set_entry(r, c++, "BTHRESH");
    out_at.set_entry(r, c++, "WINDOW_BEG");
    out_at.set_entry(r, c++, "WINDOW_END");
-  
+
    // Write case column names
    for(i=0; i<CaseColumn.n_elements(); i++) {
       out_at.set_entry(r, c++, CaseColumn[i]);
@@ -2783,8 +2908,8 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
 
    // Write the header columns
    write_header_row(ctc_columns, n_ctc_columns, 0, out_at, r, c);
-   
-   // Loop over the map entries and popluate the output table
+
+   // Loop over the map entries and populate the output table
    for(it=RIRWMap.begin(),r=1; it!=RIRWMap.end(); it++,r++) {
 
       // Split the current map key
@@ -2827,19 +2952,19 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
    map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
    int i, r, c;
-   AsciiTable out_at; 
+   AsciiTable out_at;
 
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
-                   9 + CaseColumn.n_elements() + n_cts_columns);   
+                   9 + CaseColumn.n_elements() + n_cts_columns);
    setup_table(out_at, 9 + CaseColumn.n_elements(), get_precision());
-   
+
    // Initialize row and column indices
    r = c = 0;
 
    // Write the header row
    out_at.set_entry(r, c++, "COL_NAME:");
-   
+
    // Write the RI/RW event definition headers
    out_at.set_entry(r, c++, "ATIME");
    out_at.set_entry(r, c++, "BTIME");
@@ -2849,7 +2974,7 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
    out_at.set_entry(r, c++, "BTHRESH");
    out_at.set_entry(r, c++, "WINDOW_BEG");
    out_at.set_entry(r, c++, "WINDOW_END");
-  
+
    // Write case column names
    for(i=0; i<CaseColumn.n_elements(); i++) {
       out_at.set_entry(r, c++, CaseColumn[i]);
@@ -2857,8 +2982,8 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
 
    // Write the header columns
    write_header_row(cts_columns, n_cts_columns, 0, out_at, r, c);
-   
-   // Loop over the map entries and popluate the output table
+
+   // Loop over the map entries and populate the output table
    for(it=RIRWMap.begin(),r=1; it!=RIRWMap.end(); it++,r++) {
 
       // Allocate a single alpha value and compute statistics
@@ -2909,7 +3034,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StringArray sa;
    int i, j, r, c;
-   AsciiTable out_at; 
+   AsciiTable out_at;
    ConcatString cs;
 
    // Determine the required number of rows
@@ -2927,7 +3052,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
 
    // Write the header row
    out_at.set_entry(r, c++, "COL_NAME:");
-   
+
    // Write the RI/RW event definition headers
    out_at.set_entry(r, c++, "ATIME");
    out_at.set_entry(r, c++, "BTIME");
@@ -2937,7 +3062,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    out_at.set_entry(r, c++, "BTHRESH");
    out_at.set_entry(r, c++, "WINDOW_BEG");
    out_at.set_entry(r, c++, "WINDOW_END");
-  
+
    // Write case column names
    for(i=0; i<CaseColumn.n_elements(); i++) {
       out_at.set_entry(r, c++, CaseColumn[i]);
@@ -2959,8 +3084,8 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    out_at.set_entry(r, c++, "BMAX_WIND_DLT");
    out_at.set_entry(r, c++, "BRIRW");
    out_at.set_entry(r, c++, "CATEGORY");
-   
-   // Loop over the map entries and popluate the output table
+
+   // Loop over the map entries and populate the output table
    for(it=RIRWMap.begin(),r=1; it!=RIRWMap.end(); it++) {
 
       // Loop through the current points
@@ -2981,7 +3106,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
          out_at.set_entry(r, c++, RIRWThreshBDeck.get_str());
          out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowBeg));
          out_at.set_entry(r, c++, sec_to_hhmmss(RIRWWindowEnd));
-         
+
          // Write case column values
          sa = it->first.split(":");
          for(j=1; j<sa.n_elements(); j++) {
@@ -3000,7 +3125,391 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
    // Write the table
    out << out_at << "\n" << flush;
 
-   return;  
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class TCStatJobProbRI
+//
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobProbRI::TCStatJobProbRI() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobProbRI::~TCStatJobProbRI() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobProbRI::TCStatJobProbRI(const TCStatJobProbRI &j) {
+
+   init_from_scratch();
+
+   assign(j);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCStatJobProbRI & TCStatJobProbRI::operator=(const TCStatJobProbRI &j) {
+
+   if(this == &j) return(*this);
+
+   assign(j);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobProbRI::init_from_scratch() {
+
+   StatOut = (ofstream *) 0;
+
+   TCStatJob::init_from_scratch();
+
+   // Ignore case when performing comparisons
+   CaseColumn.set_ignore_case(1);
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobProbRI::clear() {
+   int i;
+
+   TCStatJob::clear();
+
+   JobType = TCStatJobType_ProbRI;
+
+   CaseColumn.clear();
+   ProbRIMap.clear();
+
+   // Set to default values
+   ProbRIExact = true;
+   ProbRIBDeltaThresh.set(">=30");
+   ProbRIProbThresh = string_to_prob_thresh("==0.1");
+   OutAlpha = default_tc_alpha;
+   OutLineType.clear();
+   OutLineType.add(stat_pct_str);
+   OutLineType.add(stat_pstd_str);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobProbRI::assign(const TCStatJobProbRI & j) {
+
+   TCStatJob::assign(j);
+
+   ProbRIExact        = j.ProbRIExact;
+   ProbRIBDeltaThresh = j.ProbRIBDeltaThresh;
+   ProbRIProbThresh   = j.ProbRIProbThresh;
+   CaseColumn         = j.CaseColumn;
+   OutAlpha           = j.OutAlpha;
+   OutLineType        = j.OutLineType;
+   ProbRIMap          = j.ProbRIMap;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray TCStatJobProbRI::parse_job_command(const char *jobstring) {
+   StringArray a, b;
+   const char * c = (const char *) 0;
+   int i;
+
+   // Call the parent and store any unused options
+   a = TCStatJob::parse_job_command(jobstring);
+
+   // Clear options if the user has specified them
+   if(a.has("-out_line_type"))      OutLineType.clear();
+   if(a.has("-probri_prob_thresh")) ProbRIProbThresh.clear();
+
+   // Loop over the StringArray elements
+   for(i=0; i<a.n_elements(); i++) {
+
+      // Point at the current entry
+      c = a[i];
+
+      // Check for a job command option
+      if(c[0] != '-') {
+         b.add(a[i]);
+         continue;
+      }
+
+      // Check job command options
+           if(strcasecmp(c, "-by"                  ) == 0) { CaseColumn.add_css(to_upper(a[i+1]));                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_alpha"           ) == 0) { OutAlpha = atof(a[i+1]);                             a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-out_line_type"       ) == 0) { OutLineType.add_css(to_upper(a[i+1]));               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probri_exact"        ) == 0) { ProbRIExact = string_to_bool(a[i+1]);                a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probri_bdelta_thresh") == 0) { ProbRIBDeltaThresh.set(a[i+1]);                      a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probri_prob_thresh"  ) == 0) { ProbRIProbThresh.add(string_to_prob_thresh(a[i+1])); a.shift_down(i, 1); }
+      else                                                 {                                                      b.add(a[i]);        }
+   }
+
+   return(b);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString TCStatJobProbRI::serialize() const {
+   ConcatString s;
+   int i;
+
+   // Initialize the jobstring
+   s.set_precision(get_precision());
+
+   // Call the parent
+   s = TCStatJob::serialize();
+
+   // List the probability threshold information
+   s << "-probri_exact "  << bool_to_string(ProbRIExact) << " ";
+   s << "-probri_bdelta_thresh " << ProbRIBDeltaThresh.get_str() << " ";
+   s << "-probri_prob_thresh " << prob_thresh_to_string(ProbRIProbThresh) << " ";
+
+   // Add ProbRI job-specific options
+   for(i=0; i<CaseColumn.n_elements(); i++)
+      s << "-by " << CaseColumn[i] << " ";
+
+   for(i=0; i<OutLineType.n_elements(); i++)
+      s << "-out_line_type " << OutLineType[i] << " ";
+
+   // Always list the output alpha value used
+   s << "-out_alpha " << OutAlpha << " ";
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobProbRI::do_job(const StringArray &file_list,
+                             TCLineCounts &n) {
+   ProbRIPairInfo pair;
+
+   // Add the input file list
+   TCSTFiles.add_files(file_list);
+
+   // Apply the event equalization logic to build a list of common cases
+   if(EventEqual == true) event_equalize_lines();
+
+   // Check for no common cases
+   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+      mlog << Debug(1)
+           << "Event equalization found no common cases.\n";
+   }
+   // Otherwise, process the pair data
+   else {
+
+      // Rewind to the beginning of the track pair input
+      TCSTFiles.rewind();
+
+      // Process each of the track pairs
+      while(TCSTFiles >> pair) {
+
+         // Only process lines with single probabilities
+         if(atoi(pair.line().get_item("N_THRESH")) != 1) continue;
+
+         // Increment the read and keep counts
+         n.NRead++;
+         n.NKeep++;
+
+         // Check if this line should be kept
+         if(!is_keeper_line(pair.line(), n)) continue;
+
+         mlog << Debug(4)
+              << "Processing pair: " << pair.case_info() << "\n";
+
+         // Process the ProbRIPairInfo
+         process_pair(pair);
+
+         if(DumpOut) dump_pair(pair, DumpOut);
+
+      } // end while
+   } // end else
+
+   // Close the dump file
+   close_dump_file();
+
+   // Process the ProbRI job output
+   if(JobOut) do_output(*JobOut);
+   else       do_output(cout);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) {
+   int i;
+   double f, o;
+   ConcatString key, cur;
+   ProbRIMapData data;
+   NumArray p_thresh;
+
+   // Build the map key
+   key = build_map_key("PROBRI", pair.line(), CaseColumn);
+
+   // Add map entry for this key, if necessary
+   if(ProbRIMap.count(key) == 0) {
+      for(i=0; i<ProbRIProbThresh.n_elements(); i++) {
+         p_thresh.add(ProbRIProbThresh[i].get_value());
+      }
+      data.Info.clear();
+      data.Info.pct.set_size(ProbRIProbThresh.n_elements() - 1);
+      data.Info.pct.set_thresholds(p_thresh.vals());
+      data.Info.fthresh = ProbRIProbThresh;
+      data.Info.othresh = ProbRIBDeltaThresh;
+      data.RIWindow = pair.prob_ri().ri_window();
+      ProbRIMap[key] = data;
+   }
+
+   // Make sure the RI_WINDOW remains constant
+   if(pair.prob_ri().ri_window() != ProbRIMap[key].RIWindow) {
+       mlog << Error << "\nvoid TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) -> "
+            << "RI_WINDOW must remain constant ("
+            << ProbRIMap[key].RIWindow << " != "
+            << pair.prob_ri().ri_window()
+            << ").  Try setting \"-by RI_WINDOW\" "
+            << "or \"-column_thresh RI_WINDOW ==n\".\n\n";
+      exit(1);
+   }
+
+   // Threshold BDELTA or BDELTA_MAX
+   // Rescale probabilities from [0, 100] to [0, 1]
+   f = atof(pair.line().get_item("PROB_1")) / 100.0;
+   o = (ProbRIExact ?
+        atof(pair.line().get_item("BDELTA")) :
+        atof(pair.line().get_item("BDELTA_MAX")));
+
+   // Increment the PCT table
+   if(ProbRIMap[key].Info.othresh.check(o)) {
+      ProbRIMap[key].Info.pct.inc_event(f);
+   }
+   else {
+      ProbRIMap[key].Info.pct.inc_nonevent(f);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobProbRI::do_output(ostream &out) {
+   map<ConcatString,ProbRIMapData,cs_cmp>::iterator it;
+   StringArray sa;
+   int n, i, j, lt_cols, r, c;
+   AsciiTable out_at;
+   STATLineType out_lt;
+   ConcatString cs;
+
+   // Build a simple output line
+   cs  << "JOB_LIST: " << serialize() << "\n";
+   out << cs;
+
+   // Determine the maximum dimension
+   for(it=ProbRIMap.begin(), n=0; it!=ProbRIMap.end(); it++) {
+      n = max(it->second.Info.pct.nrows() + 1, n);
+   }
+
+   // Loop over the output line types
+   for(i=0; i<OutLineType.n_elements(); i++) {
+
+      // Parse the output line type
+      out_lt = string_to_statlinetype(OutLineType[i]);
+
+      // Write the header columns
+           if(out_lt == stat_pct)  lt_cols = get_n_pct_columns (n);
+      else if(out_lt == stat_pstd) lt_cols = get_n_pstd_columns(n);
+      else if(out_lt == stat_prc)  lt_cols = get_n_prc_columns (n);
+      else if(out_lt == stat_pjc)  lt_cols = get_n_pjc_columns (n);
+      else {
+         mlog << Error << "\nvoid TCStatJobProbRI::do_output(ostream &out) -> "
+              << "unsupported output line type \"" << OutLineType[i] << "\"\n\n";
+         exit(1);
+      }
+
+      // Initialize the output table
+      out_at.clear();
+      out_at.set_size((int) ProbRIMap.size() + 1,
+                      4 + CaseColumn.n_elements() + lt_cols);
+      setup_table(out_at, 4 + CaseColumn.n_elements(), get_precision());
+
+      // Initialize row and column indices
+      r = c = 0;
+
+      // Write the header row
+      cs << cs_erase << "PROBRI_" << OutLineType[i] << ":";
+      out_at.set_entry(r, c++, cs);
+
+      // Write the ProbRI event definition headers
+      out_at.set_entry(r, c++, "EXACT");
+      out_at.set_entry(r, c++, "PROB_THRESH");
+      out_at.set_entry(r, c++, "BDELTA_THRESH");
+
+      // Write case column names
+      for(j=0; j<CaseColumn.n_elements(); j++)
+         out_at.set_entry(r, c++, CaseColumn[j]);
+
+      // Write the header columns
+           if(out_lt == stat_pct)  write_pct_header_row (0, n, out_at, r, c);
+      else if(out_lt == stat_pstd) write_pstd_header_row(0, n, out_at, r, c);
+      else if(out_lt == stat_prc)  write_prc_header_row (0, n, out_at, r, c);
+      else if(out_lt == stat_pjc)  write_pjc_header_row (0, n, out_at, r, c);
+
+      // Loop over the map entries and populate the output table
+      for(it=ProbRIMap.begin(),r=1; it!=ProbRIMap.end(); it++,r++) {
+
+         // Split the current map key
+         sa = it->first.split(":");
+
+         // Initialize column counter
+         c = 0;
+
+         // Write the table row
+         out_at.set_entry(r, c++, cs);
+
+        // Write the ProbRI event definition
+         out_at.set_entry(r, c++, bool_to_string(ProbRIExact));
+         out_at.set_entry(r, c++, prob_thresh_to_string(ProbRIProbThresh));
+         out_at.set_entry(r, c++, ProbRIBDeltaThresh.get_str());
+
+         // Write case column values
+         for(j=1; j<sa.n_elements(); j++)
+            out_at.set_entry(r, c++, sa[j]);
+
+         // Compute PSTD statistics
+         if(out_lt == stat_pstd) {
+            it->second.Info.allocate_n_alpha(1);
+            it->second.Info.alpha[0] = OutAlpha;
+            it->second.Info.compute_stats();
+            it->second.Info.compute_ci();
+         }
+
+         // Write output columns
+              if(out_lt == stat_pct)  write_pct_cols (it->second.Info,    out_at, r, c);
+         else if(out_lt == stat_pstd) write_pstd_cols(it->second.Info, 0, out_at, r, c);
+         else if(out_lt == stat_prc)  write_prc_cols (it->second.Info,    out_at, r, c);
+         else if(out_lt == stat_pjc)  write_pjc_cols (it->second.Info,    out_at, r, c);
+      } // end for it
+
+      // Write the table for the current output line type
+      out << out_at << "\n" << flush;
+
+   } // end for i
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3028,6 +3537,44 @@ void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
    at.set_delete_trailing_blank_rows(1);
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_map_key(const char *prefix, const TCStatLine &l,
+                           const StringArray &case_cols) {
+   int i, lead;
+   ConcatString key, cur;
+
+   // Initialize the map key with prefix
+   if(prefix) key = prefix;
+
+   // Build case information for the map key
+   for(i=0; i<case_cols.n_elements(); i++) {
+
+      cur = l.get_item(case_cols[i]);
+
+      // For bad data, use the NA string
+      if(is_bad_data(atoi(cur))) cur = na_str;
+
+      // Special handling for lead time:
+      // Switch 2-digit hours to 3-digit hours so that the
+      // summary job output is sorted nicely.
+      if(strcasecmp(case_cols[i], "LEAD") == 0 &&
+         cur != na_str &&
+         abs(lead = timestring_to_sec(cur)) < 100*sec_per_hour) {
+
+         // Handle positive and negative lead times
+         key << (lead < 0 ? ":-0" : ":0")
+             << sec_to_hhmmss(abs(lead));
+      }
+      // Otherwise, just append the current case info
+      else {
+         key << ":" << cur;
+      }
+   } // end for i
+
+   return(key);
 }
 
 ////////////////////////////////////////////////////////////////////////

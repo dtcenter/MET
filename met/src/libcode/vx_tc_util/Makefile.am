@@ -12,10 +12,16 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_tc_util.a
 libvx_tc_util_a_SOURCES = \
-              atcf_line.cc atcf_line.h atcf_offsets.h \
+              atcf_line_base.cc atcf_line_base.h atcf_offsets.h \
+              atcf_track_line.cc atcf_track_line.h \
+              atcf_prob_line.cc atcf_prob_line.h \
               track_point.cc track_point.h \
               track_info.cc track_info.h \
               track_pair_info.cc track_pair_info.h \
+              prob_info_base.h prob_info_base.cc \
+              prob_info_array.h prob_info_array.cc \
+              prob_ri_info.h prob_ri_info.cc \
+              prob_ri_pair_info.h prob_ri_pair_info.cc \
               tc_hdr_columns.cc tc_hdr_columns.h \
               tc_columns.cc tc_columns.h \
               tc_stat_line.cc tc_stat_line.h \

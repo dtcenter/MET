@@ -19,36 +19,28 @@ using namespace std;
 
 #include "vx_math.h"
 
-#include "atcf_line.h"
+#include "atcf_track_line.h"
 #include "atcf_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
+//
+//  Code for class ATCFTrackLine
+//
+////////////////////////////////////////////////////////////////////////
 
-extern unixtime     parse_time           (const char *);
-extern int          parse_lat            (const char *);
-extern int          parse_lon            (const char *);
-extern int          parse_int            (const char *);
-extern int          parse_int_check_zero (const char *);
-  
-////////////////////////////////////////////////////////////////////////
-//
-//  Code for class ATCFLine
-//
-////////////////////////////////////////////////////////////////////////
-  
-ATCFLine::ATCFLine() {
+ATCFTrackLine::ATCFTrackLine() {
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ATCFLine::~ATCFLine() {
+ATCFTrackLine::~ATCFTrackLine() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ATCFLine::ATCFLine(const ATCFLine &l) {
+ATCFTrackLine::ATCFTrackLine(const ATCFTrackLine &l) {
    init_from_scratch();
 
    assign(l);
@@ -56,7 +48,7 @@ ATCFLine::ATCFLine(const ATCFLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ATCFLine & ATCFLine::operator=(const ATCFLine &l) {
+ATCFTrackLine & ATCFTrackLine::operator=(const ATCFTrackLine &l) {
 
    if(this == &l) return(*this);
 
@@ -67,19 +59,10 @@ ATCFLine & ATCFLine::operator=(const ATCFLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ATCFLine::operator==(const ATCFLine &l) {
-   return(get_line() == l.get_line());
-}
+void ATCFTrackLine::init_from_scratch() {
 
-////////////////////////////////////////////////////////////////////////
+   ATCFLineBase::init_from_scratch();
 
-void ATCFLine::init_from_scratch() {
-
-   DataLine::init_from_scratch();
-
-   // ATCF lines are comma-delimited
-   set_delimiter(",");
-   
    clear();
 
    return;
@@ -87,40 +70,23 @@ void ATCFLine::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ATCFLine::assign(const ATCFLine &l) {
+void ATCFTrackLine::assign(const ATCFTrackLine &l) {
 
    clear();
 
-   DataLine::assign(l);
-
-   Technique = l.Technique;
-   IsBestTrack = l.IsBestTrack;
-   IsOperTrack = l.IsOperTrack;
+   ATCFLineBase::assign(l);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ATCFLine::dump(ostream &out, int indent_depth) const {
+void ATCFTrackLine::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString cs;
 
-   out << prefix << "Line            = " << (*this) << "\n";
-   cs = basin();
-   out << prefix << "Basin           = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
-   cs = cyclone_number();
-   out << prefix << "CycloneNumber   = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
-   out << prefix << "WarningTime     = " << unix_to_yyyymmdd_hhmmss(warning_time()) << "\n";
-   out << prefix << "TechniqueNumber = " << technique_number() << "\n";
-   out << prefix << "ForecastPeriod  = " << forecast_period() << "\n";
-   out << prefix << "Valid           = " << unix_to_yyyymmdd_hhmmss(valid()) << "\n";
-   cs = technique();
-   out << prefix << "Technique       = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
-   out << prefix << "IsBestTrack     = \"" << (IsBestTrack ? "TRUE" : "FALSE") << "\"\n";
-   out << prefix << "IsOperTrack     = \"" << (IsOperTrack ? "TRUE" : "FALSE") << "\"\n";
-   out << prefix << "Lat             = " << lat() << "\n";
-   out << prefix << "Lon             = " << lon() << "\n";
+   ATCFLineBase::dump(out, indent_depth);
+
    out << prefix << "Vmax            = " << v_max() << "\n";
    out << prefix << "MSLP            = " << mslp() << "\n";
    out << prefix << "Level           = " << cyclonelevel_to_string(level()) << "\n";
@@ -137,11 +103,11 @@ void ATCFLine::dump(ostream &out, int indent_depth) const {
    out << prefix << "EyeDiameter     = " << eye_diameter() << "\n";
    out << prefix << "SubRegion       = " << subregioncode_to_string(subregion()) << "\n";
    out << prefix << "MaxSeas         = " << max_seas() << "\n";
-   cs = initials();
+      cs = initials();
    out << prefix << "Initials        = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
    out << prefix << "StormDirection  = " << storm_direction() << "\n";
    out << prefix << "StormSpeed      = " << storm_speed() << "\n";
-   cs = storm_name();
+      cs = storm_name();
    out << prefix << "StormName       = \"" << (cs ? cs.text() : "(nul)") << "\"\n";
    out << prefix << "Depth           = " << systemsdepth_to_string(depth()) << "\n";
    out << prefix << "WaveHeight      = " << wave_height() << "\n";
@@ -150,43 +116,47 @@ void ATCFLine::dump(ostream &out, int indent_depth) const {
    out << prefix << "SeasRadius2     = " << seas_radius2() << "\n";
    out << prefix << "SeasRadius3     = " << seas_radius3() << "\n";
    out << prefix << "SeasRadius4     = " << seas_radius4() << "\n";
+
    out << flush;
-   
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void ATCFLine::clear() {
-   DataLine::clear();
-   Technique.clear();
-   IsBestTrack = false;
-   IsOperTrack = false;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::read_line(LineDataFile * ldf) {
+void ATCFTrackLine::clear() {
+   ATCFLineBase::clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ATCFTrackLine::read_line(LineDataFile * ldf) {
    int status;
 
-   status = DataLine::read_line(ldf);
+   status = ATCFLineBase::read_line(ldf);
 
    // Check for bad return status or blank line
-   if(!status || n_items() == 0) {
-      clear();
+   if(!status) return(0);
+
+   // Check the line type
+   if(Type != ATCFLineType_Track) {
+      mlog << Warning
+           << "\nint ATCFTrackLine::read_line(LineDataFile * ldf) -> "
+           << "unexpected ATCF line type ("
+           << atcflinetype_to_string(Type) << ")\n\n";
       return(0);
    }
 
-   // Check for the minumum number of elements
-   if(n_items() < MinATCFElements) {
+   // Check for the minumum number of track line elements
+   if(n_items() < MinATCFTrackElements) {
       mlog << Warning
-           << "\nint ATCFLine::read_line(LineDataFile * ldf) -> "
+           << "\nint ATCFTrackLine::read_line(LineDataFile * ldf) -> "
            << "found fewer than the expected number of elements ("
-           << n_items() << "<" << MinATCFElements << ") in ATCF line:\n"
-           << Line << "\n\n";
-      return(false);
+           << n_items() << "<" << MinATCFTrackElements
+           << ") in ATCF track line:\n" << Line << "\n\n";
+      return(0);
    }
 
    return(1);
@@ -194,100 +164,7 @@ int ATCFLine::read_line(LineDataFile * ldf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::is_header() const {
-   if(strcasecmp(basin(), "BASIN") == 0) return(1);
-   else                                  return(0);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString ATCFLine::get_item(int i) const {
-   ConcatString cs;
-
-   cs = DataLine::get_item(i);
-
-   // Strip off any whitespace
-   cs.ws_strip();
-   
-   return(cs);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString ATCFLine::get_line() const {
-   ConcatString cs;
-
-   if(N_items == 0) return(cs);
-   
-   for(int i=0; i<N_items-1; i++) cs << DataLine::get_item(i) << Delimiter;
-   cs << DataLine::get_item(N_items-1);
-   
-   return(cs);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString ATCFLine::basin() const {
-   return(get_item(BasinOffset));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString ATCFLine::cyclone_number() const {
-   return(get_item(CycloneNumberOffset));   }
-
-////////////////////////////////////////////////////////////////////////
-
-unixtime ATCFLine::warning_time() const {
-   return(parse_time(get_item(WarningTimeOffset)));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int ATCFLine::technique_number() const {
-   return(parse_int(get_item(TechniqueNumberOffset)));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString ATCFLine::technique() const {
-   ConcatString cs;
-
-   // Use Technique, if already set
-   if(Technique) cs = Technique;
-   else          cs = get_item(TechniqueOffset);
-
-   // Replace instances of AVN with GFS
-   cs.replace("AVN", "GFS");
-
-   return(cs);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int ATCFLine::forecast_period() const {
-   return(parse_int(get_item(ForecastPeriodOffset)));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double ATCFLine::lat() const {
-   double v = parse_lat(get_item(LatTenthsOffset));
-
-   return(0.1*v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double ATCFLine::lon() const {
-   double v = parse_lon(get_item(LonTenthsOffset));
-
-   return(0.1*v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int ATCFLine::v_max() const {
+int ATCFTrackLine::v_max() const {
    return(VMaxOffset < N_items ?
           parse_int_check_zero(get_item(VMaxOffset)) :
           bad_data_int);
@@ -295,7 +172,7 @@ int ATCFLine::v_max() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::mslp() const {
+int ATCFTrackLine::mslp() const {
    return(MSLPOffset < N_items ?
           parse_int_check_zero(get_item(MSLPOffset)) :
           bad_data_int);
@@ -303,7 +180,7 @@ int ATCFLine::mslp() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-CycloneLevel ATCFLine::level() const {
+CycloneLevel ATCFTrackLine::level() const {
    return(LevelOffset < N_items ?
           string_to_cyclonelevel(get_item(LevelOffset)) :
           NoCycloneLevel);
@@ -311,7 +188,7 @@ CycloneLevel ATCFLine::level() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::wind_intensity() const {
+int ATCFTrackLine::wind_intensity() const {
    return(WindIntensityOffset < N_items ?
           parse_int_check_zero(get_item(WindIntensityOffset)) :
           bad_data_int);
@@ -319,7 +196,7 @@ int ATCFLine::wind_intensity() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-QuadrantType ATCFLine::quadrant() const {
+QuadrantType ATCFTrackLine::quadrant() const {
    return(QuadrantOffset < N_items ?
           string_to_quadranttype(get_item(QuadrantOffset)) :
           NoQuadrantType);
@@ -327,7 +204,7 @@ QuadrantType ATCFLine::quadrant() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::radius1() const {
+int ATCFTrackLine::radius1() const {
    return(Radius1Offset < N_items ?
           parse_int_check_zero(get_item(Radius1Offset)) :
           bad_data_int);
@@ -335,7 +212,7 @@ int ATCFLine::radius1() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::radius2() const {
+int ATCFTrackLine::radius2() const {
    return(Radius2Offset < N_items ?
           parse_int_check_zero(get_item(Radius2Offset)) :
           bad_data_int);
@@ -343,7 +220,7 @@ int ATCFLine::radius2() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::radius3() const {
+int ATCFTrackLine::radius3() const {
    return(Radius3Offset < N_items ?
           parse_int_check_zero(get_item(Radius3Offset)) :
           bad_data_int);
@@ -351,7 +228,7 @@ int ATCFLine::radius3() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::radius4() const {
+int ATCFTrackLine::radius4() const {
    return(Radius4Offset < N_items ?
           parse_int_check_zero(get_item(Radius4Offset)) :
           bad_data_int);
@@ -359,7 +236,7 @@ int ATCFLine::radius4() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::isobar_pressure() const {
+int ATCFTrackLine::isobar_pressure() const {
    return(IsobarPressureOffset < N_items ?
           parse_int_check_zero(get_item(IsobarPressureOffset)) :
           bad_data_int);
@@ -367,7 +244,7 @@ int ATCFLine::isobar_pressure() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::isobar_radius() const {
+int ATCFTrackLine::isobar_radius() const {
    return(IsobarRadiusOffset < N_items ?
           parse_int_check_zero(get_item(IsobarRadiusOffset)) :
           bad_data_int);
@@ -375,7 +252,7 @@ int ATCFLine::isobar_radius() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::max_wind_radius() const {
+int ATCFTrackLine::max_wind_radius() const {
    return(MaxWindRadiusOffset < N_items ?
           parse_int_check_zero(get_item(MaxWindRadiusOffset)) :
           bad_data_int);
@@ -383,7 +260,7 @@ int ATCFLine::max_wind_radius() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::gusts() const {
+int ATCFTrackLine::gusts() const {
    return(GustsOffset < N_items ?
           parse_int_check_zero(get_item(GustsOffset)) :
           bad_data_int);
@@ -391,7 +268,7 @@ int ATCFLine::gusts() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::eye_diameter() const {
+int ATCFTrackLine::eye_diameter() const {
    return(EyeDiameterOffset < N_items ?
           parse_int_check_zero(get_item(EyeDiameterOffset)) :
           bad_data_int);
@@ -399,7 +276,7 @@ int ATCFLine::eye_diameter() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-SubregionCode ATCFLine::subregion() const {
+SubregionCode ATCFTrackLine::subregion() const {
    return(SubRegionOffset < N_items ?
           string_to_subregioncode(get_item(SubRegionOffset)) :
           NoSubregionCode);
@@ -407,7 +284,7 @@ SubregionCode ATCFLine::subregion() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::max_seas() const {
+int ATCFTrackLine::max_seas() const {
    return(MaxSeasOffset < N_items ?
           parse_int_check_zero(get_item(MaxSeasOffset)) :
           bad_data_int);
@@ -415,7 +292,7 @@ int ATCFLine::max_seas() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ATCFLine::initials() const {
+ConcatString ATCFTrackLine::initials() const {
    return(InitialsOffset < N_items ?
           get_item(InitialsOffset) :
           "");
@@ -423,7 +300,7 @@ ConcatString ATCFLine::initials() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::storm_direction() const {
+int ATCFTrackLine::storm_direction() const {
    return(StormDirectionOffset < N_items ?
           parse_int(get_item(StormDirectionOffset)) :
           bad_data_int);
@@ -431,7 +308,7 @@ int ATCFLine::storm_direction() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::storm_speed() const {
+int ATCFTrackLine::storm_speed() const {
    return(StormSpeedOffset < N_items ?
           parse_int(get_item(StormSpeedOffset)) :
           bad_data_int);
@@ -439,7 +316,7 @@ int ATCFLine::storm_speed() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ATCFLine::storm_name() const {
+ConcatString ATCFTrackLine::storm_name() const {
    return(StormNameOffset < N_items ?
           get_item(StormNameOffset) :
           "");
@@ -447,7 +324,7 @@ ConcatString ATCFLine::storm_name() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-SystemsDepth ATCFLine::depth() const {
+SystemsDepth ATCFTrackLine::depth() const {
    return(DepthOffset < N_items ?
           string_to_systemsdepth(get_item(DepthOffset)) :
           NoSystemsDepth);
@@ -455,7 +332,7 @@ SystemsDepth ATCFLine::depth() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::wave_height() const {
+int ATCFTrackLine::wave_height() const {
    return(WaveHeightOffset < N_items ?
           parse_int_check_zero(get_item(WaveHeightOffset)) :
           bad_data_int);
@@ -463,7 +340,7 @@ int ATCFLine::wave_height() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-QuadrantType ATCFLine::seas_code() const {
+QuadrantType ATCFTrackLine::seas_code() const {
    return(SeasCodeOffset < N_items ?
           string_to_quadranttype(get_item(SeasCodeOffset)) :
           NoQuadrantType);
@@ -471,7 +348,7 @@ QuadrantType ATCFLine::seas_code() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::seas_radius1() const {
+int ATCFTrackLine::seas_radius1() const {
    return(SeasRadius1Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius1Offset)) :
           bad_data_int);
@@ -479,7 +356,7 @@ int ATCFLine::seas_radius1() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::seas_radius2() const {
+int ATCFTrackLine::seas_radius2() const {
    return(SeasRadius2Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius2Offset)) :
           bad_data_int);
@@ -487,7 +364,7 @@ int ATCFLine::seas_radius2() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::seas_radius3() const {
+int ATCFTrackLine::seas_radius3() const {
    return(SeasRadius3Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius3Offset)) :
           bad_data_int);
@@ -495,147 +372,16 @@ int ATCFLine::seas_radius3() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ATCFLine::seas_radius4() const {
+int ATCFTrackLine::seas_radius4() const {
    return(SeasRadius4Offset < N_items ?
           parse_int_check_zero(get_item(SeasRadius4Offset)) :
           bad_data_int);
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-unixtime ATCFLine::valid() const {
-   unixtime wt = warning_time();
-   double   fp = forecast_period();
-   int      tn = technique_number();
-   unixtime ut = 0;
- 
-   // Compute the valid time if WarningTime and ForecastPeriod are valid
-   if(wt > 0 && !is_bad_data(fp)) {
-      ut = wt + sec_per_hour * fp;
-   }
-
-   // Add minutes for the BEST track
-   if(is_best_track() && !is_bad_data(tn)) {
-      ut += sec_per_minute * tn;
-   }
-
-   return(ut);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int ATCFLine::lead() const {
-   double fp = forecast_period();
-   int    s  = bad_data_int;
-
-   // Lead time for the BEST track is 0
-   if(is_best_track()) {
-      s = 0;
-   }
-   else if(!is_bad_data(fp)) {
-      s = sec_per_hour * fp;
-   }
-
-   return(s);
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 //  Code for misc functions
 //
-////////////////////////////////////////////////////////////////////////
-
-CycloneLevel wind_speed_to_cyclone_level(int s) {
-   CycloneLevel l;
-
-   // Apply logic to convert wind speed to CycloneLevel
-        if(s <= 33) l = TropicalDepression;
-   else if(s <= 63) l = TropicalStorm;
-   else             l = Hurricane;
-
-   return(l);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-unixtime parse_time(const char *s) {
-   int year, month, day, hour;
-
-   if(sscanf(s, "%4d%2d%2d%2d", &year, &month, &day, &hour) != 4) {
-      mlog << Error
-           << "\nunixtime parse_time(const char *) -> "
-           << "bad time format ... \"" << s << "\"\n\n";
-      exit(1);
-   }
-
-   return(mdyhms_to_unix(month, day, year, hour, 0, 0));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int parse_lat(const char *s) {
-   int v;
-   
-   v = parse_int(s);
-
-   switch(s[strlen(s) - 1]) {
-      case 'N':           break;
-      case 'S': v *= -1;  break; // Degrees south is negative
-      default:
-         mlog << Error
-              << "\nint parse_lat(const char *) -> "
-              << "bad latitude ... \"" << s << "\"\n\n";
-         exit(1);
-         break;
-   }
-
-   return(v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int parse_lon(const char *s) {
-   int v;
-
-   v = parse_int(s);
-
-   switch(s[strlen(s) - 1]) {
-      case 'E':           break;
-      case 'W': v *= -1;  break; // Degrees west is negative
-      default:
-         mlog << Error
-              << "\nint parse_lat(const char *) -> "
-              << "bad latitude ... \"" << s << "\"\n\n";
-         exit(1);
-         break;
-   }
-
-   return(v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int parse_int(const char *s) {
-   int v;
-   
-   if(strlen(s) > 0) v = atoi(s);
-   else              v = bad_data_int;
-
-   return(v);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int parse_int_check_zero(const char *s) {
-
-   int v = parse_int(s);
-
-   // Interpret values of 0 as bad data
-   if(v == 0) v = bad_data_int;
-
-   return(v);
-}
-
 ////////////////////////////////////////////////////////////////////////
 
 WatchWarnType ww_max(const WatchWarnType t1, const WatchWarnType t2) {
@@ -769,6 +515,19 @@ ConcatString cyclonelevel_to_string(const CycloneLevel t) {
    }
 
    return(ConcatString(s));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+CycloneLevel wind_speed_to_cyclonelevel(int s) {
+   CycloneLevel l;
+
+   // Apply logic to convert wind speed to CycloneLevel
+        if(s <= 33) l = TropicalDepression;
+   else if(s <= 63) l = TropicalStorm;
+   else             l = Hurricane;
+
+   return(l);
 }
 
 ////////////////////////////////////////////////////////////////////////

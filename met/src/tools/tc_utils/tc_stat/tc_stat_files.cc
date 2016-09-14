@@ -68,7 +68,7 @@ TCStatFiles & TCStatFiles::operator=(const TCStatFiles &j) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatFiles::init_from_scratch() {
-   
+
    clear();
 
    return;
@@ -83,7 +83,7 @@ void TCStatFiles::clear() {
    CurFile = -1;
 
    CurLDF.close();
-   
+
    return;
 }
 
@@ -92,7 +92,7 @@ void TCStatFiles::clear() {
 void TCStatFiles::assign(const TCStatFiles & j) {
 
    clear();
-   
+
    FileList = j.FileList;
 
    rewind();
@@ -117,29 +117,29 @@ void TCStatFiles::rewind() {
    CurFile = -1;
 
    CurLDF.close();
-   
+
    return;
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCStatFiles::operator>>(TrackPairInfo &tpi) {
+bool TCStatFiles::operator>>(TrackPairInfo &pair) {
    TCStatLine line;
 
    // Initialize
-   tpi.clear();
+   pair.clear();
 
    // Check the status of the current file
    if(!CurLDF.ok()) {
 
       // Increment the file index
       CurFile++;
-     
+
       // Check for the last file
       if(CurFile == FileList.n_elements()) return(false);
       else {
-      
+
          // Open the next file for reading
          CurLDF.close();
          if(!(CurLDF.open(FileList[CurFile]))) {
@@ -161,19 +161,118 @@ bool TCStatFiles::operator>>(TrackPairInfo &tpi) {
    // Read lines to the end of the track or file
    while(CurLDF >> line) {
 
-      // Skip header lines
-      if(line.is_header()) continue;
+      // Skip header and non-TCMPR lines
+      if(line.is_header() || line.type() != TCStatLineType_TCMPR) continue;
 
       // Add the current point
-      tpi.add(line);
-      
+      pair.add(line);
+
       // Break out of the loop at the end of the track
       if(atoi(line.get_item("TOTAL")) ==
          atoi(line.get_item("INDEX"))) break;
 
-   } //end while
+   } // end while
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCStatFiles::operator>>(ProbRIPairInfo &pair) {
+   TCStatLine line;
+   bool status;
+
+   // Initialize
+   pair.clear();
+
+   // Check the status of the current file
+   if(!CurLDF.ok()) {
+
+      // Increment the file index
+      CurFile++;
+
+      // Check for the last file
+      if(CurFile == FileList.n_elements()) return(false);
+      else {
+
+         // Open the next file for reading
+         CurLDF.close();
+         if(!(CurLDF.open(FileList[CurFile]))) {
+            mlog << Error << "\nTCStatFiles::operator>>(ProbRIPairInfo &) -> "
+                 << "can't open file \"" << FileList[CurFile]
+                 << "\" for reading\n\n";
+            exit(1);
+         }
+
+         // List file being read
+         mlog << Debug(3)
+              << "Reading file " << CurFile+1 << " of "
+              << FileList.n_elements() << ": " << FileList[CurFile]
+              << "\n";
+
+      } // end else
+   } // end if
+
+   // Read next line
+   while(status = (CurLDF >> line)) {
+
+      // Skip header and non-PROBRI lines
+      if(line.is_header() || line.type() != TCStatLineType_ProbRI) continue;
+
+      // Add the current point
+      pair.set(line);
+
+      break;
+
+   } //end while
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCStatFiles::operator>>(TCStatLine &line) {
+   bool status;
+
+   // Check the status of the current file
+   if(!CurLDF.ok()) {
+
+      // Increment the file index
+      CurFile++;
+
+      // Check for the last file
+      if(CurFile == FileList.n_elements()) return(false);
+      else {
+
+         // Open the next file for reading
+         CurLDF.close();
+         if(!(CurLDF.open(FileList[CurFile]))) {
+            mlog << Error << "\nTCStatFiles::operator>>(TCStatLine &) -> "
+                 << "can't open file \"" << FileList[CurFile]
+                 << "\" for reading\n\n";
+            exit(1);
+         }
+
+         // List file being read
+         mlog << Debug(3)
+              << "Reading file " << CurFile+1 << " of "
+              << FileList.n_elements() << ": " << FileList[CurFile]
+              << "\n";
+
+      } // end else
+   } // end if
+
+   // Read next line
+   while(status = (CurLDF >> line)) {
+
+      // Skip header and invalid line types
+      if(line.is_header() || line.type() == NoTCStatLineType) continue;
+
+      break;
+
+   } //end while
+
+   return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -65,6 +65,8 @@ class NumArray {
 
       double operator[](int) const;
 
+      const double * vals() const;
+
       int has(int)    const;
       int has(double) const;
 
@@ -105,7 +107,8 @@ class NumArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int NumArray::n_elements() const { return ( Nelements ); }
+inline int            NumArray::n_elements() const { return ( Nelements ); }
+inline const double * NumArray::vals()       const { return ( e );         }
 
 
 ////////////////////////////////////////////////////////////////////////

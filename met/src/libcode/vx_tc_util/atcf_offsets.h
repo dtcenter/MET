@@ -15,7 +15,6 @@
 
 //
 // ATCF Column Offsets
-//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
 //
 
 static const int BasinOffset           = 0;
@@ -27,6 +26,12 @@ static const int TechniqueOffset       = 4;
 static const int ForecastPeriodOffset  = 5;
 static const int LatTenthsOffset       = 6;
 static const int LonTenthsOffset       = 7;
+
+//
+// Offsets specific to the ADECK and BDECK track lines
+//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//
+
 static const int VMaxOffset            = 8;
 static const int MSLPOffset            = 9;
 
@@ -60,7 +65,29 @@ static const int SeasRadius2Offset     = 32;
 static const int SeasRadius3Offset     = 33;
 static const int SeasRadius4Offset     = 34;
 
-static const int MinATCFElements       = 8;
+//
+// Offsets specific to the EDECK probability lines
+//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/edeck.txt
+//
+
+static const int ProbOffset            = 8;  // probability of event (0-100)
+static const int ProbItemOffset        = 9;  // intensity change for event
+
+//
+// Offsets specific to ATCF RI line type
+//
+
+static const int ProbRIValueOffset     = 10; // final intensity
+static const int ProbRIInitialsOffset  = 11; // forecaster initials
+static const int ProbRIBegOffset       = 12; // RI start time
+static const int ProbRIEndOffset       = 13; // RI stop time
+
+//
+// Minimum number of required elements
+//
+
+static const int MinATCFTrackElements  = 8;
+static const int MinATCFProbRIElements = 14;
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -59,18 +59,25 @@ class ThreshArray {
 
       int has(const SingleThresh &) const;
       int has(const SingleThresh &, int & index) const;
-      
+
       ConcatString get_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
       ConcatString get_abbr_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
 
       int check_bins(double) const;
-      
+
       bool check_dbl(double) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 inline int ThreshArray::n_elements() const { return ( Nelements ); }
+
+////////////////////////////////////////////////////////////////////////
+
+extern ThreshArray  string_to_prob_thresh(const char *);
+extern ConcatString prob_thresh_to_string(const ThreshArray &);
+extern void         check_prob_thresh    (const ThreshArray &);
+
 
 ////////////////////////////////////////////////////////////////////////
 
