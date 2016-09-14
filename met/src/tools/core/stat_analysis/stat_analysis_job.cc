@@ -909,6 +909,11 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             throw(1);
          }
 
+         // Check for special case of a single probability threshold
+         if(j.out_fcst_thresh.n_elements() == 1) {
+            j.out_fcst_thresh = string_to_prob_thresh(j.out_fcst_thresh[0].get_str());
+         }
+
          n = j.out_fcst_thresh.n_elements();
 
          // Check that the first threshold is 0 and the last is 1.
