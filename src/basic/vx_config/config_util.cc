@@ -1191,50 +1191,6 @@ InterpMthd int_to_interpmthd(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_prob_thresh(const ThreshArray &ta) {
-   int i, n;
-
-   n = ta.n_elements();
-
-   // Check for at least 3 thresholds beginning with 0 and ending with 1.
-   if(n < 3 ||
-      !is_eq(ta[0].get_value(),   0.0) ||
-      !is_eq(ta[n-1].get_value(), 1.0)) {
-
-      mlog << Error << "\ncheck_prob_thresh() -> "
-           << "When verifying a probability field, you must "
-           << "select at least 3 thresholds beginning with 0.0 "
-           << "and ending with 1.0.\n\n";
-      exit(1);
-   }
-
-   for(i=0; i<n; i++) {
-
-      // Check that all threshold types are greater than or equal to
-      if(ta[i].get_type() != thresh_ge) {
-         mlog << Error << "\ncheck_prob_thresh() -> "
-              << "When verifying a probability field, all "
-              << "thresholds must be set as equal to, "
-              << "using \"ge\" or \">=\".\n\n";
-         exit(1);
-      }
-
-      // Check that all thresholds are in [0, 1].
-      if(ta[i].get_value() < 0.0 ||
-         ta[i].get_value() > 1.0) {
-
-         mlog << Error << "\ncheck_prob_thresh() -> "
-              << "When verifying a probability field, all "
-              << "thresholds must be between 0 and 1.\n\n";
-         exit(1);
-      }
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void check_mctc_thresh(const ThreshArray &ta) {
    int i;
 

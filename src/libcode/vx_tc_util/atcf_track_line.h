@@ -8,8 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_ATCF_LINE_H__
-#define  __VX_ATCF_LINE_H__
+#ifndef  __VX_ATCF_TRACK_LINE_H__
+#define  __VX_ATCF_TRACK_LINE_H__
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -22,16 +22,17 @@
 
 #include "vx_cal.h"
 #include "vx_util.h"
+#include "atcf_line_base.h"
 
 ////////////////////////////////////////////////////////////////////////
 
 enum WatchWarnType {
    TropicalStormWatch, // Tropical Storm Watch
    TropicalStormWarn,  // Tropical Storm Warning
-   
+
    GaleWarn,           // Gale Warning
    StormWarn,          // Storm Warning
-   
+
    HurricaneWatch,     // Hurricane Watch
    HurricaneWarn,      // Hurricane Warning
 
@@ -71,6 +72,7 @@ enum CycloneLevel {
 
 extern CycloneLevel string_to_cyclonelevel(const char *);
 extern ConcatString cyclonelevel_to_string(const CycloneLevel);
+extern CycloneLevel wind_speed_to_cyclonelevel(int);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -125,74 +127,42 @@ extern ConcatString systemsdepth_to_string(const SystemsDepth);
 
 ////////////////////////////////////////////////////////////////////////
 //
-// ATCFLine class stores the data in a single ATCF line.
+// ATCFTrackLine class stores the data in a single ATCF track line.
 //
 ////////////////////////////////////////////////////////////////////////
 
-class ATCFLine : public DataLine {
+class ATCFTrackLine : public ATCFLineBase {
 
    private:
 
       void init_from_scratch();
 
-      void assign(const ATCFLine &);
-
-      ConcatString Technique;
-      bool         IsBestTrack;
-      bool         IsOperTrack;
+      void assign(const ATCFTrackLine &);
 
    public:
 
-      ATCFLine();
-     ~ATCFLine();
-      ATCFLine(const ATCFLine &);
-      ATCFLine & operator= (const ATCFLine &);
-      bool       operator==(const ATCFLine &);
+      ATCFTrackLine();
+     ~ATCFTrackLine();
+      ATCFTrackLine(const ATCFTrackLine &);
+      ATCFTrackLine & operator= (const ATCFTrackLine &);
 
       void dump(ostream &, int depth = 0) const;
 
+      int read_line(LineDataFile *);
+
       void clear();
-
-      int read_line(LineDataFile *);   //  virtual from base class
-
-      int is_header() const;           //  virtual from base class
-
-         //
-         // set values
-         //
-
-      void set_technique(const ConcatString &);
-      void set_best_track(const bool);
-      void set_oper_track(const bool);
 
          //
          // retrieve column values
          //
 
-      bool          is_best_track()    const;
-      bool          is_oper_track()    const;
-
-      ConcatString  get_item     (int) const;
-      ConcatString  get_line        () const;
-      
-      ConcatString  basin           () const;
-      ConcatString  cyclone_number  () const;
-      unixtime      warning_time    () const;
-      int           technique_number() const; // or minutes for best track
-      ConcatString  technique       () const;
-
-      int           forecast_period () const;
-      double        lat             () const; // degrees, + north, - south
-      double        lon             () const; // degrees, + west, - east
       int           v_max           () const;
       int           mslp            () const;
 
-      unixtime      valid           () const; // WarningTime + ForecastPeriod
-      int           lead            () const; // seconds
       CycloneLevel  level           () const;
       int           wind_intensity  () const;
 
-      QuadrantType  quadrant        () const;      
+      QuadrantType  quadrant        () const;
       int           radius1         () const;
       int           radius2         () const;
       int           radius3         () const;
@@ -223,18 +193,6 @@ class ATCFLine : public DataLine {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void ATCFLine::set_technique(const ConcatString &s) { Technique   = s;     }
-inline void ATCFLine::set_best_track(const bool tf)        { IsBestTrack = tf;    } 
-inline void ATCFLine::set_oper_track(const bool tf)        { IsOperTrack = tf;    } 
-inline bool ATCFLine::is_best_track() const                { return(IsBestTrack); }
-inline bool ATCFLine::is_oper_track() const                { return(IsOperTrack); }
-
-////////////////////////////////////////////////////////////////////////
-
-extern CycloneLevel wind_speed_to_cyclone_level(int);
-  
-////////////////////////////////////////////////////////////////////////
-
-#endif   /*  __VX_ATCF_LINE_H__  */
+#endif   /*  __VX_ATCF_TRACK_LINE_H__  */
 
 ////////////////////////////////////////////////////////////////////////

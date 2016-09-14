@@ -14,6 +14,7 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
+#include <vector>
 
 #include "vx_util.h"
 #include "vx_tc_util.h"
@@ -37,8 +38,8 @@ int main(int argc, char *argv[]) {
 
    ConcatString input_filename = argv[1];
    LineDataFile f;
-   ATCFTrackLine t_line;
-   TrackInfoArray t_array;
+   ATCFProbLine p_line;
+   ProbInfoArray probs;
    int count, i;
 
    if(!f.open(input_filename)) {
@@ -49,33 +50,26 @@ int main(int argc, char *argv[]) {
    }
 
    count = 0;
-   while(f >> t_line) {
+   while(f >> p_line) {
+
+      // Add the current line to the array of probs
+      probs.add(p_line);
 
       // Increment the line count
       count++;
 
-      // Add the current line to the TrackInfoArray
-      t_array.add(t_line);
+      mlog << Debug(1)
+           << "\nLine " << count << "...\n";
+      p_line.dump(cout);
    }
 
    // Dump out summary info
    mlog << Debug(1)
         << "Read " << count << " lines from input file \""
         << input_filename << "\"\n";
-   mlog << Debug(1)
-        << "TrackInfoArray contains " << t_array.n_tracks()
-        << " tracks.\n";
 
-   for(i=0; i<t_array.n_tracks(); i++) {
-      mlog << Debug(1)
-           << "TrackInfo[" << i+1 << "] contains "
-           << t_array[i].n_points() << " points.\n";
-   }
-
-   if(mlog.verbosity_level() > 0) {
-      cout << "TrackInfoArray::dump() ->\n";
-      t_array.dump(cout, 1);
-   }
+   // Dump out summary info
+   mlog << Debug(1) << probs.serialize_r() << "\n";
 
    // Clean up
    f.close();

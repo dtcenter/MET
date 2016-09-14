@@ -47,7 +47,7 @@ class TrackPairInfo {
 
       // Number of track points
       int          NPoints;
-      
+
       // ADECK and BDECK tracks
       TrackInfo    ADeck;
       TrackInfo    BDeck;
@@ -55,7 +55,7 @@ class TrackPairInfo {
       // Distances to land
       NumArray     ADeckDLand;
       NumArray     BDeckDLand;
-      
+
       // Track Error, X/Y Errors, and Along/Cross Track Errors
       NumArray     TrackErr;
       NumArray     XErr;
@@ -71,7 +71,7 @@ class TrackPairInfo {
       // Status for whether RI/RW occurred
       NumArray     ADeckRIRW;
       NumArray     BDeckRIRW;
-      
+
       // Previous intensity values
       NumArray     ADeckPrvInt;
       NumArray     BDeckPrvInt;
@@ -100,7 +100,7 @@ class TrackPairInfo {
       void initialize(const TrackInfo &, const TrackInfo &);
       void initialize(const TCStatLine &);
       void set_keep(int, int);
-      
+
          //
          //  get stuff
          //
@@ -134,7 +134,7 @@ class TrackPairInfo {
 
       void add(const TrackPoint &, const TrackPoint &,
                double, double, double, double, double, double, double);
-      void add(const TCStatLine&);
+      void add(const TCStatLine &);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
       int  check_water_only();

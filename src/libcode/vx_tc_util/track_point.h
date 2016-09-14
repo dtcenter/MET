@@ -18,7 +18,7 @@
 #include "vx_cal.h"
 #include "vx_util.h"
 
-#include "atcf_line.h"
+#include "atcf_track_line.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -61,8 +61,8 @@ class QuadInfo {
          //  set stuff
          //
 
-      void set_wind(const ATCFLine &);
-      void set_seas(const ATCFLine &);
+      void set_wind(const ATCFTrackLine &);
+      void set_seas(const ATCFTrackLine &);
       void set_quad_vals(QuadrantType, int, int, int, int);
 
       void set_intensity(int);
@@ -87,8 +87,8 @@ class QuadInfo {
          //  do stuff
          //
 
-      bool is_match_wind(const ATCFLine &) const;
-      bool is_match_seas(const ATCFLine &) const;
+      bool is_match_wind(const ATCFTrackLine &) const;
+      bool is_match_seas(const ATCFTrackLine &) const;
 
 };
 
@@ -122,11 +122,11 @@ class TrackPoint {
       void assign(const TrackPoint &);
 
       bool          IsSet;
-      
+
       // Timing information
       unixtime      ValidTime;
       int           LeadTime;   //  seconds
- 
+
       // Location
       double        Lat;        //  degrees, + north, - south
       double        Lon;        //  degrees, + west, - east
@@ -142,7 +142,7 @@ class TrackPoint {
       // Radius of last closed isobar (nm)
       double        RRP;
 
-      // Radius of maximum winds (nm) 
+      // Radius of maximum winds (nm)
       double        MRD;
 
       // Gusts (kts)
@@ -159,7 +159,7 @@ class TrackPoint {
       SystemsDepth  Depth;
 
       // Watch/Warning status
-      WatchWarnType WatchWarn; 
+      WatchWarnType WatchWarn;
 
       // Wind Radii
       QuadInfo      Wind[NWinds];
@@ -170,7 +170,7 @@ class TrackPoint {
      ~TrackPoint();
       TrackPoint(const TrackPoint &);
       TrackPoint & operator=(const TrackPoint &);
-      TrackPoint & operator+=(const TrackPoint &);      
+      TrackPoint & operator+=(const TrackPoint &);
 
       void clear();
 
@@ -182,7 +182,7 @@ class TrackPoint {
          //  set stuff
          //
 
-      void initialize(const ATCFLine &);
+      void initialize(const ATCFTrackLine &);
 
       void set_valid(const unixtime);
       void set_lead(const int);
@@ -205,7 +205,7 @@ class TrackPoint {
          //
          //  get stuff
          //
-         
+
       const QuadInfo & operator[](int) const;
       unixtime         valid()         const;
       int              lead()          const;
@@ -229,8 +229,8 @@ class TrackPoint {
          //
 
       void set_wind(int, const QuadInfo &);
-      bool set(const ATCFLine &);
-      bool is_match(const ATCFLine &) const;
+      bool set(const ATCFTrackLine &);
+      bool is_match(const ATCFTrackLine &) const;
 
 };
 

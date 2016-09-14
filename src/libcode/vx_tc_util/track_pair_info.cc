@@ -644,8 +644,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
       } // end for j
 
       // Apply ADeck logic
-      if(!is_bad_data(acur) && !is_bad_data(aprv) &&
-         ADeck[i].lead() >= sec_adeck) {
+      if(!is_bad_data(acur) && !is_bad_data(aprv)) { 
          if(st_adeck.check(acur - aprv)) ADeckRIRW.set(i, 1);
          else                            ADeckRIRW.set(i, 0);
       }

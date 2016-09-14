@@ -26,6 +26,7 @@
 //   005    02/10/16  Halley Gotway   Add support for analysis tracks.
 //   006    06/01/16  Halley Gotway   Apply interp12 logic to tracks
 //                    with ATCF id's ending in '3'.
+//   007    06/01/16  Halley Gotway   Add support for EDecks.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -99,16 +100,26 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 static void   process_command_line (int, char **);
-static void   process_tracks       ();
+static void   process_decks        ();
+static void   process_bdecks       (TrackInfoArray &);
+static void   process_adecks       (const TrackInfoArray &);
+static void   process_edecks       (const TrackInfoArray &);
+static void   get_atcf_files       (const StringArray &,
+                                    const StringArray &,
+                                    StringArray &, StringArray &);
 static void   process_track_files  (const StringArray &,
                                     const StringArray &,
                                     TrackInfoArray &, bool, bool);
-static bool   is_keeper            (const ATCFLine &);
+static void   process_prob_files   (const StringArray &,
+                                    const StringArray &,
+                                    ProbInfoArray &);
+static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
+static void   filter_probs         (ProbInfoArray &);
 static void   derive_interp12      (TrackInfoArray &);
 static int    derive_consensus     (TrackInfoArray &);
 static int    derive_lag           (TrackInfoArray &);
-static int    derive_baseline      (TrackInfoArray &, TrackInfoArray &);
+static int    derive_baseline      (TrackInfoArray &, const TrackInfoArray &);
 static void   derive_baseline_model(const ConcatString &,
                                     const TrackInfo &, int,
                                     TrackInfoArray &);
@@ -120,11 +131,12 @@ static void   compute_track_err    (const TrackInfo &, const TrackInfo &,
                                     NumArray &, NumArray &, NumArray &);
 static void   load_dland           ();
 static void   process_watch_warn   (TrackPairInfoArray &);
-static void   write_output         (const TrackPairInfoArray &);
+static void   write_tracks         (const TrackPairInfoArray &);
+static void   write_prob_ri        (const ProbRIPairInfoArray &);
 static void   setup_table          (AsciiTable &);
-static void   clean_up             ();
 static void   usage                ();
 static void   set_adeck            (const StringArray &);
+static void   set_edeck            (const StringArray &);
 static void   set_bdeck            (const StringArray &);
 static void   set_atcf_source      (const StringArray &,
                                     StringArray &, StringArray &);
@@ -143,11 +155,14 @@ int main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Process the tropical cyclone tracks and write output
-   process_tracks();
+   // Process the ATCF deck files and write output
+   process_decks();
 
-   // Close the text files and deallocate memory
-   clean_up();
+   // List the output files
+   for(int i=0; i<out_files.n_elements(); i++) {
+      mlog << Debug(1)
+           << "Output file: " << out_files[i] << "\n";
+   }
 
    return(0);
 }
@@ -160,7 +175,7 @@ void process_command_line(int argc, char **argv) {
    int i;
 
    // Default output file
-   out_base = "./out_tcmpr";
+   out_base = "./tc_pairs";
 
    // Parse the command line into tokens
    cline.set(argc, argv);
@@ -170,6 +185,7 @@ void process_command_line(int argc, char **argv) {
 
    // Add function calls for the arguments
    cline.add(set_adeck,     "-adeck", -1);
+   cline.add(set_edeck,     "-edeck", -1);
    cline.add(set_bdeck,     "-bdeck", -1);
    cline.add(set_config,    "-config", 1);
    cline.add(set_out,       "-out",    1);
@@ -179,19 +195,17 @@ void process_command_line(int argc, char **argv) {
    // Parse the command line
    cline.parse();
 
-   // Set the output file name
-   out_file.clear();
-   out_file << out_base << tc_stat_file_ext;
-
    // Check for the minimum number of arguments
-   if(adeck_source.n_elements() == 0 ||
-      bdeck_source.n_elements() == 0 ||
-      config_file.length()      == 0) {
+   if((adeck_source.n_elements() == 0 &&
+       edeck_source.n_elements() == 0) ||
+      bdeck_source.n_elements()  == 0  ||
+      config_file.length()       == 0) {
       mlog << Error
            << "\nprocess_command_line(int argc, char **argv) -> "
-           << "You must specify at least one source of ADECK data, "
-           << "BDECK data, and the config file using the \"-adeck\", "
-           << "\"-bdeck\", and \"-config\" command line options.\n\n";
+           << "You must specify at least one source of ADECK or EDECK "
+           << "data, BDECK data, and the config file using the "
+           << "\"-adeck\", \"-edeck\", \"-bdeck\", and \"-config\" "
+           << "command line options.\n\n";
       usage();
    }
 
@@ -201,6 +215,14 @@ void process_command_line(int argc, char **argv) {
            << "[Source " << i+1 << " of " << adeck_source.n_elements()
            << "] ADECK Source: " << adeck_source[i] << ", Model Suffix: "
            << adeck_model_suffix[i] << "\n";
+   }
+
+   // List the input EDECK track files
+   for(i=0; i<edeck_source.n_elements(); i++) {
+      mlog << Debug(1)
+           << "[Source " << i+1 << " of " << edeck_source.n_elements()
+           << "] EDECK Source: " << edeck_source[i] << ", Model Suffix: "
+           << edeck_model_suffix[i] << "\n";
    }
 
    // List the input BDECK track files
@@ -230,52 +252,65 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_tracks() {
-   StringArray suffix_list, source, file_list;
-   StringArray adeck_files, adeck_files_model_suffix;
-   StringArray bdeck_files, bdeck_files_model_suffix;
-   ATCFLine line;
-   TrackInfoArray adeck_tracks, bdeck_tracks;
-   TrackPairInfoArray pairs;
-   ifstream in;
-   int i, j, n_match;
+void process_decks() {
+   TrackInfoArray bdeck_tracks;
 
-   // Search for files ending in .dat
-   suffix_list.add(atcf_suffix);
+   // Process BDECK files
+   process_bdecks(bdeck_tracks);
 
-   // Build list of ADECK files and corresponding model suffix list
-   for(i=0; i<adeck_source.n_elements(); i++) {
-      source.clear();
-      source.add(adeck_source[i]);
-      file_list = get_filenames(source, suffix_list);
-      for(j=0; j<file_list.n_elements(); j++) {
-         adeck_files.add(file_list[j]);
-         adeck_files_model_suffix.add(adeck_model_suffix[i]);
-      }
+   // Process ADECK files
+   if(adeck_source.n_elements() > 0) {
+      process_adecks(bdeck_tracks);
    }
 
-   // Build list of BDECK files and corresponding model suffix list
-   for(i=0; i<bdeck_source.n_elements(); i++) {
-      source.clear();
-      source.add(bdeck_source[i]);
-      file_list = get_filenames(source, suffix_list);
-      for(j=0; j<file_list.n_elements(); j++) {
-         bdeck_files.add(file_list[j]);
-         bdeck_files_model_suffix.add(bdeck_model_suffix[i]);
-      }
+   // Process EDECK files
+   if(edeck_source.n_elements() > 0) {
+      process_edecks(bdeck_tracks);
    }
 
-   // Process the ADECK track files
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_bdecks(TrackInfoArray &bdeck_tracks) {
+   StringArray files, files_model_suffix;
+
+   // Initialize
+   bdeck_tracks.clear();
+
+   // Get the list of track files
+   get_atcf_files(bdeck_source, bdeck_model_suffix,
+                  files, files_model_suffix);
+
    mlog << Debug(2)
-        << "Processing " << adeck_files.n_elements()
-        << " ADECK file(s).\n";
-   process_track_files(adeck_files, adeck_files_model_suffix,
-                       adeck_tracks, true,
-                       (conf_info.AnlyTrack == TrackType_ADeck ||
+        << "Processing " << files.n_elements() << " BDECK file(s).\n";
+   process_track_files(files, files_model_suffix, bdeck_tracks, false,
+                       (conf_info.AnlyTrack == TrackType_BDeck ||
                         conf_info.AnlyTrack == TrackType_Both));
    mlog << Debug(2)
-        << "Found " << adeck_tracks.n_tracks()
-        << " ADECK track(s).\n";
+        << "Found " << bdeck_tracks.n_tracks() << " BDECK track(s).\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_adecks(const TrackInfoArray &bdeck_tracks) {
+   StringArray files, files_model_suffix;
+   TrackInfoArray adeck_tracks;
+   TrackPairInfoArray pairs;
+   int i, j, n_match;
+
+   // Get the list of track files
+   get_atcf_files(adeck_source, adeck_model_suffix,
+                  files, files_model_suffix);
+
+   mlog << Debug(2)
+        << "Processing " << files.n_elements() << " ADECK file(s).\n";
+   process_track_files(files, files_model_suffix, adeck_tracks, true,
+                       (conf_info.AnlyTrack == TrackType_ADeck ||
+                        conf_info.AnlyTrack == TrackType_Both));
 
    // Filter the ADECK tracks using the config file information
    mlog << Debug(2)
@@ -283,17 +318,9 @@ void process_tracks() {
         << " ADECK tracks based on config file settings.\n";
    filter_tracks(adeck_tracks);
 
-   // Process the BDECK track files
-   mlog << Debug(2)
-        << "Processing " << bdeck_files.n_elements()
-        << " BDECK file(s).\n";
-   process_track_files(bdeck_files, bdeck_files_model_suffix,
-                       bdeck_tracks, false,
-                       (conf_info.AnlyTrack == TrackType_BDeck ||
-                        conf_info.AnlyTrack == TrackType_Both));
-   mlog << Debug(2)
-        << "Found " << bdeck_tracks.n_tracks()
-        << " BDECK track(s).\n";
+   //
+   // Derive new track types
+   //
 
    // Handle 12-hourly interpolated models
    if(conf_info.Interp12) {
@@ -327,11 +354,14 @@ void process_tracks() {
    mlog << Debug(2)
         << "Added " << i << " CLIPER/SHIFOR baseline track(s).\n";
 
+   //
+   // Loop through the ADECK tracks and find a matching BDECK track
+   //
+
    mlog << Debug(2)
         << "Matching " << adeck_tracks.n_tracks() << " ADECK tracks to "
         << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
 
-   // Loop through the ADECK tracks and find a matching BDECK track
    for(i=0; i<adeck_tracks.n_tracks(); i++) {
 
       for(j=0,n_match=0; j<bdeck_tracks.n_tracks(); j++) {
@@ -342,8 +372,8 @@ void process_tracks() {
             mlog << Debug(4)
                  << "[Track " << i+1 << "] ADECK track " << i+1
                  << " matches BDECK track " << j+1 << ":\n"
-                 << "    ADECK: " << adeck_tracks[i].serialize() << "\n"
-                 << "    BDECK: " << bdeck_tracks[j].serialize() << "\n";
+                 << "    ADeck: " << adeck_tracks[i].serialize() << "\n"
+                 << "    BDeck: " << bdeck_tracks[j].serialize() << "\n";
 
             // Process the matching tracks
             process_match(adeck_tracks[i], bdeck_tracks[j], pairs);
@@ -366,8 +396,126 @@ void process_tracks() {
            << pairs.serialize_r() << "\n";
    }
 
-   // Write the output file
-   write_output(pairs);
+   // Write out the track pairs
+   write_tracks(pairs);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_edecks(const TrackInfoArray &bdeck_tracks) {
+   StringArray files, files_model_suffix;
+   ProbInfoArray edeck_probs;
+   ProbRIPairInfo cur_ri;
+   ProbRIPairInfoArray prob_ri_pairs;
+   int n_match, i, j;
+
+   // Get the list of ATCF files
+   get_atcf_files(edeck_source, edeck_model_suffix,
+                  files, files_model_suffix);
+
+   mlog << Debug(2)
+        << "Processing " << files.n_elements()
+        << " EDECK file(s).\n";
+   process_prob_files(files, files_model_suffix, edeck_probs);
+
+   // Filter the EDECK tracks using the config file information
+   mlog << Debug(2)
+        << "Filtering " << edeck_probs.n_probs()
+        << " probabilities based on config file settings.\n";
+   filter_probs(edeck_probs);
+
+   //
+   // Match BDECK tracks to EDECK probabilities
+   //
+
+   mlog << Debug(2)
+        << "Matching " << edeck_probs.n_probs()
+        << " EDECK probabilities to "
+        << bdeck_tracks.n_tracks() << " BDECK tracks.\n";
+
+   for(i=0; i<edeck_probs.n_probs(); i++) {
+
+      for(j=0,n_match=0; j<bdeck_tracks.n_tracks(); j++) {
+
+         // Check if the BDECK track matches the current EDECK
+         if(edeck_probs[i]->is_match(bdeck_tracks[j])) {
+
+            // Attempt to store the pair
+            if(!cur_ri.set(edeck_probs.prob_ri(i), bdeck_tracks[j])) continue;
+
+            mlog << Debug(4)
+                 << "[Prob " << i+1 << "] EDECK probability " << i+1
+                 << " matches BDECK track " << j+1 << ":\n"
+                 << "    EDeck: " << edeck_probs[i]->serialize() << "\n"
+                 << "    BDeck: " << bdeck_tracks[j].serialize() << "\n";
+
+            // Compute the distances to land
+            cur_ri.set_adland(compute_dland(cur_ri.prob_ri().lat(), -1.0*cur_ri.prob_ri().lon()));
+            cur_ri.set_bdland(compute_dland(cur_ri.blat(),          -1.0*cur_ri.blon()));
+
+            // Store the current pair
+            prob_ri_pairs.add(cur_ri);
+
+            // Increment the match counter
+            n_match++;
+         }
+      } // end for j
+
+      // Dump the number of matching tracks
+      mlog << Debug(3)
+           << "[Prob " << i+1 << "] EDECK probability " << i+1
+           << " matches " << n_match << " BDECK track(s).\n";
+
+   } // end for i
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << prob_ri_pairs.serialize_r() << "\n";
+   }
+
+   // Write out the ProbRI pairs
+   write_prob_ri(prob_ri_pairs);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void get_atcf_files(const StringArray &source,
+                    const StringArray &model_suffix,
+                    StringArray &files,
+                    StringArray &files_model_suffix) {
+   StringArray cur_source, find_suffix, cur_files;
+   int i, j;
+
+   if(source.n_elements() != model_suffix.n_elements()) {
+      mlog << Error
+           << "\nget_atcf_files() -> "
+           << "the source and suffix arrays must be equal length!\n\n";
+      exit(1);
+   }
+
+   // Initialize
+   files.clear();
+   files_model_suffix.clear();
+
+   // Search for ATCF files ending in .dat
+   find_suffix.add(atcf_suffix);
+
+   // Build list of files and corresponding model suffix list
+   for(i=0; i<source.n_elements(); i++) {
+      cur_source.clear();
+      cur_source.add(source[i]);
+      cur_files = get_filenames(cur_source, find_suffix);
+
+      for(j=0; j<cur_files.n_elements(); j++) {
+         files.add(cur_files[j]);
+         files_model_suffix.add(model_suffix[i]);
+      }
+   }
 
    return;
 }
@@ -381,7 +529,7 @@ void process_track_files(const StringArray &files,
    int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
    ConcatString cs;
-   ATCFLine line;
+   ATCFTrackLine line;
 
    // Initialize
    tracks.clear();
@@ -427,7 +575,7 @@ void process_track_files(const StringArray &files,
          }
 
          // Check the keep status if requested
-         if(check_keep && !is_keeper(line)) continue;
+         if(check_keep && !is_keeper(&line)) continue;
 
          // Attempt to add the current line to the TrackInfoArray
          if(tracks.add(line, conf_info.CheckDup, check_anly)) {
@@ -474,50 +622,140 @@ void process_track_files(const StringArray &files,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void process_prob_files(const StringArray &files,
+                        const StringArray &model_suffix,
+                        ProbInfoArray &probs) {
+   int i, cur_read, cur_add, tot_read, tot_add;
+   LineDataFile f;
+   ConcatString cs;
+   ATCFProbLine line;
+
+   // Initialize
+   probs.clear();
+
+   // Initialize counts
+   tot_read = tot_add = 0;
+
+   // Process each of the input ATCF files
+   for(i=0; i<files.n_elements(); i++) {
+
+      // Open the current file
+      if(!f.open(files[i])) {
+         mlog << Error
+              << "\nprocess_prob_files() -> "
+              << "unable to open file \"" << files[i] << "\"\n\n";
+         exit(1);
+      }
+
+      // Initialize counts
+      cur_read = cur_add = 0;
+
+      // Read each line in the file
+      while(f >> line) {
+
+         // Increment the line counts
+         cur_read++;
+         tot_read++;
+
+         // Add model suffix, if specified
+         if(strlen(model_suffix[i]) > 0) {
+            cs << cs_erase << line.technique() << model_suffix[i];
+            line.set_technique(cs);
+         }
+
+         // Check the keep status
+         if(!is_keeper(&line)) continue;
+
+         // Attempt to add the current line to ProbInfoArray
+         if(probs.add(line, conf_info.CheckDup)) {
+            cur_add++;
+            tot_add++;
+         }
+      }
+
+      // Dump out the current number of lines
+      mlog << Debug(4)
+           << "[File " << i+1 << " of " << files.n_elements()
+           << "] Used " << cur_add << " of " << cur_read
+           << " lines read from file \"" << files[i] << "\"\n";
+
+      // Close the current file
+      f.close();
+
+   } // end for i
+
+   // Dump out the total number of lines
+   mlog << Debug(3)
+        << "Used " << tot_add << " of " << tot_read
+        << " lines read from " << files.n_elements() << " file(s).\n";
+
+   // Dump out the track information
+   mlog << Debug(3)
+        << "Identified " << probs.n_probs() << " probabilities.\n";
+
+   // Dump out very verbose output
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << probs.serialize_r() << "\n";
+   }
+   // Dump out track info
+   else {
+      for(i=0; i<probs.n_probs(); i++) {
+         mlog << Debug(4)
+              << "[Prob " << i+1 << " of " << probs.n_probs()
+              << "] " << probs[i]->serialize() << "\n";
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
-// Check if the ATCFLine should be kept.  Only check those columns that
-// remain constant across the entire track:
+// Check if the ATCFLineBase should be kept.  Only check those columns
+// that remain constant across the entire track:
 //    model, storm id, basin, cyclone, and init time
 //
 ////////////////////////////////////////////////////////////////////////
 
-bool is_keeper(const ATCFLine &line) {
+bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
    int m, d, y, h, mm, s;
 
    // Decompose warning time
-   unix_to_mdyhms(line.warning_time(), m, d, y, h, mm, s);
+   unix_to_mdyhms(line->warning_time(), m, d, y, h, mm, s);
 
    // Check model
    if(conf_info.Model.n_elements() > 0 &&
-      !conf_info.Model.has(line.technique()))
+      !conf_info.Model.has(line->technique()))
       keep = false;
 
    // Check storm id
    else if(conf_info.StormId.n_elements() > 0 &&
-           !has_storm_id(conf_info.StormId, line.basin(),
-                         line.cyclone_number(), line.warning_time()))
+           !has_storm_id(conf_info.StormId, line->basin(),
+                         line->cyclone_number(), line->warning_time()))
       keep = false;
 
    // Check basin
    else if(conf_info.Basin.n_elements() > 0 &&
-           !conf_info.Basin.has(line.basin()))
+           !conf_info.Basin.has(line->basin()))
       keep = false;
 
    // Check cyclone
    else if(conf_info.Cyclone.n_elements() > 0 &&
-           !conf_info.Cyclone.has(line.cyclone_number()))
+           !conf_info.Cyclone.has(line->cyclone_number()))
       keep = false;
 
    // Initialization time window
    else if((conf_info.InitBeg > 0 &&
-            conf_info.InitBeg > line.warning_time()) ||
+            conf_info.InitBeg > line->warning_time()) ||
            (conf_info.InitEnd > 0 &&
-            conf_info.InitEnd < line.warning_time()) ||
+            conf_info.InitEnd < line->warning_time()) ||
            (conf_info.InitInc.n_elements() > 0 &&
-            !conf_info.InitInc.has(line.warning_time())) ||
+            !conf_info.InitInc.has(line->warning_time())) ||
            (conf_info.InitExc.n_elements() > 0 &&
-            conf_info.InitExc.has(line.warning_time())))
+            conf_info.InitExc.has(line->warning_time())))
       keep = false;
 
    // Initialization hour
@@ -529,65 +767,22 @@ bool is_keeper(const ATCFLine &line) {
    return(keep);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void filter_tracks(TrackInfoArray &tracks) {
    int i, j;
-   int m, d, y, h, mm, s;
-   int n_mod, n_sid, n_bas, n_cyc, n_name;
-   int n_init, n_init_hour, n_vld, n_maski, n_maskv;
+   int n_name, n_vld, n_mask_init, n_mask_vld;
    bool status;
    TrackInfoArray t = tracks;
 
    // Initialize
    tracks.clear();
-   n_mod  = n_sid       = n_bas = n_cyc   = n_name  = 0;
-   n_init = n_init_hour = n_vld = n_maski = n_maskv = 0;
+   n_name = n_vld = n_mask_init = n_mask_vld = 0;
 
    // Loop through the tracks and determine which should be retained
+   // The is_keeper() function has already filtered by model, storm id,
+   // basin, cyclone, initialization time, and initialization hour.
    for(i=0; i<t.n_tracks(); i++) {
-
-      // Check model
-      if(conf_info.Model.n_elements() > 0 &&
-         !conf_info.Model.has(t[i].technique())) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for model mismatch: "
-              << t[i].technique() << "\n";
-         n_mod++;
-         continue;
-      }
-
-      // Check storm id
-      if(conf_info.StormId.n_elements() > 0 &&
-         !has_storm_id(conf_info.StormId, t[i].basin(),
-                       t[i].cyclone(), t[i].init())) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for storm id mismatch: "
-              << t[i].storm_id() << "\n";
-         n_sid++;
-         continue;
-      }
-
-      // Check basin
-      if(conf_info.Basin.n_elements() > 0 &&
-         !conf_info.Basin.has(t[i].basin())) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for basin mismatch: "
-              << t[i].basin() << "\n";
-         n_bas++;
-         continue;
-      }
-
-      // Check cyclone
-      if(conf_info.Cyclone.n_elements() > 0 &&
-         !conf_info.Cyclone.has(t[i].cyclone())) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for cyclone mismatch: "
-              << t[i].cyclone() << "\n";
-         n_cyc++;
-         continue;
-      }
 
       // Check storm name
       if(conf_info.StormName.n_elements() > 0 &&
@@ -596,35 +791,6 @@ void filter_tracks(TrackInfoArray &tracks) {
               << "Discarding track " << i+1 << " for storm name mismatch: "
               << t[i].storm_name() << "\n";
          n_name++;
-         continue;
-      }
-
-      // Initialization time window
-      if((conf_info.InitBeg > 0 &&
-          conf_info.InitBeg > t[i].init()) ||
-         (conf_info.InitEnd > 0 &&
-          conf_info.InitEnd < t[i].init()) ||
-         (conf_info.InitInc.n_elements() > 0 &&
-          !conf_info.InitInc.has(t[i].init())) ||
-         (conf_info.InitExc.n_elements() > 0 &&
-          conf_info.InitExc.has(t[i].init()))) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for initialization "
-              << "time mismatch: "
-              << unix_to_yyyymmdd_hhmmss(t[i].init()) << "\n";
-         n_init++;
-         continue;
-      }
-
-      // Initialization hour
-      unix_to_mdyhms(t[i].init(), m, d, y, h, mm, s);
-      if(conf_info.InitHour.n_elements() > 0 &&
-         !conf_info.InitHour.has(hms_to_sec(h, mm, s))) {
-         mlog << Debug(4)
-              << "Discarding track " << i+1 << " for initialization "
-              << "mismatch: " << sec_to_hhmmss(hms_to_sec(h, mm, s))
-              << "\n";
-         n_init_hour++;
          continue;
       }
 
@@ -650,7 +816,7 @@ void filter_tracks(TrackInfoArray &tracks) {
               << "Discarding track " << i+1 << " for falling outside the "
               << "initialization polyline: ("
               << t[i][0].lat() << ", " << t[i][0].lon() << ")\n";
-         n_maski++;
+         n_mask_init++;
          continue;
       }
 
@@ -658,7 +824,7 @@ void filter_tracks(TrackInfoArray &tracks) {
       if(conf_info.ValidMask.n_points() > 0) {
 
          // Loop over all the points in the current track
-         for(j=0,status=true; j<t[i].n_points(); j++) {
+         for(j=0, status=true; j<t[i].n_points(); j++) {
 
             // In the TrackPoint falls outside of the polyline break out
             if(!conf_info.ValidMask.latlon_is_inside(t[i][j].lat(),
@@ -673,7 +839,7 @@ void filter_tracks(TrackInfoArray &tracks) {
                  << "Discarding track " << i+1 << " for falling outside the "
                  << "valid polyline: "
                  << t[i][j].lat() << ", " << t[i][j].lon() << ")\n";
-            n_maskv++;
+            n_mask_vld++;
             continue;
          }
       }
@@ -686,16 +852,79 @@ void filter_tracks(TrackInfoArray &tracks) {
    mlog << Debug(3)
         << "Total tracks read       = " << t.n_tracks()      << "\n"
         << "Total tracks kept       = " << tracks.n_tracks() << "\n"
-        << "Rejected for model      = " << n_mod             << "\n"
-        << "Rejected for storm id   = " << n_sid             << "\n"
-        << "Rejected for basin      = " << n_bas             << "\n"
-        << "Rejected for cyclone    = " << n_cyc             << "\n"
         << "Rejected for storm name = " << n_name            << "\n"
-        << "Rejected for init time  = " << n_init            << "\n"
-        << "Rejected for init hour  = " << n_init_hour       << "\n"
         << "Rejected for valid time = " << n_vld             << "\n"
-        << "Rejected for init mask  = " << n_maski           << "\n"
-        << "Rejected for valid mask = " << n_maskv           << "\n";
+        << "Rejected for init mask  = " << n_mask_init       << "\n"
+        << "Rejected for valid mask = " << n_mask_vld        << "\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void filter_probs(ProbInfoArray &probs) {
+   int i, j;
+   int n_vld, n_mask_init, n_mask_vld;
+   bool status;
+   ProbInfoArray p = probs;
+
+   // Initialize
+   probs.clear();
+   n_vld = n_mask_init = n_mask_vld = 0;
+
+   // Loop through the pairs and determine which should be retained
+   // The is_keeper() function has already filtered by model, storm id,
+   // basin, cyclone, initialization time, and initialization hour.
+   for(i=0; i<p.n_probs(); i++) {
+
+      // Valid time window
+      if((conf_info.ValidBeg > 0 &&
+          conf_info.ValidBeg > p[i]->valid()) ||
+         (conf_info.ValidEnd > 0 &&
+          conf_info.ValidEnd < p[i]->valid())) {
+         mlog << Debug(4)
+              << "Discarding probability " << i+1 << " for falling "
+              << "outside the valid time window: "
+              <<  unix_to_yyyymmdd_hhmmss(p[i]->valid()) << "\n";
+         n_vld++;
+         continue;
+      }
+
+      // Initialization location mask
+      if(conf_info.InitMask.n_points() > 0 &&
+         !conf_info.InitMask.latlon_is_inside(p[i]->lat(),
+                                              p[i]->lon())) {
+         mlog << Debug(4)
+              << "Discarding probability " << i+1 << " for falling "
+              << "outside the initialization polyline: ("
+              << p[i]->lat() << ", " << p[i]->lon() << ")\n";
+         n_mask_init++;
+         continue;
+      }
+
+      // Valid location mask
+      if(conf_info.ValidMask.n_points() > 0 &&
+         !conf_info.ValidMask.latlon_is_inside(p[i]->lat(),
+                                               p[i]->lon())) {
+         mlog << Debug(4)
+              << "Discarding probability " << i+1 << " for falling "
+              << "outside the valid polyline: ("
+              << p[i]->lat() << ", " << p[i]->lon() << ")\n";
+         n_mask_init++;
+         continue;
+      }
+
+      // If we've made it here, retain this probability
+      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_ri(i));
+   }
+
+   // Print summary filtering info
+   mlog << Debug(3)
+        << "Total probabilities read = " << p.n_probs()     << "\n"
+        << "Total probabilities kept = " << probs.n_probs() << "\n"
+        << "Rejected for valid time  = " << n_vld           << "\n"
+        << "Rejected for init mask   = " << n_mask_init     << "\n"
+        << "Rejected for valid mask  = " << n_mask_vld      << "\n";
 
    return;
 }
@@ -1031,7 +1260,7 @@ int derive_lag(TrackInfoArray &tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int derive_baseline(TrackInfoArray &atracks, TrackInfoArray &btracks) {
+int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
    int i, j, k;
    ConcatString cur_case;
    StringArray case_list;
@@ -1450,7 +1679,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    int ut_inc, n_ut;
    float alat[mxp], alon[mxp], blat[mxp], blon[mxp];
    float crtk[mxp], altk[mxp];
-   double lat_err, lon_err, lat_avg, lon_min, lon_max;
+   double x, y, tk, lon_min, lon_max;
 
    // Initialize
    vld_err.clear();
@@ -1521,15 +1750,11 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
       lon_min = (min(alon[i], blon[i]) < lon_min ? min(alon[i], blon[i]) : lon_min);
       lon_max = (max(alon[i], blon[i]) > lon_max ? max(alon[i], blon[i]) : lon_max);
 
-      // Compute lat/lon errors
-      lat_err = alat[i] - blat[i];
-      lon_err = rescale_lon(alon[i] - blon[i]);
-      lat_avg = 0.5*(alat[i] + blat[i]);
-
-      // Store the X/Y and track errors
-      x_err.set(i, nautical_miles_per_deg*lon_err*cosd(lat_avg));
-      y_err.set(i, nautical_miles_per_deg*lat_err);
-      tk_err.set(i, sqrt(x_err[i]*x_err[i] + y_err[i]*y_err[i]));
+      // Compute and store track errors
+      latlon_to_xytk_err(alat[i], alon[i], blat[i], blon[i], x, y, tk);
+      x_err.set(i, x);
+      y_err.set(i, y);
+      tk_err.set(i, tk);
    }
 
    // If the range of longitudes is large, rescale from [-180, 180] to [0, 360]
@@ -1689,9 +1914,16 @@ void process_watch_warn(TrackPairInfoArray &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_output(const TrackPairInfoArray &p) {
+void write_tracks(const TrackPairInfoArray &p) {
    int i_row, i;
    TcHdrColumns tchc;
+   ConcatString out_file;
+   AsciiTable out_at;
+   ofstream *out = (ofstream *) 0;
+
+   // Set the track pair output file name
+   out_file << out_base << tc_stat_file_ext;
+   out_files.add(out_file);
 
    // Create the output file
    open_tc_txt_file(out, out_file);
@@ -1723,8 +1955,91 @@ void write_output(const TrackPairInfoArray &p) {
       tchc.set_cyclone(p[i].bdeck().cyclone());
       tchc.set_storm_name(p[i].bdeck().storm_name());
 
-     // Write the current TrackPairInfo object
-     write_tc_mpr_row(tchc, p[i], out_at, i_row);
+      // Write the current TrackPairInfo object
+      write_tc_mpr_row(tchc, p[i], out_at, i_row);
+   }
+
+   // Write the AsciiTable contents and clean up
+   if(out != (ofstream *) 0) {
+      *out << out_at;
+      out->close();
+      delete out;
+      out = (ofstream *) 0;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_prob_ri(const ProbRIPairInfoArray &p) {
+   int i_row, i, n, n_row, max_n;
+   TcHdrColumns tchc;
+   ConcatString out_file;
+   AsciiTable out_at;
+   ofstream *out = (ofstream *) 0;
+
+   // Set the track pair output file name
+   out_file << out_base << "_PROBRI" << tc_stat_file_ext;
+   out_files.add(out_file);
+
+   // Create the output file
+   open_tc_txt_file(out, out_file);
+
+   // Determine the number of output rows and max number of probs
+   max_n = p[0].prob_ri().n_prob();
+   for(i=0,n_row=1; i<p.n_pairs(); i++) {
+
+      // Current number of probabilities
+      n = p[i].prob_ri().n_prob();
+
+      // Keep track of maximum probabilities
+      if(n > max_n) max_n = n;
+
+      // Number of output lines:
+      // One line for each pair
+      // Plus one more for the maximum
+      n_row++;
+      if(n > 1) n_row++;
+   }
+
+   // Initialize the output AsciiTable
+   out_at.set_size(n_row, n_tc_header_cols + get_n_prob_ri_cols(max_n));
+   setup_table(out_at);
+
+   // Write the header row
+   write_prob_ri_header_row(1, max_n, out_at, 0, 0);
+
+   // Initialize the row index to 1 to account for the header
+   i_row = 1;
+
+   // Store masking regions in the header
+   if(conf_info.InitMask.n_points() > 0)  tchc.set_init_mask(conf_info.InitMask.name());
+   else                                   tchc.set_init_mask(na_str);
+   if(conf_info.ValidMask.n_points() > 0) tchc.set_valid_mask(conf_info.ValidMask.name());
+   else                                   tchc.set_valid_mask(na_str);
+
+   // Loop through the ProbRIPairInfo objects
+   for(i=0; i<p.n_pairs(); i++) {
+
+      // More header columns
+      tchc.set_adeck_model(p[i].prob_ri().technique());
+      tchc.set_bdeck_model(p[i].bmodel());
+      tchc.set_storm_id(p[i].prob_ri().storm_id());
+      tchc.set_basin(p[i].prob_ri().basin());
+      tchc.set_cyclone(p[i].prob_ri().cyclone());
+      tchc.set_storm_name(p[i].bdeck()->storm_name());
+
+      // Write the current TrackPairInfo object
+      write_prob_ri_row(tchc, p[i], out_at, i_row);
+   }
+
+   // Write the AsciiTable contents and clean up
+   if(out != (ofstream *) 0) {
+      *out << out_at;
+      out->close();
+      delete out;
+      out = (ofstream *) 0;
    }
 
    return;
@@ -1754,27 +2069,6 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
-
-   // Write the AsciiTable contents and close the output file
-   if(out != (ofstream *) 0) {
-      *out << out_at;
-
-      // List the file being closed
-      mlog << Debug(1)
-           << "Output file: " << out_file << "\n";
-
-      // Close the output file
-      out->close();
-      delete out;
-      out = (ofstream *) 0;
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
@@ -1782,6 +2076,7 @@ void usage() {
 
         << "Usage: " << program_name << "\n"
         << "\t-adeck source\n"
+        << "\t-edeck source\n"
         << "\t-bdeck source\n"
         << "\t-config file\n"
         << "\t[-out base]\n"
@@ -1791,6 +2086,11 @@ void usage() {
         << "\twhere\t\"-adeck source\" is used one or more times to "
         << "specify a file or top-level directory containing ATCF "
         << "model output \"" << atcf_suffix
+        << "\" data to process (required).\n"
+
+        << "\t\t\"-edeck source\" is used one or more times to "
+        << "specify a file or top-level directory containing ATCF "
+        << "ensemble model output \"" << atcf_suffix
         << "\" data to process (required).\n"
 
         << "\t\t\"-bdeck source\" is used one or more times to "
@@ -1811,9 +2111,9 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n\n"
 
-        << "\tNote: The \"-adeck\" and \"-bdeck\" options may include "
-        << "\"suffix=string\" to modify the model names from that "
-        << "source.\n\n";
+        << "\tNote: The \"-adeck\", \"-edeck\", and \"-bdeck\" options "
+        << "may include \"suffix=string\" to modify the model names "
+        << "from that source.\n\n";
 
    exit(1);
 }
@@ -1822,6 +2122,12 @@ void usage() {
 
 void set_adeck(const StringArray & a) {
    set_atcf_source(a, adeck_source, adeck_model_suffix);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_edeck(const StringArray & a) {
+   set_atcf_source(a, edeck_source, edeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////

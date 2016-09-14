@@ -31,24 +31,24 @@ class TCStatConfInfo {
       void init_from_scratch();
 
    public:
-     
+
       // TCPairs configuration object
       MetConfig Conf;
 
-      // TCStatJob to store filtering info
-      TCStatJob Filter;
-      
+      // TCStatJob to store filtering info from the config file
+      TCStatJobFilter Filter;
+
       // Jobs array
       StringArray Jobs;
-      
+
       // Config file version
       ConcatString Version;
-      
+
       TCStatConfInfo();
      ~TCStatConfInfo();
 
       void clear();
-      
+
       void read_config(const char *, const char *);
       void process_config();
 };

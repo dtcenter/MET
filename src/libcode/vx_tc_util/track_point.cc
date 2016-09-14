@@ -28,21 +28,21 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 QuadInfo::QuadInfo() {
-  
+
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 QuadInfo::~QuadInfo() {
-  
+
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 QuadInfo::QuadInfo(const QuadInfo &t) {
-  
+
    init_from_scratch();
 
    assign(t);
@@ -104,7 +104,7 @@ void QuadInfo::init_from_scratch() {
 
    // Only initialize Intensity here
    Intensity = bad_data_int;
-  
+
    clear();
 
    return;
@@ -178,22 +178,22 @@ void QuadInfo::assign(const QuadInfo &t) {
    SEVal     = t.SEVal;
    SWVal     = t.SWVal;
    NWVal     = t.NWVal;
-   
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void QuadInfo::set_wind(const ATCFLine &l) {
+void QuadInfo::set_wind(const ATCFTrackLine &l) {
 
-   // If intensity is not yet set, retrieve it from the ATCFLine
+   // If intensity is not yet set, retrieve it from the ATCFTrackLine
    if(is_bad_data(Intensity)) {
       Intensity = l.wind_intensity();
    }
-  
-   // Return if intensity doesn't match ATCFLine intensity
+
+   // Return if intensity doesn't match ATCFTrackLine intensity
    if(Intensity != l.wind_intensity()) return;
-  
+
    clear();
 
    set_quad_vals(l.quadrant(),
@@ -205,9 +205,9 @@ void QuadInfo::set_wind(const ATCFLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void QuadInfo::set_seas(const ATCFLine &l) {
+void QuadInfo::set_seas(const ATCFTrackLine &l) {
 
-   // Return if Intensity doesn't match ATCFLine wave height
+   // Return if Intensity doesn't match ATCFTrackLine wave height
    if(Intensity != l.wave_height()) return;;
 
    clear();
@@ -231,28 +231,28 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
      case(FullCircle):
         ALVal = rad1;
         break;
-        
+
      case(NE_Quadrant):
         NEVal = rad1;
         SEVal = rad2;
         SWVal = rad3;
         NWVal = rad4;
         break;
-        
+
      case(SE_Quadrant):
         NEVal = rad4;
         SEVal = rad1;
         SWVal = rad2;
         NWVal = rad3;
         break;
-        
+
      case(SW_Quadrant):
         NEVal = rad3;
         SEVal = rad4;
         SWVal = rad1;
         NWVal = rad2;
         break;
-        
+
      case(NW_Quadrant):
         NEVal = rad2;
         SEVal = rad3;
@@ -263,7 +263,7 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
      // Nothing to do
      case(NoQuadrantType):
         break;
-        
+
      default:
        mlog << Error
             << "\nQuadInfo::set_quad_vals() -> "
@@ -278,7 +278,7 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool QuadInfo::is_match_wind(const ATCFLine &l) const {
+bool QuadInfo::is_match_wind(const ATCFTrackLine &l) const {
    QuadInfo qi;
 
    // Parse the line into a QuadInfo object
@@ -289,7 +289,7 @@ bool QuadInfo::is_match_wind(const ATCFLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool QuadInfo::is_match_seas(const ATCFLine &l) const {
+bool QuadInfo::is_match_seas(const ATCFTrackLine &l) const {
    QuadInfo qi;
 
    // Parse the line into a QuadInfo object
@@ -305,21 +305,21 @@ bool QuadInfo::is_match_seas(const ATCFLine &l) const {
 ////////////////////////////////////////////////////////////////////////
 
 TrackPoint::TrackPoint() {
-  
+
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TrackPoint::~TrackPoint() {
-  
+
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TrackPoint::TrackPoint(const TrackPoint &p) {
-  
+
    init_from_scratch();
 
    assign(p);
@@ -340,7 +340,7 @@ TrackPoint & TrackPoint::operator=(const TrackPoint &p) {
 
 TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    int i;
-  
+
    // Check valid time
    if(ValidTime == (unixtime) 0) ValidTime = p.valid();
    else if(ValidTime != p.valid()) {
@@ -362,7 +362,7 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
            << sec_to_hhmmss(p.lead()) << ").\n\n";
       exit(1);
    }
-   
+
    // Increment counts
    if(is_bad_data(Lat)   || is_bad_data(p.lat()))   Lat    = bad_data_double;
    else                                             Lat   += p.lat();
@@ -384,7 +384,7 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    else                                             Eye   += p.eye();
    if(is_bad_data(Speed) || is_bad_data(p.speed())) Speed  = bad_data_double;
    else                                             Speed += p.speed();
-   
+
    for(i=0; i<NWinds; i++) Wind[i] += p[i];
 
    return(*this);
@@ -393,7 +393,7 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPoint::init_from_scratch() {
-  
+
    clear();
 
    return;
@@ -405,7 +405,7 @@ void TrackPoint::clear() {
    int i;
 
    IsSet     = false;
-  
+
    ValidTime = (unixtime) 0;
    LeadTime  = bad_data_int;
    Lat       = bad_data_double;
@@ -418,7 +418,7 @@ void TrackPoint::clear() {
    MRD       = bad_data_double;
    Gusts     = bad_data_double;
    Eye       = bad_data_double;
-   Direction = bad_data_double;   
+   Direction = bad_data_double;
    Speed     = bad_data_double;
    Depth     = NoSystemsDepth;
    WatchWarn = NoWatchWarnType;
@@ -437,7 +437,7 @@ void TrackPoint::clear() {
 void TrackPoint::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
-   
+
    out << prefix << "ValidTime = " << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime) : na_str) << "\n";
    out << prefix << "LeadTime  = " << (!is_bad_data(LeadTime) ? sec_to_hhmmss(LeadTime) : na_str) << "\n";
    out << prefix << "Lat       = " << Lat << "\n";
@@ -509,11 +509,11 @@ ConcatString TrackPoint::serialize_r(int n, int indent_depth) const {
 
 void TrackPoint::assign(const TrackPoint &t) {
    int i;
-  
+
    clear();
 
    IsSet     = true;
-   
+
    ValidTime = t.ValidTime;
    LeadTime  = t.LeadTime;
    Lat       = t.Lat;
@@ -530,15 +530,15 @@ void TrackPoint::assign(const TrackPoint &t) {
    Speed     = t.Speed;
    Depth     = t.Depth;
    WatchWarn = t.WatchWarn;
-   
+
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
-   
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackPoint::initialize(const ATCFLine &l) {
+void TrackPoint::initialize(const ATCFTrackLine &l) {
 
    IsSet     = true;
 
@@ -554,7 +554,7 @@ void TrackPoint::initialize(const ATCFLine &l) {
    MRD       = l.max_wind_radius();
    Gusts     = l.gusts();
    Eye       = l.eye_diameter();
-   Direction = l.storm_direction();   
+   Direction = l.storm_direction();
    Speed     = l.storm_speed();
    Depth     = l.depth();
 
@@ -582,19 +582,19 @@ void TrackPoint::set_watch_warn(WatchWarnType ww_type, unixtime ww_ut) {
 
    // If the watch/warning time exceeds the TrackPoint time, set it
    if(ValidTime >= ww_ut) set_watch_warn(ww_type);
-   
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackPoint::set(const ATCFLine &l) {
+bool TrackPoint::set(const ATCFTrackLine &l) {
    int i;
 
-   // Initialize TrackPoint with ATCFLine, if necessary
+   // Initialize TrackPoint with ATCFTrackLine, if necessary
    if(!IsSet) initialize(l);
 
-   // Attempt to set each WindInfo object with ATCFLine
+   // Attempt to set each WindInfo object with ATCFTrackLine
    for(i=0; i<NWinds; i++) Wind[i].set_wind(l);
 
    return(true);
@@ -620,7 +620,7 @@ void TrackPoint::set_wind(int n, const QuadInfo &w) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackPoint::is_match(const ATCFLine &l) const {
+bool TrackPoint::is_match(const ATCFTrackLine &l) const {
    bool match = true;
 
    // Check storm and model info

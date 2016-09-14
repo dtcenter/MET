@@ -36,7 +36,7 @@ class TCStatFiles {
       int CurFile;
 
       LineDataFile CurLDF;
-      
+
    public:
 
       TCStatFiles();
@@ -49,8 +49,10 @@ class TCStatFiles {
       void add_files(const StringArray &);
 
       void rewind();
-      
-      bool operator>>(TrackPairInfo &);
+
+      bool operator>>(TrackPairInfo  &);
+      bool operator>>(ProbRIPairInfo &);
+      bool operator>>(TCStatLine     &);
 
 };
 

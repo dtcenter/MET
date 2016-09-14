@@ -376,3 +376,22 @@ ConcatString str_trim(const char *str){
    ConcatString ret = dat.c_str();
    return ret;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+int parse_thresh_index(const char *col_name) {
+   int i;
+   const char *ptr = (const char *) 0;
+
+   if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
+   else {
+      mlog << Error << "\nparse_thresh_index() -> "
+           << "unexpected column name specified: \""
+           << col_name << "\"\n\n";
+      exit(1);
+   }
+
+   return(i);
+}
+
+////////////////////////////////////////////////////////////////////////

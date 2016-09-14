@@ -55,6 +55,8 @@ extern ConcatString str_format(const char *fmt, ...);
 
 extern ConcatString str_trim(const char *str);
 
+extern int parse_thresh_index(const char *str);
+
 
 ////////////////////////////////////////////////////////////////////////
 

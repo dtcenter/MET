@@ -25,6 +25,7 @@
 enum TCStatLineType {
 
    TCStatLineType_TCMPR,
+   TCStatLineType_ProbRI,
    TCStatLineType_Header,
    NoTCStatLineType
 

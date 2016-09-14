@@ -30,6 +30,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static const char *TCStatLineType_TCMPR_Str  = "TCMPR";
+static const char *TCStatLineType_ProbRI_Str = "PROBRI";
 static const char *TCStatLineType_Header_Str = "LINE_TYPE";
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,7 +138,7 @@ const char * TCStatLine::get_item(int k) const {
 
 const char * TCStatLine::get_item(const char * col_name) const {
    int offset = determine_column_offset(*this, col_name);
-   
+
    return(get_item(offset));
 }
 
@@ -294,6 +295,7 @@ TCStatLineType string_to_tcstatlinetype(const char *s) {
    TCStatLineType t;
 
         if(strcmp(s, TCStatLineType_TCMPR_Str)  == 0) t = TCStatLineType_TCMPR;
+   else if(strcmp(s, TCStatLineType_ProbRI_Str) == 0) t = TCStatLineType_ProbRI;
    else if(strcmp(s, TCStatLineType_Header_Str) == 0) t = TCStatLineType_Header;
    else                                               t = NoTCStatLineType;
 
@@ -307,6 +309,7 @@ ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
 
    switch(t) {
       case TCStatLineType_TCMPR:  s = TCStatLineType_TCMPR_Str;  break;
+      case TCStatLineType_ProbRI: s = TCStatLineType_ProbRI_Str; break;
       case TCStatLineType_Header: s = TCStatLineType_Header_Str; break;
       default:                    s = na_str;                    break;
    }
@@ -329,18 +332,22 @@ int determine_column_offset(const TCStatLine &L, const char *c, bool error_out) 
          offset = get_tc_mpr_col_offset(c);
          break;
 
+      case TCStatLineType_ProbRI:
+         offset = get_prob_ri_col_offset(c);
+         break;
+
       default:
          mlog << Error << "\ndetermine_column_offset() -> "
               << "unexpected line type value of " << L.type() << "\n\n";
          exit(1);
          break;
    };
-   
+
    // Check any extra header columns
    if(is_bad_data(offset)) {
       if(!L.get_file()->header().has(c, offset)) offset = bad_data_int;
    }
-   
+
    // Check for no match
    if(error_out && is_bad_data(offset)) {
       mlog << Error << "\ndetermine_column_offset() -> "

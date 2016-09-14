@@ -3250,7 +3250,7 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
                      const NumArray &c_na,
                      int pstd_flag, PCTInfo &pct_info) {
    int i, n_thresh, n_pair;
-   double *p_thresh = (double *) 0;
+   NumArray p_thresh;
    SingleThresh ot;
    bool cflag;
 
@@ -3269,28 +3269,24 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
    cflag = set_climo_flag(f_na, c_na);
 
    //
-   // Store the thresholds as an array of doubles
+   // Store the probability threshold values
    //
    n_thresh = pct_info.fthresh.n_elements();
-   p_thresh = new double [n_thresh];
-
-   for(i=0; i<n_thresh; i++) {
-      p_thresh[i] = pct_info.fthresh[i].get_value();
-   }
+   for(i=0; i<n_thresh; i++) p_thresh.add(pct_info.fthresh[i].get_value());
 
    //
    // Set up the forecast Nx2ContingencyTable
    //
    pct_info.pct.clear();
    pct_info.pct.set_size(n_thresh-1);
-   pct_info.pct.set_thresholds(p_thresh);
+   pct_info.pct.set_thresholds(p_thresh.vals());
 
    //
    // Set up the climatology Nx2ContingencyTable
    //
    pct_info.climo_pct.clear();
    pct_info.climo_pct.set_size(n_thresh-1);
-   pct_info.climo_pct.set_thresholds(p_thresh);
+   pct_info.climo_pct.set_thresholds(p_thresh.vals());
 
    //
    // Get the observation threshold value to be applied
@@ -3322,11 +3318,6 @@ void compute_pctinfo(const NumArray &f_na, const NumArray &o_na,
       pct_info.compute_stats();
       pct_info.compute_ci();
    }
-
-   //
-   // Deallocate memory
-   //
-   if(p_thresh) { delete [] p_thresh; p_thresh = (double *) 0; }
 
    return;
 }

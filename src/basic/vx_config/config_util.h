@@ -56,7 +56,6 @@ extern void            parse_conf_range_double(Dictionary *dict, double &beg, do
 extern void         check_climo_n_vx(Dictionary *dict, const int);
 
 extern InterpMthd   int_to_interpmthd(int);
-extern void         check_prob_thresh(const ThreshArray &);
 extern void         check_mctc_thresh(const ThreshArray &);
 
 extern bool         check_fo_thresh(const double, const SingleThresh &,

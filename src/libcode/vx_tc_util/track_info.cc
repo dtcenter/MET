@@ -264,7 +264,7 @@ void TrackInfo::extend(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TrackInfo::initialize(const ATCFLine &l, bool check_anly) {
+void TrackInfo::initialize(const ATCFTrackLine &l, bool check_anly) {
 
    IsSet           = true;
 
@@ -359,22 +359,9 @@ const TrackPoint & TrackInfo::operator[](int n) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackInfo::set_storm_id() {
-   int year, mon, day, hr, minute, sec;
-   unixtime ut;
 
-   // Use timing information to determine the year.
-        if(InitTime > 0)     ut = InitTime;
-   else if(MinValidTime > 0) ut = MinValidTime;
-   else                      ut = MaxValidTime;
-
-   // Ensure that the StormId components are valid
-   if(!Basin.empty() && !Cyclone.empty() && ut > 0) {
-
-      unix_to_mdyhms(ut, mon, day, year, hr, minute, sec);
-
-      // Set StormId
-      StormId << Basin << Cyclone << year;
-   }
+   StormId = define_storm_id(InitTime, MinValidTime, MaxValidTime,
+                             Basin, Cyclone);
 
    return;
 }
@@ -411,12 +398,12 @@ void TrackInfo::add(const TrackPoint &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::add(const ATCFLine &l, bool check_dup, bool check_anly) {
+bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
    bool found = false;
    bool status = false;
    int i;
 
-   // Initialize TrackInfo with ATCFLine, if necessary
+   // Initialize TrackInfo with ATCFTrackLine, if necessary
    if(!IsSet) initialize(l, check_anly);
 
    // Check if TrackPoint doesn't match this TrackInfo
@@ -437,8 +424,8 @@ bool TrackInfo::add(const ATCFLine &l, bool check_dup, bool check_anly) {
    if(NPoints > 0) {
       if(l.valid() < Point[NPoints-1].valid()) {
          mlog << Warning
-              << "\nTrackInfo::add(const ATCFLine &) -> "
-              << "skipping ATCFLine since the valid time is not increasing ("
+              << "\nTrackInfo::add(const ATCFTrackLine &) -> "
+              << "skipping ATCFTrackLine since the valid time is not increasing ("
               << unix_to_yyyymmdd_hhmmss(l.valid()) << " < "
               << unix_to_yyyymmdd_hhmmss(Point[NPoints-1].valid())
               << "):\n" << l.get_line() << "\n\n";
@@ -446,7 +433,7 @@ bool TrackInfo::add(const ATCFLine &l, bool check_dup, bool check_anly) {
       }
    }
 
-   // Add ATCFLine to an existing TrackPoint if possible
+   // Add ATCFTrackLine to an existing TrackPoint if possible
    for(i=NPoints-1; i>=0; i--) {
       if(Point[i].is_match(l)) {
          found = true;
@@ -467,7 +454,7 @@ bool TrackInfo::add(const ATCFLine &l, bool check_dup, bool check_anly) {
    if(MaxValidTime == (unixtime) 0 || l.valid() > MaxValidTime)
       MaxValidTime = l.valid();
 
-   // Store the ATCFLine that was just added
+   // Store the ATCFTrackLine that was just added
    if(check_dup) TrackLines.add(l.get_line());
 
    return(status);
@@ -490,13 +477,13 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::has(const ATCFLine &l) const {
+bool TrackInfo::has(const ATCFTrackLine &l) const {
    return(TrackLines.has(l.get_line()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfo::is_match(const ATCFLine &l) {
+bool TrackInfo::is_match(const ATCFTrackLine &l) {
    bool match = true;
    int diff;
 
@@ -796,23 +783,23 @@ void TrackInfoArray::set(int n, const TrackInfo &t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfoArray::add(const ATCFLine &l, bool check_dup, bool check_anly) {
+bool TrackInfoArray::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
    bool found  = false;
    bool status = false;
    int i;
 
-   // Check if this ATCFLine already exists in the TrackInfoArray
+   // Check if this ATCFTrackLine already exists in the TrackInfoArray
    if(check_dup) {
       if(has(l)) {
          mlog << Warning
-              << "\nTrackInfoArray::add(const ATCFLine &) -> "
-              << "skipping duplicate ATCFLine:\n"
+              << "\nTrackInfoArray::add(const ATCFTrackLine &) -> "
+              << "skipping duplicate ATCFTrackLine:\n"
               << l.get_line() << "\n\n";
          return(false);
       }
    }
 
-   // Add ATCFLine to an existing track if possible
+   // Add ATCFTrackLine to an existing track if possible
    for(i=NTracks-1; i>=0; i--) {
       if(Track[i].is_match(l)) {
          found = true;
@@ -832,7 +819,7 @@ bool TrackInfoArray::add(const ATCFLine &l, bool check_dup, bool check_anly) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackInfoArray::has(const ATCFLine &l) const {
+bool TrackInfoArray::has(const ATCFTrackLine &l) const {
    bool found = false;
    int i;
 
@@ -1003,7 +990,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       }
 
       // Compute consensus CycloneLevel
-      if(!is_bad_data(pavg.v_max())) pavg.set_level(wind_speed_to_cyclone_level(pavg.v_max()));
+      if(!is_bad_data(pavg.v_max())) pavg.set_level(wind_speed_to_cyclonelevel(pavg.v_max()));
 
       // Add the current track point
       tavg.add(pavg);
@@ -1073,6 +1060,33 @@ bool has_storm_id(const StringArray &storm_id,
    }
 
    return(match);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void latlon_to_xytk_err(double alat, double alon,
+                        double blat, double blon,
+                        double &x_err, double &y_err, double &tk_err) {
+   double lat_err, lon_err, lat_avg;
+
+   // Check for bad data
+   if(is_bad_data(alat) || is_bad_data(alon) ||
+      is_bad_data(blat) || is_bad_data(blon)) {
+      x_err = y_err = tk_err = bad_data_double;
+      return;
+   }
+
+   // Compute lat/lon errors
+   lat_err = alat - blat;
+   lon_err = rescale_lon(alon - blon);
+   lat_avg = 0.5*(alat + blat);
+
+   // Compute X/Y and track error
+   x_err  = nautical_miles_per_deg*lon_err*cosd(lat_avg);
+   y_err  = nautical_miles_per_deg*lat_err;
+   tk_err = sqrt(x_err*x_err + y_err*y_err);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
