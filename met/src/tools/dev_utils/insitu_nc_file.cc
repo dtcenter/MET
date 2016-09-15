@@ -135,7 +135,7 @@ bool InsituNcFile::open(const char * filename)
 
   // Open the file
 
-  _ncFile = new NcFile(filename);
+  _ncFile = open_ncfile(filename);
 
   if (!(_ncFile->is_valid()))
   {

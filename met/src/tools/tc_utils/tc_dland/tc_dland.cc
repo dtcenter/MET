@@ -44,6 +44,7 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+#include "nc_utils.h"
 #include "write_netcdf.h"
 #include "tc_poly.h"
 
@@ -207,7 +208,7 @@ void process_distances() {
    NcVar  *dland_var = (NcVar *) 0;
 
    // Create a new NetCDF file and open it
-   f_out = new NcFile(out_filename, NcFile::Replace);
+   f_out = open_ncfile(out_filename, NcFile::Replace);
 
    if(!f_out->is_valid()) {
       mlog << Error << "\nprocess_distances() -> "

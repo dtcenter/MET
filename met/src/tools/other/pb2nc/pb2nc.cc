@@ -365,7 +365,7 @@ void open_netcdf() {
 
    // Create the output netCDF file for writing
    mlog << Debug(1) << "Creating NetCDF File:\t\t" << ncfile << "\n";
-   f_out = new NcFile(ncfile, NcFile::Replace);
+   f_out = open_ncfile(ncfile, NcFile::Replace);
 
    // Check for a valid file
    if(!f_out->is_valid()) {

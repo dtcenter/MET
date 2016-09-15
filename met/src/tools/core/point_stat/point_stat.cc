@@ -593,7 +593,7 @@ void process_obs_file(int i_nc) {
    // Open the observation file as a NetCDF file.
    // The observation file must be in NetCDF format as the
    // output of the PB2NC or ASCII2NC tool.
-   obs_in = new NcFile(obs_file[i_nc]);
+   obs_in = open_ncfile(obs_file[i_nc]);
 
    if(!obs_in->is_valid()) {
       obs_in->close();

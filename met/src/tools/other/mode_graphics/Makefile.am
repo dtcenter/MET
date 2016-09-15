@@ -32,6 +32,7 @@ plot_mode_field_LDADD = -lvx_cgraph \
         -lvx_plot_util \
         -lvx_data2d_nc_met \
         -lvx_grid \
+        -lvx_nc_util \
         -lvx_ps \
         -lvx_afm \
         -lvx_pxm \

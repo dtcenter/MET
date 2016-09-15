@@ -274,7 +274,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    ConcatString cs;
 
    // Create a new NetCDF file and open it
-   NcFile *f_out = new NcFile(OutputFilename, NcFile::Replace);
+   NcFile *f_out = open_ncfile(OutputFilename, NcFile::Replace);
 
    if(!f_out->is_valid()) {
       mlog << Error << "\nwrite_netcdf() -> "

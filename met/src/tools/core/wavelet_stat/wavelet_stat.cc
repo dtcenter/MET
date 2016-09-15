@@ -605,7 +605,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    build_outfile_name(valid_ut, lead_sec, ".nc", out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = new NcFile(out_nc_file, NcFile::Replace);
+   nc_out = open_ncfile(out_nc_file, NcFile::Replace);
 
    if(!nc_out || !nc_out->is_valid()) {
       mlog << Error << "\nsetup_nc_file() -> "

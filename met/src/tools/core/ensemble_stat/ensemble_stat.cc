@@ -813,7 +813,7 @@ void process_point_obs(int i_nc) {
         << point_obs_file_list[i_nc] << "\n";
 
    // Open the observation file as a NetCDF file.
-   obs_in = new NcFile(point_obs_file_list[i_nc]);
+   obs_in = open_ncfile(point_obs_file_list[i_nc]);
 
    if(!obs_in->is_valid()) {
       obs_in->close();
@@ -1616,7 +1616,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    build_outfile_name(ens_valid_ut, suffix, out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = new NcFile(out_nc_file, NcFile::Replace);
+   nc_out = open_ncfile(out_nc_file, NcFile::Replace);
 
    if(!nc_out->is_valid()) {
       mlog << Error << "\nsetup_nc_file() -> "

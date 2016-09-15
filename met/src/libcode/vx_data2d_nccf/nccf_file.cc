@@ -156,7 +156,7 @@ bool NcCfFile::open(const char * filepath)
 
   // Open the file
 
-  _ncFile = new NcFile(filepath);
+  _ncFile = open_ncfile(filepath);
 
   if (!(_ncFile->is_valid()))
   {

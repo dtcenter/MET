@@ -292,7 +292,7 @@ void process_data_file() {
 void open_nc(const Grid &grid, ConcatString run_cs) {
 
    // Create output file
-   nc_out = new NcFile(OutputFilename, NcFile::Replace);
+   nc_out = open_ncfile(OutputFilename, NcFile::Replace);
 
    if(!nc_out->is_valid()) {
       mlog << Error << "\nopen_nc() -> "
