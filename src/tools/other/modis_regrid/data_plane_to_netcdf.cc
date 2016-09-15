@@ -25,6 +25,7 @@ using namespace std;
 #include "vx_log.h"             // mlog
 #include "vx_cal.h"             // bad_data_float
 #include "concat_string.h"      // max_str_len
+#include "nc_utils.h"
 #include "write_netcdf.h"       // write_netcdf functions
 #include "var_info_factory.h"   // VarInfoFactory
 #include "netcdf.hh"
@@ -74,7 +75,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   
   
   // Create a new NetCDF file and open it
-  f_out = new NcFile(out_filename, NcFile::Replace);
+  f_out = open_ncfile(out_filename, NcFile::Replace);
   
   if(!f_out->is_valid()) 
   {

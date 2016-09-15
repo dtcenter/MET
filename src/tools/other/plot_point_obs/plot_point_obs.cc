@@ -44,6 +44,7 @@ using namespace std;
 
 #include "netcdf.hh"
 
+#include "nc_utils.h"
 #include "vx_log.h"
 #include "data_plane.h"
 #include "vx_data2d.h"
@@ -223,7 +224,7 @@ int main(int argc, char *argv[]) {
    //
    mlog << Debug(1) << "Opening netCDF file: " << nc_file << "\n";
 
-   f_in = new NcFile(nc_file);
+   f_in = open_ncfile(nc_file);
 
    if(!f_in || !f_in->is_valid()) {
       mlog << Error << "\nmain() -> trouble opening netCDF file "

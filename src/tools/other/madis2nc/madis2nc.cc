@@ -240,7 +240,7 @@ void process_madis_file(const char *madis_file) {
    mlog << Debug(1) << "Reading MADIS File:\t" << madis_file << "\n";
 
    // Open the input NetCDF file
-   NcFile *f_in = new NcFile(madis_file);
+   NcFile *f_in = open_ncfile(madis_file);
 
    // Check for a valid file
    if(!f_in->is_valid()) {
@@ -333,7 +333,7 @@ void setup_netcdf_out(int nhdr) {
    // Create the output netCDF file for writing
    //
    mlog << Debug(1) << "Writing MET File:\t" << ncfile << "\n";
-   f_out = new NcFile(ncfile, NcFile::Replace);
+   f_out = open_ncfile(ncfile, NcFile::Replace);
 
    //
    // Check for a valid file

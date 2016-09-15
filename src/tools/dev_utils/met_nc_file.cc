@@ -18,6 +18,7 @@ using namespace std;
 #include "vx_math.h"
 
 #include "met_nc_file.h"
+#include "nc_utils.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,7 +72,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
   mlog << Debug(1) << "Opening netCDF file: " << _filePath << "\n";
 
-  _ncFile = new NcFile(_filePath.c_str());
+  _ncFile = open_ncfile(_filePath.c_str());
 
   if (!_ncFile || !_ncFile->is_valid())
   {

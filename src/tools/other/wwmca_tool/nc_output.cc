@@ -23,6 +23,7 @@ using namespace std;
 #include "wwmca_ref.h"
 
 #include "grid_output.h"
+#include "nc_utils.h"
 #include "write_netcdf.h"
 
 
@@ -56,7 +57,7 @@ const int Ny = ToGrid->ny();
    //  open the netcdf file
    //
 
-ncfile = new NcFile (output_filename, NcFile::Replace);
+ncfile = open_ncfile(output_filename, NcFile::Replace);
 
 if ( !(ncfile->is_valid()) )  {
 

@@ -49,6 +49,8 @@ extern bool get_global_att_double(const NcFile *, const ConcatString &, double &
 
 extern bool get_dim(const NcFile *, const ConcatString &, int &, bool error_out = false);
 
+extern NcFile* open_ncfile(const char * nc_name, NcFile::FileMode file_mode = NcFile::ReadOnly);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __NC_UTILS_H__  */

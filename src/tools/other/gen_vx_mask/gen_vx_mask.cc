@@ -809,7 +809,7 @@ void write_netcdf(const DataPlane &dp) {
    NcVar *mask_var  = (NcVar *)  0;
 
    // Create a new NetCDF file and open it.
-   f_out = new NcFile(out_filename, NcFile::Replace);
+   f_out = open_ncfile(out_filename, NcFile::Replace);
 
    if(!f_out->is_valid()) {
       mlog << Error << "\nwrite_netcdf() -> "

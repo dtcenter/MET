@@ -298,4 +298,8 @@ bool get_dim(const NcFile *nc, const ConcatString &dim_name,
    return(status);
 }
 
+NcFile* open_ncfile(const char * nc_name, NcFile::FileMode file_mode) {
+    return new NcFile(nc_name, file_mode);
+}
+
 ////////////////////////////////////////////////////////////////////////

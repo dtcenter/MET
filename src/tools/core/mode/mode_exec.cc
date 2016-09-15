@@ -861,7 +861,7 @@ if ( info.all_false() )  return;
    // NOTE: must multiply longitudes throughout by -1 to convert from
    // degrees_west to degree_east
    //
-   f_out = new NcFile(out_file, NcFile::Replace);
+   f_out = open_ncfile(out_file, NcFile::Replace);
 
    if(!f_out->is_valid()) {
       mlog << Error << "\nwrite_obj_netcdf() -> trouble opening output file "

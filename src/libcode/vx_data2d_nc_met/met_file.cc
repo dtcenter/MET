@@ -148,7 +148,7 @@ NcVar * v   = (NcVar *) 0;
 
 close();
 
-Nc = new NcFile (filename);
+Nc = open_ncfile(filename);
 
 if ( !(Nc->is_valid()) )  { close();  return ( false ); }
 

@@ -79,7 +79,8 @@ insitu_nc_to_ascii_SOURCES = insitu_nc_to_ascii.cc \
 	insitu_nc_file.cc insitu_nc_file.h
 insitu_nc_to_ascii_CPPFLAGS = ${MET_CPPFLAGS}
 insitu_nc_to_ascii_LDFLAGS = ${MET_LDFLAGS}
-insitu_nc_to_ascii_LDADD = -lvx_util \
+insitu_nc_to_ascii_LDADD = -lvx_nc_util \
+	-lvx_util \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf
 
@@ -88,6 +89,7 @@ swinging_door_SOURCES = swinging_door.cc \
 swinging_door_CPPFLAGS = ${MET_CPPFLAGS}
 swinging_door_LDFLAGS = ${MET_LDFLAGS}
 swinging_door_LDADD = -lvx_time_series \
+	-lvx_nc_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

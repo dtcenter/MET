@@ -472,7 +472,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = new NcFile(out_nc_file, NcFile::Replace);
+   nc_out = open_ncfile(out_nc_file, NcFile::Replace);
 
    if(!nc_out->is_valid()) {
       mlog << Error << "\nsetup_nc_file() -> "

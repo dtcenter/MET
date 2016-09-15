@@ -1080,7 +1080,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    NcVar  *pcp_var = (NcVar *)  0;
 
    // Create a new NetCDF file and open it.
-   f_out = new NcFile(out_filename, NcFile::Replace);
+   f_out = open_ncfile(out_filename, NcFile::Replace);
 
    if(!f_out->is_valid()) {
       mlog << Error << "\nwrite_netcdf() -> "

@@ -21,6 +21,7 @@ using namespace std;
 
 #include "mode_nc_output_file.h"
 #include "nc_var_info.h"
+#include "nc_utils.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -172,7 +173,7 @@ close();
 
 Filename = _filename;
 
-f = new NcFile(_filename);
+f = open_ncfile(_filename);
 
 if ( !(f->is_valid()) )  {
 
