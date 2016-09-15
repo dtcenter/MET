@@ -35,8 +35,8 @@ class TCStatConfInfo {
       // TCPairs configuration object
       MetConfig Conf;
 
-      // TCStatJob to store filtering info from the config file
-      TCStatJobFilter Filter;
+      // TCStatJob to store configuration file filtering options
+      TCStatJob Filter;
 
       // Jobs array
       StringArray Jobs;
