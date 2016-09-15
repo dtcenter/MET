@@ -169,6 +169,7 @@ void TCStatJob::init_from_scratch() {
 
    DumpOut = (ofstream *) 0;
    JobOut  = (ofstream *) 0;
+   StatOut = (ofstream *) 0;
 
    // Ignore case when performing comparisons
    AModel.set_ignore_case(1);
@@ -1175,6 +1176,17 @@ ConcatString TCStatJob::serialize() const {
       s << "-stat_row " << StatFile << " ";
 
    return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
+
+   mlog << Error << "\nTCStatJob::do_job() -> "
+        << "the do_job() base class function should never be called!\n\n";
+   exit(1);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

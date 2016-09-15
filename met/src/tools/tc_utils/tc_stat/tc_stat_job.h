@@ -219,7 +219,7 @@ class TCStatJob {
 
       //////////////////////////////////////////////////////////////////
 
-      virtual void do_job(const StringArray &, TCLineCounts &) = 0;
+      virtual void do_job(const StringArray &, TCLineCounts &);
 
       void event_equalize_tracks();
 
