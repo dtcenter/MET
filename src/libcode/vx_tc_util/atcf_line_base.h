@@ -124,8 +124,8 @@ inline bool ATCFLineBase::is_oper_track() const                { return(IsOperTr
 ////////////////////////////////////////////////////////////////////////
 
 extern unixtime parse_time           (const char *);
-extern int      parse_lat            (const char *);
-extern int      parse_lon            (const char *);
+extern double   parse_lat            (const char *);
+extern double   parse_lon            (const char *);
 extern int      parse_int            (const char *);
 extern int      parse_int_check_zero (const char *);
 

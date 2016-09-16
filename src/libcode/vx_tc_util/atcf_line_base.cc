@@ -317,8 +317,8 @@ unixtime parse_time(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int parse_lat(const char *s) {
-   int v;
+double parse_lat(const char *s) {
+   double v;
 
    v = parse_int(s);
 
@@ -343,8 +343,8 @@ int parse_lat(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int parse_lon(const char *s) {
-   int v;
+double parse_lon(const char *s) {
+   double v;
 
    v = parse_int(s);
 
