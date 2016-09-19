@@ -53,6 +53,7 @@
 #include "bool_to_string.h"
 #include "empty_string.h"
 #include "polyline.h"
+#include "mask_poly.h"
 #include "read_fortran_binary.h"
 
 

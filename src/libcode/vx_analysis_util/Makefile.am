@@ -14,7 +14,6 @@ noinst_LIBRARIES = libvx_analysis_util.a
 libvx_analysis_util_a_SOURCES = \
               analysis_utils.cc analysis_utils.h \
               by_case_info.cc by_case_info.h \
-              mask_poly.cc mask_poly.h \
               mode_atts.cc mode_atts.h \
               mode_job.cc mode_job.h \
               mode_line.cc mode_line.h \

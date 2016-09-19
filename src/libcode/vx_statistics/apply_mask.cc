@@ -296,7 +296,7 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
 void process_poly_mask(const ConcatString &file_name, const Grid &grid,
                        DataPlane &mask_dp, ConcatString &mask_name) {
-   Polyline mask_poly;
+   MaskPoly poly_mask;
 
    mlog << Debug(4) << "parse_poly_mask() -> "
         << "parsing poly mask file \"" << file_name << "\"\n";
@@ -306,16 +306,16 @@ void process_poly_mask(const ConcatString &file_name, const Grid &grid,
    mask_dp.set_constant(mask_on_value);
 
    // Initialize the masking polyline
-   mask_poly.clear();
+   poly_mask.clear();
 
    // Parse out the polyline from the file
-   parse_latlon_poly_file(file_name, mask_poly);
+   poly_mask.load(file_name);
 
    // Store the name of the masking polyline
-   mask_name = mask_poly.name;
+   mask_name = poly_mask.name();
 
    // Apply the polyline mask to the DataPlane object
-   apply_poly_mask_latlon(mask_poly, grid, mask_dp);
+   apply_poly_mask_latlon(poly_mask, grid, mask_dp);
 
    return;
 }
@@ -365,44 +365,7 @@ void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void apply_poly_mask_xy(const Polyline &poly, DataPlane &dp) {
-   int x, y;
-   int in_count, out_count;
-
-   //
-   // If the polyline contains less than 3 points, no masking region is
-   // defined and there is nothing to do
-   //
-   if(poly.n_points < 3) {
-      mlog << Warning << "\nvoid apply_poly_mask_xy() -> "
-           << "no polyline masking applied since the masking polyline "
-           << "contains fewer than 3 points.\n\n";
-      return;
-   }
-
-   //
-   // Mask out any grid points not inside the masking polygon
-   //
-   in_count = out_count = 0;
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
-
-         if(!(poly.is_inside(x, y))) {
-            out_count++;
-            dp.set(mask_off_value, x, y);
-         }
-         else {
-            in_count++;
-         }
-      } // for y
-   } // for x
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void apply_poly_mask_latlon(const Polyline &poly, const Grid &grid, DataPlane &dp) {
+void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &dp) {
    int x, y;
    double lat, lon;
    int in_count, out_count;
@@ -411,7 +374,7 @@ void apply_poly_mask_latlon(const Polyline &poly, const Grid &grid, DataPlane &d
    // If the polyline contains less than 3 points, no masking region is
    // defined and there is nothing to do
    //
-   if(poly.n_points < 3) {
+   if(poly.n_points() < 3) {
       mlog << Warning << "\nvoid apply_poly_mask_latlon() -> "
            << "no polyline masking applied since the masking polyline "
            << "contains fewer than 3 points.\n\n";
@@ -428,7 +391,7 @@ void apply_poly_mask_latlon(const Polyline &poly, const Grid &grid, DataPlane &d
 
          grid.xy_to_latlon(x, y, lat, lon);
 
-         if(!(poly.is_inside(rescale_lon(lon), lat))) {
+         if(!(poly.latlon_is_inside(rescale_lon(lon), lat))) {
             out_count++;
             dp.set(mask_off_value, x, y);
          }

@@ -46,6 +46,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                bool_to_string.h \
                empty_string.h \
                polyline.h polyline.cc \
+               mask_poly.h mask_poly.cc \
                read_fortran_binary.h read_fortran_binary.cc \
                met_buffer.h met_buffer.cc \
                vx_util.h
