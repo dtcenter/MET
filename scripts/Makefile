@@ -56,6 +56,7 @@ include $(MK_DIR)/gsi_tools.mk
 include $(MK_DIR)/madis2nc.mk
 include $(MK_DIR)/mode.mk
 include $(MK_DIR)/mode_analysis.mk
+include $(MK_DIR)/mode_graphics.mk
 include $(MK_DIR)/mode_time_domain.mk
 include $(MK_DIR)/modis.mk
 include $(MK_DIR)/pb2nc.mk
