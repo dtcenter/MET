@@ -16,6 +16,10 @@ using namespace std;
 #include "stat_hdr_columns.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+static ConcatString check_hdr_str(const char *);
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class StatHdrColumns
 //
@@ -95,7 +99,7 @@ void StatHdrColumns::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_model(const char *s) {
-   model = s;
+   model = check_hdr_str(s);
    return;
 }
 
@@ -150,49 +154,49 @@ void StatHdrColumns::set_obs_valid_end(const unixtime ut) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_var(const char *s) {
-   fcst_var = s;
+   fcst_var = check_hdr_str(s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_fcst_lev(const char *s) {
-   fcst_lev = s;
+   fcst_lev = check_hdr_str(s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_var(const char *s) {
-   obs_var = s;
+   obs_var = check_hdr_str(s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obs_lev(const char *s) {
-   obs_lev = s;
+   obs_lev = check_hdr_str(s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_obtype(const char *s) {
-   obtype = s;
+   obtype = check_hdr_str(s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_mask(const char *s) {
-   mask = s;
+   mask = check_hdr_str(s);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_interp_mthd(const char *s) {
-   interp_mthd = s;
+   interp_mthd = check_hdr_str(s);
    return;
 }
 
@@ -214,7 +218,7 @@ void StatHdrColumns::set_interp_wdth(const int w) {
 ////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_line_type(const char *s) {
-   line_type = s;
+   line_type = check_hdr_str(s);
    return;
 }
 
@@ -361,6 +365,23 @@ void StatHdrColumns::set_interp_pnts_str() {
    interp_pnts_str = tmp_str;
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Miscellaneous utility functions.
+//
+////////////////////////////////////////////////////////////////////////
+
+ConcatString check_hdr_str(const char *s) {
+   if(check_reg_exp(ws_reg_exp, s) == true ) {
+      mlog << Error << "\ncheck_hdr_str() -> "
+           << "output header column value (\"" << s
+           << "\") should contain no embedded whitespace!\n\n";
+      exit(1);
+   }
+
+   return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
