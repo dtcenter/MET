@@ -166,7 +166,7 @@ return ( count == 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-void GridInfo::create_grid(Grid & g) const 
+void GridInfo::create_grid(Grid & g) const
 
 {
 
@@ -744,19 +744,19 @@ if ( !lc1 || !lc2 )  return ( false );
 
 bool status = false;
 
-if ( lc1->nx                == lc2->nx           &&
-     lc1->ny                == lc2->ny           &&
-     is_eq  (lc1->scale_lat_1, lc2->scale_lat_1) &&
-     is_eq  (lc1->scale_lat_2, lc2->scale_lat_2) &&
-     is_eq  (lc1->lat_pin,     lc2->lat_pin)     &&
+if ( lc1->nx                == lc2->nx                      &&
+     lc1->ny                == lc2->ny                      &&
+     is_eq  (lc1->scale_lat_1, lc2->scale_lat_1, loose_tol) &&
+     is_eq  (lc1->scale_lat_2, lc2->scale_lat_2, loose_tol) &&
+     is_eq  (lc1->lat_pin,     lc2->lat_pin,     loose_tol) &&
      is_eq  (rescale_lon(lc1->lon_pin),
-             rescale_lon(lc2->lon_pin))          &&
-     is_eq  (lc1->x_pin,       lc2->x_pin)       &&
-     is_eq  (lc1->y_pin,       lc2->y_pin)       &&
+             rescale_lon(lc2->lon_pin),          loose_tol) &&
+     is_eq  (lc1->x_pin,       lc2->x_pin,       loose_tol) &&
+     is_eq  (lc1->y_pin,       lc2->y_pin,       loose_tol) &&
      is_eq  (rescale_lon(lc1->lon_orient),
-             rescale_lon(lc2->lon_orient))       &&
-     is_eq  (lc1->d_km,        lc2->d_km)        &&
-     is_eq  (lc1->r_km,        lc2->r_km) )  status = true;
+             rescale_lon(lc2->lon_orient),       loose_tol) &&
+     is_eq  (lc1->d_km,        lc2->d_km,        loose_tol) &&
+     is_eq  (lc1->r_km,        lc2->r_km,        loose_tol) )  status = true;
 
 return ( status );
 
@@ -769,24 +769,24 @@ return ( status );
 bool is_eq(const StereographicData * st1, const StereographicData * st2)
 
 {
-   
+
 if ( !st1 || !st2 )  return ( false );
 
 bool status = false;
 
-if ( st1->nx               == st2->nx          &&
-     st1->ny               == st2->ny          &&
-     st1->hemisphere       == st2->hemisphere  &&
-     is_eq  (st1->scale_lat,  st2->scale_lat)  &&
-     is_eq  (st1->lat_pin,    st2->lat_pin)    &&
+if ( st1->nx               == st2->nx                    &&
+     st1->ny               == st2->ny                    &&
+     st1->hemisphere       == st2->hemisphere            &&
+     is_eq  (st1->scale_lat,  st2->scale_lat, loose_tol) &&
+     is_eq  (st1->lat_pin,    st2->lat_pin,   loose_tol) &&
      is_eq  (rescale_lon(st1->lon_pin),
-             rescale_lon(st2->lon_pin))        &&
-     is_eq  (st1->x_pin,      st2->x_pin)      &&
-     is_eq  (st1->y_pin,      st2->y_pin)      &&
+             rescale_lon(st2->lon_pin),       loose_tol) &&
+     is_eq  (st1->x_pin,      st2->x_pin,     loose_tol) &&
+     is_eq  (st1->y_pin,      st2->y_pin,     loose_tol) &&
      is_eq  (rescale_lon(st1->lon_orient),
-             rescale_lon(st2->lon_orient))     &&
-     is_eq  (st1->d_km,       st2->d_km)       &&
-     is_eq  (st1->r_km,       st2->r_km) )  status = true;
+             rescale_lon(st2->lon_orient),    loose_tol) &&
+     is_eq  (st1->d_km,       st2->d_km,      loose_tol) &&
+     is_eq  (st1->r_km,       st2->r_km,      loose_tol) )  status = true;
 
 return ( status );
 
@@ -804,13 +804,13 @@ if ( !ll1 || !ll2 )  return ( false );
 
 bool status = false;
 
-if ( ll1->Nlat            == ll2->Nlat       &&
-     ll1->Nlon            == ll2->Nlon       &&
-     is_eq  (ll1->lat_ll,    ll2->lat_ll)    &&
+if ( ll1->Nlat            == ll2->Nlat                  &&
+     ll1->Nlon            == ll2->Nlon                  &&
+     is_eq  (ll1->lat_ll,    ll2->lat_ll,    loose_tol) &&
      is_eq  (rescale_lon(ll1->lon_ll),
-             rescale_lon(ll2->lon_ll))       &&
-     is_eq  (ll1->delta_lat, ll2->delta_lat) &&
-     is_eq  (ll1->delta_lon, ll2->delta_lon) )  status = true;
+             rescale_lon(ll2->lon_ll),       loose_tol) &&
+     is_eq  (ll1->delta_lat, ll2->delta_lat, loose_tol) &&
+     is_eq  (ll1->delta_lon, ll2->delta_lon, loose_tol) )  status = true;
 
 return ( status );
 
@@ -828,14 +828,14 @@ if ( !m1 || !m2 )  return ( false );
 
 bool status = false;
 
-if ( m1->nx           == m2->nx       &&
-     m1->ny           == m2->ny       &&
-     is_eq  (m1->lat_ll, m2->lat_ll)  &&
+if ( m1->nx           == m2->nx                  &&
+     m1->ny           == m2->ny                  &&
+     is_eq  (m1->lat_ll, m2->lat_ll,  loose_tol) &&
      is_eq  (rescale_lon(m1->lon_ll),
-             rescale_lon(m2->lon_ll)) &&
-     is_eq  (m1->lat_ur, m2->lat_ur)  &&
+             rescale_lon(m2->lon_ll), loose_tol) &&
+     is_eq  (m1->lat_ur, m2->lat_ur,  loose_tol) &&
      is_eq  (rescale_lon(m1->lon_ur),
-             rescale_lon(m2->lon_ur)) )  status = true;
+             rescale_lon(m2->lon_ur), loose_tol) )  status = true;
 
 return ( status );
 
