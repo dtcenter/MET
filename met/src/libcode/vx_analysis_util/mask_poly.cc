@@ -324,6 +324,19 @@ while ( in.getline(line, sizeof(line)) ) {
 
       Name = line;
 
+      //
+      //  check for embedded whitespace
+      //
+
+      if ( check_reg_exp(ws_reg_exp, Name) == true ) {
+         mlog << Error << "\nMaskPoly::load() -> "
+              << "masking polyline files consist of a string for the "
+              << "name followed by latitude and longitude values. "
+              << "The name (\"" <<  Name << "\") cannot contain embedded "
+              << "whitespace!\n\n";
+         exit(1);
+      }
+
       continue;
 
    }
