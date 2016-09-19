@@ -12,7 +12,7 @@
 
 
 mode_graphics:
-	@ touch mode_graphics 
+	@ touch mode_graphics
 
 
 ########################################################################
