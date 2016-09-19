@@ -13,9 +13,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include "mask_poly.h"
 #include "vx_shapedata.h"
 #include "vx_grid.h"
-#include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,9 +38,7 @@ extern void parse_poly_mask(const ConcatString &, const Grid &,
 
 extern void apply_grid_mask(const Grid &, const Grid &,
                             DataPlane &);
-extern void apply_poly_mask_xy(const Polyline &,
-                               DataPlane &);
-extern void apply_poly_mask_latlon(const Polyline &, const Grid &,
+extern void apply_poly_mask_latlon(const MaskPoly &, const Grid &,
                                    DataPlane &);
 
 ////////////////////////////////////////////////////////////////////////
