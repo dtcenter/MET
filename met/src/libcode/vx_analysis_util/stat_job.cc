@@ -2252,7 +2252,7 @@ int STATAnalysisJob::is_in_mask_poly(double lat, double lon) const {
    //
    // Only check if a masking poly has been specified
    //
-   if(mask_poly) r = poly_mask.latlon_is_inside(lat, lon);
+   if(mask_poly) r = poly_mask.latlon_is_inside_dege(lat, lon);
 
    return(r);
 }

@@ -666,7 +666,7 @@ void process_pbfile(int i_pb) {
       // polyline continue to the next PrepBufr message.  Multiply by
       // -1 to convert from degrees_east to degrees_west
       if(conf_info.poly_mask.n_points() > 0 &&
-         !conf_info.poly_mask.latlon_is_inside(hdr_arr_lat, hdr_arr_lon)) {
+         !conf_info.poly_mask.latlon_is_inside_dege(hdr_arr_lat, hdr_arr_lon)) {
          rej_poly++;
          continue;
       }

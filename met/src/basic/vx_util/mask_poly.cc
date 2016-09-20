@@ -373,7 +373,9 @@ while ( in.getline(line, sizeof(line)) ) {
 
    }
 
-   b = -b;   //  toggle from degrees_west to degrees_east
+   b = -b;   //  toggle from degrees_east to degrees_west
+             //  input longitudes are degrees_east
+             //  internal longitudes are degrees_west
 
    b -= 360.0*floor((b + 180.0)/360.0);
 
@@ -416,31 +418,13 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-bool MaskPoly::latlon_is_inside(double cur_lat, double cur_lon) const
-
-{
-
-int status;
-
-   //
-   //  toggle from degrees_west to degrees_east
-   //
-
-cur_lon = -cur_lon;
-
-status = latlon_is_inside_dege(cur_lat, cur_lon);
-
-return ( status != 0 );
-
-}
-
-
+//
+//  Input test longitude is degrees_west.
+//
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MaskPoly::latlon_is_inside_dege(double cur_lat, double cur_lon) const
+bool MaskPoly::latlon_is_inside(double cur_lat, double cur_lon) const
 
 {
 
@@ -452,6 +436,31 @@ adj_lon  = cur_lon + LonShift;
 adj_lon -= 360.0*floor((adj_lon + 180.0)/360.0);
 
 status = is_inside(U, V, adj_lon, cur_lat);
+
+return ( status != 0 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Input test longitude is degrees_east.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool MaskPoly::latlon_is_inside_dege(double cur_lat, double cur_lon) const
+
+{
+
+int status;
+
+   //
+   //  toggle from degrees_east to degrees_west
+   //
+
+cur_lon = -cur_lon;
+
+status = latlon_is_inside(cur_lat, cur_lon);
 
 return ( status != 0 );
 

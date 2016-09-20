@@ -566,7 +566,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          // Check if ADECK init location falls inside the mask
          if(is_bad_data(pair.adeck()[i_init].lat()) ||
             is_bad_data(pair.adeck()[i_init].lon()) ||
-            !OutInitMask.latlon_is_inside(
+            !OutInitMask.latlon_is_inside_dege(
                pair.adeck()[i_init].lat(),
                pair.adeck()[i_init].lon())) {
             keep = false;
@@ -703,7 +703,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       // Check ADECK locations
       if(is_bad_data(alat) ||
          is_bad_data(alon) ||
-         !OutValidMask.latlon_is_inside(alat, alon)) {
+         !OutValidMask.latlon_is_inside_dege(alat, alon)) {
          keep = false;
          n.RejOutValidMask++;
       }

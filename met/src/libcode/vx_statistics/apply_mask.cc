@@ -382,7 +382,7 @@ void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &d
    }
 
    //
-   // Mask out any grid points who's corresponding lat/lon coordinates are
+   // Mask out any grid points whose corresponding lat/lon coordinates are
    // not inside the masking lat/lon polygon.
    //
    in_count = out_count = 0;
@@ -391,7 +391,7 @@ void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &d
 
          grid.xy_to_latlon(x, y, lat, lon);
 
-         if(!(poly.latlon_is_inside(rescale_lon(lon), lat))) {
+         if(!(poly.latlon_is_inside(lat, lon))) {
             out_count++;
             dp.set(mask_off_value, x, y);
          }

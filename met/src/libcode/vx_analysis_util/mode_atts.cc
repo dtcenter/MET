@@ -1809,7 +1809,7 @@ if ( interest_min_set || interest_max_set )  {
 
 if ( poly )  {
 
-   if ( !(poly->latlon_is_inside(L.centroid_lat(), L.centroid_lon())) )  return ( 0 );
+   if ( !(poly->latlon_is_inside_dege(L.centroid_lat(), L.centroid_lon())) )  return ( 0 );
 
 }
 

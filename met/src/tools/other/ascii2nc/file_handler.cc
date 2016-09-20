@@ -827,7 +827,7 @@ bool FileHandler::_addObservations(const Observation &obs)
    //
    if(_polyMask)
    {
-     if(!_polyMask->latlon_is_inside(obs.getLatitude(), obs.getLongitude()))
+     if(!_polyMask->latlon_is_inside_dege(obs.getLatitude(), obs.getLongitude()))
      {
        _polyMaskNum++;
        return false;

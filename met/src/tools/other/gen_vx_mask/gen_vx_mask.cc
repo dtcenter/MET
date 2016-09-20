@@ -374,11 +374,9 @@ static void apply_poly_mask(DataPlane &dp) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
-         lon -= 360.0*floor((lon + 180.0)/360.0);
 
          // Check current grid point inside polyline
-         // converting from degrees_east to degrees_west
-         inside = poly_mask.latlon_is_inside(lat, -1.0*lon);
+         inside = poly_mask.latlon_is_inside(lat, lon);
 
          // Check the complement
          if(complement) inside = !inside;
