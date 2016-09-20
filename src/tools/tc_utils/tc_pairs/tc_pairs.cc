@@ -810,8 +810,8 @@ void filter_tracks(TrackInfoArray &tracks) {
 
       // Initialization location mask
       if(conf_info.InitMask.n_points() > 0 &&
-         !conf_info.InitMask.latlon_is_inside(t[i][0].lat(),
-                                              t[i][0].lon())) {
+         !conf_info.InitMask.latlon_is_inside_dege(t[i][0].lat(),
+                                                   t[i][0].lon())) {
          mlog << Debug(4)
               << "Discarding track " << i+1 << " for falling outside the "
               << "initialization polyline: ("
@@ -827,8 +827,8 @@ void filter_tracks(TrackInfoArray &tracks) {
          for(j=0, status=true; j<t[i].n_points(); j++) {
 
             // In the TrackPoint falls outside of the polyline break out
-            if(!conf_info.ValidMask.latlon_is_inside(t[i][j].lat(),
-                                                     t[i][j].lon())) {
+            if(!conf_info.ValidMask.latlon_is_inside_dege(t[i][j].lat(),
+                                                          t[i][j].lon())) {
                status = false;
                break;
             }
@@ -892,8 +892,8 @@ void filter_probs(ProbInfoArray &probs) {
 
       // Initialization location mask
       if(conf_info.InitMask.n_points() > 0 &&
-         !conf_info.InitMask.latlon_is_inside(p[i]->lat(),
-                                              p[i]->lon())) {
+         !conf_info.InitMask.latlon_is_inside_dege(p[i]->lat(),
+                                                   p[i]->lon())) {
          mlog << Debug(4)
               << "Discarding probability " << i+1 << " for falling "
               << "outside the initialization polyline: ("
@@ -904,8 +904,8 @@ void filter_probs(ProbInfoArray &probs) {
 
       // Valid location mask
       if(conf_info.ValidMask.n_points() > 0 &&
-         !conf_info.ValidMask.latlon_is_inside(p[i]->lat(),
-                                               p[i]->lon())) {
+         !conf_info.ValidMask.latlon_is_inside_dege(p[i]->lat(),
+                                                    p[i]->lon())) {
          mlog << Debug(4)
               << "Discarding probability " << i+1 << " for falling "
               << "outside the valid polyline: ("

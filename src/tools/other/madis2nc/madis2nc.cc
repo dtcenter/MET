@@ -842,7 +842,7 @@ bool check_masks(double lat, double lon) {
    // Check polyline masking.
    //
    if(poly_mask.n_points() > 0) {
-      if(!poly_mask.latlon_is_inside(lat, lon)) {
+      if(!poly_mask.latlon_is_inside_dege(lat, lon)) {
          rej_poly++;
          return false;
       }
