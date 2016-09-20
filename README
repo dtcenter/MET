@@ -194,7 +194,7 @@ sub-directory, or the MET Online Tutorial:
 
    - When running MODE Graphics, set $MET_FONT_DIR to the directory containing
      font data required at runtime.  A link to the tarball containing this font
-     data can be found on the MET website.
+     data can be found on the downloads page of the MET website.
 
 - Configure the installation for your system using the configure script.  The
   configure script has command line options to specify where to install MET and
