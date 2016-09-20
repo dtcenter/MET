@@ -166,7 +166,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       //  if either the field name or the indices are specified, bail
       if( bad_data_int == vinfo_ptv || bad_data_int == code_for_lookup ){
          mlog << Error << "\nis_prelim_match() - either name or GRIB1_ptv "
-         << "and GRIB_code must be specified in field information\n\n";
+         << "and GRIB1_code must be specified in field information\n\n";
          exit(1);
       }
 
