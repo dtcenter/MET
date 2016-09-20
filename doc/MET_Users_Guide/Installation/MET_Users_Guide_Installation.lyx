@@ -881,12 +881,6 @@ README
 \end_layout
 
 \begin_layout LyX-Code
-
-\series medium
-run_tests
-\end_layout
-
-\begin_layout LyX-Code
 scripts/
 \end_layout
 
