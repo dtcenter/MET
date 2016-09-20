@@ -34,7 +34,7 @@ export TEST_OUT_DIR
    ##
 
 
-TESTS = $(shell grep "define ENABLE_" ../config.h | cut -d" " -f2 | cut -b8- | tr A-Z a-z)
+TESTS := $(shell grep "define ENABLE_" ../config.h | cut -d" " -f2 | cut -b8- | tr A-Z a-z)
 
 
 ########################################################################
