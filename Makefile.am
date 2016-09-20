@@ -49,7 +49,7 @@ dist-hook:
 # Run the non-standard test suite
 
 test:
-	./run_tests ${bindir} ${pkgdatadir}
+	cd scripts; make
 
 .PHONY: test
 
@@ -60,7 +60,6 @@ EXTRA_DIST = \
 	doc \
 	out \
 	scripts \
-	Make-include \
-	run_tests
+	Make-include
 
 
