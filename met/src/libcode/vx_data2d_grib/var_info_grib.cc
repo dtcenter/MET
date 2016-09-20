@@ -246,7 +246,7 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
       //  if either the field name or the indices are specified, bail
       if( bad_data_int == field_ptv || bad_data_int == field_code ){
          mlog << Error << "\nVarInfoGrib::add_grib_code() - either name or GRIB1_ptv "
-         << "and GRIB1_rec or GRIB1_code must be specified in field information\n\n";
+         << "and GRIB1_code must be specified in field information\n\n";
          exit(1);
       }
 
