@@ -36,6 +36,12 @@ extern ConcatString   tcstatlinetype_to_string(const TCStatLineType);
 
 ////////////////////////////////////////////////////////////////////////
 
+static const char *TCStatLineType_TCMPR_Str  = "TCMPR";
+static const char *TCStatLineType_ProbRI_Str = "PROBRI";
+static const char *TCStatLineType_Header_Str = "LINE_TYPE";
+
+////////////////////////////////////////////////////////////////////////
+
 class TCStatLine : public DataLine {
 
    private:

@@ -28,12 +28,6 @@ using namespace std;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-static const char *TCStatLineType_TCMPR_Str  = "TCMPR";
-static const char *TCStatLineType_ProbRI_Str = "PROBRI";
-static const char *TCStatLineType_Header_Str = "LINE_TYPE";
-
-////////////////////////////////////////////////////////////////////////
 //
 // Code for class TCStatLine
 //
