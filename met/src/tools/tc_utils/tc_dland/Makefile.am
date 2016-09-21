@@ -18,13 +18,12 @@ tc_dland_LDFLAGS = ${MET_LDFLAGS}
 tc_dland_LDADD = -lvx_tc_util \
 	-lvx_nc_util \
 	-lvx_grid \
-        -lvx_gnomon \
-        -lvx_nav \
+	-lvx_gnomon \
+	-lvx_nav \
 	-lvx_config \
+	-lvx_cal \
 	-lvx_util \
 	-lvx_math \
-	-lvx_cal \
 	-lvx_log \
-	-lm \
-	-lnetcdf_c++ -lnetcdf \
+	-lm -lnetcdf_c++ -lnetcdf \
 	$(FLIBS)
