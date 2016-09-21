@@ -298,7 +298,7 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
    int i;
 
    // TCMPR line type
-   hdr.set_line_type("TCMPR");
+   hdr.set_line_type(TCStatLineType_TCMPR_Str);
 
    // Loop through the TrackPairInfo points
    for(i=0; i<p.n_points(); i++) {
