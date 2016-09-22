@@ -32,5 +32,21 @@
       <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_AHWI_rw.tcst</stat>
     </output>
   </test>
-  
+
+  <test name="tc_stat_PROBRI">
+    <exec>&MET_DIR;/bin/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/al2015_PROBRI.tcst \
+      -config &CONFIG_DIR;/TCStatConfig_PROBRI \
+      -out &OUTPUT_DIR;/tc_stat/PROBRI_stat.out \
+      -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/tc_stat/PROBRI_stat.out</exist>
+      <stat>&OUTPUT_DIR;/tc_stat/PROBRI_filter_ee.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/PROBRI_summary_tk_err.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/PROBRI_probri.tcst</stat>
+    </output>
+  </test>
+
 </met_test>
