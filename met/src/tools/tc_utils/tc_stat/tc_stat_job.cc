@@ -1013,7 +1013,7 @@ void TCStatJob::dump_pair(const ProbRIPairInfo &pair, ofstream *out) {
    out_at.set_size(1 + hdr_row,
                    n_tc_header_cols + get_n_prob_ri_cols(n));
 
-   // Write the TCMPR header row
+   // Write the PROBRI header row
    write_prob_ri_header_row(1, n, out_at, 0, 0);
 
    // Setup the output AsciiTable
@@ -1043,6 +1043,17 @@ void TCStatJob::dump_pair(const ProbRIPairInfo &pair, ofstream *out) {
 
    // Write the AsciiTable to the file
    *out << out_at;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJob::dump_line(const TCStatLine &line, ofstream *out) {
+
+   if(!out) return;
+
+   *out << line;
 
    return;
 }
@@ -1209,7 +1220,7 @@ void TCStatJob::event_equalize_tracks() {
    map<ConcatString,StringArray,cs_cmp>::iterator it;
 
    mlog << Debug(3)
-        << "Applying event equalization logic.\n";
+        << "Applying track-based event equalization logic.\n";
 
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
@@ -1259,7 +1270,7 @@ void TCStatJob::event_equalize_tracks() {
    } // end for it
 
    mlog << Debug(3)
-        << "For event equalization, identified "
+        << "For track-based event equalization, identified "
         << EventEqualCases.n_elements() << " common cases for "
         << (int) case_map.size() << " models: " << models << "\n";
 
@@ -1294,7 +1305,7 @@ void TCStatJob::event_equalize_lines() {
    map<ConcatString,StringArray,cs_cmp>::iterator it;
 
    mlog << Debug(3)
-        << "Applying event equalization logic.\n";
+        << "Applying line-based event equalization logic.\n";
 
    // Rewind to the beginning of the track pair input
    TCSTFiles.rewind();
@@ -1331,7 +1342,7 @@ void TCStatJob::event_equalize_lines() {
    } // end for it
 
    mlog << Debug(3)
-        << "For event equalization, identified "
+        << "For line-based event equalization, identified "
         << EventEqualCases.n_elements() << " common cases for "
         << (int) case_map.size() << " models: " << models << "\n";
 
@@ -1490,7 +1501,7 @@ void TCStatJobFilter::assign(const TCStatJobFilter & j) {
 
 void TCStatJobFilter::do_job(const StringArray &file_list,
                              TCLineCounts &n) {
-   TrackPairInfo pair;
+   int i;
 
    // Check that the -dump_row option has been supplied
    if(!DumpOut) {
@@ -1501,8 +1512,52 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
       exit(1);
    }
 
+   //
+   // Apply logic based on the LineType
+   //
+
+   // If not specified, assume TCMPR by adding it to the LineType
+   if(LineType.n_elements() == 0) LineType.add(TCStatLineType_TCMPR_Str);
+
    // Add the input file list
    TCSTFiles.add_files(file_list);
+
+   // Process track-based filter job
+   if(LineType.has(TCStatLineType_TCMPR_Str)) {
+
+      // TCMPR and non-TCMPR LineTypes cannot be mixed
+      for(i=0; i<LineType.n_elements(); i++) {
+         if(strcasecmp(LineType[i], TCStatLineType_TCMPR_Str) != 0) {
+            mlog << Error << "\nTCStatJobFilter::do_job() -> "
+                 << "the track-based " << TCStatLineType_TCMPR_Str
+                 << " line type cannot be mixed with the "
+                 << LineType[i] << " line type.\n\n";
+            exit(1);
+         }
+      } // end for
+
+      filter_tracks(n);
+   }
+
+   // Process line-based filter job
+   else {
+      filter_lines(n);
+   }
+
+   // Close the dump file
+   if(DumpOut) close_dump_file();
+
+   // Process the filter output
+   if(JobOut) do_output(*JobOut);
+   else       do_output(cout);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobFilter::filter_tracks(TCLineCounts &n) {
+   TrackPairInfo pair;
 
    // Apply the event equalization logic to build a list of common cases
    if(EventEqual == true) event_equalize_tracks();
@@ -1510,12 +1565,12 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    // Check for no common cases
    if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
-           << "Event equalization found no common cases.\n";
+           << "Event equalization of tracks found no common cases.\n";
    }
    // Otherwise, process the track data
    else {
 
-      // Rewind to the beginning of the track pair input
+      // Rewind to the beginning of the input
       TCSTFiles.rewind();
 
       // Process each of the track pairs
@@ -1528,19 +1583,49 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
          if(pair.n_points() > 0) {
 
             mlog << Debug(4)
-                 << "Processing pair: " << pair.case_info() << "\n";
+                 << "Processing track pair: " << pair.case_info() << "\n";
 
             if(DumpOut) dump_pair(pair, DumpOut);
          }
       } // end while
    } // end else
 
-   // Close the dump file
-   if(DumpOut) close_dump_file();
+   return;
+}
 
-   // Process the filter output
-   if(JobOut) do_output(*JobOut);
-   else       do_output(cout);
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobFilter::filter_lines(TCLineCounts &n) {
+   TCStatLine line;
+
+   // Apply the event equalization logic to build a list of common cases
+   if(EventEqual == true) event_equalize_lines();
+
+   // Check for no common cases
+   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+      mlog << Debug(1)
+           << "Event equalization of lines found no common cases.\n";
+   }
+   // Otherwise, process the line data
+   else {
+
+      // Rewind to the beginning of the input
+      TCSTFiles.rewind();
+
+      // Process each of the pair lines
+      while(TCSTFiles >> line) {
+
+         // Increment the read and keep counts
+         n.NRead++;
+         n.NKeep++;
+
+         // Check if this line should be kept
+         if(!is_keeper_line(line, n)) continue;
+
+         if(DumpOut) dump_line(line, DumpOut);
+
+      } // end while
+   } // end else
 
    return;
 }
@@ -1750,6 +1835,7 @@ ConcatString TCStatJobSummary::serialize() const {
 void TCStatJobSummary::do_job(const StringArray &file_list,
                               TCLineCounts &n) {
    TrackPairInfo pair;
+   int i;
 
    // Check that the -column option has been supplied
    if(Column.n_elements() == 0) {
@@ -1760,8 +1846,52 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
       exit(1);
    }
 
+   //
+   // Apply logic based on the LineType
+   //
+
+   // If not specified, assume TCMPR by adding it to the LineType
+   if(LineType.n_elements() == 0) LineType.add(TCStatLineType_TCMPR_Str);
+
    // Add the input file list
    TCSTFiles.add_files(file_list);
+
+   // Process track-based filter job
+   if(LineType.has(TCStatLineType_TCMPR_Str)) {
+
+      // TCMPR and non-TCMPR LineTypes cannot be mixed
+      for(i=0; i<LineType.n_elements(); i++) {
+         if(strcasecmp(LineType[i], TCStatLineType_TCMPR_Str) != 0) {
+            mlog << Error << "\nTCStatJobSummary::do_job() -> "
+                 << "the track-based " << TCStatLineType_TCMPR_Str
+                 << " line type cannot be mixed with the "
+                 << LineType[i] << " line type.\n\n";
+            exit(1);
+         }
+      } // end for
+
+      summarize_tracks(n);
+   }
+
+   // Process line-based summary job
+   else {
+      summarize_lines(n);
+   }
+
+   // Close the dump file
+   if(DumpOut) close_dump_file();
+
+   // Process the filter output
+   if(JobOut) do_output(*JobOut);
+   else       do_output(cout);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobSummary::summarize_tracks(TCLineCounts &n) {
+   TrackPairInfo pair;
 
    // Apply the event equalization logic to build a list of common cases
    if(EventEqual == true) event_equalize_tracks();
@@ -1769,7 +1899,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    // Check for no common cases
    if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
       mlog << Debug(1)
-           << "Event equalization found no common cases.\n";
+           << "Event equalization of tracks found no common cases.\n";
    }
    // Otherwise, process the track data
    else {
@@ -1797,12 +1927,44 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
       } // end while
    } // end else
 
-   // Close the dump file
-   if(DumpOut) close_dump_file();
+   return;
+}
 
-   // Process the summary output
-   if(JobOut) do_output(*JobOut);
-   else       do_output(cout);
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobSummary::summarize_lines(TCLineCounts &n) {
+   TCStatLine line;
+
+   // Apply the event equalization logic to build a list of common cases
+   if(EventEqual == true) event_equalize_lines();
+
+   // Check for no common cases
+   if(EventEqualSet == true && EventEqualCases.n_elements() == 0) {
+      mlog << Debug(1)
+           << "Event equalization of lines found no common cases.\n";
+   }
+   // Otherwise, process the line data
+   else {
+
+      // Rewind to the beginning of the track pair input
+      TCSTFiles.rewind();
+
+      // Process each of the track pairs
+      while(TCSTFiles >> line) {
+
+         // Increment the read and keep counts
+         n.NRead++;
+         n.NKeep++;
+
+         // Check if this line should be kept
+         if(!is_keeper_line(line, n)) continue;
+
+         // Process the line for the summary job
+         process_line(line);
+
+         if(DumpOut) dump_line(line, DumpOut);
+      } // end while
+   } // end else
 
    return;
 }
@@ -1841,6 +2003,43 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
          cur_map[key].Valid.add(pair.line(i)->valid());
 
       } // end for j
+   } // end for i
+
+   // Add the current map
+   add_map(cur_map);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobSummary::process_line(TCStatLine &line) {
+   int i;
+   map<ConcatString,SummaryMapData,cs_cmp> cur_map;
+   ConcatString key, cur;
+   SummaryMapData data;
+   double val;
+
+   // Initialize the map
+   cur_map.clear();
+
+   // Add summary info to the current map
+   for(i=0; i<Column.n_elements(); i++) {
+
+      // Build the key and get the current column value
+      key = build_map_key(Column[i], line, CaseColumn);
+      val = get_column_double(line, Column[i]);
+
+      // Add map entry for this key, if necessary
+      if(cur_map.count(key) == 0) cur_map[key] = data;
+
+      // Add values for this key
+      cur_map[key].Val.add(val);
+      cur_map[key].Hdr.add(line.header());
+      cur_map[key].AModel.add(line.amodel());
+      cur_map[key].Init.add(line.init());
+      cur_map[key].Lead.add(line.lead());
+      cur_map[key].Valid.add(line.valid());
    } // end for i
 
    // Add the current map
