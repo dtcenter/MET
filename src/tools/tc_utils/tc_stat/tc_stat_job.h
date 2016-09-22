@@ -214,6 +214,7 @@ class TCStatJob {
 
       void dump_pair(const TrackPairInfo &,  ofstream *);
       void dump_pair(const ProbRIPairInfo &, ofstream *);
+      void dump_line(const TCStatLine &,     ofstream *);
 
       virtual ConcatString serialize() const;
 
@@ -343,6 +344,9 @@ class TCStatJobFilter : public TCStatJob {
 
       void do_job(const StringArray &, TCLineCounts &); // virtual from base class
 
+      void filter_tracks(TCLineCounts &);
+      void filter_lines (TCLineCounts &);
+
       void do_output(ostream &);
 
 };
@@ -374,7 +378,11 @@ class TCStatJobSummary : public TCStatJob {
 
       void do_job(const StringArray &, TCLineCounts &); // virtual from base class
 
+      void summarize_tracks(TCLineCounts &);
+      void summarize_lines (TCLineCounts &);
+
       void process_pair(TrackPairInfo &);
+      void process_line(TCStatLine &);
 
       void add_map(map<ConcatString,SummaryMapData,cs_cmp>&);
 
