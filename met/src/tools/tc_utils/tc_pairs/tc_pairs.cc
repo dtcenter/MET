@@ -477,7 +477,7 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
    }
 
    // Write out the ProbRI pairs
-   write_prob_ri(prob_ri_pairs);
+   if(prob_ri_pairs.n_pairs() > 0) write_prob_ri(prob_ri_pairs);
 
    return;
 }
