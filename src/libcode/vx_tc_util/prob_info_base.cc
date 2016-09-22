@@ -202,14 +202,14 @@ void ProbInfoBase::initialize(const ATCFProbLine &l) {
 
 bool ProbInfoBase::is_match(const ATCFProbLine &l) const {
 
-   return(Type      == l.type(),
-          StormId   == l.storm_id(),
-          Basin     == l.basin(),
-          Cyclone   == l.cyclone_number(),
-          Technique == l.technique(),
-          InitTime  == l.warning_time(),
-          ValidTime == l.valid(),
-          Lat       == l.lat(),
+   return(Type      == l.type() &&
+          StormId   == l.storm_id() &&
+          Basin     == l.basin() &&
+          Cyclone   == l.cyclone_number() &&
+          Technique == l.technique() &&
+          InitTime  == l.warning_time() &&
+          ValidTime == l.valid() &&
+          Lat       == l.lat() &&
           Lon       == l.lon());
 }
 
