@@ -72,12 +72,12 @@
       -edeck &DATA_DIR;/edeck/*2015*.dat \
       -bdeck &DATA_DIR;/bdeck/*2015*.dat \
       -config &CONFIG_DIR;/TCPairsConfig_PROBRI \
-      -out &OUTPUT_DIR;/tc_pairs/al2015 \
+      -out &OUTPUT_DIR;/tc_pairs/alal2015 \
       -log &OUTPUT_DIR;/tc_pairs/tc_pairs_PROBRI.log \
       -v 3
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/tc_pairs/al2015_PROBRI.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2015_PROBRI.tcst</stat>
     </output>
   </test>
 

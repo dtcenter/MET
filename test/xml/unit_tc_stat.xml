@@ -36,7 +36,7 @@
   <test name="tc_stat_PROBRI">
     <exec>&MET_DIR;/bin/tc_stat</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/tc_pairs/al2015_PROBRI.tcst \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2015_PROBRI.tcst \
       -config &CONFIG_DIR;/TCStatConfig_PROBRI \
       -out &OUTPUT_DIR;/tc_stat/PROBRI_stat.out \
       -v 2
