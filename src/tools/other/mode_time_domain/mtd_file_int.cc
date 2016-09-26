@@ -1625,7 +1625,7 @@ int MtdIntFile::x_right(const int y) const
 
 if ( (y < 0) || (y >= Ny) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::x_left(int) -> range check error\n\n";
+   mlog << Error << "\n\n  MtdIntFile::x_right(int) -> range check error\n\n";
 
    exit ( 1 );
 
