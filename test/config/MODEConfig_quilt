@@ -12,6 +12,11 @@
 model = "WRF";
 
 //
+// Output description to be written
+//
+desc = "NA";
+
+//
 // Output observation type to be written
 //
 obtype = "STAGE4";
@@ -227,6 +232,6 @@ ct_stats_flag   = TRUE;
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.1";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

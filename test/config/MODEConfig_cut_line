@@ -12,6 +12,11 @@
 model = "WRF";
 
 //
+// Output description to be written
+//
+desc = "NA";
+
+//
 // Output observation type to be written
 //
 obtype = "ANALYS";
@@ -229,6 +234,6 @@ shift_right = 50;   //  grid squares
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.2";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

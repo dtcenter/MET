@@ -201,7 +201,7 @@
     </env>
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <param> \
-      -lookin &DATA_DIR_MODEL;/time_series/*.stat \
+      -lookin &DATA_DIR_MODEL;/time_series_met_6.0/*.stat \
       -config &CONFIG_DIR;/STATAnalysisConfig_ramps \
       -out &OUTPUT_DIR;/stat_analysis/RAMPS.out \
       -v 1

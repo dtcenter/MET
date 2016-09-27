@@ -2,6 +2,12 @@
 
 model = "GTG";
 
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
 ////////////////////////////////////////////////////////////////////////////////
 
 regrid = {
@@ -132,6 +138,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.2";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 # to the STAT format consistent with the output of other MET
 # tools
 #
-# last revised: 2013-03-12
+# last revised: 2016-09-27 for MET version 6.0
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -34,6 +34,7 @@ my @fld_tcst  = qw(AMODEL BMODEL STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VAL
 my $fmt_hdr = 
       "%-8s"  . # VERSION
       "%-12s" . # MODEL
+      "%-12s" . # DESC
       "%-10s" . # FCST_LEAD
       "%-16s" . # FCST_VALID_BEG
       "%-16s" . # FCST_VALID_END
@@ -153,6 +154,7 @@ while(<$fh_tcst_in>){
   my @outs = (
      $vals[0], # VERSION
      "NA",     # MODEL
+     "NA",     # DESC 
      $vals[8], # FCST_LEAD
      $vals[9], # FCST_VALID_BEG
      $vals[9], # FCST_VALID_END

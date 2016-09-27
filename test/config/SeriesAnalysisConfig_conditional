@@ -12,6 +12,11 @@
 model = "GFS";
 
 //
+// Output description to be written
+//
+desc = "NA";
+
+//
 // Output observation type to be written
 //
 obtype = "STAGE4";
@@ -106,6 +111,6 @@ output_stats = {
 
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
-version        = "V5.2";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

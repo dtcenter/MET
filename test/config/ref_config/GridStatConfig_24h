@@ -12,6 +12,12 @@
 model = "${MODEL}";
 
 //
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+//
 // Output observation type to be written
 //
 obtype = "MC_PCP";
@@ -128,6 +134,6 @@ grid_weight_flag = NONE;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${MODEL}_F${FCST_TIME}_24h";
-version          = "V5.2";
+version          = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

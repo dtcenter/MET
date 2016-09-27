@@ -11,6 +11,12 @@
 //
 model = "WRF";
 
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -128,6 +134,6 @@ duplicate_flag = ${DUPLICATE_FLAG};
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V5.2";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,12 @@
 model = "WRF";
 
 //
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+//
 // Output observation type to be written
 //
 obtype = "ANALYS";
@@ -157,6 +163,6 @@ rng = {
 grid_weight_flag = NONE;
 duplicate_flag   = NONE;
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V5.2";
+version          = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////
