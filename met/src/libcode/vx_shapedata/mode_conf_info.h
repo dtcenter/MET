@@ -94,6 +94,7 @@ class ModeConfInfo {
       MetConfig conf;                          // MODE configuration object
 
       ConcatString     model;                  // Model name
+      ConcatString     desc;                   // Description
       ConcatString     obtype;                 // Observation type
 
       RegridInfo       regrid_info;            // Regridding information
@@ -139,7 +140,7 @@ class ModeConfInfo {
       MergeType        fcst_merge_flag;        // Define which merging methods should be employed
       MergeType         obs_merge_flag;
 
-      FieldType        mask_missing_flag;      // Mask missing data between fcst and obs      
+      FieldType        mask_missing_flag;      // Mask missing data between fcst and obs
 
       MatchType        match_flag;             // Define which matching methods should be employed
 
@@ -181,13 +182,13 @@ class ModeConfInfo {
       PlotInfo         obs_raw_pi;             // Raw observation plotting info
       PlotInfo         object_pi;              // Object plotting info
 
-      int              zero_border_size;       // Zero out edge rows and columns for object definition      
+      int              zero_border_size;       // Zero out edge rows and columns for object definition
 
       bool             plot_valid_flag;        // Zoom up plot to the sub-region of valid data
       bool             plot_gcarc_flag;        // Plot lines as great-circle arcs
-      bool             ps_plot_flag;           // Flag for the output PostScript image file      
+      bool             ps_plot_flag;           // Flag for the output PostScript image file
       // bool             nc_pairs_flag;          // output NetCDF file
-      ModeNcOutInfo    nc_info; 
+      ModeNcOutInfo    nc_info;
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
 
       int              shift_right;            //  shift amount for global grids

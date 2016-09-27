@@ -1048,6 +1048,9 @@ void process_point_scores() {
    // requested, and write the output.
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      // Set the description
+      shc.set_desc(conf_info.vx_pd[i].desc);
+
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_pd[i].fcst_info->name().text());
 
@@ -1203,6 +1206,9 @@ void process_grid_vx() {
       // Set the forecast valid time
       shc.set_fcst_valid_beg(ens_valid_ut);
       shc.set_fcst_valid_end(ens_valid_ut);
+
+      // Set the description
+      shc.set_desc(conf_info.vx_pd[i].desc);
 
       // Set the forecast variable name
       shc.set_fcst_var(conf_info.vx_pd[i].fcst_info->name().text());
@@ -1627,7 +1633,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_nc_file.text(), program_name,
-                       conf_info.model, conf_info.obtype);
+                       conf_info.model, conf_info.obtype, conf_info.desc);
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);

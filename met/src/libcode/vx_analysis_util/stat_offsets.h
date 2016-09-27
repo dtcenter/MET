@@ -22,35 +22,36 @@
 //
 static const int version_offset          = 0;
 static const int model_offset            = 1;
+static const int desc_offset             = 2;
 
-static const int fcst_lead_offset        = 2;
-static const int fcst_valid_beg_offset   = 3;
-static const int fcst_valid_end_offset   = 4;
+static const int fcst_lead_offset        = 3;
+static const int fcst_valid_beg_offset   = 4;
+static const int fcst_valid_end_offset   = 5;
 
-static const int obs_lead_offset         = 5;
-static const int obs_valid_beg_offset    = 6;
-static const int obs_valid_end_offset    = 7;
+static const int obs_lead_offset         = 6;
+static const int obs_valid_beg_offset    = 7;
+static const int obs_valid_end_offset    = 8;
 
-static const int fcst_var_offset         = 8;
-static const int fcst_lev_offset         = 9;
+static const int fcst_var_offset         = 9;
+static const int fcst_lev_offset         = 10;
 
-static const int obs_var_offset          = 10;
-static const int obs_lev_offset          = 11;
+static const int obs_var_offset          = 11;
+static const int obs_lev_offset          = 12;
 
-static const int obtype_offset           = 12;
-static const int vx_mask_offset          = 13;
+static const int obtype_offset           = 13;
+static const int vx_mask_offset          = 14;
 
-static const int interp_mthd_offset      = 14;
-static const int interp_pnts_offset      = 15;
+static const int interp_mthd_offset      = 15;
+static const int interp_pnts_offset      = 16;
 
-static const int fcst_thresh_offset      = 16;
-static const int obs_thresh_offset       = 17;
-static const int cov_thresh_offset       = 18;
+static const int fcst_thresh_offset      = 17;
+static const int obs_thresh_offset       = 18;
+static const int cov_thresh_offset       = 19;
 
-static const int alpha_offset            = 19;
-static const int line_type_offset        = 20;
+static const int alpha_offset            = 20;
+static const int line_type_offset        = 21;
 
-static const int nhc                     = 21;
+static const int nhc                     = 22;
 
 //
 // SL1L2 Line Type offsets

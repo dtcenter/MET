@@ -83,6 +83,7 @@ class MtdConfigInfo {
       MetConfig conf;                          // MODE configuration object
 
       ConcatString     model;                  // Model name
+      ConcatString     desc;                   // Description
       ConcatString     obtype;                 // Observation type
 
       RegridInfo       regrid_info;            // Regridding information
@@ -117,7 +118,7 @@ class MtdConfigInfo {
       MergeType        fcst_merge_flag;        // Define which merging methods should be employed
       MergeType        obs_merge_flag;
 
-      FieldType        mask_missing_flag;      // Mask missing data between fcst and obs      
+      FieldType        mask_missing_flag;      // Mask missing data between fcst and obs
 
       MatchType        match_flag;             // Define which matching methods should be employed
 
@@ -157,10 +158,10 @@ class MtdConfigInfo {
 
       double           print_interest_thresh;  // Only write output for pairs with >= this interest
 
-      int              zero_border_size;       // Zero out edge rows and columns for object definition      
+      int              zero_border_size;       // Zero out edge rows and columns for object definition
 
       // bool             nc_pairs_flag;          // output NetCDF file
-      MtdNcOutInfo      nc_info; 
+      MtdNcOutInfo      nc_info;
       bool             ct_stats_flag;          // Flag for the output contingency table statistics file
 
       bool             do_2d_att_ascii;

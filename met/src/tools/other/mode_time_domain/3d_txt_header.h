@@ -23,6 +23,7 @@ static const char * header_3d_cols [] = {
 
    "VERSION", 
    "MODEL", 
+   "DESC", 
    "FCST_LEAD", 
    "FCST_VALID", 
    // "FCST_T_DELTA", 

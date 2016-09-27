@@ -24,12 +24,12 @@ using namespace std;
 #include "rad_offsets.h"
 #include "rad_record.h"
 #include "gsi_util.h"
-   
+
 ////////////////////////////////////////////////////////////////////////
 
 ConvData parse_conv_data(const ConvRecord &r, const int i) {
    ConvData d;
-   
+
    bool uv_flag = (str_trim(r.variable) == "uv");
 
    d.var        = str_trim(r.variable);
@@ -38,7 +38,7 @@ ConvData parse_conv_data(const ConvRecord &r, const int i) {
    d.lon        = rescale_lon(r.rdiag_get_2d(conv_lon_index - 1, i));
    d.prs        = r.rdiag_get_2d(conv_pressure_index - 1, i);
    d.prs        = (d.var == "pw" ? bad_data_double : d.prs);
-   
+
    d.elv        = r.rdiag_get_2d(conv_elevation_index - 1, i);
 
    d.obtype << cs_erase << nint(r.rdiag_get_2d(conv_obstype_index - 1, i));
@@ -46,7 +46,7 @@ ConvData parse_conv_data(const ConvRecord &r, const int i) {
    d.obs_ut     = nint(r.date + (r.rdiag_get_2d(conv_obs_hours_index - 1, i) * sec_per_hour));
    d.obs        = r.rdiag_get_2d(conv_obs_data_index - 1, i);
    d.guess      = r.rdiag_get_guess(i);
-   
+
    if(uv_flag) {
       d.obs_v   = r.rdiag_get_2d(conv_obs_v_data_index - 1, i);
       d.guess_v = r.rdiag_get_guess_v(i);
@@ -78,7 +78,7 @@ RadData parse_rad_data(const RadRecord  &r, const int i,
    RadData d;
 
    d.var.format("TB_%02d", chval);
-   
+
    d.lat       = r.diag_data(rad_lat_index - 1);
    d.lon       = rescale_lon(r.diag_data(rad_lon_index - 1));
    d.elv       = r.diag_data(rad_elevation_index - 1);
@@ -123,7 +123,7 @@ RadData parse_rad_data(const RadRecord  &r, const int i,
    d.twarm     = r.diag_data(rad_idtw_index - 1);
    d.tcool     = r.diag_data(rad_idtc_index - 1);
    d.tzfnd     = r.diag_data(rad_itz_tr_index - 1);
-   
+
    d.obs_err   = r.diagchan_data(rad_inv_chan_index - 1, i);
    d.fcst_nobc = d.obs - r.diagchan_data(rad_omg_nobc_chan_index - 1, i);
    d.sfc_emis  = r.diagchan_data(rad_surf_em_index - 1, i);
@@ -135,9 +135,9 @@ RadData parse_rad_data(const RadRecord  &r, const int i,
    d.prs_max_wgt = (d.prs_max_wgt > 1.0E8 ?
                     bad_data_double :
                     d.prs_max_wgt);
-   
+
    d.n_use     = 0;
-   
+
    return(d);
 }
 
@@ -168,7 +168,7 @@ ConcatString get_rad_key(const RadData &d) {
        << unix_to_yyyymmdd_hhmmss(d.obs_ut) << key_sep
        << d.obs;
 
-   return(key);   
+   return(key);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -205,13 +205,21 @@ void setup_header(StatHdrColumns &shc,
                   const char *default_line_type) {
    int index;
    SingleThresh st;
-   
+
    // MODEL
    if(name.has("MODEL", index)) {
       shc.set_model(value[index]);
    }
    else {
       shc.set_model(default_model);
+   }
+
+   // DESC
+   if(name.has("DESC", index)) {
+      shc.set_desc(value[index]);
+   }
+   else {
+      shc.set_desc(default_desc);
    }
 
    // FCST_LEAD
@@ -308,12 +316,12 @@ void setup_header(StatHdrColumns &shc,
    if(name.has("FCST_THRESH", index)) st.set(value[index]);
    else                                   st.set(default_thresh);
    shc.set_fcst_thresh(st);
-   
+
    // OBS_THRESH
    if(name.has("OBS_THRESH", index))  st.set(value[index]);
    else                                   st.set(default_thresh);
-   shc.set_obs_thresh(st);   
-   
+   shc.set_obs_thresh(st);
+
    // COV_THRESH
    if(name.has("COV_THRESH", index))  st.set(value[index]);
    else                                   st.set(default_thresh);

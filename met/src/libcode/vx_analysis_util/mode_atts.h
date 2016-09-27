@@ -86,7 +86,7 @@ class ModeAttributes {
       int is_single;              //  true for single, false for pair
 
       int is_simple_toggle_set;
-      int is_simple;              //  true for simple, false for cluster 
+      int is_simple;              //  true for simple, false for cluster
 
       int is_matched_toggle_set;
       int is_matched;             //  true for matched, false for unmatched
@@ -96,6 +96,7 @@ class ModeAttributes {
          //
 
       StringArray model;
+      StringArray desc;
       StringArray fcst_thr;
       StringArray obs_thr;
       StringArray fcst_var;
@@ -109,7 +110,7 @@ class ModeAttributes {
 
       IntArray fcst_lead;
       IntArray fcst_valid_hour;
-      IntArray fcst_init_hour;      
+      IntArray fcst_init_hour;
       IntArray fcst_accum;
       IntArray obs_lead;
       IntArray obs_valid_hour;
@@ -385,6 +386,8 @@ class ModeAttributes {
 
       void add_model    (const char *);
 
+      void add_desc     (const char *);
+
       void add_fcst_thr (const char *);
 
       void add_obs_thr  (const char *);
@@ -406,7 +409,7 @@ class ModeAttributes {
       void add_fcst_lead       (int);
 
       void add_fcst_valid_hour (int);
-      
+
       void add_fcst_init_hour  (int);
 
       void add_fcst_accum      (int);
@@ -414,7 +417,7 @@ class ModeAttributes {
       void add_obs_lead        (int);
 
       void add_obs_valid_hour  (int);
-      
+
       void add_obs_init_hour   (int);
 
       void add_obs_accum       (int);

@@ -54,7 +54,7 @@ static const int min_time_series = 10;
 ////////////////////////////////////////////////////////////////////////
 
 struct StatHdrInfo {
-   StringArray model, fcst_var, fcst_lev, obs_var, obs_lev;
+   StringArray model, desc, fcst_var, fcst_lev, obs_var, obs_lev;
    StringArray obtype, vx_mask, interp_mthd;
    StringArray fcst_thresh, obs_thresh, cov_thresh;
    NumArray fcst_lead, obs_lead, interp_pnts, alpha;

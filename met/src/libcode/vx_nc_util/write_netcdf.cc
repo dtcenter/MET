@@ -35,7 +35,7 @@ extern void write_netcdf_latlon_2d(NcFile *, NcDim *, NcDim *, const Grid &);
 
 void write_netcdf_global(NcFile * f_out, const char *file_name,
                          const char *program_name, const char *model_name,
-                         const char *obtype)
+                         const char *obtype, const char *desc)
 
 {
 
@@ -56,6 +56,7 @@ f_out->add_att("MET_version", met_version);
 f_out->add_att("MET_tool", program_name);
 if(model_name) f_out->add_att("model",  model_name);
 if(obtype)     f_out->add_att("obtype", obtype);
+if(desc)       f_out->add_att("desc",   desc);
 
 return;
 

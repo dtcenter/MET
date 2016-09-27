@@ -76,6 +76,7 @@ void EnsembleStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   desc.clear();
    obtype.clear();
    regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
@@ -161,6 +162,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: desc
+   desc = parse_conf_string(&conf, conf_key_desc);
 
    // Conf: obtype
    obtype = parse_conf_string(&conf, conf_key_obtype);
@@ -324,6 +328,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          // Get the current dictionaries
          i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
+
+         // Conf: desc
+         vx_pd[i].set_desc(parse_conf_string(&i_obs_dict, conf_key_desc));
 
          // Conf: message_type
          msg_typ[i] = parse_conf_message_type(&i_obs_dict, point_vx);

@@ -86,6 +86,7 @@ void STATAnalysisJob::init_from_scratch() {
    boot_seed = (char *)     0;
 
    model.set_ignore_case(1);
+   desc.set_ignore_case(1);
    fcst_var.set_ignore_case(1);
    obs_var.set_ignore_case(1);
    fcst_lev.set_ignore_case(1);
@@ -112,6 +113,7 @@ void STATAnalysisJob::clear() {
    job_type = no_stat_job_type;
 
    model.clear();
+   desc.clear();
 
    fcst_lead.clear();
    obs_lead.clear();
@@ -218,6 +220,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    job_type             = aj.job_type;
 
    model                = aj.model;
+   desc                 = aj.desc;
 
    fcst_lead            = aj.fcst_lead;
    obs_lead             = aj.obs_lead;
@@ -319,6 +322,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "model ...\n";
    model.dump(out, depth + 1);
+
+   out << prefix << "desc ...\n";
+   desc.dump(out, depth + 1);
 
    out << prefix << "fcst_lead ...\n";
    fcst_lead.dump(out, depth + 1);
@@ -538,6 +544,13 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(model.n_elements() > 0) {
       if(!(model.has(L.model()))) return(0);
+   }
+
+   //
+   // desc
+   //
+   if(desc.n_elements() > 0) {
+      if(!(desc.has(L.desc()))) return(0);
    }
 
    //
@@ -840,6 +853,8 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
 
       if(     strcmp(jc_array[i], "-model"          ) == 0)
          model.clear();
+      else if(strcmp(jc_array[i], "-desc"           ) == 0)
+         desc.clear();
       else if(strcmp(jc_array[i], "-fcst_lead"      ) == 0)
          fcst_lead.clear();
       else if(strcmp(jc_array[i], "-obs_lead"       ) == 0)
@@ -935,6 +950,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       }
       else if(strcmp(jc_array[i], "-model") == 0) {
          model.add_css(jc_array[i+1]);
+         i++;
+      }
+      else if(strcmp(jc_array[i], "-desc") == 0) {
+         desc.add_css(jc_array[i+1]);
          i++;
       }
       else if(strcmp(jc_array[i], "-fcst_lead") == 0) {
@@ -1785,6 +1804,12 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    if(model.n_elements() > 0) {
       for(i=0; i<model.n_elements(); i++)
          js << "-model " << model[i] << " ";
+   }
+
+   // desc
+   if(desc.n_elements() > 0) {
+      for(i=0; i<desc.n_elements(); i++)
+         js << "-desc " << desc[i] << " ";
    }
 
    // fcst_lead

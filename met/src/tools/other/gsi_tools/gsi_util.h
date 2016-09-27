@@ -21,6 +21,7 @@ using namespace std;
 
 // Constants
 static const char   default_model[]       = "GSI";
+static const char   default_desc[]        = "NA";
 static const int    default_lead          = 0;
 static const char   default_lev[]         = "NA";
 static const char   default_obtype[]      = "NA";

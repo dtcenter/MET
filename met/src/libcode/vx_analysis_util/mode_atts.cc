@@ -135,6 +135,7 @@ is_matched            = 0;
    //
 
    model.clear();
+    desc.clear();
 fcst_thr.clear();
  obs_thr.clear();
 fcst_var.clear();
@@ -437,6 +438,7 @@ is_matched            = A.is_matched;
    //
 
 model    = A.model;
+desc     = A.desc;
 fcst_thr = A.fcst_thr;
 obs_thr  = A.obs_thr;
 fcst_var = A.fcst_var;
@@ -776,6 +778,22 @@ if ( model.n_elements() > 0 )  {
       out << "\"" << model[j] << "\"";
 
       if ( j < (model.n_elements() - 1) )  out << ", ";
+
+   }
+
+   out << " }\n";
+
+}
+
+if ( desc.n_elements() > 0 )  {
+
+   out << prefix << "desc = { ";
+
+   for (j=0; j<(desc.n_elements()); ++j)  {
+
+      out << "\"" << desc[j] << "\"";
+
+      if ( j < (desc.n_elements() - 1) )  out << ", ";
 
    }
 
@@ -1338,6 +1356,10 @@ c = L.model();
 
 if ( (model.n_elements() > 0) && !(model.has(c)) )  return ( 0 );
 
+c = L.desc();
+
+if ( (desc.n_elements() > 0) && !(desc.has(c)) )  return ( 0 );
+
 c = L.fcst_thr();
 
 if ( (fcst_thr.n_elements() > 0) && !(fcst_thr.has(c)) )  return ( 0 );
@@ -1861,6 +1883,7 @@ while ( j < (a.n_elements()) )  {
       //
 
    else if ( strcmp(c, "-model"   ) == 0 )  { add_model   (a[j + 1]);  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-desc"    ) == 0 )  { add_desc    (a[j + 1]);  a.shift_down(j, 2); }
    else if ( strcmp(c, "-fcst_thr") == 0 )  { add_fcst_thr(a[j + 1]);  a.shift_down(j, 2); }
    else if ( strcmp(c, "-obs_thr" ) == 0 )  { add_obs_thr (a[j + 1]);  a.shift_down(j, 2); }
    else if ( strcmp(c, "-fcst_var") == 0 )  { add_fcst_var(a[j + 1]);  a.shift_down(j, 2); }
@@ -2044,6 +2067,12 @@ if ( m.is_matched_toggle_set )  {
 for (j=0; j<(m.model.n_elements()); ++j)  {
 
    add_model(m.model[j]);
+
+}
+
+for (j=0; j<(m.desc.n_elements()); ++j)  {
+
+   add_desc(m.desc[j]);
 
 }
 
@@ -2437,6 +2466,20 @@ void ModeAttributes::add_model(const char * text)
 {
 
 if ( !(model.has(text)) )   model.add(text);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeAttributes::add_desc(const char * text)
+
+{
+
+if ( !(desc.has(text)) )   desc.add(text);
 
 return;
 
@@ -3956,6 +3999,7 @@ s << "multiple set string options\n"
   << "===========================\n"
   << "\n";
 s << "   -model    value\n";
+s << "   -desc     value\n";
 s << "   -fcst_thr value\n";
 s << "   -obs_thr  value\n";
 s << "   -fcst_var value\n";

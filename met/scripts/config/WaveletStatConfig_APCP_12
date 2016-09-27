@@ -12,6 +12,12 @@
 model = "WRF";
 
 //
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+//
 // Output observation type to be written
 //
 obtype = "MC_PCP";
@@ -132,6 +138,6 @@ wvlt_plot = {
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix = "";
-version = "V5.2";
+version = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -126,10 +126,10 @@ class STATAnalysisJob {
       void dump(ostream &, int depth = 0) const;
 
       //////////////////////////////////////////////////////////////////
-      
+
       void set_precision(int);
       int  get_precision() const;
-      
+
       int  is_keeper(const STATLine &) const;
 
       void parse_job_command(const char *);
@@ -164,6 +164,7 @@ class STATAnalysisJob {
       // Variables used to stratify the input STAT lines
       //
       StringArray model;
+      StringArray desc;
 
       IntArray    fcst_lead; // stored in seconds
       IntArray    obs_lead;  // stored in seconds
@@ -171,7 +172,7 @@ class STATAnalysisJob {
       unixtime    fcst_valid_beg;
       unixtime    fcst_valid_end;
       IntArray    fcst_valid_hour; // stored in seconds
-      
+
       unixtime    obs_valid_beg;
       unixtime    obs_valid_end;
       IntArray    obs_valid_hour; // stored in seconds
@@ -179,7 +180,7 @@ class STATAnalysisJob {
       unixtime    fcst_init_beg;
       unixtime    fcst_init_end;
       IntArray    fcst_init_hour; // stored in seconds
-      
+
       unixtime    obs_init_beg;
       unixtime    obs_init_end;
       IntArray    obs_init_hour;  // stored in seconds
@@ -236,7 +237,7 @@ class STATAnalysisJob {
       char        *stat_file; // dump output statistics to a STAT file
       ofstream    *stat_out;  // output file stream for -out_stat
       AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
-      
+
 
       StringArray  out_line_type;        // output line types
       ThreshArray  out_fcst_thresh;      // output forecast threshold(s)

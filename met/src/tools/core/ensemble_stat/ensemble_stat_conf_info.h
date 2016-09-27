@@ -78,6 +78,7 @@ class EnsembleStatConfInfo {
 
       // Store data parsed from the Ensemble-Stat configuration object
       ConcatString         model;               // Model name
+      ConcatString         desc;                // Description
       ConcatString         obtype;              // Observation type
       RegridInfo           regrid_info;         // Regridding information
       int                  beg_ds;              // Begin observation time window offset

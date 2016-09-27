@@ -13,6 +13,12 @@
 model = "WRF";
 
    //
+   // Output description to be written
+   //
+
+desc = "NA";
+
+   //
    // Output observation type to be written
    //
 
@@ -20,9 +26,9 @@ obtype = "ANALYS";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-   //  
+   //
    //  Verification grid
-   //  
+   //
 
 regrid = {
    to_grid    = NONE;
@@ -50,7 +56,7 @@ fcst = {
       name  = "APCP";
       level = "A03";
    }
-   
+
    conv_radius       = 60.0/grid_res; // in grid squares
    conv_thresh       = >=5.0;
 
@@ -213,6 +219,6 @@ txt_output = {
 
 output_prefix  = "";
 
-version        = "V5.2";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

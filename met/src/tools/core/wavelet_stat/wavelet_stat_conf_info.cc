@@ -70,6 +70,7 @@ void WaveletStatConfInfo::clear() {
    n_scale      = 0;
 
    model.clear();
+   desc.clear();
    obtype.clear();
    regrid_info.clear();
    mask_missing_flag = FieldType_None;
@@ -85,7 +86,7 @@ void WaveletStatConfInfo::clear() {
    met_data_dir.clear();
    output_prefix.clear();
    version.clear();
-   
+
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    // Deallocate memory
@@ -143,7 +144,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    Dictionary *dict      = (Dictionary *) 0;
    Dictionary i_fcst_dict, i_obs_dict;
    gsl_wavelet_type type;
-   
+
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
@@ -230,6 +231,9 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       fcst_info[i]->set_dict(i_fcst_dict);
       obs_info[i]->set_dict(i_obs_dict);
 
+      // Conf: desc
+      desc.add(parse_conf_string(&i_obs_dict, conf_key_desc));
+
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
@@ -248,7 +252,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
               << "using wavelet_stat.\n\n";
          exit(1);
       }
-      
+
       // Conf: cat_thresh
       fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_cat_thresh);
       obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_cat_thresh);
@@ -273,7 +277,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
       // Keep track of the maximum number of thresholds
       if(fcst_ta[i].n_elements() > max_n_thresh) max_n_thresh = fcst_ta[i].n_elements();
-      
+
    } // end for i
 
    // Conf: mask_missing_flag
@@ -284,7 +288,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Only check tile definitions for GridDecompType_Tile
    if(grid_decomp_flag == GridDecompType_Tile) {
-   
+
       // Conf: tile.width
       tile_dim = conf.lookup_int(conf_key_tile_width);
 
@@ -295,7 +299,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
               << "\" parameter must be set to an integer power of 2.\n\n";
          exit(1);
       }
-      
+
       // Conf: tile.location
       dict = conf.lookup_array(conf_key_tile_location);
 
@@ -365,7 +369,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
             exit(1);
          }
          break;
-        
+
       case(WaveletType_None):
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
@@ -373,10 +377,10 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          exit(1);
          break;
    }
-   
+
    // Initialize the requested wavelet
    wvlt_ptr = wavelet_set(&type, wvlt_member);
-   
+
    // Conf: nc_pairs_flag
    parse_nc_info();
 
@@ -394,7 +398,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: wvlt_plot
    wvlt_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_wvlt_plot));
-   
+
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 

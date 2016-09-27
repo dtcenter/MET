@@ -250,6 +250,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       i_fdict = parse_conf_i_vx_dict(fdict, i);
       i_odict = parse_conf_i_vx_dict(odict, i);
 
+      // Conf: desc
+      vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));
+
       // Conf: message_type
       msg_typ[i] = parse_conf_message_type(&i_odict);
 

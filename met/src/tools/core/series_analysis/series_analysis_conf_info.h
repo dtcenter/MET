@@ -44,6 +44,7 @@ class SeriesAnalysisConfInfo {
 
       // Store data parsed from the Series-Analysis configuration object
       ConcatString     model;              // Model name
+      ConcatString     desc;               // Description
       ConcatString     obtype;             // Observation type
       RegridInfo       regrid_info;        // Regridding information
 

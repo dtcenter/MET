@@ -33,6 +33,9 @@ class StatHdrColumns {
       // Model name
       ConcatString model;
 
+      // Description
+      ConcatString desc;
+
       // Fcst lead time
       int          fcst_lead_sec;
       ConcatString fcst_lead_str;
@@ -109,6 +112,7 @@ class StatHdrColumns {
 
       // Set functions
       void set_model         (const char *);
+      void set_desc          (const char *);
 
       void set_fcst_lead_sec (const int);
       void set_fcst_valid_beg(const unixtime);
@@ -144,6 +148,7 @@ class StatHdrColumns {
 
       // Get functions
       ConcatString get_model             () const;
+      ConcatString get_desc              () const;
 
       int          get_fcst_lead_sec     () const;
       ConcatString get_fcst_lead_str     () const;
@@ -195,6 +200,7 @@ class StatHdrColumns {
 ////////////////////////////////////////////////////////////////////////
 
 inline ConcatString StatHdrColumns::get_model             () const { return(model.contents(na_str));              }
+inline ConcatString StatHdrColumns::get_desc              () const { return(desc.contents(na_str));               }
 
 inline int          StatHdrColumns::get_fcst_lead_sec     () const { return(fcst_lead_sec);                       }
 inline ConcatString StatHdrColumns::get_fcst_lead_str     () const { return(fcst_lead_str.contents(na_str));      }

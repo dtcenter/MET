@@ -608,7 +608,7 @@ void ModeExecutive::build_outfile_prefix(ConcatString &str)
 
    // Append the output directory and program name
 
-str << cs_erase 
+str << cs_erase
     << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
@@ -875,7 +875,9 @@ if ( info.all_false() )  return;
 
    // Add global attributes
    write_netcdf_global(f_out, out_file.text(), program_name,
-                       engine.conf_info.model, engine.conf_info.obtype);
+                       engine.conf_info.model,
+                       engine.conf_info.obtype,
+                       engine.conf_info.desc);
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);

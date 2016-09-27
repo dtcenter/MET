@@ -69,6 +69,7 @@ StatHdrInfo::StatHdrInfo() {
 
 void StatHdrInfo::clear() {
    model.clear();
+   desc.clear();
    fcst_lead.clear();
    fcst_valid_beg = fcst_valid_end = (unixtime) 0;
    obs_lead.clear();
@@ -98,6 +99,8 @@ void StatHdrInfo::clear() {
 void StatHdrInfo::add(const STATLine &line) {
    if(!model.has(line.model()))
       model.add(line.model());
+   if(!desc.has(line.desc()))
+      desc.add(line.desc());
    if(!fcst_lead.has(line.fcst_lead()))
       fcst_lead.add(line.fcst_lead());
    if(fcst_valid_beg == (unixtime) 0 || line.fcst_valid_beg() < fcst_valid_beg)
@@ -168,6 +171,21 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    }
    else {
       shc.set_model(css);
+   }
+
+   // DESC
+   css = write_css(desc);
+   if(desc.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << desc.n_elements()
+           << " unique DESC values: " << css << "\n";
+   }
+   if(hdr_name.has("DESC", index)) {
+      shc.set_desc(hdr_value[index]);
+   }
+   else {
+      shc.set_desc(css);
    }
 
    // FCST_LEAD
@@ -1467,6 +1485,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          hdr << cs_erase
              << line.model() << ":"
+             << line.desc() << ":"
              << sec_to_hhmmss(line.fcst_lead()) << ":"
              << unix_to_yyyymmdd_hhmmss(line.fcst_valid_beg()) << ":"
              << unix_to_yyyymmdd_hhmmss(line.fcst_valid_end()) << ":"
