@@ -59,6 +59,7 @@ class STATLine : public DataLine {
 
       const char * version        () const;
       const char * model          () const;
+      const char * desc           () const;
 
       int          fcst_lead      () const;
       unixtime     fcst_valid_beg () const;

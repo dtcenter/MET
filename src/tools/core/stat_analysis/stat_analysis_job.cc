@@ -62,6 +62,7 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    //
 
    j.model           = c.lookup_string_array(conf_key_model, false);
+   j.desc            = c.lookup_string_array(conf_key_desc, false);
    j.fcst_lead       = c.lookup_seconds_array(conf_key_fcst_lead, false);
    j.obs_lead        = c.lookup_seconds_array(conf_key_obs_lead, false);
    j.fcst_valid_beg  = c.lookup_unixtime(conf_key_fcst_valid_beg, false);

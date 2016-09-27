@@ -206,6 +206,22 @@ return ( c );
 ////////////////////////////////////////////////////////////////////////
 
 
+const char * ModeLine::desc() const
+
+{
+
+const char * c = (const char *) 0;
+
+c = get_item(desc_column);
+
+return ( c );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 int ModeLine::fcst_lead() const
 
 {

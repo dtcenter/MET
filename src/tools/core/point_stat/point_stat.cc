@@ -821,6 +821,9 @@ void process_scores() {
       // Check for no forecast fields
       if(conf_info.vx_pd[i].fcst_dpa.n_planes() == 0) continue;
 
+      // Store the description
+      shc.set_desc(conf_info.vx_pd[i].desc);
+
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_pd[i].fcst_info->name());
 

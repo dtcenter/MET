@@ -565,6 +565,8 @@ void VxPairDataEnsemble::clear() {
    if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
    if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) 0; }
 
+   desc.clear();
+
    interp_thresh = 0;
 
    fcst_dpa.clear();
@@ -603,6 +605,8 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    set_fcst_info(vx_pd.fcst_info);
    set_climo_info(vx_pd.climo_info);
    set_obs_info(vx_pd.obs_info);
+
+   desc         = vx_pd.desc;
 
    fcst_ut      = vx_pd.fcst_ut;
    beg_ut       = vx_pd.beg_ut;
@@ -670,6 +674,15 @@ void VxPairDataEnsemble::set_obs_info(VarInfo *info) {
    // Perform a deep copy
    obs_info = f.new_var_info(info->file_type());
    *obs_info = *info;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_desc(const char *s) {
+
+   desc = s;
 
    return;
 }

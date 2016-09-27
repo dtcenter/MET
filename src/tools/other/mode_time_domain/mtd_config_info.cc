@@ -81,6 +81,7 @@ void MtdConfigInfo::clear()
    // Initialize values
 
    model.clear();
+   desc.clear();
    obtype.clear();
 
    do_2d_att_ascii = true;
@@ -279,6 +280,10 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: model
 
    model = parse_conf_string(&conf, conf_key_model);
+
+      // Conf: desc
+
+   desc = parse_conf_string(&conf, conf_key_desc);
 
       // Conf: obtype
 
@@ -724,6 +729,10 @@ table.set_entry(row, c++, version.text());
    //  model
 
 table.set_entry(row, c++, model.text());
+
+   //  description
+
+table.set_entry(row, c++, desc.text());
 
    //  fcst lead
 

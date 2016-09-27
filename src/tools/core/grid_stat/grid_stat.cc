@@ -482,7 +482,8 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    }
 
    // Add global attributes
-   write_netcdf_global(nc_out, out_nc_file, program_name, conf_info.model, conf_info.obtype);
+   write_netcdf_global(nc_out, out_nc_file, program_name,
+                       conf_info.model, conf_info.obtype, "");
    if(nc_info.do_diff) {
       nc_out->add_att("Difference", "Forecast Value - Observation Value");
    }
@@ -694,6 +695,9 @@ void process_scores() {
 
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dp);
+
+      // Store the description
+      shc.set_desc(conf_info.desc[i]);
 
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.fcst_info[i]->name());
@@ -1763,6 +1767,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
          add_var_att(fcst_var, "units", conf_info.fcst_info[i_vx]->units());
          write_netcdf_var_times(fcst_var, fcst_dp);
          fcst_var->add_att("_FillValue", bad_data_float);
+         add_var_att(fcst_var, "desc", conf_info.desc[i_vx]);
          add_var_att(fcst_var, "masking_region", conf_info.mask_name[i]);
          add_var_att(fcst_var, "smoothing_method", mthd_str);
          fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
@@ -1788,6 +1793,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
          add_var_att(obs_var, "units", conf_info.obs_info[i_vx]->units());
          write_netcdf_var_times(obs_var, obs_dp);
          obs_var->add_att("_FillValue", bad_data_float);
+         add_var_att(obs_var, "desc", conf_info.desc[i_vx]);
          add_var_att(obs_var, "masking_region", conf_info.mask_name[i]);
          add_var_att(obs_var, "smoothing_method", mthd_str);
          obs_var->add_att("smoothing_neighborhood", wdth*wdth);
@@ -1820,6 +1826,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
          diff_var->add_att("_FillValue", bad_data_float);
          write_netcdf_var_times(diff_var, fcst_dp);
          diff_var->add_att("_FillValue", bad_data_float);
+         add_var_att(diff_var, "desc", conf_info.desc[i_vx]);
          add_var_att(diff_var, "masking_region", conf_info.mask_name[i]);
          add_var_att(diff_var, "smoothing_method", mthd_str);
          diff_var->add_att("smoothing_neighborhood", wdth*wdth);
@@ -1845,6 +1852,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
          add_var_att(cmn_var, "units", conf_info.fcst_info[i_vx]->units());
          write_netcdf_var_times(cmn_var, cmn_dp);
          cmn_var->add_att("_FillValue", bad_data_float);
+         add_var_att(cmn_var, "desc", conf_info.desc[i_vx]);
          add_var_att(cmn_var, "masking_region", conf_info.mask_name[i]);
          add_var_att(cmn_var, "smoothing_method", mthd_str);
          cmn_var->add_att("smoothing_neighborhood", wdth*wdth);

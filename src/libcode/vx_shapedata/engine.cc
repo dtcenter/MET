@@ -447,7 +447,7 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
    // mlog << Debug(3) << "Applying zero border of width "
    //      << conf_info.zero_border_size
    //      << " to the observation field.\n";
-   //  
+   //
    // int k = conf_info.zero_border_size;
    // obs_raw->zero_border(k, bad_data_double);
 
@@ -2801,6 +2801,10 @@ void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
    // Model Name
    at.set_entry(row, mode_model_offset,
                 eng.conf_info.model);
+
+   // Description
+   at.set_entry(row, mode_desc_offset,
+                eng.conf_info.desc);
 
    // Forecast lead time
    at.set_entry(row, mode_fcst_lead_offset,

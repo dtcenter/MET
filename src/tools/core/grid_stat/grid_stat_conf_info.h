@@ -122,6 +122,8 @@ class GridStatConfInfo {
       RegridInfo        regrid_info;        // Regridding information
 
       // Settings for each verification task
+      StringArray       desc;               // Array of description strings [n_vx]
+
       VarInfo **        fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
       VarInfo **        obs_info;           // Array of pointers for obs VarInfo [n_vx]
 

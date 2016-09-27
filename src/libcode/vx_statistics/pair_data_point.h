@@ -102,6 +102,8 @@ class VxPairDataPoint {
       VarInfo     *climo_info; // Climatology field, allocated by VarInfoFactory
       VarInfoGrib *obs_info;   // Observation field, allocated by VarInfoFactory
 
+      ConcatString desc;       // User description from config file
+
       double interp_thresh;    // Threshold between 0 and 1 used when
                                // interpolating the forecasts to the
                                // observation location.
@@ -165,6 +167,9 @@ class VxPairDataPoint {
       void set_fcst_info(VarInfo *);
       void set_climo_info(VarInfo *);
       void set_obs_info(VarInfoGrib *);
+
+      void set_desc(const char *);
+
       void set_interp_thresh(double);
 
       void set_fcst_dpa(const DataPlaneArray &);

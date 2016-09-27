@@ -87,6 +87,7 @@ void GridStatConfInfo::clear() {
    model.clear();
    obtype.clear();
    regrid_info.clear();
+   desc.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -266,6 +267,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       // Set the current dictionaries
       fcst_info[i]->set_dict(i_fdict);
       obs_info[i]->set_dict(i_odict);
+
+      // Conf: desc
+      desc.add(parse_conf_string(&i_odict, conf_key_desc));
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {

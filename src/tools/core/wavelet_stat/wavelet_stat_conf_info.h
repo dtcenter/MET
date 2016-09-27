@@ -83,13 +83,15 @@ class WaveletStatConfInfo {
       ConcatString            model;              // Model name
       ConcatString            obtype;             // Observation type
       RegridInfo              regrid_info;        // Regridding information
+
+      StringArray             desc;               // Description
       VarInfo **              fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
       VarInfo **              obs_info;           // Array of pointers for obs VarInfo [n_vx]
       ThreshArray *           fcst_ta;            // Array for fcst thresholds [n_vx]
       ThreshArray *           obs_ta;             // Array for obs thresholds [n_vx]
       FieldType               mask_missing_flag;  // Mask missing data between fcst and obs
       GridDecompType          grid_decomp_flag;   // Method for grid decomposition
-      int                     tile_dim;           // Tile dimension      
+      int                     tile_dim;           // Tile dimension
       NumArray                tile_xll;           // Array of lower-left x coordinates
       NumArray                tile_yll;           // Array of lower-left y coordinates
       Box                     pad_bb;             // Pad bouding box

@@ -112,6 +112,7 @@ out << prefix << "\n";
 
 out << prefix << "Version        = "   << version()     << "\n";
 out << prefix << "Model          = \"" << model()       << "\"\n";
+out << prefix << "Description    = \"" << desc()        << "\"\n";
 
 out << prefix << "Fcst Lead      = "   << fcst_lead()
     << "  ( " << sec_to_hhmmss(fcst_lead()) << " )\n";
@@ -275,6 +276,20 @@ const char * STATLine::model() const
 {
 
 const char * c = get_item(model_offset);
+
+return ( c );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * STATLine::desc() const
+
+{
+
+const char * c = get_item(desc_offset);
 
 return ( c );
 

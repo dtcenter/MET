@@ -24,8 +24,9 @@
 
 static const char * hdr_columns [] = {
    "VERSION",        "MODEL",
-   "FCST_LEAD",      "FCST_VALID_BEG",
-   "FCST_VALID_END", "OBS_LEAD",
+   "DESC",           "FCST_LEAD",
+   "FCST_VALID_BEG", "FCST_VALID_END",
+   "OBS_LEAD",
    "OBS_VALID_BEG",  "OBS_VALID_END",
    "FCST_VAR",       "FCST_LEV",
    "OBS_VAR",        "OBS_LEV",
@@ -306,7 +307,7 @@ static const char * job_ramp_mpr_columns [] = {
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int max_stat_col       = 94;
+static const int max_stat_col       = 95;
 
 static const int n_header_columns       = sizeof(hdr_columns)/sizeof(*hdr_columns);
 static const int n_fho_columns          = sizeof(fho_columns)/sizeof(*fho_columns);

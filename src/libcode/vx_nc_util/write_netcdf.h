@@ -22,6 +22,7 @@
 
 extern void write_netcdf_global     (NcFile *, const char *, const char *,
                                      const char *model_name = (const char *) 0,
+                                     const char *desc       = (const char *) 0,
                                      const char *obtype     = (const char *) 0);
 extern void write_netcdf_proj       (NcFile *, const Grid &);
 extern void write_netcdf_latlon     (NcFile *, NcDim *, NcDim *, const Grid &);

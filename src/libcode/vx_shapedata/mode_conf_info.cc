@@ -73,6 +73,7 @@ void ModeConfInfo::clear()
    // Initialize values
 
    model.clear();
+   desc.clear();
    obtype.clear();
 
    regrid_info.clear();
@@ -226,6 +227,10 @@ PlotInfo plot_info;
       // Conf: model
 
    model = parse_conf_string(&conf, conf_key_model);
+
+      // Conf: desc
+
+   desc = parse_conf_string(&conf, conf_key_desc);
 
       // Conf: obtype
 
@@ -387,12 +392,12 @@ PlotInfo plot_info;
    }
 
 //    if ( fcst_merge_thresh_array.n_elements() != fcst_conv_thresh_array.n_elements() )  {
-// 
+//
 //       mlog << Error << "\nModeConfInfo::process_config() -> "
 //            << "convolution threshold arrays and merge threshold arrays need to be the same size\n\n";
-// 
+//
 //       exit ( 1 );
-// 
+//
 //    }
 
    if ( fcst_merge_thresh_array.n_elements() == 1 )  fcst_merge_thresh = fcst_merge_thresh_array[0];

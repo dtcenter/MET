@@ -12,6 +12,11 @@
 model = "WRF";
 
 //
+// Output description to be written
+//
+desc = "NA";
+
+//
 // Output observation type to be written
 //
 obtype = "MC_PCP";
@@ -233,6 +238,6 @@ shift_right = 0;   //  grid squares
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "";
-version        = "V5.2";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

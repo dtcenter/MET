@@ -64,6 +64,7 @@ void StatHdrColumns::clear() {
 
    // Clear the ConcatStrings
    model.clear();
+   desc.clear();
 
    fcst_lead_str.clear();
    fcst_valid_beg_str.clear();
@@ -100,6 +101,13 @@ void StatHdrColumns::clear() {
 
 void StatHdrColumns::set_model(const char *s) {
    model = check_hdr_str(s);
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrColumns::set_desc(const char *s) {
+   desc = check_hdr_str(s);
    return;
 }
 

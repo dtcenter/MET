@@ -10,6 +10,7 @@
 // Filtering input STAT lines by the contents of each column
 //
 model = [];
+desc  = [];
 
 fcst_lead = [];
 obs_lead  = [];
@@ -85,6 +86,6 @@ boot = {
 rank_corr_flag = FALSE;
 vif_flag       = FALSE;
 tmp_dir        = "/tmp";
-version        = "V5.2";
+version        = "V6.0";
 
 ////////////////////////////////////////////////////////////////////////////////

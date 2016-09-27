@@ -363,6 +363,7 @@ static const char conf_key_exit_on_warning[]   = "exit_on_warning";
 static const char conf_key_output_precision[]  = "output_precision";
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
+static const char conf_key_desc[]              = "desc";
 static const char conf_key_obtype[]            = "obtype";
 static const char conf_key_output_flag[]       = "output_flag";
 static const char conf_key_obs_window[]        = "obs_window";
