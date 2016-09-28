@@ -173,7 +173,7 @@ if ( Name )  { delete [] Name;  Name = (char *) 0; }
 
 int n = strlen(text);
 
-Name = new char [1 + n];;
+Name = new char [1 + n];
 
 strcpy(Name, text);
 

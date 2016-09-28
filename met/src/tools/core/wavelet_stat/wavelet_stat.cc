@@ -2320,7 +2320,7 @@ void plot_ps_wvlt(const double *diff, int n, int i_vx, int i_tile,
    h_tab_a = 2.0*plot_text_sep;
    h_tab_b = h_tab_a + 10.0*plot_text_sep;
 
-   h_tab_c = h_tab_cen + 2.0*plot_text_sep;;
+   h_tab_c = h_tab_cen + 2.0*plot_text_sep;
    h_tab_d = h_tab_c + 10.0*plot_text_sep;
 
    //

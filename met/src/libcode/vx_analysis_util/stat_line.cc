@@ -238,7 +238,7 @@ return ( 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * STATLine::get_item(int k) const
+const char * STATLine::get_item(int k, bool check_na) const
 
 {
 
@@ -248,8 +248,8 @@ const char * c = DataLine::get_item(k);
    // Check for the NA string and interpret it as bad data
    //
 
-if ( strcmp(c, na_str) == 0 ) return ( bad_data_str );
-else                          return ( c );
+if ( check_na && strcmp(c, na_str) == 0 ) return ( bad_data_str );
+else                                      return ( c );
 
 }
 
@@ -261,7 +261,7 @@ const char * STATLine::version() const
 
 {
 
-const char * c = get_item(version_offset);
+const char * c = get_item(version_offset, false);
 
 return ( c );
 
@@ -275,7 +275,7 @@ const char * STATLine::model() const
 
 {
 
-const char * c = get_item(model_offset);
+const char * c = get_item(model_offset, false);
 
 return ( c );
 
@@ -289,7 +289,7 @@ const char * STATLine::desc() const
 
 {
 
-const char * c = get_item(desc_offset);
+const char * c = get_item(desc_offset, false);
 
 return ( c );
 
@@ -429,7 +429,7 @@ const char * STATLine::fcst_var() const
 
 {
 
-const char * c = get_item(fcst_var_offset);
+const char * c = get_item(fcst_var_offset, false);
 
 return ( c );
 
@@ -443,7 +443,7 @@ const char * STATLine::fcst_lev() const
 
 {
 
-const char * c = get_item(fcst_lev_offset);
+const char * c = get_item(fcst_lev_offset, false);
 
 return ( c );
 
@@ -457,7 +457,7 @@ const char * STATLine::obs_var() const
 
 {
 
-const char * c = get_item(obs_var_offset);
+const char * c = get_item(obs_var_offset, false);
 
 return ( c );
 
@@ -471,7 +471,7 @@ const char * STATLine::obs_lev() const
 
 {
 
-const char * c = get_item(obs_lev_offset);
+const char * c = get_item(obs_lev_offset, false);
 
 return ( c );
 
@@ -485,7 +485,7 @@ const char * STATLine::obtype() const
 
 {
 
-const char * c = get_item(obtype_offset);
+const char * c = get_item(obtype_offset, false);
 
 return ( c );
 
@@ -499,7 +499,7 @@ const char * STATLine::vx_mask() const
 
 {
 
-const char * c = get_item(vx_mask_offset);
+const char * c = get_item(vx_mask_offset, false);
 
 return ( c );
 
@@ -513,7 +513,7 @@ const char * STATLine::interp_mthd() const
 
 {
 
-const char * c = get_item(interp_mthd_offset);
+const char * c = get_item(interp_mthd_offset, false);
 
 return ( c );
 
@@ -546,7 +546,7 @@ ThreshArray STATLine::fcst_thresh() const
 
 ThreshArray ta;
 
-const char * c = get_item(fcst_thresh_offset);
+const char * c = get_item(fcst_thresh_offset, false);
 
 ta.add_css(c);
 
@@ -564,7 +564,7 @@ ThreshArray STATLine::obs_thresh() const
 
 ThreshArray ta;
 
-const char * c = get_item(obs_thresh_offset);
+const char * c = get_item(obs_thresh_offset, false);
 
 ta.add_css(c);
 
@@ -582,7 +582,7 @@ SetLogic STATLine::thresh_logic() const
 
 SetLogic t = SetLogic_None;
 
-ConcatString cs = get_item(fcst_thresh_offset);
+ConcatString cs = get_item(fcst_thresh_offset, false);
 
      if(cs.endswith(setlogic_symbol_union))        t = SetLogic_Union;
 else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic_Intersection;
@@ -603,7 +603,7 @@ ThreshArray STATLine::cov_thresh() const
 
 ThreshArray ta;
 
-const char * c = get_item(cov_thresh_offset);
+const char * c = get_item(cov_thresh_offset, false);
 
 ta.add_css(c);
 
@@ -636,7 +636,7 @@ const char * STATLine::line_type() const
 
 {
 
-const char * c = get_item(line_type_offset);
+const char * c = get_item(line_type_offset, false);
 
 return ( c );
 

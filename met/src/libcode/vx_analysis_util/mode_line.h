@@ -49,7 +49,7 @@ class ModeLine : public DataLine {
          //  retrieve stuff
          //
 
-      const char * get_item                (int) const;
+      const char * get_item (int, bool check_na = true) const;
 
       const char * version                    () const;   //  column  1
       const char * model                      () const;   //  column  2

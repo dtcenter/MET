@@ -611,8 +611,8 @@ options.dump(out, depth + 1);
 
 out << prefix << "\n";
 
-out << prefix << "AllowNumbers              = " << ( AllowNumbers ? "true" : "false" ) << "\n";;
-out << prefix << "AllowUnrecognizedSwitches = " << ( AllowUnrecognizedSwitches ? "true" : "false" ) << "\n";;
+out << prefix << "AllowNumbers              = " << ( AllowNumbers ? "true" : "false" ) << "\n";
+out << prefix << "AllowUnrecognizedSwitches = " << ( AllowUnrecognizedSwitches ? "true" : "false" ) << "\n";
 
 return;
 

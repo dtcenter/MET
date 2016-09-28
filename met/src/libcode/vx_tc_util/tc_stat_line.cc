@@ -116,7 +116,7 @@ int TCStatLine::is_header() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const char * TCStatLine::get_item(int k) const {
+const char * TCStatLine::get_item(int k, bool check_na) const {
 
    // Return bad data instead of erroring out
    if(k < 0 || k >= N_items) return(bad_data_str);
@@ -124,64 +124,64 @@ const char * TCStatLine::get_item(int k) const {
    const char * c = DataLine::get_item(k);
 
    // Check for the NA string and interpret it as bad data
-   if(strcmp(c, na_str) == 0) return(bad_data_str);
-   else                       return(c);
+   if(check_na && strcmp(c, na_str) == 0) return(bad_data_str);
+   else                                   return(c);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const char * TCStatLine::get_item(const char * col_name) const {
+const char * TCStatLine::get_item(const char * col_name, bool check_na) const {
    int offset = determine_column_offset(*this, col_name);
 
-   return(get_item(offset));
+   return(get_item(offset, check_na));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::version() const {
-   return(get_item("VERSION"));
+   return(get_item("VERSION", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::amodel() const {
-   return(get_item("AMODEL"));
+   return(get_item("AMODEL", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::bmodel() const {
-   return(get_item("BMODEL"));
+   return(get_item("BMODEL", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::desc() const {
-   return(get_item("DESC"));
+   return(get_item("DESC", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::storm_id() const {
-   return(get_item("STORM_ID"));
+   return(get_item("STORM_ID", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::basin() const {
-   return(get_item("BASIN"));
+   return(get_item("BASIN", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::cyclone() const {
-   return(get_item("CYCLONE"));
+   return(get_item("CYCLONE", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::storm_name() const {
-   return(get_item("STORM_NAME"));
+   return(get_item("STORM_NAME", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -235,19 +235,19 @@ int TCStatLine::valid_hour() const {
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::init_mask() const {
-   return(get_item("INIT_MASK"));
+   return(get_item("INIT_MASK", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::valid_mask() const {
-   return(get_item("VALID_MASK"));
+   return(get_item("VALID_MASK", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::initials() const {
-   return(get_item("INITIALS"));
+   return(get_item("INITIALS", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -256,7 +256,7 @@ const char * TCStatLine::line_type() const {
    int offset = get_tc_col_offset(tc_header_cols, n_tc_header_cols,
                                   "LINE_TYPE");
 
-   return(get_item(offset));
+   return(get_item(offset, false));
 }
 
 ////////////////////////////////////////////////////////////////////////

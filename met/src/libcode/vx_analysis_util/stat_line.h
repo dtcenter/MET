@@ -55,7 +55,7 @@ class STATLine : public DataLine {
          //  retrieve values of the header columns
          //
 
-      const char * get_item    (int) const;
+      const char * get_item (int, bool check_na = true) const;
 
       const char * version        () const;
       const char * model          () const;
