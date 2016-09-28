@@ -31,10 +31,11 @@
 ##    "-save"        calls save.image() before exiting R.
 ##
 ##  Details:
+##    Updated for MET version 6.0.
 ##
 ##  Examples:
 ##    Rscript plot_cnt.R \
-##      met-5.0/out/point_stat/*_cnt.txt
+##      met-6.0/out/point_stat/*_cnt.txt
 ##
 ##   Author:
 ##      John Halley Gotway (johnhg@ucar.edu), NCAR-RAL/DTC
@@ -50,8 +51,8 @@ library(stats)
 #
 ########################################################################
 
-# Header for the CNT line type (METv5.0)
-cnt_header <- c("VERSION", "MODEL",
+# Header for the CNT line type (MET version 6.0)
+cnt_header <- c("VERSION", "MODEL", "DESC",
                 "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
                 "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
                 "FCST_VAR", "FCST_LEV",
