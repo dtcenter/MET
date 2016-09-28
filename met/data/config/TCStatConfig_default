@@ -22,7 +22,12 @@ amodel = [];
 bmodel = [];
 
 //
-// Storm Identifiers
+// Stratify by the DESC column.
+//
+desc = [];
+
+//
+// Stratify by the STORM_ID column.
 //
 storm_id = [];
 
@@ -77,7 +82,7 @@ init_mask  = [];
 valid_mask = [];
 
 //
-// Stratify by the LINE_TYPE column. 
+// Stratify by the LINE_TYPE column.
 //
 line_type = [];
 
@@ -101,7 +106,7 @@ column_str_name = [];
 column_str_val  = [];
 
 //
-// Similar to the column_thresh options above  
+// Similar to the column_thresh options above
 //
 init_thresh_name = [];
 init_thresh_val  = [];
@@ -113,14 +118,14 @@ init_str_name = [];
 init_str_val  = [];
 
 //
-// Stratify by the ADECK and BDECK distances to land. 
+// Stratify by the ADECK and BDECK distances to land.
 //
 water_only = FALSE;
 
 //
 // Specify whether only those track points for which rapid intensification
 // or weakening of the maximum wind speed occurred in the previous time
-// step should be retained. 
+// step should be retained.
 //
 rirw = {
    track  = NONE;
@@ -135,7 +140,7 @@ rirw = {
 //
 // Specify whether only those track points occurring near landfall should be
 // retained, and define the landfall retention window in HH[MMSS] format
-// around the landfall time.  
+// around the landfall time.
 //
 landfall     = FALSE;
 landfall_beg = "-24";
@@ -150,7 +155,7 @@ match_points = FALSE;
 
 //
 // Specify whether only those cases common to all models in the dataset should
-// be retained.  
+// be retained.
 //
 event_equal = FALSE;
 
@@ -162,13 +167,13 @@ event_equal_lead = [];
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the
-// initialization time.  
+// initialization time.
 //
 out_init_mask = "";
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the
-// valid time.  
+// valid time.
 //
 out_valid_mask = "";
 

@@ -598,6 +598,8 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
      !AModel.has(line.amodel()))        { keep = false; n.RejAModel++;    }
    else if(BModel.n_elements() > 0 &&
      !BModel.has(line.bmodel()))        { keep = false; n.RejBModel++;    }
+   else if(Desc.n_elements() > 0 &&
+     !Desc.has(line.desc()))            { keep = false; n.RejDesc++;      }
    else if(StormId.n_elements() > 0 &&
      !has_storm_id(StormId, line.basin(), line.cyclone(), line.init()))
                                         { keep = false; n.RejStormId++;   }
@@ -787,6 +789,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
            if(strcasecmp(c, "-job"               ) == 0) { JobType = string_to_tcstatjobtype(a[i+1]); a.shift_down(i, 1); }
       else if(strcasecmp(c, "-amodel"            ) == 0) { AModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
       else if(strcasecmp(c, "-bmodel"            ) == 0) { BModel.add_css(a[i+1]);                    a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-desc"              ) == 0) { Desc.add_css(a[i+1]);                      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-storm_id"          ) == 0) { StormId.add_css(a[i+1]);                   a.shift_down(i, 1); }
       else if(strcasecmp(c, "-basin"             ) == 0) { Basin.add_css(a[i+1]);                     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-cyclone"           ) == 0) { Cyclone.add_css(a[i+1]);                   a.shift_down(i, 1); }
@@ -1076,6 +1079,8 @@ ConcatString TCStatJob::serialize() const {
       s << "-amodel " << AModel[i] << " ";
    for(i=0; i<BModel.n_elements(); i++)
       s << "-bmodel " << BModel[i] << " ";
+   for(i=0; i<Desc.n_elements(); i++)
+      s << "-desc " << Desc[i] << " ";
    for(i=0; i<StormId.n_elements(); i++)
       s << "-storm_id " << StormId[i] << " ";
    for(i=0; i<Basin.n_elements(); i++)

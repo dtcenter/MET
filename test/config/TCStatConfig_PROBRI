@@ -22,7 +22,12 @@ amodel = [];
 bmodel = [];
 
 //
-// Storm Identifiers
+// Stratify by the DESC column.
+//
+desc = [];
+
+//
+// Stratify by the STORM_ID column.
 //
 storm_id = [];
 

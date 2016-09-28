@@ -32,19 +32,22 @@ class TcHdrColumns {
       // Model names
       ConcatString ADeckModel, BDeckModel;
 
+      // User-defined description
+      ConcatString Desc;
+
       // Basin and cyclone names
       ConcatString StormId, Basin, Cyclone, StormName;
 
       // Timing info
       unixtime     InitTime, ValidTime;
-      int          LeadTime;      
+      int          LeadTime;
 
-      // Masking regions            
+      // Masking regions
       ConcatString InitMask, ValidMask;
 
       // Line type
       ConcatString LineType;
-      
+
    public:
 
       TcHdrColumns();
@@ -55,6 +58,7 @@ class TcHdrColumns {
       // Set functions
       void set_adeck_model (const ConcatString &);
       void set_bdeck_model (const ConcatString &);
+      void set_desc        (const ConcatString &);
       void set_storm_id    (const ConcatString &);
       void set_basin       (const ConcatString &);
       void set_cyclone     (const ConcatString &);
@@ -69,6 +73,7 @@ class TcHdrColumns {
       // Get functions
       ConcatString adeck_model () const;
       ConcatString bdeck_model () const;
+      ConcatString desc        () const;
       ConcatString storm_id    () const;
       ConcatString basin       () const;
       ConcatString cyclone     () const;
@@ -88,12 +93,13 @@ class TcHdrColumns {
 
 inline void TcHdrColumns::set_adeck_model (const ConcatString &s) { ADeckModel = s; }
 inline void TcHdrColumns::set_bdeck_model (const ConcatString &s) { BDeckModel = s; }
+inline void TcHdrColumns::set_desc        (const ConcatString &s) { Desc = s;       }
 inline void TcHdrColumns::set_storm_id    (const ConcatString &s) { StormId = s;    }
 inline void TcHdrColumns::set_basin       (const ConcatString &s) { Basin = s;      }
 inline void TcHdrColumns::set_cyclone     (const ConcatString &s) { Cyclone = s;    }
 inline void TcHdrColumns::set_storm_name  (const ConcatString &s) { StormName = s;  }
-inline void TcHdrColumns::set_lead        (const int s)           { LeadTime  = s;  }
-inline void TcHdrColumns::set_init        (const unixtime u)      { InitTime  = u;  }
+inline void TcHdrColumns::set_lead        (const int s)           { LeadTime = s;   }
+inline void TcHdrColumns::set_init        (const unixtime u)      { InitTime = u;   }
 inline void TcHdrColumns::set_valid       (const unixtime u)      { ValidTime = u;  }
 inline void TcHdrColumns::set_init_mask   (const ConcatString &s) { InitMask = s;   }
 inline void TcHdrColumns::set_valid_mask  (const ConcatString &s) { ValidMask = s;  }
@@ -101,6 +107,7 @@ inline void TcHdrColumns::set_line_type   (const ConcatString &s) { LineType = s
 
 inline ConcatString TcHdrColumns::adeck_model () const { return(ADeckModel);               }
 inline ConcatString TcHdrColumns::bdeck_model () const { return(BDeckModel);               }
+inline ConcatString TcHdrColumns::desc        () const { return(Desc);                     }
 inline ConcatString TcHdrColumns::storm_id    () const { return(StormId);                  }
 inline ConcatString TcHdrColumns::basin       () const { return(Basin);                    }
 inline ConcatString TcHdrColumns::cyclone     () const { return(Cyclone);                  }

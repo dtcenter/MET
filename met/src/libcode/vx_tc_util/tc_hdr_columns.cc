@@ -48,6 +48,7 @@ void TcHdrColumns::clear() {
 
    ADeckModel.clear();
    BDeckModel.clear();
+   Desc.clear();
    StormId.clear();
    Basin.clear();
    Cyclone.clear();

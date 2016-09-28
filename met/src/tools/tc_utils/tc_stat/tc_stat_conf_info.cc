@@ -98,9 +98,12 @@ void TCStatConfInfo::process_config() {
    // Conf: TCStatJob::BModel
    Filter.BModel = Conf.lookup_string_array(conf_key_bmodel);
 
+   // Conf: TCStatJob::Desc
+   Filter.Desc = Conf.lookup_string_array(conf_key_desc);
+
    // Conf: TCStatJob::StormId
    Filter.StormId = Conf.lookup_string_array(conf_key_storm_id);
-   
+
    // Conf: TCStatJob::Basin
    Filter.Basin = Conf.lookup_string_array(conf_key_basin);
 
@@ -118,7 +121,7 @@ void TCStatConfInfo::process_config() {
    sa = Conf.lookup_string_array(conf_key_init_inc);
    for(i=0; i<sa.n_elements(); i++)
       Filter.InitInc.add(timestring_to_unix(sa[i]));
-   
+
    // Conf: TCStatJob::InitExc
    sa = Conf.lookup_string_array(conf_key_init_exc);
    for(i=0; i<sa.n_elements(); i++)
@@ -147,7 +150,7 @@ void TCStatConfInfo::process_config() {
    sa = Conf.lookup_string_array(conf_key_valid_hour);
    for(i=0; i<sa.n_elements(); i++)
       Filter.ValidHour.add(timestring_to_sec(sa[i]));
-   
+
    // Conf: TCStatJob::Lead
    sa = Conf.lookup_string_array(conf_key_lead);
    for(i=0; i<sa.n_elements(); i++)
@@ -164,7 +167,7 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::TrackWatchWarn
    Filter.TrackWatchWarn = Conf.lookup_string_array(conf_key_track_watch_warn);
-   
+
    // Conf: TCStatJob::ColumnThreshName, TCStatJob::ColumnThreshVal
    sa     = Conf.lookup_string_array(conf_key_column_thresh_name);
    ta_val = Conf.lookup_thresh_array(conf_key_column_thresh_val);
@@ -177,7 +180,7 @@ void TCStatConfInfo::process_config() {
            << "entries must have the same length.\n\n";
       exit(1);
    }
-   
+
    // Add entries to the map
    for(i=0; i<sa.n_elements(); i++) {
       if(Filter.ColumnThreshMap.count(sa[i]) > 0) {
@@ -202,7 +205,7 @@ void TCStatConfInfo::process_config() {
            << "entries must have the same length.\n\n";
       exit(1);
    }
-   
+
    // Add entries to the map
    for(i=0; i<sa.n_elements(); i++) {
       if(Filter.ColumnStrMap.count(sa[i]) > 0) {
@@ -228,7 +231,7 @@ void TCStatConfInfo::process_config() {
            << "entries must have the same length.\n\n";
       exit(1);
    }
-   
+
    // Add entries to the map
    for(i=0; i<sa.n_elements(); i++) {
       if(Filter.InitThreshMap.count(sa[i]) > 0) {
@@ -253,7 +256,7 @@ void TCStatConfInfo::process_config() {
            << "entries must have the same length.\n\n";
       exit(1);
    }
-   
+
    // Add entries to the map
    for(i=0; i<sa.n_elements(); i++) {
       if(Filter.InitStrMap.count(sa[i]) > 0) {
@@ -266,7 +269,7 @@ void TCStatConfInfo::process_config() {
          Filter.InitStrMap.insert(pair<ConcatString,StringArray>(sa[i], sa_new));
       }
    } // end for i
-   
+
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool(conf_key_water_only);
 
@@ -292,15 +295,15 @@ void TCStatConfInfo::process_config() {
 
    // Conf: TCStatJob::EventEqual
    Filter.EventEqual = Conf.lookup_bool(conf_key_event_equal);
-   
+
    // Conf: TCStatJob::OutInitMask
    poly_file = Conf.lookup_string(conf_key_out_init_mask);
    if(poly_file.nonempty()) Filter.set_mask(Filter.OutInitMask, poly_file);
-   
+
    // Conf: TCStatJob::OutValidMask
    poly_file = Conf.lookup_string(conf_key_out_valid_mask);
    if(poly_file.nonempty()) Filter.set_mask(Filter.OutValidMask, poly_file);
-   
+
    // Conf: Jobs
    Jobs = Conf.lookup_string_array(conf_key_jobs);
    if(Jobs.n_elements() == 0) {

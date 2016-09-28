@@ -15,8 +15,13 @@
 model = [];
 
 //
+// Description
+//
+desc = "NA";
+
+//
 // Storm identifiers
-//    
+//
 storm_id = [ "ALAL2010" ];
 
 //
@@ -49,7 +54,7 @@ valid_beg = "";
 valid_end = "";
 
 //
-// Model initialization hours 
+// Model initialization hours
 //
 init_hour = [];
 
@@ -60,7 +65,7 @@ init_mask  = "";
 valid_mask = "";
 
 //
-// Specify if the code should check for duplicate ATCF lines 
+// Specify if the code should check for duplicate ATCF lines
 //
 check_dup = TRUE;
 
