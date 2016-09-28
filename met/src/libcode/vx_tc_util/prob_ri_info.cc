@@ -158,7 +158,7 @@ void ProbRIInfo::initialize(const ATCFProbLine &l) {
    ProbInfoBase::initialize(l);
 
    Value    = parse_int(l.get_item(ProbRIValueOffset));
-   Initials =           l.get_item(ProbRIInitialsOffset, false);
+   Initials =           l.get_item(ProbRIInitialsOffset);
    RIBeg    = parse_int(l.get_item(ProbRIBegOffset));
    RIEnd    = parse_int(l.get_item(ProbRIEndOffset));
 
