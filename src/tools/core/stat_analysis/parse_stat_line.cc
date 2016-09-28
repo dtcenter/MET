@@ -254,8 +254,8 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &n_info) {
    n_info.clear();
 
    n_info.nbr_wdth   = atoi(l.get_item(interp_pnts_offset));
-   n_info.fthresh.set(l.get_item(fcst_thresh_offset));
-   n_info.othresh.set(l.get_item(obs_thresh_offset));
+   n_info.fthresh.set(l.get_item(fcst_thresh_offset, false));
+   n_info.othresh.set(l.get_item(obs_thresh_offset, false));
    n_info.sl1l2_info.scount = atoi(l.get_item(nbrcnt_total_offset));
    n_info.fbs.v      = atof(l.get_item(nbrcnt_fbs_offset));
    n_info.fss.v      = atof(l.get_item(nbrcnt_fss_offset));
@@ -281,11 +281,11 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &n_info) {
 
 void parse_mpr_line(STATLine &l, MPRData &m_data) {
 
-   m_data.fcst_var = l.get_item(fcst_var_offset);
-   m_data.obs_var  = l.get_item(obs_var_offset);
+   m_data.fcst_var = l.get_item(fcst_var_offset, false);
+   m_data.obs_var  = l.get_item(obs_var_offset, false);
    m_data.total    = atoi(l.get_item(mpr_total_offset));
    m_data.index    = atoi(l.get_item(mpr_index_offset));
-   m_data.obs_sid  = l.get_item(mpr_obs_sid_offset);
+   m_data.obs_sid  = l.get_item(mpr_obs_sid_offset, false);
    m_data.obs_lat  = atof(l.get_item(mpr_obs_lat_offset));
    m_data.obs_lon  = atof(l.get_item(mpr_obs_lon_offset));
    m_data.obs_lvl  = atof(l.get_item(mpr_obs_lvl_offset));
@@ -296,7 +296,7 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
 
    // Parse OBS_QC, if present
    if(l.n_items() > mpr_obs_qc_offset) {
-      m_data.obs_qc = l.get_item(mpr_obs_qc_offset);
+      m_data.obs_qc = l.get_item(mpr_obs_qc_offset, false);
    }
    else {
       m_data.obs_qc.clear();
@@ -407,7 +407,7 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
 
    o_data.total     = atoi(l.get_item(orank_total_offset));
    o_data.index     = atoi(l.get_item(orank_index_offset));
-   o_data.obs_sid   = l.get_item(orank_obs_sid_offset);
+   o_data.obs_sid   = l.get_item(orank_obs_sid_offset, false);
    o_data.obs_lat   = atof(l.get_item(orank_obs_lat_offset));
    o_data.obs_lon   = atof(l.get_item(orank_obs_lon_offset));
    o_data.obs_lvl   = atof(l.get_item(orank_obs_lvl_offset));
@@ -428,7 +428,7 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
 
    // Parse OBS_QC, if present
    if(l.n_items() > orank_obs_qc_offset(o_data.n_ens)) {
-      o_data.obs_qc = l.get_item(orank_obs_qc_offset(o_data.n_ens));
+      o_data.obs_qc = l.get_item(orank_obs_qc_offset(o_data.n_ens), false);
    }
    else {
       o_data.obs_qc.clear();

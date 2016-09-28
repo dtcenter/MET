@@ -180,7 +180,7 @@ const char * ModeLine::version() const
 
 const char * c = (const char *) 0;
 
-c = get_item(version_column);
+c = get_item(version_column, false);
 
 return ( c );
 
@@ -196,7 +196,7 @@ const char * ModeLine::model() const
 
 const char * c = (const char *) 0;
 
-c = get_item(model_column);
+c = get_item(model_column, false);
 
 return ( c );
 
@@ -212,7 +212,7 @@ const char * ModeLine::desc() const
 
 const char * c = (const char *) 0;
 
-c = get_item(desc_column);
+c = get_item(desc_column, false);
 
 return ( c );
 
@@ -455,7 +455,7 @@ const char * ModeLine::fcst_thr() const
 
 const char * c = (const char *) 0;
 
-c = get_item(fcst_thr_column);
+c = get_item(fcst_thr_column, false);
 
 return ( c );
 
@@ -490,7 +490,7 @@ const char * ModeLine::obs_thr() const
 
 const char * c = (const char *) 0;
 
-c = get_item(obs_thr_column);
+c = get_item(obs_thr_column, false);
 
 return ( c );
 
@@ -506,7 +506,7 @@ const char * ModeLine::fcst_var() const
 
 const char * c = (const char *) 0;
 
-c = get_item(fcst_var_column);
+c = get_item(fcst_var_column, false);
 
 return ( c );
 
@@ -522,7 +522,7 @@ const char * ModeLine::fcst_lev() const
 
 const char * c = (const char *) 0;
 
-c = get_item(fcst_lev_column);
+c = get_item(fcst_lev_column, false);
 
 return ( c );
 
@@ -538,7 +538,7 @@ const char * ModeLine::obs_var() const
 
 const char * c = (const char *) 0;
 
-c = get_item(obs_var_column);
+c = get_item(obs_var_column, false);
 
 return ( c );
 
@@ -554,7 +554,7 @@ const char * ModeLine::obs_lev() const
 
 const char * c = (const char *) 0;
 
-c = get_item(obs_lev_column);
+c = get_item(obs_lev_column, false);
 
 return ( c );
 
@@ -570,7 +570,7 @@ const char * ModeLine::object_id() const
 
 const char * c = (const char *) 0;
 
-c = get_item(object_id_column);
+c = get_item(object_id_column, false);
 
 return ( c );
 
@@ -586,7 +586,7 @@ const char * ModeLine::object_cat() const
 
 const char * c = (const char *) 0;
 
-c = get_item(object_cat_column);
+c = get_item(object_cat_column, false);
 
 return ( c );
 
@@ -1549,7 +1549,7 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * ModeLine::get_item(int k) const
+const char * ModeLine::get_item(int k, bool check_na) const
 
 {
 
@@ -1559,8 +1559,8 @@ const char * c = DataLine::get_item(k);
    // Check for the NA string and interpret it as bad data
    //
 
-if ( strcmp(c, na_str) == 0 ) return ( bad_data_str );
-else                          return ( c );
+if ( check_na && strcmp(c, na_str) == 0 ) return ( bad_data_str );
+else                                      return ( c );
 
 }
 

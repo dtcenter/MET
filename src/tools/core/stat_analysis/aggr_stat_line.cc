@@ -129,12 +129,12 @@ void StatHdrInfo::add(const STATLine &line) {
       interp_mthd.add(line.interp_mthd());
    if(!interp_pnts.has(line.interp_pnts()))
       interp_pnts.add(line.interp_pnts());
-   if(!fcst_thresh.has(line.get_item(fcst_thresh_offset)))
-      fcst_thresh.add(line.get_item(fcst_thresh_offset));
-   if(!obs_thresh.has(line.get_item(obs_thresh_offset)))
-      obs_thresh.add(line.get_item(obs_thresh_offset));
-   if(!cov_thresh.has(line.get_item(cov_thresh_offset)))
-      cov_thresh.add(line.get_item(cov_thresh_offset));
+   if(!fcst_thresh.has(line.get_item(fcst_thresh_offset, false)))
+      fcst_thresh.add(line.get_item(fcst_thresh_offset, false));
+   if(!obs_thresh.has(line.get_item(obs_thresh_offset, false)))
+      obs_thresh.add(line.get_item(obs_thresh_offset, false));
+   if(!cov_thresh.has(line.get_item(cov_thresh_offset, false)))
+      cov_thresh.add(line.get_item(cov_thresh_offset, false));
    if(!alpha.has(line.alpha()))
       alpha.add(line.alpha());
 
@@ -2469,11 +2469,11 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Only aggregate consistent variable names
          //
-         if(fcst_var.empty()) fcst_var = line.get_item(fcst_var_offset);
-         if(obs_var.empty())  obs_var  = line.get_item(obs_var_offset);
+         if(fcst_var.empty()) fcst_var = line.get_item(fcst_var_offset, false);
+         if(obs_var.empty())  obs_var  = line.get_item(obs_var_offset, false);
 
-         if(fcst_var != line.get_item(fcst_var_offset) ||
-            obs_var  != line.get_item(obs_var_offset)) {
+         if(fcst_var != line.get_item(fcst_var_offset, false) ||
+            obs_var  != line.get_item(obs_var_offset, false)) {
             mlog << Error << "\naggr_ssvar_lines() -> "
                  << "both the forecast and observation variable types must "
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
@@ -2574,16 +2574,16 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(m.count(key) == 0) {
             cur.clear();
-            cur.fcst_var = line.get_item(fcst_var_offset);
-            cur.obs_var  = line.get_item(obs_var_offset);;
+            cur.fcst_var = line.get_item(fcst_var_offset, false);
+            cur.obs_var  = line.get_item(obs_var_offset, false);
             m[key] = cur;
          }
 
          //
          // Only aggregate consistent variable names
          //
-         if(m[key].fcst_var != line.get_item(fcst_var_offset) ||
-            m[key].obs_var  != line.get_item(obs_var_offset)) {
+         if(m[key].fcst_var != line.get_item(fcst_var_offset, false) ||
+            m[key].obs_var  != line.get_item(obs_var_offset, false)) {
             mlog << Error << "\naggr_time_series_lines() -> "
                  << "both the forecast and observation variable names must "
                  << "remain constant for case \"" << key

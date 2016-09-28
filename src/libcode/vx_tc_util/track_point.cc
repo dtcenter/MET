@@ -208,7 +208,7 @@ void QuadInfo::set_wind(const ATCFTrackLine &l) {
 void QuadInfo::set_seas(const ATCFTrackLine &l) {
 
    // Return if Intensity doesn't match ATCFTrackLine wave height
-   if(Intensity != l.wave_height()) return;;
+   if(Intensity != l.wave_height()) return;
 
    clear();
 

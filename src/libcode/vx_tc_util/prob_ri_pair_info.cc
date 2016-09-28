@@ -278,8 +278,8 @@ void ProbRIPairInfo::set(const TCStatLine &l) {
    BDeck = (TrackInfo *) 0;
 
    // Store column information
-   StormName = l.get_item("STORM_NAME");
-   BModel    = l.get_item("BMODEL");
+   StormName = l.get_item("STORM_NAME", false);
+   BModel    = l.get_item("BMODEL", false);
    BLat      = atof(l.get_item("BLAT"));
    BLon      = atof(l.get_item("BLON"));
    TrackErr  = atof(l.get_item("TK_ERR"));

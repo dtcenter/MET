@@ -158,7 +158,7 @@ void ProbRIInfo::initialize(const ATCFProbLine &l) {
    ProbInfoBase::initialize(l);
 
    Value    = parse_int(l.get_item(ProbRIValueOffset));
-   Initials =           l.get_item(ProbRIInitialsOffset);
+   Initials =           l.get_item(ProbRIInitialsOffset, false);
    RIBeg    = parse_int(l.get_item(ProbRIBegOffset));
    RIEnd    = parse_int(l.get_item(ProbRIEndOffset));
 
@@ -216,7 +216,7 @@ void ProbRIInfo::set(const TCStatLine &l) {
 
    // Store column information
    Value    = atof(l.get_item("AWIND_END"));
-   Initials = l.get_item("Initials");
+   Initials = l.get_item("Initials", false);
    RIBeg    = atoi(l.get_item("RI_BEG"));
    RIEnd    = atoi(l.get_item("RI_END"));
 
