@@ -15,6 +15,11 @@
 model = [];
 
 //
+// Description
+//
+desc = "NA";
+
+//
 // Storm identifiers
 //
 storm_id = [];

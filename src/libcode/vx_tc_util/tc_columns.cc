@@ -312,6 +312,9 @@ void write_tc_mpr_row(TcHdrColumns &hdr, const TrackPairInfo &p,
       // Valid time for the ADECK and/or BDECK
       hdr.set_valid(p.valid(i));
 
+      // Set the description
+      if(p.n_lines() > i) hdr.set_desc(p.line(i)->get_item("DESC"));
+
       // Write the header columns
       write_tc_header_cols(hdr, at, i_row);
 
@@ -361,15 +364,16 @@ void write_tc_header_cols(const TcHdrColumns &hdr,
    int c = 0;
 
    // Header columns:
-   //    VERSION,      AMODEL,     BDECK_MODEL,
-   //    STORM_ID,     BASIN,      CYCLONE,
-   //    STORM_NAME,   INIT,       LEAD,
-   //    VALID,        INIT_MASK,  VALID_MASK,
-   //    LINE_TYPE
+   //    VERSION,    AMODEL,     BMODEL,
+   //    DESC,       STORM_ID,   BASIN,
+   //    CYCLONE,    STORM_NAME, INIT,
+   //    LEAD,       VALID,      INIT_MASK,
+   //    VALID_MASK, LINE_TYPE
 
    at.set_entry(r, c++, met_version);
    at.set_entry(r, c++, hdr.adeck_model());
    at.set_entry(r, c++, hdr.bdeck_model());
+   at.set_entry(r, c++, hdr.desc());
    at.set_entry(r, c++, hdr.storm_id());
    at.set_entry(r, c++, hdr.basin());
    at.set_entry(r, c++, hdr.cyclone());

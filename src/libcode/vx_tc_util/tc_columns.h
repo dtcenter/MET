@@ -25,11 +25,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 static const char * tc_header_cols [] = {
-   "VERSION",      "AMODEL",     "BMODEL",
-   "STORM_ID",     "BASIN",      "CYCLONE",
-   "STORM_NAME",   "INIT",       "LEAD",
-   "VALID",        "INIT_MASK",  "VALID_MASK",
-   "LINE_TYPE"
+   "VERSION",    "AMODEL",     "BMODEL",
+   "DESC",       "STORM_ID",   "BASIN",
+   "CYCLONE",    "STORM_NAME", "INIT",
+   "LEAD",       "VALID",      "INIT_MASK",
+   "VALID_MASK", "LINE_TYPE"
 };
 
 static const int n_tc_header_cols = sizeof(tc_header_cols)/sizeof(*tc_header_cols);

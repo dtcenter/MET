@@ -59,6 +59,7 @@ void TCPairsConfInfo::clear() {
    // Deallocate memory
    if(Consensus) { delete [] Consensus; Consensus = (ConsensusInfo *) 0; }
 
+   Desc.clear();
    Model.clear();
    StormId.clear();
    Basin.clear();
@@ -118,6 +119,9 @@ void TCPairsConfInfo::process_config() {
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
    check_met_version(Version);
+
+   // Conf: Desc
+   Desc = parse_conf_string(&Conf, conf_key_desc);
 
    // Conf: Model
    Model = Conf.lookup_string_array(conf_key_model);

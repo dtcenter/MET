@@ -27,6 +27,7 @@
 //   006    06/01/16  Halley Gotway   Apply interp12 logic to tracks
 //                    with ATCF id's ending in '3'.
 //   007    06/01/16  Halley Gotway   Add support for EDecks.
+//   008    09/29/16  Halley Gotway   Add DESC output column.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1938,6 +1939,9 @@ void write_tracks(const TrackPairInfoArray &p) {
    // Initialize the row index to 1 to account for the header
    i_row = 1;
 
+   // Store user-defined description
+   tchc.set_desc(conf_info.Desc);
+
    // Store masking regions in the header
    if(conf_info.InitMask.n_points() > 0)  tchc.set_init_mask(conf_info.InitMask.name());
    else                                   tchc.set_init_mask(na_str);
@@ -2012,6 +2016,9 @@ void write_prob_ri(const ProbRIPairInfoArray &p) {
 
    // Initialize the row index to 1 to account for the header
    i_row = 1;
+
+   // Store user-defined description
+   tchc.set_desc(conf_info.Desc);
 
    // Store masking regions in the header
    if(conf_info.InitMask.n_points() > 0)  tchc.set_init_mask(conf_info.InitMask.name());

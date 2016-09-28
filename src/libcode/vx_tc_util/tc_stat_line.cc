@@ -156,6 +156,12 @@ const char * TCStatLine::bmodel() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+const char * TCStatLine::desc() const {
+   return(get_item("DESC"));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 const char * TCStatLine::storm_id() const {
    return(get_item("STORM_ID"));
 }

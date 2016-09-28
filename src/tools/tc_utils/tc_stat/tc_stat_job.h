@@ -130,6 +130,7 @@ struct TCLineCounts {
    // Checking track point attributes
    int RejAModel;
    int RejBModel;
+   int RejDesc;
    int RejStormId;
    int RejBasin;
    int RejCyclone;
@@ -241,6 +242,7 @@ class TCStatJob {
       // Header column entries
       StringArray AModel;
       StringArray BModel;
+      StringArray Desc;
       StringArray StormId;
       StringArray Basin;
       StringArray Cyclone;

@@ -16,6 +16,7 @@
 //   ----   ----      ----            -----------
 //   000    04/03/12  Halley Gotway   New
 //   001    07/14/14  Halley Gotway   Generalize rapid intensification.
+//   002    09/28/16  Halley Gotway   Add DESC output column.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -232,6 +233,7 @@ void process_jobs() {
            << "Rejected for landfall          = " << n.RejLandfall       << "\n"
            << "Rejected for amodel            = " << n.RejAModel         << "\n"
            << "Rejected for bmodel            = " << n.RejBModel         << "\n"
+           << "Rejected for desc              = " << n.RejDesc           << "\n"
            << "Rejected for storm id          = " << n.RejStormId        << "\n"
            << "Rejected for basin             = " << n.RejBasin          << "\n"
            << "Rejected for cyclone           = " << n.RejCyclone        << "\n"
