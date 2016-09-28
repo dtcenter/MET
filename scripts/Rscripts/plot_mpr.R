@@ -19,6 +19,7 @@
 ##  Usage:
 ##    Rscript plot_mpr.R
 ##      file_list
+##      [-wind_rose]
 ##      [-out name]
 ##      [-save]
 ##
@@ -28,10 +29,11 @@
 ##    "-save"     calls save.image() before exiting R.
 ##
 ##  Details:
+##    Updated for MET version 6.0.
 ##
 ##  Examples:
 ##    Rscript plot_mpr.R \
-##      met-5.0/out/point_stat/*_mpr.txt
+##      met-6.0/out/point_stat/*_mpr.txt
 ##
 ##   Author:
 ##      John Halley Gotway (johnhg@ucar.edu), NCAR-RAL/DTC
@@ -43,12 +45,25 @@ library(stats)
 
 ########################################################################
 #
+# Wind Rose Plotting function.
+#
+########################################################################
+
+plot_wind_rose <- function(u, v, title) {
+  library(openair)
+  ws = sqrt(u^2 + v^2);
+  wd = atan2(u/ws, v/ws) * 180/pi;
+  pollutionRose(data.frame(ws=ws, wd=wd), pollutant="ws", main=title)
+}
+
+########################################################################
+#
 # Constants.
 #
 ########################################################################
 
-# Header for the MPR line type (METv5.0)
-mpr_header <- c("VERSION", "MODEL",
+# Header for the MPR line type (MET version 6.0)
+mpr_header <- c("VERSION", "MODEL", "DESC",
                 "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
                 "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
                 "FCST_VAR", "FCST_LEV",
@@ -58,7 +73,7 @@ mpr_header <- c("VERSION", "MODEL",
                 "FCST_THRESH", "OBS_THRESH", "COV_THRESH",
                 "ALPHA", "LINE_TYPE",
                 "TOTAL", "INDEX", "OBS_SID", "OBS_LAT", "OBS_LON",
-                "OBS_LVL", "OBS_ELV", "FCST", "OBS", "CLIMO", "OBS_QC")
+                "OBS_LVL", "OBS_ELV", "FCST", "OBS", "CLIMO")
 
 # Temporary input file name
 tmp_file <- "mpr_input.tmp"
@@ -79,16 +94,19 @@ args = commandArgs(TRUE)
 if(length(args) < 1) {
    cat("Usage: plot_mpr.R\n")
    cat("         mpr_file_list\n")
+   cat("         [-wind_rose]\n")
    cat("         [-out name]\n")
    cat("         [-save]\n")
-   cat("         where \"file_list\" is one or more files containing MPR lines.\n")
-   cat("               \"-out name\" specifies an output PDF file name.\n")
-   cat("               \"-save\"     calls save.image() before exiting R.\n\n")
+   cat("         where \"file_list\"  is one or more files containing MPR lines.\n")
+   cat("               \"-wind_rose\" enables plotting of vector winds.\n")
+   cat("               \"-out name\"  specifies an output PDF file name.\n")
+   cat("               \"-save\"      calls save.image() before exiting R.\n\n")
    quit()
 }
 
 # Initialize
 save = FALSE
+wind_rose = FALSE
 file_list = c()
 
 # Parse the arguments
@@ -98,6 +116,8 @@ while(i <= length(args)) {
   # Check optional arguments
   if(args[i] == "-save") {
     save = TRUE
+  } else if(args[i] == "-wind_rose") {
+    wind_rose = TRUE
   } else if(args[i] == "-out") {
 
     # Set the output file name
@@ -215,6 +235,41 @@ for(i in 1:length(case_list)) {
   qqplot(data$FCST[ind], data$OBS[ind], main=title, ylab="Observation", xlab="Forecast",
          col=colors, pch=19)
   abline(a=0, b=1, lwd=2, lty=2)
+
+  # Check for UGRD/VGRD vector pairs and plot wind rose
+  if(wind_rose &&
+     data$FCST_VAR[ind][1] == "UGRD" &&
+     data$OBS_VAR[ind][1]  == "UGRD") {
+
+    # Store UGRD/VGRD indices
+    uind <- ind;
+    vgrd_case = gsub("UGRD", "VGRD", case_list[i]);
+    vind <- data$index == vgrd_case;
+
+    # Make sure they are the same lenght and the station id's match
+    if(sum(uind) != sum(vind) ||
+       sum(data$OBS_SID[uind] == data$OBS_SID[vind]) != sum(uind)) {
+       print(paste("WARNING: UGRD/VGRD vectors do not exactly match"))
+       next;
+    }
+
+    # Print status message
+    print(paste("Processing vector:", case_list[i], "and", vgrd_case))
+
+    # Title string
+    title_str = paste(sum(ind),  "points\n",
+                      gsub("UGRD", "Winds", main_info),
+                      case_info);
+
+    # Create wind rose plots
+    plot_wind_rose(data$FCST[uind], data$FCST[vind],
+      paste("Forecast Winds for", title_str));
+    plot_wind_rose( data$OBS[uind],  data$OBS[vind],
+      paste("Observed Winds for", title_str));
+    plot_wind_rose(data$FCST[uind] - data$OBS[uind],
+                   data$FCST[vind] - data$OBS[vind],
+      paste("Wind Errors for", title_str));
+  }
 }
 
 # Finished with the plots

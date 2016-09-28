@@ -22,6 +22,7 @@
 ##    "-save"     calls save.image() before exiting R.
 ##
 ##  Details:
+##    Updated for MET version 6.0.
 ##
 ##  Examples:
 ##    Rscript gspairs2mpr.R \
@@ -117,13 +118,14 @@ for(i in 1:length(var_list)) {
   fvar  = round(get.var.ncdf(nc, fstr), prec);
   ovar  = round(get.var.ncdf(nc, ostr), prec);
   ind   = !is.na(fvar) & !is.na(ovar);
-  flead = att.get.ncdf(nc, fstr, "valid_time_ut")$value - 
-          att.get.ncdf(nc, fstr, "init_time_ut")$value;
-  olead = att.get.ncdf(nc, ostr, "valid_time_ut")$value - 
-          att.get.ncdf(nc, ostr, "init_time_ut")$value;
+  flead = as.numeric(att.get.ncdf(nc, fstr, "valid_time_ut")$value) -
+          as.numeric(att.get.ncdf(nc, fstr, "init_time_ut")$value);
+  olead = as.numeric(att.get.ncdf(nc, ostr, "valid_time_ut")$value) -
+          as.numeric(att.get.ncdf(nc, ostr, "init_time_ut")$value);
   mpr   = data.frame(
             VERSION=att.get.ncdf(nc, 0, "MET_version")$value,
             MODEL=att.get.ncdf(nc, 0, "model")$value,
+            DESC=att.get.ncdf(nc, fstr, "desc")$value,
             FCST_LEAD=sprintf("%02d%02d%02d", round(flead/3600, 0), round(flead%%3600/60, 0), flead%%60),
             FCST_VALID_BEG=att.get.ncdf(nc, fstr, "valid_time")$value,
             FCST_VALID_END=att.get.ncdf(nc, fstr, "valid_time")$value,
