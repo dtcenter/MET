@@ -19,17 +19,22 @@ sub usage(){
          "  stat file.\n\n";
 }
 
-my @fld_hdrs  = qw(VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG FCST_VALID_END OBS_LEAD OBS_VALID_BEG
-                   OBS_VALID_END FCST_VAR FCST_LEV OBS_VAR OBS_LEV OBTYPE VX_MASK INTERP_MTHD
-                   INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE);
+my @fld_hdrs   = qw(VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG FCST_VALID_END OBS_LEAD OBS_VALID_BEG
+                    OBS_VALID_END FCST_VAR FCST_LEV OBS_VAR OBS_LEV OBTYPE VX_MASK INTERP_MTHD
+                    INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE);
 
-my @fld_tcst  = qw(AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
-                   TOTAL INDEX LEVEL WATCH_WARN INITIALS ALAT ALON BLAT BLON
-                   TK_ERR X_ERR Y_ERR ALTK_ERR CRTK_ERR ADLAND BDLAND AMSLP BMSLP AMAX_WIND BMAX_WIND
-                   AAL_WIND_34 BAL_WIND_34 ANE_WIND_34 BNE_WIND_34 ASE_WIND_34 BSE_WIND_34 ASW_WIND_34 BSW_WIND_34 ANW_WIND_34 BNW_WIND_34
-                   AAL_WIND_50 BAL_WIND_50 ANE_WIND_50 BNE_WIND_50 ASE_WIND_50 BSE_WIND_50 ASW_WIND_50 BSW_WIND_50 ANW_WIND_50 BNW_WIND_50
-                   AAL_WIND_64 BAL_WIND_64 ANE_WIND_64 BNE_WIND_64 ASE_WIND_64 BSE_WIND_64 ASW_WIND_64 BSW_WIND_64 ANW_WIND_64 BNW_WIND_64
-                   ARADP BRADP ARRP BRRP AMRD BMRD AGUSTS BGUSTS AEYE BEYE ADIR BDIR ASPEED BSPEED ADEPTH BDEPTH);
+my @fld_tcmpr  = qw(AMODEL BMODEL STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
+                    TOTAL INDEX LEVEL WATCH_WARN INITIALS ALAT ALON BLAT BLON
+                    TK_ERR X_ERR Y_ERR ALTK_ERR CRTK_ERR ADLAND BDLAND AMSLP BMSLP AMAX_WIND BMAX_WIND
+                    AAL_WIND_34 BAL_WIND_34 ANE_WIND_34 BNE_WIND_34 ASE_WIND_34 BSE_WIND_34 ASW_WIND_34 BSW_WIND_34 ANW_WIND_34 BNW_WIND_34
+                    AAL_WIND_50 BAL_WIND_50 ANE_WIND_50 BNE_WIND_50 ASE_WIND_50 BSE_WIND_50 ASW_WIND_50 BSW_WIND_50 ANW_WIND_50 BNW_WIND_50
+                    AAL_WIND_64 BAL_WIND_64 ANE_WIND_64 BNE_WIND_64 ASE_WIND_64 BSE_WIND_64 ASW_WIND_64 BSW_WIND_64 ANW_WIND_64 BNW_WIND_64
+                    ARADP BRADP ARRP BRRP AMRD BMRD AGUSTS BGUSTS AEYE BEYE ADIR BDIR ASPEED BSPEED ADEPTH BDEPTH);
+
+my @fld_probri = qw(AMODEL BMODEL STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
+                    ALAT ALON BLAT BLON INITIALS TK_ERR X_ERR Y_ERR ADLAND BDLAND RI_BEG RI_END RI_WINDOW
+                    AWIND_END BWIND_BEG BWIND_END BDELTA BDELTA_MAX BLEVEL_BEG BLEVEL_END N_THRESH
+                    THRESH_ PROB_);
 
 my $fmt_hdr =
       "%-8s"  . # VERSION
@@ -55,10 +60,9 @@ my $fmt_hdr =
       "%-6s"  . # ALPHA
       "%-10s";  # LINE_TYPE
 
-my $fmt_tcst =
+my $fmt_tcmpr =
       "%15s"  . # AMODEL
       "%15s"  . # BMODEL
-      "%15s"  . # DESC
       "%15s"  . # STORM_ID
       "%15s"  . # BASIN
       "%15s"  . # CYCLONE
@@ -132,6 +136,37 @@ my $fmt_tcst =
       "%15s"  . # ADEPTH
       "%15s";   # BDEPTH
 
+my $fmt_probri =
+      "%15s"  . # AMODEL
+      "%15s"  . # BMODEL
+      "%15s"  . # STORM_ID
+      "%15s"  . # BASIN
+      "%15s"  . # CYCLONE
+      "%15s"  . # STORM_NAME
+      "%15s"  . # INIT_MASK
+      "%15s"  . # VALID_MASK
+      "%15s"  . # ALAT
+      "%15s"  . # ALON
+      "%15s"  . # BLAT
+      "%15s"  . # BLON
+      "%15s"  . # INITIALS
+      "%15s"  . # TK_ERR
+      "%15s"  . # X_ERR
+      "%15s"  . # Y_ERR
+      "%15s"  . # ADLAND
+      "%15s"  . # BDLAND
+      "%15s"  . # RI_BEG
+      "%15s"  . # RI_END
+      "%15s"  . # RI_WINDOW
+      "%15s"  . # AWIND_END
+      "%15s"  . # BWIND_BEG
+      "%15s"  . # BWIND_END
+      "%15s"  . # BDELTA
+      "%15s"  . # BDELTA_MAX
+      "%15s"  . # BLEVEL_BEG
+      "%15s"  . # BLEVEL_END
+      "%15s";   # N_THRESH
+
 
 if( 1 > @ARGV && 2 < @ARGV ){ die "ERROR: unexpected number of arguments\n\n" . usage() }
 
@@ -139,9 +174,6 @@ my $file = pop @ARGV;
 
 # open the input file
 open(my $fh_tcst_in, "<", $file) or die "ERROR: cannot open input file $file\n\n" . usage();
-
-# print the column headers
-printf( "${fmt_hdr}${fmt_tcst}\n", (@fld_hdrs, @fld_tcst) );
 
 # handle each input file line
 while(<$fh_tcst_in>){
@@ -173,20 +205,33 @@ while(<$fh_tcst_in>){
      "NA",      # FCST_THRESH
      "NA",      # OBS_THRESH
      "NA",      # COV_THRESH
-     "NA",      # ALPHA
-     "TCST"     # LINE_TYPE
+     "NA"       # ALPHA
   );
 
-  # write the output line
-  push @outs, (@vals[1 .. 7,11,12,14 .. 79]);
+  # write a TCMPR line
+  my $fmt_val;
+  if( $vals[13] eq "TCMPR" ){
+    push @outs, ("TCST_TCMPR", @vals[1,2,4 .. 7,11,12,14 .. 79]);
+    $fmt_val = $fmt_tcmpr;
+  }
+
+  # write a PROBRI line
+  elsif( $vals[13] eq "PROBRI" ) {
+    push @outs, ("TCST_PROBRI", @vals[1,2,4 .. 7,11,12,14 .. 34]);
+    $fmt_val = $fmt_probri;
+    foreach my $i ( 35 .. $#vals ) {
+      $fmt_val = $fmt_val . "%15s";
+      push @outs, ($vals[$i]);
+    }
+  }
 
   # print the line
-  printf("${fmt_hdr}${fmt_tcst}\n", @outs);
+  printf("${fmt_hdr}${fmt_val}\n", @outs);
 }
 
 close($fh_tcst_in);
 
-# TCST Header Line
+# TCST Header
 #     0 VERSION
 #     1 AMODEL
 #     2 BMODEL
@@ -201,6 +246,8 @@ close($fh_tcst_in);
 #    11 INIT_MASK
 #    12 VALID_MASK
 #    13 LINE_TYPE
+
+# TCMPR Line Type
 #    14 TOTAL
 #    15 INDEX
 #    16 LEVEL
@@ -267,3 +314,36 @@ close($fh_tcst_in);
 #    77  BSPEED
 #    78  ADEPTH
 #    79  BDEPTH
+
+# PROBRI Line Type
+#     0 ALAT
+#     1 ALON
+#     2 BLAT
+#     3 BLON
+#     4 INITIALS
+#     5 TK_ERR
+#     6 X_ERR
+#     7 Y_ERR
+#     8 ADLAND
+#     9 BDLAND
+#    10 RI_BEG
+#    11 RI_END
+#    12 RI_WINDOW
+#    13 AWIND_END
+#    14 BWIND_BEG
+#    15 BWIND_END
+#    16 BDELTA
+#    17 BDELTA_MAX
+#    18 BLEVEL_BEG
+#    19 BLEVEL_END
+#    20 N_THRESH
+#    21 THRESH_1
+#    22 PROB_1
+#    23 THRESH_2
+#    24 PROB_2
+#    25 THRESH_3
+#    26 PROB_3
+#    27 THRESH_4
+#    28 PROB_4
+#    29 THRESH_5
+#    30 PROB_5

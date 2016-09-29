@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
 # mode_conv.pl - a utility to convert MODE text output files
 # to the STAT format consistent with the output of other MET
 # tools
 #
-# last revised: 2012-01-18
+# last revised: 2016-09-17 for MET version 6.0
 #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 use warnings;
 use strict;
@@ -24,25 +24,26 @@ sub usage(){
          "    -p writes out only pair object attributes with column headers\n";
 }
 
-my @fld_hdrs  = qw(VERSION MODEL FCST_LEAD FCST_VALID_BEG FCST_VALID_END OBS_LEAD OBS_VALID_BEG 
-                   OBS_VALID_END FCST_VAR FCST_LEV OBS_VAR OBS_LEV OBTYPE VX_MASK INTERP_MTHD 
+my @fld_hdrs  = qw(VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG FCST_VALID_END OBS_LEAD OBS_VALID_BEG
+                   OBS_VALID_END FCST_VAR FCST_LEV OBS_VAR OBS_LEV OBTYPE VX_MASK INTERP_MTHD
                    INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE);
-                  
-my @fld_sings = qw(OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y CENTROID_LAT CENTROID_LON 
-                   AXIS_ANG LENGTH WIDTH AREA AREA_FILTER AREA_THRESH CURVATURE CURVATURE_X 
-                   CURVATURE_Y COMPLEXITY INTENSITY_10 INTENSITY_25 INTENSITY_50 INTENSITY_75 
+
+my @fld_sings = qw(OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y CENTROID_LAT CENTROID_LON
+                   AXIS_ANG LENGTH WIDTH AREA AREA_FILTER AREA_THRESH CURVATURE CURVATURE_X
+                   CURVATURE_Y COMPLEXITY INTENSITY_10 INTENSITY_25 INTENSITY_50 INTENSITY_75
                    INTENSITY_90 INTENSITY_50 INTENSITY_SUM);
 
-my @fld_pairs = qw(OBJECT_ID OBJECT_CAT CENTROID_DIST BOUNDARY_DIST CONVEX_HULL_DIST ANGLE_DIFF 
-                   AREA_RATIO INTERSECTION_AREA UNION_AREA SYMMETRIC_DIFF INTERSECTION_OVER_AREA 
+my @fld_pairs = qw(OBJECT_ID OBJECT_CAT CENTROID_DIST BOUNDARY_DIST CONVEX_HULL_DIST ANGLE_DIFF
+                   AREA_RATIO INTERSECTION_AREA UNION_AREA SYMMETRIC_DIFF INTERSECTION_OVER_AREA
                    COMPLEXITY_RATIO PERCENTILE_INTENSITY_RATIO INTEREST);
 
-my @fld_ctss  = qw(FIELD TOTAL FY_OY FY_ON FN_OY FN_ON BASER FMEAN ACC FBIAS PODY PODN POFD FAR 
+my @fld_ctss  = qw(FIELD TOTAL FY_OY FY_ON FN_OY FN_ON BASER FMEAN ACC FBIAS PODY PODN POFD FAR
                    CSI GSS HK HSS ODDS);
 
-my $fmt_hdr = 
+my $fmt_hdr =
       "%-8s"  . # VERSION
       "%-12s" . # MODEL
+      "%-12s" . # DESC
       "%-10s" . # FCST_LEAD
       "%-16s" . # FCST_VALID_BEG
       "%-16s" . # FCST_VALID_END
@@ -63,7 +64,7 @@ my $fmt_hdr =
       "%-6s"  . # ALPHA
       "%-10s";  # LINE_TYPE
 
-my $fmt_sing = 
+my $fmt_sing =
       "%-12s" . # OBJECT_ID
       "%-12s" . # OBJECT_CAT
       "%11s"  . # CENTROID_X
@@ -87,8 +88,8 @@ my $fmt_sing =
       "%13s"  . # INTENSITY_90
       "%13s"  . # INTENSITY_50
       "%14s";   # INTENSITY_SUM
-       
-my $fmt_pair = 
+
+my $fmt_pair =
       "%-12s" . # OBJECT_ID
       "%-12s" . # OBJECT_CAT
       "%14s"  . # CENTROID_DIST
@@ -104,7 +105,7 @@ my $fmt_pair =
       "%27s"  . # PERCENTILE_INTENSITY_RATIO
       "%12s";   # INTEREST
 
-my $fmt_cts = 
+my $fmt_cts =
       "%7s"   . # FIELD
       "%8s"   . # TOTAL
       "%8s"   . # FY_OY
@@ -163,7 +164,7 @@ while(<$fh_mode_in>){
 
   # parse the data line, and build the header
   my @vals = split /\s+/;
-  my @outs = (@vals[0,1,2,3,3,5,6,6,12,13,14,15],
+  my @outs = (@vals[0,1,2,3,4,4,6,7,7,13,14,15,16],
     "ANALYS",      # OBTYPE
     "FULL",        # VX_MASK
     "UW_MEAN",     # INTERP_MTHD
@@ -177,23 +178,23 @@ while(<$fh_mode_in>){
   # write a cts line
   my $fmt_val;
   if( $type eq "c" ){
-    push @outs, ("MODE_CTS", @vals[16 .. 34]);
+    push @outs, ("MODE_CTS", @vals[17 .. 35]);
     $fmt_val = $fmt_cts;
-  } 
-  
-  # write a pair object attribute line 
-  elsif( $vals[16] !~ /_/ ){
+  }
+
+  # write a pair object attribute line
+  elsif( $vals[17] !~ /_/ ){
     next if( $type eq "p");
-    push @outs, ("MODE_SOA", @vals[16 .. 40]);
+    push @outs, ("MODE_SOA", @vals[17 .. 41]);
     $fmt_val = $fmt_sing;
-  } 
-  
+  }
+
   # write a single object attribute line
   else {
     next if ($type eq "s");
-    push @outs, ("MODE_POA", @vals[16,17,39 .. 50]);
+    push @outs, ("MODE_POA", @vals[17,18,40 .. 51]);
     $fmt_val = $fmt_pair;
-  } 
+  }
 
   # print the line
   printf("${fmt_hdr}${fmt_val}\n", @outs);
@@ -204,75 +205,76 @@ close($fh_mode_in);
 
 #  0 - VERSION
 #  1 - MODEL
-#  2 - FCST_LEAD
-#  3 - FCST_VALID
-#  4 - FCST_ACCUM
-#  5 - OBS_LEAD
-#  6 - OBS_VALID
-#  7 - OBS_ACCUM
-#  8 - FCST_RAD
-#  9 - FCST_THR
-# 10 - OBS_RAD
-# 11 - OBS_THR
-# 12 - FCST_VAR
-# 13 - FCST_LEV
-# 14 - OBS_VAR
-# 15 - OBS_LEV
+#  2 - DESC
+#  3 - FCST_LEAD
+#  4 - FCST_VALID
+#  5 - FCST_ACCUM
+#  6 - OBS_LEAD
+#  7 - OBS_VALID
+#  8 - OBS_ACCUM
+#  9 - FCST_RAD
+# 10 - FCST_THR
+# 11 - OBS_RAD
+# 12 - OBS_THR
+# 13 - FCST_VAR
+# 14 - FCST_LEV
+# 15 - OBS_VAR
+# 16 - OBS_LEV
 
-# 16 - OBJECT_ID
-# 17 - OBJECT_CAT
-# 18 - CENTROID_X
-# 19 - CENTROID_Y
-# 20 - CENTROID_LAT
-# 21 - CENTROID_LON
-# 22 - AXIS_ANG
-# 23 - LENGTH
-# 24 - WIDTH
-# 25 - AREA
-# 26 - AREA_FILTER
-# 27 - AREA_THRESH
-# 28 - CURVATURE
-# 29 - CURVATURE_X
-# 30 - CURVATURE_Y
-# 31 - COMPLEXITY
-# 32 - INTENSITY_10
-# 33 - INTENSITY_25
-# 34 - INTENSITY_50
-# 35 - INTENSITY_75
-# 36 - INTENSITY_90
-# 37 - INTENSITY_50
-# 38 - INTENSITY_SUM
-# 39 - CENTROID_DIST
-# 40 - BOUNDARY_DIST
-# 41 - CONVEX_HULL_DIST
-# 42 - ANGLE_DIFF
-# 43 - AREA_RATIO
-# 44 - INTERSECTION_AREA
-# 45 - UNION_AREA
-# 46 - SYMMETRIC_DIFF
-# 47 - INTERSECTION_OVER_AREA
-# 48 - COMPLEXITY_RATIO
-# 49 - PERCENTILE_INTENSITY_RATIO
-# 50 - INTEREST
+# 17 - OBJECT_ID
+# 18 - OBJECT_CAT
+# 19 - CENTROID_X
+# 20 - CENTROID_Y
+# 21 - CENTROID_LAT
+# 22 - CENTROID_LON
+# 23 - AXIS_ANG
+# 24 - LENGTH
+# 25 - WIDTH
+# 26 - AREA
+# 27 - AREA_FILTER
+# 28 - AREA_THRESH
+# 29 - CURVATURE
+# 30 - CURVATURE_X
+# 31 - CURVATURE_Y
+# 32 - COMPLEXITY
+# 33 - INTENSITY_10
+# 34 - INTENSITY_25
+# 35 - INTENSITY_50
+# 36 - INTENSITY_75
+# 37 - INTENSITY_90
+# 38 - INTENSITY_50
+# 39 - INTENSITY_SUM
+# 40 - CENTROID_DIST
+# 41 - BOUNDARY_DIST
+# 42 - CONVEX_HULL_DIST
+# 43 - ANGLE_DIFF
+# 44 - AREA_RATIO
+# 45 - INTERSECTION_AREA
+# 46 - UNION_AREA
+# 47 - SYMMETRIC_DIFF
+# 48 - INTERSECTION_OVER_AREA
+# 49 - COMPLEXITY_RATIO
+# 50 - PERCENTILE_INTENSITY_RATIO
+# 51 - INTEREST
 
-# 16 - FIELD
-# 17 - TOTAL
-# 18 - FY_OY
-# 19 - FY_ON
-# 20 - FN_OY
-# 21 - FN_ON
-# 22 - BASER
-# 23 - FMEAN
-# 24 - ACC
-# 25 - FBIAS
-# 26 - PODY
-# 27 - PODN
-# 28 - POFD
-# 29 - FAR
-# 30 - CSI
-# 31 - GSS
-# 32 - HK
-# 33 - HSS
-# 34 - ODDS
+# 17 - FIELD
+# 18 - TOTAL
+# 19 - FY_OY
+# 20 - FY_ON
+# 21 - FN_OY
+# 22 - FN_ON
+# 23 - BASER
+# 24 - FMEAN
+# 25 - ACC
+# 26 - FBIAS
+# 27 - PODY
+# 28 - PODN
+# 29 - POFD
+# 30 - FAR
+# 31 - CSI
+# 32 - GSS
+# 33 - HK
+# 34 - HSS
+# 35 - ODDS
 
 
