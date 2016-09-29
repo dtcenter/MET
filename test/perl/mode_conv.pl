@@ -178,21 +178,21 @@ while(<$fh_mode_in>){
   # write a cts line
   my $fmt_val;
   if( $type eq "c" ){
-    push @outs, ("MODE_CTS", @vals[17 .. 35]);
+    push @outs, (" MODE_CTS ", @vals[17 .. 35]);
     $fmt_val = $fmt_cts;
   }
 
   # write a pair object attribute line
   elsif( $vals[17] !~ /_/ ){
     next if( $type eq "p");
-    push @outs, ("MODE_SOA", @vals[17 .. 41]);
+    push @outs, (" MODE_SOA ", @vals[17 .. 41]);
     $fmt_val = $fmt_sing;
   }
 
   # write a single object attribute line
   else {
     next if ($type eq "s");
-    push @outs, ("MODE_POA", @vals[17,18,40 .. 51]);
+    push @outs, (" MODE_POA ", @vals[17,18,40 .. 51]);
     $fmt_val = $fmt_pair;
   }
 

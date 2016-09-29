@@ -211,13 +211,13 @@ while(<$fh_tcst_in>){
   # write a TCMPR line
   my $fmt_val;
   if( $vals[13] eq "TCMPR" ){
-    push @outs, ("TCST_TCMPR", @vals[1,2,4 .. 7,11,12,14 .. 79]);
+    push @outs, (" TCST_TCMPR ", @vals[1,2,4 .. 7,11,12,14 .. 79]);
     $fmt_val = $fmt_tcmpr;
   }
 
   # write a PROBRI line
   elsif( $vals[13] eq "PROBRI" ) {
-    push @outs, ("TCST_PROBRI", @vals[1,2,4 .. 7,11,12,14 .. 34]);
+    push @outs, (" TCST_PROBRI ", @vals[1,2,4 .. 7,11,12,14 .. 34]);
     $fmt_val = $fmt_probri;
     foreach my $i ( 35 .. $#vals ) {
       $fmt_val = $fmt_val . "%15s";
