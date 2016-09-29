@@ -264,9 +264,13 @@ getStatMetVer = function(stat){
 #      stat: path and filename of a MET stat file to read line types from
 getStatLty = function(stat){
 	strVer = getStatMetVer(stat);
+	strHdr = getStatHeaders(strVer, "CNT");
+
+	# location of the LINE_TYPE column
+	intLtyCol = which(unlist(strsplit(strHdr, ' ')) == "LINE_TYPE");
 
 	# parse out the distinct line types present in the input file
-	strCmdLty = paste("cat ", stat, " 2>/dev/null | egrep '^V[0-9]' | awk '{print $21}' | sort -u", sep="");
+	strCmdLty = paste("cat ", stat, " 2>/dev/null | egrep '^V[0-9]' | awk '{print $", intLtyCol, "}' | sort -u", sep="");
 	listLty = system(strCmdLty, intern=T);
 
 	# modify the list to include the length of variable length lines
@@ -792,6 +796,10 @@ compareDiff = function(file1, file2, verb=0){
 	else if( 1 <= verb ){ cat("passed diff\n"); }
 }
 
-listHeaderCols = c("VERSION", "MODEL", "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END", "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
-                   "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV", "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS", "FCST_THRESH",
-				   "OBS_THRESH", "COV_THRESH", "ALPHA", "LINE_TYPE");
+listHeaderCols = c("VERSION", "DESC", "MODEL",
+                   "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
+                   "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
+                   "FCST_VAR", "FCST_LEV", "OBS_VAR", "OBS_LEV",
+                   "OBTYPE", "VX_MASK", "INTERP_MTHD", "INTERP_PNTS",
+                   "FCST_THRESH", "OBS_THRESH", "COV_THRESH", "ALPHA",
+                   "LINE_TYPE");
