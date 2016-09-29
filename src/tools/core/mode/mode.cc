@@ -153,6 +153,7 @@ if ( conf.quilt )  {
 
 }
 
+mode_exec.clear();
 
    //
    //  done
