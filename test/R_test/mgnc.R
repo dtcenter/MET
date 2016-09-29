@@ -1,5 +1,5 @@
 
-library(ncdf)
+library(ncdf4)
 
 verb = F;
 
@@ -24,14 +24,14 @@ if( 1 > length(strLs) ){
 }
 
 if( verb ){ cat("Opening", listArgs[1], "\n"); }
-ncfile = open.ncdf(listArgs[1]);
+ncfile = nc_open(listArgs[1]);
 
 # check each variable in the file
 intNumVar = 0;
 for(strVarName in names(ncfile$var)){
 	
 	# get the variable values and return bad status if it's all NA
-	var = get.var.ncdf(ncfile, strVarName);
+	var = ncvar_get(ncfile, strVarName);
 	if( verb ){ cat("Checking", strVarName, "... "); }
 	size = length(var);
 	if( size <= sum( is.na(var) ) ){
@@ -48,7 +48,7 @@ if( 1 > intNumVar ){
 	q(status=1);
 }
 
-#close.ncdf(ncfile);
+#nc_close(ncfile);
 
 # otherwise, exit with success
 q(status=0);

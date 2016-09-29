@@ -682,14 +682,14 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	}
 
 	# open the NetCDF files for reading
-	ncFile1 = open.ncdf(c(nc1), write=F);
-	ncFile2 = open.ncdf(c(nc2), write=F);
-	ncFileD = open.ncdf(c(strNcDiff), write=F);
+	ncFile1 = nc_open(c(nc1), write=F);
+	ncFile2 = nc_open(c(nc2), write=F);
+	ncFileD = nc_open(c(strNcDiff), write=F);
 
 	# read the global attributes from each file
-	listAtt1 = att.get.ncdf(ncFile1, varid=0);
+	listAtt1 = ncatt_get(ncFile1, varid=0);
 	listAtt1Nam = names(listAtt1);
-	listAtt2 = att.get.ncdf(ncFile2, varid=0);
+	listAtt2 = ncatt_get(ncFile2, varid=0);
 	listAtt2Nam = names(listAtt2);
 
 	# compare the global attributes
@@ -705,9 +705,9 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	for(strVar in names(ncFileD$var)){
 
 		# check the variable attributes for differences
-		listAtt1 = att.get.ncdf(ncFile1, varid=strVar);
+		listAtt1 = ncatt_get(ncFile1, varid=strVar);
 		listAtt1Nam = names(listAtt1);
-		listAtt2 = att.get.ncdf(ncFile2, varid=strVar);
+		listAtt2 = ncatt_get(ncFile2, varid=strVar);
 		listAtt2Nam = names(listAtt2);
 
 		# compare the field attributes
@@ -716,7 +716,7 @@ compareNc = function(nc1, nc2, verb, strict=0){
 		compMapStr (listAtt1, listAtt2, paste("value of field", strVar, "attribute differs for"), verb);
 
 		# check the numerical data for differences
-		dataNcVar = get.var.ncdf(ncFileD, ncFileD$var[[ strVar ]]);
+		dataNcVar = ncvar_get(ncFileD, ncFileD$var[[ strVar ]]);
 		boolDiff = FALSE;
 		strVarType = "";
 		if( is.numeric(dataNcVar[1]) ){
@@ -732,8 +732,8 @@ compareNc = function(nc1, nc2, verb, strict=0){
 			}
 		} else {
 			strVarType = "string";
-			dataNcVar1 = get.var.ncdf(ncFile1, ncFile1$var[[ strVar ]]);
-			dataNcVar2 = get.var.ncdf(ncFile2, ncFile2$var[[ strVar ]]);
+			dataNcVar1 = ncvar_get(ncFile1, ncFile1$var[[ strVar ]]);
+			dataNcVar2 = ncvar_get(ncFile2, ncFile2$var[[ strVar ]]);
 			listDiff = (as.character(dataNcVar1) != as.character(dataNcVar2));
 			boolDiff = (0 < sum(listDiff));
 			if( TRUE == boolDiff & 1 <= verb ){ cat("ERROR:", sum(listDiff), "string difference(s) found in var", strVar, "\n"); }
@@ -748,9 +748,9 @@ compareNc = function(nc1, nc2, verb, strict=0){
 	}
 
 	# close the diff file
-	close.ncdf(ncFile1);
-	close.ncdf(ncFile2);
-	close.ncdf(ncFileD);
+	nc_close(ncFile1);
+	nc_close(ncFile2);
+	nc_close(ncFileD);
 
 	# remove the temporary diff files, if required
 	if( TRUE == boolRmTmp ){

@@ -1,4 +1,4 @@
-library(ncdf);
+library(ncdf4);
 
 # get the MET_TEST_BASE environment variable and include the support scripts
 met_test_base = system("echo $MET_TEST_BASE", intern=T);

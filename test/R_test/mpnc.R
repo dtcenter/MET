@@ -1,5 +1,5 @@
 
-library(ncdf)
+library(ncdf4)
 
 verb = F;
 
@@ -24,7 +24,7 @@ if( 1 > length(strLs) ){
 }
 
 if( verb ){ cat("Opening", listArgs[1], "\n"); }
-ncfile = open.ncdf(listArgs[1]);
+ncfile = nc_open(listArgs[1]);
 
 # check each variable in the file
 intNumHdrVar = 0;
@@ -32,7 +32,7 @@ intNumArrVar = 0;
 for(strVarName in names(ncfile$var)){
 	
 	# get the variable values
-	var = get.var.ncdf(ncfile, strVarName);
+	var = ncvar_get(ncfile, strVarName);
 	if( verb ){ cat("Checking", strVarName, "... "); }
 	
 	# if the variable contains header information, make sure it's not empty
@@ -74,7 +74,7 @@ if( 2 != intNumArrVar ){
 	q(status=1);
 }
 
-#close.ncdf(ncfile);
+#close_nc(ncfile);
 
 # otherwise, exit with success
 q(status=0);
