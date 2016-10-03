@@ -19,7 +19,6 @@
 
 
 #include "concat_string.h"
-#include "util_constants.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,6 +162,21 @@ static const int Friday    = 5;
 static const int Saturday  = 6;
 static const int Sunday    = 7;
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Bad Data Values
+   //
+
+static const int        bad_data_int          = -9999;
+static const long long  bad_data_ll           = -9999LL;
+static const float      bad_data_float        = -9999.f;
+static const double     bad_data_double       = -9999.0;
+static const char       bad_data_str[]        = "-9999";
+static const char       bad_data_char         = '\0';
+static const char       na_str[]              = "NA";
 
 
 ////////////////////////////////////////////////////////////////////////
