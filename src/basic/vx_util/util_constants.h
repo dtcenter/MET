@@ -17,13 +17,30 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char met_version[]          = "V6.0";
+// Released versions of MET
+static const char met_version_6_0[]   = "V6.0";
+static const char met_version_5_2[]   = "V5.2";
+static const char met_version_5_1[]   = "V5.1";
+static const char met_version_5_0[]   = "V5.0";
+static const char met_version_4_1[]   = "V4.1";
+static const char met_version_4_0[]   = "V4.0";
+static const char met_version_3_1[]   = "V3.1";
+static const char met_version_3_0_1[] = "V3.0.1";
+static const char met_version_3_0[]   = "V3.0";
+static const char met_version_2_0[]   = "V2.0";
+static const char met_version_1_1[]   = "V1.1";
+
+////////////////////////////////////////////////////////////////////////
+
+static const char *met_version           = met_version_6_0;
 static const char met_base_str[]         = "MET_BASE";
 static const char default_met_data_dir[] = "MET_BASE";
 static const char txt_file_ext[]         = ".txt";
 static const char stat_file_ext[]        = ".stat";
 static const char tc_stat_file_ext[]     = ".tcst";
 static const char full_domain_str[]      = "FULL";
+
+////////////////////////////////////////////////////////////////////////
 
 static const char latlon_proj_type         [] = "LatLon";
 static const char mercator_proj_type       [] = "Mercator";
@@ -95,16 +112,6 @@ static const double const_gop   = 9.80616; // from The Ceaseless Wind
 static const double const_rd    = 287.0;   // kg/k dry gas constant
 
 static const int vx_data2d_star = -12345;
-
-// Bad data strings and values
-
-static const int        bad_data_int          = -9999;
-static const long long  bad_data_ll           = -9999LL;
-static const float      bad_data_float        = -9999.f;
-static const double     bad_data_double       = -9999.0;
-static const char       bad_data_str[]        = "-9999";
-static const char       bad_data_char         = '\0';
-static const char       na_str[]              = "NA";
 
 ////////////////////////////////////////////////////////////////////////
 
