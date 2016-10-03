@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "ascii_header.h"
 #include "ascii_table.h"
 #include "asciitablejust_to_string.h"
 #include "check_endian.h"
