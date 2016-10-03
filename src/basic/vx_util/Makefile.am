@@ -11,7 +11,8 @@ include ${top_srcdir}/Make-include
 # The library
 
 noinst_LIBRARIES = libvx_util.a
-libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
+libvx_util_a_SOURCES = ascii_header.cc ascii_header.h \
+               ascii_table.cc ascii_table.h \
                asciitablejust_to_string.cc asciitablejust_to_string.h \
                check_endian.cc check_endian.h \
                comma_string.cc comma_string.h \

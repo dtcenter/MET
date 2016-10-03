@@ -96,6 +96,16 @@ static const double const_rd    = 287.0;   // kg/k dry gas constant
 
 static const int vx_data2d_star = -12345;
 
+// Bad data strings and values
+
+static const int        bad_data_int          = -9999;
+static const long long  bad_data_ll           = -9999LL;
+static const float      bad_data_float        = -9999.f;
+static const double     bad_data_double       = -9999.0;
+static const char       bad_data_str[]        = "-9999";
+static const char       bad_data_char         = '\0';
+static const char       na_str[]              = "NA";
+
 ////////////////////////////////////////////////////////////////////////
 
 // Define isatty() function, if needed.  It used used by lex but is
