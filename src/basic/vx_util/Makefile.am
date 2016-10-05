@@ -19,7 +19,6 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                conversions.cc conversions.h \
                data_line.cc data_line.h \
                grib_constants.cc grib_constants.h \
-               int_array.cc int_array.h \
                is_number.cc is_number.h \
                long_array.cc long_array.h \
                make_path.cc make_path.h \
