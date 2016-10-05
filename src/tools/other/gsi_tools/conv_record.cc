@@ -391,11 +391,11 @@ r.date = f.Date;
 
 r.extend(512);
 
-long long s = read_fortran_binary(f.Fd, r.Buf, 19, f.RecPadSize, f.SwapEndian);
+long long s = read_fortran_binary(f.Fd, r.Buf, 23, f.RecPadSize, f.SwapEndian);
 
 if ( s == 0 )  return ( false );
 
-if ( s != 19 )  {
+if ( s != 19 && s != 23 )  {
 
    mlog << Error << "\noperator>>(ConvFile &, ConvRecord &) -> "
         << "trouble reading cdiag data\n\n";
