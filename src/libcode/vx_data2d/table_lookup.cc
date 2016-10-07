@@ -562,7 +562,6 @@ TableFlatFile::TableFlatFile(int) {
 
    readUserGribTables("grib1");
 
-
    path1 << cs_erase << table_data_dir;
 
    path1 = replace_path(path1);
@@ -620,11 +619,16 @@ TableFlatFile::TableFlatFile(int) {
       }
 
    }
+
    //
    //  done
    //
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 void TableFlatFile::readUserGribTables(const char * table_type) {
    ConcatString path_to_user_tables;
@@ -644,15 +648,16 @@ void TableFlatFile::readUserGribTables(const char * table_type) {
 
          if (!read(path)) {
 
-            mlog << Error
-            << "TableFlatFile::TableFlatFile(int) -> unable to read table file \"" << path << "\"\n\n";
+            mlog << Error << "\nTableFlatFile::readUserGribTables() -> "
+                 << "unable to read user-defined " << table_type
+                 << " table file \"" << path << "\"\n\n";
+
+            exit(1);
 
          }
       }
    }
 }
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -926,7 +931,11 @@ if ( empty(filename) )  {
 
 }
 
-n_lines = file_linecount(filename);
+   //
+   //  add one in case there is no trailing new line
+   //
+
+n_lines = file_linecount(filename) + 1;
 
 in.open(filename);
 
@@ -990,39 +999,28 @@ bool status = false;
 extend_grib1(N_grib1_elements + n);
 
    //
-   //  shuffle all the old elements to the end of the array,
-   //
-   //   so that the new stuff gets prepended
-   //
-
-for (j=(N_grib1_elements - 1); j>=0; --j)  {
-
-   g1e[j + n] = g1e[j];
-
-}
-
-for (j=0; j<n; ++j)  g1e[j] = (Grib1TableEntry *) 0;
-
-   //
    //  read the new elements
    //
 
-for (j=0; j<n; ++j)  {
+j = 0;
 
-   status = line.read_line(in);
+while ( line.read_line(in) )  {
 
-   if ( ! status )  {
+   //
+   //  skip blank lines
+   //
 
-      mlog << Error << "\nTableFlatFile::read_grib1(istream &) -> "
-           << "trouble reading file \"" << filename << "\"\n\n";
+   if ( line.empty() )  continue;
 
-      exit ( 1 );
+   g1e[N_grib1_elements + j] = new Grib1TableEntry;
 
-   }
+   //
+   //  add newline in case it is missing from the last line of the file
+   //
 
-   g1e[j] = new Grib1TableEntry;
+   line << "\n";
 
-   status = g1e[j]->parse_line(line);
+   status = g1e[N_grib1_elements + j]->parse_line(line);
 
    if ( ! status )  {
 
@@ -1034,14 +1032,23 @@ for (j=0; j<n; ++j)  {
 
    }
 
-}   //  for j
+   //
+   //  increment counter
+   //
 
+   j++;
+
+}  //  while
+
+   //
+   //  increment the number of elements
+   //
+
+N_grib1_elements += j;
 
    //
    //  done
    //
-
-N_grib1_elements += n;
 
 return ( true );
 
@@ -1066,39 +1073,28 @@ bool status = false;
 extend_grib2(N_grib2_elements + n);
 
    //
-   //  shuffle all the old elements to the end of the array,
-   //
-   //   so that the new stuff gets prepended
-   //
-
-for (j=(N_grib2_elements - 1); j>=0; --j)  {
-
-   g2e[j + n] = g2e[j];
-
-}
-
-for (j=0; j<n; ++j)  g2e[j] = (Grib2TableEntry *) 0;
-
-   //
    //  read the new elements
    //
 
-for (j=0; j<n; ++j)  {
+j = 0;
 
-   status = line.read_line(in);
+while ( line.read_line(in) )  {
 
-   if ( ! status )  {
+   //
+   //  skip blank lines
+   //
 
-      mlog << Error << "\nTableFlatFile::read_grib2(istream &) -> "
-           << "trouble reading file \"" << filename << "\"\n\n";
+   if ( line.empty() )  continue;
 
-      exit ( 1 );
+   //
+   //  add newline in case it is missing from the last line of the file
+   //
 
-   }
+   line << "\n";
 
-   g2e[j] = new Grib2TableEntry;
+   g2e[N_grib2_elements + j] = new Grib2TableEntry;
 
-   status = g2e[j]->parse_line(line);
+   status = g2e[N_grib2_elements + j]->parse_line(line);
 
    if ( ! status )  {
 
@@ -1110,30 +1106,39 @@ for (j=0; j<n; ++j)  {
 
    }
 
-}   //  for j
+   //
+   //  increment counter
+   //
 
+   j++;
+
+}  //  while
 
    //
    //  done
    //
 
-N_grib2_elements += n;
+N_grib2_elements += j;
 
 return ( true );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
 int TableFlatFile::get_table_files(const char *dir, const char *prefix, const char *postfix, vector<ConcatString> &files)
 {
    DIR *dp;
    struct dirent *dirp;
-   size_t prefix_lenght = strlen(prefix);
-   size_t postfix_lenght = strlen(postfix);
-   size_t max_lenght = prefix_lenght;
+   size_t prefix_length = strlen(prefix);
+   size_t postfix_length = strlen(postfix);
+   size_t max_length = prefix_length;
 
-   if(max_lenght < postfix_lenght)
+   if(max_length < postfix_length)
    {
-      max_lenght=postfix_lenght;
+      max_length=postfix_length;
    }
 
    dp = opendir( dir );
@@ -1149,7 +1154,7 @@ int TableFlatFile::get_table_files(const char *dir, const char *prefix, const ch
       struct stat st;
       snprintf(filename, sizeof(filename), "%s/%s", dir, dirp->d_name);
       lstat(filename, &st);
-      if( !S_ISDIR(st.st_mode) && strlen(dirp->d_name) > max_lenght && strncmp(prefix,dirp->d_name,prefix_lenght) == 0  && strcmp(dirp->d_name+ strlen(dirp->d_name) - postfix_lenght, postfix) == 0)
+      if( !S_ISDIR(st.st_mode) && strlen(dirp->d_name) > max_length && strncmp(prefix,dirp->d_name,prefix_length) == 0  && strcmp(dirp->d_name+ strlen(dirp->d_name) - postfix_length, postfix) == 0)
       {
          files.push_back(dirp->d_name);
       }
