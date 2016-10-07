@@ -254,4 +254,4 @@ GRIB1
 252 151 98 -1 "var252" "undefined" ""
 253 151 98 -1 "var253" "undefined" ""
 254 151 98 -1 "var254" "undefined" ""
-255 151 98 -1 "var255" "" ""
+255 151 98 -1 "var255" "undefined" ""
