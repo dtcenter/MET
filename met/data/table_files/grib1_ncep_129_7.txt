@@ -129,7 +129,7 @@ GRIB1
 127 129 7 -1 "IMGD" "Image data" ""
 128 129 7 -1 "PAOT" "Probability anomaly of temperature" "%"
 129 7 -1 129 7 -1 "PAOP" "Probability anomaly of precipitation" "%"
-130 129 7 -1 "CWR" "Probability of Wetting Rain, exceeding 0.10" "in a given time period" "%"
+130 129 7 -1 "CWR" "Probability of Wetting Rain, exceeding 0.10 in a given time period" "%"
 131 129 7 -1 "FRAIN" "Rain fraction of total liquid water" "non-dim"
 132 129 7 -1 "FICE" "Ice fraction of total condensate" "non-dim"
 133 129 7 -1 "RIME" "Rime Factor" "non-dim"

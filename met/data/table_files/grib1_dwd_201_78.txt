@@ -132,7 +132,7 @@ GRIB1
 130 201 78 -1 "DQI_GSP" "tend of the sp cl ice cont due to gs precipitation" "kg/(kg*s)"
 131 201 78 -1 "PRG_GSP" "surface precipitation rate, graupel, grid scale" "kg/(s*m**2)"
 132 201 78 -1 "GRAU_GSP" "surface precipitation amount, graupel, grid scale" "kg/(m**2)"
-133 201 78 -1 "RHO_SNOW" "snow density" "kg/m**3" ""
+133 201 78 -1 "RHO_SNOW" "snow density" "kg/m**3"
 134 201 78 -1 "var134" "undefined" ""
 135 201 78 -1 "var135" "undefined" ""
 136 201 78 -1 "var136" "undefined" ""
