@@ -849,7 +849,13 @@ do {
 
    in.get(c);
 
-   if ( !in )  return ( false );
+   if ( !in )  {
+
+      // Check for end of file and non-empty line
+      if ( in.eof() && Length != 0 )  return ( true  );
+      else                            return ( false );
+
+   }
 
    add(c);
 
