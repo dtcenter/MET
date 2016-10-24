@@ -313,8 +313,8 @@ class ModeFuzzyEngine {
       Color obs_color  [max_singles];
       ColorTable ctable;
 
-      InterestInfo info[max_singles*max_singles];
-      InterestInfo info_clus[max_singles];
+      InterestInfo info_singles [max_singles*max_singles];
+      InterestInfo info_clus    [max_singles];
 
       int get_info_index(int) const;
 

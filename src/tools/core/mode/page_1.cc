@@ -193,7 +193,7 @@ bad_count = 0;
 
 for(i=0; i<n; i++) {
 
-   if ( eng.info[i].interest_value < eng.conf_info.total_interest_thresh )  ++bad_count;
+   if ( eng.info_singles[i].interest_value < eng.conf_info.total_interest_thresh )  ++bad_count;
 
 }
 
@@ -218,18 +218,18 @@ x = 0.5*(t0.col_width(0));
 
 for(i=0; i<n; i++) {
 
-   snprintf(junk, sizeof(junk), "%d", eng.info[i].fcst_number);
+   snprintf(junk, sizeof(junk), "%d", eng.info_singles[i].fcst_number);
 
    t0.write_xy1_to_cell(i + 1, 0, x, dy, 0.5, 0.0, junk);
 
-   snprintf(junk, sizeof(junk), "%d", eng.info[i].obs_number);
+   snprintf(junk, sizeof(junk), "%d", eng.info_singles[i].obs_number);
 
    t0.write_xy1_to_cell(i + 1, 1, x, dy, 0.5, 0.0, junk);
 
-   if ( eng.info[i].interest_value < 0 ) label = na_str;
+   if ( eng.info_singles[i].interest_value < 0 ) label = na_str;
    else {
       label.set_precision(4);
-      label << cs_erase << eng.info[i].interest_value;
+      label << cs_erase << eng.info_singles[i].interest_value;
    }
 
    t0.write_xy1_to_cell(i + 1, 2, dx, dy, 0.0, 0.0, label);

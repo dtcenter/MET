@@ -1051,10 +1051,11 @@ void ModeFuzzyEngine::do_match_merge() {
 
          n = two_to_one(j, k);
 
-         info[n].fcst_number    = (j+1);
-         info[n].obs_number     = (k+1);
-         info[n].pair_number    = n;
-         info[n].interest_value = total_interest(conf_info, 1, pair[n]);
+         info_singles[n].fcst_number    = (j+1);
+         info_singles[n].obs_number     = (k+1);
+         info_singles[n].pair_number    = n;
+         info_singles[n].interest_value = total_interest(conf_info, 1, pair[n]);
+
       }
    }
 
@@ -1066,11 +1067,11 @@ void ModeFuzzyEngine::do_match_merge() {
    for(j=0; j<(n-1); j++) {
       for(k=(j+1); k<n; k++) {
 
-         if(info[j].interest_value < info[k].interest_value) {
+         if(info_singles[j].interest_value < info_singles[k].interest_value) {
 
-            junkinfo = info[j];
-            info[j] = info[k];
-            info[k] = junkinfo;
+            junkinfo = info_singles[j];
+            info_singles[j] = info_singles[k];
+            info_singles[k] = junkinfo;
          }
       }
    }
@@ -1082,10 +1083,10 @@ void ModeFuzzyEngine::do_match_merge() {
 
    for(j=0; j<n; j++) {
 
-      if(info[j].interest_value < conf_info.total_interest_thresh)
+      if(info_singles[j].interest_value < conf_info.total_interest_thresh)
          continue;
 
-      collection.add_pair(info[j].fcst_number, info[j].obs_number);
+      collection.add_pair(info_singles[j].fcst_number, info_singles[j].obs_number);
    }
 
    //
@@ -1825,10 +1826,11 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
          n = two_to_one(j, k);
 
-         info[n].fcst_number    = (j+1);
-         info[n].obs_number     = (k+1);
-         info[n].pair_number    = n;
-         info[n].interest_value = total_interest(conf_info, 1, pair[n]);
+         info_singles[n].fcst_number    = (j+1);
+         info_singles[n].obs_number     = (k+1);
+         info_singles[n].pair_number    = n;
+         info_singles[n].interest_value = total_interest(conf_info, 1, pair[n]);
+
       }
    }
 
@@ -1840,11 +1842,12 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    for(j=0; j<(n-1); j++) {
       for(k=(j+1); k<n; k++) {
 
-         if(info[j].interest_value < info[k].interest_value) {
+         if(info_singles[j].interest_value < info_singles[k].interest_value) {
 
-            junkinfo = info[j];
-            info[j] = info[k];
-            info[k] = junkinfo;
+            junkinfo = info_singles[j];
+            info_singles[j] = info_singles[k];
+            info_singles[k] = junkinfo;
+
          }
       }
    }
@@ -1856,15 +1859,15 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    for(j=0; j<n; j++) {
 
-      if(info[j].interest_value < conf_info.total_interest_thresh) {
+      if(info_singles[j].interest_value < conf_info.total_interest_thresh) {
          continue;
       }
 
       //
       // Only add this pair if the forecast object is not already matched
       //
-      if(!collection.is_fcst_matched(info[j].fcst_number)) {
-         collection.add_pair(info[j].fcst_number, info[j].obs_number);
+      if(!collection.is_fcst_matched(info_singles[j].fcst_number)) {
+         collection.add_pair(info_singles[j].fcst_number, info_singles[j].obs_number);
       }
    }
 
@@ -1993,10 +1996,10 @@ void ModeFuzzyEngine::do_match_only() {
 
          n = two_to_one(j, k);
 
-         info[n].fcst_number    = (j+1);
-         info[n].obs_number     = (k+1);
-         info[n].pair_number    = n;
-         info[n].interest_value = total_interest(conf_info, 1, pair[n]);
+         info_singles[n].fcst_number    = (j+1);
+         info_singles[n].obs_number     = (k+1);
+         info_singles[n].pair_number    = n;
+         info_singles[n].interest_value = total_interest(conf_info, 1, pair[n]);
       }
    }
 
@@ -2007,11 +2010,11 @@ void ModeFuzzyEngine::do_match_only() {
    for(j=0; j<(n-1); j++) {
       for(k=(j+1); k<n; k++) {
 
-         if(info[j].interest_value < info[k].interest_value) {
+         if(info_singles[j].interest_value < info_singles[k].interest_value) {
 
-            junkinfo = info[j];
-            info[j] = info[k];
-            info[k] = junkinfo;
+            junkinfo = info_singles[j];
+            info_singles[j] = info_singles[k];
+            info_singles[k] = junkinfo;
          }
       }
    }
@@ -2022,16 +2025,16 @@ void ModeFuzzyEngine::do_match_only() {
    n = n_fcst*n_obs;
    for(j=0; j<n; j++) {
 
-      if(info[j].interest_value < conf_info.total_interest_thresh)
+      if(info_singles[j].interest_value < conf_info.total_interest_thresh)
          continue;
 
       //
       // Only add this pair if both the forecast and observation objects
       // are not already matched
       //
-      if(!collection.is_fcst_matched(info[j].fcst_number) &&
-         !collection.is_obs_matched(info[j].obs_number)) {
-         collection.add_pair(info[j].fcst_number, info[j].obs_number);
+      if(!collection.is_fcst_matched(info_singles[j].fcst_number) &&
+         !collection.is_obs_matched(info_singles[j].obs_number)) {
+         collection.add_pair(info_singles[j].fcst_number, info_singles[j].obs_number);
       }
    }
 
@@ -2241,7 +2244,7 @@ int ModeFuzzyEngine::get_info_index(int pair_n) const {
 
    for(i=0; i<max_singles*max_singles; i++) {
 
-      if(info[i].pair_number == pair_n) return(i);
+      if(info_singles[i].pair_number == pair_n) return(i);
    }
 
    return(-1);
@@ -2615,12 +2618,12 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
       //
       // Skip this interest info if it's not assigned
       //
-      if(eng.info[i].fcst_number == 0 ||
-         eng.info[i].obs_number  == 0) continue;
+      if(eng.info_singles[i].fcst_number == 0 ||
+         eng.info_singles[i].obs_number  == 0) continue;
 
-      interest = eng.info[i].interest_value;
-      fcst_i   = eng.info[i].fcst_number - 1;
-      obs_i    = eng.info[i].obs_number - 1;
+      interest = eng.info_singles[i].interest_value;
+      fcst_i   = eng.info_singles[i].fcst_number - 1;
+      obs_i    = eng.info_singles[i].obs_number - 1;
 
       if(interest >= fcst_na[fcst_i]) fcst_na.set(fcst_i, interest);
       if(interest >= obs_na[obs_i])   obs_na.set(obs_i,   interest);
@@ -3124,7 +3127,7 @@ void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
    // Only dump out pair features if the total interest value for the pair
    // is greater than the print interest threshold
    //
-   if( eng.info[eng.get_info_index(n)].interest_value <
+   if( eng.info_singles[eng.get_info_index(n)].interest_value <
        eng.conf_info.print_interest_thresh)  return;
 
    // Write out the common header columns
@@ -3189,7 +3192,7 @@ void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
 
    // Total interest value
    at.set_entry(row, mode_interest_offset,
-                eng.info[eng.get_info_index(n)].interest_value);
+                eng.info_singles[eng.get_info_index(n)].interest_value);
 
    //
    // Increment row counter
