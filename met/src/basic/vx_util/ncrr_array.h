@@ -98,7 +98,12 @@ class NCRR_Array {
       void bubble_sort_increasing(ncrr_cmp_func);
       void bubble_sort_decreasing(ncrr_cmp_func);
 
+      void qsort_increasing(ncrr_cmp_func);
+      void qsort_decreasing(ncrr_cmp_func);
+
       void extend(int);
+
+      void reverse();   //  reverse the order of the elements
 
 };
 
@@ -367,9 +372,46 @@ return ( *(e[N]) );
 
 template <typename T>
 
+void NCRR_Array<T>::reverse()
+
+{
+
+if ( Nelements < 2 )  return;
+
+int j, k;
+int jmax;
+T * temp = 0;
+
+jmax = Nelements/2;   //  works whether Nelements is even or odd
+
+k = Nelements - 1;
+
+for (j=0; j<jmax; ++j, --k)  {
+
+   temp = e[j];
+
+   e[j] = e[k];
+
+   e[k] = temp;
+
+}
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
 void NCRR_Array<T>::bubble_sort_decreasing(ncrr_cmp_func _cmp)
 
 {
+
+if ( Nelements < 2 )  return;
 
 int j, k;
 T * temp = 0;
@@ -397,6 +439,66 @@ for (j=0; j<(Nelements - 1); ++j) {
 return;
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+void NCRR_Array<T>::bubble_sort_increasing(ncrr_cmp_func _cmp)
+
+{
+
+if ( Nelements < 2 )  return;
+
+bubble_sort_decreasing(_cmp);
+
+reverse();
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+void NCRR_Array<T>::qsort_increasing(ncrr_cmp_func _cmp)
+
+{
+
+if ( Nelements < 2 )  return;
+
+qsort(e, Nelements, sizeof(*e), _cmp);   //  sort in increasing order
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+void NCRR_Array<T>::qsort_decreasing(ncrr_cmp_func _cmp)
+
+{
+
+if ( Nelements < 2 )  return;
+
+qsort(e, Nelements, sizeof(*e), _cmp);   //  sort in increasing order
+
+reverse();
+
+return;
+
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////
