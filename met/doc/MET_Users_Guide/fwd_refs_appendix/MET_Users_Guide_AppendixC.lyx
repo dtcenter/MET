@@ -3061,9 +3061,7 @@ Some of the other statistics for continuous forecasts (e.g., RMSE) can be
 \end_layout
 
 \begin_layout Subsubsection*
-
-\series medium
-Scalar anomaly L1L2 values
+Scalar anomaly L1 and L2 values
 \end_layout
 
 \begin_layout Standard
@@ -3082,9 +3080,123 @@ Computation of these statistics requires a climatological value, c.
 \end_layout
 
 \begin_layout Standard
+\begin_inset ERT
+status open
 
-\series medium
-and 
+\begin_layout Plain Layout
+
+$$
+\backslash
+hbox{FABAR}=
+\backslash
+hbox{Mean}(f-c)=
+\backslash
+overline{f-c}=
+\backslash
+frac{1}{n}
+\backslash
+sum_{i=1}^n(f_i-c)$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\backslash
+hbox{OABAR}=
+\backslash
+hbox{Mean}(o-c)=
+\backslash
+overline{o-c}=
+\backslash
+frac{1}{n}
+\backslash
+sum_{i=1}^n(o_i-c)$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\backslash
+hbox{FOABAR}=
+\backslash
+hbox{Mean}[(f-c)(o-c)]=
+\backslash
+overline{(f-c)(o-c)}=
+\backslash
+frac{1}{n}
+\backslash
+sum_{i=1}^n(f_i-c)(o_i-c)$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\backslash
+hbox{FFABAR}=
+\backslash
+hbox{Mean}[(f-c)^2]=
+\backslash
+overline{(f-c)}^2=
+\backslash
+frac{1}{n}
+\backslash
+sum_{i=1}^n(f_i-c)^2$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$
+\backslash
+hbox{OOABAR}=
+\backslash
+hbox{Mean}[(o-c)^2]=
+\backslash
+overline{(o-c)}^2=
+\backslash
+frac{1}{n}
+\backslash
+sum_{i=1}^n(o_i-c)^2$$
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
