@@ -626,6 +626,10 @@ bf direction}
 \end_inset
 
  of movement of the object.
+ As in MODE, where spatial separation is in units of the grid resolution,
+ so here in MTD the unit of length is the grid resolution, and the unit
+ of time is whatever the time separation between the input files is.
+ Speed and velocity are thus in grid units per time unit.
 \end_layout
 
 \begin_layout Standard
