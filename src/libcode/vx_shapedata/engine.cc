@@ -1049,6 +1049,9 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Calculate the interest values
    //
+
+   info_singles.set_size(n_fcst*n_obs);
+
    for(j=0; j<n_fcst; j++) {
       for(k=0; k<n_obs; k++) {
 
@@ -1828,6 +1831,9 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Calculate the interest values
    //
+
+   info_singles.set_size(n_fcst*n_obs);
+
    for(j=0; j<n_fcst; j++) {
       for(k=0; k<n_obs; k++) {
 
@@ -2002,6 +2008,9 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Calculate the interest values
    //
+
+   info_singles.set_size(n_fcst*n_obs);
+
    for(j=0; j<n_fcst; j++) {
       for(k=0; k<n_obs; k++) {
 
@@ -2235,6 +2244,9 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Calculate the interest values
    //
+
+   info_clus.set_size(n_clus);
+
    for(j=0; j<n_clus; j++) {
       info_clus[j].fcst_number    = (j+1);
       info_clus[j].obs_number     = (j+1);
@@ -2257,9 +2269,10 @@ void ModeFuzzyEngine::do_cluster_features() {
 int ModeFuzzyEngine::get_info_index(int pair_n) const {
    int i;
 
-   for(i=0; i<max_singles*max_singles; i++) {
+   for(i=0; i<(info_singles.n()); i++) {
 
       if(info_singles[i].pair_number == pair_n) return(i);
+
    }
 
    return(-1);

@@ -81,7 +81,7 @@ class CRR_Array {
 
       void add(const CRR_Array <T> &);
 
-      T & operator[](int);
+      T & operator[](int) const;
 
       void extend(int);
 
@@ -207,7 +207,7 @@ void CRR_Array<T>::set_size(int N)
 
 {
 
-extend(n);
+extend(N);
 
 if ( N > Nelements )  Nelements = N;
 
@@ -322,7 +322,7 @@ return;
 
 template <typename T>
 
-T & CRR_Array<T>::operator[](int N)
+T & CRR_Array<T>::operator[](int N) const
 
 {
 
