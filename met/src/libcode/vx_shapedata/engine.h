@@ -29,7 +29,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
+struct InterestInfo {
+   int    fcst_number;
+   int    obs_number;
+   int    pair_number;
+   double interest_value;
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
 typedef CRR_Array<Color> ColorArray;
+
+typedef CRR_Array<InterestInfo> InterestInfoArray;
+
+typedef CRR_Array<SingleFeature> SingleFeatureArray;
+
+typedef CRR_Array<PairFeature> PairFeatureArray;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,15 +153,6 @@ static const char ncep_defaults_name          [] = "ncep_defaults";
 ///////////////////////////////////////////////////////////////////////////////
 
 static const int max_singles = 500;
-
-///////////////////////////////////////////////////////////////////////////////
-
-struct InterestInfo {
-   int    fcst_number;
-   int    obs_number;
-   int    pair_number;
-   double interest_value;
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -318,14 +326,13 @@ class ModeFuzzyEngine {
       SingleFeature * obs_clus;     //  allocated
       PairFeature   * pair_clus;    //  allocated
 
-      // Color fcst_color [max_singles];
-      // Color obs_color  [max_singles];
       ColorArray fcst_color;
       ColorArray obs_color;
+
       ColorTable ctable;
 
-      InterestInfo info_singles [max_singles*max_singles];
-      InterestInfo info_clus    [max_singles];
+      InterestInfoArray info_singles;
+      InterestInfoArray info_clus;
 
       int get_info_index(int) const;
 
