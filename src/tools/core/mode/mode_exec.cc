@@ -1411,11 +1411,11 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
             break;
 
          case FcstClusHullPoly:
-            poly[i] = &engine.fcst_clus[i].convex_hull;
+            poly[i] = &engine.fcst_cluster[i].convex_hull;
             break;
 
          case ObsClusHullPoly:
-            poly[i] = &engine.obs_clus[i].convex_hull;
+            poly[i] = &engine.obs_cluster[i].convex_hull;
             break;
 
          default:
