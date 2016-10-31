@@ -152,10 +152,6 @@ static const char ncep_defaults_name          [] = "ncep_defaults";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const int max_singles = 500;
-
-///////////////////////////////////////////////////////////////////////////////
-
 typedef double (*ConfidenceFunc) (double);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -318,13 +314,15 @@ class ModeFuzzyEngine {
       int n_obs;
       int n_clus;
 
-      SingleFeature * fcst_single;  //  allocated
-      SingleFeature * obs_single;   //  allocated
-      PairFeature   * pair;         //  allocated
+      SingleFeatureArray fcst_single;
+      SingleFeatureArray obs_single;
 
-      SingleFeature * fcst_clus;    //  allocated
-      SingleFeature * obs_clus;     //  allocated
-      PairFeature   * pair_clus;    //  allocated
+      PairFeatureArray pair_single;
+
+      SingleFeatureArray fcst_cluster;
+      SingleFeatureArray obs_cluster;
+
+      PairFeatureArray pair_cluster;
 
       ColorArray fcst_color;
       ColorArray obs_color;

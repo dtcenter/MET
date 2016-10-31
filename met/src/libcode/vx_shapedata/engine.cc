@@ -46,38 +46,6 @@ ModeFuzzyEngine::~ModeFuzzyEngine() {
    clear_features();
 
    //
-   // Clear single features
-   //
-   if(fcst_single) {
-      delete [] fcst_single;
-      fcst_single = (SingleFeature *) 0;
-   }
-   if(obs_single) {
-      delete [] obs_single;
-      obs_single = (SingleFeature *) 0;
-   }
-   if(fcst_clus) {
-      delete [] fcst_clus;
-      fcst_clus = (SingleFeature *) 0;
-   }
-   if(obs_clus) {
-      delete [] obs_clus;
-      obs_clus = (SingleFeature *) 0;
-   }
-
-   //
-   // Clear pair features
-   //
-   if(pair) {
-      delete [] pair;
-      pair = (PairFeature *) 0;
-   }
-   if(pair_clus) {
-      delete [] pair_clus;
-      pair_clus = (PairFeature *) 0;
-   }
-
-   //
    // Clear fcst ShapeData objects
    //
    if(fcst_raw) {
@@ -218,29 +186,6 @@ void ModeFuzzyEngine::init_from_scratch() {
    n_obs            = 0;
    n_clus           = 0;
 
-   fcst_single      = (SingleFeature *) 0;
-   obs_single       = (SingleFeature *) 0;
-   pair             = (PairFeature *)   0;
-
-   fcst_clus        = (SingleFeature *) 0;
-   obs_clus         = (SingleFeature *) 0;
-   pair_clus        = (PairFeature *)   0;
-
-   fcst_single      = new SingleFeature [max_singles];
-   obs_single       = new SingleFeature [max_singles];
-   pair             = new PairFeature   [max_singles*max_singles];
-
-   fcst_clus        = new SingleFeature [max_singles];
-   obs_clus         = new SingleFeature [max_singles];
-   pair_clus        = new PairFeature   [max_singles];
-
-   if(!fcst_single || !obs_single || !pair ||
-      !fcst_clus   || !obs_clus   || !pair_clus) {
-      mlog << Error << "\nModeFuzzyEngine::init_from_scratch() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
    collection.clear();
 
    clear_features();
@@ -253,17 +198,14 @@ void ModeFuzzyEngine::init_from_scratch() {
 void ModeFuzzyEngine::clear_features() {
    int j;
 
-   for(j=0; j<max_singles; j++) {
-      fcst_single[j].clear();
-      obs_single[j].clear();
-      fcst_clus[j].clear();
-      obs_clus[j].clear();
-      pair_clus[j].clear();
-   }
+   fcst_single.clear();
+    obs_single.clear();
 
-   for(j=0; j<(max_singles*max_singles); j++) {
-      pair[j].clear();
-   }
+   fcst_cluster.clear();
+    obs_cluster.clear();
+
+    pair_single.clear();
+    pair_cluster.clear();
 
    n_fcst = 0;
    n_obs  = 0;
@@ -927,14 +869,6 @@ void ModeFuzzyEngine::do_no_match() {
    do_fcst_splitting();
    do_obs_splitting();
 
-   if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_no_match() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << max(n_fcst, n_obs) << "\n\n";
-      exit(1);
-   }
-
    clear_colors();
 
    fcst_shape = new ShapeData [n_fcst];
@@ -951,6 +885,8 @@ void ModeFuzzyEngine::do_no_match() {
    // Do the single features
    //
 
+   fcst_single.set_size(n_fcst);
+
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
@@ -958,6 +894,8 @@ void ModeFuzzyEngine::do_no_match() {
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
+
+   obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
@@ -992,14 +930,6 @@ void ModeFuzzyEngine::do_match_merge() {
    do_fcst_splitting();
    do_obs_splitting();
 
-   if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_match_merge() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << max(n_fcst, n_obs) << "\n\n";
-      exit(1);
-   }
-
    clear_colors();
 
    fcst_shape = new ShapeData [n_fcst];
@@ -1016,6 +946,8 @@ void ModeFuzzyEngine::do_match_merge() {
    // Do the single features
    //
 
+   fcst_single.set_size(n_fcst);
+
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
@@ -1023,6 +955,8 @@ void ModeFuzzyEngine::do_match_merge() {
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
+
+   obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
@@ -1035,14 +969,17 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Do the pair features
    //
+
+   pair_single.set_size(n_fcst*n_obs);
+
    for(j=0; j<n_fcst; j++) {
       for(k=0; k<n_obs; k++) {
 
          n = two_to_one(j, k);
 
-         pair[n].set(fcst_single[j], obs_single[k],
+         pair_single[n].set(fcst_single[j], obs_single[k],
                      conf_info.max_centroid_dist);
-         pair[n].pair_number = n;
+         pair_single[n].pair_number = n;
       }
    }
 
@@ -1060,7 +997,7 @@ void ModeFuzzyEngine::do_match_merge() {
          info_singles[n].fcst_number    = (j+1);
          info_singles[n].obs_number     = (k+1);
          info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info, 1, pair[n]);
+         info_singles[n].interest_value = total_interest(conf_info, 1, pair_single[n]);
 
       }
    }
@@ -1165,14 +1102,6 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
    ShapeData * fcst_merge_shape = (ShapeData *) 0;
 
    do_fcst_splitting();
-
-   if(n_fcst >= max_singles) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_thresh() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << n_fcst << "\n\n";
-      exit(1);
-   }
 
    //
    // Define the forecast merge field by applying the specified threshold
@@ -1295,14 +1224,6 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
 
    do_obs_splitting();
 
-   if(n_obs >= max_singles) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_thresh() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << n_obs << "\n\n";
-      exit(1);
-   }
-
    //
    // Define the forecast merge field by applying the specified threshold
    // to the convolved field
@@ -1422,13 +1343,6 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
    ConcatString path;
 
    do_fcst_splitting();
-
-   if(n_fcst >= max_singles) {
-      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_engine() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << n_fcst << "\n\n";
-      exit(1);
-   }
 
    //
    // Will be deleted by destructor if allocated
@@ -1597,14 +1511,6 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    ConcatString path;
 
    do_obs_splitting();
-
-   if(n_obs >= max_singles) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_engine() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << n_obs << "\n\n";
-      exit(1);
-   }
 
    //
    // Will be deleted by destructor if allocated
@@ -1777,13 +1683,6 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    do_fcst_splitting();
    do_obs_splitting();
 
-   if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-      mlog << Error << "\nModeFuzzyEngine::do_match_fcst_merge() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << max(n_fcst, n_obs) << "\n\n";
-      exit(1);
-   }
-
    clear_colors();
 
    fcst_shape = new ShapeData [n_fcst];
@@ -1798,6 +1697,9 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Do the single features
    //
+
+   fcst_single.set_size(n_fcst);
+
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
@@ -1805,6 +1707,8 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
+
+   obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
@@ -1817,14 +1721,17 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Do the pair features
    //
+
+   pair_single.set_size(n_fcst*n_obs);
+
    for(j=0; j<n_fcst; j++) {
       for(k=0; k<n_obs; k++) {
 
          n = two_to_one(j, k);
 
-         pair[n].set(fcst_single[j], obs_single[k],
+         pair_single[n].set(fcst_single[j], obs_single[k],
                      conf_info.max_centroid_dist);
-         pair[n].pair_number = n;
+         pair_single[n].pair_number = n;
       }
    }
 
@@ -1842,7 +1749,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
          info_singles[n].fcst_number    = (j+1);
          info_singles[n].obs_number     = (k+1);
          info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info, 1, pair[n]);
+         info_singles[n].interest_value = total_interest(conf_info, 1, pair_single[n]);
 
       }
    }
@@ -1954,13 +1861,6 @@ void ModeFuzzyEngine::do_match_only() {
    do_fcst_splitting();
    do_obs_splitting();
 
-   if((n_fcst >= max_singles) || (n_obs >= max_singles)) {
-      mlog << Error << "\nModeFuzzyEngine::do_match_only() -> "
-           << "too many shapes ... increase \"max_singles\" to at least "
-           << max(n_fcst, n_obs) << "\n\n";
-      exit(1);
-   }
-
    clear_colors();
 
    fcst_shape = new ShapeData [n_fcst];
@@ -1975,6 +1875,9 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Do the single features
    //
+
+   fcst_single.set_size(n_fcst);
+
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
       fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
@@ -1982,6 +1885,8 @@ void ModeFuzzyEngine::do_match_only() {
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
    }
+
+   obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
@@ -1994,14 +1899,17 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Do the pair features
    //
+
+   pair_single.set_size(n_fcst*n_obs);
+
    for(j=0; j<n_fcst; j++) {
       for(k=0; k<n_obs; k++) {
 
          n = two_to_one(j, k);
 
-         pair[n].set(fcst_single[j], obs_single[k],
+         pair_single[n].set(fcst_single[j], obs_single[k],
                      conf_info.max_centroid_dist);
-         pair[n].pair_number = n;
+         pair_single[n].pair_number = n;
       }
    }
 
@@ -2019,7 +1927,7 @@ void ModeFuzzyEngine::do_match_only() {
          info_singles[n].fcst_number    = (j+1);
          info_singles[n].obs_number     = (k+1);
          info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info, 1, pair[n]);
+         info_singles[n].interest_value = total_interest(conf_info, 1, pair_single[n]);
       }
    }
 
@@ -2218,27 +2126,34 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Do the single features for clusters
    //
+
+   fcst_cluster.set_size(n_clus);
+    obs_cluster.set_size(n_clus);
+
    for(j=0; j<n_clus; j++) {
       fcst_clus_shape[j] = select(*fcst_clus_split, j+1);
-      fcst_clus[j].set(*fcst_filter, *fcst_thresh, fcst_clus_shape[j],
+      fcst_cluster[j].set(*fcst_filter, *fcst_thresh, fcst_clus_shape[j],
                        conf_info.inten_perc_value,
                        conf_info.fcst_info->is_precipitation());
-      fcst_clus[j].object_number = j+1;
+      fcst_cluster[j].object_number = j+1;
 
       obs_clus_shape[j] = select(*obs_clus_split, j+1);
-      obs_clus[j].set(*obs_filter, *obs_thresh, obs_clus_shape[j],
+      obs_cluster[j].set(*obs_filter, *obs_thresh, obs_clus_shape[j],
                       conf_info.inten_perc_value,
                       conf_info.obs_info->is_precipitation());
-      obs_clus[j].object_number = j+1;
+      obs_cluster[j].object_number = j+1;
    }
 
    //
    // Do the pair features
    //
+
+   pair_cluster.set_size(n_clus);
+
    for(j=0; j<n_clus; j++) {
-      pair_clus[j].set(fcst_clus[j], obs_clus[j],
+      pair_cluster[j].set(fcst_cluster[j], obs_cluster[j],
                        conf_info.max_centroid_dist);
-      pair_clus[j].pair_number = j+1;
+      pair_cluster[j].pair_number = j+1;
    }
 
    //
@@ -2251,7 +2166,7 @@ void ModeFuzzyEngine::do_cluster_features() {
       info_clus[j].fcst_number    = (j+1);
       info_clus[j].obs_number     = (j+1);
       info_clus[j].pair_number    = j;
-      info_clus[j].interest_value = total_interest(conf_info, 0, pair_clus[j]);
+      info_clus[j].interest_value = total_interest(conf_info, 0, pair_cluster[j]);
    }
 
    //
@@ -3179,44 +3094,44 @@ void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
    }
 
    // Distance between centroids
-   at.set_entry(row, mode_centroid_dist_offset, eng.pair[n].centroid_dist);
+   at.set_entry(row, mode_centroid_dist_offset, eng.pair_single[n].centroid_dist);
 
    // Distance between boundaries
-   at.set_entry(row, mode_boundary_dist_offset, eng.pair[n].boundary_dist);
+   at.set_entry(row, mode_boundary_dist_offset, eng.pair_single[n].boundary_dist);
 
    // Distance between convex hulls
    at.set_entry(row, mode_convex_hull_dist_offset,
-                eng.pair[n].convex_hull_dist);
+                eng.pair_single[n].convex_hull_dist);
 
    // Difference in angles in degrees
-   at.set_entry(row, mode_angle_diff_offset, eng.pair[n].angle_diff);
+   at.set_entry(row, mode_angle_diff_offset, eng.pair_single[n].angle_diff);
 
    // Area ratio
-   at.set_entry(row, mode_area_ratio_offset, eng.pair[n].area_ratio);
+   at.set_entry(row, mode_area_ratio_offset, eng.pair_single[n].area_ratio);
 
    // Intersection area
    at.set_entry(row, mode_intersection_area_offset,
-                nint(eng.pair[n].intersection_area));
+                nint(eng.pair_single[n].intersection_area));
 
    // Union area
    at.set_entry(row, mode_union_area_offset,
-                nint(eng.pair[n].union_area));
+                nint(eng.pair_single[n].union_area));
 
    // Symmetric difference area
    at.set_entry(row, mode_symmetric_diff_offset,
-                nint(eng.pair[n].symmetric_diff));
+                nint(eng.pair_single[n].symmetric_diff));
 
    // Intersection over area
    at.set_entry(row, mode_intersection_over_area_offset,
-                eng.pair[n].intersection_over_area);
+                eng.pair_single[n].intersection_over_area);
 
    // Complexity ratio
    at.set_entry(row, mode_complexity_ratio_offset,
-                eng.pair[n].complexity_ratio);
+                eng.pair_single[n].complexity_ratio);
 
    // Percentile intensity ratio
    at.set_entry(row, mode_percentile_intensity_ratio_offset,
-                eng.pair[n].percentile_intensity_ratio);
+                eng.pair_single[n].percentile_intensity_ratio);
 
    // Total interest value
    at.set_entry(row, mode_interest_offset,
@@ -3249,15 +3164,15 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    at.set_entry(row, mode_object_cat_offset, tmp_str);
 
    // Convert x,y to lat,lon
-   grid.xy_to_latlon(eng.fcst_clus[n].centroid_x,
-                     eng.fcst_clus[n].centroid_y,
+   grid.xy_to_latlon(eng.fcst_cluster[n].centroid_x,
+                     eng.fcst_cluster[n].centroid_y,
                      lat, lon);
 
    // Object centroid, x-coordinate
-   at.set_entry(row, mode_centroid_x_offset, eng.fcst_clus[n].centroid_x);
+   at.set_entry(row, mode_centroid_x_offset, eng.fcst_cluster[n].centroid_x);
 
    // Object centroid, y-coordinate
-   at.set_entry(row, mode_centroid_y_offset, eng.fcst_clus[n].centroid_y);
+   at.set_entry(row, mode_centroid_y_offset, eng.fcst_cluster[n].centroid_y);
 
    // Object centroid, latitude
    at.set_entry(row, mode_centroid_lat_offset, lat);
@@ -3266,65 +3181,65 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    at.set_entry(row, mode_centroid_lon_offset, -1.0*lon);
 
    // Axis angle
-   at.set_entry(row, mode_axis_ang_offset, eng.fcst_clus[n].axis_ang);
+   at.set_entry(row, mode_axis_ang_offset, eng.fcst_cluster[n].axis_ang);
 
    // Object length
-   at.set_entry(row, mode_length_offset, eng.fcst_clus[n].length);
+   at.set_entry(row, mode_length_offset, eng.fcst_cluster[n].length);
 
    // Object width
-   at.set_entry(row, mode_width_offset, eng.fcst_clus[n].width);
+   at.set_entry(row, mode_width_offset, eng.fcst_cluster[n].width);
 
    // Area of object
    at.set_entry(row, mode_area_offset,
-                nint(eng.fcst_clus[n].area));
+                nint(eng.fcst_cluster[n].area));
 
    // Area in the raw field that is non-zero
    at.set_entry(row, mode_area_filter_offset,
-                nint(eng.fcst_clus[n].area_filter));
+                nint(eng.fcst_cluster[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
    at.set_entry(row, mode_area_thresh_offset,
-                nint(eng.fcst_clus[n].area_thresh));
+                nint(eng.fcst_cluster[n].area_thresh));
 
    // Object curvature
-   at.set_entry(row, mode_curvature_offset, eng.fcst_clus[n].curvature);
+   at.set_entry(row, mode_curvature_offset, eng.fcst_cluster[n].curvature);
 
    // Center of curvature, x-coordinate
-   at.set_entry(row, mode_curvature_x_offset, eng.fcst_clus[n].curvature_x);
+   at.set_entry(row, mode_curvature_x_offset, eng.fcst_cluster[n].curvature_x);
 
    // Center of curvature, y-coordiante
-   at.set_entry(row, mode_curvature_y_offset, eng.fcst_clus[n].curvature_y);
+   at.set_entry(row, mode_curvature_y_offset, eng.fcst_cluster[n].curvature_y);
 
    // Object complexity
-   at.set_entry(row, mode_complexity_offset, eng.fcst_clus[n].complexity);
+   at.set_entry(row, mode_complexity_offset, eng.fcst_cluster[n].complexity);
 
    // 10th percentile of object intensity
    at.set_entry(row, mode_intensity_10_offset,
-                eng.fcst_clus[n].intensity_ptile.p10);
+                eng.fcst_cluster[n].intensity_ptile.p10);
 
    // 25th percentile of object intensity
    at.set_entry(row, mode_intensity_25_offset,
-                eng.fcst_clus[n].intensity_ptile.p25);
+                eng.fcst_cluster[n].intensity_ptile.p25);
 
    // 50th percentile of object intensity
    at.set_entry(row, mode_intensity_50_offset,
-                eng.fcst_clus[n].intensity_ptile.p50);
+                eng.fcst_cluster[n].intensity_ptile.p50);
 
    // 75th percentile of object intensity
    at.set_entry(row, mode_intensity_75_offset,
-                eng.fcst_clus[n].intensity_ptile.p75);
+                eng.fcst_cluster[n].intensity_ptile.p75);
 
    // 90th percentile of object intensity
    at.set_entry(row, mode_intensity_90_offset,
-                eng.fcst_clus[n].intensity_ptile.p90);
+                eng.fcst_cluster[n].intensity_ptile.p90);
 
    // Specified percentile of object intensity
    at.set_entry(row, mode_intensity_user_offset,
-                eng.fcst_clus[n].intensity_ptile.pth);
+                eng.fcst_cluster[n].intensity_ptile.pth);
 
    // Sum of the object intensity values
    at.set_entry(row, mode_intensity_sum_offset,
-                eng.fcst_clus[n].intensity_ptile.sum);
+                eng.fcst_cluster[n].intensity_ptile.sum);
 
    //
    // Fill the columns that don't apply with bad data values
@@ -3359,15 +3274,15 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    at.set_entry(row, mode_object_cat_offset, tmp_str);
 
    // Convert x,y to lat,lon
-   grid.xy_to_latlon(eng.obs_clus[n].centroid_x,
-                     eng.obs_clus[n].centroid_y,
+   grid.xy_to_latlon(eng.obs_cluster[n].centroid_x,
+                     eng.obs_cluster[n].centroid_y,
                      lat, lon);
 
    // Object centroid, x-coordinate
-   at.set_entry(row, mode_centroid_x_offset, eng.obs_clus[n].centroid_x);
+   at.set_entry(row, mode_centroid_x_offset, eng.obs_cluster[n].centroid_x);
 
    // Object centroid, y-coordinate
-   at.set_entry(row, mode_centroid_y_offset, eng.obs_clus[n].centroid_y);
+   at.set_entry(row, mode_centroid_y_offset, eng.obs_cluster[n].centroid_y);
 
    // Object centroid, latitude
    at.set_entry(row, mode_centroid_lat_offset, lat);
@@ -3376,65 +3291,65 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    at.set_entry(row, mode_centroid_lon_offset, -1.0*lon);
 
    // Axis angle
-   at.set_entry(row, mode_axis_ang_offset, eng.obs_clus[n].axis_ang);
+   at.set_entry(row, mode_axis_ang_offset, eng.obs_cluster[n].axis_ang);
 
    // Object length
-   at.set_entry(row, mode_length_offset, eng.obs_clus[n].length);
+   at.set_entry(row, mode_length_offset, eng.obs_cluster[n].length);
 
    // Object width
-   at.set_entry(row, mode_width_offset, eng.obs_clus[n].width);
+   at.set_entry(row, mode_width_offset, eng.obs_cluster[n].width);
 
    // Area of object
    at.set_entry(row, mode_area_offset,
-                nint(eng.obs_clus[n].area));
+                nint(eng.obs_cluster[n].area));
 
    // Area in the raw field that is non-zero
    at.set_entry(row, mode_area_filter_offset,
-                nint(eng.obs_clus[n].area_filter));
+                nint(eng.obs_cluster[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
    at.set_entry(row, mode_area_thresh_offset,
-                nint(eng.obs_clus[n].area_thresh));
+                nint(eng.obs_cluster[n].area_thresh));
 
    // Object curvature
-   at.set_entry(row, mode_curvature_offset, eng.obs_clus[n].curvature);
+   at.set_entry(row, mode_curvature_offset, eng.obs_cluster[n].curvature);
 
    // Center of curvature, x-coordinate
-   at.set_entry(row, mode_curvature_x_offset, eng.obs_clus[n].curvature_x);
+   at.set_entry(row, mode_curvature_x_offset, eng.obs_cluster[n].curvature_x);
 
    // Center of curvature, y-coordiante
-   at.set_entry(row, mode_curvature_y_offset, eng.obs_clus[n].curvature_y);
+   at.set_entry(row, mode_curvature_y_offset, eng.obs_cluster[n].curvature_y);
 
    // Object complexity
-   at.set_entry(row, mode_complexity_offset, eng.obs_clus[n].complexity);
+   at.set_entry(row, mode_complexity_offset, eng.obs_cluster[n].complexity);
 
    // 10th percentile of object intensity
    at.set_entry(row, mode_intensity_10_offset,
-                eng.obs_clus[n].intensity_ptile.p10);
+                eng.obs_cluster[n].intensity_ptile.p10);
 
    // 25th percentile of object intensity
    at.set_entry(row, mode_intensity_25_offset,
-                eng.obs_clus[n].intensity_ptile.p25);
+                eng.obs_cluster[n].intensity_ptile.p25);
 
    // 50th percentile of object intensity
    at.set_entry(row, mode_intensity_50_offset,
-                eng.obs_clus[n].intensity_ptile.p50);
+                eng.obs_cluster[n].intensity_ptile.p50);
 
    // 75th percentile of object intensity
    at.set_entry(row, mode_intensity_75_offset,
-                eng.obs_clus[n].intensity_ptile.p75);
+                eng.obs_cluster[n].intensity_ptile.p75);
 
    // 90th percentile of object intensity
    at.set_entry(row, mode_intensity_90_offset,
-                eng.obs_clus[n].intensity_ptile.p90);
+                eng.obs_cluster[n].intensity_ptile.p90);
 
    // Specified percentile of object intensity
    at.set_entry(row, mode_intensity_user_offset,
-                eng.obs_clus[n].intensity_ptile.pth);
+                eng.obs_cluster[n].intensity_ptile.pth);
 
    // Sum of the object intensity values
    at.set_entry(row, mode_intensity_sum_offset,
-                eng.obs_clus[n].intensity_ptile.sum);
+                eng.obs_cluster[n].intensity_ptile.sum);
 
    //
    // Fill the columns that don't apply with bad data values
@@ -3476,45 +3391,45 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const int n,
 
    // Distance between centroids
    at.set_entry(row, mode_centroid_dist_offset,
-                eng.pair_clus[n].centroid_dist);
+                eng.pair_cluster[n].centroid_dist);
 
    // Distance between boundaries
    at.set_entry(row, mode_boundary_dist_offset,
-                eng.pair_clus[n].boundary_dist);
+                eng.pair_cluster[n].boundary_dist);
 
    // Distance between convex hulls
    at.set_entry(row, mode_convex_hull_dist_offset,
-                eng.pair_clus[n].convex_hull_dist);
+                eng.pair_cluster[n].convex_hull_dist);
 
    // Difference in angles in degrees
-   at.set_entry(row, mode_angle_diff_offset, eng.pair_clus[n].angle_diff);
+   at.set_entry(row, mode_angle_diff_offset, eng.pair_cluster[n].angle_diff);
 
    // Area ratio
-   at.set_entry(row, mode_area_ratio_offset, eng.pair_clus[n].area_ratio);
+   at.set_entry(row, mode_area_ratio_offset, eng.pair_cluster[n].area_ratio);
 
    // Intersection area
    at.set_entry(row, mode_intersection_area_offset,
-                nint(eng.pair_clus[n].intersection_area));
+                nint(eng.pair_cluster[n].intersection_area));
 
    // Union area
    at.set_entry(row, mode_union_area_offset,
-                nint(eng.pair_clus[n].union_area));
+                nint(eng.pair_cluster[n].union_area));
 
    // Symmetric difference area
    at.set_entry(row, mode_symmetric_diff_offset,
-                nint(eng.pair_clus[n].symmetric_diff));
+                nint(eng.pair_cluster[n].symmetric_diff));
 
    // Intersection over area
    at.set_entry(row, mode_intersection_over_area_offset,
-                eng.pair_clus[n].intersection_over_area);
+                eng.pair_cluster[n].intersection_over_area);
 
    // Complexity ratio
    at.set_entry(row, mode_complexity_ratio_offset,
-                eng.pair_clus[n].complexity_ratio);
+                eng.pair_cluster[n].complexity_ratio);
 
    // Percentile intensity ratio
    at.set_entry(row, mode_percentile_intensity_ratio_offset,
-                eng.pair_clus[n].percentile_intensity_ratio);
+                eng.pair_cluster[n].percentile_intensity_ratio);
 
    // Total interest value
    at.set_entry(row, mode_interest_offset,

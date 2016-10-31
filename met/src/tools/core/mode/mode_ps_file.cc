@@ -1137,8 +1137,8 @@ setlinewidth(0.0);
 
 for (i=0; i<eng.collection.n_sets; i++) {
 
-   if ( fcst ) poly = eng.pair_clus[i].Fcst[0].convex_hull;
-   else        poly = eng.pair_clus[i].Obs[0].convex_hull;
+   if ( fcst ) poly = eng.pair_cluster[i].Fcst[0].convex_hull;
+   else        poly = eng.pair_cluster[i].Obs[0].convex_hull;
 
    draw_polyline(poly, HullColor, false);
 
@@ -1153,13 +1153,13 @@ for (i=0; i<eng.collection.n_sets; i++) {
          //
 
       if(fcst) {
-         grid_x = eng.pair_clus[i].Fcst[0].centroid_x;
-         grid_y = eng.pair_clus[i].Fcst[0].centroid_y;
+         grid_x = eng.pair_cluster[i].Fcst[0].centroid_x;
+         grid_y = eng.pair_cluster[i].Fcst[0].centroid_y;
          j = eng.collection.set[i].fcst_number[0]-1;
          c = eng.fcst_color[j];
       } else {
-         grid_x = eng.pair_clus[i].Obs[0].centroid_x;
-         grid_y = eng.pair_clus[i].Obs[0].centroid_y;
+         grid_x = eng.pair_cluster[i].Obs[0].centroid_x;
+         grid_y = eng.pair_cluster[i].Obs[0].centroid_y;
          j = eng.collection.set[i].obs_number[0]-1;
          c = eng.obs_color[j];
       }

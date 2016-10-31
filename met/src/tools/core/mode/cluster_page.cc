@@ -265,67 +265,67 @@ for(i=0; i<eng.n_clus && Vtab >= Vmargin; i++) {
    Htab += dx;
 
    // Centroid Distance
-   snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].centroid_dist);
+   snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].centroid_dist);
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Angle Difference
-   snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].angle_diff);
+   snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].angle_diff);
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Forecast Area
-   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].Fcst[0].area));
+   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].Fcst[0].area));
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Observation Area
-   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].Obs[0].area));
+   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].Obs[0].area));
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Intersection Area
-   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].intersection_area));
+   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].intersection_area));
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Union Area
-   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].union_area));
+   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].union_area));
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Symmetric Difference
-   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_clus[i].symmetric_diff));
+   snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].symmetric_diff));
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Forecast median intensity
-   snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p50);
+   snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p50);
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Observation median intensity
-   snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p50);
+   snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p50);
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Forecast 90th percentile of intensity
-   snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Fcst[0].intensity_ptile.p90);
+   snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p90);
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
 
    // Observation median intensity
-   snprintf(junk, sizeof(junk), "%.2f", eng.pair_clus[i].Obs[0].intensity_ptile.p90);
+   snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p90);
    t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
    // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
    Htab += dx;
