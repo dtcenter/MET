@@ -277,8 +277,11 @@ void ModeFuzzyEngine::clear_features() {
 void ModeFuzzyEngine::clear_colors() {
    int j;
 
-   for(j=0; j<max_singles; j++) {
+   for(j=0; j<(fcst_color.n()); j++) {
       fcst_color[j] = unmatched_color;
+   }
+
+   for(j=0; j<(obs_color.n()); j++) {
       obs_color[j]  = unmatched_color;
    }
 
@@ -1104,8 +1107,10 @@ void ModeFuzzyEngine::do_match_merge() {
            << ") ... reusing some colors!\n\n";
    }
 
+   fcst_color.extend(n_fcst);
+
    for(j=0; j<n_fcst; j++) {
-      fcst_color[j] = unmatched_color;
+      fcst_color.add(unmatched_color);
 
       for(k=0; k<(collection.n_sets); k++) {
 
@@ -1116,8 +1121,10 @@ void ModeFuzzyEngine::do_match_merge() {
       }
    }
 
+   obs_color.extend(n_obs);
+
    for(j=0; j<n_obs; j++) {
-      obs_color[j] = unmatched_color;
+      obs_color.add(unmatched_color);
 
       for(k=0; k<(collection.n_sets); k++) {
 
@@ -1886,8 +1893,10 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
            << ") ... reusing some colors!\n\n";
    }
 
+   fcst_color.extend(n_fcst);
+
    for(j=0; j<n_fcst; j++) {
-      fcst_color[j] = unmatched_color;
+      fcst_color.add(unmatched_color);
 
       for(k=0; k<(collection.n_sets); k++) {
 
@@ -1899,8 +1908,10 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    }
 
+   obs_color.extend(n_obs);
+
    for(j=0; j<n_obs; j++) {
-      obs_color[j] = unmatched_color;
+      obs_color.add(unmatched_color);
 
       for(k=0; k<(collection.n_sets); k++) {
 
@@ -2053,8 +2064,10 @@ void ModeFuzzyEngine::do_match_only() {
            << ") ... reusing some colors!\n\n";
    }
 
+   fcst_color.extend(n_fcst);
+
    for(j=0; j<n_fcst; j++) {
-      fcst_color[j] = unmatched_color;
+      fcst_color.add(unmatched_color);
 
       for(k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_fcst(j+1)) {
@@ -2064,8 +2077,10 @@ void ModeFuzzyEngine::do_match_only() {
       }
    }
 
+   obs_color.extend(n_obs);
+
    for(j=0; j<n_obs; j++) {
-      obs_color[j] = unmatched_color;
+      obs_color.add(unmatched_color);
 
       for(k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_obs(j+1)) {

@@ -23,6 +23,15 @@
 #include "vx_color.h"
 #include "vx_grid.h"
 
+#include "crr_array.h"
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+typedef CRR_Array<Color> ColorArray;
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Constants used to format the output text files
@@ -309,8 +318,10 @@ class ModeFuzzyEngine {
       SingleFeature * obs_clus;     //  allocated
       PairFeature   * pair_clus;    //  allocated
 
-      Color fcst_color [max_singles];
-      Color obs_color  [max_singles];
+      // Color fcst_color [max_singles];
+      // Color obs_color  [max_singles];
+      ColorArray fcst_color;
+      ColorArray obs_color;
       ColorTable ctable;
 
       InterestInfo info_singles [max_singles*max_singles];
