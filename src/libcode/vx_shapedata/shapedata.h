@@ -150,6 +150,7 @@ class ShapeData {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 inline Moments ShapeData::moments() const { return(mom); }
 
 inline bool ShapeData::is_valid_xy (int x, int y) const { return ( ! ::is_bad_data(data(x, y)) ); }
@@ -158,66 +159,126 @@ inline bool ShapeData::is_bad_data (int x, int y) const { return (   ::is_bad_da
 inline bool ShapeData::is_zero    (int x, int y) const { return (   is_eq(data(x, y), 0.0) ); }
 inline bool ShapeData::is_nonzero (int x, int y) const { return ( ! is_eq(data(x, y), 0.0) ); }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
-static const int max_cell_elements = 2000;
+
+// static const int max_cell_elements = 2000;
+
+static const int      cell_alloc_inc = 500;
+
+static const int partition_alloc_inc = 500;
 
 static const int max_cells = 1000;
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 class Cell {
 
    public:
 
-      int e[max_cell_elements];
-
-      int n;
+      void init_from_scratch();
 
       void assign(const Cell &);
 
-      int has(int) const;
+      void extend(int);
 
-      void add(int);
+
+
+      int * e;
+
+      int n;
+
+      int n_alloc;
+
+
+   public:
+
+      Cell();
+     ~Cell();
+      Cell(const Cell &);
+      Cell & operator=(const Cell &);
 
       void clear();
 
-      Cell();
-      ~Cell();
-      Cell(const Cell &);
-      Cell & operator=(const Cell &);
+         //
+         //  set stuff
+         //
+
+         //
+         //  get stuff
+         //
+
+      bool has(int) const;
+
+         //
+         //  do stuff
+         //
+
+      void add(int);
+
+
 };
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 extern ostream & operator<<(ostream &, const Cell &);
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 class Partition {
 
    public:
 
-      Cell c[max_cells];
+      void init_from_scratch();
+
+      void assign(const Partition &);
+
+      void extend(int);
+
+
+      Cell ** c;
 
       int n;
 
-      void clear();
-      void assign(const Partition &);
+      int n_alloc;
 
-      int has(int) const;
+   public:
+
+      Partition();
+     ~Partition();
+      Partition(const Partition &);
+      Partition & operator=(const Partition &);
+
+      void clear();
+
+         //
+         //  set stuff
+         //
+
+         //
+         //  get stuff
+         //
+
+      bool has(int) const;
 
       int which_cell(int) const;
+
+         //
+         //  do stuff
+         //
 
       void merge_cells(int, int);
       void merge_values(int, int);
 
       void add(int);
 
-      Partition();
-      ~Partition();
-      Partition(const Partition &);
-      Partition & operator=(const Partition &);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

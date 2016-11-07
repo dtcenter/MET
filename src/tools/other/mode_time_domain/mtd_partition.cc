@@ -469,7 +469,7 @@ if ( n <= Nalloc )  return;
 
 EquivalenceClass ** u = (EquivalenceClass **) 0;
 
-n = partition_alloc_inc*((n + partition_alloc_inc - 1)/partition_alloc_inc);
+n = mtd_partition_alloc_inc*((n + mtd_partition_alloc_inc - 1)/mtd_partition_alloc_inc);
 
 u = new EquivalenceClass * [n];
 
