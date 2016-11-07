@@ -163,13 +163,9 @@ inline bool ShapeData::is_nonzero (int x, int y) const { return ( ! is_eq(data(x
 ///////////////////////////////////////////////////////////////////////////////
 
 
-// static const int max_cell_elements = 2000;
-
 static const int      cell_alloc_inc = 500;
 
 static const int partition_alloc_inc = 500;
-
-static const int max_cells = 1000;
 
 
 ///////////////////////////////////////////////////////////////////////////////
