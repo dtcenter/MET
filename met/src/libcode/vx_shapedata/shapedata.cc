@@ -1609,18 +1609,22 @@ void ShapeData::threshold(SingleThresh t) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void ShapeData::threshold_area(SingleThresh t) {
+void ShapeData::threshold_area(SingleThresh t)
+
+{
+
    int j, n, x, y, v_int;
    ShapeData sd_split, sd_object;
-   double area_object[1 + max_cells];  // area_object[0] is ignored
    const int nx = data.nx();
    const int ny = data.ny();
 
    // Split the field to number the shapes
    sd_split = split(*this, n);
 
+   double * area_object = new double [1 + n];  // area_object[0] is ignored
+
    // Zero out area array
-   for(j=0; j<max_cells; j++) area_object[j] = 0;
+   for(j=0; j<=n; j++) area_object[j] = 0;   // want <= here, not <
 
    //
    // Compute the area of each object
@@ -1646,6 +1650,8 @@ void ShapeData::threshold_area(SingleThresh t) {
       } // end for y
    } // end for x
 
+if ( area_object )  { delete [] area_object;  area_object = (double *) 0; }
+
    return;
 }
 
@@ -1658,8 +1664,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
 {
    int i, n, x, y, v_int, n_obj_inten;
    ShapeData s;
-   double *obj_inten = (double *) 0, obj_inten_sum;
-   double inten_object[1 + max_cells];  // area_object[0] is ignored
+   double * obj_inten = (double *) 0, obj_inten_sum;
    const int nx = data.nx();
    const int ny = data.ny();
 
@@ -1675,6 +1680,8 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
    // Split the field to number the shapes
    //
    s = split(*this, n);
+
+   double * inten_object = new double [1 + n];  // area_object[0] is ignored
 
    //
    // For each object, compute the requested percentile of intensity
@@ -1737,6 +1744,8 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
    } // end for x
 
    if(obj_inten) { delete [] obj_inten; obj_inten = (double *) 0; }
+
+if ( inten_object )  { delete [] inten_object;   inten_object = (double *) 0; }
 
    return;
 }
