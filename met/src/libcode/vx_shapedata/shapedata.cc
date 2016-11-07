@@ -530,7 +530,7 @@ Polyline ShapeData::convex_hull() const
 
    if(area() <= 0) {
 
-      mlog << Error << "\nconvex_hull(Polyline &) -> "
+      mlog << Error << "\nShapedata::cconvex_hull() -> "
            << "attempting to fit convex hull to a shape with area = 0\n\n";
       exit(1);
    }
@@ -542,7 +542,7 @@ Polyline ShapeData::convex_hull() const
 
    if ( !Index )  {
 
-      mlog << Error << "\nconvex_hull(Polyline &) -> "
+      mlog << Error << "\nShapedata::cconvex_hull() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -591,7 +591,7 @@ Polyline ShapeData::convex_hull() const
 
    if ( j < 0 )  {
 
-      mlog << Error << "\nconvex_hull(Polyline &) -> "
+      mlog << Error << "\nShapedata::convex_hull() -> "
            << "can't find lowest point\n\n";
       exit(1);
 
@@ -650,7 +650,7 @@ Polyline ShapeData::convex_hull() const
 
       if ( j < 0 )  {
 
-         mlog << Error << "\nconvex_hull(Polyline &) -> "
+         mlog << Error << "\nShapedata::convex_hull() -> "
               << "can't find next hull point\n\n";
          exit(1);
       }
@@ -883,88 +883,175 @@ void ShapeData::zero_field()
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::Cell() {
+Cell::Cell()
 
-   clear();
+{
 
-   return;
+init_from_scratch();
+
+return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::~Cell() { }
+Cell::~Cell()
 
-///////////////////////////////////////////////////////////////////////////////
+{
 
-Cell::Cell(const Cell &c) {
+clear();
 
-   assign(c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell & Cell::operator=(const Cell &c) {
+Cell::Cell(const Cell & c)
 
-   if ( this == &c )  return ( *this );
+{
 
-   assign(c);
+init_from_scratch();
 
-   return(*this);
+assign(c);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::clear() {
-   int j;
+Cell & Cell::operator=(const Cell & c)
 
-   for (j=0; j<max_cell_elements; ++j)  e[j] = -1;
+{
 
-   n = 0;
+if ( this == &c )  return ( * this );
 
-   return;
+assign(c);
+
+return ( * this );
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::assign(const Cell &c) {
-   int j;
 
-   clear();
+void Cell::init_from_scratch()
 
-   for (j=0; j<(c.n); ++j)  e[j] = c.e[j];
+{
 
-   n = c.n;
+e = 0;
 
-   return;
+clear();
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Cell::clear()
+
+{
+
+if ( e )  { delete [] e;  e = (int *) 0; }
+
+n = 0;
+
+n_alloc = 0;
+
+return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int Cell::has(int k) const {
-   int j;
+void Cell::assign(const Cell & c)
 
-   for (j=0; j<n; ++j) {
-      if ( e[j] == k )  return ( 1 );
-   }
+{
 
-   return(0);
+int j;
+
+clear();
+
+if ( c.n == 0 )  return;
+
+extend(c.n);
+
+for (j=0; j<(c.n); ++j)  e[j] = c.e[j];
+
+n = c.n;
+
+return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::add(int k) {
 
-   if ( has(k) )  return;
+void Cell::extend(int N)
 
-   if ( n >= max_cell_elements ) {
-      mlog << Error << "\nvoid Cell::add() -> "
-           << "too many elements!\n\n";
-      exit(1);
-   }
+{
 
-   e[n++] = k;
+if ( n_alloc >= N )  return;
 
-   return;
+N = (N + cell_alloc_inc - 1)/cell_alloc_inc;
+
+N *= cell_alloc_inc;
+
+int j;
+int * u = 0;
+
+u = new int [N];
+
+for (j=0; j<n; ++j)  u[j] = e[j];
+
+for (j=n; j<N; ++j)  u[j] = -1;
+
+if ( e )  { delete [] e;  e = 0; }
+
+e = u;
+
+n_alloc = N;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool Cell::has(int k) const
+
+{
+
+int j;
+
+for (j=0; j<n; ++j) {
+
+   if ( e[j] == k )  return ( true );
+
+}
+
+return ( false );
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Cell::add(int k)
+
+{
+
+if ( has(k) )  return;
+
+extend(n + 1);
+
+e[n++] = k;
+
+return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -979,156 +1066,307 @@ void Cell::add(int k) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::Partition() {
+Partition::Partition()
 
-   clear();
+{
+
+init_from_scratch();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::~Partition() { }
+Partition::~Partition()
 
-///////////////////////////////////////////////////////////////////////////////
+{
 
-Partition::Partition(const Partition &p) {
+clear();
 
-   assign(p);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition & Partition::operator=(const Partition &p) {
+Partition::Partition(const Partition & p)
 
-   if ( this == &p )  return ( *this );
+{
 
-   assign(p);
+init_from_scratch();
 
-   return(*this);
+assign(p);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Partition::clear() {
+Partition & Partition::operator=(const Partition & p)
+
+{
+
+if ( this == &p )  return ( * this );
+
+assign(p);
+
+return ( * this );
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void Partition::init_from_scratch()
+
+{
+
+c = (Cell **) 0;
+
+clear();
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::clear()
+
+{
+
+int j;
+
+if ( c )  { 
+
+   for (j=0; j<n_alloc; ++j)  {
+
+     if ( c[j] )  { delete c[j];  c[j] = (Cell *) 0; }
+
+   }
+
+   delete [] c;  c = (Cell **) 0;
+
+}
+
+n = 0;
+
+n_alloc = 0;
+
+return;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::assign(const Partition & p)
+
+{
+
+clear();
+
+if ( !(p.c) )  return;
+
+int j;
+
+extend(p.n);
+
+for (j=0; j<(p.n); ++j)  {
+
+   c[j] = new Cell;
+
+   *(c[j]) = *(p.c[j]);
+
+}
+
+n = p.n;
+
+return;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void Partition::extend(int N)
+
+{
+
+if ( N <= n_alloc )  return;
+
+Cell ** u = (Cell **) 0;
+
+N = partition_alloc_inc*((N + partition_alloc_inc - 1)/partition_alloc_inc);
+
+u = new Cell * [N];
+
+memset(u, 0, N*(sizeof(Cell *)));
+
+if ( c )  {
+
    int j;
 
-   for (j=0; j<max_cells; ++j)  c[j].clear();
+   for(j=0; j<n; ++j)  u[j] = c[j];
 
-   n = 0;
+   delete [] c;  c = (Cell **) 0;
+
+}
+
+
+c = u;  u = (Cell **) 0;
+
+n_alloc = N;
+
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool Partition::has(int k) const
+
+{
+
+int j;
+
+for (j=0; j<n; ++j) {
+
+   if ( c[j]->has(k) )  return ( true );
+
+}
+
+return ( false );
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int Partition::which_cell(int k) const
+
+{
+
+int j;
+
+for (j=0; j<n; ++j) {
+
+   if ( c[j]->has(k) )  return ( j );
+
+}
+
+return ( -1 );
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::merge_cells(int j_1, int j_2)
+
+{
+
+int k, nn;
+int j_min, j_max;
+
+
+if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
+
+   mlog << Error 
+        << "\nPartition::merge_cells() -> "
+        << "range check error\n\n";
+
+   exit(1);
+
+}
+
+if ( j_1 == j_2 )  return;
+
+
+
+if ( j_1 < j_2 ) {
+
+   j_min = j_1;
+   j_max = j_2;
+
+} else {
+
+   j_min = j_2;
+   j_max = j_1;
+
+}
+
+nn = c[j_max]->n;
+
+for (k=0; k<nn; ++k) {
+
+   c[j_min]->add(c[j_max]->e[k]);
+
+}
+
+*(c[j_max]) = *(c[n - 1]);
+
+c[n - 1]->clear();
+
+--n;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::merge_values(int v1, int v2)
+
+{
+
+int j_1, j_2;
+
+if ( v1 == v2 )  return;
+
+j_1 = which_cell(v1);
+j_2 = which_cell(v2);
+
+if ( (j_1 < 0) || (j_2 < 0) ) {
+
+   mlog << Error 
+        << "\nvoid Partition::merge_values() -> "
+        << "bad values: (v1, v2) = (" << v1 << ", " << v2
+        << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
 
    return;
+
+}
+
+merge_cells(j_1, j_2);
+
+   //
+   //  done
+   //
+
+return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Partition::assign(const Partition &p) {
-   int j;
+void Partition::add(int k)
 
-   clear();
+{
 
-   for (j=0; j<(p.n); ++j)  c[j] = p.c[j];
+if ( has(k) )  return;
 
-   n = p.n;
+extend(n + 1);
 
-   return;
-}
+c[n] = new Cell;
 
-///////////////////////////////////////////////////////////////////////////////
+c[n]->add(k);
 
-int Partition::has(int k) const {
-   int j;
+++n;
 
-   for (j=0; j<n; ++j) {
-      if ( c[j].has(k) )  return ( 1 );
-   }
+return;
 
-   return(0);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-int Partition::which_cell(int k) const {
-   int j;
-
-   for (j=0; j<n; ++j) {
-      if ( c[j].has(k) )  return ( j );
-   }
-
-   return(-1);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::merge_cells(int j_1, int j_2) {
-   int k;
-   int j_min, j_max;
-
-   if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
-      mlog << Error << "\nPartition::merge_cells() -> "
-           << "range check error\n\n";
-      exit(1);
-   }
-
-   if ( j_1 == j_2 )  return;
-
-   if ( j_1 < j_2 ) {
-      j_min = j_1;
-      j_max = j_2;
-   }
-   else {
-      j_min = j_2;
-      j_max = j_1;
-   }
-
-   for (k=0; k<(c[j_max].n); ++k) {
-      c[j_min].add(c[j_max].e[k]);
-   }
-
-   c[j_max] = c[n - 1];
-
-   c[n - 1].clear();
-
-   --n;
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::merge_values(int v1, int v2) {
-   int j_1, j_2;
-
-   if ( v1 == v2 )  return;
-
-   j_1 = which_cell(v1);
-   j_2 = which_cell(v2);
-
-   if ( (j_1 < 0) || (j_2 < 0) ) {
-      mlog << Error << "\nvoid Partition::merge_values() -> "
-           << "bad values: (v1, v2) = (" << v1 << ", " << v2
-           << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
-      return;
-   }
-
-   merge_cells(j_1, j_2);
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::add(int k) {
-
-   if ( has(k) )  return;
-
-   if ( n >= max_cells ) {
-      mlog << Error << "\nvoid Partition::add() -> "
-           << "too many cells!\n\n";
-      exit(1);
-   }
-
-   c[n++].add(k);
-
-   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1143,12 +1381,16 @@ void Partition::add(int k) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-double dot(double x_1, double y_1, double x_2, double y_2) {
-   double d;
+double dot(double x_1, double y_1, double x_2, double y_2)
 
-   d = x_1*x_2 + y_1*y_2;
+{
 
-   return(d);
+double d;
+
+d = x_1*x_2 + y_1*y_2;
+
+return ( d );
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1501,142 +1743,184 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ShapeData split(const ShapeData &wfd, int &n_shapes)
+ShapeData split(const ShapeData & wfd, int & n_shapes)
 
 {
-   int k, x, y;
-   int s;
-   int xx, yy, numx, numy;
-   int current_shape;
-   int shape_assigned;
-   ShapeData d;
-   ShapeData q = wfd;
-   Partition p;
 
-   numx = wfd.data.nx();
-   numy = wfd.data.ny();
+int k, x, y;
+int s;
+int xx, yy, nx, ny;
+int current_shape;
+bool shape_assigned = false;
+ShapeData d;
+ShapeData q = wfd;
+Partition p;
 
-   d.data.set_size(numx, numy);
 
-   n_shapes = 0;
+nx = wfd.data.nx();
+ny = wfd.data.ny();
 
+d.data.set_size(nx, ny);
+
+n_shapes = 0;
+
+   //
    //  shape numbers start at ONE here!!
+   //
 
-   current_shape = 0;
+current_shape = 0;
 
-   for (y=(wfd.data.ny() - 2); y>=0; --y) {
-      for (x=(wfd.data.nx() - 2); x>=0; --x) {
+for (y=(wfd.data.ny() - 2); y>=0; --y) {
 
-         s = wfd.s_is_on(x, y);
+   for (x=(wfd.data.nx() - 2); x>=0; --x) {
 
-         if ( !s ) continue;
+      s = wfd.s_is_on(x, y);
 
-         shape_assigned = 0;
+      if ( !s ) continue;
 
-         // check above left
+      shape_assigned = false;
 
-         xx = x - 1;
-         yy = y + 1;
+         //
+         //  check above left
+         //
 
-         if ( (xx >= 0) && (yy < numy) ) {
+      xx = x - 1;
+      yy = y + 1;
 
-            s = wfd.s_is_on(xx, yy);
+      if ( (xx >= 0) && (yy < ny) ) {
 
-            if ( s ) {
-               if ( shape_assigned )
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               else
-                  d.data.set(d.data(xx, yy), x, y);
+         s = wfd.s_is_on(xx, yy);
 
-               shape_assigned = 1;
-            }
+         if ( s ) {
+
+            if ( shape_assigned )
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+            else
+               d.data.set(d.data(xx, yy), x, y);
+
+            shape_assigned = true;
+
          }
 
-         // check above
+      }
 
-         xx = x;
-         yy = y + 1;
+         //
+         //  check above
+         //
 
-         if ( yy < numy ) {
+      xx = x;
+      yy = y + 1;
 
-            s = wfd.s_is_on(xx, yy);
+      if ( yy < ny ) {
 
-            if ( s ) {
-               if ( shape_assigned )
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               else
-                  d.data.set(d.data(xx, yy), x, y);
+         s = wfd.s_is_on(xx, yy);
 
-               shape_assigned = 1;
-            }
+         if ( s ) {
+
+            if ( shape_assigned )
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+            else
+               d.data.set(d.data(xx, yy), x, y);
+
+            shape_assigned = true;
+
          }
 
-         // check upper right
+      }
 
-         xx = x + 1;
-         yy = y + 1;
+         //
+         //  check upper right
+         //
 
-         if ( (xx < numx) && (yy < numy) ) {
+      xx = x + 1;
+      yy = y + 1;
 
-            s = wfd.s_is_on(xx, yy);
+      if ( (xx < nx) && (yy < ny) ) {
 
-            if ( s ) {
+         s = wfd.s_is_on(xx, yy);
 
-               if ( shape_assigned )
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               else
-                  d.data.set(d.data(xx, yy), x, y);
+         if ( s ) {
 
-               shape_assigned = 1;
-            }
+            if ( shape_assigned )
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+            else
+               d.data.set(d.data(xx, yy), x, y);
+
+            shape_assigned = true;
          }
+      }
 
-         // check to the right
+         //
+         //  check to the right
+         //
 
-         xx = x + 1;
-         yy = y;
+      xx = x + 1;
+      yy = y;
 
-         if ( xx < numx ) {
+      if ( xx < nx ) {
 
-            s = wfd.s_is_on(xx, yy);
+         s = wfd.s_is_on(xx, yy);
 
-            if ( s ) {
+         if ( s ) {
 
-               if ( shape_assigned )
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               else
-                  d.data.set(d.data(xx, yy), x, y);
+            if ( shape_assigned )
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+            else
+               d.data.set(d.data(xx, yy), x, y);
 
-               shape_assigned = 1;
-            }
+            shape_assigned = true;
          }
+      }
 
-         // is it a new shape?
+         //
+         //  is it a new shape?
+         //
 
-         if ( !shape_assigned ) {
+      if ( !shape_assigned ) {
 
-            d.data.set(++current_shape, x, y);
-            p.add(nint(d.data(x, y)));
-         }
-      } // for x
-   } // for y
+         d.data.set(++current_shape, x, y);
 
-   for (x=0; x<numx; ++x) {
-      for (y=0; y<numy; ++y) {
+         p.add(nint(d.data(x, y)));
 
-         q.data.set(0, x, y);
+      }
 
-         for (k=0; k<(p.n); ++k) {
-            if ( p.c[k].has(nint(d.data(x, y))) )   q.data.set(k + 1, x, y);
-         }
-      } // for y
    } // for x
 
-   n_shapes = p.n;
+} // for y
 
-   q.calc_moments();
 
-   return(q);
+     ///////////////////////////////////
+
+
+for (x=0; x<nx; ++x) {
+
+   for (y=0; y<ny; ++y) {
+
+      q.data.set(0, x, y);
+
+      for (k=0; k<(p.n); ++k) {
+
+         if ( p.c[k]->has(nint(d.data(x, y))) )   q.data.set(k + 1, x, y);
+
+      }
+
+   } // for y
+
+} // for x
+
+
+     ///////////////////////////////////
+
+
+n_shapes = p.n;
+
+q.calc_moments();
+
+   //
+   //  done
+   //
+
+return ( q );
 
 }
 
