@@ -13,14 +13,10 @@
 
 <met_test>
 
-  <test_dir>&TEST_DIR;</test_dir>
-  <exit_on_fail>true</exit_on_fail>
-
-
   <!--                                    -->
   <!--  point_stat                        -->
   <!--                                    -->
-  
+
   <test name="point_stat_GRIB1_NAM_GDAS">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
@@ -36,7 +32,7 @@
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_PHYS \
       -outdir &OUTPUT_DIR;/point_stat -v 1
-    </param>   
+    </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V_fho.txt</stat>
@@ -79,7 +75,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
-  
+
   <test name="point_stat_GRIB2_NAM_NDAS">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
@@ -94,7 +90,7 @@
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
       &CONFIG_DIR;/PointStatConfig_PHYS \
       -outdir &OUTPUT_DIR;/point_stat -v 1
-    </param>   
+    </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_fho.txt</stat>
@@ -108,7 +104,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_NAM_NDAS_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
-  
+
   <test name="point_stat_GRIB2_SREF_GDAS">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
@@ -135,7 +131,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
-  
+
   <test name="point_stat_GRIB1_NAM_TRMM">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
@@ -161,7 +157,7 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_TRMM_120000L_20120409_120000V_sl1l2.txt</stat>
     </output>
   </test>
-  
+
   <test name="point_stat_GRIB2_SREF_TRMM">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
@@ -356,10 +352,27 @@
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_sid_exc \
       -outdir &OUTPUT_DIR;/point_stat -v 1
-    </param>   
+    </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_EXC_120000L_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_SID_EXC_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_GRIB1_NAM_GDAS_INTERP_OPTS">
+    <exec>&MET_DIR;/bin/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_INTERP_OPTS</value></pair>
+      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_INTERP_OPTS \
+      -outdir &OUTPUT_DIR;/point_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_INTERP_OPTS_120000L_20120409_120000V.stat</stat>
     </output>
   </test>
 
