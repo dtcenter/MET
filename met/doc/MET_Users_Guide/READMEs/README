@@ -170,10 +170,23 @@ obtype = "ANALYS";
 //
 //   - The "method" entry defines the regridding method to be used.
 //      - Valid regridding methods:
-//        MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN, LS_FIT, BILIN, NEAREST, BUDGET, FORCE
+//         - MIN         for the minimum value
+//         - MAX         for the maximum value
+//         - MEDIAN      for the median value
+//         - UW_MEAN     for the unweighted average value
+//         - DW_MEAN     for the distance-weighted average value (weight = distance^-2)
+//         - LS_FIT      for a least-squares fit
+//         - BILIN       for bilinear interpolation (width = 2)
+//         - NEAREST     for the nearest grid point (width = 1)
+//         - BUDGET      for the mass-conserving budget interpolation
+//         - FORCE       to compare gridded data directly with no interpolation
+//                       as long as the grid x and y dimensions match.
+//         - UPPER_LEFT  for the upper left grid point (width = 1)
+//         - UPPER_RIGHT for the upper right grid point (width = 1)
+//         - LOWER_RIGHT for the lower right grid point (width = 1)
+//         - LOWER_LEFT  for the lower left grid point (width = 1)
 //
-//        Use FORCE to compare input values directly with no interpolation as
-//        long as the grid x and y dimensions match.
+//         The BEST interpolation option is not valid for regridding.
 //
 //   - The "width" entry specifies a regridding width, when applicable.
 //      - width = 4;        To regrid using a 4x4 box.
@@ -685,15 +698,22 @@ boot = {
 //
 //      - The "method" entry specifies the interpolation procedure to be
 //        applied to the points in the box:
-//           - "MIN" for the minimum value
-//           - "MAX" for the maximum value
-//           - "MEDIAN" for the median value
-//           - "UW_MEAN" for the unweighted average value
-//           - "DW_MEAN" for the distance-weighted average value
-//           - "LS_FIT" for a least-squares fit
-//           - "BILIN" for bilinear interpolation
-//           - For grid-to-grid comparisons, only valid options are MIN, MAX,
-//             MEDIAN, and UW_MEAN are options.
+//         - MIN         for the minimum value
+//         - MAX         for the maximum value
+//         - MEDIAN      for the median value
+//         - UW_MEAN     for the unweighted average value
+//         - DW_MEAN     for the distance-weighted average value (weight = distance^-2)
+//         - LS_FIT      for a least-squares fit
+//         - BILIN       for bilinear interpolation (width = 2)
+//         - NEAREST     for the nearest grid point (width = 1)
+//         - BEST        for the value closest to the observation
+//         - UPPER_LEFT  for the upper left grid point (width = 1)
+//         - UPPER_RIGHT for the upper right grid point (width = 1)
+//         - LOWER_RIGHT for the lower right grid point (width = 1)
+//         - LOWER_LEFT  for the lower left grid point (width = 1)
+//
+//         The BUDGET and FORCE regridding options are not valid for interpolating.
+//         For grid-to-grid comparisons, the only valid options are MIN, MAX, MEDIAN, and UW_MEAN.
 //
 interp = {
    field      = BOTH;
