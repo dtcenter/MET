@@ -670,6 +670,14 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    info.method     = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
    info.width      = regrid_dict->lookup_int(conf_key_width);
 
+   // Check for unsupported regridding options
+   if(method == InterpMthd_Best) {
+      mlog << Error << "\nparse_conf_regrid() -> "
+           << "\"" << interpmthd_to_string(method)
+           << "\" not valid for regridding, only interpolating.\n\n";
+      exit(1);
+   }
+
    // Check the nearest neighbor special case
    if(info.width  == 1 &&
       info.method != InterpMthd_Nearest &&
