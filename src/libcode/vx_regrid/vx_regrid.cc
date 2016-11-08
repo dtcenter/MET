@@ -112,7 +112,8 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
       } else {
 
-         value = compute_horz_interp(from_data, x_from, y_from, info.method, info.width, info.vld_thresh);
+         value = compute_horz_interp(from_data, x_from, y_from, bad_data_double,
+                                     info.method, info.width, info.vld_thresh);
 
       }
 

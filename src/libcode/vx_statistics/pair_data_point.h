@@ -208,8 +208,8 @@ class VxPairDataPoint {
       void inc_count(int ***&, int, int);
       void inc_count(int ***&, int, int, int);
 
-      double compute_interp(const DataPlaneArray &, double, double, int,
-                            double, int, int);
+      double compute_interp(const DataPlaneArray &, double, double,
+                            double, int, double, int, int);
 };
 
 ////////////////////////////////////////////////////////////////////////

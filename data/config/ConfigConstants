@@ -15,7 +15,7 @@ output_precision = 5;
 // Defintion of constants used throughout MET configuration files.
 //
 // THE FOLLOWING SHOULD NOT BE MODIFIED.  DOING SO WILL MAKE THE MET
-// CONFIGURATION FILES UNREADABLE. 
+// CONFIGURATION FILES UNREADABLE.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -44,6 +44,11 @@ NBRHD          = 8;
 NEAREST        = 9;
 BUDGET         = 10;
 FORCE          = 11;
+BEST           = 12;
+UPPER_LEFT     = 13;
+UPPER_RIGHT    = 14;
+LOWER_RIGHT    = 15;
+LOWER_LEFT     = 16;
 
 // Interpolation types
 NONE           = 1;

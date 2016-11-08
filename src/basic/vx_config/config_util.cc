@@ -673,7 +673,11 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    // Check the nearest neighbor special case
    if(info.width  == 1 &&
       info.method != InterpMthd_Nearest &&
-      info.method != InterpMthd_Force) {
+      info.method != InterpMthd_Force &&
+      info.method != InterpMthd_Upper_Left &&
+      info.method != InterpMthd_Upper_Right &&
+      info.method != InterpMthd_Lower_Right &&
+      info.method != InterpMthd_Lower_Left) {
       mlog << Warning << "\nparse_conf_regrid() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(info.method) << "\" to \""
@@ -703,7 +707,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    Dictionary *type_dict = (Dictionary *) 0;
    InterpInfo info;
    NumArray mthd_na, wdth_na;
-   ConcatString method;
+   InterpMthd method;
    int i, j, k, v, width, n_entries;
    bool is_correct_type = false;
 
@@ -773,12 +777,13 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       for(j=0; j<mthd_na.n_elements(); j++) {
 
          // Store interpolation method as a string
-         method = interpmthd_to_string(int_to_interpmthd(mthd_na[j]));
+         method = int_to_interpmthd(mthd_na[j]);
 
-         // Check for budget interpolation
-         if(strcmp(method, interpmthd_budget_str) == 0) {
+         // Check for unsupported interpolation options
+         if(method == InterpMthd_Budget ||
+            method == InterpMthd_Force) {
             mlog << Error << "\nparse_conf_interp() -> "
-                 << "\"" << interpmthd_budget_str
+                 << "\"" << interpmthd_to_string(method)
                  << "\" not valid for interpolating, only regridding.\n\n";
             exit(1);
          }
@@ -789,27 +794,34 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
             // Store the current width
             width = nint(wdth_na[k]);
 
-            // Check for the nearest neighbor special case
-            if(width == 1 && strcmp(method, interpmthd_nearest_str) != 0) {
+            // Check the nearest neighbor special case
+            if(width  == 1 &&
+               method != InterpMthd_Nearest &&
+               method != InterpMthd_Upper_Left &&
+               method != InterpMthd_Upper_Right &&
+               method != InterpMthd_Lower_Right &&
+               method != InterpMthd_Lower_Left) {
                mlog << Warning << "\nparse_conf_interp() -> "
-                    << "For neareast neighbor interpolation method, "
-                    << "resetting method from \"" << method << "\" to \""
+                    << "Resetting the interpolation method from \""
+                    << interpmthd_to_string(method) << "\" to \""
                     << interpmthd_nearest_str
-                    << "\" since the interpolation width is 1.\n\n";
-               method = interpmthd_nearest_str;
+                    << "\" since the regridding width is 1.\n\n";
+               method = InterpMthd_Nearest;
             }
 
-            // Check for the bilinear interpolation special case
-            if(width != 2 && strcmp(method, interpmthd_bilin_str) == 0) {
+            // Check the bilinear special case
+            if(width  != 2 &&
+               method == InterpMthd_Bilin) {
                mlog << Warning << "\nparse_conf_interp() -> "
-                    << "For bilinear interpolation method, resetting "
-                    << "width from \"" << width << "\" to \"2\".\n\n";
+                    << "Resetting the interpolation width from "
+                    << width << " to 2 for interpolation method \""
+                    << interpmthd_to_string(method) << "\".\n\n";
                width = 2;
             }
 
             // Add the current entries
             info.n_interp += 1;
-            info.method.add(method);
+            info.method.add(interpmthd_to_string(method));
             info.width.add(width);
 
          } // end for k
@@ -1168,17 +1180,22 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 InterpMthd int_to_interpmthd(int i) {
    InterpMthd m;
 
-        if(i == conf_const.lookup_int(interpmthd_min_str))     m = InterpMthd_Min;
-   else if(i == conf_const.lookup_int(interpmthd_max_str))     m = InterpMthd_Max;
-   else if(i == conf_const.lookup_int(interpmthd_median_str))  m = InterpMthd_Median;
-   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str)) m = InterpMthd_UW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str)) m = InterpMthd_DW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))  m = InterpMthd_LS_Fit;
-   else if(i == conf_const.lookup_int(interpmthd_bilin_str))   m = InterpMthd_Bilin;
-   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))   m = InterpMthd_Nbrhd;
-   else if(i == conf_const.lookup_int(interpmthd_nearest_str)) m = InterpMthd_Nearest;
-   else if(i == conf_const.lookup_int(interpmthd_budget_str))  m = InterpMthd_Budget;
-   else if(i == conf_const.lookup_int(interpmthd_force_str))   m = InterpMthd_Force;
+        if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
+   else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd_Max;
+   else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd_Median;
+   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd_UW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd_DW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd_LS_Fit;
+   else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd_Bilin;
+   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd_Nbrhd;
+   else if(i == conf_const.lookup_int(interpmthd_nearest_str))     m = InterpMthd_Nearest;
+   else if(i == conf_const.lookup_int(interpmthd_budget_str))      m = InterpMthd_Budget;
+   else if(i == conf_const.lookup_int(interpmthd_force_str))       m = InterpMthd_Force;
+   else if(i == conf_const.lookup_int(interpmthd_best_str))        m = InterpMthd_Best;
+   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))  m = InterpMthd_Upper_Left;
+   else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd_Upper_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd_Lower_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd_Lower_Left;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
