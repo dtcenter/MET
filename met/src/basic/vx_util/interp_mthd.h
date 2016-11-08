@@ -30,27 +30,37 @@ enum InterpMthd {
    InterpMthd_DW_Mean,
    InterpMthd_LS_Fit,
    InterpMthd_Nbrhd,
-   InterpMthd_Bilin, 
+   InterpMthd_Bilin,
    InterpMthd_Nearest,
    InterpMthd_Budget,
-   InterpMthd_Force
+   InterpMthd_Force,
+   InterpMthd_Best,
+   InterpMthd_Upper_Left,
+   InterpMthd_Upper_Right,
+   InterpMthd_Lower_Right,
+   InterpMthd_Lower_Left
 };
 
 //
 // String corresponding to the enumerated values above
 //
-static const char interpmthd_none_str[]    = "NA";
-static const char interpmthd_min_str[]     = "MIN";
-static const char interpmthd_max_str[]     = "MAX";
-static const char interpmthd_median_str[]  = "MEDIAN";
-static const char interpmthd_uw_mean_str[] = "UW_MEAN";
-static const char interpmthd_dw_mean_str[] = "DW_MEAN";
-static const char interpmthd_ls_fit_str[]  = "LS_FIT";
-static const char interpmthd_nbrhd_str[]   = "NBRHD";
-static const char interpmthd_bilin_str[]   = "BILIN";
-static const char interpmthd_nearest_str[] = "NEAREST";
-static const char interpmthd_budget_str[]  = "BUDGET";
-static const char interpmthd_force_str[]   = "FORCE";
+static const char interpmthd_none_str[]        = "NA";
+static const char interpmthd_min_str[]         = "MIN";
+static const char interpmthd_max_str[]         = "MAX";
+static const char interpmthd_median_str[]      = "MEDIAN";
+static const char interpmthd_uw_mean_str[]     = "UW_MEAN";
+static const char interpmthd_dw_mean_str[]     = "DW_MEAN";
+static const char interpmthd_ls_fit_str[]      = "LS_FIT";
+static const char interpmthd_nbrhd_str[]       = "NBRHD";
+static const char interpmthd_bilin_str[]       = "BILIN";
+static const char interpmthd_nearest_str[]     = "NEAREST";
+static const char interpmthd_budget_str[]      = "BUDGET";
+static const char interpmthd_force_str[]       = "FORCE";
+static const char interpmthd_best_str[]        = "BEST";
+static const char interpmthd_upper_left_str[]  = "UPPER_LEFT";
+static const char interpmthd_upper_right_str[] = "UPPER_RIGHT";
+static const char interpmthd_lower_right_str[] = "LOWER_RIGHT";
+static const char interpmthd_lower_left_str[]  = "LOWER_LEFT";
 
 ///////////////////////////////////////////////////////////////////////////////
 

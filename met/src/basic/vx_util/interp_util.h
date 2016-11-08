@@ -28,44 +28,46 @@
 #include "data_plane.h"
 #include "interp_mthd.h"
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 // Exponent used in distance weighted mean calculations
 static const int dw_mean_pow = 2;
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // Utility functions for horizontal interpolation on a DataPlane
 //
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-extern double interp_min     (const DataPlane &, int x_ll, int y_ll, int w, double);
-extern double interp_max     (const DataPlane &, int x_ll, int y_ll, int w, double);
-extern double interp_median  (const DataPlane &, int x_ll, int y_ll, int w, double);
-extern double interp_uw_mean (const DataPlane &, int x_ll, int y_ll, int w, double);
+extern double interp_min     (const DataPlane &, int x_ll, int y_ll, int w, double t);
+extern double interp_max     (const DataPlane &, int x_ll, int y_ll, int w, double t);
+extern double interp_median  (const DataPlane &, int x_ll, int y_ll, int w, double t);
+extern double interp_uw_mean (const DataPlane &, int x_ll, int y_ll, int w, double t);
 
-extern void  dp_interp_min     (const DataPlane & fat, DataPlane & out, int w, double);
-extern void  dp_interp_max     (const DataPlane & fat, DataPlane & out, int w, double);
-extern void  dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int w, double);
+extern void  dp_interp_min     (const DataPlane & fat, DataPlane & out, int w, double t);
+extern void  dp_interp_max     (const DataPlane & fat, DataPlane & out, int w, double t);
+extern void  dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int w, double t);
 
-extern double interp_dw_mean (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, int i_pow, double);
-extern double interp_ls_fit  (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obx_y, double);
+extern double interp_dw_mean (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, int i_pow, double t);
+extern double interp_ls_fit  (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, double t);
 
 extern double interp_bilin   (const DataPlane &, double obs_x, double obs_y);
+extern double interp_xy      (const DataPlane &, int x, int y);
+extern double interp_best    (const DataPlane &, int x_ll, int y_ll, int w, double o, double t);
 
 extern void   get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // Utility functions for horizontal and vertical interpolation
 //
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
-extern double compute_horz_interp(const DataPlane &, double, double, int, int, double);
+extern double compute_horz_interp(const DataPlane &, double, double, double, int, int, double);
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // Interpolate two fields in time
 //

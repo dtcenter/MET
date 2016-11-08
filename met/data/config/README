@@ -170,7 +170,8 @@ obtype = "ANALYS";
 //
 //   - The "method" entry defines the regridding method to be used.
 //      - Valid regridding methods:
-//        MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN, LS_FIT, BILIN, NEAREST, BUDGET, FORCE
+//        MIN, MAX, MEDIAN, UW_MEAN, DW_MEAN, LS_FIT, BILIN, NEAREST, BUDGET,
+//        FORCE, BEST, UPPER_LEFT, UPPER_RIGHT, LOWER_RIGHT, LOWER_LEFT
 //
 //        Use FORCE to compare input values directly with no interpolation as
 //        long as the grid x and y dimensions match.

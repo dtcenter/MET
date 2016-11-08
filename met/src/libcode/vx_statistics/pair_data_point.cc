@@ -810,7 +810,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // observation pressure level or height
             to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
-            fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, k,
+            fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, k,
                         to_lvl, f_lvl_blw, f_lvl_abv);
 
             if(is_bad_data(fcst_v)) {
@@ -819,11 +819,24 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Compute the interpolated climatology mean
-            cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, k,
+            cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v, k,
                       to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
+            // Check for valid interpolation options
+            if(climo_sd_dpa.n_planes() > 0 &&
+               (pd[0][0][k].interp_mthd == InterpMthd_Min    ||
+                pd[0][0][k].interp_mthd == InterpMthd_Max    ||
+                pd[0][0][k].interp_mthd == InterpMthd_Median ||
+                pd[0][0][k].interp_mthd == InterpMthd_Best)) {
+               mlog << Warning << "\nVxPairDataPoint::add_obs() -> "
+                    << "applying the "
+                    << interpmthd_to_string(pd[0][0][k].interp_mthd)
+                    << " interpolation method to climatological spread "
+                    << "may cause unexpected results.\n\n";
+            }
+
             // Compute the interpolated climatology standard deviation
-            csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, k,
+            csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v, k,
                       to_lvl, csd_lvl_blw, csd_lvl_abv);
 
             // Compute weight for current point
@@ -955,14 +968,15 @@ void VxPairDataPoint::print_duplicate_report() {
 
 double VxPairDataPoint::compute_interp(const DataPlaneArray &dpa,
                                        double obs_x, double obs_y,
-                                       int i_interp, double to_lvl,
+                                       double obs_v, int i_interp,
+                                       double to_lvl,
                                        int i_blw, int i_abv) {
    double v, v_blw, v_abv, t;
 
    // Check for no data
    if(dpa.n_planes() == 0) return(bad_data_double);
 
-   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y,
+   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
                                pd[0][0][i_interp].interp_mthd,
                                pd[0][0][i_interp].interp_dpth,
                                interp_thresh);
@@ -971,7 +985,7 @@ double VxPairDataPoint::compute_interp(const DataPlaneArray &dpa,
       v = v_blw;
    }
    else {
-      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y,
+      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
                                   pd[0][0][i_interp].interp_mthd,
                                   pd[0][0][i_interp].interp_dpth,
                                   interp_thresh);

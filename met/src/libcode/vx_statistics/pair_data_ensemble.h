@@ -222,8 +222,8 @@ class VxPairDataEnsemble {
       void set_duplicate_flag(DuplicateType duplicate_flag);
       void print_duplicate_report();
 
-      double compute_interp(const DataPlaneArray &, double, double, int,
-                            double, int, int);
+      double compute_interp(const DataPlaneArray &, double, double,
+                            double, int, double, int, int);
 };
 
 ////////////////////////////////////////////////////////////////////////
