@@ -671,9 +671,9 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    info.width      = regrid_dict->lookup_int(conf_key_width);
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best) {
+   if(info.method == InterpMthd_Best) {
       mlog << Error << "\nparse_conf_regrid() -> "
-           << "\"" << interpmthd_to_string(method)
+           << "\"" << interpmthd_to_string(info.method)
            << "\" not valid for regridding, only interpolating.\n\n";
       exit(1);
    }
