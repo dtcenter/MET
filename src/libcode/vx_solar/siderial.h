@@ -16,7 +16,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "cal.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -26,13 +26,13 @@
    //  Greenwich mean siderial time, in degrees
    //
 
-extern double gmt_to_gmst(Unixtime gmt);
+extern double gmt_to_gmst(unixtime gmt);
 
    //
    //  local mean siderial time, in degrees
    //
 
-extern double lmt_to_lmst(Unixtime lmt, int zone, double lon);
+extern double lmt_to_lmst(unixtime lmt, int zone, double lon);
 
 
 ////////////////////////////////////////////////////////////////////////
