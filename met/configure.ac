@@ -1001,6 +1001,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_grid/Makefile
                  src/libcode/vx_gsl_prob/Makefile
                  src/libcode/vx_nav/Makefile
+                 src/libcode/vx_solar/Makefile
                  src/libcode/vx_nc_util/Makefile
                  src/libcode/vx_pb_util/Makefile
                  src/libcode/vx_plot_util/Makefile

@@ -25,7 +25,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void solar_altaz(Unixtime gmt, double lat, double lon, double & alt, double & azi)
+void solar_altaz(unixtime gmt, double lat, double lon, double & alt, double & azi)
 
 {
 
@@ -125,7 +125,7 @@ return;
    //
 
 
-void solar_radec(Unixtime gmt, double & Ra, double & Dec)
+void solar_radec(unixtime gmt, double & Ra, double & Dec)
 
 {
 
@@ -234,7 +234,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void solar_latlon(Unixtime gmt, double & lat, double & lon)
+void solar_latlon(unixtime gmt, double & lat, double & lon)
 
 {
 

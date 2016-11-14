@@ -34,7 +34,7 @@ using namespace std;
    //
 
 
-double gmt_to_gmst(Unixtime gmt)
+double gmt_to_gmst(unixtime gmt)
 
 {
 
@@ -83,12 +83,12 @@ return ( theta );
    //
 
 
-double lmt_to_lmst(Unixtime lmt, int zone, double lon)
+double lmt_to_lmst(unixtime lmt, int zone, double lon)
 
 {
 
 double lst, gst;
-Unixtime gmt;
+unixtime gmt;
 
 
 gmt = lmt + 3600*zone;

@@ -16,13 +16,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "cal.h"
+#include "vx_cal.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void solar_altaz(Unixtime gmt, double lat, double lon, double & alt, double & azi);
+extern void solar_altaz(unixtime gmt, double lat, double lon, double & alt, double & azi);
 
    //
    //  calculates the altitude and azimuth of the sun at the given gmt
@@ -46,7 +46,7 @@ extern void solar_altaz(Unixtime gmt, double lat, double lon, double & alt, doub
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void solar_radec(Unixtime gmt, double & Ra, double & Dec);
+extern void solar_radec(unixtime gmt, double & Ra, double & Dec);
 
    //
    //  calculates the sun's right ascension and declination
@@ -65,7 +65,7 @@ extern void solar_radec(Unixtime gmt, double & Ra, double & Dec);
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void solar_latlon(Unixtime gmt, double & lat, double & lon);
+extern void solar_latlon(unixtime gmt, double & lat, double & lon);
 
 
    //
