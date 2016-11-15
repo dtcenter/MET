@@ -40,6 +40,7 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_config \
 	-lvx_util \
 	-lvx_math \
+	-lvx_solar \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas

@@ -496,6 +496,23 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool is_datestring(const char * text)
+
+{
+
+return ( is_yyyymmdd_hhmmss(text) ||
+         is_yyyymmdd_hh(text)     ||
+         is_yyyymmddhhmmss(text)  ||
+         is_yyyymmddhhmm(text)    ||
+         is_yyyymmddhh(text)      ||
+         is_yyyymmdd(text) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool is_yyyymmdd(const char * text)
 
 {
