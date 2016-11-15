@@ -31,9 +31,9 @@ extern void solar_altaz(unixtime gmt, double lat, double lon, double & alt, doub
    //
    //  Input:   gmt, greenwich mean time expressed as unix time
    //
-   //           lat, latitude in degrees of location (+ north, - south)
+   //           lat, latitude (degrees) of given location (+ north, - south)
    //
-   //           lon, longitude in degrees of location (+ west, - east)
+   //           lon, longitude (degrees) of given location (+ west, - east)
    //
    //
    //  Output:  alt, sun's altitude in degrees (angle between line 
