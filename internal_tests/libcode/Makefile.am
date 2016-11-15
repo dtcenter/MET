@@ -24,6 +24,7 @@ SUBDIRS	= vx_data2d \
 	vx_geodesy \
 	vx_grid \
 	vx_ps \
+	vx_solar \
 	vx_plot_util \
 	vx_tc_util
 
