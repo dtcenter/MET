@@ -19,6 +19,7 @@
 //   002    06/01/16  Halley Gotway   Pass -input_field timing
 //                    timing information through to the output.
 //   003    06/02/16  Halley Gotway   Add box masking type.
+//   004    11/15/16  Halley Gotway   Add solar masking types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +48,7 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_nc_util.h"
 #include "data2d_nc_met.h"
+#include "solar.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -189,6 +191,7 @@ void process_mask_file(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
+   unixtime solar_ut = (unixtime) 0;
 
    // Process the mask file as a lat/lon polyline file
    if(mask_type == MaskType_Poly   ||
@@ -202,6 +205,16 @@ void process_mask_file(DataPlane &dp) {
       mlog << Debug(2)
            << "Parsed Lat/Lon Mask File:\t" << poly_mask.name()
            << " containing " << poly_mask.n_points() << " points\n";
+   }
+   // For solar masking, check for a date/time string
+   else if(is_datestring(mask_filename) &&
+           is_solar_masktype(mask_type)) {
+
+      solar_ut = timestring_to_unix(mask_filename);
+
+      mlog << Debug(2)
+           << "Solar Time String:\t"
+           << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
    }
    // Otherwise, process the mask file as a gridded data file
    else {
@@ -229,18 +242,40 @@ void process_mask_file(DataPlane &dp) {
       // Check for matching grids
       if(mask_type == MaskType_Data && grid != grid_mask) {
          mlog << Error << "\nprocess_mask_file() -> "
-              << "The data grid and mask grid must be identical for \"data\" masking.\n"
+              << "The data grid and mask grid must be identical for "
+              << "\"data\" masking.\n"
               << "Data Grid -> " << grid.serialize() << "\n"
               << "Mask Grid -> " << grid_mask.serialize() << "\n\n";
          exit(1);
       }
    }
 
-   // Read the mask data plane, if requested
-   if(mask_type == MaskType_Data) {
+   // For solar masking, parse the valid time from gridded data
+   if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
+
       if(mask_field_str.length() == 0) {
          mlog << Error << "\nprocess_mask_file() -> "
-              << "use \"-mask_field\" to specify the field for \"data\" masking.\n\n";
+              << "use \"-mask_field\" to specify the data whose valid "
+              << "time should be used for \"solar_alt\" and "
+              << "\"solar_azi\" masking.\n\n";
+         exit(1);
+      }
+      get_data_plane(mtddf_ptr, mask_field_str, dp);
+      solar_ut = dp.valid();
+      dp.clear();
+
+      mlog << Debug(2)
+           << "Solar File Time:\t"
+           << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
+   }
+
+   // Read mask_field for data masking
+   if(mask_type == MaskType_Data) {
+
+      if(mask_field_str.length() == 0) {
+         mlog << Error << "\nprocess_mask_file() -> "
+              << "use \"-mask_field\" to specify the field for "
+              << "\"data\" masking.\n\n";
          exit(1);
       }
       get_data_plane(mtddf_ptr, mask_field_str, dp);
@@ -270,9 +305,14 @@ void process_mask_file(DataPlane &dp) {
       case MaskType_Data:
          apply_data_mask(dp);
          break;
+      case MaskType_Solar_Alt:
+      case MaskType_Solar_Azi:
+         apply_solar_mask(solar_ut, dp);
+         break;
       default:
          mlog << Error << "\nprocess_mask_file() -> "
               << "Unxpected MaskType value (" << mask_type << ")\n\n";
+         exit(1);
          break;
    }
 
@@ -284,8 +324,8 @@ void process_mask_file(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void get_data_plane(Met2dDataFile *mtddf_ptr,
-                           const char *config_str, DataPlane &dp) {
+void get_data_plane(Met2dDataFile *mtddf_ptr,
+                    const char *config_str, DataPlane &dp) {
    VarInfoFactory vi_factory;
    VarInfo *vi_ptr = (VarInfo *) 0;
    double dmin, dmax;
@@ -363,7 +403,7 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void apply_poly_mask(DataPlane &dp) {
+void apply_poly_mask(DataPlane &dp) {
    int x, y, n_in;
    bool inside;
    double lat, lon;
@@ -404,7 +444,7 @@ static void apply_poly_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void apply_box_mask(DataPlane &dp) {
+void apply_box_mask(DataPlane &dp) {
    int i, x_ll, y_ll, x, y, n_in;
    double cen_x, cen_y;
    bool inside;
@@ -478,7 +518,7 @@ static void apply_box_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void apply_circle_mask(DataPlane &dp) {
+void apply_circle_mask(DataPlane &dp) {
    int x, y, i, n_in;
    double lat, lon, dist, v;
    bool check;
@@ -550,7 +590,7 @@ static void apply_circle_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void apply_track_mask(DataPlane &dp) {
+void apply_track_mask(DataPlane &dp) {
    int x, y, i, n_in;
    double lat, lon, dist, v;
    bool check;
@@ -625,7 +665,7 @@ static void apply_track_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void apply_grid_mask(DataPlane &dp) {
+void apply_grid_mask(DataPlane &dp) {
    int x, y, n_in;
    bool inside;
    double lat, lon, mask_x, mask_y;
@@ -671,7 +711,7 @@ static void apply_grid_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void apply_data_mask(DataPlane &dp) {
+void apply_data_mask(DataPlane &dp) {
    int x, y, n_in;
    bool check;
 
@@ -711,6 +751,79 @@ static void apply_data_mask(DataPlane &dp) {
    mlog << Debug(3)
         << "Data Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
         << " points inside\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_solar_mask(const unixtime ut, DataPlane &dp) {
+   int x, y, n_in;
+   double lat, lon, alt, azi, v;
+   bool check;
+
+   // Check for no threshold
+   if(thresh.get_type() == thresh_na) {
+      mlog << Warning
+           << "\napply_solar_mask() -> since \"-thresh\" was not used "
+           << "the raw " << masktype_to_string(mask_type)
+           << " value will be written.\n\n";
+   }
+
+   // Compute solar value for each grid point Lat/Lon
+   for(x=0,n_in=0; x<grid.nx(); x++) {
+      for(y=0; y<grid.ny(); y++) {
+
+         // Lat/Lon value for the current grid point
+         grid.xy_to_latlon(x, y, lat, lon);
+         lon -= 360.0*floor((lon + 180.0)/360.0);
+
+         // Compute the solar altitude and azimuth
+         solar_altaz(ut, lat, lon, alt, azi);
+         v = (mask_type == MaskType_Solar_Alt ? alt : azi);
+
+         // Apply threshold, if specified
+         if(thresh.get_type() != thresh_na) {
+            check = thresh.check(v);
+
+            // Check the complement
+            if(complement) check = !check;
+
+            // Increment count
+            n_in += check;
+
+            v = (check ? 1.0 : 0.0);
+         }
+
+         // Store the current solar value
+         dp.set(v, x, y);
+
+      } // end for y
+   } // end for x
+
+   if(thresh.get_type() != thresh_na && complement) {
+      mlog << Debug(3)
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
+   }
+
+   const char *solar_str = (mask_type == MaskType_Solar_Alt ?
+                            "Altitude" : "Azimuth");
+
+   // List the number of points inside the mask
+   if(thresh.get_type() != thresh_na) {
+      mlog << Debug(3)
+           << "Solar Masking:\t\t" << n_in << " of "
+           << grid.nx() * grid.ny()<< " points inside\n";
+   }
+   // Otherwise, list the min/max distances computed
+   else {
+      double dmin, dmax;
+      dp.data_range(dmin, dmax);
+      mlog << Debug(3)
+           << "Solar Masking:\t\tValues ranging from "
+           << dmin << " to " << dmax << "\n";
+   }
 
    return;
 }
@@ -890,15 +1003,23 @@ void write_netcdf(const DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool is_solar_masktype(MaskType t) {
+   return(t == MaskType_Solar_Alt || t == MaskType_Solar_Azi);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 MaskType string_to_masktype(const char *s) {
    MaskType t;
 
-        if(strcasecmp(s, "poly")   == 0) t = MaskType_Poly;
-   else if(strcasecmp(s, "box")    == 0) t = MaskType_Box;
-   else if(strcasecmp(s, "circle") == 0) t = MaskType_Circle;
-   else if(strcasecmp(s, "track")  == 0) t = MaskType_Track;
-   else if(strcasecmp(s, "grid")   == 0) t = MaskType_Grid;
-   else if(strcasecmp(s, "data")   == 0) t = MaskType_Data;
+        if(strcasecmp(s, "poly")      == 0) t = MaskType_Poly;
+   else if(strcasecmp(s, "box")       == 0) t = MaskType_Box;
+   else if(strcasecmp(s, "circle")    == 0) t = MaskType_Circle;
+   else if(strcasecmp(s, "track")     == 0) t = MaskType_Track;
+   else if(strcasecmp(s, "grid")      == 0) t = MaskType_Grid;
+   else if(strcasecmp(s, "data")      == 0) t = MaskType_Data;
+   else if(strcasecmp(s, "solar_alt") == 0) t = MaskType_Solar_Alt;
+   else if(strcasecmp(s, "solar_azi") == 0) t = MaskType_Solar_Azi;
    else {
       mlog << Error << "\nstring_to_masktype() -> "
            << "unsupported masking type \"" << s << "\"\n\n";
@@ -914,14 +1035,16 @@ const char * masktype_to_string(const MaskType t) {
    const char *s = (const char *) 0;
 
    switch(t) {
-      case MaskType_Poly:   s = "poly";           break;
-      case MaskType_Box:    s = "box";           break;
-      case MaskType_Circle: s = "circle";         break;
-      case MaskType_Track:  s = "track";          break;
-      case MaskType_Grid:   s = "grid";           break;
-      case MaskType_Data:   s = "data";           break;
-      case MaskType_None:   s = na_str;           break;
-      default:              s = (const char *) 0; break;
+      case MaskType_Poly:      s = "poly";           break;
+      case MaskType_Box:       s = "box";            break;
+      case MaskType_Circle:    s = "circle";         break;
+      case MaskType_Track:     s = "track";          break;
+      case MaskType_Grid:      s = "grid";           break;
+      case MaskType_Data:      s = "data";           break;
+      case MaskType_Solar_Alt: s = "solar_alt";      break;
+      case MaskType_Solar_Azi: s = "solar_azi";      break;
+      case MaskType_None:      s = na_str;           break;
+      default:                 s = (const char *) 0; break;
    }
 
    return(s);
@@ -942,7 +1065,7 @@ void usage() {
         << "\t[-input_field string]\n"
         << "\t[-mask_field string]\n"
         << "\t[-complement]\n"
-        << "\t[-union|-intersection|-symdiff]\n"
+        << "\t[-union | -intersection | -symdiff]\n"
         << "\t[-thresh string]\n"
         << "\t[-height n]\n"
         << "\t[-width n]\n"
@@ -955,20 +1078,20 @@ void usage() {
         << "(required).\n"
         << "\t\t   If " << program_name << " output, automatically read mask data.\n"
 
-        << "\t\t\"mask_file\" defines the masking region (required).\n"
-        << "\t\t   ASCII Lat/Lon file for \"poly\", \"box\", \"circle\", and \"track\" masking.\n"
-        << "\t\t   Gridded data file for \"grid\" and \"data\" masking.\n"
+        << "\t\t\"mask_file\" defines the masking information (required).\n"
+        << "\t\t   ASCII Lat/Lon file for poly, box, circle, and track masking.\n"
+        << "\t\t   Gridded data file for grid and data masking.\n"
+        << "\t\t   Gridded data file or YYYYMMDD[_HH[MMSS]] timestring for solar_alt and solar_azi masking.\n"
 
-        << "\t\t\"out_file\" is the output NetCDF mask file to be "
-        << "written (required).\n"
+        << "\t\t\"out_file\" is the output NetCDF mask file to be written (required).\n"
 
         << "\t\t\"-type string\" overrides the default masking type ("
-        << masktype_to_string(default_mask_type) << ") (optional).\n"
-        << "\t\t   May be set to \"poly\", \"box\", \"circle\", \"track\", \"grid\", or \"data\".\n"
+        << masktype_to_string(default_mask_type) << ") (optional):\n"
+        << "\t\t   poly, box, circle, track, grid, data, solar_alt, or solar_azi\n"
 
         << "\t\t\"-input_field string\" to read existing mask data from \"input_file\" (optional).\n"
 
-        << "\t\t\"-mask_field string\" to define the field from \"mask_file\" to be used for \"data\" masking (optional).\n"
+        << "\t\t\"-mask_field string\" to define the field from \"mask_file\" to be used for data masking (optional).\n"
 
         << "\t\t\"-complement\" to compute the complement of the area defined in \"mask_file\" (optional).\n"
 
@@ -976,11 +1099,12 @@ void usage() {
         << "masks from \"input_file\" and \"mask_file\" (optional).\n"
 
         << "\t\t\"-thresh string\" defines the threshold to be applied (optional).\n"
-        << "\t\t   Distance (km) for \"circle\" and \"track\" masking.\n"
-        << "\t\t   Raw input values for \"data\" masking.\n"
+        << "\t\t   Distance (km) for circle and track masking.\n"
+        << "\t\t   Raw input values for data masking.\n"
+        << "\t\t   Computed values for solar_alt and solar_azi masking.\n"
 
         << "\t\t\"-height n\" and \"-width n\" set the size in grid units "
-        << "for \"box\" masking (optional).\n"
+        << "for box masking (optional).\n"
 
         << "\t\t\"-value n\" overrides the default output mask data value ("
         << default_mask_val << ") (optional).\n"

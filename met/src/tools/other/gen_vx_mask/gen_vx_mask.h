@@ -16,6 +16,7 @@
 //   ----   ----      ----            -----------
 //   000    12/09/14  Halley Gotway   New
 //   001    06/02/16  Halley Gotway   Add box masking type.
+//   002    11/15/16  Halley Gotway   Add solar masking types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,15 +42,18 @@ static const char *program_name = "gen_vx_mask";
 ////////////////////////////////////////////////////////////////////////
 
 enum MaskType {
-   MaskType_Poly,   // Polyline masking region
-   MaskType_Box,    // Box masking type
-   MaskType_Circle, // Circle masking region
-   MaskType_Track,  // Track masking region
-   MaskType_Grid,   // Grid masking type
-   MaskType_Data,   // Data masking type
+   MaskType_Poly,      // Polyline masking region
+   MaskType_Box,       // Box masking type
+   MaskType_Circle,    // Circle masking region
+   MaskType_Track,     // Track masking region
+   MaskType_Grid,      // Grid masking type
+   MaskType_Data,      // Data masking type
+   MaskType_Solar_Alt, // Solar altitude masking type
+   MaskType_Solar_Azi, // Solar azimuth masking type
    MaskType_None
 };
 
+extern bool is_solar_masktype(MaskType);
 extern MaskType string_to_masktype(const char *);
 extern const char * masktype_to_string(MaskType);
 
@@ -106,6 +110,7 @@ static void      apply_circle_mask(DataPlane &dp);
 static void      apply_track_mask(DataPlane &dp);
 static void      apply_grid_mask(DataPlane &dp);
 static void      apply_data_mask(DataPlane &dp);
+static void      apply_solar_mask(const unixtime ut, DataPlane &dp);
 static DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask, SetLogic);
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
