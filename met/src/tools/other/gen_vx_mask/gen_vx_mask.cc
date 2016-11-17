@@ -191,7 +191,9 @@ void process_mask_file(DataPlane &dp) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
-   unixtime solar_ut = (unixtime) 0;
+
+   // Initialize
+   solar_ut = (unixtime) 0;
 
    // Process the mask file as a lat/lon polyline file
    if(mask_type == MaskType_Poly   ||
@@ -307,7 +309,7 @@ void process_mask_file(DataPlane &dp) {
          break;
       case MaskType_Solar_Alt:
       case MaskType_Solar_Azi:
-         apply_solar_mask(solar_ut, dp);
+         apply_solar_mask(dp);
          break;
       default:
          mlog << Error << "\nprocess_mask_file() -> "
@@ -757,7 +759,7 @@ void apply_data_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_solar_mask(const unixtime ut, DataPlane &dp) {
+void apply_solar_mask(DataPlane &dp) {
    int x, y, n_in;
    double lat, lon, alt, azi, v;
    bool check;
@@ -779,7 +781,7 @@ void apply_solar_mask(const unixtime ut, DataPlane &dp) {
          lon -= 360.0*floor((lon + 180.0)/360.0);
 
          // Compute the solar altitude and azimuth
-         solar_altaz(ut, lat, lon, alt, azi);
+         solar_altaz(solar_ut, lat, lon, alt, azi);
          v = (mask_type == MaskType_Solar_Alt ? alt : azi);
 
          // Apply threshold, if specified
@@ -966,6 +968,13 @@ void write_netcdf(const DataPlane &dp) {
    if(thresh.get_type() != thresh_na) cs << thresh.get_str();
    mask_var->add_att("mask_type", cs);
 
+   // Write the solar time
+   if(is_solar_masktype(mask_type)) {
+      char time_str[max_str_len];
+      unix_to_yyyymmdd_hhmmss(solar_ut, time_str);
+      mask_var->add_att("solar_time", time_str);
+   }
+
    // Write out the times
    if(dp.init() != (unixtime) 0 || dp.valid() != (unixtime) 0) {
       write_netcdf_var_times(mask_var, dp);
@@ -1079,19 +1088,19 @@ void usage() {
         << "\t\t   If " << program_name << " output, automatically read mask data.\n"
 
         << "\t\t\"mask_file\" defines the masking information (required).\n"
-        << "\t\t   ASCII Lat/Lon file for poly, box, circle, and track masking.\n"
-        << "\t\t   Gridded data file for grid and data masking.\n"
-        << "\t\t   Gridded data file or YYYYMMDD[_HH[MMSS]] timestring for solar_alt and solar_azi masking.\n"
+        << "\t\t   ASCII Lat/Lon file for \"poly\", \"box\", \"circle\", and \"track\" masking.\n"
+        << "\t\t   Gridded data file for \"grid\" and \"data\" masking.\n"
+        << "\t\t   Gridded data file or YYYYMMDD[_HH[MMSS]] timestring for \"solar_alt\" and \"solar_azi\" masking.\n"
 
         << "\t\t\"out_file\" is the output NetCDF mask file to be written (required).\n"
 
         << "\t\t\"-type string\" overrides the default masking type ("
         << masktype_to_string(default_mask_type) << ") (optional):\n"
-        << "\t\t   poly, box, circle, track, grid, data, solar_alt, or solar_azi\n"
+        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", \"data\", \"solar_alt\", or \"solar_azi\"\n"
 
         << "\t\t\"-input_field string\" to read existing mask data from \"input_file\" (optional).\n"
 
-        << "\t\t\"-mask_field string\" to define the field from \"mask_file\" to be used for data masking (optional).\n"
+        << "\t\t\"-mask_field string\" to define the field from \"mask_file\" to be used for \"data\" masking (optional).\n"
 
         << "\t\t\"-complement\" to compute the complement of the area defined in \"mask_file\" (optional).\n"
 
@@ -1099,12 +1108,12 @@ void usage() {
         << "masks from \"input_file\" and \"mask_file\" (optional).\n"
 
         << "\t\t\"-thresh string\" defines the threshold to be applied (optional).\n"
-        << "\t\t   Distance (km) for circle and track masking.\n"
-        << "\t\t   Raw input values for data masking.\n"
-        << "\t\t   Computed values for solar_alt and solar_azi masking.\n"
+        << "\t\t   Distance (km) for \"circle\" and \"track\" masking.\n"
+        << "\t\t   Raw input values for \"data\" masking.\n"
+        << "\t\t   Computed values for \"solar_alt\" and \"solar_azi\" masking.\n"
 
         << "\t\t\"-height n\" and \"-width n\" set the size in grid units "
-        << "for box masking (optional).\n"
+        << "for \"box\" masking (optional).\n"
 
         << "\t\t\"-value n\" overrides the default output mask data value ("
         << default_mask_val << ") (optional).\n"
