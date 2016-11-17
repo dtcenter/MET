@@ -85,6 +85,7 @@ static int height = bad_data_double;
 static int width = bad_data_double;
 static double mask_val = default_mask_val;
 static ConcatString mask_name;
+static unixtime solar_ut = (unixtime) 0;
 
 // Masking polyline
 static MaskPoly poly_mask;
@@ -110,7 +111,7 @@ static void      apply_circle_mask(DataPlane &dp);
 static void      apply_track_mask(DataPlane &dp);
 static void      apply_grid_mask(DataPlane &dp);
 static void      apply_data_mask(DataPlane &dp);
-static void      apply_solar_mask(const unixtime ut, DataPlane &dp);
+static void      apply_solar_mask(DataPlane &dp);
 static DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask, SetLogic);
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
