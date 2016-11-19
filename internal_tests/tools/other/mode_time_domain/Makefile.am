@@ -39,7 +39,7 @@ test_velocity_LDADD = \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_read_data.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_txt_output.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_grid.o \
-	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_utils.o \
+	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_utils_local.o \
 	-lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
