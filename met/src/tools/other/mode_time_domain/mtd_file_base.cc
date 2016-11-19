@@ -24,7 +24,7 @@ using namespace std;
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"
 #include "nc_grid.h"
-#include "nc_utils.h"
+#include "nc_utils_local.h"
 #include "mtdfiletype_to_string.h"
 
 #include "vx_math.h"

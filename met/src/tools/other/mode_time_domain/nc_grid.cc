@@ -20,7 +20,7 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "nc_utils.h"
+#include "nc_utils_local.h"
 #include "nc_grid.h"
 
 
