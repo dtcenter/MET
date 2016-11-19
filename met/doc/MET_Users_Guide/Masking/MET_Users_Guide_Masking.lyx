@@ -289,7 +289,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-union|-intersection|-symdiff]
+[-union | -intersection | -symdiff]
 \end_layout
 
 \begin_layout LyX-Code
@@ -486,8 +486,23 @@ data
 \begin_inset Quotes erd
 \end_inset
 
+ masking; Gridded data file or YYYYMMDD[_HH[MMSS]] timestring for 
+\begin_inset Quotes eld
+\end_inset
+
+solar_alt
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+solar_azi
+\begin_inset Quotes erd
+\end_inset
+
  masking.
- 
 \end_layout
 
 \begin_layout Description
@@ -577,7 +592,24 @@ arguments for gen_vx_mask
 -thresh string
 \series medium
  option can be used to define the threshold to be applied - Distance (km)
- for "circle" and "track" masking; Raw input values for "data" masking.
+ for "circle" and "track" masking; Raw input values for "data" masking;
+ Computed values for 
+\begin_inset Quotes eld
+\end_inset
+
+solar_alt
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+solar_azi
+\begin_inset Quotes erd
+\end_inset
+
+ masking.
 \end_layout
 
 \begin_layout Description
@@ -791,6 +823,46 @@ data
 selects grid points which meet that threshold criteria.
  The option is useful when thresholding topography to define a mask based
  on elevation or when threshold land use to extract a particular category.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ Solar altitude (
+\series bold
+solar_alt
+\series medium
+) and solar azimuth (
+\series bold
+solar_alt
+\series medium
+) masking computes the solar alitude and azimuth values at each grid point
+ for the time defined by the 
+\series bold
+mask_file
+\series medium
+ setting.
+ 
+\series bold
+mask_file
+\series medium
+ may either to set to an explict timestring in YYYYMMDD[_HH[MMSS]] format
+ or to a gridded data file.
+ If set to a gridded data file, the 
+\series bold
+-mask_field
+\series medium
+ command line option specifies the field of data whose valid time should
+ be used.
+ If the 
+\series bold
+-thresh
+\series default
+ command line option is not used, the raw solar altitude or azimuth value
+ for each grid point will be written to the output.
+ If it is used, the resulting binary mask field will be written.
+ This option is useful when defining a day/night mask.
 \end_layout
 
 \begin_layout Standard
