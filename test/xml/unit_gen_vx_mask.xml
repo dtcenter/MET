@@ -333,4 +333,38 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- SOLAR_ALT: Solar altitude                                        -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_SOLAR_ALT">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      20050808 \
+      &OUTPUT_DIR;/gen_vx_mask/SOLAR_ALT_mask.nc \
+      -type solar_alt -thresh gt0 -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SOLAR_ALT_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- SOLAR_AZI: Solar altitude                                        -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_SOLAR_AZI">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &OUTPUT_DIR;/gen_vx_mask/SOLAR_AZI_raw.nc \
+      -type solar_azi -mask_field 'name="TMP"; level="Z2";' -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SOLAR_AZI_raw.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
