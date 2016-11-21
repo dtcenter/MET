@@ -22,7 +22,9 @@
 
 #include <iostream>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"

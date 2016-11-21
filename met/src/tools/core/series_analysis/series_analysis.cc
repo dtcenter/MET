@@ -743,18 +743,18 @@ void process_scores() {
    } // end for i_read
 
    // Add time range information to the global NetCDF attributes
-   nc_out->add_att("fcst_init_beg",  unix_to_yyyymmdd_hhmmss(fcst_init_beg));
-   nc_out->add_att("fcst_init_end",  unix_to_yyyymmdd_hhmmss(fcst_init_end));
-   nc_out->add_att("fcst_valid_beg", unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
-   nc_out->add_att("fcst_valid_end", unix_to_yyyymmdd_hhmmss(fcst_valid_end));
-   nc_out->add_att("fcst_lead_beg",  sec_to_hhmmss(fcst_lead_beg));
-   nc_out->add_att("fcst_lead_end",  sec_to_hhmmss(fcst_lead_end));
-   nc_out->add_att("obs_init_beg",   unix_to_yyyymmdd_hhmmss(obs_init_beg));
-   nc_out->add_att("obs_init_end",   unix_to_yyyymmdd_hhmmss(obs_init_end));
-   nc_out->add_att("obs_valid_beg",  unix_to_yyyymmdd_hhmmss(obs_valid_beg));
-   nc_out->add_att("obs_valid_end",  unix_to_yyyymmdd_hhmmss(obs_valid_end));
-   nc_out->add_att("obs_lead_beg",   sec_to_hhmmss(obs_lead_beg));
-   nc_out->add_att("obs_lead_end",   sec_to_hhmmss(obs_lead_end));
+   add_att(nc_out, "fcst_init_beg",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_beg));
+   add_att(nc_out, "fcst_init_end",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_end));
+   add_att(nc_out, "fcst_valid_beg", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_beg));
+   add_att(nc_out, "fcst_valid_end", (string)unix_to_yyyymmdd_hhmmss(fcst_valid_end));
+   add_att(nc_out, "fcst_lead_beg",  (string)sec_to_hhmmss(fcst_lead_beg));
+   add_att(nc_out, "fcst_lead_end",  (string)sec_to_hhmmss(fcst_lead_end));
+   add_att(nc_out, "obs_init_beg",   (string)unix_to_yyyymmdd_hhmmss(obs_init_beg));
+   add_att(nc_out, "obs_init_end",   (string)unix_to_yyyymmdd_hhmmss(obs_init_end));
+   add_att(nc_out, "obs_valid_beg",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_beg));
+   add_att(nc_out, "obs_valid_end",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_end));
+   add_att(nc_out, "obs_lead_beg",   (string)sec_to_hhmmss(obs_lead_beg));
+   add_att(nc_out, "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
 
    // Deallocate and clean up
    if(f_na) { delete [] f_na; f_na = (NumArray *) 0; }
@@ -1935,9 +1935,9 @@ void store_stat_prc(int n, const ConcatString &col,
 void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_file, NcFile::Replace);
+   nc_out = open_ncfile(out_file, NcFile::replace);
 
-   if(!nc_out->is_valid()) {
+   if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_file << "\n\n";
@@ -1947,32 +1947,34 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
    // Add global attributes
    write_netcdf_global(nc_out, out_file, program_name,
                        conf_info.model, conf_info.obtype, conf_info.desc);
-   nc_out->add_att("mask_grid",  (conf_info.mask_grid_name ?
-                                  conf_info.mask_grid_name : na_str));
-   nc_out->add_att("mask_poly",  (conf_info.mask_poly_name ?
-                                  conf_info.mask_poly_name : na_str));
-   nc_out->add_att("fcst_var",   fcst_info->name());
-   nc_out->add_att("fcst_lev",   fcst_info->level_name());
-   nc_out->add_att("fcst_units", fcst_info->units());
-   nc_out->add_att("obs_var",    obs_info->name());
-   nc_out->add_att("obs_lev",    obs_info->level_name());
-   nc_out->add_att("obs_units",  obs_info->units());
+   add_att(nc_out, "mask_grid",  (conf_info.mask_grid_name ?
+                                  (string)conf_info.mask_grid_name : na_str));
+   add_att(nc_out, "mask_poly",  (conf_info.mask_poly_name ?
+                                  (string)conf_info.mask_poly_name : na_str));
+   add_att(nc_out, "fcst_var",   (string)fcst_info->name());
+   add_att(nc_out, "fcst_lev",   (string)fcst_info->level_name());
+   add_att(nc_out, "fcst_units", (string)fcst_info->units());
+   add_att(nc_out, "obs_var",    (string)obs_info->name());
+   add_att(nc_out, "obs_lev",    (string)obs_info->level_name());
+   add_att(nc_out, "obs_units",  (string)obs_info->units());
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
-   lat_dim = nc_out->add_dim("lat", (long) grid.ny());
-   lon_dim = nc_out->add_dim("lon", (long) grid.nx());
+   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
 
    // Add the series length variable
-   NcVar * var = nc_out->add_var("n_series", ncInt);
-   var->add_att("long_name", "length of series");
+   //NcVar * var = nc_out->add_var("n_series", ncInt);
+   NcDim dimSingle = add_dim(nc_out, "single", 1);
+   NcVar var = add_var(nc_out, "n_series", ncInt, dimSingle);
+   add_att(&var, "long_name", "length of series");
 
-   if(!var->put(&n_series)) {
+   if(!put_nc_data(&var, &n_series)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "error writing the series length variable.\n\n";
             exit(1);
@@ -1995,15 +1997,16 @@ void add_nc_var(const ConcatString &var_name,
    NcVarData d;
 
    // Add a new variable to the NetCDF file
-   d.var = nc_out->add_var(var_name, ncFloat, lat_dim, lon_dim);
-
+   NcVar var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
+   d.var = new NcVar(var);
+   
    // Add variable attributes
-   d.var->add_att("_FillValue", bad_data_float);
-   if(name.length() > 0)        d.var->add_att("name", name);
-   if(long_name.length() > 0)   d.var->add_att("long_name", long_name);
-   if(fcst_thresh.length() > 0) d.var->add_att("fcst_thresh", fcst_thresh);
-   if(obs_thresh.length() > 0)  d.var->add_att("obs_thresh", obs_thresh);
-   if(!is_bad_data(alpha))      d.var->add_att("alpha", alpha);
+   add_att(d.var, "_FillValue", bad_data_float);
+   if(name.length() > 0)        add_att(d.var, "name", (string)name);
+   if(long_name.length() > 0)   add_att(d.var, "long_name", (string)long_name);
+   if(fcst_thresh.length() > 0) add_att(d.var, "fcst_thresh", (string)fcst_thresh);
+   if(obs_thresh.length() > 0)  add_att(d.var, "obs_thresh", (string)obs_thresh);
+   if(!is_bad_data(alpha))      add_att(d.var, "alpha", alpha);
 
    // Store the new NcVarData object in the map
    stat_data[var_name] = d;
@@ -2030,8 +2033,15 @@ void put_nc_val(int n, const ConcatString &var_name, float v) {
    // Get the NetCDF variable to be written
    NcVar *var = stat_data[var_name].var;
 
+   long offsets[2];
+   long lengths[2];
+   offsets[0] = y;
+   offsets[1] = x;
+   lengths[0] = 1;
+   lengths[1] = 1;
+   
    // Store the current value
-   if(!var->set_cur(y, x) || !var->put(&v, 1, 1)) {
+   if(!put_nc_data(var, &v, lengths, offsets)) {
       mlog << Error << "\nput_nc_val() -> "
            << "error writing to variable " << var_name
            << " for point (" << x << ", " << y << ").\n\n";
@@ -2071,7 +2081,7 @@ void clean_up() {
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_file << "\n";
 
-      nc_out->close();
+      //nc_out->close();
       delete nc_out;
       nc_out = (NcFile *) 0;
    }

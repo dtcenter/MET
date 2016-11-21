@@ -40,7 +40,7 @@ using namespace std;
 
 #include "gen_vx_mask.h"
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
 #include "grib_classes.h"
 
 #include "vx_log.h"
@@ -66,7 +66,6 @@ int main(int argc, char *argv[]) {
 
    // Process the mask file
    process_mask_file(dp_mask);
-
    // Apply combination logic if the current mask is binary
    if(mask_type == MaskType_Poly ||
       mask_type == MaskType_Box  ||
@@ -152,16 +151,20 @@ void process_input_file(DataPlane &dp) {
       ftype = parse_conf_file_type(&config);
    }
 
+cout << " process_input_file() call mtddf_factory.new_met_2d_data_file\n";
    mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_filename, ftype);
+cout << " process_input_file() call mtddf_factory.new_met_2d_data_file\n";
    if(!mtddf_ptr) {
       mlog << Error << "\nprocess_input_file() -> "
            << "can't open input file \"" << input_filename << "\"\n\n";
       exit(1);
    }
 
+cout << " process_input_file () \n";
    // Extract the grid
    grid = mtddf_ptr->grid();
 
+cout << " process_input_file () \n";
    // Read the input data plane, if requested
    if(input_field_str.length() > 0) {
       get_data_plane(mtddf_ptr, input_field_str, dp);
@@ -917,18 +920,21 @@ void write_netcdf(const DataPlane &dp) {
 
    float *mask_data = (float *)  0;
    NcFile *f_out    = (NcFile *) 0;
-   NcDim *lat_dim   = (NcDim *)  0;
-   NcDim *lon_dim   = (NcDim *)  0;
-   NcVar *mask_var  = (NcVar *)  0;
+   //NcDim *lat_dim   = (NcDim *)  0;
+   //NcDim *lon_dim   = (NcDim *)  0;
+   //NcVar *mask_var  = (NcVar *)  0;
+   NcDim lat_dim;
+   NcDim lon_dim;
+   NcVar mask_var;
 
    // Create a new NetCDF file and open it.
-   f_out = open_ncfile(out_filename, NcFile::Replace);
+   f_out = open_ncfile(out_filename, NcFile::replace);
 
-   if(!f_out->is_valid()) {
+   if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      f_out->close();
+      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
       exit(1);
@@ -941,11 +947,11 @@ void write_netcdf(const DataPlane &dp) {
    write_netcdf_proj(f_out, grid);
 
    // Define Dimensions
-   lat_dim = f_out->add_dim("lat", (long) grid.ny());
-   lon_dim = f_out->add_dim("lon", (long) grid.nx());
+   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
+   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
 
    // Set the mask_name, if not already set
    if(mask_name.length() == 0) {
@@ -960,13 +966,13 @@ void write_netcdf(const DataPlane &dp) {
    }
 
    // Define Variables
-   mask_var = f_out->add_var(mask_name, ncFloat, lat_dim, lon_dim);
+   mask_var = add_var(f_out, string(mask_name), ncFloat, lat_dim, lon_dim);
    cs << cs_erase << mask_name << " masking region";
-   mask_var->add_att("long_name", cs);
-   mask_var->add_att("_FillValue", bad_data_float);
+   add_att(&mask_var, "long_name", string(cs));
+   add_att(&mask_var, "_FillValue", bad_data_float);
    cs << cs_erase << masktype_to_string(mask_type);
    if(thresh.get_type() != thresh_na) cs << thresh.get_str();
-   mask_var->add_att("mask_type", cs);
+   add_att(&mask_var, "mask_type", string(cs));
 
    // Write the solar time
    if(is_solar_masktype(mask_type)) {
@@ -977,7 +983,7 @@ void write_netcdf(const DataPlane &dp) {
 
    // Write out the times
    if(dp.init() != (unixtime) 0 || dp.valid() != (unixtime) 0) {
-      write_netcdf_var_times(mask_var, dp);
+      write_netcdf_var_times(&mask_var, dp);
    }
 
    // Allocate memory to store the mask values for each grid point
@@ -991,7 +997,8 @@ void write_netcdf(const DataPlane &dp) {
       } // end for y
    } // end for x
 
-   if(!mask_var->put(&mask_data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&mask_var, &mask_data[0], grid.ny(), grid.nx())) {
+   //if(!put_nc_data_with_dims(mask_var, mask_data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
       exit(1);
@@ -1000,7 +1007,7 @@ void write_netcdf(const DataPlane &dp) {
    // Delete allocated memory
    if(mask_data) { delete mask_data; mask_data = (float *) 0; }
 
-   f_out->close();
+   //f_out->close();
    delete f_out;
    f_out = (NcFile *) 0;
 

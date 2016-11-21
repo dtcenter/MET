@@ -74,11 +74,11 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
   _ncFile = open_ncfile(_filePath.c_str());
 
-  if (!_ncFile || !_ncFile->is_valid())
+  if (!_ncFile || IS_INVALID_NC_P(_ncFile))
   {
     mlog << Error << "\n" << method_name << " -> trouble opening netCDF file "
 	 << _filePath << "\n\n";
-    _ncFile->close();
+    //_ncFile->close();
     delete _ncFile;
     _ncFile = (NcFile *) 0;
 
@@ -87,30 +87,42 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
   // Retrieve the dimensions and variable from the netCDF file
 
-  _hdrArrDim = _ncFile->get_dim("hdr_arr_len");
-  _obsArrDim = _ncFile->get_dim("obs_arr_len");
+  hdrArrDim = get_nc_dim(_ncFile, "hdr_arr_len");
+  obsArrDim = get_nc_dim(_ncFile, "obs_arr_len");
 
-  _nhdrDim = _ncFile->get_dim("nhdr");
-  _nobsDim = _ncFile->get_dim("nobs");
+  nhdrDim = get_nc_dim(_ncFile, "nhdr");
+  nobsDim = get_nc_dim(_ncFile, "nobs");
 
-  _strlDim = _ncFile->get_dim("mxstr");
+  strlDim = get_nc_dim(_ncFile, "mxstr");
 
-  _hdrArrVar = _ncFile->get_var("hdr_arr");
-  _hdrTypeVar = _ncFile->get_var("hdr_typ");
-  _hdrSidVar = _ncFile->get_var("hdr_sid");
-  _hdrVldVar = _ncFile->get_var("hdr_vld");
-  _obsArrVar = _ncFile->get_var("obs_arr");
+  _hdrArrDim = &hdrArrDim;
+  _obsArrDim = &obsArrDim;
+  _nhdrDim   = &nhdrDim;
+  _nobsDim   = &nobsDim;
+  _strlDim   = &strlDim;
+  
+  hdrArrVar  = get_nc_var(_ncFile, "hdr_arr");
+  hdrTypeVar = get_nc_var(_ncFile, "hdr_typ");
+  hdrSidVar  = get_nc_var(_ncFile, "hdr_sid");
+  hdrVldVar  = get_nc_var(_ncFile, "hdr_vld");
+  obsArrVar  = get_nc_var(_ncFile, "obs_arr");
+  
+  _hdrArrVar  = &hdrArrVar ;
+  _hdrTypeVar = &hdrTypeVar;
+  _hdrSidVar  = &hdrSidVar ;
+  _hdrVldVar  = &hdrVldVar ;
+  _obsArrVar  = &obsArrVar ;
 
-  if (!_hdrArrDim || !_hdrArrDim->is_valid() ||
-      !_obsArrDim || !_obsArrDim->is_valid() ||
-      !_nhdrDim    || !_nhdrDim->is_valid()    ||
-      !_nobsDim    || !_nobsDim->is_valid()    ||
-      !_strlDim    || !_strlDim->is_valid()    ||
-      !_hdrArrVar || !_hdrArrVar->is_valid() ||
-      !_hdrTypeVar || !_hdrTypeVar->is_valid() ||
-      !_hdrSidVar || !_hdrSidVar->is_valid() ||
-      !_hdrVldVar || !_hdrVldVar->is_valid() ||
-      !_obsArrVar || !_obsArrVar->is_valid())
+  if (!_hdrArrDim  || IS_INVALID_NC_P(_hdrArrDim)  ||
+      !_obsArrDim  || IS_INVALID_NC_P(_obsArrDim)  ||
+      !_nhdrDim    || IS_INVALID_NC_P(_nhdrDim)    ||
+      !_nobsDim    || IS_INVALID_NC_P(_nobsDim)    ||
+      !_strlDim    || IS_INVALID_NC_P(_strlDim)    ||
+      IS_INVALID_NC(hdrArrVar)  ||
+      IS_INVALID_NC(hdrTypeVar) ||
+      IS_INVALID_NC(hdrSidVar)  ||
+      IS_INVALID_NC(hdrVldVar)  ||
+      IS_INVALID_NC(obsArrVar))
   {
     mlog << Error << "\nmain() -> "
 	 << "trouble reading netCDF file " << _filePath << "\n\n";
@@ -118,26 +130,115 @@ bool MetNcFile::readFile(const int desired_grib_code,
   }
 
   // Allocate space to store the data
+  long hdr_count   = get_dim_size(&nhdrDim);
+  long obs_count   = get_dim_size(&nobsDim);
+  long obs_arr_len = get_dim_size(&obsArrDim);
+  long hdr_arr_len = get_dim_size(&hdrArrDim);
+  long  strl_count = get_dim_size(&strlDim);
 
-  float *obs_arr = new float[_obsArrDim->size()];
+  float *obs_arr = new float[obs_arr_len];
+  float *hdr_arr = new float[hdr_arr_len];
 
-  mlog << Debug(2) << "Processing " << _nobsDim->size() << " observations at "
-       << _nhdrDim->size() << " locations.\n";
+  mlog << Debug(2) << "Processing " << (obs_count) << " observations at "
+       << (hdr_count) << " locations.\n";
 
   // Loop through the observations, saving the ones that we are
   // interested in
 
-  for (int i = 0; i < _nobsDim->size(); ++i)
+  
+
+  //int buf_size = ((nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count));
+  int buf_size = obs_count;
+  int hdr_buf_size = hdr_count;
+  
+  //
+  // Allocate space to store the data
+  //
+  
+  char hdr_typ_str_full[hdr_buf_size][strl_count];
+  char hdr_sid_str_full[hdr_buf_size][strl_count];
+  char hdr_vld_str_full[hdr_buf_size][strl_count];
+  //float **hdr_arr_full = (float **) 0, **obs_arr_block = (float **) 0;
+
+  float hdr_arr_full[hdr_buf_size][hdr_arr_len];
+  float obs_arr_block[    buf_size][obs_arr_len];
+  //char obs_qty_str_block[ buf_size][strl_count];
+
+  long offsets[2] = { 0, 0 };
+  long lengths[2] = { 1, 1 };
+  
+  lengths[0] = hdr_buf_size;
+  lengths[1] = strl_count;
+
+  //
+  // Get the corresponding header message type
+  //
+  if(!get_nc_data(&hdrTypeVar, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
+    mlog << Error << "\nmain() -> "
+         << "trouble getting hdr_typ\n\n";
+    exit(1);
+  }
+
+  //
+  // Get the corresponding header station id
+  //
+  if(!get_nc_data(&hdrSidVar, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
+    mlog << Error << "\nmain() -> "
+         << "trouble getting hdr_sid\n\n";
+    exit(1);
+  }
+
+  //
+  // Get the corresponding header valid time
+  //
+  if(!get_nc_data(&hdrVldVar, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
+    mlog << Error << "\nmain() -> "
+         << "trouble getting hdr_vld\n\n";
+    exit(1);
+  }
+
+  //
+  // Get the header for this observation
+  //
+  lengths[1] = hdr_arr_len;
+  if(!get_nc_data(&hdrArrVar, (float *)&hdr_arr_full[0], lengths, offsets)) {
+    mlog << Error << "\nmain() -> "
+        << "trouble getting hdr_arr\n\n";
+    exit(1);
+  }
+  
+  //for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
+  //   buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
+     
+  offsets[0] = 0;
+  lengths[0] = buf_size;
+  lengths[1] = obs_arr_len;
+
+  // Read the current observation message
+  if(!get_nc_data(&obsArrVar, (float *)&obs_arr_block[0], lengths, offsets)) {
+    mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
+    exit(1);
+  }
+
+  lengths[1] = strl_count;
+  //if(!get_nc_data(&obs_arr_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
+  //   mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
+  //   exit(1);
+  //}
+      
+  for (int i = 0; i < GET_NC_SIZE_P(_nobsDim); ++i)
   {
-    if (!_obsArrVar->set_cur(i, 0) ||
-	!_obsArrVar->get(obs_arr, 1, _obsArrDim->size()))
-    {
-      mlog << Error << "\n" << method_name << " -> trouble getting obs_arr\n\n";
-      return false;
-    }
+      
+    // Copy the current observation message
+    for (int k=0; k < obs_arr_len; k++)
+       obs_arr[k] = obs_arr_block[i][k];
 
     if (obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10)
       break;
+
+    // Read the current observation quality flag
+    //strncpy(obs_qty_str, obs_qty_str_block[i_offset], strl_count);
+      
 
     // Get the header index and variable type for this observation.
 
@@ -150,30 +251,39 @@ bool MetNcFile::readFile(const int desired_grib_code,
       continue;
 
     // Get the corresponding header message type
-
+    // Read the corresponding header array for this observation
+    for (int k=0; k < obs_arr_len; k++)
+       hdr_arr[k] = hdr_arr_full[hdr_index][k];
+   
+    int  str_length;
     char message_type_buffer[max_str_len];
-    if (!_hdrTypeVar->set_cur(hdr_index, 0) ||
-	!_hdrTypeVar->get(message_type_buffer, 1, _strlDim->size()))
-    {
-      mlog << Error << "\n" << method_name << " -> "
-	   << "trouble getting hdr_typ\n\n";
-      return false;
-    }
+    char station_id_buffer[max_str_len];
+    char hdr_vld_buffer[max_str_len];
+    // Read the corresponding header type for this observation
+    str_length = strlen(hdr_typ_str_full[hdr_index]);
+    if (str_length > strl_count) str_length = strl_count;
+    strncpy(message_type_buffer, hdr_typ_str_full[hdr_index], str_length);
+    message_type_buffer[str_length] = bad_data_char;
+
+    // Read the corresponding header Station ID for this observation
+    str_length = strlen(hdr_sid_str_full[hdr_index]);
+    if (str_length > strl_count) str_length = strl_count;
+    strncpy(station_id_buffer, hdr_sid_str_full[hdr_index], str_length);
+    station_id_buffer[str_length] = bad_data_char;
+
+    // Read the corresponding valid time for this observation
+    str_length = strlen(hdr_vld_str_full[hdr_index]);
+    if (str_length > strl_count) str_length = strl_count;
+    strncpy(hdr_vld_buffer, hdr_vld_str_full[hdr_index], str_length);
+    hdr_vld_buffer[str_length] = bad_data_char;
+    
+
     string message_type = message_type_buffer;
 
     if (message_type != desired_message_type)
       continue;
 
     // Get the corresponding header station id
-
-    char station_id_buffer[max_str_len];
-    if (!_hdrSidVar->set_cur(hdr_index, 0) ||
-	!_hdrSidVar->get(station_id_buffer, 1, _strlDim->size()))
-    {
-      mlog << Error << "\n" << method_name << " -> "
-	   << "trouble getting hdr_sid\n\n";
-      return false;
-    }
     string station_id = station_id_buffer;
 
     if (station_id != desired_station_id)
@@ -181,15 +291,6 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
     // Get the corresponding header valid time
 
-    char hdr_vld_buffer[max_str_len];
-
-    if (!_hdrVldVar->set_cur(hdr_index, 0) ||
-	!_hdrVldVar->get(hdr_vld_buffer, 1, _strlDim->size()))
-    {
-      mlog << Error << "\n" << method_name << " -> "
-	   << "trouble getting hdr_vld\n\n";
-      return false;
-    }
 
     // If we get here, this is an observation that we want to use
 

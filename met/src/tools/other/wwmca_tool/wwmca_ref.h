@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-#include <netcdf.hh>
+//#include <netcdf.hh>
 
 #include "af_file.h"
 #include "af_cp_file.h"

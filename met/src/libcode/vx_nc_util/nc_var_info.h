@@ -21,7 +21,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include <netcdf.hh>
+//#include <netcdf.hh>
+#include <netcdf>
+using namespace netCDF;
+typedef signed char ncbyte; // from ncvalues.h
 
 #include "vx_util.h"
 
@@ -77,13 +80,14 @@ class NcVarInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool get_att_str(const NcVarInfo &, const ConcatString &, ConcatString &);
 
-extern bool get_att_int(const NcVarInfo &, const ConcatString &, int &);
+extern bool get_att_str(const NcVarInfo &, const ConcatString, ConcatString &);
+
+extern bool get_att_int(const NcVarInfo &, const ConcatString, int &);
 
    //  unixtimes could be ints or strings
 
-extern bool get_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &);
+extern bool get_att_unixtime(const NcVarInfo &, const ConcatString, unixtime &);
 
 
 ////////////////////////////////////////////////////////////////////////

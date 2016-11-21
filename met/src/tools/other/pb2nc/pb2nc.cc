@@ -68,7 +68,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
 
 #include "pb2nc_conf_info.h"
 #include "vx_log.h"
@@ -80,11 +80,14 @@ using namespace std;
 #include "vx_cal.h"
 #include "vx_math.h"
 
+#define OBS_BUFFER_SIZE  (128 * 1024)
+
 ////////////////////////////////////////////////////////////////////////
 
 //
 // Constants
 //
+
 
 static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_default";
 
@@ -183,23 +186,51 @@ static NumArray    hdr_arr_lon_na; // Longitude
 static NumArray    hdr_arr_elv_na; // Elevation
 static int         n_total_obs;    // Running total of observations
 
+//int   obs_buf_size;
+//int   processed_count;
+int   obs_data_idx;
+int   obs_data_offset;
+int   hdr_data_idx;
+int   hdr_data_offset;
+
+char   hdr_typ_buf[OBS_BUFFER_SIZE][strl_len];
+char   hdr_sid_buf[OBS_BUFFER_SIZE][strl_len];
+char   hdr_vld_buf[OBS_BUFFER_SIZE][strl_len];
+float  hdr_arr_buf[OBS_BUFFER_SIZE][hdr_arr_len];
+float obs_data_buf[OBS_BUFFER_SIZE][obs_arr_len];
+char  qty_data_buf[OBS_BUFFER_SIZE][strl_len];
+
+
 //
 // Output NetCDF file, dimensions, and variables
 //
 static NcFile *f_out      = (NcFile *) 0;
 
-static NcDim *strl_dim    = (NcDim *)  0; // Maximum string length
-static NcDim *hdr_arr_dim = (NcDim *)  0; // Header array width
-static NcDim *obs_arr_dim = (NcDim *)  0; // Observation array width
-static NcDim *hdr_dim     = (NcDim *)  0; // Header array length
-static NcDim *obs_dim     = (NcDim *)  0; // Observation array length
+//static NcDim *strl_dim    = (NcDim *)  0; // Maximum string length
+//static NcDim *hdr_arr_dim = (NcDim *)  0; // Header array width
+//static NcDim *obs_arr_dim = (NcDim *)  0; // Observation array width
+//static NcDim *hdr_dim     = (NcDim *)  0; // Header array length
+//static NcDim *obs_dim     = (NcDim *)  0; // Observation array length
 
-static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
-static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
-static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
-static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
-static NcVar *obs_qty_var = (NcVar *)  0; // Quality flag
-static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
+//static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
+//static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
+//static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
+//static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
+//static NcVar *obs_qty_var = (NcVar *)  0; // Quality flag
+//static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
+
+static NcDim strl_dim    ; // Maximum string length
+static NcDim hdr_arr_dim ; // Header array width
+static NcDim obs_arr_dim ; // Observation array width
+static NcDim hdr_dim     ; // Header array length
+static NcDim obs_dim     ; // Observation array length
+
+static NcVar hdr_typ_var ; // Message type
+static NcVar hdr_sid_var ; // Station ID
+static NcVar hdr_vld_var ; // Valid time
+static NcVar hdr_arr_var ; // Header array
+static NcVar obs_qty_var ; // Quality flag
+static NcVar obs_arr_var ; // Observation array
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -365,14 +396,14 @@ void open_netcdf() {
 
    // Create the output netCDF file for writing
    mlog << Debug(1) << "Creating NetCDF File:\t\t" << ncfile << "\n";
-   f_out = open_ncfile(ncfile, NcFile::Replace);
+   f_out = open_ncfile(ncfile, NcFile::replace);
 
    // Check for a valid file
-   if(!f_out->is_valid()) {
+   if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nopen_netcdf() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
 
-      f_out->close();
+      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
 
@@ -380,34 +411,28 @@ void open_netcdf() {
    }
 
    // Define netCDF dimensions
-   strl_dim    = f_out->add_dim("mxstr", (long) strl_len);
-   hdr_arr_dim = f_out->add_dim("hdr_arr_len", (long) hdr_arr_len);
-   obs_arr_dim = f_out->add_dim("obs_arr_len", (long) obs_arr_len);
-   obs_dim     = f_out->add_dim("nobs"); // unlimited dimension
+   strl_dim    = add_dim(f_out, "mxstr", (long) strl_len);
+   hdr_arr_dim = add_dim(f_out, "hdr_arr_len", (long) hdr_arr_len);
+   obs_arr_dim = add_dim(f_out, "obs_arr_len", (long) obs_arr_len);
+   obs_dim     = add_dim(f_out, "nobs"); // unlimited dimension
 
    // Define netCDF variables
-   obs_qty_var = f_out->add_var("obs_qty", ncChar, obs_dim,
-                                strl_dim);
-   obs_arr_var = f_out->add_var("obs_arr", ncFloat, obs_dim,
-                                obs_arr_dim);
+   obs_qty_var = add_var(f_out, "obs_qty", ncChar, obs_dim, strl_dim);
+   obs_arr_var = add_var(f_out, "obs_arr", ncFloat, obs_dim, obs_arr_dim);
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
 
    // Add variable attributes
-   obs_qty_var->add_att("long_name", "quality flag");
-   obs_arr_var->add_att("long_name", "array of observation values");
-   obs_arr_var->add_att("_fill_value", fill_value);
-   obs_arr_var->add_att("columns", "hdr_id gc lvl hgt ob");
-   obs_arr_var->add_att("hdr_id_long_name",
-                        "index of matching header data");
-   obs_arr_var->add_att("gc_long_name",
-      "grib code corresponding to the observation type");
-   obs_arr_var->add_att("lvl_long_name",
-      "pressure level (hPa) or accumulation interval (sec)");
-   obs_arr_var->add_att("hgt_long_name",
-                        "height in meters above sea level (msl)");
-   obs_arr_var->add_att("ob_long_name", "observation value");
+   add_att(&obs_qty_var, "long_name", "quality flag");
+   add_att(&obs_arr_var, "long_name", "array of observation values");
+   add_att(&obs_arr_var, "_fill_value", fill_value);
+   add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
+   add_att(&obs_arr_var, "hdr_id_long_name", "index of matching header data");
+   add_att(&obs_arr_var, "gc_long_name", "grib code corresponding to the observation type");
+   add_att(&obs_arr_var, "lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
+   add_att(&obs_arr_var, "hgt_long_name", "height in meters above sea level (msl)");
+   add_att(&obs_arr_var, "ob_long_name", "observation value");
 
    return;
 }
@@ -511,7 +536,17 @@ void process_pbfile(int i_pb) {
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_pb_rpt = rej_in_rpt = rej_itp  = rej_nobs = 0;
 
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { OBS_BUFFER_SIZE, 1} ;
+   
+   //processed_count = 0;
+   obs_data_idx = 0;
+   obs_data_offset = 0;
+   hdr_data_idx = 0;
+   hdr_data_offset = 0;
+   
    // Loop through the PrepBufr messages from the input file
+   cout << "   npbmsg: " << npbmsg << "\n";
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
       if(mlog.verbosity_level() > 0) {
@@ -860,25 +895,35 @@ void process_pbfile(int i_pb) {
             // Write the quality flag to the netCDF file
             ConcatString quality_mark_str;
             quality_mark_str.format("%d", nint(quality_mark));
-            if(!obs_qty_var->set_cur(n_total_obs, (long) 0) ||
-               !obs_qty_var->put(quality_mark_str, (long) 1,
-                                 (long) strl_len)) {
-               mlog << Error << "\nprocess_pbfile() -> "
-                    << "error writing the quality flag to the "
-                    << "netCDF file\n\n";
-               exit(1);
-            }
+            
+            strncpy(qty_data_buf[obs_data_idx], quality_mark_str, quality_mark_str.length());
+            //qty_data_idx++;
 
             // Write the observation array to the netCDF file
-            if(!obs_arr_var->set_cur(n_total_obs, (long) 0) ||
-               !obs_arr_var->put(obs_arr, (long) 1,
-                                 (long) obs_arr_len)) {
-               mlog << Error << "\nprocess_pbfile() -> "
-                    << "error writing the observation array to the "
-                    << "netCDF file\n\n";
-               exit(1);
+            for (int idx=0; idx<obs_arr_len; idx++) {
+               obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
             }
 
+            obs_data_idx++;
+            if (obs_data_idx >= OBS_BUFFER_SIZE) {
+               lengths[1] = strl_len;
+               if(!put_nc_data(&obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
+                  mlog << Error << "\nprocess_pbfile() -> "
+                       << "error writing the quality flag to the "
+                       << "netCDF file\n\n";
+                  exit(1);
+               }
+               lengths[1] = obs_arr_len;
+               if(!put_nc_data(&obs_arr_var, (float*)obs_data_buf[0], lengths, offsets)) {
+                  mlog << Error << "\nprocess_pbfile() -> "
+                       << "error writing the observation array to the "
+                       << "netCDF file\n\n";
+                  exit(1);
+               }
+               offsets[0] += OBS_BUFFER_SIZE;
+               obs_data_idx = 0;
+            }
+            
             // Increment the current and total observations counts
             n_file_obs++;
             n_total_obs++;
@@ -914,27 +959,37 @@ void process_pbfile(int i_pb) {
                if(is_eq(obs_arr[4], fill_value)) continue;
 
                // Write the quality flag to the netCDF file
+               lengths[1] = strl_len;
                ConcatString quality_mark_str;
                quality_mark_str.format("%d", nint(quality_mark));
-               if(!obs_qty_var->set_cur(n_total_obs, (long) 0) ||
-                  !obs_qty_var->put(quality_mark_str, (long) 1,
-                                    (long) strl_len)) {
-                  mlog << Error << "\nprocess_pbfile() -> "
-                       << "error writing the quality flag to the "
-                       << "netCDF file\n\n";
-                  exit(1);
-               }
 
+               strncpy(qty_data_buf[obs_data_idx], quality_mark_str, quality_mark_str.length());
+               
                // Write the observation array to the netCDF file
-               if(!obs_arr_var->set_cur(n_total_obs, (long) 0) ||
-                  !obs_arr_var->put(obs_arr, (long) 1,
-                                   (long) obs_arr_len) ) {
-                  mlog << Error << "\nmain() -> "
-                       << "error writing the derive observation array "
-                       << "to the netCDF file\n\n";
-                  exit(1);
+               for (int idx=0; idx<obs_arr_len; idx++) {
+                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
                }
-
+               
+               obs_data_idx++;
+               if (obs_data_idx >= OBS_BUFFER_SIZE) {
+                  lengths[1] = strl_len;
+                  if(!put_nc_data(&obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
+                     mlog << Error << "\nprocess_pbfile() -> "
+                          << "error writing the quality flag to the "
+                          << "netCDF file\n\n";
+                     exit(1);
+                  }
+                  lengths[1] = obs_arr_len;
+                  if(!put_nc_data(&obs_arr_var, (float*)obs_data_buf[0], lengths, offsets)) {
+                     mlog << Error << "\nprocess_pbfile() -> "
+                          << "error writing the observation array to the "
+                          << "netCDF file\n\n";
+                     exit(1);
+                  }
+                  offsets[0] += OBS_BUFFER_SIZE;
+                  obs_data_idx = 0;
+               }
+               
                // Increment the current and total observations counts
                n_file_obs++;
                n_total_obs++;
@@ -968,6 +1023,24 @@ void process_pbfile(int i_pb) {
 
    } // end for
 
+   if (obs_data_idx > 0) {
+      lengths[0] = obs_data_idx;
+      lengths[1] = strl_len;
+      if(!put_nc_data(&obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
+         mlog << Error << "\nprocess_pbfile() -> "
+              << "error writing the quality flag to the "
+              << "netCDF file\n\n";
+         exit(1);
+      }
+      lengths[1] = obs_arr_len;
+      if(!put_nc_data(&obs_arr_var, (float*)obs_data_buf[0], lengths, offsets)) {
+         mlog << Error << "\nprocess_pbfile() -> "
+              << "error writing the observation array to the "
+              << "netCDF file\n\n";
+         exit(1);
+      }
+   }
+   
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
    mlog << Debug(2) << "Total PrepBufr Messages processed\t= "
@@ -1035,64 +1108,49 @@ void write_netcdf_hdr_data() {
    }
 
    // Define netCDF dimensions
-   hdr_dim = f_out->add_dim("nhdr", (long) hdr_typ_sa.n_elements());
+   hdr_dim = add_dim(f_out, "nhdr", (long) hdr_typ_sa.n_elements());
 
    // Define netCDF variables
-   hdr_typ_var = f_out->add_var("hdr_typ", ncChar,  hdr_dim, strl_dim);
-   hdr_sid_var = f_out->add_var("hdr_sid", ncChar,  hdr_dim, strl_dim);
-   hdr_vld_var = f_out->add_var("hdr_vld", ncChar,  hdr_dim, strl_dim);
-   hdr_arr_var = f_out->add_var("hdr_arr", ncFloat, hdr_dim,
-                                hdr_arr_dim);
+   hdr_typ_var = add_var(f_out, "hdr_typ", ncChar,  hdr_dim, strl_dim);
+   hdr_sid_var = add_var(f_out, "hdr_sid", ncChar,  hdr_dim, strl_dim);
+   hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  hdr_dim, strl_dim);
+   hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim);
 
    // Add variable attributes
-   hdr_typ_var->add_att("long_name", "message type");
-   hdr_sid_var->add_att("long_name", "station identification");
-   hdr_vld_var->add_att("long_name", "valid time");
-   hdr_vld_var->add_att("units", "YYYYMMDD_HHMMSS");
+   add_att(&hdr_typ_var, "long_name", "message type");
+   add_att(&hdr_sid_var, "long_name", "station identification");
+   add_att(&hdr_vld_var, "long_name", "valid time");
+   add_att(&hdr_vld_var, "units", "YYYYMMDD_HHMMSS");
 
-   hdr_arr_var->add_att("long_name",
+   add_att(&hdr_arr_var, "long_name",
                         "array of observation station header values");
-   hdr_arr_var->add_att("_fill_value", fill_value);
-   hdr_arr_var->add_att("columns", "lat lon elv");
-   hdr_arr_var->add_att("lat_long_name", "latitude");
-   hdr_arr_var->add_att("lat_units", "degrees_north");
-   hdr_arr_var->add_att("lon_long_name", "longitude");
-   hdr_arr_var->add_att("lon_units", "degrees_east");
-   hdr_arr_var->add_att("elv_long_name", "elevation");
-   hdr_arr_var->add_att("elv_units", "meters above sea level (msl)");
+   add_att(&hdr_arr_var, "_fill_value", fill_value);
+   add_att(&hdr_arr_var, "columns", "lat lon elv");
+   add_att(&hdr_arr_var, "lat_long_name", "latitude");
+   add_att(&hdr_arr_var, "lat_units", "degrees_north");
+   add_att(&hdr_arr_var, "lon_long_name", "longitude");
+   add_att(&hdr_arr_var, "lon_units", "degrees_east");
+   add_att(&hdr_arr_var, "elv_long_name", "elevation");
+   add_att(&hdr_arr_var, "elv_units", "meters above sea level (msl)");
 
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { hdr_typ_sa.n_elements(), strl_len } ;
+   
    // Loop through and write out the header data
+ 
    for(i=0; i<hdr_typ_sa.n_elements(); i++) {
 
       // PrepBufr Message type
-      if(!hdr_typ_var->set_cur(i, (long) 0) ||
-         !hdr_typ_var->put(hdr_typ_sa[i], (long) 1,
-                           (long) strlen(hdr_typ_sa[i]))) {
-         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-              << "error writing the prepbufr message type string to "
-              << "the netCDF file\n\n";
-         exit(1);
-      }
+      strncpy(hdr_typ_buf[i], hdr_typ_sa[i], strlen(hdr_typ_sa[i]));
+      hdr_typ_buf[hdr_data_idx][strlen(hdr_typ_sa[i])] = bad_data_char;
 
       // Station ID
-      if(!hdr_sid_var->set_cur(i, (long) 0) ||
-         !hdr_sid_var->put(hdr_sid_sa[i], (long) 1,
-                           (long) strlen(hdr_sid_sa[i]))) {
-         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-              << "error writing the station id string to the "
-              << "netCDF file\n\n";
-         exit(1);
-      }
+      strncpy(hdr_sid_buf[i], hdr_sid_sa[i], strlen(hdr_sid_sa[i]));
+      hdr_sid_buf[hdr_data_idx][strlen(hdr_sid_sa[i])] = bad_data_char;
 
       // Valid Time
-      if(!hdr_vld_var->set_cur(i, (long) 0) ||
-         !hdr_vld_var->put(hdr_vld_sa[i], (long) 1,
-                           (long) strlen(hdr_vld_sa[i]))) {
-         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-              << "error writing the valid time to the "
-              << "netCDF file\n\n";
-         exit(1);
-      }
+      strncpy(hdr_vld_buf[i], hdr_vld_sa[i], strlen(hdr_vld_sa[i]));
+      hdr_vld_buf[hdr_data_idx][strlen(hdr_vld_sa[i])] = bad_data_char;
 
       // Write the header array which consists of the following:
       //    LAT LON ELV
@@ -1100,16 +1158,48 @@ void write_netcdf_hdr_data() {
       hdr_arr[1] = (float) hdr_arr_lon_na[i];
       hdr_arr[2] = (float) hdr_arr_elv_na[i];
 
-      if(!hdr_arr_var->set_cur(i, (long) 0) ||
-         !hdr_arr_var->put(hdr_arr, (long) 1,
-                           (long) hdr_arr_len)) {
-         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-              << "error writing the header array to the "
-              << "netCDF file\n\n";
-         exit(1);
+      for (int idx=0; idx<hdr_arr_len; idx++) {
+         hdr_arr_buf[i][idx] = hdr_arr[idx];
       }
+     
    } // end for i
 
+   
+   lengths[1] = strl_len;
+   if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
+      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+           << "error writing the prepbufr message type string to "
+           << "the netCDF file\n\n";
+      exit(1);
+   }
+
+   // Station ID
+   if(!put_nc_data(&hdr_sid_var, (char *)hdr_sid_buf[0], lengths, offsets)) {
+      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+           << "error writing the station id string to the "
+           << "netCDF file\n\n";
+      exit(1);
+   }
+
+   // Valid Time
+   if(!put_nc_data(&hdr_vld_var, (char *)hdr_vld_buf[0], lengths, offsets)) {
+      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+           << "error writing the valid time to the "
+           << "netCDF file\n\n";
+      exit(1);
+   }
+
+   // Write the header array which consists of the following:
+   //    LAT LON ELV
+
+   lengths[1] = hdr_arr_len;
+   if(!put_nc_data(&hdr_arr_var, (float *)hdr_arr_buf[0], lengths, offsets)) {
+      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+           << "error writing the header array to the "
+           << "netCDF file\n\n";
+      exit(1);
+   }
+   
    return;
 }
 
@@ -1118,7 +1208,7 @@ void write_netcdf_hdr_data() {
 void clean_up() {
 
    if(f_out) {
-      f_out->close();
+      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
    }

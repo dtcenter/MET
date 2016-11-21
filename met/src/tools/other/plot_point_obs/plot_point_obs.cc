@@ -42,7 +42,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
 
 #include "nc_utils.h"
 #include "vx_log.h"
@@ -107,10 +107,6 @@ int main(int argc, char *argv[]) {
    CommandLine cline;
    ConcatString nc_file, ps_file;
    ConcatString met_data_dir;
-   char hdr_typ_str[max_str_len];
-   char hdr_sid_str[max_str_len];
-   char hdr_vld_str[max_str_len];
-   float *hdr_arr = (float *) 0, *obs_arr = (float *) 0;
    int i, h, v, plot_count, skip_count;
    PSfile plot;
    Box page, view, map_box;
@@ -207,17 +203,28 @@ int main(int argc, char *argv[]) {
    //
    NcFile *f_in       = (NcFile *) 0;
 
-   NcDim *hdr_arr_dim = (NcDim *) 0;
-   NcDim *obs_arr_dim = (NcDim *) 0;
-   NcDim *nhdr_dim    = (NcDim *) 0;
-   NcDim *nobs_dim    = (NcDim *) 0;
-   NcDim *strl_dim    = (NcDim *) 0;
+   //NcDim *hdr_arr_dim = (NcDim *) 0;
+   //NcDim *obs_arr_dim = (NcDim *) 0;
+   //NcDim *nhdr_dim    = (NcDim *) 0;
+   //NcDim *nobs_dim    = (NcDim *) 0;
+   //NcDim *strl_dim    = (NcDim *) 0;
 
-   NcVar *hdr_arr_var = (NcVar *) 0;
-   NcVar *hdr_typ_var = (NcVar *) 0;
-   NcVar *hdr_sid_var = (NcVar *) 0;
-   NcVar *hdr_vld_var = (NcVar *) 0;
-   NcVar *obs_arr_var = (NcVar *) 0;
+   NcDim hdr_arr_dim ;
+   NcDim obs_arr_dim ;
+   NcDim nhdr_dim    ;
+   NcDim nobs_dim    ;
+   NcDim strl_dim    ;
+
+   //NcVar *hdr_arr_var = (NcVar *) 0;
+   //NcVar *hdr_typ_var = (NcVar *) 0;
+   //NcVar *hdr_sid_var = (NcVar *) 0;
+   //NcVar *hdr_vld_var = (NcVar *) 0;
+   //NcVar *obs_arr_var = (NcVar *) 0;
+   NcVar hdr_arr_var ;
+   NcVar hdr_typ_var ;
+   NcVar hdr_sid_var ;
+   NcVar hdr_vld_var ;
+   NcVar obs_arr_var ;
 
    //
    // Open the netCDF point observation file
@@ -226,10 +233,10 @@ int main(int argc, char *argv[]) {
 
    f_in = open_ncfile(nc_file);
 
-   if(!f_in || !f_in->is_valid()) {
+   if(!f_in || IS_INVALID_NC_P(f_in)) {
       mlog << Error << "\nmain() -> trouble opening netCDF file "
            << nc_file << "\n\n";
-      f_in->close();
+      //f_in->close();
       delete f_in;
       f_in = (NcFile *) 0;
 
@@ -239,43 +246,41 @@ int main(int argc, char *argv[]) {
    //
    // Retrieve the dimensions and variable from the netCDF file
    //
-   hdr_arr_dim = f_in->get_dim("hdr_arr_len");
-   obs_arr_dim = f_in->get_dim("obs_arr_len");
+   hdr_arr_dim = get_nc_dim(f_in, "hdr_arr_len");
+   obs_arr_dim = get_nc_dim(f_in, "obs_arr_len");
 
-   nhdr_dim = f_in->get_dim("nhdr");
-   nobs_dim = f_in->get_dim("nobs");
+   nhdr_dim = get_nc_dim(f_in, "nhdr");
+   nobs_dim = get_nc_dim(f_in, "nobs");
 
-   strl_dim = f_in->get_dim("mxstr");
+   strl_dim = get_nc_dim(f_in, "mxstr");
 
-   hdr_arr_var = f_in->get_var("hdr_arr");
-   hdr_typ_var = f_in->get_var("hdr_typ");
-   hdr_sid_var = f_in->get_var("hdr_sid");
-   hdr_vld_var = f_in->get_var("hdr_vld");
-   obs_arr_var = f_in->get_var("obs_arr");
+   hdr_arr_var = get_nc_var(f_in, "hdr_arr");
+   hdr_typ_var = get_nc_var(f_in, "hdr_typ");
+   hdr_sid_var = get_nc_var(f_in, "hdr_sid");
+   hdr_vld_var = get_nc_var(f_in, "hdr_vld");
+   obs_arr_var = get_nc_var(f_in, "obs_arr");
 
-   if(!hdr_arr_dim || !hdr_arr_dim->is_valid() ||
-      !obs_arr_dim || !obs_arr_dim->is_valid() ||
-      !nhdr_dim    || !nhdr_dim->is_valid()    ||
-      !nobs_dim    || !nobs_dim->is_valid()    ||
-      !strl_dim    || !strl_dim->is_valid()    ||
-      !hdr_arr_var || !hdr_arr_var->is_valid() ||
-      !hdr_typ_var || !hdr_typ_var->is_valid() ||
-      !hdr_sid_var || !hdr_sid_var->is_valid() ||
-      !hdr_vld_var || !hdr_vld_var->is_valid() ||
-      !obs_arr_var || !obs_arr_var->is_valid()) {
+   if(IS_INVALID_NC(hdr_arr_dim) ||
+      IS_INVALID_NC(obs_arr_dim) ||
+      IS_INVALID_NC(nhdr_dim)    ||
+      IS_INVALID_NC(nobs_dim)    ||
+      IS_INVALID_NC(strl_dim)    ||
+      IS_INVALID_NC(hdr_arr_var) ||
+      IS_INVALID_NC(hdr_typ_var) ||
+      IS_INVALID_NC(hdr_sid_var) ||
+      IS_INVALID_NC(hdr_vld_var) ||
+      IS_INVALID_NC(obs_arr_var)) {
       mlog << Error << "\nmain() -> "
            << "trouble reading netCDF file " << nc_file << "\n\n";
       exit(1);
    }
 
-   //
-   // Allocate space to store the data
-   //
-   hdr_arr = new float[hdr_arr_dim->size()];
-   obs_arr = new float[obs_arr_dim->size()];
+   long nhdr_count = get_dim_size(&nhdr_dim);
+   long nobs_count = get_dim_size(&nobs_dim);
+   long strl_count = get_dim_size(&strl_dim);
 
-   mlog << Debug(2) << "Processing " << nobs_dim->size() << " observations at "
-        << nhdr_dim->size() << " locations.\n";
+   mlog << Debug(2) << "Processing " << (nobs_count) << " observations at "
+        << nhdr_count << " locations.\n";
 
    mlog << Debug(2) << "Observation GRIB codes: ";
    if(ivar.n_elements() == 0) mlog << "ALL\n";
@@ -359,121 +364,188 @@ int main(int argc, char *argv[]) {
    plot.lineto(map_box.x_ll(), map_box.y_ur());
    plot.clip();
 
+   int hdr_arr_len = get_dim_size(&hdr_arr_dim);
+   int obs_arr_len = get_dim_size(&obs_arr_dim);
+
+   int buf_size = ((nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count));
+   int hdr_buf_size = nhdr_count;
+   
+   //
+   // Allocate space to store the data
+   //
+   char hdr_typ_str[strl_count];
+   char hdr_sid_str[strl_count];
+   char hdr_vld_str[strl_count];
+   float *hdr_arr = (float *) 0, *obs_arr = (float *) 0;
+   
+   char hdr_typ_str_full[hdr_buf_size][strl_count];
+   char hdr_sid_str_full[hdr_buf_size][strl_count];
+   char hdr_vld_str_full[hdr_buf_size][strl_count];
+   //float **hdr_arr_full = (float **) 0, **obs_arr_block = (float **) 0;
+
+   hdr_arr = new float[hdr_arr_len];
+   obs_arr = new float[obs_arr_len];
+   float hdr_arr_full[hdr_buf_size][hdr_arr_len];
+   float obs_arr_block[    buf_size][obs_arr_len];
+
    //
    // Loop through the observations looking for the correct observation
    // variable type.
    //
    plot.setrgbcolor(1.0, 0.0, 0.0);
    plot_count = skip_count = 0;
-   for(i=0; i<nobs_dim->size(); i++) {
 
-      if(!obs_arr_var->set_cur(i, 0) ||
-         !obs_arr_var->get(obs_arr, 1, obs_arr_dim->size())) {
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { 1, 1 };
+   
+   lengths[0] = hdr_buf_size;
+   lengths[1] = strl_count;
+   
+   //
+   // Get the corresponding header message type
+   //
+   if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_typ\n\n";
+      exit(1);
+   }
+
+   //
+   // Get the corresponding header station id
+   //
+   if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_sid\n\n";
+      exit(1);
+   }
+
+   //
+   // Get the corresponding header valid time
+   //
+   if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_vld\n\n";
+      exit(1);
+   }
+
+   //
+   // Get the header for this observation
+   //
+   lengths[1] = hdr_arr_len;
+   if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_arr\n\n";
+      exit(1);
+   }
+   
+   for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
+      buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
+      
+      offsets[0] = i_start;
+      lengths[0] = buf_size;
+      lengths[1] = obs_arr_len;
+
+      // Read the current observation message
+      if(!get_nc_data(&obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
          mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }
-      if(obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10) break;
+      
+      for(int i_offset=0; i_offset<buf_size; i_offset++) {
+         int str_length;
+         i = i_start + i_offset;
 
-      //
-      // Get the header index and variable type for this observation.
-      //
-      h = nint(obs_arr[0]);
-      v = nint(obs_arr[1]);
-
-      //
-      // Check if we want to plot this variable type.
-      //
-      if(ivar.n_elements() > 0 && !ivar.has(v)) continue;
-
-      //
-      // Get the corresponding header message type
-      //
-      if(!hdr_typ_var->set_cur(h, 0) ||
-         !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\nmain() -> "
-              << "trouble getting hdr_typ\n\n";
-         exit(1);
-      }
-
-      //
-      // Get the corresponding header station id
-      //
-      if(!hdr_sid_var->set_cur(h, 0) ||
-         !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
-         mlog << Error << "\nmain() -> "
-              << "trouble getting hdr_sid\n\n";
-         exit(1);
-      }
-
-      //
-      // Get the corresponding header valid time
-      //
-      if(!hdr_vld_var->set_cur(h, 0) ||
-         !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
-         mlog << Error << "\nmain() -> "
-              << "trouble getting hdr_vld\n\n";
-         exit(1);
-      }
-
-      //
-      // Check if we want to plot this message type.
-      //
-      if(ityp.n_elements() > 0 && !ityp.has(hdr_typ_str)) continue;
-
-      //
-      // Only plot a circle if one hasn't been plotted for this
-      // location yet.
-      //
-      if(!ihdr.has(h)) {
-
-         //
-         // Get the header for this observation
-         //
-         hdr_arr_var->set_cur(h, 0);
-         hdr_arr_var->get(hdr_arr, 1, hdr_arr_dim->size());
-
-         if(hdr_arr[0] >= 1.0E10 && hdr_arr[1] >= 1.0E10) break;
-
-         lat = (double) hdr_arr[0];
-         lon = (double) (-1.0*hdr_arr[1]);
-
-         //
-         // Convert lat/lon to grid x/y
-         //
-         grid.latlon_to_xy(lat, lon, grid_x, grid_y);
-
-         //
-         // If the current point is off the grid, increment the skip count
-         //
-         if(grid_x < 0 || grid_x >= grid.nx() ||
-            grid_y < 0 || grid_y >= grid.ny()) {
-            skip_count++;
-            ihdr.add(h);
-            continue;
-         }
-
-         //
-         // Convert grid x/y to page x/y
-         //
-         gridxy_to_pagexy(grid, grid_bb, grid_x, grid_y, page_x, page_y, map_box);
-
-         //
-         // Draw a circle at this point and increment the plot count
-         //
-         plot.circle(page_x, page_y, dotsize, 0);
-         plot.fill();
-
-         //
-         // Dump out the location being plotted
-         //
-         mlog << Debug(3)
-              << "[" << plot_count + 1
-              << "] Plotting location [ type, sid, valid, lat, lon, elevation ] = [ "
-              << hdr_typ_str << ", " << hdr_sid_str << ", " << hdr_vld_str << ", "
-              << hdr_arr[0] << ", " << hdr_arr[1] << ", " << hdr_arr[2] << " ]\n";
+         for (int j=0; j < obs_arr_len; j++)
+            obs_arr[j] = obs_arr_block[i_offset][j];
          
-         ihdr.add(h);
-         plot_count++;
+         if(obs_arr[0] >= 1.0E10 && obs_arr[1] >= 1.0E10) break;
+         
+         //
+         // Get the header index and variable type for this observation.
+         //
+         h = nint(obs_arr[0]);
+         v = nint(obs_arr[1]);
+
+         for (int j=0; j < obs_arr_len; j++)
+            hdr_arr[j] = hdr_arr_full[h][j];
+        
+         str_length = strlen(hdr_typ_str_full[h]);
+         if (str_length > strl_count) str_length = strl_count;
+         strncpy(hdr_typ_str, hdr_typ_str_full[h], str_length);
+         hdr_typ_str[str_length] = bad_data_char;
+
+         str_length = strlen(hdr_sid_str_full[h]);
+         if (str_length > strl_count) str_length = strl_count;
+         strncpy(hdr_sid_str, hdr_sid_str_full[h], str_length);
+         hdr_sid_str[str_length] = bad_data_char;
+
+         str_length = strlen(hdr_vld_str_full[h]);
+         if (str_length > strl_count) str_length = strl_count;
+         strncpy(hdr_vld_str, hdr_vld_str_full[h], str_length);
+         hdr_vld_str[str_length] = bad_data_char;
+
+         //
+         // Check if we want to plot this variable type.
+         //
+         if(ivar.n_elements() > 0 && !ivar.has(v)) continue;
+         
+         //
+         // Check if we want to plot this message type.
+         //
+         if(ityp.n_elements() > 0 && !ityp.has(hdr_typ_str)) continue;
+         
+         //
+         // Only plot a circle if one hasn't been plotted for this
+         // location yet.
+         //
+         if(!ihdr.has(h)) {
+         
+            //
+            // Get the header for this observation
+            //
+            if(hdr_arr[0] >= 1.0E10 && hdr_arr[1] >= 1.0E10) break;
+         
+            lat = (double) hdr_arr[0];
+            lon = (double) (-1.0*hdr_arr[1]);
+         
+            //
+            // Convert lat/lon to grid x/y
+            //
+            grid.latlon_to_xy(lat, lon, grid_x, grid_y);
+         
+            //
+            // If the current point is off the grid, increment the skip count
+            //
+            if(grid_x < 0 || grid_x >= grid.nx() ||
+               grid_y < 0 || grid_y >= grid.ny()) {
+               skip_count++;
+               ihdr.add(h);
+               continue;
+            }
+         
+            //
+            // Convert grid x/y to page x/y
+            //
+            gridxy_to_pagexy(grid, grid_bb, grid_x, grid_y, page_x, page_y, map_box);
+         
+            //
+            // Draw a circle at this point and increment the plot count
+            //
+            plot.circle(page_x, page_y, dotsize, 0);
+            plot.fill();
+         
+            //
+            // Dump out the location being plotted
+            //
+            mlog << Debug(3)
+                 << "[" << plot_count + 1
+                 << "] Plotting location [ type, sid, valid, lat, lon, elevation ] = [ "
+                 << hdr_typ_str << ", " << hdr_sid_str << ", " << hdr_vld_str << ", "
+                 << hdr_arr[0] << ", " << hdr_arr[1] << ", " << hdr_arr[2] << " ]\n";
+            
+            ihdr.add(h);
+            plot_count++;
+         }
       }
    } // end for i
    plot.grestore();
@@ -491,7 +563,10 @@ int main(int argc, char *argv[]) {
    //
    // Deallocate memory and clean up
    //
-   if(f_in)    { f_in->close(); delete f_in; f_in = (NcFile *) 0; }
+   if(f_in)    {
+      //f_in->close();
+      delete f_in; f_in = (NcFile *) 0; 
+   }
    if(hdr_arr) { delete hdr_arr; hdr_arr = (float *) 0; }
    if(obs_arr) { delete obs_arr; obs_arr = (float *) 0; }
 

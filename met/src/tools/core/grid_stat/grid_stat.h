@@ -41,7 +41,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "grid_stat_conf_info.h"
 
@@ -122,8 +124,10 @@ static ConcatString out_dir;
 // Output NetCDF file
 static ConcatString out_nc_file;
 static NcFile      *nc_out  = (NcFile *) 0;
-static NcDim       *lat_dim = (NcDim *)  0;
-static NcDim       *lon_dim = (NcDim *)  0;
+//static NcDim       *lat_dim = (NcDim *)  0;
+//static NcDim       *lon_dim = (NcDim *)  0;
+static NcDim       lat_dim ;
+static NcDim       lon_dim ;
 
 // List of output NetCDF variable names
 static StringArray fcst_var_sa;

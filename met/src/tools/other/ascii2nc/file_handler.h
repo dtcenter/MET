@@ -22,7 +22,9 @@
 #include <time.h>
 #include <vector>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "mask_poly.h"
 #include "vx_grid.h"
@@ -33,6 +35,12 @@
 #include "summary_calc.h"
 #include "summary_key.h"
 #include "time_summary_interval.h"
+
+#define _HDR_ARRAY_LEN   3   // Observation header length
+#define _OBS_ARRAY_LEN   5   // Observation values length
+#define _MAX_STRING_LEN  40  // Maximum length for strings
+
+#define OBS_BUFFER_SIZE  (128 * 1024)
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -80,12 +88,12 @@ protected:
   // Variables for writing output NetCDF file
 
   NcFile *_ncFile;
-  NcVar  *_hdrTypeVar;
-  NcVar  *_hdrStationIdVar;
-  NcVar  *_hdrValidTimeVar;
-  NcVar  *_hdrArrayVar;
-  NcVar  *_obsQualityVar;
-  NcVar  *_obsArrayVar;
+  NcVar  _hdrTypeVar;
+  NcVar  _hdrStationIdVar;
+  NcVar  _hdrValidTimeVar;
+  NcVar  _hdrArrayVar;
+  NcVar  _obsQualityVar;
+  NcVar  _obsArrayVar;
 
   long _nhdr;
 
@@ -107,6 +115,21 @@ protected:
 
   vector< Observation > _observations;
   
+  int   obs_buf_size;
+  int   hdr_buf_size;
+  int   processed_count;
+  int   obs_data_idx;
+  int   obs_data_offset;
+  int   hdr_data_idx;
+  int   hdr_data_offset;
+  
+  char   hdr_typ_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
+  char   hdr_sid_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
+  char   hdr_vld_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
+  float  hdr_arr_buf[OBS_BUFFER_SIZE][_HDR_ARRAY_LEN];
+  float obs_data_buf[OBS_BUFFER_SIZE][_OBS_ARRAY_LEN];
+  char  qty_data_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
+
 
   ///////////////////////
   // Protected methods //

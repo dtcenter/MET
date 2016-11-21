@@ -42,6 +42,7 @@ plot_mode_field_LDADD = -lvx_cgraph \
         -lvx_cal \
         -lvx_log \
         -lvx_math \
+        -lnetcdf_c++4 \
         -lnetcdf_c++ \
         -lnetcdf \
         -lcairo \

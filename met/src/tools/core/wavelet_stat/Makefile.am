@@ -41,6 +41,7 @@ wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = wavelet_stat.h \

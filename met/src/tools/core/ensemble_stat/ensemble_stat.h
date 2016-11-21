@@ -42,7 +42,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "ensemble_stat_conf_info.h"
 
@@ -138,8 +140,10 @@ static ConcatString out_dir;
 // Output NetCDF file
 static StringArray  out_nc_file_list;
 static NcFile      *nc_out  = (NcFile *) 0;
-static NcDim       *lat_dim = (NcDim *)  0;
-static NcDim       *lon_dim = (NcDim *)  0;
+//static NcDim       *lat_dim = (NcDim *)  0;
+//static NcDim       *lon_dim = (NcDim *)  0;
+static NcDim       lat_dim;
+static NcDim       lon_dim;
 
 // Output STAT file
 static ConcatString stat_file;

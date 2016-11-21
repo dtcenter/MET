@@ -22,7 +22,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-#include <netcdf.hh>
+//#include <netcdf.hh>
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_log.h"
 #include "vx_math.h"
@@ -75,7 +77,7 @@ bool get_pinterp_grid(const char * pinterp_filename, Grid & grid)
 {
 
 bool status = false;
-NcFile nc(pinterp_filename);
+NcFile nc(pinterp_filename, NcFile::read);
 
 
 status = get_pinterp_grid(nc, grid);

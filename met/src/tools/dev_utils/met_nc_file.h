@@ -23,7 +23,9 @@
 #include <string>
 #include <vector>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_time_series.h"
 
@@ -61,11 +63,23 @@ protected:
   NcDim *_nobsDim;
   NcDim *_strlDim;
 
+  NcDim hdrArrDim;
+  NcDim obsArrDim;
+  NcDim nhdrDim;
+  NcDim nobsDim;
+  NcDim strlDim;
+
   NcVar *_hdrArrVar;
   NcVar *_hdrTypeVar;
   NcVar *_hdrSidVar;
   NcVar *_hdrVldVar;
   NcVar *_obsArrVar;
+  
+  NcVar hdrArrVar;
+  NcVar hdrTypeVar;
+  NcVar hdrSidVar;
+  NcVar hdrVldVar;
+  NcVar obsArrVar;
   
   ///////////////////////
   // Protected methods //

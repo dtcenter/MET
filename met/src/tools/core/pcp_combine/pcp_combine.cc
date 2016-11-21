@@ -97,7 +97,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
@@ -1075,18 +1077,21 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    ConcatString command_str;
 
    NcFile *f_out   = (NcFile *) 0;
-   NcDim  *lat_dim = (NcDim *)  0;
-   NcDim  *lon_dim = (NcDim *)  0;
-   NcVar  *pcp_var = (NcVar *)  0;
+   //NcDim  *lat_dim = (NcDim *)  0;
+   //NcDim  *lon_dim = (NcDim *)  0;
+   //NcVar  *pcp_var = (NcVar *)  0;
+   NcDim  lat_dim ;
+   NcDim  lon_dim ;
+   NcVar  pcp_var ;
 
    // Create a new NetCDF file and open it.
-   f_out = open_ncfile(out_filename, NcFile::Replace);
+   f_out = open_ncfile(out_filename, NcFile::replace);
 
-   if(!f_out->is_valid()) {
+   if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      f_out->close();
+      //f_out->close();
       delete f_out;  f_out = (NcFile *) 0;
 
       exit(1);
@@ -1121,7 +1126,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    }
 
-   f_out->add_att("RunCommand", (const char *) command_str);
+   add_att(f_out, "RunCommand", (const char *) command_str);
 
    //
    // Add the projection information
@@ -1129,11 +1134,11 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    write_netcdf_proj(f_out, grid);
 
    // Define Dimensions
-   lat_dim = f_out->add_dim("lat", (long) grid.ny());
-   lon_dim = f_out->add_dim("lon", (long) grid.nx());
+   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
+   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
 
    // If the -varname command line option was used or the accumulation
    // interval is zero, just use the field_name
@@ -1162,11 +1167,11 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    }
 
    // Define Variable
-   pcp_var = f_out->add_var((const char *) var_str, ncFloat, lat_dim, lon_dim);
+   pcp_var = add_var(f_out, (const char *) var_str, ncFloat, lat_dim, lon_dim);
 
    // Add variable attributes
-   pcp_var->add_att("name",  (const char *) var_str);
-   pcp_var->add_att("long_name", var_info->long_name());
+   add_att(&pcp_var, "name",  (const char *) var_str);
+   add_att(&pcp_var, "long_name", (const char *)var_info->long_name());
 
    // Ouput level string
    if(nc_accum%sec_per_hour == 0) {
@@ -1175,9 +1180,9 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
       var_str << cs_erase << 'A' << sec_to_hhmmss(nc_accum);
    }
 
-   pcp_var->add_att("level", (const char *) var_str);
-   pcp_var->add_att("units",      var_info->units());
-   pcp_var->add_att("_FillValue", bad_data_float);
+   add_att(&pcp_var, "level", (const char *) var_str);
+   add_att(&pcp_var, "units", (const char *)var_info->units());
+   add_att(&pcp_var, "_FillValue", bad_data_float);
 
    //
    // Add initialization, valid, and accumulation time info as attributes to
@@ -1188,19 +1193,19 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    //
    // Write out the times
    //
-   write_netcdf_var_times(pcp_var, nc_init, nc_valid, nc_accum);
+   write_netcdf_var_times(&pcp_var, nc_init, nc_valid, nc_accum);
 
    //
    // Write the precip data
    //
-   if(!pcp_var->put(plane.data(), plane.ny(), plane.nx())) {
+   if(!put_nc_data_with_dims(&pcp_var, plane.data(), plane.ny(), plane.nx())) {
 
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with pcp_var->put()\n\n";
       exit(1);
    }
 
-   f_out->close();
+   //f_out->close();
    delete f_out;
    f_out = (NcFile *) 0;
 

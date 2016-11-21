@@ -555,9 +555,9 @@ bool MtdFloatFile::read(const char * _filename)
 
 {
 
-NcFile f(_filename);
+NcFile f(_filename, NcFile::read);
 
-if ( ! f.is_valid() )  return ( false );
+if ( IS_INVALID_NC(f) )  return ( false );
 
 Filename = _filename;
 
@@ -575,7 +575,8 @@ void MtdFloatFile::read(NcFile & f)
 
 {
 
-NcVar * var = 0;
+//NcVar * var = 0;
+NcVar var;
 
 
 
@@ -594,19 +595,31 @@ DataMax = string_att_as_double (f, max_value_att_name);
 
 set_size(Nx, Ny, Nt);
 
-var = f.get_var(data_field_name);
+var = get_nc_var(&f, data_field_name);
 
-if ( !(var->set_cur(0, 0, 0)) )  {
+//if ( !(var->set_cur(0, 0, 0)) )  {
+//
+//   mlog << Error << "\n\n  MtdFloatFile::read() -> trouble setting corner\n\n";
+//
+//   exit ( 1 );
+//
+//}
+//
+//// const time_t t_start = time(0);   //  for timing the data read operation
+//
+//if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
+//
+//   mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
+//
+//   exit ( 1 );
+//
+//}
 
-   mlog << Error << "\n\n  MtdFloatFile::read() -> trouble setting corner\n\n";
+long offsets[3] = {0,0,0};
+long lengths[3] = {Nt, Ny, Nx};
 
-   exit ( 1 );
-
-}
-
-// const time_t t_start = time(0);   //  for timing the data read operation
-
-if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
+//if ( ! get_nc_data(&var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
+if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
 
    mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
 
@@ -634,10 +647,14 @@ void MtdFloatFile::write(NcFile & f) const
 
 {
 
-NcDim * nx_dim   = 0;
-NcDim * ny_dim   = 0;
-NcDim * nt_dim   = 0;
-NcVar * data_var = 0;
+//NcDim * nx_dim   = 0;
+//NcDim * ny_dim   = 0;
+//NcDim * nt_dim   = 0;
+NcDim nx_dim;
+NcDim ny_dim;
+NcDim nt_dim;
+//NcVar * data_var = 0;
+NcVar data_var ;
 const char format [] = "%.3f";
 char junk[256];
 
@@ -652,53 +669,64 @@ MtdFileBase::write(f);
    //  get the dimensions of the data field
    //
 
-nx_dim = f.get_dim(nx_dim_name);
-ny_dim = f.get_dim(ny_dim_name);
-nt_dim = f.get_dim(nt_dim_name);
+nx_dim = get_nc_dim(&f, nx_dim_name);
+ny_dim = get_nc_dim(&f, ny_dim_name);
+nt_dim = get_nc_dim(&f, nt_dim_name);
 
 
    //  DataMin, DataMax
 
 sprintf(junk, format, DataMin);
 
-f.add_att(min_value_att_name, junk);
+add_att(&f, min_value_att_name, junk);
 
 sprintf(junk, format, DataMax);
 
-f.add_att(max_value_att_name, junk);
+add_att(&f, max_value_att_name, junk);
 
    //  Radius
 
 if ( Radius >= 0 )  {
 
-   f.add_att(radius_att_name, Radius);
+   add_att(&f, radius_att_name, Radius);
 
 }
 
    //  Data
 
-f.add_var(data_field_name, ncFloat, nt_dim, ny_dim, nx_dim);
+add_var(&f, data_field_name, ncFloat, nt_dim, ny_dim, nx_dim);
 
-data_var = f.get_var(data_field_name);
+data_var = get_nc_var(&f, data_field_name);
 
-if ( !(data_var->set_cur(0, 0, 0)) )  {
+//if ( !(data_var->set_cur(0, 0, 0)) )  {
+//
+//   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble setting corner on data field\n\n";
+//
+//   exit ( 1 );
+//
+//}
+//
+//// const time_t t_start = time(0);   //  for timing the data write operation
+//
+//if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
+//
+//   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble with put in data field\n\n";
+//
+//   exit ( 1 );
+//
+//}
 
-   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble setting corner on data field\n\n";
+long offsets[3] = {0,0,0};
+long lengths[3] = {Nt, Ny, Nx};
+
+//if ( ! get_nc_data(&data_var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
+if ( ! get_nc_data(&data_var, Data, lengths, offsets) )  {
+
+   mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
 
    exit ( 1 );
 
 }
-
-// const time_t t_start = time(0);   //  for timing the data write operation
-
-if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
-
-   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble with put in data field\n\n";
-
-   exit ( 1 );
-
-}
-
 
 // const time_t t_stop = time(0);   //  for timing the data write operation
 
@@ -720,9 +748,9 @@ void MtdFloatFile::write(const char * _filename) const
 
 {
 
-NcFile f(_filename, NcFile::Replace);
+NcFile f(_filename, NcFile::replace);
 
-if ( ! f.is_valid() )  {
+if ( IS_INVALID_NC(f) )  {
 
    mlog << Error << "\n\n  MtdFloatFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
 

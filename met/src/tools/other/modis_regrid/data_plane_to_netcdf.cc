@@ -28,7 +28,6 @@ using namespace std;
 #include "nc_utils.h"
 #include "write_netcdf.h"       // write_netcdf functions
 #include "var_info_factory.h"   // VarInfoFactory
-#include "netcdf.hh"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,20 +68,23 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
 {
   // Initialization
   NcFile *f_out   = (NcFile *) 0;
-  NcDim  *lat_dim = (NcDim *)  0;
-  NcDim  *lon_dim = (NcDim *)  0;
-  NcVar  *f_var = (NcVar *)  0;
+  //NcDim  *lat_dim = (NcDim *)  0;
+  //NcDim  *lon_dim = (NcDim *)  0;
+  //NcVar  *f_var = (NcVar *)  0;
+  NcDim  lat_dim  ;
+  NcDim  lon_dim  ;
+  NcVar  f_var    ;
   
   
   // Create a new NetCDF file and open it
-  f_out = open_ncfile(out_filename, NcFile::Replace);
+  f_out = open_ncfile(out_filename, NcFile::replace);
   
-  if(!f_out->is_valid()) 
+  if(IS_INVALID_NC_P(f_out)) 
   {
     mlog << Error << "\nwrite_netcdf() -> "
 	 << "trouble opening output file " << out_filename
 	 << "\n\n";
-    f_out->close();
+    //f_out->close();
     delete f_out;  f_out = (NcFile *) 0;
     
     exit(1);
@@ -96,26 +98,26 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   write_netcdf_proj(f_out, grid);
   
   // Define Dimensions
-  lat_dim = f_out->add_dim("lat", (long) grid.ny());
-  lon_dim = f_out->add_dim("lon", (long) grid.nx());
+  lat_dim = add_dim(f_out, "lat", (long) grid.ny());
+  lon_dim = add_dim(f_out, "lon", (long) grid.nx());
   
   // Add the lat/lon variables
-  write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
+  write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
   
   // Define variable
-  f_var = f_out->add_var(var_info.name(), ncFloat, lat_dim, lon_dim);
+  f_var = add_var(f_out, (string)var_info.name(), ncFloat, lat_dim, lon_dim);
   
   // Add variable attributes
-  f_var->add_att("name", var_info.name());
-  f_var->add_att("units", var_info.units());
-  f_var->add_att("long_name", var_info.long_name());
-  f_var->add_att("_FillValue", bad_data_float);
+  add_att(&f_var, "name", (string)var_info.name());
+  add_att(&f_var, "units", (string)var_info.units());
+  add_att(&f_var, "long_name", (string)var_info.long_name());
+  add_att(&f_var, "_FillValue", bad_data_float);
   
   // Write out the times
-  write_netcdf_var_times(f_var, plane);
+  write_netcdf_var_times(&f_var, plane);
   
   // Write the data
-  if (!f_var->put(plane.data(), plane.ny(), plane.nx())) 
+  if (!put_nc_data_with_dims(&f_var, plane.data(), plane.ny(), plane.nx())) 
   {
     mlog << Error << "\nwrite_netcdf() -> "
 	 << "error with f_var->put()\n\n";
@@ -123,7 +125,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   }
   
   // Close and clean up
-  f_out->close();
+  //f_out->close();
   delete f_out;
   f_out = (NcFile *) 0;
   

@@ -54,6 +54,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
 
 wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
@@ -97,6 +98,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
 
 # If we are in development mode, generate the "to_string" files and

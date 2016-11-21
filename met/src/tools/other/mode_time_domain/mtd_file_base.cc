@@ -355,20 +355,21 @@ void MtdFileBase::read(NcFile & f)
 
 {
 
-NcDim * dim = 0;
+//NcDim * dim = 0;
+NcDim dim;
 
    //  Nx, Ny, Nt
 
-dim = f.get_dim(nx_dim_name);
-Nx  = dim->size();
+dim = get_nc_dim(&f, nx_dim_name);
+Nx  = GET_NC_SIZE(dim);
 
-dim = f.get_dim(ny_dim_name);
-Ny  = dim->size();
+dim = get_nc_dim(&f, ny_dim_name);
+Ny  = GET_NC_SIZE(dim);
 
-dim = f.get_dim(nt_dim_name);
-Nt  = dim->size();
+dim = get_nc_dim(&f, nt_dim_name);
+Nt  = GET_NC_SIZE(dim);
 
-dim = 0;
+//dim = 0;
 
    //  Grid
 
@@ -420,9 +421,9 @@ ConcatString s;
 
    //  Nx, Ny, Nt
 
-f.add_dim(nx_dim_name, Nx);
-f.add_dim(ny_dim_name, Ny);
-f.add_dim(nt_dim_name, Nt);
+add_dim(&f, nx_dim_name, Nx);
+add_dim(&f, ny_dim_name, Ny);
+add_dim(&f, nt_dim_name, Nt);
 
    //  Grid
 
@@ -432,18 +433,18 @@ write_nc_grid(f, *G);
 
 s = start_time_string(StartTime);
 
-f.add_att(start_time_att_name, s.text());
+add_att(&f, start_time_att_name, s.text());
 
 
 sprintf(junk, "%d", DeltaT);
 
-f.add_att(delta_t_att_name, junk);
+add_att(&f, delta_t_att_name, junk);
 
    //  FileType
 
 s = mtdfiletype_to_string(FileType);
 
-f.add_att(filetype_att_name, s.text());
+add_att(&f, filetype_att_name, s.text());
 
 
 

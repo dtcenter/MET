@@ -111,7 +111,7 @@ static void write_orank_var_float(int, int, int, float *, DataPlane &,
 static void write_orank_var_int(int, int, int, int *, DataPlane &,
                                 const char *, const char *);
 
-static void add_var_att(VarInfo *, NcVar *, bool is_int, DataPlane &,
+static void add_var_att_local(VarInfo *, NcVar *, bool is_int, DataPlane &,
                         const char *, const char *);
 
 static void finish_txt_files();
@@ -682,7 +682,11 @@ void process_ensemble() {
    } // end for i
 
    // Close the output NetCDF file
-   if(nc_out) { nc_out->close(); delete nc_out; nc_out = (NcFile *) 0; }
+   if(nc_out) {
+      //nc_out->close();
+      delete nc_out;
+      nc_out = (NcFile *) 0;
+   }
 
    return;
 }
@@ -800,11 +804,6 @@ void process_point_climo() {
 
 void process_point_obs(int i_nc) {
    int i_obs, j;
-   float obs_arr[obs_arr_len], hdr_arr[hdr_arr_len];
-   char hdr_typ_str[max_str_len];
-   char hdr_sid_str[max_str_len];
-   char hdr_vld_str[max_str_len];
-   char obs_qty_str[max_str_len];
    unixtime hdr_ut;
    NcFile *obs_in = (NcFile *) 0;
 
@@ -815,8 +814,8 @@ void process_point_obs(int i_nc) {
    // Open the observation file as a NetCDF file.
    obs_in = open_ncfile(point_obs_file_list[i_nc]);
 
-   if(!obs_in->is_valid()) {
-      obs_in->close();
+   if(IS_INVALID_NC_P(obs_in)) {
+      //obs_in->close();
       delete obs_in;
       obs_in = (NcFile *) 0;
 
@@ -827,26 +826,35 @@ void process_point_obs(int i_nc) {
    }
 
    // Define dimensions
-   NcDim *strl_dim    = (NcDim *) 0; // Maximum string length
-   NcDim *obs_dim     = (NcDim *) 0; // Number of observations
-   NcDim *hdr_dim     = (NcDim *) 0; // Number of PrepBufr messages
+   //NcDim *strl_dim    = (NcDim *) 0; // Maximum string length
+   //NcDim *obs_dim     = (NcDim *) 0; // Number of observations
+   //NcDim *hdr_dim     = (NcDim *) 0; // Number of PrepBufr messages
+   NcDim strl_dim    ; // Maximum string length
+   NcDim obs_dim     ; // Number of observations
+   NcDim hdr_dim     ; // Number of PrepBufr messages
 
    // Define variables
-   NcVar *obs_arr_var = (NcVar *) 0;
-   NcVar *obs_qty_var = (NcVar *) 0;
-   NcVar *hdr_typ_var = (NcVar *) 0;
-   NcVar *hdr_sid_var = (NcVar *) 0;
-   NcVar *hdr_vld_var = (NcVar *) 0;
-   NcVar *hdr_arr_var = (NcVar *) 0;
+   //NcVar *obs_arr_var = (NcVar *) 0;
+   //NcVar *obs_qty_var = (NcVar *) 0;
+   //NcVar *hdr_typ_var = (NcVar *) 0;
+   //NcVar *hdr_sid_var = (NcVar *) 0;
+   //NcVar *hdr_vld_var = (NcVar *) 0;
+   //NcVar *hdr_arr_var = (NcVar *) 0;
+   NcVar obs_arr_var;
+   NcVar obs_qty_var;
+   NcVar hdr_typ_var;
+   NcVar hdr_sid_var;
+   NcVar hdr_vld_var;
+   NcVar hdr_arr_var;
 
    // Read the dimensions
-   strl_dim = obs_in->get_dim("mxstr");
-   obs_dim  = obs_in->get_dim("nobs");
-   hdr_dim  = obs_in->get_dim("nhdr");
+   strl_dim = get_nc_dim(obs_in, "mxstr");
+   obs_dim  = get_nc_dim(obs_in, "nobs");
+   hdr_dim  = get_nc_dim(obs_in, "nhdr");
 
-   if(!strl_dim || !strl_dim->is_valid() ||
-      !obs_dim  || !obs_dim->is_valid()  ||
-      !hdr_dim  || !hdr_dim->is_valid()) {
+   if(IS_INVALID_NC(strl_dim) ||
+      IS_INVALID_NC(obs_dim)  ||
+      IS_INVALID_NC(hdr_dim)) {
       mlog << Error << "\nprocess_point_obs() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
            << "dimensions from netCDF file: "
@@ -855,18 +863,18 @@ void process_point_obs(int i_nc) {
    }
 
    // Read the variables
-   obs_arr_var = obs_in->get_var("obs_arr");
-   hdr_typ_var = obs_in->get_var("hdr_typ");
-   hdr_sid_var = obs_in->get_var("hdr_sid");
-   hdr_vld_var = obs_in->get_var("hdr_vld");
-   hdr_arr_var = obs_in->get_var("hdr_arr");
-   obs_qty_var = has_var(obs_in, "obs_qty");
+   obs_arr_var = get_nc_var(obs_in, "obs_arr");
+   hdr_typ_var = get_nc_var(obs_in, "hdr_typ");
+   hdr_sid_var = get_nc_var(obs_in, "hdr_sid");
+   hdr_vld_var = get_nc_var(obs_in, "hdr_vld");
+   hdr_arr_var = get_nc_var(obs_in, "hdr_arr");
+   if (has_var(obs_in, "obs_qty")) obs_qty_var = get_nc_var(obs_in, "obs_qty");
 
-   if(!obs_arr_var || !obs_arr_var->is_valid() ||
-      !hdr_typ_var || !hdr_typ_var->is_valid() ||
-      !hdr_sid_var || !hdr_sid_var->is_valid() ||
-      !hdr_vld_var || !hdr_vld_var->is_valid() ||
-      !hdr_arr_var || !hdr_arr_var->is_valid()) {
+   if(IS_INVALID_NC(obs_arr_var) ||
+      IS_INVALID_NC(hdr_typ_var) ||
+      IS_INVALID_NC(hdr_sid_var) ||
+      IS_INVALID_NC(hdr_vld_var) ||
+      IS_INVALID_NC(hdr_arr_var)) {
       mlog << Error << "\nprocess_point_obs() -> "
            << "can't read \"obs_arr\", \"hdr_typ\", \"hdr_sid\", "
            << "\"hdr_vld\", or \"hdr_arr\" variables from netCDF file: "
@@ -874,82 +882,143 @@ void process_point_obs(int i_nc) {
       exit(1);
    }
 
-   if(!obs_qty_var || !obs_qty_var->is_valid())
+   if(IS_INVALID_NC(obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file.\n";
 
-   mlog << Debug(2) << "Searching " << obs_dim->size()
-        << " observations from " << hdr_dim->size()
+   int hdr_buf_size = GET_NC_SIZE(hdr_dim);
+   int obs_count = GET_NC_SIZE(obs_dim);
+   mlog << Debug(2) << "Searching " << (obs_count)
+        << " observations from " << (hdr_buf_size)
         << " header messages.\n";
 
-   // Process each observation in the file
-   for(i_obs=0; i_obs<obs_dim->size(); i_obs++) {
+   int mxstr_len = GET_NC_SIZE(strl_dim);
+   int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
+   long lengths[2] = { hdr_buf_size, mxstr_len };
+   long offsets[2] = { 0, 0 };
+   float obs_arr_block[buf_size][obs_arr_len];
+   char obs_qty_str_block[buf_size][mxstr_len];
+
+   float obs_arr[obs_arr_len], hdr_arr[hdr_arr_len];
+   char hdr_typ_str[max_str_len];
+   char hdr_sid_str[max_str_len];
+   char hdr_vld_str[max_str_len];
+   char obs_qty_str[max_str_len];
+   
+   float hdr_arr_full   [hdr_buf_size][hdr_arr_len];
+   char hdr_typ_str_full[hdr_buf_size][mxstr_len];
+   char hdr_sid_str_full[hdr_buf_size][mxstr_len];
+   char hdr_vld_str_full[hdr_buf_size][mxstr_len];
+   
+   
+   lengths[0] = hdr_buf_size;
+   lengths[1] = mxstr_len;
+
+   //
+   // Get the corresponding header message type
+   //
+   if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_typ\n\n";
+      exit(1);
+   }
+
+   //
+   // Get the corresponding header station id
+   //
+   if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_sid\n\n";
+      exit(1);
+   }
+
+   //
+   // Get the corresponding header valid time
+   //
+   if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_vld\n\n";
+      exit(1);
+   }
+
+   //
+   // Get the header for this observation
+   //
+   lengths[1] = hdr_arr_len;
+   if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
+      mlog << Error << "\nmain() -> "
+           << "trouble getting hdr_arr\n\n";
+      exit(1);
+   }
+   
+   for(int i_start=0; i_start<obs_count; i_start+=buf_size) {
+      buf_size = ((obs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count-i_start);
+      
+      offsets[0] = i_start;
+      lengths[0] = buf_size;
+      lengths[1] = obs_arr_len;
 
       // Read the current observation message
-      if(!obs_arr_var->set_cur((long) i_obs) ||
-         !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "can't read the record for observation "
-              << "number " << i_obs << "\n\n";
+      if(!get_nc_data(&obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }
 
-      // Read the corresponding header array for this observation
-      if(!hdr_arr_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_arr_var->get(hdr_arr, 1, hdr_arr_len)) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "can't read the header array record for header "
-              << "number " << obs_arr[0] << "\n\n";
+      lengths[1] = mxstr_len;
+      if(!get_nc_data(&obs_qty_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }
+      
+      // Process each observation in the file
+      for(int i_offset=0; i_offset<buf_size; i_offset++) {
+         int str_length;
+         i_obs = i_start + i_offset;
 
-      // Read the corresponding header type for this observation
-      if(!hdr_typ_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "can't read the message type record for header "
-              << "number " << obs_arr[0] << "\n\n";
-         exit(1);
-      }
+         // Copy the current observation message
+         for (int k=0; k < obs_arr_len; k++)
+            obs_arr[k] = obs_arr_block[i_offset][k];
 
-      // Read the corresponding header Station ID for this observation
-      if(!hdr_sid_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "can't read the station ID record for header "
-              << "number " << obs_arr[0] << "\n\n";
-         exit(1);
-      }
+         // Read the current observation quality flag
+         str_length = strlen(obs_qty_str_block[i_offset]);
+         if (str_length > mxstr_len) str_length = mxstr_len;
+         strncpy(obs_qty_str, obs_qty_str_block[i_offset], str_length);
+         obs_qty_str[str_length] = bad_data_char;
+         
+         int headerOffset  = i_obs;
+         // Read the corresponding header array for this observation
+         for (int k=0; k < obs_arr_len; k++)
+            hdr_arr[k] = hdr_arr_full[headerOffset][k];
 
-      // Read the corresponding valid time for this observation
-      if(!hdr_vld_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "can't read the valid time for header "
-              << "number " << obs_arr[0] << "\n\n";
-         exit(1);
-      }
+        // Read the corresponding header type for this observation
+         str_length = strlen(hdr_typ_str_full[i_offset]);
+         if (str_length > mxstr_len) str_length = mxstr_len;
+         strncpy(hdr_typ_str, hdr_typ_str_full[headerOffset], str_length);
+         hdr_typ_str[str_length] = bad_data_char;
 
-      // Read the current observation quality flag
-      strcpy(obs_qty_str, "");
-      if((obs_qty_var && obs_qty_var->is_valid()) &&
-         (!obs_qty_var->set_cur((long) i_obs) ||
-          !obs_qty_var->get(obs_qty_str, 1, strl_dim->size()))) {
-         mlog << Error << "\nprocess_point_obs() -> "
-              << "can't read the quality flag for observation "
-              << "index " << i_obs << "\n\n";
-         exit(1);
-      }
+         // Read the corresponding header Station ID for this observation
+         str_length = strlen(hdr_sid_str_full[i_offset]);
+         if (str_length > mxstr_len) str_length = mxstr_len;
+         strncpy(hdr_sid_str, hdr_sid_str_full[headerOffset], str_length);
+         hdr_sid_str[str_length] = bad_data_char;
 
-      // Convert string to a unixtime
-      hdr_ut = timestring_to_unix(hdr_vld_str);
-
-      // Check each conf_info.vx_pd object to see if this observation
-      // should be added
-      for(j=0; j<conf_info.get_n_vx(); j++) {
-
-         // Attempt to add the observation to the conf_info.vx_pd object
-         conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                    hdr_ut, obs_qty_str, obs_arr, grid);
+         // Read the corresponding valid time for this observation
+         str_length = strlen(hdr_vld_str_full[i_offset]);
+         if (str_length > mxstr_len) str_length = mxstr_len;
+         strncpy(hdr_vld_str, hdr_vld_str_full[headerOffset], str_length);
+         hdr_vld_str[str_length] = bad_data_char;
+      
+      
+         // Convert string to a unixtime
+         hdr_ut = timestring_to_unix(hdr_vld_str);
+        
+         // Check each conf_info.vx_pd object to see if this observation
+         // should be added
+         for(j=0; j<conf_info.get_n_vx(); j++) {
+        
+            // Attempt to add the observation to the conf_info.vx_pd object
+            conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                       hdr_ut, obs_qty_str, obs_arr, grid);
+         }
       }
    } // end for i_obs
 
@@ -957,7 +1026,10 @@ void process_point_obs(int i_nc) {
    for(j=0; j < conf_info.get_n_vx(); j++) conf_info.vx_pd[j].print_duplicate_report();
 
    // Deallocate and clean up
-   if(obs_in) { obs_in->close(); delete obs_in; obs_in = (NcFile *) 0; }
+   if(obs_in) {
+      //obs_in->close();
+      delete obs_in; obs_in = (NcFile *) 0; 
+   }
 
    return;
 }
@@ -1475,7 +1547,10 @@ void process_grid_vx() {
    if(fcst_dp_smooth) { delete [] fcst_dp_smooth; fcst_dp_smooth = (DataPlane *) 0; }
 
    // Close the output NetCDF file
-   if(nc_out) { nc_out->close(); delete nc_out; nc_out = (NcFile *) 0; }
+   if(nc_out) {
+      //nc_out->close();
+      delete nc_out; nc_out = (NcFile *) 0; 
+   }
 
    return;
 }
@@ -1622,9 +1697,9 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    build_outfile_name(ens_valid_ut, suffix, out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, NcFile::Replace);
+   nc_out = open_ncfile(out_nc_file, NcFile::replace);
 
-   if(!nc_out->is_valid()) {
+   if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -1639,15 +1714,15 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
-   lat_dim = nc_out->add_dim("lat", (long) grid.ny());
-   lon_dim = nc_out->add_dim("lon", (long) grid.nx());
+   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
 
    // Add grid weight variable
    if(conf_info.ensemble_flag[i_nc_weight]) {
-      write_netcdf_grid_weight(nc_out, lat_dim, lon_dim,
+      write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
 
@@ -2004,7 +2079,8 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
 void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
-   NcVar *ens_var = (NcVar *) 0;
+   //NcVar *ens_var = (NcVar *) 0;
+   NcVar ens_var;
    ConcatString ens_var_name, name_str;
 
    // Construct the variable name
@@ -2012,7 +2088,7 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name() << "_"
                 << type_str;
-   ens_var = nc_out->add_var(ens_var_name, ncFloat, lat_dim, lon_dim);
+   ens_var = add_var(nc_out, (string)ens_var_name, ncFloat, lat_dim, lon_dim);
 
    //
    // Construct the variable name attribute
@@ -2030,11 +2106,11 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
    }
 
    // Add the variable attributes
-   add_var_att(conf_info.ens_info[i_ens], ens_var, false, dp,
+   add_var_att_local(conf_info.ens_info[i_ens], &ens_var, false, dp,
                name_str, long_name_str);
 
    // Write the data
-   if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_ens_var_float() -> "
            << "error in ens_var->put for the " << ens_var_name
            << " field.\n\n";
@@ -2049,7 +2125,8 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
 void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
-   NcVar *ens_var = (NcVar *) 0;
+   //NcVar *ens_var = (NcVar *) 0;
+   NcVar ens_var;
    ConcatString ens_var_name, name_str;
 
    // Construct the variable name
@@ -2057,7 +2134,7 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name() << "_"
                 << type_str;
-   ens_var = nc_out->add_var(ens_var_name, ncInt, lat_dim, lon_dim);
+   ens_var = add_var(nc_out, (string)ens_var_name, ncInt, lat_dim, lon_dim);
 
    // Construct the variable name attribute
    name_str << cs_erase
@@ -2065,11 +2142,11 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
             << type_str;
 
    // Add the variable attributes
-   add_var_att(conf_info.ens_info[i_ens], ens_var, true, dp,
+   add_var_att_local(conf_info.ens_info[i_ens], &ens_var, true, dp,
                name_str, long_name_str);
 
    // Write the data
-   if(!ens_var->put(&ens_data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_ens_var_int() -> "
            << "error in ens_var->put for the " << ens_var_name
            << " field.\n\n";
@@ -2154,7 +2231,8 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
                            float *data, DataPlane &dp,
                            const char *type_str,
                            const char *long_name_str) {
-   NcVar *nc_var = (NcVar *) 0;
+   //NcVar *nc_var = (NcVar *) 0;
+   NcVar nc_var;
    int wdth;
    ConcatString mthd_str, var_name, name_str;
 
@@ -2184,14 +2262,14 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    }
 
    // Define the variable
-   nc_var = nc_out->add_var(var_name, ncFloat, lat_dim, lon_dim);
+   nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(conf_info.vx_pd[i_vx].fcst_info, nc_var, false, dp,
+   add_var_att_local(conf_info.vx_pd[i_vx].fcst_info, &nc_var, false, dp,
                name_str, long_name_str);
 
    // Write the data
-   if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_orank_var_float() -> "
            << "error in nc_var->put for the " << var_name
            << " field.\n\n";
@@ -2207,7 +2285,8 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
                          int *data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
-   NcVar *nc_var = (NcVar *) 0;
+   //NcVar *nc_var = (NcVar *) 0;
+   NcVar nc_var;
    int wdth;
    ConcatString mthd_str, var_name, name_str;
 
@@ -2237,14 +2316,14 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    }
 
    // Define the variable
-   nc_var = nc_out->add_var(var_name, ncInt, lat_dim, lon_dim);
+   nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att(conf_info.vx_pd[i_vx].fcst_info, nc_var, true, dp,
+   add_var_att_local(conf_info.vx_pd[i_vx].fcst_info, &nc_var, true, dp,
                name_str, long_name_str);
 
    // Write the data
-   if(!nc_var->put(&data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_orank_var_int() -> "
            << "error in nc_var->put for the " << var_name
            << " field.\n\n";
@@ -2256,7 +2335,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att(VarInfo *info, NcVar *nc_var, bool is_int, DataPlane &dp,
+void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int, DataPlane &dp,
                  const char *name_str, const char *long_name_str) {
    ConcatString att_str;
 
@@ -2267,13 +2346,13 @@ void add_var_att(VarInfo *info, NcVar *nc_var, bool is_int, DataPlane &dp,
            << long_name_str;
 
    // Add variable attributes
-   nc_var->add_att("name", name_str);
-   nc_var->add_att("long_name", att_str);
-   nc_var->add_att("level", info->level_name());
-   nc_var->add_att("units", info->units());
+   add_att(nc_var, "name", name_str);
+   add_att(nc_var, "long_name", (string)att_str);
+   add_att(nc_var, "level", (string)info->level_name());
+   add_att(nc_var, "units", (string)info->units());
 
-   if(is_int) nc_var->add_att("_FillValue", bad_data_int);
-   else       nc_var->add_att("_FillValue", bad_data_float);
+   if(is_int) add_att(nc_var, "_FillValue", bad_data_int);
+   else       add_att(nc_var, "_FillValue", bad_data_float);
 
    // Write out times
    write_netcdf_var_times(nc_var, dp);

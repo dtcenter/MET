@@ -82,6 +82,7 @@ insitu_nc_to_ascii_LDFLAGS = ${MET_LDFLAGS}
 insitu_nc_to_ascii_LDADD = -lvx_nc_util \
 	-lvx_util \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lnetcdf_c++ -lnetcdf
 
 swinging_door_SOURCES = swinging_door.cc \
@@ -94,6 +95,7 @@ swinging_door_LDADD = -lvx_time_series \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lnetcdf_c++ -lnetcdf
 
 # Build chk4copyright when making a distribution so that we can

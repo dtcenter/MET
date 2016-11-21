@@ -105,6 +105,7 @@ if ( suffix_type != FileType_None && suffix_type != data_type )  {
 
 }
 
+
 if ( suffix_type != FileType_None )  return ( suffix_type );
 else                                 return ( data_type   );
 
@@ -120,6 +121,7 @@ GrdFileType file_type_by_suffix(const char * filename)
 
 int j;
 const ConcatString suffix = filename_suffix(filename);
+
 
 if ( suffix.empty() ) return ( FileType_None );
 

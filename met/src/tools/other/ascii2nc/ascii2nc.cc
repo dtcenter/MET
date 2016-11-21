@@ -59,7 +59,9 @@ using namespace std;
 #include <unistd.h>
 #include <vector>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "data2d_factory.h"
 #include "mask_poly.h"
@@ -223,7 +225,6 @@ int main(int argc, char *argv[]) {
    }
 
    int status = file_handler->writeNetcdfFile(ncfile.text());
-   
    delete file_handler;
    
    if (!status)

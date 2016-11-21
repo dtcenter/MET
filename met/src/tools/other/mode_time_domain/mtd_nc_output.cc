@@ -26,9 +26,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static NcDim * nx_dim = 0;
-static NcDim * ny_dim = 0;
-static NcDim * nt_dim = 0;
+//static NcDim * nx_dim = 0;
+//static NcDim * ny_dim = 0;
+//static NcDim * nt_dim = 0;
+static NcDim  nx_dim ;
+static NcDim  ny_dim ;
+static NcDim  nt_dim ;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,9 +54,9 @@ void do_mtd_nc_output(const MtdNcOutInfo &  nc_info, const MM_Engine    & engine
 
 {
 
-NcFile out(output_filename, NcFile::Replace);
+NcFile out(output_filename, NcFile::replace);
 
-if ( ! out.is_valid() )  {
+if ( IS_INVALID_NC(out) )  {
 
    mlog << Error << "\n\n  do_mtd_nc_output() -> trouble opening output file \""
         << output_filename << "\"\n\n";
@@ -67,22 +70,22 @@ const bool have_pairs =    (fcst_obj.n_objects() != 0)
 
 // nc_info.dump(cout);
 
-nx_dim = 0;
-ny_dim = 0;
-nt_dim = 0;
+//nx_dim = 0;
+//ny_dim = 0;
+//nt_dim = 0;
 
    //
    //  dimensions
    //
 
 
-out.add_dim(nx_dim_name, fcst_raw.nx());
-out.add_dim(ny_dim_name, fcst_raw.ny());
-out.add_dim(nt_dim_name, fcst_raw.nt());
+//nx_dim = out.get_dim(nx_dim_name);
+//ny_dim = out.get_dim(ny_dim_name);
+//nt_dim = out.get_dim(nt_dim_name);
 
-nx_dim = out.get_dim(nx_dim_name);
-ny_dim = out.get_dim(ny_dim_name);
-nt_dim = out.get_dim(nt_dim_name);
+nx_dim = add_dim(&out,  nx_dim_name, fcst_raw.nx());
+ny_dim = add_dim(&out,  ny_dim_name, fcst_raw.ny());
+nt_dim = add_dim(&out,  nt_dim_name, fcst_raw.nt());
 
    //
    //  global attributes
@@ -132,7 +135,7 @@ if ( have_pairs && (nc_info.do_cluster_id) )  {
    //  done
    //
 
-out.close();
+//out.close();
 
 return;
 
@@ -153,9 +156,9 @@ void do_mtd_nc_output(const MtdNcOutInfo &  nc_info,
 
 {
 
-NcFile out(output_filename, NcFile::Replace);
+NcFile out(output_filename, NcFile::replace);
 
-if ( ! out.is_valid() )  {
+if ( IS_INVALID_NC(out) )  {
 
    mlog << Error << "\n\n  do_mtd_nc_output[single]() -> trouble opening output file \""
         << output_filename << "\"\n\n";
@@ -166,22 +169,22 @@ if ( ! out.is_valid() )  {
 
 // nc_info.dump(cout);
 
-nx_dim = 0;
-ny_dim = 0;
-nt_dim = 0;
+//nx_dim = 0;
+//ny_dim = 0;
+//nt_dim = 0;
 
    //
    //  dimensions
    //
 
 
-out.add_dim(nx_dim_name, raw.nx());
-out.add_dim(ny_dim_name, raw.ny());
-out.add_dim(nt_dim_name, raw.nt());
+nx_dim = add_dim(&out,  nx_dim_name, raw.nx());
+ny_dim = add_dim(&out,  ny_dim_name, raw.ny());
+nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
 
-nx_dim = out.get_dim(nx_dim_name);
-ny_dim = out.get_dim(ny_dim_name);
-nt_dim = out.get_dim(nt_dim_name);
+//nx_dim = out.get_dim(nx_dim_name);
+//ny_dim = out.get_dim(ny_dim_name);
+//nt_dim = out.get_dim(nt_dim_name);
 
    //
    //  global attributes
@@ -221,7 +224,7 @@ if ( nc_info.do_object_id )  {
    //  done
    //
 
-out.close();
+//out.close();
 
 return;
 
@@ -243,14 +246,14 @@ const int nx = grid.nx();
 const int ny = grid.ny();
 
 
-out.add_var(lat_name, ncFloat, ny_dim, nx_dim);
-out.add_var(lon_name, ncFloat, ny_dim, nx_dim);
+NcVar lat_var = add_var(&out, lat_name, ncFloat, ny_dim, nx_dim);
+NcVar lon_var = add_var(&out, lon_name, ncFloat, ny_dim, nx_dim);
 
-NcVar * lat_var = out.get_var(lat_name);
-NcVar * lon_var = out.get_var(lon_name);
+//NcVar * lat_var = get_nc_var(out, lat_name);
+//NcVar * lon_var = get_nc_var(out, lon_name);
 
-lat_var->add_att("long_name", "Latitude");
-lon_var->add_att("long_name", "Longitude");
+add_att(&lat_var, "long_name", "Latitude");
+add_att(&lon_var, "long_name", "Longitude");
 
 float * lat_data = new float [nx*ny];
 float * lon_data = new float [nx*ny];
@@ -274,16 +277,19 @@ for (y=0; y<ny; ++y)  {
 
 }
 
-lat_var->set_cur(0, 0);
+//lat_var->set_cur(0, 0);
+//
+//lat_var->put(lat_data, ny, nx);
+//
+//
+//lon_var->set_cur(0, 0);
+//
+//lon_var->put(lon_data, ny, nx);
 
-lat_var->put(lat_data, ny, nx);
-
-
-lon_var->set_cur(0, 0);
-
-lon_var->put(lon_data, ny, nx);
-
-
+long offsets[2] = {0,0};
+long lengths[2] = {ny, nx};
+put_nc_data(&lat_var, lat_data, lengths, offsets);
+put_nc_data(&lon_var, lon_data, lengths, offsets);
 
    //
    //  done
@@ -311,21 +317,24 @@ ConcatString s;
 
 const char * const name = ( is_fcst ? fcst_raw_name : obs_raw_name );
 
-out.add_var(name, ncFloat, nt_dim, ny_dim, nx_dim);
+NcVar var = add_var(&out, name, ncFloat, nt_dim, ny_dim, nx_dim);
 
-NcVar * var = out.get_var(name);
+//NcVar * var = get_nc_var(&outname);
 
 if ( is_fcst )  s = "Forecast Raw Data";
 else            s = "Observed Raw Data";
 
-var->add_att("long_name", s.text());
+add_att(&var, "long_name", s.text());
 
-var->add_att("_FillValue", bad_data_float);
+add_att(&var, "_FillValue", bad_data_float);
 
-var->set_cur(0, 0, 0);
+//var->set_cur(0, 0, 0);
+//
+//var->put(raw.data(), nt, ny, nx);
 
-var->put(raw.data(), nt, ny, nx);
-
+long offsets[3] = {0,0,0};
+long lengths[3] = {nt,ny, nx};
+put_nc_data(&var, raw.data(), lengths, offsets);
 
    //
    //  done
@@ -351,20 +360,24 @@ ConcatString s;
 
 const char * const name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
 
-out.add_var(name, ncInt, nt_dim, ny_dim, nx_dim);
+NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
 
-NcVar * var = out.get_var(name);
+//NcVar * var = get_nc_var(&outname);
 
 if ( is_fcst )  s = "Forecast Object ID";
 else            s = "Observed Object ID";
 
-var->add_att("long_name", s.text());
+add_att(&var, "long_name", s.text());
 
-var->add_att("_FillValue", bad_data_int);
+add_att(&var, "_FillValue", bad_data_int);
 
-var->set_cur(0, 0, 0);
+//var->set_cur(0, 0, 0);
+//
+//var->put(id.data(), nt, ny, nx);
 
-var->put(id.data(), nt, ny, nx);
+long offsets[3] = {0,0,0};
+long lengths[3] = {nt,ny, nx};
+put_nc_data(&var, id.data(), lengths, offsets);
 
 
    //
@@ -400,16 +413,16 @@ out_data = new int [n3];
 
 const char * const name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
 
-out.add_var(name, ncInt, nt_dim, ny_dim, nx_dim);
+NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
 
-NcVar * var = out.get_var(name);
+//NcVar * var = get_nc_var(&outname);
 
 if ( is_fcst )  s = "Forecast Cluster ID";
 else            s = "Observed Cluster ID";
 
-var->add_att("long_name", s.text());
+add_att(&var, "long_name", s.text());
 
-var->add_att("_FillValue", bad_data_int);
+add_att(&var, "_FillValue", bad_data_int);
 
    //
    //  create mapping array
@@ -444,9 +457,12 @@ for (j=0; j<n3; ++j)  {
 }
 
 
-var->set_cur(0, 0, 0);
+//var->set_cur(0, 0, 0);
+//var->put(out_data, nt, ny, nx);
 
-var->put(out_data, nt, ny, nx);
+long offsets[3] = {0,0,0};
+long lengths[3] = {nt,ny, nx};
+put_nc_data(&var, out_data, lengths, offsets);
 
    //
    //  done

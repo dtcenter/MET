@@ -37,7 +37,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
 
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
@@ -66,8 +66,10 @@ static ConcatString VarName;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
-static NcDim  *lat_dim = (NcDim *)  0;
-static NcDim  *lon_dim = (NcDim *)  0;
+//static NcDim  *lat_dim = (NcDim *)  0;
+//static NcDim  *lon_dim = (NcDim *)  0;
+static NcDim  lat_dim ;
+static NcDim  lon_dim ;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -292,9 +294,9 @@ void process_data_file() {
 void open_nc(const Grid &grid, ConcatString run_cs) {
 
    // Create output file
-   nc_out = open_ncfile(OutputFilename, NcFile::Replace);
+   nc_out = open_ncfile(OutputFilename, NcFile::replace);
 
-   if(!nc_out->is_valid()) {
+   if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nopen_nc() -> "
            << "trouble opening output NetCDF file \""
            << OutputFilename << "\"\n\n";
@@ -305,17 +307,17 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
    write_netcdf_global(nc_out, OutputFilename, program_name);
 
    // Add the run command
-   nc_out->add_att("RunCommand", run_cs);
+   add_att(nc_out, "RunCommand", run_cs);
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
-   lat_dim = nc_out->add_dim("lat", (long) grid.ny());
-   lon_dim = nc_out->add_dim("lon", (long) grid.nx());
+   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
 
    return;
 }
@@ -341,13 +343,13 @@ void write_nc(const DataPlane &dp, const Grid &grid,
       nc_var_name = VarName;
    }
 
-   NcVar *data_var = nc_out->add_var(nc_var_name, ncFloat, lat_dim, lon_dim);
-   data_var->add_att("name", nc_var_name);
-   data_var->add_att("long_name", vinfo->long_name());
-   data_var->add_att("level", vinfo->level_name());
-   data_var->add_att("units", vinfo->units());
-   data_var->add_att("_FillValue", bad_data_float);
-   write_netcdf_var_times(data_var, dp);
+   NcVar data_var = add_var(nc_out, (string)nc_var_name, ncFloat, lat_dim, lon_dim);
+   add_att(&data_var, "name", (string)nc_var_name);
+   add_att(&data_var, "long_name", (string)vinfo->long_name());
+   add_att(&data_var, "level", (string)vinfo->level_name());
+   add_att(&data_var, "units", (string)vinfo->units());
+   add_att(&data_var, "_FillValue", bad_data_float);
+   write_netcdf_var_times(&data_var, dp);
 
    // Allocate memory to store data values for each grid point
    float *data = new float [grid.nx()*grid.ny()];
@@ -361,7 +363,7 @@ void write_nc(const DataPlane &dp, const Grid &grid,
    } // end for x
 
    // Write out the data
-   if(!data_var->put(&data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&data_var, &data[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
@@ -378,7 +380,10 @@ void write_nc(const DataPlane &dp, const Grid &grid,
 void close_nc() {
 
    // Clean up
-   if(nc_out) { nc_out->close(); delete nc_out; nc_out = (NcFile *) 0; }
+   if(nc_out) {
+      //nc_out->close();
+      delete nc_out; nc_out = (NcFile *) 0; 
+   }
 
    // List the output file
    mlog << Debug(1)

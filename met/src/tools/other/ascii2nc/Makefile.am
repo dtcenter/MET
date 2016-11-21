@@ -59,4 +59,5 @@ ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas

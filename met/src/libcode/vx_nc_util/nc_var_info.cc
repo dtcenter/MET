@@ -21,6 +21,7 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include "nc_utils.h"
 #include "nc_var_info.h"
 #include "vx_math.h"
 #include "vx_log.h"
@@ -184,7 +185,7 @@ if ( Dims )  {
 
    out << "[ ";
 
-   for (j=0; j<Ndims; ++j)  out << Dims[j]->size() << ' ';
+   for (j=0; j<Ndims; ++j)  out << Dims[j]->getSize() << ' ';
 
    out << "]\n";
 
@@ -264,46 +265,39 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_att_str(const NcVarInfo &info, const ConcatString &att_name, ConcatString &att_value)
+bool get_att_str(const NcVarInfo &info, const ConcatString att_name, ConcatString &att_value)
 
 {
 
-int j, n;
-NcAtt * att = (NcAtt *) 0;
-bool found = false;
-
-n = info.var->num_atts();
-att_value.clear();
-
-for (j=0; j<n; ++j)  {
-
-   att = info.var->get_att(j);
-
-   if ( strcmp(att_name, att->name()) == 0 )  {
-
-      // Check for the correct type
-      if ( att->type() != ncChar ) {
-
-         mlog << Error << "\nget_att_str(const NcVarInfo &, const ConcatString &, ConcatString &) -> "
-              << "attribute \"" << att_name << "\" should be a string.\n\n";
-
-         exit ( 1 );
+   int j, n;
+   //NcVarAtt * att = (NcVarAtt *) 0;
+   NcVarAtt att ;
+   bool found = false;
+   string att_value_str;
+   
+   //n = info.var->num_atts();
+   att_value.clear();
+   
+   att = get_nc_att(info.var, att_name, false);
+   if (!IS_INVALID_NC(att)) {
+      found = get_att_value_chars(&att, att_value);
+      if ( !found)  {
+         // Check for the correct type
+         if ( GET_NC_TYPE(att) != NcType::nc_CHAR ) {
+         
+            mlog << Error << "\nget_att_str(const NcVarInfo &, const ConcatString &, ConcatString &) -> "
+                   << "attribute \"" << att_name << "\" should be a string.\n\n";
+         
+            exit ( 1 );
+         }
       }
-     
-      att_value = att->as_string(0);
-      found = true;
-
-      break;
-
    }
-
-}
 
    //
    //  done
    //
 
-return ( found );
+   return ( found );
 
 }
 
@@ -311,46 +305,36 @@ return ( found );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_att_int(const NcVarInfo &info, const ConcatString &att_name, int &att_value)
+bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_value)
 
 {
 
-int j, n;
-NcAtt * att = (NcAtt *) 0;
-bool found = false;
-
-n = info.var->num_atts();
-att_value = bad_data_int;
-
-for (j=0; j<n; ++j)  {
-
-   att = info.var->get_att(j);
-
-   if ( strcmp(att_name, att->name()) == 0 )  {
-
+   int j, n;
+   //NcVarAtt * att = (NcVarAtt *) 0;
+   NcVarAtt att;
+   bool found = false;
+   att_value = bad_data_int;
+   
+   att = get_nc_att(info.var, att_name, false);
+   if (!IS_INVALID_NC(att)) {
+      att_value = get_att_value_int(&att);
+   
       // Check for the correct type
-      if ( att->type() != ncInt ) {
-
+      if ( GET_NC_TYPE(att) != NcType::nc_INT ) {
+   
          mlog << Error << "\nget_att_int(const NcVarInfo &, const ConcatString &, int &) -> "
               << "attribute \"" << att_name << "\" should be an integer.\n\n";
-
+   
          exit ( 1 );
       }
-     
-      att_value = att->as_int(0);
       found = true;
-
-      break;
-
    }
-
-}
-
+   
    //
    //  done
    //
-
-return ( found );
+   
+   return ( found );
 
 }
 
@@ -358,29 +342,22 @@ return ( found );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_att_unixtime(const NcVarInfo &info, const ConcatString &att_name, unixtime &att_value)
+bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixtime &att_value)
 
 {
 
 int j, n;
-NcAtt * att = (NcAtt *) 0;
+//NcVarAtt * att = (NcVarAtt *) 0;
+NcVarAtt att;
 bool found = false;
-
-n = info.var->num_atts();
 
 att_value = (unixtime) bad_data_int;
 
-for (j=0; j<n; ++j)  {
 
-   att = info.var->get_att(j);
+att = get_nc_att(info.var, att_name, false);
+if (!IS_INVALID_NC(att)) {
 
-   if ( strcmp(att_name, att->name()) == 0 )  {
-
-      found = true;
-
-      break;
-
-   }
+   found = true;
 
 }
 
@@ -389,25 +366,45 @@ if ( !found )  return ( false );
    // Check the type
 
 ConcatString s;
+switch ( GET_NC_TYPE(att).getId() )  {
 
-switch ( att->type() )  {
-
-   case ncInt:
-      att_value = (unixtime) (att->as_int(0));
+   case NcType::nc_INT:
+      //int a_value;
+      att_value = get_att_value_int(&att);
+      //att_value = a_value;
+      //att_value = (unixtime) (att->as_int(0));
       break;
 
-   case ncChar:
-      s = att->as_string(0);
+   case NcType::nc_CHAR:
+      get_att_value_chars(&att, s);
+      //s = att->as_string(0);
       att_value = string_to_unixtime(s);
       break;
 
    default:
-         mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
-              << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
-         exit ( 1 );
+      mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
+           << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
+      exit ( 1 );
       break;
 
 }   //  switch
+
+//NcType ncType = att->getType();
+//if  ( ncType == NcType::nc_INT) {
+//   int a_value;
+//   att->getValues(&a_value);
+//   att_value = a_value;
+//}
+//else if (ncType == NcType::nc_CHAR) {
+//   string s;
+//   att->getValues(s);
+//   att_value = string_to_unixtime(s.c_str());
+//}
+//else {
+//   mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
+//        << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
+//   exit ( 1 );
+//}   //  if
 
 
    //
