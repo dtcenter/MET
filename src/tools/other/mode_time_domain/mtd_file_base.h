@@ -20,7 +20,9 @@
 
 #include <iostream>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_util.h"
 #include "vx_cal.h"

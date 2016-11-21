@@ -40,7 +40,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "point_stat_conf_info.h"
 

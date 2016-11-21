@@ -40,7 +40,10 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
+//typedef signed char ncbyte; // from ncvalues.h
 
 #include "wavelet_stat_conf_info.h"
 
@@ -95,14 +98,23 @@ static ConcatString out_dir;
 // Output NetCDF file
 static ConcatString out_nc_file;
 static NcFile       *nc_out    = (NcFile *) 0;
-static NcDim        *x_dim     = (NcDim *)  0;
-static NcDim        *y_dim     = (NcDim *)  0;
-static NcDim        *scale_dim = (NcDim *)  0;
-static NcDim        *tile_dim  = (NcDim *)  0;
+//static NcDim        *x_dim     = (NcDim *)  0;
+//static NcDim        *y_dim     = (NcDim *)  0;
+//static NcDim        *scale_dim = (NcDim *)  0;
+//static NcDim        *tile_dim  = (NcDim *)  0;
 
-static NcVar        *fcst_var  = (NcVar *)  0;
-static NcVar        *obs_var   = (NcVar *)  0;
-static NcVar        *diff_var  = (NcVar *)  0;
+static NcDim        x_dim     ;
+static NcDim        y_dim     ;
+static NcDim        scale_dim ;
+static NcDim        tile_dim  ;
+
+//static NcVar        *fcst_var  = (NcVar *)  0;
+//static NcVar        *obs_var   = (NcVar *)  0;
+//static NcVar        *diff_var  = (NcVar *)  0;
+
+static NcVar        fcst_var  ;
+static NcVar        obs_var   ;
+static NcVar        diff_var  ;
 
 // Output PostScript file
 static ConcatString out_ps_file;

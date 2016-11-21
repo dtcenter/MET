@@ -37,4 +37,5 @@ plot_point_obs_LDADD = -lvx_data2d_factory \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas

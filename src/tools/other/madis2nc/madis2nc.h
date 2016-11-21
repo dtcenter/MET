@@ -41,6 +41,10 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
+//#define BUFFER_SIZE (128*1024)
+#define BUFFER_SIZE (32*1024)
+
+
 // Enumeration of possible MADIS observation types
 enum MadisType {
   madis_none,
@@ -125,19 +129,46 @@ static int          rej_poly = 0;
 NcFile *f_out = (NcFile *) 0;
 
 // Output NetCDF dimensions
-static NcDim *strl_dim    = (NcDim *)  0; // Maximum string length
-static NcDim *hdr_arr_dim = (NcDim *)  0; // Header array width
-static NcDim *obs_arr_dim = (NcDim *)  0; // Observation array width
-static NcDim *hdr_dim     = (NcDim *)  0; // Header array length
-static NcDim *obs_dim     = (NcDim *)  0; // Observation array length
+//static NcDim *strl_dim    = (NcDim *)  0; // Maximum string length
+//static NcDim *hdr_arr_dim = (NcDim *)  0; // Header array width
+//static NcDim *obs_arr_dim = (NcDim *)  0; // Observation array width
+//static NcDim *hdr_dim     = (NcDim *)  0; // Header array length
+//static NcDim *obs_dim     = (NcDim *)  0; // Observation array length
+
+static NcDim strl_dim    ; // Maximum string length
+static NcDim hdr_arr_dim ; // Header array width
+static NcDim obs_arr_dim ; // Observation array width
+static NcDim hdr_dim     ; // Header array length
+static NcDim obs_dim     ; // Observation array length
 
 // Output NetCDF variables
-static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
-static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
-static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
-static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
-static NcVar *obs_qty_var = (NcVar *)  0; // Quality Flag
-static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
+//static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
+//static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
+//static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
+//static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
+//static NcVar *obs_qty_var = (NcVar *)  0; // Quality Flag
+//static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
+
+static NcVar hdr_typ_var ; // Message type
+static NcVar hdr_sid_var ; // Station ID
+static NcVar hdr_vld_var ; // Valid time
+static NcVar hdr_arr_var ; // Header array
+static NcVar obs_qty_var ; // Quality Flag
+static NcVar obs_arr_var ; // Observation array
+
+int   obs_buf_size;
+int   processed_count;
+int   obs_data_idx;
+int   obs_data_offset;
+int   hdr_data_idx;
+int   hdr_data_offset;
+
+char   hdr_typ_buf[BUFFER_SIZE][strl_len];
+char   hdr_sid_buf[BUFFER_SIZE][strl_len];
+char   hdr_vld_buf[BUFFER_SIZE][strl_len];
+float  hdr_arr_buf[BUFFER_SIZE][hdr_arr_len];
+float obs_data_buf[BUFFER_SIZE][obs_arr_len];
+char  qty_data_buf[BUFFER_SIZE][strl_len];
 
 ////////////////////////////////////////////////////////////////////////
 

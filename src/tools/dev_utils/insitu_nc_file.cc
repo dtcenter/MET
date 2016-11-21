@@ -130,14 +130,15 @@ bool InsituNcFile::open(const char * filename)
   // on any failure, and leaves any other error handling to the
   // calling program. In the case of this example, we just exit with
   // an NC_ERR error code.
-  
-  NcError err(NcError::silent_nonfatal);
+
+  // FIXME COmmmented out for NetCDF4
+  //NcError err(NcError::silent_nonfatal);
 
   // Open the file
 
   _ncFile = open_ncfile(filename);
 
-  if (!(_ncFile->is_valid()))
+  if (!(IS_INVALID_NC_P(_ncFile)))
   {
     close();
     return false;
@@ -145,8 +146,8 @@ bool InsituNcFile::open(const char * filename)
 
   // Pull out the dimensions
 
-  NcDim *num_recs_dim = _ncFile->get_dim("recNum");
-  if (num_recs_dim == 0)
+  NcDim num_recs_dim = get_nc_dim(_ncFile, "recNum");
+  if (IS_INVALID_NC(num_recs_dim))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "recNum dimension not found in file\n";
@@ -154,15 +155,15 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _numRecords = num_recs_dim->size();
+  _numRecords = GET_NC_SIZE(num_recs_dim);
   _currRecord = 0;
   
   // Pull out the needed variables
 
   // aircraftId
 
-  NcDim *aircraft_id_len_dim = _ncFile->get_dim("aircraftIdLen");
-  if (aircraft_id_len_dim == 0)
+  NcDim aircraft_id_len_dim = get_nc_dim(_ncFile, "aircraftIdLen");
+  if (IS_INVALID_NC(aircraft_id_len_dim))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "aircraftIdLen dimension not found in file\n";
@@ -170,10 +171,10 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  long aircraft_id_len = aircraft_id_len_dim->size();
+  long aircraft_id_len = GET_NC_SIZE(aircraft_id_len_dim);
   
-  NcVar *aircraft_id_var = _ncFile->get_var("aircraftId");
-  if (aircraft_id_var == 0)
+  NcVar aircraft_id_var = get_nc_var(_ncFile, "aircraftId");
+  if (IS_INVALID_NC(aircraft_id_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "aircraftId variable not found in file\n";
@@ -183,7 +184,8 @@ bool InsituNcFile::open(const char * filename)
   
   char *aircraft_id = new char[_numRecords * aircraft_id_len];
   
-  if (!aircraft_id_var->get(aircraft_id, _numRecords, aircraft_id_len))
+  //if (!aircraft_id_var->get(aircraft_id, _numRecords, aircraft_id_len))
+  if (!get_nc_data(&aircraft_id_var, aircraft_id))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving aircraftId values from file\n";
@@ -198,8 +200,8 @@ bool InsituNcFile::open(const char * filename)
   
   // timeObs
 
-  NcVar *time_obs_var = _ncFile->get_var("timeObs");
-  if (time_obs_var == 0)
+  NcVar time_obs_var = get_nc_var(_ncFile, "timeObs");
+  if (IS_INVALID_NC(time_obs_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "timeObs variable not found in file\n";
@@ -209,7 +211,8 @@ bool InsituNcFile::open(const char * filename)
   
   _timeObs = new time_t[_numRecords];
   
-  if (!time_obs_var->get(_timeObs, _numRecords))
+  //if (!get_nc_data(time_obs_var, _timeObs, _numRecords))
+  if (!get_nc_data(&time_obs_var, _timeObs))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving timeObs variable from file\n";
@@ -219,8 +222,8 @@ bool InsituNcFile::open(const char * filename)
   
   // latitude
 
-  NcVar *latitude_var = _ncFile->get_var("latitude");
-  if (latitude_var == 0)
+  NcVar latitude_var = get_nc_var(_ncFile, "latitude");
+  if (IS_INVALID_NC(latitude_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "latitude variable not found in file\n";
@@ -230,7 +233,7 @@ bool InsituNcFile::open(const char * filename)
   
   _latitude = new double[_numRecords];
   
-  if (!latitude_var->get(_latitude, _numRecords))
+  if (!get_nc_data(&latitude_var, _latitude, _numRecords))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving latitude values from file\n";
@@ -240,8 +243,8 @@ bool InsituNcFile::open(const char * filename)
     
   // longitude
 
-  NcVar *longitude_var = _ncFile->get_var("longitude");
-  if (longitude_var == 0)
+  NcVar longitude_var = get_nc_var(_ncFile, "longitude");
+  if (IS_INVALID_NC(longitude_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "longitude variable not found in file\n";
@@ -251,7 +254,7 @@ bool InsituNcFile::open(const char * filename)
   
   _longitude = new double[_numRecords];
   
-  if (!longitude_var->get(_longitude, _numRecords))
+  if (!get_nc_data(&longitude_var, _longitude, _numRecords))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving longitude values from file\n";
@@ -261,8 +264,8 @@ bool InsituNcFile::open(const char * filename)
   
   // altitude
 
-  NcVar *altitude_var = _ncFile->get_var("altitude");
-  if (altitude_var == 0)
+  NcVar altitude_var = get_nc_var(_ncFile, "altitude");
+  if (IS_INVALID_NC(altitude_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "altitude variable not found in file\n";
@@ -272,7 +275,7 @@ bool InsituNcFile::open(const char * filename)
   
   _altitude = new double[_numRecords];
   
-  if (!altitude_var->get(_altitude, _numRecords))
+  if (!get_nc_data(&altitude_var, _altitude, _numRecords))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "retrieving altitude values from file\n";
@@ -282,8 +285,8 @@ bool InsituNcFile::open(const char * filename)
   
   // QCconfidence
 
-  NcVar *qc_confidence_var = _ncFile->get_var("QCconfidence");
-  if (qc_confidence_var == 0)
+  NcVar qc_confidence_var = get_nc_var(_ncFile, "QCconfidence");
+  if (IS_INVALID_NC(qc_confidence_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "QCconfidence variable not found in file\n";
@@ -293,7 +296,7 @@ bool InsituNcFile::open(const char * filename)
   
   _QCconfidence = new double[_numRecords];
   
-  if (!qc_confidence_var->get(_QCconfidence, _numRecords))
+  if (!get_nc_data(&qc_confidence_var, _QCconfidence, _numRecords))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving QCconfidence values from file\n";
@@ -303,8 +306,8 @@ bool InsituNcFile::open(const char * filename)
   
   // medEDR
 
-  NcVar *med_edr_var = _ncFile->get_var("medEDR");
-  if (med_edr_var == 0)
+  NcVar med_edr_var = get_nc_var(_ncFile, "medEDR");
+  if (IS_INVALID_NC(med_edr_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "medEDR variable not found in file\n";
@@ -314,7 +317,7 @@ bool InsituNcFile::open(const char * filename)
   
   _medEDR = new double[_numRecords];
   
-  if (!med_edr_var->get(_medEDR, _numRecords))
+  if (!get_nc_data(&med_edr_var, _medEDR, _numRecords))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving medEDR values from file\n";
@@ -324,8 +327,8 @@ bool InsituNcFile::open(const char * filename)
   
   // maxEDR
 
-  NcVar *max_edr_var = _ncFile->get_var("maxEDR");
-  if (max_edr_var == 0)
+  NcVar max_edr_var = get_nc_var(_ncFile, "maxEDR");
+  if (IS_INVALID_NC(max_edr_var))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "maxEDR variable not found in file\n";
@@ -335,7 +338,7 @@ bool InsituNcFile::open(const char * filename)
   
   _maxEDR = new double[_numRecords];
   
-  if (!max_edr_var->get(_maxEDR, _numRecords))
+  if (!get_nc_data(&max_edr_var, _maxEDR, _numRecords))
   {
     mlog << Error << "\n" << method_name << " -> "
 	 << "error retrieving maxEDR values from file\n";

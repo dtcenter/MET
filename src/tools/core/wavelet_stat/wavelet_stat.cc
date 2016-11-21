@@ -100,7 +100,7 @@ static void write_nc_raw(const WaveletStatNcOutInfo &, const double *, const dou
 static void write_nc_wav(const WaveletStatNcOutInfo &, const double *, const double *,
                          int, int, int, int,
                          SingleThresh &, SingleThresh &);
-static void add_var_att(NcVar *, const char *, const char *);
+static void add_var_att_local(NcVar *, const char *, const char *);
 
 static void close_out_files();
 
@@ -608,9 +608,9 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    build_outfile_name(valid_ut, lead_sec, ".nc", out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, NcFile::Replace);
+   nc_out = open_ncfile(out_nc_file, NcFile::replace);
 
-   if(!nc_out || !nc_out->is_valid()) {
+   if(!nc_out || IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -620,27 +620,29 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    // Add global attributes
    write_netcdf_global(nc_out, out_nc_file.text(), program_name,
                        conf_info.model, conf_info.obtype);
-   if ( nc_info.do_diff )  nc_out->add_att("Difference", "Forecast Value - Observation Value");
+   if ( nc_info.do_diff )  add_att(nc_out, "Difference", "Forecast Value - Observation Value");
 
    // Set the NetCDF dimensions
-   x_dim     = (NcDim *) 0;
-   x_dim     = nc_out->add_dim("x", conf_info.get_tile_dim());
+   //x_dim     = (NcDim *) 0;
+   x_dim = add_dim(nc_out, "x", conf_info.get_tile_dim());
 
-   y_dim     = (NcDim *) 0;
-   y_dim     = nc_out->add_dim("y", conf_info.get_tile_dim());
+   //y_dim     = (NcDim *) 0;
+   y_dim = add_dim(nc_out, "y", conf_info.get_tile_dim());
 
-   scale_dim = (NcDim *) 0;
-   scale_dim = nc_out->add_dim("scale", conf_info.get_n_scale()+2);
+   //scale_dim = (NcDim *) 0;
+   scale_dim = add_dim(nc_out, "scale", conf_info.get_n_scale()+2);
 
-   tile_dim  = (NcDim *) 0;
-   tile_dim  = nc_out->add_dim("tile", conf_info.get_n_tile());
+   //tile_dim  = (NcDim *) 0;
+   tile_dim  = add_dim(nc_out, "tile", conf_info.get_n_tile());
 
    // Add the x_ll and y_ll variables
-   NcVar *x_ll_var = (NcVar *) 0;
-   NcVar *y_ll_var = (NcVar *) 0;
+   //NcVar *x_ll_var = (NcVar *) 0;
+   //NcVar *y_ll_var = (NcVar *) 0;
+   NcVar x_ll_var ;
+   NcVar y_ll_var ;
 
-   x_ll_var = nc_out->add_var("x_ll", ncInt, tile_dim);
-   y_ll_var = nc_out->add_var("y_ll", ncInt, tile_dim);
+   x_ll_var = add_var(nc_out, "x_ll", ncInt, tile_dim);
+   y_ll_var = add_var(nc_out, "y_ll", ncInt, tile_dim);
 
    for(i=0; i<conf_info.get_n_tile(); i++) {
 
@@ -648,8 +650,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
       y = nint(conf_info.tile_yll[i]);
 
       // Write the x_ll value
-      if(!x_ll_var->set_cur(i) ||
-         !x_ll_var->put(&x, 1)) {
+      if(!put_nc_data(&x_ll_var, &x, 1, i)) {
 
          mlog << Error << "\nsetup_nc_file() -> "
               << "error with the x_ll_var->put"
@@ -658,8 +659,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
       }
 
       // Write the y_ll value
-      if(!y_ll_var->set_cur(i) ||
-         !y_ll_var->put(&y, 1)) {
+      if(!put_nc_data(&y_ll_var, &y, 1, i)) {
 
          mlog << Error << "\nsetup_nc_file() -> "
               << "error with the y_ll_var->put"
@@ -1372,72 +1372,72 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       // Define the forecast and difference variables
 
       if ( nc_info.do_raw )  {
-         fcst_var = nc_out->add_var(fcst_var_name, ncFloat, tile_dim, x_dim, y_dim);
-         obs_var  = nc_out->add_var(obs_var_name,  ncFloat, tile_dim, x_dim, y_dim);
+         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat, tile_dim, x_dim, y_dim);
+         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat, tile_dim, x_dim, y_dim);
       }
-      if ( nc_info.do_diff )  diff_var = nc_out->add_var(diff_var_name, ncFloat, tile_dim, x_dim, y_dim);
+      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat, tile_dim, x_dim, y_dim);
 
       // Add variable attributes for the observation field
 
       if ( nc_info.do_raw )  {
-         add_var_att(obs_var, "type", "Observation");
-         add_var_att(obs_var, "name", shc.get_obs_var());
+         add_var_att_local(&obs_var, "type", "Observation");
+         add_var_att_local(&obs_var, "name", shc.get_obs_var());
          val.format("%s at %s",
                  conf_info.obs_info[i_vx]->name().text(),
                  conf_info.obs_info[i_vx]->level_name().text());
-         add_var_att(obs_var, "long_name", val);
-         add_var_att(obs_var, "level", shc.get_obs_lev());
-         add_var_att(obs_var, "units", conf_info.fcst_info[i_vx]->units().text());
-         obs_var->add_att("_FillValue", bad_data_float);
-         write_netcdf_var_times(obs_var,
+         add_var_att_local(&obs_var, "long_name", val);
+         add_var_att_local(&obs_var, "level", shc.get_obs_lev());
+         add_var_att_local(&obs_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_att(&obs_var, "_FillValue", bad_data_float);
+         write_netcdf_var_times(&obs_var,
             shc.get_obs_valid_beg() - shc.get_obs_lead_sec(),
             shc.get_obs_valid_beg(), 0);
-         add_var_att(obs_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&obs_var, "desc", conf_info.desc[i_vx]);
 
          // Add variable attributes for the forecast field
-         add_var_att(fcst_var, "type", "Forecast");
-         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         add_var_att_local(&fcst_var, "type", "Forecast");
+         add_var_att_local(&fcst_var, "name", shc.get_fcst_var());
          val.format("%s at %s",
                  conf_info.fcst_info[i_vx]->name().text(),
                  conf_info.fcst_info[i_vx]->level_name().text());
-         add_var_att(fcst_var, "long_name", val);
-         add_var_att(fcst_var, "level", shc.get_fcst_lev());
-         add_var_att(fcst_var, "units", conf_info.fcst_info[i_vx]->units().text());
-         fcst_var->add_att("_FillValue", bad_data_float);
-            write_netcdf_var_times(fcst_var,
+         add_var_att_local(&fcst_var, "long_name", val);
+         add_var_att_local(&fcst_var, "level", shc.get_fcst_lev());
+         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_att(&fcst_var, "_FillValue", bad_data_float);
+         write_netcdf_var_times(&fcst_var,
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
-         add_var_att(fcst_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&fcst_var, "desc", conf_info.desc[i_vx]);
 
       }
 
       if ( nc_info.do_diff )  {
 
          // Add variable attributes for the difference field
-         add_var_att(diff_var, "type", "Difference (F-O)");
+         add_var_att_local(&diff_var, "type", "Difference (F-O)");
          val.format("Forecast %s minus Observed %s",
                  shc.get_fcst_var().text(),
                  shc.get_obs_var().text());
-         add_var_att(diff_var, "name", val);
+         add_var_att_local(&diff_var, "name", val);
          val.format("%s at %s and %s at %s",
                  conf_info.fcst_info[i_vx]->name().text(),
                  conf_info.fcst_info[i_vx]->level_name().text(),
                  conf_info.obs_info[i_vx]->name().text(),
                  conf_info.obs_info[i_vx]->level_name().text());
-         add_var_att(diff_var, "long_name", val);
+         add_var_att_local(&diff_var, "long_name", val);
          val.format("%s and %s",
                  shc.get_fcst_lev().text(),
                  shc.get_obs_lev().text());
-         add_var_att(diff_var, "level", val);
+         add_var_att_local(&diff_var, "level", val);
          val.format("%s and %s",
                  conf_info.fcst_info[i_vx]->units().text(),
                  conf_info.obs_info[i_vx]->units().text());
-         add_var_att(diff_var, "units", val);
-         diff_var->add_att("_FillValue", bad_data_float);
-         write_netcdf_var_times(diff_var,
+         add_var_att_local(&diff_var, "units", val);
+         add_att(&diff_var, "_FillValue", bad_data_float);
+         write_netcdf_var_times(&diff_var,
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
-         add_var_att(diff_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&diff_var, "desc", conf_info.desc[i_vx]);
 
       }
 
@@ -1446,10 +1446,10 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    else {
 
       if ( nc_info.do_raw )  {
-         fcst_var = nc_out->get_var(fcst_var_name);
-         obs_var  = nc_out->get_var(obs_var_name);
+         fcst_var = get_var(nc_out, fcst_var_name);
+         obs_var  = get_var(nc_out, obs_var_name);
       }
-      if ( nc_info.do_diff )  diff_var = nc_out->get_var(diff_var_name);
+      if ( nc_info.do_diff )  diff_var = get_var(nc_out, diff_var_name);
    }
 
    // Allocate memory for the forecast, observation, and difference
@@ -1489,11 +1489,21 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    // Retrieve the tile dimension
    d = conf_info.get_tile_dim();
 
-   if ( nc_info.do_raw )  {
+   int dim_count = get_dim_count(&fcst_var);
+   long lengths[dim_count];
+   long offsets[dim_count];
+   
+   offsets[0] = i_tile;
+   offsets[1] = 0;
+   offsets[2] = 0;
+ 
+   lengths[0] = 1;
+   lengths[1] = d;
+   lengths[2] = d;
 
+   if ( nc_info.do_raw )  {
       // Write out the forecast field
-      if(!fcst_var->set_cur(i_tile, 0, 0) ||
-         !fcst_var->put(&fcst_data[0], 1, d, d)) {
+      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1501,8 +1511,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!obs_var->set_cur(i_tile, 0, 0) ||
-         !obs_var->put(&obs_data[0], 1, d, d)) {
+      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1514,8 +1523,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    if ( nc_info.do_diff )  {
 
       // Write out the difference field
-      if(!diff_var->set_cur(i_tile, 0, 0) ||
-         !diff_var->put(&diff_data[0], 1, d, d)) {
+      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1587,87 +1595,88 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       // Define the forecast and difference variables
 
       if ( nc_info.do_raw )  {
-         fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
-                                    tile_dim, scale_dim, x_dim, y_dim);
-         obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
-                                    tile_dim, scale_dim, x_dim, y_dim);
+         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+                            tile_dim, scale_dim, x_dim, y_dim);
+         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+                            tile_dim, scale_dim, x_dim, y_dim);
       }
 
-      if ( nc_info.do_diff )  diff_var = nc_out->add_var(diff_var_name, ncFloat, tile_dim, scale_dim, x_dim, y_dim);
+      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+                                                 tile_dim, scale_dim, x_dim, y_dim);
 
       if ( nc_info.do_raw )  {
 
          // Add variable attributes for the observation field
-         add_var_att(obs_var, "type", "Observation");
-         add_var_att(obs_var, "name", shc.get_obs_var());
+         add_var_att_local(&obs_var, "type", "Observation");
+         add_var_att_local(&obs_var, "name", shc.get_obs_var());
          val.format("%s at %s",
                  conf_info.obs_info[i_vx]->name().text(),
                  conf_info.obs_info[i_vx]->level_name().text());
-         add_var_att(obs_var, "long_name", val);
-         add_var_att(obs_var, "level", shc.get_obs_lev());
-         add_var_att(obs_var, "units", conf_info.fcst_info[i_vx]->units().text());
-         add_var_att(obs_var, "threshold", fcst_thresh_str);
-         add_var_att(obs_var, "scale_0", "binary");
-         add_var_att(obs_var, "scale_n", "scale 2^(n-1)");
-         obs_var->add_att("_FillValue", bad_data_float);
-         write_netcdf_var_times(obs_var,
+         add_var_att_local(&obs_var, "long_name", val);
+         add_var_att_local(&obs_var, "level", shc.get_obs_lev());
+         add_var_att_local(&obs_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_var_att_local(&obs_var, "threshold", fcst_thresh_str);
+         add_var_att_local(&obs_var, "scale_0", "binary");
+         add_var_att_local(&obs_var, "scale_n", "scale 2^(n-1)");
+         add_att(&obs_var, "_FillValue", bad_data_float);
+         write_netcdf_var_times(&obs_var,
             shc.get_obs_valid_beg() - shc.get_obs_lead_sec(),
             shc.get_obs_valid_beg(), 0);
-         add_var_att(obs_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&obs_var, "desc", conf_info.desc[i_vx]);
 
          // Add variable attributes for the forecast field
-         add_var_att(fcst_var, "type", "Forecast");
-         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         add_var_att_local(&fcst_var, "type", "Forecast");
+         add_var_att_local(&fcst_var, "name", shc.get_fcst_var());
          val.format("%s at %s",
                  conf_info.fcst_info[i_vx]->name().text(),
                  conf_info.fcst_info[i_vx]->level_name().text());
-         add_var_att(fcst_var, "long_name", val);
-         add_var_att(fcst_var, "level", shc.get_fcst_lev());
-         add_var_att(fcst_var, "units", conf_info.fcst_info[i_vx]->units().text());
-         add_var_att(fcst_var, "threshold", fcst_thresh_str);
-         add_var_att(fcst_var, "scale_0", "binary");
-         add_var_att(fcst_var, "scale_n", "scale 2^(n-1)");
-         fcst_var->add_att("_FillValue", bad_data_float);
-         write_netcdf_var_times(fcst_var,
+         add_var_att_local(&fcst_var, "long_name", val);
+         add_var_att_local(&fcst_var, "level", shc.get_fcst_lev());
+         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units().text());
+         add_var_att_local(&fcst_var, "threshold", fcst_thresh_str);
+         add_var_att_local(&fcst_var, "scale_0", "binary");
+         add_var_att_local(&fcst_var, "scale_n", "scale 2^(n-1)");
+         add_att(&fcst_var, "_FillValue", bad_data_float);
+         write_netcdf_var_times(&fcst_var,
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
-         add_var_att(fcst_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&fcst_var, "desc", conf_info.desc[i_vx]);
 
       }
 
       if ( nc_info.do_diff )  {
 
          // Add variable attributes for the difference field
-         add_var_att(diff_var, "type", "Difference (F-O)");
+         add_var_att_local(&diff_var, "type", "Difference (F-O)");
          val.format("Forecast %s minus Observed %s",
                  shc.get_fcst_var().text(),
                  shc.get_obs_var().text());
-         add_var_att(diff_var, "name", val);
+         add_var_att_local(&diff_var, "name", val);
          val.format("%s at %s and %s at %s",
                  conf_info.fcst_info[i_vx]->name().text(),
                  conf_info.fcst_info[i_vx]->level_name().text(),
                  conf_info.obs_info[i_vx]->name().text(),
                  conf_info.obs_info[i_vx]->level_name().text());
-         add_var_att(diff_var, "long_name", val);
+         add_var_att_local(&diff_var, "long_name", val);
          val.format("%s and %s",
                  shc.get_fcst_lev().text(),
                  shc.get_obs_lev().text());
-         add_var_att(diff_var, "level", val);
+         add_var_att_local(&diff_var, "level", val);
          val.format("%s and %s",
                  conf_info.fcst_info[i_vx]->units().text(),
                  conf_info.obs_info[i_vx]->units().text());
-         add_var_att(diff_var, "units", val);
+         add_var_att_local(&diff_var, "units", val);
          val.format("%s and %s",
                  fcst_thresh_str.text(),
                  obs_thresh_str.text());
-         add_var_att(diff_var, "threshold", val);
-         add_var_att(diff_var, "scale_0", "binary");
-         add_var_att(diff_var, "scale_n", "scale 2^(n-1)");
-         diff_var->add_att("_FillValue", bad_data_float);
-         write_netcdf_var_times(diff_var,
+         add_var_att_local(&diff_var, "threshold", val);
+         add_var_att_local(&diff_var, "scale_0", "binary");
+         add_var_att_local(&diff_var, "scale_n", "scale 2^(n-1)");
+         add_att(&diff_var, "_FillValue", bad_data_float);
+         write_netcdf_var_times(&diff_var,
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
-         add_var_att(diff_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&diff_var, "desc", conf_info.desc[i_vx]);
       }
 
    }
@@ -1676,12 +1685,12 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
       if ( nc_info.do_raw )  {
 
-         fcst_var = nc_out->get_var(fcst_var_name);
-         obs_var  = nc_out->get_var(obs_var_name);
+         fcst_var = get_var(nc_out, fcst_var_name);
+         obs_var  = get_var(nc_out, obs_var_name);
 
       }
 
-      if ( nc_info.do_diff )  diff_var = nc_out->get_var(diff_var_name);
+      if ( nc_info.do_diff )  diff_var = get_var(nc_out, diff_var_name);
 
    }
 
@@ -1725,11 +1734,22 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    // Retrieve the tile dimensions
    d = conf_info.get_tile_dim();
 
+   int dim_count = get_dim_count(&fcst_var);
+   long lengths[dim_count];
+   long offsets[dim_count];
+   
+   offsets[0] = i_tile;
+   offsets[1] = i_scale+1;
+   offsets[2] = 0;
+   offsets[3] = 0;
+   lengths[0] = 1;
+   lengths[1] = 1;
+   lengths[2] = d;
+   lengths[3] = d;
    if ( nc_info.do_raw )  {
 
       // Write out the forecast field
-      if(!fcst_var->set_cur(i_tile, i_scale+1, 0, 0) ||
-         !fcst_var->put(&fcst_data[0], 1, 1, d, d)) {
+      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1737,8 +1757,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!obs_var->set_cur(i_tile, i_scale+1, 0, 0) ||
-         !obs_var->put(&obs_data[0], 1, 1, d, d)) {
+      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1749,9 +1768,9 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
    if ( nc_info.do_diff )  {
 
+
       // Write out the difference field
-      if(!diff_var->set_cur(i_tile, i_scale+1, 0, 0) ||
-         !diff_var->put(&diff_data[0], 1, 1, d, d)) {
+      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
          mlog << Error << "\nwrite_nc()_wav -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1770,10 +1789,10 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att(NcVar *var, const char *att_name, const char *att_value) {
+void add_var_att_local(NcVar *var, const char *att_name, const char *att_value) {
 
-   if(att_value) var->add_att(att_name, att_value);
-   else          var->add_att(att_name, na_str);
+   if(att_value) add_att(var, att_name, att_value);
+   else          add_att(var, att_name, na_str);
 
    return;
 }
@@ -1803,7 +1822,7 @@ void close_out_files() {
 
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
-      nc_out->close();
+      //nc_out->close();
       delete nc_out;
       nc_out = (NcFile *) 0;
    }

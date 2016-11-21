@@ -164,8 +164,10 @@ bool ModeNcOutputFile::open(const char * _filename)
 
 // int x, y;
 // int value;
-NcDim * dim = (NcDim *) 0;
-NcAtt * att = (NcAtt *) 0;
+//NcDim * dim = (NcDim *) 0;
+//NcAtt * att = (NcAtt *) 0;
+NcDim dim;
+NcVarAtt att;
 ConcatString s;
 
 
@@ -175,7 +177,7 @@ Filename = _filename;
 
 f = open_ncfile(_filename);
 
-if ( !(f->is_valid()) )  {
+if ( IS_INVALID_NC_P(f) )  {
 
    close();
 
@@ -188,30 +190,41 @@ if ( !(f->is_valid()) )  {
    //
 
 
-dim = f->get_dim("lon");
+dim = get_nc_dim(f, "lon");
 
-Nx = dim->size();
-
-
-dim = f->get_dim("lat");
-
-Ny = dim->size();
+Nx = GET_NC_SIZE(dim);
 
 
-dim = (NcDim *) 0;
+dim = get_nc_dim(f, "lat");
+
+Ny = GET_NC_SIZE(dim);
+
+
+//dim = (NcDim *) 0;
 
    //
    //  variables
    //
 
-FcstRaw    = f->get_var("fcst_raw" );
-ObsRaw     = f->get_var("obs_raw" );
+_FcstRaw    = get_nc_var(f, "fcst_raw" );
+_ObsRaw     = get_nc_var(f, "obs_raw" );
 
-FcstObjId  = f->get_var("fcst_obj_id" );
-FcstClusId = f->get_var("fcst_clus_id");
+_FcstObjId  = get_nc_var(f, "fcst_obj_id" );
+_FcstClusId = get_nc_var(f, "fcst_clus_id");
 
-ObsObjId   = f->get_var("obs_obj_id" );
-ObsClusId  = f->get_var("obs_clus_id");
+_ObsObjId   = get_nc_var(f, "obs_obj_id" );
+_ObsClusId  = get_nc_var(f, "obs_clus_id");
+
+FcstRaw    = &_FcstRaw    ; 
+ObsRaw     = &_ObsRaw     ; 
+              
+FcstObjId  = &_FcstObjId  ; 
+FcstClusId = &_FcstClusId ; 
+              
+ObsObjId   = &_ObsObjId   ; 
+ObsClusId  = &_ObsClusId  ; 
+
+
 
    //
    //  count objects
@@ -254,16 +267,18 @@ read_netcdf_grid(f, *_Grid);
    //  get init time, valid time, lead time from FcstRaw variable attributes
    //
 
-att = FcstRaw->get_att("init_time_ut");
+att = get_nc_att(FcstRaw, "init_time_ut");
 
-switch ( att->type() )  {
+switch ( GET_NC_TYPE(att).getId() )  {
 
-   case ncInt:
-      InitTime = att->as_nclong(0);
+   //case ncInt:
+   case NC_INT:
+      InitTime = get_att_value_int(&att);
       break;
 
-   case ncChar:
-      s = att->as_string(0);
+   //case ncChar:
+   case NC_CHAR:
+      get_att_value_chars(&att, s);
       InitTime = string_to_unixtime(s);
       break;
 
@@ -276,16 +291,18 @@ switch ( att->type() )  {
 }   //  switch
 
 
-att = FcstRaw->get_att("valid_time_ut");
+att = get_nc_att(FcstRaw, "valid_time_ut");
 
-switch ( att->type() )  {
+switch ( GET_NC_TYPE(att).getId() )  {
 
-   case ncInt:
-      ValidTime = att->as_nclong(0);
+   //case ncInt:
+   case NC_INT:
+      InitTime = get_att_value_int(&att);
       break;
 
-   case ncChar:
-      s = att->as_string(0);
+   //case ncChar:
+   case NC_CHAR:
+      get_att_value_chars(&att, s);
       ValidTime = string_to_unixtime(s);
       break;
 
@@ -475,19 +492,23 @@ int ModeNcOutputFile::count_objects(NcVar * var) const
 int x, y, n, k;
 
 n = 0;
-
-for (x=0; x<Nx; ++x)  {
-
-   for (y=0; y<Ny; ++y)  {
-
-      k = get_int(var, x, y);
-
-      if ( k > n )  n = k;
-
+int v[Ny][Nx];
+long offsets[2] = { 0,  0};   //  NOT (x, y)!
+long lengths[2] = {Ny, Nx};
+if (get_nc_data(var, (int *)&v, lengths, offsets)) {
+   for (x=0; x<Nx; ++x)  {
+   
+      for (y=0; y<Ny; ++y)  {
+   
+         //k = get_int(var, x, y);
+         k = v[y][x];
+   
+         if ( k > n )  n = k;
+   
+      }
+   
    }
-
 }
-
 return ( n );
 
 }
@@ -512,18 +533,21 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  {
 
 int i[2];
 int status;
+long offsets[2] = {y, x};   //  NOT (x, y)!
+long lengths[2] = {1,1};
 
-status = var->set_cur(y, x);   //  NOT (x, y)!
-
-if ( !status )  {
-
-   mlog << Error << "\n\n  ModeNcOutputFile::get_int() const -> can't set_cur for (" << x << ", " << y << ")!\n\n";
-
-   exit ( 1 );
-
-}
-
-status = var->get(i, 1, 1);
+//status = var->set_cur(y, x);
+//
+//if ( !status )  {
+//
+//   mlog << Error << "\n\n  ModeNcOutputFile::get_int() const -> can't set_cur for (" << x << ", " << y << ")!\n\n";
+//
+//   exit ( 1 );
+//
+//}
+//
+//status = var->get(i, 1, 1);
+status = get_nc_data(var, (int *)&i, lengths, offsets);
 
 if ( !status )  {
 
@@ -557,18 +581,21 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  {
 
 float ff[2];
 int status;
+long offsets[2] = {y, x};   //  NOT (x, y)!
+long lengths[2] = {1,1};
 
-status = var->set_cur(y, x);   //  NOT (x, y)!
-
-if ( !status )  {
-
-   mlog << Error << "\n\n  ModeNcOutputFile::get_float() const -> can't set_cur for (" << x << ", " << y << ")!\n\n";
-
-   exit ( 1 );
-
-}
-
-status = var->get(ff, 1, 1);
+//status = var->set_cur(y, x);   //  NOT (x, y)!
+//
+//if ( !status )  {
+//
+//   mlog << Error << "\n\n  ModeNcOutputFile::get_float() const -> can't set_cur for (" << x << ", " << y << ")!\n\n";
+//
+//   exit ( 1 );
+//
+//}
+//
+//status = var->get(ff, 1, 1);
+status = get_nc_data(var, (float *)&ff, lengths, offsets);
 
 if ( !status )  {
 

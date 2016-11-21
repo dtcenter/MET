@@ -25,5 +25,6 @@ tc_dland_LDADD = -lvx_tc_util \
 	-lvx_util \
 	-lvx_math \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lm -lnetcdf_c++ -lnetcdf \
 	$(FLIBS)

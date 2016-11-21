@@ -1802,7 +1802,6 @@ void load_dland() {
 
    // Check for no file provided
    if(file_name.empty()) return;
-
    // Open the NetCDF output of the tc_dland tool
    MetNcFile MetNc;
    if(!MetNc.open(file_name)) {

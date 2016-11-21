@@ -23,7 +23,8 @@
 
 #include <ostream>
 
-#include <netcdf.hh>
+//#include <netcdf.hh>
+
 
 #include "vx_grid.h"
 #include "data_plane.h"

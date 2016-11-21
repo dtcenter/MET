@@ -39,7 +39,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
 
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
@@ -274,9 +274,9 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    ConcatString cs;
 
    // Create a new NetCDF file and open it
-   NcFile *f_out = open_ncfile(OutputFilename, NcFile::Replace);
+   NcFile *f_out = open_ncfile(OutputFilename, NcFile::replace);
 
-   if(!f_out->is_valid()) {
+   if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output NetCDF file \""
            << OutputFilename << "\"\n\n";
@@ -287,17 +287,17 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    write_netcdf_global(f_out, OutputFilename, program_name);
 
    // Add the run command
-   f_out->add_att("RunCommand", shift_cs);
+   add_att(f_out, "RunCommand", shift_cs);
 
    // Add the projection information
    write_netcdf_proj(f_out, grid);
 
    // Define Dimensions
-   NcDim *lat_dim = f_out->add_dim("lat", (long) grid.ny());
-   NcDim *lon_dim = f_out->add_dim("lon", (long) grid.nx());
+   NcDim lat_dim = add_dim(f_out, "lat", (long) grid.ny());
+   NcDim lon_dim = add_dim(f_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
+   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
 
    // Define output variable and attributes
    cs << cs_erase << vinfo->name();
@@ -309,15 +309,15 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
       cs << "_" << vinfo->level_name();
    }
 
-   NcVar *data_var = f_out->add_var(cs, ncFloat, lat_dim, lon_dim);
-   data_var->add_att("name", cs);
-   data_var->add_att("long_name", vinfo->long_name());
-   data_var->add_att("level", vinfo->level_name());
-   data_var->add_att("units", vinfo->units());
-   data_var->add_att("_FillValue", bad_data_float);
-   write_netcdf_var_times(data_var, dp);
-   data_var->add_att("smoothing_method", interpmthd_to_string(Method));
-   data_var->add_att("smoothing_neighborhood", Width*Width);
+   NcVar data_var = add_var(f_out, (string)cs, ncFloat, lat_dim, lon_dim);
+   add_att(&data_var, "name", (string)cs);
+   add_att(&data_var, "long_name", (string)vinfo->long_name());
+   add_att(&data_var, "level", (string)vinfo->level_name());
+   add_att(&data_var, "units", (string)vinfo->units());
+   add_att(&data_var, "_FillValue", bad_data_float);
+   write_netcdf_var_times(&data_var, dp);
+   add_att(&data_var, "smoothing_method", (string)interpmthd_to_string(Method));
+   add_att(&data_var, "smoothing_neighborhood", Width*Width);
 
    // Allocate memory to store data values for each grid point
    float *data = new float [grid.nx()*grid.ny()];
@@ -331,7 +331,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    } // end for x
 
    // Write out the data
-   if(!data_var->put(&data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&data_var, &data[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
@@ -339,7 +339,10 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
 
    // Clean up
    if(data)  {                 delete [] data; data  = (float *)  0; }
-   if(f_out) { f_out->close(); delete f_out;   f_out = (NcFile *) 0; }
+   if(f_out) { 
+      //f_out->close();
+      delete f_out;   f_out = (NcFile *) 0; 
+   }
 
    // List the output file
    mlog << Debug(1)

@@ -18,8 +18,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
 
+#include "nc_utils.h"
 #include "vx_grid.h"
 
 

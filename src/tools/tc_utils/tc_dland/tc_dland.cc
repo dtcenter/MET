@@ -35,7 +35,7 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
 #include "grib_classes.h"
 
 #include "vx_log.h"
@@ -203,18 +203,21 @@ void process_distances() {
    
    // NetCDF variables
    NcFile *f_out     = (NcFile *) 0;
-   NcDim  *lat_dim   = (NcDim *) 0;
-   NcDim  *lon_dim   = (NcDim *) 0;
-   NcVar  *dland_var = (NcVar *) 0;
+   //NcDim  *lat_dim   = (NcDim *) 0;
+   //NcDim  *lon_dim   = (NcDim *) 0;
+   //NcVar  *dland_var = (NcVar *) 0;
+   NcDim  lat_dim    ;
+   NcDim  lon_dim    ;
+   NcVar  dland_var ;
 
    // Create a new NetCDF file and open it
-   f_out = open_ncfile(out_filename, NcFile::Replace);
+   f_out = open_ncfile(out_filename, NcFile::replace);
 
-   if(!f_out->is_valid()) {
+   if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nprocess_distances() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      f_out->close();
+      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
       exit(1);
@@ -229,20 +232,20 @@ void process_distances() {
    write_netcdf_proj(f_out, grid);
 
    // Define Dimensions
-   lat_dim = f_out->add_dim("lat", (long) grid.ny());
-   lon_dim = f_out->add_dim("lon", (long) grid.nx());
+   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
+   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
    
    // Add the lat/lon variables
    if(latlon_flag) {
       mlog << Debug(3) << "Writing NetCDF lat/lon variables.\n";
-      write_netcdf_latlon(f_out, lat_dim, lon_dim, grid);
+      write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
    }
 
    // Define Variables
-   dland_var = f_out->add_var("dland", ncFloat, lat_dim, lon_dim);
-   dland_var->add_att("long_name", "distance to land");
-   dland_var->add_att("units", "nm");
-   dland_var->add_att("_FillValue", bad_data_float);
+   dland_var = add_var(f_out, (string)"dland", ncFloat, lat_dim, lon_dim);
+   add_att(&dland_var, "long_name", "distance to land");
+   add_att(&dland_var, "units", "nm");
+   add_att(&dland_var, "_FillValue", bad_data_float);
 
    // Allocate memory to store the data values for each grid point
    dland = new float [grid.nx()*grid.ny()];
@@ -289,7 +292,7 @@ void process_distances() {
 
    // Write the computed distances to the output file
    mlog << Debug(3) << "Writing distance to land variable.\n";
-   if(!dland_var->put(&dland[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&dland_var, &dland[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nprocess_distances() -> "
            << "error with dland_var->put\n\n";
       exit(1);
@@ -299,7 +302,7 @@ void process_distances() {
    if(dland) { delete dland; dland = (float *) 0; }
 
    // Close the output NetCDF file
-   f_out->close();
+   //f_out->close();
    delete f_out;
    f_out = (NcFile *) 0;
 

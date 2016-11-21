@@ -153,7 +153,7 @@ static void write_nbrhd_nc(const GridStatNcOutInfo &,
                            const SingleThresh &, const SingleThresh &,
                            int);
 
-static void add_var_att(NcVar *, const char *, const char *);
+static void add_var_att_local(NcVar *, const char *, const char *);
 
 static void finish_txt_files();
 
@@ -472,9 +472,9 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, NcFile::Replace);
+   nc_out = open_ncfile(out_nc_file, NcFile::replace);
 
-   if(!nc_out->is_valid()) {
+   if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_nc_file << "\n\n";
@@ -485,24 +485,24 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    write_netcdf_global(nc_out, out_nc_file, program_name,
                        conf_info.model, conf_info.obtype);
    if(nc_info.do_diff) {
-      nc_out->add_att("Difference", "Forecast Value - Observation Value");
+      add_att(nc_out, "Difference", "Forecast Value - Observation Value");
    }
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
 
    // Define Dimensions
-   lat_dim = nc_out->add_dim("lat", (long) grid.ny());
-   lon_dim = nc_out->add_dim("lon", (long) grid.nx());
+   lat_dim = add_dim(nc_out,"lat", (long) grid.ny());
+   lon_dim = add_dim(nc_out,"lon", (long) grid.nx());
 
    // Add the lat/lon variables
    if(nc_info.do_latlon) {
-      write_netcdf_latlon(nc_out, lat_dim, lon_dim, grid);
+      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
    }
 
    // Add grid weight variable
    if(nc_info.do_weight) {
-      write_netcdf_grid_weight(nc_out, lat_dim, lon_dim,
+      write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
 
@@ -1671,10 +1671,14 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    float *diff_data = (float *) 0;
    float *cmn_data  = (float *) 0;
 
-   NcVar *fcst_var = (NcVar *) 0;
-   NcVar *obs_var  = (NcVar *) 0;
-   NcVar *diff_var = (NcVar *) 0;
-   NcVar *cmn_var  = (NcVar *) 0;
+   //NcVar *fcst_var = (NcVar *) 0;
+   //NcVar *obs_var  = (NcVar *) 0;
+   //NcVar *diff_var = (NcVar *) 0;
+   //NcVar *cmn_var  = (NcVar *) 0;
+   NcVar fcst_var;
+   NcVar obs_var ;
+   NcVar diff_var;
+   NcVar cmn_var ;
 
    // Get the interpolation strings
    mthd_str = interpmthd_to_string(mthd);
@@ -1751,60 +1755,60 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       if(fcst_flag) {
 
          // Define the forecast variable
-         fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
-                                    lat_dim, lon_dim);
+         fcst_var = add_var(nc_out, (string)fcst_var_name,
+                            ncFloat, lat_dim, lon_dim);
 
          // Add to the list of previously defined variables
          fcst_var_sa.add(fcst_var_name);
 
          // Add variable attributes for the forecast field
-         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         add_var_att_local(&fcst_var, "name", shc.get_fcst_var());
          att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
                  << " at "
                  << conf_info.fcst_info[i_vx]->level_name();
-         add_var_att(fcst_var, "long_name", att_str);
-         add_var_att(fcst_var, "level", shc.get_fcst_lev());
-         add_var_att(fcst_var, "units", conf_info.fcst_info[i_vx]->units());
-         write_netcdf_var_times(fcst_var, fcst_dp);
-         fcst_var->add_att("_FillValue", bad_data_float);
-         add_var_att(fcst_var, "desc", conf_info.desc[i_vx]);
-         add_var_att(fcst_var, "masking_region", conf_info.mask_name[i]);
-         add_var_att(fcst_var, "smoothing_method", mthd_str);
-         fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
+         add_var_att_local(&fcst_var, "long_name", att_str);
+         add_var_att_local(&fcst_var, "level", shc.get_fcst_lev());
+         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units());
+         write_netcdf_var_times(&fcst_var, fcst_dp);
+         add_att(&fcst_var, "_FillValue", bad_data_float);
+         add_var_att_local(&fcst_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&fcst_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&fcst_var, "smoothing_method", mthd_str);
+         add_att(&fcst_var, "smoothing_neighborhood", wdth*wdth);
       } // end fcst_flag
 
       // Set up the observation variable if not already defined
       if(obs_flag) {
 
          // Define the observation variable
-         obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
-                                    lat_dim, lon_dim);
+         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+                            lat_dim, lon_dim);
 
          // Add to the list of previously defined variables
          obs_var_sa.add(obs_var_name);
 
          // Add variable attributes for the observation field
-         add_var_att(obs_var, "name", shc.get_obs_var());
+         add_var_att_local(&obs_var, "name", shc.get_obs_var());
          att_str << cs_erase << conf_info.obs_info[i_vx]->name()
                  << " at "
                  << conf_info.obs_info[i_vx]->level_name();
-         add_var_att(obs_var, "long_name", att_str);
-         add_var_att(obs_var, "level", shc.get_obs_lev());
-         add_var_att(obs_var, "units", conf_info.obs_info[i_vx]->units());
-         write_netcdf_var_times(obs_var, obs_dp);
-         obs_var->add_att("_FillValue", bad_data_float);
-         add_var_att(obs_var, "desc", conf_info.desc[i_vx]);
-         add_var_att(obs_var, "masking_region", conf_info.mask_name[i]);
-         add_var_att(obs_var, "smoothing_method", mthd_str);
-         obs_var->add_att("smoothing_neighborhood", wdth*wdth);
+         add_var_att_local(&obs_var, "long_name", att_str);
+         add_var_att_local(&obs_var, "level", shc.get_obs_lev());
+         add_var_att_local(&obs_var, "units", conf_info.obs_info[i_vx]->units());
+         write_netcdf_var_times(&obs_var, obs_dp);
+         add_att(&obs_var, "_FillValue", bad_data_float);
+         add_var_att_local(&obs_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&obs_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&obs_var, "smoothing_method", mthd_str);
+         add_att(&obs_var, "smoothing_neighborhood", wdth*wdth);
       } // end obs_flag
 
       // Set up the difference variable if not already defined
       if(diff_flag) {
 
          // Define the difference variable
-         diff_var = nc_out->add_var(diff_var_name, ncFloat,
-                                    lat_dim, lon_dim);
+         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+                            lat_dim, lon_dim);
 
          // Add to the list of previously defined variables
          diff_var_sa.add(diff_var_name);
@@ -1812,50 +1816,50 @@ void write_nc(const GridStatNcOutInfo & nc_info,
          // Add variable attributes for the difference field
          att_str << cs_erase << "Forecast " << shc.get_fcst_var()
                  << " minus Observed " << shc.get_obs_var();
-         add_var_att(diff_var, "name", att_str);
+         add_var_att_local(&diff_var, "name", att_str);
          att_str << cs_erase << conf_info.fcst_info[i_vx]->name() << " at "
                  << conf_info.fcst_info[i_vx]->level_name() << " and "
                  << conf_info.obs_info[i_vx]->name() << " at "
                  << conf_info.obs_info[i_vx]->level_name();
-         add_var_att(diff_var, "long_name", att_str);
+         add_var_att_local(&diff_var, "long_name", att_str);
          att_str << cs_erase << shc.get_fcst_lev() << " and " << shc.get_obs_lev();
-         add_var_att(diff_var, "level", att_str);
+         add_var_att_local(&diff_var, "level", att_str);
          att_str << cs_erase << conf_info.fcst_info[i_vx]->units() << " and "
                  << conf_info.obs_info[i_vx]->units();
-         add_var_att(diff_var, "units", att_str);
-         diff_var->add_att("_FillValue", bad_data_float);
-         write_netcdf_var_times(diff_var, fcst_dp);
-         diff_var->add_att("_FillValue", bad_data_float);
-         add_var_att(diff_var, "desc", conf_info.desc[i_vx]);
-         add_var_att(diff_var, "masking_region", conf_info.mask_name[i]);
-         add_var_att(diff_var, "smoothing_method", mthd_str);
-         diff_var->add_att("smoothing_neighborhood", wdth*wdth);
+         add_var_att_local(&diff_var, "units", att_str);
+         add_att(&diff_var, "_FillValue", bad_data_float);
+         write_netcdf_var_times(&diff_var, fcst_dp);
+         add_att(&diff_var, "_FillValue", bad_data_float);
+         add_var_att_local(&diff_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&diff_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&diff_var, "smoothing_method", mthd_str);
+         add_att(&diff_var, "smoothing_neighborhood", wdth*wdth);
       } // end diff_flag
 
       // Add the climatology mean variable
       if(cmn_flag) {
 
          // Define the forecast variable
-         cmn_var = nc_out->add_var(cmn_var_name, ncFloat,
-                                   lat_dim, lon_dim);
+         cmn_var = add_var(nc_out, (string)cmn_var_name, ncFloat,
+                           lat_dim, lon_dim);
 
          // Add to the list of previously defined variables
          cmn_var_sa.add(cmn_var_name);
 
          // Add variable attributes for the climatology mean field
-         add_var_att(cmn_var, "name", shc.get_fcst_var());
+         add_var_att_local(&cmn_var, "name", shc.get_fcst_var());
          att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
                  << " at "
                  << conf_info.fcst_info[i_vx]->level_name();
-         add_var_att(cmn_var, "long_name", att_str);
-         add_var_att(cmn_var, "level", shc.get_fcst_lev());
-         add_var_att(cmn_var, "units", conf_info.fcst_info[i_vx]->units());
-         write_netcdf_var_times(cmn_var, cmn_dp);
-         cmn_var->add_att("_FillValue", bad_data_float);
-         add_var_att(cmn_var, "desc", conf_info.desc[i_vx]);
-         add_var_att(cmn_var, "masking_region", conf_info.mask_name[i]);
-         add_var_att(cmn_var, "smoothing_method", mthd_str);
-         cmn_var->add_att("smoothing_neighborhood", wdth*wdth);
+         add_var_att_local(&cmn_var, "long_name", att_str);
+         add_var_att_local(&cmn_var, "level", shc.get_fcst_lev());
+         add_var_att_local(&cmn_var, "units", conf_info.fcst_info[i_vx]->units());
+         write_netcdf_var_times(&cmn_var, cmn_dp);
+         add_att(&cmn_var, "_FillValue", bad_data_float);
+         add_var_att_local(&cmn_var, "desc", conf_info.desc[i_vx]);
+         add_var_att_local(&cmn_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&cmn_var, "smoothing_method", mthd_str);
+         add_att(&cmn_var, "smoothing_neighborhood", wdth*wdth);
       } // end cmn_flag
 
       // Store the forecast, observation, difference, and climatology values
@@ -1890,7 +1894,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
       // Write out the forecast field
       if(fcst_flag) {
-         if(!fcst_var->put(&fcst_data[0], grid.ny(), grid.nx())) {
+         if(!put_nc_data_with_dims(&fcst_var, &fcst_data[0], grid.ny(), grid.nx())) {
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the fcst_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
@@ -1902,7 +1906,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
       // Write out the observation field
       if(obs_flag) {
-         if(!obs_var->put(&obs_data[0], grid.ny(), grid.nx())) {
+         if(!put_nc_data_with_dims(&obs_var, &obs_data[0], grid.ny(), grid.nx())) {
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the obs_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
@@ -1914,7 +1918,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
       // Write out the difference field
       if(diff_flag) {
-         if(!diff_var->put(&diff_data[0], grid.ny(), grid.nx())) {
+         if(!put_nc_data_with_dims(&diff_var, &diff_data[0], grid.ny(), grid.nx())) {
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the diff_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
@@ -1926,7 +1930,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
       // Write out the climatology mean field
       if(cmn_flag) {
-         if(!cmn_var->put(&cmn_data[0], grid.ny(), grid.nx())) {
+         if(!put_nc_data_with_dims(&cmn_var, &cmn_data[0], grid.ny(), grid.nx())) {
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the cmn_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
@@ -1962,8 +1966,10 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
 
-   NcVar *fcst_var = (NcVar *) 0;
-   NcVar *obs_var  = (NcVar *) 0;
+   //NcVar *fcst_var = (NcVar *) 0;
+   //NcVar *obs_var  = (NcVar *) 0;
+   NcVar fcst_var ;
+   NcVar obs_var  ;
 
    // Get the interpolation strings
    mthd_str = interpmthd_to_string(InterpMthd_Nbrhd);
@@ -2001,52 +2007,52 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
       if(fcst_flag) {
 
          // Define the forecast variable
-         fcst_var = nc_out->add_var(fcst_var_name, ncFloat,
-                                    lat_dim, lon_dim);
+         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+                            lat_dim, lon_dim);
 
          // Add to the list of previously defined variables
          fcst_var_sa.add(fcst_var_name);
 
          // Add variable attributes for the forecast field
-         add_var_att(fcst_var, "name", shc.get_fcst_var());
+         add_var_att_local(&fcst_var, "name", shc.get_fcst_var());
          att_str << cs_erase << conf_info.fcst_info[i_vx]->name()
                  << " at "
                  << conf_info.fcst_info[i_vx]->level_name();
-         add_var_att(fcst_var, "long_name", att_str);
-         add_var_att(fcst_var, "level", shc.get_fcst_lev());
-         add_var_att(fcst_var, "units", conf_info.fcst_info[i_vx]->units());
-         write_netcdf_var_times(fcst_var, fcst_dp);
-         fcst_var->add_att("_FillValue", bad_data_float);
-         add_var_att(fcst_var, "masking_region", conf_info.mask_name[i]);
-         add_var_att(fcst_var, "smoothing_method", mthd_str);
-         add_var_att(fcst_var, "threshold", fcst_st.get_abbr_str());
-         fcst_var->add_att("smoothing_neighborhood", wdth*wdth);
+         add_var_att_local(&fcst_var, "long_name", att_str);
+         add_var_att_local(&fcst_var, "level", shc.get_fcst_lev());
+         add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units());
+         write_netcdf_var_times(&fcst_var, fcst_dp);
+         add_att(&fcst_var, "_FillValue", bad_data_float);
+         add_var_att_local(&fcst_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&fcst_var, "smoothing_method", mthd_str);
+         add_var_att_local(&fcst_var, "threshold", fcst_st.get_abbr_str());
+         add_att(&fcst_var, "smoothing_neighborhood", wdth*wdth);
       } // end fcst_flag
 
       // Add the observation variable
       if(obs_flag) {
 
          // Define the observation variable
-         obs_var  = nc_out->add_var(obs_var_name,  ncFloat,
-                                    lat_dim, lon_dim);
+         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+                            lat_dim, lon_dim);
 
          // Add to the list of previously defined variables
          obs_var_sa.add(obs_var_name);
 
          // Add variable attributes for the observation field
-         add_var_att(obs_var, "name", shc.get_obs_var());
+         add_var_att_local(&obs_var, "name", shc.get_obs_var());
          att_str << cs_erase << conf_info.obs_info[i_vx]->name()
                  << " at "
                  << conf_info.obs_info[i_vx]->level_name();
-         add_var_att(obs_var, "long_name", att_str);
-         add_var_att(obs_var, "level", shc.get_obs_lev());
-         add_var_att(obs_var, "units", conf_info.obs_info[i_vx]->units());
-         write_netcdf_var_times(obs_var, obs_dp);
-         obs_var->add_att("_FillValue", bad_data_float);
-         add_var_att(obs_var, "masking_region", conf_info.mask_name[i]);
-         add_var_att(obs_var, "smoothing_method", mthd_str);
-         add_var_att(obs_var, "threshold", obs_st.get_abbr_str());
-         obs_var->add_att("smoothing_neighborhood", wdth*wdth);
+         add_var_att_local(&obs_var, "long_name", att_str);
+         add_var_att_local(&obs_var, "level", shc.get_obs_lev());
+         add_var_att_local(&obs_var, "units", conf_info.obs_info[i_vx]->units());
+         write_netcdf_var_times(&obs_var, obs_dp);
+         add_att(&obs_var, "_FillValue", bad_data_float);
+         add_var_att_local(&obs_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&obs_var, "smoothing_method", mthd_str);
+         add_var_att_local(&obs_var, "threshold", obs_st.get_abbr_str());
+         add_att(&obs_var, "smoothing_neighborhood", wdth*wdth);
       } // end obs_flag
 
       // Store the forecast and observation values
@@ -2075,7 +2081,7 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
 
       // Write out the forecast field
       if(fcst_flag) {
-         if(!fcst_var->put(&fcst_data[0], grid.ny(), grid.nx())) {
+         if(!put_nc_data_with_dims(&fcst_var, &fcst_data[0], grid.ny(), grid.nx())) {
             mlog << Error << "\nwrite_nbrhd_nc() -> "
                  << "error with the fcst_var->put for forecast variable "
                  << fcst_var_name << "\n\n";
@@ -2085,7 +2091,7 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
 
       // Write out the observation field
       if(obs_flag) {
-         if(!obs_var->put(&obs_data[0], grid.ny(), grid.nx())) {
+         if(!put_nc_data_with_dims(&obs_var, &obs_data[0], grid.ny(), grid.nx())) {
             mlog << Error << "\nwrite_nbrhd_nc() -> "
                  << "error with the obs_var->put for observation variable "
                  << obs_var_name << "\n\n";
@@ -2104,10 +2110,10 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att(NcVar *var, const char *att_name, const char *att_value) {
+void add_var_att_local(NcVar *var, const char *att_name, const char *att_value) {
 
-   if(att_value) var->add_att(att_name, att_value);
-   else          var->add_att(att_name, na_str);
+   if(att_value) add_att(var, att_name, att_value);
+   else          add_att(var, att_name, na_str);
 
    return;
 }
@@ -2154,7 +2160,7 @@ void clean_up() {
       // List the NetCDF file after it is finished
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
 
-      nc_out->close();
+      //nc_out->close();
       delete nc_out;
       nc_out = (NcFile *) 0;
    }

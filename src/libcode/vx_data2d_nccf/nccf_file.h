@@ -23,9 +23,12 @@
 
 #include <ostream>
 
-#include <netcdf.hh>
+//#include <netcdf.hh>
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_grid.h"
+#include "nc_utils.h"
 #include "data_plane.h"
 #include "long_array.h"
 #include "nc_var_info.h"
@@ -60,7 +63,7 @@ class NcCfFile {
         if (_xDim == 0)
           return 0;
 
-        return _xDim->size();
+        return GET_NC_SIZE_P(_xDim);
       }
       
       int getNy() const
@@ -68,7 +71,7 @@ class NcCfFile {
         if (_yDim == 0)
           return 0;
 
-        return _yDim->size();
+        return GET_NC_SIZE_P(_yDim);
       }
       
          //
@@ -132,6 +135,10 @@ class NcCfFile {
       NcDim *_yDim;
       NcDim *_tDim;
 
+      NcDim xDim;
+      NcDim yDim;
+      NcDim tDim;
+
       NcVar *_xCoordVar;
       NcVar *_yCoordVar;
       
@@ -152,7 +159,7 @@ class NcCfFile {
       // grid member with that information.
 
       void read_netcdf_grid();
-      void get_grid_from_grid_mapping(const NcAtt *grid_mapping_att);
+      void get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att);
       
       void get_grid_mapping_albers_conical_equal_area(const NcVar *grid_mapping_var);
       void get_grid_mapping_azimuthal_equidistant(const NcVar *grid_mapping_var);

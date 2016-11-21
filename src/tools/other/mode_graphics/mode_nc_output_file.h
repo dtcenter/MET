@@ -17,7 +17,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include <netcdf.hh>
+//#include <netcdf.hh>
+#include <netcdf>
+using namespace netCDF;
 
 #include "data_plane.h"
 #include "vx_grid.h"
@@ -71,6 +73,15 @@ class ModeNcOutputFile {
       NcVar * FcstRaw;     //  NOT allocated
       NcVar * ObsRaw;      //  NOT allocated
 
+      NcVar _FcstObjId;   //
+      NcVar _FcstClusId;  //
+
+      NcVar _ObsObjId;    //
+      NcVar _ObsClusId;   //
+
+      NcVar _FcstRaw;     //
+      NcVar _ObsRaw;      //
+      
       ModeNcOutputFile(const ModeNcOutputFile &);
       ModeNcOutputFile & operator=(const ModeNcOutputFile &);
 

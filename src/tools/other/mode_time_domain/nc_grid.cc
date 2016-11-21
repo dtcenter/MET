@@ -43,32 +43,34 @@ bool read_nc_grid(NcFile & f, Grid & g)
 
 {
 
-bool status = false;
-const ConcatString proj = string_att(f, "Projection");
-
-
-g.clear();
-
-
-if ( proj == "Polar Stereographic" )  {
-
-   status = read_nc_st_grid(f, g);
-
-} else if ( proj == "Lambert Conformal" )  {
-
-   status = read_nc_lc_grid(f, g);
-
-} else if ( proj == "LatLon" )  {
-
-   status = read_nc_latlon_grid(f, g);
-
-} else {
-
-   mlog << Error << "\n\n  read_nc_grid() -> haven't written code to parse \"" << proj << "\" grids yet!\n\n";
-
-   return ( false );
-
-}
+   bool status = false;
+   ConcatString proj;
+   //const ConcatString proj = string_att(f, "Projection");
+   get_att_value_string(&f, "Projection", proj);
+   
+   
+   g.clear();
+   
+   
+   if ( proj == "Polar Stereographic" )  {
+   
+      status = read_nc_st_grid(f, g);
+   
+   } else if ( proj == "Lambert Conformal" )  {
+   
+      status = read_nc_lc_grid(f, g);
+   
+   } else if ( proj == "LatLon" )  {
+   
+      status = read_nc_latlon_grid(f, g);
+   
+   } else {
+   
+      mlog << Error << "\n\n  read_nc_grid() -> haven't written code to parse \"" << proj << "\" grids yet!\n\n";
+   
+      return ( false );
+   
+   }
 
 
    //
@@ -124,20 +126,21 @@ bool read_nc_st_grid(NcFile & f, Grid & g)
 
 {
 
-StereographicData data;
-const char * c = (const char *) 0;
+   StereographicData data;
+   ConcatString c;
 
    //
    //  name
    //
 
-data.name = "Unknown stereographic";
+   data.name = "Unknown stereographic";
 
    //
    //  hemisphere
    //
 
-c = string_att(f, "hemisphere");
+   //c = string_att(f, "hemisphere");
+   get_att_value_string(&f, "hemisphere", c);
 
 data.hemisphere = c[0];
 
@@ -335,7 +338,7 @@ char j2[256];
    //  name
    //
 
-f.add_att("Projection", "Polar Stereographic");
+add_att(&f, "Projection", "Polar Stereographic");
 
    //
    //  hemisphere
@@ -344,7 +347,7 @@ f.add_att("Projection", "Polar Stereographic");
 junk[0] = data.hemisphere;
 junk[1] = (char) 0;
 
-f.add_att("hemisphere", junk);
+add_att(&f, "hemisphere", junk);
 
    //
    //  scale latitude
@@ -356,7 +359,7 @@ fix_float(j2);
 
 sprintf(junk, "%s degrees_north", j2);
 
-f.add_att("scale_lat", junk);
+add_att(&f, "scale_lat", junk);
 
    //
    //  lat/lon pin point
@@ -366,14 +369,14 @@ sprintf(junk, "%.5f", data.lat_pin);
 
 fix_float(junk);
 
-f.add_att("lat_pin", junk);
+add_att(&f, "lat_pin", junk);
 
 
 sprintf(junk, "%.5f", -(data.lon_pin));
 
 fix_float(junk);
 
-f.add_att("lon_pin", junk);
+add_att(&f, "lon_pin", junk);
 
    //
    //  x/y pin point
@@ -383,14 +386,14 @@ sprintf(junk, "%.5f", data.x_pin);
 
 fix_float(junk);
 
-f.add_att("x_pin", junk);
+add_att(&f, "x_pin", junk);
 
 
 sprintf(junk, "%.5f", data.y_pin);
 
 fix_float(junk);
 
-f.add_att("y_pin", junk);
+add_att(&f, "y_pin", junk);
 
    //
    //  orientation longitude
@@ -400,7 +403,7 @@ sprintf(junk, "%.5f", -(data.lon_orient));
 
 fix_float(junk);
 
-f.add_att("lon_orient", junk);
+add_att(&f, "lon_orient", junk);
 
    //
    //  D and R
@@ -412,7 +415,7 @@ fix_float(j2);
 
 sprintf(junk, "%s km", j2);
 
-f.add_att("d_km", junk);
+add_att(&f, "d_km", junk);
 
 
 sprintf(j2, "%.5f", data.r_km);
@@ -421,7 +424,7 @@ fix_float(j2);
 
 sprintf(junk, "%s km", j2);
 
-f.add_att("r_km", junk);
+add_att(&f, "r_km", junk);
 
    //
    //  nx and ny
@@ -429,12 +432,12 @@ f.add_att("r_km", junk);
 
 sprintf(junk, "%d", data.nx);
 
-f.add_att("nx", junk);
+add_att(&f, "nx", junk);
 
 
 sprintf(junk, "%d", data.ny);
 
-f.add_att("ny", junk);
+add_att(&f, "ny", junk);
 
 
    //
@@ -460,7 +463,7 @@ char j2[256];
    //  name
    //
 
-f.add_att("Projection", "Lambert Conformal");
+add_att(&f, "Projection", "Lambert Conformal");
 
    //
    //  scale latitudes
@@ -470,14 +473,14 @@ sprintf(junk, "%.5f", data.scale_lat_1);
 
 fix_float(junk);
 
-f.add_att("scale_lat_1", junk);
+add_att(&f, "scale_lat_1", junk);
 
 
 sprintf(junk, "%.5f", data.scale_lat_2);
 
 fix_float(junk);
 
-f.add_att("scale_lat_2", junk);
+add_att(&f, "scale_lat_2", junk);
 
    //
    //  lat/lon pin point
@@ -487,14 +490,14 @@ sprintf(junk, "%.5f", data.lat_pin);
 
 fix_float(junk);
 
-f.add_att("lat_pin", junk);
+add_att(&f, "lat_pin", junk);
 
 
 sprintf(junk, "%.5f", -(data.lon_pin));
 
 fix_float(junk);
 
-f.add_att("lon_pin", junk);
+add_att(&f, "lon_pin", junk);
 
    //
    //  x/y pin point
@@ -504,14 +507,14 @@ sprintf(junk, "%.5f", data.x_pin);
 
 fix_float(junk);
 
-f.add_att("x_pin", junk);
+add_att(&f, "x_pin", junk);
 
 
 sprintf(junk, "%.5f", data.y_pin);
 
 fix_float(junk);
 
-f.add_att("y_pin", junk);
+add_att(&f, "y_pin", junk);
 
    //
    //  orientation longitude
@@ -521,7 +524,7 @@ sprintf(junk, "%.5f", -(data.lon_orient));
 
 fix_float(junk);
 
-f.add_att("lon_orient", junk);
+add_att(&f, "lon_orient", junk);
 
    //
    //  D and R
@@ -533,7 +536,7 @@ fix_float(j2);
 
 sprintf(junk, "%s km", j2);
 
-f.add_att("d_km", junk);
+add_att(&f, "d_km", junk);
 
 
 sprintf(j2, "%.5f", data.r_km);
@@ -542,7 +545,7 @@ fix_float(j2);
 
 sprintf(junk, "%s km", j2);
 
-f.add_att("r_km", junk);
+add_att(&f, "r_km", junk);
 
    //
    //  nx and ny
@@ -550,12 +553,12 @@ f.add_att("r_km", junk);
 
 sprintf(junk, "%d", data.nx);
 
-f.add_att("nx", junk);
+add_att(&f, "nx", junk);
 
 
 sprintf(junk, "%d", data.ny);
 
-f.add_att("ny", junk);
+add_att(&f, "ny", junk);
 
 
    //
@@ -581,7 +584,7 @@ char junk[256];
    //  name
    //
 
-f.add_att("Projection", "LatLon");
+add_att(&f, "Projection", "LatLon");
 
    //
    //  lower left point
@@ -591,14 +594,14 @@ sprintf(junk, "%.5f", data.lat_ll);
 
 fix_float(junk);
 
-f.add_att("lat_ll", junk);
+add_att(&f, "lat_ll", junk);
 
 
 sprintf(junk, "%.5f", -(data.lon_ll));
 
 fix_float(junk);
 
-f.add_att("lon_ll", junk);
+add_att(&f, "lon_ll", junk);
 
    //
    //  lat/lon deltas
@@ -608,14 +611,14 @@ sprintf(junk, "%.5f", data.delta_lat);
 
 fix_float(junk);
 
-f.add_att("delta_lat", junk);
+add_att(&f, "delta_lat", junk);
 
 
 sprintf(junk, "%.5f", data.delta_lon);
 
 fix_float(junk);
 
-f.add_att("delta_lon", junk);
+add_att(&f, "delta_lon", junk);
 
    //
    //  grid size
@@ -625,14 +628,14 @@ sprintf(junk, "%d", data.Nlat);
 
 fix_float(junk);
 
-f.add_att("Nlat", junk);
+add_att(&f, "Nlat", junk);
 
 
 sprintf(junk, "%d", data.Nlon);
 
 fix_float(junk);
 
-f.add_att("Nlon", junk);
+add_att(&f, "Nlon", junk);
 
 
    //

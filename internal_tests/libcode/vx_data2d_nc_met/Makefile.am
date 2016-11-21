@@ -24,5 +24,6 @@ test_read_nc_met_LDADD = -lvx_data2d_nc_met \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	-lnetcdf_c++4 \
 	-lnetcdf_c++ -lnetcdf
 

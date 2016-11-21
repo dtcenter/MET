@@ -38,7 +38,9 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "netcdf.hh"
+//#include "netcdf.hh"
+#include <netcdf>
+using namespace netCDF;
 
 #include "series_analysis_conf_info.h"
 
@@ -88,8 +90,10 @@ static SeriesAnalysisConfInfo conf_info;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
-static NcDim  *lat_dim = (NcDim *)  0;
-static NcDim  *lon_dim = (NcDim *)  0;
+//static NcDim  *lat_dim = (NcDim *)  0;
+//static NcDim  *lon_dim = (NcDim *)  0;
+static NcDim  lat_dim;
+static NcDim  lon_dim ;
 
 // Structure to store computed statistics and corresponding metadata
 struct NcVarData {

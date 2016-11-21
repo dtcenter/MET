@@ -53,7 +53,7 @@
 #
 ########################################################################
 
-library(ncdf)
+library(ncdf4)
 
 ########################################################################
 #
@@ -178,47 +178,47 @@ pcp[pcp < missing] = missing
 ########################################################################
 
 # Define dimensions
-dim_lat = dim.def.ncdf("lat", "degrees_north", lat, create_dimvar=TRUE)
-dim_lon = dim.def.ncdf("lon", "degrees_east",  lon, create_dimvar=TRUE)
+dim_lat = ncdim_def("lat", "degrees_north", lat, create_dimvar=TRUE)
+dim_lon = ncdim_def("lon", "degrees_east",  lon, create_dimvar=TRUE)
 
 # Define variables
-var_pcp = var.def.ncdf(paste("APCP_", acc_str, sep=''), "kg/m^2",
+var_pcp = ncvar_def(paste("APCP_", acc_str, sep=''), "kg/m^2",
                        list(dim_lon, dim_lat), missing,
                        longname="Total precipitation", prec="single")
 
 # Define file
-nc = create.ncdf(nc_file, var_pcp)
+nc = nc_create(nc_file, var_pcp)
 
 # Add variable attributes
-att.put.ncdf(nc, var_pcp, "name", "APCP")
-att.put.ncdf(nc, var_pcp, "level", paste("A", acc_hr, sep=''))
-att.put.ncdf(nc, var_pcp, "grib_code", 61, prec="int")
-att.put.ncdf(nc, var_pcp, "_FillValue", missing, prec="single")
-att.put.ncdf(nc, var_pcp, "init_time", format(init, "%Y%m%d_%H%M%S", tz="GMT"), prec="text")
-att.put.ncdf(nc, var_pcp, "init_time_ut", as.numeric(init), prec="int")
-att.put.ncdf(nc, var_pcp, "valid_time", format(valid, "%Y%m%d_%H%M%S", tz="GMT"), prec="text")
-att.put.ncdf(nc, var_pcp, "valid_time_ut", as.numeric(valid), prec="int")
-att.put.ncdf(nc, var_pcp, "accum_time", paste(acc_str, "0000", sep=''))
-att.put.ncdf(nc, var_pcp, "accum_time_sec", acc_sec, prec="int")
+ncatt_put(nc, var_pcp, "name", "APCP")
+ncatt_put(nc, var_pcp, "level", paste("A", acc_hr, sep=''))
+ncatt_put(nc, var_pcp, "grib_code", 61, prec="int")
+ncatt_put(nc, var_pcp, "_FillValue", missing, prec="single")
+ncatt_put(nc, var_pcp, "init_time", format(init, "%Y%m%d_%H%M%S", tz="GMT"), prec="text")
+ncatt_put(nc, var_pcp, "init_time_ut", as.numeric(init), prec="int")
+ncatt_put(nc, var_pcp, "valid_time", format(valid, "%Y%m%d_%H%M%S", tz="GMT"), prec="text")
+ncatt_put(nc, var_pcp, "valid_time_ut", as.numeric(valid), prec="int")
+ncatt_put(nc, var_pcp, "accum_time", paste(acc_str, "0000", sep=''))
+ncatt_put(nc, var_pcp, "accum_time_sec", acc_sec, prec="int")
 
 # Add global attributes
 cur_time = Sys.time()
-att.put.ncdf(nc, 0, "FileOrigins", paste("File", nc_file, "generated", format(Sys.time(), "%Y%m%d_%H%M%S"),
+ncatt_put(nc, 0, "FileOrigins", paste("File", nc_file, "generated", format(Sys.time(), "%Y%m%d_%H%M%S"),
                                          "on host", Sys.info()[4], "by the Rscript trmm2nc.R"))
-att.put.ncdf(nc, 0, "MET_version", "V4.1")
-att.put.ncdf(nc, 0, "Projection", "LatLon", prec="text")
-att.put.ncdf(nc, 0, "lat_ll", paste(min(lat), "degrees_north"), prec="text")
-att.put.ncdf(nc, 0, "lon_ll", paste(min(lon), "degrees_east"), prec="text")
-att.put.ncdf(nc, 0, "delta_lat", paste(dlat, "degrees"), prec="text")
-att.put.ncdf(nc, 0, "delta_lon", paste(dlon, "degrees"), prec="text")
-att.put.ncdf(nc, 0, "Nlat", paste(nlat, "grid_points"), prec="text")
-att.put.ncdf(nc, 0, "Nlon", paste(nlon, "grid_points"), prec="text")
+ncatt_put(nc, 0, "MET_version", "V4.1")
+ncatt_put(nc, 0, "Projection", "LatLon", prec="text")
+ncatt_put(nc, 0, "lat_ll", paste(min(lat), "degrees_north"), prec="text")
+ncatt_put(nc, 0, "lon_ll", paste(min(lon), "degrees_east"), prec="text")
+ncatt_put(nc, 0, "delta_lat", paste(dlat, "degrees"), prec="text")
+ncatt_put(nc, 0, "delta_lon", paste(dlon, "degrees"), prec="text")
+ncatt_put(nc, 0, "Nlat", paste(nlat, "grid_points"), prec="text")
+ncatt_put(nc, 0, "Nlon", paste(nlon, "grid_points"), prec="text")
 
 # Add pcp to the file
-put.var.ncdf(nc, var_pcp, pcp)
+ncvar_put(nc, var_pcp, pcp)
 
 # Close the file
-close.ncdf(nc)
+nc_close(nc)
 
 cat(paste("Writing:", nc_file, "\n"))
 

@@ -104,6 +104,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+#define BUFFER_SIZE (DEF_NC_BUFFER_SIZE/2)
+
 static void process_command_line    (int, char **);
 static void setup_first_pass        (const DataPlane &, const Grid &);
 
@@ -595,8 +597,8 @@ void process_obs_file(int i_nc) {
    // output of the PB2NC or ASCII2NC tool.
    obs_in = open_ncfile(obs_file[i_nc]);
 
-   if(!obs_in->is_valid()) {
-      obs_in->close();
+   if(IS_INVALID_NC_P(obs_in)) {
+      //obs_in->close();
       delete obs_in;
       obs_in = (NcFile *) 0;
 
@@ -607,26 +609,26 @@ void process_obs_file(int i_nc) {
    }
 
    // Define dimensions
-   NcDim *strl_dim    = (NcDim *) 0; // Maximum string length
-   NcDim *obs_dim     = (NcDim *) 0; // Number of observations
-   NcDim *hdr_dim     = (NcDim *) 0; // Number of messages
+   NcDim strl_dim    ; // Maximum string length
+   NcDim obs_dim     ; // Number of observations
+   NcDim hdr_dim     ; // Number of messages
 
    // Define variables
-   NcVar *obs_qty_var = (NcVar *) 0;
-   NcVar *obs_arr_var = (NcVar *) 0;
-   NcVar *hdr_typ_var = (NcVar *) 0;
-   NcVar *hdr_sid_var = (NcVar *) 0;
-   NcVar *hdr_vld_var = (NcVar *) 0;
-   NcVar *hdr_arr_var = (NcVar *) 0;
+   NcVar obs_qty_var ;
+   NcVar obs_arr_var ;
+   NcVar hdr_typ_var ;
+   NcVar hdr_sid_var ;
+   NcVar hdr_vld_var ;
+   NcVar hdr_arr_var ;
 
    // Read the dimensions
-   strl_dim = obs_in->get_dim("mxstr");
-   obs_dim  = obs_in->get_dim("nobs");
-   hdr_dim  = obs_in->get_dim("nhdr");
+   strl_dim = get_nc_dim(obs_in,"mxstr");
+   obs_dim  = get_nc_dim(obs_in,"nobs");
+   hdr_dim  = get_nc_dim(obs_in,"nhdr");
 
-   if(!strl_dim || !strl_dim->is_valid() ||
-      !obs_dim  || !obs_dim->is_valid()  ||
-      !hdr_dim  || !hdr_dim->is_valid()) {
+   if(IS_INVALID_NC(strl_dim) ||
+      IS_INVALID_NC(obs_dim)  ||
+      IS_INVALID_NC(hdr_dim)) {
       mlog << Error << "\nprocess_obs_file() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
            << "dimensions from netCDF file: "
@@ -635,18 +637,18 @@ void process_obs_file(int i_nc) {
    }
 
    // Read the variables
-   obs_arr_var = obs_in->get_var("obs_arr");
-   hdr_typ_var = obs_in->get_var("hdr_typ");
-   hdr_sid_var = obs_in->get_var("hdr_sid");
-   hdr_vld_var = obs_in->get_var("hdr_vld");
-   hdr_arr_var = obs_in->get_var("hdr_arr");
-   obs_qty_var = has_var(obs_in, "obs_qty");
+   obs_arr_var = get_nc_var(obs_in, "obs_arr");
+   hdr_typ_var = get_nc_var(obs_in, "hdr_typ");
+   hdr_sid_var = get_nc_var(obs_in, "hdr_sid");
+   hdr_vld_var = get_nc_var(obs_in, "hdr_vld");
+   hdr_arr_var = get_nc_var(obs_in, "hdr_arr");
+   if (has_var(obs_in, "obs_qty")) obs_qty_var = get_nc_var(obs_in, "obs_qty");
 
-   if(!obs_arr_var || !obs_arr_var->is_valid() ||
-      !hdr_typ_var || !hdr_typ_var->is_valid() ||
-      !hdr_sid_var || !hdr_sid_var->is_valid() ||
-      !hdr_vld_var || !hdr_vld_var->is_valid() ||
-      !hdr_arr_var || !hdr_arr_var->is_valid()) {
+   if(IS_INVALID_NC(obs_arr_var) ||
+      IS_INVALID_NC(hdr_typ_var) ||
+      IS_INVALID_NC(hdr_sid_var) ||
+      IS_INVALID_NC(hdr_vld_var) ||
+      IS_INVALID_NC(hdr_arr_var)) {
       mlog << Error << "\nprocess_obs_file() -> "
            << "can't read \"obs_arr\", \"hdr_typ\", \"hdr_sid\", "
            << "\"hdr_vld\", or \"hdr_arr\" variables from netCDF file: "
@@ -654,116 +656,306 @@ void process_obs_file(int i_nc) {
       exit(1);
    }
 
-   if(!obs_qty_var || !obs_qty_var->is_valid())
+   if(IS_INVALID_NC(obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file\n";
 
+   int obs_count = get_dim_size(&obs_dim);
+   int hdr_count = get_dim_size(&hdr_dim);
+   int strl_len  = get_dim_size(&strl_dim);
    mlog << Debug(2)
-        << "Searching " << obs_dim->size()
-           << " observations from " << hdr_dim->size()
+        << "Searching " << obs_count
+           << " observations from " << hdr_count
            << " messages.\n";
+   
 
+   int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
+   int hdr_buf_size = (hdr_count == obs_count) ? buf_size : hdr_count;
+   if (hdr_buf_size > BUFFER_SIZE) hdr_buf_size = BUFFER_SIZE;
+   
+   //
+   // Allocate space to store the data
+   //
+   
+   float     obs_arr_block[buf_size][obs_arr_len];
+   char  obs_qty_str_block[buf_size][strl_len];
+   
+   char hdr_typ_str_block[hdr_buf_size][strl_len];
+   char hdr_sid_str_block[hdr_buf_size][strl_len];
+   char hdr_vld_str_block[hdr_buf_size][strl_len];
+   float    hdr_arr_block[hdr_buf_size][hdr_arr_len];
+   //float **hdr_arr_full = (float **) 0, **obs_arr_block = (float **) 0;
+   //for (int i=0; i<hdr_buf_size; i++) {
+   //   for (j=0; j<strl_len; j++) {
+   //      hdr_typ_str_block[i][j] = bad_data_char;
+   //      hdr_sid_str_block[i][j] = bad_data_char;
+   //      hdr_vld_str_block[i][j] = bad_data_char;
+   //   }
+   //}
+
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { 1, 1 };
+   
+   lengths[0] = 1;
+   lengths[1] = strl_len;
+
+   if (hdr_count != obs_count) {
+      //
+      // Get the corresponding header message type
+      //
+      lengths[0] = hdr_buf_size;
+      lengths[1] = strl_len;
+      if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_typ\n\n";
+         exit(1);
+      }
+      
+      //
+      // Get the corresponding header station id
+      //
+      if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_sid\n\n";
+         exit(1);
+      }
+      
+      //
+      // Get the corresponding header valid time
+      //
+      if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_vld\n\n";
+         exit(1);
+      }
+      
+      //
+      // Get the header for this observation
+      //
+      lengths[1] = hdr_arr_len;
+      if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_arr\n\n";
+         exit(1);
+      }
+   }
+   
+   lengths[1] = strl_len;
+
+   int prev_hdr_offset = -1;
    // Process each observation in the file
-   for(i_obs=0; i_obs<obs_dim->size(); i_obs++) {
+   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=BUFFER_SIZE) {
+      int block_size = (obs_count - i_block_start_idx);
+      if (block_size > BUFFER_SIZE) block_size = BUFFER_SIZE;
+
+      offsets[0] = i_block_start_idx;
+      offsets[1] = 0;
+      lengths[0] = block_size;
+      lengths[1] = obs_arr_len;
 
       // Read the current observation message
-      if(!obs_arr_var->set_cur((long) i_obs) ||
-         !obs_arr_var->get(obs_arr, 1, obs_arr_len)) {
+      if(!get_nc_data(&obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the record for observation "
-              << "index " << i_obs << "\n\n";
-         exit(1);
-      }
-
-      // If the current observation is UGRD, save it as the
-      // previous.  If vector winds are to be computed, UGRD
-      // must be followed by VGRD
-      if(conf_info.get_vflag() && nint(obs_arr[1]) == ugrd_grib_code) {
-         for(j=0; j<4; j++) prev_obs_arr[j] = obs_arr[j];
-      }
-
-      // If the current observation is VGRD and vector
-      // winds are to be computed.  Make sure that the
-      // previous observation was UGRD with the same header
-      // and at the same vertical level.
-      if(conf_info.get_vflag() && nint(obs_arr[1]) == vgrd_grib_code) {
-
-         if(!is_eq(obs_arr[0], prev_obs_arr[0]) ||
-            !is_eq(obs_arr[2], prev_obs_arr[2]) ||
-            !is_eq(obs_arr[3], prev_obs_arr[3])) {
-            mlog << Error << "\nprocess_obs_file() -> "
-                 << "for observation index " << i_obs
-                 << ", when computing VL1L2 and/or VAL1L2 vector winds "
-                 << "each UGRD observation must be followed by a VGRD "
-                 << "observation with the same header and at the same "
-                 << "level.\n\n";
-            exit(1);
-         }
-      }
-
-      // Read the corresponding header array for this observation
-      if(!hdr_arr_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_arr_var->get(hdr_arr, 1, hdr_arr_len)) {
-         mlog << Error << "\nprocess_obs_file() -> "
-              << "for observation index " << i_obs
-              << ", can't read the header array record for header "
-              << "number " << obs_arr[0] << "\n\n";
-         exit(1);
-      }
-
-      // Read the corresponding header type for this observation
-      if(!hdr_typ_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_typ_var->get(hdr_typ_str, 1, strl_dim->size())) {
-         mlog << Error << "\nprocess_obs_file() -> "
-              << "for observation index " << i_obs
-              << ", can't read the message type record for header "
-              << "number " << obs_arr[0] << "\n\n";
-         exit(1);
-      }
-
-      // Read the corresponding header Station ID for this observation
-      if(!hdr_sid_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_sid_var->get(hdr_sid_str, 1, strl_dim->size())) {
-         mlog << Error << "\nprocess_obs_file() -> "
-              << "for observation index " << i_obs
-              << ", can't read the station ID record for header "
-              << "number " << obs_arr[0] << "\n\n";
-         exit(1);
-      }
-
-      // Read the corresponding valid time for this observation
-      if(!hdr_vld_var->set_cur((long) (obs_arr[0])) ||
-         !hdr_vld_var->get(hdr_vld_str, 1, strl_dim->size())) {
-         mlog << Error << "\nprocess_obs_file() -> "
-              << "for observation index " << i_obs
-              << ", can't read the valid time for header "
-              << "number " << obs_arr[0] << "\n\n";
+              << "index " << i_block_start_idx << "\n\n";
          exit(1);
       }
 
       // Read the current observation quality flag
+      lengths[1] = strl_len;
       strcpy(obs_qty_str, "");
-      if((obs_qty_var && obs_qty_var->is_valid()) &&
-         (!obs_qty_var->set_cur((long) i_obs) ||
-          !obs_qty_var->get(obs_qty_str, 1, strl_dim->size()))) {
+      if(!IS_INVALID_NC(obs_qty_var)
+          && !get_nc_data(&obs_qty_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the quality flag for observation "
-              << "index " << i_obs << "\n\n";
+              << "index " << i_block_start_idx << "\n\n";
          exit(1);
       }
 
-      // Convert string to a unixtime
-      hdr_ut = timestring_to_unix(hdr_vld_str);
+      if (hdr_count == obs_count) {
+         // Read the corresponding header array for this observation
+         lengths[1] = hdr_arr_len;
+         
+         if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "for observation index " << i_block_start_idx
+                 << ", can't read the header array record for header "
+                 << "number " << obs_arr[0] << "\n\n";
+            exit(1);
+         }
+         
+         // Read the corresponding header type for this observation
+         lengths[1] = strl_len;
+         if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "for observation index " << i_block_start_idx
+                 << ", can't read the message type record for header "
+                 << "number " << obs_arr[0] << "\n\n";
+            exit(1);
+         }
+         
+         // Read the corresponding header Station ID for this observation
+         lengths[1] = strl_len;
+         if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "for observation index " << i_block_start_idx
+                 << ", can't read the station ID record for header "
+                 << "number " << obs_arr[0] << "\n\n";
+            exit(1);
+         }
+         
+         // Read the corresponding valid time for this observation
+         if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "for observation index " << i_block_start_idx
+                 << ", can't read the valid time for header "
+                 << "number " << obs_arr[0] << "\n\n";
+            exit(1);
+         }
+      }
 
-      // Check each conf_info.vx_pd object to see if this observation
-      // should be added
-      for(j=0; j<conf_info.get_n_vx(); j++) {
-
-         // Check for no forecast fields
-         if(conf_info.vx_pd[j].fcst_dpa.n_planes() == 0) continue;
-
-         // Attempt to add the observation to the conf_info.vx_pd object
-         conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                    hdr_ut, obs_qty_str, obs_arr, grid);
+      for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
+         i_obs = i_block_start_idx + i_block_idx;
+         
+         for (j=0; j<obs_arr_len; j++) {
+             obs_arr[j] = obs_arr_block[i_block_idx][j];
+         }
+         int headerOffset = obs_arr[0];
+         //if ((hdr_count == obs_count) || ((0 <= headerOffset) && (headerOffset < hdr_buf_size))) {
+         if ((hdr_count == obs_count) || (headerOffset < hdr_buf_size)) {
+            int str_length;
+            
+            if (obs_count == hdr_count) headerOffset = i_block_idx;
+            //if (hdr_count == obs_count) headerOffset = i_block_idx;
+            //if ((headerOffset < 0) || headerOffset >= hdr_count) {
+            //   continue;
+            //}
+            if (prev_hdr_offset != headerOffset) {
+               // Read the corresponding header array for this observation
+               for (int k=0; k < hdr_arr_len; k++)
+                  hdr_arr[k] = hdr_arr_block[headerOffset][k];
+              
+               // Read the corresponding header type for this observation
+               str_length = strlen(hdr_typ_str_block[headerOffset]);
+               if (str_length > strl_len) str_length = strl_len;
+               strncpy(hdr_typ_str, hdr_typ_str_block[headerOffset], str_length);
+               hdr_typ_str[str_length] = bad_data_char;
+               
+               // Read the corresponding header Station ID for this observation
+               str_length = strlen(hdr_sid_str_block[headerOffset]);
+               if (str_length > strl_len) str_length = strl_len;
+               strncpy(hdr_sid_str, hdr_sid_str_block[headerOffset], str_length);
+               hdr_sid_str[str_length] = bad_data_char;
+               
+               // Read the corresponding valid time for this observation
+               str_length = strlen(hdr_sid_str_block[headerOffset]);
+               int str_length2 = sizeof(hdr_vld_str_block[headerOffset]);
+               if (str_length > strl_len) str_length = strl_len;
+               str_length = strl_len;
+               strncpy(hdr_vld_str, hdr_vld_str_block[headerOffset], str_length);
+               hdr_vld_str[str_length] = bad_data_char;
+               
+   //cout << " str_length: " << str_length << " sizeof: " << str_length2 << ", [" << hdr_sid_str_block[headerOffset][0] << "] " << " hdr_vld_str_block[headerOffset]: [" << (hdr_vld_str_block[headerOffset]) << "] hdr_vld_str: [" << hdr_vld_str << "] headerOffset: " << headerOffset << " i_obs: " << i_obs << "\n";
+   //cout << " hdr_vld_str: [" << hdr_vld_str << "] headerOffset: " << headerOffset << " i_obs: " << i_obs << "\n";
+               
+               prev_hdr_offset = headerOffset;
+            }
+         }
+         else {
+            offsets[0] = headerOffset;
+            lengths[0] = 1;
+            lengths[1] = hdr_arr_len;
+            
+            if ((offsets[0] < 0) || offsets[0] >= hdr_count) {
+               mlog << Error << "\nprocess_obs_file() -> "
+                    << "for header index " << headerOffset
+                    << ", can't read the header array record for header "
+                    << "number " << obs_arr[0] << " (" <<  hdr_count << ")\n\n";
+               exit(1);
+            }
+            
+            if (prev_hdr_offset != headerOffset) {
+               if(!get_nc_data(&hdr_arr_var, hdr_arr, lengths, offsets)) {
+                  mlog << Error << "\nprocess_obs_file() -> "
+                       << "for observation index " << i_obs
+                       << ", can't read the header array record for header "
+                       << "number " << obs_arr[0] << "\n\n";
+                  exit(1);
+               }
+               
+               // Read the corresponding header type for this observation
+               lengths[1] = strl_len;
+               if(!get_nc_data(&hdr_typ_var, hdr_typ_str, lengths, offsets)) {
+                  mlog << Error << "\nprocess_obs_file() -> "
+                       << "for observation index " << i_obs
+                       << ", can't read the message type record for header "
+                       << "number " << obs_arr[0] << "\n\n";
+                  exit(1);
+               }
+               
+               // Read the corresponding header Station ID for this observation
+               lengths[1] = strl_len;
+               if(!get_nc_data(&hdr_sid_var, hdr_sid_str, lengths, offsets)) {
+                  mlog << Error << "\nprocess_obs_file() -> "
+                       << "for observation index " << i_obs
+                       << ", can't read the station ID record for header "
+                       << "number " << obs_arr[0] << "\n\n";
+                  exit(1);
+               }
+               
+               // Read the corresponding valid time for this observation
+               if(!get_nc_data(&hdr_vld_var, hdr_vld_str, lengths, offsets)) {
+                  mlog << Error << "\nprocess_obs_file() -> "
+                       << "for observation index " << i_obs
+                       << ", can't read the valid time for header "
+                       << "number " << obs_arr[0] << "\n\n";
+                  exit(1);
+               }
+            }
+            prev_hdr_offset = headerOffset;
+         }
+         
+         // If the current observation is UGRD, save it as the
+         // previous.  If vector winds are to be computed, UGRD
+         // must be followed by VGRD
+         if(conf_info.get_vflag() && nint(obs_arr[1]) == ugrd_grib_code) {
+            for(j=0; j<4; j++) prev_obs_arr[j] = obs_arr[j];
+         }
+   
+         // If the current observation is VGRD and vector
+         // winds are to be computed.  Make sure that the
+         // previous observation was UGRD with the same header
+         // and at the same vertical level.
+         if(conf_info.get_vflag() && nint(obs_arr[1]) == vgrd_grib_code) {
+   
+            if(!is_eq(obs_arr[0], prev_obs_arr[0]) ||
+               !is_eq(obs_arr[2], prev_obs_arr[2]) ||
+               !is_eq(obs_arr[3], prev_obs_arr[3])) {
+               mlog << Error << "\nprocess_obs_file() -> "
+                    << "for observation index " << i_obs
+                    << ", when computing VL1L2 and/or VAL1L2 vector winds "
+                    << "each UGRD observation must be followed by a VGRD "
+                    << "observation with the same header and at the same "
+                    << "level.\n\n";
+               exit(1);
+            }
+         }
+   
+   
+         // Convert string to a unixtime
+         //cout << "  --------------- hdr_vld_str: " << hdr_vld_str << " i_obs: " << i_obs << " hdrOffste: " << headerOffset << "\n";
+         hdr_ut = timestring_to_unix(hdr_vld_str);
+   
+         // Check each conf_info.vx_pd object to see if this observation
+         // should be added
+         for(j=0; j<conf_info.get_n_vx(); j++) {
+   
+            // Check for no forecast fields
+            if(conf_info.vx_pd[j].fcst_dpa.n_planes() == 0) continue;
+   
+            // Attempt to add the observation to the conf_info.vx_pd object
+            conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                       hdr_ut, obs_qty_str, obs_arr, grid);
+         }
       }
 
    } // end for i_obs
@@ -774,7 +966,7 @@ void process_obs_file(int i_nc) {
    }
 
    // Deallocate and clean up
-   obs_in->close();
+   //obs_in->close();
    delete obs_in;
    obs_in = (NcFile *) 0;
 

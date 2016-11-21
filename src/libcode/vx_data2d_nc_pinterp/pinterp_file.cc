@@ -186,15 +186,18 @@ int j, k;
 int month, day, year, hour, minute, second, str_len;
 char time_str[max_str_len];
 const char * c = (const char *) 0;
-NcVar * v   = (NcVar *) 0;
-NcAtt * att = (NcAtt *) 0;
+//NcVar * v   = (NcVar *) 0;
+NcVar v;
+NcGroupAtt * att = (NcGroupAtt *) 0;
 
 
 close();
 
 Nc = open_ncfile(filename);
+mlog << Debug(5) << "\nPinterpFile::open() -> "
+     << "opend  \"" << filename << "\".\n\n";
 
-if ( !(Nc->is_valid()) )  { close();  return ( false ); }
+if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
 
    //
    //  grid
@@ -205,32 +208,26 @@ if ( ! get_pinterp_grid(*Nc, grid) )  { close();  return ( false ); }
    //
    //  dimensions
    //
+Ndims = get_dim_count(Nc);
+Dim = new NcDim*[Ndims];
+//get_global_dims(Nc, &Ndims, Dim, &DimNames);
 
-Ndims = Nc->num_dims();
-
-Dim = new NcDim * [Ndims];
-
-DimNames.extend(Ndims);
-
+StringArray gDimNames;
+get_dim_names(Nc, &gDimNames);
+   
 for (j=0; j<Ndims; ++j)  {
+   c = gDimNames[j];
+   //mlog << Debug(10) << "\nPinterpFile::open()  global dimension: "
+   //     << c << ".\n\n";
+   NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
-   Dim[j] = Nc->get_dim(j);
+   if ( strcasecmp(c, t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
 
-   if ( strcasecmp(Dim[j]->name(), t_dim_name) == 0 )  Ntimes = Dim[j]->size();
-
-   DimNames.add(Dim[j]->name());
-
-}
-
-for (j=0; j<Ndims; ++j)  {
-
-   c = Dim[j]->name();
-
-   if ( strcasecmp(c, x_dim_name) == 0 )            Xdim = Dim[j];
-   if ( strcasecmp(c, y_dim_name) == 0 )            Ydim = Dim[j];
+   if ( strcasecmp(c, x_dim_name) == 0 )            Xdim = &dim;
+   if ( strcasecmp(c, y_dim_name) == 0 )            Ydim = &dim;
    if ( strcasecmp(c, z_dim_p_interp_name  ) == 0 ||
-        strcasecmp(c, z_dim_wrf_interp_name) == 0)  Zdim = Dim[j];
-   if ( strcasecmp(c, t_dim_name) == 0 )            Tdim = Dim[j];
+        strcasecmp(c, z_dim_wrf_interp_name) == 0)  Zdim = &dim;
+   if ( strcasecmp(c, t_dim_name) == 0 )            Tdim = &dim;
 
 }
 
@@ -247,17 +244,21 @@ Time = new unixtime [Ntimes];
    // format = YYYY-MM-DD_hh:mm:ss
    //
 
-if ( ( v = has_var(Nc, times_var_name) ) != 0 ) {
+   
+if ( has_var(Nc, times_var_name) ) {
+   v = get_var(Nc, times_var_name);
 
    get_dim(Nc, strl_dim_name, str_len, true);
 
    for (j=0; j<Ntimes; ++j)  {
-
-      if(!v->set_cur(j, 0) ||
-         !v->get(time_str, 1, str_len)) {
-         close();
-         return ( false );
-      }
+      ConcatString tmp_time_str;
+      get_string_val(&v, j, str_len, tmp_time_str);
+      //if(!v->set_cur(j, 0) ||
+      //   !v->get(time_str, 1, str_len)) {
+      //   close();
+      //   return ( false );
+      //}
+      strncpy ( time_str, tmp_time_str, str_len );
       time_str[str_len] = '\0';
 
       // Check for leading blank
@@ -296,61 +297,83 @@ else {
    }   //  for j
 }
 
-att = Nc->get_att(init_time_att_name);
+ConcatString att_value;
+get_global_att(Nc, init_time_att_name, att_value);
+//att = get_att(Nc, init_time_att_name);
 
-InitTime = parse_init_time(att->as_string(0));
+InitTime = parse_init_time(att_value);
 
    //
    //  variables
    //
 
-Nvars = Nc->num_vars();
 
-Var = new NcVarInfo [Nvars];
+   StringArray varNames;
+   StringArray dimNames;
+   Nvars = get_var_names(Nc, &varNames);
+   Var = new NcVarInfo [Nvars];
+   //get_vars_info(Nc, &Var);
 
-for (j=0; j<Nvars; ++j)  {
+   for (j=0; j<Nvars; ++j)  {
+      v = get_var(Nc, varNames[j]);
+  
+      Var[j].var = new NcVar(v);
+      //*(Var[j].var) = v;
+  
+      Var[j].name = GET_NC_NAME(v).c_str();
+  
+      int dim_count = GET_NC_DIM_COUNT(v);
+      Var[j].Ndims = dim_count;
+  
+      Var[j].Dims = new NcDim * [dim_count];
+  
+      //
+      //  parse the variable attributes
+      //
+      get_att_str( Var[j], description_att_name, Var[j].long_name_att );
+      get_att_str( Var[j], units_att_name,       Var[j].units_att     );
+      
+      //
+      //  get the pressure variable and store the hPa conversion factor
+      //
 
-   v = Nc->get_var(j);
+      if ( strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_p_interp_name)   == 0 ||
+           strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_interp_name) == 0 ) {
+         PressureIndex = j;
+              if ( strcasecmp(Var[j].units_att, pa_units_str ) == 0 ) hPaCF = 0.01;
+         else if ( strcasecmp(Var[j].units_att, hpa_units_str) == 0 ) hPaCF = 1.0;
+      }
+     
+  
+      dimNames.clear();
+      get_dim_names(&v, &dimNames);
+  
+      for (k=0; k<(dim_count); ++k)  {
+        c = dimNames[k];
+        NcDim dim = get_nc_dim(&v, dimNames[k]);
+        Var[j].Dims[k] = &dim;
+  
+        if ( Var[j].Dims[k] == Xdim )  Var[j].x_slot = k;
+        if ( Var[j].Dims[k] == Ydim )  Var[j].y_slot = k;
+        if ( Var[j].Dims[k] == Zdim )  Var[j].z_slot = k;
+        if ( Var[j].Dims[k] == Tdim )  Var[j].t_slot = k;
+        if ( strcasecmp(c, x_dim_name) == 0 ) {
+           Var[j].x_slot = k;
+        }
+        if ( strcasecmp(c, y_dim_name) == 0 ) {
+           Var[j].y_slot = k;
+        }
+        if ( strcasecmp(c, z_dim_p_interp_name  ) == 0 ||
+             strcasecmp(c, z_dim_wrf_interp_name) == 0) {
+           Var[j].z_slot = k;
+        }
+        if ( strcasecmp(c, t_dim_name) == 0 ) {
+           Var[j].t_slot = k;
+        }
+      }   //  for k
+   }   //  for j
 
-   Var[j].var = v;
-
-   Var[j].name = v->name();
-
-   Var[j].Ndims = v->num_dims();
-
-   Var[j].Dims = new NcDim * [Var[j].Ndims];
-
-   //
-   //  parse the variable attributes
-   //
-
-   get_att_str( Var[j], description_att_name, Var[j].long_name_att );
-   get_att_str( Var[j], units_att_name,       Var[j].units_att     );
-
-   //
-   //  get the pressure variable and store the hPa conversion factor
-   //
-
-   if ( strcasecmp(v->name(), pressure_var_p_interp_name)   == 0 ||
-        strcasecmp(v->name(), pressure_var_wrf_interp_name) == 0 ) {
-      PressureIndex = j;
-           if ( strcasecmp(Var[j].units_att, pa_units_str ) == 0 ) hPaCF = 0.01;
-      else if ( strcasecmp(Var[j].units_att, hpa_units_str) == 0 ) hPaCF = 1.0;
-   }
-
-   for (k=0; k<(Var[j].Ndims); ++k)  {
-
-      Var[j].Dims[k] = v->get_dim(k);
-
-      if ( Var[j].Dims[k] == Xdim )  Var[j].x_slot = k;
-      if ( Var[j].Dims[k] == Ydim )  Var[j].y_slot = k;
-      if ( Var[j].Dims[k] == Zdim )  Var[j].z_slot = k;
-      if ( Var[j].Dims[k] == Tdim )  Var[j].t_slot = k;
-
-   }   //  for k
-
-}   //  for j
-
+  
    //
    //  done
    //
@@ -389,16 +412,16 @@ out << prefix << "Ndims = " << Ndims << "\n";
 
 for (j=0; j<Ndims; ++j)  {
 
-   out << p2 << "Dim # " << j << " = " << DimNames[j] << "   (" << (Dim[j]->size()) << ")\n";
+   out << p2 << "Dim # " << j << " = " << DimNames[j] << "   (" << (GET_NC_SIZE_P(Dim[j])) << ")\n";
 
 }   //  for j
 
 out << prefix << "\n";
 
-out << prefix << "Xdim = " << (Xdim ? Xdim->name() : "(nul)") << "\n";
-out << prefix << "Ydim = " << (Ydim ? Ydim->name() : "(nul)") << "\n";
-out << prefix << "Zdim = " << (Zdim ? Zdim->name() : "(nul)") << "\n";
-out << prefix << "Tdim = " << (Zdim ? Tdim->name() : "(nul)") << "\n";
+out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
+out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
+out << prefix << "Zdim = " << (Zdim ? GET_NC_NAME_P(Zdim) : "(nul)") << "\n";
+out << prefix << "Tdim = " << (Zdim ? GET_NC_NAME_P(Tdim) : "(nul)") << "\n";
 
 out << prefix << "\n";
 
@@ -440,7 +463,7 @@ for (j=0; j<Nvars; ++j)  {
       else if ( Var[j].Dims[k] == Ydim )  out << 'Y';
       else if ( Var[j].Dims[k] == Zdim )  out << 'Z';
       else if ( Var[j].Dims[k] == Tdim )  out << 'T';
-      else                                out << Var[j].Dims[k]->name();
+      else                                out << GET_NC_NAME_P(Var[j].Dims[k]);
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
 
@@ -537,56 +560,62 @@ if ( !args_ok(a) )  {
 
 }
 
-if ( var->num_dims() != a.n_elements() )  {
+int dim_count = var->getDimCount();
+if ( dim_count != a.n_elements() )  {
 
    mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-        << "needed " << (var->num_dims()) << " arguments for variable "
-        << (var->name()) << ", got " << (a.n_elements()) << "\n\n";
+        << "needed " << (dim_count) << " arguments for variable "
+        << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
 
    exit ( 1 );
 
 }
 
-if ( var->num_dims() >= max_pinterp_args )  {
+if ( dim_count >= max_pinterp_args )  {
 
    mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-        << " too may arguments for variable \"" << (var->name()) << "\"\n\n";
+        << " too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
 
    exit ( 1 );
 
 }
 
 int j;
-float f[2];
-double d[2];
+//float f[2];
+//double d[2];
 bool status;
-long counts[max_pinterp_args];
+float f;
+double d;
+//long counts[max_pinterp_args];
+long counts[a.n_elements()];
 
 for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
 
-if ( !(var->set_cur((long *) a)) )  {
+//if ( !(var->set_cur((long *) a)) )  {
+//
+//   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
+//        << " can't set corner for variable \"" << (var->getName()) << "\"\n\n";
+//
+//   exit ( 1 );
+//
+//}
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-        << " can't set corner for variable \"" << (var->name()) << "\"\n\n";
+switch ( var->getType().getId() )  {
 
-   exit ( 1 );
-
-}
-
-switch ( var->type() )  {
-
-   case ncFloat:
-      status = var->get(f, counts);
-      d[0] = (double) (f[0]);
+   //case ncFloat:
+   case NcType::nc_FLOAT:
+      status = get_nc_data(var, &f, (long *)a);
+      d = (double) (f);
       break;
 
-   case ncDouble:
-      status = var->get(d, counts);
+   //case ncDouble:
+   case NcType::nc_DOUBLE:
+      status = get_nc_data(var, &d, (long *)a);
       break;
 
    default:
       mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-           << " bad type for variable \"" << (var->name()) << "\"\n\n";
+           << " bad type for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -606,7 +635,7 @@ if ( !status )  {
    //  done
    //
 
-return ( d[0] );
+return ( d );
 
 }
 
@@ -629,11 +658,13 @@ if ( !args_ok(a) )  {
 
 }
 
-if ( v->num_dims() != a.n_elements() )  {
+string var_name = GET_NC_NAME_P(v);
+int dim_count = v->getDimCount();
+if ( dim_count != a.n_elements() )  {
 
    mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << "needed " << (v->num_dims()) << " arguments for variable "
-        << (v->name()) << ", got " << (a.n_elements()) << "\n\n";
+        << "needed " << dim_count << " arguments for variable "
+        << (var_name) << ", got " << (a.n_elements()) << "\n\n";
 
    exit ( 1 );
 
@@ -641,10 +672,10 @@ if ( v->num_dims() != a.n_elements() )  {
 
 }
 
-if ( v->num_dims() >= max_pinterp_args )  {
+if ( dim_count >= max_pinterp_args )  {
 
    mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << " too may arguments for variable \"" << (v->name()) << "\"\n\n";
+        << " too may arguments for variable \"" << (var_name) << "\"\n\n";
 
    return ( false );
 
@@ -680,7 +711,7 @@ for (j=0; j<Nvars; ++j)  {
 if ( !found )  {
 
    mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << "variable " << (v->name()) << " not found!\n\n";
+        << "variable " << (var_name) << " not found!\n\n";
 
    return ( false );
 
@@ -695,7 +726,7 @@ if ( (var->x_slot < 0) || (var->y_slot < 0) )  {
    mlog << Error
         << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
         << "can't find needed dimensions(s) for variable \""
-        << var->name << "\" ... one of the dimensions may be staggered.\n\n";
+        << var_name << "\" ... one of the dimensions may be staggered.\n\n";
 
    // exit ( 1 );
 
@@ -765,8 +796,65 @@ plane.set_size(Nx, Ny);
    //
    //  get the data
    //
+//int    i[Nx][Ny];
+//float  f[Nx][Ny];
+//double d[Nx][Ny];
+int    i[Ny];
+float  f[Ny];
+double d[Ny];
 
+long offsets[dim_count];
+long lengths[dim_count];
+//lengths[dim_count-2] = Nx;
+lengths[dim_count-1] = Ny;
+
+for (int k=0; k<dim_count; k++) {
+  offsets[k] = (a[k] == vx_data2d_star) ? 0 : 0;
+  lengths[k] = 1;
+}
+//offsets[x_slot] = 0;
+//offsets[y_slot] = 0;
+//lengths[x_slot] = 1;
+lengths[y_slot] = Ny;
+
+int type_id = v->getType().getId();
+//status = false;
 for (x=0; x<Nx; ++x)  {
+   offsets[x_slot] = x;
+   switch ( type_id )  {
+   
+      //case ncInt:
+      case NcType::nc_INT:
+         get_nc_data(v, (int *)&i, lengths, offsets);
+         //get_nc_data(v, (int *)&i);
+         for (y=0; y<Ny; ++y)  {
+            d[y] = (double)i[y];
+         }
+         break;
+     
+      //case ncFloat:
+      case NcType::nc_FLOAT:
+         get_nc_data(v, (float *)&f, lengths, offsets);
+         //get_nc_data(v, (float *)&f);
+         for (y=0; y<Ny; ++y)  {
+            d[y] = (double)f[y];
+         }
+         break;
+   
+      //case ncDouble:
+      case NcType::nc_DOUBLE:
+         get_nc_data(v, (double *)&d, lengths, offsets);
+         //get_nc_data(v, (double *)&d);
+         break;
+         
+      default:
+         mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
+              << " bad type for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
+         exit ( 1 );
+         break;
+   
+   }   //  switch
+
 
    b[x_slot] = x;
 
@@ -774,7 +862,8 @@ for (x=0; x<Nx; ++x)  {
 
       b[y_slot] = y;
 
-      value = data(v, b);
+      //value = data(v, b);
+      value = d[y];
 
       if ( is_bad_data_pinterp( value ) ) value = bad_data_double;
 

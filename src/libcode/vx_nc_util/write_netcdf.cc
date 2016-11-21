@@ -22,6 +22,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_cal.h"
+#include "nc_utils.h"
 #include "vx_util.h"
 #include "write_netcdf.h"
 #include "grid_output.h"
@@ -51,12 +52,12 @@ gethostname(hostname_str, max_str_len);
 sprintf(attribute_str,
         "File %s generated %s UTC on host %s by the MET %s tool",
         file_name, time_str, hostname_str, program_name);
-f_out->add_att("FileOrigins", attribute_str);
-f_out->add_att("MET_version", met_version);
-f_out->add_att("MET_tool", program_name);
-if(model_name) f_out->add_att("model",  model_name);
-if(obtype)     f_out->add_att("obtype", obtype);
-if(desc)       f_out->add_att("desc",   desc);
+f_out->putAtt("FileOrigins", attribute_str);
+f_out->putAtt("MET_version", met_version);
+f_out->putAtt("MET_tool", program_name);
+if(model_name) f_out->putAtt("model",  model_name);
+if(obtype)     f_out->putAtt("obtype", obtype);
+if(desc)       f_out->putAtt("desc",   desc);
 
 return;
 
@@ -98,23 +99,28 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                             const Grid &grid) {
    int i;
    double lat, lon;
-   NcVar *lat_var  = (NcVar *) 0;
-   NcVar *lon_var  = (NcVar *) 0;
+   //NcVar *lat_var  = (NcVar *) 0;
+   //NcVar *lon_var  = (NcVar *) 0;
+   NcVar lat_var  ;
+   NcVar lon_var  ;
    float *lat_data = (float *) 0;
    float *lon_data = (float *) 0;
 
    // Define Variables
-   lat_var = f_out->add_var("lat", ncFloat, lat_dim);
-   lon_var = f_out->add_var("lon", ncFloat, lon_dim);
+   lat_var = f_out->addVar("lat", ncFloat, *lat_dim);
+   lon_var = f_out->addVar("lon", ncFloat, *lon_dim);
+   
+   //lat_var = &lat_var_T;
+   //lon_var = &lon_var_T;
 
    // Add variable attributes
-   lat_var->add_att("long_name", "latitude");
-   lat_var->add_att("units", "degrees_north");
-   lat_var->add_att("standard_name", "latitude");
+   add_att(&lat_var, "long_name", "latitude");
+   add_att(&lat_var, "units", "degrees_north");
+   add_att(&lat_var, "standard_name", "latitude");
 
-   lon_var->add_att("long_name", "longitude");
-   lon_var->add_att("units", "degrees_east");
-   lon_var->add_att("standard_name", "longitude");
+   add_att(&lon_var, "long_name", "longitude");
+   add_att(&lon_var, "units", "degrees_east");
+   add_att(&lon_var, "standard_name", "longitude");
 
    // Allocate space for lat/lon values
    lat_data = new float [grid.ny()];
@@ -133,22 +139,25 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    }
 
    // Write the lat data
-   if(!lat_var->put(&lat_data[0], lat_dim->size())) {
-      mlog << Error << "\nwrite_netcdf_latlon() -> "
-           << "error with lat_var->put\n\n";
-      exit(1);
-   }
+   put_nc_data(&lat_var, &lat_data[0], lat_dim->getSize(), 0);
+   //if(!lat_var->putVar(&lat_data[0], lat_dim->getSize())) {
+   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
+   //        << "error with lat_var->put\n\n";
+   //   exit(1);
+   //}
 
    // Write the lon data
-   if(!lon_var->put(&lon_data[0], lon_dim->size())) {
-      mlog << Error << "\nwrite_netcdf_latlon() -> "
-           << "error with lon_var->put\n\n";
-      exit(1);
-   }
+   //lon_var->putVar(count, offset, &lon_data[0]);
+   put_nc_data(&lon_var, &lon_data[0], lon_dim->getSize(), 0);
+   //if(!lon_var->put(&lon_data[0], lon_dim->getSize())) {
+   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
+   //        << "error with lon_var->put\n\n";
+   //   exit(1);
+   //}
 
    // Clean up
-   if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
-   if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
+   //if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
+   //if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
 
    return;
 }
@@ -159,23 +168,30 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                             const Grid &grid) {
    int i, x, y;
    double lat, lon;
-   NcVar *lat_var  = (NcVar *) 0;
-   NcVar *lon_var  = (NcVar *) 0;
+   //NcVar *lat_var  = (NcVar *) 0;
+   //NcVar *lon_var  = (NcVar *) 0;
+   NcVar lat_var  ;
+   NcVar lon_var  ;
    float *lat_data = (float *) 0;
    float *lon_data = (float *) 0;
+   std::vector<NcDim> dims;
+   long  counts[2] = {grid.ny(), grid.nx()};
+   long offsets[2] = {0 , 0};
 
    // Define Variables
-   lat_var = f_out->add_var("lat", ncFloat, lat_dim, lon_dim);
-   lon_var = f_out->add_var("lon", ncFloat, lat_dim, lon_dim);
+   dims.push_back(*lat_dim);
+   dims.push_back(*lon_dim);
+   lat_var = add_var(f_out, "lat", ncFloat, dims);
+   lon_var = add_var(f_out, "lon", ncFloat, dims);
 
    // Add variable attributes
-   lat_var->add_att("long_name", "latitude");
-   lat_var->add_att("units", "degrees_north");
-   lat_var->add_att("standard_name", "latitude");
+   add_att(&lat_var, "long_name", "latitude");
+   add_att(&lat_var, "units", "degrees_north");
+   add_att(&lat_var, "standard_name", "latitude");
 
-   lon_var->add_att("long_name", "longitude");
-   lon_var->add_att("units", "degrees_east");
-   lon_var->add_att("standard_name", "longitude");
+   add_att(&lon_var, "long_name", "longitude");
+   add_att(&lon_var, "units", "degrees_east");
+   add_att(&lon_var, "standard_name", "longitude");
 
    // Allocate space for lat/lon values
    lat_data = new float [grid.nx()*grid.ny()];
@@ -195,22 +211,24 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    }
 
    // Write the lat data
-   if(!lat_var->put(&lat_data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\nwrite_netcdf_latlon() -> "
-           << "error with lat_var->put\n\n";
-      exit(1);
-   }
+   put_nc_data(&lat_var, &lat_data[0], counts, offsets);
+   //if(!lat_var->put(&lat_data[0], grid.ny(), grid.nx())) {
+   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
+   //        << "error with lat_var->put\n\n";
+   //   exit(1);
+   //}
 
    // Write the lon data
-   if(!lon_var->put(&lon_data[0], grid.ny(), grid.nx())) {
-      mlog << Error << "\nwrite_netcdf_latlon() -> "
-           << "error with lon_var->put\n\n";
-      exit(1);
-   }
+   put_nc_data(&lon_var, &lon_data[0], counts, offsets);
+   //if(!lon_var->put(&lon_data[0], grid.ny(), grid.nx())) {
+   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
+   //        << "error with lon_var->put\n\n";
+   //   exit(1);
+   //}
 
    // Clean up
-   if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
-   if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
+   //if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
+   //if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
 
    return;
 }
@@ -220,30 +238,35 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                               const GridWeightType t, const DataPlane &wgt_dp) {
    int i, x, y;
-   NcVar *wgt_var  = (NcVar *) 0;
+   //NcVar *wgt_var  = (NcVar *) 0;
+   NcVar wgt_var  ;
    float *wgt_data = (float *) 0;
+   std::vector<NcDim> dims;
+   std::vector<size_t> count;
 
-   // Define variable
-   wgt_var = f_out->add_var("grid_weight", ncFloat, lat_dim, lon_dim);
+   // Define Variables
+   dims.push_back(*lat_dim);
+   dims.push_back(*lon_dim);
+   wgt_var = add_var(f_out, "grid_weight", ncFloat, dims);
 
    // Add variable attributes
-   wgt_var->add_att("standard_name", "weight");
+   add_att(&wgt_var, "standard_name", "weight");
 
    switch(t) {
 
       case GridWeightType_Cos_Lat:
-         wgt_var->add_att("long_name", "cosine latitude grid weight");
-         wgt_var->add_att("units", "NA");
+         add_att(&wgt_var, "long_name", "cosine latitude grid weight");
+         add_att(&wgt_var, "units", "NA");
          break;
 
       case GridWeightType_Area:
-         wgt_var->add_att("long_name", "true area grid weight");
-         wgt_var->add_att("units", "km^2");
+         add_att(&wgt_var, "long_name", "true area grid weight");
+         add_att(&wgt_var, "units", "km^2");
          break;
 
       default:
-         wgt_var->add_att("long_name", "default grid weight");
-         wgt_var->add_att("units", "NA");
+         add_att(&wgt_var, "long_name", "default grid weight");
+         add_att(&wgt_var, "units", "NA");
          break;
    }
 
@@ -259,11 +282,14 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    }
 
    // Write the weights
-   if(!wgt_var->put(&wgt_data[0], wgt_dp.ny(), wgt_dp.nx())) {
-      mlog << Error << "\nwrite_netcdf_grid_weight() -> "
-           << "error with wgt_var->put\n\n";
-      exit(1);
-   }
+   count.push_back(wgt_dp.ny());
+   count.push_back(wgt_dp.nx());
+   put_nc_data_with_dims(&wgt_var, &wgt_data[0], wgt_dp.ny(), wgt_dp.nx());
+   //if(!wgt_var->put(&wgt_data[0], wgt_dp.ny(), wgt_dp.nx())) {
+   //   mlog << Error << "\nwrite_netcdf_grid_weight() -> "
+   //        << "error with wgt_var->put\n\n";
+   //   exit(1);
+   //}
 
    // Clean up
    if(wgt_data) { delete [] wgt_data; wgt_data = (float *) 0; }
@@ -292,25 +318,25 @@ ConcatString s;
 
    // Init time
    unix_to_yyyymmdd_hhmmss(init_ut, time_str);
-   var->add_att("init_time", time_str);
+   add_att(var, "init_time", time_str);
 
    s = unixtime_to_string(init_ut);
 
-   var->add_att("init_time_ut", s.text());
+   add_att(var, "init_time_ut", s.text());
 
    // Valid time
    unix_to_yyyymmdd_hhmmss(valid_ut, time_str);
-   var->add_att("valid_time", time_str);
+   add_att(var, "valid_time", time_str);
 
    s = unixtime_to_string(valid_ut);
 
-   var->add_att("valid_time_ut", s.text());
+   add_att(var, "valid_time_ut", s.text());
 
    // Accumulation time
    if(accum_sec > 0) {
       sec_to_hhmmss(accum_sec, time_str);
-      var->add_att("accum_time", time_str);
-      var->add_att("accum_time_sec", accum_sec);
+      add_att(var, "accum_time", time_str);
+      var->putAtt("accum_time_sec", ncInt, accum_sec);
    }
 
    return;

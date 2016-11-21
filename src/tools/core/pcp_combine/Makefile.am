@@ -29,4 +29,5 @@ pcp_combine_LDADD = -lvx_data2d \
 	-lvx_cal \
 	-lvx_log \
 	-lvx_color \
+	-lnetcdf_c++4 \
 	-lm -lnetcdf_c++ -lnetcdf

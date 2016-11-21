@@ -355,9 +355,9 @@ bool MtdIntFile::read(const char * _filename)
 
 {
 
-NcFile f(_filename);
+NcFile f(_filename, NcFile::read);
 
-if ( ! f.is_valid() )  return ( false );
+if ( IS_INVALID_NC(f) )  return ( false );
 
 Filename = _filename;
 
@@ -375,7 +375,8 @@ void MtdIntFile::read(NcFile & f)
 
 {
 
-NcVar * var = 0;
+//NcVar * var = 0;
+NcVar var ;
 
 
 
@@ -394,19 +395,31 @@ DataMax = string_att_as_double (f, max_value_att_name);
 
 set_size(Nx, Ny, Nt);
 
-var = f.get_var(data_field_name);
+var = get_nc_var(&f, data_field_name);
 
-if ( !(var->set_cur(0, 0, 0)) )  {
+//if ( !(var->set_cur(0, 0, 0)) )  {
+//
+//   mlog << Error << "\n\n  MtdIntFile::read() -> trouble setting corner\n\n";
+//
+//   exit ( 1 );
+//
+//}
+//
+//// const time_t t_start = time(0);   //  for timing the data read operation
+//
+//if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
+//
+//   mlog << Error << "\n\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
+//
+//   exit ( 1 );
+//
+//}
 
-   mlog << Error << "\n\n  MtdIntFile::read() -> trouble setting corner\n\n";
+long offsets[3] = {0,0,0};
+long lengths[3] = {Nt, Ny, Nx};
 
-   exit ( 1 );
-
-}
-
-// const time_t t_start = time(0);   //  for timing the data read operation
-
-if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
+//if ( ! get_nc_data(&var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
+if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
 
    mlog << Error << "\n\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
 
@@ -434,12 +447,18 @@ void MtdIntFile::write(NcFile & f) const
 
 {
 
-NcDim * nx_dim   = 0;
-NcDim * ny_dim   = 0;
-NcDim * nt_dim   = 0;
-NcDim * n_obj_dim   = 0;
-NcVar * data_var = 0;
-NcVar * volumes_var = 0;
+//NcDim * nx_dim   = 0;
+//NcDim * ny_dim   = 0;
+//NcDim * nt_dim   = 0;
+//NcDim * n_obj_dim   = 0;
+NcDim nx_dim   ;
+NcDim ny_dim   ;
+NcDim nt_dim   ;
+NcDim n_obj_dim;
+//NcVar * data_var = 0;
+//NcVar * volumes_var = 0;
+NcVar  data_var    ;
+NcVar  volumes_var ;
 const char format [] = "%d";
 char junk[256];
 const bool is_split = (ObjVolume != 0);
@@ -457,9 +476,9 @@ MtdFileBase::write(f);
 
 if ( is_split )  {
 
-   f.add_dim(nobj_dim_name, Nobjects);
+   add_dim(&f, nobj_dim_name, Nobjects);
 
-   n_obj_dim = f.get_dim(nobj_dim_name);
+   n_obj_dim = get_nc_dim(&f, nobj_dim_name);
 
 }
 
@@ -467,52 +486,63 @@ if ( is_split )  {
    //  get the dimensions of the data field
    //
 
-nx_dim = f.get_dim(nx_dim_name);
-ny_dim = f.get_dim(ny_dim_name);
-nt_dim = f.get_dim(nt_dim_name);
+nx_dim = get_nc_dim(&f, nx_dim_name);
+ny_dim = get_nc_dim(&f, ny_dim_name);
+nt_dim = get_nc_dim(&f, nt_dim_name);
 
 
    //  DataMin, DataMax
 
 sprintf(junk, format, DataMin);
 
-f.add_att(min_value_att_name, junk);
+add_att(&f, min_value_att_name, junk);
 
 sprintf(junk, format, DataMax);
 
-f.add_att(max_value_att_name, junk);
+add_att(&f, max_value_att_name, junk);
 
    //  Radius
 
-f.add_att(radius_att_name, Radius);
+add_att(&f, radius_att_name, Radius);
 
    //  Threshold
 
-f.add_att(threshold_att_name, Threshold);
+add_att(&f, threshold_att_name, Threshold);
 
    //  Data
 
-f.add_var(data_field_name, ncInt, nt_dim, ny_dim, nx_dim);
+data_var = add_var(&f, data_field_name, ncInt, nt_dim, ny_dim, nx_dim);
 
-data_var = f.get_var(data_field_name);
+//data_var = get_nc_var(&f, data_field_name);
 
-if ( !(data_var->set_cur(0, 0, 0)) )  {
+long offsets[3] = {0,0,0};
+long lengths[3] = {Nt, Ny, Nx};
 
-   mlog << Error << "\n\n  MtdIntFile::write() -> trouble setting corner on data field\n\n";
+if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
 
-   exit ( 1 );
-
-}
-
-// const time_t t_start = time(0);   //  for timing the data write operation
-
-if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
-
-   mlog << Error << "\n\n  MtdIntFile::write() -> trouble writing data field\n\n";
+   mlog << Error << "\n\n  MtdIntFile::write(const char *) -> trouble getting data\n\n";
 
    exit ( 1 );
 
 }
+
+//if ( !(data_var->set_cur(0, 0, 0)) )  {
+//
+//   mlog << Error << "\n\n  MtdIntFile::write() -> trouble setting corner on data field\n\n";
+//
+//   exit ( 1 );
+//
+//}
+//
+//// const time_t t_start = time(0);   //  for timing the data write operation
+//
+//if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
+//
+//   mlog << Error << "\n\n  MtdIntFile::write() -> trouble writing data field\n\n";
+//
+//   exit ( 1 );
+//
+//}
 
    //
    //  volumes, if needed
@@ -520,11 +550,11 @@ if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
 
 if ( is_split )  {
 
-   f.add_var(volumes_name, ncInt, n_obj_dim);
+   volumes_var = add_var(&f, volumes_name, ncInt, n_obj_dim);
 
-   volumes_var = f.get_var(volumes_name);
+   //volumes_var = get_nc_var(&f, volumes_name);
 
-   if ( !(volumes_var->put(ObjVolume, Nobjects)) )  {
+   if ( !(put_nc_data(&volumes_var, ObjVolume, Nobjects, 0)) )  {
 
       mlog << Error << "\n\n  MtdIntFile::write() -> trouble writing object volumes\n\n";
 
@@ -554,9 +584,9 @@ void MtdIntFile::write(const char * _filename) const
 
 {
 
-NcFile f(_filename, NcFile::Replace);
+NcFile f(_filename, NcFile::replace);
 
-if ( ! f.is_valid() )  {
+if ( IS_INVALID_NC(f) )  {
 
    mlog << Error << "\n\n  MtdIntFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
 

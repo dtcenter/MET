@@ -143,14 +143,15 @@ bool MetNcFile::open(const char * filename)
 int j, k;
 const char * c = (const char *) 0;
 long long ill, vll;
-NcVar * v   = (NcVar *) 0;
+//NcVar * v   = (NcVar *) 0;
+NcVar  v;
 
 
 close();
 
 Nc = open_ncfile(filename);
 
-if ( !(Nc->is_valid()) )  { close();  return ( false ); }
+if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
 
    //
    //  grid
@@ -164,26 +165,21 @@ read_netcdf_grid(Nc, grid);
    //  dimensions
    //
 
-Ndims = Nc->num_dims();
-
-Dim = new NcDim * [Ndims];
-
-DimNames.extend(Ndims);
-
+StringArray gDimNames;
+get_dim_names(Nc, &gDimNames);
+   
 for (j=0; j<Ndims; ++j)  {
+   c = gDimNames[j];
+   NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
-   Dim[j] = Nc->get_dim(j);
-
-   DimNames.add(Dim[j]->name());
-
-}
-
-for (j=0; j<Ndims; ++j)  {
-
-   c = Dim[j]->name();
-
-   if ( strcmp(c, x_dim_name) == 0 )  Xdim = Dim[j];
-   if ( strcmp(c, y_dim_name) == 0 )  Ydim = Dim[j];
+   if ( strcmp(c, x_dim_name) == 0 ) {
+      //Xdim = Dim[j];
+      Xdim = &dim;
+   }
+   if ( strcmp(c, y_dim_name) == 0 ) {
+      //Ydim = Dim[j];
+      Ydim = &dim;
+   }
 
 }
 
@@ -191,49 +187,57 @@ for (j=0; j<Ndims; ++j)  {
    //  variables
    //
 
-Nvars = Nc->num_vars();
-
-Var = new NcVarInfo [Nvars];
-
-
-for (j=0; j<Nvars; ++j)  {
-
-   v = Nc->get_var(j);
-
-   Var[j].var = v;
-
-   Var[j].name = v->name();
-
-   Var[j].Ndims = v->num_dims();
-
-   Var[j].Dims = new NcDim * [Var[j].Ndims];
-
-   //
-   //  parse the variable attributes
-   //
+   StringArray varNames;
+   Nvars = get_var_names(Nc, &varNames);
    
-   get_att_str( Var[j], name_att_name,       Var[j].name_att      );
-   get_att_str( Var[j], long_name_att_name,  Var[j].long_name_att );
-   get_att_str( Var[j], level_att_name,      Var[j].level_att     );
-   get_att_str( Var[j], units_att_name,      Var[j].units_att     );
-   get_att_int( Var[j], accum_time_att_name, Var[j].AccumTime     );
-
-   get_att_unixtime( Var[j], init_time_att_name,  ill);
-   get_att_unixtime( Var[j], valid_time_att_name, vll);
-
-   if ( !is_bad_data(ill) )   InitTime = ill;
-   if ( !is_bad_data(vll) )  ValidTime = vll;
-
-   for (k=0; k<(Var[j].Ndims); ++k)  {
-
-      Var[j].Dims[k] = v->get_dim(k);
-
-      if ( Var[j].Dims[k] == Xdim )  Var[j].x_slot = k;
-      if ( Var[j].Dims[k] == Ydim )  Var[j].y_slot = k;
-
-   }   //  for k
-
-}   //  for j
+   Var = new NcVarInfo [Nvars];
+   
+   
+   for (j=0; j<Nvars; ++j)  {
+   
+      v = get_var(Nc, varNames[j]);
+   
+      Var[j].var = new NcVar(v);
+   
+      Var[j].name = GET_NC_NAME(v).c_str();
+   
+      int dim_count = GET_NC_DIM_COUNT(v);
+      Var[j].Ndims = dim_count;
+   
+      Var[j].Dims = new NcDim * [Var[j].Ndims];
+   
+      //
+      //  parse the variable attributes
+      //
+      get_att_str( Var[j], name_att_name,       Var[j].name_att      );
+      get_att_str( Var[j], long_name_att_name,  Var[j].long_name_att );
+      get_att_str( Var[j], level_att_name,      Var[j].level_att     );
+      get_att_str( Var[j], units_att_name,      Var[j].units_att     );
+      get_att_int( Var[j], accum_time_att_name, Var[j].AccumTime     );
+   
+      get_att_unixtime( Var[j], init_time_att_name,  ill);
+      get_att_unixtime( Var[j], valid_time_att_name, vll);
+   
+      if ( !is_bad_data(ill) )   InitTime = ill;
+      if ( !is_bad_data(vll) )  ValidTime = vll;
+   
+      StringArray dimNames;
+      get_dim_names(&v, &dimNames);
+   
+      for (k=0; k<(dim_count); ++k)  {
+         c = gDimNames[k];
+         NcDim dim = get_nc_dim(&v, dimNames[k]);
+         Var[j].Dims[k] = &dim;
+   
+         //if ( GET_NC_NAME_P(Var[j].Dims[k]) == GET_NC_NAME_P(Xdim) )  Var[j].x_slot = k;
+         //if ( GET_NC_NAME_P(Var[j].Dims[k]) == GET_NC_NAME_P(Ydim) )  Var[j].y_slot = k;
+   
+         if ( strcmp(c, x_dim_name) == 0 ) Var[j].x_slot = k;
+         if ( strcmp(c, y_dim_name) == 0 ) Var[j].y_slot = k;
+         
+      }   //  for k
+   
+   }   //  for j
 
    //
    //  done
@@ -273,14 +277,14 @@ out << prefix << "Ndims = " << Ndims << "\n";
 
 for (j=0; j<Ndims; ++j)  {
 
-   out << p2 << "Dim # " << j << " = " << DimNames[j] << "   (" << (Dim[j]->size()) << ")\n";
+   out << p2 << "Dim # " << j << " = " << DimNames[j] << "   (" << (GET_NC_SIZE_P(Dim[j])) << ")\n";
 
 }   //  for j
 
 out << prefix << "\n";
 
-out << prefix << "Xdim = " << (Xdim ? Xdim->name() : "(nul)") << "\n";
-out << prefix << "Ydim = " << (Ydim ? Ydim->name() : "(nul)") << "\n";
+out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
+out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
 
 out << prefix << "\n";
 
@@ -304,7 +308,7 @@ for (j=0; j<Nvars; ++j)  {
 
            if ( Var[j].Dims[k] == Xdim )  out << 'X';
       else if ( Var[j].Dims[k] == Ydim )  out << 'Y';
-      else                                out << Var[j].Dims[k]->name();
+      else                                out << GET_NC_NAME_P(Var[j].Dims[k]);
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
 
@@ -368,62 +372,66 @@ if ( !args_ok(a) )  {
 
 }
 
-if ( var->num_dims() != a.n_elements() )  {
+int dimCount = GET_NC_DIM_COUNT_P(var);
+if ( dimCount != a.n_elements() )  {
 
    mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-        << "needed " << (var->num_dims()) << " arguments for variable "
-        << (var->name()) << ", got " << (a.n_elements()) << "\n\n";
+        << "needed " << (dimCount) << " arguments for variable "
+        << (var->getName()) << ", got " << (a.n_elements()) << "\n\n";
 
    exit ( 1 );
 
 }
 
-if ( var->num_dims() >= max_met_args )  {
+if ( dimCount >= max_met_args )  {
 
    mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-        << " too may arguments for variable \"" << (var->name()) << "\"\n\n";
+        << " too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
 
    exit ( 1 );
 
 }
 
 int j;
-float f[2];
-double d[2];
-int i[2];
+//float f[2];
+//double d[2];
+//int i[2];
+float f;
+double d;
+int i;
 bool status;
-long counts[max_met_args];
 
-for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
+status = false;
+switch ( var->getType().getId() )  {
 
-if ( !(var->set_cur((long *) a)) )  {
-
-   mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-        << " can't set corner for variable \"" << (var->name()) << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-switch ( var->type() )  {
-
-   case ncInt:
-      status = var->get(i, counts);
-      d[0] = (double) (i[0]);
+   //case ncInt:
+   case NcType::nc_INT:
+      //var->getVar(start, count, i);
+      get_nc_data(var, &i, (long *)a);
+      //d[0] = (double) (i[0]);
+      d = (double) (i);
+      status = true;
       break;
   
-   case ncFloat:
-      status = var->get(f, counts);
-      d[0] = (double) (f[0]);
+   //case ncFloat:
+   case NcType::nc_FLOAT:
+      //var->getVar(start, count, f);
+      get_nc_data(var, &f, (long *)a);
+      //d[0] = (double) (f[0]);
+      d = (double) (f);
+      status = true;
       break;
 
-   case ncDouble:
-      status = var->get(d, counts);
+   //case ncDouble:
+   case NcType::nc_DOUBLE:
+      //var->getVar(start, count, d);
+      get_nc_data(var, &d, (long *)a);
+      status = true;
       break;
       
    default:
       mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-           << " bad type for variable \"" << (var->name()) << "\"\n\n";
+           << " bad type for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit ( 1 );
       break;
 
@@ -443,7 +451,8 @@ if ( !status )  {
    //  done
    //
 
-return ( d[0] );
+//return ( d[0] );
+return ( d );
 
 }
 
@@ -466,20 +475,22 @@ if ( !args_ok(a) )  {
 
 }
 
-if ( v->num_dims() != a.n_elements() )  {
+int dimCount = GET_NC_DIM_COUNT_P(v);
+
+if ( dimCount != a.n_elements() )  {
 
    mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
-        << "needed " << (v->num_dims()) << " arguments for variable "
-        << (v->name()) << ", got " << (a.n_elements()) << "\n\n";
+        << "needed " << (dimCount) << " arguments for variable "
+        << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
 
    exit ( 1 );
 
 }
 
-if ( v->num_dims() >= max_met_args )  {
+if ( dimCount >= max_met_args )  {
 
    mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) -> "
-        << " too may arguments for variable \"" << (v->name()) << "\"\n\n";
+        << " too may arguments for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
 
    exit ( 1 );
 
@@ -511,7 +522,7 @@ for (j=0; j<Nvars; ++j)  {
 if ( !found )  {
 
    mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
-        << "variable " << (v->name()) << " not found!\n\n";
+        << "variable " << (GET_NC_NAME_P(v)) << " not found!\n\n";
 
    exit ( 1 );
 

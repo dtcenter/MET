@@ -29,6 +29,7 @@ tc_pairs_LDADD = -lvx_config \
 	-lvx_cal \
 	-lvx_log \
 	-lm \
+	-lnetcdf_c++4 \
 	-lnetcdf_c++ -lnetcdf \
 	$(FLIBS)
 
