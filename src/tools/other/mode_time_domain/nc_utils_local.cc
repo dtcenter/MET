@@ -20,6 +20,7 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include "nc_utils.h"
 #include "nc_utils_local.h"
 #include "vx_log.h"
 
@@ -31,9 +32,9 @@ const char * string_att(const NcFile & Nc, const char * name)
 
 {
 
-NcAtt * att = Nc.get_att(name);
+NcGroupAtt att = get_nc_att(&Nc, name);
 
-if ( att->type() != ncChar )  {
+if ( GET_NC_TYPE(att) != ncChar )  {
 
    mlog << Error << "\n\n   string_att() -> attribute \"" << name << "\" is not a character string!\n\n";
 
@@ -41,7 +42,11 @@ if ( att->type() != ncChar )  {
 
 }
 
-const char * c = att->as_string(0);
+char * c = new char[8096];
+
+ConcatString value;
+get_att_value_chars(&att, value);
+strncpy(c, value, value.length());
 
    //
    //  done

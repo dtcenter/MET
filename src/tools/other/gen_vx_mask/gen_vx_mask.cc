@@ -978,7 +978,7 @@ void write_netcdf(const DataPlane &dp) {
    if(is_solar_masktype(mask_type)) {
       char time_str[max_str_len];
       unix_to_yyyymmdd_hhmmss(solar_ut, time_str);
-      mask_var->add_att("solar_time", time_str);
+      add_att(&mask_var, "solar_time", time_str);
    }
 
    // Write out the times
