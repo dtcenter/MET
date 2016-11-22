@@ -33,7 +33,6 @@ static const int buf_size = 65536;
 // static const int buf_size = 15000000;
 
 static unsigned char buf[buf_size];
-static unsigned char buf2[buf_size];
 
 static const int max_dims = 100;
 
@@ -1184,15 +1183,15 @@ const char * c = (const char *) 0;
 ConcatString s;
 SatDimension * d = (SatDimension *) 0;
 int n_dims;
-int * rank       = (int *) 0;
-int * numbertype = (int *) 0;
-hsize_t dims[max_dims];
-int r, nt;
+int32 * rank       = (int32 *) 0;
+int32 * numbertype = (int32 *) 0;
+int32 dims[max_dims];
+int32 r, nt;
 
 
 clear_buf();
 
-if ( HE5_SWinqdatafields(SwathId, (char *) buf, 0, 0) < 0 )  {
+if ( SWinqdatafields(SwathId, (char *) buf, 0, 0) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_data_fields() -> error (1)\n\n";
@@ -1213,12 +1212,12 @@ for (j=0; j<Ndatafields; ++j)  {
 
 }
 
-rank = new int [Ndatafields];
-numbertype = new int [Ndatafields];
+rank = new int32 [Ndatafields];
+numbertype = new int32 [Ndatafields];
 
 clear_buf();
 
-if ( HE5_SWinqdatafields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
+if ( SWinqdatafields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_data_fields() -> error (2)\n\n";
@@ -1244,7 +1243,7 @@ for (j=0; j<Ndatafields; ++j)  {
 
    c = (const char *) s;
 
-   if ( HE5_SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf, (char *) buf2) < 0 )  {
+   if ( SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_data_fields() -> error (3)\n\n";
@@ -1284,8 +1283,8 @@ for (j=0; j<Ndatafields; ++j)  {
    //  done
    //
 
-if ( rank )        { delete [] rank;  rank = (int *) 0; }
-if ( numbertype )  { delete [] numbertype;  numbertype = (int *) 0; }
+if ( rank )        { delete [] rank;  rank = (int32 *) 0; }
+if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) 0; }
 
 return;
 
@@ -1300,15 +1299,13 @@ void CloudsatSwath::get_attributes()
 {
 
 int j;
-long att_buf_size;
-hsize_t att_size;
-int nt, retval;
+int32 nt, att_buf_size, att_size, retval;
 StringArray a;
 
 
 Nattributes = 0;
 
-if ( (retval = HE5_SWinqattrs(SwathId, NULL, &att_buf_size)) < 0 )  {
+if ( (retval = SWinqattrs(SwathId, NULL, &att_buf_size)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute buffer size\n\n";
@@ -1321,7 +1318,7 @@ if ( retval == 0 )  return;
 
 char * att_buf = new char [att_buf_size];
 
-if ( (retval = HE5_SWinqattrs(SwathId, att_buf, &att_buf_size)) < 0 )  {
+if ( (retval = SWinqattrs(SwathId, att_buf, &att_buf_size)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute names\n\n";
@@ -1342,7 +1339,7 @@ for (j=0; j<Nattributes; ++j)  {
 
    Attribute[j].set_name(a[j]);
 
-   if ( HE5_SWattrinfo(SwathId, (char *) (a[j]), &nt, &att_size) < 0 )  {
+   if ( SWattrinfo(SwathId, (char *) (a[j]), &nt, &att_size) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get info on attribute \"" << (a[j]) << "\"\n\n";
@@ -1356,7 +1353,7 @@ for (j=0; j<Nattributes; ++j)  {
 
    clear_buf(att_buf, att_buf_size);
 
-   if ( HE5_SWreadattr(SwathId, (char *) (a[j]), att_buf) < 0 )  {
+   if ( SWreadattr(SwathId, (char *) (a[j]), att_buf) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get value for attribute \"" << (a[j]) << "\"\n\n";
@@ -1395,15 +1392,15 @@ const char * c = (const char *) 0;
 ConcatString s;
 SatDimension * d = (SatDimension *) 0;
 StringArray a;
-int * rank       = (int *) 0;
-int * numbertype = (int *) 0;
-hsize_t dims[max_dims];
-int r, nt;
+int32 * rank       = (int32 *) 0;
+int32 * numbertype = (int32 *) 0;
+int32 dims[max_dims];
+int32 r, nt;
 
 
 clear_buf();
 
-if ( HE5_SWinqgeofields(SwathId, (char *) buf, 0, 0) < 0 )  {
+if ( SWinqgeofields(SwathId, (char *) buf, 0, 0) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_geo_fields() -> error (1)\n\n";
@@ -1424,12 +1421,12 @@ for (j=0; j<Ngeofields; ++j)  {
 
 }
 
-rank = new int [Ngeofields];
-numbertype = new int [Ngeofields];
+rank = new int32 [Ngeofields];
+numbertype = new int32 [Ngeofields];
 
 clear_buf();
 
-if ( HE5_SWinqgeofields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
+if ( SWinqgeofields(SwathId, (char *) buf, rank, numbertype) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_geo_fields() -> error (2)\n\n";
@@ -1456,7 +1453,7 @@ for (j=0; j<Ngeofields; ++j)  {
 
    c = (const char *) s;
 
-   if ( HE5_SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf, (char *) buf2) < 0 )  {
+   if ( SWfieldinfo(SwathId, (char *) c, &r, dims, &nt, (char *) buf) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_geo_fields() -> error (3)\n\n";
@@ -1495,8 +1492,8 @@ for (j=0; j<Ngeofields; ++j)  {
    //  done
    //
 
-if ( rank )  { delete [] rank;  rank = (int *) 0; }
-if ( numbertype )  { delete [] numbertype;  numbertype = (int *) 0; }
+if ( rank )  { delete [] rank;  rank = (int32 *) 0; }
+if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) 0; }
 
 return;
 
@@ -1516,7 +1513,7 @@ StringArray a;
 
 clear_buf();
 
-if ( HE5_SWinqdims(SwathId, (char *) buf, 0) < 0 )  {
+if ( SWinqdims(SwathId, (char *) buf, 0) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_dimensions() -> error (1)\n\n";
@@ -1535,7 +1532,7 @@ for (j=0; j<Ndimensions; ++j)  {
 
    Dimension[j].set_name(a[j]);
 
-   if ( (k = HE5_SWdiminfo(SwathId, (char *) (a[j]))) < 0 )  {
+   if ( (k = SWdiminfo(SwathId, (char *) (a[j]))) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_dimensions() ->can't get size for dimension \"" << a[j] << "\"\n\n";
@@ -1770,8 +1767,8 @@ if ( !Latitude )  setup_geo_pointers();
 
 double x;
 int n;
-hssize_t start;
-hsize_t edge = 1;
+int32 start;
+int32 edge = 1;
 float * F = (float *) buf;
 
 n = Latitude->dimension_size(0);
@@ -1785,12 +1782,12 @@ if ( (k < 0) || (k >= n) )  {
 
 }
 
-start = (int) k;
+start = (int32) k;
 
-if ( HE5_SWreadfield(SwathId, (char *) "Latitude", &start, 0, &edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Latitude", &start, 0, &edge, buf) < 0 )  {
 
    mlog << Error
-        << "\n\n  CloudsatSwath::lat(int) const -> bad HE5_SWreadfield status\n\n";
+        << "\n\n  CloudsatSwath::lat(int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -1814,8 +1811,8 @@ if ( !Longitude )  setup_geo_pointers();
 
 double x;
 int n;
-hssize_t start;
-hsize_t edge = 1;
+int32 start;
+int32 edge = 1;
 float * F = (float *) buf;
 
 n = Longitude->dimension_size(0);
@@ -1829,12 +1826,12 @@ if ( (k < 0) || (k >= n) )  {
 
 }
 
-start = (hsize_t) k;
+start = (int32) k;
 
-if ( HE5_SWreadfield(SwathId, (char *) "Longitude", &start, 0, &edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Longitude", &start, 0, &edge, buf) < 0 )  {
 
    mlog << Error
-        << "\n\n  CloudsatSwath::lon(int) const -> bad HE5_SWreadfield status\n\n";
+        << "\n\n  CloudsatSwath::lon(int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -1860,8 +1857,8 @@ if ( !Height )  setup_geo_pointers();
 
 double x;
 int n1, n2;
-hssize_t start[2];
-hsize_t edge[2];
+int32 start[2];
+int32 edge[2];
 short * S = (short *) buf;
 
 n1 = Height->dimension_size(0);
@@ -1876,15 +1873,15 @@ if ( (ray < 0) || (ray >= n1) || (bin < 0) || (bin >= n2) )  {
 
 }
 
-start[0] = (int) ray;
-start[1] = (int) bin;
+start[0] = (int32) ray;
+start[1] = (int32) bin;
 
 edge[0] = edge[1] = 1;
 
-if ( HE5_SWreadfield(SwathId, (char *) "Height", start, 0, edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Height", start, 0, edge, buf) < 0 )  {
 
    mlog << Error
-        << "\n\n  CloudsatSwath::height_m(int) const -> bad HE5_SWreadfield status\n\n";
+        << "\n\n  CloudsatSwath::height_m(int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -1909,8 +1906,8 @@ if ( !Reflectivity )  setup_geo_pointers();
 
 double x;
 int n1, n2;
-hssize_t start[2];
-hsize_t edge[2];
+int32 start[2];
+int32 edge[2];
 short * S = (short *) buf;
 
 n1 = Reflectivity->dimension_size(0);
@@ -1925,15 +1922,15 @@ if ( (ray < 0) || (ray >= n1) || (bin < 0) || (bin >= n2) )  {
 
 }
 
-start[0] = (int) ray;
-start[1] = (int) bin;
+start[0] = (int32) ray;
+start[1] = (int32) bin;
 
 edge[0] = edge[1] = 1;
 
-if ( HE5_SWreadfield(SwathId, (char *) "Radar_Reflectivity", start, 0, edge, buf) < 0 )  {
+if ( SWreadfield(SwathId, (char *) "Radar_Reflectivity", start, 0, edge, buf) < 0 )  {
 
    mlog << Error
-        << "\n\n  CloudsatSwath::reflectivity(int, int) const -> bad HE5_SWreadfield status\n\n";
+        << "\n\n  CloudsatSwath::reflectivity(int, int) const -> bad SWreadfield status\n\n";
 
    exit ( 1 );
 
@@ -2090,7 +2087,7 @@ bool CloudsatSwathFile::open(const char * _filename)
 {
 
 int j, k;
-long size;
+int32 size;
 StringArray a;
 
 
@@ -2102,7 +2099,7 @@ Filename = _filename;
    //  open file
    //
 
-if ( (FileId = HE5_SWopen((char *) _filename, HDF5_ACC_RDONLY)) < 0 )  {
+if ( (FileId = SWopen((char *) _filename, DFACC_READ)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwathFile::open(const char *) -> unable to open input file \"" << _filename << "\"\n\n";
@@ -2119,7 +2116,7 @@ if ( (FileId = HE5_SWopen((char *) _filename, HDF5_ACC_RDONLY)) < 0 )  {
 
 clear_buf();
 
-if ( HE5_SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
+if ( SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwathFile::open(const char *) -> unable to get number of swaths from file \"" << _filename << "\"\n\n";
@@ -2140,7 +2137,7 @@ for (j=0; j<Nswaths; ++j)  {
 
    Swath[j].set_name(a[j]);
 
-   if ( (k = HE5_SWattach(FileId, (char *) (a[j]))) < 0 )  {
+   if ( (k = SWattach(FileId, (char *) (a[j]))) < 0 )  {
 
       mlog << Error
            << "\n\n  CloudsatSwathFile::open(const char *) -> to attach swath # " << j << " in file \"" << _filename << "\"\n\n";
@@ -2182,7 +2179,7 @@ void CloudsatSwathFile::close()
 
 {
 
-if ( (FileId >= 0) && (HE5_SWclose(FileId) < 0) )  {
+if ( (FileId >= 0) && (SWclose(FileId) < 0) )  {
 
    mlog << Error
         << "\n\n  CloudsatSwathFile::close() -> trouble closing file\n\n";

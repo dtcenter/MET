@@ -21,11 +21,11 @@
 
 #include "vx_log.h"
 
-#include "hdf5.h"
-#include "H5public.h"
+#include "hdf.h"
+#include "mfhdf.h"
 
-#include "HE5_HdfEosDef.h"
-#include "HE5_GctpFunc.h"
+#include "HdfEosDef.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 

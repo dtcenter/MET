@@ -32,7 +32,7 @@ using namespace std;
 static const char dim0_name [] = "Cell_Along_Swath_5km";
 static const char dim1_name [] = "Cell_Across_Swath_5km";
 
-static hsize_t edge_2[2] = { 1, 1 };   //  can't declare this "const" or HE5_SWreadfield will complain
+static int32 edge_2[2] = { 1, 1 };   //  can't declare this "const" or SWreadfield will complain
 
 static const int buf_size = 4096;
 
@@ -241,7 +241,7 @@ bool ModisFile::open(const char * _filename)
 
 int k;
 int n_swaths;
-long size;
+int32 size;
 int n0, n1;
 double dt;
 StringArray a;
@@ -257,7 +257,7 @@ Filename = _filename;
    //  open file
    //
 
-if ( (FileId = HE5_SWopen((char *) _filename, HDF5_ACC_RDONLY)) < 0 )  {
+if ( (FileId = SWopen((char *) _filename, DFACC_READ)) < 0 )  {
 
    mlog << Error
         << "\n\n  ModisFile::open(const char *) -> unable to open input file \"" << _filename << "\"\n\n";
@@ -274,7 +274,7 @@ if ( (FileId = HE5_SWopen((char *) _filename, HDF5_ACC_RDONLY)) < 0 )  {
 
 clear_buf();
 
-if ( HE5_SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
+if ( SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
 
    mlog << Error
         << "\n\n  ModisFile::open(const char *) -> unable to get number of swaths from file \"" << _filename << "\"\n\n";
@@ -305,7 +305,7 @@ Swath = new CloudsatSwath;
 
 Swath->set_name(a[0]);
 
-if ( (k = HE5_SWattach(FileId, (char *) (a[0]))) < 0 )  {
+if ( (k = SWattach(FileId, (char *) (a[0]))) < 0 )  {
 
    mlog << Error
         << "\n\n  ModisFile::open(const char *) -> unable to attach swath in file \"" << _filename << "\"\n\n";
@@ -563,7 +563,7 @@ void ModisFile::close()
 
 {
 
-if ( (FileId >= 0) && (HE5_SWclose(FileId) < 0) )  {
+if ( (FileId >= 0) && (SWclose(FileId) < 0) )  {
 
    mlog << Error
         << "\n\n  ModisFile::close() -> trouble closing file\n\n";
@@ -607,8 +607,8 @@ bool ModisFile::get_double_data(SwathDataField * field, int n0, int n1, double &
 
 {
 
-hssize_t start[2];
-herr_t status;
+int32 start[2];
+intn status;
 double * d = (double *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
@@ -631,12 +631,12 @@ char * field_name = (char *) (const char *) _field_name;
 
 // cout << "field_name = " << field_name << "\n" << flush;
 
-status = HE5_SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
    mlog << Error
-        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad HE5_SWreadfield status\n\n";
+        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
    // exit ( 1 );
 
@@ -662,8 +662,8 @@ bool ModisFile::get_float_data(SwathDataField * field, int n0, int n1, float & v
 
 {
 
-hssize_t start[2];
-herr_t status;
+int32 start[2];
+intn status;
 float * f = (float *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
@@ -686,7 +686,7 @@ char * field_name = (char *) (const char *) _field_name;
 
 // cout << "field_name = " << field_name << "\n" << flush;
 
-status = HE5_SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
@@ -717,8 +717,8 @@ bool ModisFile::get_int16_data(SwathDataField * field, int n0, int n1, short & v
 
 {
 
-hssize_t start[2];
-herr_t status;
+int32 start[2];
+intn status;
 short * s = (short *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
@@ -741,12 +741,12 @@ char * field_name = (char *) (const char *) _field_name;
 
 // cout << "field_name = " << field_name << "\n" << flush;
 
-status = HE5_SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
    mlog << Error
-        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad HE5_SWreadfield status\n\n";
+        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
    // exit ( 1 );
 
@@ -772,8 +772,8 @@ bool ModisFile::get_int8_data(SwathDataField * field, int n0, int n1, char & val
 
 {
 
-hssize_t start[2];
-herr_t status;
+int32 start[2];
+intn status;
 char * c = (char *) buf;
 
 if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
@@ -796,12 +796,12 @@ char * field_name = (char *) (const char *) _field_name;
 
 // cout << "field_name = " << field_name << "\n" << flush;
 
-status = HE5_SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
+status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
 
    mlog << Error
-        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad HE5_SWreadfield status\n\n";
+        << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
    // exit ( 1 );
 
