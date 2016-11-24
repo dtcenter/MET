@@ -734,13 +734,9 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    if (hdr_buf_size > OBS_BUFFER_SIZE) hdr_buf_size = OBS_BUFFER_SIZE;
    
    bool save_nc = (hdr_buf_size <= hdr_data_idx);
-   if (! save_nc && processed_count == hdr_buf_size ) {
-      save_nc = true;
-      hdr_buf_size = hdr_buf_size % OBS_BUFFER_SIZE;
-   }
    if (save_nc) {
-      cout << "   Save header!!! offset: " << hdr_data_offset
-           << ", buf_size: " << hdr_buf_size << ", str_len: " << MAX_STRING_LEN <<"\n";
+      //cout << "   Save header!!! offset: " << hdr_data_offset
+      //     << ", buf_size: " << hdr_buf_size << ", str_len: " << MAX_STRING_LEN <<"\n";
       
       long offsets[2] = { hdr_data_offset, 0 };
       long lengths[2] = { hdr_buf_size, MAX_STRING_LEN };

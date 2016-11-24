@@ -95,6 +95,7 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
                                     const long *cur, bool count_bad=false);
 static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
                                     const long *cur, bool count_bad=false);
+static void reset_header_buffer(int buf_size);
 
 static void   check_quality_control_flag(int &value, const char qty, const char* var_name);
 static void   check_quality_control_flag(float &value, const char qty, const char* var_name);
@@ -437,6 +438,10 @@ void setup_netcdf_out(int nhdr) {
    // Add the command line arguments that were applied.
    //
    add_att(f_out, "RunCommand", (string)argv_str);
+
+   int buf_size = nhdr;
+   if (buf_size > BUFFER_SIZE) buf_size = BUFFER_SIZE;
+   reset_header_buffer(buf_size);
 
    return;
 }
@@ -929,7 +934,7 @@ void process_obs(const int in_gc, const float conversion,
    if(!is_bad_data(obs_arr[4])) {
       obs_arr[4] *= conversion;
       for (int idx=0; idx<obs_arr_len; idx++) {
-         obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+         obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
       }
       
       //put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
@@ -1013,14 +1018,32 @@ void process_obs(const int in_gc, const float conversion,
 
 ////////////////////////////////////////////////////////////////////////
 
+void reset_header_buffer(int buf_size) {
+   for (int i=0; i<buf_size; i++) {
+      for (int j=0; j<strl_len; j++) {
+         hdr_typ_out_buf[i][j] = bad_data_char;
+         hdr_sid_out_buf[i][j] = bad_data_char;
+         hdr_vld_out_buf[i][j] = bad_data_char;
+      }
+      for (int j=0; j<hdr_arr_len; j++) {
+         hdr_arr_out_buf[i][j] = fill_value;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_qty(char &qty) {
    ConcatString qty_str;
    if(qty == '\0') qty_str = na_str;
    else            qty_str << qty;
    qty_str.replace(" ", "_", false);
-   strncpy(qty_data_buf[obs_data_idx], qty_str, qty_str.length()); 
+   strncpy(qty_data_out_buf[obs_data_idx], qty_str, qty_str.length()); 
+   qty_data_out_buf[obs_data_idx][qty_str.length()] = bad_data_char; 
    //put_nc_var_val(obs_qty_var, i_obs, qty_str);
 }
+
+////////////////////////////////////////////////////////////////////////
 
 bool write_nc_hdr_data(int buf_size) {
    bool status = true;
@@ -1029,19 +1052,19 @@ bool write_nc_hdr_data(int buf_size) {
    long lengths[2] = { buf_size, strl_len };
 
    
-   if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
+   if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_out_buf[0], lengths, offsets)) {
       mlog << Error << " write_nc_hdr_data() -> "
            << "error writing the header type to the netCDF file\n\n";
       //exit(1);
       status = false;
    }
-   if(!put_nc_data(&hdr_sid_var, (char *)hdr_sid_buf[0], lengths, offsets)) {
+   if(!put_nc_data(&hdr_sid_var, (char *)hdr_sid_out_buf[0], lengths, offsets)) {
       mlog << Error << " write_nc_hdr_data() -> "
            << "error writing the station id to the netCDF file\n\n";
       //exit(1);
       status = false;
    }
-   if(!put_nc_data(&hdr_vld_var, (char *)hdr_vld_buf[0], lengths, offsets)) {
+   if(!put_nc_data(&hdr_vld_var, (char *)hdr_vld_out_buf[0], lengths, offsets)) {
       mlog << Error << " write_nc_hdr_data() -> "
            << "error writing the valid time to the netCDF file\n\n";
       //exit(1);
@@ -1049,7 +1072,7 @@ bool write_nc_hdr_data(int buf_size) {
    }
    
    lengths[1] = hdr_arr_len;
-   if(!put_nc_data(&hdr_arr_var, (float *)hdr_arr_buf[0], lengths, offsets)) {
+   if(!put_nc_data(&hdr_arr_var, (float *)hdr_arr_out_buf[0], lengths, offsets)) {
       mlog << Error << " write_nc_hdr_data() -> "
            << "error writing the header array (lat/lon/elv) to the netCDF file\n\n";
       //exit(1);
@@ -1065,7 +1088,7 @@ bool write_nc_obs_data(int buf_size) {
    long offsets[2] = { obs_data_offset, 0 };
    long lengths[2] = { buf_size, obs_arr_len };
    
-   if(!put_nc_data(&obs_arr_var, (float *)obs_data_buf, lengths, offsets)) {
+   if(!put_nc_data(&obs_arr_var, (float *)obs_data_out_buf, lengths, offsets)) {
       mlog << Error << " write_nc_obs_data() -> "
            << "error writing the obs data to the netCDF file\n\n";
       //exit(1);
@@ -1073,7 +1096,7 @@ bool write_nc_obs_data(int buf_size) {
    }
    
    lengths[1] = strl_len;
-   if(!put_nc_data(&obs_qty_var, (char *)qty_data_buf, lengths, offsets)) {
+   if(!put_nc_data(&obs_qty_var, (char *)qty_data_out_buf, lengths, offsets)) {
       mlog << Error << " write_nc_obs_data() -> "
            << "error writing the obs data to the netCDF file\n\n";
       //exit(1);
@@ -1331,7 +1354,7 @@ void process_madis_metar(NcFile *&f_in) {
       get_nc_data(&in_hdr_vld_var, &tmp_dbl_arr[0], buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lat_var, &hdr_lat_arr[0], buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lon_var, &hdr_lon_arr[0], buf_size, i_hdr_s);
-      get_filtered_nc_data(in_hdr_elv_var, &hdr_elv_arr[0], i_hdr_s, buf_size);
+      get_filtered_nc_data(in_hdr_elv_var, &hdr_elv_arr[0], buf_size, i_hdr_s);
 
       if (!IS_INVALID_NC(seaLevelPressQty_var)) get_nc_data(&seaLevelPressQty_var, seaLevelPressQty, buf_size, i_hdr_s);
       if (!IS_INVALID_NC(visibilityQty_var))    get_nc_data(&visibilityQty_var, visibilityQty, buf_size, i_hdr_s);
@@ -1348,20 +1371,20 @@ void process_madis_metar(NcFile *&f_in) {
       if (!IS_INVALID_NC(precip24HourQty_var))  get_nc_data(&precip24HourQty_var, precip24HourQty, buf_size, i_hdr_s);
       if (!IS_INVALID_NC(snowCoverQty_var))     get_nc_data(&snowCoverQty_var, snowCoverQty, buf_size, i_hdr_s);
       
-      get_filtered_nc_data(seaLevelPress_var,  seaLevelPress, i_hdr_s, buf_size);
-      get_filtered_nc_data(visibility_var,     visibility,    i_hdr_s, buf_size);
-      get_filtered_nc_data(temperature_var,    temperature,   i_hdr_s, buf_size);
-      get_filtered_nc_data(dewpoint_var,       dewpoint,      i_hdr_s, buf_size);
-      get_filtered_nc_data(windDir_var,        windDir,       i_hdr_s, buf_size);
-      get_filtered_nc_data(windSpeed_var,      windSpeed,     i_hdr_s, buf_size);
-      get_filtered_nc_data(windGust_var,       windGust,      i_hdr_s, buf_size);
-      get_filtered_nc_data(minTemp24Hour_var,  minTemp24Hour, i_hdr_s, buf_size);
-      get_filtered_nc_data(maxTemp24Hour_var,  maxTemp24Hour, i_hdr_s, buf_size);
-      get_filtered_nc_data(precip1Hour_var,    precip1Hour,   i_hdr_s, buf_size);
-      get_filtered_nc_data(precip3Hour_var,    precip3Hour,   i_hdr_s, buf_size);
-      get_filtered_nc_data(precip6Hour_var,    precip6Hour,   i_hdr_s, buf_size);
-      get_filtered_nc_data(precip24Hour_var,   precip24Hour,  i_hdr_s, buf_size);
-      get_filtered_nc_data(snowCover_var,      snowCover,     i_hdr_s, buf_size);
+      get_filtered_nc_data(seaLevelPress_var,  seaLevelPress, buf_size, i_hdr_s);
+      get_filtered_nc_data(visibility_var,     visibility,    buf_size, i_hdr_s);
+      get_filtered_nc_data(temperature_var,    temperature,   buf_size, i_hdr_s);
+      get_filtered_nc_data(dewpoint_var,       dewpoint,      buf_size, i_hdr_s);
+      get_filtered_nc_data(windDir_var,        windDir,       buf_size, i_hdr_s);
+      get_filtered_nc_data(windSpeed_var,      windSpeed,     buf_size, i_hdr_s);
+      get_filtered_nc_data(windGust_var,       windGust,      buf_size, i_hdr_s);
+      get_filtered_nc_data(minTemp24Hour_var,  minTemp24Hour, buf_size, i_hdr_s);
+      get_filtered_nc_data(maxTemp24Hour_var,  maxTemp24Hour, buf_size, i_hdr_s);
+      get_filtered_nc_data(precip1Hour_var,    precip1Hour,   buf_size, i_hdr_s);
+      get_filtered_nc_data(precip3Hour_var,    precip3Hour,   buf_size, i_hdr_s);
+      get_filtered_nc_data(precip6Hour_var,    precip6Hour,   buf_size, i_hdr_s);
+      get_filtered_nc_data(precip24Hour_var,   precip24Hour,  buf_size, i_hdr_s);
+      get_filtered_nc_data(snowCover_var,      snowCover,     buf_size, i_hdr_s);
       
       dim2D[0] = buf_size;
       dim2D[1] = hdr_typ_len;
@@ -1369,7 +1392,7 @@ void process_madis_metar(NcFile *&f_in) {
       dim2D[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, (char *)&hdr_sid_arr[0], dim2D, cur);
       
-      dim[0] = 1;
+      //dim[0] = 1;
       for (i_idx=0; i_idx<buf_size; i_idx++) {
       
          //
@@ -1384,6 +1407,7 @@ void process_madis_metar(NcFile *&f_in) {
          //
    
          i_hdr = i_hdr_s + i_idx;
+         hdr_data_idx = i_idx;
          
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
    
@@ -1400,10 +1424,6 @@ void process_madis_metar(NcFile *&f_in) {
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
-   
          //
          // Check masking regions.
          //
@@ -1417,8 +1437,8 @@ void process_madis_metar(NcFile *&f_in) {
          //get_nc_var_val(in_hdr_typ_var, hdr_typ, hdr_typ_len, cur);
          hdr_typ = hdr_typ_arr[i_idx];
          if(hdr_typ == metar_str || hdr_typ == "SPECI") hdr_typ = "ADPSFC";
-         strncpy(hdr_typ_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
+         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
+         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
          //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
    
          //
@@ -1427,8 +1447,8 @@ void process_madis_metar(NcFile *&f_in) {
          //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
          //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
-         strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
+         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
+         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
    
          //
@@ -1440,16 +1460,18 @@ void process_madis_metar(NcFile *&f_in) {
          
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
+         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
+         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
          //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
          
-         hdr_data_idx++;
-   
          //
          // Write the header array to the output file.
          //
          //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+         for (int idx=0; idx<hdr_arr_len; idx++) {
+            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
+         }
+   
    
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
@@ -1498,12 +1520,12 @@ void process_madis_metar(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
             }
             write_qty(windSpeedQty[i_idx]);
             obs_data_idx++;
-            if (BUFFER_SIZE == obs_data_idx) {
-               write_nc_obs_data(BUFFER_SIZE);
+            if (buf_size == obs_data_idx) {
+               write_nc_obs_data(buf_size);
             }
             i_obs++;
          }
@@ -1513,12 +1535,12 @@ void process_madis_metar(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
             }
             write_qty(windSpeedQty[i_idx]);
             obs_data_idx++;
-            if (BUFFER_SIZE == obs_data_idx) {
-               write_nc_obs_data(BUFFER_SIZE);
+            if (buf_size == obs_data_idx) {
+               write_nc_obs_data(buf_size);
             }
             i_obs++;
          }
@@ -1572,14 +1594,9 @@ void process_madis_metar(NcFile *&f_in) {
          
       }
       
-      if (0 < hdr_data_idx) {
-         write_nc_hdr_data(hdr_data_idx);
-      }
+      write_nc_hdr_data(buf_size);
+      reset_header_buffer(buf_size);
    } // end for i_hdr
-
-   if (0 < hdr_data_idx) {
-      write_nc_hdr_data(hdr_data_idx);
-   }
 
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
@@ -1916,9 +1933,6 @@ void process_madis_raob(NcFile *&f_in) {
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
          
          //
          // Check masking regions.
@@ -1931,16 +1945,16 @@ void process_madis_raob(NcFile *&f_in) {
          //
          hdr_typ = "ADPUPA";
          //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
-         strncpy(hdr_typ_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
+         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
+         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
          
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
          //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
-         strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
+         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
+         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
          //
          // Process the observation time.
@@ -1950,15 +1964,18 @@ void process_madis_raob(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
          //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
-         strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
+         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
+         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         hdr_data_idx++;
-         
          //
          // Write the header array to the output file.
          //
          //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+         for (int idx=0; idx<hdr_arr_len; idx++) {
+            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
+         }
+         
+         hdr_data_idx++;
          
          //
          // Initialize the observation array: hdr_id
@@ -2031,7 +2048,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = ugrd;
             if(!is_bad_data(ugrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2046,7 +2063,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = vgrd;
             if(!is_bad_data(vgrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2142,7 +2159,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = ugrd;
             if(!is_bad_data(ugrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2157,7 +2174,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = vgrd;
             if(!is_bad_data(vgrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2215,7 +2232,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = ugrd;
             if(!is_bad_data(ugrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2230,7 +2247,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = vgrd;
             if(!is_bad_data(vgrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2298,7 +2315,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = ugrd;
             if(!is_bad_data(ugrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2313,7 +2330,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = vgrd;
             if(!is_bad_data(vgrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2371,7 +2388,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = ugrd;
             if(!is_bad_data(ugrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2386,7 +2403,7 @@ void process_madis_raob(NcFile *&f_in) {
             obs_arr[4] = vgrd;
             if(!is_bad_data(vgrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -2524,7 +2541,8 @@ void process_madis_profiler(NcFile *&f_in) {
       get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr, dim, cur);
       
       dim[1] = nlvl;
-      get_nc_data(&var_levels, (float *)levels_arr, buf_size, i_hdr_s);
+      get_nc_data(&var_levels, (float *)levels_arr, dim, cur);
+
       if (!IS_INVALID_NC(in_uComponentQty_var)) get_nc_data(&in_uComponentQty_var, (char *)uComponentQty_arr, buf_size, i_hdr_s);
       if (!IS_INVALID_NC(in_vComponentQty_var)) get_nc_data(&in_vComponentQty_var, (char *)vComponentQty_arr, buf_size, i_hdr_s);
       get_filtered_nc_data_2d(in_uComponent_var, (float *)uComponent_arr, dim, cur);
@@ -2553,6 +2571,7 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          cur[0] = i_hdr;
          cur[1] = 0;
+         hdr_data_idx = i_idx;
       
          //
          // Process the latitude, longitude, and elevation.
@@ -2563,10 +2582,6 @@ void process_madis_profiler(NcFile *&f_in) {
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
-      
          //
          // Check masking regions.
          //
@@ -2578,8 +2593,8 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          hdr_typ = "ADPUPA";
          //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
-         strncpy(hdr_typ_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
+         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
+         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
       
          //
          // Process the station name.
@@ -2587,8 +2602,8 @@ void process_madis_profiler(NcFile *&f_in) {
          //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
          //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
-         strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
+         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
+         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
       
          //
          // Process the observation time.
@@ -2599,15 +2614,17 @@ void process_madis_profiler(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
          //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
-         strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
+         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
+         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         hdr_data_idx++;
-      
          //
          // Write the header array to the output file.
          //
          //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+         for (int idx=0; idx<hdr_arr_len; idx++) {
+            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
+         }
+      
       
          //
          // Initialize the observation array: hdr_id
@@ -2660,14 +2677,9 @@ void process_madis_profiler(NcFile *&f_in) {
       
       } // end for i_hdr
       
-      if (buf_size == hdr_data_idx) {
-         write_nc_hdr_data(hdr_data_idx);
-      }
+      write_nc_hdr_data(buf_size);
+      reset_header_buffer(buf_size);
    } // end for i_hdr
-
-   if (0 < hdr_data_idx) {
-      write_nc_hdr_data(hdr_data_idx);
-   }
 
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
@@ -2868,6 +2880,7 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          cur[0] = i_hdr;
          cur[1] = 0;
+         hdr_data_idx = i_idx;
          
          //
          // Process the latitude, longitude, and elevation.
@@ -2878,9 +2891,6 @@ void process_madis_maritime(NcFile *&f_in) {
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
          
          //
          // Check masking regions.
@@ -2893,8 +2903,8 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          hdr_typ = "SFCSHP";
          //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
-         strncpy(hdr_typ_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
+         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
+         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
 
          //
          // Process the station name.
@@ -2902,8 +2912,8 @@ void process_madis_maritime(NcFile *&f_in) {
          //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
          //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
-         strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
+         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
+         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
          //
          // Process the observation time.
@@ -2914,15 +2924,16 @@ void process_madis_maritime(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
          //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
-         strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
+         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
+         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         hdr_data_idx++;
-         
          //
          // Write the header array to the output file.
          //
          //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+         for (int idx=0; idx<hdr_arr_len; idx++) {
+            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
+         }
          
          //
          // Initialize the observation array: hdr_id
@@ -3008,14 +3019,9 @@ void process_madis_maritime(NcFile *&f_in) {
          
       }
 
-      if (0 < hdr_data_idx) {
-         write_nc_hdr_data(hdr_data_idx);
-      }
+      write_nc_hdr_data(buf_size);
+      reset_header_buffer(buf_size);
    } // end for i_hdr
-
-   if (0 < hdr_data_idx) {
-      write_nc_hdr_data(hdr_data_idx);
-   }
 
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
@@ -3195,59 +3201,60 @@ void process_madis_mesonet(NcFile *&f_in) {
       
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
+      
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lat_var, hdr_lat_arr, buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lon_var, hdr_lon_arr, buf_size, i_hdr_s);
       get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr, buf_size, i_hdr_s);
       //get_filtered_nc_data(in_pressure_var, (float *)pressure_arr, buf_size, i_hdr_s);
       
-      if (!IS_INVALID_NC(in_temperatureQty_var))      get_nc_data(&in_temperatureQty_var, temperatureQty_arr);
-      if (!IS_INVALID_NC(in_dewpointQty_var))         get_nc_data(&in_dewpointQty_var, dewpointQty_arr);
-      if (!IS_INVALID_NC(in_relHumidityQty_var))      get_nc_data(&in_relHumidityQty_var, relHumidityQty_arr);
-      if (!IS_INVALID_NC(in_stationPressureQty_var))  get_nc_data(&in_stationPressureQty_var, stationPressureQty_arr);
-      if (!IS_INVALID_NC(in_seaLevelPressureQty_var)) get_nc_data(&in_seaLevelPressureQty_var, seaLevelPressureQty_arr);
-      if (!IS_INVALID_NC(in_windDirQty_var))          get_nc_data(&in_windDirQty_var, windDirQty_arr);
-      if (!IS_INVALID_NC(in_windSpeedQty_var))        get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr);
-      if (!IS_INVALID_NC(in_windGustQty_var))         get_nc_data(&in_windGustQty_var, windGustQty_arr);
-      if (!IS_INVALID_NC(in_visibilityQty_var))       get_nc_data(&in_visibilityQty_var, visibilityQty_arr);
-      if (!IS_INVALID_NC(in_precipRateQty_var))       get_nc_data(&in_precipRateQty_var, precipRateQty_arr);
-      if (!IS_INVALID_NC(in_solarRadiationQty_var))   get_nc_data(&in_solarRadiationQty_var, solarRadiationQty_arr);
-      if (!IS_INVALID_NC(in_seaSurfaceTempQty_var))   get_nc_data(&in_seaSurfaceTempQty_var, seaSurfaceTempQty_arr);
-      if (!IS_INVALID_NC(in_totalColumnPWVQty_var))   get_nc_data(&in_totalColumnPWVQty_var, totalColumnPWVQty_arr);
-      if (!IS_INVALID_NC(in_soilTemperatureQty_var))  get_nc_data(&in_soilTemperatureQty_var, soilTemperatureQty_arr);
-      if (!IS_INVALID_NC(in_minTemp24HourQty_var))    get_nc_data(&in_minTemp24HourQty_var, minTemp24HourQty_arr);
-      if (!IS_INVALID_NC(in_maxTemp24HourQty_var))    get_nc_data(&in_maxTemp24HourQty_var, maxTemp24HourQty_arr);
-      if (!IS_INVALID_NC(in_precip3hrQty_var))        get_nc_data(&in_precip3hrQty_var, precip3hrQty_arr);
-      if (!IS_INVALID_NC(in_precip6hrQty_var))        get_nc_data(&in_precip6hrQty_var, precip6hrQty_arr);
-      if (!IS_INVALID_NC(in_precip12hrQty_var))       get_nc_data(&in_precip12hrQty_var, precip12hrQty_arr);
-      if (!IS_INVALID_NC(in_precip10minQty_var))      get_nc_data(&in_precip10minQty_var, precip10minQty_arr);
-      if (!IS_INVALID_NC(in_precip1minQty_var))       get_nc_data(&in_precip1minQty_var, precip1minQty_arr);
-      if (!IS_INVALID_NC(in_windDir10Qty_var))        get_nc_data(&in_windDir10Qty_var, windDir10Qty_arr);
-      if (!IS_INVALID_NC(in_windSpeed10Qty_var))      get_nc_data(&in_windSpeed10Qty_var, windSpeed10Qty_arr);
+      if (!IS_INVALID_NC(in_temperatureQty_var))      get_nc_data(&in_temperatureQty_var, temperatureQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_dewpointQty_var))         get_nc_data(&in_dewpointQty_var, dewpointQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_relHumidityQty_var))      get_nc_data(&in_relHumidityQty_var, relHumidityQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_stationPressureQty_var))  get_nc_data(&in_stationPressureQty_var, stationPressureQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_seaLevelPressureQty_var)) get_nc_data(&in_seaLevelPressureQty_var, seaLevelPressureQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_windDirQty_var))          get_nc_data(&in_windDirQty_var, windDirQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_windSpeedQty_var))        get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_windGustQty_var))         get_nc_data(&in_windGustQty_var, windGustQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_visibilityQty_var))       get_nc_data(&in_visibilityQty_var, visibilityQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_precipRateQty_var))       get_nc_data(&in_precipRateQty_var, precipRateQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_solarRadiationQty_var))   get_nc_data(&in_solarRadiationQty_var, solarRadiationQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_seaSurfaceTempQty_var))   get_nc_data(&in_seaSurfaceTempQty_var, seaSurfaceTempQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_totalColumnPWVQty_var))   get_nc_data(&in_totalColumnPWVQty_var, totalColumnPWVQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_soilTemperatureQty_var))  get_nc_data(&in_soilTemperatureQty_var, soilTemperatureQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_minTemp24HourQty_var))    get_nc_data(&in_minTemp24HourQty_var, minTemp24HourQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_maxTemp24HourQty_var))    get_nc_data(&in_maxTemp24HourQty_var, maxTemp24HourQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_precip3hrQty_var))        get_nc_data(&in_precip3hrQty_var, precip3hrQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_precip6hrQty_var))        get_nc_data(&in_precip6hrQty_var, precip6hrQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_precip12hrQty_var))       get_nc_data(&in_precip12hrQty_var, precip12hrQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_precip10minQty_var))      get_nc_data(&in_precip10minQty_var, precip10minQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_precip1minQty_var))       get_nc_data(&in_precip1minQty_var, precip1minQty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_windDir10Qty_var))        get_nc_data(&in_windDir10Qty_var, windDir10Qty_arr, buf_size, i_hdr_s);
+      if (!IS_INVALID_NC(in_windSpeed10Qty_var))      get_nc_data(&in_windSpeed10Qty_var, windSpeed10Qty_arr, buf_size, i_hdr_s);
       
-      get_filtered_nc_data(in_temperature_var,      temperature_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_dewpoint_var,         dewpoint_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_relHumidity_var,      relHumidity_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_stationPressure_var,  stationPressure_arr, buf_size, i_hdr_s);
+      get_filtered_nc_data(in_temperature_var,      temperature_arr,      buf_size, i_hdr_s);
+      get_filtered_nc_data(in_dewpoint_var,         dewpoint_arr,         buf_size, i_hdr_s);
+      get_filtered_nc_data(in_relHumidity_var,      relHumidity_arr,      buf_size, i_hdr_s);
+      get_filtered_nc_data(in_stationPressure_var,  stationPressure_arr,  buf_size, i_hdr_s);
       get_filtered_nc_data(in_seaLevelPressure_var, seaLevelPressure_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_windDir_var,          windDir_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_windSpeed_var,        windSpeed_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_windGust_var,         windGust_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_visibility_var,       visibility_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_precipRate_var,       precipRate_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_solarRadiation_var,   solarRadiation_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_seaSurfaceTemp_var,   seaSurfaceTemp_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_totalColumnPWV_var,   totalColumnPWV_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_soilTemperature_var,  soilTemperature_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_minTemp24Hour_var,    minTemp24Hour_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_maxTemp24Hour_var,    maxTemp24Hour_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_precip3hr_var,        precip3hr_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_precip6hr_var,        precip6hr_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_precip12hr_var,       precip12hr_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_precip10min_var,      precip10min_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_precip1min_var,       precip1min_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_windDir10_var,        windDir10_arr, buf_size, i_hdr_s);
-      get_filtered_nc_data(in_windSpeed10_var,      windSpeed10_arr, buf_size, i_hdr_s);
+      get_filtered_nc_data(in_windDir_var,          windDir_arr,          buf_size, i_hdr_s);
+      get_filtered_nc_data(in_windSpeed_var,        windSpeed_arr,        buf_size, i_hdr_s);
+      get_filtered_nc_data(in_windGust_var,         windGust_arr,         buf_size, i_hdr_s);
+      get_filtered_nc_data(in_visibility_var,       visibility_arr,       buf_size, i_hdr_s);
+      get_filtered_nc_data(in_precipRate_var,       precipRate_arr,       buf_size, i_hdr_s);
+      get_filtered_nc_data(in_solarRadiation_var,   solarRadiation_arr,   buf_size, i_hdr_s);
+      get_filtered_nc_data(in_seaSurfaceTemp_var,   seaSurfaceTemp_arr,   buf_size, i_hdr_s);
+      get_filtered_nc_data(in_totalColumnPWV_var,   totalColumnPWV_arr,   buf_size, i_hdr_s);
+      get_filtered_nc_data(in_soilTemperature_var,  soilTemperature_arr,  buf_size, i_hdr_s);
+      get_filtered_nc_data(in_minTemp24Hour_var,    minTemp24Hour_arr,    buf_size, i_hdr_s);
+      get_filtered_nc_data(in_maxTemp24Hour_var,    maxTemp24Hour_arr,    buf_size, i_hdr_s);
+      get_filtered_nc_data(in_precip3hr_var,        precip3hr_arr,        buf_size, i_hdr_s);
+      get_filtered_nc_data(in_precip6hr_var,        precip6hr_arr,        buf_size, i_hdr_s);
+      get_filtered_nc_data(in_precip12hr_var,       precip12hr_arr,       buf_size, i_hdr_s);
+      get_filtered_nc_data(in_precip10min_var,      precip10min_arr,      buf_size, i_hdr_s);
+      get_filtered_nc_data(in_precip1min_var,       precip1min_arr,       buf_size, i_hdr_s);
+      get_filtered_nc_data(in_windDir10_var,        windDir10_arr,        buf_size, i_hdr_s);
+      get_filtered_nc_data(in_windSpeed10_var,      windSpeed10_arr,      buf_size, i_hdr_s);
       
       dim[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr, dim, cur);
@@ -3276,6 +3283,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          // Use cur to index into the NetCDF variables.
          //
          cur[0] = i_hdr;
+         hdr_data_idx = i_idx;
          
          //
          // Process the latitude, longitude, and elevation.
@@ -3286,9 +3294,6 @@ void process_madis_mesonet(NcFile *&f_in) {
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
          
          //
          // Check masking regions.
@@ -3299,8 +3304,8 @@ void process_madis_mesonet(NcFile *&f_in) {
          // Encode the header type as ADPSFC for MESONET observations.
          //
          //put_nc_var_val(hdr_typ_var, i_hdr, );
-         strncpy(hdr_typ_buf[hdr_data_idx], "ADPSFC", hdr_typ_len);
-         hdr_typ_buf[hdr_data_idx][hdr_typ_len] = bad_data_char;
+         strncpy(hdr_typ_out_buf[hdr_data_idx], "ADPSFC", hdr_typ_len);
+         hdr_typ_out_buf[hdr_data_idx][hdr_typ_len] = bad_data_char;
          
          //
          // Process the station name.
@@ -3308,8 +3313,8 @@ void process_madis_mesonet(NcFile *&f_in) {
          //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
          //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
-         strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
+         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
+         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
          //
          // Process the observation time.
@@ -3320,15 +3325,16 @@ void process_madis_mesonet(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
          //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
-         strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
+         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
+         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         hdr_data_idx++;
-         
          //
          // Write the header array to the output file.
          //
          //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
+         for (int idx=0; idx<hdr_arr_len; idx++) {
+            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
+         }
          
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
@@ -3382,7 +3388,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
             }
             write_qty(qty);
             obs_data_idx++;
@@ -3397,7 +3403,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
             }
             write_qty(qty);
             obs_data_idx++;
@@ -3508,7 +3514,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          obs_arr[4] = ugrd;
          if(!is_bad_data(ugrd)) {
             for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
             }
             write_qty(qty);
             obs_data_idx++;
@@ -3523,7 +3529,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          obs_arr[4] = vgrd;
          if(!is_bad_data(vgrd)) {
             for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
             }
             write_qty(qty);
             obs_data_idx++;
@@ -3534,14 +3540,13 @@ void process_madis_mesonet(NcFile *&f_in) {
          }
       }
 
-      if (0 < hdr_data_idx) {
-         write_nc_hdr_data(hdr_data_idx);
-      }
+      write_nc_hdr_data(buf_size);
+      reset_header_buffer(buf_size);
    } // end for i
 
-   if (0 < hdr_data_idx) {
-      write_nc_hdr_data(hdr_data_idx);
-   }
+   //if (0 < hdr_data_idx) {
+   //   write_nc_hdr_data(hdr_data_idx);
+   //}
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
    }
@@ -3759,15 +3764,15 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             // Write header type
             //
             //put_nc_var_val(hdr_typ_var, i_cnt, hdr_typ);
-            strncpy(hdr_typ_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-            hdr_typ_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
+            strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
+            hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
          
             //
             // Write Airport ID
             //
             //put_nc_var_val(hdr_sid_var, i_cnt, hdr_sid);
-            strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-            hdr_sid_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
+            strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
+            hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
             //
             // Use cur to index into the NetCDF variables.
@@ -3785,9 +3790,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             hdr_arr[0] = hdr_lat_arr[i_idx][i_lvl];
             hdr_arr[1] = hdr_lon_arr[i_idx][i_lvl];
             hdr_arr[2] = hdr_elv_arr[i_idx][i_lvl];
-            for (int idx=0; idx<hdr_arr_len; idx++) {
-               hdr_arr_buf[hdr_data_idx][idx] = hdr_arr[idx];
-            }
          
             //
             // Check masked regions
@@ -3820,8 +3822,8 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             tmp_dbl = tmp_dbl1+tmp_dbl2-fmod(tmp_dbl1, 86400);
             unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
             hdr_vld = tmp_str;
-            strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-            hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
+            strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
+            hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
          
             //
             // Write observation time
@@ -3832,6 +3834,10 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             // Write header array
             //
             //put_nc_var_arr(hdr_arr_var, i_cnt, hdr_arr_len, hdr_arr);
+            for (int idx=0; idx<hdr_arr_len; idx++) {
+               hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
+            }
+
             hdr_data_idx++;
             if (hdr_data_idx == BUFFER_SIZE) {
                write_nc_hdr_data(BUFFER_SIZE);
@@ -3878,7 +3884,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             obs_arr[4] = ugrd;
             if(!is_bad_data(ugrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;
@@ -3893,7 +3899,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             obs_arr[4] = vgrd;
             if(!is_bad_data(vgrd)) {
                for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
+                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
                }
                write_qty(qty);
                obs_data_idx++;

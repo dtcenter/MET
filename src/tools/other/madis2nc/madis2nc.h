@@ -170,6 +170,99 @@ float  hdr_arr_buf[BUFFER_SIZE][hdr_arr_len];
 float obs_data_buf[BUFFER_SIZE][obs_arr_len];
 char  qty_data_buf[BUFFER_SIZE][strl_len];
 
+char   hdr_typ_out_buf[BUFFER_SIZE][strl_len];
+char   hdr_sid_out_buf[BUFFER_SIZE][strl_len];
+char   hdr_vld_out_buf[BUFFER_SIZE][strl_len];
+float  hdr_arr_out_buf[BUFFER_SIZE][hdr_arr_len];
+float obs_data_out_buf[BUFFER_SIZE][obs_arr_len];
+char  qty_data_out_buf[BUFFER_SIZE][strl_len];
+
+
+// float  hdr_lat_arr[BUFFER_SIZE];
+// float  hdr_lon_arr[BUFFER_SIZE];
+// float  hdr_elv_arr[BUFFER_SIZE];
+// double tmp_dbl_arr[BUFFER_SIZE];
+
+//float pressure_arr[BUFFER_SIZE];
+
+// //float seaLevelPress_arr[BUFFER_SIZE];
+// float visibility_arr[BUFFER_SIZE];
+// float temperature_arr[BUFFER_SIZE];
+// float dewpoint_arr[BUFFER_SIZE];
+// float windDir_arr[BUFFER_SIZE];
+// float windSpeed_arr[BUFFER_SIZE];
+// float windGust_arr[BUFFER_SIZE];
+// float minTemp24Hour_arr[BUFFER_SIZE];
+// float maxTemp24Hour_arr[BUFFER_SIZE];
+// float precip1Hour_arr[BUFFER_SIZE];
+// float precip3Hour_arr[BUFFER_SIZE];
+// float precip6Hour_arr[BUFFER_SIZE];
+// float precip24Hour_arr[BUFFER_SIZE];
+// float snowCover_arr[BUFFER_SIZE];
+// 
+// char seaLevelPressQty_arr[BUFFER_SIZE];
+// char visibilityQty_arr[BUFFER_SIZE];
+// char temperatureQty_arr[BUFFER_SIZE];
+// char dewpointQty_arr[BUFFER_SIZE];
+// char windDirQty_arr[BUFFER_SIZE];
+// char windSpeedQty_arr[BUFFER_SIZE];
+// char windGustQty_arr[BUFFER_SIZE];
+// char minTemp24HourQty_arr[BUFFER_SIZE];
+// char maxTemp24HourQty_arr[BUFFER_SIZE];
+// char precip1HourQty_arr[BUFFER_SIZE];
+// char precip3HourQty_arr[BUFFER_SIZE];
+// char precip6HourQty_arr[BUFFER_SIZE];
+// char precip24HourQty_arr[BUFFER_SIZE];
+// char snowCoverQty_arr[BUFFER_SIZE];
+// 
+// //float temperature_arr[BUFFER_SIZE];
+// //float dewpoint_arr[BUFFER_SIZE];
+// float relHumidity_arr[BUFFER_SIZE];
+// float stationPressure_arr[BUFFER_SIZE];
+// float seaLevelPressure_arr[BUFFER_SIZE];
+// fl//oat windDir_arr[BUFFER_SIZE];
+// //float windSpeed_arr[BUFFER_SIZE];
+// //float windGust_arr[BUFFER_SIZE];
+// //float visibility_arr[BUFFER_SIZE];
+// float precipRate_arr[BUFFER_SIZE];
+// float solarRadiation_arr[BUFFER_SIZE];
+// float seaSurfaceTemp_arr[BUFFER_SIZE];
+// float totalColumnPWV_arr[BUFFER_SIZE];
+// float soilTemperature_arr[BUFFER_SIZE];
+// //float minTemp24Hour_arr[BUFFER_SIZE];
+// //float maxTemp24Hour_arr[BUFFER_SIZE];
+// float precip3hr_arr[BUFFER_SIZE];
+// float precip6hr_arr[BUFFER_SIZE];
+// float precip12hr_arr[BUFFER_SIZE];
+// float precip10min_arr[BUFFER_SIZE];
+// float precip1min_arr[BUFFER_SIZE];
+// float windDir10_arr[BUFFER_SIZE];
+// float windSpeed10_arr[BUFFER_SIZE];
+// 
+// //char temperatureQty_arr[BUFFER_SIZE];
+// //char dewpointQty_arr[BUFFER_SIZE];
+// char relHumidityQty_arr[BUFFER_SIZE];
+// char stationPressureQty_arr[BUFFER_SIZE];
+// char seaLevelPressureQty_arr[BUFFER_SIZE];
+// //char windDirQty_arr[BUFFER_SIZE];
+// //char windSpeedQty_arr[BUFFER_SIZE];
+// //char windGustQty_arr[BUFFER_SIZE];
+// //char visibilityQty_arr[BUFFER_SIZE];
+// char precipRateQty_arr[BUFFER_SIZE];
+// char solarRadiationQty_arr[BUFFER_SIZE];
+// char seaSurfaceTempQty_arr[BUFFER_SIZE];
+// char totalColumnPWVQty_arr[BUFFER_SIZE];
+// char soilTemperatureQty_arr[BUFFER_SIZE];
+// //char minTemp24HourQty_arr[BUFFER_SIZE];
+// //char maxTemp24HourQty_arr[BUFFER_SIZE];
+// char precip3hrQty_arr[BUFFER_SIZE];
+// char precip6hrQty_arr[BUFFER_SIZE];
+// char precip12hrQty_arr[BUFFER_SIZE];
+// char precip10minQty_arr[BUFFER_SIZE];
+// char precip1minQty_arr[BUFFER_SIZE];
+// char windDir10Qty_arr[BUFFER_SIZE];
+// char windSpeed10Qty_arr[BUFFER_SIZE];
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __MADIS2NC_H__

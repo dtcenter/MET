@@ -190,7 +190,6 @@ static int         n_total_obs;    // Running total of observations
 //int   processed_count;
 int   obs_data_idx;
 int   obs_data_offset;
-int   hdr_data_idx;
 int   hdr_data_offset;
 
 char   hdr_typ_buf[OBS_BUFFER_SIZE][strl_len];
@@ -542,7 +541,6 @@ void process_pbfile(int i_pb) {
    //processed_count = 0;
    obs_data_idx = 0;
    obs_data_offset = 0;
-   hdr_data_idx = 0;
    hdr_data_offset = 0;
    
    // Loop through the PrepBufr messages from the input file
@@ -1142,15 +1140,15 @@ void write_netcdf_hdr_data() {
 
       // PrepBufr Message type
       strncpy(hdr_typ_buf[i], hdr_typ_sa[i], strlen(hdr_typ_sa[i]));
-      hdr_typ_buf[hdr_data_idx][strlen(hdr_typ_sa[i])] = bad_data_char;
+      hdr_typ_buf[i][strlen(hdr_typ_sa[i])] = bad_data_char;
 
       // Station ID
       strncpy(hdr_sid_buf[i], hdr_sid_sa[i], strlen(hdr_sid_sa[i]));
-      hdr_sid_buf[hdr_data_idx][strlen(hdr_sid_sa[i])] = bad_data_char;
+      hdr_sid_buf[i][strlen(hdr_sid_sa[i])] = bad_data_char;
 
       // Valid Time
       strncpy(hdr_vld_buf[i], hdr_vld_sa[i], strlen(hdr_vld_sa[i]));
-      hdr_vld_buf[hdr_data_idx][strlen(hdr_vld_sa[i])] = bad_data_char;
+      hdr_vld_buf[i][strlen(hdr_vld_sa[i])] = bad_data_char;
 
       // Write the header array which consists of the following:
       //    LAT LON ELV
