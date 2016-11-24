@@ -676,8 +676,8 @@ void process_obs_file(int i_nc) {
    // Allocate space to store the data
    //
    
-   float     obs_arr_block[buf_size][obs_arr_len];
-   char  obs_qty_str_block[buf_size][strl_len];
+   float obs_arr_block[buf_size][obs_arr_len];
+   char  obs_qty_block[buf_size][strl_len];
    
    char hdr_typ_str_block[hdr_buf_size][strl_len];
    char hdr_sid_str_block[hdr_buf_size][strl_len];
@@ -764,7 +764,7 @@ void process_obs_file(int i_nc) {
       lengths[1] = strl_len;
       strcpy(obs_qty_str, "");
       if(!IS_INVALID_NC(obs_qty_var)
-          && !get_nc_data(&obs_qty_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
+          && !get_nc_data(&obs_qty_var, (char *)&obs_qty_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the quality flag for observation "
               << "index " << i_block_start_idx << "\n\n";
@@ -819,6 +819,9 @@ void process_obs_file(int i_nc) {
          for (j=0; j<obs_arr_len; j++) {
              obs_arr[j] = obs_arr_block[i_block_idx][j];
          }
+         strcpy(obs_qty_str, obs_qty_block[i_block_idx]);
+         //obs_qty_str[str_length] = bad_data_char;
+
          int headerOffset = obs_arr[0];
          //if ((hdr_count == obs_count) || ((0 <= headerOffset) && (headerOffset < hdr_buf_size))) {
          if ((hdr_count == obs_count) || (headerOffset < hdr_buf_size)) {
