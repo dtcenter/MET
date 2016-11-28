@@ -809,7 +809,7 @@ long lengths[dim_count];
 lengths[dim_count-1] = Ny;
 
 for (int k=0; k<dim_count; k++) {
-  offsets[k] = (a[k] == vx_data2d_star) ? 0 : 0;
+  offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
   lengths[k] = 1;
 }
 //offsets[x_slot] = 0;
