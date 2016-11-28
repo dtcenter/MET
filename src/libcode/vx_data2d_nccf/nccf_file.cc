@@ -905,41 +905,43 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   //  get the data
 #ifdef USE_BUFFER
-  int    i[ny];
-  float  f[ny];
-  double d[ny];
+  int    i[nx];
+  float  f[nx];
+  double d[nx];
   
   long offsets[dim_count];
   long lengths[dim_count];
   for (int k=0; k<dim_count; k++) {
-    offsets[k] = (a[k] == vx_data2d_star) ? 0 : 0;
+    offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
     lengths[k] = 1;
   }
   
   //offsets[x_slot] = 0;
-  offsets[y_slot] = 0;
+  //offsets[y_slot] = 0;
   //lengths[x_slot] = 1;
-  lengths[y_slot] = ny;
+  //lengths[y_slot] = ny;
+  offsets[x_slot] = 0;
+  lengths[x_slot] = nx;
   
   //status = false;
   int type_id = v->getType().getId();
-  for (int x=0; x<nx; ++x)  {
-    offsets[x_slot] = x;
+  for (int y=0; y<ny; ++y)  {
+    offsets[y_slot] = y;
     switch ( type_id )  {
     
       //case ncInt:
       case NcType::nc_INT:
         get_nc_data(v, (int *)&i, lengths, offsets);
-        for (int y=0; y<ny; ++y)  {
-          d[y] = (double)i[y];
+        for (int x=0; x<nx; ++x)  {
+          d[x] = (double)i[x];
         }
         break;
       
       //case ncFloat:
       case NcType::nc_FLOAT:
         get_nc_data(v, (float *)&f, lengths, offsets);
-        for (int y=0; y<ny; ++y)  {
-          d[y] = (double)f[y];
+        for (int x=0; x<nx; ++x)  {
+          d[x] = (double)f[x];
         }
         break;
     
@@ -958,12 +960,12 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     
     LongArray b = a;
     
-    for (int y = 0; y < ny; ++y)
+    for (int x = 0; x< nx; ++x)
     {
       //b[y_slot] = y;
     
       //double value = getData(v, b);
-      double value = d[y];
+      double value = d[x];
     
       if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
          value = bad_data_double;
