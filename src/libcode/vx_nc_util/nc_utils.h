@@ -216,6 +216,7 @@ extern NcVar get_nc_var(NcFile *, const char * var_name);
 extern bool has_var(NcFile *, const char * var_name);
 //extern int get_var_count(NcFile *);
 
+extern NcVar  add_var(NcFile *, const string, const NcType, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern NcVar  add_var(NcFile *, const string, const NcType, const NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern NcVar  add_var(NcFile *, const string, const NcType, const NcDim, const NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern NcVar  add_var(NcFile *, const string, const NcType, const NcDim, const NcDim, const NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);

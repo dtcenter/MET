@@ -1970,8 +1970,7 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
    // Add the series length variable
    //NcVar * var = nc_out->add_var("n_series", ncInt);
-   NcDim dimSingle = add_dim(nc_out, "single", 1);
-   NcVar var = add_var(nc_out, "n_series", ncInt, dimSingle);
+   NcVar var = add_var(nc_out, "n_series", ncInt);
    add_att(&var, "long_name", "length of series");
 
    if(!put_nc_data(&var, &n_series)) {
