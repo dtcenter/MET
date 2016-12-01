@@ -839,8 +839,6 @@ if ( info.all_false() )  return;
    NcDim  fcst_thresh_dim   ;
    NcDim   obs_thresh_dim   ;
 
-   NcDim  single_dim        ;
-   
    //NcVar  *fcst_raw_var      = (NcVar *)  0;
    //NcVar  *fcst_obj_raw_var  = (NcVar *)  0;
    //NcVar  *fcst_obj_var      = (NcVar *)  0;
@@ -909,7 +907,6 @@ if ( info.all_false() )  return;
    // Define Dimensions
    lat_dim = add_dim(f_out, "lat", (long) grid.ny());
    lon_dim = add_dim(f_out, "lon", (long) grid.nx());
-   single_dim = add_dim(f_out, "single", 1);
 
    fcst_thresh_dim = add_dim(f_out, "fcst_thresh_length", fcst_thresh.length());
     obs_thresh_dim = add_dim(f_out,  "obs_thresh_length",  obs_thresh.length());
@@ -928,8 +925,8 @@ if ( info.all_false() )  return;
    if ( info.do_object_id )   obs_obj_var      = add_var(f_out, "obs_obj_id",  ncInt,   lat_dim, lon_dim);
    if ( info.do_cluster_id )  obs_clus_var     = add_var(f_out, "obs_clus_id", ncInt,   lat_dim, lon_dim);
 
-   fcst_radius_var = add_var(f_out, (string)"fcst_conv_radius", ncInt, single_dim);
-    obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt, single_dim);
+   fcst_radius_var = add_var(f_out, (string)"fcst_conv_radius", ncInt);
+    obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt);
 
    fcst_thresh_var = add_var(f_out, "fcst_conv_threshold", ncChar, fcst_thresh_dim);
     obs_thresh_var = add_var(f_out,  "obs_conv_threshold", ncChar,  obs_thresh_dim);
@@ -1256,13 +1253,10 @@ void ModeExecutive::write_poly_netcdf(NcFile * f_out)
    NcVar n_obs_simp_var  ;
    NcVar n_clus_var      ;
 
-   NcDim single_dim = get_nc_dim(f_out, "single");
-   //if (IS_INVALID_NC(single_dim)) single_dim = add_dim(f_out, "single", 1);
-
    // Define scalar variables
-   n_fcst_simp_var = add_var(f_out, "n_fcst_simp", ncInt, single_dim);
-   n_obs_simp_var  = add_var(f_out, "n_obs_simp",  ncInt, single_dim);
-   n_clus_var      = add_var(f_out, "n_clus", ncInt, single_dim);
+   n_fcst_simp_var = add_var(f_out, "n_fcst_simp", ncInt);
+   n_obs_simp_var  = add_var(f_out, "n_obs_simp",  ncInt);
+   n_clus_var      = add_var(f_out, "n_clus", ncInt);
 
    //
    // Write the number of forecast and observation objects

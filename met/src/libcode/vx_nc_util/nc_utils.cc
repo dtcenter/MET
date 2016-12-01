@@ -718,7 +718,7 @@ void add_att(NcVar *var, const string att_name, const float att_val) {
 
 /////////
 void add_att(NcVar *var, const string att_name, const double att_val) {
-   var->putAtt(att_name, NcType::nc_FLOAT, att_val);
+   var->putAtt(att_name, NcType::nc_DOUBLE, att_val);
 }
 
 
@@ -1972,6 +1972,19 @@ bool has_var(NcFile *nc, const char * var_name) {
 //int get_var_count(NcFile *nc) {
 //   return nc->getVarCount();
 //}
+
+////////////////////////////////////////////////////////////////////////
+
+NcVar add_var(NcFile *nc, const string var_name, const NcType ncType, const int deflate_level) {
+   std::vector<NcDim> ncDimVector;
+   NcVar var = nc->addVar(var_name, ncType, ncDimVector);
+   //return nc->addVar(var_name, ncType, ncDim);
+   if (deflate_level > 0) {
+      mlog << Debug(3) << "    nc_utils.add_var() deflate_level: " << deflate_level << "\n";
+      var.setCompression(false, true, deflate_level);
+   }
+   return var;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
