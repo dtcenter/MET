@@ -16,7 +16,6 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
-
   <!--                                    -->
   <!--  pcp_combine -sum                  -->
   <!--                                    -->
@@ -32,7 +31,7 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="pcp_combine_sum_GRIB2">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -44,7 +43,6 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sref_mean_2012040821_F021_APCP18.nc</grid_nc>
     </output>
   </test>
-  
 
   <!--                                    -->
   <!--  pcp_combine -add                  -->
@@ -64,7 +62,7 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP12.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="pcp_combine_add_GRIB2">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -79,7 +77,7 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sref_mean_2012040821_F018_APCP12.nc</grid_nc>
     </output>
   </test>
-    
+
   <test name="pcp_combine_add_STAGEIV">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -93,12 +91,10 @@
     </output>
   </test>
 
-
   <!--                                        -->
   <!--  add different accumulation intervals  -->
   <!--                                        -->
 
-  
   <test name="pcp_combine_add_ACCUMS">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -113,7 +109,6 @@
     </output>
   </test>
 
-  
   <!--                                    -->
   <!--  pcp_combine -subtract             -->
   <!--                                    -->
@@ -130,7 +125,7 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP03.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="pcp_combine_sub_GRIB2">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -143,7 +138,7 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/sref_mean_2012040812_F015_APCP06.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="pcp_combine_sub_NC_MET_06">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -156,7 +151,7 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F006_APCP06.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="pcp_combine_sub_P_INTERP">
     <exec>&MET_DIR;/bin/pcp_combine</exec>
     <param> \
@@ -169,7 +164,6 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/wrfout_d01_2008-08-08_12:00:00_PLEV_APCP06.nc</grid_nc>
     </output>
   </test>
-  
 
   <!--                                    -->
   <!--  pcp_combine -add a single file    -->
@@ -187,5 +181,41 @@
       <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F012_VARNAME.nc</grid_nc>
     </output>
   </test>
-  
+
+  <!--                                             -->
+  <!--  pcp_combine -subtract different init times -->
+  <!--                                             -->
+
+  <test name="pcp_combine_sub_DIFFERENT_INIT">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F000.grib \
+      'name="TMP"; level="P500";' \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F000.grib \
+      'name="TMP"; level="P500";' \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_TMP_P500_DIFFERENT_INIT.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/arw-tom-gep0_TMP_P500_DIFFERENT_INIT.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                              -->
+  <!--  pcp_combine -subtract negative accumulation -->
+  <!--                                              -->
+
+  <test name="pcp_combine_sub_NEGATIVE_ACCUM">
+    <exec>&MET_DIR;/bin/pcp_combine</exec>
+    <param> \
+      -subtract \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040900_F018.grib 18 \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F024.grib 24 \
+      &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F024_NEGATIVE_ACCUM.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F024_NEGATIVE_ACCUM.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
