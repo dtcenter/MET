@@ -1869,6 +1869,39 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+desc = [];
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The user may specify a comma-separated list of description strings to be
+ used for all analyses performed.
+ The names must be in double quotation marks.
+ If multiple description strings are listed, the analyses will be performed
+ on their union.
+ These selections may be further refined by using the "-
+\series bold
+desc
+\series default
+" option within the job command lines.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 fcst_lead = [];
 \end_layout
 

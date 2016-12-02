@@ -2225,6 +2225,12 @@ model          = "WRF";
 \begin_layout LyX-Code
 
 \series bold
+desc           = "NA";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 obtype         = "ANALYS";
 \end_layout
 
@@ -3092,7 +3098,7 @@ name "table_mtd-header-columns"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="3">
+<lyxtabular version="3" rows="18" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -3222,11 +3228,40 @@ User provided text string giving model name
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DESC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string describing the verification task
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
 \end_layout
 
 \end_inset
@@ -3255,7 +3290,7 @@ Forecast lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-4
+5
 \end_layout
 
 \end_inset
@@ -3284,7 +3319,7 @@ Forecast valid time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+6
 \end_layout
 
 \end_inset
@@ -3313,7 +3348,7 @@ Observation lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-6
+7
 \end_layout
 
 \end_inset
@@ -3342,7 +3377,7 @@ Observation valid time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-7
+8
 \end_layout
 
 \end_inset
@@ -3371,7 +3406,7 @@ Time separation between input data files in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-8
+9
 \end_layout
 
 \end_inset
@@ -3400,7 +3435,7 @@ Forecast convolution radius in grid units
 \begin_inset Text
 
 \begin_layout Plain Layout
-9
+10
 \end_layout
 
 \end_inset
@@ -3429,7 +3464,7 @@ Forecast convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-10
+11
 \end_layout
 
 \end_inset
@@ -3458,7 +3493,7 @@ Observation convolution radius in grid units
 \begin_inset Text
 
 \begin_layout Plain Layout
-11
+12
 \end_layout
 
 \end_inset
@@ -3487,7 +3522,7 @@ Observation convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -3516,7 +3551,7 @@ Forecast variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+14
 \end_layout
 
 \end_inset
@@ -3545,7 +3580,7 @@ Forecast vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+15
 \end_layout
 
 \end_inset
@@ -3574,7 +3609,7 @@ Observation variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+16
 \end_layout
 
 \end_inset
@@ -3714,7 +3749,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+17
 \end_layout
 
 \end_inset
@@ -3743,7 +3778,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+18
 \end_layout
 
 \end_inset
@@ -3772,7 +3807,7 @@ Cluster number
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -3801,7 +3836,7 @@ Time index of slice
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+20
 \end_layout
 
 \end_inset
@@ -3830,7 +3865,7 @@ AREA
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+21
 \end_layout
 
 \end_inset
@@ -3863,7 +3898,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -3896,7 +3931,7 @@ coordinate of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -3925,7 +3960,7 @@ Latitude of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -3954,7 +3989,7 @@ Longitude of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -4094,7 +4129,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+17
 \end_layout
 
 \end_inset
@@ -4123,7 +4158,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+18
 \end_layout
 
 \end_inset
@@ -4152,7 +4187,7 @@ Cluster number
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -4185,7 +4220,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+20
 \end_layout
 
 \end_inset
@@ -4218,7 +4253,7 @@ coordinate of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+21
 \end_layout
 
 \end_inset
@@ -4251,7 +4286,7 @@ t
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -4280,7 +4315,7 @@ Latitude of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -4309,7 +4344,7 @@ Longitude of centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -4342,7 +4377,7 @@ x
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -4375,7 +4410,7 @@ component of object velocity
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -4404,7 +4439,7 @@ Angle that the axis plane of an object makes with the grid x direction
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -4441,7 +4476,7 @@ cells
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -4470,7 +4505,7 @@ Object start time
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -4499,7 +4534,7 @@ Object end time
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -4540,7 +4575,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+31
 \end_layout
 
 \end_inset
@@ -4581,7 +4616,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+32
 \end_layout
 
 \end_inset
@@ -4622,7 +4657,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+33
 \end_layout
 
 \end_inset
@@ -4663,7 +4698,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+34
 \end_layout
 
 \end_inset
@@ -4815,7 +4850,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+17
 \end_layout
 
 \end_inset
@@ -4844,7 +4879,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+18
 \end_layout
 
 \end_inset
@@ -4873,7 +4908,7 @@ Cluster number
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -4913,7 +4948,7 @@ $(x, y)$
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+20
 \end_layout
 
 \end_inset
@@ -4957,7 +4992,7 @@ index of object spacetime centroid
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+21
 \end_layout
 
 \end_inset
@@ -4986,7 +5021,7 @@ Difference in spatial axis plane angles
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -5015,7 +5050,7 @@ Difference in object speeds
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -5044,7 +5079,7 @@ Difference in object direction of movement
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -5073,7 +5108,7 @@ Ratio of object volumes
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -5102,7 +5137,7 @@ Difference in object start times
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -5131,7 +5166,7 @@ Difference in object end times
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -5167,7 +5202,7 @@ Volume
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset

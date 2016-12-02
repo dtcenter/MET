@@ -1720,6 +1720,12 @@ model          = "WRF";
 \begin_layout LyX-Code
 
 \series bold
+desc           = "NA";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
  = 1; }
 \end_layout
@@ -2386,7 +2392,7 @@ name "table_PS_header_info_point-stat_out"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="3">
+<lyxtabular version="3" rows="24" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top">
@@ -2529,12 +2535,41 @@ User provided text string designating model name
 \begin_inset Text
 
 \begin_layout Plain Layout
-FCST_LEAD
+DESC
 \end_layout
 
 \end_inset
 </cell>
 <cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string describing the verification task
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_LEAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2549,7 +2584,7 @@ Forecast lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-4
+5
 \end_layout
 
 \end_inset
@@ -2578,7 +2613,7 @@ Forecast valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+6
 \end_layout
 
 \end_inset
@@ -2607,7 +2642,7 @@ Forecast valid end time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-6
+7
 \end_layout
 
 \end_inset
@@ -2636,7 +2671,7 @@ Observation lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-7
+8
 \end_layout
 
 \end_inset
@@ -2665,7 +2700,7 @@ Observation valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-8
+9
 \end_layout
 
 \end_inset
@@ -2694,7 +2729,7 @@ Observation valid end time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-9
+10
 \end_layout
 
 \end_inset
@@ -2723,7 +2758,7 @@ Model variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-10
+11
 \end_layout
 
 \end_inset
@@ -2752,7 +2787,7 @@ Selected Vertical level for forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-11
+12
 \end_layout
 
 \end_inset
@@ -2781,7 +2816,7 @@ Observation variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -2810,7 +2845,7 @@ Selected Vertical level for observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+14
 \end_layout
 
 \end_inset
@@ -2839,7 +2874,7 @@ Observation message type selected
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+15
 \end_layout
 
 \end_inset
@@ -2869,7 +2904,7 @@ Verifying masking region indicating the masking grid or polyline region
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+16
 \end_layout
 
 \end_inset
@@ -2898,7 +2933,7 @@ Interpolation method applied to forecasts
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+17
 \end_layout
 
 \end_inset
@@ -2927,7 +2962,7 @@ Number of points used in interpolation method
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+18
 \end_layout
 
 \end_inset
@@ -2956,7 +2991,7 @@ The threshold applied to the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -2985,7 +3020,7 @@ The threshold applied to the observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+20
 \end_layout
 
 \end_inset
@@ -3014,7 +3049,7 @@ NA in Point-Stat
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+21
 \end_layout
 
 \end_inset
@@ -3043,7 +3078,7 @@ Error percent value used in confidence intervals
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -3203,7 +3238,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -3232,7 +3267,7 @@ Forecast, Hit, Observation line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -3261,7 +3296,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -3290,7 +3325,7 @@ Forecast rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -3319,7 +3354,7 @@ Hit rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -3464,7 +3499,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -3493,7 +3528,7 @@ Contingency Table Counts line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -3522,7 +3557,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -3551,7 +3586,7 @@ Number of forecast yes and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -3580,7 +3615,7 @@ Number of forecast yes and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -3609,7 +3644,7 @@ Number of forecast no and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -3756,7 +3791,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -3785,7 +3820,7 @@ Contingency Table Statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -3814,7 +3849,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23-27
+24-28
 \end_layout
 
 \end_inset
@@ -3843,7 +3878,7 @@ Base rate including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-28-32
+29-33
 \end_layout
 
 \end_inset
@@ -3885,7 +3920,7 @@ Forecast mean including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-33-37
+34-38
 \end_layout
 
 \end_inset
@@ -3930,7 +3965,7 @@ Accuracy including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-38-40
+39-41
 \end_layout
 
 \end_inset
@@ -3967,7 +4002,7 @@ Frequency Bias including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-41-45
+42-46
 \end_layout
 
 \end_inset
@@ -4009,7 +4044,7 @@ Probability of detecting yes including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-46-50
+47-51
 \end_layout
 
 \end_inset
@@ -4051,7 +4086,7 @@ Probability of detecting no including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-51-55
+52-56
 \end_layout
 
 \end_inset
@@ -4093,7 +4128,7 @@ Probability of false detection including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-56-60
+57-61
 \end_layout
 
 \end_inset
@@ -4139,7 +4174,7 @@ False alarm ratio including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-61-65
+62-66
 \end_layout
 
 \end_inset
@@ -4185,7 +4220,7 @@ Critical Success Index including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-66-68
+67-69
 \end_layout
 
 \end_inset
@@ -4342,7 +4377,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-69-73
+70-74
 \end_layout
 
 \end_inset
@@ -4388,7 +4423,7 @@ Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-74-76
+75-77
 \end_layout
 
 \end_inset
@@ -4425,7 +4460,7 @@ Heidke Skill Score including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-77-81
+78-82
 \end_layout
 
 \end_inset
@@ -4470,7 +4505,7 @@ Odds Ratio including normal and bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-82-86
+83-87
 \end_layout
 
 \end_inset
@@ -4516,7 +4551,7 @@ Logarithm of the Odds Ratio including normal and bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-87-91
+88-92
 \end_layout
 
 \end_inset
@@ -4562,7 +4597,7 @@ Odds Ratio Skill Score including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-92-96
+93-97
 \end_layout
 
 \end_inset
@@ -4608,7 +4643,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-97-101
+98-102
 \end_layout
 
 \end_inset
@@ -4654,7 +4689,7 @@ Symmetric Extreme Depenency Score including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-102-106
+103-107
 \end_layout
 
 \end_inset
@@ -4700,7 +4735,7 @@ e limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-107-111
+108-112
 \end_layout
 
 \end_inset
@@ -4746,7 +4781,7 @@ Symmetric Extremal Depenency Index including normal and bootstrap upper
 \begin_inset Text
 
 \begin_layout Plain Layout
-112-114
+113-115
 \end_layout
 
 \end_inset
@@ -4895,7 +4930,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -4924,7 +4959,7 @@ Continuous statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -4953,7 +4988,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23-27
+24-28
 \end_layout
 
 \end_inset
@@ -4999,7 +5034,7 @@ Forecast mean including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-28-32
+29-33
 \end_layout
 
 \end_inset
@@ -5045,7 +5080,7 @@ Standard deviation of the forecasts including normal and bootstrap upper
 \begin_inset Text
 
 \begin_layout Plain Layout
-33-37
+34-38
 \end_layout
 
 \end_inset
@@ -5091,7 +5126,7 @@ Observation mean including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-38-42
+39-43
 \end_layout
 
 \end_inset
@@ -5137,7 +5172,7 @@ Standard deviation of the observations including normal and bootstrap upper
 \begin_inset Text
 
 \begin_layout Plain Layout
-43-47
+44-48
 \end_layout
 
 \end_inset
@@ -5183,7 +5218,7 @@ Pearson correlation coefficient including normal and bootstrap upper and
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+49
 \end_layout
 
 \end_inset
@@ -5212,7 +5247,7 @@ Spearman's rank correlation coefficient
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+50
 \end_layout
 
 \end_inset
@@ -5241,7 +5276,7 @@ Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+51
 \end_layout
 
 \end_inset
@@ -5270,7 +5305,7 @@ Number of ranks used in computing Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+52
 \end_layout
 
 \end_inset
@@ -5299,7 +5334,7 @@ Number of tied forecast ranks used in computing Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+53
 \end_layout
 
 \end_inset
@@ -5328,7 +5363,7 @@ Number of tied observation ranks used in computing Kendall's tau statistic
 \begin_inset Text
 
 \begin_layout Plain Layout
-53-57
+54-58
 \end_layout
 
 \end_inset
@@ -5374,7 +5409,7 @@ Mean error (F-O) including normal and bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-58-62
+59-63
 \end_layout
 
 \end_inset
@@ -5540,7 +5575,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-63-65
+64-66
 \end_layout
 
 \end_inset
@@ -5577,7 +5612,7 @@ Multiplicative bias including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-66-68
+67-69
 \end_layout
 
 \end_inset
@@ -5614,7 +5649,7 @@ Mean absolute error including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-68-71
+70-72
 \end_layout
 
 \end_inset
@@ -5651,7 +5686,7 @@ Mean squared error including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-72-74
+73-75
 \end_layout
 
 \end_inset
@@ -5689,7 +5724,7 @@ Bias-corrected mean squared error including bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-75-77
+76-78
 \end_layout
 
 \end_inset
@@ -5727,7 +5762,7 @@ Root mean squared error including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-78-92
+79-92
 \end_layout
 
 \end_inset
@@ -5813,7 +5848,7 @@ E90_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-93-95
+94-96
 \end_layout
 
 \end_inset
@@ -5850,7 +5885,7 @@ The Interquartile Range including bootstrap upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-96-98
+97-99
 \end_layout
 
 \end_inset
@@ -5888,7 +5923,7 @@ The Median Absolute Deviation including bootstrap upper and lower confidence
 \begin_inset Text
 
 \begin_layout Plain Layout
-99-103
+100-104
 \end_layout
 
 \end_inset
@@ -5935,7 +5970,7 @@ e limits.
 \begin_inset Text
 
 \begin_layout Plain Layout
-104-106
+105-107
 \end_layout
 
 \end_inset
@@ -5974,7 +6009,7 @@ The square of the mean error (bias) including bootstrap upper and lower
 \begin_inset Text
 
 \begin_layout Plain Layout
-107-109
+108-110
 \end_layout
 
 \end_inset
@@ -6122,7 +6157,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -6151,7 +6186,7 @@ Multi-category Contingency Table Counts line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -6180,7 +6215,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -6209,7 +6244,7 @@ Dimension of the contingency table.
 \begin_inset Text
 
 \begin_layout Plain Layout
-24-??
+25
 \end_layout
 
 \end_inset
@@ -6228,7 +6263,7 @@ Fi_Oj
 
 \begin_layout Plain Layout
 Count of events in forecast category i and observation category j, with
- the observations incrementing first.
+ the observations incrementing first (repeated).
 \end_layout
 
 \end_inset
@@ -6352,7 +6387,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -6381,7 +6416,7 @@ Multi-category Contingency Table Statistics line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -6410,7 +6445,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -6440,7 +6475,7 @@ The total number of categories in each of dimension of the contingency table.
 \begin_inset Text
 
 \begin_layout Plain Layout
-24-28
+25-29
 \end_layout
 
 \end_inset
@@ -6473,7 +6508,7 @@ Accuracy, normal confidence limits and bootstrap confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-29-31
+30-32
 \end_layout
 
 \end_inset
@@ -6510,7 +6545,7 @@ Hanssen and Kuipers Discriminant and bootstrap confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-32-34
+33-35
 \end_layout
 
 \end_inset
@@ -6543,7 +6578,7 @@ Heidke Skill Score and bootstrap confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-35-37
+36-38
 \end_layout
 
 \end_inset
@@ -6689,7 +6724,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -6718,7 +6753,7 @@ Probability contingency table count line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -6747,7 +6782,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -6776,7 +6811,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -6805,7 +6840,7 @@ The ith probability threshold value (repeated)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -6835,7 +6870,7 @@ Number of observation yes when forecast is between the ith and i+1th probability
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -7007,7 +7042,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -7036,7 +7071,7 @@ Probabilistic statistics for dichotomous outcome line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -7065,7 +7100,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -7094,7 +7129,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-24-26
+25-27
 \end_layout
 
 \end_inset
@@ -7131,7 +7166,7 @@ The Base Rate, including normal upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -7160,7 +7195,7 @@ Reliability
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -7189,7 +7224,7 @@ Resolution
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -7218,7 +7253,7 @@ Uncertainty
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+31
 \end_layout
 
 \end_inset
@@ -7247,7 +7282,7 @@ Area under the receiver operating characteristic curve
 \begin_inset Text
 
 \begin_layout Plain Layout
-31-33
+32-34
 \end_layout
 
 \end_inset
@@ -7284,7 +7319,7 @@ Brier Score including normal upper and lower confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-34-36
+35-37
 \end_layout
 
 \end_inset
@@ -7321,7 +7356,7 @@ Climatological Brier Score including upper and lower normal confidence limits
 \begin_inset Text
 
 \begin_layout Plain Layout
-37
+38
 \end_layout
 
 \end_inset
@@ -7350,7 +7385,7 @@ Brier Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-38
+39
 \end_layout
 
 \end_inset
@@ -7492,7 +7527,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -7521,7 +7556,7 @@ Probabilistic Joint/Continuous line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -7550,7 +7585,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -7579,7 +7614,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -7608,7 +7643,7 @@ The ith probability threshold value (repeated)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -7638,7 +7673,7 @@ Number of observation yes when forecast is between the ith and i+1th probability
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -7668,7 +7703,7 @@ Number of observation no when forecast is between the ith and i+1th probability
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -7698,7 +7733,7 @@ Calibration when forecast is between the ith and i+1th probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -7728,7 +7763,7 @@ Refinement when forecast is between the ith and i+1th probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -7758,7 +7793,7 @@ Likelihood when forecast is between the ith and i+1th probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+31
 \end_layout
 
 \end_inset
@@ -7930,7 +7965,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -7959,7 +7994,7 @@ Probability ROC points line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -7988,7 +8023,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -8017,7 +8052,7 @@ Number of probability thresholds
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -8046,7 +8081,7 @@ The ith probability threshold value (repeated)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -8076,7 +8111,7 @@ Probability of detecting yes when forecast is between the ith and i+1th
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -8247,7 +8282,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -8276,7 +8311,7 @@ Scalar L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -8305,7 +8340,7 @@ Total number of matched pairs of forecast (f) and observation (o)
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -8334,7 +8369,7 @@ Mean(f)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -8363,7 +8398,7 @@ Mean(o)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -8392,7 +8427,7 @@ Mean(f*o)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -8430,7 +8465,7 @@ Mean(f
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -8468,7 +8503,7 @@ Mean(o
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -8610,7 +8645,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -8639,7 +8674,7 @@ Scalar Anomaly L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -8669,7 +8704,7 @@ gical value (c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -8698,7 +8733,7 @@ Mean(f-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -8727,7 +8762,7 @@ Mean(o-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -8756,7 +8791,7 @@ Mean((f-c)*(o-c))
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -8794,7 +8829,7 @@ Mean((f-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -8832,7 +8867,7 @@ Mean((o-c)
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -8973,7 +9008,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -9002,7 +9037,7 @@ Vector L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -9032,7 +9067,7 @@ Total number of matched pairs of forecast winds (uf, vf) and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -9061,7 +9096,7 @@ Mean(uf)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -9090,7 +9125,7 @@ Mean(vf)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -9119,7 +9154,7 @@ Mean(uo)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -9148,7 +9183,7 @@ Mean(vo)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -9177,7 +9212,7 @@ Mean(uf*uo+vf*vo)
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -9224,7 +9259,7 @@ Mean(uf
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -9320,7 +9355,7 @@ name "table_PS_format_info_VAL1L2"
 \begin_layout Plain Layout
 
 \series bold
-VAL1L2 OUTPUT FILE
+VAL1L2 OUTPUT FORMAT
 \end_layout
 
 \end_inset
@@ -9384,7 +9419,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -9413,7 +9448,7 @@ Vector Anomaly L1L2 line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -9443,7 +9478,7 @@ Total number of matched triplets of forecast winds (uf, vf), observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -9472,7 +9507,7 @@ Mean(uf-uc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -9501,7 +9536,7 @@ Mean(vf-vc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -9530,7 +9565,7 @@ Mean(uo-uc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -9559,7 +9594,7 @@ Mean(vo-vc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -9588,7 +9623,7 @@ Mean((uf-uc)*(uo-uc)+(vf-vc)*(vo-vc))
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -9635,7 +9670,7 @@ Mean((uf-uc)
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -9794,7 +9829,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -9823,7 +9858,7 @@ Matched Pair line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -9852,7 +9887,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -9881,7 +9916,7 @@ Index for the current matched pair
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -9910,7 +9945,7 @@ Station Identifier of observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -9939,7 +9974,7 @@ Latitude of the observation in degrees north
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -9968,7 +10003,7 @@ Longitude of the observation in degrees east
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -9997,7 +10032,7 @@ ressure level of the observation in hPa or accumulation interval in hours
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -10026,7 +10061,7 @@ Elevation of the observation in meters above sea level
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -10055,7 +10090,7 @@ Forecast value interpolated to the observation location
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+31
 \end_layout
 
 \end_inset
@@ -10084,7 +10119,7 @@ Observation value
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+32
 \end_layout
 
 \end_inset
@@ -10113,7 +10148,7 @@ Climatological value
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+33
 \end_layout
 
 \end_inset

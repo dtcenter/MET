@@ -132,6 +132,18 @@ output_precision = 5;
 model = "WRF";
 
 //
+// The "desc" entry specifies a user-specified description for each verification
+// task.  This string is written to the DESC column of the ASCII output
+// generated.  It may be set separately in each "obs.field" verification task
+// entry or simply once at the top level of the configuration file.  If you're
+// verifying the same field multiple times with different quality control
+// flags, you should choose description strings (no whitespace) to distinguish
+// between their output.
+// e.g. desc = "QC_9";
+//
+desc = "NA";
+
+//
 // The "obtype" entry specifies a name to describe the type of verifying gridded
 // observation used.  This name is written to the OBTYPE column in the ASCII
 // output generated.  If you're using multiple types of verifying observations,

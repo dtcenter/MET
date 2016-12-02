@@ -1652,6 +1652,12 @@ model          = "WRF";
 \begin_layout LyX-Code
 
 \series bold
+desc           = "NA";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 obtype         = "ANALYS";
 \end_layout
 
@@ -3216,7 +3222,7 @@ name "CTS_output"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="37" columns="3">
+<lyxtabular version="3" rows="38" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -3326,7 +3332,7 @@ Version number
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3335,7 +3341,7 @@ MODEL
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3346,11 +3352,40 @@ User provided text string designating model name
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DESC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string describing the verification task
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
 \end_layout
 
 \end_inset
@@ -3379,7 +3414,7 @@ Forecast lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-4
+5
 \end_layout
 
 \end_inset
@@ -3408,7 +3443,7 @@ Forecast valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+6
 \end_layout
 
 \end_inset
@@ -3437,7 +3472,7 @@ Forecast accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-6
+7
 \end_layout
 
 \end_inset
@@ -3467,7 +3502,7 @@ Observation lead time in HHMMSS format; when field2 is actually an observation,
 \begin_inset Text
 
 \begin_layout Plain Layout
-7
+8
 \end_layout
 
 \end_inset
@@ -3496,7 +3531,7 @@ Observation valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-8
+9
 \end_layout
 
 \end_inset
@@ -3525,7 +3560,7 @@ Observation accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-9
+10
 \end_layout
 
 \end_inset
@@ -3554,7 +3589,7 @@ Forecast convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-10
+11
 \end_layout
 
 \end_inset
@@ -3583,7 +3618,7 @@ Forecast convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-11
+12
 \end_layout
 
 \end_inset
@@ -3612,7 +3647,7 @@ Observation convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -3641,7 +3676,7 @@ Observation convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+14
 \end_layout
 
 \end_inset
@@ -3670,7 +3705,7 @@ Forecast variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+15
 \end_layout
 
 \end_inset
@@ -3699,7 +3734,7 @@ Forecast vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+16
 \end_layout
 
 \end_inset
@@ -3728,7 +3763,7 @@ Observation variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+17
 \end_layout
 
 \end_inset
@@ -3757,7 +3792,7 @@ Observation vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+18
 \end_layout
 
 \end_inset
@@ -3788,7 +3823,7 @@ Field type for this line:* RAW for the raw input fields* FILTER for the
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -3817,7 +3852,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+20
 \end_layout
 
 \end_inset
@@ -3846,7 +3881,7 @@ Number of forecast yes and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+21
 \end_layout
 
 \end_inset
@@ -3875,7 +3910,7 @@ Number of forecast yes and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -3904,7 +3939,7 @@ Number of forecast no and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -3933,7 +3968,7 @@ Number of forecast no and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -3962,7 +3997,7 @@ Base rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -3991,7 +4026,7 @@ Forecast mean
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -4020,7 +4055,7 @@ Accuracy
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -4049,7 +4084,7 @@ Frequency Bias
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -4078,7 +4113,7 @@ Probability of detecting yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -4107,7 +4142,7 @@ Probability of detecting no
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -4136,7 +4171,7 @@ Probability of false detection
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+31
 \end_layout
 
 \end_inset
@@ -4165,7 +4200,7 @@ False alarm ratio
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+32
 \end_layout
 
 \end_inset
@@ -4194,7 +4229,7 @@ Critical Success Index
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+33
 \end_layout
 
 \end_inset
@@ -4223,7 +4258,7 @@ Gilbert Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+34
 \end_layout
 
 \end_inset
@@ -4252,7 +4287,7 @@ Hanssen-Kuipers Discriminant
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+35
 \end_layout
 
 \end_inset
@@ -4281,7 +4316,7 @@ Heidke Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+36
 \end_layout
 
 \end_inset
@@ -4932,7 +4967,7 @@ name "MODE_object_attribute_output"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="33" columns="3">
+<lyxtabular version="3" rows="34" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -5042,7 +5077,7 @@ Version number
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5051,7 +5086,7 @@ MODEL
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5062,11 +5097,40 @@ User provided text string designating model name
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DESC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string describing the verification task
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
 \end_layout
 
 \end_inset
@@ -5095,7 +5159,7 @@ Forecast lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-4
+5
 \end_layout
 
 \end_inset
@@ -5124,7 +5188,7 @@ Forecast valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+6
 \end_layout
 
 \end_inset
@@ -5153,7 +5217,7 @@ Forecast accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-6
+7
 \end_layout
 
 \end_inset
@@ -5183,7 +5247,7 @@ Observation lead time in HHMMSS format; when field2 is actually an observation,
 \begin_inset Text
 
 \begin_layout Plain Layout
-7
+8
 \end_layout
 
 \end_inset
@@ -5212,7 +5276,7 @@ Observation valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-8
+9
 \end_layout
 
 \end_inset
@@ -5241,7 +5305,7 @@ Observation accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-9
+10
 \end_layout
 
 \end_inset
@@ -5270,7 +5334,7 @@ Forecast convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-10
+11
 \end_layout
 
 \end_inset
@@ -5299,7 +5363,7 @@ Forecast convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-11
+12
 \end_layout
 
 \end_inset
@@ -5328,7 +5392,7 @@ Observation convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -5357,7 +5421,7 @@ Observation convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+14
 \end_layout
 
 \end_inset
@@ -5386,7 +5450,7 @@ Forecast variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+15
 \end_layout
 
 \end_inset
@@ -5415,7 +5479,7 @@ Forecast vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+16
 \end_layout
 
 \end_inset
@@ -5444,7 +5508,7 @@ Observation variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+17
 \end_layout
 
 \end_inset
@@ -5473,7 +5537,7 @@ Observation vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+18
 \end_layout
 
 \end_inset
@@ -5502,7 +5566,7 @@ Object numbered from 1 to the number of objects in each field
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -5531,7 +5595,7 @@ Object category indicating to which cluster object it belongs
 \begin_inset Text
 
 \begin_layout Plain Layout
-19-20
+20-21
 \end_layout
 
 \end_inset
@@ -5560,7 +5624,7 @@ Location of the centroid (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-21-22
+22-23
 \end_layout
 
 \end_inset
@@ -5589,7 +5653,7 @@ Location of the centroid (in lat/lon degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -5618,7 +5682,7 @@ Object axis angle (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -5647,7 +5711,7 @@ Length of the enclosing rectangle (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -5676,7 +5740,7 @@ Width of the enclosing rectangle (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -5705,7 +5769,7 @@ Object area (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -5735,7 +5799,7 @@ Area of the object containing non-zero data in the filtered field (in grid
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -5765,7 +5829,7 @@ Area of the object containing data values in the filtered field that meet
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -5795,7 +5859,7 @@ Radius of curvature of the object defined in terms of third order moments
 \begin_inset Text
 
 \begin_layout Plain Layout
-30-31
+31-32
 \end_layout
 
 \end_inset
@@ -5824,7 +5888,7 @@ Center of curvature (in grid coordinates)
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+33
 \end_layout
 
 \end_inset
@@ -5854,7 +5918,7 @@ Ratio of the difference between the area of an object and the area of its
 \begin_inset Text
 
 \begin_layout Plain Layout
-33-37
+34-38
 \end_layout
 
 \end_inset
@@ -5884,7 +5948,7 @@ INTENSITY_10, _25, _50, _75, _90
 \begin_inset Text
 
 \begin_layout Plain Layout
-38
+39
 \end_layout
 
 \end_inset
@@ -6027,7 +6091,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-39
+40
 \end_layout
 
 \end_inset
@@ -6057,7 +6121,7 @@ Sum of the intensities of the filtered field within the object (variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-40
+41
 \end_layout
 
 \end_inset
@@ -6086,7 +6150,7 @@ Distance between two objects centroids (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-41
+42
 \end_layout
 
 \end_inset
@@ -6115,7 +6179,7 @@ Minimum distance between the boundaries of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-42
+43
 \end_layout
 
 \end_inset
@@ -6148,7 +6212,7 @@ Minimum distance between the convex hulls of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-43
+44
 \end_layout
 
 \end_inset
@@ -6177,7 +6241,7 @@ Difference between the axis angles of two objects (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-44
+45
 \end_layout
 
 \end_inset
@@ -6207,7 +6271,7 @@ Ratio of the areas of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-45
+46
 \end_layout
 
 \end_inset
@@ -6240,7 +6304,7 @@ Intersection area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-46
+47
 \end_layout
 
 \end_inset
@@ -6269,7 +6333,7 @@ Union area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-47
+48
 \end_layout
 
 \end_inset
@@ -6298,7 +6362,7 @@ Symmetric difference of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+49
 \end_layout
 
 \end_inset
@@ -6332,7 +6396,7 @@ Ratio of intersection area to the lesser of the forecast and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+50
 \end_layout
 
 \end_inset
@@ -6366,7 +6430,7 @@ Ratio of complexities of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+51
 \end_layout
 
 \end_inset
@@ -6405,7 +6469,7 @@ Ratio of the nth percentile (column 37) of intensity of the two objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+52
 \end_layout
 
 \end_inset

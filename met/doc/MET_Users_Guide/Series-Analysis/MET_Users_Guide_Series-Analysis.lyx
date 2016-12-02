@@ -633,6 +633,12 @@ model          = "WRF";
 \begin_layout LyX-Code
 
 \series bold
+desc           = "NA";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 obtype         = "ANALYS";
 \end_layout
 
