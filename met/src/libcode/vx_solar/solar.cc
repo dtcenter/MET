@@ -89,14 +89,18 @@ y = -cd*sh;
 z = sl*sd + cl*cd*ch;
 
    //
-   //  altitude and azimuth
+   //  altitude and azimuth (range of -180 to 180)
    //
 
 d = fabs(x) + fabs(y);
 
 azi = ( (d < tol) ? 0.0 : atan2d(y, x) );
 
+azi += 180.0;
+
 azi -= 360.0*floor(azi/360.0);
+
+azi -= 180.0;
 
 alt = asind(z);
 
@@ -142,7 +146,7 @@ const double tol = 1.0e-6;
 t = ((gmt/86400.0) - 10957.5)/36525.0;
 
    //
-   //  geometric mean longitude of the sun, 
+   //  geometric mean longitude of the sun,
    //    referred to the mean equinox of date
    //
 
