@@ -132,6 +132,18 @@ output_precision = 5;
 model = "WRF";
 
 //
+// The "desc" entry specifies a user-specified description for each verification
+// task.  This string is written to the DESC column of the ASCII output
+// generated.  It may be set separately in each "obs.field" verification task
+// entry or simply once at the top level of the configuration file.  If you're
+// verifying the same field multiple times with different quality control
+// flags, you should choose description strings (no whitespace) to distinguish
+// between their output.
+// e.g. desc = "QC_9";
+//
+desc = "NA";
+
+//
 // The "obtype" entry specifies a name to describe the type of verifying gridded
 // observation used.  This name is written to the OBTYPE column in the ASCII
 // output generated.  If you're using multiple types of verifying observations,
@@ -193,9 +205,9 @@ obtype = "ANALYS";
 //
 regrid = {
    to_grid    = NONE;
-   vld_thresh = 0.5;
    method     = NEAREST;
    width      = 1;
+   vld_thresh = 0.5;
 }
 
 //
@@ -493,9 +505,9 @@ climo_mean = {
    field     = [];
 
    regrid = {
-      vld_thresh = 0.5;
       method     = NEAREST;
       width      = 1;
+      vld_thresh = 0.5;
    }
 
    time_interp_method = DW_MEAN;
@@ -518,7 +530,7 @@ mask_missing_flag = BOTH;
 // entry) and ending ("end" entry) time offset values in seconds.  It defines
 // the time window over which observations are retained for scoring. These time
 // offsets are defined relative to a reference time t, as [t+beg, t+end].
-// In PB2NC, the reference time is the PrepBufr files grib1_center time.  In
+// In PB2NC, the reference time is the PrepBufr files center time.  In
 // Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 //
 obs_window = {
@@ -741,9 +753,9 @@ interp = {
 //      coverage field.
 //
 nbrhd = {
-   vld_thresh = 1.0;
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
+   vld_thresh = 1.0;
 }
 
 //
@@ -811,7 +823,7 @@ ps_plot_flag = TRUE;
 // Three grid weighting options are currently supported:
 //
 //    - "NONE" to disable grid weighting using a constant weight (default).
-//    - "COS_LAT" to define the weight as the cosine the grid point latitude.
+//    - "COS_LAT" to define the weight as the cosine of the grid point latitude.
 //      This an approximation for grid box area used by NCEP and WMO.
 //    - "AREA" to define the weight as the true area of the grid box (km^2).
 //
@@ -910,4 +922,4 @@ output_prefix  = "";
 // The configuration file version number should match the version number of
 // the MET code being run.  This value should generally not be modified.
 //
-version = "V5.2";
+version = "V6.0";

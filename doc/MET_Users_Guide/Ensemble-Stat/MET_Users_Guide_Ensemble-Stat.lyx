@@ -623,6 +623,12 @@ model          = "WRF";
 \begin_layout LyX-Code
 
 \series bold
+desc           = "NA";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 obtype         = "ANALYS";
 \end_layout
 
@@ -1480,7 +1486,7 @@ name "table_ES_header_info_es_out"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="3">
+<lyxtabular version="3" rows="24" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -1610,11 +1616,40 @@ User provided text string designating model name
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DESC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided text string describing the verification task
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
 \end_layout
 
 \end_inset
@@ -1643,7 +1678,7 @@ Forecast lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-4
+5
 \end_layout
 
 \end_inset
@@ -1672,7 +1707,7 @@ Forecast valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+6
 \end_layout
 
 \end_inset
@@ -1701,7 +1736,7 @@ Forecast valid end time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-6
+7
 \end_layout
 
 \end_inset
@@ -1730,7 +1765,7 @@ Observation lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-7
+8
 \end_layout
 
 \end_inset
@@ -1759,7 +1794,7 @@ Observation valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-8
+9
 \end_layout
 
 \end_inset
@@ -1788,7 +1823,7 @@ Observation valid end time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-9
+10
 \end_layout
 
 \end_inset
@@ -1817,7 +1852,7 @@ Model variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-10
+11
 \end_layout
 
 \end_inset
@@ -1846,7 +1881,7 @@ Selected Vertical level for forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-11
+12
 \end_layout
 
 \end_inset
@@ -1875,7 +1910,7 @@ Observation variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+13
 \end_layout
 
 \end_inset
@@ -1904,7 +1939,7 @@ Selected Vertical level for observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+14
 \end_layout
 
 \end_inset
@@ -1933,7 +1968,7 @@ Type of observation selected
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+15
 \end_layout
 
 \end_inset
@@ -1963,7 +1998,7 @@ Verifying masking region indicating the masking grid or polyline region
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+16
 \end_layout
 
 \end_inset
@@ -1992,7 +2027,7 @@ Interpolation method applied to forecasts
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+17
 \end_layout
 
 \end_inset
@@ -2021,7 +2056,7 @@ Number of points used in interpolation method
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+18
 \end_layout
 
 \end_inset
@@ -2050,7 +2085,7 @@ The threshold applied to the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+19
 \end_layout
 
 \end_inset
@@ -2079,7 +2114,7 @@ The threshold applied to the observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+20
 \end_layout
 
 \end_inset
@@ -2108,7 +2143,7 @@ The minimum fraction of valid ensemble members required to calculate statistics.
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+21
 \end_layout
 
 \end_inset
@@ -2137,7 +2172,7 @@ Error percent value used in confidence intervals
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -2292,7 +2327,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -2321,7 +2356,7 @@ Ranked Histogram line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -2350,7 +2385,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -2379,7 +2414,7 @@ Continuous Ranked Probability Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -2408,7 +2443,7 @@ Ignorance score
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -2437,7 +2472,7 @@ Number of possible ranks for observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -2466,7 +2501,7 @@ Continuous Ranked Probability Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-27-?
+28
 \end_layout
 
 \end_inset
@@ -2475,7 +2510,7 @@ Continuous Ranked Probability Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-RANK_?
+RANK_i
 \end_layout
 
 \end_inset
@@ -2484,7 +2519,7 @@ RANK_?
 \begin_inset Text
 
 \begin_layout Plain Layout
-# of instances that observation has this rank
+Count of observations with the ith rank (repeated)
 \end_layout
 
 \end_inset
@@ -2608,7 +2643,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -2637,7 +2672,7 @@ Probability Integral Transform line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -2666,7 +2701,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -2695,7 +2730,7 @@ Probability interval width
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -2724,7 +2759,7 @@ Total number of probability intervals
 \begin_inset Text
 
 \begin_layout Plain Layout
-25-?
+26
 \end_layout
 
 \end_inset
@@ -2742,7 +2777,7 @@ BIN_i
 \begin_inset Text
 
 \begin_layout Plain Layout
-Count of observations within each probability interval
+Count of observations in the ith probability bin (repeated)
 \end_layout
 
 \end_inset
@@ -2865,7 +2900,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -2894,7 +2929,7 @@ Observation Rank line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -2923,7 +2958,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -2952,7 +2987,7 @@ Line number in ORANK file
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -2981,7 +3016,7 @@ Station Identifiier
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -3010,7 +3045,7 @@ Latitude of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -3039,7 +3074,7 @@ Longitude of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -3068,7 +3103,7 @@ Level of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -3097,7 +3132,7 @@ Elevation of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -3126,7 +3161,7 @@ Value of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+31
 \end_layout
 
 \end_inset
@@ -3155,7 +3190,7 @@ Probability Integral Transform
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+32
 \end_layout
 
 \end_inset
@@ -3184,7 +3219,7 @@ Rank of the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+33
 \end_layout
 
 \end_inset
@@ -3213,7 +3248,7 @@ Number of valid ensemble values
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+34
 \end_layout
 
 \end_inset
@@ -3242,7 +3277,7 @@ Number of ensemble values
 \begin_inset Text
 
 \begin_layout Plain Layout
-34-?
+35
 \end_layout
 
 \end_inset
@@ -3251,7 +3286,7 @@ Number of ensemble values
 \begin_inset Text
 
 \begin_layout Plain Layout
-ENS_?
+ENS_i
 \end_layout
 
 \end_inset
@@ -3260,7 +3295,7 @@ ENS_?
 \begin_inset Text
 
 \begin_layout Plain Layout
-Value of each ensemble member
+Value of the ith ensemble member (repeated)
 \end_layout
 
 \end_inset
@@ -3474,7 +3509,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+22
 \end_layout
 
 \end_inset
@@ -3503,7 +3538,7 @@ Spread/Skill Variance line type
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+23
 \end_layout
 
 \end_inset
@@ -3532,7 +3567,7 @@ Count of observations
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+24
 \end_layout
 
 \end_inset
@@ -3561,7 +3596,7 @@ Number of bins for current forecast run
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+25
 \end_layout
 
 \end_inset
@@ -3590,7 +3625,7 @@ Index of the current bin
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+26
 \end_layout
 
 \end_inset
@@ -3619,7 +3654,7 @@ Number of points in bin i
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+27
 \end_layout
 
 \end_inset
@@ -3648,7 +3683,7 @@ Minimum variance
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset
@@ -3677,7 +3712,7 @@ Maximum variance
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+29
 \end_layout
 
 \end_inset
@@ -3706,7 +3741,7 @@ Average variance
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+30
 \end_layout
 
 \end_inset
@@ -3735,7 +3770,7 @@ Average forecast value
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+31
 \end_layout
 
 \end_inset
@@ -3764,7 +3799,7 @@ Average observed value
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+32
 \end_layout
 
 \end_inset
@@ -3793,7 +3828,7 @@ Average product of forecast and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+33
 \end_layout
 
 \end_inset
@@ -3822,7 +3857,7 @@ Average of forecast squared
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+34
 \end_layout
 
 \end_inset
@@ -3851,7 +3886,7 @@ Average of observation squared
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+35
 \end_layout
 
 \end_inset
@@ -3880,7 +3915,7 @@ Normal confidence lower bound of mean forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+36
 \end_layout
 
 \end_inset
@@ -3909,7 +3944,7 @@ Normal confidence upper bound of mean forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-36
+37
 \end_layout
 
 \end_inset
@@ -3938,7 +3973,7 @@ Standard deviation of the error
 \begin_inset Text
 
 \begin_layout Plain Layout
-37
+38
 \end_layout
 
 \end_inset
@@ -3967,7 +4002,7 @@ Normal confidence lower bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-38
+39
 \end_layout
 
 \end_inset
@@ -3996,7 +4031,7 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-39
+40
 \end_layout
 
 \end_inset
@@ -4025,7 +4060,7 @@ Normal confidence lower bound of mean observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-40
+41
 \end_layout
 
 \end_inset
@@ -4054,7 +4089,7 @@ Normal confidence upper bound of mean observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-41
+42
 \end_layout
 
 \end_inset
@@ -4083,7 +4118,7 @@ Standard deviation of the error
 \begin_inset Text
 
 \begin_layout Plain Layout
-42
+43
 \end_layout
 
 \end_inset
@@ -4112,7 +4147,7 @@ Normal confidence lower bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-43
+44
 \end_layout
 
 \end_inset
@@ -4141,7 +4176,7 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-44
+45
 \end_layout
 
 \end_inset
@@ -4170,7 +4205,7 @@ Pearson correlation coefficient
 \begin_inset Text
 
 \begin_layout Plain Layout
-45
+46
 \end_layout
 
 \end_inset
@@ -4199,7 +4234,7 @@ Normal confidence lower bound on PR_CORR
 \begin_inset Text
 
 \begin_layout Plain Layout
-46
+47
 \end_layout
 
 \end_inset
@@ -4228,7 +4263,7 @@ Normal confidence upper bound on PR_CORR
 \begin_inset Text
 
 \begin_layout Plain Layout
-47
+48
 \end_layout
 
 \end_inset
@@ -4257,7 +4292,7 @@ Mean error
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+49
 \end_layout
 
 \end_inset
@@ -4286,7 +4321,7 @@ Normal confidence lower bound on mean error
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+50
 \end_layout
 
 \end_inset
@@ -4315,7 +4350,7 @@ Normal confidence upper bound on mean error
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+51
 \end_layout
 
 \end_inset
@@ -4344,7 +4379,7 @@ Standard deviation of the error
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+52
 \end_layout
 
 \end_inset
@@ -4373,7 +4408,7 @@ Normal confidence lower bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+53
 \end_layout
 
 \end_inset
@@ -4402,7 +4437,7 @@ Normal confidence upper bound on error std dev
 \begin_inset Text
 
 \begin_layout Plain Layout
-53
+54
 \end_layout
 
 \end_inset
@@ -4431,7 +4466,7 @@ Mangitude bias
 \begin_inset Text
 
 \begin_layout Plain Layout
-54
+55
 \end_layout
 
 \end_inset
@@ -4460,7 +4495,7 @@ Mean squared error
 \begin_inset Text
 
 \begin_layout Plain Layout
-55
+56
 \end_layout
 
 \end_inset
@@ -4489,7 +4524,7 @@ Bias corrected root mean squared error
 \begin_inset Text
 
 \begin_layout Plain Layout
-56
+57
 \end_layout
 
 \end_inset
