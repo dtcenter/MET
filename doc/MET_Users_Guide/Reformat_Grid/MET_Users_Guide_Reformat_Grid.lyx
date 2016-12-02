@@ -191,23 +191,7 @@ add
  NetCDF format, with no changes to the data values.
  The files being combined must all be on a common grid.
  The Pcp-Combine tool does not support automated regridding.
- When running the 
-\begin_inset Quotes eld
-\end_inset
-
-subtract
-\begin_inset Quotes erd
-\end_inset
-
- or 
-\begin_inset Quotes eld
-\end_inset
-
-sum
-\begin_inset Quotes erd
-\end_inset
-
- command, the input files must have the same initialization time unless
+ In general the input files should have the same initialization time unless
  the user has indicated that it shoud ignore the initialization time for
  the 
 \begin_inset Quotes eld
@@ -218,6 +202,16 @@ sum
 \end_inset
 
  command.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+subtract
+\begin_inset Quotes erd
+\end_inset
+
+ command produces a warning when the input initialization times differ or
+ the subtraction results in a negative accumulation interval.
 \end_layout
 
 \begin_layout Subsection
