@@ -78,6 +78,8 @@
 //                                   pcpdir search.
 //   018    04/16/14  Halley Gotway  Bugfix for the -varname option.
 //   019    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
+//   020    12/02/16  Halley Gotway  Change init and accumulation subtraction
+//                                   errors to warnings.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -96,9 +98,8 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-//#include "netcdf.hh"
 #include <netcdf>
+
 using namespace netCDF;
 
 #include "vx_log.h"
@@ -915,28 +916,26 @@ void do_sub_command()
 
    //
    // Output initialization time
-   // Error if init_time1 != init_time2.
+   // Warning if init_time1 != init_time2.
    //
    if(plus.init() != minus.init()) {
-      mlog << Error << "\ndo_sub_command() -> "
-           << "init_time1 (" << unix_to_yyyymmdd_hhmmss(plus.init())
-           <<  ") must be equal to init_time2 ("
+      mlog << Warning << "\ndo_sub_command() -> "
+           << "the initialization times do not match ("
+           << unix_to_yyyymmdd_hhmmss(plus.init()) <<  " != "
            << unix_to_yyyymmdd_hhmmss(minus.init())
-           << ") for subtraction.\n\n";
-      exit(1);
+           << ") for subtraction.  Using the first value.\n\n";
    }
    nc_init_time = plus.init();
 
    //
    // Output accumulation time
-   // Error if accum1 < accum2.
+   // Warning if accum1 < accum2.
    //
    if(plus.accum() < minus.accum()) {
-      mlog << Error << "\ndo_sub_command() -> "
-           << "accum1 (" << sec_to_hhmmss(plus.accum())
-           <<  ") must be greater than accum2 ("
+      mlog << Warning << "\ndo_sub_command() -> "
+           << "the first accumulation interval is less than the second ("
+           << sec_to_hhmmss(plus.accum()) << " < "
            << sec_to_hhmmss(minus.accum()) << ") for subtraction.\n\n";
-      exit(1);
    }
    nc_accum = plus.accum() - minus.accum();
 
@@ -1020,14 +1019,14 @@ void get_field(const char * filename, const char * fld_accum_mag,
    if( !datafile ){
       mlog << Error << "\nget_field() -> can't open data file \"" << filename
            << "\"\n\n";
-      exit ( 1 );
+      exit(1);
    }
 
    var = var_fac.new_var_info(datafile->file_type());
    if( !var ){
       mlog << Error << "\nget_field() -> unable to determine filetype of \""
            << filename << "\"\n\n";
-      exit (1);
+      exit(1);
    }
 
    //  initialize the VarInfo object with a config
@@ -1054,7 +1053,7 @@ void get_field(const char * filename, const char * fld_accum_mag,
    if( ! datafile->data_plane(*var, plane) ){
       mlog << Error << "\nget_field() -> can't get data plane from file \"" << filename
            << "\"\n\n";
-      exit ( 1 );
+      exit(1);
    }
 
    grid = datafile->grid();
@@ -1077,9 +1076,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
    ConcatString command_str;
 
    NcFile *f_out   = (NcFile *) 0;
-   //NcDim  *lat_dim = (NcDim *)  0;
-   //NcDim  *lon_dim = (NcDim *)  0;
-   //NcVar  *pcp_var = (NcVar *)  0;
    NcDim  lat_dim ;
    NcDim  lon_dim ;
    NcVar  pcp_var ;
@@ -1116,13 +1112,7 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
       command_str << cs_erase
                   << "Subtraction: "
-                  << in_file[0]
-                  << " with accumulation of "
-                  << sec_to_hhmmss(accum[0])
-                  << " minus "
-                  << in_file[1]
-                  << " with accumulation of "
-                  << sec_to_hhmmss(accum[1]) << '.';
+                  << in_file[0] << " minus " << in_file[1];
 
    }
 
@@ -1142,10 +1132,10 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // If the -varname command line option was used or the accumulation
    // interval is zero, just use the field_name
-   if(name_flag || nc_accum <= 0) {
+   if(name_flag || nc_accum == 0) {
       var_str = field_name;
    }
-   // Otherwise, append the acculuation interval to the variable name
+   // Otherwise, append the accumluation interval to the variable name
    else {
 
       // Store up to the first underscore
@@ -1171,17 +1161,21 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Add variable attributes
    add_att(&pcp_var, "name",  (const char *) var_str);
-   add_att(&pcp_var, "long_name", (const char *)var_info->long_name());
+   add_att(&pcp_var, "long_name", (const char *) var_info->long_name());
 
    // Ouput level string
-   if(nc_accum%sec_per_hour == 0) {
-      var_str << cs_erase << 'A' << (nc_accum/sec_per_hour);
+   if(nc_accum != 0) {
+      if(nc_accum%sec_per_hour == 0) {
+         var_str << cs_erase << 'A' << (nc_accum/sec_per_hour);
+      } else {
+         var_str << cs_erase << 'A' << sec_to_hhmmss(nc_accum);
+      }
    } else {
-      var_str << cs_erase << 'A' << sec_to_hhmmss(nc_accum);
+      var_str << cs_erase << var_info->level().name();
    }
 
    add_att(&pcp_var, "level", (const char *) var_str);
-   add_att(&pcp_var, "units", (const char *)var_info->units());
+   add_att(&pcp_var, "units", (const char *) var_info->units());
    add_att(&pcp_var, "_FillValue", bad_data_float);
 
    //
@@ -1205,7 +1199,6 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
       exit(1);
    }
 
-   //f_out->close();
    delete f_out;
    f_out = (NcFile *) 0;
 
@@ -1351,7 +1344,7 @@ void usage()
 
         << "\n" << flush;
 
-   exit (1);
+   exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////

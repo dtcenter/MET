@@ -333,7 +333,7 @@ ConcatString s;
    add_att(var, "valid_time_ut", s.text());
 
    // Accumulation time
-   if(accum_sec > 0) {
+   if(accum_sec != 0) {
       sec_to_hhmmss(accum_sec, time_str);
       add_att(var, "accum_time", time_str);
       var->putAtt("accum_time_sec", ncInt, accum_sec);
