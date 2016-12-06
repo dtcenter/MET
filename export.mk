@@ -35,6 +35,7 @@ export GRIB2C_LIBS
 
 export HDF_BASE_DIR
 export HDF_EOS_BASE_DIR
+export HDF5_BASE_DIR
 
 ###############################################################################
 
