@@ -73,6 +73,43 @@ if test -n "$MET_NETCDFLIB"; then
 fi
 
 #
+# Look for the HDF5 library
+#
+
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_HDF5], [Where hdf5 lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_HDF5INC], [Where hdf5 include files are located. Use if the libraries and include files are not under the same main hdf5 directory.  If used, MET_HDF5LIB must also be defined and MET_HDF5 will be ignored.])
+AC_ARG_VAR([MET_HDF5LIB], [Where hdf5 libraries are located. Use if the libraries and include files are not under the same main hdf5 directory.  If used, MET_HDF5INC must also be defined and MET_HDF5 will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$MET_HDF5LIB" && test -z "$MET_HDF5INC") || \
+   (test -n "$MET_HDF5INC" && test -z "$MET_HDF5LIB"); then
+  if test -n "$MET_HDF5LIB"; then
+    AC_MSG_ERROR([MET_HDF5LIB environment variable set, but MET_HDF5INC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_HDF5INC environment variable set, but MET_HDF5LIB not set.  If one of these variables is set, then both must be set.])
+  fi
+fi
+
+# If the individual locations weren't specified, then the main HDF5 directory
+# must be specified.  If it isn't, let the user know they need to supply one.
+
+if test -z "$MET_HDF5LIB" && test -n "$MET_HDF5"; then
+   MET_HDF5INC='${MET_HDF5}/include'
+   MET_HDF5LIB='${MET_HDF5}/lib'
+fi
+
+# AC_SUBST command line variables.  If we get here, the HDF5
+# libraries were found so no need to check
+
+if test -n "$MET_HDF5LIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_HDF5INC}"
+   LDFLAGS="${LDFLAGS} -L${MET_HDF5LIB}"
+fi
+
+#
 # Look for the GRIB2C library
 #
 
@@ -175,9 +212,9 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_HDF], [Where hdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF is only needed if you are building the MODIS utility.])
-AC_ARG_VAR([MET_HDFINC], [Where hdf include files are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFLIB must also be defined and MET_HDF will be ignored.])
-AC_ARG_VAR([MET_HDFLIB], [Where hdf libraries are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFINC must also be defined and MET_HDF will be ignored.])
+AC_ARG_VAR([MET_HDF], [Where hdf version 4 lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF version 4 is only needed if you are building the MODIS utility.])
+AC_ARG_VAR([MET_HDFINC], [Where hdf version 4 include files are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFLIB must also be defined and MET_HDF will be ignored.])
+AC_ARG_VAR([MET_HDFLIB], [Where hdf version 4 libraries are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFINC must also be defined and MET_HDF will be ignored.])
 
 # Ensure that both or neither are specified.
 
@@ -190,7 +227,7 @@ if (test -n "$MET_HDFLIB" && test -z "$MET_HDFINC") || \
   fi
 fi
 
-# If the individual locations weren't specified, then the main Hdf directory
+# If the individual locations weren't specified, then the main HDF directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
 if test -z "$MET_HDFLIB" && test -n "$MET_HDF"; then
@@ -198,7 +235,7 @@ if test -z "$MET_HDFLIB" && test -n "$MET_HDF"; then
    MET_HDFLIB='${MET_HDF}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Hdf
+# AC_SUBST command line variables.  If we get here, the HDF
 # libraries were found so no need to check
 
 if test -n "$MET_HDFLIB"; then
@@ -207,14 +244,14 @@ if test -n "$MET_HDFLIB"; then
 fi
 
 #
-# Look for the Hdfeos library
+# Look for the HDFEOS library
 #
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_HDFEOS], [Where hdfeos lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF EOS is only needed if you are building the MODIS utility.])
-AC_ARG_VAR([MET_HDFEOSINC], [Where hdfeos include files are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSLIB must also be defined and MET_HDFEOS will be ignored.])
-AC_ARG_VAR([MET_HDFEOSLIB], [Where hdfeos libraries are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSINC must also be defined and MET_HDFEOS will be ignored.])
+AC_ARG_VAR([MET_HDFEOS], [Where hdfeos version 2 lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF-EOS version 2 is only needed if you are building the MODIS utility.])
+AC_ARG_VAR([MET_HDFEOSINC], [Where hdfeos version 2 include files are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSLIB must also be defined and MET_HDFEOS will be ignored.])
+AC_ARG_VAR([MET_HDFEOSLIB], [Where hdfeos version 2 libraries are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSINC must also be defined and MET_HDFEOS will be ignored.])
 
 # Ensure that both or neither are specified.
 
@@ -227,7 +264,7 @@ if (test -n "$MET_HDFEOSLIB" && test -z "$MET_HDFEOSINC") || \
   fi
 fi
 
-# If the individual locations weren't specified, then the main Hdfeos directory
+# If the individual locations weren't specified, then the main HDFEOS directory
 # must be specified.  If it isn't, let the user know they need to supply one.
 
 if test -z "$MET_HDFEOSLIB" && test -n "$MET_HDFEOS"; then
@@ -235,7 +272,7 @@ if test -z "$MET_HDFEOSLIB" && test -n "$MET_HDFEOS"; then
    MET_HDFEOSLIB='${MET_HDFEOS}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Hdfeos
+# AC_SUBST command line variables.  If we get here, the HDFEOS
 # libraries were found so no need to check
 
 if test -n "$MET_HDFEOSLIB"; then

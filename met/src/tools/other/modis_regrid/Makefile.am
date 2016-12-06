@@ -17,8 +17,8 @@ modis_regrid_SOURCES = modis_regrid.cc \
 	data_plane_to_netcdf.cc \
 	data_averager.cc \
 	modis_file.cc
-modis_regrid_CPPFLAGS = ${MET_CPPFLAGS} -I${MET_HDF4}/include -I${MET_HDFEOS4}/include
-modis_regrid_LDFLAGS = ${MET_LDFLAGS} -L${MET_HDF4}/lib -L${MET_HDFEOS4}/lib
+modis_regrid_CPPFLAGS = ${MET_CPPFLAGS}
+modis_regrid_LDFLAGS = ${MET_LDFLAGS}
 modis_regrid_LDADD = -lvx_pxm \
 	-lvx_plot_util \
 	-lvx_nav \
@@ -48,7 +48,6 @@ modis_regrid_LDADD = -lvx_pxm \
 	-lnetcdf_c++ -lnetcdf -lgsl -lgslcblas \
 	-lhdf5 \
 	-lhdf5_hl \
-	-lhe5_hdfeos \
 	-lhdfeos \
 	-lmfhdf \
 	-ldf \
