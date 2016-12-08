@@ -33,7 +33,9 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char * out_filename, const char * var_name, const char * var_long_name, const char * var_units)
+void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
+      const char * out_filename, const char * var_name,
+      const char * var_long_name, const char * var_units)
 {
 
   // Initialization
@@ -68,23 +70,19 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
 {
   // Initialization
   NcFile *f_out   = (NcFile *) 0;
-  //NcDim  *lat_dim = (NcDim *)  0;
-  //NcDim  *lon_dim = (NcDim *)  0;
-  //NcVar  *f_var = (NcVar *)  0;
   NcDim  lat_dim  ;
   NcDim  lon_dim  ;
   NcVar  f_var    ;
   
   
   // Create a new NetCDF file and open it
-  f_out = open_ncfile(out_filename, NcFile::replace);
+  f_out = open_ncfile(out_filename, true);
   
   if(IS_INVALID_NC_P(f_out)) 
   {
     mlog << Error << "\nwrite_netcdf() -> "
 	 << "trouble opening output file " << out_filename
 	 << "\n\n";
-    //f_out->close();
     delete f_out;  f_out = (NcFile *) 0;
     
     exit(1);
@@ -125,7 +123,6 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   }
   
   // Close and clean up
-  //f_out->close();
   delete f_out;
   f_out = (NcFile *) 0;
   

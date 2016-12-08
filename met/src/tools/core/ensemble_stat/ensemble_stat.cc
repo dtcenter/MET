@@ -826,20 +826,11 @@ void process_point_obs(int i_nc) {
    }
 
    // Define dimensions
-   //NcDim *strl_dim    = (NcDim *) 0; // Maximum string length
-   //NcDim *obs_dim     = (NcDim *) 0; // Number of observations
-   //NcDim *hdr_dim     = (NcDim *) 0; // Number of PrepBufr messages
    NcDim strl_dim    ; // Maximum string length
    NcDim obs_dim     ; // Number of observations
    NcDim hdr_dim     ; // Number of PrepBufr messages
 
    // Define variables
-   //NcVar *obs_arr_var = (NcVar *) 0;
-   //NcVar *obs_qty_var = (NcVar *) 0;
-   //NcVar *hdr_typ_var = (NcVar *) 0;
-   //NcVar *hdr_sid_var = (NcVar *) 0;
-   //NcVar *hdr_vld_var = (NcVar *) 0;
-   //NcVar *hdr_arr_var = (NcVar *) 0;
    NcVar obs_arr_var;
    NcVar obs_qty_var;
    NcVar hdr_typ_var;
@@ -1697,7 +1688,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    build_outfile_name(ens_valid_ut, suffix, out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, NcFile::replace);
+   nc_out = open_ncfile(out_nc_file, true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -2231,7 +2222,6 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
                            float *data, DataPlane &dp,
                            const char *type_str,
                            const char *long_name_str) {
-   //NcVar *nc_var = (NcVar *) 0;
    NcVar nc_var;
    int wdth;
    ConcatString mthd_str, var_name, name_str;
@@ -2285,7 +2275,6 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
                          int *data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
-   //NcVar *nc_var = (NcVar *) 0;
    NcVar nc_var;
    int wdth;
    ConcatString mthd_str, var_name, name_str;

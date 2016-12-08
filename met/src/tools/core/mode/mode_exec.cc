@@ -827,33 +827,11 @@ if ( info.all_false() )  return;
 
    NcFile *f_out             = (NcFile *) 0;
 
-   //NcDim  *lat_dim           = (NcDim *)  0;
-   //NcDim  *lon_dim           = (NcDim *)  0;
-   //
-   //NcDim  *fcst_thresh_dim   = (NcDim *)  0;
-   //NcDim  * obs_thresh_dim   = (NcDim *)  0;
-
    NcDim  lat_dim           ;
    NcDim  lon_dim           ;
 
    NcDim  fcst_thresh_dim   ;
    NcDim   obs_thresh_dim   ;
-
-   //NcVar  *fcst_raw_var      = (NcVar *)  0;
-   //NcVar  *fcst_obj_raw_var  = (NcVar *)  0;
-   //NcVar  *fcst_obj_var      = (NcVar *)  0;
-   //NcVar  *fcst_clus_var     = (NcVar *)  0;
-   //
-   //NcVar  *obs_raw_var       = (NcVar *)  0;
-   //NcVar  *obs_obj_raw_var   = (NcVar *)  0;
-   //NcVar  *obs_obj_var       = (NcVar *)  0;
-   //NcVar  *obs_clus_var      = (NcVar *)  0;
-   //
-   //NcVar  *fcst_radius_var   = (NcVar *)  0;
-   //NcVar  * obs_radius_var   = (NcVar *)  0;
-   //
-   //NcVar  *fcst_thresh_var   = (NcVar *)  0;
-   //NcVar  * obs_thresh_var   = (NcVar *)  0;
 
    NcVar  fcst_raw_var      ;
    NcVar  fcst_obj_raw_var  ;
@@ -883,7 +861,7 @@ if ( info.all_false() )  return;
    // NOTE: must multiply longitudes throughout by -1 to convert from
    // degrees_west to degree_east
    //
-   f_out = open_ncfile(out_file, NcFile::replace);
+   f_out = open_ncfile(out_file, true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_obj_netcdf() -> trouble opening output file "
@@ -931,9 +909,9 @@ if ( info.all_false() )  return;
    fcst_thresh_var = add_var(f_out, "fcst_conv_threshold", ncChar, fcst_thresh_dim);
     obs_thresh_var = add_var(f_out,  "obs_conv_threshold", ncChar,  obs_thresh_dim);
 
-      //
-      //  write the radius and threshold values
-      //
+   //
+   //  write the radius and threshold values
+   //
 
    if ( !put_nc_data(&fcst_radius_var, &engine.conf_info.fcst_conv_radius)
        || !put_nc_data(&obs_radius_var, &engine.conf_info.obs_conv_radius) )  {
@@ -946,8 +924,6 @@ if ( info.all_false() )  return;
 
    }
 
-   //if (    ! put_nc_data_with_dims(&fcst_thresh_var, (const char *) fcst_thresh, fcst_thresh.length())
-   //     || ! put_nc_data_with_dims(& obs_thresh_var, (const char *)  obs_thresh,  obs_thresh.length()) )  {
    if (    ! put_nc_data(&fcst_thresh_var, (const char *) fcst_thresh)
         || ! put_nc_data(& obs_thresh_var, (const char *)  obs_thresh) )  {
 
@@ -1246,9 +1222,6 @@ void ModeExecutive::write_poly_netcdf(NcFile * f_out)
    //
    // Write out the number of forecast, observation, and cluster objects
    //
-   //NcVar *n_fcst_simp_var = (NcVar *)  0;
-   //NcVar *n_obs_simp_var  = (NcVar *)  0;
-   //NcVar *n_clus_var      = (NcVar *)  0;
    NcVar n_fcst_simp_var ;
    NcVar n_obs_simp_var  ;
    NcVar n_clus_var      ;
@@ -1310,19 +1283,11 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    int   *poly_y              = (int       *) 0;
 
    // Dimensions and variables for each object
-   //NcDim  *obj_dim            = (NcDim     *)  0;
-   //NcVar  *obj_poly_start_var = (NcVar     *)  0;
-   //NcVar  *obj_poly_npts_var  = (NcVar     *)  0;
    NcDim  obj_dim            ;
    NcVar  obj_poly_start_var ;
    NcVar  obj_poly_npts_var  ;
 
    // Dimensions and variables for each boundary point
-   //NcDim  *poly_dim           = (NcDim     *)  0;
-   //NcVar  *poly_lat_var       = (NcVar     *)  0;
-   //NcVar  *poly_lon_var       = (NcVar     *)  0;
-   //NcVar  *poly_x_var         = (NcVar     *)  0;
-   //NcVar  *poly_y_var         = (NcVar     *)  0;
    NcDim  poly_dim           ;
    NcVar  poly_lat_var       ;
    NcVar  poly_lon_var       ;
@@ -1743,8 +1708,6 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
 
 {
 
-   //NcDim * dim = 0;
-   //NcVar * var = 0;
    NcDim  dim;
    NcVar  var;
    const int N = strlen(text);
@@ -1754,7 +1717,6 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
    
    var = add_var(f, var_name, ncChar, dim);
    
-   //if ( ! put_nc_data_with_dims(&var, text, N) )  {
    if ( ! put_nc_data(&var, text) )  {
    
       mlog << Error

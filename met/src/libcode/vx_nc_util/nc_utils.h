@@ -44,7 +44,7 @@ typedef signed char ncbyte; // from ncvalues.h
 #define GET_NC_VAR_COUNT(ncObj)          ncObj.getVarCount()
 #define GET_NC_VAR_COUNT_P(ncObjPtr)     ncObjPtr->getVarCount()
 
-#define DEF_DEFLATE_LEVEL   (2)
+#define DEF_DEFLATE_LEVEL   (0)
 
 #define GET_NC_ATT_OBJ(nc_or_var, att_name)         nc_or_var.getAtt(att_name)
 #define GET_NC_ATT_OBJ_BY_P(nc_or_var, att_name)    nc_or_var->getAtt(att_name)
@@ -180,9 +180,9 @@ extern bool put_nc_data(NcVar *, const float  *data );
 extern bool put_nc_data(NcVar *, const double *data );
 extern bool put_nc_data(NcVar *, const ncbyte *data );
 
-extern bool put_nc_data(NcVar *, const int data,    const long offset0=0, const long offset1=-1, const long c2=-1);
-extern bool put_nc_data(NcVar *, const char data,   const long offset0=0, const long offset1=-1, const long c2=-1);
-extern bool put_nc_data(NcVar *, const float data , const long offset0=0, const long offset1=-1, const long c2=-1);
+extern bool put_nc_data(NcVar *, const int    data, const long offset0=0, const long offset1=-1, const long c2=-1);
+extern bool put_nc_data(NcVar *, const char   data, const long offset0=0, const long offset1=-1, const long c2=-1);
+extern bool put_nc_data(NcVar *, const float  data, const long offset0=0, const long offset1=-1, const long c2=-1);
 extern bool put_nc_data(NcVar *, const double data, const long offset0=0, const long offset1=-1, const long c2=-1);
 extern bool put_nc_data(NcVar *, const ncbyte data, const long offset0=0, const long offset1=-1, const long c2=-1);
 
@@ -241,7 +241,7 @@ extern bool   get_dim_names(const NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 //extern multimap<string,NcDim> get_global_dims(const NcFile *nc, int *dim_count);
 
-extern NcFile* open_ncfile(const char * nc_name, NcFile::FileMode file_mode = NcFile::read);
+extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
 

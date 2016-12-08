@@ -1935,7 +1935,7 @@ void store_stat_prc(int n, const ConcatString &col,
 void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_file, NcFile::replace);
+   nc_out = open_ncfile(out_file, true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "

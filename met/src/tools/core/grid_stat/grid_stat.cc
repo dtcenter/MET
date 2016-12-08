@@ -472,7 +472,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, NcFile::replace);
+   nc_out = open_ncfile(out_nc_file, true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -1671,10 +1671,6 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    float *diff_data = (float *) 0;
    float *cmn_data  = (float *) 0;
 
-   //NcVar *fcst_var = (NcVar *) 0;
-   //NcVar *obs_var  = (NcVar *) 0;
-   //NcVar *diff_var = (NcVar *) 0;
-   //NcVar *cmn_var  = (NcVar *) 0;
    NcVar fcst_var;
    NcVar obs_var ;
    NcVar diff_var;
@@ -1966,8 +1962,6 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
 
-   //NcVar *fcst_var = (NcVar *) 0;
-   //NcVar *obs_var  = (NcVar *) 0;
    NcVar fcst_var ;
    NcVar obs_var  ;
 

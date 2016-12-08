@@ -603,7 +603,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Create the output NetCDF file for writing
    //
-   _ncFile = open_ncfile(nc_filename.c_str(), NcFile::replace);
+   _ncFile = open_ncfile(nc_filename.c_str(), true);
 
    if(IS_INVALID_NC_P(_ncFile)) {
       mlog << Error << "\nFileHandler::_openNetcdf() -> "
