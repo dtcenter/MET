@@ -608,7 +608,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    build_outfile_name(valid_ut, lead_sec, ".nc", out_nc_file);
 
    // Create a new NetCDF file and open it
-   nc_out = open_ncfile(out_nc_file, NcFile::replace);
+   nc_out = open_ncfile(out_nc_file, true);
 
    if(!nc_out || IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
@@ -623,21 +623,15 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    if ( nc_info.do_diff )  add_att(nc_out, "Difference", "Forecast Value - Observation Value");
 
    // Set the NetCDF dimensions
-   //x_dim     = (NcDim *) 0;
    x_dim = add_dim(nc_out, "x", conf_info.get_tile_dim());
 
-   //y_dim     = (NcDim *) 0;
    y_dim = add_dim(nc_out, "y", conf_info.get_tile_dim());
 
-   //scale_dim = (NcDim *) 0;
    scale_dim = add_dim(nc_out, "scale", conf_info.get_n_scale()+2);
 
-   //tile_dim  = (NcDim *) 0;
    tile_dim  = add_dim(nc_out, "tile", conf_info.get_n_tile());
 
    // Add the x_ll and y_ll variables
-   //NcVar *x_ll_var = (NcVar *) 0;
-   //NcVar *y_ll_var = (NcVar *) 0;
    NcVar x_ll_var ;
    NcVar y_ll_var ;
 

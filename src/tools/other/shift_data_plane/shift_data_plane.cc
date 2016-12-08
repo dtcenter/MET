@@ -39,8 +39,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
-
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -274,7 +272,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    ConcatString cs;
 
    // Create a new NetCDF file and open it
-   NcFile *f_out = open_ncfile(OutputFilename, NcFile::replace);
+   NcFile *f_out = open_ncfile(OutputFilename, true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_netcdf() -> "
@@ -340,7 +338,6 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    // Clean up
    if(data)  {                 delete [] data; data  = (float *)  0; }
    if(f_out) { 
-      //f_out->close();
       delete f_out;   f_out = (NcFile *) 0; 
    }
 

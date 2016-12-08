@@ -40,7 +40,6 @@ using namespace std;
 
 #include "gen_vx_mask.h"
 
-//#include "netcdf.hh"
 #include "grib_classes.h"
 
 #include "vx_log.h"
@@ -151,20 +150,16 @@ void process_input_file(DataPlane &dp) {
       ftype = parse_conf_file_type(&config);
    }
 
-cout << " process_input_file() call mtddf_factory.new_met_2d_data_file\n";
    mtddf_ptr = mtddf_factory.new_met_2d_data_file(input_filename, ftype);
-cout << " process_input_file() call mtddf_factory.new_met_2d_data_file\n";
    if(!mtddf_ptr) {
       mlog << Error << "\nprocess_input_file() -> "
            << "can't open input file \"" << input_filename << "\"\n\n";
       exit(1);
    }
 
-cout << " process_input_file () \n";
    // Extract the grid
    grid = mtddf_ptr->grid();
 
-cout << " process_input_file () \n";
    // Read the input data plane, if requested
    if(input_field_str.length() > 0) {
       get_data_plane(mtddf_ptr, input_field_str, dp);
@@ -920,15 +915,12 @@ void write_netcdf(const DataPlane &dp) {
 
    float *mask_data = (float *)  0;
    NcFile *f_out    = (NcFile *) 0;
-   //NcDim *lat_dim   = (NcDim *)  0;
-   //NcDim *lon_dim   = (NcDim *)  0;
-   //NcVar *mask_var  = (NcVar *)  0;
    NcDim lat_dim;
    NcDim lon_dim;
    NcVar mask_var;
 
    // Create a new NetCDF file and open it.
-   f_out = open_ncfile(out_filename, NcFile::replace);
+   f_out = open_ncfile(out_filename, true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_netcdf() -> "
@@ -998,7 +990,6 @@ void write_netcdf(const DataPlane &dp) {
    } // end for x
 
    if(!put_nc_data_with_dims(&mask_var, &mask_data[0], grid.ny(), grid.nx())) {
-   //if(!put_nc_data_with_dims(mask_var, mask_data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
       exit(1);
@@ -1007,7 +998,6 @@ void write_netcdf(const DataPlane &dp) {
    // Delete allocated memory
    if(mask_data) { delete mask_data; mask_data = (float *) 0; }
 
-   //f_out->close();
    delete f_out;
    f_out = (NcFile *) 0;
 

@@ -2326,14 +2326,14 @@ vector<NcDim> get_dims(const NcVar *var, int *dim_count) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcFile *open_ncfile(const char * nc_name, NcFile::FileMode file_mode) {
+NcFile *open_ncfile(const char * nc_name, bool write) {
    //return new NcFile(nc_name, file_mode);
    NcFile *nc;
-   if (NcFile::read == file_mode) {
-      nc = new NcFile(nc_name, file_mode);
+   if (write) {
+      nc = new NcFile(nc_name, NcFile::replace, NcFile::nc4);
    }
    else {
-      nc = new NcFile(nc_name, file_mode, NcFile::nc4);
+      nc = new NcFile(nc_name, NcFile::read);
    }
    return nc;
 }

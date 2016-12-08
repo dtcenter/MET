@@ -49,7 +49,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
 #include <netcdf>
 using namespace netCDF;
 
@@ -70,26 +69,6 @@ static void clean_up();
 
 static void setup_netcdf_out(int nhdr);
 
-//static int    get_nc_dim(NcFile *&f_in, const char *);
-//static void   get_var_att(NcVar &, const char *, float &);
-
-static void   get_nc_var_val(NcVar &, ConcatString &,         int len, const long *cur);
-static void   get_nc_var_val(NcVar &,       double &, const long *dim, const long *cur);
-static void   get_nc_var_val(NcVar &,        float &, const long *dim, const long *cur);
-static void   get_nc_var_val(NcVar &,        float &, const long  dim, const long  cur);
-static void   get_nc_var_val(NcVar &,         char &, const long *dim, const long *cur);
-static void   get_nc_var_val(NcVar &,          int &, const long *dim, const long *cur);
-
-static void   put_nc_var_val(NcVar &, int i, const ConcatString &);
-static void   put_nc_var_arr(NcVar &, int i, int len, const float *);
-
-//static int    get_num_lvl(NcVar &, const char *dim_str,
-//                          const long *cur, const long *dim);
-//static float  get_nc_obs(NcFile *&f_in, const char *in_str,
-//                         const long *dim, const long *cur);
-//static float  get_nc_obs(NcFile *&f_in, const char *in_str,
-//                         const long *dim, const long *cur,
-//                         char &qty);
 static bool get_filtered_nc_data(NcVar var, float *data, const long dim, const long cur);
 static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
                                     const long *cur, bool count_bad=false);
@@ -102,14 +81,6 @@ static void   check_quality_control_flag(float &value, const char qty, const cha
                                     
 static void   process_obs(const int gc, const float conversion,
                           float *obs_arr, char qty, const char* var_name='\0');
-//static void   process_obs(NcFile *&f_in, const char *in_str,
-//                          const long *cur, const long *dim,
-//                          const int gc, const float conversion,
-//                          float *obs_arr);
-//static void   process_obs(NcFile *&f_in, const char *in_str,
-//                          const long *cur, const long *dim,
-//                          const int gc, const float conversion,
-//                          float *obs_arr, char &qty);
 static void   write_qty(char &qty);
 
 static bool write_nc_hdr_data(int buf_size);
@@ -264,7 +235,6 @@ void process_madis_file(const char *madis_file) {
       mlog << Error << "\nprocess_madis_file() -> "
            << "can't open input NetCDF file \"" << madis_file
            << "\" for reading.\n\n";
-      //f_in->close();
       delete f_in;
       f_in = (NcFile *) 0;
 
@@ -349,7 +319,7 @@ void setup_netcdf_out(int nhdr) {
    // Create the output netCDF file for writing
    //
    mlog << Debug(1) << "Writing MET File:\t" << ncfile << "\n";
-   f_out = open_ncfile(ncfile, NcFile::replace);
+   f_out = open_ncfile(ncfile, true);
 
    //
    // Check for a valid file
@@ -447,342 +417,6 @@ void setup_netcdf_out(int nhdr) {
 
    return;
 }
-
-////////////////////////////////////////////////////////////////////////
-// Moved to nc_utils.cc
-//int get_nc_dim(NcFile *&f_in, const char *dim_str) {
-//   NcDim *dim = (NcDim *) 0;
-//
-//   //
-//   // Retrieve the dimension from the NetCDF file.
-//   //
-//   if(!(dim = get_nc_dim(f_in, dim_str))) {
-//      mlog << Error << "\nget_nc_dim() -> "
-//           << "can't read \"" << dim_str << "\" dimension.\n\n";
-//      exit(1);
-//   }
-//
-//   return(dim->getSize());
-//}
-
-////////////////////////////////////////////////////////////////////////
-// Moved to nc_utils.cc
-//
-//NcVar get_var(NcFile *&f_in, const char *var_str) {
-//   NcVar var = (NcVar ) 0;
-//
-//   //
-//   // Retrieve the variable from the NetCDF file.
-//   //
-//   if(!(var = f_in->get_var(var_str))) {
-//      mlog << Error << "\nget_var() -> "
-//           << "can't read \"" << var_str << "\" variable.\n\n";
-//      exit(1);
-//   }
-//
-//   return(var);
-//}
-//
-////////////////////////////////////////////////////////////////////////
-// Moved to nc_utils.cc and renamed to get_var_att
-//
-//void get_var_att(NcVar &var, const char *att_str, float &d) {
-//   NcVarAtt *att = (NcVarAtt *) 0;
-//
-//   //
-//   // Retrieve the NetCDF variable attribute.
-//   //
-//   if(!(att = var->getAtt(att_str)) || !att->is_valid()) {
-//      mlog << Error << "\nget_var_att(float) -> "
-//           << "can't read attribute \"" << att_str
-//           << "\" from \"" << GET_NC_NAME(var) << "\" variable.\n\n";
-//      exit(1);
-//   }
-//   d = att->getValues(att->as_float(0);
-//
-//   return;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-void get_nc_var_val_fixme(NcVar &var, ConcatString &tmp_cs, 
-                    const long *cur, int len) {
-   char tmp_str[max_str_len];
-
-   //
-   // Retrieve the character array value from the NetCDF variable.
-   //
-   long lengths[2];
-   lengths[0] = 1;
-   lengths[1] = len;
-   if(!get_nc_data(&var, &tmp_str[0], lengths, cur)) {
-      mlog << Error << "\nget_var_val(ConcatString) -> "
-           << "can't read data from \"" << GET_NC_NAME(var).c_str()
-           << "\" variable.\n\n";
-      exit(1);
-   }
-
-   //
-   // Store the character array as a ConcatString
-   //
-   tmp_cs = tmp_str;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void get_nc_var_val(NcVar &var, float &d, const long *dim, const long *cur) {
-   float fill_value;
-
-   //
-   // Retrieve the float value from the NetCDF variable.
-   //
-   if(!get_nc_data(&var, &d, dim, cur)) {
-      mlog << Error << "\nget_var_val(float) -> "
-           << "can't read data from \"" << GET_NC_NAME(var).c_str()
-           << "\" variable.\n\n";
-      exit(1);
-   }
-
-   //
-   // Check fill value
-   //
-   if(get_nc_att(&var, (ConcatString)in_fillValue_str, fill_value) && is_eq(d, fill_value)) d = bad_data_float;
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void get_nc_var_val(NcVar &var, float &d, const long dim, const long cur) {
-   float fill_value;
-
-   //
-   // Retrieve the float value from the NetCDF variable.
-   //
-   if(!get_nc_data(&var, &d, dim, cur)) {
-      mlog << Error << "\nget_var_val(float) -> "
-           << "can't read data from \"" << GET_NC_NAME(var).c_str()
-           << "\" variable.\n\n";
-      exit(1);
-   }
-
-   //
-   // Check fill value
-   //
-   if(get_nc_att(&var, in_fillValue_str, fill_value) &&
-      is_eq(d, fill_value)) d = bad_data_float;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-//void get_nc_var_val(NcVar &var, double &d, const long *cur, const long *dim) {
-//   double fill_value;
-//
-//   //
-//   // Retrieve the double value from the NetCDF variable.
-//   //
-//   if(!get_nc_data(var, &d, dim, cur)) {
-//      mlog << Error << "\nget_var_val(double) -> "
-//           << "can't read data from \"" << GET_NC_NAME(var).c_str()
-//           << "\" variable.\n\n";
-//      exit(1);
-//   }
-//
-//   //
-//   // Check fill value
-//   //
-//   if(get_nc_att(var, in_fillValue_str, fill_value) &&
-//      is_eq(d, fill_value)) d = bad_data_double;
-//
-//   return;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-void get_nc_var_val(NcVar &var, char &d, const long *dim, const long *cur) {
-
-   //
-   // Retrieve the character value from the NetCDF variable.
-   //
-   if(!get_nc_data(&var, &d, dim, cur)) {
-      mlog << Error << "\nget_var_val(char) -> "
-           << "can't read data from \"" << GET_NC_NAME(var).c_str()
-           << "\" variable.\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void get_nc_var_val(NcVar &var, int &d, const long *dim, const long *cur) {
-                    
-   //
-   // Retrieve the character value from the NetCDF variable.
-   //
-   if(!get_nc_data(&var, &d, dim, cur)) {
-      mlog << Error << "\nget_var_val(int) -> "
-           << "can't read data from \"" << GET_NC_NAME(var).c_str()
-           << "\" variable.\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-//void put_nc_var_val(NcVar &var, int i, const ConcatString &str) {
-//
-//   //
-//   // Store the character array in the NetCDF variable.
-//   //
-//   long offsets[2];
-//   long lengths[2];
-//   offsets[0] = i;
-//   offsets[1] = 0;
-//   lengths[0] = 1;
-//   lengths[1] = str.length();
-//   if(!put_nc_data(var, str.text(), lengths, offsets)) {
-//      mlog << Error << "\nput_nc_var_val(ConcatString) -> "
-//           << "can't write data to \"" << GET_NC_NAME(var).c_str()
-//           << "\" variable for record number " << i << ".\n\n";
-//      exit(1);
-//   }
-//
-//   return;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//void put_nc_var_arr(NcVar &var, int i, int len, const float *arr) {
-//
-//   //
-//   // Store the array of floats in the NetCDF variable.
-//   //
-//   long offsets[2];
-//   long lengths[2];
-//   offsets[0] = i;
-//   offsets[1] = 0;
-//   lengths[0] = 1;
-//   lengths[1] = len;
-//   if(!put_nc_data(var, arr, lengths, offsets)) {
-//      mlog << Error << "\nput_nc_var_arr(float) -> "
-//           << "can't write data to \"" << (GET_NC_NAME(var))
-//           << "\" variable for record number " << i << ".\n\n";
-//      exit(1);
-//   }
-//
-//   int j;
-//   ConcatString msg;
-//   msg << "    [WRITE]  " << (GET_NC_NAME(var)).c_str() << "[" << i << "]:";
-//   for(j=0; j<len; j++) msg << " " << arr[j];
-//   mlog << Debug(3) << msg << "\n";
-//
-//   return;
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//int get_num_lvl(NcVar &var, const char *dim_str,
-//                const long *cur, const long *dim) {
-//   int d;
-//
-//   //
-//   // If vertical level dimensions were specified on the command line
-//   // but did not include this one, return 0.
-//   //
-//   if(lvl_dim_sa.n_elements() == 0 || lvl_dim_sa.has(dim_str)) {
-//      get_nc_var_val(&var, &d, dim, cur);
-//   }
-//   else {
-//      d = 0;
-//   }
-//
-//   return(d);
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//float get_nc_obs(NcFile *&f_in, const char *in_str,
-//                 const long *dim, const long *cur,
-//                 char &qty) {
-//   float v, in_fill_value;
-//   ConcatString in_dd_str, dd_str;
-//
-//   //
-//   // Setup the QC search string.
-//   //
-//   in_dd_str = in_str;
-//   in_dd_str << "DD";
-//
-//   //
-//   // Retrieve the input and DD variables
-//   //
-//   NcVar in_var    = get_var(f_in, in_str);
-//   //NcVar in_var_dd = (NcVar ) 0;
-//   NcVar in_var_dd;
-//   if (has_var(f_in, in_dd_str)) in_var_dd = get_var(f_in, in_dd_str);
-//
-//   //
-//   // Retrieve the fill value
-//   //
-//   get_nc_att(&in_var, in_fillValue_str, in_fill_value);
-//
-//   //
-//   // Retrieve the observation value
-//   //
-//   get_nc_var_val(in_var, v, dim, cur);
-//
-//   //
-//   // Retrieve the QC string, if present
-//   //
-//   if(!IS_INVALID_NC(in_var_dd)) {
-//      get_nc_var_val(in_var_dd, qty, dim, cur);
-//      dd_str << cs_erase << qty;
-//   }
-//   else {
-//      qty = '\0';
-//      dd_str << cs_erase << na_str;
-//   }
-//
-//   //
-//   // Check for missing data
-//   //
-//   if(is_eq(v, in_fill_value)) {
-//      v = bad_data_float;
-//      rej_fill++;
-//   }
-//
-//   //
-//   // Check quality control flag
-//   //
-//   if(!is_bad_data(v)  &&
-//      qc_dd_sa.n_elements() > 0 &&
-//      !qc_dd_sa.has(dd_str)) {
-//      v = bad_data_float;
-//      rej_qc++;
-//   }
-//
-//   mlog << Debug(3)  << "    [" << (is_bad_data(v) ? "REJECT" : "ACCEPT") << "] " << in_str
-//        << ": value = " << v
-//        << ", qc = " << dd_str
-//        << " (get_nc_obs)\n";
-//
-//   return(v);
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//float get_nc_obs(NcFile *&f_in, const char *in_str,
-//                 const long *dim, const long *cur) {
-//   char qty;
-//   return get_nc_obs(f_in, in_str, qty, dim, cur);
-//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -939,7 +573,6 @@ void process_obs(const int in_gc, const float conversion,
          obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
       }
       
-      //put_nc_var_arr(obs_arr_var, i_obs, obs_arr_len, obs_arr);
       write_qty(qty);
       obs_data_idx++;
       if (BUFFER_SIZE == obs_data_idx) {
@@ -951,72 +584,6 @@ void process_obs(const int in_gc, const float conversion,
    return;
 }
 
-
-//void process_obs(const int in_gc, const float conversion,
-//                 float *obs_arr) {
-//   char qty;
-//   process_obs(in_gc, conversion, obs_arr, qty);
-//}
-
-////////////////////////////////////////////////////////////////////////
-
-//void process_obs(NcFile *&f_in, const char *in_str,
-//                 const long *cur, const long *dim,
-//                 const int in_gc, const float conversion,
-//                 float *obs_arr, char &qty) {
-//   //
-//   // Store the GRIB code
-//   //
-//   obs_arr[1] = in_gc;
-//
-//   //
-//   // Get the observation value and store it
-//   //
-//   obs_arr[4] = get_nc_obs(f_in, in_str, qty, dim, cur);
-//
-//   //
-//   // Check for bad data and apply conversion factor
-//   //
-//   if(!is_bad_data(obs_arr[4])) {
-//      obs_arr[4] *= conversion;
-//      put_nc_var_arr(obs_arr_var, obs_arr, obs_arr_len, i_obs);
-//      write_qty(qty);
-//      i_obs++;
-//   }
-//
-//   return;
-//}
-
-////////////////////////////////////////////////////////////////////////
-//void process_obs(NcFile *&f_in, const char *in_str,
-//                 const long *cur, const long *dim,
-//                 const int in_gc, const float conversion,
-//                 float *obs_arr) {
-//   char qty;
-//   
-//   process_obs(f_in, in_str, cur, dim, in_gc, conversion, obs_arr, qty);
-//   //
-//   // Store the GRIB code
-//   //
-//   obs_arr[1] = in_gc;
-//
-//   //
-//   // Get the observation value and store it
-//   //
-//   obs_arr[4] = get_nc_obs(f_in, in_str, qty, dim, cur);
-//
-//   //
-//   // Check for bad data and apply conversion factor
-//   //
-//   if(!is_bad_data(obs_arr[4])) {
-//      obs_arr[4] *= conversion;
-//      put_nc_var_arr(obs_arr_var, obs_arr, obs_arr_len, i_obs);
-//      write_qty(qty);
-//      i_obs++;
-//   }
-//
-//   return;
-//}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1042,7 +609,6 @@ void write_qty(char &qty) {
    qty_str.replace(" ", "_", false);
    strncpy(qty_data_out_buf[obs_data_idx], qty_str, qty_str.length()); 
    qty_data_out_buf[obs_data_idx][qty_str.length()] = bad_data_char; 
-   //put_nc_var_val(obs_qty_var, i_obs, qty_str);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1420,9 +986,6 @@ void process_madis_metar(NcFile *&f_in) {
          //
          // Process the latitude, longitude, and elevation.
          //
-         //get_nc_var_val(in_hdr_lat_var, hdr_arr[0], dim, cur);
-         //get_nc_var_val(in_hdr_lon_var, hdr_arr[1], dim, cur);
-         //get_nc_var_val(in_hdr_elv_var, hdr_arr[2], dim, cur);
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
@@ -1436,19 +999,15 @@ void process_madis_metar(NcFile *&f_in) {
          // For METAR or SPECI, encode as ADPSFC.
          // Otherwise, use value from file.
          //
-         //get_nc_var_val(in_hdr_typ_var, hdr_typ, hdr_typ_len, cur);
          hdr_typ = hdr_typ_arr[i_idx];
          if(hdr_typ == metar_str || hdr_typ == "SPECI") hdr_typ = "ADPSFC";
          strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
          hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
-         //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
    
          //
          // Process the station name.
          //
-         //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
-         //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
@@ -1456,7 +1015,6 @@ void process_madis_metar(NcFile *&f_in) {
          //
          // Process the observation time.
          //
-         //get_nc_var_val(in_hdr_vld_var, tmp_dbl, dim, cur);
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
          
@@ -1464,12 +1022,10 @@ void process_madis_metar(NcFile *&f_in) {
          hdr_vld = tmp_str;
          strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
          hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
-         //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
          
          //
          // Write the header array to the output file.
          //
-         //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
          for (int idx=0; idx<hdr_arr_len; idx++) {
             hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
          }
@@ -1820,12 +1376,6 @@ void process_madis_raob(NcFile *&f_in) {
       cur[0] = i_hdr_s;
 
       dim[0] = buf_size;
-      //get_nc_data(in_man_var,    nlvl_manLevel,      dim, cur);
-      //get_nc_data(in_sigt_var,   nlvl_sigTLevel,     dim, cur);
-      //get_nc_data(in_sigw_var,   nlvl_sigWLevel,     dim, cur);
-      //get_nc_data(in_sigprw_var, nlvl_sigPresWLevel, dim, cur);
-      //get_nc_data(in_trop_var,   nlvl_mTropNum,      dim, cur);
-      //get_nc_data(in_maxw_var,   nlvl_mWndNum,       dim, cur);
       
       get_nc_data(&in_man_var,    nlvl_manLevel,      buf_size, i_hdr_s);
       get_nc_data(&in_sigt_var,   nlvl_sigTLevel,     buf_size, i_hdr_s);
@@ -1946,7 +1496,6 @@ void process_madis_raob(NcFile *&f_in) {
          // For RAOB, store as ADPUPA.
          //
          hdr_typ = "ADPUPA";
-         //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
          strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
          hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
          
@@ -1954,7 +1503,6 @@ void process_madis_raob(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
@@ -1965,14 +1513,12 @@ void process_madis_raob(NcFile *&f_in) {
          if(is_bad_data(tmp_dbl)) continue;
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
          strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
          hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
          //
          // Write the header array to the output file.
          //
-         //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
          for (int idx=0; idx<hdr_arr_len; idx++) {
             hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
          }
@@ -2578,9 +2124,6 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          // Process the latitude, longitude, and elevation.
          //
-         //get_nc_var_val(in_hdr_lat_var, hdr_arr[0], dim, cur);
-         //get_nc_var_val(in_hdr_lon_var, hdr_arr[1], dim, cur);
-         //get_nc_var_val(in_hdr_elv_var, hdr_arr[2], dim, cur);
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
@@ -2594,35 +2137,29 @@ void process_madis_profiler(NcFile *&f_in) {
          // For PROFILER, store as ADPUPA.
          //
          hdr_typ = "ADPUPA";
-         //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
          strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
          hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
       
          //
          // Process the station name.
          //
-         //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
-         //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
       
          //
          // Process the observation time.
          //
-         //get_nc_var_val(in_hdr_vld_var, tmp_dbl, dim, cur);
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
          strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
          hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
          //
          // Write the header array to the output file.
          //
-         //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
          for (int idx=0; idx<hdr_arr_len; idx++) {
             hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
          }
@@ -2636,7 +2173,6 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          // Get the pressure for the current level
          //
-         //get_nc_var_val(in_pressure_var, pressure, dim, cur);
          pressure = pressure_arr[i_idx];
       
          //
@@ -2655,7 +2191,6 @@ void process_madis_profiler(NcFile *&f_in) {
             // Set the pressure and height for this level
             //
             obs_arr[2] = pressure;
-            //get_nc_var_val(var_levels, obs_arr[3], dim, cur);
             obs_arr[3] = levels_arr[i_idx][i_lvl];
       
             //
@@ -2887,9 +2422,6 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          // Process the latitude, longitude, and elevation.
          //
-         //get_nc_var_val(in_hdr_lat_var, hdr_arr[0], dim, cur);
-         //get_nc_var_val(in_hdr_lon_var, hdr_arr[1], dim, cur);
-         //get_nc_var_val(in_hdr_elv_var, hdr_arr[2], dim, cur);
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
@@ -2904,35 +2436,29 @@ void process_madis_maritime(NcFile *&f_in) {
          // For maritime, store as SFCSHP.
          //
          hdr_typ = "SFCSHP";
-         //put_nc_var_val(hdr_typ_var, i_hdr, hdr_typ);
          strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
          hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
 
          //
          // Process the station name.
          //
-         //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
-         //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
          //
          // Process the observation time.
          //
-         //get_nc_var_val(in_hdr_vld_var, tmp_dbl, dim, cur);
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
          strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
          hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
          //
          // Write the header array to the output file.
          //
-         //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
          for (int idx=0; idx<hdr_arr_len; idx++) {
             hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
          }
@@ -2945,7 +2471,6 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          // Get the pressure for the current level
          //
-         //get_nc_var_val(in_pressure_var, pressure, dim, cur);
          pressure = pressure_arr[i_idx];
          
          //
@@ -3208,7 +2733,6 @@ void process_madis_mesonet(NcFile *&f_in) {
       get_nc_data(&in_hdr_lat_var, hdr_lat_arr, buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lon_var, hdr_lon_arr, buf_size, i_hdr_s);
       get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr, buf_size, i_hdr_s);
-      //get_filtered_nc_data(in_pressure_var, (float *)pressure_arr, buf_size, i_hdr_s);
       
       if (!IS_INVALID_NC(in_temperatureQty_var))      get_nc_data(&in_temperatureQty_var, temperatureQty_arr, buf_size, i_hdr_s);
       if (!IS_INVALID_NC(in_dewpointQty_var))         get_nc_data(&in_dewpointQty_var, dewpointQty_arr, buf_size, i_hdr_s);
@@ -3290,9 +2814,6 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
          // Process the latitude, longitude, and elevation.
          //
-         //get_nc_var_val(in_hdr_lat_var, hdr_arr[0], dim, cur);
-         //get_nc_var_val(in_hdr_lon_var, hdr_arr[1], dim, cur);
-         //get_nc_var_val(in_hdr_elv_var, hdr_arr[2], dim, cur);
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
@@ -3305,35 +2826,29 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
          // Encode the header type as ADPSFC for MESONET observations.
          //
-         //put_nc_var_val(hdr_typ_var, i_hdr, );
          strncpy(hdr_typ_out_buf[hdr_data_idx], "ADPSFC", hdr_typ_len);
          hdr_typ_out_buf[hdr_data_idx][hdr_typ_len] = bad_data_char;
          
          //
          // Process the station name.
          //
-         //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
-         //put_nc_var_val(hdr_sid_var, i_hdr, hdr_sid);
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
          //
          // Process the observation time.
          //
-         //get_nc_var_val(in_hdr_vld_var, tmp_dbl, dim, cur);
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         //put_nc_var_val(hdr_vld_var, i_hdr, hdr_vld);
          strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
          hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
          //
          // Write the header array to the output file.
          //
-         //put_nc_var_arr(hdr_arr_var, i_hdr, hdr_arr_len, hdr_arr);
          for (int idx=0; idx<hdr_arr_len; idx++) {
             hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
          }
@@ -3735,13 +3250,11 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
          //
          // Process the station i.e. airport name.
          //
-         //get_nc_var_val(in_hdr_sid_var, hdr_sid, hdr_sid_len, cur);
          hdr_sid = hdr_sid_arr[i_idx];
          
          //
          // Process the observation time.
          //
-         //get_nc_var_val(in_hdr_vld_var, tmp_dbl1, dim, cur));
          tmp_dbl1 = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl1)) continue;
 
@@ -3749,7 +3262,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
          //
          // Process the number of levels
          //
-         //get_nc_var_val(in_var, nlvl, dim, cur);
          check_quality_control_flag(levels[i_idx], levelsQty[i_idx], GET_NC_NAME(in_var).c_str());
          nlvl = levels[i_idx];
          obs_arr[2] = levels[i_idx];
@@ -3765,14 +3277,12 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Write header type
             //
-            //put_nc_var_val(hdr_typ_var, i_cnt, hdr_typ);
             strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
             hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
          
             //
             // Write Airport ID
             //
-            //put_nc_var_val(hdr_sid_var, i_cnt, hdr_sid);
             strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
             hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
@@ -3785,9 +3295,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Process the latitude, longitude, and elevation.
             //
-            //get_nc_var_val(in_hdr_lat_var, hdr_arr[0], dim, cur);
-            //get_nc_var_val(in_hdr_lon_var, hdr_arr[1], dim, cur);
-            //get_nc_var_val(in_hdr_elv_var, hdr_arr[2], dim, cur);
             check_quality_control_flag(hdr_elv_arr[i_idx][i_lvl], altitudeQty_arr[i_idx][i_lvl], GET_NC_NAME(in_hdr_elv_var).c_str());
             hdr_arr[0] = hdr_lat_arr[i_idx][i_lvl];
             hdr_arr[1] = hdr_lon_arr[i_idx][i_lvl];
@@ -3814,7 +3321,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Process the observation time.
             //
-            //get_nc_var_val(in_hdr_tob_var, tmp_dbl2, dim, cur);
             tmp_dbl2 = obsTimeOfDay_arr[i_idx][i_lvl];
          
             //
@@ -3830,12 +3336,10 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Write observation time
             //
-            //put_nc_var_val(hdr_vld_var, i_cnt, hdr_vld);
          
             //
             // Write header array
             //
-            //put_nc_var_arr(hdr_arr_var, i_cnt, hdr_arr_len, hdr_arr);
             for (int idx=0; idx<hdr_arr_len; idx++) {
                hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
             }

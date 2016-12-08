@@ -68,8 +68,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
-
 #include "pb2nc_conf_info.h"
 #include "vx_log.h"
 #include "vx_nc_util.h"
@@ -204,19 +202,6 @@ char  qty_data_buf[OBS_BUFFER_SIZE][strl_len];
 // Output NetCDF file, dimensions, and variables
 //
 static NcFile *f_out      = (NcFile *) 0;
-
-//static NcDim *strl_dim    = (NcDim *)  0; // Maximum string length
-//static NcDim *hdr_arr_dim = (NcDim *)  0; // Header array width
-//static NcDim *obs_arr_dim = (NcDim *)  0; // Observation array width
-//static NcDim *hdr_dim     = (NcDim *)  0; // Header array length
-//static NcDim *obs_dim     = (NcDim *)  0; // Observation array length
-
-//static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
-//static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
-//static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
-//static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
-//static NcVar *obs_qty_var = (NcVar *)  0; // Quality flag
-//static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
 
 static NcDim strl_dim    ; // Maximum string length
 static NcDim hdr_arr_dim ; // Header array width
@@ -395,7 +380,7 @@ void open_netcdf() {
 
    // Create the output netCDF file for writing
    mlog << Debug(1) << "Creating NetCDF File:\t\t" << ncfile << "\n";
-   f_out = open_ncfile(ncfile, NcFile::replace);
+   f_out = open_ncfile(ncfile, true);
 
    // Check for a valid file
    if(IS_INVALID_NC_P(f_out)) {

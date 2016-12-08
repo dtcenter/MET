@@ -35,7 +35,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
 #include "grib_classes.h"
 
 #include "vx_log.h"
@@ -203,21 +202,17 @@ void process_distances() {
    
    // NetCDF variables
    NcFile *f_out     = (NcFile *) 0;
-   //NcDim  *lat_dim   = (NcDim *) 0;
-   //NcDim  *lon_dim   = (NcDim *) 0;
-   //NcVar  *dland_var = (NcVar *) 0;
    NcDim  lat_dim    ;
    NcDim  lon_dim    ;
    NcVar  dland_var ;
 
    // Create a new NetCDF file and open it
-   f_out = open_ncfile(out_filename, NcFile::replace);
+   f_out = open_ncfile(out_filename, true);
 
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nprocess_distances() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
       exit(1);
@@ -302,7 +297,6 @@ void process_distances() {
    if(dland) { delete dland; dland = (float *) 0; }
 
    // Close the output NetCDF file
-   //f_out->close();
    delete f_out;
    f_out = (NcFile *) 0;
 

@@ -66,8 +66,6 @@ static ConcatString VarName;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
-//static NcDim  *lat_dim = (NcDim *)  0;
-//static NcDim  *lon_dim = (NcDim *)  0;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
@@ -294,7 +292,7 @@ void process_data_file() {
 void open_nc(const Grid &grid, ConcatString run_cs) {
 
    // Create output file
-   nc_out = open_ncfile(OutputFilename, NcFile::replace);
+   nc_out = open_ncfile(OutputFilename, true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nopen_nc() -> "
@@ -332,10 +330,10 @@ void write_nc(const DataPlane &dp, const Grid &grid,
    if(VarName.length() == 0) {
       nc_var_name << cs_erase << vinfo->name();
       if(vinfo->level().type() != LevelType_Accum &&
-         ftype != FileType_NcMet &&
-         ftype != FileType_General_Netcdf &&
-         ftype != FileType_NcPinterp &&
-         ftype != FileType_NcCF) {
+            ftype != FileType_NcMet &&
+            ftype != FileType_General_Netcdf &&
+            ftype != FileType_NcPinterp &&
+            ftype != FileType_NcCF) {
          nc_var_name << "_" << vinfo->level_name();
       }
    }
@@ -381,7 +379,6 @@ void close_nc() {
 
    // Clean up
    if(nc_out) {
-      //nc_out->close();
       delete nc_out; nc_out = (NcFile *) 0; 
    }
 
