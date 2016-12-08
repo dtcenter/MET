@@ -779,22 +779,39 @@ Grid Grid::subset_center(double lat_center, double lon_center, int nx_new, int n
 
 {
 
-int x_ll, y_ll;
-int ix_center, iy_center;
+int ix_ll, iy_ll;
+double dx_ll, dy_ll;
 double dx_center, dy_center;
 
+   //
+   //  find the (floating-point) grid coords corresponding 
+   //
+   //     to the given point (lat_center, lon_center)
+   //
 
 latlon_to_xy(lat_center, lon_center, dx_center, dy_center);
 
-ix_center = nint(floor(dx_center));
-iy_center = nint(floor(dy_center));
+   //
+   //  subtract half of the new grid size in each direction
+   //
 
+dx_ll = dx_center - 0.5*nx_new;
+dy_ll = dy_center - 0.5*ny_new;
 
-x_ll = ix_center - nx_new/2;
-y_ll = iy_center - ny_new/2;
+   //
+   //  find the (integer) grid coords of the lower-left corner of whatever
+   //
+   //    grid square we're in now
+   //
 
+ix_ll = nint(floor(dx_ll));
+iy_ll = nint(floor(dy_ll));
 
-return ( subset_ll(x_ll, y_ll, nx_new, ny_new) );
+   //
+   //  subset
+   //
+
+return ( subset_ll(ix_ll, iy_ll, nx_new, ny_new) );
 
 }
 
