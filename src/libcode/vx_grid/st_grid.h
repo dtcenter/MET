@@ -106,6 +106,17 @@ class StereographicGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
+extern double stereographic_alpha(double scale_lat, double r_km, double d_km);
+
+extern double     st_func (double lat, bool is_north_hemisphere);
+extern double st_der_func (double lat, bool is_north_hemisphere);
+
+extern double st_inv_func (double r, bool is_north_hemisphere);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   //  __STEREOGRAPHIC_GRID_H__
 
 
