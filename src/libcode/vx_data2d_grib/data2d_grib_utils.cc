@@ -54,10 +54,9 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
       field_name.clear ();
       code_for_lookup = vinfo.code ();
    }
-      vinfo.set_code (bad_data_int);
-      vinfo.units ().clear ();
-      vinfo.long_name ().clear ();
-
+   vinfo.set_code (bad_data_int);
+   vinfo.units ().clear ();
+   vinfo.long_name ().clear ();
 
    //
    //  check ptv
@@ -108,8 +107,11 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          }
          // if one of the parameters was not set - error
          if( is_bad_data(vinfo_ens_number) || is_bad_data(vinfo_ens_type) ){
-            mlog << Error << "\nis_prelim_match() - unrecognized GRIB_ens value '"
-            << vinfo_ens << "' Should be '" << conf_key_grib_ens_hi_res_ctl << "' or '" << conf_key_grib_ens_low_res_ctl << "' or '+/-' followed by the number "  << "\n\n";
+            mlog << Error << "\nis_prelim_match() -> "
+                 << "unrecognized GRIB_ens value '" << vinfo_ens
+                 << "' should be '" << conf_key_grib_ens_hi_res_ctl
+                 << "' or '" << conf_key_grib_ens_low_res_ctl
+                 << "' or '+/-' followed by the number "  << "\n\n";
             exit(1);
          }
       }
@@ -119,8 +121,10 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
 
    // Check for matching parameters
-   if ( vinfo_ptv != ptv || vinfo_center != center || vinfo_subcenter != subcenter
-           || !isEnsMatch)  return ( false );
+   if ( vinfo_ptv       != ptv       ||
+        vinfo_center    != center    ||
+        vinfo_subcenter != subcenter ||
+        !isEnsMatch )  return ( false );
 
    // if p_flag is 'on' (probability field) and the request name is set - get the real name of the field from the begining of a request name
    if( vinfo.p_flag () && !vinfo.req_name().empty())
@@ -132,7 +136,8 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    if (field_name.length () > 4 && strncmp ("APCP", field_name, 4) == 0)
    {
       StringArray name_arr = field_name.split ("_");
-      if (name_arr.Nelements == 2 && (strlen (name_arr[1]) == 2 || strlen (name_arr[1]) == 6))
+      if (name_arr.Nelements == 2 &&
+         (strlen (name_arr[1]) == 2 || strlen (name_arr[1]) == 6))
       {
          field_name = "APCP";
       }
@@ -142,25 +147,24 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    Grib1TableEntry tab;
    int tab_match = -1;
 
-//  if the name is specified, use it
+   // if the name is specified, use it
    if( !field_name.empty() ){
 
       //  look up the name in the grib tables
       if( !GribTable.lookup_grib1(field_name, vinfo_ptv, code_for_lookup, vinfo_center, vinfo_subcenter, tab, tab_match) )
       {
-         //if did not find with params from the header - try default
+         //  if did not find with params from the header - try default
          if( !GribTable.lookup_grib1(field_name, default_grib1_ptv, code_for_lookup, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
          {
-            mlog << Error << "\nis_prelim_match() - unrecognized GRIB1 field abbreviation '"
-            << field_name << "' for table version " << vinfo_ptv << "\n\n";
-            exit(1);
+            //  if the lookup still fails, then it's not a match
+            return ( false );
          }
 
       }
 
    }
 
-      //  if the field name is not specified, look for and use indexes
+   //  if the field name is not specified, look for and use indexes
    else {
 
       //  if either the field name or the indices are specified, bail
