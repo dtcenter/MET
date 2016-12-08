@@ -32,6 +32,18 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+inline bool is_even(int k) { return ( (k%2) == 0 ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static int ll_func(double x_center, int N);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class GridInfo
    //
@@ -688,7 +700,15 @@ Grid Grid::subset_ll(int x_ll, int y_ll, int nx_new, int ny_new) const
 
 if ( ! rep )  {
 
-   cerr << "\n\n  Grid::subset_ll() const -> empty grid!\n\n";
+   mlog << Error << "\n\n  Grid::subset_ll() const -> empty grid!\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( (nx_new < 2) || ( ny_new < 2) )  {
+
+   mlog << Error << "\n\n  Grid::subset_ll() const -> bad size for subset grid\n\n";
 
    exit ( 1 );
 
@@ -761,7 +781,7 @@ if ( info_new.lc )  {
 
 } else {
 
-   cerr << "\n\n  Grid::subset_ll() const -> bad grid projection\n\n";
+   mlog << Error << "\n\n  Grid::subset_ll() const -> bad grid projection\n\n";
 
    exit ( 1 );
 
@@ -779,9 +799,13 @@ Grid Grid::subset_center(double lat_center, double lon_center, int nx_new, int n
 
 {
 
+   //
+   //  subset_ll does sanity checking on nx_new and ny_new, so we don't have to do it here
+   //
+
 int ix_ll, iy_ll;
-double dx_ll, dy_ll;
 double dx_center, dy_center;
+
 
    //
    //  find the (floating-point) grid coords corresponding 
@@ -792,20 +816,11 @@ double dx_center, dy_center;
 latlon_to_xy(lat_center, lon_center, dx_center, dy_center);
 
    //
-   //  subtract half of the new grid size in each direction
+   //  figure out (old grid) coordinates of the new grid's lower-left corner
    //
 
-dx_ll = dx_center - 0.5*nx_new;
-dy_ll = dy_center - 0.5*ny_new;
-
-   //
-   //  find the (integer) grid coords of the lower-left corner of whatever
-   //
-   //    grid square we're in now
-   //
-
-ix_ll = nint(floor(dx_ll));
-iy_ll = nint(floor(dy_ll));
+ix_ll = ll_func(dx_center, nx_new);
+iy_ll = ll_func(dy_center, ny_new);
 
    //
    //  subset
@@ -1037,6 +1052,31 @@ if ( m1->nx           == m2->nx                  &&
              rescale_lon(m2->lon_ur), loose_tol) )  status = true;
 
 return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int ll_func(double x_center, int N)
+
+{
+
+int LL;
+
+if ( is_even(N) )  {
+
+   LL = nint(floor(x_center)) - ((N/2) - 1);
+
+} else {
+
+   LL = nint(x_center) - ((N - 1)/2);
+
+}
+
+
+return ( LL );
 
 }
 
