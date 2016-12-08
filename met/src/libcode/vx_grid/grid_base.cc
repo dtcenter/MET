@@ -819,6 +819,68 @@ return ( subset_ll(ix_ll, iy_ll, nx_new, ny_new) );
 ////////////////////////////////////////////////////////////////////////
 
 
+Grid Grid::zoom_stereographic(double lat1, double lon1, double lat2, double lon2,
+                              double resolution_km, int nx_new, int ny_new)
+
+{
+
+Grid g_new;
+// double alpha;
+double r1, r2;
+double Qx, Qy;
+StereographicData data;
+bool is_north = false;
+
+
+data.name = "subset";
+
+if ( lat1 >= 0.0 )  { data.hemisphere = 'N';   is_north = true;  }
+else                { data.hemisphere = 'S';   is_north = false; }
+
+data.scale_lat = lat1;
+
+data.lat_pin = lat1;
+data.lon_pin = lon1;
+
+data.x_pin = 0.5*nx_new;
+data.y_pin = 0.5*ny_new;
+
+// data.r_km = earth_radius_km;
+data.r_km = 63878.140;
+
+data.d_km = resolution_km;
+
+data.nx = nx_new;
+data.ny = ny_new;
+
+   //
+   //  calculate orientation longitude
+   //
+
+// alpha = stereographic_alpha(data.scale_lat, data.r_km, data.d_km);
+
+r1 = st_func(lat1, is_north);
+r2 = st_func(lat2, is_north);
+
+Qx = r2*sind(lon2) - r1*sind(lon1);
+Qy = r2*cosd(lon2) - r1*cosd(lon1);
+
+data.lon_orient = atan2d(-Qy, -Qx);
+
+   //
+   //  done
+   //
+
+g_new.set(data);
+
+return ( g_new );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

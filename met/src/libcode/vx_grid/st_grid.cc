@@ -33,10 +33,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static double     st_func (double lat, bool is_north_hemisphere);
-static double st_der_func (double lat, bool is_north_hemisphere);
-
-static double st_inv_func (double r, bool is_north_hemisphere);
+// static double     st_func (double lat, bool is_north_hemisphere);
+// static double st_der_func (double lat, bool is_north_hemisphere);
+// 
+// static double st_inv_func (double r, bool is_north_hemisphere);
 
 static void reduce(double & angle);
 
@@ -644,6 +644,23 @@ if ( is_north_hemisphere )  a = -1.0/(1.0 + sind(lat));
 else                        a = -1.0/(1.0 - sind(lat));
 
 return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double stereographic_alpha(double scale_lat, double r_km, double d_km)
+
+{
+
+double alpha;
+
+alpha = (1.0 + sind(fabs(scale_lat)))*((r_km)/(d_km));
+
+
+return ( alpha );
 
 }
 
