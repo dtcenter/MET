@@ -682,6 +682,126 @@ return ( rep->shift_right(N) );
 ////////////////////////////////////////////////////////////////////////
 
 
+Grid Grid::subset_ll(int x_ll, int y_ll, int nx_new, int ny_new) const
+
+{
+
+if ( ! rep )  {
+
+   cerr << "\n\n  Grid::subset_ll() const -> empty grid!\n\n";
+
+   exit ( 1 );
+
+}
+
+Grid g_new;
+double lat_ll, lon_ll;
+GridInfo info_new = info();
+
+
+xy_to_latlon(x_ll, y_ll, lat_ll, lon_ll);
+
+
+if ( info_new.lc )  {
+
+   LambertData lc_new = *(info_new.lc);
+
+   lc_new.lat_pin = lat_ll;
+   lc_new.lon_pin = lon_ll;
+
+   lc_new.x_pin = 0.0;
+   lc_new.y_pin = 0.0;
+
+   lc_new.nx = nx_new;
+   lc_new.ny = ny_new;
+
+   g_new.set(lc_new);
+
+} else if ( info_new.st )  {
+
+   StereographicData st_new = *(info_new.st);
+
+   st_new.lat_pin = lat_ll;
+   st_new.lon_pin = lon_ll;
+
+   st_new.x_pin = 0.0;
+   st_new.y_pin = 0.0;
+
+   st_new.nx = nx_new;
+   st_new.ny = ny_new;
+
+   g_new.set(st_new);
+
+} else if ( info_new.ll )  {
+
+   LatLonData ll_new = *(info_new.ll);
+
+   ll_new.lat_ll = lat_ll;
+   ll_new.lon_ll = lon_ll;
+
+   ll_new.Nlat = ny_new;
+   ll_new.Nlon = nx_new;
+
+   g_new.set(ll_new);
+
+} else if ( info_new.m )  {
+
+   MercatorData m_new = *(info_new.m);
+   double lat_ur, lon_ur;
+
+   xy_to_latlon(x_ll + nx_new - 1, y_ll + ny_new - 1, lat_ur, lon_ur);
+
+   m_new.lat_ll = lat_ll;
+   m_new.lon_ll = lon_ll;
+
+   m_new.lat_ur = lat_ur;
+   m_new.lon_ur = lon_ur;
+
+   g_new.set(m_new);
+
+} else {
+
+   cerr << "\n\n  Grid::subset_ll() const -> bad grid projection\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( g_new );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid Grid::subset_center(double lat_center, double lon_center, int nx_new, int ny_new) const
+
+{
+
+int x_ll, y_ll;
+int ix_center, iy_center;
+double dx_center, dy_center;
+
+
+latlon_to_xy(lat_center, lon_center, dx_center, dy_center);
+
+ix_center = nint(floor(dx_center));
+iy_center = nint(floor(dy_center));
+
+
+x_ll = ix_center - nx_new/2;
+y_ll = iy_center - ny_new/2;
+
+
+return ( subset_ll(x_ll, y_ll, nx_new, ny_new) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

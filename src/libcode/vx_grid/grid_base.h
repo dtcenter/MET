@@ -223,6 +223,14 @@ class Grid : public GridInterface {
 
       void shift_right(int);
 
+         //
+         //  subsetting the grid
+         //
+
+      Grid subset_ll(int x_ll, int y_ll, int nx_new, int ny_new) const;   //  input: lower left corner, and size
+
+      Grid subset_center(double lat_center, double lon_center, int nx_new, int ny_new) const;
+
 };
 
 
