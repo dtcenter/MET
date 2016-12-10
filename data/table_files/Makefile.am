@@ -19,6 +19,17 @@
 tablefilesdir = $(pkgdatadir)/table_files
 
 tablefiles_DATA = \
+        met_header_columns_V6.0.txt \
+        met_header_columns_V5.2.txt \
+        met_header_columns_V5.1.txt \
+        met_header_columns_V5.0.txt \
+        met_header_columns_V4.2.txt \
+        met_header_columns_V4.1.txt \
+        met_header_columns_V4.0.txt \
+        met_header_columns_V3.1.txt \
+        met_header_columns_V3.0.1.txt \
+        met_header_columns_V3.0.txt \
+        met_header_columns_V2.0.txt \
 	stat_column_description.txt \
 	grib1_af_131_57.txt \
 	grib1_cptec_254_64.txt \
