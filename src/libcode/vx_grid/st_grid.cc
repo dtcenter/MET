@@ -832,6 +832,69 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+Grid create_aligned_st(double lat1, double lon1, double lat2, double lon2,
+                       double d_km, double r_km, int nx, int ny)
+
+{
+
+Grid g_new;
+// double alpha;
+double r1, r2;
+double Qx, Qy;
+StereographicData data;
+bool is_north = false;
+
+
+data.name = "zoom";
+
+if ( lat1 >= 0.0 )  { data.hemisphere = 'N';   is_north = true;  }
+else                { data.hemisphere = 'S';   is_north = false; }
+
+data.scale_lat = lat1;
+
+data.lat_pin = lat1;
+data.lon_pin = lon1;
+
+data.x_pin = 0.5*nx;
+data.y_pin = 0.5*ny;
+
+data.r_km = r_km;
+
+data.d_km = d_km;
+
+data.nx = nx;
+data.ny = ny;
+
+   //
+   //  calculate orientation longitude
+   //
+
+// alpha = stereographic_alpha(data.scale_lat, data.r_km, data.d_km);
+
+r1 = st_func(lat1, is_north);
+r2 = st_func(lat2, is_north);
+
+Qx = r1*sind(lon1) - r2*sind(lon2);
+Qy = r1*cosd(lon1) - r2*cosd(lon2);
+
+data.lon_orient = atan2d(Qx, Qy);
+
+// cout << "\n\n  Lon orient = " << (data.lon_orient) << "\n\n";
+
+   //
+   //  done
+   //
+
+g_new.set(data);
+
+return ( g_new );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 
 

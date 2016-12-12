@@ -117,6 +117,15 @@ extern double st_inv_func (double r, bool is_north_hemisphere);
 ////////////////////////////////////////////////////////////////////////
 
 
+extern Grid create_aligned_st(double lat1, double lon1,
+                              double lat2, double lon2,
+                              double d_km, double r_km,
+                              int nx, int ny);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   //  __STEREOGRAPHIC_GRID_H__
 
 
