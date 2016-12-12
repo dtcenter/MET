@@ -231,13 +231,6 @@ class Grid : public GridInterface {
 
       Grid subset_center(double lat_center, double lon_center, int nx_new, int ny_new) const;
 
-         //
-         //  zooming in on a small region
-         //
-
-      Grid zoom_stereographic(double lat1, double lon1, double lat2, double lon2,
-                              double resolution_km, int nx_new, int ny_new);
-
 };
 
 
