@@ -95,6 +95,7 @@ static Grid grid, grid_mask;
 
 // Configuration object for reading config strings
 static MetConfig config;
+static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -129,6 +130,7 @@ static void      set_value(const StringArray &);
 static void      set_name(const StringArray &);
 static void      set_logfile(const StringArray &);
 static void      set_verbosity(const StringArray &);
+static void      set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 

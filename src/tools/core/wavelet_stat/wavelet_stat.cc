@@ -63,6 +63,7 @@ using namespace std;
 
 
 static const bool use_flate = true;
+static int compress_level = -1;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -127,6 +128,7 @@ static void usage();
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -170,6 +172,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
+   cline.add(set_compress,  "-compress",  1);
 
    // Parse the command line
    cline.parse();
@@ -635,8 +638,11 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    NcVar x_ll_var ;
    NcVar y_ll_var ;
 
-   x_ll_var = add_var(nc_out, "x_ll", ncInt, tile_dim);
-   y_ll_var = add_var(nc_out, "y_ll", ncInt, tile_dim);
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+
+   x_ll_var = add_var(nc_out, "x_ll", ncInt, tile_dim, deflate_level);
+   y_ll_var = add_var(nc_out, "y_ll", ncInt, tile_dim, deflate_level);
 
    for(i=0; i<conf_info.get_n_tile(); i++) {
 
@@ -1365,11 +1371,14 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
       // Define the forecast and difference variables
 
+      int deflate_level = compress_level;
+      if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+
       if ( nc_info.do_raw )  {
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat, tile_dim, x_dim, y_dim);
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat, tile_dim, x_dim, y_dim);
+         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat, tile_dim, x_dim, y_dim, deflate_level);
+         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat, tile_dim, x_dim, y_dim, deflate_level);
       }
-      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat, tile_dim, x_dim, y_dim);
+      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat, tile_dim, x_dim, y_dim, deflate_level);
 
       // Add variable attributes for the observation field
 
@@ -1586,17 +1595,20 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    // If this is the binary field, define new variables
    if(i_tile == 0 && i_scale < 0) {
 
+      int deflate_level = compress_level;
+      if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+      
       // Define the forecast and difference variables
 
       if ( nc_info.do_raw )  {
          fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
-                            tile_dim, scale_dim, x_dim, y_dim);
+                            tile_dim, scale_dim, x_dim, y_dim, deflate_level);
          obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
-                            tile_dim, scale_dim, x_dim, y_dim);
+                            tile_dim, scale_dim, x_dim, y_dim, deflate_level);
       }
 
       if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
-                                                 tile_dim, scale_dim, x_dim, y_dim);
+                                                 tile_dim, scale_dim, x_dim, y_dim, deflate_level);
 
       if ( nc_info.do_raw )  {
 
@@ -2926,6 +2938,12 @@ void set_logfile(const StringArray & a)
 void set_verbosity(const StringArray & a)
 {
    mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

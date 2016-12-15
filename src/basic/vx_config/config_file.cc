@@ -236,6 +236,27 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+int MetConfig::nc_compression()
+
+{
+
+   char *ptr;
+   int n = lookup_int(conf_key_nc_compression, false);
+
+   // Use the MET_NC_COMPRESS environment variable, if set.
+   if((ptr = getenv("MET_NC_COMPRESS")) != NULL) {
+      n = atoi(ptr);
+   }
+   else {
+      if ( !LastLookupStatus )  n = default_nc_compression;
+   }
+
+   return ( n );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int MetConfig::output_precision()
 
 {

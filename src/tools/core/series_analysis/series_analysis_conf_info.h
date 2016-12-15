@@ -89,6 +89,7 @@ class SeriesAnalysisConfInfo {
       void read_config   (const char *, const char *);
       void process_config(GrdFileType, GrdFileType);
       void process_masks (const Grid &);
+      int get_compression_level();
 
       // Dump out the counts
       int get_n_fcst() const;
@@ -99,6 +100,7 @@ class SeriesAnalysisConfInfo {
 
 inline int SeriesAnalysisConfInfo::get_n_fcst() const { return(n_fcst); }
 inline int SeriesAnalysisConfInfo::get_n_obs()  const { return(n_obs);  }
+inline int SeriesAnalysisConfInfo::get_compression_level()  { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 

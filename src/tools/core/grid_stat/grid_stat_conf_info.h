@@ -202,6 +202,8 @@ class GridStatConfInfo {
       // on the contents of the configuration file
       int n_txt_row (int i);
       int n_stat_row();
+      int get_compression_level();
+
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -217,6 +219,7 @@ inline int GridStatConfInfo::get_n_cov_thresh()  const { return(nbrhd_cov_ta.n_e
 inline int GridStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());     }
 inline int GridStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);             }
 inline int GridStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);             }
+inline int GridStatConfInfo::get_compression_level()   { return conf.nc_compression(); }
 
 inline int GridStatConfInfo::get_max_n_cat_thresh() const {
    return(max_n_cat_thresh);

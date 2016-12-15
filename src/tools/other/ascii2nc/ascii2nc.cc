@@ -112,6 +112,8 @@ static Ascii2NcConfInfo config_info;
 static Grid grid_mask;
 static MaskPoly poly_mask;
 
+static int compress_level = -1;
+
 ////////////////////////////////////////////////////////////////////////
 
 static FileHandler *create_file_handler(const ASCIIFormat,
@@ -125,6 +127,7 @@ static void set_config(const StringArray &);
 static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
 static void set_verbosity(const StringArray &);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -160,7 +163,8 @@ int main(int argc, char *argv[]) {
    cline.add(set_config,    "-config",    1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
-   
+   cline.add(set_compress,  "-compress",  1);
+
    //
    // Parse the command line
    //
@@ -196,6 +200,10 @@ int main(int argc, char *argv[]) {
    
    if (file_handler == 0)
      return 0;
+   
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = config_info.get_compression_level();
+   file_handler->setCompressionLevel(deflate_level);
    
    //
    // Set the masking grid and polyline, if specified.
@@ -546,3 +554,7 @@ void set_verbosity(const StringArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
+}

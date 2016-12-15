@@ -47,6 +47,7 @@ static ConcatString pt_sh_filename;
 
 static ConcatString output_filename;
 
+static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +74,7 @@ static void set_outfile     (const StringArray &);
 static void set_config      (const StringArray &);
 static void set_logfile     (const StringArray &);
 static void set_verbosity   (const StringArray &);
+static void set_compress(const StringArray &);
 
 static void sanity_check();
 
@@ -102,6 +104,7 @@ cline.add(set_outfile,     "-out",    1);
 cline.add(set_config,      "-config", 1);
 cline.add(set_logfile,     "-log",    1);
 cline.add(set_verbosity,   "-v",      1);
+cline.add(set_compress,  "-compress",  1);
 
 cline.parse();
 
@@ -305,6 +308,20 @@ mlog.set_verbosity_level(atoi(a[0]));
 
 return;
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+int get_compress() {
+   //return ((compress_level < 0)? 0 : compress_level);
+   return compress_level;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 

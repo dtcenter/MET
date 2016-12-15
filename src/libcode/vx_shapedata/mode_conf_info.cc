@@ -194,6 +194,8 @@ void ModeConfInfo::read_config(const char *default_file_name, const char *user_f
    // Read the user-specified config file
    conf.read(user_file_name);
 
+   nc_info.set_compress_level(conf.nc_compression());
+   
    return;
 
 }

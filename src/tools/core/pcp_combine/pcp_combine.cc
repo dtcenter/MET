@@ -148,6 +148,7 @@ static ConcatString *in_file = (ConcatString *) 0;
 static int          *accum = (int *) 0;
 static StringArray   accum_mag;
 static int           n_files;
+static int           compress_level = -1;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -185,6 +186,7 @@ static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_user_dict(const StringArray & a);
 static void set_name(const StringArray & a);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -257,6 +259,7 @@ void process_command_line(int argc, char **argv)
    cline.add(set_name,      "-varname",  1);
    cline.add(set_logfile,   "-log",      1);
    cline.add(set_verbosity, "-v",        1);
+   cline.add(set_compress,  "-compress",  1);
 
    //
    // parse the command line
@@ -1156,8 +1159,11 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
       }
    }
 
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = config.nc_compression();
+
    // Define Variable
-   pcp_var = add_var(f_out, (const char *) var_str, ncFloat, lat_dim, lon_dim);
+   pcp_var = add_var(f_out, (const char *) var_str, ncFloat, lat_dim, lon_dim, deflate_level);
 
    // Add variable attributes
    add_att(&pcp_var, "name",  (const char *) var_str);
@@ -1413,6 +1419,12 @@ void set_name(const StringArray & a)
 {
    field_name = a[0];
    name_flag  = true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -199,6 +199,8 @@ R_index = T_index = 0;
         << "Forecast File: "    << fcst_file << "\n"
         << "Observation File: " << obs_file  << "\n";
 
+   engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
+
 return;
 
 }
@@ -892,22 +894,24 @@ if ( info.all_false() )  return;
    // Add the lat/lon variables
    if ( info.do_latlon )  write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
 
+   int deflate_level = info.compress_level;
+   
    // Define Variables
-   if ( info.do_raw )         fcst_raw_var     = add_var(f_out, "fcst_raw",     ncFloat, lat_dim, lon_dim);
-   if ( info.do_object_raw )  fcst_obj_raw_var = add_var(f_out, "fcst_obj_raw", ncFloat, lat_dim, lon_dim);
-   if ( info.do_object_id )   fcst_obj_var     = add_var(f_out, "fcst_obj_id",  ncInt,   lat_dim, lon_dim);
-   if ( info.do_cluster_id )  fcst_clus_var    = add_var(f_out, "fcst_clus_id", ncInt,   lat_dim, lon_dim);
+   if ( info.do_raw )         fcst_raw_var     = add_var(f_out, "fcst_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
+   if ( info.do_object_raw )  fcst_obj_raw_var = add_var(f_out, "fcst_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
+   if ( info.do_object_id )   fcst_obj_var     = add_var(f_out, "fcst_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
+   if ( info.do_cluster_id )  fcst_clus_var    = add_var(f_out, "fcst_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
 
-   if ( info.do_raw )         obs_raw_var      = add_var(f_out, "obs_raw",     ncFloat, lat_dim, lon_dim);
-   if ( info.do_object_raw )  obs_obj_raw_var  = add_var(f_out, "obs_obj_raw", ncFloat, lat_dim, lon_dim);
-   if ( info.do_object_id )   obs_obj_var      = add_var(f_out, "obs_obj_id",  ncInt,   lat_dim, lon_dim);
-   if ( info.do_cluster_id )  obs_clus_var     = add_var(f_out, "obs_clus_id", ncInt,   lat_dim, lon_dim);
+   if ( info.do_raw )         obs_raw_var      = add_var(f_out, "obs_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
+   if ( info.do_object_raw )  obs_obj_raw_var  = add_var(f_out, "obs_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
+   if ( info.do_object_id )   obs_obj_var      = add_var(f_out, "obs_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
+   if ( info.do_cluster_id )  obs_clus_var     = add_var(f_out, "obs_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
 
-   fcst_radius_var = add_var(f_out, (string)"fcst_conv_radius", ncInt);
-    obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt);
+   fcst_radius_var = add_var(f_out, (string)"fcst_conv_radius", ncInt, deflate_level);
+    obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt, deflate_level);
 
-   fcst_thresh_var = add_var(f_out, "fcst_conv_threshold", ncChar, fcst_thresh_dim);
-    obs_thresh_var = add_var(f_out,  "obs_conv_threshold", ncChar,  obs_thresh_dim);
+   fcst_thresh_var = add_var(f_out, "fcst_conv_threshold", ncChar, fcst_thresh_dim, deflate_level);
+    obs_thresh_var = add_var(f_out,  "obs_conv_threshold", ncChar,  obs_thresh_dim, deflate_level);
 
    //
    //  write the radius and threshold values

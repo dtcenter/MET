@@ -164,6 +164,8 @@ static int nmsg = -1;
 static bool dump_flag = false;
 static ConcatString dump_dir = ".";
 
+static int compress_level = -1;
+
 ////////////////////////////////////////////////////////////////////////
 
 // Shared memory defined in the PREPBC common block in readpb.prm
@@ -262,6 +264,7 @@ static void   set_nmsg(const StringArray &);
 static void   set_dump_path(const StringArray &);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
+static void    set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -333,6 +336,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_dump_path, "-dump", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
+   cline.add(set_compress,  "-compress",  1);
 
    // Parse the command line
    cline.parse();
@@ -400,9 +404,12 @@ void open_netcdf() {
    obs_arr_dim = add_dim(f_out, "obs_arr_len", (long) obs_arr_len);
    obs_dim     = add_dim(f_out, "nobs"); // unlimited dimension
 
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
+
    // Define netCDF variables
-   obs_qty_var = add_var(f_out, "obs_qty", ncChar, obs_dim, strl_dim);
-   obs_arr_var = add_var(f_out, "obs_arr", ncFloat, obs_dim, obs_arr_dim);
+   obs_qty_var = add_var(f_out, "obs_qty", ncChar,  obs_dim, strl_dim,    deflate_level);
+   obs_arr_var = add_var(f_out, "obs_arr", ncFloat, obs_dim, obs_arr_dim, deflate_level);
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
@@ -1093,11 +1100,14 @@ void write_netcdf_hdr_data() {
    // Define netCDF dimensions
    hdr_dim = add_dim(f_out, "nhdr", (long) hdr_typ_sa.n_elements());
 
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
+
    // Define netCDF variables
-   hdr_typ_var = add_var(f_out, "hdr_typ", ncChar,  hdr_dim, strl_dim);
-   hdr_sid_var = add_var(f_out, "hdr_sid", ncChar,  hdr_dim, strl_dim);
-   hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  hdr_dim, strl_dim);
-   hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim);
+   hdr_typ_var = add_var(f_out, "hdr_typ", ncChar,  hdr_dim, strl_dim,    deflate_level);
+   hdr_sid_var = add_var(f_out, "hdr_sid", ncChar,  hdr_dim, strl_dim,    deflate_level);
+   hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  hdr_dim, strl_dim,    deflate_level);
+   hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim, deflate_level);
 
    // Add variable attributes
    add_att(&hdr_typ_var, "long_name", "message type");
@@ -1566,6 +1576,12 @@ void set_logfile(const StringArray & a)
 void set_verbosity(const StringArray & a)
 {
    mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

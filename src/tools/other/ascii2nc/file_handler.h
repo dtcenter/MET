@@ -65,6 +65,7 @@ public:
   
   bool summarizeObs(const TimeSummaryInfo &summary_info);
   
+  void setCompressionLevel(int compressoion_level);
 
 protected:
 
@@ -114,7 +115,6 @@ protected:
   // List of observations read from the ascii files
 
   vector< Observation > _observations;
-  
   int   obs_buf_size;
   int   hdr_buf_size;
   int   processed_count;
@@ -130,6 +130,7 @@ protected:
   float obs_data_buf[OBS_BUFFER_SIZE][_OBS_ARRAY_LEN];
   char  qty_data_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
 
+  int   deflate_level;
 
   ///////////////////////
   // Protected methods //
@@ -328,9 +329,9 @@ protected:
   bool _writeObsInfo(int gc, float prs, float hgt, float obs,
 		     const ConcatString &qty);
   
-
 };
 
+inline void FileHandler::setCompressionLevel(int compressoion_level) { deflate_level = compressoion_level; }
 inline void FileHandler::setGridMask(Grid     &g) { _gridMask = &g; }
 inline void FileHandler::setPolyMask(MaskPoly &p) { _polyMask = &p; }
 inline void FileHandler::setMessageTypeMap(map<ConcatString, ConcatString> m) {

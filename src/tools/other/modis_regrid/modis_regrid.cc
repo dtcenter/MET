@@ -59,6 +59,7 @@ static double data_fill_value = -9999.0;
 static double data_scale      = 1.0;
 static double data_offset     = 0.0;
 
+static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -70,6 +71,8 @@ static void set_units     (const StringArray &);
 static void set_scale     (const StringArray &);
 static void set_offset    (const StringArray &);
 static void set_fillvalue (const StringArray &);
+static void set_compress(const StringArray &);
+static void set_verbosity(const StringArray & a);
 
 static void usage();
 
@@ -77,6 +80,7 @@ static void get_grid();
 
 static void process(const char * input_filename);
 
+int  get_compress();
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -102,6 +106,8 @@ cline.add(set_units,     "-units",     1);
 cline.add(set_scale,     "-scale",     1);
 cline.add(set_offset,    "-offset",    1);
 cline.add(set_fillvalue, "-fill",      1);
+cline.add(set_verbosity, "-v", 1);
+cline.add(set_compress,  "-compress",  1);
 
 cline.parse();
 
@@ -328,6 +334,25 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_verbosity(const StringArray & a)
+{
+   mlog.set_verbosity_level(atoi(a[0]));
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+int get_compress() {
+   return ((compress_level < 0) ? 0 : compress_level);
+}
+
+/////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
+}
+
+/////////////////////////////////////////////////
 
 
 void process(const char * input_filename)

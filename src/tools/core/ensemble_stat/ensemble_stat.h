@@ -131,6 +131,8 @@ static unixtime     obs_valid_end_ut    = (unixtime) 0;
 
 static ConcatString out_dir;
 
+static int compress_level = -1;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Output Files

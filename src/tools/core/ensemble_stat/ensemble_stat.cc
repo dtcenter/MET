@@ -127,6 +127,7 @@ static void set_obs_valid_end(const StringArray &);
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -192,6 +193,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
+   cline.add(set_compress,  "-compress",  1);
 
    //
    // parse the command line
@@ -2125,7 +2127,10 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name() << "_"
                 << type_str;
-   ens_var = add_var(nc_out, (string)ens_var_name, ncInt, lat_dim, lon_dim);
+   
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+   ens_var = add_var(nc_out, (string)ens_var_name, ncInt, lat_dim, lon_dim, deflate_level);
 
    // Construct the variable name attribute
    name_str << cs_erase
@@ -2524,6 +2529,12 @@ void set_logfile(const StringArray & a)
 void set_verbosity(const StringArray & a)
 {
    mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

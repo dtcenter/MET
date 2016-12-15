@@ -74,6 +74,7 @@ static StringArray obs_files,  found_obs_files;
 static GrdFileType ftype  = FileType_None;
 static GrdFileType otype  = FileType_None;
 static bool        paired = false;
+static int compress_level = -1;
 
 // Output file
 static ConcatString out_file;

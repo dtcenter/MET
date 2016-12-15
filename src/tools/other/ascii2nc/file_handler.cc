@@ -65,6 +65,7 @@ FileHandler::FileHandler(const string &program_name) :
   _polyMaskNum(0),
   _gridMask(0),
   _polyMask(0),
+  deflate_level(DEF_DEFLATE_LEVEL),
   _dataSummarized(false)
 {
 }
@@ -626,12 +627,13 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Add variables to NetCDF file
    //
-   _hdrTypeVar = add_var(_ncFile, "hdr_typ", ncChar, hdr_dim, strl_dim, DEF_DEFALTE_LEVEL);
-   _hdrStationIdVar = add_var(_ncFile, "hdr_sid", ncChar, hdr_dim, strl_dim, DEF_DEFALTE_LEVEL);
-   _hdrValidTimeVar = add_var(_ncFile, "hdr_vld", ncChar, hdr_dim, strl_dim, DEF_DEFALTE_LEVEL);
-   _hdrArrayVar = add_var(_ncFile, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim, DEF_DEFALTE_LEVEL);
-   _obsQualityVar = add_var(_ncFile, "obs_qty", ncChar, obs_dim, strl_dim, DEF_DEFALTE_LEVEL);
-   _obsArrayVar = add_var(_ncFile, "obs_arr", ncFloat, obs_dim, obs_arr_dim, DEF_DEFALTE_LEVEL);
+   mlog << Debug(4) << "\nFileHandler::_openNetcdf() compression_level: " << deflate_level << "\n";
+   _hdrTypeVar      = add_var(_ncFile, "hdr_typ", ncChar,  hdr_dim, strl_dim,    deflate_level);
+   _hdrStationIdVar = add_var(_ncFile, "hdr_sid", ncChar,  hdr_dim, strl_dim,    deflate_level);
+   _hdrValidTimeVar = add_var(_ncFile, "hdr_vld", ncChar,  hdr_dim, strl_dim,    deflate_level);
+   _hdrArrayVar     = add_var(_ncFile, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim, deflate_level);
+   _obsQualityVar   = add_var(_ncFile, "obs_qty", ncChar,  obs_dim, strl_dim,    deflate_level);
+   _obsArrayVar     = add_var(_ncFile, "obs_arr", ncFloat, obs_dim, obs_arr_dim, deflate_level);
 
    //
    // Add attributes to the NetCDF variables
