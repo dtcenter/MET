@@ -29,6 +29,10 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+extern int get_compress();
+
+////////////////////////////////////////////////////////////////////////
+
 
 static const float fill_value = bad_data_float;
 
@@ -86,9 +90,12 @@ void WwmcaRegridder::do_output(const char * output_filename)
    //  variable attributes
    //
 
+   int deflate_level = get_compress();
+   if (deflate_level < 0) deflate_level = Config->nc_compression();
+
    s = Config->lookup_string(conf_key_variable_name);
    
-   data_var = add_var(ncfile, (const char *) s, ncFloat, lat_dim, lon_dim);
+   data_var = add_var(ncfile, (const char *) s, ncFloat, lat_dim, lon_dim, deflate_level);
    
    s = Config->lookup_string(conf_key_units);
    

@@ -81,6 +81,7 @@ static LatLonData GridData = NWHemTenthData;
 static bool latlon_flag = true;
 static StringArray land_data_files;
 static TCPolyArray land_array;
+static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -93,6 +94,7 @@ static void set_noll(const StringArray &);
 static void set_land(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -155,6 +157,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_land,      "-land", 1);
    cline.add(set_logfile,   "-log",  1);
    cline.add(set_verbosity, "-v",    1);
+   cline.add(set_compress,  "-compress",  1);
    
    cline.allow_numbers();
 
@@ -236,8 +239,11 @@ void process_distances() {
       write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
    }
 
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = 0;
+   
    // Define Variables
-   dland_var = add_var(f_out, (string)"dland", ncFloat, lat_dim, lon_dim);
+   dland_var = add_var(f_out, (string)"dland", ncFloat, lat_dim, lon_dim, deflate_level);
    add_att(&dland_var, "long_name", "distance to land");
    add_att(&dland_var, "units", "nm");
    add_att(&dland_var, "_FillValue", bad_data_float);
@@ -386,6 +392,12 @@ void set_logfile(const StringArray & a) {
 
 void set_verbosity(const StringArray & a) {
    mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

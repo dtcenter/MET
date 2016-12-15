@@ -60,6 +60,8 @@ static ConcatString output_directory;
 
 static int max_minutes = 120;
 
+static int compress_level = -1;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -102,6 +104,8 @@ static void set_max_minutes(const StringArray &);
 static void set_logfile(const StringArray &);
 
 static void set_verbosity(const StringArray &);
+
+static void set_compress(const StringArray &);
 
 static void process(const char * filename);
 
@@ -147,6 +151,8 @@ cline.add(set_max_minutes, "-max", 1);
 cline.add(set_logfile, "-log", 1);
 
 cline.add(set_verbosity, "-v", 1);
+
+cline.add(set_compress,  "-compress",  1);
 
 cline.parse();
 
@@ -268,6 +274,19 @@ return;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+int get_compress() {
+   //return ((compress_level < 0)? 0 : compress_level);
+   return compress_level;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
+}
 
 ////////////////////////////////////////////////////////////////////////
 

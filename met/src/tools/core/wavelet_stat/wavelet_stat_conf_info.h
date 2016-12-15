@@ -133,6 +133,7 @@ class WaveletStatConfInfo {
       // on the contents of the configuration file
       int n_isc_row ();
       int n_stat_row();
+      int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -142,6 +143,7 @@ inline int WaveletStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);
 inline int WaveletStatConfInfo::get_n_tile()       const { return(n_tile);        }
 inline int WaveletStatConfInfo::get_tile_dim()     const { return(tile_dim);      }
 inline int WaveletStatConfInfo::get_n_scale()      const { return(n_scale);      }
+inline int WaveletStatConfInfo::get_compression_level()  { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 

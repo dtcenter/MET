@@ -163,6 +163,7 @@ static void usage();
 static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -206,6 +207,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_outdir,    "-outdir", 1);
    cline.add(set_logfile,   "-log",    1);
    cline.add(set_verbosity, "-v",      1);
+   cline.add(set_compress,  "-compress",  1);
 
    // Parse the command line
    cline.parse();
@@ -1686,6 +1688,9 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    obs_data  = new float [grid.nx()*grid.ny()];
    diff_data = new float [grid.nx()*grid.ny()];
    cmn_data  = new float [grid.nx()*grid.ny()];
+   
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Compute the difference field for each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
@@ -1752,7 +1757,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
          // Define the forecast variable
          fcst_var = add_var(nc_out, (string)fcst_var_name,
-                            ncFloat, lat_dim, lon_dim);
+                            ncFloat, lat_dim, lon_dim, deflate_level);
 
          // Add to the list of previously defined variables
          fcst_var_sa.add(fcst_var_name);
@@ -1778,7 +1783,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
          // Define the observation variable
          obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
-                            lat_dim, lon_dim);
+                            lat_dim, lon_dim, deflate_level);
 
          // Add to the list of previously defined variables
          obs_var_sa.add(obs_var_name);
@@ -1804,7 +1809,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
          // Define the difference variable
          diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
-                            lat_dim, lon_dim);
+                            lat_dim, lon_dim, deflate_level);
 
          // Add to the list of previously defined variables
          diff_var_sa.add(diff_var_name);
@@ -1837,7 +1842,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
          // Define the forecast variable
          cmn_var = add_var(nc_out, (string)cmn_var_name, ncFloat,
-                           lat_dim, lon_dim);
+                           lat_dim, lon_dim, deflate_level);
 
          // Add to the list of previously defined variables
          cmn_var_sa.add(cmn_var_name);
@@ -1973,6 +1978,9 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
    fcst_data = new float [grid.nx()*grid.ny()];
    obs_data  = new float [grid.nx()*grid.ny()];
 
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+
    // Process each of the masking regions
    for(i=0; i<conf_info.get_n_mask(); i++) {
 
@@ -2002,7 +2010,7 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
 
          // Define the forecast variable
          fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
-                            lat_dim, lon_dim);
+                            lat_dim, lon_dim, deflate_level);
 
          // Add to the list of previously defined variables
          fcst_var_sa.add(fcst_var_name);
@@ -2028,7 +2036,7 @@ static void write_nbrhd_nc(const GridStatNcOutInfo & nc_info,
 
          // Define the observation variable
          obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
-                            lat_dim, lon_dim);
+                            lat_dim, lon_dim, deflate_level);
 
          // Add to the list of previously defined variables
          obs_var_sa.add(obs_var_name);
@@ -2228,6 +2236,12 @@ void set_logfile(const StringArray & a)
 void set_verbosity(const StringArray & a)
 {
    mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

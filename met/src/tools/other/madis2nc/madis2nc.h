@@ -111,6 +111,7 @@ static int          rec_end = 0;
 static ConcatString argv_str;
 static Grid         grid_mask;
 static MaskPoly     poly_mask;
+static int compress_level = -1;
 
 // Counters
 static int          i_obs    = 0;

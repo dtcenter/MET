@@ -95,6 +95,8 @@ static ModeExecutive mode_exec;   //  gotta make this global ... not sure why
 // static const char * default_out_dir = "MET_BASE/out/mode";
 static const char * default_out_dir = ".";
 
+static int compress_level = -1;
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -110,6 +112,7 @@ static void set_config_merge_file (const StringArray &);
 static void set_outdir            (const StringArray &);
 static void set_logfile           (const StringArray &);
 static void set_verbosity         (const StringArray &);
+static void set_compress(const StringArray &);
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -135,12 +138,15 @@ process_command_line(argc, argv);
    // Process the forecast and observation files
    //
 
-const ModeConfInfo & conf = mode_exec.engine.conf_info;
+//const ModeConfInfo & conf = mode_exec.engine.conf_info;
+ModeConfInfo & conf = mode_exec.engine.conf_info;
 
 
 // mode_exec.process_fcst_obs_files();
 
 mode_exec.setup_fcst_obs_data();
+
+if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
 
 
 if ( conf.quilt )  {
@@ -270,6 +276,7 @@ void process_command_line(int argc, char **argv)
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
+   cline.add(set_compress,  "-compress",  1);
 
    // Parse the command line
    cline.parse();
@@ -364,3 +371,8 @@ void set_verbosity(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////

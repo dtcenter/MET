@@ -7,6 +7,9 @@
 // Warning message results in tool exiting.
 exit_on_warning = FALSE;
 
+// NetCDF Compression per variable (0 to 9, 0: disable compression)
+nc_compression = 0;
+
 // Precision for output statistics written by the MET tools.
 output_precision = 5;
 

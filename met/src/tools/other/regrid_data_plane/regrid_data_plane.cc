@@ -63,6 +63,7 @@ static ConcatString OutputFilename;
 static StringArray FieldSA;
 static RegridInfo RGInfo;
 static ConcatString VarName;
+static int compress_level = -1;
 
 // Output NetCDF file
 static NcFile *nc_out  = (NcFile *) 0;
@@ -85,6 +86,7 @@ static void set_vld_thresh(const StringArray &);
 static void set_name(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -134,6 +136,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_name,       "-name",       1);
    cline.add(set_logfile,    "-log",        1);
    cline.add(set_verbosity,  "-v",          1);
+   cline.add(set_compress,  "-compress",  1);
 
    // Parse the command line
    cline.parse();
@@ -193,6 +196,9 @@ void process_data_file() {
    MetConfig config;
    config.read(replace_path(config_const_filename));
    config.read_string(FieldSA[0]);
+
+   // Note: The command line argument MUST processed before this
+   if (compress_level < 0) compress_level = config.nc_compression();
 
    // Get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&config);
@@ -341,7 +347,10 @@ void write_nc(const DataPlane &dp, const Grid &grid,
       nc_var_name = VarName;
    }
 
-   NcVar data_var = add_var(nc_out, (string)nc_var_name, ncFloat, lat_dim, lon_dim);
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = 0;
+
+   NcVar data_var = add_var(nc_out, (string)nc_var_name, ncFloat, lat_dim, lon_dim, deflate_level);
    add_att(&data_var, "name", (string)nc_var_name);
    add_att(&data_var, "long_name", (string)vinfo->long_name());
    add_att(&data_var, "level", (string)vinfo->level_name());
@@ -494,6 +503,12 @@ void set_logfile(const StringArray &a) {
 
 void set_verbosity(const StringArray &a) {
    mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

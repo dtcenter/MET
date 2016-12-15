@@ -30,6 +30,8 @@ using namespace std;
 #include "var_info_factory.h"   // VarInfoFactory
 
 
+extern int get_compress();
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -102,8 +104,11 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   // Add the lat/lon variables
   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
   
+  int deflate_level = get_compress();
+  //if (deflate_level < 0) deflate_level = 0;
+  
   // Define variable
-  f_var = add_var(f_out, (string)var_info.name(), ncFloat, lat_dim, lon_dim);
+  f_var = add_var(f_out, (string)var_info.name(), ncFloat, lat_dim, lon_dim, deflate_level);
   
   // Add variable attributes
   add_att(&f_var, "name", (string)var_info.name());

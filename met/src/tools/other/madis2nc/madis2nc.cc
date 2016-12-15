@@ -109,6 +109,7 @@ static void set_logfile(const StringArray &);
 static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
 static void set_verbosity(const StringArray &);
+static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -199,6 +200,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
+   cline.add(set_compress,  "-compress",  1);
 
    //
    // parse the command line
@@ -345,6 +347,10 @@ void setup_netcdf_out(int nhdr) {
    //
    // Define netCDF variables
    //
+   int deflate_level = compress_level;
+   //if (deflate_level < 0) deflate_level = conf_info.nc_compression();
+   if (deflate_level < 0) deflate_level = 0;
+   
    vector<NcDim> ncDims_hdr_strl;
    vector<NcDim> ncDims_obs_strl;
    vector<NcDim> ncDims_hdr_arr;
@@ -357,12 +363,12 @@ void setup_netcdf_out(int nhdr) {
    ncDims_hdr_arr.push_back(hdr_arr_dim);
    ncDims_obs_arr.push_back(obs_dim);
    ncDims_obs_arr.push_back(obs_arr_dim);
-   hdr_typ_var = add_var(f_out, "hdr_typ", ncChar,  ncDims_hdr_strl);
-   hdr_sid_var = add_var(f_out, "hdr_sid", NcType::nc_CHAR,  ncDims_hdr_strl);
-   hdr_vld_var = add_var(f_out, "hdr_vld", NcType::nc_CHAR,  ncDims_hdr_strl);
-   hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, ncDims_hdr_arr);
-   obs_qty_var = add_var(f_out, "obs_qty", NcType::nc_CHAR,  ncDims_obs_strl);
-   obs_arr_var = add_var(f_out, "obs_arr", ncFloat, ncDims_obs_arr);
+   hdr_typ_var = add_var(f_out, "hdr_typ", ncChar,  ncDims_hdr_strl, deflate_level);
+   hdr_sid_var = add_var(f_out, "hdr_sid", ncChar,  ncDims_hdr_strl, deflate_level);
+   hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  ncDims_hdr_strl, deflate_level);
+   hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, ncDims_hdr_arr,  deflate_level);
+   obs_qty_var = add_var(f_out, "obs_qty", ncChar,  ncDims_obs_strl, deflate_level);
+   obs_arr_var = add_var(f_out, "obs_arr", ncFloat, ncDims_obs_arr,  deflate_level);
    //obs_arr_var->SetCompression(false, true, 2)
 
    //
@@ -3631,6 +3637,12 @@ void set_mask_poly(const StringArray & a) {
 void set_verbosity(const StringArray & a)
 {
    mlog.set_verbosity_level(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a) {
+   compress_level = atoi(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

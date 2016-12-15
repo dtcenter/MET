@@ -148,6 +148,8 @@ static ofstream    *txt_out[n_txt];
 static AsciiTable   txt_at[n_txt];
 static int          i_txt_row[n_txt];
 
+static int compress_level = -1;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous Variables

@@ -39,7 +39,8 @@ struct ModeNcOutInfo {
 
    bool do_polylines;
 
-      ///////////////
+   int compress_level;
+   ///////////////
 
    ModeNcOutInfo();
 
@@ -49,6 +50,7 @@ struct ModeNcOutInfo {
 
    void set_all_false();
    void set_all_true();
+   void set_compress_level(int compression_level) {compress_level = compression_level;} ;
 
 };
 
@@ -89,7 +91,9 @@ class ModeConfInfo {
 
       int n_runs() const;   //  # threshs times # radii
 
-         // Store data parsed from the MODE configuration object
+      int get_compression_level();
+      
+      // Store data parsed from the MODE configuration object
 
       MetConfig conf;                          // MODE configuration object
 
@@ -220,6 +224,7 @@ inline int ModeConfInfo::n_obs_merge_threshs  () const { return (  obs_merge_thr
 inline bool ModeConfInfo::need_fcst_merge_thresh () const { return ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Thresh) ); }
 inline bool ModeConfInfo::need_obs_merge_thresh  () const { return ( ( obs_merge_flag == MergeType_Both) || ( obs_merge_flag == MergeType_Thresh) ); }
 
+inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 

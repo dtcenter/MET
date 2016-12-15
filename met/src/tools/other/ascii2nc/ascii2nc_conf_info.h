@@ -39,6 +39,8 @@ public:
   {
      return _messageTypeMap;
   }
+
+  int get_compression_level() { return _conf.nc_compression(); }
   
 protected:
 

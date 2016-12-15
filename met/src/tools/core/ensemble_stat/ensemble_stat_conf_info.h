@@ -139,6 +139,7 @@ class EnsembleStatConfInfo {
       // on the contents of the configuration file
       int n_txt_row(int i);
       int n_stat_row();
+      int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -150,6 +151,7 @@ inline int EnsembleStatConfInfo::get_n_interp()       const { return(n_interp); 
 inline int EnsembleStatConfInfo::get_n_mask()         const { return(n_mask);       }
 inline int EnsembleStatConfInfo::get_n_mask_area()    const { return(n_mask_area);  }
 inline int EnsembleStatConfInfo::get_n_mask_sid()     const { return(n_mask_sid);   }
+inline int EnsembleStatConfInfo::get_compression_level()    { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 
