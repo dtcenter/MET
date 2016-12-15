@@ -288,6 +288,8 @@ void create_image(Ppm & image, const Grid & grid, const DataPlane & plane,
             //
          value = plane.get(x, y);
 
+         if(is_bad_data(value)) value = bad_data_double;
+
             //
             // set the color for this value
             //
