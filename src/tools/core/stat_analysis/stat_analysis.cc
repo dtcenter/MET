@@ -726,6 +726,7 @@ void set_tmp_dir(const StringArray & a)
            << tmp_dir << "\n\n";
       exit(1);
    }
+   setenv("MET_TMP_DIR", tmp_dir, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////
