@@ -1960,8 +1960,11 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
    }
    else {
       // Tokenize the input string
+      // Parse using spaces or 'T' for timestrings such as:
+      //   minutes since 2016-01-28T12:00:00Z
+      //   seconds since 1977-08-07 12:00:00Z
       StringArray tok;
-      tok.parse_wsss(str);
+      tok.parse_delim(str, " T");
       tok.set_ignore_case(true);
 
       // Determine the time step
