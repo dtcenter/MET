@@ -65,6 +65,8 @@ class MetConfig : public Dictionary {
 
       int output_precision();
       
+      ConcatString get_tmp_dir();
+
       StringArray filename() const;
 
       bool debug() const;

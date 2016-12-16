@@ -8,10 +8,15 @@
 exit_on_warning = FALSE;
 
 // NetCDF Compression per variable (0 to 9, 0: disable compression)
+// This will be overridden by the environment variable MET_NC_COMPRESS and the command line argument.
 nc_compression = 0;
 
 // Precision for output statistics written by the MET tools.
 output_precision = 5;
+
+// Temporary directory. This will be overridden by the environment variable MET_TMP_DIR.
+
+tmp_dir = "/tmp";
 
 ////////////////////////////////////////////////////////////////////////////////
 //
