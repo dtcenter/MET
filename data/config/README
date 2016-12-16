@@ -117,12 +117,12 @@ exit_on_warning = FALSE;
 //
 // The "nc_compression" entry in ConfigConstants defines the compression level
 // for the NetCDF variables. Setting this option in the config file of one of
-// the tools will override the default value set in ConfigConstants. The
-// environment variable MET_NC_COMPRESS will override the compression level
+// the tools overrides the default value set in ConfigConstants. The
+// environment variable MET_NC_COMPRESS overrides the compression level
 // from configuration file. The command line argument "-compress n" for some
-// tools will override it.
+// tools overrides it.
 // The range is 0 to 9.
-//   - 0 is to disbaable the compression.
+//   - 0 is to disable the compression.
 //   - 1 to 9: Lower number is faster, higher number is better.
 nc_compression = 0;
 
