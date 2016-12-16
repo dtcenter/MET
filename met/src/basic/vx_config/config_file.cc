@@ -235,24 +235,43 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString MetConfig::get_tmp_dir()
+{
+   char *ptr;
+   ConcatString tmp_dir; 
+
+   // Use the MET_TMP_DIR environment variable, if set.
+   if((ptr = getenv("MET_TMP_DIR")) != NULL) {
+      tmp_dir = ptr;
+   }
+   else {
+      const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
+      const ConcatString *tmp_dir2 = _e->string_value(); 
+      tmp_dir = *tmp_dir2;
+      if ( !LastLookupStatus ) tmp_dir = default_tmp_dir;
+   }
+
+   return ( tmp_dir );
+
+}
+
+////////////////////////////////////////////////////////////////////////
 
 int MetConfig::nc_compression()
-
 {
-
    char *ptr;
-   int n = lookup_int(conf_key_nc_compression, false);
+   int n = 0;
 
    // Use the MET_NC_COMPRESS environment variable, if set.
    if((ptr = getenv("MET_NC_COMPRESS")) != NULL) {
       n = atoi(ptr);
    }
    else {
+      n = lookup_int(conf_key_nc_compression, false);
       if ( !LastLookupStatus )  n = default_nc_compression;
    }
 
    return ( n );
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -393,9 +412,18 @@ if ( empty(s) )  {
 }
 
 ofstream out;
-const ConcatString temp_filename = make_temp_file_name("config", ".temp");
+ConcatString temp_filename = make_temp_file_name("config", ".temp");
 
 out.open(temp_filename);
+
+if ( ! out ) {
+   string tmp_path = string(get_tmp_dir());
+   tmp_path += "/config";
+   const ConcatString temp_filename2 = make_temp_file_name(tmp_path.c_str(), ".temp");
+   out.close();
+   out.open(temp_filename2);
+   if ( out ) temp_filename = temp_filename2;
+}
 
 if ( ! out )  {
 
