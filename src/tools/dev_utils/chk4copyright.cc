@@ -219,6 +219,7 @@ void process_directory(const char * dir_name)
       //
    pid = getpid();
    tmp_directory = getenv("TMPDIR");
+   if (tmp_directory.length() == 0) tmp_directory = getenv("MET_TMP_DIR");
 
    if (tmp_directory.length() == 0)
    {
