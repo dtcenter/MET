@@ -180,15 +180,15 @@ bool NcCfFile::open(const char * filepath)
   _dims = new NcDim*[_numDims];
   //get_global_dims(_ncFile, &_numDims, _dims, &_dimNames);
   //get_global_dims(Nc, &Ndims, Dim, &DimNames);
-  
+
   StringArray gDimNames;
   get_dim_names(_ncFile, &gDimNames);
-     
+
   for (int j=0; j<_numDims; ++j)  {
      NcDim dim = get_nc_dim(_ncFile, gDimNames[j]);
      _dims[j] = new NcDim(dim);
   }
-  
+
   // Pull out the valid and init times
 
   ConcatString units;
@@ -315,20 +315,20 @@ bool NcCfFile::open(const char * filepath)
   for (int j=0; j<Nvars; ++j)  {
     const char * c = (const char *) 0;
     NcVar v = get_var(_ncFile, varNames[j]);
-  
+
     Var[j].var = new NcVar(v);
-  
+
     Var[j].name = GET_NC_NAME(v).c_str();
-  
+
     int dim_count = GET_NC_DIM_COUNT(v);
     Var[j].Ndims = dim_count;
-  
+
     Var[j].Dims = new NcDim * [dim_count];
-  
+
     //  parse the variable attributes
     get_att_str( Var[j], "long_name",  Var[j].long_name_att );
     get_att_str( Var[j], "units",      Var[j].units_att     );
-     
+
   }   //  for j
 
   // Pull out the grid.  This must be done after pulling out the dimension
@@ -340,20 +340,20 @@ bool NcCfFile::open(const char * filepath)
   // Now go back through the variables and use _xDim, _yDim, and _tDim
   // to set the slots.
   // Should be called after read_netcdf_grid() is called
-  
+
   StringArray dimNames;
   for (int j=0; j<Nvars; ++j)  {
-     
+
     int dim_count = GET_NC_DIM_COUNT_P(Var[j].var);
     NcVar *v = Var[j].var;
 
     dimNames.clear();
     get_dim_names(v, &dimNames);
-  
+
     for (int k=0; k<(dim_count); ++k)  {
       const char * c = dimNames[k];
       NcDim *dim = Var[j].Dims[k];
-      
+
       if ((dim == _xDim) || (strcmp(c,x_dim_var_name) == 0)) {
          Var[j].x_slot = k;
       }
@@ -754,29 +754,29 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
     case NcType::nc_INT:
     {
       int i;
-    
+
       status = get_nc_data(var, &i, (long *)a);
       d = (double) (i);
       break;
     }
-    
+
     //case ncFloat:
     case NcType::nc_FLOAT:
     {
       float f;
-    
+
       status = get_nc_data(var, &f, (long *)a);
       d = (double) (f);
       break;
     }
-    
+
     //case ncDouble:
     case NcType::nc_DOUBLE:
     {
       status = get_nc_data(var, &d, (long *)a);
       break;
     }
-    
+
     default:
     {
       mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
@@ -908,27 +908,27 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   int    i[nx];
   float  f[nx];
   double d[nx];
-  
+
   long offsets[dim_count];
   long lengths[dim_count];
   for (int k=0; k<dim_count; k++) {
     offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
     lengths[k] = 1;
   }
-  
+
   //offsets[x_slot] = 0;
   //offsets[y_slot] = 0;
   //lengths[x_slot] = 1;
   //lengths[y_slot] = ny;
   offsets[x_slot] = 0;
   lengths[x_slot] = nx;
-  
+
   //status = false;
   int type_id = v->getType().getId();
   for (int y=0; y<ny; ++y)  {
     offsets[y_slot] = y;
     switch ( type_id )  {
-    
+
       //case ncInt:
       case NcType::nc_INT:
         get_nc_data(v, (int *)&i, lengths, offsets);
@@ -936,7 +936,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
           d[x] = (double)i[x];
         }
         break;
-      
+
       //case ncFloat:
       case NcType::nc_FLOAT:
         get_nc_data(v, (float *)&f, lengths, offsets);
@@ -944,61 +944,61 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
           d[x] = (double)f[x];
         }
         break;
-    
+
       //case ncDouble:
       case NcType::nc_DOUBLE:
         get_nc_data(v, (double *)&d, lengths, offsets);
         break;
-          
+
       default:
         mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
              << " bad type for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
         exit ( 1 );
         break;
-    
+
     }   //  switch
-    
+
     LongArray b = a;
-    
+
     for (int x = 0; x< nx; ++x)
     {
       //b[y_slot] = y;
-    
+
       //double value = getData(v, b);
       double value = d[x];
-    
+
       if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
          value = bad_data_double;
       }
-    
+
       plane.set(value, x, y);
-    
+
     }   //  for y
   }   //  for x
 
 #else
   LongArray b = a;
-  
+
   for (int x = 0; x < nx; ++x)
   {
     b[x_slot] = x;
-  
+
     for (int y = 0; y < ny; ++y)
     {
       b[y_slot] = y;
-  
+
       double value = getData(v, b);
-  
+
       if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
          value = bad_data_double;
       }
-  
+
       plane.set(value, x, y);
-  
+
     }   //  for y
   }   //  for x
 #endif
-  
+
   //  done
 
   return true;
@@ -1357,7 +1357,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     if (strcmp(dim_std_name, x_dim_key_name) == 0)
     {
       _xDim = _dims[dim_num];
-      
+
       x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
       for (int var_num = 0; var_num < Nvars; ++var_num)
       {
@@ -1927,7 +1927,7 @@ bool NcCfFile::get_grid_from_dimensions()
       if (_yDim == 0)
       {
         _yDim = _dims[dim_num];
-        
+
         y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
         {
@@ -1956,7 +1956,7 @@ bool NcCfFile::get_grid_from_dimensions()
       if (_xDim == 0)
       {
         _xDim = _dims[dim_num];
-        
+
         x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
         {
@@ -2099,8 +2099,11 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut, int &sec_per_unit) 
    }
    else {
       // Tokenize the input string
+      // Parse using spaces or 'T' for timestrings such as:
+      //   minutes since 2016-01-28T12:00:00Z
+      //   seconds since 1977-08-07 12:00:00Z
       StringArray tok;
-      tok.parse_wsss(str);
+      tok.parse_delim(str, " T");
       tok.set_ignore_case(true);
 
       // Determine the time step
