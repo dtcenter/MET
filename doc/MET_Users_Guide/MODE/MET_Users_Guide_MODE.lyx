@@ -1395,7 +1395,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-log file] 
+[-log file]
 \end_layout
 
 \begin_layout LyX-Code
@@ -1411,7 +1411,23 @@ hskip 0.5in}
 
 \end_inset
 
-[-v level] 
+[-v level]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-compress level]
 \end_layout
 
 \begin_layout Standard
@@ -1523,6 +1539,31 @@ option indicates the directory where output files should be written.
  The contents of ``level'' will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity above 1 will increase the amount of logging.
+\end_layout
+
+\begin_layout Description
+8.
+ The 
+\series bold
+-compress level
+\series default
+ option indicates the desired level of compression (deflate level) for NetCDF
+ variables.
+ Tha valid level is between 0 and 9.
+ The value of 
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 0 from the configuration file or the
+ environment variable MET_NC_COMPRESS.
+ Setting the compression level to 0 will make no compression for the NetCDF
+ output.
+ Lower number is for fast compression and higher number is for better compressio
+n.
 \end_layout
 
 \begin_layout Standard
