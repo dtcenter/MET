@@ -154,7 +154,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_out_file,    "-out",    1);
    cline.add(set_log_file,    "-log",    1);
    cline.add(set_verbosity,   "-v",      1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_compress,    "-compress", 1);
 
    // Parse the command line
    cline.parse();
@@ -2118,7 +2118,8 @@ void usage() {
         << "\t-out file\n"
         << "\t-config file\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"-fcst file_1 ... file_n\" are the gridded "
         << "forecast files to be used (required).\n"
@@ -2148,7 +2149,10 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
+        << mlog.verbosity_level() << ") (optional).\n"
+
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+        << conf_info.get_compression_level() << ") (optional).\n" << flush;
 
    exit(1);
 }

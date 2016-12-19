@@ -402,7 +402,8 @@ void usage() {
         << "\t[-mask_grid string]\n"
         << "\t[-mask_poly file]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"ascii_file\" is the formatted ASCII "
         << "observation file to be converted to NetCDF format "
@@ -431,7 +432,10 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n"
+        << mlog.verbosity_level() << ") (optional).\n"
+
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+        << config_info.get_compression_level() << ") (optional).\n\n"
 
         << "\tThe \"" << MetHandler::getFormatString()
         << "\" ASCII format consists of 11 columns:\n"

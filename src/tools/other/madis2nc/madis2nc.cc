@@ -3462,7 +3462,8 @@ void usage() {
         << "\t[-mask_grid string]\n"
         << "\t[-mask_poly file]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"madis_file\" is the MADIS NetCDF point "
         << "observation file (required).\n"
@@ -3496,7 +3497,9 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n"
+        << mlog.verbosity_level() << ") (optional).\n"
+
+        << "\t\t\"-compress level\" specifies the compression level of NetCDF variable (optional).\n"
 
         << flush;
 
