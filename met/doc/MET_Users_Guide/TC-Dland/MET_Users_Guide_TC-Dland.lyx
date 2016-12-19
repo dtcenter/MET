@@ -333,6 +333,22 @@ hskip 0.5in}
 [-v level]
 \end_layout
 
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-compress level]
+\end_layout
+
 \begin_layout Standard
 tc_dland has one required arguments and accepts several optional ones.
 \end_layout
@@ -428,6 +444,21 @@ level
  will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity above 1 will increase the amount of logging.
+\end_layout
+
+\begin_layout Description
+7.
+ The 
+\series bold
+-compress level
+\series default
+ option specifies the desired level of compression (deflate level) for NetCDF
+ variables.
+ Tha valid level is between 0 and 9.
+ Setting the compression level to 0 will make no compression for the NetCDF
+ output.
+ Lower number is for fast compression and higher number is for better compressio
+n.
 \end_layout
 
 \end_body

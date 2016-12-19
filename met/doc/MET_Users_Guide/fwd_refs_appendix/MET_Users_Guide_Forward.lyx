@@ -129,7 +129,7 @@ This User's Guide was prepared by the developers of the MET, including Tressa
 \end_layout
 
 \begin_layout Section*
-New for MET v5.2
+New for MET v6.0
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:New-for-MET"
@@ -137,6 +137,36 @@ name "sec:New-for-MET"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+ETv6.0 includes several enhancements to existing tools, including t
+\series default
+he NetCDF4 enhanced mode.
+\end_layout
+
+\begin_layout Standard
+NetCDF4 supports the compression for variables.
+ The default compresison level is defined in the ConfigConstants file.
+ The valid range is between 0 and 9.
+ The compression level 0 disables the compression.
+ Lower number is faster and higher number is better compression.
+ Some tools can override this by using tool specific configuration file.
+ Indivisual user has an option to override the compression level with the
+ environment variable MET_NC_COMPRESS or with the command line argument
+ 
+\begin_inset Quotes eld
+\end_inset
+
+-compress level
+\begin_inset Quotes erd
+\end_inset
+
+.
+ THe command line argument has the precedence over the environment variable
+ MET_NC_COMPRESS.
 \end_layout
 
 \begin_layout Standard
