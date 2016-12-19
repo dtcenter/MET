@@ -415,7 +415,8 @@ void usage() {
         << "\t[-vld_thresh n]\n"
         << "\t[-name str]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"input_filename\" is the gridded data file to be "
         << "read (required).\n"
@@ -448,7 +449,9 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
+        << mlog.verbosity_level() << ") (optional).\n"
+
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
 
    exit(1);
 }
