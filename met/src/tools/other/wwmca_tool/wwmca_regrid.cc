@@ -183,7 +183,8 @@ cout << "\nUsage: " << program_name << "\n"
      << "\t-nh filename [pt_filename]\n"
      << "\t-sh filename [pt_filename]\n"
      << "\t[-log file]\n"
-     << "\t[-v level]\n\n"
+     << "\t[-v level]\n"
+     << "\t[-compress level]\n\n"
      << "\twhere\t\"-out filename\" is the name of the output "
      << "file to create (required).\n"
      << "\t\t\"-config filename\" is a WWMCARegridConfig file "
@@ -197,7 +198,8 @@ cout << "\nUsage: " << program_name << "\n"
      << "\t\t\"-log file\" outputs log messages to the specified "
      << "file (optional).\n"
      << "\t\t\"-v level\" overrides the default level of logging ("
-     << mlog.verbosity_level() << ") (optional).\n\n";
+     << mlog.verbosity_level() << ") (optional).\n"
+     << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n";
 
 
 exit ( 1 );

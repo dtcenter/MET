@@ -1241,7 +1241,8 @@ void usage()
         << "\t[-field string]\n"
         << "\t[-name variable_name]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"-sum sum_args\" indicates that accumulations "
         << "from multiple files should be summed up using the "
@@ -1265,7 +1266,10 @@ void usage()
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << verbosity << ") (optional).\n\n"
+        << verbosity << ") (optional).\n"
+        
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+        << config.nc_compression() << ") (optional).\n"
 
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
         << "the default behavior.\n"
@@ -1279,6 +1283,7 @@ void usage()
         << "\t\tvalid_time\n"
         << "\t\tout_accum\n"
         << "\t\tout_file\n"
+        << "\t\t[-pcpdir path]\n"
         << "\t\t[-pcpdir path]\n"
         << "\t\t[-pcprx reg_exp]\n\n"
 

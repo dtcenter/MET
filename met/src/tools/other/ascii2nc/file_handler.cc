@@ -627,7 +627,7 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Add variables to NetCDF file
    //
-   mlog << Debug(4) << "\nFileHandler::_openNetcdf() compression_level: " << deflate_level << "\n";
+   //mlog << Debug(4) << "\nFileHandler::_openNetcdf() compression_level: " << deflate_level << "\n";
    _hdrTypeVar      = add_var(_ncFile, "hdr_typ", ncChar,  hdr_dim, strl_dim,    deflate_level);
    _hdrStationIdVar = add_var(_ncFile, "hdr_sid", ncChar,  hdr_dim, strl_dim,    deflate_level);
    _hdrValidTimeVar = add_var(_ncFile, "hdr_vld", ncChar,  hdr_dim, strl_dim,    deflate_level);

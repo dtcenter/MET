@@ -326,7 +326,8 @@ void usage() {
         << "\t[-noll]\n"
         << "\t[-land file]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"out_file\" is the NetCDF output file containing "
         << "the computed distances to land (required).\n"
@@ -345,7 +346,9 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n"
+        << mlog.verbosity_level() << ") (optional).\n"
+        
+        << "\t\t\"-compress level\" specifies the compression level of NetCDF variable (optional)\n\n"
 
         << flush;
 

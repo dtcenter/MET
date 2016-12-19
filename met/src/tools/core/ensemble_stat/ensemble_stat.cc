@@ -2430,7 +2430,8 @@ void usage() {
         << "\t[-obs_valid_end time]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"n_ens ens_file_1 ... ens_file_n\" is the number "
         << "of ensemble members followed by a list of ensemble member "
@@ -2464,7 +2465,10 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
+        << mlog.verbosity_level() << ") (optional).\n"
+        
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+        << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
    exit (1);
 }

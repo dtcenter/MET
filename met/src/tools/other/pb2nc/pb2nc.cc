@@ -1484,7 +1484,8 @@ void usage() {
         << "\t[-nmsg n]\n"
         << "\t[-dump path]\n"
         << "\t[-log file]\n"
-        << "\t[-v level]\n\n"
+        << "\t[-v level]\n"
+        << "\t[-compress level]\n\n"
 
         << "\twhere\t\"prepbufr_file\" is the input PrepBufr "
         << "observation file to be converted to netCDF format "
@@ -1517,7 +1518,10 @@ void usage() {
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
-        << mlog.verbosity_level() << ") (optional).\n\n"
+        << mlog.verbosity_level() << ") (optional).\n"
+
+        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+        << conf_info.conf.nc_compression() << ") (optional).\n"
 
         << flush;
 
