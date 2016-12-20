@@ -645,7 +645,8 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    add_att(&_hdrValidTimeVar,"units", "YYYYMMDD_HHMMSS UTC");
 
    add_att(&_hdrArrayVar, "long_name", "array of observation station header values");
-   add_att(&_hdrArrayVar, "_fill_value", FILL_VALUE);
+   add_att(&_hdrArrayVar, "missing_value", FILL_VALUE);
+   add_att(&_hdrArrayVar, "_FillValue", FILL_VALUE);
    add_att(&_hdrArrayVar, "columns", "lat lon elv");
    add_att(&_hdrArrayVar, "lat_long_name", "latitude");
    add_att(&_hdrArrayVar, "lat_units", "degrees_north");
@@ -657,7 +658,8 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    add_att(&_obsQualityVar, "long_name", "quality flag");
 
    add_att(&_obsArrayVar, "long_name", "array of observation values");
-   add_att(&_obsArrayVar, "_fill_value", FILL_VALUE);
+   add_att(&_obsArrayVar, "missing_value", FILL_VALUE);
+   add_att(&_obsArrayVar, "_FillValue", FILL_VALUE);
    add_att(&_obsArrayVar, "columns", "hdr_id gc lvl hgt ob");
    add_att(&_obsArrayVar, "hdr_id_long_name", "index of matching header data");
    add_att(&_obsArrayVar, "gc_long_name", "grib code corresponding to the observation type");
