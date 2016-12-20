@@ -381,7 +381,7 @@ void setup_netcdf_out(int nhdr) {
 
    add_att(&hdr_arr_var, "long_name",
                         "array of observation station header values");
-   add_att(&hdr_arr_var, "_fill_value", fill_value);
+   add_att(&hdr_arr_var, "missing_value", fill_value);
    add_att(&hdr_arr_var, in_fillValue_str, fill_value);
    add_att(&hdr_arr_var, "columns", "lat lon elv");
    add_att(&hdr_arr_var, "lat_long_name", "latitude");
@@ -394,7 +394,7 @@ void setup_netcdf_out(int nhdr) {
    add_att(&obs_qty_var, "long_name", "quality flag");
 
    add_att(&obs_arr_var, "long_name", "array of observation values");
-   add_att(&obs_arr_var, "_fill_value", fill_value);
+   add_att(&obs_arr_var, "missing_value", fill_value);
    add_att(&obs_arr_var, in_fillValue_str, fill_value);
    add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
    add_att(&obs_arr_var, "hdr_id_long_name",

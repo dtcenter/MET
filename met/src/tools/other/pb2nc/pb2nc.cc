@@ -417,7 +417,8 @@ void open_netcdf() {
    // Add variable attributes
    add_att(&obs_qty_var, "long_name", "quality flag");
    add_att(&obs_arr_var, "long_name", "array of observation values");
-   add_att(&obs_arr_var, "_fill_value", fill_value);
+   add_att(&obs_arr_var, "missing_value", fill_value);
+   add_att(&obs_arr_var, "_FillValue", fill_value);
    add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
    add_att(&obs_arr_var, "hdr_id_long_name", "index of matching header data");
    add_att(&obs_arr_var, "gc_long_name", "grib code corresponding to the observation type");
