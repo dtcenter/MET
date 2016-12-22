@@ -19,7 +19,7 @@
 
 # Make sure that tc_stat can be found
 #tc_stat = Sys.which("tc_stat");
-tc_stat = "/d1/CODE/MET/MET_development/met_edecks/bin/tc_stat";
+tc_stat = "/d1/CODE/MET/MET_development/met/bin/tc_stat";
 
 if(nchar(tc_stat) == 0) {
   cat("ERROR: Cannot find the tc_stat tool in your path.\n");
@@ -71,7 +71,8 @@ read.grep = function(in_file, pattern) {
 outdir = ".";
 tcst_dump_file = paste("/tmp/plot_probri_tcst_", Sys.getpid(), ".tcst", sep='');
 tcst_out_file  = paste("/tmp/plot_probri_tcst_", Sys.getpid(), ".out",  sep='');
-color_list = c("black", "red", "green", "blue", "purple", "orange");
+color_list     = c("black", "red", "green", "blue", "purple", "orange", "black", "red", "green", "blue", "purple", "orange", "black", "red", "green", "blue", "purple", "orange");
+lty_list       = rep(c(1, 2, 4, 1, 2, 4, 2, 4, 1, 2, 4, 1, 4, 2, 1, 4, 2, 1), 100);
 
 # Defaults
 file_list = c();
@@ -339,7 +340,7 @@ bitmap(out_file, type="png256", height=8.5, width=11, res=72);
   for(i in 1:dim(prc)[1]) {
     pody = unlist(c(1, prc[i, grep("PODY", names(prc))], 0));
     pofd = unlist(c(1, prc[i, grep("POFD", names(prc))], 0));
-    lines(x=pofd, y=pody, col=color_list[i], lwd=2);
+    lines(x=pofd, y=pody, col=color_list[i], lty=lty_list[i], lwd=2);
   }
 
   if(nchar(by) > 0) {
@@ -360,7 +361,7 @@ bitmap(out_file, type="png256", height=8.5, width=11, res=72);
                ": Area = ",  round(pstd$ROC_AUC, 4),
                ", Reli = ",  round(pstd$RELIABILITY, 4),
                ", Brier = ", round(pstd$BRIER, 4), sep=''),
-         col=color_list, lty=1, lwd=2);
+         col=color_list, lty=lty_list, lwd=2);
 
 dev.off();
 
