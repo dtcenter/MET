@@ -409,12 +409,12 @@ Users may specify several job command options to configure the behavior
  and for each track point (i.e.
  each TCMPR line) determines whether rapid intensification or weakening
  occurred.
- For each point in time, it uses the forecast and Best track event occurence
+ For each point in time, it uses the forecast and BEST track event occurence
  to populate a 2x2 contingency table.
- The job may be configured to require that forecast and Best track events
+ The job may be configured to require that forecast and BEST track events
  occur at exactly the same time to be considered a hit.
  Alternatively, the job may be configured to define a hit as long as the
- forecast and Best track events occurred within a configurable time window.
+ forecast and BEST track events occurred within a configurable time window.
  Using this relaxed matching criteria false alarms may be considered hits
  and misses may be considered correct negatives as long as the adeck and
  bdeck events were close enough in time.
@@ -440,7 +440,7 @@ name "sub:tc_stat-probri"
 The TC-Stat tool can be used to accumulate multiple PROBRI lines and derive
  probabilistic statistics summarizing performance.
  The PROBRI line contains a probabilistic forecast for a specified intensity
- change along with the actual intensity change that occurred in the Best
+ change along with the actual intensity change that occurred in the BEST
  track.
  Accurately forecast the likelihood of large changes in intensity is a challengi
 ng problem and this job helps quanity a model's ability to do so.
@@ -450,7 +450,7 @@ ng problem and this job helps quanity a model's ability to do so.
 Users may specify several job command options to configure the behavior
  of this job.
  The TC-Stat tools reads the input PROBI lines, applies the configurable
- options to extract a forecast probability value and Best track event, and
+ options to extract a forecast probability value and BEST track event, and
  bins those probabilistic pairs into an Nx2 contingency table.
  This job writes up to four probabilstic output line types summarizing the
  performance.
@@ -1020,7 +1020,7 @@ bmodel
 \series bold
 bmodel
 \series medium
- specifies the reference dataset, generally the best track analysis.
+ specifies the reference dataset, generally the BEST track analysis.
  Using the 
 \series bold
 -amodel
@@ -2670,7 +2670,7 @@ Job: PROBRI
 
 \series medium
 The PROBRI job produces probabilistic contingency table counts and statistics
- defined by placing forecast probabilities and Best track rapid intensification
+ defined by placing forecast probabilities and BEST track rapid intensification
  events into an Nx2 contingency table.
  Users may specify several job command options to configure the behavior
  of this job:
@@ -2681,9 +2681,34 @@ The PROBRI job produces probabilistic contingency table counts and statistics
 \series medium
 The 
 \series bold
+-prob_thresh n 
+\series medium
+option defines which probability threshold should be evaluated.
+ It determines which
+\series bold
+ PROB_i
+\series medium
+ column from the PROBRI line type is selected for the job.
+ For example, use 
+\series bold
+-prob_thresh 30 
+\series medium
+to evaluate forecast probabilites of a 30 kt increase or use 
+\series bold
+-prob_thresh -30
+\series medium
+ to evaluate forecast probabilities of a 30 kt decrease in intensity.
+ The default is a 30 kt increase.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+The 
+\series bold
 -prob_exact bool 
 \series medium
-option is a boolean defining whether the exact or maximum Best track intensity
+option is a boolean defining whether the exact or maximum BEST track intensity
  change over the time window should be used.
  If true, the values in the 
 \series bold
@@ -2703,7 +2728,13 @@ The
 \series bold
 -probri_bdelta_thresh threshold
 \series medium
- option defines the intensity change event threshold.
+ option defines the BEST track intensity change event threshold.
+ This should typically be set consistent with the probability threshold
+ (
+\series bold
+-prob_thresh
+\series medium
+) chosen above.
  The default is greater than or equal to 30 kts.
 \end_layout
 
@@ -2740,7 +2771,7 @@ Users may also specify the
 \series bold
 RI_WINDOW 
 \series default
-column cannot be combined in a single PROBRI job since Best track intensity
+column cannot be combined in a single PROBRI job since BEST track intensity
  threshold should change for each.
  Using the 
 \series bold

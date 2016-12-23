@@ -493,12 +493,16 @@ class TCStatJobProbRI : public TCStatJob {
 
       void process_pair(ProbRIPairInfo &);
 
+      double get_probri_value(const ProbRIPairInfo &);
+
       void do_output     (ostream &);
 
-      // Threshold probabilities
-      bool         ProbRIExact;
-      SingleThresh ProbRIBDeltaThresh;
-      ThreshArray  ProbRIProbThresh;
+      // Probability information
+      double       ProbRIThresh;       // Probability threshold to evaluate
+                                       //   e.g. -30, -10, 0, 10, 30, 55, 65
+      bool         ProbRIExact;        // True for exact change, false for maximum change
+      SingleThresh ProbRIBDeltaThresh; // Threshold the BEST track change
+      ThreshArray  ProbRIProbThresh;   // Array of probabilities for PCT bins
 
       // Store the case information
       StringArray CaseColumn;

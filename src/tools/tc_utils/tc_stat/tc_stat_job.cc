@@ -3411,6 +3411,7 @@ void TCStatJobProbRI::clear() {
    ProbRIMap.clear();
 
    // Set to default values
+   ProbRIThresh = 30.0;
    ProbRIExact = true;
    ProbRIBDeltaThresh.set(">=30");
    ProbRIProbThresh = string_to_prob_thresh("==0.1");
@@ -3428,6 +3429,7 @@ void TCStatJobProbRI::assign(const TCStatJobProbRI & j) {
 
    TCStatJob::assign(j);
 
+   ProbRIThresh       = j.ProbRIThresh;
    ProbRIExact        = j.ProbRIExact;
    ProbRIBDeltaThresh = j.ProbRIBDeltaThresh;
    ProbRIProbThresh   = j.ProbRIProbThresh;
@@ -3469,6 +3471,7 @@ StringArray TCStatJobProbRI::parse_job_command(const char *jobstring) {
            if(strcasecmp(c, "-by"                  ) == 0) { CaseColumn.add_css(to_upper(a[i+1]));                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_alpha"           ) == 0) { OutAlpha = atof(a[i+1]);                             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_line_type"       ) == 0) { OutLineType.add_css(to_upper(a[i+1]));               a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-probri_thresh"       ) == 0) { ProbRIThresh = atof(a[i+1]);                         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-probri_exact"        ) == 0) { ProbRIExact = string_to_bool(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-probri_bdelta_thresh") == 0) { ProbRIBDeltaThresh.set(a[i+1]);                      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-probri_prob_thresh"  ) == 0) { ProbRIProbThresh.add(string_to_prob_thresh(a[i+1])); a.shift_down(i, 1); }
@@ -3491,7 +3494,8 @@ ConcatString TCStatJobProbRI::serialize() const {
    s = TCStatJob::serialize();
 
    // List the probability threshold information
-   s << "-probri_exact "  << bool_to_string(ProbRIExact) << " ";
+   s << "-probri_thresh " << ProbRIThresh << " ";
+   s << "-probri_exact " << bool_to_string(ProbRIExact) << " ";
    s << "-probri_bdelta_thresh " << ProbRIBDeltaThresh.get_str() << " ";
    s << "-probri_prob_thresh " << prob_thresh_to_string(ProbRIProbThresh) << " ";
 
@@ -3534,15 +3538,18 @@ void TCStatJobProbRI::do_job(const StringArray &file_list,
       // Process each of the track pairs
       while(TCSTFiles >> pair) {
 
-         // Only process lines with single probabilities
-         if(atoi(pair.line().get_item("N_THRESH")) != 1) continue;
-
          // Increment the read and keep counts
          n.NRead++;
          n.NKeep++;
 
          // Check if this line should be kept
          if(!is_keeper_line(pair.line(), n)) continue;
+
+         // Check that the requested probability is actually present
+         if(is_bad_data(get_probri_value(pair))) {
+            n.NKeep--;
+            continue;
+         }
 
          mlog << Debug(4)
               << "Processing pair: " << pair.case_info() << "\n";
@@ -3591,20 +3598,17 @@ void TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) {
       ProbRIMap[key] = data;
    }
 
+   // Get the forecast probability
+   f = get_probri_value(pair);
+
    // Make sure the RI_WINDOW remains constant
-   if(pair.prob_ri().ri_window() != ProbRIMap[key].RIWindow) {
-       mlog << Error << "\nvoid TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) -> "
-            << "RI_WINDOW must remain constant ("
-            << ProbRIMap[key].RIWindow << " != "
-            << pair.prob_ri().ri_window()
-            << ").  Try setting \"-by RI_WINDOW\" "
-            << "or \"-column_thresh RI_WINDOW ==n\".\n\n";
+   if(is_bad_data(f)) {
+      mlog << Error << "\nvoid TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) -> "
+           << "bad probability value!\n\n";
       exit(1);
    }
 
    // Threshold BDELTA or BDELTA_MAX
-   // Rescale probabilities from [0, 100] to [0, 1]
-   f = atof(pair.line().get_item("PROB_1")) / 100.0;
    o = (ProbRIExact ?
         atof(pair.line().get_item("BDELTA")) :
         atof(pair.line().get_item("BDELTA_MAX")));
@@ -3617,7 +3621,42 @@ void TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) {
       ProbRIMap[key].Info.pct.inc_nonevent(f);
    }
 
+   // Make sure the RI_WINDOW remains constant
+   if(pair.prob_ri().ri_window() != ProbRIMap[key].RIWindow) {
+      mlog << Error << "\nvoid TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) -> "
+           << "RI_WINDOW must remain constant ("
+           << ProbRIMap[key].RIWindow << " != "
+           << pair.prob_ri().ri_window()
+           << ").  Try setting \"-by RI_WINDOW\" "
+           << "or \"-column_thresh RI_WINDOW ==n\".\n\n";
+      exit(1);
+   }
+
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TCStatJobProbRI::get_probri_value(const ProbRIPairInfo &pair) {
+   double p = bad_data_double;
+   int i, n;
+   ConcatString cs;
+
+   // Get the number of threhsolds
+   n = atoi(pair.line().get_item("N_THRESH"));
+
+   // Find the matching threshold and get the corresponding probability
+   // Rescale probabilities from [0, 100] to [0, 1]
+   for(i=1; i<=n; i++) {
+      cs << cs_erase << "THRESH_" << i;
+      if(is_eq(ProbRIThresh, atof(pair.line().get_item(cs)))) {
+         cs << cs_erase << "PROB_" << i;
+         p = atof(pair.line().get_item(cs)) / 100.0;
+         break;
+      }
+   }
+
+   return(p);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3659,8 +3698,8 @@ void TCStatJobProbRI::do_output(ostream &out) {
       // Initialize the output table
       out_at.clear();
       out_at.set_size((int) ProbRIMap.size() + 1,
-                      4 + CaseColumn.n_elements() + lt_cols);
-      setup_table(out_at, 4 + CaseColumn.n_elements(), get_precision());
+                      5 + CaseColumn.n_elements() + lt_cols);
+      setup_table(out_at, 5 + CaseColumn.n_elements(), get_precision());
 
       // Initialize row and column indices
       r = c = 0;
@@ -3670,9 +3709,10 @@ void TCStatJobProbRI::do_output(ostream &out) {
       out_at.set_entry(r, c++, cs);
 
       // Write the ProbRI event definition headers
+      out_at.set_entry(r, c++, "THRESH");
       out_at.set_entry(r, c++, "EXACT");
-      out_at.set_entry(r, c++, "PROB_THRESH");
       out_at.set_entry(r, c++, "BDELTA_THRESH");
+      out_at.set_entry(r, c++, "PROB_THRESH");
 
       // Write case column names
       for(j=0; j<CaseColumn.n_elements(); j++)
@@ -3696,10 +3736,11 @@ void TCStatJobProbRI::do_output(ostream &out) {
          // Write the table row
          out_at.set_entry(r, c++, cs);
 
-        // Write the ProbRI event definition
+         // Write the ProbRI event definition
+         out_at.set_entry(r, c++, ProbRIThresh);
          out_at.set_entry(r, c++, bool_to_string(ProbRIExact));
-         out_at.set_entry(r, c++, prob_thresh_to_string(ProbRIProbThresh));
          out_at.set_entry(r, c++, ProbRIBDeltaThresh.get_str());
+         out_at.set_entry(r, c++, prob_thresh_to_string(ProbRIProbThresh));
 
          // Write case column values
          for(j=1; j<sa.n_elements(); j++)
