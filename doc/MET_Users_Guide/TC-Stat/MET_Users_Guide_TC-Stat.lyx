@@ -2040,8 +2040,8 @@ h ge20
 \begin_layout LyX-Code
 
 \series bold
-      -job probri  -line_type PROBRI -column_thresh RI_WINDOW ==24 -probri_prob_
-thresh ==0.25
+      -job probri  -line_type PROBRI -column_thresh RI_WINDOW ==24 -probri_thres
+h 30 -probri_prob_thresh ==0.25
 \end_layout
 
 \begin_layout Standard
@@ -2683,7 +2683,7 @@ The
 \series bold
 -prob_thresh n 
 \series medium
-option defines which probability threshold should be evaluated.
+option is required and defines which probability threshold should be evaluated.
  It determines which
 \series bold
  PROB_i
@@ -2782,6 +2782,30 @@ column cannot be combined in a single PROBRI job since BEST track intensity
 -column_thresh RI_WINDOW ==24
 \series default
  option provide convenient ways avoiding this problem.
+\end_layout
+
+\begin_layout Standard
+Users should note that for the PROBRI line type, 
+\series bold
+PROBRI_PROB
+\series default
+ is a derived column name.
+ The -probri_thresh option defines the probabilities of interest (e.g.
+ 
+\series bold
+-probri_thresh 30
+\series default
+) and the 
+\series bold
+PROBRI_PROB
+\series default
+ column name refers those probability values, regardless of their column
+ number.
+ For example, the job command options 
+\series bold
+-probri_thresh 30 -column_thresh PROBRI_PROB >0
+\series default
+ select 30 kt probabilities and match probability values greater than 0.
 \end_layout
 
 \end_body

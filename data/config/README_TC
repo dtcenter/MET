@@ -610,9 +610,11 @@ out_valid_mask = "";
 //          binning the forecast probabilities, and writing output probabilistic counts and
 //          statistics.
 //
-//          Optional Args:
-//             -probri_thresh to select which forecast probability value to evaluate
+//          Required Args:
+//             -probri_thresh to define the forecast probabilities to be evaluated
 //                (e.g. -probri_thresh 30)
+//
+//          Optional Args:
 //             -probri_exact TRUE/FALSE to verify against the exact (e.g. BDELTA column)
 //                or maximum (e.g. BDELTA_MAX column) intensity change in the BEST track
 //             -probri_bdelta_thresh to define BEST track change event threshold
@@ -622,6 +624,10 @@ out_valid_mask = "";
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
 //             -out_line_type to specify which output types (PCT, PSTD, PRC, and PJC) should be written
+//
+//       For the PROBRI line type, PROBRI_PROB is a derived column name.  For example, the following
+//       options select 30 kt probabilities and match probability values greater than 0:
+//         -probri_thresh 30 -column_thresh PROBRI_PROB >0
 //
 //       e.g.
 //       jobs = ["-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
