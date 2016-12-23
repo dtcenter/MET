@@ -241,6 +241,7 @@ void TCStatJob::clear() {
    RIRWThreshBDeck = default_rirw_thresh;
    RIRWWindowBeg   = default_rirw_window;
    RIRWWindowEnd   = default_rirw_window;
+   ProbRIThresh    = default_probri_thresh;
    Landfall        = default_landfall;
    LandfallBeg     = default_landfall_beg;
    LandfallEnd     = default_landfall_end;
@@ -307,6 +308,8 @@ void TCStatJob::assign(const TCStatJob & j) {
    RIRWThreshBDeck = j.RIRWThreshBDeck;
    RIRWWindowBeg = j.RIRWWindowBeg;
    RIRWWindowEnd = j.RIRWWindowEnd;
+
+   ProbRIThresh = j.ProbRIThresh;
 
    Landfall = j.Landfall;
    LandfallBeg = j.LandfallBeg;
@@ -434,6 +437,8 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "RIRWWindowBeg = " << sec_to_hhmmss(RIRWWindowBeg) << "\n";
 
    out << prefix << "RIRWWindowEnd = " << sec_to_hhmmss(RIRWWindowEnd) << "\n";
+
+   out << prefix << "ProbRIThresh = " << ProbRIThresh << "\n";
 
    out << prefix << "Landfall = " << bool_to_string(Landfall) << "\n";
 
@@ -727,6 +732,13 @@ double TCStatJob::get_column_double(const TCStatLine &line,
    bool abs_flag = false;
    int i;
 
+   // Check for PROBRI_PROB special case
+   if(strcasecmp(column, "PROBRI_PROB") == 0 &&
+      line.type() == TCStatLineType_ProbRI) {
+      v = get_probri_value(line, ProbRIThresh);
+      return(v);
+   }
+
    // Check for absolute value
    if(strncasecmp(column, "ABS", 3) == 0) {
       abs_flag = true;
@@ -831,12 +843,13 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
                                                            RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_thresh_adeck" ) == 0) { RIRWThreshADeck.set(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-rirw_thresh_bdeck" ) == 0) { RIRWThreshBDeck.set(a[i+1]);               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-rirw_window")        == 0) {
+      else if(strcasecmp(c, "-rirw_window"       ) == 0) {
          if(i+2 < a.n_elements() && is_number(a[i+2]))   { RIRWWindowBeg = timestring_to_sec(a[i+1]);
                                                            RIRWWindowEnd = timestring_to_sec(a[i+2]); a.shift_down(i, 2); }
          else                                            { RIRWWindowEnd = timestring_to_sec(a[i+1]);
                                                            RIRWWindowBeg = -1 * RIRWWindowEnd;        a.shift_down(i, 1); }
       }
+      else if(strcasecmp(c, "-probri_thresh"     ) == 0) { ProbRIThresh = atof(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall"          ) == 0) { Landfall = string_to_bool(a[i+1]);         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-landfall_window")    == 0) {
                                                            Landfall = true; // For -landfall_window, set -landfall true
@@ -1170,6 +1183,9 @@ ConcatString TCStatJob::serialize() const {
       }
       s << "-rirw_window " << sec_to_hhmmss(RIRWWindowBeg) << " "
         << sec_to_hhmmss(RIRWWindowEnd) << " ";
+   }
+   if(ProbRIThresh != default_probri_thresh) {
+      s << "-probri_thresh " << ProbRIThresh << " ";
    }
    if(Landfall != default_landfall) {
       s << "-landfall " << bool_to_string(Landfall) << " "
@@ -3411,10 +3427,9 @@ void TCStatJobProbRI::clear() {
    ProbRIMap.clear();
 
    // Set to default values
-   ProbRIThresh = 30.0;
-   ProbRIExact = true;
-   ProbRIBDeltaThresh.set(">=30");
-   ProbRIProbThresh = string_to_prob_thresh("==0.1");
+   ProbRIExact = default_probri_exact;
+   ProbRIBDeltaThresh = default_probri_bdelta_thresh;
+   ProbRIProbThresh = string_to_prob_thresh(default_probri_prob_thresh);
    OutAlpha = default_tc_alpha;
    OutLineType.clear();
    OutLineType.add(stat_pct_str);
@@ -3429,7 +3444,6 @@ void TCStatJobProbRI::assign(const TCStatJobProbRI & j) {
 
    TCStatJob::assign(j);
 
-   ProbRIThresh       = j.ProbRIThresh;
    ProbRIExact        = j.ProbRIExact;
    ProbRIBDeltaThresh = j.ProbRIBDeltaThresh;
    ProbRIProbThresh   = j.ProbRIProbThresh;
@@ -3471,7 +3485,6 @@ StringArray TCStatJobProbRI::parse_job_command(const char *jobstring) {
            if(strcasecmp(c, "-by"                  ) == 0) { CaseColumn.add_css(to_upper(a[i+1]));                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_alpha"           ) == 0) { OutAlpha = atof(a[i+1]);                             a.shift_down(i, 1); }
       else if(strcasecmp(c, "-out_line_type"       ) == 0) { OutLineType.add_css(to_upper(a[i+1]));               a.shift_down(i, 1); }
-      else if(strcasecmp(c, "-probri_thresh"       ) == 0) { ProbRIThresh = atof(a[i+1]);                         a.shift_down(i, 1); }
       else if(strcasecmp(c, "-probri_exact"        ) == 0) { ProbRIExact = string_to_bool(a[i+1]);                a.shift_down(i, 1); }
       else if(strcasecmp(c, "-probri_bdelta_thresh") == 0) { ProbRIBDeltaThresh.set(a[i+1]);                      a.shift_down(i, 1); }
       else if(strcasecmp(c, "-probri_prob_thresh"  ) == 0) { ProbRIProbThresh.add(string_to_prob_thresh(a[i+1])); a.shift_down(i, 1); }
@@ -3494,7 +3507,6 @@ ConcatString TCStatJobProbRI::serialize() const {
    s = TCStatJob::serialize();
 
    // List the probability threshold information
-   s << "-probri_thresh " << ProbRIThresh << " ";
    s << "-probri_exact " << bool_to_string(ProbRIExact) << " ";
    s << "-probri_bdelta_thresh " << ProbRIBDeltaThresh.get_str() << " ";
    s << "-probri_prob_thresh " << prob_thresh_to_string(ProbRIProbThresh) << " ";
@@ -3517,6 +3529,14 @@ ConcatString TCStatJobProbRI::serialize() const {
 void TCStatJobProbRI::do_job(const StringArray &file_list,
                              TCLineCounts &n) {
    ProbRIPairInfo pair;
+
+   // Check that -probri_thresh has been supplied
+   if(is_bad_data(ProbRIThresh)) {
+      mlog << Error << "\nTCStatJobProbRI::do_job() -> "
+           << "must use the -probri_thresh job command option "
+           << "to define the forecast probabilities to be evaluated.\n\n";
+      exit(1);
+   }
 
    // Add the input file list
    TCSTFiles.add_files(file_list);
@@ -3544,12 +3564,6 @@ void TCStatJobProbRI::do_job(const StringArray &file_list,
 
          // Check if this line should be kept
          if(!is_keeper_line(pair.line(), n)) continue;
-
-         // Check that the requested probability is actually present
-         if(is_bad_data(get_probri_value(pair))) {
-            n.NKeep--;
-            continue;
-         }
 
          mlog << Debug(4)
               << "Processing pair: " << pair.case_info() << "\n";
@@ -3599,9 +3613,9 @@ void TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) {
    }
 
    // Get the forecast probability
-   f = get_probri_value(pair);
+   f = get_probri_value(pair.line(), ProbRIThresh);
 
-   // Make sure the RI_WINDOW remains constant
+   // Check for bad data
    if(is_bad_data(f)) {
       mlog << Error << "\nvoid TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) -> "
            << "bad probability value!\n\n";
@@ -3633,30 +3647,6 @@ void TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) {
    }
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double TCStatJobProbRI::get_probri_value(const ProbRIPairInfo &pair) {
-   double p = bad_data_double;
-   int i, n;
-   ConcatString cs;
-
-   // Get the number of threhsolds
-   n = atoi(pair.line().get_item("N_THRESH"));
-
-   // Find the matching threshold and get the corresponding probability
-   // Rescale probabilities from [0, 100] to [0, 1]
-   for(i=1; i<=n; i++) {
-      cs << cs_erase << "THRESH_" << i;
-      if(is_eq(ProbRIThresh, atof(pair.line().get_item(cs)))) {
-         cs << cs_erase << "PROB_" << i;
-         p = atof(pair.line().get_item(cs)) / 100.0;
-         break;
-      }
-   }
-
-   return(p);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3832,6 +3822,33 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
    } // end for i
 
    return(key);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double get_probri_value(const TCStatLine &line, double ProbRIThresh) {
+   double p = bad_data_double;
+   int i, n;
+   ConcatString cs;
+
+   // Only valid for the PROBRI line type
+   if(line.type() != TCStatLineType_ProbRI) return(bad_data_double);
+
+   // Get the number of threhsolds
+   n = atoi(line.get_item("N_THRESH"));
+
+   // Find the matching threshold and get the corresponding probability
+   // Rescale probabilities from [0, 100] to [0, 1]
+   for(i=1; i<=n; i++) {
+      cs << cs_erase << "THRESH_" << i;
+      if(is_eq(ProbRIThresh, atof(line.get_item(cs)))) {
+         cs << cs_erase << "PROB_" << i;
+         p = atof(line.get_item(cs)) / 100.0;
+         break;
+      }
+   }
+
+   return(p);
 }
 
 ////////////////////////////////////////////////////////////////////////

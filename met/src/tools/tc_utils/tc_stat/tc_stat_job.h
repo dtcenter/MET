@@ -39,6 +39,12 @@ static const bool         default_rirw_exact  = true;
 static const SingleThresh default_rirw_thresh(">=30.0");
 static const int          default_rirw_window = 0;
 
+// Defaults for the PROBRI job type
+static const double       default_probri_thresh = bad_data_double;
+static const bool         default_probri_exact  = false;
+static const SingleThresh default_probri_bdelta_thresh(">=30");
+static const char         default_probri_prob_thresh[] = "==0.1";
+
 // Default is 24 hours prior to landfall
 static const bool         default_landfall           = false;
 static const int          default_landfall_beg       = -86400;
@@ -314,10 +320,14 @@ class TCStatJob {
       int          RIRWWindowBeg;
       int          RIRWWindowEnd;
 
+      // ProbRI filtering logic
+      //   e.g. -30, -10, 0, 10, 30, 55, 65
+      double       ProbRIThresh;
+
       // Only retain TrackPoints in a time window around landfall
-      bool Landfall;
-      int  LandfallBeg;
-      int  LandfallEnd;
+      bool         Landfall;
+      int          LandfallBeg;
+      int          LandfallEnd;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -493,13 +503,9 @@ class TCStatJobProbRI : public TCStatJob {
 
       void process_pair(ProbRIPairInfo &);
 
-      double get_probri_value(const ProbRIPairInfo &);
-
       void do_output     (ostream &);
 
       // Probability information
-      double       ProbRIThresh;       // Probability threshold to evaluate
-                                       //   e.g. -30, -10, 0, 10, 30, 55, 65
       bool         ProbRIExact;        // True for exact change, false for maximum change
       SingleThresh ProbRIBDeltaThresh; // Threshold the BEST track change
       ThreshArray  ProbRIProbThresh;   // Array of probabilities for PCT bins
@@ -524,6 +530,7 @@ extern bool        is_time_series(const TimeArray &, const NumArray &,
                                   const TimeArray &, int &);
 extern int         compute_time_to_indep(const NumArray &, int);
 extern StringArray intersection(const StringArray &, const StringArray &);
+extern double      get_probri_value(const TCStatLine &, double);
 
 ////////////////////////////////////////////////////////////////////////
 
