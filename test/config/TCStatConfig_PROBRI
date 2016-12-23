@@ -173,8 +173,8 @@ out_valid_mask = "";
 //
 jobs = [
    "-job filter  -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_filter_ee.tcst",
-   "-job summary -column TK_ERR -by AMODEL -column_thresh N_THRESH ==1 -column_thresh THRESH_1 ==30 -column_thresh PROB_1 >0 -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_summary_tk_err.tcst",
-   "-job probri  -column_thresh RI_WINDOW ==24 -by AMODEL -out_line_type PCT,PSTD,PRC,PJC -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_probri.tcst"
+   "-job summary -column TK_ERR -by AMODEL -probri_thresh 30 -column_thresh PROBRI_PROB >0 -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_summary_tk_err.tcst",
+   "-job probri  -column_thresh RI_WINDOW ==24 -by AMODEL -probri_thresh 30 -probri_bdelta_thresh >=30 -out_line_type PCT,PSTD,PRC,PJC -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_probri.tcst"
 ];
 
 //
