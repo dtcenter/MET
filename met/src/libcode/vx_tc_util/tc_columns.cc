@@ -346,14 +346,6 @@ void write_prob_ri_row(TcHdrColumns &hdr, const ProbRIPairInfo &p,
    write_prob_ri_cols(p, -1, at, i_row, n_tc_header_cols);
    i_row++;
 
-   // For multiple probabilities, write the last one to a separate line
-   if(p.prob_ri().n_prob() > 1) {
-      write_tc_header_cols(hdr, at, i_row);
-      write_prob_ri_cols(p, p.prob_ri().n_prob()-1, at, i_row,
-                         n_tc_header_cols);
-      i_row++;
-   }
-
    return;
 }
 

@@ -611,9 +611,14 @@ out_valid_mask = "";
 //          statistics.
 //
 //          Optional Args:
-//             -probri_exact to specify the exact or maximum intensity change in the Best track
-//             -probri_bdelta_thresh to define Best track change event threshold
-//             -probri_prob_thresh to define probability thresholds
+//             -probri_thresh to select which forecast probability value to evaluate
+//                (e.g. -probri_thresh 30)
+//             -probri_exact TRUE/FALSE to verify against the exact (e.g. BDELTA column)
+//                or maximum (e.g. BDELTA_MAX column) intensity change in the BEST track
+//             -probri_bdelta_thresh to define BEST track change event threshold
+//                (e.g. -probri_bdelta_thresh >=30)
+//             -probri_prob_thresh to define output probability thresholds
+//                (e.g. -probri_prob_thresh ==0.1)
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
 //             -out_line_type to specify which output types (PCT, PSTD, PRC, and PJC) should be written
