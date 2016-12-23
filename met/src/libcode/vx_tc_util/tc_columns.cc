@@ -341,6 +341,9 @@ void write_prob_ri_row(TcHdrColumns &hdr, const ProbRIPairInfo &p,
    hdr.set_lead (p.prob_ri().valid() - p.prob_ri().init());
    hdr.set_valid(p.prob_ri().valid());
 
+   // Set the description
+   hdr.set_desc(p.line().get_item("DESC", false));
+
    // Write one line for all the probabilities
    write_tc_header_cols(hdr, at, i_row);
    write_prob_ri_cols(p, -1, at, i_row, n_tc_header_cols);
