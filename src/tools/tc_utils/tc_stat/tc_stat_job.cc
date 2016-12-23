@@ -643,6 +643,14 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    else if(LineType.n_elements() > 0 &&
      !LineType.has(line.line_type()))   { keep = false; n.RejLineType++;  }
 
+   // Check that PROBRI lines include the requested probability type
+   else if(line.type() == TCStatLineType_ProbRI &&
+           !is_bad_data(ProbRIThresh) &&
+           is_bad_data(get_probri_value(line, ProbRIThresh))) {
+     keep = false;
+     n.RejColumnThresh++;
+   }
+
    // Check ColumnThreshMap
    if(keep == true) {
 
