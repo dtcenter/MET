@@ -42,6 +42,7 @@ usage = function() {
   cat("        [-lead n]\n");
   cat("        [-ri_window n]\n");
   cat("        [-ri_thresh n]\n");
+  cat("        [-ri_bdelta_thresh n]\n");
   cat("        [-bdelta_max]\n");
   cat("        [-save]\n");
   cat("\n");
@@ -64,6 +65,25 @@ read.grep = function(in_file, pattern) {
 
 ########################################################################
 #
+# check.thresh(d, thr_typ, thr_val)
+#
+########################################################################
+
+check.thresh = function(d, typ, val) {
+         if(typ == "lt" || typ == "<" ) { return(d <  val);
+  } else if(typ == "le" || typ == "<=") { return(d <= val);
+  } else if(typ == "eq" || typ == "==") { return(d == val);
+  } else if(typ == "ne" || typ == "!=") { return(d != val);
+  } else if(typ == "ge" || typ == ">=") { return(d >= val);
+  } else if(typ == "gt" || typ == ">" ) { return(d >  val);
+  } else {
+    cat("ERROR: unexpected threshold type:", typ, "\n");
+    quit("no");
+  }
+}
+
+########################################################################
+#
 # Constants.
 #
 ########################################################################
@@ -82,6 +102,7 @@ by        = "";
 lead      = 24;
 ri_window = 24;
 ri_thresh = 30;
+ri_bdelta_thresh = "ge30";
 ri_exact  = TRUE;
 save      = FALSE;
 
@@ -130,6 +151,9 @@ while(i <= length(args)) {
   } else if(args[i] == "-ri_thresh") {
     ri_thresh = args[i+1];
     i=i+1;
+  } else if(args[i] == "-ri_bdelta_thresh") {
+    ri_bdelta_thresh = args[i+1];
+    i=i+1;
   } else if(args[i] == "-bdelta_max") {
     ri_exact = FALSE;
   } else if(args[i] == "-save") {
@@ -170,7 +194,8 @@ run_cmd = paste(tc_stat,
                 " -column_thresh BDLAND gt0",
                 " -column_thresh RI_WINDOW ==", ri_window,
                 " -lead ", lead,
-                " -probri_bdelta_thresh ge", ri_thresh,
+                " -probri_thresh ", ri_thresh,
+                " -probri_bdelta_thresh ", ri_bdelta_thresh,
                 " -probri_exact ", ri_exact,
                 " -dump_row ", tcst_dump_file,
                 " -out ", tcst_out_file,
@@ -206,9 +231,59 @@ if(status != 0) {
   quit(status=status);
 }
 
-# Read the data
+# Parse ri_bdelta_thresh to extract hi and lo thresholds
+thr1_typ = thr2_typ = thr1_val = thr2_val = NA;
+thr_tok = strsplit(ri_bdelta_thresh, "[&,\\]")[[1]];
+for(i in 1:length(thr_tok)) {
+  if(nchar(thr_tok[i]) == 0) {
+    next;
+  }
+  if(is.na(thr1_typ)) {
+    thr1_typ = gsub('-|0|1|2|3|4|5|6|7|8|9', '', thr_tok[i]);
+    thr1_val = gsub('lt|le|gt|ge',         '', thr_tok[i]);
+  }
+  else {
+    thr2_typ = gsub('0|1|2|3|4|5|6|7|8|9', '', thr_tok[i]);
+    thr2_val = gsub('lt|le|gt|ge',         '', thr_tok[i]);
+  }
+}
+
+# Reformat ri_bdelta_thresh
+old_str = c("\\", "lt", "le", "eq", "ne", "ge", "gt",     "&&",   "||");
+new_str = c(  "",  "<", "<=", "==", "!=", ">=",  ">",  " and ", " or ");
+bdelta_thresh_str = ri_bdelta_thresh;
+for(i in 1:length(old_str)) {
+  bdelta_thresh_str = gsub(old_str[i], new_str[i], bdelta_thresh_str, fixed=TRUE);
+}
+
+# Read the TCST data allowing for ragged arrays
 cat("Reading PROBRI data:", tcst_dump_file, "\n");
-tcst = read.table(tcst_dump_file, header=TRUE);
+tcst = read.table(tcst_dump_file, header=TRUE, fill=TRUE);
+
+# Select probability value from each line
+tcst$PROB = NA;
+for(i in 1:dim(tcst)[1]) {
+  n = tcst$N_THRESH[i];
+  for(j in 1:n) {
+    if(ri_thresh == tcst[[paste("THRESH_", j, sep="")]][i]) {
+      tcst$PROB[i] = tcst[[paste("PROB_", j, sep="")]][i];
+      break;
+    }
+  }
+}
+
+# Apply thresholds to determine events
+if(is.na(thr2_typ)) {
+  # Apply single threshold
+  ind = check.thresh(tcst$BDELTA, thr1_typ, thr1_val);
+} else {
+  # Apply two thresholds
+  ind = check.thresh(tcst$BDELTA, thr1_typ, thr1_val) &
+        check.thresh(tcst$BDELTA, thr1_typ, thr1_val);
+}
+tcst$EVENT = NA;
+tcst$EVENT[ind]  = "Y";
+tcst$EVENT[!ind] = "N";
 
 cat("Reading PROBRI output:", tcst_out_file, "\n");
 pct  = read.grep(tcst_out_file, "PROBRI_PCT");
@@ -237,8 +312,9 @@ if(ri_exact) {
   BDelta_str = "BDELTA_MAX";
 }
 
-subtitle = paste(BDelta_str, " >= ", ri_thresh, ", ",
-                 length(tcst$PROB_1), " probs (", sum(tcst$PROB_1>0),
+subtitle = paste(ri_thresh, "kt Change Probability ",
+                 BDelta_str, " ", bdelta_thresh_str, ", ",
+                 length(tcst$PROB), " probs (", sum(tcst$PROB>0),
                  " non-zero), ", "Basin: ", basin_str,", Model: ",
                  amodel_str, ", Lead: ", lead, sep='');
 
@@ -258,15 +334,16 @@ library(graphics);
 # Create output file name
 out_file = paste(out_base, "_hist.png", sep='');
 
-brate = sum(tcst$BDELTA >= as.integer(ri_thresh))/length(tcst$BDELTA);
+brate = sum(tcst$EVENT == "Y") / length(tcst$EVENT);
 
 # Open the output device
 cat(paste("Creating image file:", out_file, "\n"));
 bitmap(out_file, type="png256", height=8.5, width=11, res=72);
 
-  hist(tcst$PROB_1, breaks=seq(0,100,1), freq=FALSE,
-       main=paste("Histogram of", ri_window, "hr RI Probabilities\n",
-                  BDelta_str, ">=", ri_thresh, "Rate =", round(brate, 4)),
+  hist(tcst$PROB, breaks=seq(0,100,1), freq=FALSE,
+       main=paste("Histogram of", ri_window, "hr", ri_thresh,
+                  "kt Change Probabilities\n", BDelta_str,
+                  bdelta_thresh_str, "Rate =", round(brate, 4)),
        xlab="Probability (%)", sub=subtitle);
 
 dev.off();
@@ -284,12 +361,9 @@ out_file = paste(out_base, "_discrim.png", sep='');
 cat(paste("Creating image file:", out_file, "\n"));
 bitmap(out_file, type="png256", height=8.5, width=11, res=72);
 
-  tcst$RI = NA;
-  tcst$RI[tcst$BDELTA >= ri_thresh] = "Y"
-  tcst$RI[tcst$BDELTA <  ri_thresh] = "N"
-
-  discrimination.plot(tcst$RI, tcst$PROB_1,
-    main=paste(ri_window, "hr RI Probability Discrimination\n",
+  discrimination.plot(tcst$EVENT, tcst$PROB,
+    main=paste(ri_window, "hr", ri_thresh,
+               "kt Change Probability Discrimination\n",
     subtitle, sep=''), xlab="Probability (%)");
 
 dev.off();
@@ -308,11 +382,14 @@ cat(paste("Creating image file:", out_file, "\n"));
 
 bitmap(out_file, type="png256", height=8.5, width=11, res=72);
 
-  smoothScatter(tcst$PROB_1, tcst$BDELTA, nrpoints=0,
-    main=paste(ri_window, "hr RI Probability vs BDECK Change"),
+  smoothScatter(tcst$PROB, tcst$BDELTA, nrpoints=0,
+    main=paste(ri_window, "hr", ri_thresh,
+               "kt Change Probability vs BDECK Change"),
     ylab=paste(BDelta_str, "(kts)"), xlab="Probability (%)", sub=subtitle);
-  abline(h=ri_thresh, col="red", lwd=2.0);
 
+  # Draw reference lines for each threshold
+  if(!is.na(thr1_val)) abline(h=thr1_val, col="red", lwd=2.0);
+  if(!is.na(thr2_val)) abline(h=thr2_val, col="red", lwd=2.0);
 dev.off();
 
 ########################################################################
