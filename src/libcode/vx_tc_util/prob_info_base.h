@@ -121,8 +121,8 @@ inline unixtime             ProbInfoBase::init()           const { return(InitTi
 inline int                  ProbInfoBase::init_hour()      const { return(InitTime % sec_per_hour); }
 inline unixtime             ProbInfoBase::valid()          const { return(ValidTime);               }
 inline int                  ProbInfoBase::valid_hour()     const { return(ValidTime % sec_per_hour);}
-inline double               ProbInfoBase::lat()            const { return(Lat);                    }
-inline double               ProbInfoBase::lon()            const { return(Lon);                    }
+inline double               ProbInfoBase::lat()            const { return(Lat);                     }
+inline double               ProbInfoBase::lon()            const { return(Lon);                     }
 inline int                  ProbInfoBase::n_prob()         const { return(NProb);                   }
 inline double               ProbInfoBase::prob(int i)      const { return(Prob[i]);                 }
 inline double               ProbInfoBase::prob_item(int i) const { return(ProbItem[i]);             }

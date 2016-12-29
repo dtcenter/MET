@@ -342,7 +342,11 @@ void write_prob_ri_row(TcHdrColumns &hdr, const ProbRIPairInfo &p,
    hdr.set_valid(p.prob_ri().valid());
 
    // Set the description
-   hdr.set_desc(p.line().get_item("DESC", false));
+   // JHG, this is a temporary fix to get the nightly build working again.
+   // Instead of writing NA, I should pass the contents of the DESC column
+   // through to the output!
+   // hdr.set_desc(p.line().get_item("DESC", false));
+   hdr.set_desc(na_str);
 
    // Write one line for all the probabilities
    write_tc_header_cols(hdr, at, i_row);
