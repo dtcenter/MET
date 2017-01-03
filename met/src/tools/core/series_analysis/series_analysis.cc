@@ -1213,9 +1213,6 @@ void store_stat_cts(int n, const ConcatString &col,
       else if(c == "GSS")       { v = cts_info.gss.v;            }
       else if(c == "GSS_BCL")   { v = cts_info.gss.v_bcl[i];     }
       else if(c == "GSS_BCU")   { v = cts_info.gss.v_bcu[i];     }
-      else if(c == "BAGSS")     { v = cts_info.bagss.v;          }
-      else if(c == "BAGSS_BCL") { v = cts_info.bagss.v_bcl[i];   }
-      else if(c == "BAGSS_BCU") { v = cts_info.bagss.v_bcu[i];   }
       else if(c == "HK")        { v = cts_info.hk.v;             }
       else if(c == "HK_NCL")    { v = cts_info.hk.v_ncl[i];      }
       else if(c == "HK_NCU")    { v = cts_info.hk.v_ncu[i];      }
@@ -1259,6 +1256,9 @@ void store_stat_cts(int n, const ConcatString &col,
       else if(c == "SEDI_NCU")  { v = cts_info.sedi.v_ncu[i];    }
       else if(c == "SEDI_BCL")  { v = cts_info.sedi.v_bcl[i];    }
       else if(c == "SEDI_BCU")  { v = cts_info.sedi.v_bcu[i];    }
+      else if(c == "BAGSS")     { v = cts_info.bagss.v;          }
+      else if(c == "BAGSS_BCL") { v = cts_info.bagss.v_bcl[i];   }
+      else if(c == "BAGSS_BCU") { v = cts_info.bagss.v_bcu[i];   }
       else {
         mlog << Error << "\nstore_stat_cts() -> "
              << "unsupported column name requested \"" << c
@@ -1482,11 +1482,6 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "PR_CORR_NCU")   { v = cnt_info.pr_corr.v_ncu[i];   }
       else if(c == "PR_CORR_BCL")   { v = cnt_info.pr_corr.v_bcl[i];   }
       else if(c == "PR_CORR_BCU")   { v = cnt_info.pr_corr.v_bcu[i];   }
-      else if(c == "ANOM_CORR")     { v = cnt_info.anom_corr.v;        }
-      else if(c == "ANOM_CORR_NCL") { v = cnt_info.anom_corr.v_ncl[i]; }
-      else if(c == "ANOM_CORR_NCU") { v = cnt_info.anom_corr.v_ncu[i]; }
-      else if(c == "ANOM_CORR_BCL") { v = cnt_info.anom_corr.v_bcl[i]; }
-      else if(c == "ANOM_CORR_BCU") { v = cnt_info.anom_corr.v_bcu[i]; }
       else if(c == "SP_CORR")       { v = cnt_info.sp_corr.v;          }
       else if(c == "KT_CORR")       { v = cnt_info.kt_corr.v;          }
       else if(c == "RANKS")         { v = cnt_info.n_ranks;            }
@@ -1497,9 +1492,6 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "ME_NCU")        { v = cnt_info.me.v_ncu[i];        }
       else if(c == "ME_BCL")        { v = cnt_info.me.v_bcl[i];        }
       else if(c == "ME_BCU")        { v = cnt_info.me.v_bcu[i];        }
-      else if(c == "ME2")           { v = cnt_info.me2.v;              }
-      else if(c == "ME2_BCL")       { v = cnt_info.me2.v_bcl[i];       }
-      else if(c == "ME2_BCU")       { v = cnt_info.me2.v_bcu[i];       }
       else if(c == "ESTDEV")        { v = cnt_info.estdev.v;           }
       else if(c == "ESTDEV_NCL")    { v = cnt_info.estdev.v_ncl[i];    }
       else if(c == "ESTDEV_NCU")    { v = cnt_info.estdev.v_ncu[i];    }
@@ -1514,9 +1506,6 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "MSE")           { v = cnt_info.mse.v;              }
       else if(c == "MSE_BCL")       { v = cnt_info.mse.v_bcl[i];       }
       else if(c == "MSE_BCU")       { v = cnt_info.mse.v_bcu[i];       }
-      else if(c == "MSESS")         { v = cnt_info.msess.v;            }
-      else if(c == "MSESS_BCL")     { v = cnt_info.msess.v_bcl[i];     }
-      else if(c == "MSESS_BCU")     { v = cnt_info.msess.v_bcu[i];     }
       else if(c == "BCMSE")         { v = cnt_info.bcmse.v;            }
       else if(c == "BCMSE_BCL")     { v = cnt_info.bcmse.v_bcl[i];     }
       else if(c == "BCMSE_BCU")     { v = cnt_info.bcmse.v_bcu[i];     }
@@ -1544,17 +1533,17 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "MAD")           { v = cnt_info.mad.v;              }
       else if(c == "MAD_BCL")       { v = cnt_info.mad.v_bcl[i];       }
       else if(c == "MAD_BCU")       { v = cnt_info.mad.v_bcu[i];       }
+      else if(c == "ANOM_CORR")     { v = cnt_info.anom_corr.v;        }
+      else if(c == "ANOM_CORR_NCL") { v = cnt_info.anom_corr.v_ncl[i]; }
+      else if(c == "ANOM_CORR_NCU") { v = cnt_info.anom_corr.v_ncu[i]; }
+      else if(c == "ANOM_CORR_BCL") { v = cnt_info.anom_corr.v_bcl[i]; }
+      else if(c == "ANOM_CORR_BCU") { v = cnt_info.anom_corr.v_bcu[i]; }
       else if(c == "ME2")           { v = cnt_info.me2.v;              }
       else if(c == "ME2_BCL")       { v = cnt_info.me2.v_bcl[i];       }
       else if(c == "ME2_BCU")       { v = cnt_info.me2.v_bcu[i];       }
       else if(c == "MSESS")         { v = cnt_info.msess.v;            }
       else if(c == "MSESS_BCL")     { v = cnt_info.msess.v_bcl[i];     }
       else if(c == "MSESS_BCU")     { v = cnt_info.msess.v_bcu[i];     }
-      else if(c == "ANOM_CORR")     { v = cnt_info.anom_corr.v;        }
-      else if(c == "ANOM_CORR_NCL") { v = cnt_info.anom_corr.v_ncl[i]; }
-      else if(c == "ANOM_CORR_NCU") { v = cnt_info.anom_corr.v_ncu[i]; }
-      else if(c == "ANOM_CORR_BCL") { v = cnt_info.anom_corr.v_bcl[i]; }
-      else if(c == "ANOM_CORR_BCU") { v = cnt_info.anom_corr.v_bcu[i]; }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c
@@ -2006,7 +1995,7 @@ void add_nc_var(const ConcatString &var_name,
    // Add a new variable to the NetCDF file
    NcVar var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim, deflate_level);
    d.var = new NcVar(var);
-   
+
    // Add variable attributes
    add_att(d.var, "_FillValue", bad_data_float);
    if(name.length() > 0)        add_att(d.var, "name", (string)name);
@@ -2046,7 +2035,7 @@ void put_nc_val(int n, const ConcatString &var_name, float v) {
    offsets[1] = x;
    lengths[0] = 1;
    lengths[1] = 1;
-   
+
    // Store the current value
    if(!put_nc_data(var, &v, lengths, offsets)) {
       mlog << Error << "\nput_nc_val() -> "
