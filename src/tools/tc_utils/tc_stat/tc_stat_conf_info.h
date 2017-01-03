@@ -32,7 +32,7 @@ class TCStatConfInfo {
 
    public:
 
-      // TCPairs configuration object
+      // TCStat configuration object
       MetConfig Conf;
 
       // TCStatJob to store configuration file filtering options
