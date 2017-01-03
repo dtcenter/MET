@@ -258,7 +258,20 @@ for(i in 1:length(old_str)) {
 
 # Read the TCST data allowing for ragged arrays
 cat("Reading PROBRI data:", tcst_dump_file, "\n");
-tcst = read.table(tcst_dump_file, header=TRUE, fill=TRUE);
+# tcst = read.table(tcst_dump_file, header=TRUE, fill=TRUE);
+
+# Temporary fix: The number of header columns in the output of tc_stat
+# does not necessarily match the maximum number of probabilities in the
+# data.  As a temporary fix, manually specify the column names.
+ 
+probri_cols = c("VERSION", "AMODEL", "BMODEL", "DESC", "STORM_ID", "BASIN", "CYCLONE",
+                "STORM_NAME", "INIT", "LEAD", "VALID", "INIT_MASK", "VALID_MASK", "LINE_TYPE",
+                "ALAT", "ALON", "BLAT", "BLON", "INITIALS", "TK_ERR", "X_ERR", "Y_ERR",
+                "ADLAND", "BDLAND", "RI_BEG", "RI_END", "RI_WINDOW", "AWIND_END",
+                "BWIND_BEG", "BWIND_END", "BDELTA", "BDELTA_MAX", "BLEVEL_BEG", "BLEVEL_END",
+                "N_THRESH", "THRESH_1", "PROB_1", "THRESH_2", "PROB_2", "THRESH_3", "PROB_3",
+                "THRESH_4", "PROB_4", "THRESH_5", "PROB_5");
+tcst = read.table(tcst_dump_file, skip=1, header=FALSE, col.names=probri_cols, fill=TRUE);
 
 # Select probability value from each line
 tcst$PROB = NA;
