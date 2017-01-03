@@ -265,7 +265,17 @@ tcst$PROB = NA;
 for(i in 1:dim(tcst)[1]) {
   n = tcst$N_THRESH[i];
   for(j in 1:n) {
-    if(ri_thresh == tcst[[paste("THRESH_", j, sep="")]][i]) {
+    thr_col = paste("THRESH_", j, sep="");
+
+    # Check that the threshold column exists
+    if(!(thr_col %in% colnames(tcst))) {
+      cat("ERROR: Column name \"", thr_col, "\" not found for line number ",
+          i, " of TCST file: ", tcst_dump_file, "\n", sep="");
+      quit(status=1);
+    }
+
+    # Look for a match 
+    if(ri_thresh == tcst[[thr_col]][i]) {
       tcst$PROB[i] = tcst[[paste("PROB_", j, sep="")]][i];
       break;
     }
