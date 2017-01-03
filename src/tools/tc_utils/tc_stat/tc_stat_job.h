@@ -219,9 +219,8 @@ class TCStatJob {
       void open_stat_file();
       void close_stat_file();
 
-      void dump_pair(const TrackPairInfo &,  ofstream *);
-      void dump_pair(const ProbRIPairInfo &, ofstream *);
-      void dump_line(const TCStatLine &,     ofstream *);
+      void dump_pair(const TrackPairInfo &, ofstream *);
+      void dump_line(const TCStatLine &,    ofstream *);
 
       virtual ConcatString serialize() const;
 
@@ -497,13 +496,15 @@ class TCStatJobProbRI : public TCStatJob {
 
       StringArray parse_job_command(const char *);
 
+      void close_dump_file();
+
       ConcatString serialize() const;
 
       void do_job(const StringArray &, TCLineCounts &); // virtual from base class
 
       void process_pair(ProbRIPairInfo &);
 
-      void do_output     (ostream &);
+      void do_output(ostream &);
 
       // Probability information
       bool         ProbRIExact;        // True for exact change, false for maximum change
@@ -512,6 +513,10 @@ class TCStatJobProbRI : public TCStatJob {
 
       // Store the case information
       StringArray CaseColumn;
+
+      // Maximum number of thresholds encountered
+      int MaxNThresh;
+      int NDumpLines;
 
       // Confidence interval alpha value
       double OutAlpha;

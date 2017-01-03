@@ -1020,59 +1020,6 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump_pair(const ProbRIPairInfo &pair, ofstream *out) {
-
-   if(!out) return;
-
-   TcHdrColumns tchc;
-   AsciiTable out_at;
-   int i_row, hdr_row;
-   int n = pair.prob_ri().n_prob();
-
-   // Determine if we need to write a header row
-   if((int) out->tellp() == 0) hdr_row = 1;
-   else                        hdr_row = 0;
-
-   // Initialize the output AsciiTable
-   out_at.set_size(1 + hdr_row,
-                   n_tc_header_cols + get_n_prob_ri_cols(n));
-
-   // Write the PROBRI header row
-   write_prob_ri_header_row(1, n, out_at, 0, 0);
-
-   // Setup the output AsciiTable
-   justify_tc_stat_cols(out_at);
-   out_at.set_precision(get_precision());
-   out_at.set_bad_data_value(bad_data_double);
-   out_at.set_bad_data_str(na_str);
-   out_at.set_delete_trailing_blank_rows(1);
-
-   // Setup header columns
-   tchc.clear();
-   tchc.set_adeck_model(pair.prob_ri().technique());
-   tchc.set_bdeck_model(pair.bmodel());
-   tchc.set_storm_id(pair.prob_ri().storm_id());
-   tchc.set_basin(pair.prob_ri().basin());
-   tchc.set_cyclone(pair.prob_ri().cyclone());
-   tchc.set_storm_name(pair.storm_name());
-
-   if(OutInitMask.n_points() > 0)  tchc.set_init_mask(OutInitMask.name());
-   else                            tchc.set_init_mask(na_str);
-   if(OutValidMask.n_points() > 0) tchc.set_valid_mask(OutValidMask.name());
-   else                            tchc.set_valid_mask(na_str);
-
-   // Write the ProbRIPairInfo object
-   i_row = hdr_row;
-   write_prob_ri_row(tchc, pair, out_at, i_row);
-
-   // Write the AsciiTable to the file
-   *out << out_at;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void TCStatJob::dump_line(const TCStatLine &line, ofstream *out) {
 
    if(!out) return;
@@ -1992,6 +1939,7 @@ void TCStatJobSummary::summarize_lines(TCLineCounts &n) {
          process_line(line);
 
          if(DumpOut) dump_line(line, DumpOut);
+
       } // end while
    } // end else
 
@@ -3438,6 +3386,8 @@ void TCStatJobProbRI::clear() {
    ProbRIExact = default_probri_exact;
    ProbRIBDeltaThresh = default_probri_bdelta_thresh;
    ProbRIProbThresh = string_to_prob_thresh(default_probri_prob_thresh);
+   MaxNThresh = 0;
+   NDumpLines = 0;
    OutAlpha = default_tc_alpha;
    OutLineType.clear();
    OutLineType.add(stat_pct_str);
@@ -3456,6 +3406,8 @@ void TCStatJobProbRI::assign(const TCStatJobProbRI & j) {
    ProbRIBDeltaThresh = j.ProbRIBDeltaThresh;
    ProbRIProbThresh   = j.ProbRIProbThresh;
    CaseColumn         = j.CaseColumn;
+   MaxNThresh         = j.MaxNThresh;
+   NDumpLines         = j.NDumpLines;
    OutAlpha           = j.OutAlpha;
    OutLineType        = j.OutLineType;
    ProbRIMap          = j.ProbRIMap;
@@ -3500,6 +3452,67 @@ StringArray TCStatJobProbRI::parse_job_command(const char *jobstring) {
    }
 
    return(b);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatJobProbRI::close_dump_file() {
+
+   // Close the current output dump file stream
+   DumpOut->close();
+   delete DumpOut;
+   DumpOut = (ofstream *) 0;
+
+   // Prepare nicely formatted AsciiTable object
+   AsciiTable out_at;
+   DataLine line;
+   LineDataFile f;
+   int row, col;
+
+   // Initialize the output AsciiTable
+   out_at.set_size(1 + NDumpLines,
+                   n_tc_header_cols + get_n_prob_ri_cols(MaxNThresh));
+
+   // Write the PROBRI header row
+   write_prob_ri_header_row(1, MaxNThresh, out_at, 0, 0);
+
+   // Setup the output AsciiTable
+   justify_tc_stat_cols(out_at);
+   out_at.set_precision(get_precision());
+   out_at.set_bad_data_value(bad_data_double);
+   out_at.set_bad_data_str(na_str);
+   out_at.set_delete_trailing_blank_rows(1);
+
+   // Open the dump file back up for reading
+   if(!f.open(DumpFile)) {
+      mlog << Error << "\nTCStatJobProbRI::close_dump_file() -> "
+           << "can't open the dump file \"" << DumpFile
+           << "\" for reading!\n\n";
+      exit(1);
+   }
+
+   // Read and write each line to the AsciiTable
+   row = 1;
+   while(f >> line) {
+      for(col=0; col<line.n_items(); col++) {
+         out_at.set_entry(row, col, line.get_item(col));
+      }
+      row++;
+   }
+
+   // Close the dump file
+   f.close();
+
+   // Call parent to open the dump file back up
+   TCStatJob::open_dump_file();
+
+   // Write the reformatted AsciiTable
+   *DumpOut << out_at;
+
+   // Call parent to close the dump file
+   TCStatJob::close_dump_file();
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3579,7 +3592,10 @@ void TCStatJobProbRI::do_job(const StringArray &file_list,
          // Process the ProbRIPairInfo
          process_pair(pair);
 
-         if(DumpOut) dump_pair(pair, DumpOut);
+         if(DumpOut) {
+            dump_line(pair.line(), DumpOut);
+            NDumpLines++;
+         }
 
       } // end while
    } // end else
@@ -3597,11 +3613,15 @@ void TCStatJobProbRI::do_job(const StringArray &file_list,
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRI::process_pair(ProbRIPairInfo &pair) {
-   int i;
+   int i, n;
    double f, o;
    ConcatString key, cur;
    ProbRIMapData data;
    NumArray p_thresh;
+
+   // Track the maximum number of thresholds
+   n = atoi(pair.line().get_item("N_THRESH"));
+   if(n > MaxNThresh) MaxNThresh = n;
 
    // Build the map key
    key = build_map_key("PROBRI", pair.line(), CaseColumn);
