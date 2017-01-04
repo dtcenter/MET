@@ -32,9 +32,13 @@ class STATLine : public DataLine {
 
    private:
 
-      void determine_line_type();
-
       STATLineType Type;
+
+      const AsciiHeaderLine *HdrLine;   //  not allocated
+
+      void init_from_scratch();
+
+      void assign(const STATLine &);
 
    public:
 
@@ -42,6 +46,8 @@ class STATLine : public DataLine {
      ~STATLine();
       STATLine(const STATLine &);
       STATLine & operator=(const STATLine &);
+
+      void clear();
 
       void dump(ostream &, int depth = 0) const;
 
@@ -55,7 +61,8 @@ class STATLine : public DataLine {
          //  retrieve values of the header columns
          //
 
-      const char * get_item (int, bool check_na = true) const;
+      const char * get_item (const char *, bool check_na = true) const;
+      const char * get_item (int,          bool check_na = true) const;
 
       const char * version        () const;
       const char * model          () const;
