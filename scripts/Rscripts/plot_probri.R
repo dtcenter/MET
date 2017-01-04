@@ -84,6 +84,27 @@ check.thresh = function(d, typ, val) {
 
 ########################################################################
 #
+# build case information
+#
+########################################################################
+
+define.case = function(d) {
+  if(nchar(by) > 0) {
+    for(col in unlist(strsplit(toupper(by), ','))) {
+      if(is.null(d$CASE)) {
+        d$CASE = d[,col];
+      } else {
+        d$CASE = paste(d$CASE, "_", d[,col], sep='');
+      }
+    }
+  } else {
+    d$CASE = "ALL";
+  }
+  return(d$CASE);
+}
+
+########################################################################
+#
 # Constants.
 #
 ########################################################################
@@ -292,7 +313,7 @@ if(is.na(thr2_typ)) {
         check.thresh(tcst$BDELTA, thr1_typ, thr1_val);
 }
 tcst$EVENT = NA;
-tcst$EVENT[ind]  = "Y";
+tcst$EVENT[ind]  = "Y"
 tcst$EVENT[!ind] = "N";
 
 cat("Reading PROBRI output:", tcst_out_file, "\n");
@@ -334,6 +355,15 @@ out_base = gsub(",", "_", out_base);
 
 library(verification);
 library(graphics);
+
+# Append the non-zero probability counts
+tcst$CASE    = define.case(tcst);
+pstd$CASE    = define.case(pstd);
+pstd$NONZERO = NA;
+for(i in 1:dim(pstd)[1]) {
+  ind = tcst$CASE == pstd$CASE[i];
+  pstd$NONZERO[i] = sum(tcst$PROB[ind]>0);
+}
 
 # Write the PSTD stats out
 out_file = paste(out_base, "_pstd.txt", sep='');
@@ -418,17 +448,7 @@ pdf(out_file, height=8.5, width=11, useDingbats=FALSE);
     lines(x=pofd, y=pody, col=color_list[i], lty=lty_list[i], lwd=2);
   }
 
-  if(nchar(by) > 0) {
-    for(col in unlist(strsplit(toupper(by), ','))) {
-      if(is.null(prc$CASE)) {
-        prc$CASE = prc[,col];
-      } else {
-        prc$CASE = paste(prc$CASE, "_", prc[,col], sep='');
-      }
-    }
-  } else {
-    prc$CASE = "ALL";
-  }
+  prc$CASE = define.case(prc);
 
   par(bg="white");
   legend("bottomright",
