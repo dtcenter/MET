@@ -274,7 +274,7 @@ for(i in 1:dim(tcst)[1]) {
       quit(status=1);
     }
 
-    # Look for a match 
+    # Look for a match
     if(ri_thresh == tcst[[thr_col]][i]) {
       tcst$PROB[i] = tcst[[paste("PROB_", j, sep="")]][i];
       break;
@@ -335,20 +335,26 @@ out_base = gsub(",", "_", out_base);
 library(verification);
 library(graphics);
 
+# Write the PSTD stats out
+out_file = paste(out_base, "_pstd.txt", sep='');
+print(paste("Writing:", out_file));
+write.table(pstd, out_file, quote=FALSE, row.names=FALSE);
+
+# Open up the output device
+out_file = paste(out_base, ".pdf", sep='');
+print(paste("Writing:", out_file));
+pdf(out_file, height=8.5, width=11, useDingbats=FALSE);
+
 ########################################################################
 #
 # Create histogram of probability values
 #
 ########################################################################
 
-# Create output file name
-out_file = paste(out_base, "_hist.png", sep='');
+  brate = sum(tcst$EVENT == "Y") / length(tcst$EVENT);
 
-brate = sum(tcst$EVENT == "Y") / length(tcst$EVENT);
-
-# Open the output device
-cat(paste("Creating image file:", out_file, "\n"));
-bitmap(out_file, type="png256", height=8.5, width=11, res=72);
+  # Open the output device
+  cat(paste("Creating image file:", out_file, "\n"));
 
   hist(tcst$PROB, breaks=seq(0,100,1), freq=FALSE,
        main=paste("Histogram of", ri_window, "hr", ri_thresh,
@@ -356,27 +362,18 @@ bitmap(out_file, type="png256", height=8.5, width=11, res=72);
                   bdelta_thresh_str, "Rate =", round(brate, 4)),
        xlab="Probability (%)", sub=subtitle);
 
-dev.off();
-
 ########################################################################
 #
 # Create discrimination plot
 #
 ########################################################################
 
-# Create output file name
-out_file = paste(out_base, "_discrim.png", sep='');
-
-# Open the output device
-cat(paste("Creating image file:", out_file, "\n"));
-bitmap(out_file, type="png256", height=8.5, width=11, res=72);
+  cat("Plotting discrimination...\n");
 
   discrimination.plot(tcst$EVENT, tcst$PROB,
     main=paste(ri_window, "hr", ri_thresh,
                "kt Change Probability Discrimination\n",
     subtitle, sep=''), xlab="Probability (%)");
-
-dev.off();
 
 ########################################################################
 #
@@ -384,15 +381,12 @@ dev.off();
 #
 ########################################################################
 
-# Create output file name
-out_file = paste(out_base, "_scatter.png", sep='');
+  cat("Plotting scatter...\n");
 
-# Open the output device
-cat(paste("Creating image file:", out_file, "\n"));
+  # Colors for plotting points
+  colors <- rgb(0, 0, 1, 0.25)
 
-bitmap(out_file, type="png256", height=8.5, width=11, res=72);
-
-  smoothScatter(tcst$PROB, tcst$BDELTA, nrpoints=0,
+  plot(tcst$PROB, tcst$BDELTA, col=colors, pch=19,
     main=paste(ri_window, "hr", ri_thresh,
                "kt Change Probability vs BDECK Change"),
     ylab=paste(BDelta_str, "(kts)"), xlab="Probability (%)", sub=subtitle);
@@ -400,7 +394,6 @@ bitmap(out_file, type="png256", height=8.5, width=11, res=72);
   # Draw reference lines for each threshold
   if(!is.na(thr1_val)) abline(h=thr1_val, col="red", lwd=2.0);
   if(!is.na(thr2_val)) abline(h=thr2_val, col="red", lwd=2.0);
-dev.off();
 
 ########################################################################
 #
@@ -408,13 +401,8 @@ dev.off();
 #
 ########################################################################
 
-# Create output file name
-out_file = paste(out_base, "_roc.png", sep='');
+  cat("Plotting ROC...\n");
 
-# Open the output device
-cat(paste("Creating image file:", out_file, "\n"));
-
-bitmap(out_file, type="png256", height=8.5, width=11, res=72);
   plot(x=c(0,1), y=c(0,1), type="n", xlab="POFD", ylab="PODY",
        main=paste(ri_window, "hr RI Probability ROC"),
        sub=subtitle);
@@ -450,21 +438,13 @@ bitmap(out_file, type="png256", height=8.5, width=11, res=72);
                ", Brier = ", round(pstd$BRIER, 4), sep=''),
          col=color_list, lty=lty_list, lwd=2);
 
-dev.off();
-
 ########################################################################
 #
 # Create Reliability Diagram.
 #
 ########################################################################
 
-# Create output file name
-out_file = paste(out_base, "_reli.png", sep='');
-
-# Open the output device
-cat(paste("Creating image file:", out_file, "\n"));
-
-bitmap(out_file, type="png256", height=8.5, width=11, res=72);
+  cat("Plotting reliability...\n");
 
   # Probability mid-points
   probs = pct[1, grep("THRESH_", names(pct))];
@@ -495,13 +475,17 @@ bitmap(out_file, type="png256", height=8.5, width=11, res=72);
                    titl=paste(ri_window, "hr RI Reliability Diagram\n", subtitle),
                    legend.names=as.character(pct$CASE));
 
-dev.off();
-
 ########################################################################
 #
 # Clean up.
 #
 ########################################################################
+
+# Finished with the plots
+dev.off();
+
+# List the completed output file
+print(paste("Finished:", out_file));
 
 # Optionally, save all of the data to an .RData file
 if(save == TRUE) save.image();
