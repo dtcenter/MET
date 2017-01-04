@@ -138,6 +138,14 @@ class AsciiHeader {
                                      const int dim = 0);
 };
 
+//////////////////////////////////////////////////////////////////
+
+//
+// global instantiation of the AsciiHeader class
+//
+
+extern AsciiHeader METHdrTable;
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __ASCII_HEADER_H__  */

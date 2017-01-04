@@ -27,11 +27,11 @@ using namespace std;
 #include <cmath>
 
 #include "stat_columns.h"
+#include "stat_offsets.h"
 #include "stat_line.h"
-#include "stat_offsets.h"
 #include "analysis_utils.h"
-#include "stat_offsets.h"
 
+#include "vx_util.h"
 #include "vx_log.h"
 
 
@@ -50,6 +50,7 @@ STATLine::STATLine()
 
 {
 
+init_from_scratch();
 
 }
 
@@ -61,6 +62,7 @@ STATLine::~STATLine()
 
 {
 
+clear();
 
 }
 
@@ -71,6 +73,8 @@ STATLine::~STATLine()
 STATLine::STATLine(const STATLine & L)
 
 {
+
+init_from_scratch();
 
 assign(L);
 
@@ -98,6 +102,56 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
+void STATLine::init_from_scratch()
+
+{
+
+DataLine::init_from_scratch();
+
+clear();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void STATLine::assign(const STATLine &l)
+
+{
+
+DataLine::assign(l);
+
+Type    = l.Type;
+HdrLine = l.HdrLine;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void STATLine::clear()
+
+{
+
+DataLine::clear();
+
+Type    = no_stat_line_type;
+HdrLine = (AsciiHeaderLine *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void STATLine::dump(ostream & out, int depth) const
 
 {
@@ -109,6 +163,8 @@ ThreshArray ta;
 DataLine::dump(out, depth);
 
 out << prefix << "\n";
+
+out << prefix << "HdrLine        = "   << HdrLine       << "\n";
 
 out << prefix << "Version        = "   << version()     << "\n";
 out << prefix << "Model          = \"" << model()       << "\"\n";
@@ -184,21 +240,53 @@ int STATLine::read_line(LineDataFile * ldf)
 
 {
 
-int status;
+int status, offset;
 
 status = DataLine::read_line(ldf);
 
-if ( !status )  {
+//
+// Check for bad read status or zero length
+//
+
+if ( !status || n_items() == 0 )  {
 
    clear();
-
-   Type = no_stat_line_type;
 
    return ( 0 );
 
 }
 
-determine_line_type();
+//
+// Check for a header line
+//
+
+if ( strcmp(get_item(0), "VERSION") == 0 ) {
+
+   Type = stat_header;
+
+   return ( 1 );
+}
+
+//
+// Determine the LINE_TYPE column offset
+//
+
+offset = METHdrTable.col_offset(get_item(0), "STAT", na_str, "LINE_TYPE");
+
+if( is_bad_data(offset) || n_items() < (offset + 1) )  {
+
+   Type = no_stat_line_type;
+
+   return ( 0 );
+}
+
+//
+// Load the matching header line and store the line type
+//
+
+HdrLine = METHdrTable.header(get_item(0), "STAT", get_item(offset));
+
+Type = string_to_statlinetype(get_item(offset));
 
 return ( 1 );
 
@@ -224,13 +312,32 @@ int STATLine::is_header() const
 
 {
 
-const char * c = line_type();
+return ( Type == stat_header );
 
-STATLineType t = string_to_statlinetype(c);
+}
 
-if ( t == stat_header ) return ( 1 );
 
-return ( 0 );
+////////////////////////////////////////////////////////////////////////
+
+
+const char * STATLine::get_item(const char *col_str, bool check_na) const
+
+{
+
+int dim = bad_data_int;
+
+   //
+   // Parse the variable length dimension
+   //
+
+if ( HdrLine->is_var_length() ) {
+   dim = atoi( get_item(HdrLine->var_index_offset()) );
+}
+
+int k = HdrLine->col_offset(col_str, dim);
+
+if ( is_bad_data(k) ) return ( bad_data_str );
+else                  return ( get_item(k, check_na) );
 
 }
 
@@ -261,7 +368,7 @@ const char * STATLine::version() const
 
 {
 
-const char * c = get_item(version_offset, false);
+const char * c = get_item("VERSION", false);
 
 return ( c );
 
@@ -275,7 +382,7 @@ const char * STATLine::model() const
 
 {
 
-const char * c = get_item(model_offset, false);
+const char * c = get_item("MODEL", false);
 
 return ( c );
 
@@ -289,7 +396,7 @@ const char * STATLine::desc() const
 
 {
 
-const char * c = get_item(desc_offset, false);
+const char * c = get_item("DESC", false);
 
 return ( c );
 
@@ -304,7 +411,7 @@ int STATLine::fcst_lead() const
 {
 
 int j;
-const char * c = get_item(fcst_lead_offset);
+const char * c = get_item("FCST_LEAD");
 
 j = timestring_to_sec(c);
 
@@ -321,7 +428,7 @@ unixtime STATLine::fcst_valid_beg() const
 {
 
 unixtime t;
-const char * c = get_item(fcst_valid_beg_offset);
+const char * c = get_item("FCST_VALID_BEG");
 
 t = timestring_to_unix(c);
 
@@ -338,7 +445,7 @@ unixtime STATLine::fcst_valid_end() const
 {
 
 unixtime t;
-const char * c = get_item(fcst_valid_end_offset);
+const char * c = get_item("FCST_VALID_END");
 
 t = timestring_to_unix(c);
 
@@ -367,7 +474,7 @@ int STATLine::obs_lead() const
 {
 
 int j;
-const char * c = get_item(obs_lead_offset);
+const char * c = get_item("OBS_LEAD");
 
 j = timestring_to_sec(c);
 
@@ -384,7 +491,7 @@ unixtime STATLine::obs_valid_beg() const
 {
 
 unixtime t;
-const char * c = get_item(obs_valid_beg_offset);
+const char * c = get_item("OBS_VALID_BEG");
 
 t = timestring_to_unix(c);
 
@@ -401,7 +508,7 @@ unixtime STATLine::obs_valid_end() const
 {
 
 unixtime t;
-const char * c = get_item(obs_valid_end_offset);
+const char * c = get_item("OBS_VALID_END");
 
 t = timestring_to_unix(c);
 
@@ -429,7 +536,7 @@ const char * STATLine::fcst_var() const
 
 {
 
-const char * c = get_item(fcst_var_offset, false);
+const char * c = get_item("FCST_VAR", false);
 
 return ( c );
 
@@ -443,7 +550,7 @@ const char * STATLine::fcst_lev() const
 
 {
 
-const char * c = get_item(fcst_lev_offset, false);
+const char * c = get_item("FCST_LEV", false);
 
 return ( c );
 
@@ -457,7 +564,7 @@ const char * STATLine::obs_var() const
 
 {
 
-const char * c = get_item(obs_var_offset, false);
+const char * c = get_item("OBS_VAR", false);
 
 return ( c );
 
@@ -471,7 +578,7 @@ const char * STATLine::obs_lev() const
 
 {
 
-const char * c = get_item(obs_lev_offset, false);
+const char * c = get_item("OBS_LEV", false);
 
 return ( c );
 
@@ -485,7 +592,7 @@ const char * STATLine::obtype() const
 
 {
 
-const char * c = get_item(obtype_offset, false);
+const char * c = get_item("OBTYPE", false);
 
 return ( c );
 
@@ -499,7 +606,7 @@ const char * STATLine::vx_mask() const
 
 {
 
-const char * c = get_item(vx_mask_offset, false);
+const char * c = get_item("VX_MASK", false);
 
 return ( c );
 
@@ -513,7 +620,7 @@ const char * STATLine::interp_mthd() const
 
 {
 
-const char * c = get_item(interp_mthd_offset, false);
+const char * c = get_item("INTERP_MTHD", false);
 
 return ( c );
 
@@ -528,7 +635,7 @@ int STATLine::interp_pnts() const
 {
 
 int k;
-const char * c = get_item(interp_pnts_offset);
+const char * c = get_item("INTERP_PNTS", false);
 
 k = atoi(c);
 
@@ -546,7 +653,7 @@ ThreshArray STATLine::fcst_thresh() const
 
 ThreshArray ta;
 
-const char * c = get_item(fcst_thresh_offset, false);
+const char * c = get_item("FCST_THRESH", false);
 
 ta.add_css(c);
 
@@ -564,7 +671,7 @@ ThreshArray STATLine::obs_thresh() const
 
 ThreshArray ta;
 
-const char * c = get_item(obs_thresh_offset, false);
+const char * c = get_item("OBS_THRESH", false);
 
 ta.add_css(c);
 
@@ -582,7 +689,7 @@ SetLogic STATLine::thresh_logic() const
 
 SetLogic t = SetLogic_None;
 
-ConcatString cs = get_item(fcst_thresh_offset, false);
+ConcatString cs = get_item("FCST_THRESH", false);
 
      if(cs.endswith(setlogic_symbol_union))        t = SetLogic_Union;
 else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic_Intersection;
@@ -603,7 +710,7 @@ ThreshArray STATLine::cov_thresh() const
 
 ThreshArray ta;
 
-const char * c = get_item(cov_thresh_offset, false);
+const char * c = get_item("COV_THRESH", false);
 
 ta.add_css(c);
 
@@ -620,7 +727,8 @@ double STATLine::alpha() const
 {
 
 double a;
-const char * c = get_item(alpha_offset);
+
+const char * c = get_item("ALPHA");
 
 a = atof(c);
 
@@ -636,7 +744,7 @@ const char * STATLine::line_type() const
 
 {
 
-const char * c = get_item(line_type_offset, false);
+const char * c = get_item("LINE_TYPE", false);
 
 return ( c );
 
@@ -747,36 +855,6 @@ int STATLine::obs_init_hour() const
 {
 
 return ( unix_to_sec_of_day(obs_init_beg()) );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void STATLine::determine_line_type()
-
-{
-
-//
-// If there aren't enough columns present to determine the line type
-// just return.
-//
-if( n_items() < (line_type_offset + 1) )  {
-
-   Type = no_stat_line_type;
-   return;
-}
-
-const char * const c = line_type();
-
-Type = string_to_statlinetype(c);
-
-   //
-   //  done
-   //
-
-return;
 
 }
 

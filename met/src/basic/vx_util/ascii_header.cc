@@ -25,6 +25,14 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+//
+// global instantiation of the AsciiHeader class
+//
+
+AsciiHeader METHdrTable;
+
+////////////////////////////////////////////////////////////////////////
+
 static const char * header_file_tmpl   = "MET_BASE/table_files/met_header_columns_VERSION.txt";
 static const char * ascii_header_delim = ":";
 static const char * var_index_reg_exp  = "^(.*)$";
@@ -207,13 +215,8 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
    if(!is_var_length()) {
 
       // Check for no match
-      if(!ColNames.has(name, offset)) {
-         mlog << Error << "\nAsciiHeaderLine::col_offset() -> "
-              << "column \"" << name
-              << "\" not found in fixed length data/line type \""
-              << DataType << "/" << LineType << "\"\n\n";
-         exit(1);
-      }
+      if(!ColNames.has(name, offset)) return(bad_data_int);
+
    }
    // Handle variable length lines
    else {
@@ -228,13 +231,7 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
       }
 
       // Check for no match
-      if(is_bad_data(match)) {
-         mlog << Error << "\nAsciiHeaderLine::col_offset() -> "
-              << "column \"" << name
-              << "\" not found in variable length data/line type \""
-              << DataType << "/" << LineType << "\"\n\n";
-         exit(1);
-      }
+      if(is_bad_data(match)) return(bad_data_int);
 
       // Fixed columns before variable ones
       if(match < VarBegOffset) {
@@ -242,7 +239,7 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
       }
 
       // Fixed columns after variable ones
-      else if(i >= (VarBegOffset + NVarCols)) {
+      else if(match >= (VarBegOffset + NVarCols)) {
          offset = match +            // Matching column offset
                   (dim * NVarCols) - // Plus total of variable columns
                   NVarCols;          // Minus variable column names
@@ -460,11 +457,13 @@ const AsciiHeaderLine * AsciiHeader::header(const char *version,
    if(!Versions.has(version)) read(version);
 
    // Find matching header line
+   // Allow NA for line_type to match any line type
    vector<AsciiHeaderLine>::const_iterator it;
    for(it = Headers.begin(); it != Headers.end(); ++it) {
-      if(strcmp(it->version(),   version)   == 0 &&
-         strcmp(it->data_type(), data_type) == 0 &&
-         strcmp(it->line_type(), line_type) == 0) break;
+      if(strcmp(it->version(),    version)   == 0 &&
+         strcmp(it->data_type(),  data_type) == 0 &&
+         (strcmp(it->line_type(), line_type) == 0 ||
+          strcmp(na_str,          line_type) == 0)) break;
    }
 
    // Check for no match
