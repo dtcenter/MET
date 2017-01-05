@@ -266,8 +266,8 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &n_info) {
 
 void parse_mpr_line(STATLine &l, MPRData &m_data) {
 
-   m_data.fcst_var = l.get_item("FCST_VAR", false);
-   m_data.obs_var  = l.get_item("OBS_VAR", false);
+   m_data.fcst_var = l.fcst_var();
+   m_data.obs_var  = l.obs_var();
    m_data.total    = atoi(l.get_item("TOTAL"));
    m_data.index    = atoi(l.get_item("INDEX"));
    m_data.obs_sid  = l.get_item("OBS_SID", false);
