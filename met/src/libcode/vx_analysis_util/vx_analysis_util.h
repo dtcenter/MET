@@ -25,7 +25,6 @@
 #include "time_series.h"
 #include "stat_job.h"
 #include "stat_line.h"
-#include "stat_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
 

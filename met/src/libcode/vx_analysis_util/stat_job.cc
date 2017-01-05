@@ -537,7 +537,6 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 int STATAnalysisJob::is_keeper(const STATLine & L) const {
-   int c;
 
    //
    // model
@@ -767,19 +766,9 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
        thr_it != column_thresh_map.end(); thr_it++) {
 
       //
-      // Determine the column offset
-      //
-      c = determine_column_offset(L, thr_it->first, false);
-
-      //
-      // Check that the column was found
-      //
-      if(is_bad_data(c)) return(0);
-
-      //
       // Check if the current value meets the threshold criteria
       //
-      if(!thr_it->second.check_dbl(atof(L.get_item(c)))) return(0);
+      if(!thr_it->second.check_dbl(atof(L.get_item(thr_it->first)))) return(0);
    }
 
    //
@@ -789,19 +778,9 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
        str_it != column_str_map.end(); str_it++) {
 
       //
-      // Determine the column offset
-      //
-      c = determine_column_offset(L, str_it->first, false);
-
-      //
-      // Check that the column was found
-      //
-      if(is_bad_data(c)) return(0);
-
-      //
       // Check if the current value is in the list for the column
       //
-      if(!str_it->second.has(L.get_item(c))) return(0);
+      if(!str_it->second.has(L.get_item(str_it->first, false))) return(0);
    }
 
    return(1);
@@ -1114,7 +1093,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i+=2;
       }
       else if(strcmp(jc_array[i], "-set_hdr") == 0) {
-         n = get_column_offset ((const char **) 0, 0, to_upper(jc_array[i+1]));
+         n = METHdrTable.header(met_version, "STAT", na_str)->col_offset(to_upper(jc_array[i+1]));
          if(is_bad_data(n)) {
             mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
                  << "no match found for header column named: \""
@@ -1779,7 +1758,7 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    //
    for(i=0; i<column_case.n_elements(); i++) {
       key << (i == 0 ? "" : ":")
-          << L.get_item(determine_column_offset(L, column_case[i]));
+          << L.get_item(column_case[i]);
    }
 
    return(key);

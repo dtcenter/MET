@@ -129,12 +129,12 @@ void StatHdrInfo::add(const STATLine &line) {
       interp_mthd.add(line.interp_mthd());
    if(!interp_pnts.has(line.interp_pnts()))
       interp_pnts.add(line.interp_pnts());
-   if(!fcst_thresh.has(line.get_item(fcst_thresh_offset, false)))
-      fcst_thresh.add(line.get_item(fcst_thresh_offset, false));
-   if(!obs_thresh.has(line.get_item(obs_thresh_offset, false)))
-      obs_thresh.add(line.get_item(obs_thresh_offset, false));
-   if(!cov_thresh.has(line.get_item(cov_thresh_offset, false)))
-      cov_thresh.add(line.get_item(cov_thresh_offset, false));
+   if(!fcst_thresh.has(line.get_item("FCST_THRESH", false)))
+      fcst_thresh.add(line.get_item("FCST_THRESH", false));
+   if(!obs_thresh.has(line.get_item("OBS_THRESH", false)))
+      obs_thresh.add(line.get_item("OBS_THRESH", false));
+   if(!cov_thresh.has(line.get_item("COV_THRESH", false)))
+      cov_thresh.add(line.get_item("COV_THRESH", false));
    if(!alpha.has(line.alpha()))
       alpha.add(line.alpha());
 
@@ -676,7 +676,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Cannot compute VIF when the times are not unique
             //
-            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+            ut = line.fcst_valid_beg();
 
             if(m[key].valid_ts.has((double) ut)) {
                mlog << Warning << "\naggr_ctc_lines() -> "
@@ -876,7 +876,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Cannot compute VIF when the times are not unique
             //
-            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+            ut = line.fcst_valid_beg();
 
             if(m[key].valid_ts.has((double) ut)) {
                mlog << Warning << "\naggr_mctc_lines() -> "
@@ -1067,7 +1067,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Cannot compute VIF when the times are not unique
             //
-            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+            ut = line.fcst_valid_beg();
 
             if(m[key].valid_ts.has((double) ut)) {
                mlog << Warning << "\naggr_pct_lines() -> "
@@ -1258,7 +1258,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Cannot compute VIF when the times are not unique
             //
-            ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+            ut = line.fcst_valid_beg();
 
             if(m[key].valid_ts.has((double) ut)) {
                mlog << Warning << "\naggr_psum_lines() -> "
@@ -2469,11 +2469,11 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Only aggregate consistent variable names
          //
-         if(fcst_var.empty()) fcst_var = line.get_item(fcst_var_offset, false);
-         if(obs_var.empty())  obs_var  = line.get_item(obs_var_offset, false);
+         if(fcst_var.empty()) fcst_var = line.fcst_var();
+         if(obs_var.empty())  obs_var  = line.obs_var();
 
-         if(fcst_var != line.get_item(fcst_var_offset, false) ||
-            obs_var  != line.get_item(obs_var_offset, false)) {
+         if(fcst_var != line.fcst_var() ||
+            obs_var  != line.obs_var()) {
             mlog << Error << "\naggr_ssvar_lines() -> "
                  << "both the forecast and observation variable types must "
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
@@ -2574,16 +2574,16 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(m.count(key) == 0) {
             cur.clear();
-            cur.fcst_var = line.get_item(fcst_var_offset, false);
-            cur.obs_var  = line.get_item(obs_var_offset, false);
+            cur.fcst_var = line.fcst_var();
+            cur.obs_var  = line.obs_var();
             m[key] = cur;
          }
 
          //
          // Only aggregate consistent variable names
          //
-         if(m[key].fcst_var != line.get_item(fcst_var_offset, false) ||
-            m[key].obs_var  != line.get_item(obs_var_offset, false)) {
+         if(m[key].fcst_var != line.fcst_var() ||
+            m[key].obs_var  != line.obs_var()) {
             mlog << Error << "\naggr_time_series_lines() -> "
                  << "both the forecast and observation variable names must "
                  << "remain constant for case \"" << key
@@ -2595,8 +2595,8 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Parse the init and valid times
          //
-         lead_sec = timestring_to_sec(line.get_item(fcst_lead_offset));
-         valid_ut = yyyymmdd_hhmmss_to_unix(line.get_item(fcst_valid_beg_offset));
+         lead_sec = line.fcst_lead();
+         valid_ut = line.fcst_valid_beg();
          init_ut  = valid_ut - lead_sec;
 
          //
@@ -2627,8 +2627,8 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Add forecast and observation values
          //
-         m[key].f_na.add(atof(line.get_item(determine_column_offset(line, j.column[0]))));
-         m[key].o_na.add(atof(line.get_item(determine_column_offset(line, j.column[1]))));
+         m[key].f_na.add(atof(line.get_item(j.column[0])));
+         m[key].o_na.add(atof(line.get_item(j.column[1])));
 
          //
          // Keep track of the unique header column entries
