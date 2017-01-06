@@ -323,6 +323,7 @@ const char * STATLine::get_item(const char *col_str, bool check_na) const
 
 {
 
+int offset = bad_data_int;
 int dim = bad_data_int;
 
    //
@@ -333,10 +334,26 @@ if ( HdrLine->is_var_length() ) {
    dim = atoi( get_item(HdrLine->var_index_offset()) );
 }
 
-int k = HdrLine->col_offset(col_str, dim);
+   //
+   // Search for matching header column
+   //
 
-if ( is_bad_data(k) ) return ( bad_data_str );
-else                  return ( get_item(k, check_na) );
+offset = HdrLine->col_offset(col_str, dim);
+
+   //
+   // If not found, check extra header columns
+   //
+
+if ( is_bad_data(offset) ) {
+   if ( !get_file()->header().has(col_str, offset) ) offset = bad_data_int;
+}
+
+   //
+   // Return bad data string for no match
+   //
+
+if ( is_bad_data(offset) ) return ( bad_data_str );
+else                       return ( get_item(offset, check_na) );
 
 }
 
@@ -344,11 +361,11 @@ else                  return ( get_item(k, check_na) );
 ////////////////////////////////////////////////////////////////////////
 
 
-const char * STATLine::get_item(int k, bool check_na) const
+const char * STATLine::get_item(int offset, bool check_na) const
 
 {
 
-const char * c = DataLine::get_item(k);
+const char * c = DataLine::get_item(offset);
 
    //
    // Check for the NA string and interpret it as bad data
