@@ -110,6 +110,7 @@ int main(int argc, char * argv []) {
 
       // Initialize the observation key
       obs_key.clear();
+      obs_key_map.clear();
 
       // Process by file type
       if(is_conv(cline[i])) process_conv(cline[i], output_filename);
@@ -499,7 +500,7 @@ bool is_dup(const char *key) {
    dup = false;
    int int_key = key_to_integer(key);
    StringArray key_array = obs_key_map[int_key];
-   if (key_array.n_elements()) {
+   if (key_array.n_elements() > 0) {
       if (key_array.has(key)) {
          mlog << Warning
               << "\nSkipping duplicate entry for case \"" << key << "\"\n\n";
