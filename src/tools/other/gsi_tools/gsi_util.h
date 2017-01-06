@@ -83,12 +83,24 @@ struct RadData {
 
 ////////////////////////////////////////////////////////////////////////
 
+static bool not_has_FCST_VALID_BEG = true;
+static bool not_has_FCST_VALID_END = true;
+static bool not_has_OBS_VALID_BEG  = true;
+static bool not_has_OBS_VALID_END  = true;
+static bool not_has_FCST_VAR       = true;
+static bool not_has_OBS_VAR        = true;
+static bool not_has_OBTYPE         = true;
+
+////////////////////////////////////////////////////////////////////////
+
 ConvData parse_conv_data(const ConvRecord &r, const int i);
 RadData  parse_rad_data (const RadRecord  &r, const int i,
                          const int chval, const int use);
 
 ConcatString get_conv_key(const ConvData &d);
 ConcatString get_rad_key (const RadData &d);
+
+int key_to_integer(const char * key);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -359,13 +359,13 @@ void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
    int col;
 
    // Update header for current data
-   if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d.fcst_ut);
-   if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d.fcst_ut);
-   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d.obs_ut);
-   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(d.obs_ut);
-   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(d.var);
-   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(d.var);
-   if(!hdr_name.has("OBTYPE"))         shc.set_obtype(d.obtype);
+   if(not_has_FCST_VALID_BEG) shc.set_fcst_valid_beg(d.fcst_ut);
+   if(not_has_FCST_VALID_END) shc.set_fcst_valid_end(d.fcst_ut);
+   if(not_has_OBS_VALID_BEG)  shc.set_obs_valid_beg(d.obs_ut);
+   if(not_has_OBS_VALID_END)  shc.set_obs_valid_end(d.obs_ut);
+   if(not_has_FCST_VAR)       shc.set_fcst_var(d.var);
+   if(not_has_OBS_VAR)        shc.set_obs_var(d.var);
+   if(not_has_OBTYPE)         shc.set_obtype(d.obtype);
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -412,12 +412,12 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
    int col;
 
    // Update header for current data
-   if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d.fcst_ut);
-   if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d.fcst_ut);
-   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d.obs_ut);
-   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(d.obs_ut);
-   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(d.var);
-   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(d.var);
+   if(not_has_FCST_VALID_BEG) shc.set_fcst_valid_beg(d.fcst_ut);
+   if(not_has_FCST_VALID_END) shc.set_fcst_valid_end(d.fcst_ut);
+   if(not_has_OBS_VALID_BEG)  shc.set_obs_valid_beg(d.obs_ut);
+   if(not_has_OBS_VALID_END)  shc.set_obs_valid_end(d.obs_ut);
+   if(not_has_FCST_VAR)       shc.set_fcst_var(d.var);
+   if(not_has_OBS_VAR)        shc.set_obs_var(d.var);
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -487,17 +487,33 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
 
 bool is_dup(const char *key) {
    bool dup;
-
-   if(obs_key.has(key)) {
-      mlog << Warning
-           << "\nSkipping duplicate entry for case \"" << key << "\"\n\n";
-      dup = true;
+   //if(obs_key.has(key)) {
+   //   mlog << Warning
+   //        << "\nSkipping duplicate entry for case \"" << key << "\"\n\n";
+   //   dup = true;
+   //}
+   //else {
+   //   obs_key.add(key);
+   //   dup = false;
+   //}
+   dup = false;
+   int int_key = key_to_integer(key);
+   StringArray key_array = obs_key_map[int_key];
+   if (key_array.n_elements()) {
+      if (key_array.has(key)) {
+         mlog << Warning
+              << "\nSkipping duplicate entry for case \"" << key << "\"\n\n";
+         dup = true;
+      }
+      else {
+         key_array.add(key);
+         obs_key_map[int_key] = key_array;
+      }
    }
    else {
-      obs_key.add(key);
-      dup = false;
+      key_array.add(key);
+      obs_key_map[int_key] = key_array;
    }
-
    return(dup);
 }
 
