@@ -365,6 +365,12 @@ const char * STATLine::get_item(int offset, bool check_na) const
 
 {
 
+   //
+   // Range check
+   //
+
+if ( offset < 0 || offset >= N_items ) return ( bad_data_str );
+
 const char * c = DataLine::get_item(offset);
 
    //
