@@ -173,6 +173,17 @@ ConcatString get_rad_key(const RadData &d) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int key_to_integer(const char * key) {
+   int int_key = 0;
+   for (int idx=0; idx<strlen(key); idx++) {
+      int_key += ((int)key[idx]) << (idx%3)*8;
+      //int_key += (int)key[idx];
+   }
+   return(int_key);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool is_conv(const char *s) {
    return(strstr(get_short_name(s), conv_id_str) != (char *) 0);
 }
@@ -233,9 +244,11 @@ void setup_header(StatHdrColumns &shc,
    // FCST_VALID_BEG, FCST_VALID_END
    if(name.has("FCST_VALID_BEG", index)) {
       shc.set_fcst_valid_beg(timestring_to_unix(value[index]));
+      not_has_FCST_VALID_BEG = false;
    }
    if(name.has("FCST_VALID_END", index)) {
       shc.set_fcst_valid_end(timestring_to_unix(value[index]));
+      not_has_FCST_VALID_END = false;
    }
 
    // OBS_LEAD
@@ -249,14 +262,17 @@ void setup_header(StatHdrColumns &shc,
    // OBS_VALID_BEG, OBS_VALID_END
    if(name.has("OBS_VALID_BEG", index)) {
       shc.set_obs_valid_beg(timestring_to_unix(value[index]));
+      not_has_OBS_VALID_BEG = false;
    }
    if(name.has("OBS_VALID_END", index)) {
       shc.set_obs_valid_end(timestring_to_unix(value[index]));
+      not_has_OBS_VALID_END = false;
    }
 
    // FCST_VAR
    if(name.has("FCST_VAR", index)) {
       shc.set_fcst_var(value[index]);
+      not_has_FCST_VAR = false;
    }
 
    // FCST_LEV
@@ -270,6 +286,7 @@ void setup_header(StatHdrColumns &shc,
    // OBS_VAR
    if(name.has("OBS_VAR", index)) {
       shc.set_obs_var(value[index]);
+      not_has_OBS_VAR = false;
    }
 
    // OBS_LEV
@@ -283,6 +300,7 @@ void setup_header(StatHdrColumns &shc,
    // OBTYPE
    if(name.has("OBTYPE", index)) {
       shc.set_obtype(value[index]);
+      not_has_OBTYPE = false;
    }
    else {
       shc.set_obtype(default_obtype);

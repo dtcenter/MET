@@ -56,6 +56,10 @@ static void write_orank();
 static void write_orank_row_conv(AsciiTable &at, int row, int i_obs);
 static void write_orank_row_rad (AsciiTable &at, int row, int i_obs);
 
+static void add_key(const char * key);
+static bool has_key(const char * key);
+static bool has_key(const char * key, int & index);
+
 static void check_int(int i1, int i2, const char *col, const char *key);
 static void check_dbl(double d1, double d2, const char *col, const char *key);
 
@@ -252,10 +256,10 @@ void process_conv_data(ConvData &d, int i_mem) {
    ConcatString key = get_conv_key(d);
 
    // Add entry for new observation
-   if(!obs_key.has(key)) {
+   if(!has_key(key)) {
 
       // Store the current key
-      obs_key.add(key);
+      add_key(key);
 
       // Store the current pair data
       conv_data.push_back(d);
@@ -274,7 +278,7 @@ void process_conv_data(ConvData &d, int i_mem) {
    } // end if
 
    // Get the current observation index
-   if(!obs_key.has(key, i_obs)) {
+   if(!has_key(key, i_obs)) {
       mlog << Error << "\nprocess_conv_data() -> "
            << "can't find entry for case \"" << key << "\"\n\n";
       exit(1);
@@ -409,10 +413,10 @@ void process_rad_data(RadData &d, int i_mem) {
    ConcatString key = get_rad_key(d);
 
    // Add entry for new observation
-   if(!obs_key.has(key)) {
+   if(!has_key(key)) {
 
       // Store the current key
-      obs_key.add(key);
+      add_key(key);
 
       // Store the current pair data
       rad_data.push_back(d);
@@ -431,7 +435,7 @@ void process_rad_data(RadData &d, int i_mem) {
    } // end if
 
    // Get the current observation index
-   if(!obs_key.has(key, i_obs)) {
+   if(!has_key(key, i_obs)) {
       mlog << Error << "\nprocess_rad_data() -> "
            << "can't find entry for case \"" << key << "\"\n\n";
       exit(1);
@@ -718,6 +722,71 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, d->tzfnd);                 // TZFND
 
    return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void add_key(const char *key) {
+   int int_key = key_to_integer(key);
+   StringArray key_array = obs_key_map[int_key];
+   if (key_array.n_elements()) {
+      if (key_array.has(key)) {
+         mlog << Warning
+              << "\nExist the key already for case \"" << key << "\"\n\n";
+      }
+      else {
+         key_array.add(key);
+         obs_key_map[int_key] = key_array;
+      }
+   }
+   else {
+      key_array.add(key);
+      obs_key_map[int_key] = key_array;
+      obs_index_map[int_key] = obs_key.n_elements();
+   }
+   obs_key.add(key);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_key(const char *key) {
+   bool found_key;
+   found_key = false;
+   int int_key = key_to_integer(key);
+   StringArray key_array = obs_key_map[int_key];
+   if (key_array.n_elements()) {
+      if (key_array.has(key)) {
+         found_key = true;
+      }
+   }
+   return(found_key);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_key(const char *key, int & index) {
+   bool found_key;
+   found_key = false;
+   int int_key = key_to_integer(key);
+   StringArray key_array = obs_key_map[int_key];
+   if (key_array.n_elements()) {
+      if (key_array.has(key)) {
+         found_key = true;
+         if (1 == key_array.n_elements()) {
+            index = obs_index_map[int_key];
+         }
+         else {
+            obs_key.has(key, index);
+         }
+      }
+   }
+   //bool found_key2 = obs_key.has(key, index);
+   //if (found_key2 != found_key ) {
+   //   cout << " key: " << key << ", result_1: " << found_key << ", result_2: " << found_key2 << endl;
+   //   cout << " int_key: " << int_key << ", result_1: " << found_key << ", result_2: " << found_key2 << endl;
+   //}
+   return(found_key);
 }
 
 ////////////////////////////////////////////////////////////////////////

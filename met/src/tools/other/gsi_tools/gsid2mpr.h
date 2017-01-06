@@ -139,6 +139,7 @@ static StatHdrColumns shc;
 
 // Store observation keys to search for duplicates
 static StringArray    obs_key;
+static map<int,StringArray> obs_key_map;
 
 ////////////////////////////////////////////////////////////////////////
 
