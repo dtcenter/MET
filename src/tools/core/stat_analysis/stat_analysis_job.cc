@@ -374,7 +374,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
             //
             // Retrieve the value
             //
-            v = atof(line.get_item(line.get_item(j.column[i])));
+            v = atof(line.get_item(j.column[i]));
 
             //
             // Add value to existing map entry or add a new one
