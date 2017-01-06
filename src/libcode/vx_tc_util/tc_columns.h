@@ -136,12 +136,6 @@ inline int get_n_prob_ri_cols (int n) { return(n_prob_ri_cols + (2*n)); } // n =
 
 ////////////////////////////////////////////////////////////////////////
 
-extern int get_tc_col_offset     (const char **, int, const char *);
-extern int get_tc_mpr_col_offset (const char *);
-extern int get_prob_ri_col_offset(const char *);
-
-////////////////////////////////////////////////////////////////////////
-
 extern void open_tc_txt_file (ofstream *&,  const char *);
 extern void close_tc_txt_file(ofstream *&,  const char *);
 

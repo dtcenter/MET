@@ -471,7 +471,7 @@ void TCStatJob::dump(ostream & out, int depth) const {
 bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
                                 TCLineCounts &n) const {
    bool keep = true;
-   int i, i_init, offset;
+   int i, i_init;
    double v_dbl;
    ConcatString v_str;
    map<ConcatString,ThreshArray>::const_iterator thr_it;
@@ -549,9 +549,8 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
 
       for(str_it=InitStrMap.begin(); str_it!= InitStrMap.end(); str_it++) {
 
-         // Determine the column offset and retrieve the value
-         offset = determine_column_offset(*(pair.line(i_init)), str_it->first);
-         v_str  = pair.line(i_init)->get_item(offset);
+         // Retrieve the column value
+         v_str = pair.line(i_init)->get_item(str_it->first);
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
@@ -591,7 +590,6 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
 bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCLineCounts &n) const {
    bool keep = true;
-   int offset;
    double v_dbl, alat, alon, blat, blon;
    ConcatString v_str;
    StringArray sa;
@@ -675,9 +673,8 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
       // Loop through the column string matching
       for(str_it=ColumnStrMap.begin(); str_it!= ColumnStrMap.end(); str_it++) {
 
-         // Determine the column offset and retrieve the value
-         offset = determine_column_offset(line, str_it->first);
-         v_str  = line.get_item(offset);
+         // Retrieve the column value
+         v_str = line.get_item(str_it->first);
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
