@@ -35,17 +35,23 @@ using namespace std;
 
 TCStatLine::TCStatLine() {
 
+   init_from_scratch();
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TCStatLine::~TCStatLine() {
 
+   clear();
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TCStatLine::TCStatLine(const TCStatLine & L) {
+
+   init_from_scratch();
 
    assign(L);
 
@@ -65,11 +71,36 @@ TCStatLine & TCStatLine::operator=(const TCStatLine & L) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TCStatLine::init_from_scratch() {
+
+   DataLine::init_from_scratch();
+
+   clear();
+
+   return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TCStatLine::assign(const TCStatLine & L) {
 
    DataLine::assign(L);
 
-   Type = L.Type;
+   Type    = L.Type;
+   HdrLine = L.HdrLine;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCStatLine::clear() {
+
+   DataLine::clear();
+
+   Type    = NoTCStatLineType;
+   HdrLine = (AsciiHeaderLine *) 0;
 
    return;
 }
@@ -77,20 +108,42 @@ void TCStatLine::assign(const TCStatLine & L) {
 ////////////////////////////////////////////////////////////////////////
 
 int TCStatLine::read_line(LineDataFile * ldf) {
-   int status;
+   int status, offset;
 
    status = DataLine::read_line(ldf);
 
-   if(!status) {
-
+   //
+   // Check for bad read status or zero length
+   //
+   if(!status || n_items() == 0) {
       clear();
-
-      Type = NoTCStatLineType;
-
       return(0);
    }
 
-   determine_line_type();
+   //
+   // Check for a header line
+   //
+   if(strcmp(get_item(0), "VERSION") == 0) {
+      Type = TCStatLineType_Header;
+      return(1);
+   }
+
+   //
+   // Determine the LINE_TYPE column offset
+   //
+   offset = METHdrTable.col_offset(get_item(0), "TCST", na_str, "LINE_TYPE");
+
+   if(is_bad_data(offset) || n_items() < (offset + 1)) {
+      Type = NoTCStatLineType;
+      return(0);
+   }
+
+   //
+   // Load the matching header line and store the line type
+   //
+   HdrLine = METHdrTable.header(get_item(0), "TCST", get_item(offset));
+
+   Type = string_to_tcstatlinetype(get_item(offset));
 
    return(1);
 }
@@ -104,36 +157,53 @@ int TCStatLine::is_ok() const {
 ////////////////////////////////////////////////////////////////////////
 
 int TCStatLine::is_header() const {
-
-   const char * c = line_type();
-
-   TCStatLineType t = string_to_tcstatlinetype(c);
-
-   if(t == TCStatLineType_Header) return(1);
-
-   return(0);
+   return(Type == TCStatLineType_Header);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const char * TCStatLine::get_item(int k, bool check_na) const {
+const char * TCStatLine::get_item(const char *col_str, bool check_na) const {
+   int offset = bad_data_int;
+   int dim = bad_data_int;
 
-   // Return bad data instead of erroring out
-   if(k < 0 || k >= N_items) return(bad_data_str);
+   //
+   // Parse the variable length dimension
+   //
+   if(HdrLine->is_var_length()) {
+      dim = atoi(get_item(HdrLine->var_index_offset()));
+   }
 
-   const char * c = DataLine::get_item(k);
+   //
+   // Search for matching header column
+   //
+   offset = HdrLine->col_offset(col_str, dim);
+
+   //
+   // If not found, check extra header columns
+   //
+   if(is_bad_data(offset)) {
+      if(!get_file()->header().has(col_str, offset)) offset = bad_data_int;
+   }
+
+   //
+   // Return bad data string for no match
+   //
+   if(is_bad_data(offset)) return(bad_data_str);
+   else                    return(get_item(offset, check_na));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char * TCStatLine::get_item(int offset, bool check_na) const {
+
+   // Range check
+   if(offset < 0 || offset >= N_items) return(bad_data_str);
+
+   const char * c = DataLine::get_item(offset);
 
    // Check for the NA string and interpret it as bad data
    if(check_na && strcmp(c, na_str) == 0) return(bad_data_str);
    else                                   return(c);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-const char * TCStatLine::get_item(const char * col_name, bool check_na) const {
-   int offset = determine_column_offset(*this, col_name);
-
-   return(get_item(offset, check_na));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -187,13 +257,12 @@ const char * TCStatLine::storm_name() const {
 ////////////////////////////////////////////////////////////////////////
 
 unixtime TCStatLine::init() const {
+   unixtime t;
    const char * c = get_item("INIT");
-   unixtime ut;
 
-   if(strcmp(c, bad_data_str) == 0) ut = (unixtime) 0;
-   else                             ut = timestring_to_unix(c);
+   t = timestring_to_unix(c);
 
-   return(ut);
+   return(t);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -205,11 +274,10 @@ int TCStatLine::init_hour() const {
 ////////////////////////////////////////////////////////////////////////
 
 int TCStatLine::lead() const {
-   const char * c = get_item("LEAD");
    int s;
+   const char * c = get_item("LEAD");
 
-   if(strcmp(c, bad_data_str) == 0) s = bad_data_int;
-   else                             s = timestring_to_sec(c);
+   s = timestring_to_sec(c);
 
    return(s);
 }
@@ -217,13 +285,12 @@ int TCStatLine::lead() const {
 ////////////////////////////////////////////////////////////////////////
 
 unixtime TCStatLine::valid() const {
+   unixtime t;
    const char * c = get_item("VALID");
-   unixtime ut;
 
-   if(strcmp(c, bad_data_str) == 0) ut = (unixtime) 0;
-   else                             ut = timestring_to_unix(c);
+   t = timestring_to_unix(c);
 
-   return(ut);
+   return(t);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -253,10 +320,7 @@ const char * TCStatLine::initials() const {
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::line_type() const {
-   int offset = get_tc_col_offset(tc_header_cols, n_tc_header_cols,
-                                  "LINE_TYPE");
-
-   return(get_item(offset, false));
+   return(get_item("LINE_TYPE", false));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -273,16 +337,6 @@ ConcatString TCStatLine::header() const {
        << (valid() > 0 ? unix_to_yyyymmdd_hhmmss(valid()) : na_str);
 
    return(hdr);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCStatLine::determine_line_type() {
-   const char *c = line_type();
-
-   Type = string_to_tcstatlinetype(c);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -315,47 +369,6 @@ ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
    }
 
    return(ConcatString(s));
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Code for misc functions
-//
-////////////////////////////////////////////////////////////////////////
-
-int determine_column_offset(const TCStatLine &L, const char *c, bool error_out) {
-   int offset = bad_data_int;
-
-   switch(L.type()) {
-
-      case TCStatLineType_TCMPR:
-         offset = get_tc_mpr_col_offset(c);
-         break;
-
-      case TCStatLineType_ProbRI:
-         offset = get_prob_ri_col_offset(c);
-         break;
-
-      default:
-         mlog << Error << "\ndetermine_column_offset() -> "
-              << "unexpected line type value of " << L.type() << "\n\n";
-         exit(1);
-         break;
-   };
-
-   // Check any extra header columns
-   if(is_bad_data(offset)) {
-      if(!L.get_file()->header().has(c, offset)) offset = bad_data_int;
-   }
-
-   // Check for no match
-   if(error_out && is_bad_data(offset)) {
-      mlog << Error << "\ndetermine_column_offset() -> "
-           << "no match found for column named: \"" << c << "\"\n\n";
-      exit(1);
-   }
-
-   return(offset);
 }
 
 ////////////////////////////////////////////////////////////////////////

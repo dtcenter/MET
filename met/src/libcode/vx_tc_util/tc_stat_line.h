@@ -46,11 +46,13 @@ class TCStatLine : public DataLine {
 
    private:
 
-      void assign(const TCStatLine &);
-
-      void determine_line_type();
-
       TCStatLineType Type;
+
+      const AsciiHeaderLine *HdrLine;   //  not allocated
+
+      void init_from_scratch();
+
+      void assign(const TCStatLine &);
 
    public:
 
@@ -58,6 +60,8 @@ class TCStatLine : public DataLine {
      ~TCStatLine();
       TCStatLine(const TCStatLine &);
       TCStatLine & operator=(const TCStatLine &);
+
+      void clear();
 
       int read_line(LineDataFile *);   //  virtual from base class
 
@@ -69,8 +73,8 @@ class TCStatLine : public DataLine {
       // Retrieve values of the header columns
       //
 
-      const char * get_item     (int, bool check_na = true) const;
       const char * get_item     (const char *, bool check_na = true) const;
+      const char * get_item     (int,          bool check_na = true) const;
 
       const char * version      () const;
       const char * amodel       () const;
@@ -97,11 +101,6 @@ class TCStatLine : public DataLine {
 ////////////////////////////////////////////////////////////////////////
 
 inline  TCStatLineType TCStatLine::type() const { return(Type); }
-
-////////////////////////////////////////////////////////////////////////
-
-extern int determine_column_offset(const TCStatLine &, const char *,
-                                   bool error_out = true);
 
 ////////////////////////////////////////////////////////////////////////
 
