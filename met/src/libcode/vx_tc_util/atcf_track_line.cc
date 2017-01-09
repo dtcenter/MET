@@ -135,6 +135,8 @@ void ATCFTrackLine::clear() {
 int ATCFTrackLine::read_line(LineDataFile * ldf) {
    int status;
 
+   clear();
+
    status = ATCFLineBase::read_line(ldf);
 
    // Check for bad return status or blank line

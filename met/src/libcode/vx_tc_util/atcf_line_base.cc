@@ -138,6 +138,8 @@ void ATCFLineBase::clear() {
 int ATCFLineBase::read_line(LineDataFile * ldf) {
    int status;
 
+   clear();
+
    status = DataLine::read_line(ldf);
 
    // Check for bad return status or blank line
