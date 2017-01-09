@@ -110,6 +110,8 @@ void TCStatLine::clear() {
 int TCStatLine::read_line(LineDataFile * ldf) {
    int status, offset;
 
+   clear();
+
    status = DataLine::read_line(ldf);
 
    //
