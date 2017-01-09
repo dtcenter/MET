@@ -56,10 +56,10 @@ class BasicModeAnalysisJob {
       virtual ~BasicModeAnalysisJob();
       BasicModeAnalysisJob(const BasicModeAnalysisJob &);
       BasicModeAnalysisJob & operator=(const BasicModeAnalysisJob &);
-      
+
       void set_precision (int);
       int  get_precision () const;
-      
+
       virtual void clear();
 
       virtual void dump(ostream &, int depth = 0) const;
@@ -79,14 +79,14 @@ class BasicModeAnalysisJob {
 
       ModeAttributes atts;
 
-      IntArray columns;
+      StringArray columns;
 
       int n_lines_read;
       int n_lines_kept;
 
       ostream * dumpfile;   //  NOT allocated, so don't delete
       ostream * outfile;    //  NOT allocated, so don't delete
-      
+
       int        n_dump;    //  number of lines written to dump file
       AsciiTable dump_at;   //  AsciiTable object to buffer dump data
 

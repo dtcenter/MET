@@ -895,7 +895,7 @@ if ( info.all_false() )  return;
    if ( info.do_latlon )  write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
 
    int deflate_level = info.compress_level;
-   
+
    // Define Variables
    if ( info.do_raw )         fcst_raw_var     = add_var(f_out, "fcst_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
    if ( info.do_object_raw )  fcst_obj_raw_var = add_var(f_out, "fcst_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
@@ -1553,7 +1553,7 @@ void ModeExecutive::write_ct_stats()
 
    AsciiTable cts_at;
    ofstream out;
-   int i;
+   int i, c;
    double v;
    ConcatString stat_file;
 
@@ -1616,75 +1616,77 @@ void ModeExecutive::write_ct_stats()
       // Write out the header columns
       write_header_columns(engine, cts_at, i+1);
 
+      c = n_mode_hdr_columns;
+
       // Field
-      cts_at.set_entry(i+1, mode_field_offset, cts[i].name());
+      cts_at.set_entry(i+1, c++, cts[i].name());
 
       // Total
-      cts_at.set_entry(i+1, mode_total_offset, cts[i].n());
+      cts_at.set_entry(i+1, c++, cts[i].n());
 
       // FY_OY
-      cts_at.set_entry(i+1, mode_fy_oy_offset, cts[i].fy_oy());
+      cts_at.set_entry(i+1, c++, cts[i].fy_oy());
 
       // FY_ON
-      cts_at.set_entry(i+1, mode_fy_on_offset, cts[i].fy_on());
+      cts_at.set_entry(i+1, c++, cts[i].fy_on());
 
       // FN_OY
-      cts_at.set_entry(i+1, mode_fn_oy_offset, cts[i].fn_oy());
+      cts_at.set_entry(i+1, c++, cts[i].fn_oy());
 
       // FN_ON
-      cts_at.set_entry(i+1, mode_fn_on_offset, cts[i].fn_on());
+      cts_at.set_entry(i+1, c++, cts[i].fn_on());
 
       // Base Rate
       v = cts[i].oy_tp();
-      cts_at.set_entry(i+1, mode_baser_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // Forecast Mean
       v = cts[i].fy_tp();
-      cts_at.set_entry(i+1, mode_fmean_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // Accuracy
       v = cts[i].accuracy();
-      cts_at.set_entry(i+1, mode_acc_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // Forecast Bias
       v = cts[i].fbias();
-      cts_at.set_entry(i+1, mode_fbias_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // PODY
       v = cts[i].pod_yes();
-      cts_at.set_entry(i+1, mode_pody_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // PODN
       v = cts[i].pod_no();
-      cts_at.set_entry(i+1, mode_podn_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // POFD
       v = cts[i].pofd();
-      cts_at.set_entry(i+1, mode_pofd_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // FAR
       v = cts[i].far();
-      cts_at.set_entry(i+1, mode_far_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // CSI
       v = cts[i].csi();
-      cts_at.set_entry(i+1, mode_csi_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // GSS
       v = cts[i].gss();
-      cts_at.set_entry(i+1, mode_gss_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // HK
       v = cts[i].hk();
-      cts_at.set_entry(i+1, mode_hk_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // HSS
       v = cts[i].hss();
-      cts_at.set_entry(i+1, mode_hss_offset, v);
+      cts_at.set_entry(i+1, c++, v);
 
       // ODDS
       v = cts[i].odds();
-      cts_at.set_entry(i+1, mode_odds_offset, v);
+      cts_at.set_entry(i+1, c++, v);
    }
 
    //
@@ -1715,19 +1717,19 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
    NcDim  dim;
    NcVar  var;
    const int N = strlen(text);
-   
-   
+
+
    dim = add_dim(f, dim_name, N);
-   
+
    var = add_var(f, var_name, ncChar, dim);
-   
+
    if ( ! put_nc_data(&var, text) )  {
-   
+
       mlog << Error
            << " nc_add_string() -> unable to add string variable \"" << text << "\"\n\n";
-   
+
       exit ( 1 );
-   
+
    }
 
    //

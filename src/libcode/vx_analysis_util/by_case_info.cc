@@ -21,7 +21,6 @@ using namespace std;
 #include "by_case_info.h"
 #include "analysis_utils.h"
 #include "mode_atts.h"
-#include "mode_analysis_columns.h"
 
 #include "vx_log.h"
 
@@ -213,9 +212,7 @@ matched   = L.is_matched();
    //  area
    //
 
-c = L.get_item(area_column);
-
-x = atof(c);
+x = L.area();
 
 if ( x >= 0.0 )  {   //  check for "flag" value -9999
 

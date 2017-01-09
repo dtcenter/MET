@@ -23,7 +23,6 @@ using namespace std;
 
 #include "analysis_utils.h"
 #include "mode_job.h"
-#include "mode_analysis_columns.h"
 #include "mode_columns.h"
 #include "engine.h"
 #include "by_case_info.h"
@@ -36,7 +35,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void get_times_from_file(const char * mode_filename, IntArray & valid_times, const int column_index, const ModeAttributes & atts);
+static void get_times_from_file(const char * mode_filename, IntArray & valid_times, const ModeAttributes & atts);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -226,7 +225,7 @@ if ( n == 0 )  {
 
    for (j=0; j<n; ++j)  {
 
-      out << "\"" << lc_mode_columns[columns[j]] << "\"";
+      out << "\"" << columns[j] << "\"";
 
       if ( j < (n - 1) )  out << ", ";
 
@@ -263,29 +262,7 @@ void BasicModeAnalysisJob::add_column_by_name(const char * name)
 
 {
 
-int j;
-int status;
-
-
-for (j=0; j<n_mode_columns; ++j)  {
-
-   status = strcasecmp(lc_mode_columns[j], name);   //  case-insensitive comparison
-
-   if ( status == 0 )  {
-
-      add_column_by_number(j);
-
-      return;
-
-   }
-
-}
-
-mlog << Error << "\nBasicModeAnalysisJob::add_column_by_name(const char *) -> "
-     << "bad column name \"" << name << "\"\n\n";
-
-exit ( 1 );
-
+columns.add(name);
 
 return;
 
@@ -299,7 +276,11 @@ void BasicModeAnalysisJob::add_column_by_number(int k)
 
 {
 
-if ( (k < 0) || (k >= n_mode_columns) )  {
+   //
+   // Assume the column number corresponds to the current MET version
+   //
+
+if ( (k < 0) || (k >= (n_mode_hdr_columns + n_mode_obj_columns) ) )  {
 
    mlog << Error << "\nBasicModeAnalysisJob::add_column_by_number(int) -> "
         << "bad column number -> " << k << "\n\n";
@@ -308,7 +289,12 @@ if ( (k < 0) || (k >= n_mode_columns) )  {
 
 }
 
-columns.add(k);
+if ( k < n_mode_hdr_columns )  {
+   columns.add(mode_hdr_columns[k]);
+}
+else  {
+   columns.add(mode_obj_columns[k - n_mode_hdr_columns]);
+}
 
 return;
 
@@ -531,7 +517,7 @@ for (j=0; j<Nfields; ++j)  {
 
    r = j + 2;
 
-   table.set_entry(r, k++, lc_mode_columns[columns[j]]);
+   table.set_entry(r, k++, columns[j]);
    table.set_entry(r, k++, accums[j].n_elements());
    table.set_entry(r, k++, accums[j].min());
    table.set_entry(r, k++, accums[j].max());
@@ -664,7 +650,7 @@ void SummaryJob::process_mode_file(const char * path)
 
 {
 
-int j, k;
+int j;
 double value;
 const int N = columns.n_elements();
 LineDataFile in;
@@ -683,7 +669,7 @@ if ( !(in.open(path)) )  {
 
 while ( in >> L )  {
 
-   if ( L.n_items() == 0 )  continue;
+   if ( L.is_header() )  continue;
 
    ++n_lines_read;
 
@@ -699,11 +685,9 @@ while ( in >> L )  {
 
    for (j=0; j<N; ++j)  {
 
-      k = columns[j];
+      value = atof(L.get_item(columns[j]));
 
-      value = atof(L.get_item(k));
-
-      if ( value <= -9999.0 )   continue;   //  bad data flag
+      if ( is_bad_data(value) )   continue;
 
       accums[j].add(value);
 
@@ -1004,8 +988,7 @@ void ByCaseJob::do_job(const StringArray & mode_files)
 {
 
 int j;
-const int Nfiles       = mode_files.n_elements();
-const int column_index = fcst_valid_column;
+const int Nfiles = mode_files.n_elements();
 char junk[256];
 int n_valid_times;
 
@@ -1022,7 +1005,7 @@ valid_times.clear();
 
 for (j=0; j<Nfiles; ++j)  {
 
-   get_times_from_file(mode_files[j], valid_times, column_index, atts);
+   get_times_from_file(mode_files[j], valid_times, atts);
 
 }
 
@@ -1089,8 +1072,6 @@ if ( N == 0 )  return;
 LineDataFile in;
 ModeLine L;
 int t, index;
-const char * c = (const char *) 0;
-const int column_index = fcst_valid_column;
 
 
 if ( !(in.open(mode_filename)) )  {
@@ -1104,6 +1085,8 @@ if ( !(in.open(mode_filename)) )  {
 
 while ( in >> L )  {
 
+   if ( L.is_header() )  continue;
+
    ++n_lines_read;
 
    if ( !(atts.is_keeper(L)) )  continue;
@@ -1112,9 +1095,7 @@ while ( in >> L )  {
 
    dump_mode_line( L );
 
-   c = L.get_item(column_index);
-
-   t = (int) timestring_to_unix(c);
+   t = L.fcst_valid();
 
    if ( valid_times.has(t, index) )  {
 
@@ -1147,14 +1128,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_times_from_file(const char * mode_filename, IntArray & valid_times, const int column_index, const ModeAttributes & atts)
+void get_times_from_file(const char * mode_filename, IntArray & valid_times, const ModeAttributes & atts)
 
 {
 
 LineDataFile in;
 ModeLine L;
 int t;
-const char * c = (const char *) 0;
 
 
 if ( !(in.open(mode_filename)) )  {
@@ -1169,11 +1149,11 @@ if ( !(in.open(mode_filename)) )  {
 
 while ( in >> L )  {
 
+   if ( L.is_header() )  continue;
+
    if ( !(atts.is_keeper(L)) )  continue;
 
-   c = L.get_item(column_index);
-
-   t = (int) timestring_to_unix(c);
+   t = L.fcst_valid();
 
    if ( !(valid_times.has(t)) )  {
 

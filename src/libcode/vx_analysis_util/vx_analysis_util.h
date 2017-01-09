@@ -19,7 +19,6 @@
 #include "by_case_info.h"
 #include "mask_poly.h"
 #include "mode_atts.h"
-#include "mode_analysis_columns.h"
 #include "mode_job.h"
 #include "mode_line.h"
 #include "time_series.h"

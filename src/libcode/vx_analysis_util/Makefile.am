@@ -20,6 +20,5 @@ libvx_analysis_util_a_SOURCES = \
               stat_job.cc stat_job.h \
               stat_line.cc stat_line.h \
               time_series.cc time_series.h \
-              mode_analysis_columns.h \
               vx_analysis_util.h
 libvx_analysis_util_a_CPPFLAGS = ${MET_CPPFLAGS}

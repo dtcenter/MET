@@ -2709,7 +2709,7 @@ void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) 
 ///////////////////////////////////////////////////////////////////////
 
 void write_header(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
-   int i;
+   int i, c;
    char tmp_str[max_str_len];
 
    //
@@ -2729,9 +2729,10 @@ void write_header(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
    //
    // Over-ride the name of the INTENSITY_USER column
    //
+   c = METHdrTable.header(met_version, "MODE", "OBJ")->col_offset("INTENSITY_USER");
    sprintf(tmp_str, "INTENSITY_%d",
            nint(eng.conf_info.inten_perc_value));
-   at.set_entry(row, mode_intensity_user_offset, tmp_str);
+   at.set_entry(row, c, tmp_str);
 
    return;
 }
@@ -2739,73 +2740,74 @@ void write_header(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
 ///////////////////////////////////////////////////////////////////////
 
 void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
+   int c = 0;
 
    // Version
-   at.set_entry(row, mode_version_offset,
+   at.set_entry(row, c++,
                 met_version);
 
    // Model Name
-   at.set_entry(row, mode_model_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.model);
 
    // Description
-   at.set_entry(row, mode_desc_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.desc);
 
    // Forecast lead time
-   at.set_entry(row, mode_fcst_lead_offset,
+   at.set_entry(row, c++,
                 sec_to_hhmmss(eng.fcst_raw->data.lead()));
 
    // Forecast valid time
-   at.set_entry(row, mode_fcst_valid_offset,
+   at.set_entry(row, c++,
                 unix_to_yyyymmdd_hhmmss(eng.fcst_raw->data.valid()));
 
    // Forecast accumulation time
-   at.set_entry(row, mode_fcst_accum_offset,
+   at.set_entry(row, c++,
                 sec_to_hhmmss(eng.fcst_raw->data.accum()));
 
    // Observation lead time
-   at.set_entry(row, mode_obs_lead_offset,
+   at.set_entry(row, c++,
                 sec_to_hhmmss(eng.obs_raw->data.lead()));
 
    // Observation valid time
-   at.set_entry(row, mode_obs_valid_offset,
+   at.set_entry(row, c++,
                 unix_to_yyyymmdd_hhmmss(eng.obs_raw->data.valid()));
 
    // Observation accumulation time
-   at.set_entry(row, mode_obs_accum_offset,
+   at.set_entry(row, c++,
                 sec_to_hhmmss(eng.obs_raw->data.accum()));
 
    // Forecast convolution radius
-   at.set_entry(row, mode_fcst_rad_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.fcst_conv_radius);
 
    // Forecast convolution threshold
-   at.set_entry(row, mode_fcst_thr_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.fcst_conv_thresh.get_str());
 
    // Observation convolution radius
-   at.set_entry(row, mode_obs_rad_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.obs_conv_radius);
 
    // Observation convolution threshold
-   at.set_entry(row, mode_obs_thr_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.obs_conv_thresh.get_str());
 
    // Forecast Variable Name
-   at.set_entry(row, mode_fcst_var_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.fcst_info->name());
 
    // Forecast Variable Level
-   at.set_entry(row, mode_fcst_lev_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.fcst_info->level_name());
 
    // Observation Variable Name
-   at.set_entry(row, mode_obs_var_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.obs_info->name());
 
    // Observation Variable Level
-   at.set_entry(row, mode_obs_lev_offset,
+   at.set_entry(row, c++,
                 eng.conf_info.obs_info->level_name());
 
    return;
@@ -2815,7 +2817,7 @@ void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
 
 void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                        AsciiTable &at, const int row) {
-   int i;
+   int i, c;
    double lat, lon;
    char tmp_str[max_str_len];
 
@@ -2829,14 +2831,16 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    // Write out the common header columns
    write_header_columns(eng, at, row);
 
+   c = n_mode_hdr_columns;
+
    // Object ID
    sprintf(tmp_str, "F%03d", (n+1));
-   at.set_entry(row, mode_object_id_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Object category
    i = eng.collection.fcst_set_number(n + 1);
    sprintf(tmp_str, "CF%03d", (i + 1));
-   at.set_entry(row, mode_object_cat_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
    grid.xy_to_latlon(eng.fcst_single[n].centroid_x,
@@ -2844,83 +2848,83 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                      lat, lon);
 
    // Object centroid, x-coordinate
-   at.set_entry(row, mode_centroid_x_offset, eng.fcst_single[n].centroid_x);
+   at.set_entry(row, c++, eng.fcst_single[n].centroid_x);
 
    // Object centroid, y-coordinate
-   at.set_entry(row, mode_centroid_y_offset, eng.fcst_single[n].centroid_y);
+   at.set_entry(row, c++, eng.fcst_single[n].centroid_y);
 
    // Object centroid, latitude
-   at.set_entry(row, mode_centroid_lat_offset, lat);
+   at.set_entry(row, c++, lat);
 
    // Object centroid, longitude
-   at.set_entry(row, mode_centroid_lon_offset, -1.0*lon);
+   at.set_entry(row, c++, -1.0*lon);
 
    // Axis angle
-   at.set_entry(row, mode_axis_ang_offset, eng.fcst_single[n].axis_ang);
+   at.set_entry(row, c++, eng.fcst_single[n].axis_ang);
 
    // Object length
-   at.set_entry(row, mode_length_offset, eng.fcst_single[n].length);
+   at.set_entry(row, c++, eng.fcst_single[n].length);
 
    // Object width
-   at.set_entry(row, mode_width_offset, eng.fcst_single[n].width);
+   at.set_entry(row, c++, eng.fcst_single[n].width);
 
    // Area of object
-   at.set_entry(row, mode_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.fcst_single[n].area));
 
    // Area in the raw field that is non-zero
-   at.set_entry(row, mode_area_filter_offset,
+   at.set_entry(row, c++,
                 nint(eng.fcst_single[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
-   at.set_entry(row, mode_area_thresh_offset,
+   at.set_entry(row, c++,
                 nint(eng.fcst_single[n].area_thresh));
 
    // Object curvature
-   at.set_entry(row, mode_curvature_offset, eng.fcst_single[n].curvature);
+   at.set_entry(row, c++, eng.fcst_single[n].curvature);
 
    // Center of curvature, x-coordinate
-   at.set_entry(row, mode_curvature_x_offset, eng.fcst_single[n].curvature_x);
+   at.set_entry(row, c++, eng.fcst_single[n].curvature_x);
 
    // Center of curvature, y-coordiante
-   at.set_entry(row, mode_curvature_y_offset, eng.fcst_single[n].curvature_y);
+   at.set_entry(row, c++, eng.fcst_single[n].curvature_y);
 
    // Object complexity
-   at.set_entry(row, mode_complexity_offset, eng.fcst_single[n].complexity);
+   at.set_entry(row, c++, eng.fcst_single[n].complexity);
 
    // 10th percentile of object intensity
-   at.set_entry(row, mode_intensity_10_offset,
+   at.set_entry(row, c++,
                 eng.fcst_single[n].intensity_ptile.p10);
 
    // 25th percentile of object intensity
-   at.set_entry(row, mode_intensity_25_offset,
+   at.set_entry(row, c++,
                 eng.fcst_single[n].intensity_ptile.p25);
 
    // 50th percentile of object intensity
-   at.set_entry(row, mode_intensity_50_offset,
+   at.set_entry(row, c++,
                 eng.fcst_single[n].intensity_ptile.p50);
 
    // 75th percentile of object intensity
-   at.set_entry(row, mode_intensity_75_offset,
+   at.set_entry(row, c++,
                 eng.fcst_single[n].intensity_ptile.p75);
 
    // 90th percentile of object intensity
-   at.set_entry(row, mode_intensity_90_offset,
+   at.set_entry(row, c++,
                 eng.fcst_single[n].intensity_ptile.p90);
 
    // Specified percentile of object intensity
-   at.set_entry(row, mode_intensity_user_offset,
+   at.set_entry(row, c++,
                 eng.fcst_single[n].intensity_ptile.pth);
 
    // Sum of the object intensity values
-   at.set_entry(row, mode_intensity_sum_offset,
+   at.set_entry(row, c++,
                 eng.fcst_single[n].intensity_ptile.sum);
 
    //
    // Fill the columns that don't apply with bad data values
    //
-   for(i=mode_centroid_dist_offset; i<=mode_interest_offset; i++) {
-      at.set_entry(row, i, bad_data_double);
+   for(i=0; i<n_mode_pair_columns; i++) {
+      at.set_entry(row, c++, bad_data_double);
    }
 
    //
@@ -2934,7 +2938,7 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 
 void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                       AsciiTable &at, const int row) {
-   int i;
+   int i, c;
    double lat, lon;
    char tmp_str[max_str_len];
 
@@ -2948,14 +2952,16 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    // Write out the common header columns
    write_header_columns(eng, at, row);
 
+   c = n_mode_hdr_columns;
+
    // Object ID
    sprintf(tmp_str, "O%03d", (n+1));
-   at.set_entry(row, mode_object_id_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Object category
    i = eng.collection.obs_set_number(n + 1);
    sprintf(tmp_str, "CO%03d", (i + 1));
-   at.set_entry(row, mode_object_cat_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
    grid.xy_to_latlon(eng.obs_single[n].centroid_x,
@@ -2963,83 +2969,83 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                      lat, lon);
 
    // Object centroid, x-coordinate
-   at.set_entry(row, mode_centroid_x_offset, eng.obs_single[n].centroid_x);
+   at.set_entry(row, c++, eng.obs_single[n].centroid_x);
 
    // Object centroid, y-coordinate
-   at.set_entry(row, mode_centroid_y_offset, eng.obs_single[n].centroid_y);
+   at.set_entry(row, c++, eng.obs_single[n].centroid_y);
 
    // Object centroid, latitude
-   at.set_entry(row, mode_centroid_lat_offset, lat);
+   at.set_entry(row, c++, lat);
 
    // Object centroid, longitude
-   at.set_entry(row, mode_centroid_lon_offset, -1.0*lon);
+   at.set_entry(row, c++, -1.0*lon);
 
    // Axis angle
-   at.set_entry(row, mode_axis_ang_offset, eng.obs_single[n].axis_ang);
+   at.set_entry(row, c++, eng.obs_single[n].axis_ang);
 
    // Object length
-   at.set_entry(row, mode_length_offset, eng.obs_single[n].length);
+   at.set_entry(row, c++, eng.obs_single[n].length);
 
    // Object width
-   at.set_entry(row, mode_width_offset, eng.obs_single[n].width);
+   at.set_entry(row, c++, eng.obs_single[n].width);
 
    // Area of object
-   at.set_entry(row, mode_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.obs_single[n].area));
 
    // Area in the raw field that is non-zero
-   at.set_entry(row, mode_area_filter_offset,
+   at.set_entry(row, c++,
                 nint(eng.obs_single[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
-   at.set_entry(row, mode_area_thresh_offset,
+   at.set_entry(row, c++,
                 nint(eng.obs_single[n].area_thresh));
 
    // Object curvature
-   at.set_entry(row, mode_curvature_offset, eng.obs_single[n].curvature);
+   at.set_entry(row, c++, eng.obs_single[n].curvature);
 
    // Center of curvature, x-coordinate
-   at.set_entry(row, mode_curvature_x_offset, eng.obs_single[n].curvature_x);
+   at.set_entry(row, c++, eng.obs_single[n].curvature_x);
 
    // Center of curvature, y-coordiante
-   at.set_entry(row, mode_curvature_y_offset, eng.obs_single[n].curvature_y);
+   at.set_entry(row, c++, eng.obs_single[n].curvature_y);
 
    // Object complexity
-   at.set_entry(row, mode_complexity_offset, eng.obs_single[n].complexity);
+   at.set_entry(row, c++, eng.obs_single[n].complexity);
 
    // 10th percentile of object intensity
-   at.set_entry(row, mode_intensity_10_offset,
+   at.set_entry(row, c++,
                 eng.obs_single[n].intensity_ptile.p10);
 
    // 25th percentile of object intensity
-   at.set_entry(row, mode_intensity_25_offset,
+   at.set_entry(row, c++,
                 eng.obs_single[n].intensity_ptile.p25);
 
    // 50th percentile of object intensity
-   at.set_entry(row, mode_intensity_50_offset,
+   at.set_entry(row, c++,
                 eng.obs_single[n].intensity_ptile.p50);
 
    // 75th percentile of object intensity
-   at.set_entry(row, mode_intensity_75_offset,
+   at.set_entry(row, c++,
                 eng.obs_single[n].intensity_ptile.p75);
 
    // 90th percentile of object intensity
-   at.set_entry(row, mode_intensity_90_offset,
+   at.set_entry(row, c++,
                 eng.obs_single[n].intensity_ptile.p90);
 
    // Specified percentile of object intensity
-   at.set_entry(row, mode_intensity_user_offset,
+   at.set_entry(row, c++,
                 eng.obs_single[n].intensity_ptile.pth);
 
    // Sum of the object intensity values
-   at.set_entry(row, mode_intensity_sum_offset,
+   at.set_entry(row, c++,
                 eng.obs_single[n].intensity_ptile.sum);
 
    //
    // Fill the columns that don't apply with bad data values
    //
-   for(i=mode_centroid_dist_offset; i<=mode_interest_offset; i++) {
-      at.set_entry(row, i, bad_data_double);
+   for(i=0; i<n_mode_pair_columns; i++) {
+      at.set_entry(row, c++, bad_data_double);
    }
 
    //
@@ -3053,7 +3059,7 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 
 void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
                 AsciiTable &at, int &row) {
-   int n, i, fcst_i, obs_i;
+   int n, i, c, fcst_i, obs_i;
    char tmp_str[max_str_len];
 
    if(n_f >= eng.n_fcst || n_o >= eng.n_obs) {
@@ -3076,65 +3082,67 @@ void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
    // Write out the common header columns
    write_header_columns(eng, at, row);
 
+   c = n_mode_hdr_columns;
+
    // Object ID
    sprintf(tmp_str, "F%03d_O%03d", (n_f+1), (n_o+1));
-   at.set_entry(row, mode_object_id_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Object category
    fcst_i = eng.collection.fcst_set_number(n_f+1);
    obs_i  = eng.collection.obs_set_number(n_o+1);
    sprintf(tmp_str, "CF%03d_CO%03d", (fcst_i+1), (obs_i+1));
-   at.set_entry(row, mode_object_cat_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    //
    // Fill the columns that don't apply with bad data values
    //
-   for(i=mode_centroid_x_offset; i<=mode_intensity_sum_offset; i++) {
-      at.set_entry(row, i, bad_data_double);
+   for(i=0; i<n_mode_single_columns; i++) {
+      at.set_entry(row, c++, bad_data_double);
    }
 
    // Distance between centroids
-   at.set_entry(row, mode_centroid_dist_offset, eng.pair_single[n].centroid_dist);
+   at.set_entry(row, c++, eng.pair_single[n].centroid_dist);
 
    // Distance between boundaries
-   at.set_entry(row, mode_boundary_dist_offset, eng.pair_single[n].boundary_dist);
+   at.set_entry(row, c++, eng.pair_single[n].boundary_dist);
 
    // Distance between convex hulls
-   at.set_entry(row, mode_convex_hull_dist_offset,
+   at.set_entry(row, c++,
                 eng.pair_single[n].convex_hull_dist);
 
    // Difference in angles in degrees
-   at.set_entry(row, mode_angle_diff_offset, eng.pair_single[n].angle_diff);
+   at.set_entry(row, c++, eng.pair_single[n].angle_diff);
 
    // Area ratio
-   at.set_entry(row, mode_area_ratio_offset, eng.pair_single[n].area_ratio);
+   at.set_entry(row, c++, eng.pair_single[n].area_ratio);
 
    // Intersection area
-   at.set_entry(row, mode_intersection_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.pair_single[n].intersection_area));
 
    // Union area
-   at.set_entry(row, mode_union_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.pair_single[n].union_area));
 
    // Symmetric difference area
-   at.set_entry(row, mode_symmetric_diff_offset,
+   at.set_entry(row, c++,
                 nint(eng.pair_single[n].symmetric_diff));
 
    // Intersection over area
-   at.set_entry(row, mode_intersection_over_area_offset,
+   at.set_entry(row, c++,
                 eng.pair_single[n].intersection_over_area);
 
    // Complexity ratio
-   at.set_entry(row, mode_complexity_ratio_offset,
+   at.set_entry(row, c++,
                 eng.pair_single[n].complexity_ratio);
 
    // Percentile intensity ratio
-   at.set_entry(row, mode_percentile_intensity_ratio_offset,
+   at.set_entry(row, c++,
                 eng.pair_single[n].percentile_intensity_ratio);
 
    // Total interest value
-   at.set_entry(row, mode_interest_offset,
+   at.set_entry(row, c++,
                 eng.info_singles[eng.get_info_index(n)].interest_value);
 
    //
@@ -3149,19 +3157,21 @@ void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
 
 void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                           AsciiTable &at, const int row) {
-   int i;
+   int i, c;
    double lat, lon;
    char tmp_str[max_str_len];
 
    // Write out the common header columns
    write_header_columns(eng, at, row);
 
+   c = n_mode_hdr_columns;
+
    // Object ID
    sprintf(tmp_str, "CF%03d", (n+1));
-   at.set_entry(row, mode_object_id_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Object category
-   at.set_entry(row, mode_object_cat_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
    grid.xy_to_latlon(eng.fcst_cluster[n].centroid_x,
@@ -3169,83 +3179,83 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                      lat, lon);
 
    // Object centroid, x-coordinate
-   at.set_entry(row, mode_centroid_x_offset, eng.fcst_cluster[n].centroid_x);
+   at.set_entry(row, c++, eng.fcst_cluster[n].centroid_x);
 
    // Object centroid, y-coordinate
-   at.set_entry(row, mode_centroid_y_offset, eng.fcst_cluster[n].centroid_y);
+   at.set_entry(row, c++, eng.fcst_cluster[n].centroid_y);
 
    // Object centroid, latitude
-   at.set_entry(row, mode_centroid_lat_offset, lat);
+   at.set_entry(row, c++, lat);
 
    // Object centroid, longitude
-   at.set_entry(row, mode_centroid_lon_offset, -1.0*lon);
+   at.set_entry(row, c++, -1.0*lon);
 
    // Axis angle
-   at.set_entry(row, mode_axis_ang_offset, eng.fcst_cluster[n].axis_ang);
+   at.set_entry(row, c++, eng.fcst_cluster[n].axis_ang);
 
    // Object length
-   at.set_entry(row, mode_length_offset, eng.fcst_cluster[n].length);
+   at.set_entry(row, c++, eng.fcst_cluster[n].length);
 
    // Object width
-   at.set_entry(row, mode_width_offset, eng.fcst_cluster[n].width);
+   at.set_entry(row, c++, eng.fcst_cluster[n].width);
 
    // Area of object
-   at.set_entry(row, mode_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.fcst_cluster[n].area));
 
    // Area in the raw field that is non-zero
-   at.set_entry(row, mode_area_filter_offset,
+   at.set_entry(row, c++,
                 nint(eng.fcst_cluster[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
-   at.set_entry(row, mode_area_thresh_offset,
+   at.set_entry(row, c++,
                 nint(eng.fcst_cluster[n].area_thresh));
 
    // Object curvature
-   at.set_entry(row, mode_curvature_offset, eng.fcst_cluster[n].curvature);
+   at.set_entry(row, c++, eng.fcst_cluster[n].curvature);
 
    // Center of curvature, x-coordinate
-   at.set_entry(row, mode_curvature_x_offset, eng.fcst_cluster[n].curvature_x);
+   at.set_entry(row, c++, eng.fcst_cluster[n].curvature_x);
 
    // Center of curvature, y-coordiante
-   at.set_entry(row, mode_curvature_y_offset, eng.fcst_cluster[n].curvature_y);
+   at.set_entry(row, c++, eng.fcst_cluster[n].curvature_y);
 
    // Object complexity
-   at.set_entry(row, mode_complexity_offset, eng.fcst_cluster[n].complexity);
+   at.set_entry(row, c++, eng.fcst_cluster[n].complexity);
 
    // 10th percentile of object intensity
-   at.set_entry(row, mode_intensity_10_offset,
+   at.set_entry(row, c++,
                 eng.fcst_cluster[n].intensity_ptile.p10);
 
    // 25th percentile of object intensity
-   at.set_entry(row, mode_intensity_25_offset,
+   at.set_entry(row, c++,
                 eng.fcst_cluster[n].intensity_ptile.p25);
 
    // 50th percentile of object intensity
-   at.set_entry(row, mode_intensity_50_offset,
+   at.set_entry(row, c++,
                 eng.fcst_cluster[n].intensity_ptile.p50);
 
    // 75th percentile of object intensity
-   at.set_entry(row, mode_intensity_75_offset,
+   at.set_entry(row, c++,
                 eng.fcst_cluster[n].intensity_ptile.p75);
 
    // 90th percentile of object intensity
-   at.set_entry(row, mode_intensity_90_offset,
+   at.set_entry(row, c++,
                 eng.fcst_cluster[n].intensity_ptile.p90);
 
    // Specified percentile of object intensity
-   at.set_entry(row, mode_intensity_user_offset,
+   at.set_entry(row, c++,
                 eng.fcst_cluster[n].intensity_ptile.pth);
 
    // Sum of the object intensity values
-   at.set_entry(row, mode_intensity_sum_offset,
+   at.set_entry(row, c++,
                 eng.fcst_cluster[n].intensity_ptile.sum);
 
    //
    // Fill the columns that don't apply with bad data values
    //
-   for(i=mode_centroid_dist_offset; i<=mode_interest_offset; i++) {
-      at.set_entry(row, i, bad_data_double);
+   for(i=0; i<n_mode_pair_columns; i++) {
+      at.set_entry(row, c++, bad_data_double);
    }
 
    //
@@ -3259,19 +3269,21 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 
 void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                          AsciiTable &at, const int row) {
-   int i;
+   int i, c;
    double lat, lon;
    char tmp_str[max_str_len];
 
    // Write out the common header columns
    write_header_columns(eng, at, row);
 
+   c = n_mode_hdr_columns;
+
    // Object ID
    sprintf(tmp_str, "CO%03d", (n+1));
-   at.set_entry(row, mode_object_id_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Object category
-   at.set_entry(row, mode_object_cat_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
    grid.xy_to_latlon(eng.obs_cluster[n].centroid_x,
@@ -3279,83 +3291,83 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
                      lat, lon);
 
    // Object centroid, x-coordinate
-   at.set_entry(row, mode_centroid_x_offset, eng.obs_cluster[n].centroid_x);
+   at.set_entry(row, c++, eng.obs_cluster[n].centroid_x);
 
    // Object centroid, y-coordinate
-   at.set_entry(row, mode_centroid_y_offset, eng.obs_cluster[n].centroid_y);
+   at.set_entry(row, c++, eng.obs_cluster[n].centroid_y);
 
    // Object centroid, latitude
-   at.set_entry(row, mode_centroid_lat_offset, lat);
+   at.set_entry(row, c++, lat);
 
    // Object centroid, longitude
-   at.set_entry(row, mode_centroid_lon_offset, -1.0*lon);
+   at.set_entry(row, c++, -1.0*lon);
 
    // Axis angle
-   at.set_entry(row, mode_axis_ang_offset, eng.obs_cluster[n].axis_ang);
+   at.set_entry(row, c++, eng.obs_cluster[n].axis_ang);
 
    // Object length
-   at.set_entry(row, mode_length_offset, eng.obs_cluster[n].length);
+   at.set_entry(row, c++, eng.obs_cluster[n].length);
 
    // Object width
-   at.set_entry(row, mode_width_offset, eng.obs_cluster[n].width);
+   at.set_entry(row, c++, eng.obs_cluster[n].width);
 
    // Area of object
-   at.set_entry(row, mode_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.obs_cluster[n].area));
 
    // Area in the raw field that is non-zero
-   at.set_entry(row, mode_area_filter_offset,
+   at.set_entry(row, c++,
                 nint(eng.obs_cluster[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
-   at.set_entry(row, mode_area_thresh_offset,
+   at.set_entry(row, c++,
                 nint(eng.obs_cluster[n].area_thresh));
 
    // Object curvature
-   at.set_entry(row, mode_curvature_offset, eng.obs_cluster[n].curvature);
+   at.set_entry(row, c++, eng.obs_cluster[n].curvature);
 
    // Center of curvature, x-coordinate
-   at.set_entry(row, mode_curvature_x_offset, eng.obs_cluster[n].curvature_x);
+   at.set_entry(row, c++, eng.obs_cluster[n].curvature_x);
 
    // Center of curvature, y-coordiante
-   at.set_entry(row, mode_curvature_y_offset, eng.obs_cluster[n].curvature_y);
+   at.set_entry(row, c++, eng.obs_cluster[n].curvature_y);
 
    // Object complexity
-   at.set_entry(row, mode_complexity_offset, eng.obs_cluster[n].complexity);
+   at.set_entry(row, c++, eng.obs_cluster[n].complexity);
 
    // 10th percentile of object intensity
-   at.set_entry(row, mode_intensity_10_offset,
+   at.set_entry(row, c++,
                 eng.obs_cluster[n].intensity_ptile.p10);
 
    // 25th percentile of object intensity
-   at.set_entry(row, mode_intensity_25_offset,
+   at.set_entry(row, c++,
                 eng.obs_cluster[n].intensity_ptile.p25);
 
    // 50th percentile of object intensity
-   at.set_entry(row, mode_intensity_50_offset,
+   at.set_entry(row, c++,
                 eng.obs_cluster[n].intensity_ptile.p50);
 
    // 75th percentile of object intensity
-   at.set_entry(row, mode_intensity_75_offset,
+   at.set_entry(row, c++,
                 eng.obs_cluster[n].intensity_ptile.p75);
 
    // 90th percentile of object intensity
-   at.set_entry(row, mode_intensity_90_offset,
+   at.set_entry(row, c++,
                 eng.obs_cluster[n].intensity_ptile.p90);
 
    // Specified percentile of object intensity
-   at.set_entry(row, mode_intensity_user_offset,
+   at.set_entry(row, c++,
                 eng.obs_cluster[n].intensity_ptile.pth);
 
    // Sum of the object intensity values
-   at.set_entry(row, mode_intensity_sum_offset,
+   at.set_entry(row, c++,
                 eng.obs_cluster[n].intensity_ptile.sum);
 
    //
    // Fill the columns that don't apply with bad data values
    //
-   for(i=mode_centroid_dist_offset; i<=mode_interest_offset; i++) {
-      at.set_entry(row, i, bad_data_double);
+   for(i=0; i<n_mode_pair_columns; i++) {
+      at.set_entry(row, c++, bad_data_double);
    }
 
    //
@@ -3369,70 +3381,72 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 
 void write_cluster_pair(ModeFuzzyEngine &eng, const int n,
                           AsciiTable &at, const int row) {
-   int i;
+   int i, c;
    char tmp_str[max_str_len];
 
    // Write out the common header columns
    write_header_columns(eng, at, row);
 
+   c = n_mode_hdr_columns;
+
    // Object ID
    sprintf(tmp_str, "CF%03d_CO%03d", (n+1), (n+1));
-   at.set_entry(row, mode_object_id_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    // Object category
-   at.set_entry(row, mode_object_cat_offset, tmp_str);
+   at.set_entry(row, c++, tmp_str);
 
    //
    // Fill the columns that don't apply with bad data values
    //
-   for(i=mode_centroid_x_offset; i<=mode_intensity_sum_offset; i++) {
-      at.set_entry(row, i, bad_data_double);
+   for(i=0; i<n_mode_single_columns; i++) {
+      at.set_entry(row, c++, bad_data_double);
    }
 
    // Distance between centroids
-   at.set_entry(row, mode_centroid_dist_offset,
+   at.set_entry(row, c++,
                 eng.pair_cluster[n].centroid_dist);
 
    // Distance between boundaries
-   at.set_entry(row, mode_boundary_dist_offset,
+   at.set_entry(row, c++,
                 eng.pair_cluster[n].boundary_dist);
 
    // Distance between convex hulls
-   at.set_entry(row, mode_convex_hull_dist_offset,
+   at.set_entry(row, c++,
                 eng.pair_cluster[n].convex_hull_dist);
 
    // Difference in angles in degrees
-   at.set_entry(row, mode_angle_diff_offset, eng.pair_cluster[n].angle_diff);
+   at.set_entry(row, c++, eng.pair_cluster[n].angle_diff);
 
    // Area ratio
-   at.set_entry(row, mode_area_ratio_offset, eng.pair_cluster[n].area_ratio);
+   at.set_entry(row, c++, eng.pair_cluster[n].area_ratio);
 
    // Intersection area
-   at.set_entry(row, mode_intersection_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.pair_cluster[n].intersection_area));
 
    // Union area
-   at.set_entry(row, mode_union_area_offset,
+   at.set_entry(row, c++,
                 nint(eng.pair_cluster[n].union_area));
 
    // Symmetric difference area
-   at.set_entry(row, mode_symmetric_diff_offset,
+   at.set_entry(row, c++,
                 nint(eng.pair_cluster[n].symmetric_diff));
 
    // Intersection over area
-   at.set_entry(row, mode_intersection_over_area_offset,
+   at.set_entry(row, c++,
                 eng.pair_cluster[n].intersection_over_area);
 
    // Complexity ratio
-   at.set_entry(row, mode_complexity_ratio_offset,
+   at.set_entry(row, c++,
                 eng.pair_cluster[n].complexity_ratio);
 
    // Percentile intensity ratio
-   at.set_entry(row, mode_percentile_intensity_ratio_offset,
+   at.set_entry(row, c++,
                 eng.pair_cluster[n].percentile_intensity_ratio);
 
    // Total interest value
-   at.set_entry(row, mode_interest_offset,
+   at.set_entry(row, c++,
                 eng.info_clus[n].interest_value);
 
    //
