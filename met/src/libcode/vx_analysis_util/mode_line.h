@@ -29,6 +29,16 @@
 
 class ModeLine : public DataLine {
 
+   private:
+
+      bool HdrFlag;
+
+      const AsciiHeaderLine *HdrLine;   //  not allocated
+
+      void init_from_scratch();
+
+      void assign(const ModeLine &);
+
    public:
 
       ModeLine();
@@ -36,20 +46,22 @@ class ModeLine : public DataLine {
       ModeLine(const ModeLine &);
       ModeLine & operator=(const ModeLine &);
 
-
-      // void clear();
+      void clear();
 
       void dump(ostream &, int depth = 0) const;
 
       int read_line(LineDataFile *);   //  virtual from base class
 
-      int is_ok() const;   //  virtual from base class
+      int is_ok() const;               //  virtual from base class
+
+      int is_header() const;           //  virtual from base class
 
          //
          //  retrieve stuff
          //
 
-      const char * get_item (int, bool check_na = true) const;
+      const char * get_item (const char *, bool check_na = true) const;
+      const char * get_item (int,          bool check_na = true) const;
 
       const char * version                    () const;   //  column  1
       const char * model                      () const;   //  column  2
