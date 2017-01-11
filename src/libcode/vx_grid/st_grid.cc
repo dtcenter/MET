@@ -86,6 +86,8 @@ clear();
 
 Lon_orient = data.lon_orient;
 
+if ( data.hemisphere == 'S' )  Lon_orient += 90.0;
+
 Nx = data.nx;
 Ny = data.ny;
 
