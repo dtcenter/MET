@@ -71,6 +71,9 @@ class StereographicGrid : public GridRep {
 
       StereographicData Data;
 
+      bool is_north() const;
+      bool is_south() const;
+
          //
          //  grid interface
          //
@@ -101,6 +104,13 @@ class StereographicGrid : public GridRep {
       GridRep * copy() const;
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline bool StereographicGrid::is_north () const { return (   IsNorthHemisphere ); }
+inline bool StereographicGrid::is_south () const { return ( ! IsNorthHemisphere ); }
 
 
 ////////////////////////////////////////////////////////////////////////

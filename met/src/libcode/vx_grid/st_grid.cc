@@ -86,10 +86,6 @@ clear();
 
 Lon_orient = data.lon_orient;
 
-if ( data.hemisphere == 'S' )  Lon_orient += 90.0;
-
-Nx = data.nx;
-Ny = data.ny;
 
 switch ( data.hemisphere )  {
 
@@ -104,7 +100,16 @@ switch ( data.hemisphere )  {
 
 }   //  switch
 
+const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
+
+
+Nx = data.nx;
+Ny = data.ny;
+
 Name = data.name;
+
+Lon_orient = data.lon_orient;
+
 
    //
    //  calculate Alpha
@@ -118,14 +123,12 @@ Alpha = (1.0 + sind(fabs(data.scale_lat)))*((data.r_km)/(data.d_km));
 
 double r0, theta0;
 
-r0 = st_func(data.lat_pin, IsNorthHemisphere);
+r0 = st_func(data.lat_pin, is_north());
 
-theta0 = Lon_orient - data.lon_pin;
+theta0 = H*(Lon_orient - data.lon_pin);
 
-if ( ! IsNorthHemisphere )  theta0 = -theta0;
-
-Bx = data.x_pin - Alpha*r0*sind(theta0);
-By = data.y_pin + Alpha*r0*cosd(theta0);
+Bx = data.x_pin - Alpha*r0*H*sind(theta0);
+By = data.y_pin + Alpha*r0*H*cosd(theta0);
 
 Data = data;
 
@@ -171,7 +174,7 @@ double StereographicGrid::f(double lat) const
 
 {
 
-return ( st_func(lat, IsNorthHemisphere) );
+return ( st_func(lat, is_north()) );
 
 }
 
@@ -183,7 +186,7 @@ double StereographicGrid::df(double lat) const
 
 {
 
-return ( st_der_func(lat, IsNorthHemisphere) );
+return ( st_der_func(lat, is_north()) );
 
 }
 
@@ -197,18 +200,19 @@ void StereographicGrid::latlon_to_xy(double lat, double lon, double & x, double 
 
 double r, theta;
 
+const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 reduce(lon);
 
-r = st_func(lat, IsNorthHemisphere);
+r = st_func(lat, is_north());
 
 theta = Lon_orient - lon;
 
-if ( !IsNorthHemisphere )  theta = -theta;
+if ( is_south() )  theta = -theta;
 
-x = Bx + Alpha*r*sind(theta);
+x = Bx + Alpha*r*H*sind(theta);
 
-y = By - Alpha*r*cosd(theta);
+y = By - Alpha*r*H*cosd(theta);
 
 return;
 
@@ -224,18 +228,19 @@ void StereographicGrid::xy_to_latlon(double x, double y, double & lat, double & 
 
 double r, theta;
 
+const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 x = (x - Bx)/Alpha;
 y = (y - By)/Alpha;
 
 r = sqrt( x*x + y*y );
 
-lat = st_inv_func(r, IsNorthHemisphere);
+lat = st_inv_func(r, is_north());
 
 if ( fabs(r) < 1.0e-5 )  theta = 0.0;
-else                     theta = atan2d(x, -y);   //  NOT atan2d(y, x);
+else                     theta = atan2d(H*x, -H*y);   //  NOT atan2d(y, x);
 
-if ( !IsNorthHemisphere )  theta = -theta;
+if ( is_south() )  theta = -theta;
 
 lon = Lon_orient - theta;
 
@@ -441,7 +446,7 @@ out << '\n';   //  no prefix
 
 out << prefix << "Projection = Stereographic\n";
 
-out << prefix << "Hemisphere = " << (IsNorthHemisphere ? "North" : "South") << "\n";
+out << prefix << "Hemisphere = " << (is_north() ? "North" : "South") << "\n";
 
 sprintf(junk, "%.5f", Lon_orient);
 fix_float(junk);
@@ -540,7 +545,7 @@ xy_to_latlon((double) x, (double) y, lat, lon);
 
 angle = Lon_orient - lon;
 
-if ( !IsNorthHemisphere )  angle = -angle;
+if ( is_south() )  angle = -angle;
 
 return ( angle );
 
@@ -645,7 +650,7 @@ double st_der_func(double lat, bool is_north_hemisphere)
 double a;
 
 if ( is_north_hemisphere )  a = -1.0/(1.0 + sind(lat));
-else                        a = -1.0/(1.0 - sind(lat));
+else                        a =  1.0/(1.0 - sind(lat));
 
 return ( a );
 
