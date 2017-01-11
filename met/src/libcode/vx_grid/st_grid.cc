@@ -122,6 +122,8 @@ r0 = st_func(data.lat_pin, IsNorthHemisphere);
 
 theta0 = Lon_orient - data.lon_pin;
 
+if ( ! IsNorthHemisphere )  theta0 = -theta0;
+
 Bx = data.x_pin - Alpha*r0*sind(theta0);
 By = data.y_pin + Alpha*r0*cosd(theta0);
 
