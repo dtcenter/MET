@@ -14,7 +14,6 @@ bin_PROGRAMS    = wwmca_regrid \
 	wwmca_plot
 
 wwmca_regrid_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
-	wwmca_grids.h \
 	wwmca_regrid.cc \
 	af_file.cc af_file.h \
 	af_cp_file.cc af_cp_file.h \
@@ -58,7 +57,6 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lm -lz -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
 
 wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
-	wwmca_grids.h \
 	wwmca_plot.cc \
 	af_file.cc af_file.h \
 	af_cp_file.cc af_cp_file.h \
