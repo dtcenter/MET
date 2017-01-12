@@ -157,8 +157,8 @@ static const int n_ncep_st_grids = sizeof(ncep_st_grids)/sizeof(*ncep_st_grids);
 
 static const StereographicData misc_st_grids [] = {
 
-   { "wwmca_north", 'N',  60.0,  90.0, 0.0, 511.0, 511.0,   80.0, 23.79848,  ncep_earth_radius_km, 1024, 1024 },
-   { "wwmca_south", 'S', -60.0, -90.0, 0.0, 511.0, 511.0, -100.0, 23.79848,  ncep_earth_radius_km, 1024, 1024 },
+   { "wwmca_north", 'N',  60.0,  90.0, 0.0, 511.0, 511.0, 80.0, 23.79848, ncep_earth_radius_km, 1024, 1024 },
+   { "wwmca_south", 'S', -60.0, -90.0, 0.0, 511.0, 511.0, 80.0, 23.79848, ncep_earth_radius_km, 1024, 1024 },
 
 };
 
