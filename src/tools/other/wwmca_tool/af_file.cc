@@ -25,10 +25,10 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_util.h"
+#include "vx_grid.h"
 #include "vx_cal.h"
 
 #include "af_file.h"
-#include "wwmca_grids.h"
 
 
 ////////////////////////////////////////////////////////////////////////

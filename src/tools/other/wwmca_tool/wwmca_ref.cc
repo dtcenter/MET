@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_log.h"
+#include "vx_grid.h"
 
 #include "wwmca_ref.h"
 #include "interp_base.h"
@@ -27,7 +28,6 @@ using namespace std;
 #include "min_interp.h"
 #include "nearest_interp.h"
 #include "gridhemisphere_to_string.h"
-#include "wwmca_grids.h"
 
 #include "grid_output.h"
 #include "apply_mask.h"

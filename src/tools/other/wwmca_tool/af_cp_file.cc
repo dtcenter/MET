@@ -29,7 +29,6 @@ using namespace std;
 
 #include "af_file.h"
 #include "af_cp_file.h"
-#include "wwmca_grids.h"
 
 
 ////////////////////////////////////////////////////////////////////////
