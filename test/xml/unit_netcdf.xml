@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_DIR        "${MET_BUILD_BASE}">
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+  
+  <test name="ascii2nc_no_compression">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_2012040912_3hr.nc \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_2012040912_3hr.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="ascii2nc_compression2_by_config">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
+      -config &CONFIG_DIR;/NetcdfConfig \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp2_by_config.nc \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp2_by_config.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="ascii2nc_compression3_by_env">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>MET_NC_COMPRESS</name>         <value>3</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
+      -config &CONFIG_DIR;/NetcdfConfig \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp3_by_env.nc \
+      -v 1
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp3_by_env.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="ascii2nc_compression4_by_argument">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>MET_NC_COMPRESS</name>         <value>3</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
+      -config &CONFIG_DIR;/NetcdfConfig \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp4_by_argument.nc \
+      -v 1 -compress 4
+    </param>   
+    <output>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp4_by_argument.nc</point_nc>
+    </output>
+  </test>
+  
+</met_test>
