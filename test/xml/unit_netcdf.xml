@@ -11,6 +11,11 @@
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
+<!--
+  Note for the compression test: the output filename should have the same length
+    by appendinfg '_' for the file size comparison.
+-->
+
 <met_test>
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -20,11 +25,11 @@
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
-      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_2012040912_3hr.nc \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_12040912_no_compression_.nc \
       -v 1
     </param>   
     <output>
-      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_2012040912_3hr.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_12040912_no_compression_.nc</point_nc>
     </output>
   </test>
   
@@ -33,11 +38,11 @@
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       -config &CONFIG_DIR;/NetcdfConfig \
-      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp2_by_config.nc \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_compression2_by_config__.nc \
       -v 1
     </param>   
     <output>
-      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp2_by_config.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_compression2_by_config__.nc</point_nc>
     </output>
   </test>
   
@@ -49,11 +54,11 @@
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       -config &CONFIG_DIR;/NetcdfConfig \
-      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp3_by_env.nc \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_compression3_by_environ_.nc \
       -v 1
     </param>   
     <output>
-      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp3_by_env.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_compression3_by_environ_.nc</point_nc>
     </output>
   </test>
   
@@ -65,11 +70,11 @@
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       -config &CONFIG_DIR;/NetcdfConfig \
-      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp4_by_argument.nc \
+      &OUTPUT_DIR;/netcdf/ascii2nc_trmm_compression4_by_argument.nc \
       -v 1 -compress 4
     </param>   
     <output>
-      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_comp4_by_argument.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/netcdf/ascii2nc_trmm_compression4_by_argument.nc</point_nc>
     </output>
   </test>
   
