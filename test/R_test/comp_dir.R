@@ -11,6 +11,7 @@ source(paste(met_test_base, "/R_test/test_util.R", sep=""));
 verb = 1;
 strict = F;
 hist = 0;		# default histogram plot production
+file_size_delta = 0;
 
 usage = function(){
 	cat("usage: Rscript comp_dir.R [-v {lev}] [-hist {0|1}] [-strict] {dir_1} {dir_2}\n",
@@ -88,7 +89,7 @@ for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
 	# if the files are NetCDF, compare accordingly
 	if( TRUE == grepl("\\.nc$", strFile1, perl=T) ){
 		if( 1 <= verb ){ cat("file1: ", strFile1, "\nfile2: ", strFile2, "\n", sep=""); }
-		compareNc(strFile1, strFile2, verb, strict);
+		compareNc(strFile1, strFile2, verb, strict, file_size_delta);
 	}
 
 	# if the files are PostScript, PNG, or end in .out, compare accordingly
