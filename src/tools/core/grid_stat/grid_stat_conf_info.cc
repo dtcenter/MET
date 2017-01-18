@@ -291,7 +291,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       }
 
       // Check that the observation field does not contain probabilities
-      if(obs_info[i]->p_flag()) {
+      if(obs_info[i]->is_prob()) {
          mlog << Error << "\nGridStatConfInfo::process_config() -> "
               << "The observation field cannot contain probabilities.\n\n";
          exit(1);
@@ -326,8 +326,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Compute the number of scalar and probability fields to be verified.
    for(i=0, n_vx_prob = 0, n_vx_scal = 0; i<n_vx; i++) {
-      if(fcst_info[i]->p_flag()) n_vx_prob++;
-      else                       n_vx_scal++;
+      if(fcst_info[i]->is_prob()) n_vx_prob++;
+      else                        n_vx_scal++;
    }
 
    // Initialize maximum threshold counts
@@ -381,12 +381,12 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       }
 
       // Verifying a probability field
-      if(fcst_info[i]->p_flag() == 1) {
+      if(fcst_info[i]->is_prob()) {
          fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
       }
 
       // Check for equal threshold length for non-probability fields
-      if(!fcst_info[i]->p_flag() &&
+      if(!fcst_info[i]->is_prob() &&
          fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
 
          mlog << Error << "\nGridStatConfInfo::process_config() -> "
@@ -408,7 +408,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       while(owind_ta[i].n_elements() < n) owind_ta[i].add(na_str);
 
       // Verifying with multi-category contingency tables
-      if(!fcst_info[i]->p_flag() &&
+      if(!fcst_info[i]->is_prob() &&
          (output_flag[i_mctc] != STATOutputType_None ||
           output_flag[i_mcts] != STATOutputType_None)) {
          check_mctc_thresh(fcat_ta[i]);
@@ -416,7 +416,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       }
 
       // Look for the maximum number of thresholds
-      if(!fcst_info[i]->p_flag()) {
+      if(!fcst_info[i]->is_prob()) {
 
          if(fcat_ta[i].n_elements() > max_n_cat_thresh)
             max_n_cat_thresh = fcat_ta[i].n_elements();

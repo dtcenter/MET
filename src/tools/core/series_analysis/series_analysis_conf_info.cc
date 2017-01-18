@@ -266,7 +266,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       }
 
       // Check that the observation field does not contain probabilities
-      if(obs_info[i]->p_flag()) {
+      if(obs_info[i]->is_prob()) {
          mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
               << "The observation field cannot contain probabilities.\n\n";
          exit(1);
@@ -315,12 +315,12 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
            << "Parsed observed categorical thresholds: "  << ocat_ta.get_str() << "\n";
 
       // Verifying a probability field
-      if(fcst_info[0]->p_flag() == 1) {
+      if(fcst_info[0]->is_prob()) {
          fcat_ta = string_to_prob_thresh(fcat_ta.get_str());
       }
 
       // Verifying non-probability fields
-      if(!fcst_info[0]->p_flag() &&
+      if(!fcst_info[0]->is_prob() &&
          fcat_ta.n_elements() != ocat_ta.n_elements()) {
 
          mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
@@ -330,7 +330,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       }
 
       // Verifying with multi-category contingency tables
-      if(!fcst_info[0]->p_flag() &&
+      if(!fcst_info[0]->is_prob() &&
          (output_stats[stat_mctc].n_elements() > 0 ||
           output_stats[stat_mcts].n_elements() > 0)) {
          check_mctc_thresh(fcat_ta);

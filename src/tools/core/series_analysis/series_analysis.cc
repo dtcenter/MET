@@ -438,7 +438,7 @@ void get_series_data(int i_series,
 
    // For probability fields, check to see if they need to be
    // rescaled from [0, 100] to [0, 1]
-   if(conf_info.fcst_info[0]->p_flag()) rescale_probability(fcst_dp);
+   if(conf_info.fcst_info[0]->is_prob()) rescale_probability(fcst_dp);
 
    // Check that non-zero valid times match
    if(fcst_dp.valid() != (unixtime) 0 &&
@@ -698,7 +698,7 @@ void process_scores() {
          }
 
          // Compute contingency table counts and statistics
-         if(!conf_info.fcst_info[0]->p_flag() &&
+         if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[stat_fho].n_elements() +
              conf_info.output_stats[stat_ctc].n_elements() +
              conf_info.output_stats[stat_cts].n_elements()) > 0) {
@@ -706,27 +706,27 @@ void process_scores() {
          }
 
          // Compute multi-category contingency table counts and statistics
-         if(!conf_info.fcst_info[0]->p_flag() &&
+         if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[stat_mctc].n_elements() +
              conf_info.output_stats[stat_mcts].n_elements()) > 0) {
             do_mcts(i_point+i, f_na[i], o_na[i]);
          }
 
          // Compute continuous statistics
-         if(!conf_info.fcst_info[0]->p_flag() &&
+         if(!conf_info.fcst_info[0]->is_prob() &&
             conf_info.output_stats[stat_cnt].n_elements() > 0) {
             do_cnt(i_point+i, f_na[i], o_na[i], c_na[i]);
          }
 
          // Compute partial sums
-         if(!conf_info.fcst_info[0]->p_flag() &&
+         if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[stat_sl1l2].n_elements()  > 0 ||
              conf_info.output_stats[stat_sal1l2].n_elements() > 0)) {
             do_sl1l2(i_point+i, f_na[i], o_na[i], c_na[i]);
          }
 
          // Compute probabilistics counts and statistics
-         if(conf_info.fcst_info[0]->p_flag() &&
+         if(conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[stat_pct].n_elements() +
              conf_info.output_stats[stat_pstd].n_elements() +
              conf_info.output_stats[stat_pjc].n_elements() +

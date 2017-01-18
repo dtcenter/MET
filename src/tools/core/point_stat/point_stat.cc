@@ -530,7 +530,7 @@ void process_fcst_climo_files() {
 
       // For probability fields, check to see if they need to be
       // rescaled from [0, 100] to [0, 1]
-      if(conf_info.vx_pd[i].fcst_info->p_flag()) {
+      if(conf_info.vx_pd[i].fcst_info->is_prob()) {
          for(j=0; j<fcst_dpa.n_planes(); j++) {
             rescale_probability(fcst_dpa[j]);
          }
@@ -666,19 +666,19 @@ void process_obs_file(int i_nc) {
         << "Searching " << obs_count
            << " observations from " << hdr_count
            << " messages.\n";
-   
+
 
    int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
    int hdr_buf_size = (hdr_count == obs_count) ? buf_size : hdr_count;
    if (hdr_buf_size > BUFFER_SIZE) hdr_buf_size = BUFFER_SIZE;
-   
+
    //
    // Allocate space to store the data
    //
-   
+
    float obs_arr_block[buf_size][obs_arr_len];
    char  obs_qty_block[buf_size][strl_len];
-   
+
    char hdr_typ_str_block[hdr_buf_size][strl_len];
    char hdr_sid_str_block[hdr_buf_size][strl_len];
    char hdr_vld_str_block[hdr_buf_size][strl_len];
@@ -694,7 +694,7 @@ void process_obs_file(int i_nc) {
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
-   
+
    lengths[0] = 1;
    lengths[1] = strl_len;
 
@@ -709,7 +709,7 @@ void process_obs_file(int i_nc) {
               << "trouble getting hdr_typ\n\n";
          exit(1);
       }
-      
+
       //
       // Get the corresponding header station id
       //
@@ -718,7 +718,7 @@ void process_obs_file(int i_nc) {
               << "trouble getting hdr_sid\n\n";
          exit(1);
       }
-      
+
       //
       // Get the corresponding header valid time
       //
@@ -727,7 +727,7 @@ void process_obs_file(int i_nc) {
               << "trouble getting hdr_vld\n\n";
          exit(1);
       }
-      
+
       //
       // Get the header for this observation
       //
@@ -738,7 +738,7 @@ void process_obs_file(int i_nc) {
          exit(1);
       }
    }
-   
+
    lengths[1] = strl_len;
 
    int prev_hdr_offset = -1;
@@ -774,7 +774,7 @@ void process_obs_file(int i_nc) {
       if (hdr_count == obs_count) {
          // Read the corresponding header array for this observation
          lengths[1] = hdr_arr_len;
-         
+
          if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
             mlog << Error << "\nprocess_obs_file() -> "
                  << "for observation index " << i_block_start_idx
@@ -782,7 +782,7 @@ void process_obs_file(int i_nc) {
                  << "number " << obs_arr[0] << "\n\n";
             exit(1);
          }
-         
+
          // Read the corresponding header type for this observation
          lengths[1] = strl_len;
          if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
@@ -792,7 +792,7 @@ void process_obs_file(int i_nc) {
                  << "number " << obs_arr[0] << "\n\n";
             exit(1);
          }
-         
+
          // Read the corresponding header Station ID for this observation
          lengths[1] = strl_len;
          if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
@@ -802,7 +802,7 @@ void process_obs_file(int i_nc) {
                  << "number " << obs_arr[0] << "\n\n";
             exit(1);
          }
-         
+
          // Read the corresponding valid time for this observation
          if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
             mlog << Error << "\nprocess_obs_file() -> "
@@ -815,7 +815,7 @@ void process_obs_file(int i_nc) {
 
       for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
          i_obs = i_block_start_idx + i_block_idx;
-         
+
          for (j=0; j<obs_arr_len; j++) {
              obs_arr[j] = obs_arr_block[i_block_idx][j];
          }
@@ -826,7 +826,7 @@ void process_obs_file(int i_nc) {
          //if ((hdr_count == obs_count) || ((0 <= headerOffset) && (headerOffset < hdr_buf_size))) {
          if ((hdr_count == obs_count) || (headerOffset < hdr_buf_size)) {
             int str_length;
-            
+
             if (obs_count == hdr_count) headerOffset = i_block_idx;
             //if (hdr_count == obs_count) headerOffset = i_block_idx;
             //if ((headerOffset < 0) || headerOffset >= hdr_count) {
@@ -836,19 +836,19 @@ void process_obs_file(int i_nc) {
                // Read the corresponding header array for this observation
                for (int k=0; k < hdr_arr_len; k++)
                   hdr_arr[k] = hdr_arr_block[headerOffset][k];
-              
+
                // Read the corresponding header type for this observation
                str_length = strlen(hdr_typ_str_block[headerOffset]);
                if (str_length > strl_len) str_length = strl_len;
                strncpy(hdr_typ_str, hdr_typ_str_block[headerOffset], str_length);
                hdr_typ_str[str_length] = bad_data_char;
-               
+
                // Read the corresponding header Station ID for this observation
                str_length = strlen(hdr_sid_str_block[headerOffset]);
                if (str_length > strl_len) str_length = strl_len;
                strncpy(hdr_sid_str, hdr_sid_str_block[headerOffset], str_length);
                hdr_sid_str[str_length] = bad_data_char;
-               
+
                // Read the corresponding valid time for this observation
                str_length = strlen(hdr_sid_str_block[headerOffset]);
                int str_length2 = sizeof(hdr_vld_str_block[headerOffset]);
@@ -856,10 +856,10 @@ void process_obs_file(int i_nc) {
                str_length = strl_len;
                strncpy(hdr_vld_str, hdr_vld_str_block[headerOffset], str_length);
                hdr_vld_str[str_length] = bad_data_char;
-               
+
    //cout << " str_length: " << str_length << " sizeof: " << str_length2 << ", [" << hdr_sid_str_block[headerOffset][0] << "] " << " hdr_vld_str_block[headerOffset]: [" << (hdr_vld_str_block[headerOffset]) << "] hdr_vld_str: [" << hdr_vld_str << "] headerOffset: " << headerOffset << " i_obs: " << i_obs << "\n";
    //cout << " hdr_vld_str: [" << hdr_vld_str << "] headerOffset: " << headerOffset << " i_obs: " << i_obs << "\n";
-               
+
                prev_hdr_offset = headerOffset;
             }
          }
@@ -867,7 +867,7 @@ void process_obs_file(int i_nc) {
             offsets[0] = headerOffset;
             lengths[0] = 1;
             lengths[1] = hdr_arr_len;
-            
+
             if ((offsets[0] < 0) || offsets[0] >= hdr_count) {
                mlog << Error << "\nprocess_obs_file() -> "
                     << "for header index " << headerOffset
@@ -875,7 +875,7 @@ void process_obs_file(int i_nc) {
                     << "number " << obs_arr[0] << " (" <<  hdr_count << ")\n\n";
                exit(1);
             }
-            
+
             if (prev_hdr_offset != headerOffset) {
                if(!get_nc_data(&hdr_arr_var, hdr_arr, lengths, offsets)) {
                   mlog << Error << "\nprocess_obs_file() -> "
@@ -884,7 +884,7 @@ void process_obs_file(int i_nc) {
                        << "number " << obs_arr[0] << "\n\n";
                   exit(1);
                }
-               
+
                // Read the corresponding header type for this observation
                lengths[1] = strl_len;
                if(!get_nc_data(&hdr_typ_var, hdr_typ_str, lengths, offsets)) {
@@ -894,7 +894,7 @@ void process_obs_file(int i_nc) {
                        << "number " << obs_arr[0] << "\n\n";
                   exit(1);
                }
-               
+
                // Read the corresponding header Station ID for this observation
                lengths[1] = strl_len;
                if(!get_nc_data(&hdr_sid_var, hdr_sid_str, lengths, offsets)) {
@@ -904,7 +904,7 @@ void process_obs_file(int i_nc) {
                        << "number " << obs_arr[0] << "\n\n";
                   exit(1);
                }
-               
+
                // Read the corresponding valid time for this observation
                if(!get_nc_data(&hdr_vld_var, hdr_vld_str, lengths, offsets)) {
                   mlog << Error << "\nprocess_obs_file() -> "
@@ -916,20 +916,20 @@ void process_obs_file(int i_nc) {
             }
             prev_hdr_offset = headerOffset;
          }
-         
+
          // If the current observation is UGRD, save it as the
          // previous.  If vector winds are to be computed, UGRD
          // must be followed by VGRD
          if(conf_info.get_vflag() && nint(obs_arr[1]) == ugrd_grib_code) {
             for(j=0; j<4; j++) prev_obs_arr[j] = obs_arr[j];
          }
-   
+
          // If the current observation is VGRD and vector
          // winds are to be computed.  Make sure that the
          // previous observation was UGRD with the same header
          // and at the same vertical level.
          if(conf_info.get_vflag() && nint(obs_arr[1]) == vgrd_grib_code) {
-   
+
             if(!is_eq(obs_arr[0], prev_obs_arr[0]) ||
                !is_eq(obs_arr[2], prev_obs_arr[2]) ||
                !is_eq(obs_arr[3], prev_obs_arr[3])) {
@@ -942,19 +942,19 @@ void process_obs_file(int i_nc) {
                exit(1);
             }
          }
-   
-   
+
+
          // Convert string to a unixtime
          //cout << "  --------------- hdr_vld_str: " << hdr_vld_str << " i_obs: " << i_obs << " hdrOffste: " << headerOffset << "\n";
          hdr_ut = timestring_to_unix(hdr_vld_str);
-   
+
          // Check each conf_info.vx_pd object to see if this observation
          // should be added
          for(j=0; j<conf_info.get_n_vx(); j++) {
-   
+
             // Check for no forecast fields
             if(conf_info.vx_pd[j].fcst_dpa.n_planes() == 0) continue;
-   
+
             // Attempt to add the observation to the conf_info.vx_pd object
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
                                        hdr_ut, obs_qty_str, obs_arr, grid);
@@ -1111,8 +1111,8 @@ void process_scores() {
                }
 
                // Compute CTS scores
-               if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
-                   conf_info.fcat_ta[i].n_elements() > 0 &&
+               if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
+                   conf_info.fcat_ta[i].n_elements() > 0   &&
                   (conf_info.output_flag[i_fho] != STATOutputType_None ||
                    conf_info.output_flag[i_ctc] != STATOutputType_None ||
                    conf_info.output_flag[i_cts] != STATOutputType_None)) {
@@ -1159,8 +1159,8 @@ void process_scores() {
                } // end Compute CTS scores
 
                // Compute MCTS scores
-               if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
-                   conf_info.fcat_ta[i].n_elements() > 1 &&
+               if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
+                   conf_info.fcat_ta[i].n_elements() > 1   &&
                   (conf_info.output_flag[i_mctc] != STATOutputType_None ||
                    conf_info.output_flag[i_mcts] != STATOutputType_None)) {
 
@@ -1192,7 +1192,7 @@ void process_scores() {
                } // end Compute MCTS scores
 
                // Compute CNT scores
-               if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
+               if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
                    conf_info.output_flag[i_cnt] != STATOutputType_None) {
 
                   // Initialize
@@ -1218,8 +1218,8 @@ void process_scores() {
 
                // Compute SL1L2 and SAL1L2 scores as long as the
                // vflag is not set
-               if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
-                  !conf_info.vx_pd[i].fcst_info->v_flag() &&
+               if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
+                  !conf_info.vx_pd[i].fcst_info->v_flag()  &&
                   (conf_info.output_flag[i_sl1l2]  != STATOutputType_None ||
                    conf_info.output_flag[i_sal1l2] != STATOutputType_None)) {
 
@@ -1255,8 +1255,8 @@ void process_scores() {
                }  // end Compute SL1L2 and SAL1L2
 
                // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
-               if(!conf_info.vx_pd[i].fcst_info->p_flag() &&
-                   conf_info.vx_pd[i].fcst_info->v_flag() &&
+               if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
+                   conf_info.vx_pd[i].fcst_info->v_flag()  &&
                   (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
                    conf_info.output_flag[i_val1l2] != STATOutputType_None) &&
                    i > 0 &&
@@ -1310,7 +1310,7 @@ void process_scores() {
                } // end Compute VL1L2 and VAL1L2
 
                // Compute PCT counts and scores
-               if(conf_info.vx_pd[i].fcst_info->p_flag() &&
+               if(conf_info.vx_pd[i].fcst_info->is_prob() &&
                   (conf_info.output_flag[i_pct]  != STATOutputType_None ||
                    conf_info.output_flag[i_pstd] != STATOutputType_None ||
                    conf_info.output_flag[i_pjc]  != STATOutputType_None ||

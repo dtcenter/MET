@@ -245,7 +245,7 @@ void ModeExecutive::setup_fcst_obs_data()
 
       // For probability fields, rescale from [0, 100] to [0, 1]
 
-   if ( engine.conf_info.fcst_info->p_flag() ) rescale_probability(Fcst_sd.data);
+   if ( engine.conf_info.fcst_info->is_prob() ) rescale_probability(Fcst_sd.data);
 
       // Read the gridded data from the input observation file
 
@@ -268,7 +268,7 @@ void ModeExecutive::setup_fcst_obs_data()
 
       // For probability fields, rescale from [0, 100] to [0, 1]
 
-   if ( engine.conf_info.obs_info->p_flag() ) rescale_probability(Obs_sd.data);
+   if ( engine.conf_info.obs_info->is_prob() ) rescale_probability(Obs_sd.data);
 
       // Print a warning if the valid times do not match
 

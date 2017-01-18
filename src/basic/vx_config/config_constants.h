@@ -403,6 +403,7 @@ static const char conf_key_cnt_thresh[]        = "cnt_thresh";
 static const char conf_key_cnt_logic[]         = "cnt_logic";
 static const char conf_key_cat_thresh[]        = "cat_thresh";
 static const char conf_key_prob[]              = "prob";
+static const char conf_key_prob_as_scalar[]    = "prob_as_scalar"; // true/false
 static const char conf_key_thresh_lo[]         = "thresh_lo";
 static const char conf_key_thresh_hi[]         = "thresh_hi";
 static const char conf_key_wind_thresh[]       = "wind_thresh";

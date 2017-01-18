@@ -620,7 +620,7 @@ void process_scores() {
 
       // For probability fields, check to see if they need to be
       // rescaled from [0, 100] to [0, 1]
-      if(conf_info.fcst_info[i]->p_flag()) rescale_probability(fcst_dp);
+      if(conf_info.fcst_info[i]->is_prob()) rescale_probability(fcst_dp);
 
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
@@ -791,7 +791,7 @@ void process_scores() {
             if(f_na.n_elements() == 0) continue;
 
             // Compute CTS scores
-            if(!conf_info.fcst_info[i]->p_flag()      &&
+            if(!conf_info.fcst_info[i]->is_prob()     &&
                 conf_info.fcat_ta[i].n_elements() > 0 &&
                (conf_info.output_flag[i_fho] != STATOutputType_None ||
                 conf_info.output_flag[i_ctc] != STATOutputType_None ||
@@ -839,7 +839,7 @@ void process_scores() {
             } // end Compute CTS
 
             // Compute MCTS scores
-            if(!conf_info.fcst_info[i]->p_flag()      &&
+            if(!conf_info.fcst_info[i]->is_prob()     &&
                 conf_info.fcat_ta[i].n_elements() > 1 &&
                (conf_info.output_flag[i_mctc] != STATOutputType_None ||
                 conf_info.output_flag[i_mcts] != STATOutputType_None)) {
@@ -872,7 +872,7 @@ void process_scores() {
             } // end Compute MCTS
 
             // Compute CNT scores
-            if(!conf_info.fcst_info[i]->p_flag() &&
+            if(!conf_info.fcst_info[i]->is_prob() &&
                conf_info.output_flag[i_cnt] != STATOutputType_None) {
 
                // Initialize
@@ -898,8 +898,8 @@ void process_scores() {
 
             // Compute SL1L2 and SAL1L2 scores as long as the
             // vflag is not set
-            if(!conf_info.fcst_info[i]->p_flag() &&
-               !conf_info.fcst_info[i]->v_flag() &&
+            if(!conf_info.fcst_info[i]->is_prob() &&
+               !conf_info.fcst_info[i]->v_flag()  &&
                (conf_info.output_flag[i_sl1l2]  != STATOutputType_None ||
                 conf_info.output_flag[i_sal1l2] != STATOutputType_None)) {
 
@@ -935,8 +935,8 @@ void process_scores() {
             }  // end Compute SL1L2 and SAL1L2
 
             // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
-            if(!conf_info.fcst_info[i]->p_flag() &&
-                conf_info.fcst_info[i]->v_flag() &&
+            if(!conf_info.fcst_info[i]->is_prob() &&
+                conf_info.fcst_info[i]->v_flag()  &&
                (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
                 conf_info.output_flag[i_val1l2] != STATOutputType_None) &&
                i > 0 &&
@@ -1024,11 +1024,11 @@ void process_scores() {
             } // end Compute VL1L2
 
             // Compute PCT counts and scores
-            if(conf_info.fcst_info[i]->p_flag() &&
-               (conf_info.output_flag[i_pct] != STATOutputType_None  ||
+            if(conf_info.fcst_info[i]->is_prob() &&
+               (conf_info.output_flag[i_pct]  != STATOutputType_None  ||
                 conf_info.output_flag[i_pstd] != STATOutputType_None ||
-                conf_info.output_flag[i_pjc] != STATOutputType_None  ||
-                conf_info.output_flag[i_prc] != STATOutputType_None)) {
+                conf_info.output_flag[i_pjc]  != STATOutputType_None  ||
+                conf_info.output_flag[i_prc]  != STATOutputType_None)) {
 
                // Initialize
                for(m=0; m<n_prob; m++) pct_info[m].clear();
@@ -1096,7 +1096,7 @@ void process_scores() {
 
       // Loop through and apply the Neighborhood methods for each of the
       // neighborhood widths if requested in the config file
-      if(!conf_info.fcst_info[i]->p_flag() &&
+      if(!conf_info.fcst_info[i]->is_prob() &&
          (conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
           conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
           conf_info.output_flag[i_nbrcnt] != STATOutputType_None)) {
@@ -1688,7 +1688,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    obs_data  = new float [grid.nx()*grid.ny()];
    diff_data = new float [grid.nx()*grid.ny()];
    cmn_data  = new float [grid.nx()*grid.ny()];
-   
+
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
@@ -1747,7 +1747,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       }
 
       // Skip differences for probability forecasts
-      if(conf_info.fcst_info[i_vx]->p_flag()) diff_flag = false;
+      if(conf_info.fcst_info[i_vx]->is_prob()) diff_flag = false;
 
       // Skip empty climatology mean
       if(cmn_dp.nx() == 0 && cmn_dp.ny() == 0) cmn_flag = false;
@@ -2213,7 +2213,7 @@ void usage() {
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
-        
+
    exit(1);
 }
 
