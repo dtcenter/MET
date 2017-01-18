@@ -93,9 +93,10 @@ void VarInfo::assign(const VarInfo &v) {
    PUnits    = v.p_units();
    PThreshLo = v.p_thresh_lo();
    PThreshHi = v.p_thresh_hi();
+   PAsScalar = v.p_as_scalar();
 
    VFlag     = v.v_flag();
-   
+
    Init      = v.init();
    Valid     = v.valid();
    Lead      = v.lead();
@@ -121,9 +122,10 @@ void VarInfo::clear() {
    PUnits.clear();
    PThreshLo.clear();
    PThreshHi.clear();
-   
+   PAsScalar = false;
+
    VFlag = false;
-   
+
    Init  = (unixtime) 0;
    Valid = (unixtime) 0;
    Lead  = bad_data_int;
@@ -139,25 +141,26 @@ void VarInfo::dump(ostream &out) const {
 
    init_str  = unix_to_yyyymmdd_hhmmss(Init);
    valid_str = unix_to_yyyymmdd_hhmmss(Valid);
-   
+
    if(is_bad_data(Lead)) lead_str = na_str;
    else                  lead_str = sec_to_hhmmss(Lead);
 
    // Dump out the contents
    out << "VarInfo::dump():\n"
-       << "  MagicStr = " << (MagicStr ? MagicStr.text() : "(nul)") << "\n"
-       << "  ReqName  = " << (ReqName ? ReqName.text() : "(nul)") << "\n"
-       << "  Name     = " << (Name ? Name.text() : "(nul)") << "\n"
-       << "  LongName = " << (LongName ? LongName.text() : "(nul)") << "\n"
-       << "  Units    = " << (Units ? Units.text() : "(nul)") << "\n"
-       << "  PFlag    = " << PFlag << "\n"
-       << "  PName    = " << (PName ? PName.text() : "(nul)") << "\n"
-       << "  PUnits   = " << (PUnits ? PUnits.text() : "(nul)") << "\n"
-       << "  VFlag    = " << VFlag << "\n"
-       << "  Init     = " << init_str << " (" << Init << ")\n"
-       << "  Valid    = " << valid_str << " (" << Valid << ")\n"
-       << "  Ensemble = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
-       << "  Lead     = " << lead_str << " (" << Lead << ")\n";
+       << "  MagicStr  = " << (MagicStr ? MagicStr.text() : "(nul)") << "\n"
+       << "  ReqName   = " << (ReqName ? ReqName.text() : "(nul)") << "\n"
+       << "  Name      = " << (Name ? Name.text() : "(nul)") << "\n"
+       << "  LongName  = " << (LongName ? LongName.text() : "(nul)") << "\n"
+       << "  Units     = " << (Units ? Units.text() : "(nul)") << "\n"
+       << "  PFlag     = " << PFlag << "\n"
+       << "  PName     = " << (PName ? PName.text() : "(nul)") << "\n"
+       << "  PUnits    = " << (PUnits ? PUnits.text() : "(nul)") << "\n"
+       << "  PAsScalar = " << PAsScalar << "\n"
+       << "  VFlag     = " << VFlag << "\n"
+       << "  Init      = " << init_str << " (" << Init << ")\n"
+       << "  Valid     = " << valid_str << " (" << Valid << ")\n"
+       << "  Ensemble  = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
+       << "  Lead      = " << lead_str << " (" << Lead << ")\n";
 
    Level.dump(out);
 
@@ -257,6 +260,13 @@ void VarInfo::set_p_thresh_hi(const SingleThresh &t) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_p_as_scalar(bool f) {
+   PAsScalar = f;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_v_flag(bool f) {
    VFlag = f;
    return;
@@ -284,7 +294,7 @@ void VarInfo::set_lead(int s) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
- 
+
 void VarInfo::set_magic(const ConcatString &mag) {
 
    //  verify that there are no embedded spaces
@@ -302,7 +312,8 @@ void VarInfo::set_magic(const ConcatString &mag) {
 
 void VarInfo::set_dict(Dictionary &dict) {
    ConcatString s;
-   
+   bool f;
+
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
    if(dict.last_lookup_status()) set_init(timestring_to_unix(s));
@@ -314,6 +325,10 @@ void VarInfo::set_dict(Dictionary &dict) {
    // Set lead time, if present
    s = dict.lookup_string(conf_key_lead_time, false);
    if(dict.last_lookup_status()) set_lead(timestring_to_sec(s));
+
+   // Parse prob_as_scalar, if present
+   f = dict.lookup_bool(conf_key_prob_as_scalar, false);
+   if(dict.last_lookup_status()) set_p_as_scalar(f);
 
    return;
 }
@@ -499,3 +514,8 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool VarInfo::is_prob(){
+   return(PFlag && !PAsScalar);
+}
+
+///////////////////////////////////////////////////////////////////////////////

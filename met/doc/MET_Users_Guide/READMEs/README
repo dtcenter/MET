@@ -285,6 +285,16 @@ regrid = {
 //        with a range [0, 100], it will automatically rescale it to be [0, 1]
 //        before applying the probabilistic verification methods.
 //
+//      - Set "prob_as_scalar = TRUE" to override the processing of probability
+//        data.  When the "prob" entry is set as a dictionary to define the field
+//        of interest, setting "prob_as_scalar = TRUE" indicates that this data
+//        should be processed as regular scalars rather than probabilities.
+//        For example, this option can be used to compute traditional 2x2
+//        contingency tables and neighborhood verification statistics for
+//        probability data.  It can also be used to compare two probability
+//        fields directly.  When this flag is set, probability values will not
+//        automatically be rescaled to the range [0, 1].
+//
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
 //

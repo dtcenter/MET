@@ -310,7 +310,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       }
 
       // Check that the observation field does not contain probabilities
-      if(vx_pd[i].obs_info->p_flag()) {
+      if(vx_pd[i].obs_info->is_prob()) {
          mlog << Error << "\nPointStatConfInfo::process_config() -> "
               << "The observation field cannot contain probabilities.\n\n";
          exit(1);
@@ -345,8 +345,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Compute the number of scalar and probability fields to be verified.
    for(i=0, n_vx_prob = 0, n_vx_scal = 0; i<n_vx; i++) {
-      if(vx_pd[i].fcst_info->p_flag()) n_vx_prob++;
-      else                             n_vx_scal++;
+      if(vx_pd[i].fcst_info->is_prob()) n_vx_prob++;
+      else                              n_vx_scal++;
    }
 
    // Initialize maximum threshold counts
@@ -400,12 +400,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       }
 
       // Verifying a probability field
-      if(vx_pd[i].fcst_info->p_flag()) {
+      if(vx_pd[i].fcst_info->is_prob()) {
          fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
       }
 
       // Check for equal threshold length for non-probability fields
-      if(!vx_pd[i].fcst_info->p_flag() &&
+      if(!vx_pd[i].fcst_info->is_prob() &&
          fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
 
          mlog << Error << "\nPointStatConfInfo::process_config() -> "
@@ -427,7 +427,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       while(owind_ta[i].n_elements() < n) owind_ta[i].add(na_str);
 
       // Verifying with multi-category contingency tables
-      if(!vx_pd[i].fcst_info->p_flag() &&
+      if(!vx_pd[i].fcst_info->is_prob() &&
          (output_flag[i_mctc] != STATOutputType_None ||
           output_flag[i_mcts] != STATOutputType_None)) {
 
@@ -436,7 +436,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       }
 
       // Look for the maximum number of thresholds
-      if(!vx_pd[i].fcst_info->p_flag()) {
+      if(!vx_pd[i].fcst_info->is_prob()) {
 
          if(fcat_ta[i].n_elements() > max_n_cat_thresh)
             max_n_cat_thresh = fcat_ta[i].n_elements();

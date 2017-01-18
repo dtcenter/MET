@@ -42,6 +42,7 @@ class VarInfo
       ConcatString PUnits;    // Unit for probability
       SingleThresh PThreshLo; // Lower probability threshold
       SingleThresh PThreshHi; // Upper probability threshold
+      bool         PAsScalar; // Flag to process probabilities as scalars
 
       bool         VFlag;     // Flag for vector winds
 
@@ -84,6 +85,7 @@ class VarInfo
       ConcatString p_units()        const;
       SingleThresh p_thresh_lo()    const;
       SingleThresh p_thresh_hi()    const;
+      bool         p_as_scalar()    const;
 
       bool         v_flag()         const;
 
@@ -113,9 +115,10 @@ class VarInfo
       void set_p_units(const char *);
       void set_p_thresh_lo(const SingleThresh &);
       void set_p_thresh_hi(const SingleThresh &);
+      void set_p_as_scalar(bool);
 
       void set_v_flag(bool);
-      
+
       void set_init(unixtime);
       void set_valid(unixtime);
       void set_lead(int);
@@ -135,6 +138,7 @@ class VarInfo
       virtual bool is_v_wind()            const = 0;
       virtual bool is_wind_speed()        const = 0;
       virtual bool is_wind_direction()    const = 0;
+              bool is_prob();
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,6 +160,7 @@ inline ConcatString VarInfo::p_name()         const { return(PName);            
 inline ConcatString VarInfo::p_units()        const { return(PUnits);           }
 inline SingleThresh VarInfo::p_thresh_lo()    const { return(PThreshLo);        }
 inline SingleThresh VarInfo::p_thresh_hi()    const { return(PThreshHi);        }
+inline bool         VarInfo::p_as_scalar()    const { return(PAsScalar);        }
 
 inline bool         VarInfo::v_flag()         const { return(VFlag);            }
 
