@@ -436,9 +436,9 @@ void get_series_data(int i_series,
          break;
    }
 
-   // For probability fields, check to see if they need to be
-   // rescaled from [0, 100] to [0, 1]
-   if(conf_info.fcst_info[0]->is_prob()) rescale_probability(fcst_dp);
+   // Rescale probabilities from [0, 100] to [0, 1]
+   if(conf_info.fcst_info[0]->p_flag()) rescale_probability(fcst_dp);
+   if(conf_info.obs_info[0]->p_flag())  rescale_probability(obs_dp);
 
    // Check that non-zero valid times match
    if(fcst_dp.valid() != (unixtime) 0 &&

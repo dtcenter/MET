@@ -528,9 +528,8 @@ void process_fcst_climo_files() {
          }
       }
 
-      // For probability fields, check to see if they need to be
-      // rescaled from [0, 100] to [0, 1]
-      if(conf_info.vx_pd[i].fcst_info->is_prob()) {
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(conf_info.vx_pd[i].fcst_info->p_flag()) {
          for(j=0; j<fcst_dpa.n_planes(); j++) {
             rescale_probability(fcst_dpa[j]);
          }

@@ -292,8 +292,8 @@ regrid = {
 //        For example, this option can be used to compute traditional 2x2
 //        contingency tables and neighborhood verification statistics for
 //        probability data.  It can also be used to compare two probability
-//        fields directly.  When this flag is set, probability values will not
-//        automatically be rescaled to the range [0, 1].
+//        fields directly.  When this flag is set, probability values are
+//        automatically rescaled from the range [0, 100] to [0, 1].
 //
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
