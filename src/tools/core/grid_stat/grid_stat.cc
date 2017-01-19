@@ -618,9 +618,8 @@ void process_scores() {
                               conf_info.regrid_info);
       }
 
-      // For probability fields, check to see if they need to be
-      // rescaled from [0, 100] to [0, 1]
-      if(conf_info.fcst_info[i]->is_prob()) rescale_probability(fcst_dp);
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(conf_info.fcst_info[i]->p_flag()) rescale_probability(fcst_dp);
 
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
@@ -653,6 +652,9 @@ void process_scores() {
          obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
                              conf_info.regrid_info);
       }
+
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(conf_info.obs_info[i]->p_flag()) rescale_probability(obs_dp);
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
