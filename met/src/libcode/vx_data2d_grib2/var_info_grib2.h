@@ -27,24 +27,6 @@ using namespace std;
 #include "data_file_type.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-//
-//  GRIB2 keywords expected to be used in the configuration file.
-//
-///////////////////////////////////////////////////////////////////////////////
-
-// GRIB version 2 keywords
-static const char * const CONFIG_GRIB2_Discipline = "GRIB2_Discipline";
-static const char * const CONFIG_GRIB2_MTable     = "GRIB2_MTable";
-static const char * const CONFIG_GRIB2_LTable     = "GRIB2_LTable";
-static const char * const CONFIG_GRIB2_Tmpl       = "GRIB2_Tmpl";
-static const char * const CONFIG_GRIB2_ParmCat    = "GRIB2_ParmCat";
-static const char * const CONFIG_GRIB2_Parm       = "GRIB2_Parm";
-static const char * const CONFIG_GRIB2_Process    = "GRIB2_Process";
-static const char * const CONFIG_GRIB2_EnsType    = "GRIB2_EnsType";
-static const char * const CONFIG_GRIB2_DerType    = "GRIB2_DerType";
-
-
-///////////////////////////////////////////////////////////////////////////////
 
 class VarInfoGrib2 : public VarInfo
 {

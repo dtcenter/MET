@@ -42,6 +42,7 @@ typedef struct {
    string ParmName;
    int ParmCat;
    int Parm;
+   int Process;
    int LvlTyp;
    double LvlVal1;
    double LvlVal2;
@@ -56,8 +57,9 @@ typedef struct {
    unixtime ValidTime;
    int LeadTime;
    int Accum;
-   int  ens_type;
-   int ens_number;
+   int EnsType;
+   int EnsNumber;
+   int DerType;
 } Grib2Record;
 
 
