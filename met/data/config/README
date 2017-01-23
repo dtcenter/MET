@@ -193,6 +193,14 @@ obtype = "ANALYS";
 //         - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
 //         - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
 //
+//         - Specify a grid subset tile:
+//            - tile fcst|obs Nx Ny lat_cen lon_cen [lat_prv lon_prv]
+//            - tile lambert  Nx Ny lat_cen lon_cen lat_prv lon_prv D_km R_km
+//            - tile stereo   Nx Ny lat_cen lon_cen lat_prv lon_prv D_km R_km
+//
+//            Tile rotation, defined by (lat_prv, lon_prv), is only supported
+//            for lambert and stereographic projections.
+//
 //    - The "vld_thresh" entry specifies a proportion between 0 and 1 to define
 //      the required ratio of valid data points.  When regridding, compute
 //      a ratio of the number of valid data points to the total number of
@@ -365,6 +373,10 @@ regrid = {
 //       - The "GRIB2_disc" entry specifies the GRIB2 discipline code.
 //       - The "GRIB2_parm_cat" entry specifies the parameter category code.
 //       - The "GRIB2_parm" entry specifies the parameter code.
+//       - The "GRIB2_pdt" entry specifies the product definition template (Table 4.0).
+//       - The "GRIB2_process" entry specifies the generating process (Table 4.3).
+//       - The "GRIB2_ens_type" entry specifies the ensemble type (Table 4.6).
+//       - The "GRIB2_der_type" entry specifies the derived product type (Table 4.7).
 //
 //    - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
 //       - The "name" entry specifies the NetCDF variable name.

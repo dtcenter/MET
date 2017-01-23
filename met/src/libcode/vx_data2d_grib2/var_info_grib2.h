@@ -49,9 +49,9 @@ class VarInfoGrib2 : public VarInfo
       int LTable;     // GRIB Local Tables Version Number
 
       // Section 4
-      int Tmpl;       // Product Definition Template Number
       int ParmCat;    // Parameter Category by Product Discipline
       int Parm;       // Parameter Number by Product Discipline and Parameter Category
+      int PDTmpl;     // Product Definition Template Number
       int Process;    // Type of Generating Process
       int EnsType;    // Type of Ensemble Forecast
       int DerType;    // Derived Forecast
@@ -77,9 +77,9 @@ class VarInfoGrib2 : public VarInfo
       int         discipline()  const;
       int         m_table()     const;
       int         l_table()     const;
-      int         tmpl()        const;
       int         parm_cat()    const;
       int         parm()        const;
+      int         pdt()         const;
       int         process()     const;
       int         ens_type()    const;
       int         der_type()    const;
@@ -95,9 +95,9 @@ class VarInfoGrib2 : public VarInfo
       void set_discipline(int);
       void set_m_table(int);
       void set_l_table(int);
-      void set_tmpl(int);
       void set_parm_cat(int);
       void set_parm(int);
+      void set_pdt(int);
       void set_process(int);
       void set_ens_type(int);
       void set_der_type(int);
@@ -125,9 +125,9 @@ inline int         VarInfoGrib2::record()     const { return(Record);       }
 inline int         VarInfoGrib2::discipline() const { return(Discipline);   }
 inline int         VarInfoGrib2::m_table()    const { return(MTable);       }
 inline int         VarInfoGrib2::l_table()    const { return(LTable);       }
-inline int         VarInfoGrib2::tmpl()       const { return(Tmpl);         }
 inline int         VarInfoGrib2::parm_cat()   const { return(ParmCat);      }
 inline int         VarInfoGrib2::parm()       const { return(Parm);         }
+inline int         VarInfoGrib2::pdt()        const { return(PDTmpl);       }
 inline int         VarInfoGrib2::process()    const { return(Process);      }
 inline int         VarInfoGrib2::ens_type()   const { return(EnsType);      }
 inline int         VarInfoGrib2::der_type()   const { return(DerType);      }

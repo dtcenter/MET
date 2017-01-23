@@ -101,9 +101,9 @@ void VarInfoGrib2::assign(const VarInfoGrib2 &v) {
    Discipline = v.discipline();
    MTable     = v.m_table();
    LTable     = v.l_table();
-   Tmpl       = v.tmpl();
    ParmCat    = v.parm_cat();
    Parm       = v.parm();
+   PDTmpl     = v.pdt();
    Process    = v.process();
    EnsType    = v.ens_type();
    DerType    = v.der_type();
@@ -123,9 +123,9 @@ void VarInfoGrib2::clear() {
    Discipline = bad_data_int;
    MTable     = bad_data_int;
    LTable     = bad_data_int;
-   Tmpl       = bad_data_int;
    ParmCat    = bad_data_int;
    Parm       = bad_data_int;
+   PDTmpl     = bad_data_int;
    Process    = bad_data_int;
    EnsType    = bad_data_int;
    DerType    = bad_data_int;
@@ -143,9 +143,9 @@ void VarInfoGrib2::dump(ostream &out) const {
        << "  Discipline = " << Discipline << "\n"
        << "  MTable     = " << MTable     << "\n"
        << "  LTable     = " << LTable     << "\n"
-       << "  Tmpl       = " << Tmpl       << "\n"
        << "  ParmCat    = " << ParmCat    << "\n"
        << "  Parm       = " << Parm       << "\n"
+       << "  PDTmpl     = " << PDTmpl     << "\n"
        << "  Process    = " << Process    << "\n"
        << "  EnsType    = " << EnsType    << "\n"
        << "  DerType    = " << DerType    << "\n";
@@ -183,13 +183,6 @@ void VarInfoGrib2::set_l_table(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoGrib2::set_tmpl(int v) {
-   Tmpl = v;
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void VarInfoGrib2::set_parm_cat(int v) {
    ParmCat = v;
    return;
@@ -199,6 +192,13 @@ void VarInfoGrib2::set_parm_cat(int v) {
 
 void VarInfoGrib2::set_parm(int v) {
    Parm = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfoGrib2::set_pdt(int v) {
+   PDTmpl = v;
    return;
 }
 
@@ -251,9 +251,9 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    int cntr                = dict.lookup_int   (conf_key_GRIB2_cntr,      false);
    int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab,      false);
    int mtab                = dict.lookup_int   (conf_key_GRIB2_mtab,      false);
-   int tmpl                = dict.lookup_int   (conf_key_GRIB2_tmpl,      false);
 
    //  user-specified GRIB2 record filters
+   PDTmpl                  = dict.lookup_int   (conf_key_GRIB2_pdt,       false);
    Process                 = dict.lookup_int   (conf_key_GRIB2_process,   false);
    EnsType                 = dict.lookup_int   (conf_key_GRIB2_ens_type,  false);
    DerType                 = dict.lookup_int   (conf_key_GRIB2_der_type,  false);
