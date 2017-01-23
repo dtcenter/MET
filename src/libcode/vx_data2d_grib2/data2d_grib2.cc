@@ -108,8 +108,8 @@ bool MetGrib2DataFile::open(const char * _filename) {
    //  attempt to opent he
    Filename = _filename;
    if( NULL == (FileGrib2 = fopen(Filename, "r")) ){
-      mlog << Error << "\nMetGrib2DataFile::open() - unable to open input GRIB2 file "
-           << _filename << "\n\n";
+      mlog << Error << "\nMetGrib2DataFile::open() -> "
+           << "unable to open input GRIB2 file " << _filename << "\n\n";
       exit(1);
    }
 
@@ -350,13 +350,15 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          ens_number_str[vinfo_ens.length()-1] = (char) 0;
 
          //  if the  string is numeric
-         if( check_reg_exp("^[0-9]*$", ens_number_str) ) vinfo_ens_number= atoi(ens_number_str);
+         if( check_reg_exp("^[0-9]*$", ens_number_str) ) vinfo_ens_number = atoi(ens_number_str);
       }
       // if one of the parameters was not set - error
       if( is_bad_data(vinfo_ens_number) || is_bad_data(vinfo_ens_type) ){
-         mlog << Error << "\nfind_record_matches() - unrecognized GRIB_ens value '"
-         << vinfo_ens << "' Should be '" << conf_key_grib_ens_hi_res_ctl << "' or '" << conf_key_grib_ens_low_res_ctl << "' or '+/-' followed by the number "  << "\n\n";
-         exit(1);
+         mlog << Error << "\nfind_record_matches() -> "
+              << "unrecognized GRIB_ens value '" << vinfo_ens << "' Should be '"
+              << conf_key_grib_ens_hi_res_ctl << "' or '"
+              << conf_key_grib_ens_low_res_ctl << "' or '+/-' followed by the number\n\n";
+              exit(1);
       }
    }
 
@@ -378,11 +380,19 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          continue;
       }
 
-      // if this is ensemble record - test for ensemble information
-      if((*it)->PdsTmpl == 1 ||  (*it)->PdsTmpl == 11){
+      //  test additional config file options
+      if( (!is_bad_data(vinfo->tmpl())     && vinfo->tmpl()     != (*it)->PdsTmpl ) ||
+          (!is_bad_data(vinfo->process())  && vinfo->process()  != (*it)->Process ) ||
+          (!is_bad_data(vinfo->ens_type()) && vinfo->ens_type() != (*it)->EnsType ) ||
+          (!is_bad_data(vinfo->der_type()) && vinfo->der_type() != (*it)->DerType ) ){
+         continue;
+      }
 
-         int ens_type = (*it)->ens_type;
-         int ens_number = (*it)->ens_number;
+      // if this is ensemble record - test for ensemble information
+      if((*it)->PdsTmpl == 1 || (*it)->PdsTmpl == 11){
+
+         int ens_type   = (*it)->EnsType;
+         int ens_number = (*it)->EnsNumber;
 
          // if both of ens info properties are valid in vinfo - use them to match value
          if( !is_bad_data(vinfo_ens_number) && !is_bad_data(vinfo_ens_type)){
@@ -391,7 +401,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          }
 
 
-         if( (*it)->ens_number != ens_number || (*it)->ens_type != ens_type){
+         if( (*it)->EnsNumber != ens_number || (*it)->EnsType != ens_type){
             continue;
          }
       }
@@ -621,6 +631,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->PdsTmpl      = gfld->ipdtnum;
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
+         rec->Process      = gfld->ipdtmpl[2];
          rec->LvlTyp       = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
 
          //  check for ground or water surface
@@ -650,24 +661,31 @@ void MetGrib2DataFile::read_grib2_record_list() {
             case 2:     rec->ValidTime = ref_time;      break;      //  Verifying Time of Forecast
             case 3:     rec->ValidTime = ref_time;      break;      //  Observation Time
             default:
-               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - found unexpected "
-                    << "time reference indicator of " << gfld->ipdtmpl[4] << ".\n\n";
+               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() -> "
+                    << "found unexpected time reference indicator of "
+                    << gfld->ipdtmpl[4] << ".\n\n";
                exit(1);
          }
 
-         //init ensemble data if appropriet
-         if( 1  == gfld->ipdtnum || 11  == gfld->ipdtnum ){
-            rec->ens_number = gfld->ipdtmpl[16];
-            rec->ens_type = gfld->ipdtmpl[15];
+         //  ensemble type and number for templates 1 and 11
+         if( 1 == gfld->ipdtnum || 11 == gfld->ipdtnum ){
+            rec->EnsType   = gfld->ipdtmpl[15];
+            rec->EnsNumber = gfld->ipdtmpl[16];
+         }
+
+         //  derived type and number for templates 2 to 4 and 12 to 14
+         if( (  2 <= gfld->ipdtnum &&  4 >= gfld->ipdtnum ) ||
+             ( 12 <= gfld->ipdtnum && 14 >= gfld->ipdtnum ) ){
+            rec->DerType = gfld->ipdtmpl[15];
          }
 
          //  depending on the template number, determine the reference times
-         if( 8  == gfld->ipdtnum || 9  == gfld->ipdtnum || 12 == gfld->ipdtnum ){
+         if( 8  == gfld->ipdtnum || 9 == gfld->ipdtnum || 12 == gfld->ipdtnum ){
 
             if( -1 != rec->ValidTime ){
-               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - accum valid time "
-                    << "unexpectedly set for record " << rec->RecNum << " field " << rec->FieldNum
-                    << "\n\n";
+               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() -> "
+                    << "accum valid time unexpectedly set for record " << rec->RecNum
+                    << " field " << rec->FieldNum << "\n\n";
                exit(1);
             }
 
@@ -711,8 +729,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
             //  determine the time unit of the lead time and calculate it
             double sec_lead_unit = VarInfoGrib2::g2_time_range_unit_to_sec( (int)gfld->ipdtmpl[i_time_unit] );
             if( 0 >= sec_lead_unit ){
-               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() - found unexpected "
-                    << "lead time unit of " << gfld->ipdtmpl[i_time_unit] << "\n\n";
+               mlog << Error << "\nMetGrib2DataFile::read_grib2_record_list() -> "
+                    << "found unexpected lead time unit of " << gfld->ipdtmpl[i_time_unit] << "\n\n";
                exit(1);
             }
             rec->LeadTime = nint(sec_lead_unit * gfld->ipdtmpl[i_fcst_time]);
@@ -893,8 +911,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
          case 0:  hem = 'N';  break;
          case 1:  hem = 'S';  break;
          default:
-            mlog << Error << "\nMetGrib2DataFile::data_plane() - unexpected polar stereo "
-                 << " projection center (" << gfld->igdtmpl[16] << ")\n\n";
+            mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+                 << "unexpected polar stereo projection center (" << gfld->igdtmpl[16] << ")\n\n";
             exit(1);
       }
 
@@ -1034,8 +1052,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
    //  unrecognized grid
    else {
 
-      mlog << Error << "\nMetGrib2DataFile::data_plane() found unrecognized grid definition ("
-           << gfld->igdtnum << ")\n\n";
+      mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+           << "found unrecognized grid definition (" << gfld->igdtnum << ")\n\n";
       exit(1);
 
    }
@@ -1054,8 +1072,8 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
    float v, v_miss[2];
    int n_miss, i;
    if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld, cgrib, numfields) ){
-      mlog << Error << "\nMetGrib2DataFile::read_grib2_record_data_plane() - failed to read "
-           << "record at offset " << rec->ByteOffset << " and field number "
+      mlog << Error << "\nMetGrib2DataFile::read_grib2_record_data_plane() -> "
+           << "failed to read record at offset " << rec->ByteOffset << " and field number "
            << rec->FieldNum << "\n\n";
       exit(1);
    }
@@ -1099,8 +1117,8 @@ bool MetGrib2DataFile::read_grib2_record_data_plane( Grib2Record *rec,
                                                 y*n_x + x :
                                                 y*n_x + (n_x - x - 1) );           break;
          default:
-            mlog << Error << "\nMetGrib2DataFile::data_plane() found unrecognized ScanMode ("
-                 << ScanMode << ")\n\n";
+            mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+                 << "found unrecognized ScanMode (" << ScanMode << ")\n\n";
             exit(1);
          }
 
