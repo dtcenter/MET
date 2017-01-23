@@ -381,7 +381,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       }
 
       //  test additional config file options
-      if( (!is_bad_data(vinfo->tmpl())     && vinfo->tmpl()     != (*it)->PdsTmpl ) ||
+      if( (!is_bad_data(vinfo->pdt())      && vinfo->pdt()      != (*it)->PdsTmpl ) ||
           (!is_bad_data(vinfo->process())  && vinfo->process()  != (*it)->Process ) ||
           (!is_bad_data(vinfo->ens_type()) && vinfo->ens_type() != (*it)->EnsType ) ||
           (!is_bad_data(vinfo->der_type()) && vinfo->der_type() != (*it)->DerType ) ){
