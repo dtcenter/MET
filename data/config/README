@@ -195,11 +195,11 @@ obtype = "ANALYS";
 //
 //         - Specify a grid subset tile:
 //            - tile fcst|obs Nx Ny lat_cen lon_cen [lat_prv lon_prv]
-//            - tile lambert  Nx Ny lat_cen lon_cen lat_prv lon_prv D_km R_km
-//            - tile stereo   Nx Ny lat_cen lon_cen lat_prv lon_prv D_km R_km
+//            - tile lambert  Nx Ny lat_cen lon_cen  lat_prv lon_prv D_km
+//            - tile stereo   Nx Ny lat_cen lon_cen  lat_prv lon_prv D_km
 //
 //            Tile rotation, defined by (lat_prv, lon_prv), is only supported
-//            for lambert and stereographic projections.
+//            for lambert conformal and stereographic projections.
 //
 //    - The "vld_thresh" entry specifies a proportion between 0 and 1 to define
 //      the required ratio of valid data points.  When regridding, compute
@@ -367,9 +367,8 @@ regrid = {
 //       - The "GRIB_ens" entry is a string which specifies NCEP's usage of the
 //         extended PDS for ensembles.  Set to "hi_res_ctl", "low_res_ctl", "+n",
 //         or "-n", for the n-th ensemble member.
-//       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version
-//         number.
-//       - The "GRIB1_code" entry specifies the GRIB1 record number.
+//       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version number.
+//       - The "GRIB1_code" entry specifies the GRIB1 code (wgrib kpds5 value).
 //       - The "GRIB2_disc" entry specifies the GRIB2 discipline code.
 //       - The "GRIB2_parm_cat" entry specifies the parameter category code.
 //       - The "GRIB2_parm" entry specifies the parameter code.
