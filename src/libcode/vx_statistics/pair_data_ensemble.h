@@ -83,6 +83,8 @@ class PairDataEnsemble : public PairBase {
 
       void clear();
 
+      void extend(int);
+
       void add_ens(int, double);
       void set_ens_size(int);
 

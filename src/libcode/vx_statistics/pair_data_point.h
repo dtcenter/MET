@@ -48,6 +48,8 @@ class PairDataPoint : public PairBase {
 
       void clear();
 
+      void extend(int);
+
       bool add_pair(const char *, double, double, double, double,
                     unixtime, double, double, double, double,
                     const char *, double, double,
@@ -56,20 +58,14 @@ class PairDataPoint : public PairBase {
       bool add_pair(double, double, double,
                     double wgt = default_grid_weight);
 
+      bool add_pair(const NumArray f_in, const NumArray o_in,
+                    const NumArray c_in, const NumArray w_in);
+
       void set_pair(int, const char *, double, double, double, double,
                     unixtime, double, double, double, double,
                     const char *, double, double,
                     double wgt = default_grid_weight);
 };
-
-////////////////////////////////////////////////////////////////////////
-
-inline bool PairDataPoint::add_pair(double f, double o, double c, double w) {
-   return(add_pair(na_str, bad_data_double, bad_data_double,
-                   bad_data_double, bad_data_double, (unixtime) 0,
-                   bad_data_double, bad_data_double, f, o, na_str,
-                   c, bad_data_double, w));
-}
 
 ////////////////////////////////////////////////////////////////////////
 //

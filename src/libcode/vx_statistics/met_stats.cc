@@ -1085,18 +1085,10 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
    cflag = set_climo_flag(f_na, c_na);
    wflag = set_climo_flag(f_na, w_na);
 
-   //
    // Store pairs in PairDataPoint object
-   //
-   for(i=0; i<o_na.n_elements(); i++) {
-      c = (cflag ? c_na[i] : bad_data_double);
-      w = (wflag ? w_na[i] : default_grid_weight);
-      pd_all.add_pair(f_na[i], o_na[i], c, w);
-   }
+   pd_all.add_pair(f_na, o_na, c_na, w_na);
 
-   //
    // Apply continuous filtering thresholds to subset pairs
-   //
    pd = subset_pairs(pd_all, fthresh, othresh, logic);
 
    // Check for no matched pairs to process
