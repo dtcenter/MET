@@ -560,6 +560,19 @@ void process_scores() {
    // Thresholded fractional coverage pairs
    NumArray fthr_na, othr_na;
 
+   // Allocate memory in one big chunk based on grid size
+   f_na.extend(grid.nx()*grid.ny());
+   o_na.extend(grid.nx()*grid.ny());
+   c_na.extend(grid.nx()*grid.ny());
+   w_na.extend(grid.nx()*grid.ny());
+
+   if(conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
+      conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
+      conf_info.output_flag[i_nbrcnt] != STATOutputType_None) {
+      fthr_na.extend(grid.nx()*grid.ny());
+      othr_na.extend(grid.nx()*grid.ny());
+   }
+
    // Objects to handle vector winds
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
@@ -1386,9 +1399,7 @@ void do_cnt(CNTInfo *&cnt_info, int i_vx,
       // Store pairs in PairDataPoint object
       //
       pd_all.clear();
-      for(j=0; j<o_na.n_elements(); j++) {
-         pd_all.add_pair(f_na[j], o_na[j], c_na[j], w_na[j]);
-      }
+      pd_all.add_pair(f_na, o_na, c_na, w_na);
 
       //
       // Apply continuous filtering thresholds to subset pairs
