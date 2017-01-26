@@ -896,13 +896,13 @@ void process_point_obs(int i_nc) {
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
    char obs_qty_str[max_str_len];
-   
+
    float hdr_arr_full   [hdr_buf_size][hdr_arr_len];
    char hdr_typ_str_full[hdr_buf_size][mxstr_len];
    char hdr_sid_str_full[hdr_buf_size][mxstr_len];
    char hdr_vld_str_full[hdr_buf_size][mxstr_len];
-   
-   
+
+
    lengths[0] = hdr_buf_size;
    lengths[1] = mxstr_len;
 
@@ -942,10 +942,10 @@ void process_point_obs(int i_nc) {
            << "trouble getting hdr_arr\n\n";
       exit(1);
    }
-   
+
    for(int i_start=0; i_start<obs_count; i_start+=buf_size) {
       buf_size = ((obs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count-i_start);
-      
+
       offsets[0] = i_start;
       lengths[0] = buf_size;
       lengths[1] = obs_arr_len;
@@ -961,7 +961,7 @@ void process_point_obs(int i_nc) {
          mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }
-      
+
       // Process each observation in the file
       for(int i_offset=0; i_offset<buf_size; i_offset++) {
          int str_length;
@@ -976,7 +976,7 @@ void process_point_obs(int i_nc) {
          if (str_length > mxstr_len) str_length = mxstr_len;
          strncpy(obs_qty_str, obs_qty_str_block[i_offset], str_length);
          obs_qty_str[str_length] = bad_data_char;
-         
+
          int headerOffset  = i_obs;
          // Read the corresponding header array for this observation
          for (int k=0; k < obs_arr_len; k++)
@@ -999,15 +999,15 @@ void process_point_obs(int i_nc) {
          if (str_length > mxstr_len) str_length = mxstr_len;
          strncpy(hdr_vld_str, hdr_vld_str_full[headerOffset], str_length);
          hdr_vld_str[str_length] = bad_data_char;
-      
-      
+
+
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
-        
+
          // Check each conf_info.vx_pd object to see if this observation
          // should be added
          for(j=0; j<conf_info.get_n_vx(); j++) {
-        
+
             // Attempt to add the observation to the conf_info.vx_pd object
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
                                        hdr_ut, obs_qty_str, obs_arr, grid);
@@ -1021,7 +1021,7 @@ void process_point_obs(int i_nc) {
    // Deallocate and clean up
    if(obs_in) {
       //obs_in->close();
-      delete obs_in; obs_in = (NcFile *) 0; 
+      delete obs_in; obs_in = (NcFile *) 0;
    }
 
    return;
@@ -1542,7 +1542,7 @@ void process_grid_vx() {
    // Close the output NetCDF file
    if(nc_out) {
       //nc_out->close();
-      delete nc_out; nc_out = (NcFile *) 0; 
+      delete nc_out; nc_out = (NcFile *) 0;
    }
 
    return;
@@ -1555,6 +1555,9 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
         DataPlane &mask_dp, PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
    double v, cmn;
+
+   // Allocate memory in on big chunk based on grid size
+   pd.extend(grid.nx()*grid.ny());
 
    // Climatology flags
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
@@ -2127,7 +2130,7 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                 << conf_info.ens_info[i_ens]->name() << "_"
                 << conf_info.ens_info[i_ens]->level_name() << "_"
                 << type_str;
-   
+
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
    ens_var = add_var(nc_out, (string)ens_var_name, ncInt, lat_dim, lon_dim, deflate_level);
@@ -2466,7 +2469,7 @@ void usage() {
 
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
-        
+
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
