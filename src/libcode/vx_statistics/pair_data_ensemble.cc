@@ -112,6 +112,27 @@ void PairDataEnsemble::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairDataEnsemble::extend(int n) {
+   int i;
+
+   PairBase::extend(n);
+
+   for(i=0; i<n_ens; i++) e_na[i].extend(n);
+
+   r_na.extend(n);
+   crps_na.extend(n);
+   ign_na.extend(n);
+   pit_na.extend(n);
+   rhist_na.extend(n);
+   phist_na.extend(n);
+   var_na.extend(n);
+   mn_na.extend(n);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    int i;
 

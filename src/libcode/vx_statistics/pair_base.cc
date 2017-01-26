@@ -93,6 +93,27 @@ void PairBase::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::extend(int n) {
+
+   sid_sa.extend(n);
+   lat_na.extend(n);
+   lon_na.extend(n);
+   x_na.extend(n);
+   y_na.extend(n);
+   vld_ta.extend(n);
+   lvl_na.extend(n);
+   elv_na.extend(n);
+   o_na.extend(n);
+   o_qc_sa.extend(n);
+   cmn_na.extend(n);
+   csd_na.extend(n);
+   wgt_na.extend(n);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairBase::set_mask_name(const char *c) {
 
    mask_name = c;
