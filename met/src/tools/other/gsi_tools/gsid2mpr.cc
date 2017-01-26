@@ -488,15 +488,6 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
 
 bool is_dup(const char *key) {
    bool dup;
-   //if(obs_key.has(key)) {
-   //   mlog << Warning
-   //        << "\nSkipping duplicate entry for case \"" << key << "\"\n\n";
-   //   dup = true;
-   //}
-   //else {
-   //   obs_key.add(key);
-   //   dup = false;
-   //}
    dup = false;
    int int_key = key_to_integer(key);
    StringArray key_array = obs_key_map[int_key];
