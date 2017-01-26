@@ -1486,6 +1486,9 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
                     cmn_dp.ny() == obs_dp.ny());
 
+   // Allocate memory in on big chunk based on grid size
+   pd.extend(grid.nx()*grid.ny());
+
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
       for(y=0; y<obs_dp.ny(); y++) {
