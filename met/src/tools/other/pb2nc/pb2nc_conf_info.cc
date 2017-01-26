@@ -98,8 +98,8 @@ void PB2NCConfInfo::read_config(const char *default_file_name,
 void PB2NCConfInfo::process_config() {
    int i;
 
-   ConcatString s;
-   StringArray sa;
+   ConcatString s, mask_name;
+   StringArray sa, *sid_list;
    Dictionary *dict = (Dictionary *) 0;
 
    
@@ -123,7 +123,12 @@ void PB2NCConfInfo::process_config() {
    }
    
    // Conf: station_id
-   station_id = conf.lookup_string_array(conf_key_station_id);
+   sa = conf.lookup_string_array(conf_key_station_id);
+   sid_list = new StringArray [sa.n_elements()];
+   for(i=0; i<sa.n_elements(); i++) {
+      parse_sid_mask(replace_path(sa[i]), sid_list[i], mask_name);
+      station_id.add(sid_list[i]);
+   }
 
    // Conf: beg_ds and end_ds
    dict = conf.lookup_dictionary(conf_key_obs_window);
@@ -135,10 +140,20 @@ void PB2NCConfInfo::process_config() {
    // Parse the masking grid
    if(s.nonempty()) {
       if(!find_grid_by_name(s, grid_mask)) {
-         mlog << Error << "\nPB2NCConfInfo::process_config() -> "
-              << "the \"" << conf_key_mask_grid << "\" requested ("
-              << s << ") is not defined.\n\n";
-         exit(1);
+         Met2dDataFileFactory factory;
+         Met2dDataFile * datafile = (Met2dDataFile *) 0;
+         // If that doesn't work, try to open a data file.
+         datafile = factory.new_met_2d_data_file(replace_path(s));
+         
+         if(!datafile) {
+            mlog << Error << "\nPB2NCConfInfo::process_config() -> "
+                 << "the \"" << conf_key_mask_grid << "\" requested ("
+                 << s << ") as named grid or data file is not defined.\n\n";
+            exit(1);
+         }
+         
+         // Store the data file's grid
+         grid_mask = datafile->grid();
       }
    }
 

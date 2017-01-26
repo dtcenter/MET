@@ -109,8 +109,9 @@ static ConcatString ncfile;
 static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 static Ascii2NcConfInfo config_info;
 
-static Grid grid_mask;
+static Grid grid_mask;      // Grid masking region from the named Grid
 static MaskPoly poly_mask;
+StringArray mask_sid;
 
 static int compress_level = -1;
 
@@ -126,6 +127,7 @@ static void set_logfile(const StringArray &);
 static void set_config(const StringArray &);
 static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
+static void set_mask_sid(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
@@ -163,6 +165,7 @@ int main(int argc, char *argv[]) {
    cline.add(set_config,    "-config",    1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
+   cline.add(set_mask_sid,  "-mask_sid",  1);
    cline.add(set_compress,  "-compress",  1);
 
    //
@@ -210,7 +213,7 @@ int main(int argc, char *argv[]) {
    //
    if(grid_mask.nx() > 0 || grid_mask.ny() > 0) file_handler->setGridMask(grid_mask);
    if(poly_mask.n_points() > 0)                 file_handler->setPolyMask(poly_mask);
-
+   
    //
    // Load the message type map
    //
@@ -401,6 +404,7 @@ void usage() {
         << "\t[-config file]\n"
         << "\t[-mask_grid string]\n"
         << "\t[-mask_poly file]\n"
+        << "\t[-mask_sid station_ids]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -427,6 +431,10 @@ void usage() {
 
         << "\t\t\"-mask_poly file\" is a polyline masking file for filtering "
         << "the point observations spatially (optional).\n"
+
+        << "\t\t\"-mask_sid station_ids\" is a comma separated station list "
+        << "or a file with station list for filtering the point observations "
+        << "spatially (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -562,3 +570,20 @@ void set_verbosity(const StringArray & a) {
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0]);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void set_mask_sid(const StringArray & a) {
+   ConcatString mask_name;
+   StringArray sa, *sid_list;
+
+   sa.parse_css(a[0]);
+   sid_list = new StringArray [sa.n_elements()];
+   for(int i=0; i<sa.n_elements(); i++) {
+      parse_sid_mask(sa[i], sid_list[i], mask_name);
+      mask_sid.add(sid_list[i]);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
