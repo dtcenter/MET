@@ -38,15 +38,13 @@ class TimeArray {
 
       void assign(const TimeArray &);
 
-      void extend(int);
-
       unixtime * e;
 
       int Nelements;
 
       int Nalloc;
 
-      bool Sorted;      
+      bool Sorted;
 
    public:
 
@@ -56,6 +54,8 @@ class TimeArray {
       TimeArray & operator=(const TimeArray &);
 
       void clear();
+
+      void extend(int);
 
       void dump(ostream &, int depth = 0) const;
 
