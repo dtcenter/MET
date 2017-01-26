@@ -85,10 +85,24 @@ void PairDataPoint::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairDataPoint::extend(int n) {
+
+   PairBase::extend(n);
+
+   f_na.extend(n);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairDataPoint::assign(const PairDataPoint &pd) {
    int i;
 
    clear();
+
+   // Allocate memory for output pairs
+   extend(pd.n_obs);
 
    set_mask_name(pd.mask_name);
    set_mask_dp_ptr(pd.mask_dp_ptr);
@@ -97,12 +111,20 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    set_interp_mthd(pd.interp_mthd);
    set_interp_dpth(pd.interp_dpth);
 
-   for(i=0; i<pd.n_obs; i++) {
-      add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
-               pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
-               pd.lvl_na[i], pd.elv_na[i],
-               pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
-               pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+   // Handle point data
+   if(pd.sid_sa.n_elements() == pd.n_obs) {
+
+      for(i=0; i<pd.n_obs; i++) {
+         add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+                  pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
+                  pd.lvl_na[i], pd.elv_na[i],
+                  pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
+                  pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+      }
+   }
+   // Handle gridded data
+   else {
+      add_pair(pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na);
    }
 
    return;
@@ -120,6 +142,44 @@ bool PairDataPoint::add_pair(const char *sid, double lat, double lon,
                          o, qc, cmn, csd, wgt) ) return(false);
 
    f_na.add(f);
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairDataPoint::add_pair(double f, double o, double c, double w) {
+
+   f_na.add(f);
+   o_na.add(o);
+   cmn_na.add(c);
+   wgt_na.add(w);
+   n_obs++;
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairDataPoint::add_pair(const NumArray f_in, const NumArray o_in,
+                             const NumArray c_in, const NumArray w_in) {
+
+   // Check for constant length
+   if(o_in.n_elements() != f_in.n_elements() ||
+      o_in.n_elements() != c_in.n_elements() ||
+      o_in.n_elements() != w_in.n_elements()) {
+      mlog << Error << "\nPairDataPoint::add_pair() -> "
+           << "arrays must all have the same length!\n\n";
+      exit(1);
+   }
+
+   f_na.add(f_in);
+   o_na.add(o_in);
+   cmn_na.add(c_in);
+   wgt_na.add(w_in);
+
+   // Increment the number of pairs
+   n_obs += o_in.n_elements();
 
    return(true);
 }
@@ -1065,8 +1125,17 @@ void VxPairDataPoint::inc_count(int ***&rej, int i, int j, int k) {
 PairDataPoint subset_pairs(const PairDataPoint &pd,
                            const SingleThresh &ft, const SingleThresh &ot,
                            const SetLogic type) {
+
+   // Check for no work to be done
+   if(ft.get_type() == thresh_na && ot.get_type() == thresh_na) {
+      return(pd);
+   }
+
    int i;
    PairDataPoint out_pd;
+
+   // Allocate memory for output pairs
+   out_pd.extend(pd.n_obs);
 
    bool cflag = set_climo_flag(pd.f_na, pd.cmn_na);
    bool wflag = set_climo_flag(pd.f_na, pd.wgt_na);
@@ -1082,11 +1151,20 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
 
       // Keep pairs which meet the threshold criteria
       if(check_fo_thresh(pd.f_na[i], ft, pd.o_na[i], ot, type)) {
-         out_pd.add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
-                         pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
-                         pd.lvl_na[i], pd.elv_na[i],
-                         pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
-                         pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+
+         // Handle point data
+         if(pd.sid_sa.n_elements() == pd.n_obs) {
+            out_pd.add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+                            pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
+                            pd.lvl_na[i], pd.elv_na[i],
+                            pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
+                            pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+         }
+         // Handle gridded data
+         else {
+            out_pd.add_pair(pd.f_na[i], pd.o_na[i],
+                            pd.cmn_na[i], pd.wgt_na[i]);
+         }
       }
    } // end for
 

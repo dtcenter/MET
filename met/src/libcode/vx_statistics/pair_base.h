@@ -81,6 +81,8 @@ class PairBase {
 
       void clear();
 
+      void extend(int);    // Allocate memory for expected size
+
       void set_mask_name(const char *);
       void set_mask_dp_ptr(DataPlane *);
       void set_mask_sid_ptr(StringArray *);
