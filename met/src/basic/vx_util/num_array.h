@@ -40,8 +40,6 @@ class NumArray {
 
       void assign(const NumArray &);
 
-      void extend(int);
-
       double * e;
 
       int Nelements;
@@ -56,10 +54,12 @@ class NumArray {
      ~NumArray();
       NumArray(const NumArray &);
       NumArray & operator=(const NumArray &);
-
+ 
       void clear();
 
       void empty();
+
+      void extend(int);
 
       void dump(ostream &, int depth = 0) const;
 
