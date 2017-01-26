@@ -38,6 +38,8 @@ const float FileHandler::FILL_VALUE = -9999.f;
 
 const int DEF_DEFALTE_LEVEL = 2;
 
+extern StringArray mask_sid;
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -63,6 +65,7 @@ FileHandler::FileHandler(const string &program_name) :
   _obsNum(0),
   _gridMaskNum(0),
   _polyMaskNum(0),
+  _sidMaskNum(0),
   _gridMask(0),
   _polyMask(0),
   deflate_level(DEF_DEFLATE_LEVEL),
@@ -126,7 +129,9 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
        << "Rejected " << _gridMaskNum
        << " observations off the masking grid.\n"
        << "Rejected " << _polyMaskNum
-       << " observations outside the masking polyline.\n";
+       << " observations outside the masking polyline.\n"
+       << "Rejected " << _sidMaskNum
+       << " observations not matched with station ids.\n";
 
   // Loop through the observations, counting the number of headers needed in
   // the netCDF file.  We need to count the headers before opening the netCDF
@@ -888,6 +893,12 @@ bool FileHandler::_addObservations(const Observation &obs)
      }
    }
 
+   if (0 < mask_sid.n_elements() && !mask_sid.has(obs.getStationId().c_str())) {
+      _sidMaskNum++;
+      return false;
+   }
+
+   
    _observations.push_back(obs);
 
   return true;

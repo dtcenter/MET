@@ -103,6 +103,7 @@ protected:
   
   int _gridMaskNum;
   int _polyMaskNum;
+  int _sidMaskNum;
 
   Grid     *_gridMask;
   MaskPoly *_polyMask;

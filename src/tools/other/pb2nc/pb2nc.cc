@@ -69,6 +69,8 @@ using namespace std;
 #include <unistd.h>
 
 #include "pb2nc_conf_info.h"
+#include "data_class.h"
+#include "data2d_factory.h"
 #include "vx_log.h"
 #include "vx_nc_util.h"
 #include "vx_grid.h"
@@ -164,7 +166,10 @@ static int nmsg = -1;
 static bool dump_flag = false;
 static ConcatString dump_dir = ".";
 
+static ConcatString data_plane_filename;
+
 static int compress_level = -1;
+static Grid grid_mask;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -264,7 +269,8 @@ static void   set_nmsg(const StringArray &);
 static void   set_dump_path(const StringArray &);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
-static void    set_compress(const StringArray &);
+static void   set_compress(const StringArray &);
+static void   set_mask_grid(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -333,6 +339,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_valid_beg_time, "-valid_beg", 1);
    cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_nmsg, "-nmsg", 1);
+   cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_dump_path, "-dump", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
@@ -455,6 +462,7 @@ void process_pbfile(int i_pb) {
    float    quality_mark, dl_category;
    float    obs_arr[obs_arr_len];
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
+   Grid     local_grid_mask;
 
    // List the PrepBufr file being processed
    mlog << Debug(1) << "Processing PrepBufr File:\t" << pbfile[i_pb]
@@ -536,6 +544,12 @@ void process_pbfile(int i_pb) {
    obs_data_offset = 0;
    hdr_data_offset = 0;
    
+   local_grid_mask = grid_mask;
+   if(grid_mask.nx() == 0 && grid_mask.ny() == 0
+         && conf_info.grid_mask.nx() > 0 && conf_info.grid_mask.ny() > 0) {
+      local_grid_mask = conf_info.grid_mask;
+   }
+          
    // Loop through the PrepBufr messages from the input file
    cout << "   npbmsg: " << npbmsg << "\n";
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
@@ -679,10 +693,10 @@ void process_pbfile(int i_pb) {
 
       // If the lat/lon for the PrepBufr message is not on the
       // grid_mask, continue to the next PrepBufr message
-      if(conf_info.grid_mask.nx() > 0 && conf_info.grid_mask.ny() > 0) {
-         conf_info.grid_mask.latlon_to_xy(hdr_arr_lat, (-1.0*hdr_arr_lon), x, y);
-         if(x < 0 || x >= conf_info.grid_mask.nx() ||
-            y < 0 || y >= conf_info.grid_mask.ny()) {
+      if(local_grid_mask.nx() > 0 && local_grid_mask.ny() > 0) {
+         local_grid_mask.latlon_to_xy(hdr_arr_lat, (-1.0*hdr_arr_lon), x, y);
+         if(x < 0 || x >= local_grid_mask.nx() ||
+            y < 0 || y >= local_grid_mask.ny()) {
             rej_grid++;
             continue;
          }
@@ -1483,6 +1497,7 @@ void usage() {
         << "\t[-valid_beg time]\n"
         << "\t[-valid_end time]\n"
         << "\t[-nmsg n]\n"
+        << "\t[-mask_data_file name]\n"
         << "\t[-dump path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -1511,6 +1526,9 @@ void usage() {
         << "\t\t\"-nmsg n\" indicates the number of PrepBufr message "
         << "to process (optional).\n"
 
+        << "\t\t\"-mask_data_file name\" is a data file for filtering "
+        << "the PrepBufr observation spatially (optional).\n"
+        
         << "\t\t\"-dump path\" indicates that the entire contents of "
         << "\"prepbufr_file\" should also be dumped to text files "
         << "in the directory specified (optional).\n"
@@ -1587,6 +1605,40 @@ void set_verbosity(const StringArray & a)
 
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_mask_grid(const StringArray & a) {
+  Met2dDataFileFactory factory;
+  Met2dDataFile * datafile = (Met2dDataFile *) 0;
+
+  // List the grid masking file
+  mlog << Debug(1)
+       << "Grid Masking: " << a[0] << "\n";
+
+  // First, try to find the grid by name.
+  if(!find_grid_by_name(a[0], grid_mask)) {
+
+    // If that doesn't work, try to open a data file.
+    datafile = factory.new_met_2d_data_file(replace_path(a[0]));
+
+    if(!datafile) {
+      mlog << Error << "\nset_mask_grid() -> "
+           << "can't open data file \"" << a[0] << "\"\n\n";
+      exit(1);
+    }
+
+    // Store the data file's grid
+    grid_mask = datafile->grid();
+
+    delete datafile; datafile = (Met2dDataFile *) 0;
+  }
+
+  // List the grid mask
+  mlog << Debug(2)
+       << "Parsed Masking Grid: " << grid_mask.name() << " ("
+       << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

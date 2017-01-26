@@ -76,18 +76,17 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
                                     const long *cur, bool count_bad=false);
 static void reset_header_buffer(int buf_size);
 
-static void   check_quality_control_flag(int &value, const char qty, const char* var_name);
-static void   check_quality_control_flag(float &value, const char qty, const char* var_name);
+static void check_quality_control_flag(int &value, const char qty, const char* var_name);
+static void check_quality_control_flag(float &value, const char qty, const char* var_name);
                                     
-static void   process_obs(const int gc, const float conversion,
-                          float *obs_arr, char qty, const char* var_name='\0');
-static void   write_qty(char &qty);
+static void process_obs(const int gc, const float conversion,
+                        float *obs_arr, char qty, const char* var_name='\0');
+static void write_qty(char &qty);
 
 static bool write_nc_hdr_data(int buf_size);
 static bool write_nc_obs_data(int buf_size);
  
 static MadisType get_madis_type(NcFile *&f_in);
-static void      parse_css(const char *, StringArray &);
 static void      convert_wind_wdir_to_u_v(float wind, float wdir,
                                           float &u, float &v);
 static bool      check_masks(double lat, double lon);
@@ -108,6 +107,7 @@ static void set_rec_end(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
+static void set_mask_sid(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
@@ -149,6 +149,7 @@ void initialize() {
 
    mdfile.clear();
    ncfile.clear();
+   mask_sid.clear();
    qc_dd_sa.clear();
    lvl_dim_sa.clear();
    i_obs    = 0;
@@ -156,6 +157,7 @@ void initialize() {
    rej_qc   = 0;
    rej_grid = 0;
    rej_poly = 0;
+   rej_sid  = 0;
 
    return;
 }
@@ -200,6 +202,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
+   cline.add(set_mask_sid,  "-mask_sid",  1);
    cline.add(set_compress,  "-compress",  1);
 
    //
@@ -696,33 +699,6 @@ MadisType get_madis_type(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_css(const char *in_str, StringArray &sa) {
-   int i, n;
-   char tmp_str[max_str_len];
-
-   //
-   // FUTURE WORK: This function could become a member function of
-   // StringArray.
-   //
-
-   strcpy(tmp_str, in_str);
-
-   //
-   // Replace comma's with spaces.
-   //
-   for(i=0, n=strlen(in_str); i<n; i++)
-      if(tmp_str[i] == ',') tmp_str[i] = ' ';
-
-   //
-   // Parse white-space separated text.
-   //
-   sa.parse_wsss(tmp_str);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void convert_wind_wdir_to_u_v(float wind, float wdir,
                               float &u, float &v) {
    //
@@ -776,6 +752,7 @@ void print_rej_counts() {
    mlog << Debug(2)
         << "Rejected recs based on masking grid\t= " << rej_grid << "\n"
         << "Rejected recs based on masking poly\t= " << rej_poly << "\n"
+        << "Rejected recs based on masking station ids\t= " << rej_sid << "\n"
         << "Rejected based on fill value\t\t= " << rej_fill << "\n"
         << "Rejected based on quality control\t= " << rej_qc << "\n"
         << "Total observations retained or derived\t= " << i_obs << "\n";
@@ -806,34 +783,34 @@ void process_madis_metar(NcFile *&f_in) {
    NcVar in_hdr_elv_var = get_var(f_in, "elevation");
    
    NcVar seaLevelPress_var = get_var(f_in, "seaLevelPress");
-   NcVar visibility_var = get_var(f_in, "visibility");
-   NcVar temperature_var = get_var(f_in, "temperature");
-   NcVar dewpoint_var = get_var(f_in, "dewpoint");
-   NcVar windDir_var = get_var(f_in, "windDir");
-   NcVar windSpeed_var = get_var(f_in, "windSpeed");
-   NcVar windGust_var = get_var(f_in, "windGust");
+   NcVar visibility_var    = get_var(f_in, "visibility");
+   NcVar temperature_var   = get_var(f_in, "temperature");
+   NcVar dewpoint_var      = get_var(f_in, "dewpoint");
+   NcVar windDir_var       = get_var(f_in, "windDir");
+   NcVar windSpeed_var     = get_var(f_in, "windSpeed");
+   NcVar windGust_var      = get_var(f_in, "windGust");
    NcVar minTemp24Hour_var = get_var(f_in, "minTemp24Hour");
    NcVar maxTemp24Hour_var = get_var(f_in, "maxTemp24Hour");
-   NcVar precip1Hour_var = get_var(f_in, "precip1Hour");
-   NcVar precip3Hour_var = get_var(f_in, "precip3Hour");
-   NcVar precip6Hour_var = get_var(f_in, "precip6Hour");
-   NcVar precip24Hour_var = get_var(f_in, "precip24Hour");
-   NcVar snowCover_var = get_var(f_in, "snowCover");
+   NcVar precip1Hour_var   = get_var(f_in, "precip1Hour");
+   NcVar precip3Hour_var   = get_var(f_in, "precip3Hour");
+   NcVar precip6Hour_var   = get_var(f_in, "precip6Hour");
+   NcVar precip24Hour_var  = get_var(f_in, "precip24Hour");
+   NcVar snowCover_var     = get_var(f_in, "snowCover");
 
    NcVar seaLevelPressQty_var = get_var(f_in, "seaLevelPressDD");
-   NcVar visibilityQty_var = get_var(f_in, "visibilityDD");
+   NcVar visibilityQty_var  = get_var(f_in, "visibilityDD");
    NcVar temperatureQty_var = get_var(f_in, "temperatureDD");
-   NcVar dewpointQty_var = get_var(f_in, "dewpointDD");
-   NcVar windDirQty_var = get_var(f_in, "windDirDD");
-   NcVar windSpeedQty_var = get_var(f_in, "windSpeedDD");
-   NcVar windGustQty_var = get_var(f_in, "windGustDD");
+   NcVar dewpointQty_var    = get_var(f_in, "dewpointDD");
+   NcVar windDirQty_var     = get_var(f_in, "windDirDD");
+   NcVar windSpeedQty_var   = get_var(f_in, "windSpeedDD");
+   NcVar windGustQty_var    = get_var(f_in, "windGustDD");
    NcVar minTemp24HourQty_var = get_var(f_in, "minTemp24HourDD");
    NcVar maxTemp24HourQty_var = get_var(f_in, "maxTemp24HourDD");
-   NcVar precip1HourQty_var = get_var(f_in, "precip1HourDD");
-   NcVar precip3HourQty_var = get_var(f_in, "precip3HourDD");
-   NcVar precip6HourQty_var = get_var(f_in, "precip6HourDD");
+   NcVar precip1HourQty_var  = get_var(f_in, "precip1HourDD");
+   NcVar precip3HourQty_var  = get_var(f_in, "precip3HourDD");
+   NcVar precip6HourQty_var  = get_var(f_in, "precip6HourDD");
    NcVar precip24HourQty_var = get_var(f_in, "precip24HourDD");
-   NcVar snowCoverQty_var = get_var(f_in, "snowCoverDD");
+   NcVar snowCoverQty_var    = get_var(f_in, "snowCoverDD");
    
    //
    // Retrieve applicable dimensions
@@ -1014,6 +991,7 @@ void process_madis_metar(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
+         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
@@ -1509,6 +1487,8 @@ void process_madis_raob(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
+         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
+
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
@@ -2150,6 +2130,7 @@ void process_madis_profiler(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
+         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
       
@@ -2449,6 +2430,7 @@ void process_madis_maritime(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
+         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
@@ -2839,6 +2821,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
+         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
          
@@ -3257,6 +3240,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
          // Process the station i.e. airport name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
+         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          
          //
          // Process the observation time.
@@ -3461,6 +3445,7 @@ void usage() {
         << "\t[-rec_end n]\n"
         << "\t[-mask_grid string]\n"
         << "\t[-mask_poly file]\n"
+        << "\t[-mask_sid station_ids]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -3492,6 +3477,10 @@ void usage() {
 
         << "\t\t\"-mask_poly file\" is a polyline masking file for filtering "
         << "the point observations spatially (optional).\n"
+
+        << "\t\t\"-mask_sid station_ids\" is a comma separated station list "
+        << "or a file with station list for filtering the point observations "
+        << "spatially (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -3546,7 +3535,7 @@ void set_qc_dd(const StringArray & a)
    //
    // Parse the list of QC flags to be used
    //
-   parse_css(a[0], qc_dd_sa);
+   qc_dd_sa.parse_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3556,7 +3545,7 @@ void set_lvl_dim(const StringArray & a)
    //
    // Parse the list vertical level dimensions to be processed
    //
-   parse_css(a[0], lvl_dim_sa);
+   lvl_dim_sa.parse_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3646,6 +3635,22 @@ void set_verbosity(const StringArray & a)
 
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_mask_sid(const StringArray & a) {
+   ConcatString mask_name;
+   StringArray sa, *sid_list;
+
+   sa.parse_css(a[0]);
+   sid_list = new StringArray [sa.n_elements()];
+   for(int i=0; i<sa.n_elements(); i++) {
+      parse_sid_mask(sa[i], sid_list[i], mask_name);
+      mask_sid.add(sid_list[i]);
+   }
+   cout << " DEBUG ascii2nc: set_mask_sid(): " << endl;
+   mask_sid.dump(cout);
 }
 
 ////////////////////////////////////////////////////////////////////////
