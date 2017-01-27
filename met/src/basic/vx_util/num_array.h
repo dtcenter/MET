@@ -54,10 +54,10 @@ class NumArray {
      ~NumArray();
       NumArray(const NumArray &);
       NumArray & operator=(const NumArray &);
- 
+
       void clear();
 
-      void empty();
+      void erase();
 
       void extend(int);
 

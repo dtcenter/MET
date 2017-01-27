@@ -313,7 +313,7 @@ void apply_mask(const DataPlane &dp, const DataPlane &mask_dp,
    double v;
 
    // Initialize the NumArray object
-   na.empty();
+   na.erase();
 
    // Loop through the mask data points
    for(x=0; x<mask_dp.nx(); x++) {

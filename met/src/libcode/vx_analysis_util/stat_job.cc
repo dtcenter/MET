@@ -1741,7 +1741,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
    //
    if(n_dump%dump_at.nrows() == 0) {
       *(dr_out) << dump_at;
-      dump_at.empty();
+      dump_at.erase();
    }
 
    return;

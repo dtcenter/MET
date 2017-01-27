@@ -181,7 +181,7 @@ class AsciiTable {
       AsciiTable & operator=(const AsciiTable &);
 
       void clear();
-      void empty();
+      void erase();
 
 
          //
