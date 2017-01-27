@@ -20,16 +20,20 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                data_line.cc data_line.h \
                grib_constants.cc grib_constants.h \
                is_number.cc is_number.h \
+               crc_array.h \
+               crr_array.h \
+               ncrr_array.h \
+               int_array.h \
                long_array.cc long_array.h \
+               num_array.cc num_array.h \
+               thresh_array.cc thresh_array.h \
                make_path.cc make_path.h \
                memory.cc memory.h \
-               num_array.cc num_array.h \
                ordinal.cc ordinal.h \
                roman_numeral.cc roman_numeral.h \
                string_fxns.cc string_fxns.h \
                substring.cc substring.h \
                temp_file.cc temp_file.h \
-               thresh_array.cc thresh_array.h \
                fix_float.cc fix_float.h \
                command_line.cc command_line.h \
                file_exists.cc file_exists.h \
