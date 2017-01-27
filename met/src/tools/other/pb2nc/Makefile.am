@@ -25,7 +25,11 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_shapedata \
 	-lvx_gsl_prob \
 	-lvx_analysis_util \
-	-lvx_data2d_grib \
+	-lvx_data2d_factory \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_grid \
