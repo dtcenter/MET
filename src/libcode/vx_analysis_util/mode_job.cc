@@ -347,7 +347,7 @@ n_dump++;
 // Write the buffer, if full
 if ( n_dump%dump_at.nrows() == 0 ) {
    *(dumpfile) << dump_at;
-   dump_at.empty();
+   dump_at.erase();
 }
 
    //

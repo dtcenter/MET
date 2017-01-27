@@ -51,7 +51,7 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
 
   // Convert the ramps to slope values
 
-  slopes.empty();
+  slopes.erase();
 
   for (int i = 0; i < valid_times.n_elements(); ++i)
   {

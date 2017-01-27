@@ -737,9 +737,9 @@ void process_scores() {
 
       // Empty out the NumArray objects
       for(i=0; i<conf_info.block_size; i++) {
-         f_na[i].empty();
-         o_na[i].empty();
-         c_na[i].empty();
+         f_na[i].erase();
+         o_na[i].erase();
+         c_na[i].erase();
       }
 
    } // end for i_read
