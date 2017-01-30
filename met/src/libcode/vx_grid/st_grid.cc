@@ -206,9 +206,7 @@ reduce(lon);
 
 r = st_func(lat, is_north());
 
-theta = Lon_orient - lon;
-
-if ( is_south() )  theta = -theta;
+theta = H*(Lon_orient - lon);
 
 x = Bx + Alpha*r*H*sind(theta);
 
