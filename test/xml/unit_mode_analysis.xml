@@ -44,4 +44,30 @@
     </output>
   </test>
 
+  <test name="mode_analysis_MET-644_LOOKIN_BY_DIR">
+    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/mode \
+      -bycase -single -simple \
+      -out &OUTPUT_DIR;/mode_analysis/MET-644_job.out \
+      -v 1
+    </param>   
+    <output>
+      <exist>&OUTPUT_DIR;/mode_analysis/MET-644_job.out</exist>
+    </output>
+  </test>
+
+  <test name="mode_analysis_MET-644_LOOKIN_BY_FILE">
+    <exec>&MET_DIR;/bin/mode_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/mode/mode_QUILT_300000L_20120410_180000V_060000A_R2_T2_obj.txt \
+      -bycase -single -simple \
+      -out &OUTPUT_DIR;/mode_analysis/MET-644_by_dir_job.out \
+      -v 1
+    </param>   
+    <output>
+      <exist>&OUTPUT_DIR;/mode_analysis/MET-644_by_dir_job.out</exist>
+    </output>
+  </test>
+
 </met_test>
