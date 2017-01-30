@@ -290,7 +290,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
       //  use the specified indexes to look up the field name
       if( !GribTable.lookup_grib2(field_disc, field_parm_cat, field_parm, mtab, cntr, ltab, tab) ){
-         mlog << Error << "\nVarInfoGrib2::set_dict() ->"
+         mlog << Error << "\nVarInfoGrib2::set_dict() -> "
               << "no parameter found with matching "
               << "GRIB2_disc ("     << field_disc     << ") "
               << "GRIB2_parm_cat (" << field_parm_cat << ") "
