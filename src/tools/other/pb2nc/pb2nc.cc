@@ -1497,7 +1497,7 @@ void usage() {
         << "\t[-valid_beg time]\n"
         << "\t[-valid_end time]\n"
         << "\t[-nmsg n]\n"
-        << "\t[-mask_data_file name]\n"
+        << "\t[-mask_grid name]\n"
         << "\t[-dump path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -1526,8 +1526,9 @@ void usage() {
         << "\t\t\"-nmsg n\" indicates the number of PrepBufr message "
         << "to process (optional).\n"
 
-        << "\t\t\"-mask_data_file name\" is a data file for filtering "
-        << "the PrepBufr observation spatially (optional).\n"
+        << "\t\t\"-mask_grid name\" is a named grid or a data file "
+        << "defining grid for filtering the PrepBufr observation "
+        << "spatially (optional).\n"
         
         << "\t\t\"-dump path\" indicates that the entire contents of "
         << "\"prepbufr_file\" should also be dumped to text files "

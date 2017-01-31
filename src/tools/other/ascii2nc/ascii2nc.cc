@@ -426,8 +426,8 @@ void usage() {
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
 
-        << "\t\t\"-mask_grid string\" is a named grid or a gridded data "
-        << "file for filtering the point observations spatially (optional).\n"
+        << "\t\t\"-mask_grid string\" is a named grid or a data file "
+        << "defining grid for filtering the point observations spatially (optional).\n"
 
         << "\t\t\"-mask_poly file\" is a polyline masking file for filtering "
         << "the point observations spatially (optional).\n"
