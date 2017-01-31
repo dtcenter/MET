@@ -519,6 +519,21 @@ void Logger::set_exit_on_warning(bool b)
 //////////////////////////////////////////////////////////////////
 
 
+void Logger::open_log_file(const char * path)
+
+{
+
+
+open_log_file(ConcatString(path));
+
+return;
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
 void Logger::open_log_file(ConcatString & s)
 {
       //

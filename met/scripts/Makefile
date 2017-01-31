@@ -71,6 +71,7 @@ include $(MK_DIR)/stat_analysis.mk
 include $(MK_DIR)/tc_utils.mk
 include $(MK_DIR)/wavelet_stat.mk
 include $(MK_DIR)/wwmca.mk
+include $(MK_DIR)/lidar2nc.mk
 
 
 ########################################################################
@@ -101,6 +102,7 @@ clean:
 	rm -f ${TEST_OUT_DIR}/point_stat/*
 	rm -f ${TEST_OUT_DIR}/stat_analysis/*
 	rm -f ${TEST_OUT_DIR}/wavelet_stat/*
+	rm -f ${TEST_OUT_DIR}/lidar2nc/*
 
 
 ########################################################################
