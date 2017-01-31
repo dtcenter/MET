@@ -3472,8 +3472,8 @@ void usage() {
         << "\t\t\"-rec_end n\" specifies the index of the last "
         << "MADIS record to process, zero-based (optional).\n"
 
-        << "\t\t\"-mask_grid string\" is a named grid or a gridded data "
-        << "file for filtering the point observations spatially (optional).\n"
+        << "\t\t\"-mask_grid string\" is a named grid or a data file "
+        << "defining grid for filtering the point observations spatially (optional).\n"
 
         << "\t\t\"-mask_poly file\" is a polyline masking file for filtering "
         << "the point observations spatially (optional).\n"
