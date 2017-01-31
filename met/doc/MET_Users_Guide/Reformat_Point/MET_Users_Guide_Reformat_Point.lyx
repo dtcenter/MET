@@ -278,6 +278,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-mask_grid name]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-dump path]
 \end_layout
 
@@ -450,6 +466,24 @@ num_messages
 5.
  The 
 \series bold
+-mask_grid name
+\series medium
+ option may be used to override the setting at the configuration (mask.grid)
+ which filters out the PrepBufr observation spatially.
+ The 
+\series bold
+name
+\series medium
+ specifies a named grid or a gridded data file for filtering the point observati
+ons spatially.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+6.
+ The 
+\series bold
 -dump path
 \series medium
  option may be used to dump the entire contents of the PrepBufr file to
@@ -473,7 +507,7 @@ path
 \begin_layout Description
 
 \series medium
-6.
+7.
  The 
 \series bold
 -log file
@@ -493,7 +527,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-7.
+8.
  The 
 \series bold
 -v level
@@ -515,7 +549,7 @@ level
 \begin_layout Description
 
 \series medium
-8.
+9.
 
 \series default
  The 
@@ -785,6 +819,7 @@ Each PrepBufr message has a station identification string associated with
  The user may specify a comma-separated list of station IDs to be retained.
  Providing an empty list indicates that messages from all station IDs will
  be retained.
+ It can be a file name containing a list of stations.
 \end_layout
 
 \begin_layout Standard
@@ -2537,6 +2572,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-mask_sid station_ids]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
@@ -2678,6 +2729,18 @@ mask_poly file
 7.
  The 
 \series bold
+-mask_sid station_ids 
+\series medium
+option specifies a comma separated station list or a file contains station
+ list for filtering the point observations spatially.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+8.
+ The 
+\series bold
 -log file 
 \series medium
 option directs output and errors to the specified log file.
@@ -2695,7 +2758,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-8.
+9.
  The 
 \series bold
 -v level
@@ -2709,7 +2772,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-9.
+10.
 
 \series default
  The 
@@ -3340,6 +3403,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-mask_sid station_ids]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
@@ -3497,6 +3576,18 @@ Optional arguments for madis2nc
 9.
  The 
 \series bold
+-mask_sid station_ids 
+\series medium
+option specifies a comma separated station list or a file contains station
+ list for filtering the point observations spatially.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+10.
+ The 
+\series bold
 -log file
 \series medium
  option directs output and errors to the specified log file.
@@ -3514,7 +3605,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-10.
+11.
  The 
 \series bold
 -v level
@@ -3528,7 +3619,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-11.
+12.
 
 \series default
  The 
