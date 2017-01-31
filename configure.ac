@@ -418,6 +418,28 @@ else
     AC_MSG_NOTICE([ascii2nc will not be compiled])
 fi
 
+
+# lidar2nc
+
+AC_ARG_ENABLE(lidar2nc,
+       [AS_HELP_STRING([--disable-lidar2nc], [Disable compilation of lidar2nc])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_LIDAR2NC="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-lidar2nc) ;;
+   esac],
+  [ENABLE_LIDAR2NC="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_LIDAR2NC], [test "x$ENABLE_LIDAR2NC" = "xyes"])
+
+if test "x$ENABLE_LIDAR2NC" = "xyes"; then
+    AC_DEFINE([ENABLE_LIDAR2NC], [], ["build lidar2nc"])
+    AC_MSG_NOTICE([lidar2nc will be compiled])
+else
+    AC_MSG_NOTICE([lidar2nc will not be compiled])
+fi
+
+
 # ensemble_stat
 
 AC_ARG_ENABLE(ensemble_stat,
@@ -1064,6 +1086,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/core/wavelet_stat/Makefile
                  src/tools/other/Makefile
                  src/tools/other/ascii2nc/Makefile
+                 src/tools/other/lidar2nc/Makefile
                  src/tools/other/gen_vx_mask/Makefile
                  src/tools/other/madis2nc/Makefile
                  src/tools/other/mode_graphics/Makefile

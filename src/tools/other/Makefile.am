@@ -34,6 +34,10 @@ if ENABLE_ASCII2NC
   SUBDIRS += ascii2nc
 endif
 
+if ENABLE_LIDAR2NC
+  SUBDIRS += lidar2nc
+endif
+
 if ENABLE_MADIS2NC
   SUBDIRS += madis2nc
 endif

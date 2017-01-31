@@ -263,6 +263,7 @@ class Logger
          //
 
       void open_log_file(ConcatString &);
+      void open_log_file(const char *);
 
       Logger & operator<<(const char *);
       Logger & operator<<(string);
