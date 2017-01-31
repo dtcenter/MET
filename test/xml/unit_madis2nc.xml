@@ -33,6 +33,36 @@
     </output>
   </test>
 
+  <test name="madis2nc_METAR_mask_sid">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_sid.nc \
+      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
+      -mask_sid OIKB,OIBB,OIKK,OICK,OICC,OIIP,OIIK,OIMM,OIAA,OIAH \
+      -type metar -rec_beg 2000 -rec_end 6000 -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log</exist>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_sid.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="madis2nc_METAR_mask_grid">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_grid.nc \
+      -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
+      -mask_grid &OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc \
+      -type metar -rec_beg 2000 -rec_end 6000 -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log</exist>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_grid.nc</point_nc>
+    </output>
+  </test>
+
   <test name="madis2nc_RAOB">
     <exec>&MET_DIR;/bin/madis2nc</exec>
     <param> \

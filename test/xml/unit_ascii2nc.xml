@@ -186,6 +186,65 @@
     </output>
   </test>
 
+  <test name="ascii2nc_insitu_turb_mask_sid">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.15.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.16.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.17.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.18.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.19.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.20.ascii \
+      &OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_sid.nc \
+      -mask_sid "N526UA,N567UA,N571UA,N594UA" \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_sid.nc </point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_insitu_turb_mask_grid_data">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.15.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.16.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.17.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.18.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.19.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.20.ascii \
+      &OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_grid_data.nc \
+      -mask_grid &OUTPUT_DIR;/ref_config/gen_vx_mask/CONUS.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_grid_data.nc </point_nc>
+    </output>
+  </test>
+ 
+  <test name="ascii2nc_insitu_turb_mask_named_grid">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.15.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.16.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.17.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.18.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.19.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.20.ascii \
+      &OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_named_grid.nc \
+      -mask_grid G212 -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_named_grid.nc </point_nc>
+    </output>
+  </test>
+ 
   <test name="ascii2nc_MASK_GRID">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
