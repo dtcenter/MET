@@ -593,6 +593,7 @@ obs_window = {
 //      verification should be performed over the entire grid on which the data
 //      resides.
 //      http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
+//      The "grid" entry can be the gridded data file defining grid.
 //
 //    - The "poly" entry contains a comma-separated list of files that define
 //      verification masking regions. These masking regions may be specified in
@@ -1731,8 +1732,10 @@ shift_right = 0;
 message_type = [];
 
 //
-// The "station_id" entry is an array of station ids to be retained.  An empty
-// list indicates that all stations should be retained.
+// The "station_id" entry is an array of station ids to be retained or
+// the filename which contains station ids. An array of station ids
+// contains a comma-separated list. An empty list indicates that all
+// stations should be retained.
 //
 // e.g. station_id = [ "KDEN" ];
 //
