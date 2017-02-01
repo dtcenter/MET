@@ -523,7 +523,6 @@ void Logger::open_log_file(const char * path)
 
 {
 
-
 open_log_file(ConcatString(path));
 
 return;
