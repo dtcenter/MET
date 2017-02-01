@@ -310,25 +310,26 @@ NcType::ncType t;
 
 switch ( hdf_type )  {
 
-   case DFNT_CHAR8:    t =  NcType::nc_CHAR;  break;   // 8-bit character type
-   case DFNT_UCHAR8:   t =  NcType::nc_BYTE;  break;   // 8-bit unsigned character type
+   case DFNT_CHAR8:    t =  NcType::nc_CHAR;   break;   // 8-bit character type
+   case DFNT_UCHAR8:   t =  NcType::nc_BYTE;   break;   // 8-bit unsigned character type
 
    // case DFNT_INT8:     t =  NcType::nc_SHORT;  break;   // 8-bit integer type
    // case DFNT_UINT8:    t =  NcType::nc_SHORT;  break;   // 8-bit unsigned integer type
 
-   case DFNT_INT16:    t = NcType::nc_SHORT;  break;   // 16-bit integer type
+   case DFNT_INT16:    t = NcType::nc_SHORT;   break;   // 16-bit integer type
    case DFNT_UINT16:   t = NcType::nc_USHORT;  break;   // 16-bit unsigned integer type
 
-   case DFNT_INT32:    t = NcType::nc_INT;  break;    // 32-bit integer type
-   case DFNT_UINT32:   t = NcType::nc_UINT;  break;   // 32-bit unsigned integer type
+   case DFNT_INT32:    t = NcType::nc_INT;     break;   // 32-bit integer type
+   case DFNT_UINT32:   t = NcType::nc_UINT;    break;   // 32-bit unsigned integer type
 
-   case DFNT_FLOAT32:  t = NcType::nc_FLOAT;  break;   // 32-bit floating-point type
+   case DFNT_FLOAT32:  t = NcType::nc_FLOAT;   break;   // 32-bit floating-point type
 
    case DFNT_FLOAT64:  t = NcType::nc_DOUBLE;  break;   // 64-bit floating-point type 
 
    default:
       mlog << Error
-           << program_name << ": hdf_type_to_nc_type() -> unrecognized hdf data type\n\n";
+           << program_name << ": hdf_type_to_nc_type() -> unrecognized hdf data type ... "
+           << hdf_type << "\n\n";
       exit ( 1 );
       break;
 
@@ -467,13 +468,13 @@ n_data = 1;
 
 for (j=0; j<hdf_rank; ++j)  n_data *= hdf_dimsizes[j];
 
+   //
+   //  allocate the buffer
+   //
+
 n_bytes = n_data*sizeof_hdf_type(hdf_type);
 
 buf = new unsigned char [n_bytes];
-
-// cout << "\n\n  n_data = " << n_data << "\n\n" << flush;
-
-float * f = (float *) buf;
 
    //
    //  add dims to output file
@@ -483,9 +484,7 @@ dims.resize(hdf_rank);
 
 for (j=0; j<hdf_rank; ++j)  {
 
-   dim_name.erase();
-
-   dim_name << nc_name << "_dim_" << (j + 1);
+   dim_name << cs_erase << nc_name << "_dim_" << (j + 1);
 
    dims.at(j) = out.addDim(dim_name.text(), hdf_dimsizes[j]);
 
@@ -514,7 +513,7 @@ for (j=0; j<hdf_rank; ++j)  {
 }
 
    //
-   //  fill the data buffer from the hdf file
+   //  read the data from the hdf file into the buffer
    //
 
 if ( SDreaddata(hdf_id, hdf_start, hdf_stride, hdf_edge, buf) < 0 )  {
@@ -528,15 +527,18 @@ if ( SDreaddata(hdf_id, hdf_start, hdf_stride, hdf_edge, buf) < 0 )  {
    //
    //  write the data to the netcdf file
    //
+   //    the NcVar::putVar function is overloaded, so we have to 
+   //     use a cast to make sure the right function is called
+   //
 
 switch ( nc_type )  {
 
-   case NcType::nc_FLOAT:   nc_var.putVar((float *)  buf);  break;
-   case NcType::nc_DOUBLE:  nc_var.putVar((double *) buf);  break;
+   case NcType::nc_FLOAT:   nc_var.putVar((const float *)  buf);  break;
+   case NcType::nc_DOUBLE:  nc_var.putVar((const double *) buf);  break;
 
-   case NcType::nc_INT:     nc_var.putVar((int *)    buf);  break;
+   case NcType::nc_INT:     nc_var.putVar((const int *)    buf);  break;
 
-   case NcType::nc_CHAR:    nc_var.putVar((char *)   buf);  break;
+   case NcType::nc_CHAR:    nc_var.putVar((const char *)   buf);  break;
 
    default:
       mlog << Error
