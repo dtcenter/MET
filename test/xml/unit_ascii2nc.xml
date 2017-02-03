@@ -206,6 +206,7 @@
     </output>
   </test>
 
+  <!--
   <test name="ascii2nc_insitu_turb_mask_grid_data">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
@@ -225,6 +226,7 @@
       <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_grid_data.nc </point_nc>
     </output>
   </test>
+  -->
  
   <test name="ascii2nc_insitu_turb_mask_named_grid">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
