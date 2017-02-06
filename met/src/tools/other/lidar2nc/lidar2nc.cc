@@ -9,22 +9,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char hdf_lat_name        [] = "Latitude";
-static const char hdf_lon_name        [] = "Longitude";
-static const char hdf_time_name       [] = "Profile_UTC_Time";
-static const char hdf_data_name       [] = "Layer_Base_Altitude";
+static const char hdf_lat_name         [] = "Latitude";
+static const char hdf_lon_name         [] = "Longitude";
+static const char hdf_time_name        [] = "Profile_Time";
+static const char hdf_data_name        [] = "Layer_Base_Altitude";
 
-static const char nc_dim_name         [] = "track";
+static const char na_string            [] = "NA";
 
-static const char nc_lat_name         [] = "lat";
-static const char nc_lon_name         [] = "lon";
-static const char nc_time_name        [] = "time_utc";
-static const char nc_data_name        [] = "layer_base_altitude_km";
-
-static const char na_string           [] = "NA";
-
-static const char mxstr_dim_name      [] = "mxstr";
-static const int  mxstr_dim_size         = 40;
+static const char mxstr_dim_name       [] = "mxstr";
+static const int  mxstr_dim_size          = 40;
 
 static const char hdr_arr_len_dim_name [] = "hdf_arr_len";
 static const int  hdr_arr_len_dim_size    = 2;
@@ -91,6 +84,8 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
+static const unixtime jan_1_1993 = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -107,6 +102,7 @@ struct HdfVarInfo {
    int hdf_atts;
 
    int hdf_dimsizes[MAX_VAR_DIMS];
+
 };
 
 
@@ -145,9 +141,6 @@ static void process_calypso_file (NcFile &, const char * filename);
 static int get_lat_size(const int hdf_sd_id, const char * hdf_lat_name);
 
 static void get_hdf_var_info(const int hdf_sd_id, const char * hdf_name, HdfVarInfo &);
-
-static void nc_populate(NcFile &, int hdf_sd_id, 
-                        const char * nc_name, const char * hdf_name);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -559,9 +552,7 @@ float * const fbuf = (float *) buf;
    //  populate the hdr_typ variable
    //
 
-
-
-memset(cbuf, 0, n);
+memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
@@ -575,7 +566,7 @@ hdr_type_var.putVar(cbuf);
    //  populate the hdr_sid variable
    //
 
-memset(cbuf, 0, n);
+memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
@@ -589,7 +580,7 @@ hdr_sid_var.putVar(cbuf);
    //  populate the obs_qty variable
    //
 
-memset(cbuf, 0, n);
+memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
@@ -606,19 +597,26 @@ obs_qty_var.putVar(cbuf);
 HdfVarInfo lat_info, lon_info;
 float ff[2];
 
+
 get_hdf_var_info(hdf_sd_id, hdf_lat_name, lat_info);
 get_hdf_var_info(hdf_sd_id, hdf_lon_name, lon_info);
+
+hdf_stride[0] = 1;
+hdf_stride[1] = 1;
+
+hdf_edge[0] = 1;
+hdf_edge[1] = 1;
+
+memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
    hdf_start[0] = j;
-   hdf_start[1] = 0;
+   hdf_start[1] = 1;   //  take the middle value
 
-   hdf_stride[0] = 1;
-   hdf_stride[1] = 1;
-
-   hdf_edge[0] = 1;
-   hdf_edge[1] = 1;
+      //
+      //  read the latitude value
+      //
 
    if ( SDreaddata(lat_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
 
@@ -629,6 +627,10 @@ for (j=0; j<n_data; ++j)  {
    }
 
    fbuf[2*j] = ff[0];
+
+      //
+      //  read the longitude value
+      //
 
    if ( SDreaddata(lon_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
 
@@ -644,6 +646,71 @@ for (j=0; j<n_data; ++j)  {
 
 hdr_arr_var.putVar(fbuf);
 
+   //
+   //  populate the hdr_vld variable
+   //
+   //    the time in the hdf file is seconds from Jan 1, 1993 0h
+   //
+
+int k;
+HdfVarInfo info;
+unixtime t;
+int month, day, year, hour, minute, second;
+double dd;
+char junk [1 + mxstr_dim_size];
+
+
+
+get_hdf_var_info(hdf_sd_id, hdf_time_name, info);
+
+hdf_stride[0] = 1;
+hdf_stride[1] = 1;
+
+hdf_edge[0] = 1;
+hdf_edge[1] = 1;
+
+memset(buf, 0, buf_size);
+
+for (j=0; j<n_data; ++j)  {
+
+   hdf_start[0] = j;
+   hdf_start[1] = 1;   //  take the middle value
+
+   if ( SDreaddata(info.hdf_id, hdf_start, hdf_stride, hdf_edge, &dd) < 0 )  {
+
+      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+
+      exit ( 1 );
+
+   }
+
+   k = nint(dd);
+
+   t = k + jan_1_1993;
+
+   unix_to_mdyhms(t, month, day, year, hour, minute, second);
+
+   snprintf(junk, sizeof(junk), 
+            "%04d%02d%02d_%02d%02d%02d",
+             year, month, day, hour, minute, second);
+
+   strcpy(cbuf + j*mxstr_dim_size, junk);
+
+}   //  for j
+
+hdr_vld_var.putVar(cbuf);
+
+   //
+   //  populate the obs_arr variable
+   //
+
+memset(buf, 0, buf_size);
+
+for (j=0; j<n_data; ++j)  {
+
+
+
+}   //  for j
 
 
 
@@ -660,19 +727,6 @@ hdr_arr_var.putVar(fbuf);
 
 
 
-
-
-
-
-
-
-
-
-
-// nc_populate(out, hdf_sd_id, nc_lat_name,   hdf_lat_name);
-// nc_populate(out, hdf_sd_id, nc_lon_name,   hdf_lon_name);
-// nc_populate(out, hdf_sd_id, nc_time_name,  hdf_time_name);
-// nc_populate(out, hdf_sd_id, nc_data_name,  hdf_data_name);
 
    //
    //  close hdf file
@@ -781,162 +835,6 @@ if ( SDgetinfo(info.hdf_id, 0, &(info.hdf_rank), info.hdf_dimsizes, &(info.hdf_t
    //
    //  done
    //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void nc_populate(NcFile & out, int hdf_sd_id, const char * nc_name, const char * hdf_name)
-
-{
-
-int j;
-int hdf_index, hdf_id;
-int hdf_rank;
-int hdf_type, hdf_atts;
-int hdf_start[MAX_VAR_DIMS], hdf_stride[MAX_VAR_DIMS], hdf_edge[MAX_VAR_DIMS];
-int hdf_dimsizes[MAX_VAR_DIMS];
-int n_bytes, n_data;
-NcVar nc_var;
-vector<NcDim> dims;
-unsigned char * buf = 0;
-ConcatString dim_name;
-NcType::ncType nc_type;
-
-
-   //
-   //  get hdf index and id for this variable
-   //
-
-if ( (hdf_index = SDnametoindex(hdf_sd_id, hdf_name)) < 0 )  {
-
-   cerr << "\n\n  " << program_name << ": failed to get index for \""
-        << hdf_name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( (hdf_id = SDselect(hdf_sd_id, hdf_index)) < 0 )  {
-
-   cerr << "\n\n  " << program_name << ": failed to get id for \""
-        << hdf_name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  get hdf info on this variable
-   //
-
-if ( SDgetinfo(hdf_id, 0, &hdf_rank, hdf_dimsizes, &hdf_type, &hdf_atts) < 0 )  {
-
-   cerr << "\n\n  " << program_name << ": SDgetinfo failed\n\n";
-
-   exit ( 1 );
-
-}
-
-nc_type = hdf_type_to_nc_type(hdf_type);
-
-   //
-   //  how many data points altogether?
-   //
-
-n_data = 1;
-
-for (j=0; j<hdf_rank; ++j)  n_data *= hdf_dimsizes[j];
-
-   //
-   //  allocate the buffer
-   //
-
-n_bytes = n_data*sizeof_hdf_type(hdf_type);
-
-buf = new unsigned char [n_bytes];
-
-   //
-   //  add dims to output file
-   //
-
-dims.resize(hdf_rank);
-
-for (j=0; j<hdf_rank; ++j)  {
-
-   dim_name << cs_erase << nc_name << "_dim_" << (j + 1);
-
-   dims.at(j) = out.addDim(dim_name.text(), hdf_dimsizes[j]);
-
-}
-
-   //
-   //  add variable to output file
-   //
-
-nc_var = out.addVar(string(nc_name), nc_type, dims);
-
-  //
-  //  select hdf data cube
-  //
-
-for (j=0; j<MAX_VAR_DIMS; ++j)  hdf_start[j] = hdf_stride[j] = hdf_edge[j] = 0;
-
-for (j=0; j<hdf_rank; ++j)  {
-
-   hdf_start[j] = 0;
-
-   hdf_stride[j] = 1;
-
-   hdf_edge[j] = hdf_dimsizes[j];
-
-}
-
-   //
-   //  read the data from the hdf file into the buffer
-   //
-
-if ( SDreaddata(hdf_id, hdf_start, hdf_stride, hdf_edge, buf) < 0 )  {
-
-   cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  write the data to the netcdf file
-   //
-   //    the NcVar::putVar function is overloaded, so we have to 
-   //     use a cast to make sure the right function is called
-   //
-
-switch ( nc_type )  {
-
-   case NcType::nc_FLOAT:   nc_var.putVar((const float *)  buf);  break;
-   case NcType::nc_DOUBLE:  nc_var.putVar((const double *) buf);  break;
-
-   case NcType::nc_INT:     nc_var.putVar((const int *)    buf);  break;
-
-   case NcType::nc_CHAR:    nc_var.putVar((const char *)   buf);  break;
-
-   default:
-      mlog << Error
-           << program_name << ": nc_populate() -> bad netcdf data type ... " << nc_type << "\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-   //
-   //  done
-   //
-
-if ( buf )  { delete [] buf;  buf = 0; }
 
 return;
 
