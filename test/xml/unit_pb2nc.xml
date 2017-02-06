@@ -96,7 +96,7 @@
     <exec>&MET_DIR;/bin/pb2nc</exec>
     <env>
       <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value>&MET_DIR;/sample_fcst/2005080700/wrfprs_ruc13_00.tm00_G212</value></pair>
+      <pair><name>MASK_GRID</name>           <value>&MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_00.tm00_G212</value></pair>
       <pair><name>MASK_POLY</name>           <value></value></pair>
       <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
     </env>
