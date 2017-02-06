@@ -408,6 +408,8 @@ NcDim nc_dim;
 NcVar nc_lat_var, nc_lon_var, nc_data_var, nc_time_var;
 
 
+for (j=0; j<MAX_VAR_DIMS; ++j)  hdf_start[j] = hdf_stride[j] = hdf_edge[j] = 0;
+
    //
    //  open hdf file
    //
@@ -430,8 +432,6 @@ if ( hdf_sd_id < 0 )  {
    //
 
 n_data = get_lat_size(hdf_sd_id, hdf_lat_name);
-
-cout << "\n\n  n_data = " << n_data << "\n\n";
 
 const int nhdr_dim_size = n_data;
 const int nobs_dim_size = n_data;
@@ -551,15 +551,14 @@ unsigned char * buf = 0;
 
 buf = new unsigned char [buf_size];
 
-char  * cbuf = (char *) buf;
-float * fbuf = (float *) buf;
+char  * const cbuf = (char *) buf;
+float * const fbuf = (float *) buf;
 
 
    //
    //  populate the hdr_typ variable
    //
 
-// HdfVarInfo info;
 
 
 memset(cbuf, 0, n);
@@ -599,6 +598,70 @@ for (j=0; j<n_data; ++j)  {
 }
 
 obs_qty_var.putVar(cbuf);
+
+   //
+   //  populate the hdr_arr variable
+   //
+
+HdfVarInfo lat_info, lon_info;
+float ff[2];
+
+get_hdf_var_info(hdf_sd_id, hdf_lat_name, lat_info);
+get_hdf_var_info(hdf_sd_id, hdf_lon_name, lon_info);
+
+for (j=0; j<n_data; ++j)  {
+
+   hdf_start[0] = j;
+   hdf_start[1] = 0;
+
+   hdf_stride[0] = 1;
+   hdf_stride[1] = 1;
+
+   hdf_edge[0] = 1;
+   hdf_edge[1] = 1;
+
+   if ( SDreaddata(lat_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
+
+      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+
+      exit ( 1 );
+
+   }
+
+   fbuf[2*j] = ff[0];
+
+   if ( SDreaddata(lon_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
+
+      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+
+      exit ( 1 );
+
+   }
+
+   fbuf[2*j + 1] = ff[0];
+
+}   //  for j
+
+hdr_arr_var.putVar(fbuf);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
