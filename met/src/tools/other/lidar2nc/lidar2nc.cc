@@ -12,7 +12,10 @@
 static const char hdf_lat_name         [] = "Latitude";
 static const char hdf_lon_name         [] = "Longitude";
 static const char hdf_time_name        [] = "Profile_Time";
-static const char hdf_data_name        [] = "Layer_Base_Altitude";
+static const char hdf_num_layers_name  [] = "Number_Layers_Found";
+
+static const char hdf_obs_name         [] = "Layer_Base_Altitude";
+static const char hdf_pressure_name    [] = "Layer_Base_Pressure";
 
 static const char na_string            [] = "NA";
 
@@ -37,8 +40,13 @@ static const char hdr_arr_var_name     [] = "hdr_arr";
 static const char obs_qty_var_name     [] = "obs_qty";
 static const char obs_arr_var_name     [] = "obs_arr";
 
+static const int  grib_code               = 500;
+
+static const int  level_index             = 0;   //  use the bottom cloud level
+
 
 ////////////////////////////////////////////////////////////////////////
+
 
 using namespace std;
 
@@ -388,7 +396,7 @@ void process_calypso_file(NcFile & out, const char * filename)
 
 {
 
-int j, n;
+int j;
 int hdf_sd_id;
 int hdf_lat_index, hdf_lat_id;
 int hdf_lon_index, hdf_lon_id;
@@ -704,14 +712,76 @@ hdr_vld_var.putVar(cbuf);
    //  populate the obs_arr variable
    //
 
+const int offset = obs_arr_len_dim_size;
+HdfVarInfo pressure_info;
+HdfVarInfo obs_info;
+HdfVarInfo num_layers_info;
+
+get_hdf_var_info(hdf_sd_id, hdf_pressure_name,     pressure_info);
+get_hdf_var_info(hdf_sd_id, hdf_obs_name,               obs_info);
+get_hdf_var_info(hdf_sd_id, hdf_num_layers_name, num_layers_info);
+
+
 memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
+   fbuf[offset*j] = (float) j;   //  hdr_id
 
+   fbuf[offset*j + 1] = (float) grib_code;  // gc
+
+      //
+      //  pressure
+      //
+
+   hdf_stride[0] = 1;
+   hdf_stride[1] = 1;
+
+   hdf_edge[0] = 1;
+   hdf_edge[1] = 1;
+
+   hdf_start[0] = j;
+   hdf_start[1] = level_index;
+
+   if ( SDreaddata(pressure_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
+
+      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+
+      exit ( 1 );
+
+   }
+
+   fbuf[offset*j + 2] = *ff;  // lvl
+
+      //
+      //  height = obs?
+      //
+
+   hdf_stride[0] = 1;
+   hdf_stride[1] = 1;
+
+   hdf_edge[0] = 1;
+   hdf_edge[1] = 1;
+
+   hdf_start[0] = j;
+   hdf_start[1] = level_index;
+
+   if ( SDreaddata(obs_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
+
+      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+
+      exit ( 1 );
+
+   }
+
+   ff[0] *= 1000.0;   //  kilometers -> meters
+
+   fbuf[offset*j + 3] = *ff;  // hgt
+   fbuf[offset*j + 4] = *ff;  // ob
 
 }   //  for j
 
+obs_arr_var.putVar(fbuf);
 
 
 
