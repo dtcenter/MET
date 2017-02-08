@@ -15,6 +15,7 @@ file_size_delta = 0;
 usage = function(){
 	cat("usage: Rscript comp_nc.R [-v {lev}] [-strict] {nc_file_1} {nc_file_2}\n",
 			"  where -v {lev}  indicates verbosity level (0-2), default 1\n",
+			"        -delta {file_size_delta} Allowed file size differnce. If negative, skip size checking. default 0\n",
 			"        -strict   applies strict equality when comparing numerical values, default false\n\n",
 			sep="");
 }
@@ -24,6 +25,9 @@ listArgs = commandArgs(TRUE);
 while( 2 < length(listArgs) ){
 	if( "-v" == listArgs[1] ){
 		verb = listArgs[2];
+		listArgs = listArgs[3:length(listArgs)];
+	} else if( "-delta" == listArgs[1] ){
+		file_size_delta = listArgs[2];
 		listArgs = listArgs[3:length(listArgs)];
 	} else if( "-strict" == listArgs[1] ){
 		strict = 1;
