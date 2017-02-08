@@ -617,7 +617,7 @@ printCompReport = function(listTest, verb=0, hist=""){
 #      nc2: path and file name of second NetCDF file to compare
 #     verb: (optional) verbosity level, 0 for no output
 #   strict: (optional) require strict numerical equality, default no
-#    delta: (optional) the allowed file size difference, ignore the file size if negative
+#    delta: (optional) the allowed file size difference, ignore the file size checking if negative
 compareNc = function(nc1, nc2, verb, strict=0, delta=-1){
 
 	strNcDump1 = paste(strDirTmp, "/", "ncdump_hdr1_", as.numeric(Sys.time()), ".txt", sep="");
@@ -651,7 +651,12 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1){
 		}
 	}
     
-    if (delta >= 0) {
+    skip_nc_size_checking = system("echo $MET_TEST_NO_NC_SIZE", intern=T);
+    if (skip_nc_size_checking != "" ) {
+        cat("INFO: NetCDF file size checking was disabled by environment variable MET_TEST_NO_NC_SIZE\n");
+    } else if (delta < 0 ) {
+        cat("INFO: NetCDF file size checking was disabled\n");
+    } else {
         ncFileSize1 = file.size(nc1);
         ncFileSize2 = file.size(nc2);
         ncHeaderSize1 = file.size(strNcDump1);
@@ -664,9 +669,9 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1){
                     cat("       header size difference: ", abs(ncHeaderSize1 - ncHeaderSize2), ", file size difference: ", abs(ncFileSize1 - ncFileSize2), "\n");
                     cat("       ", nc1, " : ", ncFileSize1, "\n");
                     cat("       ", nc2, " : ", ncFileSize2, "\n");
-                    return();
-                } else {
-                    quit(status=1);
+                #    return();
+                #} else {
+                #    quit(status=1);
                 }
             }
         };
