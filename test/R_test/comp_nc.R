@@ -15,7 +15,7 @@ file_size_delta = 0;
 usage = function(){
 	cat("usage: Rscript comp_nc.R [-v {lev}] [-strict] {nc_file_1} {nc_file_2}\n",
 			"  where -v {lev}  indicates verbosity level (0-2), default 1\n",
-			"        -delta {file_size_delta} Allowed file size differnce. If negative, skip size checking. default 0\n",
+			"        -delta {file_size_delta} Allowed file size difference. If negative, skip size checking. default 0\n",
 			"        -strict   applies strict equality when comparing numerical values, default false\n\n",
 			sep="");
 }
