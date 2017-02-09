@@ -59,6 +59,7 @@ void GridStatConfInfo::init_from_scratch() {
    wind_logic  = (SetLogic *)     0;
    mask_dp     = (DataPlane *)    0;
    interp_mthd = (InterpMthd *)   0;
+   ascii_output_flag = true;
 
    clear();
 
@@ -104,6 +105,7 @@ void GridStatConfInfo::clear() {
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
+   ascii_output_flag = true;
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
@@ -213,9 +215,15 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Check for at least one output line type
    if(n == 0) {
-      mlog << Error << "\nGridStatConfInfo::process_config() -> "
-           << "At least one output STAT type must be requested.\n\n";
-      exit(1);
+       // MET-620  Do NOT error out when no STAT type is requested.
+       // Instead, generate the requested output file and do NOT
+       // generate any ASCII output text files. Set the ascii_output_flat
+       // to false, it is set to true by default.
+       mlog <<Debug(3)
+            <<"\n No STAT type requested, proceeding with ascii output flag to false.\n";
+       set_ascii_output_flag(false);
+
+
    }
 
    // Conf: fcst.field, obs.field, and climo.field
@@ -489,6 +497,13 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    // Conf: nc_pairs_flag
    parse_nc_info();
 
+   // Check for at least one output data type
+   if(!get_ascii_output_flag() && nc_info.all_false()) {
+      mlog<<Error<<"\nGridStatConfInfo::process_config() -> "
+          <<"At least one output STAT or NetCDF type must be requested.\n\n";
+      exit(1);
+   }
+
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
 
@@ -559,12 +574,12 @@ if ( type != DictionaryType )  {
 
 Dictionary * d = e->dict_value();
 
-nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
-nc_info.do_raw    = d->lookup_bool(conf_key_raw_flag);
-nc_info.do_diff   = d->lookup_bool(conf_key_diff_flag);
-nc_info.do_climo  = d->lookup_bool(conf_key_climo_flag);
-nc_info.do_weight = d->lookup_bool(conf_key_weight);
-nc_info.do_nbrhd  = d->lookup_bool(conf_key_nbrhd);
+nc_info.do_latlon      = d->lookup_bool(conf_key_latlon_flag);
+nc_info.do_raw         = d->lookup_bool(conf_key_raw_flag);
+nc_info.do_diff        = d->lookup_bool(conf_key_diff_flag);
+nc_info.do_climo       = d->lookup_bool(conf_key_climo_flag);
+nc_info.do_weight      = d->lookup_bool(conf_key_weight);
+nc_info.do_nbrhd       = d->lookup_bool(conf_key_nbrhd);
 
 
    //
@@ -743,6 +758,21 @@ int GridStatConfInfo::n_stat_row() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void GridStatConfInfo::set_ascii_output_flag(bool val)
+{
+    ascii_output_flag = val;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool GridStatConfInfo::get_ascii_output_flag()
+{
+    return ascii_output_flag;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
    //
    //  Code for struct GridStatNcOutInfo
@@ -820,9 +850,6 @@ do_climo  = true;
 return;
 
 }
-
-
-////////////////////////////////////////////////////////////////////////
 
 
 
