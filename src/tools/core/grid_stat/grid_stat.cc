@@ -165,6 +165,7 @@ static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 
+
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
@@ -293,7 +294,12 @@ void setup_first_pass(const DataPlane &dp) {
    conf_info.process_masks(grid);
 
    // Create output text files as requested in the config file
-   setup_txt_files(dp.valid(), dp.lead());
+   // only if the ascii_output_flag is true.
+   if (conf_info.get_ascii_output_flag())
+   {
+       setup_txt_files(dp.valid(), dp.lead());
+   }
+
 
    // If requested, create a NetCDF file to store the matched pairs and
    // difference fields for each GRIB code and masking region
