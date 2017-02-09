@@ -130,4 +130,21 @@
     </output>
   </test>
 
+  <test name="grid_stat_MET-620_NO_STATS">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>MET-620_NO_STATS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i18.f00.nc \
+      &CONFIG_DIR;/GridStatConfig_GTG_latlon \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MET-620_NO_STATS_060000L_20130827_180000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
