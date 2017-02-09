@@ -74,6 +74,8 @@ struct GridStatNcOutInfo {
 
    bool do_nbrhd;
 
+   bool do_apply_mask;
+
       //////////////////
 
    GridStatNcOutInfo();
@@ -170,6 +172,10 @@ class GridStatConfInfo {
       GridStatConfInfo();
      ~GridStatConfInfo();
 
+      // Setting for generating ASCII output file
+      bool             ascii_output_flag;  // Flag to indicate whether the ASCII text file
+                                           // should be generated
+
       void clear();
 
       void read_config   (const char *, const char *);
@@ -203,6 +209,10 @@ class GridStatConfInfo {
       int n_txt_row (int i);
       int n_stat_row();
       int get_compression_level();
+
+      // Accessor and mutator for the ascii_output_flag
+      void set_ascii_output_flag(bool val);
+      bool get_ascii_output_flag();
 
 };
 
