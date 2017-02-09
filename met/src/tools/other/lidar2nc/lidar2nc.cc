@@ -23,7 +23,7 @@ static const char mxstr_dim_name       [] = "mxstr";
 static const int  mxstr_dim_size          = 40;
 
 static const char hdr_arr_len_dim_name [] = "hdf_arr_len";
-static const int  hdr_arr_len_dim_size    = 2;
+static const int  hdr_arr_len_dim_size    = 3;
 
 static const char obs_arr_len_dim_name [] = "obs_arr_len";
 static const int  obs_arr_len_dim_size    = 5;
@@ -31,9 +31,9 @@ static const int  obs_arr_len_dim_size    = 5;
 static const char nhdr_dim_name        [] = "nhdr";
 static const char nobs_dim_name        [] = "nobs";
 
-static const char hdr_type_string      [] = "calypso";
+static const char hdr_typ_string      [] = "calypso";
 
-static const char hdr_type_var_name    [] = "hdr_type";
+static const char hdr_typ_var_name     [] = "hdr_typ";
 static const char hdr_sid_var_name     [] = "hdr_sid";
 static const char hdr_vld_var_name     [] = "hdr_vld";
 static const char hdr_arr_var_name     [] = "hdr_arr";
@@ -93,6 +93,10 @@ static ConcatString program_name;
 static CommandLine cline;
 
 static const unixtime jan_1_1993 = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
+
+// static const float FileHandler::FILL_VALUE = -9999.f;
+
+static const float FILL_VALUE = -9999.f;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,8 +194,6 @@ if ( output_filename.empty() )  usage();
    //
 
 static NcFile ncf(output_filename.text(), NcFile::replace, NcFile::nc4);
-
-
 
    //
    //  process the lidar files
@@ -441,14 +443,14 @@ const int nobs_dim_size = n_data;
    //  see how big a buffer we'll need
    //
 
-const int hdr_type_bytes = nhdr_dim_size*mxstr_dim_size;
-const int hdr_sid_bytes  = nhdr_dim_size*mxstr_dim_size;
-const int hdr_vld_bytes  = nhdr_dim_size*mxstr_dim_size;
-const int hdr_arr_bytes  = nhdr_dim_size*hdr_arr_len_dim_size*sizeof(float);
-const int obs_qty_bytes  = nobs_dim_size*mxstr_dim_size;
-const int obs_arr_bytes  = nobs_dim_size*obs_arr_len_dim_size*sizeof(float);
+const int hdr_typ_bytes = nhdr_dim_size*mxstr_dim_size;
+const int hdr_sid_bytes = nhdr_dim_size*mxstr_dim_size;
+const int hdr_vld_bytes = nhdr_dim_size*mxstr_dim_size;
+const int hdr_arr_bytes = nhdr_dim_size*hdr_arr_len_dim_size*sizeof(float);
+const int obs_qty_bytes = nobs_dim_size*mxstr_dim_size;
+const int obs_arr_bytes = nobs_dim_size*obs_arr_len_dim_size*sizeof(float);
 
-int buf_size = hdr_type_bytes;
+int buf_size = hdr_typ_bytes;
 
 buf_size = max<int>(buf_size, hdr_sid_bytes);
 buf_size = max<int>(buf_size, hdr_vld_bytes);
@@ -486,7 +488,7 @@ nobs_dim        = out.getDim(nobs_dim_name);
    //
 
 vector<NcDim> dims;
-NcVar hdr_type_var;
+NcVar hdr_typ_var;
 NcVar hdr_sid_var;
 NcVar hdr_vld_var;
 NcVar hdr_arr_var;
@@ -496,14 +498,16 @@ NcVar obs_arr_var;
 
 dims.resize(2);
 
-    /////////////////////////////////////
+
 
 dims.at(0) = nhdr_dim;
 dims.at(1) = mxstr_dim;
 
-out.addVar(hdr_type_var_name, NcType::nc_CHAR, dims);
+out.addVar(hdr_typ_var_name, NcType::nc_CHAR, dims);
 
-hdr_type_var = out.getVar(hdr_type_var_name);
+hdr_typ_var = out.getVar(hdr_typ_var_name);
+
+(void) hdr_typ_var.putAtt(string("long_name"), string("message type"));
 
     /////////////////////////////////////
 
@@ -511,11 +515,17 @@ out.addVar(hdr_sid_var_name, NcType::nc_CHAR, dims);
 
 hdr_sid_var = out.getVar(hdr_sid_var_name);
 
+(void) hdr_sid_var.putAtt(string("long_name"), string("station identification"));   //  we pause now for ...
+
     /////////////////////////////////////
 
 out.addVar(hdr_vld_var_name, NcType::nc_CHAR, dims);
 
 hdr_vld_var = out.getVar(hdr_vld_var_name);
+
+(void) hdr_vld_var.putAtt(string("long_name"), string("valid time"));
+
+(void) hdr_vld_var.putAtt(string("units"), string("YYYYMMDD_HHMMS UTC"));
 
     /////////////////////////////////////
 
@@ -526,6 +536,17 @@ out.addVar(hdr_arr_var_name, NcType::nc_FLOAT, dims);
 
 hdr_arr_var = out.getVar(hdr_arr_var_name);
 
+(void) hdr_arr_var.putAtt(string("long_name"),      string("array of observation station header values"));
+(void) hdr_arr_var.putAtt(string("missing_value"),  NcType::nc_FLOAT, FILL_VALUE);
+(void) hdr_arr_var.putAtt(string("_FillValue"),     NcType::nc_FLOAT, FILL_VALUE);
+(void) hdr_arr_var.putAtt(string("columns"),        string("lat lon elv"));
+(void) hdr_arr_var.putAtt(string("lat_long_name"),  string("latitude"));
+(void) hdr_arr_var.putAtt(string("lat_units"),      string("degrees_north"));
+(void) hdr_arr_var.putAtt(string("lon_long_name"),  string("longitude"));
+(void) hdr_arr_var.putAtt(string("lon_units"),      string("degrees_east"));
+(void) hdr_arr_var.putAtt(string("elev_long_name"), string("elevation"));
+(void) hdr_arr_var.putAtt(string("elev_units"),     string("meters above sea level (msl)"));
+
     /////////////////////////////////////
 
 dims.at(0) = nobs_dim;
@@ -535,6 +556,8 @@ out.addVar(obs_qty_var_name, NcType::nc_CHAR, dims);
 
 obs_qty_var = out.getVar(obs_qty_var_name);
 
+(void) obs_qty_var.putAtt(string("long_name"), string("quality flag"));
+
     /////////////////////////////////////
 
 dims.at(0) = nobs_dim;
@@ -543,6 +566,43 @@ dims.at(1) = obs_arr_len_dim;
 out.addVar(obs_arr_var_name, NcType::nc_FLOAT, dims);
 
 obs_arr_var = out.getVar(obs_arr_var_name);
+
+(void) obs_arr_var.putAtt(string("long_name"),        string("array of observation values"));
+(void) obs_arr_var.putAtt(string("missing_value"),    NcType::nc_FLOAT, FILL_VALUE);
+(void) obs_arr_var.putAtt(string("_FillValue"),       NcType::nc_FLOAT, FILL_VALUE);
+(void) obs_arr_var.putAtt(string("columns"),          string("hdr_id gc lvl hgt ob"));
+(void) obs_arr_var.putAtt(string("hdr_id_long_name"), string("index of matching header data"));
+(void) obs_arr_var.putAtt(string("gc_long_name"),     string("grib code corresponding to the observation type"));
+(void) obs_arr_var.putAtt(string("lvl_long_name"),    string("pressure level (hPa) or accumulation interval (sec)"));
+(void) obs_arr_var.putAtt(string("hgt_long_name"),    string("height in meters above sea level or ground level (msl or agl)"));
+(void) obs_arr_var.putAtt(string("ob_long_name"),     string("observation value"));
+
+   //
+   //  global attributes
+   //
+
+const unixtime now = time(0);
+int month, day, year, hour, minute, second;
+ConcatString s;
+char junk [1 + mxstr_dim_size];
+
+unix_to_mdyhms(now, month, day, year, hour, minute, second);
+
+snprintf(junk, sizeof(junk), 
+         "%04d%02d%02d_%02d%02d%02d", 
+         year, month, day, hour, minute, second);
+
+
+s << "File " << output_filename << " generated " << junk << " UTC";
+
+memset(junk, 0, sizeof(junk));
+
+if ( gethostname(junk, sizeof(junk) - 1) < 0 )  s << " on unknown host";
+else                                            s << " on host " << junk;
+
+(void) out.putAtt(string("FileOrigins"), string( s.text() ));
+(void) out.putAtt(string("MET_version"), string( VERSION ));
+(void) out.putAtt(string("MET_tool"),    string(program_name.text()));
 
    //
    //  allocate the buffer
@@ -564,11 +624,11 @@ memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*mxstr_dim_size, hdr_type_string);
+   strcpy(cbuf + j*mxstr_dim_size, hdr_typ_string);
 
 }
 
-hdr_type_var.putVar(cbuf);
+hdr_typ_var.putVar(cbuf);
 
    //
    //  populate the hdr_sid variable
@@ -634,7 +694,7 @@ for (j=0; j<n_data; ++j)  {
 
    }
 
-   fbuf[2*j] = ff[0];
+   fbuf[hdr_arr_len_dim_size*j] = ff[0];
 
       //
       //  read the longitude value
@@ -648,7 +708,9 @@ for (j=0; j<n_data; ++j)  {
 
    }
 
-   fbuf[2*j + 1] = ff[0];
+   fbuf[hdr_arr_len_dim_size*j + 1] = ff[0];
+
+   fbuf[hdr_arr_len_dim_size*j + 2] = FILL_VALUE;
 
 }   //  for j
 
@@ -663,9 +725,7 @@ hdr_arr_var.putVar(fbuf);
 int k;
 HdfVarInfo info;
 unixtime t;
-int month, day, year, hour, minute, second;
 double dd;
-char junk [1 + mxstr_dim_size];
 
 
 
