@@ -22,7 +22,7 @@ static const char na_string            [] = "NA";
 static const char mxstr_dim_name       [] = "mxstr";
 static const int  mxstr_dim_size          = 40;
 
-static const char hdr_arr_len_dim_name [] = "hdf_arr_len";
+static const char hdr_arr_len_dim_name [] = "hdr_arr_len";
 static const int  hdr_arr_len_dim_size    = 3;
 
 static const char obs_arr_len_dim_name [] = "obs_arr_len";
@@ -286,7 +286,7 @@ return;
 
 void set_config(const StringArray & a)
 
-{  
+{
 
 config_filename = a[0];
 
@@ -332,7 +332,7 @@ switch ( type )  {
    case DFNT_UINT32:   k = 32;  break;   // 32-bit unsigned integer type
    case DFNT_FLOAT32:  k = 32;  break;   // 32-bit floating-point type
 
-   case DFNT_FLOAT64:  k = 64;  break;   // 64-bit floating-point type 
+   case DFNT_FLOAT64:  k = 64;  break;   // 64-bit floating-point type
 
    default:
       mlog << Error
@@ -374,7 +374,7 @@ switch ( hdf_type )  {
 
    case DFNT_FLOAT32:  t = NcType::nc_FLOAT;   break;   // 32-bit floating-point type
 
-   case DFNT_FLOAT64:  t = NcType::nc_DOUBLE;  break;   // 64-bit floating-point type 
+   case DFNT_FLOAT64:  t = NcType::nc_DOUBLE;  break;   // 64-bit floating-point type
 
    default:
       mlog << Error
@@ -429,7 +429,7 @@ if ( hdf_sd_id < 0 )  {
 
 
    //
-   //  get number of data points 
+   //  get number of data points
    //
    //    we'll assume this is the number of latutide points
    //
@@ -530,7 +530,7 @@ hdr_vld_var = out.getVar(hdr_vld_var_name);
     /////////////////////////////////////
 
 dims.at(0) = nhdr_dim;
-dims.at(1) = obs_arr_len_dim;
+dims.at(1) = hdr_arr_len_dim;
 
 out.addVar(hdr_arr_var_name, NcType::nc_FLOAT, dims);
 
@@ -588,8 +588,8 @@ char junk [1 + mxstr_dim_size];
 
 unix_to_mdyhms(now, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), 
-         "%04d%02d%02d_%02d%02d%02d", 
+snprintf(junk, sizeof(junk),
+         "%04d%02d%02d_%02d%02d%02d",
          year, month, day, hour, minute, second);
 
 
@@ -758,7 +758,7 @@ for (j=0; j<n_data; ++j)  {
 
    unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), 
+   snprintf(junk, sizeof(junk),
             "%04d%02d%02d_%02d%02d%02d",
              year, month, day, hour, minute, second);
 
