@@ -748,7 +748,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   bool status;
   double d;
 
-  switch (var->getType().getId())
+  switch (GET_NC_TYPE_ID_P(var))
   {
     //case ncInt:
     case NcType::nc_INT:
@@ -924,7 +924,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   lengths[x_slot] = nx;
 
   //status = false;
-  int type_id = v->getType().getId();
+  int type_id = GET_NC_TYPE_ID_P(v);
   for (int y=0; y<ny; ++y)  {
     offsets[y_slot] = y;
     switch ( type_id )  {

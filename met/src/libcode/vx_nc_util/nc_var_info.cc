@@ -283,7 +283,7 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name, ConcatStrin
       found = get_att_value_chars(&att, att_value);
       if ( !found)  {
          // Check for the correct type
-         if ( GET_NC_TYPE(att) != NcType::nc_CHAR ) {
+         if ( GET_NC_TYPE_ID(att) != NcType::nc_CHAR ) {
          
             mlog << Error << "\nget_att_str(const NcVarInfo &, const ConcatString &, ConcatString &) -> "
                    << "attribute \"" << att_name << "\" should be a string.\n\n";
@@ -320,7 +320,7 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_va
       att_value = get_att_value_int(&att);
    
       // Check for the correct type
-      if ( GET_NC_TYPE(att) != NcType::nc_INT ) {
+      if ( GET_NC_TYPE_ID(att) != NcType::nc_INT ) {
    
          mlog << Error << "\nget_att_int(const NcVarInfo &, const ConcatString &, int &) -> "
               << "attribute \"" << att_name << "\" should be an integer.\n\n";
@@ -366,7 +366,7 @@ if ( !found )  return ( false );
    // Check the type
 
 ConcatString s;
-switch ( GET_NC_TYPE(att).getId() )  {
+switch ( GET_NC_TYPE_ID(att) )  {
 
    case NcType::nc_INT:
       //int a_value;
@@ -389,7 +389,7 @@ switch ( GET_NC_TYPE(att).getId() )  {
 
 }   //  switch
 
-//NcType ncType = att->getType();
+//int ncType = GET_TYPE_ID_P(att);
 //if  ( ncType == NcType::nc_INT) {
 //   int a_value;
 //   att->getValues(&a_value);

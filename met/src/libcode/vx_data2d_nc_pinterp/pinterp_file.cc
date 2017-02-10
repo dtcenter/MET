@@ -600,7 +600,7 @@ for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
 //
 //}
 
-switch ( var->getType().getId() )  {
+switch ( GET_NC_TYPE_ID_P(var) )  {
 
    //case ncFloat:
    case NcType::nc_FLOAT:
@@ -817,7 +817,7 @@ for (int k=0; k<dim_count; k++) {
 //lengths[x_slot] = 1;
 lengths[y_slot] = Ny;
 
-int type_id = v->getType().getId();
+int type_id = GET_NC_TYPE_ID_P(v);
 //status = false;
 for (x=0; x<Nx; ++x)  {
    offsets[x_slot] = x;

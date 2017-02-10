@@ -34,7 +34,7 @@ const char * string_att(const NcFile & Nc, const char * name)
 
 NcGroupAtt att = get_nc_att(&Nc, name);
 
-if ( GET_NC_TYPE(att) != ncChar )  {
+if ( GET_NC_TYPE_ID(att) != NcType::nc_CHAR )  {
 
    mlog << Error << "\n\n   string_att() -> attribute \"" << name << "\" is not a character string!\n\n";
 
