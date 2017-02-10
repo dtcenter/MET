@@ -1,4 +1,4 @@
-library(ncdf);
+library(ncdf4);
 
 usage = function(){
 	cat("\nUsage: pntnc2ascii\n",
@@ -34,43 +34,43 @@ if( 1 < length(listArgs) ){
 
 # open the input NetCDF file
 strPntNc = listArgs[ length(listArgs) ];
-ncPnt = open.ncdf(c(strPntNc), write=F);
+ncPnt = nc_open(c(strPntNc), write=F);
 
 # build the header data frame
 dfHdr = data.frame(
-	typ    = get.var.ncdf(ncPnt, ncPnt$var[["hdr_typ"]]),
-	sid    = get.var.ncdf(ncPnt, ncPnt$var[["hdr_sid"]]),
-	vld    = get.var.ncdf(ncPnt, ncPnt$var[["hdr_vld"]]),
-	lat    = get.var.ncdf(ncPnt, ncPnt$var[["hdr_arr"]])[1,],
-	lon    = get.var.ncdf(ncPnt, ncPnt$var[["hdr_arr"]])[2,],
-	elv    = get.var.ncdf(ncPnt, ncPnt$var[["hdr_arr"]])[3,]
+	typ    = ncvar_get(ncPnt, ncPnt$var[["hdr_typ"]]),
+	sid    = ncvar_get(ncPnt, ncPnt$var[["hdr_sid"]]),
+	vld    = ncvar_get(ncPnt, ncPnt$var[["hdr_vld"]]),
+	lat    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[1,],
+	lon    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[2,],
+	elv    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[3,]
 );
 dfHdr$hdr_id = seq(0,nrow(dfHdr)-1);
 
-# replace empty SID strings with NA                                                                                                                                                                                                     
+# replace empty SID strings with NA
 dfHdr$sid[dfHdr$sid == ""] = NA;
 
 # check for the obs_qty variable
 if( 0 < length(ncPnt$var[["obs_qty"]]) ) {
-	ObsQty = get.var.ncdf(ncPnt, ncPnt$var[["obs_qty"]]);
+	ObsQty = ncvar_get(ncPnt, ncPnt$var[["obs_qty"]]);
 } else {
 	ObsQty = rep(-9999, ncPnt$dim[["nobs"]]$len);
 }
 
 # build the observation data frame
 dfObs = data.frame(
-	hdr_id = get.var.ncdf(ncPnt, ncPnt$var[["obs_arr"]])[1,],
-	gc     = get.var.ncdf(ncPnt, ncPnt$var[["obs_arr"]])[2,],
-	lvl    = get.var.ncdf(ncPnt, ncPnt$var[["obs_arr"]])[3,],
-	hgt    = get.var.ncdf(ncPnt, ncPnt$var[["obs_arr"]])[4,],
+	hdr_id = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[1,],
+	gc     = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[2,],
+	lvl    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[3,],
+	hgt    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[4,],
 	qty    = ObsQty,
-	ob     = signif(get.var.ncdf(ncPnt, ncPnt$var[["obs_arr"]])[5,], 5)
+	ob     = signif(ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[5,], 5)
 );
 
 # apply the filtering criteria and merge the headers and obs
 if( strSid != "" ){ dfHdr = dfHdr[dfHdr$sid == strSid,]; }
 if( strMsg != "" ){ dfHdr = dfHdr[dfHdr$typ == strMsg,]; }
-if( strGc  != "" ){ dfObs = dfObs[dfObs$gc  == strGc, ]; } 
+if( strGc  != "" ){ dfObs = dfObs[dfObs$gc  == strGc, ]; }
 dfSid = merge(dfHdr, dfObs);
 
 # format level column to HHMMSS for accumulation intervals
@@ -98,4 +98,4 @@ apply(dfSid[,2:12], 1, function(d){ cat(d,"\n") })
 #}
 
 # close the input NetCDF file
-close.ncdf(ncPnt);
+nc_close(ncPnt);
