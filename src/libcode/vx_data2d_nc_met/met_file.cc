@@ -402,7 +402,7 @@ int i;
 bool status;
 
 status = false;
-switch ( var->getType().getId() )  {
+switch ( GET_NC_TYPE_ID_P(var) )  {
 
    //case ncInt:
    case NcType::nc_INT:

@@ -35,8 +35,11 @@ typedef signed char ncbyte; // from ncvalues.h
 #define GET_NC_SIZE(ncObj)          ncObj.getSize()
 #define GET_NC_SIZE_P(ncObjPtr)     ncObjPtr->getSize()
 
-#define GET_NC_TYPE(ncObj)          ncObj.getType()
-#define GET_NC_TYPE_P(ncObjPtr)     ncObjPtr->getType()
+//#define GET_NC_TYPE(ncObj)          ncObj.getType()
+//#define GET_NC_TYPE_P(ncObjPtr)     ncObjPtr->getType()
+
+#define GET_NC_TYPE_ID(ncObj)          ncObj.getType().getId()
+#define GET_NC_TYPE_ID_P(ncObjPtr)     ncObjPtr->getType().getId()
 
 #define GET_NC_DIM_COUNT(ncObj)          ncObj.getDimCount()
 #define GET_NC_DIM_COUNT_P(ncObjPtr)     ncObjPtr->getDimCount()

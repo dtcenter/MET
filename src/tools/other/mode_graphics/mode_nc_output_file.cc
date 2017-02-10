@@ -269,14 +269,12 @@ read_netcdf_grid(f, *_Grid);
 
 att = get_nc_att(FcstRaw, "init_time_ut");
 
-switch ( GET_NC_TYPE(att).getId() )  {
+switch ( GET_NC_TYPE_ID(att) )  {
 
-   //case ncInt:
    case NC_INT:
       InitTime = get_att_value_int(&att);
       break;
 
-   //case ncChar:
    case NC_CHAR:
       get_att_value_chars(&att, s);
       InitTime = string_to_unixtime(s);
@@ -293,7 +291,7 @@ switch ( GET_NC_TYPE(att).getId() )  {
 
 att = get_nc_att(FcstRaw, "valid_time_ut");
 
-switch ( GET_NC_TYPE(att).getId() )  {
+switch ( GET_NC_TYPE_ID(att) )  {
 
    //case ncInt:
    case NC_INT:
