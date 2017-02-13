@@ -392,6 +392,9 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    DataPlane mask_grid_dp, mask_poly_dp;
    ConcatString name;
 
+   mlog << Debug(2)
+        << "Processing masking regions.\n";
+
    // Initialize the mask to all points on
    mask_dp.set_size(grid.nx(), grid.ny());
    mask_dp.set_constant(mask_on_value);
@@ -404,12 +407,16 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
 
    // Parse out the masking grid
    if(mask_grid_file.length() > 0) {
+      mlog << Debug(3)
+           << "Processing grid mask: " << mask_grid_file << "\n";
       parse_grid_mask(mask_grid_file, grid, mask_grid_dp, mask_grid_name);
       apply_mask(mask_dp, mask_grid_dp);
    }
 
    // Parse out the masking polyline
    if(mask_poly_file.length() > 0) {
+      mlog << Debug(3)
+           << "Processing poly mask: " << mask_poly_file << "\n";
       parse_poly_mask(mask_poly_file, grid, mask_poly_dp, mask_poly_name);
       apply_mask(mask_dp, mask_poly_dp);
    }

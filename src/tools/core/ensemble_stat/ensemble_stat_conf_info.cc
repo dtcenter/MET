@@ -428,6 +428,9 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    StringArray mask_grid, mask_poly, sid_list;
    ConcatString s;
 
+   mlog << Debug(2)
+        << "Processing masking regions.\n";
+
    // Retrieve the area masks
    mask_grid = conf.lookup_string_array(conf_key_mask_grid);
    mask_poly = conf.lookup_string_array(conf_key_mask_poly);
@@ -454,12 +457,16 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
    // Parse out the masking grid areas
    for(i=0; i<mask_grid.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Processing grid mask: " << mask_grid[i] << "\n";
       parse_grid_mask(mask_grid[i], grid, mask_dp[i], s);
       mask_name.add(s);
    }
 
    // Parse out the masking poly areas
    for(i=0,j=mask_grid.n_elements(); i<mask_poly.n_elements(); i++,j++) {
+      mlog << Debug(3)
+           << "Processing poly mask: " << mask_poly[i] << "\n"; 
       parse_poly_mask(mask_poly[i], grid, mask_dp[j], s);
       mask_name.add(s);
    }
@@ -469,6 +476,8 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
    // Parse out the station ID masks
    for(i=0; i<sid_list.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Processing sid mask: " << sid_list[i] << "\n";
       parse_sid_mask(sid_list[i], mask_sid[i], s);
       mask_name.add(s);
    }

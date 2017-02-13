@@ -453,14 +453,23 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
    ShapeData grid_mask_sd, poly_mask_sd;
    ConcatString name;
 
+   mlog << Debug(2)
+        << "Processing masking regions.\n";
+
    // Parse the grid mask into a ShapeData object
    if(engine.conf_info.mask_grid_flag != FieldType_None) {
+      mlog << Debug(3)
+           << "Processing grid mask: "
+           << engine.conf_info.mask_grid_name << "\n";
       parse_grid_mask(engine.conf_info.mask_grid_name, grid,
                       grid_mask_sd.data, name);
    }
 
    // Parse the poly mask into a ShapeData object
    if(engine.conf_info.mask_poly_flag != FieldType_None) {
+      mlog << Debug(3)
+           << "Processing poly mask: "
+           << engine.conf_info.mask_poly_name << "\n";
       parse_poly_mask(engine.conf_info.mask_poly_name, grid,
                       poly_mask_sd.data, name);
    }
