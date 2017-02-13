@@ -115,7 +115,7 @@ Lon_orient = data.lon_orient;
    //  calculate Alpha
    //
 
-Alpha = (1.0 + sind(fabs(data.scale_lat)))*((data.r_km)/(data.d_km));
+Alpha = (1.0 + H*sind(data.scale_lat))*((data.r_km)/(data.d_km));
 
    //
    //  Calculate Bx, By
@@ -839,28 +839,35 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid create_aligned_st(double lat1, double lon1, double lat2, double lon2,
-                       double d_km, double r_km, int nx, int ny)
+Grid create_aligned_st(double lat_center,   double lon_center, 
+                       double lat_previous, double lon_previous,
+                       double d_km, double r_km, 
+                       int nx, int ny)
 
 {
 
 Grid g_new;
 // double alpha;
-double r1, r2;
+double r_center, r_previous;
 double Qx, Qy;
+double L;
 StereographicData data;
 bool is_north = false;
 
 
 data.name = "zoom";
 
-if ( lat1 >= 0.0 )  { data.hemisphere = 'N';   is_north = true;  }
-else                { data.hemisphere = 'S';   is_north = false; }
+if ( lat_center >= 0.0 )  { data.hemisphere = 'N';   is_north = true;  }
+else                      { data.hemisphere = 'S';   is_north = false; }
 
-data.scale_lat = lat1;
 
-data.lat_pin = lat1;
-data.lon_pin = lon1;
+const double H = ( is_north ? 1.0 : -1.0 );
+
+
+data.scale_lat = lat_center;
+
+data.lat_pin = lat_center;
+data.lon_pin = lon_center;
 
 data.x_pin = 0.5*nx;
 data.y_pin = 0.5*ny;
@@ -878,13 +885,26 @@ data.ny = ny;
 
 // alpha = stereographic_alpha(data.scale_lat, data.r_km, data.d_km);
 
-r1 = st_func(lat1, is_north);
-r2 = st_func(lat2, is_north);
+r_center   = st_func(lat_center,   is_north);
+r_previous = st_func(lat_previous, is_north);
 
-Qx = r1*sind(lon1) - r2*sind(lon2);
-Qy = r1*cosd(lon1) - r2*cosd(lon2);
+Qx = r_center*sind(lon_center) - r_previous*sind(lon_previous);
+Qy = r_center*cosd(lon_center) - r_previous*cosd(lon_previous);
 
-data.lon_orient = atan2d(Qx, Qy);
+L = atan2d(H*Qx, H*Qy) - 180.0;
+
+   //
+   //  reduce L to the range -180 to +180
+   //
+
+L += 180.0;
+
+L -= 360.0*floor(L/360.0);
+
+L -= 180.0;
+
+
+data.lon_orient = L;
 
 // cout << "\n\n  Lon orient = " << (data.lon_orient) << "\n\n";
 
