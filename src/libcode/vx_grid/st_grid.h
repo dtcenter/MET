@@ -127,8 +127,8 @@ extern double st_inv_func (double r, bool is_north_hemisphere);
 ////////////////////////////////////////////////////////////////////////
 
 
-extern Grid create_aligned_st(double lat1, double lon1,
-                              double lat2, double lon2,
+extern Grid create_aligned_st(double lat_center,   double lon_center,
+                              double lat_previous, double lon_previous,
                               double d_km, double r_km,
                               int nx, int ny);
 

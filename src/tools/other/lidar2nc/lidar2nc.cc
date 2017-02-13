@@ -421,7 +421,8 @@ hdf_sd_id = SDstart(filename, DFACC_READ);
 
 if ( hdf_sd_id < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to open calypso file \"" << filename << "\"\n\n";
+   mlog << Error
+        << "\n\n  " << program_name << ": failed to open calypso file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -688,7 +689,8 @@ for (j=0; j<n_data; ++j)  {
 
    if ( SDreaddata(lat_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
 
-      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+      mlog << Error
+           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
 
       exit ( 1 );
 
@@ -702,7 +704,8 @@ for (j=0; j<n_data; ++j)  {
 
    if ( SDreaddata(lon_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
 
-      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+      mlog << Error
+           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
 
       exit ( 1 );
 
@@ -746,7 +749,8 @@ for (j=0; j<n_data; ++j)  {
 
    if ( SDreaddata(info.hdf_id, hdf_start, hdf_stride, hdf_edge, &dd) < 0 )  {
 
-      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+      mlog << Error
+           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
 
       exit ( 1 );
 
@@ -805,7 +809,8 @@ for (j=0; j<n_data; ++j)  {
 
    if ( SDreaddata(pressure_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
 
-      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+      mlog << Error
+           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
 
       exit ( 1 );
 
@@ -828,7 +833,8 @@ for (j=0; j<n_data; ++j)  {
 
    if ( SDreaddata(obs_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
 
-      cerr << "\n\n  " << program_name << ": SDreaddata failed\n\n";
+      mlog << Error
+           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
 
       exit ( 1 );
 
@@ -864,7 +870,8 @@ obs_arr_var.putVar(fbuf);
 
 if ( SDend(hdf_sd_id) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to close file\n\n";
+   mlog << Error
+        << "\n\n  " << program_name << ": failed to close file\n\n";
 
    exit ( 1 );
 
@@ -893,7 +900,8 @@ int hdf_rank, hdf_type, hdf_atts;
 
 if ( (hdf_index = SDnametoindex(hdf_sd_id, hdf_lat_name)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to get index for \""
+   mlog << Error
+        << "\n\n  " << program_name << ": failed to get index for \""
         << hdf_lat_name << "\"\n\n";
 
    exit ( 1 );
@@ -902,7 +910,8 @@ if ( (hdf_index = SDnametoindex(hdf_sd_id, hdf_lat_name)) < 0 )  {
 
 if ( (hdf_id = SDselect(hdf_sd_id, hdf_index)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to get id for \""
+   mlog << Error
+        << "\n\n  " << program_name << ": failed to get id for \""
         << hdf_lat_name << "\"\n\n";
 
    exit ( 1 );
@@ -911,7 +920,8 @@ if ( (hdf_id = SDselect(hdf_sd_id, hdf_index)) < 0 )  {
 
 if ( SDgetinfo(hdf_id, 0, &hdf_rank, hdf_dimsizes, &hdf_type, &hdf_atts) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": SDgetinfo failed\n\n";
+   mlog << Error
+        << "\n\n  " << program_name << ": SDgetinfo failed\n\n";
 
    exit ( 1 );
 
@@ -938,7 +948,8 @@ void get_hdf_var_info(const int hdf_sd_id, const char * hdf_name, HdfVarInfo & i
 
 if ( (info.hdf_index = SDnametoindex(hdf_sd_id, hdf_name)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to get index for \""
+   mlog << Error
+        << "\n\n  " << program_name << ": failed to get index for \""
         << hdf_name << "\"\n\n";
 
    exit ( 1 );
@@ -947,7 +958,8 @@ if ( (info.hdf_index = SDnametoindex(hdf_sd_id, hdf_name)) < 0 )  {
 
 if ( (info.hdf_id = SDselect(hdf_sd_id, info.hdf_index)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": failed to get id for \""
+   mlog << Error
+        << "\n\n  " << program_name << ": failed to get id for \""
         << hdf_name << "\"\n\n";
 
    exit ( 1 );
@@ -956,7 +968,8 @@ if ( (info.hdf_id = SDselect(hdf_sd_id, info.hdf_index)) < 0 )  {
 
 if ( SDgetinfo(info.hdf_id, 0, &(info.hdf_rank), info.hdf_dimsizes, &(info.hdf_type), &(info.hdf_atts)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": SDgetinfo failed\n\n";
+   mlog << Error
+        << "\n\n  " << program_name << ": SDgetinfo failed\n\n";
 
    exit ( 1 );
 
