@@ -602,7 +602,8 @@ if ( gethostname(junk, sizeof(junk) - 1) < 0 )  s << " on unknown host";
 else                                            s << " on host " << junk;
 
 (void) out.putAtt(string("FileOrigins"), string( s.text() ));
-(void) out.putAtt(string("MET_version"), string( VERSION ));
+// (void) out.putAtt(string("MET_version"), string( VERSION ));
+(void) out.putAtt(string("MET_version"), string( met_version ));
 (void) out.putAtt(string("MET_tool"),    string(program_name.text()));
 
    //
