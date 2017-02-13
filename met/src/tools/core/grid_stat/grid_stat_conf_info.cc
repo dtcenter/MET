@@ -598,6 +598,9 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
    StringArray mask_grid, mask_poly;
    ConcatString name;
 
+   mlog << Debug(2)
+        << "Processing masking regions.\n";
+
    // Retrieve the mask names
    mask_grid = conf.lookup_string_array(conf_key_mask_grid);
    mask_poly = conf.lookup_string_array(conf_key_mask_poly);
@@ -619,12 +622,16 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
 
    // Parse out the masking grids
    for(i=0; i<mask_grid.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Processing grid mask: " << mask_grid[i] << "\n";
       parse_grid_mask(mask_grid[i], grid, mask_dp[i], name);
       mask_name.add(name);
    }
 
    // Parse out the masking polylines
    for(i=0; i<mask_poly.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Processing poly mask: " << mask_poly[i] << "\n";
       parse_poly_mask(mask_poly[i], grid,
                       mask_dp[i+mask_grid.n_elements()], name);
       mask_name.add(name);
