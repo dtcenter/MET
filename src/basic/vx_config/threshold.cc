@@ -523,8 +523,10 @@ clear();
 
 Simple_Node * a = new Simple_Node;
 
-a->T  = t;
-a->op = ind;
+a->T      = t;
+a->op     = ind;
+a->s      << thresh_type_str[ind] << t;
+a->abbr_s << thresh_abbr_str[ind] << t;
 
 node = a;
 
