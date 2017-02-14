@@ -596,25 +596,54 @@ plane.set_size(Nx, Ny);
    //  get the data
    //
 
-for (x=0; x<Nx; ++x)  {
-
-   b[x_slot] = x;
-
-   for (y=0; y<Ny; ++y)  {
-
-      b[y_slot] = y;
-
-      value = data(v, b);
-
-      if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
-         value = bad_data_double;
-      }
-
-      plane.set(value, x, y);
-
-   }   //  for y
-
-}   //  for x
+   long dim[dimCount], cur[dimCount];
+   for (int index=0; index<dimCount; index++) {
+      dim[index] = 1;
+      cur[index] = (b[index] == vx_data2d_star) ? 0 : b[index];
+   }
+   if (Nx > Ny) {
+      double data_array[Nx];
+      dim[x_slot] = Nx;
+      //cout << "  =================== read Column (Nx)  ==================" << endl;
+      for (y=0; y<Ny; ++y)  {
+         cur[y_slot] = y;
+         get_nc_data(v, data_array, dim, cur);
+         for (x=0; x<Nx; ++x)  {
+            value = data_array[x];
+            if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
+               value = bad_data_double;
+            }
+            plane.set(value, x, y);
+         }   //  for y
+      }   //  for x
+   }
+   else {
+      double data_array[Ny];
+      dim[y_slot] = Ny;
+      //cout << "  =================== read Row (Ny)  ==================" << endl;
+      for (x=0; x<Nx; ++x)  {
+         cur[x_slot] = x;
+         get_nc_data(v, data_array, dim, cur);
+         for (y=0; y<Ny; ++y)  {
+            value = data_array[y];
+            if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
+               value = bad_data_double;
+            }
+            plane.set(value, x, y);
+         }   //  for y
+      }   //  for x
+   }
+   //for (x=0; x<Nx; ++x)  {
+   //   b[x_slot] = x;
+   //   for (y=0; y<Ny; ++y)  {
+   //      b[y_slot] = y;
+   //      value = data(v, b);
+   //      if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
+   //         value = bad_data_double;
+   //      }
+   //      plane.set(value, x, y);
+   //   }   //  for y
+   //}   //  for x
 
    //
    //  done
