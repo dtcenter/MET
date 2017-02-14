@@ -440,10 +440,20 @@ ThreshArray string_to_prob_thresh(const char *s) {
          exit(1);
       }
 
-      // Construct list of probability thresholds
+      // Determine input precision
+      ConcatString cs;
+      const char *ptr = strchr(s, '.');
+      int prec = ( ptr ? strlen(++ptr) : 0 );
+      cs.set_precision(prec);
+
+      // Construct list of probability thresholds using the input precision
       ta.clear();
-      for(i=0; i*v<1.0; i++) ta.add(i*v, thresh_ge);
-      ta.add(1.0, thresh_ge);
+      for(i=0; i*v<1.0; i++) {
+         cs << cs_erase << ">=" << i*v;
+         ta.add(cs);
+      }
+      cs << cs_erase << ">=" << 1.0;
+      ta.add(cs);
    }
 
    // Check probability thresholds
@@ -454,7 +464,7 @@ ThreshArray string_to_prob_thresh(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Convert array of proability thresholds to a string.
+// Convert array of probability thresholds to a string.
 //
 ////////////////////////////////////////////////////////////////////////
 
