@@ -393,31 +393,39 @@ if ( dimCount >= max_met_args )  {
 }
 
 int j;
-//float f[2];
-//double d[2];
-//int i[2];
+int i;
+short s;
 float f;
 double d;
-int i;
 bool status;
+float add_offset   = 0.f;
+float scale_factor = 1.f;
+double missing_value = get_var_missing_value(var);
+double fill_value    = get_var_fill_value(var);
+NcVarAtt att_add_offset   = get_nc_att(var, "add_offset");
+NcVarAtt att_scale_factor = get_nc_att(var, "scale_factor");
+if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
+   add_offset = get_att_value_float(&att_add_offset);
+   scale_factor = get_att_value_float(&att_scale_factor);
+}
 
 status = false;
 switch ( GET_NC_TYPE_ID_P(var) )  {
 
-   //case ncInt:
    case NcType::nc_INT:
-      //var->getVar(start, count, i);
       get_nc_data(var, &i, (long *)a);
-      //d[0] = (double) (i[0]);
       d = (double) (i);
       status = true;
       break;
   
-   //case ncFloat:
+   case NcType::nc_SHORT:
+      get_nc_data(var, &s, (long *)a);
+      d = (double) (s);
+      status = true;
+      break;
+  
    case NcType::nc_FLOAT:
-      //var->getVar(start, count, f);
       get_nc_data(var, &f, (long *)a);
-      //d[0] = (double) (f[0]);
       d = (double) (f);
       status = true;
       break;
@@ -431,11 +439,14 @@ switch ( GET_NC_TYPE_ID_P(var) )  {
       
    default:
       mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-           << " bad type for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
+           << " bad type (" << GET_NC_TYPE_ID_P(var) << ") for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit ( 1 );
       break;
 
 }   //  switch
+if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
+   d = d * scale_factor + add_offset;
+}
 
 
 if ( !status )  {
@@ -595,6 +606,15 @@ plane.set_size(Nx, Ny);
    //
    //  get the data
    //
+   float add_offset   = 0.f;
+   float scale_factor = 1.f;
+   NcVarAtt att_add_offset   = get_nc_att(v, "add_offset");
+   NcVarAtt att_scale_factor = get_nc_att(v, "scale_factor");
+   if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
+      add_offset = get_att_value_float(&att_add_offset);
+      scale_factor = get_att_value_float(&att_scale_factor);
+   }
+   int type_id = GET_NC_TYPE_ID_P(v);
 
    long dim[dimCount], cur[dimCount];
    for (int index=0; index<dimCount; index++) {
@@ -603,15 +623,53 @@ plane.set_size(Nx, Ny);
    }
    if (Nx > Ny) {
       double data_array[Nx];
+      int    int_array[Nx];
+      short  short_array[Nx];
+      float  float_array[Nx];
       dim[x_slot] = Nx;
       //cout << "  =================== read Column (Nx)  ==================" << endl;
       for (y=0; y<Ny; ++y)  {
          cur[y_slot] = y;
-         get_nc_data(v, data_array, dim, cur);
+         switch ( type_id )  {
+            case NcType::nc_INT:
+               get_nc_data(v, int_array, dim, cur);
+               for (x=0; x<Nx; ++x) {
+                  data_array[x] = (double)int_array[x];
+               }
+               break;
+           
+            case NcType::nc_SHORT:
+               get_nc_data(v, short_array, dim, cur);
+               for (x=0; x<Nx; ++x) {
+                  data_array[x] = (double)short_array[x];
+               }
+               break;
+           
+            case NcType::nc_FLOAT:
+               get_nc_data(v, float_array, dim, cur);
+               for (x=0; x<Nx; ++x) {
+                  data_array[x] = (double)float_array[x];
+               }
+               break;
+         
+            case NcType::nc_DOUBLE:
+               get_nc_data(v, data_array, dim, cur);
+               break;
+               
+            default:
+               mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
+                    << " bad type (" << GET_NC_TYPE_NAME_P(v) << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
+               exit ( 1 );
+               break;
+         
+         }   //  switch
          for (x=0; x<Nx; ++x)  {
             value = data_array[x];
             if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
                value = bad_data_double;
+            }
+            else if (add_offset != 0.0 || scale_factor != 1.0) {
+               value = value * scale_factor + add_offset;
             }
             plane.set(value, x, y);
          }   //  for y
@@ -619,31 +677,58 @@ plane.set_size(Nx, Ny);
    }
    else {
       double data_array[Ny];
+      int    int_array[Ny];
+      short  short_array[Ny];
+      float  float_array[Ny];
       dim[y_slot] = Ny;
       //cout << "  =================== read Row (Ny)  ==================" << endl;
       for (x=0; x<Nx; ++x)  {
          cur[x_slot] = x;
-         get_nc_data(v, data_array, dim, cur);
+         switch ( type_id )  {
+            case NcType::nc_INT:
+               get_nc_data(v, int_array, dim, cur);
+               for (y=0; y<Ny; ++y) {
+                  data_array[y] = (double)int_array[y];
+               }
+               break;
+           
+            case NcType::nc_SHORT:
+               get_nc_data(v, short_array, dim, cur);
+               for (y=0; y<Ny; ++y) {
+                  data_array[y] = (double)short_array[y];
+               }
+               break;
+           
+            case NcType::nc_FLOAT:
+               get_nc_data(v, float_array, dim, cur);
+               for (y=0; y<Ny; ++y) {
+                  data_array[y] = (double)float_array[y];
+               }
+               break;
+         
+            case NcType::nc_DOUBLE:
+               get_nc_data(v, data_array, dim, cur);
+               break;
+               
+            default:
+               mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
+                    << " bad type (" << GET_NC_TYPE_ID_P(v) << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
+               exit ( 1 );
+               break;
+         
+         }   //  switch
          for (y=0; y<Ny; ++y)  {
             value = data_array[y];
             if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
                value = bad_data_double;
             }
+            else if (add_offset != 0.0 || scale_factor != 1.0) {
+               value = value * scale_factor + add_offset;
+            }
             plane.set(value, x, y);
          }   //  for y
       }   //  for x
    }
-   //for (x=0; x<Nx; ++x)  {
-   //   b[x_slot] = x;
-   //   for (y=0; y<Ny; ++y)  {
-   //      b[y_slot] = y;
-   //      value = data(v, b);
-   //      if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
-   //         value = bad_data_double;
-   //      }
-   //      plane.set(value, x, y);
-   //   }   //  for y
-   //}   //  for x
 
    //
    //  done

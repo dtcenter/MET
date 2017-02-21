@@ -122,6 +122,31 @@ double *get_att_value_doubles(const NcAtt *att) {
    return values;
 }
 
+float get_att_value_float(const NcAtt *att) {
+   float value;
+   att->getValues(&value);
+   return value;
+}
+
+unixtime get_att_value_unixtime(const NcAtt *att) {
+   unixtime time_value = -1;
+   switch ( GET_NC_TYPE_ID_P(att) )  {
+      case NC_INT:
+         time_value = get_att_value_int(att);
+         break;
+
+      case NC_CHAR:
+         ConcatString s;
+         get_att_value_chars(att, s);
+         time_value = string_to_unixtime(s);
+         break;
+
+      //default:
+      //   break;
+   }   //  switch
+   return time_value;
+}
+
 bool get_att_value_string(const NcVar *var, const ConcatString &att_name, ConcatString &value) {
    NcVarAtt att = get_nc_att(var, att_name);
    return get_att_value_chars(&att, value);
@@ -158,7 +183,6 @@ double  get_att_value_double(const NcFile *nc, const ConcatString &att_name) {
 }
 
 
-
 //long long get_att_value_long_long(const NcAtt *att) {
 //   long long value;
 //   att->getValues(&value);
@@ -170,7 +194,6 @@ double  get_att_value_double(const NcFile *nc, const ConcatString &att_name) {
 //   att->getValues(&value);
 //   return value.c_str();
 //}
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1143,6 +1166,72 @@ bool get_nc_data(NcVar *var, int *data, const long *dim, const long *cur) {
       //        << "\" variable.\n\n";
       //   exit(1);
       //}
+      return_status = true;
+   }
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, short *data, const long *cur) {
+   bool return_status = false;
+   //mlog << Debug(3) << "get_nc_data(short) is called\n";
+
+   if (!var->isNull()) {
+      std::vector<size_t> start;
+      std::vector<size_t> count;
+
+      const int dimC = get_dim_count(var);
+      //cout << "   get_nc_data(float) at nc_util.cc  dim: " << dimC <<"\n";
+      for (int idx = 0 ; idx < dimC; idx++) {
+         start.push_back((size_t)cur[idx]);
+         count.push_back((size_t)1);
+      }
+      *data = bad_data_int;
+      
+      //
+      // Retrieve the float value from the NetCDF variable.
+      // Note: missing data was checked here
+      //
+      var->getVar(start, count, data);
+      return_status = true;
+   }
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, short *data, const long *dim, const long *cur) {
+   bool return_status = false;
+   //mlog << Debug(3) << "get_nc_data(short) is called\n";
+
+   if (!var->isNull()) {
+      std::vector<size_t> start;
+      std::vector<size_t> count;
+
+      const int dimC = get_dim_count(var);
+      for (int idx = 0 ; idx < dimC; idx++) {
+         start.push_back((size_t)cur[idx]);
+         count.push_back((size_t)dim[idx]);
+      }
+      
+      int x_dim_index = (dimC < 2) ? 0 : dimC-2;
+      for (int idx1=0; idx1<dim[x_dim_index]; idx1++) {
+         if (dimC >= 2) {
+            for (int idx2=0; idx2<dim[dimC-1]; idx2++) {
+               data[(idx1*dim[dimC-1])+idx2] = bad_data_int;
+            }
+         }
+         else{
+            data[idx1] = bad_data_int;
+         }
+      }
+      
+      //
+      // Retrieve the float value from the NetCDF variable.
+      // Note: missing data was checked here
+      //
+      var->getVar(start, count, data);
       return_status = true;
    }
    return(return_status);
