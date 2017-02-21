@@ -35,7 +35,9 @@ Calipso_5km_data::Calipso_5km_data()
 
 {
 
-clear();
+hdf_sd_id = -1;
+
+// clear();
 
 }
 
@@ -88,13 +90,19 @@ get_hdf_var_info(hdf_sd_id, hdf_lat_name,   lat_info);
 get_hdf_var_info(hdf_sd_id, hdf_lon_name,   lon_info);
 get_hdf_var_info(hdf_sd_id, hdf_time_name, time_info);
 
-get_hdf_var_info(hdf_sd_id, hdf_base_pressure_name,  base_pressure_info);
-get_hdf_var_info(hdf_sd_id, hdf_top_pressure_name,    top_pressure_info);
-get_hdf_var_info(hdf_sd_id, hdf_base_layer_name,        base_layer_info);
+
 get_hdf_var_info(hdf_sd_id, hdf_top_layer_name,          top_layer_info);
+get_hdf_var_info(hdf_sd_id, hdf_top_pressure_name,    top_pressure_info);
+
+get_hdf_var_info(hdf_sd_id, hdf_base_layer_name,        base_layer_info);
+get_hdf_var_info(hdf_sd_id, hdf_base_pressure_name,  base_pressure_info);
+
 get_hdf_var_info(hdf_sd_id, hdf_opacity_flag_name,    opacity_flag_info);
+
 get_hdf_var_info(hdf_sd_id, hdf_cad_score_name,          cad_score_info);
+
 get_hdf_var_info(hdf_sd_id, hdf_num_layers_name,        num_layers_info);
+
 // get_hdf_var_info(hdf_sd_id, hdf_fclass_name,                fclass_info);
 
 

@@ -43,6 +43,10 @@ extern FILE * colorin;
 
 extern ColorList clist;
 
+extern int color_file_line_number;
+
+extern int color_file_column;
+
 
 
    //
@@ -564,6 +568,10 @@ if ( (colorin = fopen(input_filename, "r")) == NULL )  {
 }
 
 colordebug = debug;
+
+color_file_line_number = 1;
+
+color_file_column = 1;
 
 clist.clear();
 

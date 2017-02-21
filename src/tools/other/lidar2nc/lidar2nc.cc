@@ -34,6 +34,8 @@ static const char obs_arr_var_name        [] = "obs_arr";
 
 static const int  level_index                = 0;   //  use the bottom cloud level
 
+static const int default_grib_code           = 500;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +99,7 @@ static ConcatString output_filename;
 
 static int compress_level = -1;
 
-static int grib_code      = 500;
+static int grib_code      = default_grib_code;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -110,9 +112,7 @@ static void set_outfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
 static void set_grib_code (const StringArray &);
 
-static void process_calypso_file (NcFile &, const char * filename);
-
-static int get_lat_size(const int hdf_sd_id, const char * hdf_lat_name);
+static void process_calipso_file (NcFile &, const char * filename);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,7 @@ static NcFile ncf(output_filename.text(), NcFile::replace, NcFile::nc4);
 
 mlog << "Processing \"" << cline[0] << "\"\n";
 
-process_calypso_file(ncf, cline[0]);
+process_calipso_file(ncf, cline[0]);
 
 
    //
@@ -193,7 +193,7 @@ cout << "\n\n"
 
      << tab << "[ -log filename ]\n\n"
 
-     << tab << "[ -grib_code value ]\n\n"
+     << tab << "[ -grib_code value ]    (default: " << default_grib_code << ")\n\n"
 
      << tab << "   lidar_filename\n"
 
@@ -322,7 +322,7 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-void process_calypso_file(NcFile & out, const char * filename)
+void process_calipso_file(NcFile & out, const char * filename)
 
 {
 
@@ -350,7 +350,7 @@ hdf_sd_id = SDstart(filename, DFACC_READ);
 if ( hdf_sd_id < 0 )  {
 
    mlog << Error
-        << "\n\n  " << program_name << ": failed to open calypso file \"" << filename << "\"\n\n";
+        << "\n\n  " << program_name << ": failed to open calipso file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
@@ -360,10 +360,14 @@ if ( hdf_sd_id < 0 )  {
    //
    //  get number of data points
    //
-   //    we'll assume this is the number of latutide points
+   //    we'll assume this is the same as the number of points in the latitude array
    //
 
-n_data = get_lat_size(hdf_sd_id, hdf_lat_name);
+Calipso_5km_data hdf_5km;
+
+hdf_5km.get_var_info(hdf_sd_id);
+
+n_data = max<int> (hdf_5km.lat_info.hdf_dimsizes[0], hdf_5km.lat_info.hdf_dimsizes[1]);
 
 const int nhdr_dim_size = n_data;
 const int nobs_dim_size = n_data;
@@ -592,7 +596,6 @@ obs_qty_var.putVar(cbuf);
    //  populate the hdr_arr variable
    //
 
-Calipso_5km_data hdf_5km;
 float ff[2];
 
 
@@ -823,60 +826,6 @@ if ( SDend(hdf_sd_id) < 0 )  {
 return;
 
 }
-
-////////////////////////////////////////////////////////////////////////
-
-
-int get_lat_size(const int hdf_sd_id, const char * hdf_lat_name)
-
-{
-
-int n_data;
-int hdf_index, hdf_id;
-int hdf_dimsizes[MAX_VAR_DIMS];
-int hdf_rank, hdf_type, hdf_atts;
-
-
-if ( (hdf_index = SDnametoindex(hdf_sd_id, hdf_lat_name)) < 0 )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": failed to get index for \""
-        << hdf_lat_name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( (hdf_id = SDselect(hdf_sd_id, hdf_index)) < 0 )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": failed to get id for \""
-        << hdf_lat_name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( SDgetinfo(hdf_id, 0, &hdf_rank, hdf_dimsizes, &hdf_type, &hdf_atts) < 0 )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": SDgetinfo failed\n\n";
-
-   exit ( 1 );
-
-}
-
-
-n_data = max<int>(hdf_dimsizes[0], hdf_dimsizes[1]);
-
-   //
-   //  done
-   //
-
-return ( n_data );
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
