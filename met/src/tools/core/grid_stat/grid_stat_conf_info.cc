@@ -313,22 +313,24 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
       for(i=0, n_vx_vect = 0; i<n_vx; i++) {
 
-         if(i+1 < n_vx                  &&
-            fcst_info[i]->is_u_wind()   &&
-            obs_info[i]->is_u_wind()    &&
-            fcst_info[i+1]->is_v_wind() &&
-            obs_info[i+1]->is_v_wind()  &&
-            fcst_info[i]->req_level_name() == fcst_info[i+1]->req_level_name() &&
-            obs_info[i]->req_level_name()  == obs_info[i+1]->req_level_name()) {
+	if(fcst_info[i]->is_u_wind()   &&
+           obs_info[i]->is_u_wind() ) {
+          // search for corresponding v wind
+	  for(int j=0; j<n_vx; j++) {
+            if( fcst_info[j]->is_v_wind() &&
+	        obs_info[j]->is_v_wind() &&
+	        fcst_info[i]->req_level_name() == fcst_info[j]->req_level_name() &&
+                obs_info[i]->req_level_name()  == obs_info[j]->req_level_name()) {
 
-            fcst_info[i]->set_v_flag(true);
-            obs_info[i]->set_v_flag(true);
-            fcst_info[i+1]->set_v_flag(true);
-            obs_info[i+1]->set_v_flag(true);
+              fcst_info[i]->set_v_index(j);
+              obs_info[i]->set_v_index(j);
+              // Increment the number of vector fields to be verified
+              n_vx_vect++;
 
-            // Increment the number of vector fields to be verified
-            n_vx_vect++;
-         }
+	    }
+	  }
+        }
+
       } // end for
    } // end if
 
