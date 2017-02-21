@@ -344,7 +344,10 @@ regrid = {
 //
 //    - GRIB1 and GRIB2:
 //       - The "name" entry specifies a GRIB code number or abbreviation.
-//         http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//         - GRIB1 Product Definition Section:
+//           http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//         - GRIB2 Product Definition Section:
+//           http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml
 //       - The "level" entry specifies a level type and value:
 //          - ANNN for accumulation interval NNN
 //          - ZNNN for vertical level NNN
