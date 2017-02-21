@@ -11,7 +11,11 @@ include ${top_srcdir}/Make-include
 # The program
 
 bin_PROGRAMS    = lidar2nc
-lidar2nc_SOURCES = lidar2nc.cc
+lidar2nc_SOURCES = lidar2nc.cc  \
+                   hdf_utils.h  \
+                   hdf_utils.cc  \
+                   calipso_5km.cc  \
+                   calipso_5km.h
 lidar2nc_CPPFLAGS = ${MET_CPPFLAGS} \
      -I../../../libcode/vx_data2d_factory
 lidar2nc_LDFLAGS = ${MET_LDFLAGS}

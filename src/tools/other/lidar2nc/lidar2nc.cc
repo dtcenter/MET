@@ -9,40 +9,30 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char hdf_lat_name         [] = "Latitude";
-static const char hdf_lon_name         [] = "Longitude";
-static const char hdf_time_name        [] = "Profile_Time";
-static const char hdf_num_layers_name  [] = "Number_Layers_Found";
+static const char na_string               [] = "NA";
 
-static const char hdf_obs_name         [] = "Layer_Base_Altitude";
-static const char hdf_pressure_name    [] = "Layer_Base_Pressure";
+static const char mxstr_dim_name          [] = "mxstr";
+static const int  mxstr_dim_size             = 40;
 
-static const char na_string            [] = "NA";
+static const char hdr_arr_len_dim_name    [] = "hdr_arr_len";
+static const int  hdr_arr_len_dim_size       = 3;
 
-static const char mxstr_dim_name       [] = "mxstr";
-static const int  mxstr_dim_size          = 40;
+static const char obs_arr_len_dim_name    [] = "obs_arr_len";
+static const int  obs_arr_len_dim_size       = 5;
 
-static const char hdr_arr_len_dim_name [] = "hdr_arr_len";
-static const int  hdr_arr_len_dim_size    = 3;
+static const char nhdr_dim_name           [] = "nhdr";
+static const char nobs_dim_name           [] = "nobs";
 
-static const char obs_arr_len_dim_name [] = "obs_arr_len";
-static const int  obs_arr_len_dim_size    = 5;
+static const char hdr_typ_string          [] = "calipso";
 
-static const char nhdr_dim_name        [] = "nhdr";
-static const char nobs_dim_name        [] = "nobs";
+static const char hdr_typ_var_name        [] = "hdr_typ";
+static const char hdr_sid_var_name        [] = "hdr_sid";
+static const char hdr_vld_var_name        [] = "hdr_vld";
+static const char hdr_arr_var_name        [] = "hdr_arr";
+static const char obs_qty_var_name        [] = "obs_qty";
+static const char obs_arr_var_name        [] = "obs_arr";
 
-static const char hdr_typ_string      [] = "calypso";
-
-static const char hdr_typ_var_name     [] = "hdr_typ";
-static const char hdr_sid_var_name     [] = "hdr_sid";
-static const char hdr_vld_var_name     [] = "hdr_vld";
-static const char hdr_arr_var_name     [] = "hdr_arr";
-static const char obs_qty_var_name     [] = "obs_qty";
-static const char obs_arr_var_name     [] = "obs_arr";
-
-static const int  grib_code               = 500;
-
-static const int  level_index             = 0;   //  use the bottom cloud level
+static const int  level_index                = 0;   //  use the bottom cloud level
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,12 +71,11 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_log.h"
 
+#include "calipso_5km.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
-// Constants
-
-// static const char *DEFAULT_CONFIG_FILENAME = "MET_BASE/config/Ascii2NcConfig_default";
 
 static ConcatString program_name;
 
@@ -94,31 +83,11 @@ static CommandLine cline;
 
 static const unixtime jan_1_1993 = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
 
-// static const float FileHandler::FILL_VALUE = -9999.f;
-
 static const float FILL_VALUE = -9999.f;
 
 
 ////////////////////////////////////////////////////////////////////////
 
-struct HdfVarInfo {
-
-   int hdf_index;
-
-   int hdf_id;
-
-   int hdf_rank;
-
-   int hdf_type;
-
-   int hdf_atts;
-
-   int hdf_dimsizes[MAX_VAR_DIMS];
-
-};
-
-
-////////////////////////////////////////////////////////////////////////
 
    //
    //   Command-line switches
@@ -126,14 +95,9 @@ struct HdfVarInfo {
 
 static ConcatString output_filename;
 
-// static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
-
-// static Grid grid_mask;      // Grid masking region from the named Grid
-// static MaskPoly poly_mask;
-// StringArray mask_sid;
-
 static int compress_level = -1;
 
+static int grib_code      = 500;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -144,15 +108,11 @@ static void usage();
 static void set_logfile   (const StringArray &);
 static void set_outfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
-
-static int sizeof_hdf_type(const int type);
-
+static void set_grib_code (const StringArray &);
 
 static void process_calypso_file (NcFile &, const char * filename);
 
 static int get_lat_size(const int hdf_sd_id, const char * hdf_lat_name);
-
-static void get_hdf_var_info(const int hdf_sd_id, const char * hdf_name, HdfVarInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -178,14 +138,15 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
-cline.add(set_logfile,   "-log", 1);
-cline.add(set_outfile,   "-out", 1);
-cline.add(set_verbosity, "-v",   1);
+cline.add(set_logfile,   "-log",       1);
+cline.add(set_outfile,   "-out",       1);
+cline.add(set_verbosity, "-v",         1);
+cline.add(set_grib_code, "-grib_code", 1);
 
 cline.parse();
 
 
-if ( cline.n() < 1 )  usage();
+if ( cline.n() != 1 )  usage();
 
 if ( output_filename.empty() )  usage();
 
@@ -196,21 +157,12 @@ if ( output_filename.empty() )  usage();
 static NcFile ncf(output_filename.text(), NcFile::replace, NcFile::nc4);
 
    //
-   //  process the lidar files
+   //  process the lidar file
    //
 
-int j;
+mlog << "Processing \"" << cline[0] << "\"\n";
 
-for (j=0; j<(cline.n()); ++j)  {
-
-   mlog << "Processing \"" << cline[j] << "\"\n";
-
-   if ( (j%5) == 4 )  mlog << "\n";
-
-   process_calypso_file(ncf, cline[j]);
-
-}   //  for j
-
+process_calypso_file(ncf, cline[0]);
 
 
    //
@@ -240,6 +192,8 @@ cout << "\n\n"
      << tab << "-out nc_filename\n\n"
 
      << tab << "[ -log filename ]\n\n"
+
+     << tab << "[ -grib_code value ]\n\n"
 
      << tab << "   lidar_filename\n"
 
@@ -312,39 +266,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int sizeof_hdf_type(const int type)
+void set_grib_code(const StringArray & a)
 
 {
 
-int k = 0;
+grib_code = atoi(a[0]);
 
-switch ( type )  {
-
-   case DFNT_CHAR8:    k =  8;  break;   // 8-bit character type
-   case DFNT_UCHAR8:   k =  8;  break;   // 8-bit unsigned character type
-   case DFNT_INT8:     k =  8;  break;   // 8-bit integer type
-   case DFNT_UINT8:    k =  8;  break;   // 8-bit unsigned integer type
-
-   case DFNT_INT16:    k = 16;  break;   // 16-bit integer type
-   case DFNT_UINT16:   k = 16;  break;   // 16-bit unsigned integer type
-
-   case DFNT_INT32:    k = 32;  break;   // 32-bit integer type
-   case DFNT_UINT32:   k = 32;  break;   // 32-bit unsigned integer type
-   case DFNT_FLOAT32:  k = 32;  break;   // 32-bit floating-point type
-
-   case DFNT_FLOAT64:  k = 64;  break;   // 64-bit floating-point type
-
-   default:
-      mlog << Error
-           << program_name << ": sizeof_hdf_type() -> unrecognized hdf data type\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-
-
-return ( k );
+return;
 
 }
 
@@ -664,12 +592,11 @@ obs_qty_var.putVar(cbuf);
    //  populate the hdr_arr variable
    //
 
-HdfVarInfo lat_info, lon_info;
+Calipso_5km_data hdf_5km;
 float ff[2];
 
 
-get_hdf_var_info(hdf_sd_id, hdf_lat_name, lat_info);
-get_hdf_var_info(hdf_sd_id, hdf_lon_name, lon_info);
+hdf_5km.get_var_info(hdf_sd_id);
 
 hdf_stride[0] = 1;
 hdf_stride[1] = 1;
@@ -688,7 +615,7 @@ for (j=0; j<n_data; ++j)  {
       //  read the latitude value
       //
 
-   if ( SDreaddata(lat_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
+   if ( SDreaddata(hdf_5km.lat_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
 
       mlog << Error
            << "\n\n  " << program_name << ": SDreaddata failed\n\n";
@@ -703,7 +630,7 @@ for (j=0; j<n_data; ++j)  {
       //  read the longitude value
       //
 
-   if ( SDreaddata(lon_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
+   if ( SDreaddata(hdf_5km.lon_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
 
       mlog << Error
            << "\n\n  " << program_name << ": SDreaddata failed\n\n";
@@ -778,13 +705,24 @@ hdr_vld_var.putVar(cbuf);
    //
 
 const int offset = obs_arr_len_dim_size;
-HdfVarInfo pressure_info;
-HdfVarInfo obs_info;
+HdfVarInfo base_pressure_info;
+HdfVarInfo top_pressure_info;
+HdfVarInfo layer_base_info;
+HdfVarInfo layer_top_info;
+HdfVarInfo opacity_flag_info;
+HdfVarInfo cad_score_info;
 HdfVarInfo num_layers_info;
+HdfVarInfo fclass_info;
 
-get_hdf_var_info(hdf_sd_id, hdf_pressure_name,     pressure_info);
-get_hdf_var_info(hdf_sd_id, hdf_obs_name,               obs_info);
-get_hdf_var_info(hdf_sd_id, hdf_num_layers_name, num_layers_info);
+
+get_hdf_var_info(hdf_sd_id, hdf_base_pressure_name,  base_pressure_info);
+get_hdf_var_info(hdf_sd_id, hdf_top_pressure_name,    top_pressure_info);
+get_hdf_var_info(hdf_sd_id, hdf_base_layer_name,        layer_base_info);
+get_hdf_var_info(hdf_sd_id, hdf_top_layer_name,          layer_top_info);
+get_hdf_var_info(hdf_sd_id, hdf_opacity_flag_name,    opacity_flag_info);
+get_hdf_var_info(hdf_sd_id, hdf_cad_score_name,          cad_score_info);
+get_hdf_var_info(hdf_sd_id, hdf_num_layers_name,        num_layers_info);
+get_hdf_var_info(hdf_sd_id, hdf_fclass_name,                fclass_info);
 
 
 memset(buf, 0, buf_size);
@@ -808,7 +746,7 @@ for (j=0; j<n_data; ++j)  {
    hdf_start[0] = j;
    hdf_start[1] = level_index;
 
-   if ( SDreaddata(pressure_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
+   if ( SDreaddata(base_pressure_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
 
       mlog << Error
            << "\n\n  " << program_name << ": SDreaddata failed\n\n";
@@ -832,7 +770,7 @@ for (j=0; j<n_data; ++j)  {
    hdf_start[0] = j;
    hdf_start[1] = level_index;
 
-   if ( SDreaddata(obs_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
+   if ( SDreaddata(layer_base_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
 
       mlog << Error
            << "\n\n  " << program_name << ": SDreaddata failed\n\n";
@@ -841,7 +779,7 @@ for (j=0; j<n_data; ++j)  {
 
    }
 
-   ff[0] *= 1000.0;   //  kilometers -> meters
+   if ( ff[0] >= 0.0 )  ff[0] *= 1000.0;   //  kilometers -> meters
 
    fbuf[offset*j + 3] = *ff;  // hgt
    fbuf[offset*j + 4] = *ff;  // ob
@@ -936,51 +874,6 @@ n_data = max<int>(hdf_dimsizes[0], hdf_dimsizes[1]);
    //
 
 return ( n_data );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void get_hdf_var_info(const int hdf_sd_id, const char * hdf_name, HdfVarInfo & info)
-
-{
-
-if ( (info.hdf_index = SDnametoindex(hdf_sd_id, hdf_name)) < 0 )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": failed to get index for \""
-        << hdf_name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( (info.hdf_id = SDselect(hdf_sd_id, info.hdf_index)) < 0 )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": failed to get id for \""
-        << hdf_name << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( SDgetinfo(info.hdf_id, 0, &(info.hdf_rank), info.hdf_dimsizes, &(info.hdf_type), &(info.hdf_atts)) < 0 )  {
-
-   mlog << Error
-        << "\n\n  " << program_name << ": SDgetinfo failed\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  done
-   //
-
-return;
 
 }
 
