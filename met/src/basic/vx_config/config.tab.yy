@@ -211,7 +211,7 @@ assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean   ($1
            | assign_prefix dictionary                  { do_assign_dict      ($1); }
 
            | array_prefix boolean_list    ']' ';'      { do_assign_dict($1); }
-           | array_prefix number_list     ']' ';'      { do_assign_dict($1); }
+           | array_prefix expression_list ']' ';'      { do_assign_dict($1); }
            | array_prefix string_list     ']' ';'      { do_assign_dict($1); }
            | array_prefix threshold_list  ']' ';'      { do_assign_dict($1); }
            | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
@@ -273,11 +273,6 @@ boolean_list : BOOLEAN                   { do_boolean($1); }
             ;
 
 
-number_list : number                   { do_number($1); }
-            | number_list ',' number   { do_number($3); }
-            ;
-
-
 opt_semi : ';'
          |  /*  nothing  */
          ;
@@ -292,6 +287,12 @@ expression : number                                     { $$ = $1; }
            | '-' expression  %prec UNARY_MINUS          { $$ = do_negate($2); }
            | '(' expression ')'                         { $$ = $2; }
            ;
+
+
+
+expression_list : expression                     { do_number($1); }
+                | expression_list ',' expression { do_number($3); }
+                ;
 
 
 piecewise_linear : '(' point_list ')'   { }
