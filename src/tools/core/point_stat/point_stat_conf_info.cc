@@ -324,22 +324,22 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
       for(i=0, n_vx_vect = 0; i<n_vx; i++) {
 
-         if(i+1 < n_vx                        &&
-            vx_pd[i].fcst_info->is_u_wind()   &&
-            vx_pd[i].obs_info->is_u_wind()    &&
-            vx_pd[i+1].fcst_info->is_v_wind() &&
-            vx_pd[i+1].obs_info->is_v_wind()  &&
-            vx_pd[i].fcst_info->req_level_name() == vx_pd[i+1].fcst_info->req_level_name() &&
-            vx_pd[i].obs_info->req_level_name()  == vx_pd[i+1].obs_info->req_level_name()) {
+	if( vx_pd[i].fcst_info->is_u_wind()   &&
+            vx_pd[i].obs_info->is_u_wind() ) {
+          for(int j=0; j < n_vx; j++) {
+            if(vx_pd[j].fcst_info->is_v_wind() &&
+               vx_pd[j].obs_info->is_v_wind()  &&
+	       vx_pd[i].fcst_info->req_level_name() == vx_pd[j].fcst_info->req_level_name() &&
+               vx_pd[i].obs_info->req_level_name()  == vx_pd[j].obs_info->req_level_name()) {
 
-            vx_pd[i].fcst_info->set_v_flag(true);
-            vx_pd[i].obs_info->set_v_flag(true);
-            vx_pd[i+1].fcst_info->set_v_flag(true);
-            vx_pd[i+1].obs_info->set_v_flag(true);
-
-            // Increment the number of vector fields to be verified
-            n_vx_vect++;
-         }
+	      vx_pd[i].fcst_info->set_v_index(j);
+              vx_pd[i].obs_info->set_v_index(j);
+              // Increment the number of vector fields to be verified
+              n_vx_vect++;
+	       
+            }       
+	  }
+	}
       } // end for
    } // end if
 
