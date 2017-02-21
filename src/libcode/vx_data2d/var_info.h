@@ -44,7 +44,7 @@ class VarInfo
       SingleThresh PThreshHi; // Upper probability threshold
       bool         PAsScalar; // Flag to process probabilities as scalars
 
-      bool         VFlag;     // Flag for vector winds
+      int         VIndex;      // Index for v vector wind
 
       unixtime     Init;      // Initialization time in unixtime
       unixtime     Valid;     // Valid time in unixtime
@@ -87,7 +87,7 @@ class VarInfo
       SingleThresh p_thresh_hi()    const;
       bool         p_as_scalar()    const;
 
-      bool         v_flag()         const;
+      int         v_index()         const;
 
       unixtime     init()           const;
       unixtime     valid()          const;
@@ -117,7 +117,7 @@ class VarInfo
       void set_p_thresh_hi(const SingleThresh &);
       void set_p_as_scalar(bool);
 
-      void set_v_flag(bool);
+      void set_v_index(int);
 
       void set_init(unixtime);
       void set_valid(unixtime);
@@ -162,7 +162,7 @@ inline SingleThresh VarInfo::p_thresh_lo()    const { return(PThreshLo);        
 inline SingleThresh VarInfo::p_thresh_hi()    const { return(PThreshHi);        }
 inline bool         VarInfo::p_as_scalar()    const { return(PAsScalar);        }
 
-inline bool         VarInfo::v_flag()         const { return(VFlag);            }
+inline int         VarInfo::v_index()         const { return(VIndex);            }
 
 inline unixtime     VarInfo::init()           const { return(Init);             }
 inline unixtime     VarInfo::valid()          const { return(Valid);            }
