@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////
 using namespace std;
 #include <string.h>
+#include <time.h>
 
 //#include <netcdf.hh>
 #include <netcdf>
@@ -23,6 +24,7 @@ typedef signed char ncbyte; // from ncvalues.h
 
 #include "concat_string.h"
 #include "long_array.h"
+#include "vx_cal.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,8 +40,10 @@ typedef signed char ncbyte; // from ncvalues.h
 //#define GET_NC_TYPE(ncObj)          ncObj.getType()
 //#define GET_NC_TYPE_P(ncObjPtr)     ncObjPtr->getType()
 
-#define GET_NC_TYPE_ID(ncObj)          ncObj.getType().getId()
-#define GET_NC_TYPE_ID_P(ncObjPtr)     ncObjPtr->getType().getId()
+#define GET_NC_TYPE_ID(ncObj)            ncObj.getType().getId()
+#define GET_NC_TYPE_ID_P(ncObjPtr)       ncObjPtr->getType().getId()
+#define GET_NC_TYPE_NAME(ncObj)          ncObj.getType().getName()
+#define GET_NC_TYPE_NAME_P(ncObjPtr)     ncObjPtr->getType().getName()
 
 #define GET_NC_DIM_COUNT(ncObj)          ncObj.getDimCount()
 #define GET_NC_DIM_COUNT_P(ncObjPtr)     ncObjPtr->getDimCount()
@@ -64,6 +68,8 @@ extern int       get_att_value_int    (const NcAtt *);
 extern long long get_att_value_llong  (const NcAtt *);
 extern double    get_att_value_double (const NcAtt *);
 extern double*   get_att_value_doubles(const NcAtt *);
+extern float     get_att_value_float  (const NcAtt *);
+extern unixtime  get_att_value_unixtime(const NcAtt *);
 
 extern bool      get_att_value_string(const NcVar *, const ConcatString &, ConcatString &);
 extern int       get_att_value_int   (const NcVar *, const ConcatString &);
@@ -113,8 +119,8 @@ extern void add_att(NcVar  *, const string, const double);
 
 extern int    get_var_names(NcFile *, StringArray *varNames);
 
-extern bool   get_var_att_float (const NcVar *, const ConcatString &, float  &);
-extern bool   get_var_att_double(const NcVar *, const ConcatString &, double &);
+extern bool     get_var_att_float (const NcVar *, const ConcatString &, float  &);
+extern bool     get_var_att_double(const NcVar *, const ConcatString &, double &);
 
 extern bool   get_var_units(const NcVar *, ConcatString &);
 
@@ -156,6 +162,7 @@ extern bool get_nc_data(NcVar *, time_t *data);
 
 extern bool get_nc_data(NcVar *, int    *data, const long *cur);
 extern bool get_nc_data(NcVar *, char   *data, const long *cur);
+extern bool get_nc_data(NcVar *, short  *data, const long *cur);
 extern bool get_nc_data(NcVar *, float  *data, const long *cur);
 extern bool get_nc_data(NcVar *, double *data, const long *cur);
 
@@ -167,6 +174,7 @@ extern bool get_nc_data(NcVar *, ncbyte *data, const long dim, const long cur=0)
 
 extern bool get_nc_data(NcVar *, int    *data, const long *dim, const long *cur);
 extern bool get_nc_data(NcVar *, char   *data, const long *dim, const long *cur);
+extern bool get_nc_data(NcVar *, short  *data, const long *dim, const long *cur);
 extern bool get_nc_data(NcVar *, float  *data, const long *dim, const long *cur);
 extern bool get_nc_data(NcVar *, double *data, const long *dim, const long *cur);
 extern bool get_nc_data(NcVar *, ncbyte *data, const long *dim, const long *cur);

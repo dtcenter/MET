@@ -732,25 +732,35 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
     exit(1);
   }
 
-  //long counts[max_met_args];
   long counts[dim_count];
 
   for (int j = 0; j < (dim_count); ++j)
     counts[j] = 1;
 
-  //if (!(var->set_cur((long *)a)))
-  //{
-  //  mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
-  //       << "can't set corner for variable \"" << (var->getName()) << "\"\n\n";
-  //  exit(1);
-  //}
-
   bool status;
   double d;
+  float add_offset = 0.f;
+  float scale_factor = 1.f;
+  NcVarAtt att_add_offset   = get_nc_att(var, "add_offset");
+  NcVarAtt att_scale_factor = get_nc_att(var, "scale_factor");
+  if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
+    add_offset = get_att_value_float(&att_add_offset);
+    scale_factor = get_att_value_float(&att_scale_factor);
+  }
+  double missing_value = get_var_missing_value(var);
+  double fill_value    = get_var_fill_value(var);
 
   switch (GET_NC_TYPE_ID_P(var))
   {
-    //case ncInt:
+    case NcType::nc_SHORT:
+    {
+      short s;
+
+      status = get_nc_data(var, &s, (long *)a);
+      d = (double) (s);
+      break;
+    }
+
     case NcType::nc_INT:
     {
       int i;
@@ -760,7 +770,6 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
       break;
     }
 
-    //case ncFloat:
     case NcType::nc_FLOAT:
     {
       float f;
@@ -770,7 +779,6 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
       break;
     }
 
-    //case ncDouble:
     case NcType::nc_DOUBLE:
     {
       status = get_nc_data(var, &d, (long *)a);
@@ -780,11 +788,14 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
     default:
     {
       mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
-           << "bad type for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
+           << "bad type [" << GET_NC_TYPE_NAME_P(var) << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit(1);
       break;
     }
   }   //  switch
+  if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
+    d = d * scale_factor + add_offset;
+  }
 
   if (!status)
   {
@@ -906,6 +917,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   //  get the data
 #ifdef USE_BUFFER
   int    i[nx];
+  short  s[nx];
   float  f[nx];
   double d[nx];
 
@@ -916,20 +928,29 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     lengths[k] = 1;
   }
 
-  //offsets[x_slot] = 0;
-  //offsets[y_slot] = 0;
-  //lengths[x_slot] = 1;
-  //lengths[y_slot] = ny;
   offsets[x_slot] = 0;
   lengths[x_slot] = nx;
+  float add_offset = 0.f;
+  float scale_factor = 1.f;
+  NcVarAtt att_add_offset   = get_nc_att(v, "add_offset");
+  NcVarAtt att_scale_factor = get_nc_att(v, "scale_factor");
+  if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
+    add_offset = get_att_value_float(&att_add_offset);
+    scale_factor = get_att_value_float(&att_scale_factor);
+  }
 
-  //status = false;
   int type_id = GET_NC_TYPE_ID_P(v);
   for (int y=0; y<ny; ++y)  {
     offsets[y_slot] = y;
     switch ( type_id )  {
 
-      //case ncInt:
+      case NcType::nc_SHORT:
+        get_nc_data(v, (short *)&s, lengths, offsets);
+        for (int x=0; x<nx; ++x)  {
+          d[x] = (double)s[x];
+        }
+        break;
+
       case NcType::nc_INT:
         get_nc_data(v, (int *)&i, lengths, offsets);
         for (int x=0; x<nx; ++x)  {
@@ -937,7 +958,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         }
         break;
 
-      //case ncFloat:
       case NcType::nc_FLOAT:
         get_nc_data(v, (float *)&f, lengths, offsets);
         for (int x=0; x<nx; ++x)  {
@@ -951,8 +971,8 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         break;
 
       default:
-        mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-             << " bad type for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
+        mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
+             << " bad type [" << GET_NC_TYPE_NAME_P(v) << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
         exit ( 1 );
         break;
 
@@ -962,13 +982,14 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
     for (int x = 0; x< nx; ++x)
     {
-      //b[y_slot] = y;
-
       //double value = getData(v, b);
       double value = d[x];
 
       if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
          value = bad_data_double;
+      }
+      else if (add_offset != 0.0 || scale_factor != 1.0) {
+         value = value * scale_factor + add_offset;
       }
 
       plane.set(value, x, y);

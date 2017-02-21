@@ -581,34 +581,42 @@ if ( dim_count >= max_pinterp_args )  {
 }
 
 int j;
-//float f[2];
-//double d[2];
 bool status;
+int i;
+short s;
 float f;
 double d;
-//long counts[max_pinterp_args];
-long counts[a.n_elements()];
+long counts[dim_count];
+float add_offset   = 0.f;
+float scale_factor = 1.f;
+double missing_value = get_var_missing_value(var);
+double fill_value    = get_var_fill_value(var);
+NcVarAtt att_add_offset   = get_nc_att(var, "add_offset");
+NcVarAtt att_scale_factor = get_nc_att(var, "scale_factor");
+if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
+   add_offset = get_att_value_float(&att_add_offset);
+   scale_factor = get_att_value_float(&att_scale_factor);
+}
 
 for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
 
-//if ( !(var->set_cur((long *) a)) )  {
-//
-//   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-//        << " can't set corner for variable \"" << (var->getName()) << "\"\n\n";
-//
-//   exit ( 1 );
-//
-//}
-
 switch ( GET_NC_TYPE_ID_P(var) )  {
 
-   //case ncFloat:
+   case NcType::nc_INT:
+      status = get_nc_data(var, &i, (long *)a);
+      d = (double) (i);
+      break;
+
+   case NcType::nc_SHORT:
+      status = get_nc_data(var, &s, (long *)a);
+      d = (double) (s);
+      break;
+
    case NcType::nc_FLOAT:
       status = get_nc_data(var, &f, (long *)a);
       d = (double) (f);
       break;
 
-   //case ncDouble:
    case NcType::nc_DOUBLE:
       status = get_nc_data(var, &d, (long *)a);
       break;
@@ -620,6 +628,9 @@ switch ( GET_NC_TYPE_ID_P(var) )  {
       break;
 
 }   //  switch
+if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
+   d = d * scale_factor + add_offset;
+}
 
 
 if ( !status )  {
@@ -796,52 +807,56 @@ plane.set_size(Nx, Ny);
    //
    //  get the data
    //
-//int    i[Nx][Ny];
-//float  f[Nx][Ny];
-//double d[Nx][Ny];
-int    i[Ny];
-float  f[Ny];
 double d[Ny];
+int    i[Ny];
+short  s[Ny];
+float  f[Ny];
 
 long offsets[dim_count];
 long lengths[dim_count];
 //lengths[dim_count-2] = Nx;
-lengths[dim_count-1] = Ny;
+//lengths[dim_count-1] = Ny;
+float add_offset   = 0.f;
+float scale_factor = 1.f;
+NcVarAtt att_add_offset   = get_nc_att(v, "add_offset");
+NcVarAtt att_scale_factor = get_nc_att(v, "scale_factor");
+if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
+   add_offset = get_att_value_float(&att_add_offset);
+   scale_factor = get_att_value_float(&att_scale_factor);
+}
 
 for (int k=0; k<dim_count; k++) {
   offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
   lengths[k] = 1;
 }
-//offsets[x_slot] = 0;
-//offsets[y_slot] = 0;
-//lengths[x_slot] = 1;
 lengths[y_slot] = Ny;
 
 int type_id = GET_NC_TYPE_ID_P(v);
-//status = false;
 for (x=0; x<Nx; ++x)  {
    offsets[x_slot] = x;
    switch ( type_id )  {
    
-      //case ncInt:
       case NcType::nc_INT:
          get_nc_data(v, (int *)&i, lengths, offsets);
-         //get_nc_data(v, (int *)&i);
          for (y=0; y<Ny; ++y)  {
             d[y] = (double)i[y];
          }
          break;
      
-      //case ncFloat:
+      case NcType::nc_SHORT:
+         get_nc_data(v, (short *)&s, lengths, offsets);
+         for (y=0; y<Ny; ++y)  {
+            d[y] = (double)s[y];
+         }
+         break;
+     
       case NcType::nc_FLOAT:
          get_nc_data(v, (float *)&f, lengths, offsets);
-         //get_nc_data(v, (float *)&f);
          for (y=0; y<Ny; ++y)  {
             d[y] = (double)f[y];
          }
          break;
    
-      //case ncDouble:
       case NcType::nc_DOUBLE:
          get_nc_data(v, (double *)&d, lengths, offsets);
          //get_nc_data(v, (double *)&d);
@@ -859,13 +874,16 @@ for (x=0; x<Nx; ++x)  {
    b[x_slot] = x;
 
    for (y=0; y<Ny; ++y)  {
-
-      b[y_slot] = y;
-
+      //b[y_slot] = y;
       //value = data(v, b);
       value = d[y];
 
-      if ( is_bad_data_pinterp( value ) ) value = bad_data_double;
+      if ( is_bad_data_pinterp( value ) ) {
+         value = bad_data_double;
+      }
+      else if (add_offset != 0.0 || scale_factor != 1.0) {
+         value = value * scale_factor + add_offset;
+      }
 
       plane.set(value, x, y);
 

@@ -27,6 +27,7 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_cal.h"
 
+extern unixtime    get_att_value_unixtime (const NcAtt *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -346,72 +347,33 @@ bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixti
 
 {
 
-int j, n;
-//NcVarAtt * att = (NcVarAtt *) 0;
-NcVarAtt att;
-bool found = false;
-
-att_value = (unixtime) bad_data_int;
-
-
-att = get_nc_att(info.var, att_name, false);
-if (!IS_INVALID_NC(att)) {
-
-   found = true;
-
-}
-
-if ( !found )  return ( false );
-
+   int j, n;
+   NcVarAtt att;
+   bool found = false;
+   
+   att_value = (unixtime) bad_data_int;
+   
+   
+   att = get_nc_att(info.var, att_name, false);
+   if (!IS_INVALID_NC(att)) {
+      found = true;
+   }
+   
+   if ( !found )  return ( false );
+   
    // Check the type
-
-ConcatString s;
-switch ( GET_NC_TYPE_ID(att) )  {
-
-   case NcType::nc_INT:
-      //int a_value;
-      att_value = get_att_value_int(&att);
-      //att_value = a_value;
-      //att_value = (unixtime) (att->as_int(0));
-      break;
-
-   case NcType::nc_CHAR:
-      get_att_value_chars(&att, s);
-      //s = att->as_string(0);
-      att_value = string_to_unixtime(s);
-      break;
-
-   default:
+   att_value = get_att_value_unixtime(&att);
+   if (att_value < 0) {
       mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
            << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
       exit ( 1 );
-      break;
-
-}   //  switch
-
-//int ncType = GET_TYPE_ID_P(att);
-//if  ( ncType == NcType::nc_INT) {
-//   int a_value;
-//   att->getValues(&a_value);
-//   att_value = a_value;
-//}
-//else if (ncType == NcType::nc_CHAR) {
-//   string s;
-//   att->getValues(s);
-//   att_value = string_to_unixtime(s.c_str());
-//}
-//else {
-//   mlog << Error << "\nget_att_unixtime(const NcVarInfo &, const ConcatString &, unixtime &) -> "
-//        << "attribute \"" << att_name << "\" should be an integer or a string.\n\n";
-//   exit ( 1 );
-//}   //  if
-
-
+   }
+   
    //
    //  done
    //
-
-return ( true );
+   
+   return ( true );
 
 }
 

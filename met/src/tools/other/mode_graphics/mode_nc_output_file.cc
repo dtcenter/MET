@@ -231,27 +231,16 @@ ObsClusId  = &_ObsClusId  ;
    //
 /*
 for (x=0; x<Nx; ++x)  {
-
    for (y=0; y<Ny; ++y)  {
-
       value = fcst_obj_id(x, y);
-
       if ( value > NFcstObjs )  NFcstObjs = value;
-
       value = obs_obj_id(x, y);
-
       if ( value > NObsObjs )  NObsObjs = value;
-
       value = fcst_clus_id(x, y);
-
       if ( value > NFcstClus )  NFcstClus = value;
-
       value = obs_clus_id(x, y);
-
       if ( value > NObsClus )  NObsClus = value;
-
    }
-
 }
 */
 
@@ -259,59 +248,31 @@ for (x=0; x<Nx; ++x)  {
    //  get grid
    //
 
-_Grid = new Grid;
-
-read_netcdf_grid(f, *_Grid);
+   _Grid = new Grid;
+   
+   read_netcdf_grid(f, *_Grid);
 
    //
    //  get init time, valid time, lead time from FcstRaw variable attributes
    //
 
-att = get_nc_att(FcstRaw, "init_time_ut");
-
-switch ( GET_NC_TYPE_ID(att) )  {
-
-   case NC_INT:
-      InitTime = get_att_value_int(&att);
-      break;
-
-   case NC_CHAR:
-      get_att_value_chars(&att, s);
-      InitTime = string_to_unixtime(s);
-      break;
-
-   default:
+   att = get_nc_att(FcstRaw, "init_time_ut");
+   InitTime = get_att_value_unixtime(&att);
+   if (InitTime < 0) {
       mlog << Error
            << "ModeNcOutputFile::open(const char *) -> init time should be an integer or a string!\n\n";
       exit ( 1 );
-      break;
-
-}   //  switch
-
-
-att = get_nc_att(FcstRaw, "valid_time_ut");
-
-switch ( GET_NC_TYPE_ID(att) )  {
-
-   //case ncInt:
-   case NC_INT:
-      InitTime = get_att_value_int(&att);
-      break;
-
-   //case ncChar:
-   case NC_CHAR:
-      get_att_value_chars(&att, s);
-      ValidTime = string_to_unixtime(s);
-      break;
-
-   default:
+   }
+   
+   
+   att = get_nc_att(FcstRaw, "valid_time_ut");
+   ValidTime = get_att_value_unixtime(&att);
+   if (ValidTime < 0) {
       mlog << Error
            << "ModeNcOutputFile::open(const char *) -> valid time should be an integer or a string!\n\n";
       exit ( 1 );
-      break;
-
-}   //  switch
-
+   }
+   
 // att = FcstRaw->get_att("accum_time_sec");
 // 
 // AccumTime = att->as_nclong(0);
