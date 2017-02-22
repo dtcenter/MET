@@ -20,6 +20,8 @@ static const int  hdr_arr_len_dim_size       = 3;
 static const char obs_arr_len_dim_name    [] = "obs_arr_len";
 static const int  obs_arr_len_dim_size       = 5;
 
+static const int  n_obs_types                = 5;  //  layer base, layer top, opacity, cad score, feature classification
+
 static const char nhdr_dim_name           [] = "nhdr";
 static const char nobs_dim_name           [] = "nobs";
 
@@ -31,10 +33,6 @@ static const char hdr_vld_var_name        [] = "hdr_vld";
 static const char hdr_arr_var_name        [] = "hdr_arr";
 static const char obs_qty_var_name        [] = "obs_qty";
 static const char obs_arr_var_name        [] = "obs_arr";
-
-static const int  level_index                = 0;   //  use the bottom cloud level
-
-static const int default_grib_code           = 500;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,10 +81,6 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const unixtime jan_1_1993 = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
-
-static const float FILL_VALUE = -9999.f;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -99,7 +93,7 @@ static ConcatString output_filename;
 
 static int compress_level = -1;
 
-static int grib_code      = default_grib_code;
+static int grib_code = 500;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -193,7 +187,7 @@ cout << "\n\n"
 
      << tab << "[ -log filename ]\n\n"
 
-     << tab << "[ -grib_code value ]    (default: " << default_grib_code << ")\n\n"
+     // << tab << "[ -grib_code value ]    (default: " << default_grib_code << ")\n\n"
 
      << tab << "   lidar_filename\n"
 
@@ -363,14 +357,14 @@ if ( hdf_sd_id < 0 )  {
    //    we'll assume this is the same as the number of points in the latitude array
    //
 
-Calipso_5km_data hdf_5km;
+Calipso_5km_Vars hdf_5km;
 
-hdf_5km.get_var_info(hdf_sd_id);
+hdf_5km.get_vars(hdf_sd_id);
 
-n_data = max<int> (hdf_5km.lat_info.hdf_dimsizes[0], hdf_5km.lat_info.hdf_dimsizes[1]);
+n_data = max<int> (hdf_5km.lat.dimsizes[0], hdf_5km.lat.dimsizes[1]);
 
 const int nhdr_dim_size = n_data;
-const int nobs_dim_size = n_data;
+const int nobs_dim_size = obs_arr_len_dim_size*n_data;
 
    //
    //  see how big a buffer we'll need
@@ -381,7 +375,7 @@ const int hdr_sid_bytes = nhdr_dim_size*mxstr_dim_size;
 const int hdr_vld_bytes = nhdr_dim_size*mxstr_dim_size;
 const int hdr_arr_bytes = nhdr_dim_size*hdr_arr_len_dim_size*sizeof(float);
 const int obs_qty_bytes = nobs_dim_size*mxstr_dim_size;
-const int obs_arr_bytes = nobs_dim_size*obs_arr_len_dim_size*sizeof(float);
+const int obs_arr_bytes = nobs_dim_size*sizeof(float);
 
 int buf_size = hdr_typ_bytes;
 
@@ -408,7 +402,7 @@ out.addDim(mxstr_dim_name,       mxstr_dim_size);
 out.addDim(hdr_arr_len_dim_name, hdr_arr_len_dim_size);
 out.addDim(obs_arr_len_dim_name, obs_arr_len_dim_size);
 out.addDim(nhdr_dim_name,        n_data);
-out.addDim(nobs_dim_name,        n_data);
+out.addDim(nobs_dim_name,        5*n_data);
 
 mxstr_dim       = out.getDim(mxstr_dim_name);
 hdr_arr_len_dim = out.getDim(hdr_arr_len_dim_name);
@@ -432,6 +426,11 @@ NcVar obs_arr_var;
 dims.resize(2);
 
 
+    /////////////////////////////////////
+
+       //
+       //  hdr type variable
+       //
 
 dims.at(0) = nhdr_dim;
 dims.at(1) = mxstr_dim;
@@ -444,6 +443,10 @@ hdr_typ_var = out.getVar(hdr_typ_var_name);
 
     /////////////////////////////////////
 
+       //
+       //  hdr sid variable
+       //
+
 out.addVar(hdr_sid_var_name, NcType::nc_CHAR, dims);
 
 hdr_sid_var = out.getVar(hdr_sid_var_name);
@@ -451,6 +454,10 @@ hdr_sid_var = out.getVar(hdr_sid_var_name);
 (void) hdr_sid_var.putAtt(string("long_name"), string("station identification"));   //  we pause now for ...
 
     /////////////////////////////////////
+
+       //
+       //  hdr vld variable
+       //
 
 out.addVar(hdr_vld_var_name, NcType::nc_CHAR, dims);
 
@@ -461,6 +468,10 @@ hdr_vld_var = out.getVar(hdr_vld_var_name);
 (void) hdr_vld_var.putAtt(string("units"), string("YYYYMMDD_HHMMS UTC"));
 
     /////////////////////////////////////
+
+       //
+       //  hdr arr variable
+       //
 
 dims.at(0) = nhdr_dim;
 dims.at(1) = hdr_arr_len_dim;
@@ -482,6 +493,10 @@ hdr_arr_var = out.getVar(hdr_arr_var_name);
 
     /////////////////////////////////////
 
+       //
+       //  obs qty variable
+       //
+
 dims.at(0) = nobs_dim;
 dims.at(1) = mxstr_dim;
 
@@ -492,6 +507,10 @@ obs_qty_var = out.getVar(obs_qty_var_name);
 (void) obs_qty_var.putAtt(string("long_name"), string("quality flag"));
 
     /////////////////////////////////////
+
+       //
+       //  obs arr variable
+       //
 
 dims.at(0) = nobs_dim;
 dims.at(1) = obs_arr_len_dim;
@@ -511,7 +530,7 @@ obs_arr_var = out.getVar(obs_arr_var_name);
 (void) obs_arr_var.putAtt(string("ob_long_name"),     string("observation value"));
 
    //
-   //  global attributes
+   //  global attributes for netcdf output file
    //
 
 const unixtime now = time(0);
@@ -546,7 +565,7 @@ unsigned char * buf = 0;
 
 buf = new unsigned char [buf_size];
 
-char  * const cbuf = (char *) buf;
+char  * const cbuf = (char *)  buf;
 float * const fbuf = (float *) buf;
 
 
@@ -599,50 +618,16 @@ obs_qty_var.putVar(cbuf);
 float ff[2];
 
 
-hdf_5km.get_var_info(hdf_sd_id);
-
-hdf_stride[0] = 1;
-hdf_stride[1] = 1;
-
-hdf_edge[0] = 1;
-hdf_edge[1] = 1;
 
 memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   hdf_start[0] = j;
-   hdf_start[1] = 1;   //  take the middle value
+   hdf_5km.get_latlon(j, ff[0], ff[1]);
 
-      //
-      //  read the latitude value
-      //
+   fbuf[hdr_arr_len_dim_size*j]     = ff[0];   //  latitude
 
-   if ( SDreaddata(hdf_5km.lat_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
-
-      mlog << Error
-           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
-
-      exit ( 1 );
-
-   }
-
-   fbuf[hdr_arr_len_dim_size*j] = ff[0];
-
-      //
-      //  read the longitude value
-      //
-
-   if ( SDreaddata(hdf_5km.lon_info.hdf_id, hdf_start, hdf_stride, hdf_edge, ff) < 0 )  {
-
-      mlog << Error
-           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
-
-      exit ( 1 );
-
-   }
-
-   fbuf[hdr_arr_len_dim_size*j + 1] = ff[0];
+   fbuf[hdr_arr_len_dim_size*j + 1] = ff[1];   //  longitude
 
    fbuf[hdr_arr_len_dim_size*j + 2] = FILL_VALUE;
 
@@ -675,21 +660,7 @@ memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   hdf_start[0] = j;
-   hdf_start[1] = 1;   //  take the middle value
-
-   if ( SDreaddata(info.hdf_id, hdf_start, hdf_stride, hdf_edge, &dd) < 0 )  {
-
-      mlog << Error
-           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
-
-      exit ( 1 );
-
-   }
-
-   k = nint(dd);
-
-   t = k + jan_1_1993;
+   t = hdf_5km.get_time(j);
 
    unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
@@ -707,85 +678,31 @@ hdr_vld_var.putVar(cbuf);
    //  populate the obs_arr variable
    //
 
+Calipso_5km_Obs obs;
 const int offset = obs_arr_len_dim_size;
-HdfVarInfo base_pressure_info;
-HdfVarInfo top_pressure_info;
-HdfVarInfo layer_base_info;
-HdfVarInfo layer_top_info;
-HdfVarInfo opacity_flag_info;
-HdfVarInfo cad_score_info;
-HdfVarInfo num_layers_info;
-HdfVarInfo fclass_info;
-
-
-get_hdf_var_info(hdf_sd_id, hdf_base_pressure_name,  base_pressure_info);
-get_hdf_var_info(hdf_sd_id, hdf_top_pressure_name,    top_pressure_info);
-get_hdf_var_info(hdf_sd_id, hdf_base_layer_name,        layer_base_info);
-get_hdf_var_info(hdf_sd_id, hdf_top_layer_name,          layer_top_info);
-get_hdf_var_info(hdf_sd_id, hdf_opacity_flag_name,    opacity_flag_info);
-get_hdf_var_info(hdf_sd_id, hdf_cad_score_name,          cad_score_info);
-get_hdf_var_info(hdf_sd_id, hdf_num_layers_name,        num_layers_info);
-get_hdf_var_info(hdf_sd_id, hdf_fclass_name,                fclass_info);
-
 
 memset(buf, 0, buf_size);
 
+float * f = fbuf;
+
 for (j=0; j<n_data; ++j)  {
 
-   fbuf[offset*j] = (float) j;   //  hdr_id
+   hdf_5km.get_obs(j, obs);
 
-   fbuf[offset*j + 1] = (float) grib_code;  // gc
+   obs.get_layer_base_record (j, f);
+      f += offset;
 
-      //
-      //  pressure
-      //
+   obs.get_layer_top_record  (j, f);
+      f += offset;
 
-   hdf_stride[0] = 1;
-   hdf_stride[1] = 1;
+   obs.get_opacity_record    (j, f);
+      f += offset;
 
-   hdf_edge[0] = 1;
-   hdf_edge[1] = 1;
+   obs.get_cad_score_record  (j, f);
+      f += offset;
 
-   hdf_start[0] = j;
-   hdf_start[1] = level_index;
-
-   if ( SDreaddata(base_pressure_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
-
-      mlog << Error
-           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
-
-      exit ( 1 );
-
-   }
-
-   fbuf[offset*j + 2] = *ff;  // lvl
-
-      //
-      //  height = obs?
-      //
-
-   hdf_stride[0] = 1;
-   hdf_stride[1] = 1;
-
-   hdf_edge[0] = 1;
-   hdf_edge[1] = 1;
-
-   hdf_start[0] = j;
-   hdf_start[1] = level_index;
-
-   if ( SDreaddata(layer_base_info.hdf_id, hdf_start, hdf_stride, hdf_edge, &ff) < 0 )  {
-
-      mlog << Error
-           << "\n\n  " << program_name << ": SDreaddata failed\n\n";
-
-      exit ( 1 );
-
-   }
-
-   if ( ff[0] >= 0.0 )  ff[0] *= 1000.0;   //  kilometers -> meters
-
-   fbuf[offset*j + 3] = *ff;  // hgt
-   fbuf[offset*j + 4] = *ff;  // ob
+   obs.get_fclass_record     (j, f);
+      f += offset;
 
 }   //  for j
 

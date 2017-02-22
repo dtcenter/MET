@@ -50,25 +50,27 @@ static const char hdf_top_pressure_name   [] = "Layer_Top_Pressure";
 
 struct HdfVarInfo {
 
-   ConcatString hdf_name;
 
-   int hdf_index;
+   ConcatString name;
 
-   int hdf_id;
+   int index;
 
-   int hdf_rank;
+   int id;
 
-   int hdf_type;
+   int rank;
 
-   int hdf_atts;
+   int type;
 
-   int hdf_dimsizes[MAX_VAR_DIMS];
+   int atts;
+
+   int dimsizes[MAX_VAR_DIMS];
 
       //
 
    HdfVarInfo();
 
    void clear();
+
 
 };
 

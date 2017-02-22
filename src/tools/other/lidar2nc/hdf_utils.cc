@@ -47,19 +47,19 @@ void HdfVarInfo::clear()
 
 {
 
-hdf_index = -1;
+index = -1;
 
-hdf_id = -1;
+id = -1;
 
-hdf_rank = -1;
+rank = -1;
 
-hdf_type = -1;
+type = -1;
 
-hdf_atts = -1;
+atts = -1;
 
 int j;
 
-for (j=0; j<MAX_VAR_DIMS; ++j)  hdf_dimsizes[j] = -1;
+for (j=0; j<MAX_VAR_DIMS; ++j)  dimsizes[j] = -1;
 
 
 return;
@@ -82,9 +82,9 @@ void get_hdf_var_info(const int hdf_sd_id, const char * hdf_name, HdfVarInfo & i
 
 {
 
-info.hdf_name = hdf_name;
+info.name = hdf_name;
 
-if ( (info.hdf_index = SDnametoindex(hdf_sd_id, hdf_name)) < 0 )  {
+if ( (info.index = SDnametoindex(hdf_sd_id, hdf_name)) < 0 )  {
 
    mlog << Error
         << "\n\n  get_hdf_var_info() -> failed to get index for \""
@@ -94,7 +94,7 @@ if ( (info.hdf_index = SDnametoindex(hdf_sd_id, hdf_name)) < 0 )  {
 
 }
 
-if ( (info.hdf_id = SDselect(hdf_sd_id, info.hdf_index)) < 0 )  {
+if ( (info.id = SDselect(hdf_sd_id, info.index)) < 0 )  {
 
    mlog << Error
         << "\n\n  get_hdf_var_info() -> failed to get id for \""
@@ -104,7 +104,7 @@ if ( (info.hdf_id = SDselect(hdf_sd_id, info.hdf_index)) < 0 )  {
 
 }
 
-if ( SDgetinfo(info.hdf_id, 0, &(info.hdf_rank), info.hdf_dimsizes, &(info.hdf_type), &(info.hdf_atts)) < 0 )  {
+if ( SDgetinfo(info.id, 0, &(info.rank), info.dimsizes, &(info.type), &(info.atts)) < 0 )  {
 
    mlog << Error
         << "\n\n  get_hdf_var_info() -> SDgetinfo failed\n\n";
