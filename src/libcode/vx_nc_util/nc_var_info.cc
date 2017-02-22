@@ -27,7 +27,25 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_cal.h"
 
-extern unixtime    get_att_value_unixtime (const NcAtt *);
+unixtime get_att_value_unixtime(const NcAtt *att) {
+   unixtime time_value = -1;
+   switch ( GET_NC_TYPE_ID_P(att) )  {
+      case NC_INT:
+         time_value = get_att_value_int(att);
+         break;
+
+      case NC_CHAR:
+         ConcatString s;
+         get_att_value_chars(att, s);
+         time_value = string_to_unixtime(s);
+         break;
+
+      //default:
+      //   break;
+   }   //  switch
+   return time_value;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
