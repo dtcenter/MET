@@ -28,6 +28,7 @@ typedef signed char ncbyte; // from ncvalues.h
 
 #include "vx_util.h"
 
+extern unixtime  get_att_value_unixtime(const NcAtt *);
 
 ////////////////////////////////////////////////////////////////////////
 

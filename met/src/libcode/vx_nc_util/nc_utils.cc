@@ -128,25 +128,6 @@ float get_att_value_float(const NcAtt *att) {
    return value;
 }
 
-unixtime get_att_value_unixtime(const NcAtt *att) {
-   unixtime time_value = -1;
-   switch ( GET_NC_TYPE_ID_P(att) )  {
-      case NC_INT:
-         time_value = get_att_value_int(att);
-         break;
-
-      case NC_CHAR:
-         ConcatString s;
-         get_att_value_chars(att, s);
-         time_value = string_to_unixtime(s);
-         break;
-
-      //default:
-      //   break;
-   }   //  switch
-   return time_value;
-}
-
 bool get_att_value_string(const NcVar *var, const ConcatString &att_name, ConcatString &value) {
    NcVarAtt att = get_nc_att(var, att_name);
    return get_att_value_chars(&att, value);
