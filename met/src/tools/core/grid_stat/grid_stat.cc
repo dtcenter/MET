@@ -739,8 +739,8 @@ void process_scores() {
       // If verifying vector winds, store the U-wind fields
       if(conf_info.fcst_info[i]->is_u_wind() &&
          conf_info.obs_info[i]->is_u_wind() &&
-         conf_info.fcst_info[i]->v_index() >= 0 &&
-         conf_info.obs_info[i]->v_index() >= 0) {
+         conf_info.fcst_info[i]->uv_index() >= 0 &&
+         conf_info.obs_info[i]->uv_index() >= 0) {
 
          fu_dp   = fcst_dp;
          ou_dp   = obs_dp;
@@ -957,7 +957,7 @@ void process_scores() {
             // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
             if(!conf_info.fcst_info[i]->is_prob() &&
 	        conf_info.fcst_info[i]->is_u_wind() &&
-                conf_info.fcst_info[i]->v_index() >= 0  &&
+                conf_info.fcst_info[i]->uv_index() >= 0  &&
                (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
                 conf_info.output_flag[i_val1l2] != STATOutputType_None) ) {
 
