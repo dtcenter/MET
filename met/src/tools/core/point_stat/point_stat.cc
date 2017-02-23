@@ -1271,8 +1271,8 @@ void process_scores() {
                   // Compute VL1L2 and VAL1L2
 		  int vi = conf_info.vx_pd[i].fcst_info->v_index();
                   do_vl1l2(vl1l2_info, i,
-                           &conf_info.vx_pd[vi].pd[j][k][l],
-                           &conf_info.vx_pd[i].pd[j][k][l]);
+                           &conf_info.vx_pd[i].pd[j][k][l],
+                           &conf_info.vx_pd[vi].pd[j][k][l]);
 
                   // Loop through all of the wind speed thresholds
                   for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
