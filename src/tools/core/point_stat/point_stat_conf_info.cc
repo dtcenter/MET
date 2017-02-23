@@ -332,8 +332,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 	       vx_pd[i].fcst_info->req_level_name() == vx_pd[j].fcst_info->req_level_name() &&
                vx_pd[i].obs_info->req_level_name()  == vx_pd[j].obs_info->req_level_name()) {
 
-	      vx_pd[i].fcst_info->set_v_index(j);
-              vx_pd[i].obs_info->set_v_index(j);
+	      vx_pd[i].fcst_info->set_uv_index(j);
+              vx_pd[i].obs_info->set_uv_index(j);
               // Increment the number of vector fields to be verified
               n_vx_vect++;
 	       
