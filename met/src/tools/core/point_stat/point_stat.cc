@@ -1255,7 +1255,7 @@ void process_scores() {
                // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
                if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
                    conf_info.vx_pd[i].fcst_info->is_u_wind() &&
-                   conf_info.vx_pd[i].fcst_info->v_index() >= 0  &&
+                   conf_info.vx_pd[i].fcst_info->uv_index() >= 0  &&
                   (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
                    conf_info.output_flag[i_val1l2] != STATOutputType_None) ) {
 
@@ -1269,7 +1269,7 @@ void process_scores() {
                   for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
                   // Compute VL1L2 and VAL1L2
-		  int vi = conf_info.vx_pd[i].fcst_info->v_index();
+		  int vi = conf_info.vx_pd[i].fcst_info->uv_index();
                   do_vl1l2(vl1l2_info, i,
                            &conf_info.vx_pd[i].pd[j][k][l],
                            &conf_info.vx_pd[vi].pd[j][k][l]);
