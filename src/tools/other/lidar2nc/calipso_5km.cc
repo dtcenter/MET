@@ -47,11 +47,40 @@ inline float km_to_meters(float km) {
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  masking 3 high bits
+   //
+
+inline unsigned short fclass_mask(unsigned short u)
+
+{
+
+return ( u >> 13 );
+
+}
+
+   //
+   //  masking 3 low bits
+   //
+/*
+inline unsigned short fclass_mask(unsigned short u)
+
+{
+
+return ( u & 7 );
+
+}
+*/
+
+////////////////////////////////////////////////////////////////////////
+
+
 static const unixtime jan_1_1993 = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
 
-static const int  level_index    = 0;   //  use the first cloud level
 
-static const int default_grib_code  = 500;
+static const int  level_index        = 0;   //  use the first cloud level
+
+static const int  default_grib_code  = 500;
 
    //
    //  indices into the 5-element obs_arr record
@@ -431,6 +460,8 @@ if ( SDreaddata(fclass.id, hdf_start, hdf_stride, hdf_edge, &(obs.fclass)) < 0 )
 
 }
 
+obs.fclass = fclass_mask(obs.fclass);
+
    //
    //  done
    //
@@ -502,7 +533,7 @@ clear_float_buf(record);
 if ( n_layers == 0 )  return;
 
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) (default_grib_code + 1);
+record [ grib_code_index ] = (float) (default_grib_code);
 record [  pressure_index ] = base_pressure;
 record [    height_index ] = km_to_meters(base_height);
 record [       obs_index ] = km_to_meters(base_height);
@@ -528,7 +559,7 @@ clear_float_buf(record);
 if ( n_layers == 0 )  return;
 
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) default_grib_code;
+record [ grib_code_index ] = (float) (default_grib_code + 1);
 record [  pressure_index ] = top_pressure;
 record [    height_index ] = km_to_meters(top_height);
 record [       obs_index ] = km_to_meters(top_height);
@@ -609,7 +640,7 @@ if ( n_layers == 0 )  return;
 
 
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) (default_grib_code + 3);
+record [ grib_code_index ] = (float) (default_grib_code + 4);
 record [  pressure_index ] = base_pressure;
 record [    height_index ] = km_to_meters(base_height);
 record [       obs_index ] = (float) fclass;
