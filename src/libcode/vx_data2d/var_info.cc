@@ -95,7 +95,7 @@ void VarInfo::assign(const VarInfo &v) {
    PThreshHi = v.p_thresh_hi();
    PAsScalar = v.p_as_scalar();
 
-   VIndex     = v.v_index();
+   UVIndex     = v.uv_index();
 
    Init      = v.init();
    Valid     = v.valid();
@@ -124,7 +124,7 @@ void VarInfo::clear() {
    PThreshHi.clear();
    PAsScalar = false;
 
-   VIndex = -1;
+   UVIndex = -1;
 
    Init  = (unixtime) 0;
    Valid = (unixtime) 0;
@@ -156,7 +156,7 @@ void VarInfo::dump(ostream &out) const {
        << "  PName     = " << (PName ? PName.text() : "(nul)") << "\n"
        << "  PUnits    = " << (PUnits ? PUnits.text() : "(nul)") << "\n"
        << "  PAsScalar = " << PAsScalar << "\n"
-       << "  VIndex     = " << VIndex << "\n"
+       << "  UVIndex     = " << UVIndex << "\n"
        << "  Init      = " << init_str << " (" << Init << ")\n"
        << "  Valid     = " << valid_str << " (" << Valid << ")\n"
        << "  Ensemble  = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
@@ -267,8 +267,8 @@ void VarInfo::set_p_as_scalar(bool f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfo::set_v_index(int i) {
-   VIndex = i;
+void VarInfo::set_uv_index(int i) {
+   UVIndex = i;
    return;
 }
 
