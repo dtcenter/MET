@@ -322,8 +322,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 	        fcst_info[i]->req_level_name() == fcst_info[j]->req_level_name() &&
                 obs_info[i]->req_level_name()  == obs_info[j]->req_level_name()) {
 
-              fcst_info[i]->set_v_index(j);
-              obs_info[i]->set_v_index(j);
+              fcst_info[i]->set_uv_index(j);
+              obs_info[i]->set_uv_index(j);
               // Increment the number of vector fields to be verified
               n_vx_vect++;
 
