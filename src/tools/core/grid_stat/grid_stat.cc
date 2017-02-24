@@ -164,6 +164,11 @@ static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
+static bool read_data_plane(VarInfo* info,
+			    RegridInfo regrid_info,
+			    DataPlane& dp,
+			    Met2dDataFile* mtddf,
+			    ConcatString filename);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -617,29 +622,9 @@ void process_scores() {
            << conf_info.fcst_info[i]->magic_str() << ".\n";
 
       // Read the gridded data from the input forecast file
-      status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
-
-      if(!status) {
-         mlog << Warning << "\nprocess_scores() -> "
-              << conf_info.fcst_info[i]->magic_str()
-              << " not found in file: " << fcst_file
-              << "\n\n";
-         continue;
-      }
-
-      // Regrid, if necessary
-      if(!(fcst_mtddf->grid() == grid)) {
-         mlog << Debug(1)
-              << "Regridding forecast "
-              << conf_info.fcst_info[i]->magic_str()
-              << " to the verification grid.\n";
-         fcst_dp = met_regrid(fcst_dp, fcst_mtddf->grid(), grid,
-                              conf_info.regrid_info);
-      }
-
-      // Rescale probabilities from [0, 100] to [0, 1]
-      if(conf_info.fcst_info[i]->p_flag()) rescale_probability(fcst_dp);
-
+      if(!read_data_plane(conf_info.fcst_info[i],
+			 conf_info.regrid_info,
+			  fcst_dp, fcst_mtddf, fcst_file)) continue;
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
 
@@ -652,28 +637,9 @@ void process_scores() {
            << conf_info.obs_info[i]->magic_str() << ".\n";
 
       // Read the gridded data from the input observation file
-      status = obs_mtddf->data_plane(*conf_info.obs_info[i], obs_dp);
-
-      if(!status) {
-         mlog << Warning << "\nprocess_scores() -> "
-              << conf_info.obs_info[i]->magic_str()
-              << " not found in file: " << obs_file
-              << "\n\n";
-         continue;
-      }
-
-      // Regrid, if necessary
-      if(!(obs_mtddf->grid() == grid)) {
-         mlog << Debug(1)
-              << "Regridding observation "
-              << conf_info.obs_info[i]->magic_str()
-              << " to the verification grid.\n";
-         obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
-                             conf_info.regrid_info);
-      }
-
-      // Rescale probabilities from [0, 100] to [0, 1]
-      if(conf_info.obs_info[i]->p_flag()) rescale_probability(obs_dp);
+      if(!read_data_plane(conf_info.obs_info[i],
+			 conf_info.regrid_info,
+			 obs_dp, obs_mtddf, obs_file)) continue;
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -735,17 +701,6 @@ void process_scores() {
       shc.set_obs_lev(conf_info.obs_info[i]->level_name());
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n";
-
-      // If verifying vector winds, store the U-wind fields
-      if(conf_info.fcst_info[i]->is_u_wind() &&
-         conf_info.obs_info[i]->is_u_wind() &&
-         conf_info.fcst_info[i]->uv_index() >= 0 &&
-         conf_info.obs_info[i]->uv_index() >= 0) {
-
-         fu_dp   = fcst_dp;
-         ou_dp   = obs_dp;
-         cmnu_dp = cmn_dp;
-      }
 
       // Loop through and apply each of the smoothing operations
       for(j=0; j<conf_info.get_n_interp(); j++) {
@@ -956,7 +911,7 @@ void process_scores() {
 
             // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
             if(!conf_info.fcst_info[i]->is_prob() &&
-	        conf_info.fcst_info[i]->is_u_wind() &&
+	        conf_info.fcst_info[i]->is_v_wind() &&
                 conf_info.fcst_info[i]->uv_index() >= 0  &&
                (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
                 conf_info.output_flag[i_val1l2] != STATOutputType_None) ) {
@@ -970,6 +925,16 @@ void process_scores() {
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
+               // Read the gridded data from the input forecast file for UGRD
+               int ui = conf_info.fcst_info[i]->uv_index();
+               if(!read_data_plane(conf_info.fcst_info[ui],
+			 conf_info.regrid_info,
+			  fu_dp, fcst_mtddf, fcst_file)) continue;
+
+               if(!read_data_plane(conf_info.obs_info[ui],
+			 conf_info.regrid_info,
+			  ou_dp, obs_mtddf, obs_file)) continue;	       
+	       
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
                if(conf_info.interp_field == FieldType_Fcst ||
@@ -1006,8 +971,10 @@ void process_scores() {
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i,
-                        fu_na, f_na, ou_na, o_na,
-                        cmnu_na, c_na, w_na);
+                        fu_na, f_na,
+			ou_na, o_na,
+                        cmnu_na, c_na,
+			w_na);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
@@ -2265,3 +2232,32 @@ void set_compress(const StringArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
+		     DataPlane& dp, Met2dDataFile* mtddf,
+		     ConcatString filename)
+{
+   bool status = mtddf->data_plane(*info, dp);
+
+   if(!status) {
+      mlog << Warning << "\nprocess_scores() -> "
+           << info->magic_str()
+           << " not found in file: " << filename
+           << "\n\n";
+      return false;
+   }
+
+   // Regrid, if necessary
+   if(!(mtddf->grid() == grid)) {
+      mlog << Debug(1)
+           << "Regridding forecast "
+           << info->magic_str()
+           << " to the verification grid.\n";
+      dp = met_regrid(dp, mtddf->grid(),
+		      grid, regrid_info);
+   }
+
+   // Rescale probabilities from [0, 100] to [0, 1]
+   if(info->p_flag()) rescale_probability(dp);
+   return true;
+}

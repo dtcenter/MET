@@ -330,6 +330,21 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 	    }
 	  }
         }
+	else if(fcst_info[i]->is_v_wind()   &&
+           obs_info[i]->is_v_wind() ) {
+          // search for corresponding v wind
+	  for(int j=0; j<n_vx; j++) {
+            if( fcst_info[j]->is_u_wind() &&
+	        obs_info[j]->is_u_wind() &&
+	        fcst_info[i]->req_level_name() == fcst_info[j]->req_level_name() &&
+                obs_info[i]->req_level_name()  == obs_info[j]->req_level_name()) {
+
+              fcst_info[i]->set_uv_index(j);
+              obs_info[i]->set_uv_index(j);
+
+	    }
+	  }
+        }
 
       } // end for
    } // end if
