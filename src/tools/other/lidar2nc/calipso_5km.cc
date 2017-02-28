@@ -78,10 +78,6 @@ return ( u & 7 );
 static const unixtime jan_1_1993 = mdyhms_to_unix(1, 1, 1993, 0, 0, 0);
 
 
-static const int  level_index        = 0;   //  use the first cloud level
-
-static const int  default_grib_code  = 500;
-
    //
    //  indices into the 5-element obs_arr record
    //
@@ -294,8 +290,9 @@ void Calipso_5km_Vars::get_obs(int n, Calipso_5km_Obs & obs) const
 
 {
 
-unsigned char u;
-signed char c;
+int j;
+unsigned char u [hdf_max_layers];
+signed char   c [hdf_max_layers];
 
 
 obs.clear();
@@ -322,7 +319,7 @@ if ( SDreaddata(num_layers.id, hdf_start, hdf_stride, hdf_edge, &u) < 0 )  {
 
 }
 
-obs.n_layers = (int) u;
+obs.n_layers = (int) (u[0]);
 
 if ( obs.n_layers == 0 )  return;
 
@@ -334,10 +331,10 @@ hdf_stride[0] = 1;
 hdf_stride[1] = 1;
 
 hdf_edge[0]   = 1;
-hdf_edge[1]   = 1;
+hdf_edge[1]   = hdf_max_layers;
 
 hdf_start[0]  = n;
-hdf_start[1]  = level_index;
+hdf_start[1]  = 0;
 
 if ( SDreaddata(base_pressure.id, hdf_start, hdf_stride, hdf_edge, &(obs.base_pressure)) < 0 )  {
 
@@ -348,7 +345,7 @@ if ( SDreaddata(base_pressure.id, hdf_start, hdf_stride, hdf_edge, &(obs.base_pr
 
 }
 
-if ( SDreaddata(base_layer.id, hdf_start, hdf_stride, hdf_edge, &(obs.base_height)) < 0 )  {
+if ( SDreaddata(base_layer.id, hdf_start, hdf_stride, hdf_edge, &(obs.base_height_km)) < 0 )  {
 
    mlog << Error
         << "\n\n  Calipso_5km_Vars::get_obs() -> SDreaddata failed for layer base height\n\n";
@@ -366,10 +363,10 @@ hdf_stride[0] = 1;
 hdf_stride[1] = 1;
 
 hdf_edge[0]   = 1;
-hdf_edge[1]   = 1;
+hdf_edge[1]   = hdf_max_layers;
 
 hdf_start[0]  = n;
-hdf_start[1]  = level_index;
+hdf_start[1]  = 0;
 
 if ( SDreaddata(top_pressure.id, hdf_start, hdf_stride, hdf_edge, &(obs.top_pressure)) < 0 )  {
 
@@ -380,7 +377,7 @@ if ( SDreaddata(top_pressure.id, hdf_start, hdf_stride, hdf_edge, &(obs.top_pres
 
 }
 
-if ( SDreaddata(top_layer.id, hdf_start, hdf_stride, hdf_edge, &(obs.top_height)) < 0 )  {
+if ( SDreaddata(top_layer.id, hdf_start, hdf_stride, hdf_edge, &(obs.top_height_km)) < 0 )  {
 
    mlog << Error
         << "\n\n  Calipso_5km_Vars::get_obs() -> SDreaddata failed for layer top height\n\n";
@@ -398,10 +395,10 @@ hdf_stride[0] = 1;
 hdf_stride[1] = 1;
 
 hdf_edge[0]   = 1;
-hdf_edge[1]   = 1;
+hdf_edge[1]   = hdf_max_layers;
 
 hdf_start[0]  = n;
-hdf_start[1]  = level_index;
+hdf_start[1]  = 0;
 
 if ( SDreaddata(opacity_flag.id, hdf_start, hdf_stride, hdf_edge, &u) < 0 )  {
 
@@ -412,7 +409,11 @@ if ( SDreaddata(opacity_flag.id, hdf_start, hdf_stride, hdf_edge, &u) < 0 )  {
 
 }
 
-obs.opacity = (int) u;
+for (j=0; j<hdf_max_layers; ++j)  {
+
+   obs.opacity[j] = (int) (u[j]);
+
+}
 
    //
    //  cad score
@@ -422,10 +423,10 @@ hdf_stride[0] = 1;
 hdf_stride[1] = 1;
 
 hdf_edge[0]   = 1;
-hdf_edge[1]   = 1;
+hdf_edge[1]   = hdf_max_layers;
 
 hdf_start[0]  = n;
-hdf_start[1]  = level_index;
+hdf_start[1]  = 0;
 
 if ( SDreaddata(cad_score.id, hdf_start, hdf_stride, hdf_edge, &c) < 0 )  {
 
@@ -436,7 +437,11 @@ if ( SDreaddata(cad_score.id, hdf_start, hdf_stride, hdf_edge, &c) < 0 )  {
 
 }
 
-obs.cad_score = (int) c;
+for (j=0; j<hdf_max_layers; ++j)  {
+
+   obs.cad_score[j] = (int) (c[j]);
+
+}
 
    //
    //  feature classification flags (fclass)
@@ -446,10 +451,10 @@ hdf_stride[0] = 1;
 hdf_stride[1] = 1;
 
 hdf_edge[0]   = 1;
-hdf_edge[1]   = 1;
+hdf_edge[1]   = hdf_max_layers;
 
 hdf_start[0]  = n;
-hdf_start[1]  = level_index;
+hdf_start[1]  = 0;
 
 if ( SDreaddata(fclass.id, hdf_start, hdf_stride, hdf_edge, &(obs.fclass)) < 0 )  {
 
@@ -460,7 +465,11 @@ if ( SDreaddata(fclass.id, hdf_start, hdf_stride, hdf_edge, &(obs.fclass)) < 0 )
 
 }
 
-obs.fclass = fclass_mask(obs.fclass);
+for (j=0; j<hdf_max_layers; ++j)  {
+
+   obs.fclass[j] = fclass_mask(obs.fclass[j]);
+
+}
 
    //
    //  done
@@ -500,17 +509,23 @@ void Calipso_5km_Obs::clear()
 
 n_layers = 0;
 
-base_height   = FILL_VALUE;
-base_pressure = FILL_VALUE;
+int j;
 
-top_height    = FILL_VALUE;
-top_pressure  = FILL_VALUE;
+for (j=0; j<hdf_max_layers; ++j)  {
 
-opacity = 0;
+   base_height_km [j] = FILL_VALUE;
+   base_pressure  [j] = FILL_VALUE;
 
-cad_score = 0;
+   top_height_km  [j] = FILL_VALUE;
+   top_pressure   [j] = FILL_VALUE;
 
-fclass = 0;
+   opacity        [j] = 0;
+
+   cad_score      [j] = 0;
+
+   fclass         [j] = 0;
+
+}
 
    //
    //  done
@@ -524,19 +539,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calipso_5km_Obs::get_layer_base_record(int hdr_id, float * record)
+void Calipso_5km_Obs::get_layer_base_record(int hdr_id, int layer, float * record)
 
 {
 
 clear_float_buf(record);
 
-if ( n_layers == 0 )  return;
-
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) (default_grib_code);
-record [  pressure_index ] = base_pressure;
-record [    height_index ] = km_to_meters(base_height);
-record [       obs_index ] = km_to_meters(base_height);
+record [ grib_code_index ] = (float) layer_base_grib_code;
+record [  pressure_index ] = base_pressure[layer];
+record [    height_index ] = km_to_meters(base_height_km[layer]);
+record [       obs_index ] = km_to_meters(base_height_km[layer]);
 
    //
    //  done
@@ -550,19 +563,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calipso_5km_Obs::get_layer_top_record(int hdr_id, float * record)
+void Calipso_5km_Obs::get_layer_top_record(int hdr_id, int layer, float * record)
 
 {
 
 clear_float_buf(record);
 
-if ( n_layers == 0 )  return;
-
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) (default_grib_code + 1);
-record [  pressure_index ] = top_pressure;
-record [    height_index ] = km_to_meters(top_height);
-record [       obs_index ] = km_to_meters(top_height);
+record [ grib_code_index ] = (float) layer_top_grib_code;
+record [  pressure_index ] = top_pressure[layer];
+record [    height_index ] = km_to_meters(top_height_km[layer]);
+record [       obs_index ] = km_to_meters(top_height_km[layer]);
 
    //
    //  done
@@ -576,7 +587,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calipso_5km_Obs::get_opacity_record(int hdr_id, float * record)
+void Calipso_5km_Obs::get_opacity_record(int hdr_id, int layer, float * record)
 
 {
 
@@ -586,10 +597,10 @@ if ( n_layers == 0 )  return;
 
 
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) (default_grib_code + 2);
-record [  pressure_index ] = base_pressure;
-record [    height_index ] = km_to_meters(base_height);
-record [       obs_index ] = (float) opacity;
+record [ grib_code_index ] = (float) opacity_grib_code;
+record [  pressure_index ] = base_pressure[layer];
+record [    height_index ] = km_to_meters(base_height_km[layer]);
+record [       obs_index ] = (float) (opacity[layer]);
 
    //
    //  done
@@ -603,7 +614,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calipso_5km_Obs::get_cad_score_record(int hdr_id, float * record)
+void Calipso_5km_Obs::get_cad_score_record(int hdr_id, int layer, float * record)
 
 {
 
@@ -613,10 +624,10 @@ if ( n_layers == 0 )  return;
 
 
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) (default_grib_code + 3);
-record [  pressure_index ] = base_pressure;
-record [    height_index ] = km_to_meters(base_height);
-record [       obs_index ] = (float) cad_score;
+record [ grib_code_index ] = (float) cad_score_grib_code;
+record [  pressure_index ] = base_pressure[layer];
+record [    height_index ] = km_to_meters(base_height_km[layer]);
+record [       obs_index ] = (float) (cad_score[layer]);
 
    //
    //  done
@@ -630,7 +641,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calipso_5km_Obs::get_fclass_record(int hdr_id, float * record)
+void Calipso_5km_Obs::get_fclass_record(int hdr_id, int layer, float * record)
 
 {
 
@@ -640,10 +651,10 @@ if ( n_layers == 0 )  return;
 
 
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) (default_grib_code + 4);
-record [  pressure_index ] = base_pressure;
-record [    height_index ] = km_to_meters(base_height);
-record [       obs_index ] = (float) fclass;
+record [ grib_code_index ] = (float) fclass_grib_code;
+record [  pressure_index ] = base_pressure[layer];
+record [    height_index ] = km_to_meters(base_height_km[layer]);
+record [       obs_index ] = (float) (fclass[layer]);
 
    //
    //  done
