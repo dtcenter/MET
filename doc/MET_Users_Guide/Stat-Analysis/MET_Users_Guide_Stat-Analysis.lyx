@@ -1230,8 +1230,7 @@ The first step in verifying wind direction is running the Grid-Stat and/or
 \begin_layout Description
 1.
  To generate VL1L2 or MPR lines, the user must request the verification
- of the U-component of the wind followed by the V-component, both at the
- same vertical level.
+ of both the U-component and V-component of wind at the same vertical levels.
 \end_layout
 
 \begin_layout Description
