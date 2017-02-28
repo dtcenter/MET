@@ -362,13 +362,6 @@ bool NcCfFile::open(const char * filepath)
       if ((dim == _xDim) || (strcmp(c,x_dim_var_name) == 0)) {
          Var[j].x_slot = k;
       }
-//static const char dim_lat_nt[] = "nlat";
-//static const char dim_lon_nt[] = "nlon";
-//static const char var_lat_nt[] = "tlat";
-//static const char var_lon_nt[] = "tlon";
-//      else if ((dim == _xDim) || (strcmp(c,dim_lon_nt) ==0 x_dim_var_name) == 0)) {
-//         Var[j].x_slot = k;
-//      }
       else if ((dim == _yDim) || (strcmp(c, y_dim_var_name) == 0)) {
          Var[j].y_slot = k;
       }
@@ -1155,6 +1148,9 @@ void NcCfFile::read_netcdf_grid()
   if (get_grid_from_dimensions())
     return;
 
+  if (get_grid_from_coordinates(data_var))
+    return;
+
   // If we get here, we couldn't get the grid projection from the file
 
   mlog << Error << "\nNcCfFile::read_netcdf_grid() -> "
@@ -1919,6 +1915,187 @@ void NcCfFile::get_grid_mapping_vertical_perspective(const NcVar *grid_mapping_v
 ////////////////////////////////////////////////////////////////////////
 
 
+bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
+  static const string method_name = "NcCfFile::get_grid_from_coordinates()";
+
+  // Currently, we can only intuit a lat/lon grid from the dimensions.
+  // Start by looking for the lat/lon dimensions in the file
+
+  NcVar coord_var;
+  NcVarAtt coordinates_att = get_nc_att(data_var, "coordinates");
+
+  if (!IS_INVALID_NC(coordinates_att)) {
+    ConcatString coordinates_value;
+    NcVarAtt missing_value_att;
+    get_att_value_chars(&coordinates_att, coordinates_value);
+    StringArray sa = coordinates_value.split(" ");
+    int count = sa.n_elements();
+    x_dim_var_name = sa[count-2];
+    y_dim_var_name = sa[count-1];
+    cout << "     DEBUG] " << method_name  << " xName: " << x_dim_var_name << ", yName: " << y_dim_var_name << endl;
+    
+    float lat_missing_value = bad_data_double;
+    float lon_missing_value = bad_data_double;
+    for (int var_num = 0; var_num < Nvars; ++var_num) {
+      if (strcmp(Var[var_num].name, y_dim_var_name) == 0) {
+        _yCoordVar = Var[var_num].var;
+        missing_value_att = get_nc_att(_yCoordVar, "_FillValue");
+        if (!IS_INVALID_NC(missing_value_att)) {
+          lat_missing_value = get_att_value_double(&missing_value_att);
+        }
+      }
+      else if (strcmp(Var[var_num].name, x_dim_var_name) == 0) {
+        _xCoordVar = Var[var_num].var;
+        missing_value_att = get_nc_att(_xCoordVar, "_FillValue");
+        if (!IS_INVALID_NC(missing_value_att)) {
+          lon_missing_value = get_att_value_double(&missing_value_att);
+        }
+      }
+    }
+    
+    if (_xCoordVar == 0) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Didn't find X coord variable (" << x_dim_var_name
+           << ") in netCDF file.\n\n";
+      //exit(1);
+      return true;
+    }
+  
+    if (_yCoordVar == 0) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Didn't find Y coord variable (" << y_dim_var_name
+           << ") in netCDF file.\n\n";
+      //exit(1);
+      return true;
+    }
+    
+    StringArray dimNames;
+    get_dim_names(_xCoordVar, &dimNames);
+    NcDim xDim, yDim;
+    int dim_count = dimNames.n_elements();
+    if (dim_count == 2) {
+      x_dim_var_name = dimNames[dim_count-1];
+      y_dim_var_name = dimNames[dim_count-2];
+      xDim = get_nc_dim(_xCoordVar, string(x_dim_var_name));
+      yDim = get_nc_dim(_xCoordVar, string(y_dim_var_name));
+    }
+    else {
+      x_dim_var_name = dimNames[0];
+      if (dimNames.n_elements() == 1) xDim = get_nc_dim(_xCoordVar, string(x_dim_var_name));
+      get_dim_names(_yCoordVar, &dimNames);
+      y_dim_var_name = dimNames[0];
+      if (dimNames.n_elements() == 1) yDim = get_nc_dim(_yCoordVar, string(y_dim_var_name));
+    }
+
+    long lat_counts = GET_NC_SIZE(yDim);
+    long lon_counts = GET_NC_SIZE(xDim);
+    cout << "     DEBUG] " << method_name  << " lat_counts: " << lat_counts << ", lon_counts: " << lon_counts << endl;
+    bool two_dim_corrd = false;
+    
+    if (get_data_size(_xCoordVar) == (lon_counts*lat_counts) ||
+        get_data_size(_yCoordVar) == (lon_counts*lat_counts)) {
+      two_dim_corrd = true;
+    }
+    else if (get_data_size(_xCoordVar) != lon_counts ||
+             get_data_size(_yCoordVar) != lat_counts)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
+      exit(1);
+    }
+  
+    // Figure out the dlat/dlon values from the dimension variables
+  
+    double lat_values[lat_counts];
+    double lon_values[lon_counts];
+  
+    //_yCoordVar->get(lat_values, &lat_counts);
+    if (two_dim_corrd) {
+      long cur[2], length[2];
+      for (int i=0; i<2; i++) {
+         cur[i] = 0;
+         length[i] = 1;
+      }
+      length[0] = lat_counts;
+      get_nc_data(_yCoordVar,lat_values, length, cur);
+      length[1] = lon_counts;
+      length[0] = 1;
+      get_nc_data(_xCoordVar,lon_values, length, cur);
+      cout << "     DEBUG] " << method_name  << " lat_values[0]=" << lat_values[0] << ", lat_values[1]=" << lat_values[1] << endl;
+      cout << "     DEBUG] " << method_name  << " lon_values[0]=" << lon_values[0] << ", lon_values[1]=" << lon_values[1] << endl;
+    }
+    else {
+      get_nc_data(_yCoordVar,lat_values);
+      get_nc_data(_xCoordVar,lon_values);
+    }
+  
+    // Calculate dlat and dlon assuming they are constant.  MET requires that
+    // dlat be equal to dlon
+  
+    double dlat = lat_values[1] - lat_values[0];
+    double dlon = rescale_lon(lon_values[1] - lon_values[0]);
+  
+    if (fabs(dlat - dlon) > DELTA_TOLERANCE)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+           << "MET can only process Latitude/Longitude files where the delta lat and delta lon are the same\n\n";
+      exit(1);
+    }
+  
+    // As a sanity check, make sure that the deltas are constant through the
+    // entire grid.  CF compliancy doesn't require this, but MET does.
+  
+    for (int i = 1; i < (int)lat_counts; ++i)
+    {
+      if ((fabs(lat_missing_value - lat_values[i]) < DELTA_TOLERANCE) ||
+          (fabs(lat_missing_value - lat_values[i-1]) < DELTA_TOLERANCE)) continue;
+      double curr_delta = lat_values[i] - lat_values[i-1];
+      if (fabs(curr_delta - dlat) > DELTA_TOLERANCE)
+      {
+        mlog << Error << "\n" << method_name << " -> "
+             << "MET can only process Latitude/Longitude files where the lat delta is constant\n\n";
+        exit(1);
+      }
+    }
+  
+    for (int i = 1; i < (int)lon_counts; ++i)
+    {
+      if ((fabs(lon_missing_value - lon_values[i]) < DELTA_TOLERANCE) ||
+          (fabs(lon_missing_value - lon_values[i-1]) < DELTA_TOLERANCE)) continue;
+      double curr_delta = rescale_lon(lon_values[i] - lon_values[i-1]);
+      if (fabs(curr_delta - dlon) > DELTA_TOLERANCE)
+      {
+        mlog << Error << "\n" << method_name << " -> "
+             << "MET can only process Latitude/Longitude files where the lon delta is constant\n\n";
+        exit(1);
+      }
+    }
+  
+    // Fill in the data structure.  Remember to negate the longitude
+    // values since MET uses the mathematical coordinate system centered on
+    // the center of the earth rather than the regular map coordinate system.
+  
+    // Note that I am assuming that the data is ordered from the lower-left
+    // corner.  I think this will generally be the case, but it is not
+    // guaranteed anywhere that I see.  But if this is not the case, then we
+    // will probably also need to reorder the data itself.
+  
+    LatLonData data;
+  
+    data.name = latlon_proj_type;
+    data.lat_ll = lat_values[0];
+    data.lon_ll = -lon_values[0];
+    data.delta_lat = dlat;
+    data.delta_lon = dlon;
+    data.Nlat = lat_counts;
+    data.Nlon = lon_counts;
+  
+    grid.set(data);
+  }
+  
+  return true;
+}
+
 bool NcCfFile::get_grid_from_dimensions()
 {
   static const string method_name = "NcCfFile::get_grid_from_dimensions()";
@@ -2052,12 +2229,12 @@ bool NcCfFile::get_grid_from_dimensions()
     exit(1);
   }
 
-  bool one_dim_corrd = true;
+  bool two_dim_corrd = false;
   long lat_counts = GET_NC_SIZE_P(_yDim);
   long lon_counts = GET_NC_SIZE_P(_xDim);
   if (get_data_size(_xCoordVar) == (lon_counts*lat_counts) ||
       get_data_size(_yCoordVar) == (lon_counts*lat_counts)) {
-    one_dim_corrd = false;
+    two_dim_corrd = true;
   }
   else if (get_data_size(_xCoordVar) != lon_counts ||
            get_data_size(_yCoordVar) != lat_counts)
@@ -2073,11 +2250,7 @@ bool NcCfFile::get_grid_from_dimensions()
   double lon_values[lon_counts];
 
   //_yCoordVar->get(lat_values, &lat_counts);
-  if (one_dim_corrd) {
-    get_nc_data(_yCoordVar,lat_values);
-    get_nc_data(_xCoordVar,lon_values);
-  }
-  else {
+  if (two_dim_corrd) {
     long cur[2], length[2];
     for (int i=0; i<2; i++) {
        cur[i] = 0;
@@ -2088,8 +2261,12 @@ bool NcCfFile::get_grid_from_dimensions()
     length[1] = lon_counts;
     length[0] = 1;
     get_nc_data(_xCoordVar,lon_values, length, cur);
-    cout << " lat_values[0]=" << lat_values[0] << ", lat_values[1]=" << lat_values[1] << endl;
-    cout << " lon_values[0]=" << lon_values[0] << ", lon_values[1]=" << lon_values[1] << endl;
+    cout << "     DEBUG] " << method_name << " lat_values[0]=" << lat_values[0] << ", lat_values[1]=" << lat_values[1] << endl;
+    cout << "     DEBUG] " << method_name << " lon_values[0]=" << lon_values[0] << ", lon_values[1]=" << lon_values[1] << endl;
+  }
+  else {
+    get_nc_data(_yCoordVar,lat_values);
+    get_nc_data(_xCoordVar,lon_values);
   }
 
   // Calculate dlat and dlon assuming they are constant.  MET requires that
