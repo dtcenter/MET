@@ -42,6 +42,11 @@ static const char x_dim_key_name[] = "projection_x_coordinate";
 static const char y_dim_key_name[] = "projection_y_coordinate";
 static ConcatString t_dim_name = "Time";
 
+static const char dim_lat_nt[] = "nlat";
+static const char dim_lon_nt[] = "nlon";
+static const char var_lat_nt[] = "tlat";
+static const char var_lon_nt[] = "tlon";
+           
 static ConcatString x_dim_var_name;
 static ConcatString y_dim_var_name;
 //const char * t_dim_var_name;
@@ -357,10 +362,17 @@ bool NcCfFile::open(const char * filepath)
       if ((dim == _xDim) || (strcmp(c,x_dim_var_name) == 0)) {
          Var[j].x_slot = k;
       }
-      if ((dim == _yDim) || (strcmp(c, y_dim_var_name) == 0)) {
+//static const char dim_lat_nt[] = "nlat";
+//static const char dim_lon_nt[] = "nlon";
+//static const char var_lat_nt[] = "tlat";
+//static const char var_lon_nt[] = "tlon";
+//      else if ((dim == _xDim) || (strcmp(c,dim_lon_nt) ==0 x_dim_var_name) == 0)) {
+//         Var[j].x_slot = k;
+//      }
+      else if ((dim == _yDim) || (strcmp(c, y_dim_var_name) == 0)) {
          Var[j].y_slot = k;
       }
-      if ((dim == _tDim) || (strcmp(c, t_dim_name) == 0)) {
+      else if ((dim == _tDim) || (strcmp(c, t_dim_name) == 0)) {
          Var[j].t_slot = k;
       }
     }
@@ -710,7 +722,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 {
   if (!args_ok(a))
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
          << "bad arguments:\n";
     a.dump(cerr);
     exit(1);
@@ -719,7 +731,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   int dim_count = get_dim_count(var);
   if (dim_count != a.n_elements())
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
          << "needed " << (dim_count) << " arguments for variable "
          << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
@@ -727,7 +739,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   if (dim_count >= max_met_args)
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
          << "too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
     exit(1);
   }
@@ -787,7 +799,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
     default:
     {
-      mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
+      mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
            << "bad type [" << GET_NC_TYPE_NAME_P(var) << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
       exit(1);
       break;
@@ -799,7 +811,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   if (!status)
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
          << "bad status for var->get()\n\n";
     exit(1);
   }
@@ -817,7 +829,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 {
   if (!args_ok(a))
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
          << "bad arguments:\n";
     a.dump(cerr);
     exit(1);
@@ -826,7 +838,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   int dim_count = get_dim_count(v);
   if (dim_count != a.n_elements())
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) -> "
          << "needed " << (dim_count) << " arguments for variable "
          << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
@@ -834,7 +846,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (dim_count >= max_met_args)
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) -> "
          << "too may arguments for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
     exit(1);
   }
@@ -856,7 +868,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (!found)
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
          << "variable " << (GET_NC_NAME_P(v)) << " not found!\n\n";
     exit(1);
   }
@@ -873,7 +885,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
       if ((j != var->x_slot) && (j != var->y_slot))
       {
-        mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+        mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
              << "star found in bad slot\n\n";
         exit(1);
       }
@@ -882,7 +894,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (count != 2)
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
          << "bad star count ... " << count << "\n\n";
     exit(1);
   }
@@ -894,7 +906,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (x_slot < 0 || y_slot < 0)
   {
-    mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &, DataPlane &) const -> "
+    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &, DataPlane &) const -> "
          << "bad x|y|z slot\n\n";
     exit(1);
   }
@@ -971,7 +983,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         break;
 
       default:
-        mlog << Error << "\nNcCfFile::data(NcVar *, const LongArray &) const -> "
+        mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
              << " bad type [" << GET_NC_TYPE_NAME_P(v) << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
         exit ( 1 );
         break;
@@ -1919,11 +1931,23 @@ bool NcCfFile::get_grid_from_dimensions()
   //const char *dim_units;
   ConcatString dim_units;
   string dim_units_str;
+  ConcatString dim_name;
   for (int dim_num = 0; dim_num < _numDims; ++dim_num)
   {
     // The lat/lon dimensions are identified by their units
 
-    coord_var = get_nc_var(_ncFile, _dims[dim_num]->getName().c_str());
+    dim_name = _dims[dim_num]->getName().c_str();
+    coord_var = get_nc_var(_ncFile, dim_name);
+    if (IS_INVALID_NC(coord_var)) {
+       if (strcmp(dim_lat_nt,dim_name) == 0) {
+          dim_name = var_lat_nt;
+          coord_var = get_nc_var(_ncFile, dim_name);
+       }
+       else if (strcmp(dim_lon_nt,dim_name) == 0) {
+          dim_name = var_lon_nt;
+          coord_var = get_nc_var(_ncFile, dim_name);
+       }
+    }
     if (IS_INVALID_NC(coord_var))
       continue;
 
@@ -1952,8 +1976,14 @@ bool NcCfFile::get_grid_from_dimensions()
         y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
         {
-          if (strcmp(Var[var_num].name, GET_NC_NAME_P(_yDim).c_str()) == 0)
+          if (strcmp(Var[var_num].name, y_dim_var_name) == 0)
           {
+            _yCoordVar = Var[var_num].var;
+            break;
+          }
+          if ((strcmp(Var[var_num].name, var_lat_nt) == 0)
+              && (strcmp(y_dim_var_name, dim_lat_nt) == 0)) {
+            y_dim_var_name = dim_lat_nt;
             _yCoordVar = Var[var_num].var;
             break;
           }
@@ -1966,8 +1996,7 @@ bool NcCfFile::get_grid_from_dimensions()
              << GET_NC_NAME_P(_yCoordVar) << "\".\n\n";
       }
     }
-
-    if (strcmp(dim_units, "degrees_east") == 0 ||
+    else if (strcmp(dim_units, "degrees_east") == 0 ||
         strcmp(dim_units, "degree_east") == 0 ||
         strcmp(dim_units, "degree_E") == 0 ||
         strcmp(dim_units, "degrees_E") == 0 ||
@@ -1981,8 +2010,14 @@ bool NcCfFile::get_grid_from_dimensions()
         x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
         for (int var_num = 0; var_num < Nvars; ++var_num)
         {
-          if (strcmp(Var[var_num].name, GET_NC_NAME_P(_xDim).c_str()) == 0)
+          if (strcmp(Var[var_num].name, x_dim_var_name) == 0)
           {
+            _xCoordVar = Var[var_num].var;
+            break;
+          }
+          if ((strcmp(Var[var_num].name, var_lon_nt) == 0)
+              && (strcmp(x_dim_var_name, dim_lon_nt) == 0)) {
+            x_dim_var_name = dim_lon_nt;
             _xCoordVar = Var[var_num].var;
             break;
           }
@@ -2017,10 +2052,15 @@ bool NcCfFile::get_grid_from_dimensions()
     exit(1);
   }
 
+  bool one_dim_corrd = true;
   long lat_counts = GET_NC_SIZE_P(_yDim);
   long lon_counts = GET_NC_SIZE_P(_xDim);
-  if (get_data_size(_xCoordVar) != lon_counts ||
-      get_data_size(_yCoordVar) != lat_counts)
+  if (get_data_size(_xCoordVar) == (lon_counts*lat_counts) ||
+      get_data_size(_yCoordVar) == (lon_counts*lat_counts)) {
+    one_dim_corrd = false;
+  }
+  else if (get_data_size(_xCoordVar) != lon_counts ||
+           get_data_size(_yCoordVar) != lat_counts)
   {
     mlog << Error << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
@@ -2030,14 +2070,27 @@ bool NcCfFile::get_grid_from_dimensions()
   // Figure out the dlat/dlon values from the dimension variables
 
   double lat_values[lat_counts];
-
-  //_yCoordVar->get(lat_values, &lat_counts);
-  get_nc_data(_yCoordVar,lat_values);
-
   double lon_values[lon_counts];
 
-  //_xCoordVar->get(lon_values, &lon_counts);
-  get_nc_data(_xCoordVar,lon_values);
+  //_yCoordVar->get(lat_values, &lat_counts);
+  if (one_dim_corrd) {
+    get_nc_data(_yCoordVar,lat_values);
+    get_nc_data(_xCoordVar,lon_values);
+  }
+  else {
+    long cur[2], length[2];
+    for (int i=0; i<2; i++) {
+       cur[i] = 0;
+       length[i] = 1;
+    }
+    length[0] = lat_counts;
+    get_nc_data(_yCoordVar,lat_values, length, cur);
+    length[1] = lon_counts;
+    length[0] = 1;
+    get_nc_data(_xCoordVar,lon_values, length, cur);
+    cout << " lat_values[0]=" << lat_values[0] << ", lat_values[1]=" << lat_values[1] << endl;
+    cout << " lon_values[0]=" << lon_values[0] << ", lon_values[1]=" << lon_values[1] << endl;
+  }
 
   // Calculate dlat and dlon assuming they are constant.  MET requires that
   // dlat be equal to dlon
