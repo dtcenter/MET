@@ -18,7 +18,6 @@ static const char hdr_arr_len_dim_name    [] = "hdr_arr_len";
 static const int  hdr_arr_len_dim_size       = 3;
 
 static const char obs_arr_len_dim_name    [] = "obs_arr_len";
-static const int  obs_arr_len_dim_size       = 5;
 
 static const int  n_obs_types                = 5;  //  layer base, layer top, opacity, cad score, feature classification
 
@@ -81,6 +80,8 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
+static const int na_len = strlen(na_string);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -107,6 +108,8 @@ static void set_verbosity (const StringArray &);
 static void set_grib_code (const StringArray &);
 
 static void process_calipso_file (NcFile &, const char * filename);
+
+static void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -364,7 +367,6 @@ hdf_5km.get_vars(hdf_sd_id);
 n_data = max<int> (hdf_5km.lat.dimsizes[0], hdf_5km.lat.dimsizes[1]);
 
 const int nhdr_dim_size = n_data;
-const int nobs_dim_size = obs_arr_len_dim_size*n_data;
 
    //
    //  see how big a buffer we'll need
@@ -374,16 +376,12 @@ const int hdr_typ_bytes = nhdr_dim_size*mxstr_dim_size;
 const int hdr_sid_bytes = nhdr_dim_size*mxstr_dim_size;
 const int hdr_vld_bytes = nhdr_dim_size*mxstr_dim_size;
 const int hdr_arr_bytes = nhdr_dim_size*hdr_arr_len_dim_size*sizeof(float);
-const int obs_qty_bytes = nobs_dim_size*mxstr_dim_size;
-const int obs_arr_bytes = nobs_dim_size*sizeof(float);
 
 int buf_size = hdr_typ_bytes;
 
 buf_size = max<int>(buf_size, hdr_sid_bytes);
 buf_size = max<int>(buf_size, hdr_vld_bytes);
 buf_size = max<int>(buf_size, hdr_arr_bytes);
-buf_size = max<int>(buf_size, obs_qty_bytes);
-buf_size = max<int>(buf_size, obs_arr_bytes);
 
 
 
@@ -400,9 +398,10 @@ NcDim nobs_dim;
 
 out.addDim(mxstr_dim_name,       mxstr_dim_size);
 out.addDim(hdr_arr_len_dim_name, hdr_arr_len_dim_size);
-out.addDim(obs_arr_len_dim_name, obs_arr_len_dim_size);
+out.addDim(obs_arr_len_dim_name, n_obs_types);
 out.addDim(nhdr_dim_name,        n_data);
-out.addDim(nobs_dim_name,        5*n_data);
+
+out.addDim(nobs_dim_name);                  //  unlimited
 
 mxstr_dim       = out.getDim(mxstr_dim_name);
 hdr_arr_len_dim = out.getDim(hdr_arr_len_dim_name);
@@ -600,7 +599,7 @@ hdr_sid_var.putVar(cbuf);
    //
    //  populate the obs_qty variable
    //
-
+/* 
 memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
@@ -610,14 +609,12 @@ for (j=0; j<n_data; ++j)  {
 }
 
 obs_qty_var.putVar(cbuf);
-
+*/
    //
    //  populate the hdr_arr variable
    //
 
 float ff[2];
-
-
 
 memset(buf, 0, buf_size);
 
@@ -643,6 +640,7 @@ hdr_arr_var.putVar(fbuf);
 
 int k;
 HdfVarInfo info;
+int layer;
 unixtime t;
 double dd;
 
@@ -679,34 +677,40 @@ hdr_vld_var.putVar(cbuf);
    //
 
 Calipso_5km_Obs obs;
-const int offset = obs_arr_len_dim_size;
 
 memset(buf, 0, buf_size);
 
-float * f = fbuf;
+float f[5];
 
 for (j=0; j<n_data; ++j)  {
 
    hdf_5km.get_obs(j, obs);
 
-   obs.get_layer_base_record (j, f);
-      f += offset;
+   for (layer=0; layer<(obs.n_layers); ++layer)  {
 
-   obs.get_layer_top_record  (j, f);
-      f += offset;
+      obs.get_layer_base_record (j, layer, f);
 
-   obs.get_opacity_record    (j, f);
-      f += offset;
+         write_nc_record(out, obs_qty_var, obs_arr_var, f);
 
-   obs.get_cad_score_record  (j, f);
-      f += offset;
+      obs.get_layer_top_record  (j, layer, f);
 
-   obs.get_fclass_record     (j, f);
-      f += offset;
+         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+
+      obs.get_opacity_record    (j, layer, f);
+
+         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+
+      obs.get_cad_score_record  (j, layer, f);
+
+         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+
+      obs.get_fclass_record     (j, layer, f);
+
+         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+
+   }   //  for layer
 
 }   //  for j
-
-obs_arr_var.putVar(fbuf);
 
 
 
@@ -743,6 +747,56 @@ if ( SDend(hdf_sd_id) < 0 )  {
 return;
 
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f)
+
+{
+
+static int pos = 0;
+vector<size_t> index;
+vector<size_t> count;
+
+index.resize(2);
+count.resize(2);
+
+   //
+   //  write obs_arr record
+   //
+
+index.at(0) = pos;
+index.at(1) = 0;
+
+count.at(0) = 1;
+count.at(1) = n_obs_types;
+
+obs_arr_var.putVar(index, count, f);
+
+
+   //
+   //  write obs_qty record
+   //
+
+index.at(0) = pos;
+index.at(1) = 0;
+
+count.at(0) = 1;
+count.at(1) = na_len;
+
+obs_qty_var.putVar(index, count, na_string);
+
+   //
+   //  done
+   //
+
+++pos;
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
