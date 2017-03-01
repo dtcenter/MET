@@ -835,7 +835,7 @@ bool GridStatNcOutInfo::all_false() const
 
 {
 
-bool status = do_latlon || do_raw || do_diff || do_climo;
+bool status = do_latlon || do_raw || do_diff || do_climo || do_apply_mask;
 
 return ( !status );
 
