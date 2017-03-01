@@ -463,6 +463,7 @@ static const char conf_key_latlon_flag[]       = "latlon";
 static const char conf_key_raw_flag[]          = "raw";
 static const char conf_key_diff_flag[]         = "diff";
 static const char conf_key_climo_flag[]        = "climo";
+static const char conf_key_apply_mask_flag[]   = "apply_mask";
 static const char conf_key_object_raw_flag[]   = "object_raw";
 static const char conf_key_object_id_flag[]    = "object_id";
 static const char conf_key_cluster_id_flag[]   = "cluster_id";
