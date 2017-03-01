@@ -147,4 +147,37 @@
     </output>
   </test>
 
+  <test name="grid_stat_MET-621_APPLY_MASK_TRUE">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>MET-621_APPLY_MASK_TRUE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i18.f00.nc \
+      &CONFIG_DIR;/GridStatConfig_apply_mask_true \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MET-621_APPLY_MASK_TRUE_060000L_20130827_180000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_MET-621_APPLY_MASK_FALSE">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>MET-621_APPLY_MASK_FALSE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i18.f00.nc \
+      &CONFIG_DIR;/GridStatConfig_apply_mask_false \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MET-621_APPLY_MASK_FALSE_060000L_20130827_180000V_pairs.nc</grid_nc>
+    </output>
+  </test>
 </met_test>
