@@ -287,4 +287,69 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_CESM_SSMI_microwave">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/cesm/ssmi.ifrac.gx3v5.2003.nc \
+      &OUTPUT_DIR;/plot_data_plane/CESM_ssmi.ifrac.gx3v5.2003.ps \
+      'name="ifrac"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/CESM_ssmi.ifrac.gx3v5.2003.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_CESM_sea_ice_nc">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/cesm/b.e11.B20TRC5CNBDRD.f09_g16.002.cice.h1.aice_d_nh.19200101-20051231.nc \
+      &OUTPUT_DIR;/plot_data_plane/CESM_b.e11.B20TRC5CNBDRD.f09_g16.002.cice.h1.aice_d_nh.19200101-20051231.ps \
+      'name="aice_d"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/CESM_b.e11.B20TRC5CNBDRD.f09_g16.002.cice.h1.aice_d_nh.19200101-20051231.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_EaSM_CMIP5_histroical">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.nc \
+      &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.ps \
+      'name="pr"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_EaSM_CMIP5_rcp85">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.nc \
+      &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.ps \
+      'name="pr"; level="(0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_EaSM_CESM">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/easm/b.e15.B1850.f09_g16.pi_control.all_ga7cpl24.66.cam.i.0083-01-01-00000.nc \
+      &OUTPUT_DIR;/plot_data_plane/CESM_b.e15.B1850.f09_g16.pi_control.all_ga7cpl24.66.cam.i.0083-01-01-00000.ps \
+      'name="CLDICE"; level="(0,0,*,*)";' \
+      -v 4
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/CESM_b.e15.B1850.f09_g16.pi_control.all_ga7cpl24.66.cam.i.0083-01-01-00000.ps</ps>
+    </output>
+  </test>
+
 </met_test>
