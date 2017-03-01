@@ -81,6 +81,8 @@
 //                                   output line types.
 //   034    05/10/16  Halley Gotway  Add grid weighting.
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
+//   036    02/14/17  Win            MET-621 enhancement support- additional          
+//                                   nc_pairs_flag 'apply_mask'
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -300,7 +302,7 @@ void setup_first_pass(const DataPlane &dp) {
 
    // Create output text files as requested in the config file
    // only if the ascii_output_flag is true.
-   if (conf_info.get_ascii_output_flag())
+   if(conf_info.get_ascii_output_flag())
    {
        setup_txt_files(dp.valid(), dp.lead());
    }
@@ -1646,6 +1648,8 @@ void write_nc(const GridStatNcOutInfo & nc_info,
               int i_vx, InterpMthd mthd, int wdth) {
    int i, n, x, y;
    int fcst_flag, obs_flag, diff_flag, cmn_flag;
+   int num_masking_regions;
+   bool apply_mask_flag;
    double fval, oval, cmnval;
    ConcatString fcst_var_name, obs_var_name, diff_var_name;
    ConcatString cmn_var_name;
@@ -1656,10 +1660,15 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    float *diff_data = (float *) 0;
    float *cmn_data  = (float *) 0;
 
+   const char* mask_grid_name = "";
+
    NcVar fcst_var;
    NcVar obs_var ;
    NcVar diff_var;
    NcVar cmn_var ;
+
+   // Get the apply_mask flag, needed for JIRA issue MET-621.
+   apply_mask_flag = nc_info.do_apply_mask;
 
    // Get the interpolation strings
    mthd_str = interpmthd_to_string(mthd);
@@ -1675,14 +1684,34 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
+   // Process each of the masking regions
+   // MET-621 When the nc_pairs flag 'apply_mask'= FALSE in the config file,
+   // generate the outtput NetCDF file for the full domain only.  The default
+   // behavior is to generate fields for each masking region.
+   num_masking_regions = conf_info.get_n_mask();
+   if(!conf_info.nc_info.do_apply_mask){
+        // Generate the FCST, OBS, DIFF, etc. for the 
+        // full domain
+        num_masking_regions = 1;
+   } 
+       
+
    // Compute the difference field for each of the masking regions
-   for(i=0; i<conf_info.get_n_mask(); i++) {
+   for(i=0; i<num_masking_regions; i++) {
+       // MET-621 If the apply_mask is set to default
+       // value of True, then create fields for each
+       // masking region. Otherwise create fields for
+       // the full domain.
+       mask_grid_name = conf_info.mask_name[i];
+       if(!apply_mask_flag){
+           mask_grid_name = "FULL";
+       }
 
       // Build the forecast variable name
       cs << cs_erase
          << conf_info.fcst_info[i_vx]->name() << "_"
          << conf_info.fcst_info[i_vx]->level_name() << "_"
-         << conf_info.mask_name[i];
+         << mask_grid_name;
 
       fcst_var_name << cs_erase << "FCST_" << cs;
       if(conf_info.interp_field == FieldType_Fcst ||
@@ -1906,7 +1935,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the diff_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
-                 << " and masking region " << conf_info.mask_name[i]
+                 << " and masking region " << mask_grid_name
                  << "\n\n";
             exit(1);
          }
@@ -1918,7 +1947,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the cmn_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
-                 << " and masking region " << conf_info.mask_name[i]
+                 << " and masking region " << mask_grid_name
                  << "\n\n";
             exit(1);
          }
