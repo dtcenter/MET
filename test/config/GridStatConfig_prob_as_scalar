@@ -160,12 +160,13 @@ output_flag = {
 // NetCDF matched pairs output file
 //
 nc_pairs_flag   = {
-   latlon = TRUE;
-   raw    = TRUE;
-   diff   = TRUE;
-   climo  = TRUE;
-   weight = FALSE;
-   nbrhd  = TRUE;
+   latlon     = TRUE;
+   raw        = TRUE;
+   diff       = TRUE;
+   climo      = TRUE;
+   weight     = FALSE;
+   nbrhd      = TRUE;
+   apply_mask = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
