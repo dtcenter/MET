@@ -55,14 +55,12 @@ void read_netcdf_grid(NcFile * f_in, Grid & gr)
    bool v3_flag = false;
 
    // Check for the MET version global attribute
-cout << " DEBUG_HS get_nccf_grid.cc read_netcdf_grid\n";
 
    if (has_att(f_in, "MET_version"))
      v3_flag = true;
 
    // Parse the projection information based on the version
 
-cout << " DEBUG_HS get_nccf_grid.cc read_netcdf_gridv3? " << v3_flag << "\n";
    if (v3_flag)
      read_netcdf_grid_v3(f_in, gr);
    else
@@ -165,11 +163,7 @@ NcAtt * proj_att = (NcAtt *) 0;
        // Parse the grid specification out of the global attributes
        //
 
-cout << " ---DEBUG_HS get_nccf_grid.cc read_netcdf_grid_v2\n";       
-cout << " ---DEBUG_HS get_nccf_grid.cc read_netcdf_grid_v2\n";       
-cout << " ---DEBUG_HS get_nccf_grid.cc read_netcdf_grid_v2\n";       
    proj_att = get_nc_att(f_in, "Projection");
-cout << " === DEBUG_HS get_nccf_grid.cc read_netcdf_grid_v2\n";       
 
       //
       // Parse out the grid specification depending on the projection type
