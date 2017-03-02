@@ -170,7 +170,7 @@
     <env>
       <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
       <pair><name>OUTPUT_PREFIX</name>   <value>MET-621_APPLY_MASK_FALSE</value></pair>
-      <pair><name>APPLY_MASK</name> <value>TRUE</value></pair>
+      <pair><name>APPLY_MASK</name> <value>FALSE</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \

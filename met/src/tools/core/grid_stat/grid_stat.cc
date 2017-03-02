@@ -1686,10 +1686,10 @@ void write_nc(const GridStatNcOutInfo & nc_info,
 
    // Process each of the masking regions
    // MET-621 When the nc_pairs flag 'apply_mask'= FALSE in the config file,
-   // generate the outtput NetCDF file for the full domain only.  The default
+   // generate the output NetCDF file for the full domain only.  The default
    // behavior is to generate fields for each masking region.
    num_masking_regions = conf_info.get_n_mask();
-   if(!conf_info.nc_info.do_apply_mask){
+   if(!apply_mask_flag){
         // Generate the FCST, OBS, DIFF, etc. for the 
         // full domain
         num_masking_regions = 1;
@@ -1726,7 +1726,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
       obs_var_name << cs_erase << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
                    << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << conf_info.mask_name[i];
+                   << mask_grid_name;
       if(conf_info.interp_field == FieldType_Obs ||
          conf_info.interp_field == FieldType_Both) {
          obs_var_name << smooth_str;
@@ -1738,7 +1738,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
                     << conf_info.fcst_info[i_vx]->level_name() << "_"
                     << conf_info.obs_info[i_vx]->name() << "_"
                     << conf_info.obs_info[i_vx]->level_name() << "_"
-                    << conf_info.mask_name[i] << smooth_str;
+                    << mask_grid_name << smooth_str;
 
       // Figure out which fields should be written
       fcst_flag = !fcst_var_sa.has(fcst_var_name);
@@ -1911,7 +1911,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the fcst_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
-                 << " and masking region " << conf_info.mask_name[i]
+                 << " and masking region " << mask_grid_name
                  << "\n\n";
             exit(1);
          }
@@ -1923,7 +1923,7 @@ void write_nc(const GridStatNcOutInfo & nc_info,
             mlog << Error << "\nwrite_nc() -> "
                  << "error with the obs_var->put for fields "
                  << shc.get_fcst_var() << " and " << shc.get_obs_var()
-                 << " and masking region " << conf_info.mask_name[i]
+                 << " and masking region " << mask_grid_name
                  << "\n\n";
             exit(1);
          }
