@@ -46,6 +46,7 @@ extern InterpInfo      parse_conf_interp(Dictionary *dict);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict);
 extern GridWeightType  parse_conf_grid_weight_flag(Dictionary *dict);
 extern DuplicateType   parse_conf_duplicate_flag(Dictionary *dict);
+extern ObsSummary      parse_conf_obs_summary(Dictionary *dict);
 extern ConcatString    parse_conf_tmp_dir(Dictionary *dict);
 extern GridDecompType  parse_conf_grid_decomp_flag(Dictionary *dict);
 extern WaveletType     parse_conf_wavelet_type(Dictionary *dict);
@@ -93,6 +94,8 @@ extern ConcatString matchtype_to_string(MatchType);
 
 extern ConcatString griddecomptype_to_string(GridDecompType);
 extern ConcatString wavelettype_to_string(WaveletType);
+
+extern int parse_conf_percentile(Dictionary *dict);
 
 ////////////////////////////////////////////////////////////////////////
 
