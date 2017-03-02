@@ -145,7 +145,7 @@ nc_pairs_flag   = {
    climo      = TRUE;
    weight     = FALSE;
    nbrhd      = FALSE;
-   apply_mask = "${APPLY_MASK}";
+   apply_mask = ${APPLY_MASK};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
