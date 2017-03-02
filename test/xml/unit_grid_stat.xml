@@ -157,7 +157,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i18.f00.nc \
-      &CONFIG_DIR;/GridStatConfig_apply_mask_true \
+      &CONFIG_DIR;/GridStatConfig_apply_mask \
       -outdir &OUTPUT_DIR;/grid_stat -v 1
     </param>
     <output>
@@ -175,7 +175,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i18.f00.nc \
-      &CONFIG_DIR;/GridStatConfig_apply_mask_false \
+      &CONFIG_DIR;/GridStatConfig_apply_mask \
       -outdir &OUTPUT_DIR;/grid_stat -v 1
     </param>
     <output>
