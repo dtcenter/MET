@@ -45,6 +45,8 @@ class LambertGrid : public GridRep {
 
       ConcatString Name;
 
+      bool IsNorthHemisphere;
+
       double Lat_LL;
       double Lon_LL;
 
@@ -64,6 +66,11 @@ class LambertGrid : public GridRep {
       double df(double) const;
 
       LambertData Data;
+
+         //
+
+      bool is_north() const;
+      bool is_south() const;
 
          //
          //  grid interface
@@ -101,6 +108,13 @@ class LambertGrid : public GridRep {
       GridRep * copy() const;
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline bool LambertGrid::is_north() const { return (   IsNorthHemisphere ); }
+inline bool LambertGrid::is_south() const { return ( ! IsNorthHemisphere ); }
 
 
 ////////////////////////////////////////////////////////////////////////
