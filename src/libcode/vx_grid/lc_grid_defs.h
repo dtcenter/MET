@@ -44,6 +44,9 @@ struct LambertData {
    int nx;
    int ny;
 
+
+   // LambertData();
+
 };
 
 
