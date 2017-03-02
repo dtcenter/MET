@@ -33,10 +33,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static double     lc_func(double lat, double Cone);
-static double lc_der_func(double lat, double Cone);
+static double     lc_func(double lat, double Cone, const bool is_north);
+static double lc_der_func(double lat, double Cone, const bool is_north);
 
-static double lc_inv_func(double   r, double Cone);
+static double lc_inv_func(double   r, double Cone, const bool is_north);
 
 static void reduce(double &);
 
@@ -118,6 +118,21 @@ LambertGrid::LambertGrid(const LambertData & data)
 clear();
 
 
+switch ( data.hemisphere )  {
+
+   case 'N':  IsNorthHemisphere = true;   break;
+   case 'S':  IsNorthHemisphere = false;  break;
+
+   default:
+      cerr << "\n\n  LambertGrid::LambertGrid(const LambertData &) -> bad hemisphere ...\""
+           << (data.hemisphere) << "\"\n\n";
+      exit ( 1 );
+      break;
+
+}   //  switch
+
+double ratio;
+const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 Lat_LL = data.lat_pin;   //  temporarily
 Lon_LL = data.lon_pin;   //  temporarily
@@ -157,20 +172,26 @@ else {
    //  calculate Alpha
    //
 
-Alpha = (-1.0/lc_der_func(data.scale_lat_1, Cone))*((data.r_km)/(data.d_km));
+ratio = (data.r_km)/(data.d_km);
+
+Alpha = (1.0/lc_der_func(data.scale_lat_1, Cone, IsNorthHemisphere));
+
+Alpha = fabs(Alpha);
+
+Alpha *= ratio;
 
    //
    //  Calculate Bx, By
    //
 
-double r0, theta0;
+double r_pin, theta_pin;
 
-r0 = lc_func(data.lat_pin, Cone);
+r_pin = lc_func(data.lat_pin, Cone, IsNorthHemisphere);
 
-theta0 = Cone*(Lon_orient - Lon_LL);
+theta_pin = H*Cone*(Lon_orient - Lon_LL);
 
-Bx = data.x_pin - Alpha*r0*sind(theta0);
-By = data.y_pin + Alpha*r0*cosd(theta0);
+Bx = data.x_pin - Alpha*r_pin*H*sind(theta_pin);
+By = data.y_pin + Alpha*r_pin*H*cosd(theta_pin);
 
 xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
 
@@ -192,7 +213,7 @@ double LambertGrid::f(double lat) const
 
 {
 
-return ( lc_func(lat, Cone) );
+return ( lc_func(lat, Cone, IsNorthHemisphere) );
 
 }
 
@@ -204,7 +225,7 @@ double LambertGrid::df(double lat) const
 
 {
 
-return ( lc_der_func(lat, Cone) );
+return ( lc_der_func(lat, Cone, IsNorthHemisphere) );
 
 }
 
@@ -217,17 +238,18 @@ void LambertGrid::latlon_to_xy(double lat, double lon, double & x, double & y) c
 {
 
 double r, theta;
+const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 
 reduce(lon);
 
-r = lc_func(lat, Cone);
+r = lc_func(lat, Cone, IsNorthHemisphere);
 
-theta = Cone*(Lon_orient - lon);
+theta = H*Cone*(Lon_orient - lon);
 
-x = Bx + Alpha*r*sind(theta);
+x = Bx + Alpha*r*H*sind(theta);
 
-y = By - Alpha*r*cosd(theta);
+y = By - Alpha*r*H*cosd(theta);
 
 return;
 
@@ -242,18 +264,21 @@ void LambertGrid::xy_to_latlon(double x, double y, double & lat, double & lon) c
 {
 
 double r, theta;
+const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 x = (x - Bx)/Alpha;
 y = (y - By)/Alpha;
 
 r = sqrt( x*x + y*y );
 
-lat = lc_inv_func(r, Cone);
+lat = lc_inv_func(r, Cone, IsNorthHemisphere);
 
 if ( fabs(r) < 1.0e-5 )  theta = 0.0;
 else                     theta = atan2d(x, -y);   //  NOT atan2d(y, x);
 
 lon = Lon_orient - theta/Cone;
+
+lon *= H;
 
 reduce(lon);
 
@@ -627,13 +652,14 @@ return ( p );
 ////////////////////////////////////////////////////////////////////////
 
 
-double lc_func(double lat, double Cone)
+double lc_func(double lat, double Cone, const bool is_north)
 
 {
 
 double r;
+const double H = ( is_north ? 1.0 : -1.0 );
 
-r = tand(45.0 - 0.5*lat);
+r = tand(45.0 - 0.5*H*lat);
 
 r = pow(r, Cone);
 
@@ -645,13 +671,16 @@ return ( r );
 ////////////////////////////////////////////////////////////////////////
 
 
-double lc_inv_func(double r, double Cone)
+double lc_inv_func(double r, double Cone, const bool is_north)
 
 {
 
 double lat;
+const double H = ( is_north ? 1.0 : -1.0 );
 
 lat = 90.0 - 2.0*atand(pow(r, 1.0/Cone));
+
+lat *= H;
 
 return ( lat );
 
@@ -661,13 +690,16 @@ return ( lat );
 ////////////////////////////////////////////////////////////////////////
 
 
-double lc_der_func(double lat, double Cone)
+double lc_der_func(double lat, double Cone, const bool is_north)
 
 {
 
 double a;
+const double H = ( is_north ? 1.0 : -1.0 );
 
-a = -(Cone/cosd(lat))*lc_func(lat, Cone);
+a = -(Cone/cosd(lat))*lc_func(lat, Cone, is_north);
+
+a *= H;
 
 return ( a );
 

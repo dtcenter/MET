@@ -25,6 +25,8 @@ struct LambertData {
 
    const char * name;
 
+   char hemisphere;        //  'N' or 'S'
+
    double scale_lat_1;     //  scale latitude #1
    double scale_lat_2;     //  scale latitude #2
 
