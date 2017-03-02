@@ -597,6 +597,7 @@ nc_info.do_diff        = d->lookup_bool(conf_key_diff_flag);
 nc_info.do_climo       = d->lookup_bool(conf_key_climo_flag);
 nc_info.do_weight      = d->lookup_bool(conf_key_weight);
 nc_info.do_nbrhd       = d->lookup_bool(conf_key_nbrhd);
+nc_info.do_apply_mask  = d->lookup_bool(conf_key_apply_mask_flag);
 
 
    //
@@ -849,10 +850,11 @@ void GridStatNcOutInfo::set_all_false()
 
 {
 
-do_latlon = false;
-do_raw    = false;
-do_diff   = false;
-do_climo  = false;
+do_latlon     = false;
+do_raw        = false;
+do_diff       = false;
+do_climo      = false;
+do_apply_mask = false;
 
 return;
 
@@ -866,10 +868,11 @@ void GridStatNcOutInfo::set_all_true()
 
 {
 
-do_latlon = true;
-do_raw    = true;
-do_diff   = true;
-do_climo  = true;
+do_latlon     = true;
+do_raw        = true;
+do_diff       = true;
+do_climo      = true;
+do_apply_mask = true;
 
 return;
 
