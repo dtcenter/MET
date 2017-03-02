@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "GTG";
 
 //
 // Output description to be written
@@ -28,9 +28,9 @@ obtype = "ANALYS";
 // Verification grid
 //
 regrid = {
-   to_grid = ${TO_GRID};
-   method  = BUDGET;
-   width   = 2;
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,15 @@ wind_logic  = UNION;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   field = [ { name = "APCP"; level = [ "A24" ]; } ];
+
+   field = [
+      {
+        name       = "edr";
+        level      = [ "(0,0,*,*)", "(0,12,*,*)", "(0,25,*,*)" ];
+        cat_thresh = [ >=0.0, >=0.15, >=0.31 ];
+      }
+   ];
+
 }
 obs = fcst;
 
@@ -54,8 +62,9 @@ obs = fcst;
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [];
+   grid = [ "G212" ];
+   poly = [ "MET_BASE/poly/EAST.poly",
+            "MET_BASE/poly/WEST.poly"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +79,7 @@ boot = {
    rep_prop = 1.0;
    n_rep    = 0;
    rng      = "mt19937";
-   seed     = "1";
+   seed     = "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,9 +105,9 @@ interp = {
 // Neighborhood methods
 //
 nbrhd = {
+   vld_thresh = 1.0;
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
-   vld_thresh = 1.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,15 +116,15 @@ nbrhd = {
 // Statistical output types
 //
 output_flag = {
-   fho    = NONE;
-   ctc    = NONE;
-   cts    = NONE;
-   mctc   = NONE;
-   mcts   = NONE;
-   cnt    = STAT;
-   sl1l2  = STAT;
+   fho    = BOTH;
+   ctc    = BOTH;
+   cts    = BOTH;
+   mctc   = BOTH;
+   mcts   = BOTH;
+   cnt    = BOTH;
+   sl1l2  = NONE;
    sal1l2 = NONE;
-   vl1l2  = STAT;
+   vl1l2  = NONE;
    val1l2 = NONE;
    pct    = NONE;
    pstd   = NONE;
@@ -136,7 +145,7 @@ nc_pairs_flag   = {
    climo      = TRUE;
    weight     = FALSE;
    nbrhd      = FALSE;
-   apply_mask = TRUE;
+   apply_mask = "${APPLY_MASK}";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
