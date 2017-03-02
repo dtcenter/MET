@@ -1295,7 +1295,57 @@ void VxPairDataEnsemble::set_duplicate_flag(DuplicateType duplicate_flag) {
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
             pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType_Unique);
-            pd[i][j][k].set_check_single(duplicate_flag == DuplicateType_Single);
+         }
+      }
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_obs_summary(ObsSummary obs_summary) {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+	   switch (obs_summary) {
+              case ObsSummary_Single:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_SINGLE);
+		break;
+              case ObsSummary_Min:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MIN);
+		break;		
+              case ObsSummary_Max:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MAX);
+		break;
+              case ObsSummary_UwMean:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_UWMEAN);
+		break;		
+              case ObsSummary_TwMean:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_TWMEAN);
+		break;
+              case ObsSummary_Median:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MEDIAN);
+		break;		
+              case ObsSummary_Perc:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_PERC);
+		break;
+	   }
+
+         }
+      }
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_obs_perc_value(int percentile) {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].set_obs_perc_value(percentile);
          }
       }
    }

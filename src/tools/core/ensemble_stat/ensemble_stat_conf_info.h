@@ -108,7 +108,8 @@ class EnsembleStatConfInfo {
       ConcatString         rng_seed;            // GSL RNG seed value
       GridWeightType       grid_weight_flag;    // Grid weighting flag
       DuplicateType        duplicate_flag;      // Duplicate observation behavior
-
+      ObsSummary           obs_summary;         // selecting observations behavior
+      double               obs_perc_value;      // only used in obs_summary PERC
       ConcatString         output_prefix;       // String to customize output file names
       ConcatString         version;             // Config file version
 

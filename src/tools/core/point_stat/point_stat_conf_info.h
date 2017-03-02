@@ -125,7 +125,9 @@ class PointStatConfInfo {
       IntArray          interp_wdth;        // Array for interpolation widths [n_interp]      
 
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
-      DuplicateType     duplicate_flag;     // Duplicate observation behavior      
+      DuplicateType     duplicate_flag;     // Duplicate observation behavior
+      ObsSummary        obs_summary;        // selecting observations behavior
+      int               obs_perc_value;     // used only with PERC obs_summary
       bool              rank_corr_flag;     // Flag for computing rank correlations
 
       ConcatString      tmp_dir;            // Directory for temporary files

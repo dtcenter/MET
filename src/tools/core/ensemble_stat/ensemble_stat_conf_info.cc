@@ -89,6 +89,8 @@ void EnsembleStatConfInfo::clear() {
    rng_type.clear();
    rng_seed.clear();
    duplicate_flag = DuplicateType_None;
+   obs_summary = ObsSummary_Single;
+   obs_perc_value = bad_data_int;
    grid_weight_flag = GridWeightType_None;
    output_prefix.clear();
    version.clear();
@@ -329,8 +331,17 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
+         // Conf: duplicate_flag
+         vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_obs_dict));
+	 
+         // Conf: obs_summary
+         vx_pd[i].set_obs_summary((ObsSummary)parse_conf_obs_summary(&i_obs_dict));
+
+         // Conf: obs_perc_value
+         vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_obs_dict));	 
+
          // Conf: desc
-         vx_pd[i].set_desc(parse_conf_string(&i_obs_dict, conf_key_desc));
+         vx_pd[i].set_desc(parse_conf_string(&i_obs_dict, conf_key_desc));	 
 
          // Conf: message_type
          msg_typ[i] = parse_conf_message_type(&i_obs_dict, point_vx);
@@ -411,10 +422,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
-
-   // Conf: duplicate_flag
-   duplicate_flag = parse_conf_duplicate_flag(&conf);
-
+   
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
@@ -532,9 +540,6 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
       for(j=0; j<n_interp; j++)
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
    } // end for i
-
-   // Set the duplicate flag for each pair data object
-   for(i=0; i<n_vx; i++) vx_pd[i].set_duplicate_flag((DuplicateType) duplicate_flag);
 
    return;
 }
