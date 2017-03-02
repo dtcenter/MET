@@ -36,24 +36,6 @@
     </output>
   </test>
 
-  <test name="point_stat_DUP_SINGLE">
-    <exec>&MET_DIR;/bin/point_stat</exec>
-    <env>
-      <pair><name>DUPLICATE_FLAG</name> <value>SINGLE</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>  <value>DUP_SINGLE</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
-      &OUTPUT_DIR;/ascii2nc/dup_test.nc \
-      &CONFIG_DIR;/PointStatConfig_dup \
-      -outdir &OUTPUT_DIR;/point_stat -v 3
-    </param>   
-    <output>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_SINGLE_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat/point_stat_DUP_SINGLE_120000L_20120409_120000V_mpr.txt</stat>
-    </output>
-  </test>
-
   <test name="point_stat_DUP_UNIQUE">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
