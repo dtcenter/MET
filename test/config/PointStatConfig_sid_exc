@@ -99,7 +99,8 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-duplicate_flag = SINGLE;
+duplicate_flag = NONE;
+obs_summary    = SINGLE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
