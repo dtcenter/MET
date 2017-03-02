@@ -275,8 +275,24 @@ struct PlotInfo {
 
 enum DuplicateType {
    DuplicateType_None,   // Apply no logic for duplicate point obs
-   DuplicateType_Unique, // Filter our duplicate observation values
-   DuplicateType_Single  // Keep only a single observation per station
+   DuplicateType_Unique // Filter out duplicate observation values
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for obs_summary configuration parameter
+//
+
+enum ObsSummary {
+   ObsSummary_None,
+   ObsSummary_Single, // Keep only a single observation per station
+   ObsSummary_Min,    // Keep only smallest value
+   ObsSummary_Max,    // Keep only largest valueXS
+   ObsSummary_UwMean, // Calculate un-weighted mean
+   ObsSummary_TwMean, // Calculate time weighted mean
+   ObsSummary_Median, // Calculate median
+   ObsSummary_Perc   // Calculate precentile
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -443,6 +459,8 @@ static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
 static const char conf_key_nc_pairs_flag[]     = "nc_pairs_flag";
 static const char conf_key_grid_weight_flag[]  = "grid_weight_flag";
 static const char conf_key_duplicate_flag[]    = "duplicate_flag";
+static const char conf_key_obs_summary[]       = "obs_summary";
+static const char conf_key_percentile[]        = "obs_percentile";
 static const char conf_key_rank_corr_flag[]    = "rank_corr_flag";
 static const char conf_key_tmp_dir[]           = "tmp_dir";
 static const char conf_key_output_prefix[]     = "output_prefix";
@@ -839,7 +857,16 @@ static const char conf_val_area[]    = "AREA";
 
 // Duplicate flag values
 static const char conf_val_unique[] = "UNIQUE";
+static const char conf_val_false[] = "FALSE";
+
+// Obs Summary values
 static const char conf_val_single[] = "SINGLE";
+static const char conf_val_min[] = "MIN";
+static const char conf_val_max[] = "MAX";
+static const char conf_val_uw_mean[] = "UW_MEAN";
+static const char conf_val_tw_mean[] = "TW_MEAN";
+static const char conf_val_median[] = "MEDIAN";
+static const char conf_val_perc[] = "PERC";
 
 //
 // Wavelet-Stat specific parameter value names
@@ -849,7 +876,7 @@ static const char conf_val_single[] = "SINGLE";
 static const char conf_val_auto[] = "AUTO";
 static const char conf_val_tile[] = "TILE";
 static const char conf_val_pad[]  = "PAD";
-
+ 
 // Supported wavelet types
 static const char conf_val_haar[]         = "HAAR";
 static const char conf_val_haar_cntr[]    = "HAAR_CNTR";

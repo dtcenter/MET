@@ -72,7 +72,6 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key) {
    }
 
    s = dict->lookup_string(conf_key);
-
    if(dict->last_lookup_status()) {
 
       // Check that it's non-empty and contains no whitespace
@@ -967,7 +966,12 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    // Convert integer to enumerated DuplicateType
         if(v == conf_const.lookup_int(conf_val_none))   t = DuplicateType_None;
    else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType_Unique;
-   else if(v == conf_const.lookup_int(conf_val_single)) t = DuplicateType_Single;
+   else if(v == conf_const.lookup_int(conf_val_single)) {
+     mlog << Error << "\nparse_conf_duplicate_flag() -> "
+	  << "duplicate_flag = SINGLE has been deprecated\n"
+	  << "Please use obs_summary = SINGLE;\n\n";
+     exit(1);
+   }
    else {
       mlog << Error << "\nparse_conf_duplicate_flag() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -976,6 +980,64 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    }
 
    return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ObsSummary parse_conf_obs_summary(Dictionary *dict) {
+   ObsSummary t;
+   int v;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_obs_summary() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_obs_summary);
+
+   // Convert integer to enumerated ObsSummary
+   if(v == conf_const.lookup_int(conf_val_single)) t = ObsSummary_Single;
+   else if(v == conf_const.lookup_int(conf_val_min)) t = ObsSummary_Min;
+   else if(v == conf_const.lookup_int(conf_val_max)) t = ObsSummary_Max;
+   else if(v == conf_const.lookup_int(conf_val_uw_mean)) t = ObsSummary_UwMean;
+   else if(v == conf_const.lookup_int(conf_val_tw_mean)) t = ObsSummary_TwMean;
+   else if(v == conf_const.lookup_int(conf_val_median)) t = ObsSummary_Median;
+   else if(v == conf_const.lookup_int(conf_val_perc)) t = ObsSummary_Perc;
+   else {
+      mlog << Error << "\nparse_conf_obs_summary() -> "
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_obs_summary << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int parse_conf_percentile(Dictionary *dict) {
+   int i = bad_data_int;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_percentile() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   i = dict->lookup_int(conf_key_percentile);
+
+   // Check that the values for alpha are between 0 and 1
+   if(i <= 0 || i >= 100) {
+      mlog << Error << "\nparse_conf_percentile() -> "
+           << "Percentile value ("
+           << i << ") must be greater than 0 "
+           << "and less than 100.\n\n";
+         exit(1);
+   }
+
+   return(i);
 }
 
 ////////////////////////////////////////////////////////////////////////
