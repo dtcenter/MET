@@ -16,6 +16,30 @@
 
 #include "vx_util.h"
 
+struct ob_val_t {
+  int ut;
+  double val;
+};
+
+struct station_values_t {
+  string sid;
+  int ut;
+  vector<ob_val_t> obs;
+};
+
+enum obs_summary_enum {
+  OBS_SUMMARY_NONE,
+  OBS_SUMMARY_SINGLE,
+  OBS_SUMMARY_MIN,
+  OBS_SUMMARY_MAX,
+  OBS_SUMMARY_UWMEAN,
+  OBS_SUMMARY_TWMEAN,
+  OBS_SUMMARY_MEDIAN,
+  OBS_SUMMARY_PERC
+};
+
+static bool sort_obs(ob_val_t a, ob_val_t b) { return a.val<b.val; }
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Base class for matched pair data
@@ -70,12 +94,9 @@ class PairBase {
       unixtime    fcst_ut; // Forecast valid time
 
       bool check_unique;   // Check for duplicates, keeping unique obs
-      bool check_single;   // Check for duplicates, keeping single obs
-
-      map<string,int>         map_unique;      // Storage for unique obs
-      multimap<string,string> map_unique_sid;  // Storage for unique obs sids
-      map<string,string>      map_single;      // Storage for single obs
-      multimap<string,string> map_single_val;  // Storage for single obs values
+      obs_summary_enum obs_select; // Summarize multiple observations
+      int obs_perc_value; // percentile value to use in PERC obs_select
+      map<string,station_values_t> map_val;  // Storage for single obs values      
 
       //////////////////////////////////////////////////////////////////
 
@@ -94,11 +115,20 @@ class PairBase {
 
       void set_fcst_ut(unixtime ut);
       void set_check_unique(bool check);
-      void set_check_single(bool check);
+      void set_obs_summary(obs_summary_enum o);
+      void set_obs_perc_value(int i);      
 
       int  has_obs_rec(const char *, double, double, double, double,
                        double, double, int &);
 
+      ob_val_t compute_single(string sng_key);
+      ob_val_t compute_min(string sng_key);
+      ob_val_t compute_max(string sng_key);
+      ob_val_t compute_uwmean(string sng_key);
+      ob_val_t compute_twmean(string sng_key);
+      ob_val_t compute_median(string sng_key);
+      ob_val_t compute_percentile(string sng_key, int perc);
+      
       bool add_obs(const char *, double, double, double, double,
                    unixtime, double, double, double, const char *,
                    double, double,

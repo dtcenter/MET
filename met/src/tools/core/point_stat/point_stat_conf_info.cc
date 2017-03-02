@@ -102,6 +102,8 @@ void PointStatConfInfo::clear() {
    interp_thresh = bad_data_double;
    interp_wdth.clear();
    duplicate_flag = DuplicateType_None;
+   obs_summary = ObsSummary_Single;
+   obs_perc_value = bad_data_int;
    rank_corr_flag = false;
    tmp_dir.clear();
    output_prefix.clear();
@@ -250,6 +252,15 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       i_fdict = parse_conf_i_vx_dict(fdict, i);
       i_odict = parse_conf_i_vx_dict(odict, i);
 
+      // Conf: duplicate_flag
+      vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_odict));
+      
+      // Conf: obs_summary
+      vx_pd[i].set_obs_summary((ObsSummary)parse_conf_obs_summary(&i_odict));
+
+      // Conf: obs_perc_value
+      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_odict));	 
+      
       // Conf: desc
       vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));
 
@@ -477,9 +488,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    for(i=0; i<n_interp; i++)
       interp_mthd[i] = string_to_interpmthd(interp_info.method[i]);
 
-   // Conf: duplicate_flag
-   duplicate_flag = parse_conf_duplicate_flag(&conf);
-
    // Conf: rank_corr_flag
    rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);
 
@@ -596,6 +604,12 @@ void PointStatConfInfo::set_vx_pd() {
    // Set the duplicate flag for each pair data object
    for(i=0; i<n_vx; i++) vx_pd[i].set_duplicate_flag(duplicate_flag);
 
+   // Set the obs_summary for each pair data object
+   for(i=0; i<n_vx; i++) vx_pd[i].set_obs_summary((ObsSummary) obs_summary);
+
+   // Set the percentile for each pair data object
+   for(i=0; i<n_vx; i++) vx_pd[i].set_obs_perc_value(obs_perc_value);
+   
    return;
 }
 
