@@ -124,10 +124,16 @@ switch ( data.hemisphere )  {
    case 'S':  IsNorthHemisphere = false;  break;
 
    default:
-      cerr << "\n\n  LambertGrid::LambertGrid(const LambertData &) -> bad hemisphere ...\""
+      IsNorthHemisphere = true;
+      // data.hemisphere = 'N';
+      break;
+/*
+      mlog << Error
+           << "\n\n  LambertGrid::LambertGrid(const LambertData &) -> bad hemisphere ...\""
            << (data.hemisphere) << "\"\n\n";
       exit ( 1 );
       break;
+*/
 
 }   //  switch
 
@@ -639,6 +645,27 @@ LambertGrid * p = new LambertGrid (Data);
 return ( p );
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for struct LambertData
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+/*
+LambertData::LambertData()
+
+{
+
+hemisphere = 'N';
+
+}
+*/
 
 
 ////////////////////////////////////////////////////////////////////////
