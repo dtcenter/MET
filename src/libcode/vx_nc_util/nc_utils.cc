@@ -2412,13 +2412,13 @@ NcFile *open_ncfile(const char * nc_name, bool write) {
             nc = new NcFile(nc_name, NcFile::read);
          }
          else {
-            mlog << Debug(1) << "The NetCDF file [" << nc_name << "] does not exist!\n";
+            mlog << Warning << "open_ncfile() -> not exist: " << nc_name << "\n";
          }
       }
    }
    catch(NcException& e) {
-      cout << "Caught exception on " << (write ? "creating " : "reading ")
-           << nc_name <<  " \"" << e.what() << "\"\n";
+      //cout << "   Caught exception on " << (write ? "creating " : "reading ")
+      //     << nc_name <<  " \"" << e.what() << "\"\n";
    }
    return nc;
 }
