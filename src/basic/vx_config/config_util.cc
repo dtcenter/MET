@@ -921,6 +921,88 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void HiRAInfo::clear() {
+   flag = false;
+   width.clear();
+   vld_thresh = bad_data_double;
+   cov_ta.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+HiRAInfo::HiRAInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+HiRAInfo parse_conf_hira(Dictionary *dict) {
+   Dictionary *hira_dict = (Dictionary *) 0;
+   HiRAInfo info;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_hira() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: hira
+   hira_dict = dict->lookup_dictionary(conf_key_hira);
+
+   // Conf: flag
+   info.flag = hira_dict->lookup_bool(conf_key_flag);
+
+   // If disabled, skip remainder of the dictionary.
+   if(!info.flag) return(info);
+
+   // Conf: vld_thresh
+   info.vld_thresh = hira_dict->lookup_double(conf_key_vld_thresh);
+
+   // Check that the interpolation threshold is between 0 and 1.
+   if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
+      mlog << Error << "\nparse_conf_hira() -> "
+           << "The \"" << conf_key_hira << "." << conf_key_vld_thresh
+           << "\" parameter (" << info.vld_thresh
+           << ") must be set between 0 and 1.\n\n";
+      exit(1);
+   }
+
+   // Conf: width
+   info.width = hira_dict->lookup_num_array(conf_key_width);
+
+   // Check that at least one width is provided
+   if(info.width.n_elements() == 0) {
+      mlog << Error << "\nparse_conf_hira() -> "
+           << "At least one HiRA width must be provided.\n\n";
+      exit(1);
+   }
+
+   // Check for valid widths
+   for(i=0; i<info.width.n_elements(); i++) {
+
+      if(info.width[i] < 1) {
+         mlog << Error << "\nparse_conf_hira() -> "
+              << "The HiRA widths must be greater than or equal to 1 ("
+              << info.width[i] << ").\n\n";
+         exit(1);
+      }
+   }
+
+   // Conf: cov_thresh
+   info.cov_ta = hira_dict->lookup_thresh_array(conf_key_cov_thresh);
+
+   // Pass coverage thresholds through probaiblity logic
+   info.cov_ta = string_to_prob_thresh(info.cov_ta.get_str());
+
+   // Error check the coverage (probability) thresholds
+   check_prob_thresh(info.cov_ta);
+
+   return(info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    GridWeightType t;
    int v;

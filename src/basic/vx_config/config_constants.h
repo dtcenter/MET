@@ -257,6 +257,23 @@ struct NbrhdInfo {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Struct to store HiRA information
+//
+
+struct HiRAInfo {
+   bool        flag;       // Flag to turn on/off HiRA logic
+   IntArray    width;      // Array for HiRA widths
+   double      vld_thresh; // Proportion of valid data values
+   ThreshArray cov_ta;     // HiRA coverage (probability) thresholds
+
+   HiRAInfo();
+
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Struct to store plotting information
 //
 
@@ -454,6 +471,7 @@ static const char conf_key_type[]              = "type";
 static const char conf_key_method[]            = "method";
 static const char conf_key_width[]             = "width";
 static const char conf_key_nbrhd[]             = "nbrhd";
+static const char conf_key_hira[]              = "hira";
 static const char conf_key_cov_thresh[]        = "cov_thresh";
 static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
 static const char conf_key_nc_pairs_flag[]     = "nc_pairs_flag";

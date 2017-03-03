@@ -44,6 +44,7 @@ extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(Dictionary *dict);
 extern InterpInfo      parse_conf_interp(Dictionary *dict);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict);
+extern HiRAInfo        parse_conf_hira(Dictionary *dict);
 extern GridWeightType  parse_conf_grid_weight_flag(Dictionary *dict);
 extern DuplicateType   parse_conf_duplicate_flag(Dictionary *dict);
 extern ObsSummary      parse_conf_obs_summary(Dictionary *dict);
