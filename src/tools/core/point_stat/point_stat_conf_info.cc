@@ -101,6 +101,7 @@ void PointStatConfInfo::clear() {
    boot_seed.clear();
    interp_thresh = bad_data_double;
    interp_wdth.clear();
+   hira_info.clear();
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_Single;
    obs_perc_value = bad_data_int;
@@ -254,13 +255,13 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
       // Conf: duplicate_flag
       vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_odict));
-      
+
       // Conf: obs_summary
       vx_pd[i].set_obs_summary((ObsSummary)parse_conf_obs_summary(&i_odict));
 
       // Conf: obs_perc_value
-      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_odict));	 
-      
+      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_odict));
+
       // Conf: desc
       vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));
 
@@ -347,8 +348,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
               vx_pd[i].obs_info->set_uv_index(j);
               // Increment the number of vector fields to be verified
               n_vx_vect++;
-	       
-            }       
+
+            }
 	  }
 	}
       } // end for
@@ -488,6 +489,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    for(i=0; i<n_interp; i++)
       interp_mthd[i] = string_to_interpmthd(interp_info.method[i]);
 
+   // Conf: hira
+   hira_info = parse_conf_hira(&conf);
+
    // Conf: rank_corr_flag
    rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);
 
@@ -601,15 +605,6 @@ void PointStatConfInfo::set_vx_pd() {
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
    } // end for i
 
-   // Set the duplicate flag for each pair data object
-   for(i=0; i<n_vx; i++) vx_pd[i].set_duplicate_flag(duplicate_flag);
-
-   // Set the obs_summary for each pair data object
-   for(i=0; i<n_vx; i++) vx_pd[i].set_obs_summary((ObsSummary) obs_summary);
-
-   // Set the percentile for each pair data object
-   for(i=0; i<n_vx; i++) vx_pd[i].set_obs_perc_value(obs_perc_value);
-   
    return;
 }
 
@@ -699,19 +694,36 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_pct):
       case(i_pjc):
       case(i_prc):
+
          // Maximum number of PCT, PJC, or PRC lines possible =
-         //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
+         //    Probability Fields * Message Types * Masks * Smoothing Methods *
+         //    Max Observation Probability Thresholds
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
              max_n_oprob_thresh;
+
+         // Maximum number of HiRA PCT, PJC, or PRC lines possible =
+         //    Scalar Fields * Message Types * Masks *
+         //    Max Scalar Categorical Thresholds * HiRA widths
+         n += n_vx_scal * max_n_msg_typ * n_mask *
+              max_n_cat_thresh * hira_info.width.n_elements();
+
          break;
 
       case(i_pstd):
+
          // Maximum number of PSTD lines possible =
-         //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds * Alphas
+         //    Probability Fields * Message Types * Masks * Smoothing Methods *
+         //    Max Observation Probability Thresholds * Alphas
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
              max_n_oprob_thresh * get_n_ci_alpha();
+
+         // Maximum number of HiRA PSTD lines possible =
+         //    Scalar Fields * Message Types * Masks *
+         //    Max Scalar Categorical Thresholds * HiRA widths * Alphas
+         n += n_vx_scal * max_n_msg_typ * n_mask *
+              max_n_cat_thresh * hira_info.width.n_elements() *
+              get_n_ci_alpha();
+
          break;
 
       case(i_mpr):
