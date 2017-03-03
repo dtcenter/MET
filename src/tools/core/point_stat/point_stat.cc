@@ -971,6 +971,7 @@ void process_obs_file(int i_nc) {
 
    // Print the duplicate report
    for(j=0; j<conf_info.get_n_vx(); j++) {
+      conf_info.vx_pd[j].calc_obs_summary();
       conf_info.vx_pd[j].print_duplicate_report();
    }
 
@@ -1257,7 +1258,7 @@ void process_scores() {
 
                // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
                if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
-                   conf_info.vx_pd[i].fcst_info->is_u_wind() &&
+                   conf_info.vx_pd[i].fcst_info->is_v_wind() &&
                    conf_info.vx_pd[i].fcst_info->uv_index() >= 0  &&
                   (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
                    conf_info.output_flag[i_val1l2] != STATOutputType_None) ) {
@@ -1272,10 +1273,10 @@ void process_scores() {
                   for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
                   // Compute VL1L2 and VAL1L2
-                  int vi = conf_info.vx_pd[i].fcst_info->uv_index();
+                  int ui = conf_info.vx_pd[i].fcst_info->uv_index();
                   do_vl1l2(vl1l2_info, i,
-                           &conf_info.vx_pd[i].pd[j][k][l],
-                           &conf_info.vx_pd[vi].pd[j][k][l]);
+                           &conf_info.vx_pd[ui].pd[j][k][l],
+                           &conf_info.vx_pd[i].pd[j][k][l]);
 
                   // Loop through all of the wind speed thresholds
                   for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
