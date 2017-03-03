@@ -51,6 +51,7 @@ extern void  dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int w, d
 extern double interp_dw_mean (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, int i_pow, double t);
 extern double interp_ls_fit  (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, double t);
 
+extern double interp_nbrhd   (const DataPlane &, int x_ll, int y_ll, int w, double t, const SingleThresh *);
 extern double interp_bilin   (const DataPlane &, double obs_x, double obs_y);
 extern double interp_xy      (const DataPlane &, int x, int y);
 extern double interp_best    (const DataPlane &, int x_ll, int y_ll, int w, double o, double t);
@@ -63,7 +64,8 @@ extern void   get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-extern double compute_horz_interp(const DataPlane &, double, double, double, int, int, double);
+extern double compute_horz_interp(const DataPlane &, double, double, double, int, int, double,
+                                  const SingleThresh *cat_thresh = 0);
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);
 
