@@ -1016,8 +1016,11 @@ void process_point_obs(int i_nc) {
    } // end for i_obs
 
    // Print the duplicate report
-   for(j=0; j < conf_info.get_n_vx(); j++) conf_info.vx_pd[j].print_duplicate_report();
-
+   for(j=0; j < conf_info.get_n_vx(); j++) {
+     conf_info.vx_pd[j].calc_obs_summary();
+     conf_info.vx_pd[j].print_duplicate_report();
+   }
+   
    // Deallocate and clean up
    if(obs_in) {
       //obs_in->close();
