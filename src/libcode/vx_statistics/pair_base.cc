@@ -252,24 +252,23 @@ bool PairBase::add_obs(const char *sid,
 			      elv).text(); //  elevation
 
    //  add a single value reporting string to the reporting map
-   if( 3 <= mlog.verbosity_level() ){
-
-      ob_val_t ob_val;
-      ob_val.ut = ut;	
-      ob_val.val = o;
+   ob_val_t ob_val;
+   ob_val.ut = ut;	
+   ob_val.val = o;
       // if key exists, add new ob to vector, else add new pair
       map<string,station_values_t>::iterator it = map_val.find(sng_key);
-      if(it != map_val.end()) {
-	if(check_unique && (*it).second.ut == ut && (*it).second.obs[0].val == o)
-	   return false;
-        (*it).second.obs.push_back(ob_val);
-      } else {
-         station_values_t val;
-	 val.sid = string(sid);
-	 val.ut = fcst_ut;
-         val.obs.push_back(ob_val);
-         map_val.insert( pair<string,station_values_t>(sng_key, val) );
-      }
+   if(it != map_val.end()) {
+     if(check_unique && (*it).second.ut == ut && (*it).second.obs[0].val == o)
+     {
+         return false;
+     }
+     (*it).second.obs.push_back(ob_val);
+   } else {
+      station_values_t val;
+      val.sid = string(sid);
+      val.ut = fcst_ut;
+      val.obs.push_back(ob_val);
+      map_val.insert( pair<string,station_values_t>(sng_key, val) );
    }
    
    sid_sa.add(sid);
@@ -419,6 +418,56 @@ void PairBase::print_duplicate_report(){
 				mat[1], mat[2], mat[3], mat[4]).text();
     regex_clean(mat);
 
+    int ut_diff = labs((*it_single).second.ut - (*it_single).second.out_ob.ut);
+    string msg_val = str_format("%s (HHMMSS)", sec_to_hhmmss( ut_diff ).text()).text();
+ 
+    string msg = "  " + msg_key + " - used point ob with valid time offset of " + msg_val;
+
+    //  parse and print the point obs information for the current key
+
+    vector<ob_val_t>::iterator o_it = (*it_single).second.obs.begin();
+
+    for(; o_it != (*it_single).second.obs.end(); o_it++) {
+
+      string msg_ob = str_format("[sid: %6s  vld: %s  ob_val: %8d]",
+				 (*it_single).second.sid.c_str(),
+				 unix_to_yyyymmdd_hhmmss( (*o_it).ut ).text(),
+				 (*o_it).val).text();
+	   
+      msg += "\n    " + msg_ob;
+
+    }
+
+    if( 1 < num_val ) mlog << Debug(3) << msg.c_str() << "\n\n";
+
+  }
+
+  mlog << Debug(3) << "\n";
+}
+
+
+void PairBase::calc_obs_summary(){
+  if(obs_select == OBS_SUMMARY_NONE) return;
+
+  //  iterate over the keys in the unique station id map
+  for( map<string,station_values_t>::iterator it_single = map_val.begin();
+       it_single != map_val.end(); ++it_single ){
+
+    int num_val = 0;
+    string key_single_val = (*it_single).first;
+
+    //  parse the single key string
+    char** mat = NULL;
+    if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5, key_single_val.c_str(), mat) ){
+      mlog << Error << "\nPairBase::calc_obs_summary() - regex_apply failed "
+	   << "to parse '" << key_single_val.c_str() << "'\n\n";
+      exit(1);
+    }
+
+    string msg_key = str_format("%s:%s:%s:%s",	 
+				mat[1], mat[2], mat[3], mat[4]).text();
+    regex_clean(mat);
+
     ob_val_t single_ob;
 
     switch(obs_select) {
@@ -444,32 +493,10 @@ void PairBase::print_duplicate_report(){
       single_ob = compute_percentile(msg_key, obs_perc_value);
       break;    	      	      
     }
-	 
-    int ut_diff = labs((*it_single).second.ut - single_ob.ut);
-    string msg_val = str_format("%s (HHMMSS)", sec_to_hhmmss( ut_diff ).text()).text();
- 
-    string msg = "  " + msg_key + " - used point ob with valid time offset of " + msg_val;
 
-    //  parse and print the point obs information for the current key
-
-    vector<ob_val_t>::iterator o_it = (*it_single).second.obs.begin();
-
-    for(; o_it != (*it_single).second.obs.end(); o_it++) {
-
-      string msg_ob = str_format("[sid: %6s  vld: %s  ob_val: %8d]",
-				 (*it_single).second.sid.c_str(),
-				 unix_to_yyyymmdd_hhmmss( (*o_it).ut ).text(),
-				 (*o_it).val).text();
-	   
-      msg += "\n    " + msg_ob;
-
-    }
-
-    if( 1 < num_val ) mlog << Debug(3) << msg.c_str() << "\n\n";
+    (*it_single).second.out_ob = single_ob;
 
   }
-
-  mlog << Debug(3) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -224,8 +224,10 @@ class VxPairDataEnsemble {
       void set_obs_summary(ObsSummary obs_summary);      
 
       void set_obs_perc_value(int percentile);
-
+    
       void print_duplicate_report();
+
+      void calc_obs_summary();     
 };
 
 ////////////////////////////////////////////////////////////////////////

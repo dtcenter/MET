@@ -202,6 +202,8 @@ class VxPairDataPoint {
       
       void print_duplicate_report();
 
+      void calc_obs_summary();
+      
       // Member functions for incrementing the counts
       void inc_count(int ***&, int);
       void inc_count(int ***&, int, int);

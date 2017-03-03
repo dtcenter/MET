@@ -1327,6 +1327,20 @@ void VxPairDataEnsemble::print_duplicate_report() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::calc_obs_summary() {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].calc_obs_summary();
+         }
+      }
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Utility function for computing the continuous ranked probability
 // score (CRPS), the ignorance score (IGN), and the probability
