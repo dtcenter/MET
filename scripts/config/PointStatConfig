@@ -40,7 +40,7 @@ wind_logic  = UNION;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   message_type = [ "ADPUPA" ];
+   message_type = [ "ADPUPA", "ADPSFC" ];
    sid_exc      = [];
 
    field = [
@@ -48,6 +48,18 @@ fcst = {
         name       = "TMP";
         level      = [ "P750-900" ];
         cat_thresh = [ <=273, >273 ];
+      },
+
+      {
+        name       = "UGRD";
+        level      = [ "Z10" ];
+        cat_thresh = [ >=5 ];
+      },
+
+      {
+        name       = "VGRD";
+        level      = [ "Z10" ];
+        cat_thresh = [ >=5 ];
       }
    ];
 
@@ -141,7 +153,7 @@ interp = {
 // HiRA verification method
 //
 hira = {
-   flag       = TRUE;
+   flag       = FALSE;
    width      = [ 2, 3, 4, 5 ];
    vld_thresh = 1.0;
    cov_thresh = [ ==0.25 ];
@@ -153,21 +165,21 @@ hira = {
 // Statistical output types
 //
 output_flag = {
-   fho    = NONE;
-   ctc    = NONE;
-   cts    = NONE;
+   fho    = BOTH;
+   ctc    = BOTH;
+   cts    = BOTH;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = NONE;
-   sl1l2  = NONE;
-   sal1l2 = NONE;
-   vl1l2  = NONE;
-   val1l2 = NONE;
-   pct    = BOTH;
+   cnt    = BOTH;
+   sl1l2  = BOTH;
+   sal1l2 = BOTH;
+   vl1l2  = BOTH;
+   val1l2 = BOTH;
+   pct    = NONE;
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   mpr    = NONE;
+   mpr    = BOTH;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
