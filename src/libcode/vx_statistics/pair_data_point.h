@@ -192,8 +192,6 @@ class VxPairDataPoint {
                    const char *, float *, Grid &,
                    const DataPlane * = 0);
 
-      void find_vert_lvl(const DataPlaneArray &, double, int &, int &);
-
       int  get_n_pair();
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
@@ -208,9 +206,6 @@ class VxPairDataPoint {
       void inc_count(int ***&, int);
       void inc_count(int ***&, int, int);
       void inc_count(int ***&, int, int, int);
-
-      double compute_interp(const DataPlaneArray &, double, double,
-                            double, int, double, int, int);
 };
 
 ////////////////////////////////////////////////////////////////////////

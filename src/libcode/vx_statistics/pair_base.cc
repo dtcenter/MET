@@ -561,3 +561,121 @@ void PairBase::set_obs(int i_obs, double x, double y,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Begin miscellanous utility functions
+//
+////////////////////////////////////////////////////////////////////////
+
+void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
+                   int &i_blw, int &i_abv) {
+   int i;
+   double dist, dist_blw, dist_abv;
+
+   // Check for no data
+   if(dpa.n_planes() == 0) {
+      i_blw = i_abv = bad_data_int;
+      return;
+   }
+
+   // Find the closest levels above and below the observation
+   dist_blw = dist_abv = 1.0e30;
+   for(i=0; i<dpa.n_planes(); i++) {
+
+      dist = obs_lvl - dpa.lower(i);
+
+      // Check for the closest level below.
+      // Levels below contain higher values of pressure.
+      if(dist <= 0 && fabs(dist) < dist_blw) {
+         dist_blw = fabs(dist);
+         i_blw = i;
+      }
+
+      // Check for the closest level above.
+      // Levels above contain lower values of pressure.
+      if(dist >= 0 && fabs(dist) < dist_abv) {
+         dist_abv = fabs(dist);
+         i_abv = i;
+      }
+   }
+
+   // Check if the observation is above the forecast range
+   if(is_eq(dist_blw, 1.0e30) && !is_eq(dist_abv, 1.0e30)) {
+
+      // Set the index below to the index above and perform no vertical
+      // interpolation
+      i_blw = i_abv;
+   }
+   // Check if the observation is below the forecast range
+   else if(!is_eq(dist_blw, 1.0e30) && is_eq(dist_abv, 1.0e30)) {
+
+      // Set the index above to the index below and perform no vertical
+      // interpolation
+      i_abv = i_blw;
+   }
+   // Check if an error occurred
+   else if(is_eq(dist_blw, 1.0e30) && is_eq(dist_abv, 1.0e30)) {
+
+      mlog << Error << "\nfind_vert_lvl() -> "
+           << "could not find a level above and/or below the "
+           << "observation level of " << obs_lvl << ".\n\n"
+          ;
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double compute_interp(const DataPlaneArray &dpa,
+                      const double obs_x, const double obs_y, const double obs_v,
+                      const InterpMthd method, const int width, const double thresh,
+                      const bool spfh_flag, const LevelType lvl_typ,
+                      const double to_lvl, const int i_blw, const int i_abv,
+                      const SingleThresh *cat_thresh) {
+   double v, v_blw, v_abv, t;
+
+   // Check for no data
+   if(dpa.n_planes() == 0) return(bad_data_double);
+
+   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
+                               method, width, thresh, cat_thresh);
+
+   if(i_blw == i_abv) {
+      v = v_blw;
+   }
+   else {
+      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
+                                  method, width, thresh, cat_thresh);
+
+      // Check for bad data prior to vertical interpolation
+      if(is_bad_data(v_blw) || is_bad_data(v_abv)) {
+         return(bad_data_double);
+      }
+
+      // If verifying specific humidity, do vertical interpolation in
+      // the natural log of q
+      if(spfh_flag) {
+         t = compute_vert_pinterp(log(v_blw), dpa.lower(i_blw),
+                                  log(v_abv), dpa.lower(i_abv),
+                                  to_lvl);
+         v = exp(t);
+      }
+      // Vertically interpolate to the observation pressure level
+      else if(lvl_typ == LevelType_Pres) {
+         v = compute_vert_pinterp(v_blw, dpa.lower(i_blw),
+                                  v_abv, dpa.lower(i_abv),
+                                  to_lvl);
+      }
+      // Vertically interpolate to the observation height
+      else {
+         v = compute_vert_zinterp(v_blw, dpa.lower(i_blw),
+                                  v_abv, dpa.lower(i_abv),
+                                  to_lvl);
+      }
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
