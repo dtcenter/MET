@@ -352,6 +352,21 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
             }
 	  }
 	}
+
+	if( vx_pd[i].fcst_info->is_v_wind()   &&
+            vx_pd[i].obs_info->is_v_wind() ) {
+          for(int j=0; j < n_vx; j++) {
+            if(vx_pd[j].fcst_info->is_u_wind() &&
+               vx_pd[j].obs_info->is_u_wind()  &&
+	       vx_pd[i].fcst_info->req_level_name() == vx_pd[j].fcst_info->req_level_name() &&
+               vx_pd[i].obs_info->req_level_name()  == vx_pd[j].obs_info->req_level_name()) {
+
+	      vx_pd[i].fcst_info->set_uv_index(j);
+              vx_pd[i].obs_info->set_uv_index(j);
+
+            }
+	  }
+	}	
       } // end for
    } // end if
 
