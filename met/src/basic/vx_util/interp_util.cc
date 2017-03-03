@@ -306,6 +306,42 @@ double interp_ls_fit(const DataPlane &dp, int x_ll, int y_ll, int wdth,
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Compute neighborhood fractional coverage.
+//
+////////////////////////////////////////////////////////////////////////
+
+double interp_nbrhd(const DataPlane &dp, int x_ll, int y_ll, int wdth,
+                    double t, const SingleThresh *st) {
+   int x, y, count, count_thr;
+   double nbrhd_cov;
+
+   // Compute the ratio of events within the neighborhood
+   count = count_thr = 0;
+   for(x=x_ll; x<x_ll+wdth; x++) {
+      if(x < 0 || x >= dp.nx()) continue;
+
+      for(y=y_ll; y<y_ll+wdth; y++) {
+         if(y < 0 || y >= dp.ny())     continue;
+         if(is_bad_data(dp.get(x, y))) continue;
+
+         count++;
+         if(st->check(dp.get(x,y))) count_thr++;
+      } // end for y
+   } // end for x
+
+   // Check whether enough valid grid points were found
+   if( (double) count/(wdth*wdth) < t || count == 0) {
+      nbrhd_cov = bad_data_double;
+   }
+   else {
+      nbrhd_cov = count_thr/count;
+   }
+
+   return(nbrhd_cov);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Compute bilinear interpolation.
 //
 ////////////////////////////////////////////////////////////////////////
@@ -438,7 +474,8 @@ void get_xy_ll(double x, double y, int w, int h, int &x_ll, int &y_ll) {
 
 double compute_horz_interp(const DataPlane &dp,
                            double obs_x, double obs_y, double obs_v,
-                           int mthd, int wdth, double interp_thresh) {
+                           int mthd, int wdth, double interp_thresh,
+                           const SingleThresh *cat_thresh) {
    double v;
    int x_ll, y_ll;
 
@@ -472,6 +509,11 @@ double compute_horz_interp(const DataPlane &dp,
       case(InterpMthd_LS_Fit):      // Least-squares fit
          v = interp_ls_fit(dp, x_ll, y_ll, wdth, obs_x, obs_y,
                            interp_thresh);
+         break;
+
+      case(InterpMthd_Nbrhd):      // Neighborhood fractional coverage
+         v = interp_nbrhd(dp, x_ll, y_ll, wdth,
+                          interp_thresh, cat_thresh);
          break;
 
       case(InterpMthd_Bilin):       // Bilinear interpolation
