@@ -412,14 +412,14 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << " unique COV_THRESH values: " << css << ".\n";
       thresh.clear();
    }
-   else {
-      thresh = cov_thresh[0];
-   }
-
    if(hdr_name.has("COV_THRESH", index)) {
-      thresh.set(hdr_value[index]);
+      shc.set_cov_thresh(hdr_value[index]);
    }
-   shc.set_cov_thresh(thresh);
+   else {
+      ta.clear();
+      ta.add_css(css);
+      shc.set_cov_thresh(ta);
+   }
 
    // ALPHA
    css = write_css(alpha);

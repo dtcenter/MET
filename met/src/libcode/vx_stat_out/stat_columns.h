@@ -403,13 +403,17 @@ extern void write_vl1l2_row (StatHdrColumns &, const VL1L2Info &, bool,
 extern void write_val1l2_row(StatHdrColumns &, const VL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_pct_row   (StatHdrColumns &, const PCTInfo &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_thresh = true);
 extern void write_pstd_row  (StatHdrColumns &, const PCTInfo &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_thresh = true);
 extern void write_pjc_row   (StatHdrColumns &, const PCTInfo &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_thresh = true);
 extern void write_prc_row   (StatHdrColumns &, const PCTInfo &, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_thresh = true);
 extern void write_nbrctc_row(StatHdrColumns &, const NBRCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_nbrcts_row(StatHdrColumns &, const NBRCTSInfo &, bool,

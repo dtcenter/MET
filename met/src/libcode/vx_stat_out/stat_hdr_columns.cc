@@ -279,6 +279,14 @@ void StatHdrColumns::set_cov_thresh(const SingleThresh t) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void StatHdrColumns::set_cov_thresh(const ThreshArray t) {
+   cov_thresh.clear();
+   cov_thresh = t;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void StatHdrColumns::set_alpha(const double a) {
    alpha = a;
    return;
