@@ -15,6 +15,7 @@
 #include <utility>
 
 #include "vx_util.h"
+#include "vx_data2d.h"
 
 struct ob_val_t {
   int ut;
@@ -149,9 +150,20 @@ class PairBase {
 };
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Miscellanous utility functions
+//
+////////////////////////////////////////////////////////////////////////
 
-extern void compute_crps_ign_pit(double, const NumArray &,
-                                 double &, double &, double &);
+extern void find_vert_lvl(const DataPlaneArray &, const double,
+                          int &, int &);
+
+extern double compute_interp(const DataPlaneArray &,
+                             const double, const double, const double,
+                             const InterpMthd, const int, const double,
+                             const bool, const LevelType,
+                             const double, const int, const int,
+                             const SingleThresh *cat_thresh = 0);
 
 ////////////////////////////////////////////////////////////////////////
 

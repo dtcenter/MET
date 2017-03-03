@@ -802,6 +802,10 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
       obs_lvl = bad_data_double;
    }
 
+   // Set flag for specific humidity
+   bool spfh_flag = fcst_info->is_specific_humidity() &&
+                     obs_info->is_specific_humidity();
+
    // Look through all of the PairDataPoint objects to see if the
    // observation should be added.
 
@@ -870,7 +874,10 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // observation pressure level or height
             to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
-            fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, k,
+            fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v,
+                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                        interp_thresh, spfh_flag,
+                        fcst_info->level().type(),
                         to_lvl, f_lvl_blw, f_lvl_abv);
 
             if(is_bad_data(fcst_v)) {
@@ -879,8 +886,11 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Compute the interpolated climatology mean
-            cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v, k,
-                      to_lvl, cmn_lvl_blw, cmn_lvl_abv);
+            cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
+                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                        interp_thresh, spfh_flag,
+                        fcst_info->level().type(),
+                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
             // Check for valid interpolation options
             if(climo_sd_dpa.n_planes() > 0 &&
@@ -896,12 +906,15 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Compute the interpolated climatology standard deviation
-            csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v, k,
-                      to_lvl, csd_lvl_blw, csd_lvl_abv);
+            csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
+                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                        interp_thresh, spfh_flag,
+                        fcst_info->level().type(),
+                        to_lvl, csd_lvl_blw, csd_lvl_abv);
 
             // Compute weight for current point
-            wgt_v = ( wgt_dp == (DataPlane *) 0 ?
-                      default_grid_weight : wgt_dp->get(x, y) );
+            wgt_v = (wgt_dp == (DataPlane *) 0 ?
+                     default_grid_weight : wgt_dp->get(x, y));
 
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point
@@ -914,67 +927,6 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
          } // end for k
       } // end for j
    } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::find_vert_lvl(const DataPlaneArray &dpa, double obs_lvl,
-                                    int &i_blw, int &i_abv) {
-   int i;
-   double dist, dist_blw, dist_abv;
-
-   // Check for no data
-   if(dpa.n_planes() == 0) {
-      i_blw = i_abv = bad_data_int;
-      return;
-   }
-
-   // Find the closest pressure levels above and below the observation
-   dist_blw = dist_abv = 1.0e30;
-   for(i=0; i<dpa.n_planes(); i++) {
-
-      dist = obs_lvl - dpa.lower(i);
-
-      // Check for the closest level below.
-      // Levels below contain higher values of pressure.
-      if(dist <= 0 && fabs(dist) < dist_blw) {
-         dist_blw = fabs(dist);
-         i_blw = i;
-      }
-
-      // Check for the closest level above.
-      // Levels above contain lower values of pressure.
-      if(dist >= 0 && fabs(dist) < dist_abv) {
-         dist_abv = fabs(dist);
-         i_abv = i;
-      }
-   }
-
-   // Check if the observation is above the forecast range
-   if(is_eq(dist_blw, 1.0e30) && !is_eq(dist_abv, 1.0e30)) {
-
-      // Set the index below to the index above and perform no vertical
-      // interpolation
-      i_blw = i_abv;
-   }
-   // Check if the observation is below the forecast range
-   else if(!is_eq(dist_blw, 1.0e30) && is_eq(dist_abv, 1.0e30)) {
-
-      // Set the index above to the index below and perform no vertical
-      // interpolation
-      i_abv = i_blw;
-   }
-   // Check if an error occurred
-   else if(is_eq(dist_blw, 1.0e30) && is_eq(dist_abv, 1.0e30)) {
-
-      mlog << Error << "\nVxPairDataPoint::find_vert_lvl() -> "
-           << "could not find a level above and/or below the "
-           << "observation level of " << obs_lvl << ".\n\n"
-          ;
-      exit(1);
-   }
 
    return;
 }
@@ -1072,63 +1024,6 @@ void VxPairDataPoint::print_duplicate_report() {
       }
    }
 
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double VxPairDataPoint::compute_interp(const DataPlaneArray &dpa,
-                                       double obs_x, double obs_y,
-                                       double obs_v, int i_interp,
-                                       double to_lvl,
-                                       int i_blw, int i_abv) {
-   double v, v_blw, v_abv, t;
-
-   // Check for no data
-   if(dpa.n_planes() == 0) return(bad_data_double);
-
-   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
-                               pd[0][0][i_interp].interp_mthd,
-                               pd[0][0][i_interp].interp_dpth,
-                               interp_thresh);
-
-   if(i_blw == i_abv) {
-      v = v_blw;
-   }
-   else {
-      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
-                                  pd[0][0][i_interp].interp_mthd,
-                                  pd[0][0][i_interp].interp_dpth,
-                                  interp_thresh);
-
-      // Check for bad data prior to vertical interpolation
-      if(is_bad_data(v_blw) || is_bad_data(v_abv)) {
-         return(bad_data_double);
-      }
-
-      // If verifying specific humidity, do vertical interpolation in
-      // the natural log of q
-      if(fcst_info->is_specific_humidity() &&
-         obs_info->is_specific_humidity()) {
-         t = compute_vert_pinterp(log(v_blw), dpa.lower(i_blw),
-                                  log(v_abv), dpa.lower(i_abv),
-                                  to_lvl);
-         v = exp(t);
-      }
-      // Vertically interpolate to the observation pressure level
-      else if(fcst_info->level().type() == LevelType_Pres) {
-         v = compute_vert_pinterp(v_blw, dpa.lower(i_blw),
-                                  v_abv, dpa.lower(i_abv),
-                                  to_lvl);
-      }
-      // Vertically interpolate to the observation height
-      else {
-         v = compute_vert_zinterp(v_blw, dpa.lower(i_blw),
-                                  v_abv, dpa.lower(i_abv),
-                                  to_lvl);
-      }
-   }
-
-   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////

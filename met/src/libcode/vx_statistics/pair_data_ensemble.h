@@ -217,8 +217,6 @@ class VxPairDataEnsemble {
 
       void add_ens(int, bool mn);
 
-      void find_vert_lvl(const DataPlaneArray &, double, int &, int &);
-
       int  get_n_pair();
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
@@ -228,9 +226,6 @@ class VxPairDataEnsemble {
       void set_obs_perc_value(int percentile);
 
       void print_duplicate_report();
-
-      double compute_interp(const DataPlaneArray &, double, double,
-                            double, int, double, int, int);
 };
 
 ////////////////////////////////////////////////////////////////////////
