@@ -13,10 +13,12 @@ using namespace std;
 
 #include <string.h>
 #include <cstring>
+#include <sys/stat.h>
 
 //#include <netcdf.hh>
 #include <netcdf>
 using namespace netCDF;
+using namespace netCDF::exceptions;
 
 #include "vx_log.h"
 #include "nc_utils.h"
@@ -2398,12 +2400,25 @@ vector<NcDim> get_dims(const NcVar *var, int *dim_count) {
 
 NcFile *open_ncfile(const char * nc_name, bool write) {
    //return new NcFile(nc_name, file_mode);
-   NcFile *nc;
-   if (write) {
-      nc = new NcFile(nc_name, NcFile::replace, NcFile::nc4);
+   NcFile *nc = (NcFile *)0;
+   
+   try {  
+      if (write) {
+         nc = new NcFile(nc_name, NcFile::replace, NcFile::nc4);
+      }
+      else {
+         struct stat fileInfo;
+         if (stat(nc_name, &fileInfo) == 0) {
+            nc = new NcFile(nc_name, NcFile::read);
+         }
+         else {
+            mlog << Debug(1) << "The NetCDF file [" << nc_name << "] does not exist!\n";
+         }
+      }
    }
-   else {
-      nc = new NcFile(nc_name, NcFile::read);
+   catch(NcException& e) {
+      cout << "Caught exception on " << (write ? "creating " : "reading ")
+           << nc_name <<  " \"" << e.what() << "\"\n";
    }
    return nc;
 }
