@@ -2411,14 +2411,9 @@ NcFile *open_ncfile(const char * nc_name, bool write) {
          if (stat(nc_name, &fileInfo) == 0) {
             nc = new NcFile(nc_name, NcFile::read);
          }
-         else {
-            mlog << Warning << "open_ncfile() -> not exist: " << nc_name << "\n";
-         }
       }
    }
    catch(NcException& e) {
-      //cout << "   Caught exception on " << (write ? "creating " : "reading ")
-      //     << nc_name <<  " \"" << e.what() << "\"\n";
    }
    return nc;
 }
