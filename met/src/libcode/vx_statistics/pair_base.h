@@ -26,6 +26,7 @@ struct station_values_t {
   string sid;
   int ut;
   vector<ob_val_t> obs;
+  ob_val_t out_ob;
 };
 
 enum obs_summary_enum {
@@ -145,6 +146,8 @@ class PairBase {
 
       void set_obs(int, double, double, double, double, double,
                    double wgt = default_grid_weight);
+
+      void calc_obs_summary();
 
       void print_duplicate_report();
 };

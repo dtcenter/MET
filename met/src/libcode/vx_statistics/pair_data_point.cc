@@ -1028,6 +1028,20 @@ void VxPairDataPoint::print_duplicate_report() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void VxPairDataPoint::calc_obs_summary() {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+	   pd[i][j][k].calc_obs_summary();
+         }
+      }
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairDataPoint::inc_count(int ***&rej, int i) {
    int j, k;
 
