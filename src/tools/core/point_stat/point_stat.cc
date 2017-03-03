@@ -1777,12 +1777,17 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
          compute_pctinfo(hira_pd.f_na, hira_pd.o_na, hira_pd.cmn_na,
             conf_info.output_flag[i_pstd], pct_info);
 
+         // Set the contents of the output threshold columns
+         shc.set_fcst_thresh(conf_info.fcat_ta[i_vx][i]);
+         shc.set_obs_thresh (conf_info.ocat_ta[i_vx][i]);
+         shc.set_cov_thresh (conf_info.hira_info.cov_ta);
+
          // Write out PCT
          if(conf_info.output_flag[i_pct] != STATOutputType_None) {
             write_pct_row(shc, pct_info,
                conf_info.output_flag[i_pct] == STATOutputType_Both,
                stat_at, i_stat_row,
-               txt_at[i_pct], i_txt_row[i_pct]);
+               txt_at[i_pct], i_txt_row[i_pct], false);
          }
 
          // Write out PSTD
@@ -1790,7 +1795,7 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
             write_pstd_row(shc, pct_info,
                conf_info.output_flag[i_pstd] == STATOutputType_Both,
                stat_at, i_stat_row,
-               txt_at[i_pstd], i_txt_row[i_pstd]);
+               txt_at[i_pstd], i_txt_row[i_pstd], false);
          }
 
          // Write out PJC
@@ -1798,7 +1803,7 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
             write_pjc_row(shc, pct_info,
                conf_info.output_flag[i_pjc] == STATOutputType_Both,
                stat_at, i_stat_row,
-               txt_at[i_pjc], i_txt_row[i_pjc]);
+               txt_at[i_pjc], i_txt_row[i_pjc], false);
          }
 
          // Write out PRC
@@ -1806,7 +1811,7 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
             write_prc_row(shc, pct_info,
                conf_info.output_flag[i_prc] == STATOutputType_Both,
                stat_at, i_stat_row,
-               txt_at[i_prc], i_txt_row[i_prc]);
+               txt_at[i_prc], i_txt_row[i_prc], false);
          }
 
       } // end for j

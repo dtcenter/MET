@@ -845,19 +845,22 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
 void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    bool txt_flag,
                    AsciiTable &stat_at, int &stat_row,
-                   AsciiTable &txt_at, int &txt_row) {
+                   AsciiTable &txt_at, int &txt_row,
+                   bool update_thresh) {
 
    // PCT line type
    shc.set_line_type(stat_pct_str);
 
-   // Thresholds
-   shc.set_fcst_thresh(pct_info.fthresh);
-   shc.set_obs_thresh(pct_info.othresh);
+   // Set the threshold columns, if requested.
+   if(update_thresh) {
+      shc.set_fcst_thresh(pct_info.fthresh);
+      shc.set_obs_thresh(pct_info.othresh);
+      shc.set_cov_thresh(na_str);
+   }
 
    // Not Applicable
    shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
-   shc.set_cov_thresh(na_str);
 
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
@@ -884,19 +887,22 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                     bool txt_flag,
                     AsciiTable &stat_at, int &stat_row,
-                    AsciiTable &txt_at, int &txt_row) {
+                    AsciiTable &txt_at, int &txt_row,
+                    bool update_thresh) {
    int i;
 
    // PSTD line type
    shc.set_line_type(stat_pstd_str);
 
-   // Thresholds
-   shc.set_fcst_thresh(pct_info.fthresh);
-   shc.set_obs_thresh(pct_info.othresh);
+   // Set the threshold columns, if requested.
+   if(update_thresh) {
+      shc.set_fcst_thresh(pct_info.fthresh);
+      shc.set_obs_thresh(pct_info.othresh);
+      shc.set_cov_thresh(na_str);
+   }
 
    // Not Applicable
    shc.set_thresh_logic(SetLogic_None);
-   shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
    for(i=0; i<pct_info.n_alpha; i++) {
@@ -931,19 +937,22 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    bool txt_flag,
                    AsciiTable &stat_at, int &stat_row,
-                   AsciiTable &txt_at, int &txt_row) {
+                   AsciiTable &txt_at, int &txt_row,
+                   bool update_thresh) {
 
    // PJC line type
    shc.set_line_type(stat_pjc_str);
 
-   // Thresholds
-   shc.set_fcst_thresh(pct_info.fthresh);
-   shc.set_obs_thresh(pct_info.othresh);
+   // Set the threshold columns, if requested.
+   if(update_thresh) {
+      shc.set_fcst_thresh(pct_info.fthresh);
+      shc.set_obs_thresh(pct_info.othresh);
+      shc.set_cov_thresh(na_str);
+   }
 
    // Not Applicable
    shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
-   shc.set_cov_thresh(na_str);
 
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
@@ -970,19 +979,22 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                    bool txt_flag,
                    AsciiTable &stat_at, int &stat_row,
-                   AsciiTable &txt_at, int &txt_row) {
+                   AsciiTable &txt_at, int &txt_row,
+                   bool update_thresh) {
 
    // PRC line type
    shc.set_line_type(stat_prc_str);
 
-   // Thresholds
-   shc.set_fcst_thresh(pct_info.fthresh);
-   shc.set_obs_thresh(pct_info.othresh);
+   // Set the threshold columns, if requested.
+   if(update_thresh) {
+      shc.set_fcst_thresh(pct_info.fthresh);
+      shc.set_obs_thresh(pct_info.othresh);
+      shc.set_cov_thresh(na_str);
+   }
 
    // Not Applicable
    shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
-   shc.set_cov_thresh(na_str);
 
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);

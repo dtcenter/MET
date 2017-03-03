@@ -144,6 +144,7 @@ class StatHdrColumns {
       void set_thresh_logic  (const SetLogic);
 
       void set_cov_thresh    (const SingleThresh);
+      void set_cov_thresh    (const ThreshArray);
       void set_alpha         (const double);
 
       // Get functions
