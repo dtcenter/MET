@@ -34,6 +34,7 @@ struct LatLonData {
    int Nlat;
    int Nlon;
 
+   bool swap_to_north;
 };
 
 
