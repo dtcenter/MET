@@ -45,7 +45,7 @@ fcst = {
       {
         name       = "AOTK";
         level      = [ "L0-9" ];
-      }      
+      }
    ];
 
 }
@@ -59,8 +59,8 @@ obs = {
         name       = "AOD";
         level      = [ "L500" ];
 	GRIB1_ptv  = 141;
-      }   
-   ];   
+      }
+   ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ climo_mean = {
    //
    time_interp_method = DW_MEAN;
 
-   //   
+   //
    // When searching climatology data, only consider times where the month
    // matches the forecast month.  Set match_day to TRUE or FALSE to define
    // whether the climatology day must also match.
@@ -163,6 +163,18 @@ interp = {
          width  = 2;
       }
    ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// HiRA verification method
+//
+hira = {
+   flag       = FALSE;
+   width      = [ 2, 3, 4, 5 ];
+   vld_thresh = 1.0;
+   cov_thresh = [ ==0.25 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

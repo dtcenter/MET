@@ -34,7 +34,7 @@ fcst = {
 
    field = [
       {
-         name         = "PROB"; 
+         name         = "PROB";
          level        = "A3";
          cat_thresh   = [ ==0.25 ];
          prob         = { name = "APCP"; thresh_lo = 1.27; }
@@ -46,13 +46,13 @@ fcst = {
 obs = {
 
    sid_exc     = [];
-   
+
    field = [
       {
-         name         = "APCP"; 
+         name         = "APCP";
          level        = "A3";
          cat_thresh   = [ >1.27 ];
-         message_type = "ADPSFC";         
+         message_type = "ADPSFC";
       }
    ];
 
@@ -81,7 +81,6 @@ boot = {
 ////////////////////////////////////////////////////////////////////////////////
 
 interp = {
-  
    vld_thresh = 1.0;
 
    type = [
@@ -90,6 +89,15 @@ interp = {
          width  = 1;
       }
    ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+hira = {
+   flag       = FALSE;
+   width      = [ 2, 3, 4, 5 ];
+   vld_thresh = 1.0;
+   cov_thresh = [ ==0.25 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

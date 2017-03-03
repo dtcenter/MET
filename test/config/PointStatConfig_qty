@@ -49,7 +49,7 @@ fcst = {
         message_type = [ "ADPSFC" ];
         obs_quality  = [ ${OBS_QUALITY_SFC} ];
       },
-      
+
       {
         name         = "TMP";
         level        = [ "P500" ];
@@ -112,6 +112,18 @@ interp = {
          width  = 1;
       }
    ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// HiRA verification method
+//
+hira = {
+   flag       = FALSE;
+   width      = [ 2, 3, 4, 5 ];
+   vld_thresh = 1.0;
+   cov_thresh = [ ==0.25 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -31,7 +31,7 @@ wind_thresh = [ NA ];
 wind_logic  = UNION;
 
 fcst = {
-   
+
    field = [
       { name = "T2";   level = "(0,*,*)";     cat_thresh = [ <=273, >273 ]; },
       { name = "TT";   level = "(0,9-9,*,*)"; cat_thresh = [ <=273, >273 ]; }
@@ -41,7 +41,7 @@ fcst = {
 obs = {
 
    sid_exc = [];
-   
+
    field = [
       { name = "TMP";  level = "Z2";           cat_thresh = [ <=273, >273 ]; message_type = "ADPSFC"; },
       { name = "TMP";  level = "P850-700";     cat_thresh = [ <=273, >273 ]; message_type = "ADPUPA"; }
@@ -71,7 +71,6 @@ boot = {
 ////////////////////////////////////////////////////////////////////////////////
 
 interp = {
-  
    vld_thresh = 1.0;
 
    type = [
@@ -80,6 +79,18 @@ interp = {
          width  = 1;
       }
    ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// HiRA verification method
+//
+hira = {
+   flag       = FALSE;
+   width      = [ 2, 3, 4, 5 ];
+   vld_thresh = 1.0;
+   cov_thresh = [ ==0.25 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

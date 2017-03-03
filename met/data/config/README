@@ -352,9 +352,9 @@ regrid = {
 //
 //    - GRIB1 and GRIB2:
 //       - The "name" entry specifies a GRIB code number or abbreviation.
-//         - GRIB1 Product Definition Section: 
+//         - GRIB1 Product Definition Section:
 //           http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
-//         - GRIB2 Product Definition Section: 
+//         - GRIB2 Product Definition Section:
 //           http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml
 //       - The "level" entry specifies a level type and value:
 //          - ANNN for accumulation interval NNN
@@ -800,6 +800,40 @@ nbrhd = {
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
+}
+
+//
+// The "hira" entry is a dictionary that is very similar to the "interp" and
+// "nbrhd" entries.  It specifies information for applying the High Resolution
+// Assessment (HiRA) verification logic in Point-Stat.  HiRA is analogous to
+// neighborhood verification but for point observations.  The HiRA logic
+// converts scalar forecast values into a fractional coverage value which
+// Point-Stat evaluates as if it were a probability forecast.  For each
+// observation value, the forecast fractional coverage is computed as the ratio
+// of forecast values around the observation that meet the the forecast
+// categorical threshold criteria.  If applying HiRA, users should enable one
+// or more probabilistic line types (PCT, PSTD, PJC, and PRC) in the output_flag
+// dictionary.  The number of probabilistic HiRA output lines is determined by
+// the number of categorical thresholds and HiRA neighborhood widths chosen.
+// This dictionary may include the following entries:
+//
+//    -  The "flag" entry is a boolean which toggles "hira"
+//       on (TRUE) and off (FALSE).
+//
+//    - The "width" entry specifies the neighborhood size.  Since HiRA applies
+//      to point observations, the width may be even or odd.
+//
+//    - The "vld_thresh" entry is as described above.
+//
+//    - The "cov_thresh" entry is an array of probabilistic thresholds used to
+//      populate the Nx2 probabilistic contingency table written to the PCT
+//      output line and used for computing probabilistic statistics.
+//
+hira = {
+   flag       = FALSE;
+   width      = [ 2, 3, 4, 5 ];
+   vld_thresh = 1.0;
+   cov_thresh = [ ==0.25 ];
 }
 
 //

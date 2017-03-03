@@ -33,10 +33,10 @@ wind_logic  = UNION;
 fcst = {
 
    sid_exc = [];
-   
+
    field = [
       {
-         name         = "${FCST_FIELD_NAME}"; 
+         name         = "${FCST_FIELD_NAME}";
          level        = "${FCST_FIELD_LEVEL}";
          cat_thresh   = [ >0.254, >0.635, >1.270, >2.540 ];
          message_type = "ADPSFC";
@@ -69,7 +69,6 @@ boot = {
 ////////////////////////////////////////////////////////////////////////////////
 
 interp = {
-  
    vld_thresh = 1.0;
 
    type = [
@@ -79,6 +78,15 @@ interp = {
       { method = LS_FIT;   width  = [ 3, 5 ]; },
       { method = BILIN;    width  = 2;        }
    ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+hira = {
+   flag       = FALSE;
+   width      = [ 2, 3, 4, 5 ];
+   vld_thresh = 1.0;
+   cov_thresh = [ ==0.25 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
