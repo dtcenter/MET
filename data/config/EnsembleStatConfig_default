@@ -184,6 +184,8 @@ rng = {
 grid_weight_flag = NONE;
 obs_quality      = [];
 duplicate_flag   = NONE;
+obs_summary      = SINGLE;
+obs_percentile   = 50; 
 output_prefix    = "";
 version          = "V6.0";
 
