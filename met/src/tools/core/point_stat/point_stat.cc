@@ -77,6 +77,7 @@
 //   030    03/02/15  Halley Gotway  Add automated regridding.
 //   031    07/30/15  Halley Gotway  Add conditional continuous verification.
 //   032    09/11/15  Halley Gotway  Add climatology to config file.
+//   033    02/27/17  Halley Gotway  Add HiRA verification.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -125,6 +126,7 @@ static void do_cnt  (CNTInfo   *&, int, PairDataPoint *);
 static void do_sl1l2(SL1L2Info *&, int, PairDataPoint *);
 static void do_vl1l2(VL1L2Info *&, int, PairDataPoint *, PairDataPoint *);
 static void do_pct  (PCTInfo   *&, int, PairDataPoint *);
+static void do_hira (              int, PairDataPoint *);
 
 static void finish_txt_files();
 
@@ -309,6 +311,11 @@ void setup_txt_files() {
    // Get the maximum number of data columns
    n_prob = conf_info.get_max_n_fprob_thresh();
    n_cat  = conf_info.get_max_n_cat_thresh() + 1;
+
+   // Check for HiRA output
+   if(conf_info.hira_info.flag) {
+      n_prob = max(n_prob, conf_info.hira_info.cov_ta.n_elements());
+   }
 
    max_prob_col = get_n_pjc_columns(n_prob);
    max_mctc_col = get_n_mctc_columns(n_cat);
@@ -1125,10 +1132,10 @@ void process_scores() {
                   // Loop through the categorical thresholds
                   for(m=0; m<conf_info.fcat_ta[i].n_elements(); m++) {
 
-                     // Write out FHO
-                     if(conf_info.output_flag[i_fho] != STATOutputType_None &&
-                        cts_info[m].cts.n() > 0) {
+                     if(cts_info[m].cts.n() == 0) continue;
 
+                     // Write out FHO
+                     if(conf_info.output_flag[i_fho] != STATOutputType_None) {
                         write_fho_row(shc, cts_info[m],
                            conf_info.output_flag[i_fho] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1136,9 +1143,7 @@ void process_scores() {
                      }
 
                      // Write out CTC
-                     if(conf_info.output_flag[i_ctc] != STATOutputType_None &&
-                        cts_info[m].cts.n() > 0) {
-
+                     if(conf_info.output_flag[i_ctc] != STATOutputType_None) {
                         write_ctc_row(shc, cts_info[m],
                            conf_info.output_flag[i_ctc] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1146,9 +1151,7 @@ void process_scores() {
                      }
 
                      // Write out CTS
-                     if(conf_info.output_flag[i_cts] != STATOutputType_None &&
-                        cts_info[m].cts.n() > 0) {
-
+                     if(conf_info.output_flag[i_cts] != STATOutputType_None) {
                         write_cts_row(shc, cts_info[m],
                            conf_info.output_flag[i_cts] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1203,10 +1206,10 @@ void process_scores() {
                   // Loop through the continuous thresholds
                   for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
 
-                     // Write out CNT
-                     if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
-                        cnt_info[m].n > 0) {
+                     if(cnt_info[m].n == 0) continue;
 
+                     // Write out CNT
+                     if(conf_info.output_flag[i_cnt] != STATOutputType_None) {
                         write_cnt_row(shc, cnt_info[m],
                            conf_info.output_flag[i_cnt] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1269,7 +1272,7 @@ void process_scores() {
                   for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
                   // Compute VL1L2 and VAL1L2
-		  int vi = conf_info.vx_pd[i].fcst_info->uv_index();
+                  int vi = conf_info.vx_pd[i].fcst_info->uv_index();
                   do_vl1l2(vl1l2_info, i,
                            &conf_info.vx_pd[i].pd[j][k][l],
                            &conf_info.vx_pd[vi].pd[j][k][l]);
@@ -1277,10 +1280,10 @@ void process_scores() {
                   // Loop through all of the wind speed thresholds
                   for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
 
-                     // Write out VL1L2
-                     if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
-                        vl1l2_info[m].vcount > 0) {
+                     if(vl1l2_info[m].vcount == 0) continue;
 
+                     // Write out VL1L2
+                     if(conf_info.output_flag[i_vl1l2] != STATOutputType_None) {
                         write_vl1l2_row(shc, vl1l2_info[m],
                            conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1288,9 +1291,7 @@ void process_scores() {
                      }
 
                      // Write out VAL1L2
-                     if(conf_info.output_flag[i_val1l2] != STATOutputType_None &&
-                        vl1l2_info[m].vacount > 0) {
-
+                     if(conf_info.output_flag[i_val1l2] != STATOutputType_None) {
                         write_val1l2_row(shc, vl1l2_info[m],
                            conf_info.output_flag[i_val1l2] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1322,10 +1323,10 @@ void process_scores() {
                   // Loop through all of the thresholds
                   for(m=0; m<n_prob; m++) {
 
-                     // Write out PCT
-                     if(conf_info.output_flag[i_pct] != STATOutputType_None &&
-                        pct_info[m].pct.n() > 0) {
+                     if(pct_info[m].pct.n() == 0) continue;
 
+                     // Write out PCT
+                     if(conf_info.output_flag[i_pct] != STATOutputType_None) {
                         write_pct_row(shc, pct_info[m],
                            conf_info.output_flag[i_pct] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1333,9 +1334,7 @@ void process_scores() {
                      }
 
                      // Write out PSTD
-                     if(conf_info.output_flag[i_pstd] != STATOutputType_None &&
-                        pct_info[m].pct.n() > 0) {
-
+                     if(conf_info.output_flag[i_pstd] != STATOutputType_None) {
                         write_pstd_row(shc, pct_info[m],
                            conf_info.output_flag[i_pstd] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1343,9 +1342,7 @@ void process_scores() {
                      }
 
                      // Write out PJC
-                     if(conf_info.output_flag[i_pjc] != STATOutputType_None &&
-                        pct_info[m].pct.n() > 0) {
-
+                     if(conf_info.output_flag[i_pjc] != STATOutputType_None) {
                         write_pjc_row(shc, pct_info[m],
                            conf_info.output_flag[i_pjc] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1353,9 +1350,7 @@ void process_scores() {
                      }
 
                      // Write out PRC
-                     if(conf_info.output_flag[i_prc] != STATOutputType_None &&
-                        pct_info[m].pct.n() > 0) {
-
+                     if(conf_info.output_flag[i_prc] != STATOutputType_None) {
                         write_prc_row(shc, pct_info[m],
                            conf_info.output_flag[i_prc] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1365,6 +1360,32 @@ void process_scores() {
                } // end Compute PCT
 
             } // end for l
+
+            // Apply HiRA verification logic
+            if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
+                conf_info.hira_info.flag                &&
+               (conf_info.output_flag[i_pct]  != STATOutputType_None ||
+                conf_info.output_flag[i_pstd] != STATOutputType_None ||
+                conf_info.output_flag[i_pjc]  != STATOutputType_None ||
+                conf_info.output_flag[i_prc]  != STATOutputType_None)) {
+
+               pd_ptr = &conf_info.vx_pd[i].pd[j][k][0];
+
+               mlog << Debug(2)
+                    << "Processing "
+                    << conf_info.vx_pd[i].fcst_info->magic_str()
+                    << " versus "
+                    << conf_info.vx_pd[i].obs_info->magic_str()
+                    << ", for observation type " << pd_ptr->msg_typ
+                    << ", over region " << pd_ptr->mask_name
+                    << ", for HiRA method, using "
+                    << pd_ptr->n_obs << " pairs.\n";
+
+               // Appy HiRA verification and write probabilistic output
+               do_hira(i, pd_ptr);
+
+            } // end HiRA
+
          } // end for k
       } // end for j
 
@@ -1386,7 +1407,6 @@ void process_scores() {
 
 void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
    int i, j, n_cat;
-   NumArray f_na, o_na;
 
    mlog << Debug(2)
         << "Computing Categorical Statistics.\n";
@@ -1440,7 +1460,6 @@ void do_cts(CTSInfo *&cts_info, int i_vx, PairDataPoint *pd_ptr) {
 
 void do_mcts(MCTSInfo &mcts_info, int i_vx, PairDataPoint *pd_ptr) {
    int i;
-   NumArray f_na, o_na;
 
    mlog << Debug(2)
         << "Computing Multi-Category Statistics.\n";
@@ -1592,7 +1611,9 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               PairDataPoint *ugrd_pd_ptr, PairDataPoint *vgrd_pd_ptr) {
    int i;
 
+   //
    // Check that the number of pairs are the same
+   //
    if(ugrd_pd_ptr->n_obs != vgrd_pd_ptr->n_obs) {
       mlog << Error << "\ndo_vl1l2() -> "
            << "unequal number of UGRD and VGRD pairs ("
@@ -1601,7 +1622,9 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       exit(1);
    }
 
+   //
    // Set all of the VL1L2Info objects
+   //
    for(i=0; i<conf_info.fwind_ta[i_vx].n_elements(); i++) {
 
       //
@@ -1628,7 +1651,6 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 
 void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr) {
    int i, j, n_pct;
-   NumArray f_na, o_na;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
@@ -1662,6 +1684,132 @@ void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr) {
       //
       compute_pctinfo(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na,
             conf_info.output_flag[i_pstd], pct_info[i]);
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_hira(int i_vx, PairDataPoint *pd_ptr) {
+   PairDataPoint hira_pd;
+   int i, j, k, lvl_blw, lvl_abv;
+   double f_cov, cmn_cov;
+   SingleThresh cat_thresh;
+   PCTInfo pct_info;
+
+   // Set flag for specific humidity
+   bool spfh_flag = conf_info.vx_pd[i_vx].fcst_info->is_specific_humidity() &&
+                     conf_info.vx_pd[i_vx].obs_info->is_specific_humidity();
+
+   shc.set_interp_mthd(InterpMthd_Nbrhd);
+
+   // Loop over categorical thresholds and HiRA widths
+   for(i=0; i<conf_info.fcat_ta[i_vx].n_elements(); i++) {
+
+      cat_thresh = conf_info.fcat_ta[i_vx][i];
+
+      shc.set_cov_thresh(cat_thresh);
+
+      for(j=0; j<conf_info.hira_info.width.n_elements(); j++) {
+
+         shc.set_interp_wdth(conf_info.hira_info.width[j]);
+
+         mlog << Debug(2)
+              << "Computing HiRA Statistics for categorical threshold "
+              << conf_info.fcat_ta[i_vx][i].get_str()
+              << " and width " << conf_info.hira_info.width[j] << ".\n";
+
+         // Initialize
+         hira_pd.clear();
+         pct_info.clear();
+
+         // Loop through matched pairs and replace the forecast value
+         // with the HiRA fractional coverage.
+         for(k=0; k<pd_ptr->n_obs; k++) {
+
+            // Compute the fractional coverage forecast value using the
+            // observation level value
+            find_vert_lvl(conf_info.vx_pd[i_vx].fcst_dpa,
+                          pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
+
+            f_cov = compute_interp(conf_info.vx_pd[i_vx].fcst_dpa,
+                       pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                       InterpMthd_Nbrhd, conf_info.hira_info.width[j],
+                       conf_info.hira_info.vld_thresh, spfh_flag,
+                       conf_info.vx_pd[i_vx].fcst_info->level().type(),
+                       pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+
+            // Check for bad data
+            if(is_bad_data(f_cov)) continue;
+
+            // Compute the fractional coverage climatological mean value
+            // using the observation level value
+            find_vert_lvl(conf_info.vx_pd[i_vx].climo_mn_dpa,
+                          pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
+
+            cmn_cov = compute_interp(conf_info.vx_pd[i_vx].climo_mn_dpa,
+                         pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                         InterpMthd_Nbrhd, conf_info.hira_info.width[j],
+                         conf_info.hira_info.vld_thresh, spfh_flag,
+                         conf_info.vx_pd[i_vx].fcst_info->level().type(),
+                         pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+
+            // Store the fractional coverage pair
+            hira_pd.add_pair(f_cov, pd_ptr->o_na[k], cmn_cov, pd_ptr->wgt_na[k]);
+
+         } // end for k
+
+         // Check for zero matched pairs
+         if(hira_pd.f_na.n_elements() == 0 ||
+            hira_pd.o_na.n_elements() == 0) continue;
+
+         // Set up the PCTInfo thresholds and alpha values
+         pct_info.fthresh = conf_info.hira_info.cov_ta;
+         pct_info.othresh = conf_info.ocat_ta[i_vx][i];
+         pct_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
+
+         for(k=0; k<conf_info.get_n_ci_alpha(); k++) {
+            pct_info.alpha[k] = conf_info.ci_alpha[k];
+         }
+
+         // Compute the probabilistic counts and statistics
+         compute_pctinfo(hira_pd.f_na, hira_pd.o_na, hira_pd.cmn_na,
+            conf_info.output_flag[i_pstd], pct_info);
+
+         // Write out PCT
+         if(conf_info.output_flag[i_pct] != STATOutputType_None) {
+            write_pct_row(shc, pct_info,
+               conf_info.output_flag[i_pct] == STATOutputType_Both,
+               stat_at, i_stat_row,
+               txt_at[i_pct], i_txt_row[i_pct]);
+         }
+
+         // Write out PSTD
+         if(conf_info.output_flag[i_pstd] != STATOutputType_None) {
+            write_pstd_row(shc, pct_info,
+               conf_info.output_flag[i_pstd] == STATOutputType_Both,
+               stat_at, i_stat_row,
+               txt_at[i_pstd], i_txt_row[i_pstd]);
+         }
+
+         // Write out PJC
+         if(conf_info.output_flag[i_pjc] != STATOutputType_None) {
+            write_pjc_row(shc, pct_info,
+               conf_info.output_flag[i_pjc] == STATOutputType_Both,
+               stat_at, i_stat_row,
+               txt_at[i_pjc], i_txt_row[i_pjc]);
+         }
+
+         // Write out PRC
+         if(conf_info.output_flag[i_prc] != STATOutputType_None) {
+            write_prc_row(shc, pct_info,
+               conf_info.output_flag[i_prc] == STATOutputType_Both,
+               stat_at, i_stat_row,
+               txt_at[i_prc], i_txt_row[i_prc]);
+         }
+
+      } // end for j
    } // end for i
 
    return;

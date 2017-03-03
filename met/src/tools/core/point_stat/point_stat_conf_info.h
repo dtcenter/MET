@@ -122,7 +122,8 @@ class PointStatConfInfo {
 
       double            interp_thresh;      // Proportion of valid data values
       InterpMthd *      interp_mthd;        // Array for interpolation methods [n_interp]
-      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]      
+      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]
+      HiRAInfo          hira_info;          // HiRA verification logic
 
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
       DuplicateType     duplicate_flag;     // Duplicate observation behavior
