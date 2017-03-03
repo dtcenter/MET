@@ -28,7 +28,7 @@ typedef signed char ncbyte; // from ncvalues.h
 ////////////////////////////////////////////////////////////////////////
 
 #define IS_INVALID_NC(ncObj)        ncObj.isNull()
-#define IS_INVALID_NC_P(ncObjPtr)   ncObjPtr->isNull()
+#define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == 0 || ncObjPtr->isNull())
 
 #define GET_NC_NAME(ncObj)          ncObj.getName()
 #define GET_NC_NAME_P(ncObjPtr)     ncObjPtr->getName()
