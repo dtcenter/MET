@@ -919,8 +919,11 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   plane.clear();
   plane.set_size(nx, ny);
 
+  int y_offset;
+  bool swap_to_north = false;
+  if (grid.info().ll != 0) swap_to_north = grid.info().ll->swap_to_north;
+
   //  get the data
-#ifdef USE_BUFFER
   int    i[nx];
   short  s[nx];
   float  f[nx];
@@ -984,6 +987,8 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     }   //  switch
 
     LongArray b = a;
+    y_offset = y;
+    if (swap_to_north) y_offset = ny - 1 - y;
 
     for (int x = 0; x< nx; ++x)
     {
@@ -997,33 +1002,10 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
          value = value * scale_factor + add_offset;
       }
 
-      plane.set(value, x, y);
+      plane.set(value, x, y_offset);
 
     }   //  for y
   }   //  for x
-
-#else
-  LongArray b = a;
-
-  for (int x = 0; x < nx; ++x)
-  {
-    b[x_slot] = x;
-
-    for (int y = 0; y < ny; ++y)
-    {
-      b[y_slot] = y;
-
-      double value = getData(v, b);
-
-      if(is_eq(value, missing_value) || is_eq(value, fill_value)) {
-         value = bad_data_double;
-      }
-
-      plane.set(value, x, y);
-
-    }   //  for y
-  }   //  for x
-#endif
 
   //  done
 
@@ -1918,10 +1900,9 @@ void NcCfFile::get_grid_mapping_vertical_perspective(const NcVar *grid_mapping_v
 bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   static const string method_name = "NcCfFile::get_grid_from_coordinates()";
 
-  // Currently, we can only intuit a lat/lon grid from the dimensions.
-  // Start by looking for the lat/lon dimensions in the file
+  // Find the a lat/lon grid from the coordinates attribute.
+  // Get the dimensions from the coordinate variables.
 
-  NcVar coord_var;
   NcVarAtt coordinates_att = get_nc_att(data_var, "coordinates");
 
   if (!IS_INVALID_NC(coordinates_att)) {
@@ -2089,6 +2070,12 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     data.delta_lon = dlon;
     data.Nlat = lat_counts;
     data.Nlon = lon_counts;
+    data.swap_to_north = false;
+    if (dlat < 0) {
+      data.delta_lat = -dlat;
+      data.lat_ll = lat_values[lat_counts-1];
+      data.swap_to_north = true;
+    }
   
     grid.set(data);
   }
@@ -2105,7 +2092,6 @@ bool NcCfFile::get_grid_from_dimensions()
 
   NcVar coord_var;
   const NcVarAtt units_att;
-  //const char *dim_units;
   ConcatString dim_units;
   string dim_units_str;
   ConcatString dim_name;
@@ -2249,7 +2235,6 @@ bool NcCfFile::get_grid_from_dimensions()
   double lat_values[lat_counts];
   double lon_values[lon_counts];
 
-  //_yCoordVar->get(lat_values, &lat_counts);
   if (two_dim_corrd) {
     long cur[2], length[2];
     for (int i=0; i<2; i++) {
@@ -2261,8 +2246,6 @@ bool NcCfFile::get_grid_from_dimensions()
     length[1] = lon_counts;
     length[0] = 1;
     get_nc_data(_xCoordVar,lon_values, length, cur);
-    //cout << "     DEBUG] " << method_name << " lat_values[0]=" << lat_values[0] << ", lat_values[1]=" << lat_values[1] << endl;
-    //cout << "     DEBUG] " << method_name << " lon_values[0]=" << lon_values[0] << ", lon_values[1]=" << lon_values[1] << endl;
   }
   else {
     get_nc_data(_yCoordVar,lat_values);
@@ -2325,7 +2308,12 @@ bool NcCfFile::get_grid_from_dimensions()
   data.delta_lon = dlon;
   data.Nlat = _yDim->getSize();
   data.Nlon = _xDim->getSize();
-
+  data.swap_to_north = false;
+  if (dlat < 0) {
+    data.delta_lat = -dlat;
+    data.lat_ll = lat_values[lat_counts-1];
+    data.swap_to_north = true;
+  }
   grid.set(data);
 
   return true;
