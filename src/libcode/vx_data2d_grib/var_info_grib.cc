@@ -189,13 +189,13 @@ void VarInfoGrib::set_field_rec(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoGrib::set_magic(const ConcatString & s) {
+void VarInfoGrib::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
-   // Validate the magic string
-   VarInfo::set_magic(s);
+   // Validate the magic_string
+   VarInfo::set_magic(nstr, lstr);
 
    // Store the magic string
-   MagicStr = s;
+   MagicStr << cs_erase << nstr << "/" << lstr;
 
 }
 

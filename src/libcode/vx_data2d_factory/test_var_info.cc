@@ -116,10 +116,11 @@ int main(int argc, char *argv[]) {
    vi_nc->dump(cout);
 
    // Read magic strings from the user
-   char varinfo_str[1024];
-   strcpy(varinfo_str, " ");
+   char name_str[1024], level_str[1024];
+   strcpy(name_str,  " ");
+   strcpy(level_str, " ");
 
-   while(strlen(varinfo_str) > 0) {
+   while(strlen(name_str) > 0) {
 
       // Delete it if it's been allocated
       if(vi_user) { delete vi_user; vi_user = (VarInfo *) 0; }
@@ -155,12 +156,12 @@ int main(int argc, char *argv[]) {
 
       // Prompt user for string to parse
       cout << "\nEnter test " << type_str << " string: ";
-      cin  >> varinfo_str;
-      if(strlen(varinfo_str) == 0) break;
+      cin  >> name_str >> level_str;
+      if(strlen(name_str) == 0) break;
 
       vi_user->clear();
       vi_user->set_pair("FileType", type_str);
-      vi_user->set_magic(varinfo_str);
+      vi_user->set_magic(name_str, level_str);
       cout << "\nvi_user->VarInfo::dump(cout);\n";
       vi_user->VarInfo::dump(cout);
       cout << "\nvi_user->dump(cout);\n";

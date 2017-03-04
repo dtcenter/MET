@@ -295,13 +295,14 @@ void VarInfo::set_lead(int s) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfo::set_magic(const ConcatString &mag) {
+void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
-   //  verify that there are no embedded spaces
-   if( (unsigned int)mag.length() != strcspn(mag, " \t") ){
+   // Check for embedded whitespace
+   if((unsigned int) nstr.length() != strcspn(nstr, " \t") ||
+      (unsigned int) lstr.length() != strcspn(lstr, " \t")) {
       mlog << Error << "\nVarInfo::set_magic() -> "
-           << "embedded whitespace found in magic string \""
-           << mag << "\".\n\n";
+           << "embedded whitespace found in the nstr \"" << nstr
+           << "\" or lstr \"" << lstr << "\".\n\n";
       exit(1);
    }
 

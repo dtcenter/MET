@@ -137,33 +137,22 @@ void VarInfoNcMet::add_dimension(int dim) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcMet::set_magic(const ConcatString &s) {
+void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    char tmp_str[max_str_len];
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
 
    // Validate the magic string
-   VarInfo::set_magic(s);
+   VarInfo::set_magic(nstr, lstr);
 
    // Store the magic string
-   MagicStr = s;
-
-   // Initialize the temp string
-   strcpy(tmp_str, s);
-
-   // Retreive the NetCDF variable name
-   if((ptr = strtok_r(tmp_str, "()/", &save_ptr)) == NULL) {
-      mlog << Error << "\nVarInfoNcMet::set_magic() -> "
-           << "bad NetCDF variable name specified \""
-           << s << "\".\n\n";
-      exit(1);
-   }
+   MagicStr << cs_erase << nstr << lstr;
 
    // Set the requested name and default output name
-   set_req_name(ptr);
-   set_name(ptr);
+   set_req_name(nstr);
+   set_name(nstr);
 
    // If there's no level specification, assume (*, *)
-   if(strchr(s, '(') == NULL) {
+   if(strchr(lstr, '(') == NULL) {
       Level.set_req_name("*,*");
       Level.set_name("*,*");
       Dimension.clear();
@@ -173,8 +162,11 @@ void VarInfoNcMet::set_magic(const ConcatString &s) {
    // Parse the level specification
    else {
 
+      // Initialize the temp string
+      strcpy(tmp_str, lstr);
+
       // Retreive the NetCDF level specification
-      ptr = strtok_r(NULL, "()", &save_ptr);
+      ptr = strtok_r(tmp_str, "()", &save_ptr);
 
       // Set the level name
       Level.set_req_name(ptr);
@@ -197,7 +189,7 @@ void VarInfoNcMet::set_magic(const ConcatString &s) {
                if(Dimension.has(range_flag)) {
                   mlog << Error << "\nVarInfoNcMet::set_magic() -> "
                        << "only one dimension can have a range for NetCDF variable \""
-                       << s << "\".\n\n";
+                       << MagicStr << "\".\n\n";
                   exit(1);
                }
                // Store the dimension of the range and limits
@@ -220,7 +212,7 @@ void VarInfoNcMet::set_magic(const ConcatString &s) {
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
-   if(strstr(s, "/PROB") != NULL) PFlag = 1;
+   if(strstr(MagicStr, "/PROB") != NULL) PFlag = 1;
 
    // Set the long name
    sprintf(tmp_str, "%s(%s)", req_name().text(), Level.req_name().text());
@@ -236,15 +228,13 @@ void VarInfoNcMet::set_magic(const ConcatString &s) {
 
 void VarInfoNcMet::set_dict(Dictionary &dict){
 
-   ConcatString mag;
-   mag.format("%s%s", dict.lookup_string("name").text(),
-                      dict.lookup_string("level").text());
-   set_magic(mag);
-   set_req_name( dict.lookup_string("name") );
+   set_magic(dict.lookup_string("name").text(),
+             dict.lookup_string("level").text());
+   set_req_name(dict.lookup_string("name"));
 
-   //  check for a probability boolean setting
-   if( dict.lookup_bool(conf_key_prob, false) ){
-      set_p_flag( true );
+   // Check for a probability boolean setting
+   if(dict.lookup_bool(conf_key_prob, false)) {
+      set_p_flag(true);
       return;
    }
 

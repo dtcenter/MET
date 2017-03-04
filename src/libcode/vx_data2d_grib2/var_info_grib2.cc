@@ -225,13 +225,13 @@ void VarInfoGrib2::set_der_type(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoGrib2::set_magic(const ConcatString &s) {
+void VarInfoGrib2::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Validate the magic_string
-   VarInfo::set_magic(s);
+   VarInfo::set_magic(nstr, lstr);
 
    // Store the magic string
-   MagicStr = s;
+   MagicStr << cs_erase << nstr << "/" << lstr;
 
 }
 

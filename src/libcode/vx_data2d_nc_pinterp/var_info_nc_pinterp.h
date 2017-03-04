@@ -153,7 +153,7 @@ static const char *pinterp_grid_relative_names[] = {
 static const int n_pinterp_grid_relative_names =
                      sizeof(pinterp_grid_relative_names)/
                     sizeof(*pinterp_grid_relative_names);
-                    
+
 ///////////////////////////////////////////////////////////////////////////////
 
 //
@@ -210,7 +210,7 @@ class VarInfoNcPinterp : public VarInfo
          // set stuff
          //
 
-      void set_magic(const ConcatString &);
+      void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &);
 
       void add_dimension(int dim);

@@ -31,7 +31,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
-  
+
    // Factory objects
    Met2dDataFileFactory mtddf_factory;
    VarInfoFactory       vinfo_factory;
@@ -45,10 +45,10 @@ int main(int argc, char *argv[]) {
    DataPlaneArray plane_array;
    int i, n_lvl;
    double lower, upper, min, max;
-   
+
    // Input parameters
    ConcatString in_file_name;
-   char varinfo_str[1024];
+   char name_str[1024], level_str[1024];
 
    // Set verbosity level very high
    mlog.set_verbosity_level(10);
@@ -87,22 +87,22 @@ int main(int argc, char *argv[]) {
 
    // Prompt user for a magic string
    mlog << Debug(1) << "\n" << sep_str << "\n" << sep_str << "\n" << sep_str << "\n\n"
-        << "Enter VarInfo magic string (Q to quit): ";
-   cin  >> varinfo_str;
-   
+        << "Enter VarInfo name and level (Q to quit): ";
+   cin  >> name_str >> level_str;
+
    // Process the user's magic strings
-   while(strncasecmp(varinfo_str, "q", 1) != 0) {
+   while(strncasecmp(name_str, "q", 1) != 0) {
 
       // Set up the VarInfo object
       vinfo_cur->clear();
-      vinfo_cur->set_magic(varinfo_str);
+      vinfo_cur->set_magic(name_str, level_str);
 
       // Dump the contents
       mlog << Debug(1) << "\nCALLING: vinfo_cur->VarInfo::dump(cout);\n";
       vinfo_cur->VarInfo::dump(cout);
       mlog << Debug(1) << "\nCALLING: vinfo_cur->dump(cout);\n";
       vinfo_cur->dump(cout);
-      
+
       // Read a single data plane
       mlog << Debug(1) << "\n" << sep_str << "\n\n"
            << "CALLING: data_plane() to read a single record...\n";
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
       vinfo_cur->VarInfo::dump(cout);
       mlog << Debug(1) << "\nCALLING: vinfo_cur->dump(cout);\n";
       vinfo_cur->dump(cout);
-      
+
       // Read a range of data planes
       mlog << Debug(1) << "\n" << sep_str << "\n\n"
            << "CALLING: data_plane_array() to read multiple records...\n";
@@ -144,8 +144,8 @@ int main(int argc, char *argv[]) {
 
       // Prompt user for a magic string
       mlog << Debug(1) << "\n" << sep_str << "\n" << sep_str << "\n" << sep_str << "\n\n"
-           << "Enter VarInfo magic string (Q to quit): ";
-      cin  >> varinfo_str;
+           << "Enter VarInfo name and level string (Q to quit): ";
+      cin  >> name_str >> level_str;
 
    } // end while loop
 
