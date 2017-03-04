@@ -1525,3 +1525,4 @@ plot_valid_counts = function(data, color, vert) {
   axis(3, at=lead_list, tick=FALSE, labels=n,
        padj=vert, cex.axis=0.75, col.axis=color);
 }
+

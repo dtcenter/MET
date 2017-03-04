@@ -82,3 +82,4 @@ relperf_rank_horz_offset = 0.50;
 # Alpha and z-value
 alpha = 0.05;
 zval  = qnorm(1 - (alpha/2));
+
