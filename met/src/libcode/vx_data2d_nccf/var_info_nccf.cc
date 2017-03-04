@@ -135,151 +135,117 @@ void VarInfoNcCF::add_dimension(int dim) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcCF::set_magic(const ConcatString &magic_string)
-{
-  char tmp_str[max_str_len];
-  char *ptr = 0;
-  char *ptr2 = 0;
-  char *ptr3 = 0;
-  char *save_ptr = 0;
+void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
+   char tmp_str[max_str_len];
+   char *ptr = 0;
+   char *ptr2 = 0;
+   char *ptr3 = 0;
+   char *save_ptr = 0;
 
-  // Validate the magic string
+   // Validate the magic string
+   VarInfo::set_magic(nstr, lstr);
 
-  VarInfo::set_magic(magic_string);
+   // Store the magic string
+   MagicStr << cs_erase << nstr << lstr;
 
-  // Store the magic string
+   // Set the requested name and default output name
+   set_req_name(nstr);
+   set_name(nstr);
 
-  MagicStr = magic_string;
-
-  // Initialize the temp string
-
-  strcpy(tmp_str, magic_string);
-
-  // Retreive the NetCDF variable name
-
-  if ((ptr = strtok_r(tmp_str, "()/", &save_ptr)) == NULL)
-  {
-    mlog << Error << "\nVarInfoNcCF::set_magic() -> "
-	 << "bad NetCDF variable name specified \""
-	 << magic_string << "\".\n\n";
-    exit(1);
-  }
-
-  // Set the requested name and default output name
-
-  set_req_name(ptr);
-  set_name(ptr);
-
-  // If there's no level specification, assume (*, *)
-
-  if (strchr(magic_string, '(') == NULL)
-  {
-    Level.set_req_name("*,*");
-    Level.set_name("*,*");
-    Dimension.clear();
-    Dimension.add(vx_data2d_star);
-    Dimension.add(vx_data2d_star);
-  }
-  else
-  {
-    // Parse the level specification
-
-    // Retreive the NetCDF level specification
-
-    ptr = strtok_r(NULL, "()", &save_ptr);
-
-    // Set the level name
-
-    Level.set_req_name(ptr);
-    Level.set_name(ptr);
-
-    // If dimensions are specified, clear the default value
-
-    if (strchr(ptr, ',') != NULL)
+   // If there's no level specification, assume (*, *)
+   if(strchr(lstr, '(') == NULL) {
+      Level.set_req_name("*,*");
+      Level.set_name("*,*");
       Dimension.clear();
+      Dimension.add(vx_data2d_star);
+      Dimension.add(vx_data2d_star);
+   }
+   else {
 
-    // Parse the dimensions
+      // Initialize the temp string
+      strcpy(tmp_str, lstr);
 
-    while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL)
-    {
-      // Check for wildcards
+      // Parse the level specification
+      // Retreive the NetCDF level specification
+      ptr = strtok_r(tmp_str, "()", &save_ptr);
 
-      if (strchr(ptr2, '*') != NULL)
-	Dimension.add(vx_data2d_star);
-      else
+      // Set the level name
+      Level.set_req_name(ptr);
+      Level.set_name(ptr);
+
+      // If dimensions are specified, clear the default value
+      if (strchr(ptr, ',') != NULL) Dimension.clear();
+
+      // Parse the dimensions
+      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL)
       {
-	// Check for a range of levels
+         // Check for wildcards
+         if (strchr(ptr2, '*') != NULL) {
+            Dimension.add(vx_data2d_star);
+         }
+         else
+         {
+            // Check for a range of levels
+            if ((ptr3 = strchr(ptr2, '-')) != NULL)
+            {
+               // Check if a range has already been supplied
+               if (Dimension.has(range_flag))
+               {
+                  mlog << Error << "\nVarInfoNcCF::set_magic() -> "
+                       << "only one dimension can have a range for NetCDF variable \""
+                       << MagicStr << "\".\n\n";
+                  exit(1);
+               }
+               else
+               {
+                  // Store the dimension of the range and limits
+                  Dimension.add(range_flag);
+                  Level.set_lower(atoi(ptr2));
+                  Level.set_upper(atoi(++ptr3));
 
-	if ((ptr3 = strchr(ptr2, '-')) != NULL)
-	{
-	  // Check if a range has already been supplied
+                  // Assume pressure level type for a range of levels
+                  Level.set_type(LevelType_Pres);
+               }
+            }
+            else
+            {
+               // Single level
+               Dimension.add(atoi(ptr2));
+            }
+         }
 
-	  if (Dimension.has(range_flag))
-	  {
-	    mlog << Error << "\nVarInfoNcCF::set_magic() -> "
-		 << "only one dimension can have a range for NetCDF variable \""
-		 << magic_string << "\".\n\n";
-	    exit(1);
-	  }
-	  else
-	  {
-	    // Store the dimension of the range and limits
+         // Set ptr to NULL for next call to strtok
+         ptr = NULL;
 
-	    Dimension.add(range_flag);
-	    Level.set_lower(atoi(ptr2));
-	    Level.set_upper(atoi(++ptr3));
-       
-       // Assume pressure level type for a range of levels
-       Level.set_type(LevelType_Pres);
-	  }
-	}
-	else
-	{
-	  // Single level
+      } // end while
+   } // end else
 
-	  Dimension.add(atoi(ptr2));
-	}
-      }
+   // Check for "/PROB" to indicate a probability forecast
+   if (strstr(MagicStr, "/PROB") != NULL) PFlag = 1;
 
-      // Set ptr to NULL for next call to strtok
+   // Set the long name
+   sprintf(tmp_str, "%s(%s)", req_name().text(), Level.req_name().text());
+   set_long_name(tmp_str);
 
-      ptr = NULL;
-    } // end while
+   // Set the units
+   set_units(na_str);
 
-  } // end else
-
-  // Check for "/PROB" to indicate a probability forecast
-
-  if (strstr(magic_string, "/PROB") != NULL)
-    PFlag = 1;
-
-  // Set the long name
-
-  sprintf(tmp_str, "%s(%s)", req_name().text(), Level.req_name().text());
-  set_long_name(tmp_str);
-
-  // Set the units
-
-  set_units(na_str);
-
-  return;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcCF::set_dict(Dictionary &dict){
-   
-   VarInfo::set_dict(dict);
-   
-   ConcatString mag;
-   mag.format("%s%s", dict.lookup_string("name").text(),
-                      dict.lookup_string("level").text());
-   set_magic(mag);
-   set_req_name( dict.lookup_string("name") );
 
-   //  check for a probability boolean setting
-   if( dict.lookup_bool(conf_key_prob, false) ){
-      set_p_flag( true );
+   VarInfo::set_dict(dict);
+
+   set_magic(dict.lookup_string("name").text(),
+             dict.lookup_string("level").text());
+   set_req_name(dict.lookup_string("name"));
+
+   // Check for a probability boolean setting
+   if(dict.lookup_bool(conf_key_prob, false)) {
+      set_p_flag(true);
       return;
    }
 }

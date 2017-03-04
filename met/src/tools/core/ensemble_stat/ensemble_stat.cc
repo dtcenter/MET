@@ -1020,7 +1020,7 @@ void process_point_obs(int i_nc) {
      conf_info.vx_pd[j].calc_obs_summary();
      conf_info.vx_pd[j].print_duplicate_report();
    }
-   
+
    // Deallocate and clean up
    if(obs_in) {
       //obs_in->close();
@@ -1057,13 +1057,13 @@ int process_point_ens(int i_ens, int &n_miss) {
       // For spread/skill, use the calculated mean file if none was specified
       if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) {
          fcst_dpa.clear();
-         ConcatString ens_magic;
-         ens_magic << conf_info.vx_pd[i].fcst_info->name() << "_"
-                   << conf_info.vx_pd[i].fcst_info->level_name() << "_"
-                   << "ENS_MEAN(*,*)";
-         mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
+         ConcatString ens_mn_name;
+         ens_mn_name << conf_info.vx_pd[i].fcst_info->name() << "_"
+                     << conf_info.vx_pd[i].fcst_info->level_name() << "_"
+                     << "ENS_MEAN";
+         mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
          info = new VarInfoNcMet();
-         info->set_magic(ens_magic);
+         info->set_magic(ens_mn_name, "(*,*)");
       }
       else {
          info = conf_info.vx_pd[i].fcst_info;
@@ -1369,13 +1369,13 @@ void process_grid_vx() {
 
          // For spread/skill, use the calculated mean file if none was specified
          if(!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) {
-            ConcatString ens_magic;
-            ens_magic << conf_info.ens_info[i]->name() << "_"
-                      << conf_info.ens_info[i]->level_name() << "_"
-                      << "ENS_MEAN(*,*)";
-            mlog << Debug(4) << "Generated mean field: " << ens_magic << "\n";
+            ConcatString ens_mn_name;
+            ens_mn_name << conf_info.ens_info[i]->name() << "_"
+                        << conf_info.ens_info[i]->level_name() << "_"
+                        << "ENS_MEAN";
+            mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
             info = new VarInfoNcMet();
-            info->set_magic(ens_magic);
+            info->set_magic(ens_mn_name, "(*,*)");
          }
          else {
             info = conf_info.vx_pd[i].fcst_info;

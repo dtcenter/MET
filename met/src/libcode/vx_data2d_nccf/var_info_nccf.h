@@ -58,7 +58,7 @@ class VarInfoNcCF : public VarInfo
          // set stuff
          //
 
-      void set_magic(const ConcatString &);
+      void set_magic(const ConcatString &, const ConcatString &);
       void set_dict(Dictionary &s);
 
       void add_dimension(int dim);
@@ -66,7 +66,7 @@ class VarInfoNcCF : public VarInfo
          //
          // do stuff
          //
-      
+
       bool is_precipitation()     const;
       bool is_specific_humidity() const;
       bool is_u_wind()            const;

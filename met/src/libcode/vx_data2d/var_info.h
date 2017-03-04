@@ -97,7 +97,7 @@ class VarInfo
          // set stuff
          //
 
-      virtual void set_magic(const ConcatString &);
+      virtual void set_magic(const ConcatString &, const ConcatString &);
       virtual void set_dict(Dictionary &);
       virtual void add_grib_code(Dictionary &);
 
