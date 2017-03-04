@@ -57,7 +57,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_climatology.xml \
           unit_test_grib_tables.xml \
           unit_grid_weight.xml \
-          unit_netcdf.xml"
+          unit_netcdf.xml \
+          unit_hira.xml"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
