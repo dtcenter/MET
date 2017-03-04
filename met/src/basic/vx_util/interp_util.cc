@@ -334,7 +334,7 @@ double interp_nbrhd(const DataPlane &dp, int x_ll, int y_ll, int wdth,
       nbrhd_cov = bad_data_double;
    }
    else {
-      nbrhd_cov = count_thr/count;
+      nbrhd_cov = (double) count_thr/count;
    }
 
    return(nbrhd_cov);
