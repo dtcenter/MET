@@ -819,6 +819,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    while((c = strtok(lp, delim)) != NULL) {
 
+      // Skip newline characters
+      if(strcmp(c, "\n") == 0) continue;
+
       jc_array.add(c);
 
       lp = (char *) 0;
