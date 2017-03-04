@@ -1,4 +1,28 @@
 ########################################################################
+#                                                           
+#      Add footnote to graphics      
+#                                                           
+########################################################################
+
+footnote <- paste(format(strftime(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC")))
+
+# default footnote is today's date, cex=.7 (size) and color
+# is a kind of grey
+
+makeFootnote <- function(footnoteText=
+                         footnote, size= .7, color= grey(.66))
+{
+   require(grid)
+   pushViewport(viewport())
+   grid.text(label= footnoteText ,
+             x = unit(1,"npc") - unit(2, "mm"),
+             y= unit(2, "mm"),
+             just=c("right", "bottom"),
+             gp=gpar(cex= size, col=color))
+   popViewport()
+}
+
+########################################################################
 #
 # Get a column of data to be plotted, handling absolute values and
 # differences.
@@ -7,7 +31,7 @@
 
 get_dep_column = function(dep) {
 
-  # Check for aboslute value
+  # Check for absolute value
   abs_flag = (substring(dep, 1, 3) == "ABS");
 
   # Strip off the absolute value
@@ -20,14 +44,14 @@ get_dep_column = function(dep) {
 
   # Initialize output
   col       = c();
-  col$val   = tcst[,diff_list[1]];
+  col$val   = get_column_val(diff_list[1]);
   col$desc  = column_info[diff_list[1], "DESCRIPTION"];
   col$units = column_info[diff_list[1], "UNITS"];
 
   # Loop over any remaining entries
   i = 2
   while(i <= length(diff_list)) {
-    col$val   = col$val - tcst[,diff_list[i]];
+    col$val   = col$val - get_column_val(diff_list[i]);
     col$desc  = paste(col$desc, "-",
                       column_info[diff_list[i], "DESCRIPTION"]);
     # Only append units that differ
@@ -45,6 +69,49 @@ get_dep_column = function(dep) {
   }
 
   return(col);
+}
+
+########################################################################
+#
+# Get the column values, handling wind data.
+#
+########################################################################
+
+get_column_val = function(dep) {
+
+  # Compute the average of the wind radii, if requested
+  if(length(grep("AVG_WIND", dep)) > 0) {
+  
+    # Parse the first character and the last 2 characters
+    typ = substr(dep, 1, 1);
+    rad = substr(dep, nchar(dep)-1, nchar(dep));
+    
+    # Pull wind radii for the 4 quadrants
+    ne_wind = tcst[, paste(typ, "NE_WIND_", rad, sep='')];
+    se_wind = tcst[, paste(typ, "SE_WIND_", rad, sep='')];
+    sw_wind = tcst[, paste(typ, "SW_WIND_", rad, sep='')];
+    nw_wind = tcst[, paste(typ, "NW_WIND_", rad, sep='')];
+    
+    # Replace any instances of 0 with NA
+    ne_wind[ne_wind == 0] = NA;
+    se_wind[se_wind == 0] = NA;
+    sw_wind[sw_wind == 0] = NA;
+    nw_wind[nw_wind == 0] = NA;
+    
+    # Compute the average
+    val = (ne_wind + se_wind + sw_wind + nw_wind)/4;
+  }
+  # Otherwise, just get the column value
+  else {
+    val = tcst[,dep];
+  }
+
+  # For _WIND_ columns, replace any instances of 0 with NA
+  if(length(grep("_WIND_", dep)) > 0) {
+    val[val == 0] = NA;
+  }
+
+  return(val);
 }
 
 ########################################################################
@@ -74,7 +141,7 @@ get_series_data = function(cur, cur_plot, diff) {
         cat("ERROR: When computing series differences for",
             cur, "the case data does not match:",
             series_data$CASE, "!=", series_diff$CASE);
-        quit(1);
+        quit(status=1);
       }
 
       # Compute series difference
@@ -195,27 +262,29 @@ get_prop_ci <- function(x, n) {
 
 get_mean_ci = function(d) {
 
+  # Degrees of freedom for t-distribution
+  df = sum(!is.na(d)) - 1;
+
   # Compute the standard error
   s = Compute_STDerr_from_mean(d, "ML");
-  if(length(s) > 1 && s[2] == 0 && sum(d != 0) >= n_min) {
-    stderr = zval*s[1];
+  if(length(s) > 1 && !is.na(s[2]) && s[2] == 0) {
+    tval   = abs(qt(alpha/2, df));
+    stderr = tval*s[1];
   }
   else {
-    stderr = 0;
+    stderr = NA;
   }
 
   # Compute the statistic and confidence interval
   stat     = c();
   stat$val = mean(d, na.rm=TRUE);
-  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, stat$val - stderr);
-  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, stat$val + stderr);
+  stat$ncl = ifelse(sum(!is.na(d)) < n_min || is.na(stderr), NA, stat$val - stderr);
+  stat$ncu = ifelse(sum(!is.na(d)) < n_min || is.na(stderr), NA, stat$val + stderr);
 
   # Compute the p-value
-  count     = sum(!is.na(d));
-  df        = count - 1;
   ss_pval   = 0.0 - abs(stat$val/s[1]);
   stat$pval = 1 - 2*pt(ss_pval, df);
-
+  
   return(stat);
 }
 
@@ -227,24 +296,26 @@ get_mean_ci = function(d) {
 
 get_median_ci = function(d) {
 
+  # Degrees of freedom for t-distribution
+  df = sum(!is.na(d)) - 1;
+  
   # Compute the standard error
   s = Compute_STDerr_from_median(d, "ML");
-  if(length(s) > 1 && s[2] == 0 && sum(d != 0) >= n_min) {
-    stderr = zval*s[1];
+  if(length(s) > 1 && !is.na(s[2]) && s[2] == 0) {
+    tval   = abs(qt(alpha/2, df));
+    stderr = tval*s[1];
   }
   else {
-    stderr = 0;
+    stderr = NA;
   }
 
   # Compute the statistic and confidence interval
   stat     = c();
   stat$val = median(d, na.rm=TRUE);
-  stat$ncl = ifelse(sum(!is.na(d)) < n_min, NA, stat$val - stderr);
-  stat$ncu = ifelse(sum(!is.na(d)) < n_min, NA, stat$val + stderr);
+  stat$ncl = ifelse(sum(!is.na(d)) < n_min || is.na(stderr), NA, stat$val - stderr);
+  stat$ncu = ifelse(sum(!is.na(d)) < n_min || is.na(stderr), NA, stat$val + stderr);
 
   # Compute the p-value
-  count     = sum(!is.na(d));
-  df        = count - 1;
   ss_pval   = 0.0 - abs(stat$val/s[1]);
   stat$pval = 1 - 2*pt(ss_pval, df);
 
@@ -257,7 +328,7 @@ get_median_ci = function(d) {
 #
 ########################################################################
 
-get_yrange = function(plot_type) {
+get_yrange = function(plot_type, cur_baseline_data, skill_ref) {
 
   # Initialize
   ylim = c(NA,NA);
@@ -267,13 +338,18 @@ get_yrange = function(plot_type) {
     case_data = get_case_data();
   }
 
+  # Get current subset of skill score reference data
+  if(plot_type == skillmn_str || plot_type == skillmd_str) {
+    skill_ref_data = get_series_data(skill_ref, skill_ref,
+                                  diff_flag[i]);
+  }
+
   # Loop over the series list entries
   for(i in 1:n_series) {
 
     # Get current subset of data
     series_data = get_series_data(series_list[i], series_plot[[i]],
                                   diff_flag[i]);
-
     # Skip this iteration if there's no valid data
     if(sum(!is.na(series_data$PLOT)) == 0) next;
 
@@ -289,6 +365,13 @@ get_yrange = function(plot_type) {
         data = subset(series_data, series_data$LEAD_HR == lead_list[j] &
                       !is.na(series_data$PLOT));
 
+        if(all(!is.na(cur_baseline_data))) {
+          baseline_lead = cur_baseline_data[cur_baseline_data$LEAD/10000 == lead_list[j],]$VALUE;
+        }
+        else {
+          baseline_lead = NA;
+        }
+
         # Skip lead times for which no data is found
         if(dim(data)[1] == 0) next;
 
@@ -297,8 +380,49 @@ get_yrange = function(plot_type) {
         else                      { cur = get_median_ci(data$PLOT); }
 
         # Append the current values to the list
-        if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
-        else        { yvals = c(yvals, cur$val);                   }
+        if(series_ci[i]) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu, baseline_lead); }
+        else             { yvals = c(yvals, cur$val, baseline_lead);                   }
+
+      } # end for j
+    }
+    else if(plot_type == skillmn_str || plot_type == skillmd_str) {
+    
+      for(j in 1:length(lead_list)) {
+
+        # Get data for the current lead time
+        data     = subset(series_data, series_data$LEAD_HR == lead_list[j] &
+                          !is.na(series_data$PLOT));
+        data_ref = subset(skill_ref_data, skill_ref_data$LEAD_HR == lead_list[j] &
+                          !is.na(skill_ref_data$PLOT));
+                          
+        if(all(!is.na(cur_baseline_data))) {
+          baseline_lead = round(100*(cur_baseline_data[cur_baseline_data$LEAD/10000 == lead_list[j] & cur_baseline_data$TYPE == "OCD5",]$VALUE-cur_baseline_data[cur_baseline_data$LEAD/10000 == lead_list[j] & cur_baseline_data$TYPE == "CONS",]$VALUE)/cur_baseline_data[cur_baseline_data$LEAD/10000 == lead_list[j] & cur_baseline_data$TYPE == "OCD5",]$VALUE,1)
+        }
+        else {
+          baseline_lead = NA;
+        }
+
+        # Skip lead times for which no data is found
+        if(dim(data)[1] == 0) next;
+
+        # Get the values to be plotted for this lead time
+        if(plot_type == skillmn_str) {
+          # Compute the statistic
+          cur      = c();
+          cur_mean = mean(data$PLOT, na.rm=TRUE);
+          ref_mean = mean(data_ref$PLOT); 
+          cur$val  = round(100*(ref_mean - cur_mean)/ref_mean,0)
+        } else                    {
+          # Compute the statistic
+          cur      = c();
+          cur_median = median(data$PLOT, na.rm=TRUE);
+          ref_median = median(data_ref$PLOT); 
+          cur$val  = round(100*(ref_median - cur_median)/ref_median,0)
+        }
+        
+        # Append the current values to the list
+        if(series_ci[i]) { yvals = c(yvals, cur$val, baseline_lead);                   }
+        else             { yvals = c(yvals, cur$val, baseline_lead);                   }
 
       } # end for j
     }
@@ -319,8 +443,8 @@ get_yrange = function(plot_type) {
           cur = get_prop_ci(n_cur, n_tot);
 
           # Append the current values to the list
-          if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
-          else        { yvals = c(yvals, cur$val);                   }
+          if(series_ci[i]) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
+          else             { yvals = c(yvals, cur$val);                   }
 
           # Handle the ties
           n_cur = sum(case_data$PLOT[ind] == "TIE", na.rm=TRUE);
@@ -330,8 +454,8 @@ get_yrange = function(plot_type) {
           cur = get_prop_ci(n_cur, n_tot);
 
           # Append the current values to the list
-          if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
-          else        { yvals = c(yvals, cur$val);                   }
+          if(series_ci[i]) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
+          else             { yvals = c(yvals, cur$val);                   }
         }
         # Handle the rank frequency
         else {
@@ -344,19 +468,21 @@ get_yrange = function(plot_type) {
           cur = get_prop_ci(n_cur, n_tot);
 
           # Append the current values to the list
-          if(ci_flag) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
-          else        { yvals = c(yvals, cur$val);                   }
+          if(series_ci[i]) { yvals = c(yvals, cur$val, cur$ncl, cur$ncu); }
+          else             { yvals = c(yvals, cur$val);                   }
         }
 
       } # end for j
     }
     else {
-      yvals = range(series_data$PLOT, na.rm=TRUE);
+      if(all(!is.na(cur_baseline_data))) { baseline_lead = cur_baseline_data$VALUE; }
+      else                               { baseline_lead = NA;                      }
+      yvals = range(c(series_data$PLOT, baseline_lead), na.rm=TRUE);
     }
 
     # Update the plotting limits
     ylim = range(c(ylim, yvals), na.rm=TRUE);
-
+    
   } # end for i
 
   return(ylim);
@@ -369,31 +495,63 @@ get_yrange = function(plot_type) {
 ########################################################################
 
 plot_time_series = function(dep, plot_type,
-                            title_str, subtitle_str, ylab_str) {
+                            title_str, subtitle_str, ylab_str, 
+                            cur_baseline, cur_baseline_data,
+                            skill_ref, footnote_flag) {
 
   cat("Plotting", plot_type, "time series by", series, "\n");
+
+  # Compute the series offsets
+  hoff = ifelse(plot_type == relperf_str || plot_type == rank_str,
+                relperf_rank_horz_offset, horz_offset);
+  horz = (seq(1, n_series) - n_series/2 - 0.5)*hoff;
+  if(event_equal == FALSE) {
+    vert = seq(2.0, 2.0-(n_series*vert_offset), by=-1.0*vert_offset);
+  } else {
+    vert = rep(1.0,n_series);
+  }
+
+  # Determine whether adding the HFIP baseline is appropriate
+  if(cur_baseline == "no") {
+    cat("Plot HFIP Baseline:", cur_baseline, "\n");
+  } else if(length(i <- grep("Water Only", title_str)) | (plot_type != boxplot_str 
+            & plot_type != point_str & plot_type != mean_str 
+            & plot_type != skillmn_str)) {
+    cur_baseline = "no"
+    cur_baseline_data = NA
+    cat("Plot HFIP Baseline:", cur_baseline, "\n");
+  } else {
+    if(plot_type == "SKILL_MN") {
+      cur_baseline = gsub("Error ", "Skill ", cur_baseline)
+      cur_baseline = gsub("HFIP Baseline ", "HFIP Skill Baseline", cur_baseline)
+    } else {
+      cur_baseline_data = na.omit(subset(cur_baseline_data, cur_baseline_data$TYPE %in% "CONS"))
+    }    
+    cat("Plot HFIP Baseline:", gsub("Error ", "", cur_baseline), "\n");
+    write.table(cur_baseline_data,row.names = FALSE);
+  }
+
+  # Set the range for the Y-axis
+  if(!is.na(ymin) & !is.na(ymax)) { yrange = c(ymin, ymax);                            }
+  else                            { yrange = get_yrange(plot_type, cur_baseline_data,
+                                                        skill_ref);                    }
+
+  # Do not create plot file if the y limits are not finite
+  if(any(!is.finite(yrange))) {
+    cat("Not plotting", plot_type, "time series by", series, "since yrange is", yrange,"\n")
+  } else {
 
   # Open the output device
   cat(paste("Creating image file:", out_file, "\n"));
   bitmap(out_file, type=img_fmt,
          height=img_hgt, width=img_wdth, res=img_res);
 
-  # Compute the series offsets
-  hoff = ifelse(plot_type == relperf_str || plot_type == rank_str,
-                relperf_rank_horz_offset, horz_offset);
-  horz = (seq(1, n_series) - n_series/2 - 0.5)*hoff;
-  vert = seq(2.0, 2.0-(n_series*vert_offset), by=-1.0*vert_offset);
-
-  # Set the range for the Y-axis
-  if(!is.na(ymin) & !is.na(ymax)) { yrange = c(ymin, ymax);         }
-  else                            { yrange = get_yrange(plot_type); }
-
   cat(paste("Range of ", dep, ":", sep=''),
       paste(yrange, collapse=", "), "\n");
-  
+
   # Create an empty plot
   top_mar = ifelse(event_equal, 6, 6+floor(n_series/2));
-  par(mfrow=c(1,1), mar=c(5,4,top_mar,2), cex=1.5);
+  par(mfrow=c(1,1), mar=c(5,4,top_mar,2), cex=1.5);  
   plot(x=seq(0, max(lead_list), 6), type="n",
        xlab="Lead Time (h)",
        ylab=ylab_str,
@@ -406,9 +564,223 @@ plot_time_series = function(dep, plot_type,
   # Draw the X-axis
   axis(1, at=lead_list, tick=TRUE, labels=lead_list);
 
-  # Get the list of colors to be used
-  color_list = eval(parse(text=paste(tolower(plot_type),
+  # Determine the plotting options to be used.  If defined, use the
+  # plotting options for each series.
+  if(exists("plot_config_data") &&
+    series %in% names(plot_config_data) &&
+    plot_type != relperf_str &&
+    plot_type != rank_str) {
+ 
+    col_list = rep(NA, n_series);
+    pch_list = rep(NA, n_series);
+    lty_list = rep(NA, n_series);
+    lwd_list = rep(NA, n_series);
+    
+    # Loop through the series and store the plotting options
+    for(i in 1:n_series) {
+    
+      # Get indicator for the current series
+      if(length(ii <- grep("-", series_list))) {
+        ind = (plot_config_data[[series]] == legend_list[i]);
+      } else {
+        ind = (plot_config_data[[series]] == series_list[i]);
+      }
+
+      # If there's not exactly one setting, use defaults
+      if(sum(ind) != 1) {
+        if(length(i <- grep("-", series_list))) {
+          cat("WARNING: Problem with \"", legend_list[i],
+              "\" entry for the \"", series, "\" series in file \"",
+              plot_config, "\".\n", sep='');
+        } else {
+          cat("WARNING: Problem with \"", series_list[i],
+              "\" entry for the \"", series, "\" series in file \"",
+              plot_config, "\".\n", sep='');
+        }
+        col_list[i] = default_color;
+        pch_list[i] = default_pch;
+        lty_list[i] = default_lty;
+        lwd_list[i] = default_lwd;
+      }
+      # Otherwise, retrieve the plotting configuration entries
+      else {
+
+        col_list[i] = as.character(plot_config_data$COL[ind]);
+        pch_list[i] = plot_config_data$PCH[ind];
+        lty_list[i] = plot_config_data$LTY[ind];
+        lwd_list[i] = plot_config_data$LWD[ind];
+
+      }
+    }
+  }
+  # Otherwise, use color list for the current plot type
+  else {
+    col_list = eval(parse(text=paste(tolower(plot_type),
                                      "_color_list", sep='')));
+    pch_list = rep(default_pch, n_series);
+    lty_list = rep(default_lty, n_series);
+    lwd_list = rep(default_lwd, n_series);
+  }
+
+  # Check for too few colors
+  if(n_series > length(col_list)) {
+    cat("WARNING: The number of series (", n_series,
+        ") exceeds the number of colors (", length(col_list),
+        ").\n", sep='');
+  }
+
+  # Store all the plotting options in one list
+  plot_opts = list(col_list=col_list, pch_list=pch_list,
+                   lty_list=lty_list, lwd_list=lwd_list);
+
+  # Populate the plot based on plot type
+  if(plot_type == boxplot_str || plot_type == point_str) {
+    plot_box_point(dep, plot_type, horz, vert, plot_opts,
+                   cur_baseline, cur_baseline_data);
+  }
+  else if(plot_type == mean_str || plot_type == median_str) {
+    plot_mean_median(dep, plot_type, horz, vert, plot_opts,
+                     cur_baseline, cur_baseline_data);
+  }
+  else if(plot_type == skillmn_str || plot_type == skillmd_str) {
+    plot_skill_mean_median(dep, plot_type, horz, vert, plot_opts,
+                           cur_baseline, cur_baseline_data, skill_ref);
+  }
+  else if(plot_type == relperf_str) {
+    plot_relperf(dep, horz, vert, plot_opts);
+  }
+  else if(plot_type == rank_str) {
+    plot_rank(dep, horz, vert, plot_opts);
+  }
+
+  if(footnote_flag == "TRUE") {
+    makeFootnote(footnote)
+  }
+
+  # Close the output device
+  dev.off();
+  }
+}
+
+########################################################################
+#
+# Plot data on scatter plot.
+#
+########################################################################
+
+plot_scatter = function(scatter_x, scatter_y,
+                        title_str, subtitle_str, xlab_str, 
+                        ylab_str, footnote_flag) {
+
+  cat("Plotting scatter plot.\n");
+
+  # CWILL: For transparent dots, must use pdf
+#   pdf(out_file,
+#         height=img_hgt, width=img_wdth, useDingbats=FALSE);
+
+#   # Set the range for the X and Y-axes
+#   if(!is.na(xmin) & !is.na(xmax)) { xrange = c(xmin, xmax);      }
+#   else                            { xrange = range(tcst$SCATTER_X, na.rm=TRUE); }
+#   if(!is.na(ymin) & !is.na(ymax)) { yrange = c(ymin, ymax);      }
+#   else                            { yrange = range(tcst$SCATTER_Y, na.rm=TRUE); }
+#   cur_baseline_data = na.omit(subset(cur_baseline_data, cur_baseline_data$TYPE %in% "CONS"))
+#   tcst$SCATTER_X = subset(tcst$SCATTER_X, !is.na(tcst$SCATTER_Y))
+#   tcst$SCATTER_Y = subset(tcst$SCATTER_Y, !is.na(tcst$SCATTER_X))
+#     ne_wind[ne_wind == 0] = NA;
+
+  # Set non-matched SCATTER_X and SCATTER_Y values to NA
+  tcst$SCATTER_X[is.na(tcst$SCATTER_Y)] = NA;
+  tcst$SCATTER_Y[is.na(tcst$SCATTER_X)] = NA;
+
+  # Set the range for the X and Y-axes
+  if(!is.na(xmin) & !is.na(xmax)) {
+    xrange = c(xmin, xmax);
+  } else if(length(i <- grep("_WIND_", scatter_x)) && length(i <- grep("_WIND_", scatter_y))) {
+    xrange = range(c(tcst$SCATTER_X,tcst$SCATTER_Y), na.rm=TRUE);
+  } else if(length(i <- grep("AMAX_WIND", scatter_x)) && length(i <- grep("BMAX_WIND", scatter_y))) {
+    xrange = range(c(tcst$SCATTER_X,tcst$SCATTER_Y), na.rm=TRUE);
+  } else if(length(i <- grep("BMAX_WIND", scatter_x)) && length(i <- grep("AMAX_WIND", scatter_y))) {
+    xrange = range(c(tcst$SCATTER_X,tcst$SCATTER_Y), na.rm=TRUE);
+  } else {
+    xrange = range(tcst$SCATTER_X, na.rm=TRUE);
+  }
+  if(!is.na(ymin) & !is.na(ymax)) {
+    yrange = c(ymin, ymax);
+  } else if(length(i <- grep("_WIND_", scatter_x)) && length(i <- grep("_WIND_", scatter_y))) {
+    yrange = range(c(tcst$SCATTER_X,tcst$SCATTER_Y), na.rm=TRUE);
+  } else if(length(i <- grep("AMAX_WIND", scatter_x)) && length(i <- grep("BMAX_WIND", scatter_y))) {
+    yrange = range(c(tcst$SCATTER_X,tcst$SCATTER_Y), na.rm=TRUE);
+  } else if(length(i <- grep("BMAX_WIND", scatter_x)) && length(i <- grep("AMAX_WIND", scatter_y))) {
+    yrange = range(c(tcst$SCATTER_X,tcst$SCATTER_Y), na.rm=TRUE);
+  } else {
+    yrange = range(tcst$SCATTER_Y, na.rm=TRUE);
+  }
+  
+  # Do not create plot file if the y limits are not finite
+  if(any(!is.finite(xrange)) || any(!is.finite(yrange))) {
+    cat("Not plotting scatter plot since \n",
+         "xrange is", xrange,"\n",
+         "yrange is", yrange,"\n")
+  } else if(sum(tcst$LEAD_HR[!is.na(tcst$SCATTER_X)] %in% lead_list) == 0) {
+    cat("Not plotting scatter plot since \n",
+         "lead times for", scatter_x,"column:", unique(tcst$LEAD_HR[!is.na(tcst$SCATTER_X)]), "\n",
+         "are not in the list of lead times for this plot:", lead_list,"\n")
+  } else {
+
+  # Open the output device
+  cat(paste("Creating image file:", out_file, "\n"));
+  bitmap(out_file, type=img_fmt,
+         height=img_hgt, width=img_wdth, res=img_res);
+  
+  cat(paste("x-axis range of ", scatter_x, ":", sep=''),
+      paste(xrange, collapse=", "), "\n");
+  cat(paste("y-axis range of ", scatter_y, ":", sep=''),
+      paste(yrange, collapse=", "), "\n");
+  
+  # Add extra space to right of plot area; change clipping to figure
+  par(mar=c(5,4,4,8), xpd=TRUE)
+
+# Create an empty plot
+#   top_mar = ifelse(event_equal, 6, 6+floor(n_series/2));
+#   par(mfrow=c(1,1), mar=c(5,4,top_mar,2), cex=1.5);
+#   plot(x=seq(0, max(lead_list), 6), type="n",
+#        xlab=xlab_str,
+#        ylab=ylab_str,
+#        main=NA, sub=subtitle_str,
+#        xlim=c(0+min(horz), max(lead_list)+max(horz)),
+#        ylim=yrange,
+#        xaxt='n', col=0, col.axis="black");
+  plot(x=tcst$SCATTER_X,
+       y=tcst$SCATTER_Y,
+       type="n",
+       xlab=xlab_str,
+       ylab=ylab_str,
+       main=NA, sub=subtitle_str,
+       xlim=xrange,
+       ylim=yrange,
+       col="black", col.axis="black");
+  title(main=title_str);
+
+  par(xpd=FALSE)
+  if(length(i <- grep("_WIND_", scatter_x)) && length(i <- grep("_WIND_", scatter_y))) {
+    abline(0, 1, col="gray", lty=2); # Draw a 1 to 1 reference line
+    cat(scatter_x," ",scatter_y," ","print1", "\n")
+  } else if(length(i <- grep("AMAX_WIND", scatter_x)) && length(i <- grep("BMAX_WIND", scatter_y))) {
+    abline(0, 1, col="gray", lty=2); # Draw a 1 to 1 reference line
+    cat(scatter_x," ",scatter_y," ","print2", "\n")
+  } else if(length(i <- grep("BMAX_WIND", scatter_x)) && length(i <- grep("AMAX_WIND", scatter_y))) {
+    abline(0, 1, col="gray", lty=2); # Draw a 1 to 1 reference line
+    cat(scatter_x," ",scatter_y," ","print3", "\n")
+  } else {
+    abline(h=0, col="gray", lty=2); # Draw a reference line at 0
+    cat(scatter_x," ",scatter_y," ","print4", "\n")
+  }
+  par(xpd=TRUE)
+  
+  # Loop through the lead times in tcst$LEAD???, lookup the correct color, and call "points()" function once for each lead time
+
+  # Get the list of colors to be used
+  color_list = eval(parse(text="scatter_color_list"));
 
   # Check for too few colors
   if(n_series > length(color_list)) {
@@ -417,31 +789,53 @@ plot_time_series = function(dep, plot_type,
         ").\n", sep='');
   }
 
-  # Populate the plot based on plot type
-  if(plot_type == boxplot_str || plot_type == scatter_str) {
-    plot_box_scatter(dep, plot_type, horz, vert, color_list);
-  }
-  else if(plot_type == mean_str || plot_type == median_str) {
-    plot_mean_median(dep, plot_type, horz, vert, color_list);
-  }
-  else if(plot_type == relperf_str) {
-    plot_relperf(dep, horz, vert, color_list);
-  }
-  else if(plot_type == rank_str) {
-    plot_rank(dep, horz, vert, color_list);
+  # Add color points for each lead time
+  i = 1
+  lead_list_leg <- numeric(0)
+  color_list_leg <- character(0)
+  pch_list_leg=""
+  for(lead in lead_list) {
+      
+    # Create a point plot
+# CWILL: for transparent dots use...
+#     rgb_val = col2rgb(color_list[i])/255;
+#     rgb_col = rgb(rgb_val[1], rgb_val[2], rgb_val[3], 0.25); # (or whatever transparency value)
+#     points(tcst$SCATTER_X[tcst$LEAD_HR == lead], tcst$SCATTER_Y[tcst$LEAD_HR == lead], pch=1, col=rgb_col);
+    points(tcst$SCATTER_X[tcst$LEAD_HR == lead], tcst$SCATTER_Y[tcst$LEAD_HR == lead],           pch=1, col=color_list[i]);
+    
+    if(lead %in% tcst$LEAD_HR && !all(is.na(tcst$SCATTER_Y[tcst$LEAD_HR == lead])) && !all(is.na(tcst$SCATTER_X[tcst$LEAD_HR == lead]))) {
+      lead_list_leg=c(lead_list_leg,lead)
+      color_list_leg=c(color_list_leg,color_list[i])
+    }
+    
+    i = i +1
+    
+  } # end for lead
+  # Add a legend
+  legend(x="topright",
+         inset=c(-0.15,0),
+         legend=c(lead_list_leg),
+         col=c(color_list_leg),
+         pch=c(rep(1,length(lead_list_leg))),
+         bty="n",
+         title="Lead Times");
+         
+  if(footnote_flag == "TRUE") {
+    makeFootnote(footnote)
   }
 
   # Close the output device
   dev.off();
+  }
 }
 
 ########################################################################
 #
-# Create time series of boxplots or scatter plots.
+# Create time series of boxplots or point plots.
 #
 ########################################################################
 
-plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
+plot_box_point = function(dep, plot_type, horz, vert, plot_opts, cur_baseline, cur_baseline_data) {
 
   # Only generate a log file for boxplots
   do_log = (log_flag == TRUE && plot_type == boxplot_str);
@@ -453,46 +847,45 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
   # Loop over the series list entries
   for(i in 1:n_series) {
 
-    # Get the color index
-    i_col = i%%length(color_list);
-    if(i_col == 0) {
-      color = color_list[length(color_list)];
-    }
-    else {
-      color = color_list[i_col];
-    }
+    # Get the current plotting information
+    cur_i   = i%%length(plot_opts$col_list);
+    cur_i   = ifelse(cur_i == 0, length(plot_opts$col_list), cur_i);
+    cur_col = plot_opts$col_list[cur_i];
+    cur_pch = plot_opts$pch_list[cur_i];
+    cur_lwd = plot_opts$lwd_list[cur_i];
+    cur_lty = plot_opts$lty_list[cur_i];
 
     # Get current subset of data
     series_data = get_series_data(series_list[i], series_plot[[i]],
                                   diff_flag[i]);
 
-    # Add boxplots or scatter plots for each lead time
+    # Add boxplots or point plots for each lead time
     for(lead in lead_list) {
 
       # Get data for the current lead time
       data = subset(series_data, series_data$LEAD_HR == lead &
                     !is.na(series_data$PLOT));
+                    
+      # Point plot
+      if(plot_type == point_str || sum(!is.na(data$PLOT)) < n_min) {
 
-      # Scatter plot
-      if(plot_type == scatter_str || sum(!is.na(data$PLOT)) < n_min) {
-
-        # Create a scatter plot
+        # Create a point plot
         points(rep(lead+horz[i], length(data$PLOT)), data$PLOT,
-               pch=1, col=color);
+               pch=cur_pch, col=cur_col);
       }
       # Boxplot
       else if(plot_type == boxplot_str) {
 
         # Set the boxplot color
-        bxp_col = ifelse(color == "black", "white", color);
+        bxp_col = ifelse(cur_col == "black", "white", cur_col);
 
         # Create a boxplot
         b = boxplot(data$PLOT,
                     add=TRUE, notch=TRUE, boxwex=1.5,
-                    outpch=1, outcex=1.0,
+                    outpch=cur_pch, outcex=1.0,
                     at=lead+horz[i], xaxt="n", yaxt="n",
-                    col=bxp_col, outcol=color,
-                    whiskcol=color, staplecol=color,
+                    col=bxp_col, outcol=cur_col,
+                    whiskcol=cur_col, staplecol=cur_col,
                     varwidth=TRUE);
 
         # Store logging information
@@ -521,7 +914,7 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
           } # end for outlier
         } # end if do_log
       }
-
+      
       # Plot the mean value
       points(lead+horz[i], mean(data$PLOT, na.rm=TRUE), pch=8);
 
@@ -529,19 +922,49 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
     
     # Plot the valid data counts    
     if(event_equal == FALSE || i == 1) {
-      plot_valid_counts(series_data, color, vert[i]);
+      plot_valid_counts(series_data, cur_col, vert[n_series+1-i]);
     }
 
   } # end for i
 
+  # Add HFIP baseline for each lead time
+  for(lead in lead_list) {
+
+    # Get data for the current lead time
+    if(all(!is.na(cur_baseline_data))) {
+      baseline_lead = cur_baseline_data[cur_baseline_data$LEAD/10000 == lead,]$VALUE;
+    }
+    else {
+      baseline_lead = NA;
+    }
+    
+    # Plot the HFIP baseline
+    if(length(baseline_lead) > 0) {
+#       cat(paste("baseline_lead is",baseline_lead,"for lead",lead,"\n"))
+      points(lead, baseline_lead, pch=9, col="blue")
+    }
+    
+  } # end for lead
+
+
   # Add a legend
-  legend(x="topleft",
-         legend=c(series_list, "Mean"),
-         col=c(rep(color_list, n_series)[1:n_series], "black"),
-         lty=c(rep(1, n_series),NA),
-         lwd=c(rep(2, n_series),NA),
-         pch=c(rep(NA,n_series),8),
+  if(cur_baseline == "no") {
+    legend(x="topleft",
+           legend=c(legend_list, "Mean"),
+           col=c(rep(plot_opts$col_list, n_series)[1:n_series], "black"),
+           lty=c(rep(default_lty, n_series), NA),
+           lwd=c(rep(default_lwd, n_series), NA),
+           pch=c(rep(plot_opts$pch_list, n_series)[1:n_series], 8),
+           bty="n");
+  } else {
+    legend(x="topleft",
+         legend=c(legend_list, "Mean", cur_baseline),
+         col=c(rep(plot_opts$col_list, n_series)[1:n_series], "black", "blue"),
+         lty=c(rep(default_lty, n_series), NA, NA),
+         lwd=c(rep(default_lwd, n_series), NA, NA),
+         pch=c(rep(plot_opts$pch_list, n_series)[1:n_series], 8, 9),
          bty="n");
+  }  
 
   # Write the log data out to the log file
   if(do_log) {
@@ -568,10 +991,10 @@ plot_box_scatter = function(dep, plot_type, horz, vert, color_list) {
 #
 ########################################################################
 
-plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
+plot_mean_median = function(dep, plot_type, horz, vert, plot_opts, cur_baseline, cur_baseline_data) {
 
   # Only generate a log file for a single series of differences
-  do_log = (log_flag == TRUE && n_series == 1 && diff_flag[1] == TRUE);
+  do_log = (log_flag == TRUE && sum(diff_flag) > 0);
 
   # Draw a reference line at 0
   abline(h=0, lty=3, lwd=2.0);
@@ -579,14 +1002,13 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
   # Loop over the series list entries
   for(i in 1:n_series) {
 
-    # Get the color index
-    i_col = i%%length(color_list);
-    if(i_col == 0) {
-      color = color_list[length(color_list)];
-    }
-    else {
-      color = color_list[i_col];
-    }
+    # Get the current plotting information
+    cur_i   = i%%length(plot_opts$col_list);
+    cur_i   = ifelse(cur_i == 0, length(plot_opts$col_list), cur_i);
+    cur_col = plot_opts$col_list[cur_i];
+    cur_pch = plot_opts$pch_list[cur_i];
+    cur_lwd = plot_opts$lwd_list[cur_i];
+    cur_lty = plot_opts$lty_list[cur_i];
 
     # Get current subset of data
     series_data = get_series_data(series_list[i], series_plot[[i]],
@@ -615,11 +1037,11 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
       stat_ncu[j] = s$ncu;
 
       # Store logging information
-      if(do_log && !is.na(stat_val[j])) {
+      if(do_log && diff_flag[i] && !is.na(stat_val[j])) {
 
         # Construct a table of logging information
         if(!exists("log_data")) {
-          log_data = data.frame(row.names=c("LEAD_HR", "COUNT", "NONZERO",
+          log_data = data.frame(row.names=c("SERIES", "LEAD_HR", "COUNT", "NONZERO",
                                             "STAT", "PC", "PVAL"));
         }
 
@@ -633,6 +1055,7 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
 
         # Log the lead time, statistic, percent change, and p-value
         log_data = cbind(log_data, c(
+                     series_list[i],
                      lead_list[j],
                      sum(!is.na(data$PLOT)),
                      sum(!is.na(data$PLOT) & data$PLOT != 0),
@@ -646,29 +1069,218 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
     # Plot the statistics
     ind = !is.na(stat_val);
     points(lead_list[ind]+horz[i], stat_val[ind],
-           pch=8, type='b', col=color);
-
+           type='b', col=cur_col, pch=cur_pch, lty=cur_lty, lwd=cur_lwd);
+           
     # Plot the confidence intervals
-    if(ci_flag) {
+    if(series_ci[i]) {
       arrows(lead_list[ind]+horz[i], stat_ncl[ind],
              lead_list[ind]+horz[i], stat_ncu[ind],
-             col=color, length=0.02, angle=90, code=3, lwd=2.0);
+             col=cur_col, lwd=cur_lwd, length=0.02, angle=90, code=3);
+    
+      # Indicate which differences are statistically significance
+      if(diff_flag[i] == TRUE) {
+        sig_pch = ifelse(cur_pch == 1, 16, cur_pch);
+        sig_stat_val = stat_val[ind];
+        sig_stat_val[stat_ncl[ind] <= 0 & stat_ncu[ind] >= 0] = NA;
+        sig_stat_val[is.na(stat_ncl[ind]) | is.na(stat_ncu[ind])] = NA;
+        points(lead_list[ind]+horz[i], sig_stat_val,
+               type='p', col=cur_col, cex=1.5,
+               pch=sig_pch, lty=cur_lty, lwd=cur_lwd);
+      }
     }
+    
 
     # Plot the valid data counts
     if(event_equal == FALSE || i == 1) {
-      plot_valid_counts(series_data, color, vert[i]);
+      plot_valid_counts(series_data, cur_col, vert[n_series+1-i]);
     }
 
   } # end for i
 
+  # Add HFIP baseline for each lead time
+  for(lead in lead_list) {
+
+    # Get data for the current lead time
+    if(all(!is.na(cur_baseline_data))) {
+      baseline_lead = cur_baseline_data[cur_baseline_data$LEAD/10000 == lead,]$VALUE;
+    }
+    else {
+      baseline_lead = NA;
+    }
+
+    # Plot the HFIP baseline
+    if(length(baseline_lead) > 0) {
+#       cat(paste("baseline_lead is",baseline_lead,"for lead",lead,"\n"))
+      points(lead, baseline_lead, pch=9, col="blue")
+    }
+    
+  } # end for lead
+
   # Add a legend
-  legend(x="topleft",
-         legend=series_list,
-         col=rep(color_list, n_series)[1:n_series],
-         lty=rep(1, n_series),
-         lwd=rep(2, n_series),
-         pch=8, bty="n");
+  if(cur_baseline == "no") {
+    legend(x="topleft",
+         legend=legend_list,
+         col=rep(plot_opts$col_list, n_series)[1:n_series],
+         lty=rep(plot_opts$lty_list, n_series)[1:n_series],
+         lwd=rep(plot_opts$lwd_list, n_series)[1:n_series],
+         pch=rep(plot_opts$pch_list, n_series)[1:n_series],
+         bty="n");
+  } else {
+    legend(x="topleft",
+         legend=c(legend_list, cur_baseline),
+         col=c(rep(plot_opts$col_list, n_series)[1:n_series], "blue"),
+         lty=c(rep(plot_opts$lty_list, n_series)[1:n_series], NA),
+         lwd=c(rep(plot_opts$lwd_list, n_series)[1:n_series], 1),
+         pch=c(rep(plot_opts$pch_list, n_series)[1:n_series], 9),
+         bty="n");
+  }  
+
+  # Write the log data out to the log file
+  if(do_log) {
+    cat(paste("Writing log file:", log_file, "\n"));
+    write.table(log_data, file=log_file, sep=',',
+                row.names=FALSE, col.names=FALSE, quote=FALSE);
+  }
+}
+
+########################################################################
+#
+# Create time series of mean or median skill score line plots.
+#
+########################################################################
+
+plot_skill_mean_median = function(dep, plot_type, horz, vert, plot_opts,
+                                  cur_baseline, cur_baseline_data, skill_ref) {
+
+  # Only generate a log file for a single series of differences
+  do_log = (log_flag == TRUE && n_series == 1 && diff_flag[1] == TRUE);
+
+  # Draw a reference line at 0
+  abline(h=0, lty=3, lwd=2.0);
+
+  # Loop over the series list entries
+  for(i in 1:n_series) {
+
+    # Get the current plotting information
+    cur_i   = i%%length(plot_opts$col_list);
+    cur_i   = ifelse(cur_i == 0, length(plot_opts$col_list), cur_i);
+    cur_col = plot_opts$col_list[cur_i];
+    cur_pch = plot_opts$pch_list[cur_i];
+    cur_lwd = plot_opts$lwd_list[cur_i];
+    cur_lty = plot_opts$lty_list[cur_i];
+
+    # Get current subset of data
+    series_data    = get_series_data(series_list[i], series_plot[[i]],
+                                     diff_flag[i]);
+    skill_ref_data = get_series_data(skill_ref, skill_ref,
+                                     diff_flag[i]);
+
+    # Compute statistics plus CI's for each lead time
+    stat_val = stat_ncl = stat_ncu = rep(NA, length(lead_list));
+
+    # Prepare the data for each lead time
+    # Remove 0 hr skill scores as not reasonable to improve analysis by 20 or 50%    
+    for(j in 2:length(lead_list)) {
+
+      # Get data for the current lead time
+      data     = subset(series_data, series_data$LEAD_HR == lead_list[j] &
+                        !is.na(series_data$PLOT));
+
+      data_ref = subset(skill_ref_data, skill_ref_data$LEAD_HR == lead_list[j] &
+                        !is.na(skill_ref_data$PLOT));
+
+      # Skip lead times for which no data is found
+      if(dim(data)[1] == 0) next;
+
+      # Handle the mean and median
+      if(plot_type == skillmn_str) {
+        # Compute the statistic
+        s        = c();
+        s_mean   = mean(data$PLOT, na.rm=TRUE);
+        ref_mean = mean(data_ref$PLOT); 
+        s$val    = round(100*(ref_mean - s_mean)/ref_mean,0)
+      } else                    {
+        # Compute the statistic
+        s          = c();
+        s_median   = median(data$PLOT, na.rm=TRUE);
+        ref_median = median(data_ref$PLOT); 
+        s$val      = round(100*(ref_median - s_median)/ref_median,0)
+      }
+
+      # Store stats for this lead time
+#       stat_ncl[j] = s$ncl;
+      stat_val[j] = s$val;
+#       stat_ncu[j] = s$ncu;
+
+      # Store logging information
+      if(do_log && !is.na(stat_val[j])) {
+
+        # Construct a table of logging information
+        if(!exists("log_data")) {
+          log_data = data.frame(row.names=c("LEAD_HR", "COUNT", "NONZERO",
+                                            "STAT"));
+        }
+
+        # Log the lead time, statistic, percent change, and p-value
+        log_data = cbind(log_data, c(
+                     lead_list[j],
+                     sum(!is.na(data$PLOT)),
+                     sum(!is.na(data$PLOT) & data$PLOT != 0),
+                     stat_val[j]));
+      }
+
+    } # end for j
+
+    # Plot the statistics
+    ind = !is.na(stat_val);
+    points(lead_list[ind]+horz[i], stat_val[ind],
+           type='b', pch=cur_pch, lty=cur_lty, lwd=cur_lwd, col=cur_col);
+
+    # Plot the valid data counts
+    if(event_equal == FALSE || i == 1) {
+      plot_valid_counts(series_data, cur_col, vert[n_series+1-i]);
+    }
+
+  } # end for i
+
+  # Add HFIP baseline for each lead time
+  for(lead in lead_list) {
+    if(lead != "0") {
+      # Get data for the current lead time
+      if(all(!is.na(cur_baseline_data))) {
+        baseline_lead = round(100*(cur_baseline_data[cur_baseline_data$LEAD/10000 == lead & cur_baseline_data$TYPE == "OCD5",]$VALUE-cur_baseline_data[cur_baseline_data$LEAD/10000 == lead & cur_baseline_data$TYPE == "CONS",]$VALUE)/cur_baseline_data[cur_baseline_data$LEAD/10000 == lead & cur_baseline_data$TYPE == "OCD5",]$VALUE,1)
+      }
+      else {
+        baseline_lead = NA;
+      }
+
+      # Plot the HFIP baseline
+      if(length(baseline_lead) > 0) {
+        cat(paste("baseline_lead is",baseline_lead,"for lead",lead,"\n"))
+        points(lead, baseline_lead, pch=9, col="blue")
+      }
+    }
+    
+  } # end for lead
+
+  # Add a legend
+  if(cur_baseline == "no") {
+    legend(x="topleft",
+         legend=legend_list,
+         col=rep(plot_opts$col_list, n_series)[1:n_series],
+         lty=rep(plot_opts$lty_list, n_series)[1:n_series],
+         lwd=rep(plot_opts$lwd_list, n_series)[1:n_series],
+         pch=rep(plot_opts$pch_list, n_series)[1:n_series],
+         bty="n");
+  } else {
+    legend(x="topleft",
+         legend=c(legend_list, cur_baseline),
+         col=c(rep(plot_opts$col_list, n_series)[1:n_series], "blue"),
+         lty=c(rep(plot_opts$lty_list, n_series)[1:n_series], NA),
+         lwd=c(rep(plot_opts$lwd_list, n_series)[1:n_series], 1),
+         pch=c(rep(plot_opts$pch_list, n_series)[1:n_series], 9),
+         bty="n");
+  }  
 
   # Write the log data out to the log file
   if(do_log) {
@@ -684,7 +1296,7 @@ plot_mean_median = function(dep, plot_type, horz, vert, color_list) {
 #
 ########################################################################
 
-plot_relperf = function(dep, horz, vert, color_list) {
+plot_relperf = function(dep, horz, vert, plot_opts) {
 
   # Check that event equalization has been applied
   if(event_equal == FALSE) {
@@ -714,14 +1326,16 @@ plot_relperf = function(dep, horz, vert, color_list) {
     # Set variables for plotting the ties:
     #   color, series value, and horizontal offset
     if(i == 0) {
-      color      = "gray";
+      cur_col    = "gray";
       series_val = "TIE";
       h_off      = 0;
     }
     else {
-      i_col      = i%%length(color_list);
-      color      = ifelse(i_col == 0, color_list[length(color_list)],
-                                      color_list[i_col]);
+    
+      # Get the current plotting information
+      cur_i      = i%%length(plot_opts$col_list);
+      cur_i      = ifelse(cur_i == 0, length(plot_opts$col_list), cur_i);
+      cur_col    = plot_opts$col_list[cur_i];
       series_val = series_list[i];
       h_off      = horz[i];
     }
@@ -751,18 +1365,18 @@ plot_relperf = function(dep, horz, vert, color_list) {
     # Plot the relative performance
     ind = !is.na(stat_val);
     points(lead_list[ind]+h_off, stat_val[ind],
-           pch=8, type='b', col=color);
+           pch=8, type='b', col=cur_col);
 
     # Plot relative performance confidence intervals
-    if(ci_flag) {
+    if(i == 0 || series_ci[i]) {
       points(lead_list[ind]+h_off, stat_ncl[ind],
-             type='l', lty=3, col=color);
+             type='l', lty=3, col=cur_col);
       points(lead_list[ind]+h_off, stat_ncu[ind],
-             type='l', lty=3, col=color);
+             type='l', lty=3, col=cur_col);
     }
 
     # Plot the valid data counts
-    if(i == 1) { plot_valid_counts(case_data, color, vert[i]); }
+    if(i == 1) { plot_valid_counts(case_data, cur_col, vert[n_series+1-i]); }
 
   } # end for i
 
@@ -773,11 +1387,11 @@ plot_relperf = function(dep, horz, vert, color_list) {
   }
 
   # Legend for relative performance
-  legend_str = c(paste(series_list, "Better"), "TIE");
-  if(ci_flag) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
+  legend_str = c(paste(legend_list, "Better"), "TIE");
+  if(series_ci[i]) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
   legend(x="topleft",
          legend=legend_str,
-         col=c(rep(color_list, n_series)[1:n_series], "gray", "gray"),
+         col=c(plot_opts$col_list[1:n_series], "gray", "gray"),
          lty=c(rep(1, n_series+1), 3),
          lwd=2, pch=c(rep(8, n_series+1), NA), bty="n");
 }
@@ -788,7 +1402,7 @@ plot_relperf = function(dep, horz, vert, color_list) {
 #
 ########################################################################
 
-plot_rank = function(dep, horz, vert, color_list) {
+plot_rank = function(dep, horz, vert, plot_opts) {
 
   # Check that event equalization has been applied
   if(event_equal == FALSE) {
@@ -815,10 +1429,10 @@ plot_rank = function(dep, horz, vert, color_list) {
   # Loop over the series list entries
   for(i in 1:n_series) {
 
-    # Get the color index
-    i_col = i%%length(color_list);
-    color = ifelse(i_col == 0, color_list[length(color_list)],
-                               color_list[i_col]);
+    # Get the current plotting information
+    cur_i   = i%%length(plot_opts$col_list);
+    cur_i   = ifelse(cur_i == 0, length(plot_opts$col_list), cur_i);
+    cur_col = plot_opts$col_list[cur_i];
 
     # Compute statistic for each lead time
     stat_val = stat_ncl = stat_ncu = rep(NA, length(lead_list));
@@ -852,14 +1466,14 @@ plot_rank = function(dep, horz, vert, color_list) {
     # Plot the statistics
     ind = !is.na(stat_val);
     points(lead_list[ind]+horz[i], stat_val[ind],
-           pch=as.character(i), type='b', col=color);
+           pch=as.character(i), type='b', col=cur_col);
 
     # Plot rank confidence intervals
-    if(ci_flag) {
+    if(series_ci[i]) {
       points(lead_list[ind]+horz[i], stat_ncl[ind],
-             type='l', lty=3, col=color);
+             type='l', lty=3, col=cur_col);
       points(lead_list[ind]+horz[i], stat_ncu[ind],
-             type='l', lty=3, col=color);
+             type='l', lty=3, col=cur_col);
     }
 
     # For the BEST and WORST series, plot the RANK_MIN values
@@ -869,7 +1483,7 @@ plot_rank = function(dep, horz, vert, color_list) {
     }
 
     # Plot the valid data counts
-    if(i == 1) { plot_valid_counts(case_data, color, vert[i]); }
+    if(i == 1) { plot_valid_counts(case_data, cur_col, vert[n_series+1-i]); }
 
   } # end for i
 
@@ -878,10 +1492,10 @@ plot_rank = function(dep, horz, vert, color_list) {
   legend_str = c(rank_str[1:min(3, n_series-1)]);
   if(n_series >= 5) legend_str = c(legend_str, paste(4:(n_series-1), "th", sep=''));
   legend_str = c(legend_str, rank_str[4]);
-  if(ci_flag) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
+  if(series_ci[i]) legend_str = c(legend_str, paste(100*(1-alpha), "% CI", sep=''));
   legend(x="topleft",
          legend=legend_str,
-         col=c(rep(color_list, n_series)[1:n_series], "gray"),
+         col=c(rep(plot_opts$col_list, n_series)[1:n_series], "gray"),
          lty=c(rep(1, n_series), 3),
          lwd=rep(2, n_series),
          pch=c(as.character(1:n_series), NA), bty="n");
