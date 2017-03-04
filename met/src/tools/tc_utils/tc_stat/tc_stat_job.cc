@@ -796,6 +796,9 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
 
       c = a[i];
 
+      // Skip newline characters
+      if(strcasecmp(c, "\n") == 0) continue;
+
       // Check for a job command option
       if(c[0] != '-') {
          b.add(a[i]);
