@@ -1365,22 +1365,13 @@ void process_scores() {
             // Apply HiRA verification logic
             if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
                 conf_info.hira_info.flag                &&
-               (conf_info.output_flag[i_pct]  != STATOutputType_None ||
+               (conf_info.output_flag[i_mpr]  != STATOutputType_None ||
+                conf_info.output_flag[i_pct]  != STATOutputType_None ||
                 conf_info.output_flag[i_pstd] != STATOutputType_None ||
                 conf_info.output_flag[i_pjc]  != STATOutputType_None ||
                 conf_info.output_flag[i_prc]  != STATOutputType_None)) {
 
                pd_ptr = &conf_info.vx_pd[i].pd[j][k][0];
-
-               mlog << Debug(2)
-                    << "Processing "
-                    << conf_info.vx_pd[i].fcst_info->magic_str()
-                    << " versus "
-                    << conf_info.vx_pd[i].obs_info->magic_str()
-                    << ", for observation type " << pd_ptr->msg_typ
-                    << ", over region " << pd_ptr->mask_name
-                    << ", for HiRA method, using "
-                    << pd_ptr->n_obs << " pairs.\n";
 
                // Appy HiRA verification and write probabilistic output
                do_hira(i, pd_ptr);
@@ -1701,7 +1692,7 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
 
    // Set flag for specific humidity
    bool spfh_flag = conf_info.vx_pd[i_vx].fcst_info->is_specific_humidity() &&
-                     conf_info.vx_pd[i_vx].obs_info->is_specific_humidity();
+                    conf_info.vx_pd[i_vx].obs_info->is_specific_humidity();
 
    shc.set_interp_mthd(InterpMthd_Nbrhd);
 
@@ -1715,11 +1706,6 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
       for(j=0; j<conf_info.hira_info.width.n_elements(); j++) {
 
          shc.set_interp_wdth(conf_info.hira_info.width[j]);
-
-         mlog << Debug(2)
-              << "Computing HiRA Statistics for categorical threshold "
-              << conf_info.fcat_ta[i_vx][i].get_str()
-              << " and width " << conf_info.hira_info.width[j] << ".\n";
 
          // Initialize
          hira_pd.clear();
@@ -1757,9 +1743,27 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
                          pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
 
             // Store the fractional coverage pair
-            hira_pd.add_pair(f_cov, pd_ptr->o_na[k], cmn_cov, pd_ptr->wgt_na[k]);
+            hira_pd.add_pair(pd_ptr->sid_sa[k],
+               pd_ptr->lat_na[k], pd_ptr->lon_na[k],
+               pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
+               pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
+               f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k],
+               cmn_cov, pd_ptr->csd_na[k], pd_ptr->wgt_na[k]);
 
          } // end for k
+
+         mlog << Debug(2)
+              << "Processing "
+              << conf_info.vx_pd[i_vx].fcst_info->magic_str()
+              << conf_info.fcat_ta[i_vx][i].get_str()
+              << " versus "
+              << conf_info.vx_pd[i_vx].obs_info->magic_str()
+              << conf_info.ocat_ta[i_vx][i].get_str()
+              << ", for observation type " << pd_ptr->msg_typ
+              << ", over region " << pd_ptr->mask_name
+              << ", for interpolation method HiRA NBRHD("
+              << shc.get_interp_pnts_str()
+              << "), using " << hira_pd.n_obs << " pairs.\n";
 
          // Check for zero matched pairs
          if(hira_pd.f_na.n_elements() == 0 ||
@@ -1779,9 +1783,25 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
             conf_info.output_flag[i_pstd], pct_info);
 
          // Set the contents of the output threshold columns
-         shc.set_fcst_thresh(conf_info.fcat_ta[i_vx][i]);
-         shc.set_obs_thresh (conf_info.ocat_ta[i_vx][i]);
-         shc.set_cov_thresh (conf_info.hira_info.cov_ta);
+         shc.set_fcst_thresh (conf_info.fcat_ta[i_vx][i]);
+         shc.set_obs_thresh  (conf_info.ocat_ta[i_vx][i]);
+         shc.set_thresh_logic(SetLogic_None);
+         shc.set_cov_thresh  (na_str);
+
+         // Write out the MPR lines
+         if(conf_info.output_flag[i_mpr] != STATOutputType_None) {
+            write_mpr_row(shc, &hira_pd,
+               conf_info.output_flag[i_mpr] == STATOutputType_Both,
+               stat_at, i_stat_row,
+               txt_at[i_mpr], i_txt_row[i_mpr], false);
+
+            // Reset the observation valid time
+            shc.set_obs_valid_beg(conf_info.vx_pd[i_vx].beg_ut);
+            shc.set_obs_valid_end(conf_info.vx_pd[i_vx].end_ut);
+         }
+
+         // Set cov_thresh column using the HiRA coverage thresholds
+         shc.set_cov_thresh(conf_info.hira_info.cov_ta);
 
          // Write out PCT
          if(conf_info.output_flag[i_pct] != STATOutputType_None) {
