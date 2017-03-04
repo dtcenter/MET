@@ -297,7 +297,7 @@ void StatHdrColumns::set_alpha(const double a) {
 ConcatString StatHdrColumns::get_fcst_thresh_str() const {
    ConcatString cs;
 
-   cs << fcst_thresh.get_str();
+   cs << prob_thresh_to_string(fcst_thresh);
 
    // Append thresh_logic symbol
    if(fcst_thresh.n_elements() == 1 &&
