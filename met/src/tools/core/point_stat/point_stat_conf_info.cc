@@ -366,7 +366,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
             }
 	  }
-	}	
+	}
       } // end for
    } // end if
 
@@ -719,8 +719,10 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          // Maximum number of HiRA PCT, PJC, or PRC lines possible =
          //    Scalar Fields * Message Types * Masks *
          //    Max Scalar Categorical Thresholds * HiRA widths
-         n += n_vx_scal * max_n_msg_typ * n_mask *
-              max_n_cat_thresh * hira_info.width.n_elements();
+         if(hira_info.flag) {
+            n += n_vx_scal * max_n_msg_typ * n_mask *
+                 max_n_cat_thresh * hira_info.width.n_elements();
+         }
 
          break;
 
@@ -735,9 +737,11 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          // Maximum number of HiRA PSTD lines possible =
          //    Scalar Fields * Message Types * Masks *
          //    Max Scalar Categorical Thresholds * HiRA widths * Alphas
-         n += n_vx_scal * max_n_msg_typ * n_mask *
-              max_n_cat_thresh * hira_info.width.n_elements() *
-              get_n_ci_alpha();
+         if(hira_info.flag) {
+            n += n_vx_scal * max_n_msg_typ * n_mask *
+                 max_n_cat_thresh * hira_info.width.n_elements() *
+                 get_n_ci_alpha();
+         }
 
          break;
 
@@ -746,6 +750,14 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          // out by summing the number for each GCPairData object
          for(i=0, n=0; i<n_vx; i++) {
             n += vx_pd[i].get_n_pair();
+
+            // Maximum number of HiRA MPR lines possible =
+            //    Number of pairs * Max Scalar Categorical Thresholds *
+            //    HiRA widths
+            if(hira_info.flag) {
+               n += vx_pd[i].get_n_pair() * max_n_cat_thresh *
+                    hira_info.width.n_elements();
+            }
          }
          break;
 

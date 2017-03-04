@@ -421,7 +421,8 @@ extern void write_nbrcts_row(StatHdrColumns &, const NBRCTSInfo &, bool,
 extern void write_nbrcnt_row(StatHdrColumns &, const NBRCNTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, bool,
-                             AsciiTable &, int &, AsciiTable &, int &);
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_thresh = true);
 extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, bool,

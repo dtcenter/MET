@@ -855,11 +855,11 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
+      shc.set_thresh_logic(SetLogic_None);
       shc.set_cov_thresh(na_str);
    }
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
 
    // Write the header columns
@@ -898,11 +898,9 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
+      shc.set_thresh_logic(SetLogic_None);
       shc.set_cov_thresh(na_str);
    }
-
-   // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
 
    // Write a line for each alpha value
    for(i=0; i<pct_info.n_alpha; i++) {
@@ -947,11 +945,11 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
+      shc.set_thresh_logic(SetLogic_None);
       shc.set_cov_thresh(na_str);
    }
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
 
    // Write the header columns
@@ -989,11 +987,11 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
+      shc.set_thresh_logic(SetLogic_None);
       shc.set_cov_thresh(na_str);
    }
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
    shc.set_alpha(bad_data_double);
 
    // Write the header columns
@@ -1158,17 +1156,22 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
 void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                    bool txt_flag,
                    AsciiTable &stat_at, int &stat_row,
-                   AsciiTable &txt_at, int &txt_row) {
+                   AsciiTable &txt_at, int &txt_row,
+                   bool update_thresh) {
    int i;
 
    // MPR line type
    shc.set_line_type(stat_mpr_str);
 
+   // Set the threshold columns, if requested.
+   if(update_thresh) {
+      shc.set_fcst_thresh(na_str);
+      shc.set_obs_thresh(na_str);
+      shc.set_thresh_logic(SetLogic_None);
+      shc.set_cov_thresh(na_str);
+   }
+
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
-   shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
    // Write a line for each matched pair
