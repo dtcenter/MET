@@ -258,10 +258,12 @@ bool PairBase::add_obs(const char *sid,
       // if key exists, add new ob to vector, else add new pair
       map<string,station_values_t>::iterator it = map_val.find(sng_key);
    if(it != map_val.end()) {
-     if(check_unique && (*it).second.ut == ut)
+     /*
+     if(check_unique && (*it).second.ut == ut);
      {
          return false;
      }
+     */
      (*it).second.obs.push_back(ob_val);
    } else {
       station_values_t val;
