@@ -2,6 +2,7 @@ COLUMN      DESCRIPTION                                     UNITS
 VERSION     "MET Version"                                   NA
 AMODEL      "ADeck Model"                                   NA
 BMODEL      "BDeck Model"                                   NA
+DESC        "Description"                                   NA
 STORM_ID    "Storm ID"                                      NA
 BASIN       "Basin"                                         NA
 CYCLONE     "Cyclone Number"                                NA
@@ -62,3 +63,4 @@ ASW_WIND_64 "ADeck Southwest Quadrant Radius of 64kt Winds" "nm"
 BSW_WIND_64 "BDeck Southwest Quadrant Radius of 64kt Winds" "nm"
 ANW_WIND_64 "ADeck Northwest Quadrant Radius of 64kt Winds" "nm"
 BNW_WIND_64 "BDeck Northwest Quadrant Radius of 64kt Winds" "nm"
+
