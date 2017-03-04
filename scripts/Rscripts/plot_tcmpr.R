@@ -123,7 +123,7 @@ column_info = read.table(
   header=TRUE, row.names=1);
   
 # Read the HFIP baseline information from a data file.
-baseline = read.table(paste(${MET_BUILD_BASE}, "/scripts/Rscripts/include/hfip_baseline.dat", sep=''), header=TRUE)
+baseline = read.table(paste(RSCRIPTS_BASE, "/include/hfip_baseline.dat", sep=''), header=TRUE)
 
 ########################################################################
 #
