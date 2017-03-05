@@ -2071,11 +2071,11 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     data.Nlat = lat_counts;
     data.Nlon = lon_counts;
     data.swap_to_north = false;
-    if (dlat < 0) {
-      data.delta_lat = -dlat;
-      data.lat_ll = lat_values[lat_counts-1];
-      data.swap_to_north = true;
-    }
+    //if (dlat < 0) {
+    //  data.delta_lat = -dlat;
+    //  data.lat_ll = lat_values[lat_counts-1];
+    //  data.swap_to_north = true;
+    //}
   
     grid.set(data);
   }
