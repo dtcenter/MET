@@ -418,16 +418,15 @@ else
     AC_MSG_NOTICE([ascii2nc will not be compiled])
 fi
 
-
 # lidar2nc
 
 AC_ARG_ENABLE(lidar2nc,
-       [AS_HELP_STRING([--disable-lidar2nc], [Disable compilation of lidar2nc])],
+     [AS_HELP_STRING([--enable-lidar2nc], [Enable compilation of lidar2nc])],
   [case "${enableval}" in
      yes | no ) ENABLE_LIDAR2NC="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --disable-lidar2nc) ;;
    esac],
-  [ENABLE_LIDAR2NC="yes"]
+  [ENABLE_LIDAR2NC="no"]
 )
 
 AM_CONDITIONAL([ENABLE_LIDAR2NC], [test "x$ENABLE_LIDAR2NC" = "xyes"])
@@ -438,7 +437,6 @@ if test "x$ENABLE_LIDAR2NC" = "xyes"; then
 else
     AC_MSG_NOTICE([lidar2nc will not be compiled])
 fi
-
 
 # ensemble_stat
 
