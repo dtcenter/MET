@@ -399,6 +399,15 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
    // Otherwise, process it as a single station ID
    else {
 
+      // Print a warning if the string contains a dot which suggests
+      // the user was trying to specify a file name.
+      if(check_reg_exp("[.]", mask_sid_str)) {
+         mlog << Warning << "\nparse_sid_mask() -> "
+              << "unable to process \"" << mask_sid_str
+              << "\" as a file name and processing it as a single "
+              << "station ID mask instead.\n\n";
+      }
+
       mlog << Debug(4) << "parse_sid_mask() -> "
            << "storing single station ID mask \"" << mask_sid_str << "\"\n";
 
