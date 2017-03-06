@@ -208,8 +208,8 @@ sub-directory, or the MET Online Tutorial:
 
   --enable and --disable options for each of the MET tools.
 
-  By default, compilation of GRIB2 support, the MODIS-Regrid tool, and
-  MODE-Graphics are disabled.  Use the following options to enable them:
+  By default, compilation of GRIB2 support, the MODIS-Regrid tool, the Lidar2NC
+  tool,and MODE-Graphics are disabled.  Use the following options to enable them:
 
   --enable-grib2
       Enable compilation of utilities using GRIB2
@@ -220,10 +220,14 @@ sub-directory, or the MET Online Tutorial:
   --enable-mode_graphics
       Enable compilation of mode_graphics
 
+  --enable-lidar2nc
+      Enable compilation of lidar2nc
+
   To configure MET to install all of the available tools in the "bin"
   subdirectory of your current directory, you would use the following command:
 
-  ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-mode_graphics
+  ./configure --prefix=`pwd` --enable-grib2 --enable-modis \
+              --enable-mode_graphics --enable-lidar2nc
 
 - Type 'make install >& make_install.log &'
 
@@ -233,13 +237,14 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 27 executables:
+  command line) will contain 28 executables:
    - ascii2nc
    - ensemble_stat
    - gen_vx_mask
    - grid_stat
    - gsid2mpr
    - gsidens2orank
+   - lidar2nc
    - madis2nc
    - mode
    - mode_analysis
