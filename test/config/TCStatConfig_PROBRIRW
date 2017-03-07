@@ -84,7 +84,7 @@ valid_mask = [];
 //
 // Stratify by the LINE_TYPE column.
 //
-line_type = [ "PROBRI" ];
+line_type = [ "PROBRIRW" ];
 
 //
 // Stratify by checking the watch/warning status for each track point
@@ -172,9 +172,9 @@ out_valid_mask = "";
 // Array of TCStat analysis jobs to be performed on the filtered data
 //
 jobs = [
-   "-job filter   -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_filter_ee.tcst",
-   "-job summary  -column TK_ERR -by AMODEL -probrirw_thresh 30 -column_thresh PROBRI_PROB >0 -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_summary_tk_err.tcst",
-   "-job probrirw -column_thresh RI_WINDOW ==24 -by AMODEL -probri_thresh 30 -probri_bdelta_thresh >=30 -out_line_type PCT,PSTD,PRC,PJC -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRI_probri.tcst"
+   "-job filter   -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_filter_ee.tcst",
+   "-job summary  -column TK_ERR -by AMODEL -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0 -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_summary_tk_err.tcst",
+   "-job probrirw -column_thresh RIRW_WINDOW ==24 -by AMODEL -probrirw_thresh 30 -probrirw_bdelta_thresh >=30 -out_line_type PCT,PSTD,PRC,PJC -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_probrirw.tcst"
 ];
 
 //

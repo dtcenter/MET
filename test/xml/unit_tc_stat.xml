@@ -45,7 +45,7 @@
       <exist>&OUTPUT_DIR;/tc_stat/PROBRIRW_stat.out</exist>
       <stat>&OUTPUT_DIR;/tc_stat/PROBRIRW_filter_ee.tcst</stat>
       <stat>&OUTPUT_DIR;/tc_stat/PROBRIRW_summary_tk_err.tcst</stat>
-      <stat>&OUTPUT_DIR;/tc_stat/PROBRIRW_probri.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/PROBRIRW_probrirw.tcst</stat>
     </output>
   </test>
 
