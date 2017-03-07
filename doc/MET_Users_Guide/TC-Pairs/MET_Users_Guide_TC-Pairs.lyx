@@ -541,7 +541,7 @@ For each set of edeck probabilities that were parsed, search for a matching
 
 \begin_layout Itemize
 For each edeck/bdeck pair, write paired edeck probabilities and matching
- bdeck values to output PROBRI lines.
+ bdeck values to output PROBRIRW lines.
 \end_layout
 
 \begin_layout Subsection
@@ -1913,7 +1913,7 @@ LINE_TYPE
 \begin_inset Text
 
 \begin_layout Plain Layout
-Output line type (TCMPR or PROBRI)
+Output line type (TCMPR or PROBRIRW)
 \end_layout
 
 \end_inset
@@ -3331,8 +3331,8 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for PROBRI (Probability of Rapid Intensification) output
- line type.
+Format information for PROBRIRW (Probability of Rapid Intensification or
+ Weakening) output line type.
 \end_layout
 
 \end_inset
@@ -3362,7 +3362,7 @@ name "PROBRI Line Type"
 \begin_layout Plain Layout
 
 \series bold
-PROBRI OUTPUT FORMAT
+PROBRIRW OUTPUT FORMAT
 \end_layout
 
 \end_inset
@@ -3435,7 +3435,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-PROBRI
+PROBRIRW
 \end_layout
 
 \end_inset
@@ -3444,7 +3444,7 @@ PROBRI
 \begin_inset Text
 
 \begin_layout Plain Layout
-Probability of Rapid Intensification line type
+Probability of Rapid Intensification or Weakening line type
 \end_layout
 
 \end_inset
