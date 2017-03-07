@@ -50,9 +50,9 @@ class TCStatFiles {
 
       void rewind();
 
-      bool operator>>(TrackPairInfo  &);
-      bool operator>>(ProbRIPairInfo &);
-      bool operator>>(TCStatLine     &);
+      bool operator>>(TrackPairInfo    &);
+      bool operator>>(ProbRIRWPairInfo &);
+      bool operator>>(TCStatLine       &);
 
 };
 

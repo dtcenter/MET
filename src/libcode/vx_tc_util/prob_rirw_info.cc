@@ -17,30 +17,30 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "prob_ri_info.h"
+#include "prob_rirw_info.h"
 #include "atcf_offsets.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class ProbRIInfo
+//  Code for class ProbRIRWInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIInfo::ProbRIInfo() {
+ProbRIRWInfo::ProbRIRWInfo() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIInfo::~ProbRIInfo() {
+ProbRIRWInfo::~ProbRIRWInfo() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIInfo::ProbRIInfo(const ProbRIInfo & t) {
+ProbRIRWInfo::ProbRIRWInfo(const ProbRIRWInfo & t) {
 
    init_from_scratch();
 
@@ -49,7 +49,7 @@ ProbRIInfo::ProbRIInfo(const ProbRIInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIInfo & ProbRIInfo::operator=(const ProbRIInfo & t) {
+ProbRIRWInfo & ProbRIRWInfo::operator=(const ProbRIRWInfo & t) {
 
    if(this == &t) return(*this);
 
@@ -60,7 +60,7 @@ ProbRIInfo & ProbRIInfo::operator=(const ProbRIInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIInfo::init_from_scratch() {
+void ProbRIRWInfo::init_from_scratch() {
 
    clear();
 
@@ -69,21 +69,21 @@ void ProbRIInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIInfo::clear() {
+void ProbRIRWInfo::clear() {
 
    ProbInfoBase::clear();
 
    Value = bad_data_double;
    Initials.clear();
-   RIBeg = bad_data_int;
-   RIEnd = bad_data_int;
+   RIRWBeg = bad_data_int;
+   RIRWEnd = bad_data_int;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIInfo::dump(ostream &out, int indent_depth) const {
+void ProbRIRWInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
 
@@ -91,8 +91,8 @@ void ProbRIInfo::dump(ostream &out, int indent_depth) const {
 
    out << prefix << "Value           = "   << Value << "\n";
    out << prefix << "Initials        = \"" << (Initials ? Initials.text() : "(nul)") << "\"\n";
-   out << prefix << "RIBeg           = "   << RIBeg << "\n";
-   out << prefix << "RIEnd           = "   << RIEnd << "\n";
+   out << prefix << "RIRWBeg         = "   << RIRWBeg << "\n";
+   out << prefix << "RIRWEnd         = "   << RIRWEnd << "\n";
 
    out << flush;
 
@@ -102,22 +102,22 @@ void ProbRIInfo::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIInfo::serialize() const {
+ConcatString ProbRIRWInfo::serialize() const {
    ConcatString s;
 
    s << ProbInfoBase::serialize()
-     << ", ProbRIInfo: "
+     << ", ProbRIRWInfo: "
      << "Value = " << Value
      << ", Initials = \"" << Initials << "\""
-     << ", RIBeg = " << RIBeg
-     << ", RIEnd = " << RIEnd;
+     << ", RIRWBeg = " << RIRWBeg
+     << ", RIRWEnd = " << RIRWEnd;
 
    return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIInfo::serialize_r(int n, int indent_depth) const {
+ConcatString ProbRIRWInfo::serialize_r(int n, int indent_depth) const {
    ConcatString s;
 
    s << ProbInfoBase::serialize_r(n, indent_depth);
@@ -127,7 +127,7 @@ ConcatString ProbRIInfo::serialize_r(int n, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIInfo::assign(const ProbRIInfo &p) {
+void ProbRIRWInfo::assign(const ProbRIRWInfo &p) {
    int i;
 
    clear();
@@ -136,55 +136,55 @@ void ProbRIInfo::assign(const ProbRIInfo &p) {
 
    Value    = p.Value;
    Initials = p.Initials;
-   RIBeg    = p.RIBeg;
-   RIEnd    = p.RIEnd;
+   RIRWBeg    = p.RIRWBeg;
+   RIRWEnd    = p.RIRWEnd;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int ProbRIInfo::ri_window() const {
-   return((is_bad_data(ri_beg()) || is_bad_data(ri_end()) ?
-           bad_data_int : ri_end() - ri_beg()));
+int ProbRIRWInfo::rirw_window() const {
+   return((is_bad_data(rirw_beg()) || is_bad_data(rirw_end()) ?
+           bad_data_int : rirw_end() - rirw_beg()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIInfo::initialize(const ATCFProbLine &l) {
+void ProbRIRWInfo::initialize(const ATCFProbLine &l) {
 
    clear();
 
    ProbInfoBase::initialize(l);
 
-   Value    = parse_int(l.get_item(ProbRIValueOffset));
-   Initials =           l.get_item(ProbRIInitialsOffset);
-   RIBeg    = parse_int(l.get_item(ProbRIBegOffset));
-   RIEnd    = parse_int(l.get_item(ProbRIEndOffset));
+   Value    = parse_int(l.get_item(ProbRIRWValueOffset));
+   Initials =           l.get_item(ProbRIRWInitialsOffset);
+   RIRWBeg  = parse_int(l.get_item(ProbRIRWBegOffset));
+   RIRWEnd  = parse_int(l.get_item(ProbRIRWEndOffset));
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIInfo::is_match(const ATCFProbLine &l) const {
+bool ProbRIRWInfo::is_match(const ATCFProbLine &l) const {
 
    if(!ProbInfoBase::is_match(l)) return(false);
 
-   return(Value == parse_int(l.get_item(ProbRIValueOffset)) &&
-          RIBeg == parse_int(l.get_item(ProbRIBegOffset))   &&
-          RIEnd == parse_int(l.get_item(ProbRIEndOffset)));
+   return(Value   == parse_int(l.get_item(ProbRIRWValueOffset)) &&
+          RIRWBeg == parse_int(l.get_item(ProbRIRWBegOffset))   &&
+          RIRWEnd == parse_int(l.get_item(ProbRIRWEndOffset)));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIInfo::add(const ATCFProbLine &l, bool check_dup) {
+bool ProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) {
 
    // Check for duplicates
    if(check_dup) {
       if(has(l)) {
          mlog << Warning
-              << "\nProbRIInfo::add(const ATCFProbLine &l, bool check_dup) -> "
+              << "\nProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) -> "
               << "skipping duplicate ATCF line:\n"
               << l.get_line() << "\n\n";
          return(false);
@@ -210,15 +210,15 @@ bool ProbRIInfo::add(const ATCFProbLine &l, bool check_dup) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIInfo::set(const TCStatLine &l) {
+void ProbRIRWInfo::set(const TCStatLine &l) {
 
    ProbInfoBase::set(l);
 
    // Store column information
    Value    = atof(l.get_item("AWIND_END"));
    Initials = l.get_item("Initials", false);
-   RIBeg    = atoi(l.get_item("RI_BEG"));
-   RIEnd    = atoi(l.get_item("RI_END"));
+   RIRWBeg  = atoi(l.get_item("RIRW_BEG"));
+   RIRWEnd  = atoi(l.get_item("RIRW_END"));
 
    return;
 }

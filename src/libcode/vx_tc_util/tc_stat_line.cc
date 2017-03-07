@@ -350,10 +350,10 @@ ConcatString TCStatLine::header() const {
 TCStatLineType string_to_tcstatlinetype(const char *s) {
    TCStatLineType t;
 
-        if(strcmp(s, TCStatLineType_TCMPR_Str)  == 0) t = TCStatLineType_TCMPR;
-   else if(strcmp(s, TCStatLineType_ProbRI_Str) == 0) t = TCStatLineType_ProbRI;
-   else if(strcmp(s, TCStatLineType_Header_Str) == 0) t = TCStatLineType_Header;
-   else                                               t = NoTCStatLineType;
+        if(strcmp(s, TCStatLineType_TCMPR_Str)    == 0) t = TCStatLineType_TCMPR;
+   else if(strcmp(s, TCStatLineType_ProbRIRW_Str) == 0) t = TCStatLineType_ProbRIRW;
+   else if(strcmp(s, TCStatLineType_Header_Str)   == 0) t = TCStatLineType_Header;
+   else                                                 t = NoTCStatLineType;
 
    return(t);
 }
@@ -364,10 +364,10 @@ ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
    const char *s = (const char *) 0;
 
    switch(t) {
-      case TCStatLineType_TCMPR:  s = TCStatLineType_TCMPR_Str;  break;
-      case TCStatLineType_ProbRI: s = TCStatLineType_ProbRI_Str; break;
-      case TCStatLineType_Header: s = TCStatLineType_Header_Str; break;
-      default:                    s = na_str;                    break;
+      case TCStatLineType_TCMPR:    s = TCStatLineType_TCMPR_Str;    break;
+      case TCStatLineType_ProbRIRW: s = TCStatLineType_ProbRIRW_Str; break;
+      case TCStatLineType_Header:   s = TCStatLineType_Header_Str;   break;
+      default:                      s = na_str;                      break;
    }
 
    return(ConcatString(s));

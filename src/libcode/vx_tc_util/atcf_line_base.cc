@@ -402,7 +402,7 @@ ATCFLineType string_to_atcflinetype(const char *s) {
    else if(strlen(s) == 0)           t = ATCFLineType_Track;  // BDECK
    else if(strcasecmp(s, "TR") == 0) t = ATCFLineType_ProbTR;
    else if(strcasecmp(s, "IN") == 0) t = ATCFLineType_ProbIN;
-   else if(strcasecmp(s, "RI") == 0) t = ATCFLineType_ProbRI;
+   else if(strcasecmp(s, "RI") == 0) t = ATCFLineType_ProbRIRW;
    else if(strcasecmp(s, "WD") == 0) t = ATCFLineType_ProbWD;
    else if(strcasecmp(s, "PR") == 0) t = ATCFLineType_ProbPR;
    else if(strcasecmp(s, "GN") == 0) t = ATCFLineType_ProbGN;
@@ -418,16 +418,16 @@ ConcatString atcflinetype_to_string(const ATCFLineType t) {
    const char *s = (const char *) 0;
 
    switch(t) {
-      case ATCFLineType_Track:  s = "Track";  break;
-      case ATCFLineType_ProbTR: s = "ProbTR"; break;
-      case ATCFLineType_ProbIN: s = "ProbIN"; break;
-      case ATCFLineType_ProbRI: s = "ProbRI"; break;
-      case ATCFLineType_ProbWD: s = "ProbWD"; break;
-      case ATCFLineType_ProbPR: s = "ProbPR"; break;
-      case ATCFLineType_ProbGN: s = "ProbGN"; break;
-      case ATCFLineType_ProbGS: s = "ProbGS"; break;
-      case NoATCFLineType:      s = na_str;   break;
-      default:                  s = na_str;   break;
+      case ATCFLineType_Track:    s = "Track";    break;
+      case ATCFLineType_ProbTR:   s = "ProbTR";   break;
+      case ATCFLineType_ProbIN:   s = "ProbIN";   break;
+      case ATCFLineType_ProbRIRW: s = "ProbRIRW"; break;
+      case ATCFLineType_ProbWD:   s = "ProbWD";   break;
+      case ATCFLineType_ProbPR:   s = "ProbPR";   break;
+      case ATCFLineType_ProbGN:   s = "ProbGN";   break;
+      case ATCFLineType_ProbGS:   s = "ProbGS";   break;
+      case NoATCFLineType:        s = na_str;     break;
+      default:                    s = na_str;     break;
    }
 
    return(ConcatString(s));

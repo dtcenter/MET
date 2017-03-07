@@ -26,15 +26,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 enum ATCFLineType {
-   ATCFLineType_Track,  // Track and intensity line type (numeric)
+   ATCFLineType_Track,    // Track and intensity line type (numeric)
 
-   ATCFLineType_ProbTR, // Track probability (TR)
-   ATCFLineType_ProbIN, // Intensity probability (IN)
-   ATCFLineType_ProbRI, // Rapid intensification probability (RI)
-   ATCFLineType_ProbWD, // Wind radii probability (WD)
-   ATCFLineType_ProbPR, // Pressure probability (PR)
-   ATCFLineType_ProbGN, // TC genesis probability (GN)
-   ATCFLineType_ProbGS, // TC genesis shape probability (GS)
+   ATCFLineType_ProbTR,   // Track probability (TR)
+   ATCFLineType_ProbIN,   // Intensity probability (IN)
+   ATCFLineType_ProbRIRW, // Rapid intensification probability (RI)
+   ATCFLineType_ProbWD,   // Wind radii probability (WD)
+   ATCFLineType_ProbPR,   // Pressure probability (PR)
+   ATCFLineType_ProbGN,   // TC genesis probability (GN)
+   ATCFLineType_ProbGS,   // TC genesis shape probability (GS)
 
    NoATCFLineType
 };

@@ -20,7 +20,7 @@
 
 #include "tc_hdr_columns.h"
 #include "track_pair_info.h"
-#include "prob_ri_pair_info.h"
+#include "prob_rirw_pair_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,13 +116,13 @@ static const int n_tc_cols_xy = sizeof(tc_cols_xy)/sizeof(*tc_cols_xy);
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * prob_ri_cols [] = {
+static const char * prob_rirw_cols [] = {
    "ALAT",        "ALON",
    "BLAT",        "BLON",
    "INITIALS",
    "TK_ERR",      "X_ERR",      "Y_ERR",
    "ADLAND",      "BDLAND",
-   "RI_BEG",      "RI_END",     "RI_WINDOW",
+   "RIRW_BEG",    "RIRW_END",   "RIRW_WINDOW",
    "AWIND_END",
    "BWIND_BEG",   "BWIND_END",
    "BDELTA",      "BDELTA_MAX",
@@ -130,9 +130,9 @@ static const char * prob_ri_cols [] = {
    "N_THRESH",    "THRESH_",    "PROB_"
 };
 
-static int n_prob_ri_cols = sizeof(prob_ri_cols)/sizeof(*prob_ri_cols);
+static int n_prob_rirw_cols = sizeof(prob_rirw_cols)/sizeof(*prob_rirw_cols);
 
-inline int get_n_prob_ri_cols (int n) { return(n_prob_ri_cols + (2*n)); } // n = NThresh
+inline int get_n_prob_rirw_cols (int n) { return(n_prob_rirw_cols + (2*n)); } // n = NThresh
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -142,25 +142,22 @@ extern void close_tc_txt_file(ofstream *&,  const char *);
 ////////////////////////////////////////////////////////////////////////
 
 // Write out the header row for fixed length line types
-extern void write_tc_header_row(const char **, int, int,
-                                AsciiTable &, int, int);
+extern void write_tc_header_row(const char **, int, int, AsciiTable &, int, int);
 
 // Write out the header row
-extern void write_tc_mpr_header_row(int, AsciiTable &, int, int);
-extern void write_prob_ri_header_row(int, int, AsciiTable &, int, int);
+extern void write_tc_mpr_header_row   (int,      AsciiTable &, int, int);
+extern void write_prob_rirw_header_row(int, int, AsciiTable &, int, int);
 
 // Write out the data lines
-extern void write_tc_mpr_row (TcHdrColumns &, const TrackPairInfo &,
-                              AsciiTable &, int &);
-extern void write_prob_ri_row(TcHdrColumns &, const ProbRIPairInfo &,
-                              AsciiTable &, int &);
+extern void write_tc_mpr_row   (TcHdrColumns &, const TrackPairInfo &,    AsciiTable &, int &);
+extern void write_prob_rirw_row(TcHdrColumns &, const ProbRIRWPairInfo &, AsciiTable &, int &);
 
 // Write out the header entries
 extern void write_tc_header_cols(const TcHdrColumns &, AsciiTable &, int);
 
 // Write out the data columns
-extern void write_tc_mpr_cols (const TrackPairInfo  &, int, AsciiTable &, int, int);
-extern void write_prob_ri_cols(const ProbRIPairInfo &, int, AsciiTable &, int, int);
+extern void write_tc_mpr_cols   (const TrackPairInfo  &,   int, AsciiTable &, int, int);
+extern void write_prob_rirw_cols(const ProbRIRWPairInfo &, int, AsciiTable &, int, int);
 
 // Setup column justification for TC-STAT AsciiTable objects
 extern void justify_tc_stat_cols(AsciiTable &);

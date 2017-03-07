@@ -281,8 +281,8 @@ void ProbInfoBase::set(const TCStatLine &l) {
    // Store column information
    switch(l.type()) {
 
-      case TCStatLineType_ProbRI:
-         Type = ATCFLineType_ProbRI;
+      case TCStatLineType_ProbRIRW:
+         Type = ATCFLineType_ProbRIRW;
          break;
 
       default:

@@ -118,8 +118,8 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
 
    // Check the line type
    switch(Type) {
-      case ATCFLineType_ProbRI:
-         n_expect = MinATCFProbRIElements;
+      case ATCFLineType_ProbRIRW:
+         n_expect = MinATCFProbRIRWElements;
          break;
 
       default:

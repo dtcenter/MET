@@ -21,29 +21,29 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-// ProbRIInfo class stores probability of rapid intensification.
+// ProbRIRWInfo class stores probability of rapid intensification.
 //
 ////////////////////////////////////////////////////////////////////////
 
-class ProbRIInfo : public ProbInfoBase {
+class ProbRIRWInfo : public ProbInfoBase {
 
    private:
 
       void init_from_scratch();
-      void assign(const ProbRIInfo &);
+      void assign(const ProbRIRWInfo &);
 
       // Prob RI specific values
       double       Value;
       ConcatString Initials;
-      int          RIBeg; // hours
-      int          RIEnd; // hours
+      int          RIRWBeg; // hours
+      int          RIRWEnd; // hours
 
    public:
 
-      ProbRIInfo();
-     ~ProbRIInfo();
-      ProbRIInfo(const ProbRIInfo &);
-      ProbRIInfo & operator=(const ProbRIInfo &);
+      ProbRIRWInfo();
+     ~ProbRIRWInfo();
+      ProbRIRWInfo(const ProbRIRWInfo &);
+      ProbRIRWInfo & operator=(const ProbRIRWInfo &);
 
       void clear();
 
@@ -59,11 +59,11 @@ class ProbRIInfo : public ProbInfoBase {
          //  get stuff
          //
 
-      double               value()     const;
-      const ConcatString & initials()  const;
-      int                  ri_beg()    const;
-      int                  ri_end()    const;
-      int                  ri_window() const;
+      double               value()       const;
+      const ConcatString & initials()    const;
+      int                  rirw_beg()    const;
+      int                  rirw_end()    const;
+      int                  rirw_window() const;
 
          //
          //  do stuff
@@ -78,10 +78,10 @@ class ProbRIInfo : public ProbInfoBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline double               ProbRIInfo::value()    const { return(Value);    }
-inline const ConcatString & ProbRIInfo::initials() const { return(Initials); }
-inline int                  ProbRIInfo::ri_beg()   const { return(RIBeg);    }
-inline int                  ProbRIInfo::ri_end()   const { return(RIEnd);    }
+inline double               ProbRIRWInfo::value()    const { return(Value);    }
+inline const ConcatString & ProbRIRWInfo::initials() const { return(Initials); }
+inline int                  ProbRIRWInfo::rirw_beg() const { return(RIRWBeg);  }
+inline int                  ProbRIRWInfo::rirw_end() const { return(RIRWEnd);  }
 
 ////////////////////////////////////////////////////////////////////////
 

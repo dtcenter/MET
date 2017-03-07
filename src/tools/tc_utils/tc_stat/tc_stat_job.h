@@ -39,11 +39,11 @@ static const bool         default_rirw_exact  = true;
 static const SingleThresh default_rirw_thresh(">=30.0");
 static const int          default_rirw_window = 0;
 
-// Defaults for the PROBRI job type
-static const double       default_probri_thresh = bad_data_double;
-static const bool         default_probri_exact  = false;
-static const SingleThresh default_probri_bdelta_thresh(">=30");
-static const char         default_probri_prob_thresh[] = "==0.1";
+// Defaults for the PROBRIRW job type
+static const double       default_probrirw_thresh = bad_data_double;
+static const bool         default_probrirw_exact  = false;
+static const SingleThresh default_probrirw_bdelta_thresh(">=30");
+static const char         default_probrirw_prob_thresh[] = "==0.1";
 
 // Default is 24 hours prior to landfall
 static const bool         default_landfall           = false;
@@ -77,11 +77,11 @@ struct RIRWMapData {
 
 ////////////////////////////////////////////////////////////////////////
 
-// Define struct to store the mapped StringArray and ProbRI
+// Define struct to store the mapped StringArray and ProbRIRW
 // probabilistic contingency table counts and statistics
-struct ProbRIMapData {
+struct ProbRIRWMapData {
    PCTInfo     Info;
-   int         RIWindow;
+   int         RIRWWindow;
    StringArray Hdr;
 };
 
@@ -101,15 +101,15 @@ struct cs_cmp {
 //
 enum TCStatJobType {
 
-   TCStatJobType_Filter,  // Filter out the TC-STAT data and write
-                          // the lines to the filename specified.
-   TCStatJobType_Summary, // Compute summary info for one or more
-                          // columns of data.
-   TCStatJobType_RIRW,    // Derive contingency table and statistics
-                          // for RI/RW events.
-   TCStatJobType_ProbRI,  // Derive probabilistic contingency table and
-                          // statistics for PROBRI lines.
-   NoTCStatJobType        // Default value
+   TCStatJobType_Filter,   // Filter out the TC-STAT data and write
+                           // the lines to the filename specified.
+   TCStatJobType_Summary,  // Compute summary info for one or more
+                           // columns of data.
+   TCStatJobType_RIRW,     // Derive contingency table and statistics
+                           // for RI/RW events.
+   TCStatJobType_ProbRIRW, // Derive probabilistic contingency table and
+                           // statistics for PROBRIRW lines.
+   NoTCStatJobType         // Default value
 };
 
 extern TCStatJobType string_to_tcstatjobtype(const char *);
@@ -319,9 +319,9 @@ class TCStatJob {
       int          RIRWWindowBeg;
       int          RIRWWindowEnd;
 
-      // ProbRI filtering logic
+      // ProbRIRW filtering logic
       //   e.g. -30, -10, 0, 10, 30, 55, 65
-      double       ProbRIThresh;
+      double       ProbRIRWThresh;
 
       // Only retain TrackPoints in a time window around landfall
       bool         Landfall;
@@ -477,20 +477,20 @@ class TCStatJobRIRW : public TCStatJob {
 
 ////////////////////////////////////////////////////////////////////////
 
-class TCStatJobProbRI : public TCStatJob {
+class TCStatJobProbRIRW : public TCStatJob {
 
    private:
 
       void init_from_scratch();
 
-      void assign(const TCStatJobProbRI &);
+      void assign(const TCStatJobProbRIRW &);
 
    public:
 
-      TCStatJobProbRI();
-      virtual ~TCStatJobProbRI();
-      TCStatJobProbRI(const TCStatJobProbRI &);
-      TCStatJobProbRI & operator=(const TCStatJobProbRI &);
+      TCStatJobProbRIRW();
+      virtual ~TCStatJobProbRIRW();
+      TCStatJobProbRIRW(const TCStatJobProbRIRW &);
+      TCStatJobProbRIRW & operator=(const TCStatJobProbRIRW &);
 
       void clear();
 
@@ -502,14 +502,14 @@ class TCStatJobProbRI : public TCStatJob {
 
       void do_job(const StringArray &, TCLineCounts &); // virtual from base class
 
-      void process_pair(ProbRIPairInfo &);
+      void process_pair(ProbRIRWPairInfo &);
 
       void do_output(ostream &);
 
       // Probability information
-      bool         ProbRIExact;        // True for exact change, false for maximum change
-      SingleThresh ProbRIBDeltaThresh; // Threshold the BEST track change
-      ThreshArray  ProbRIProbThresh;   // Array of probabilities for PCT bins
+      bool         ProbRIRWExact;        // True for exact change, false for maximum change
+      SingleThresh ProbRIRWBDeltaThresh; // Threshold the BEST track change
+      ThreshArray  ProbRIRWProbThresh;   // Array of probabilities for PCT bins
 
       // Store the case information
       StringArray CaseColumn;
@@ -525,7 +525,7 @@ class TCStatJobProbRI : public TCStatJob {
       StringArray OutLineType;
 
       // Map column and case info to column values
-      map<ConcatString,ProbRIMapData,cs_cmp> ProbRIMap;
+      map<ConcatString,ProbRIRWMapData,cs_cmp> ProbRIRWMap;
 
 };
 
@@ -535,7 +535,7 @@ extern bool        is_time_series(const TimeArray &, const NumArray &,
                                   const TimeArray &, int &);
 extern int         compute_time_to_indep(const NumArray &, int);
 extern StringArray intersection(const StringArray &, const StringArray &);
-extern double      get_probri_value(const TCStatLine &, double);
+extern double      get_probrirw_value(const TCStatLine &, double);
 
 ////////////////////////////////////////////////////////////////////////
 
