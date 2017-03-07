@@ -58,11 +58,6 @@ ens = {
 // Forecast and observation fields to be verified
 //
 fcst = {
-   message_type = [ "ADPUPA" ];
-   sid_exc      = [];
-   ens_ssvar_bin_size = 1.0;
-   ens_phist_bin_size = 0.05;
-
    field = [
       {
          name  = "APCP";
@@ -71,6 +66,26 @@ fcst = {
    ];
 }
 obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+message_type   = [ "ADPUPA" ];
+sid_exc        = [];
+obs_quality    = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_percentile = 50;
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -182,10 +197,6 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-obs_quality      = [];
-duplicate_flag   = NONE;
-obs_summary      = SINGLE;
-obs_percentile   = 50; 
 output_prefix    = "";
 version          = "V6.0";
 
