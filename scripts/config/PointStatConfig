@@ -41,7 +41,6 @@ wind_logic  = UNION;
 //
 fcst = {
    message_type = [ "ADPUPA", "ADPSFC" ];
-   sid_exc      = [];
 
    field = [
       {
@@ -65,6 +64,18 @@ fcst = {
 
 }
 obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+sid_exc        = [];
+obs_quality    = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_percentile = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -184,8 +195,6 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
-duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
