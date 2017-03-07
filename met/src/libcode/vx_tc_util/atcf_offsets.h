@@ -74,20 +74,20 @@ static const int ProbOffset            = 8;  // probability of event (0-100)
 static const int ProbItemOffset        = 9;  // intensity change for event
 
 //
-// Offsets specific to ATCF RI line type
+// Offsets specific to ATCF RIRW line type
 //
 
-static const int ProbRIValueOffset     = 10; // final intensity
-static const int ProbRIInitialsOffset  = 11; // forecaster initials
-static const int ProbRIBegOffset       = 12; // RI start time
-static const int ProbRIEndOffset       = 13; // RI stop time
+static const int ProbRIRWValueOffset     = 10; // final intensity
+static const int ProbRIRWInitialsOffset  = 11; // forecaster initials
+static const int ProbRIRWBegOffset       = 12; // RIRW start time
+static const int ProbRIRWEndOffset       = 13; // RIRW stop time
 
 //
 // Minimum number of required elements
 //
 
-static const int MinATCFTrackElements  = 8;
-static const int MinATCFProbRIElements = 14;
+static const int MinATCFTrackElements    = 8;
+static const int MinATCFProbRIRWElements = 14;
 
 ////////////////////////////////////////////////////////////////////////
 

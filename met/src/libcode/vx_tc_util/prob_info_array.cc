@@ -18,7 +18,7 @@ using namespace std;
 #include <cmath>
 
 #include "prob_info_base.h"
-#include "prob_ri_info.h"
+#include "prob_rirw_info.h"
 #include "prob_info_array.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ void ProbInfoArray::init_from_scratch() {
 void ProbInfoArray::clear() {
 
    // Erase the entire vector
-   ProbRI.erase(ProbRI.begin(), ProbRI.end());
+   ProbRIRW.erase(ProbRIRW.begin(), ProbRIRW.end());
 
    return;
 }
@@ -85,11 +85,11 @@ void ProbInfoArray::dump(ostream &out, int indent_depth) const {
    int i;
 
    out << prefix << "ProbInfoArray:\n"
-       << prefix << "NProbRI = "   << n_prob_ri() << "\n";
+       << prefix << "NProbRIRW = "   << n_prob_rirw() << "\n";
 
-   for(i=0; i<ProbRI.size(); i++) {
-      out << prefix << "ProbRI[" << i+1 << "]:\n";
-      ProbRI[i].dump(out, indent_depth+1);
+   for(i=0; i<ProbRIRW.size(); i++) {
+      out << prefix << "ProbRIRW[" << i+1 << "]:\n";
+      ProbRIRW[i].dump(out, indent_depth+1);
    }
 
    out << flush;
@@ -103,7 +103,7 @@ ConcatString ProbInfoArray::serialize() const {
    ConcatString s;
 
    s << "ProbInfoArray: "
-     << "NProbRI = " << n_prob_ri();
+     << "NProbRIRW = " << n_prob_rirw();
 
    return(s);
 }
@@ -114,10 +114,10 @@ ConcatString ProbInfoArray::serialize_r(int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString s;
 
-   s << prefix << serialize() << ", ProbRI:\n";
+   s << prefix << serialize() << ", ProbRIRW:\n";
 
-   for(int i=0; i<ProbRI.size(); i++) {
-      s << ProbRI[i].serialize_r(i+1, indent_depth+1);
+   for(int i=0; i<ProbRIRW.size(); i++) {
+      s << ProbRIRW[i].serialize_r(i+1, indent_depth+1);
    }
 
    return(s);
@@ -130,8 +130,8 @@ void ProbInfoArray::assign(const ProbInfoArray &p) {
    clear();
 
    // Allocate space and copy each element
-   for(int i=0; i<p.ProbRI.size(); i++) {
-      ProbRI.push_back(p.ProbRI[i]);
+   for(int i=0; i<p.ProbRIRW.size(); i++) {
+      ProbRIRW.push_back(p.ProbRIRW[i]);
    }
 
    return;
@@ -144,7 +144,7 @@ const ProbInfoBase * ProbInfoArray::operator[](int n) const {
    // Check range
    if((n < 0) || (n >= n_probs())) {
       mlog << Error
-           << "\nProbInfoBase * ProbInfoArray::get_probri(int) -> "
+           << "\nProbInfoBase * ProbInfoArray::operator[] -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -152,22 +152,22 @@ const ProbInfoBase * ProbInfoArray::operator[](int n) const {
    // Return a base pointer to the n-th probability
    // Need to revise for each new probability vector
 
-   return(&ProbRI[n]);
+   return(&ProbRIRW[n]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const ProbRIInfo & ProbInfoArray::prob_ri(int n) const {
+const ProbRIRWInfo & ProbInfoArray::prob_rirw(int n) const {
 
    // Check range
-   if((n < 0) || (n >= ProbRI.size())) {
+   if((n < 0) || (n >= ProbRIRW.size())) {
       mlog << Error
-           << "\nProbRIInfo & ProbInfoArray::prob_ri(int) -> "
+           << "\nProbRIRWInfo & ProbInfoArray::prob_rirw(int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
 
-   return(ProbRI[n]);
+   return(ProbRIRW[n]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -185,17 +185,17 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
    // Store based on the input line type
    switch(l.type()) {
 
-      case(ATCFLineType_ProbRI):
+      case(ATCFLineType_ProbRIRW):
 
          // Check for no entries or a mismatch with the latest entry
-         if( ProbRI.size() == 0 ||
-            (ProbRI.size()  > 0 &&
-            !ProbRI[ProbRI.size()-1].add(l, check_dup))) {
+         if( ProbRIRW.size() == 0 ||
+            (ProbRIRW.size()  > 0 &&
+            !ProbRIRW[ProbRIRW.size()-1].add(l, check_dup))) {
 
             // Store new entry
-            ProbRIInfo ri;
+            ProbRIRWInfo ri;
             ri.add(l, check_dup);
-            ProbRI.push_back(ri);
+            ProbRIRW.push_back(ri);
          }
          break;
 
@@ -213,8 +213,8 @@ bool ProbInfoArray::add(const ATCFProbLine &l, bool check_dup) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbInfoArray::add(const ProbRIInfo &ri) {
-   ProbRI.push_back(ri);
+void ProbInfoArray::add(const ProbRIRWInfo &rirw) {
+   ProbRIRW.push_back(rirw);
    return;
 }
 

@@ -17,29 +17,29 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
-#include "prob_ri_pair_info.h"
+#include "prob_rirw_pair_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class ProbRIPairInfo
+//  Code for class ProbRIRWPairInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfo::ProbRIPairInfo() {
+ProbRIRWPairInfo::ProbRIRWPairInfo() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfo::~ProbRIPairInfo() {
+ProbRIRWPairInfo::~ProbRIRWPairInfo() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfo::ProbRIPairInfo(const ProbRIPairInfo & t) {
+ProbRIRWPairInfo::ProbRIRWPairInfo(const ProbRIRWPairInfo & t) {
 
    init_from_scratch();
 
@@ -48,7 +48,7 @@ ProbRIPairInfo::ProbRIPairInfo(const ProbRIPairInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfo & ProbRIPairInfo::operator=(const ProbRIPairInfo & t) {
+ProbRIRWPairInfo & ProbRIRWPairInfo::operator=(const ProbRIRWPairInfo & t) {
 
    if(this == &t) return(*this);
 
@@ -59,7 +59,7 @@ ProbRIPairInfo & ProbRIPairInfo::operator=(const ProbRIPairInfo & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfo::init_from_scratch() {
+void ProbRIRWPairInfo::init_from_scratch() {
 
    clear();
 
@@ -68,9 +68,9 @@ void ProbRIPairInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfo::clear() {
+void ProbRIRWPairInfo::clear() {
 
-   ProbRI.clear();
+   ProbRIRW.clear();
    BDeck    = (TrackInfo *) 0;
    StormName.clear();
    BModel.clear();
@@ -88,11 +88,11 @@ void ProbRIPairInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfo::dump(ostream &out, int indent_depth) const {
+void ProbRIRWPairInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
 
-   out << prefix << "ProbRIPairInfo:\n"
+   out << prefix << "ProbRIRWPairInfo:\n"
        << prefix << "StormName = " << StormName << "\n"
        << prefix << "BModel    = " << BModel    << "\n"
        << prefix << "BLat      = " << BLat      << "\n"
@@ -108,9 +108,9 @@ void ProbRIPairInfo::dump(ostream &out, int indent_depth) const {
        << prefix << "BEndLev   = " << BEndLev   << "\n"
        << prefix << "BMinV     = " << BMinV     << "\n"
        << prefix << "BMaxV     = " << BMaxV     << "\n"
-       << prefix << "ProbRI: " << "\n";
+       << prefix << "ProbRIRW: " << "\n";
 
-   ProbRI.dump(out, indent_depth+1);
+   ProbRIRW.dump(out, indent_depth+1);
 
    out << prefix << "BDeck: " << "\n";
    if(BDeck) BDeck->dump(out, indent_depth+1);
@@ -123,25 +123,25 @@ void ProbRIPairInfo::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIPairInfo::case_info() const {
+ConcatString ProbRIRWPairInfo::case_info() const {
    ConcatString s;
 
-   s << "ProbRIPairInfo: STORMID = " << ProbRI.storm_id()
-     << ", ADECK = " << ProbRI.technique()
+   s << "ProbRIRWPairInfo: STORMID = " << ProbRIRW.storm_id()
+     << ", ADECK = " << ProbRIRW.technique()
      << ", BDECK = " << BModel
-     << ", INIT = " << unix_to_yyyymmdd_hhmmss(ProbRI.init())
-     << ", RI_BEG = " << ProbRI.ri_beg()
-     << ", RI_END = " << ProbRI.ri_end();
+     << ", INIT = " << unix_to_yyyymmdd_hhmmss(ProbRIRW.init())
+     << ", RIRW_BEG = " << ProbRIRW.rirw_beg()
+     << ", RIRW_END = " << ProbRIRW.rirw_end();
 
    return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIPairInfo::serialize() const {
+ConcatString ProbRIRWPairInfo::serialize() const {
    ConcatString s;
 
-   s << "ProbRIPairInfo: "
+   s << "ProbRIRWPairInfo: "
      << "StormName = "  << StormName
      << ", BModel = "   << BModel
      << ", BLat = "     << BLat
@@ -163,14 +163,14 @@ ConcatString ProbRIPairInfo::serialize() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIPairInfo::serialize_r(int n, int indent_depth) const {
+ConcatString ProbRIRWPairInfo::serialize_r(int n, int indent_depth) const {
    Indent prefix(indent_depth), prefix2(indent_depth+1);
    ConcatString s;
    int i;
 
    s << prefix << "[" << n << "] " << serialize() << "\n";
 
-   s << prefix2 << "ProbRI = " << ProbRI.serialize() << "\n"
+   s << prefix2 << "ProbRIRW = " << ProbRIRW.serialize() << "\n"
      << prefix2 << "BDeck  = " << (BDeck ? BDeck->serialize() : "(nul)")
      << "\n";
 
@@ -179,11 +179,11 @@ ConcatString ProbRIPairInfo::serialize_r(int n, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfo::assign(const ProbRIPairInfo &p) {
+void ProbRIRWPairInfo::assign(const ProbRIRWPairInfo &p) {
 
    clear();
 
-   ProbRI    = p.ProbRI;
+   ProbRIRW  = p.ProbRIRW;
    BDeck     = p.BDeck;
    StormName = p.StormName;
    BModel    = p.BModel;
@@ -207,19 +207,19 @@ void ProbRIPairInfo::assign(const ProbRIPairInfo &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIPairInfo::set(const ProbRIInfo &prob_ri, const TrackInfo &bdeck) {
+bool ProbRIRWPairInfo::set(const ProbRIRWInfo &prob_rirw, const TrackInfo &bdeck) {
    int i, i_beg, i_end;
 
    clear();
 
    // Check for bad data
-   if(prob_ri.init() == (unixtime) 0 ||
-      is_bad_data(prob_ri.ri_beg())  ||
-      is_bad_data(prob_ri.ri_end())) return(false);
+   if(prob_rirw.init() == (unixtime) 0  ||
+      is_bad_data(prob_rirw.rirw_beg()) ||
+      is_bad_data(prob_rirw.rirw_end())) return(false);
 
    // Define begin and end times
-   unixtime beg_ut = prob_ri.init() + (prob_ri.ri_beg() * sec_per_hour);
-   unixtime end_ut = prob_ri.init() + (prob_ri.ri_end() * sec_per_hour);
+   unixtime beg_ut = prob_rirw.init() + (prob_rirw.rirw_beg() * sec_per_hour);
+   unixtime end_ut = prob_rirw.init() + (prob_rirw.rirw_end() * sec_per_hour);
 
    // Find matching BEST BEST track points
    for(i=0,i_beg=-1,i_end=-1; i<bdeck.n_points(); i++) {
@@ -231,14 +231,14 @@ bool ProbRIPairInfo::set(const ProbRIInfo &prob_ri, const TrackInfo &bdeck) {
    if(i_beg < 0 || i_end < 0) return(false);
 
    // Store the paired information
-   ProbRI = prob_ri;
-   BDeck  = &bdeck;
+   ProbRIRW = prob_rirw;
+   BDeck    = &bdeck;
 
    StormName = bdeck.storm_name();
    BModel    = bdeck.technique();
 
-   BLat   = bdeck[i_end].lat();
-   BLon   = bdeck[i_end].lon();
+   BLat  = bdeck[i_end].lat();
+   BLon  = bdeck[i_end].lon();
 
    BBegV = bdeck[i_beg].v_max();
    BEndV = bdeck[i_end].v_max();
@@ -255,7 +255,7 @@ bool ProbRIPairInfo::set(const ProbRIInfo &prob_ri, const TrackInfo &bdeck) {
    BEndLev = wind_speed_to_cyclonelevel(BEndV);
 
    // Compute track errors
-   latlon_to_xytk_err(prob_ri.lat(), prob_ri.lon(), BLat, BLon,
+   latlon_to_xytk_err(prob_rirw.lat(), prob_rirw.lon(), BLat, BLon,
                       XErr, YErr, TrackErr);
 
    return(true);
@@ -263,16 +263,16 @@ bool ProbRIPairInfo::set(const ProbRIInfo &prob_ri, const TrackInfo &bdeck) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfo::set(const TCStatLine &l) {
+void ProbRIRWPairInfo::set(const TCStatLine &l) {
    double v;
 
    clear();
 
    // Check the line type
-   if(l.type() != TCStatLineType_ProbRI) return;
+   if(l.type() != TCStatLineType_ProbRIRW) return;
 
-   // Parse ProbRIInfo
-   ProbRI.set(l);
+   // Parse ProbRIRWInfo
+   ProbRIRW.set(l);
 
    // Do not populate the BDECK
    BDeck = (TrackInfo *) 0;
@@ -302,25 +302,25 @@ void ProbRIPairInfo::set(const TCStatLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class ProbRIPairInfoArray
+//  Code for class ProbRIRWPairInfoArray
 //
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfoArray::ProbRIPairInfoArray() {
+ProbRIRWPairInfoArray::ProbRIRWPairInfoArray() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfoArray::~ProbRIPairInfoArray() {
+ProbRIRWPairInfoArray::~ProbRIRWPairInfoArray() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfoArray::ProbRIPairInfoArray(const ProbRIPairInfoArray & t) {
+ProbRIRWPairInfoArray::ProbRIRWPairInfoArray(const ProbRIRWPairInfoArray & t) {
 
    init_from_scratch();
 
@@ -329,7 +329,7 @@ ProbRIPairInfoArray::ProbRIPairInfoArray(const ProbRIPairInfoArray & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ProbRIPairInfoArray & ProbRIPairInfoArray::operator=(const ProbRIPairInfoArray & t) {
+ProbRIRWPairInfoArray & ProbRIRWPairInfoArray::operator=(const ProbRIRWPairInfoArray & t) {
 
    if(this == &t) return(*this);
 
@@ -340,7 +340,7 @@ ProbRIPairInfoArray & ProbRIPairInfoArray::operator=(const ProbRIPairInfoArray &
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfoArray::init_from_scratch() {
+void ProbRIRWPairInfoArray::init_from_scratch() {
 
    clear();
 
@@ -349,7 +349,7 @@ void ProbRIPairInfoArray::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfoArray::clear() {
+void ProbRIRWPairInfoArray::clear() {
 
    // Erase the entire vector
    Pairs.erase(Pairs.begin(), Pairs.end());
@@ -359,11 +359,11 @@ void ProbRIPairInfoArray::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfoArray::dump(ostream &out, int indent_depth) const {
+void ProbRIRWPairInfoArray::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
 
-   out << prefix << "ProbRIPairInfoArray:\n"
+   out << prefix << "ProbRIRWPairInfoArray:\n"
        << prefix << "NPairs = " << n_pairs() << "\n";
 
    for(i=0; i<Pairs.size(); i++) {
@@ -378,10 +378,10 @@ void ProbRIPairInfoArray::dump(ostream &out, int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIPairInfoArray::serialize() const {
+ConcatString ProbRIRWPairInfoArray::serialize() const {
    ConcatString s;
 
-   s << "ProbRIPairInfoArray: "
+   s << "ProbRIRWPairInfoArray: "
      << "NPairs = " << n_pairs();
 
    return(s);
@@ -389,7 +389,7 @@ ConcatString ProbRIPairInfoArray::serialize() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString ProbRIPairInfoArray::serialize_r(int indent_depth) const {
+ConcatString ProbRIRWPairInfoArray::serialize_r(int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString s;
 
@@ -404,7 +404,7 @@ ConcatString ProbRIPairInfoArray::serialize_r(int indent_depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfoArray::assign(const ProbRIPairInfoArray &p) {
+void ProbRIRWPairInfoArray::assign(const ProbRIRWPairInfoArray &p) {
 
    clear();
 
@@ -418,12 +418,12 @@ void ProbRIPairInfoArray::assign(const ProbRIPairInfoArray &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const ProbRIPairInfo & ProbRIPairInfoArray::operator[](int n) const {
+const ProbRIRWPairInfo & ProbRIRWPairInfoArray::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= Pairs.size())) {
       mlog << Error
-           << "\nProbRIPairInfoArray::operator[](int) -> "
+           << "\nProbRIRWPairInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -433,7 +433,7 @@ const ProbRIPairInfo & ProbRIPairInfoArray::operator[](int n) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ProbRIPairInfoArray::add(const ProbRIPairInfo &p) {
+void ProbRIRWPairInfoArray::add(const ProbRIRWPairInfo &p) {
 
    Pairs.push_back(p);
 
@@ -442,8 +442,8 @@ void ProbRIPairInfoArray::add(const ProbRIPairInfo &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ProbRIPairInfoArray::add(const ProbRIInfo &p, const TrackInfo &t) {
-   ProbRIPairInfo pair;
+bool ProbRIRWPairInfoArray::add(const ProbRIRWInfo &p, const TrackInfo &t) {
+   ProbRIRWPairInfo pair;
 
    // Attempt to set a new pair
    if(!pair.set(p, t)) return(false);

@@ -178,7 +178,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCStatFiles::operator>>(ProbRIPairInfo &pair) {
+bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
    TCStatLine line;
    bool status;
 
@@ -198,7 +198,7 @@ bool TCStatFiles::operator>>(ProbRIPairInfo &pair) {
          // Open the next file for reading
          CurLDF.close();
          if(!(CurLDF.open(FileList[CurFile]))) {
-            mlog << Error << "\nTCStatFiles::operator>>(ProbRIPairInfo &) -> "
+            mlog << Error << "\nTCStatFiles::operator>>(ProbRIRWPairInfo &) -> "
                  << "can't open file \"" << FileList[CurFile]
                  << "\" for reading\n\n";
             exit(1);
@@ -216,8 +216,8 @@ bool TCStatFiles::operator>>(ProbRIPairInfo &pair) {
    // Read next line
    while(status = (CurLDF >> line)) {
 
-      // Skip header and non-PROBRI lines
-      if(line.is_header() || line.type() != TCStatLineType_ProbRI) continue;
+      // Skip header and non-PROBRIRW lines
+      if(line.is_header() || line.type() != TCStatLineType_ProbRIRW) continue;
 
       // Add the current point
       pair.set(line);

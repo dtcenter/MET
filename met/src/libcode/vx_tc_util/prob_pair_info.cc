@@ -18,7 +18,7 @@ using namespace std;
 #include <cmath>
 
 #include "prob_pair_info_base.h"
-#include "prob_ri_pair_info.h"
+#include "prob_rirw_pair_info.h"
 #include "prob_pair_info_array.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -200,8 +200,8 @@ ProbPairInfoBase * new_prob_pair(const ATCFLineType t) {
    ProbPairInfoBase *new_pair = (ProbPairInfoBase *) 0;
 
    switch(t) {
-      case ATCFLineType_ProbRI:
-         new_pair = new ProbRIPairInfo;
+      case ATCFLineType_ProbRIRW:
+         new_pair = new ProbRIRWPairInfo;
          break;
 
       default:

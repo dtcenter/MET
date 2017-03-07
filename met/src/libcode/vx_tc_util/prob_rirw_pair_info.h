@@ -17,26 +17,26 @@
 #include <vector>
 
 #include "atcf_prob_line.h"
-#include "prob_ri_info.h"
+#include "prob_rirw_info.h"
 #include "track_info.h"
 
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-// ProbRIPairInfo class stores arrays of ProbRIInfo and verifying
+// ProbRIRWPairInfo class stores arrays of ProbRIRWInfo and verifying
 // TrackInfo objects.
 //
 ////////////////////////////////////////////////////////////////////////
 
-class ProbRIPairInfo {
+class ProbRIRWPairInfo {
 
    protected:
 
       void init_from_scratch();
-      void assign(const ProbRIPairInfo &);
+      void assign(const ProbRIRWPairInfo &);
 
-      ProbRIInfo  ProbRI;
+      ProbRIRWInfo  ProbRIRW;
       const TrackInfo * BDeck; // not allocated
 
       // BDeck Info
@@ -62,10 +62,10 @@ class ProbRIPairInfo {
 
    public:
 
-      ProbRIPairInfo();
-     ~ProbRIPairInfo();
-      ProbRIPairInfo(const ProbRIPairInfo &);
-      ProbRIPairInfo & operator=(const ProbRIPairInfo &);
+      ProbRIRWPairInfo();
+     ~ProbRIRWPairInfo();
+      ProbRIRWPairInfo(const ProbRIRWPairInfo &);
+      ProbRIRWPairInfo & operator=(const ProbRIRWPairInfo &);
 
       void clear();
 
@@ -78,7 +78,7 @@ class ProbRIPairInfo {
          //  get stuff
          //
 
-      const ProbRIInfo &   prob_ri()    const;
+      const ProbRIRWInfo & prob_rirw()    const;
       const TrackInfo *    bdeck()      const;
       const ConcatString & storm_name() const;
       const ConcatString & bmodel()     const;
@@ -101,7 +101,7 @@ class ProbRIPairInfo {
          //  do stuff
          //
 
-      bool set(const ProbRIInfo &, const TrackInfo &);
+      bool set(const ProbRIRWInfo &, const TrackInfo &);
       void set(const TCStatLine &);
 
       void set_adland(double);
@@ -111,49 +111,49 @@ class ProbRIPairInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ProbRIInfo &   ProbRIPairInfo::prob_ri()    const { return(ProbRI);    }
-inline const TrackInfo *    ProbRIPairInfo::bdeck()      const { return(BDeck);     }
-inline const ConcatString & ProbRIPairInfo::storm_name() const { return(StormName); }
-inline const ConcatString & ProbRIPairInfo::bmodel()     const { return(BModel);    }
-inline const double         ProbRIPairInfo::blat()       const { return(BLat);      }
-inline const double         ProbRIPairInfo::blon()       const { return(BLon);      }
-inline const double         ProbRIPairInfo::adland()     const { return(ADLand);    }
-inline const double         ProbRIPairInfo::bdland()     const { return(BDLand);    }
-inline const double         ProbRIPairInfo::track_err()  const { return(TrackErr);  }
-inline const double         ProbRIPairInfo::x_err()      const { return(XErr);      }
-inline const double         ProbRIPairInfo::y_err()      const { return(YErr);      }
-inline const double         ProbRIPairInfo::bbegv()      const { return(BBegV);     }
-inline const double         ProbRIPairInfo::bendv()      const { return(BEndV);     }
-inline const double         ProbRIPairInfo::bminv()      const { return(BMinV);     }
-inline const double         ProbRIPairInfo::bmaxv()      const { return(BMaxV);     }
-inline const CycloneLevel   ProbRIPairInfo::bbeglev()    const { return(BBegLev);   }
-inline const CycloneLevel   ProbRIPairInfo::bendlev()    const { return(BEndLev);   }
-inline const TCStatLine &   ProbRIPairInfo::line()       const { return(Line);      }
+inline const ProbRIRWInfo & ProbRIRWPairInfo::prob_rirw()  const { return(ProbRIRW);  }
+inline const TrackInfo *    ProbRIRWPairInfo::bdeck()      const { return(BDeck);     }
+inline const ConcatString & ProbRIRWPairInfo::storm_name() const { return(StormName); }
+inline const ConcatString & ProbRIRWPairInfo::bmodel()     const { return(BModel);    }
+inline const double         ProbRIRWPairInfo::blat()       const { return(BLat);      }
+inline const double         ProbRIRWPairInfo::blon()       const { return(BLon);      }
+inline const double         ProbRIRWPairInfo::adland()     const { return(ADLand);    }
+inline const double         ProbRIRWPairInfo::bdland()     const { return(BDLand);    }
+inline const double         ProbRIRWPairInfo::track_err()  const { return(TrackErr);  }
+inline const double         ProbRIRWPairInfo::x_err()      const { return(XErr);      }
+inline const double         ProbRIRWPairInfo::y_err()      const { return(YErr);      }
+inline const double         ProbRIRWPairInfo::bbegv()      const { return(BBegV);     }
+inline const double         ProbRIRWPairInfo::bendv()      const { return(BEndV);     }
+inline const double         ProbRIRWPairInfo::bminv()      const { return(BMinV);     }
+inline const double         ProbRIRWPairInfo::bmaxv()      const { return(BMaxV);     }
+inline const CycloneLevel   ProbRIRWPairInfo::bbeglev()    const { return(BBegLev);   }
+inline const CycloneLevel   ProbRIRWPairInfo::bendlev()    const { return(BEndLev);   }
+inline const TCStatLine &   ProbRIRWPairInfo::line()       const { return(Line);      }
 
-inline void ProbRIPairInfo::set_adland(double d) { ADLand = d; return; }
-inline void ProbRIPairInfo::set_bdland(double d) { BDLand = d; return; }
+inline void ProbRIRWPairInfo::set_adland(double d) { ADLand = d; return; }
+inline void ProbRIRWPairInfo::set_bdland(double d) { BDLand = d; return; }
 
 ////////////////////////////////////////////////////////////////////////
 //
-// ProbRIPairInfoArray class stores an array of ProbRIPairInfo objects.
+// ProbRIRWPairInfoArray class stores an array of ProbRIRWPairInfo objects.
 //
 ////////////////////////////////////////////////////////////////////////
 
-class ProbRIPairInfoArray {
+class ProbRIRWPairInfoArray {
 
    private:
 
       void init_from_scratch();
-      void assign(const ProbRIPairInfoArray &);
+      void assign(const ProbRIRWPairInfoArray &);
 
-      vector<ProbRIPairInfo> Pairs;
+      vector<ProbRIRWPairInfo> Pairs;
 
    public:
 
-      ProbRIPairInfoArray();
-     ~ProbRIPairInfoArray();
-      ProbRIPairInfoArray(const ProbRIPairInfoArray &);
-      ProbRIPairInfoArray & operator=(const ProbRIPairInfoArray &);
+      ProbRIRWPairInfoArray();
+     ~ProbRIRWPairInfoArray();
+      ProbRIRWPairInfoArray(const ProbRIRWPairInfoArray &);
+      ProbRIRWPairInfoArray & operator=(const ProbRIRWPairInfoArray &);
 
       void clear();
 
@@ -169,20 +169,20 @@ class ProbRIPairInfoArray {
          //  get stuff
          //
 
-      const ProbRIPairInfo & operator[](int) const;
+      const ProbRIRWPairInfo & operator[](int) const;
       int n_pairs() const;
 
          //
          //  do stuff
          //
 
-      void add(const ProbRIPairInfo &);
-      bool add(const ProbRIInfo &, const TrackInfo &);
+      void add(const ProbRIRWPairInfo &);
+      bool add(const ProbRIRWInfo &, const TrackInfo &);
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int ProbRIPairInfoArray::n_pairs() const { return(Pairs.size()); }
+inline int ProbRIRWPairInfoArray::n_pairs() const { return(Pairs.size()); }
 
 ////////////////////////////////////////////////////////////////////////
 

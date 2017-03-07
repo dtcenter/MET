@@ -133,7 +133,7 @@ static void   compute_track_err    (const TrackInfo &, const TrackInfo &,
 static void   load_dland           ();
 static void   process_watch_warn   (TrackPairInfoArray &);
 static void   write_tracks         (const TrackPairInfoArray &);
-static void   write_prob_ri        (const ProbRIPairInfoArray &);
+static void   write_prob_rirw      (const ProbRIRWPairInfoArray &);
 static void   setup_table          (AsciiTable &);
 static void   usage                ();
 static void   set_adeck            (const StringArray &);
@@ -408,8 +408,8 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
 void process_edecks(const TrackInfoArray &bdeck_tracks) {
    StringArray files, files_model_suffix;
    ProbInfoArray edeck_probs;
-   ProbRIPairInfo cur_ri;
-   ProbRIPairInfoArray prob_ri_pairs;
+   ProbRIRWPairInfo cur_ri;
+   ProbRIRWPairInfoArray prob_rirw_pairs;
    int n_match, i, j;
 
    // Get the list of ATCF files
@@ -444,7 +444,7 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
          if(edeck_probs[i]->is_match(bdeck_tracks[j])) {
 
             // Attempt to store the pair
-            if(!cur_ri.set(edeck_probs.prob_ri(i), bdeck_tracks[j])) continue;
+            if(!cur_ri.set(edeck_probs.prob_rirw(i), bdeck_tracks[j])) continue;
 
             mlog << Debug(4)
                  << "[Prob " << i+1 << "] EDECK probability " << i+1
@@ -453,11 +453,11 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
                  << "    BDeck: " << bdeck_tracks[j].serialize() << "\n";
 
             // Compute the distances to land
-            cur_ri.set_adland(compute_dland(cur_ri.prob_ri().lat(), -1.0*cur_ri.prob_ri().lon()));
-            cur_ri.set_bdland(compute_dland(cur_ri.blat(),          -1.0*cur_ri.blon()));
+            cur_ri.set_adland(compute_dland(cur_ri.prob_rirw().lat(), -1.0*cur_ri.prob_rirw().lon()));
+            cur_ri.set_bdland(compute_dland(cur_ri.blat(),            -1.0*cur_ri.blon()));
 
             // Store the current pair
-            prob_ri_pairs.add(cur_ri);
+            prob_rirw_pairs.add(cur_ri);
 
             // Increment the match counter
             n_match++;
@@ -474,11 +474,11 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
    // Dump out very verbose output
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
-           << prob_ri_pairs.serialize_r() << "\n";
+           << prob_rirw_pairs.serialize_r() << "\n";
    }
 
-   // Write out the ProbRI pairs
-   if(prob_ri_pairs.n_pairs() > 0) write_prob_ri(prob_ri_pairs);
+   // Write out the ProbRIRW pairs
+   if(prob_rirw_pairs.n_pairs() > 0) write_prob_rirw(prob_rirw_pairs);
 
    return;
 }
@@ -916,7 +916,7 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_ri(i));
+      if(p[i]->type() == ATCFLineType_ProbRIRW) probs.add(p.prob_rirw(i));
    }
 
    // Print summary filtering info
@@ -1975,7 +1975,7 @@ void write_tracks(const TrackPairInfoArray &p) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_prob_ri(const ProbRIPairInfoArray &p) {
+void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    int i_row, i, n, n_row, max_n;
    TcHdrColumns tchc;
    ConcatString out_file;
@@ -1983,18 +1983,18 @@ void write_prob_ri(const ProbRIPairInfoArray &p) {
    ofstream *out = (ofstream *) 0;
 
    // Set the track pair output file name
-   out_file << out_base << "_PROBRI" << tc_stat_file_ext;
+   out_file << out_base << "_PROBRIRW" << tc_stat_file_ext;
    out_files.add(out_file);
 
    // Create the output file
    open_tc_txt_file(out, out_file);
 
    // Determine the number of output rows and max number of probs
-   max_n = p[0].prob_ri().n_prob();
+   max_n = p[0].prob_rirw().n_prob();
    for(i=0,n_row=1; i<p.n_pairs(); i++) {
 
       // Current number of probabilities
-      n = p[i].prob_ri().n_prob();
+      n = p[i].prob_rirw().n_prob();
 
       // Keep track of maximum probabilities
       if(n > max_n) max_n = n;
@@ -2007,11 +2007,11 @@ void write_prob_ri(const ProbRIPairInfoArray &p) {
    }
 
    // Initialize the output AsciiTable
-   out_at.set_size(n_row, n_tc_header_cols + get_n_prob_ri_cols(max_n));
+   out_at.set_size(n_row, n_tc_header_cols + get_n_prob_rirw_cols(max_n));
    setup_table(out_at);
 
    // Write the header row
-   write_prob_ri_header_row(1, max_n, out_at, 0, 0);
+   write_prob_rirw_header_row(1, max_n, out_at, 0, 0);
 
    // Initialize the row index to 1 to account for the header
    i_row = 1;
@@ -2025,19 +2025,19 @@ void write_prob_ri(const ProbRIPairInfoArray &p) {
    if(conf_info.ValidMask.n_points() > 0) tchc.set_valid_mask(conf_info.ValidMask.name());
    else                                   tchc.set_valid_mask(na_str);
 
-   // Loop through the ProbRIPairInfo objects
+   // Loop through the ProbRIRWPairInfo objects
    for(i=0; i<p.n_pairs(); i++) {
 
       // More header columns
-      tchc.set_adeck_model(p[i].prob_ri().technique());
+      tchc.set_adeck_model(p[i].prob_rirw().technique());
       tchc.set_bdeck_model(p[i].bmodel());
-      tchc.set_storm_id(p[i].prob_ri().storm_id());
-      tchc.set_basin(p[i].prob_ri().basin());
-      tchc.set_cyclone(p[i].prob_ri().cyclone());
+      tchc.set_storm_id(p[i].prob_rirw().storm_id());
+      tchc.set_basin(p[i].prob_rirw().basin());
+      tchc.set_cyclone(p[i].prob_rirw().cyclone());
       tchc.set_storm_name(p[i].bdeck()->storm_name());
 
       // Write the current TrackPairInfo object
-      write_prob_ri_row(tchc, p[i], out_at, i_row);
+      write_prob_rirw_row(tchc, p[i], out_at, i_row);
    }
 
    // Write the AsciiTable contents and clean up
