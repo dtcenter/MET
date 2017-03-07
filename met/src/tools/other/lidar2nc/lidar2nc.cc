@@ -688,27 +688,46 @@ for (j=0; j<n_data; ++j)  {
 
    for (layer=0; layer<(obs.n_layers); ++layer)  {
 
-      obs.get_layer_base_record    (j, layer, f);
+      obs.get_layer_base_record         (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+      obs.get_layer_top_record          (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_layer_top_record     (j, layer, f);
+      obs.get_opacity_record            (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+      obs.get_cad_score_record          (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_opacity_record       (j, layer, f);
+      obs.get_feature_type_record       (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+      obs.get_feature_type_qa_record    (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_cad_score_record     (j, layer, f);
+      obs.get_ice_water_record          (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+      obs.get_ice_water_qa_record       (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_feature_type_record  (j, layer, f);
+      obs.get_subtype_record            (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-         write_nc_record(out, obs_qty_var, obs_arr_var, f);
+      obs.get_cloud_aerosol_record      (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+
+      obs.get_h_average_record          (j, layer, f);
+         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
    }   //  for layer
+
+   obs.get_base_base_record  (j, f);
+      write_nc_record        (out, obs_qty_var, obs_arr_var, f);
+
+   obs.get_top_top_record    (j, f);
+      write_nc_record        (out, obs_qty_var, obs_arr_var, f);
 
 }   //  for j
 
