@@ -66,18 +66,18 @@
     </output>
   </test>
 
-  <test name="tc_pairs_PROBRI">
+  <test name="tc_pairs_PROBRIRW">
     <exec>&MET_DIR;/bin/tc_pairs</exec>
     <param> \
       -edeck &DATA_DIR;/edeck/*2015*.dat \
       -bdeck &DATA_DIR;/bdeck/*2015*.dat \
-      -config &CONFIG_DIR;/TCPairsConfig_PROBRI \
+      -config &CONFIG_DIR;/TCPairsConfig_PROBRIRW \
       -out &OUTPUT_DIR;/tc_pairs/alal2015 \
-      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_PROBRI.log \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_PROBRIRW.log \
       -v 3
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/tc_pairs/alal2015_PROBRI.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2015_PROBRIRW.tcst</stat>
     </output>
   </test>
 

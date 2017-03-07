@@ -31,10 +31,10 @@ my @fld_tcmpr  = qw(AMODEL BMODEL STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VA
                     AAL_WIND_64 BAL_WIND_64 ANE_WIND_64 BNE_WIND_64 ASE_WIND_64 BSE_WIND_64 ASW_WIND_64 BSW_WIND_64 ANW_WIND_64 BNW_WIND_64
                     ARADP BRADP ARRP BRRP AMRD BMRD AGUSTS BGUSTS AEYE BEYE ADIR BDIR ASPEED BSPEED ADEPTH BDEPTH);
 
-my @fld_probri = qw(AMODEL BMODEL STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
-                    ALAT ALON BLAT BLON INITIALS TK_ERR X_ERR Y_ERR ADLAND BDLAND RI_BEG RI_END RI_WINDOW
-                    AWIND_END BWIND_BEG BWIND_END BDELTA BDELTA_MAX BLEVEL_BEG BLEVEL_END N_THRESH
-                    THRESH_ PROB_);
+my @fld_probrirw = qw(AMODEL BMODEL STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
+                      ALAT ALON BLAT BLON INITIALS TK_ERR X_ERR Y_ERR ADLAND BDLAND RI_BEG RI_END RI_WINDOW
+                      AWIND_END BWIND_BEG BWIND_END BDELTA BDELTA_MAX BLEVEL_BEG BLEVEL_END N_THRESH
+                      THRESH_ PROB_);
 
 my $fmt_hdr =
       "%-8s"  . # VERSION
@@ -136,7 +136,7 @@ my $fmt_tcmpr =
       "%15s"  . # ADEPTH
       "%15s";   # BDEPTH
 
-my $fmt_probri =
+my $fmt_probrirw =
       "%15s"  . # AMODEL
       "%15s"  . # BMODEL
       "%15s"  . # STORM_ID
@@ -215,10 +215,10 @@ while(<$fh_tcst_in>){
     $fmt_val = $fmt_tcmpr;
   }
 
-  # write a PROBRI line
-  elsif( $vals[13] eq "PROBRI" ) {
-    push @outs, (" TCST_PROBRI ", @vals[1,2,4 .. 7,11,12,14 .. 34]);
-    $fmt_val = $fmt_probri;
+  # write a PROBRIRW line
+  elsif( $vals[13] eq "PROBRIRW" ) {
+    push @outs, (" TCST_PROBRIRW ", @vals[1,2,4 .. 7,11,12,14 .. 34]);
+    $fmt_val = $fmt_probrirw;
     foreach my $i ( 35 .. $#vals ) {
       $fmt_val = $fmt_val . "%15s";
       push @outs, ($vals[$i]);
@@ -315,7 +315,7 @@ close($fh_tcst_in);
 #    78  ADEPTH
 #    79  BDEPTH
 
-# PROBRI Line Type
+# PROBRIRW Line Type
 #     0 ALAT
 #     1 ALON
 #     2 BLAT
