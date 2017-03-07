@@ -44,6 +44,8 @@ static double lambert_segment_area(double u0, double v0, double u1, double v1, d
 
 static double lambert_beta(double u0, double delta_u, double v0, double delta_v, double c, double t);
 
+static double calc_cone(const double lat1, const double lat2, const bool is_north);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -83,6 +85,8 @@ clear();
 void LambertGrid::clear()
 
 {
+
+IsNorthHemisphere = true;
 
 Lat_LL = 0.0;
 Lon_LL = 0.0;
@@ -161,18 +165,7 @@ Name = data.name;
    //  calculate Cone constant
    //
 
-if ( fabs(data.scale_lat_1 - data.scale_lat_2) < 1.0e-5 )  Cone = sind(data.scale_lat_1);
-else {
-
-   double t, b;
-
-   t = cosd(data.scale_lat_1)/cosd(data.scale_lat_2);
-
-   b = tand(45.0 - 0.5*(data.scale_lat_1))/tand(45.0 - 0.5*(data.scale_lat_2));
-
-   Cone = log(t)/log(b);
-
-}
+Cone = calc_cone(data.scale_lat_1, data.scale_lat_2, IsNorthHemisphere);
 
    //
    //  calculate Alpha
@@ -194,7 +187,7 @@ double r_pin, theta_pin;
 
 r_pin = lc_func(data.lat_pin, Cone, IsNorthHemisphere);
 
-theta_pin = H*Cone*(Lon_orient - Lon_LL);
+theta_pin = H*Cone*(Lon_orient - data.lon_pin);
 
 Bx = data.x_pin - Alpha*r_pin*H*sind(theta_pin);
 By = data.y_pin + Alpha*r_pin*H*cosd(theta_pin);
@@ -272,8 +265,8 @@ void LambertGrid::xy_to_latlon(double x, double y, double & lat, double & lon) c
 double r, theta;
 const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
-x = (x - Bx)/Alpha;
-y = (y - By)/Alpha;
+x = (x - Bx)/(H*Alpha);
+y = (y - By)/(H*Alpha);
 
 r = sqrt( x*x + y*y );
 
@@ -282,9 +275,7 @@ lat = lc_inv_func(r, Cone, IsNorthHemisphere);
 if ( fabs(r) < 1.0e-5 )  theta = 0.0;
 else                     theta = atan2d(x, -y);   //  NOT atan2d(y, x);
 
-lon = Lon_orient - theta/Cone;
-
-lon *= H;
+lon = Lon_orient - theta/(H*Cone);
 
 reduce(lon);
 
@@ -884,6 +875,48 @@ if ( !rep )  {
    exit ( 1 );
 
 }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double calc_cone(const double lat1, const double lat2, const bool is_north)
+
+{
+
+double cone;
+const double H = ( is_north ? 1.0 : -1.0 );
+const double tol = 1.0e-5;
+
+
+   //
+   //  scale latitudes equal?
+   //
+
+if ( fabs(lat1 - lat2) < tol )  {
+
+   cone = sind(H*lat1);
+
+   return ( cone );
+
+}
+
+   //
+   //  scale latitudes are different
+   //
+
+double t, b;
+
+t = cosd(lat1)/cosd(lat2);
+
+b = tand(45.0 - 0.5*H*lat1)/tand(45.0 - 0.5*H*lat2);
+
+cone = log(t)/log(b);
+
+
+return ( cone );
 
 }
 

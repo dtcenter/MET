@@ -22,6 +22,7 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_math.h"
+#include "nav.h"
 
 #include "3d_att.h"
 #include "3d_txt_header.h"
@@ -35,6 +36,13 @@ static const char format_int        [] = "%d";
 
 static const char format_2_decimals [] = "%.2f";
 static const char format_3_decimals [] = "%.3f";
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static double calc_2d_dist(const double x1_grid, const double y1_grid, 
+                           const double x2_grid, const double y2_grid, const Grid &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -144,6 +152,8 @@ Xvelocity = Yvelocity = 0.0;
 
 SpatialAxisAngle = 0.0;
 
+CdistTravelled = 0.0;
+
 Ptile_10 = 0.0;
 Ptile_25 = 0.0;
 Ptile_50 = 0.0;
@@ -196,6 +206,8 @@ Xvelocity = a.Xvelocity;
 Yvelocity = a.Yvelocity;
 
 SpatialAxisAngle = a.SpatialAxisAngle;
+
+CdistTravelled = a.CdistTravelled;
 
 Ptile_10 = a.Ptile_10;
 Ptile_25 = a.Ptile_25;
@@ -278,6 +290,20 @@ out << prefix << "SpatialAxisAngle = " << SpatialAxisAngle << "\n";
    //
 
 out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleAtt3D::set_cdist_travelled(double dist)
+
+{
+
+CdistTravelled = dist;
 
 return;
 
@@ -609,6 +635,16 @@ snprintf(junk, sizeof(junk), format, Tmax);
    table.set_entry(row, c++, junk);
 
    //
+   //  centroid distance travelled
+   //
+
+   format = format_3_decimals;
+
+snprintf(junk, sizeof(junk), format, CdistTravelled);
+
+   table.set_entry(row, c++, junk);
+
+   //
    //  intensities 10, 25, 50, 75, 90
    //
 
@@ -754,6 +790,8 @@ EndTimeDelta   = 0;
 
 TotalInterest = -1.0;
 
+DurationDifference = 0;
+
 
 return;
 
@@ -797,6 +835,22 @@ StartTimeDelta = a.StartTimeDelta;
 EndTimeDelta   = a.EndTimeDelta;
 
 TotalInterest = a.TotalInterest;
+
+DurationDifference = a.DurationDifference;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void PairAtt3D::set_duration_difference(int k)
+
+{
+
+DurationDifference = k;
 
 return;
 
@@ -1098,6 +1152,12 @@ sprintf(junk, format_int, IntersectionVol);
 
 table.set_entry(row, c++, junk);
 
+   //  duration difference
+
+sprintf(junk, format_int, DurationDifference);
+
+table.set_entry(row, c++, junk);
+
    //  total interest
 
 sprintf(junk, format_3_decimals, TotalInterest);
@@ -1163,17 +1223,20 @@ SingleAtt3D calc_3d_single_atts(const Object & mask, const MtdFloatFile & raw, c
 
 {
 
-int j;
-int n, Vol;
+int j, t;
+int n, nt, Vol;
 SingleAtt3D a;
 double bbox_volume;
 double lat, lon;
+double xbar_2d, ybar_2d, x_old, y_old;
+double dist;
 ConcatString raw_filename;
 float * values = (float *) 0;
 const int   * i = 0;
 const float * r = 0;
 Mtd_3D_Moments moments;
 const int n3 = (mask.nx())*(mask.ny())*(mask.nt());
+const Grid * grid = mask.grid_p();
 
 
 moments = mask.calc_3d_moments();
@@ -1226,6 +1289,26 @@ if ( a.n_times() <= 1 )  {
 
 }   //  else
 
+
+   //
+   //  distance travelled by the 2D centroid
+   //
+
+dist = 0.0;
+
+nt = a.Tmax - a.Tmin + 1;
+
+for (j=0; j<nt; ++j)  {
+
+   t = j + a.Tmin;
+
+   mask.calc_2d_centroid_at_t(t, xbar_2d, ybar_2d);
+
+   if ( j == 0 )  { x_old = xbar_2d;  y_old = ybar_2d;  continue; }
+
+   dist += calc_2d_dist(xbar_2d, ybar_2d, x_old, y_old, *grid);
+
+}
 
    //
    //  percentiles
@@ -1408,6 +1491,14 @@ p.set_start_time_delta(t);
 t = fcst_att.tmax() - obs_att.tmax();
 
 p.set_end_time_delta(t);
+
+   //
+   //  duration difference
+   //
+
+t = fcst_att.n_times() - obs_att.n_times();
+
+p.set_duration_difference(t);
 
    //
    //  done
@@ -1599,6 +1690,46 @@ return ( t );
 
 }
 */
+
+////////////////////////////////////////////////////////////////////////
+
+
+double calc_2d_dist(const double x1_grid, const double y1_grid, 
+                    const double x2_grid, const double y2_grid, const Grid & grid)
+
+{
+
+double dist;
+
+   //
+   //  distance in grid units
+   //
+
+// const double dx = x1_grid - x2_grid;
+// const double dy = y1_grid - y2_grid;
+// 
+// dist = sqrt ( dx*dx + dy*dy );
+
+   //
+   //  great circle distance
+   //
+
+double lat1, lon1, lat2, lon2;
+
+grid.xy_to_latlon(x1_grid, y1_grid, lat1, lon1);
+grid.xy_to_latlon(x2_grid, y2_grid, lat2, lon2);
+
+dist = gc_dist(lat1, lon1, lat2, lon2);
+
+
+   //
+   //  done
+   //
+
+return ( dist );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
