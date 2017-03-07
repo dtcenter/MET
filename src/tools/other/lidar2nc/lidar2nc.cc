@@ -688,23 +688,23 @@ for (j=0; j<n_data; ++j)  {
 
    for (layer=0; layer<(obs.n_layers); ++layer)  {
 
-      obs.get_layer_base_record (j, layer, f);
+      obs.get_layer_base_record    (j, layer, f);
 
          write_nc_record(out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_layer_top_record  (j, layer, f);
+      obs.get_layer_top_record     (j, layer, f);
 
          write_nc_record(out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_opacity_record    (j, layer, f);
+      obs.get_opacity_record       (j, layer, f);
 
          write_nc_record(out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_cad_score_record  (j, layer, f);
+      obs.get_cad_score_record     (j, layer, f);
 
          write_nc_record(out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_fclass_record     (j, layer, f);
+      obs.get_feature_type_record  (j, layer, f);
 
          write_nc_record(out, obs_qty_var, obs_arr_var, f);
 

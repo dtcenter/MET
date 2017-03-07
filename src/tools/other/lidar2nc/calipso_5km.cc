@@ -17,9 +17,9 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static int hdf_start[2];
-static int hdf_stride[2];
-static int hdf_edge[2];
+static int hdf_start  [2];
+static int hdf_stride [2];
+static int hdf_edge   [2];
 
 static float ff[2];
 
@@ -48,9 +48,43 @@ inline float km_to_meters(float km) {
 
 
    //
-   //  masking 3 high bits
+   //  bit manipulation
    //
 
+   //
+   //  bits numbered from 1 to 16 inclusive.
+   //
+   //  we're assuming that bit #1 is the high-order bit
+   //
+
+static const unsigned short mask_3 = (unsigned short) 7;
+static const unsigned short mask_2 = (unsigned short) 3;
+static const unsigned short mask_1 = (unsigned short) 1;
+
+static const unsigned short type_mask            = mask_3;
+static const unsigned short type_qa_mask         = mask_2;
+static const unsigned short ice_water_mask       = mask_2;
+static const unsigned short ice_water_qa_mask    = mask_2;
+static const unsigned short subtype_mask         = mask_3;
+static const unsigned short cloud_aerosol_mask   = mask_1;
+static const unsigned short h_average_mask       = mask_3;
+
+static const int            type_shift           = 13;
+static const int            type_qa_shift        = 11;
+static const int            ice_water_shift      =  9;
+static const int            ice_water_qa_shift   =  7;
+static const int            subtype_shift        =  4;
+static const int            cloud_aerosol_shift  =  3;
+static const int            h_average_shift      =  0;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  masking 3 high bits
+   //
+/*
 inline unsigned short fclass_mask(unsigned short u)
 
 {
@@ -58,6 +92,7 @@ inline unsigned short fclass_mask(unsigned short u)
 return ( u >> 13 );
 
 }
+*/
 
    //
    //  masking 3 low bits
@@ -93,6 +128,8 @@ static const int       obs_index = 4;
 
 
 static void clear_float_buf(float *);
+
+static int extract_bits(unsigned short u, const unsigned short mask, const int shift);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -465,11 +502,11 @@ if ( SDreaddata(fclass.id, hdf_start, hdf_stride, hdf_edge, &(obs.fclass)) < 0 )
 
 }
 
-for (j=0; j<hdf_max_layers; ++j)  {
-
-   obs.fclass[j] = fclass_mask(obs.fclass[j]);
-
-}
+// for (j=0; j<hdf_max_layers; ++j)  {
+// 
+//    // obs.fclass[j] = fclass_mask(obs.fclass[j]);
+// 
+// }
 
    //
    //  done
@@ -641,7 +678,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calipso_5km_Obs::get_fclass_record(int hdr_id, int layer, float * record)
+void Calipso_5km_Obs::fclass_record_header(int hdr_id, int layer, int grib_code, float * record)
 
 {
 
@@ -649,12 +686,138 @@ clear_float_buf(record);
 
 if ( n_layers == 0 )  return;
 
-
 record [    hdr_id_index ] = (float) hdr_id;
-record [ grib_code_index ] = (float) fclass_grib_code;
+record [ grib_code_index ] = (float) grib_code;
 record [  pressure_index ] = base_pressure[layer];
 record [    height_index ] = km_to_meters(base_height_km[layer]);
-record [       obs_index ] = (float) (fclass[layer]);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_feature_type_record(int hdr_id, int layer, float * record)
+
+{
+
+if ( n_layers == 0 )  return;
+
+fclass_record_header(hdr_id, layer, ftype_grib_code, record);
+
+record [ obs_index ] = (float) extract_bits(fclass[layer], type_mask, type_shift);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_feature_type_qa_record(int hdr_id, int layer, float * record)
+
+{
+
+if ( n_layers == 0 )  return;
+
+fclass_record_header(hdr_id, layer, ftype_qa_grib_code, record);
+
+record [ obs_index ] = (float) extract_bits(fclass[layer], type_qa_mask, type_qa_shift);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_ice_water_record(int hdr_id, int layer, float * record)
+
+{
+
+if ( n_layers == 0 )  return;
+
+fclass_record_header(hdr_id, layer, ice_water_grib_code, record);
+
+record [ obs_index ] = (float) extract_bits(fclass[layer], ice_water_mask, ice_water_shift);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_ice_water_qa_record(int hdr_id, int layer, float * record)
+
+{
+
+if ( n_layers == 0 )  return;
+
+fclass_record_header(hdr_id, layer, ice_water_qa_grib_code, record);
+
+record [ obs_index ] = (float) extract_bits(fclass[layer], ice_water_qa_mask, ice_water_qa_shift);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_cloud_aerosol_record(int hdr_id, int layer, float * record)
+
+{
+
+if ( n_layers == 0 )  return;
+
+fclass_record_header(hdr_id, layer, cloud_aerosol_grib_code, record);
+
+record [ obs_index ] = (float) extract_bits(fclass[layer], cloud_aerosol_mask, cloud_aerosol_shift);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_h_average_record(int hdr_id, int layer, float * record)
+
+{
+
+if ( n_layers == 0 )  return;
+
+fclass_record_header(hdr_id, layer, h_average_grib_code, record);
+
+record [ obs_index ] = (float) extract_bits(fclass[layer], h_average_mask, h_average_shift);
 
    //
    //  done
@@ -675,6 +838,28 @@ void clear_float_buf(float * f)
 for (int j=0; j<5; ++j)  f[j] = FILL_VALUE;
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int extract_bits(unsigned short u, const unsigned short mask, const int shift)
+
+
+{
+
+if ( shift > 0 )  u >>= shift;
+
+u &= mask;
+
+
+   //
+   //  done
+   //
+
+return ( (int) u );
 
 }
 
