@@ -38,11 +38,19 @@ static const float FILL_VALUE = -9999.f;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int layer_base_grib_code    = 500;
-static const int layer_top_grib_code     = 501;
-static const int opacity_grib_code       = 502;
-static const int cad_score_grib_code     = 503;
-static const int fclass_grib_code        = 504;
+static const int layer_base_grib_code     = 500;
+static const int layer_top_grib_code      = 501;
+static const int opacity_grib_code        = 502;
+static const int cad_score_grib_code      = 503;
+
+static const int ftype_grib_code          = 504;
+static const int ftype_qa_grib_code       = 505;
+
+static const int ice_water_grib_code      = 506;
+static const int ice_water_qa_grib_code   = 507;
+
+static const int cloud_aerosol_grib_code  = 508;
+static const int h_average_grib_code      = 509;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -70,7 +78,7 @@ struct Calipso_5km_Obs  {
 
    int cad_score          [hdf_max_layers];
 
-   unsigned short fclass  [hdf_max_layers];
+   unsigned short fclass  [hdf_max_layers];    //  feature classification bits
 
       //
 
@@ -82,8 +90,28 @@ struct Calipso_5km_Obs  {
    void get_layer_base_record (int hdr_id, int layer, float *);
    void get_opacity_record    (int hdr_id, int layer, float *);
    void get_cad_score_record  (int hdr_id, int layer, float *);
-   void get_fclass_record     (int hdr_id, int layer, float *);
 
+      //
+      //  these things are all obtained from the feature classification bits
+      //
+
+   void get_feature_type_record       (int hdr_id, int layer, float *);
+   void get_feature_type_qa_record    (int hdr_id, int layer, float *);
+
+   void get_ice_water_record          (int hdr_id, int layer, float *);
+   void get_ice_water_qa_record       (int hdr_id, int layer, float *);
+
+   void get_subtype_record            (int hdr_id, int layer, float *);
+
+   void get_cloud_aerosol_record      (int hdr_id, int layer, float *);
+
+   void get_h_average_record          (int hdr_id, int layer, float *);
+
+      //
+      //  fills in all but the last float in a feature classification record
+      //
+
+   void fclass_record_header          (int hdr_id, int layer, int grib_code, float *);
 
 };
 
