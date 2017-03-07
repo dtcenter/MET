@@ -43,14 +43,22 @@ static const int layer_top_grib_code      = 501;
 static const int opacity_grib_code        = 502;
 static const int cad_score_grib_code      = 503;
 
-static const int ftype_grib_code          = 504;
-static const int ftype_qa_grib_code       = 505;
+static const int base_base_grib_code      = 504;
+static const int top_top_grib_code        = 505;
 
-static const int ice_water_grib_code      = 506;
-static const int ice_water_qa_grib_code   = 507;
+   //
+   //  these are from the feature classification bits
+   //
 
-static const int cloud_aerosol_grib_code  = 508;
-static const int h_average_grib_code      = 509;
+static const int ftype_grib_code          = 601;
+static const int ftype_qa_grib_code       = 602;
+
+static const int ice_water_grib_code      = 603;
+static const int ice_water_qa_grib_code   = 604;
+
+static const int subtype_grib_code        = 605;
+static const int cloud_aerosol_grib_code  = 606;
+static const int h_average_grib_code      = 607;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,6 +98,9 @@ struct Calipso_5km_Obs  {
    void get_layer_base_record (int hdr_id, int layer, float *);
    void get_opacity_record    (int hdr_id, int layer, float *);
    void get_cad_score_record  (int hdr_id, int layer, float *);
+
+   void get_base_base_record  (int hdr_id,            float *);
+   void get_top_top_record    (int hdr_id,            float *);
 
       //
       //  these things are all obtained from the feature classification bits

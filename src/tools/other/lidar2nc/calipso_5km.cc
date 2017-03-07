@@ -678,6 +678,54 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void Calipso_5km_Obs::get_base_base_record(int hdr_id, float * record)
+
+{
+
+clear_float_buf(record);
+
+if ( n_layers == 0 )  return;
+
+const int layer = 0;
+
+Calipso_5km_Obs::get_layer_base_record(hdr_id, layer, record);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_top_top_record(int hdr_id, float * record)
+
+{
+
+clear_float_buf(record);
+
+if ( n_layers == 0 )  return;
+
+const int layer = n_layers - 1;
+
+Calipso_5km_Obs::get_layer_top_record(hdr_id, layer, record);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void Calipso_5km_Obs::fclass_record_header(int hdr_id, int layer, int grib_code, float * record)
 
 {
@@ -774,6 +822,28 @@ if ( n_layers == 0 )  return;
 fclass_record_header(hdr_id, layer, ice_water_qa_grib_code, record);
 
 record [ obs_index ] = (float) extract_bits(fclass[layer], ice_water_qa_mask, ice_water_qa_shift);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_subtype_record(int hdr_id, int layer, float * record)
+
+{
+
+if ( n_layers == 0 )  return;
+
+fclass_record_header(hdr_id, layer, subtype_grib_code, record);
+
+record [ obs_index ] = (float) extract_bits(fclass[layer], subtype_mask, subtype_shift);
 
    //
    //  done
