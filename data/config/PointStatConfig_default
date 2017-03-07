@@ -41,9 +41,6 @@ wind_logic  = UNION;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   message_type = [ "ADPUPA" ];
-   sid_exc      = [];
-
    field = [
       {
         name       = "SPFH";
@@ -78,6 +75,19 @@ fcst = {
 
 }
 obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+message_type   = [ "ADPUPA" ];
+sid_exc        = [];
+obs_quality    = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_percentile = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -189,11 +199,7 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-obs_quality    = [];
-duplicate_flag = NONE;
 rank_corr_flag = FALSE;
-obs_summary    = NONE;
-obs_percentile = 50; 
 tmp_dir        = "/tmp";
 output_prefix  = "";
 version        = "V6.0";
