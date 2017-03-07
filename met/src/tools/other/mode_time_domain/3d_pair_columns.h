@@ -39,6 +39,8 @@ static const char * att_3d_pair_cols [] = {
 
    "INTERSECTION_VOLUME", 
 
+   "DURATION_DIFF", 
+
    "INTEREST", 
 
 };

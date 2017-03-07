@@ -40,6 +40,8 @@ static const char * att_3d_single_cols [] = {
    "START_TIME", 
    "END_TIME", 
 
+   "CDIST_TRAVELLED", 
+
    "INTENSITY_10", 
    "INTENSITY_25", 
    "INTENSITY_50", 

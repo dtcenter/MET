@@ -147,6 +147,8 @@ class MtdIntFile : public MtdFileBase {
 
       void calc_3d_centroid(double & xbar, double & ybar, double & tbar) const;
 
+      void calc_2d_centroid_at_t(const int t, double & xbar, double & ybar) const;
+
       int x_left  (const int y) const;
       int x_right (const int y) const;
 

@@ -1480,6 +1480,58 @@ return;
 }
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+void MtdIntFile::calc_2d_centroid_at_t(const int t, double & xbar, double & ybar) const
+
+{
+
+int x, y, n;
+int count;
+
+xbar = ybar = 0.0;
+
+count = 0;
+
+for (x=0; x<Nx; ++x)  {
+
+   for (y=0; y<Ny; ++y)  {
+
+      n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
+
+      if ( Data[n] )  {
+
+         xbar += x;
+         ybar += y;
+
+         ++count;
+
+      }
+
+   }   //  for y
+
+}   //  for x
+
+if ( count == 0 )  {
+
+   mlog << Error << "\n\n  MtdIntFile::calc_2d_centroid_at_t() const -> empty object!\n\n";
+
+   exit ( 1 );
+
+}
+
+xbar /= count;
+ybar /= count;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 

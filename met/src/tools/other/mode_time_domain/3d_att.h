@@ -70,11 +70,14 @@ class SingleAtt3D {
 
       double SpatialAxisAngle;
 
+      double CdistTravelled;   //  distance travelled by the 2D centroid
+
       double Ptile_10;
       double Ptile_25;
       double Ptile_50;
       double Ptile_75;
       double Ptile_90;
+
 
    public:
 
@@ -115,6 +118,8 @@ class SingleAtt3D {
 
       void set_simple  (bool = true);
       void set_cluster (bool = true);
+
+      void set_cdist_travelled(double);
 
          //
          //  get stuff
@@ -165,6 +170,8 @@ class SingleAtt3D {
       double ydot() const;
 
       double spatial_axis() const;
+
+      double cdist_travelled () const;
 
       double ptile_10() const;
       double ptile_25() const;
@@ -226,6 +233,8 @@ inline double SingleAtt3D::ydot() const { return ( Yvelocity ); }
 
 inline double SingleAtt3D::spatial_axis() const { return ( SpatialAxisAngle ); }
 
+inline double SingleAtt3D::cdist_travelled() const { return ( CdistTravelled ); }
+
 inline double SingleAtt3D::ptile_10() const { return ( Ptile_10 ); }
 inline double SingleAtt3D::ptile_25() const { return ( Ptile_25 ); }
 inline double SingleAtt3D::ptile_50() const { return ( Ptile_50 ); }
@@ -269,6 +278,8 @@ class PairAtt3D {
 
       double VolumeRatio;
       double AxisDiff;
+
+      int DurationDifference;   //  fcst - obs
 
          //  these need to be doubles rather than ints
          //   (for the InterestCalculator class).
@@ -322,6 +333,8 @@ class PairAtt3D {
 
       void set_total_interest (double);
 
+      void set_duration_difference (int);
+
          //
          //  get stuff
          //
@@ -352,6 +365,8 @@ class PairAtt3D {
       int end_time_delta   () const;
 
       double total_interest () const;
+
+      int duration_difference() const;
 
          //
          //  do stuff
@@ -385,6 +400,8 @@ inline double PairAtt3D::axis_angle_diff () const { return ( AxisDiff ); }
 
 inline int PairAtt3D::start_time_delta () const { return ( StartTimeDelta ); }
 inline int PairAtt3D::end_time_delta   () const { return ( EndTimeDelta ); }
+
+inline int PairAtt3D::duration_difference   () const { return ( DurationDifference ); }
 
 inline double PairAtt3D::total_interest () const { return ( TotalInterest ); }
 

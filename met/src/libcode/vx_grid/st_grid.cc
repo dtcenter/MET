@@ -855,7 +855,7 @@ StereographicData data;
 bool is_north = false;
 
 
-data.name = "zoom";
+data.name = "st_zoom";
 
 if ( lat_center >= 0.0 )  { data.hemisphere = 'N';   is_north = true;  }
 else                      { data.hemisphere = 'S';   is_north = false; }
@@ -891,7 +891,7 @@ r_previous = st_func(lat_previous, is_north);
 Qx = r_center*sind(lon_center) - r_previous*sind(lon_previous);
 Qy = r_center*cosd(lon_center) - r_previous*cosd(lon_previous);
 
-L = atan2d(H*Qx, H*Qy) - 180.0;
+L = atan2d(H*Qx, H*Qy) - H*180.0;
 
    //
    //  reduce L to the range -180 to +180
