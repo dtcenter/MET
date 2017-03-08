@@ -124,8 +124,8 @@ class MtdIntFile : public MtdFileBase {
 
       MtdIntFile split_const_t(int & n_shapes) const;
 
-      MtdIntFile select(int)              const;   //  1-based, for selecting simple objects
-      MtdIntFile select(const IntArray &) const;   //  1-based, for selecting cluster objects
+      MtdIntFile select         (int)              const;   //  1-based, for selecting simple objects
+      MtdIntFile select_cluster (const IntArray &) const;   //  1-based, for selecting cluster objects
 
       MtdIntFile  const_t_slice (const int t) const;
       MtdIntFile  const_t_mask  (const int t, const int obj_num) const;   //  obj_num is 1-based

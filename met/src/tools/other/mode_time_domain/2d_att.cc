@@ -411,10 +411,16 @@ ConcatString s;
    //  object number
    //
 
-if ( IsFcst )  s << 'F';
-else           s << 'O';
+s.erase();
 
-s << '_' << ObjectNumber;
+if ( ObjectNumber > 0 )  {
+
+   if ( IsFcst )  s << 'F';
+   else           s << 'O';
+
+   s << '_' << ObjectNumber;
+
+} else s = na_str;
 
 table.set_entry(row, c++, s.text());
 
@@ -424,18 +430,18 @@ table.set_entry(row, c++, s.text());
 
 s.erase();
 
-s << 'C';
+if ( ClusterNumber > 0 )  {
 
-if ( is_fcst() )  s << 'F';
-else              s << 'O';
+   s << 'C';
 
-if ( ClusterNumber >= 1 )  {
+   if ( is_fcst() )  s << 'F';
+   else              s << 'O';
 
    sprintf(junk, format_int, ClusterNumber);
 
    s << '_' << junk;
 
-}
+} else s = na_str;
 
 table.set_entry(row, c++, s.text());
 
