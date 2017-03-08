@@ -690,6 +690,8 @@ const int layer = 0;
 
 Calipso_5km_Obs::get_layer_base_record(hdr_id, layer, record);
 
+record [ grib_code_index ] = (float) base_base_grib_code;
+
    //
    //  done
    //
@@ -713,6 +715,8 @@ if ( n_layers == 0 )  return;
 const int layer = n_layers - 1;
 
 Calipso_5km_Obs::get_layer_top_record(hdr_id, layer, record);
+
+record [ grib_code_index ] = (float) top_top_grib_code;
 
    //
    //  done
