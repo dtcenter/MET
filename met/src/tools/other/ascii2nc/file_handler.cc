@@ -38,7 +38,6 @@ const float FileHandler::FILL_VALUE = -9999.f;
 
 const int DEF_DEFALTE_LEVEL = 2;
 
-extern StringArray mask_sid;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -54,12 +53,6 @@ extern StringArray mask_sid;
 FileHandler::FileHandler(const string &program_name) :
   _programName(program_name),
   _ncFile(0),
-  //_hdrTypeVar(0),
-  //_hdrStationIdVar(0),
-  //_hdrValidTimeVar(0),
-  //_hdrArrayVar(0),
-  //_obsQualityVar(0),
-  //_obsArrayVar(0),
   _nhdr(0),
   _hdrNum(0),
   _obsNum(0),
@@ -68,6 +61,7 @@ FileHandler::FileHandler(const string &program_name) :
   _sidMaskNum(0),
   _gridMask(0),
   _polyMask(0),
+  _sidMask(0),
   deflate_level(DEF_DEFLATE_LEVEL),
   _dataSummarized(false)
 {
@@ -131,7 +125,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
        << "Rejected " << _polyMaskNum
        << " observations outside the masking polyline.\n"
        << "Rejected " << _sidMaskNum
-       << " observations not matched with station ids.\n";
+       << " observations not matched with station ID's.\n";
 
   // Loop through the observations, counting the number of headers needed in
   // the netCDF file.  We need to count the headers before opening the netCDF
@@ -710,7 +704,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    hdr_arr_buf[hdr_data_idx][0] = lat;
    hdr_arr_buf[hdr_data_idx][1] = lon;
    hdr_arr_buf[hdr_data_idx][2] = elv;
-   
+
    if(hdr_sid.length() > MAX_STRING_LEN) {
       mlog << Warning << "\nFileHandler::_writeHdrInfo() -> "
            << "only writing the first " << MAX_STRING_LEN
@@ -735,23 +729,23 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
    for (int j=hdr_typ.length(); j<MAX_STRING_LEN; j++)
        hdr_typ_buf[hdr_data_idx][j] = bad_data_char;
-   
+
    hdr_data_idx++;
 
 
    hdr_buf_size = _nhdr;
    if (hdr_buf_size > OBS_BUFFER_SIZE) hdr_buf_size = OBS_BUFFER_SIZE;
-   
+
    bool save_nc = (hdr_buf_size <= hdr_data_idx);
    if (save_nc) {
       //cout << "   Save header!!! offset: " << hdr_data_offset
       //     << ", buf_size: " << hdr_buf_size << ", str_len: " << MAX_STRING_LEN <<"\n";
-      
+
       long offsets[2] = { hdr_data_offset, 0 };
       long lengths[2] = { hdr_buf_size, MAX_STRING_LEN };
-      
+
       hdr_data_offset += hdr_buf_size;
-      
+
       //
       // Store the message type
       //
@@ -760,17 +754,17 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
               << "error writing the message type to the NetCDF file\n\n";
          return false;
       }
-      
+
       //
       // Store the station id
       //
-      
+
       if(!put_nc_data(&_hdrStationIdVar, (char *)&hdr_sid_buf[0], lengths, offsets)) {
          mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
               << "error writing the station id to the NetCDF file\n\n";
          return false;
       }
-      
+
       //
       // Store the valid time and check that it's is in the expected
       // time format: YYYYMMDD_HHMMSS
@@ -780,7 +774,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
               << "error writing the valid time to the NetCDF file\n\n";
          return false;
       }
-      
+
       //
       // Store the header array
       //
@@ -790,7 +784,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
               << "error writing the header array to the NetCDF file\n\n";
          return false;
       }
-      
+
       hdr_data_idx = 0;
    }
 
@@ -819,8 +813,8 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
    obs_arr[4] = obs;   // Observation value
    for (int idx=0; idx<OBS_ARRAY_LEN; idx++) {
       obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
-   } 
-   
+   }
+
    obs_qty = (qty.length() == 0 ? na_str : qty);
    strncpy(qty_data_buf[obs_data_idx], obs_qty, obs_qty.length());
 
@@ -836,7 +830,7 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
       long offsets[2] = { obs_data_offset, 0 };
       long lengths[2] = { obs_buf_size, OBS_ARRAY_LEN };
       obs_data_offset += obs_buf_size;
-      
+
       //
       // Write the observation array
       //
@@ -845,7 +839,7 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
               << "error writing the observation array to the NetCDF file\n\n";
          return false;
       }
-      
+
       //
       // Write the observation QC flag, resetting an empty string to NA
       //
@@ -893,12 +887,18 @@ bool FileHandler::_addObservations(const Observation &obs)
      }
    }
 
-   if (0 < mask_sid.n_elements() && !mask_sid.has(obs.getStationId().c_str())) {
-      _sidMaskNum++;
-      return false;
+   //
+   // Apply the station ID mask
+   //
+   if(_sidMask)
+   {
+     if(!_sidMask->has(obs.getStationId().c_str()))
+     {
+       _sidMaskNum++;
+       return false;
+     }
    }
 
-   
    _observations.push_back(obs);
 
   return true;
@@ -922,18 +922,14 @@ bool FileHandler::_writeObservations()
   obs_data_offset = 0;
   hdr_data_idx = 0;
   hdr_data_offset = 0;
-  
+
   processed_count =0;
   for (vector< Observation >::const_iterator obs = _observations.begin();
        obs != _observations.end(); ++obs)
   {
-    //if (processed_count % (OBS_BUFFER_SIZE/4) == 0)
-    ////if ((processed_count % 10000 == 0) || (processed_count % 10000 == 1) || (processed_count % 10000 == 9999))
-    //  mlog << Debug(4) << "\nFileHandler::_writeObsInfo() processed_count: " << processed_count
-    //       << " hdr_data_idx: " << hdr_data_idx
-    //       << ", obs_data_idx: " << obs_data_idx << "\n";
+
     processed_count++;
-    
+
     if (obs->getHeaderType() != prev_header_type    ||
         obs->getStationId()  != prev_station_id     ||
         obs->getValidTime()  != prev_valid_time     ||
@@ -956,7 +952,7 @@ bool FileHandler::_writeObservations()
       prev_longitude   = obs->getLongitude();
       prev_elevation   = obs->getElevation();
     }
-    
+
     if (!_writeObsInfo(obs->getGribCode(),
                        obs->getPressureLevel(),
                        obs->getHeight(),
