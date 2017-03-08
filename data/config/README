@@ -631,15 +631,17 @@ obs_window = {
 //         e.g. "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 //
 //    - The "sid" entry is an array of strings. Each entry in that array is
-//      either the name of a single station id or a filename. If it is a single
-//      station id name, that station will be treated as its own masking region.
-//      If it is a filename, that file should contain a "name" for the station
-//      id group followed by a space-separated list of station id's to be used.
-//      That group "name" entry is what MET puts in the VX_MASK output column.
+//      either a filename of a comma-separated list. For a comma-separated list
+//      of length one, the mask "name" will be set to the single station ID
+//      value. For a comma-separated list of length greater than one, the first
+//      element is stored as the mask name. For a filename, the file must
+//      contain the mask "name" followed by a whitespace-separated list of
+//      station ID's to be used.
+//      That mask "name" entry is what MET writes in the VX_MASK output column.
 //      This provides a way to define one or more groups of individual stations
 //      over which to compute statistics. This is an alternative to defining a
 //      masking region using a polyline or grid and is more convenient if you
-//      have a specific list of station id's you'd like to use.
+//      have a specific list of station ID's you'd like to use.
 //
 mask = {
    grid    = [ "FULL" ];

@@ -75,15 +75,16 @@ STATAnalysisJob & STATAnalysisJob::operator=(
 
 void STATAnalysisJob::init_from_scratch() {
 
-   dump_row  = (char *)     0;
-   dr_out    = (ofstream *) 0;
-   n_dump    =              0;
-   stat_file = (char *)     0;
-   stat_out  = (ofstream *) 0;
-   mask_grid = (char *)     0;
-   mask_poly = (char *)     0;
-   boot_rng  = (char *)     0;
-   boot_seed = (char *)     0;
+   dump_row      = (char *)     0;
+   dr_out        = (ofstream *) 0;
+   n_dump        =              0;
+   stat_file     = (char *)     0;
+   stat_out      = (ofstream *) 0;
+   mask_grid_str = (char *)     0;
+   mask_poly_str = (char *)     0;
+   mask_sid_str  = (char *)     0;
+   boot_rng      = (char *)     0;
+   boot_seed     = (char *)     0;
 
    model.set_ignore_case(1);
    desc.set_ignore_case(1);
@@ -97,7 +98,7 @@ void STATAnalysisJob::init_from_scratch() {
    line_type.set_ignore_case(1);
    column.set_ignore_case(1);
    column_case.set_ignore_case(1);
-   hdr_name.set_ignore_case(1);
+//    hdr_name.set_ignore_case(1);
 
    clear();
 
@@ -166,10 +167,11 @@ void STATAnalysisJob::clear() {
    close_dump_row_file();
    close_stat_file();
 
-   if(dump_row)  { delete [] dump_row;  dump_row  = (char *) 0; }
-   if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
-   if(mask_grid) { delete [] mask_grid; mask_grid = (char *) 0; }
-   if(mask_poly) { delete [] mask_poly; mask_poly = (char *) 0; }
+   if(dump_row)      { delete [] dump_row;      dump_row      = (char *) 0; }
+   if(stat_file)     { delete [] stat_file;     stat_file     = (char *) 0; }
+   if(mask_grid_str) { delete [] mask_grid_str; mask_grid_str = (char *) 0; }
+   if(mask_poly_str) { delete [] mask_poly_str; mask_poly_str = (char *) 0; }
+   if(mask_sid_str)  { delete [] mask_sid_str;  mask_sid_str  = (char *) 0; }
 
    out_line_type.clear();
 
@@ -204,7 +206,8 @@ void STATAnalysisJob::clear() {
    rank_corr_flag = default_rank_corr_flag;
    vif_flag       = default_vif_flag;
 
-   poly_mask.clear();
+   mask_poly.clear();
+   mask_sid.clear();
 
    return;
 }
@@ -305,8 +308,11 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
 
    set_dump_row (aj.dump_row);
    set_stat_file(aj.stat_file);
-   set_mask_grid(aj.mask_grid);
-   set_mask_poly(aj.mask_poly);
+
+   set_mask_grid(aj.mask_grid_str);
+   set_mask_poly(aj.mask_poly_str);
+   set_mask_sid (aj.mask_sid_str);
+
    set_boot_rng (aj.boot_rng);
    set_boot_seed(aj.boot_seed);
 
@@ -445,11 +451,14 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
    out << prefix << "stat_file = "
        << stat_file << "\n";
 
-   out << prefix << "mask_grid = "
-       << (mask_grid ? mask_grid : na_str) << "\n";
+   out << prefix << "mask_grid_str = "
+       << (mask_grid_str ? mask_grid_str : na_str) << "\n";
 
-   out << prefix << "mask_poly = "
-       << (mask_poly ? mask_poly : na_str) << "\n";
+   out << prefix << "mask_poly_str = "
+       << (mask_poly_str ? mask_poly_str : na_str) << "\n";
+
+   out << prefix << "mask_sid_str = "
+       << (mask_sid_str ? mask_sid_str : na_str) << "\n";
 
    out << prefix << "out_line_type ...\n";
    out_line_type.dump(out, depth + 1);
@@ -1127,6 +1136,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          set_mask_poly(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-mask_sid") == 0) {
+         set_mask_sid(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-out_line_type") == 0) {
          out_line_type.add_css(to_upper(jc_array[i+1]));
          i++;
@@ -1348,13 +1361,13 @@ void STATAnalysisJob::set_stat_file(const char *c) {
 
 void STATAnalysisJob::set_mask_grid(const char *c) {
 
-   if(mask_grid) { delete [] mask_grid; mask_grid = (char *) 0; }
+   if(mask_grid_str) { delete [] mask_grid_str; mask_grid_str = (char *) 0; }
 
    if(!c) return;
 
-   mask_grid = new char [strlen(c) + 1];
+   mask_grid_str = new char [strlen(c) + 1];
 
-   strcpy(mask_grid, c);
+   strcpy(mask_grid_str, c);
 
    process_mask_grid();
 
@@ -1365,15 +1378,32 @@ void STATAnalysisJob::set_mask_grid(const char *c) {
 
 void STATAnalysisJob::set_mask_poly(const char *c) {
 
-   if(mask_poly) { delete [] mask_poly; mask_poly = (char *) 0; }
+   if(mask_poly_str) { delete [] mask_poly_str; mask_poly_str = (char *) 0; }
 
    if(!c) return;
 
-   mask_poly = new char [strlen(c) + 1];
+   mask_poly_str = new char [strlen(c) + 1];
 
-   strcpy(mask_poly, c);
+   strcpy(mask_poly_str, c);
 
    process_mask_poly();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::set_mask_sid(const char *c) {
+
+   if(mask_sid_str) { delete [] mask_sid_str; mask_sid_str = (char *) 0; }
+
+   if(!c) return;
+
+   mask_sid_str = new char [strlen(c) + 1];
+
+   strcpy(mask_sid_str, c);
+
+   process_mask_sid();
 
    return;
 }
@@ -2008,10 +2038,13 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    if(stat_file) js << "-out_stat " << stat_file << " ";
 
    // mask_grid
-   if(mask_grid) js << "-mask_grid " << mask_grid << " ";
+   if(mask_grid_str) js << "-mask_grid " << mask_grid_str << " ";
 
    // mask_poly
-   if(mask_poly) js << "-mask_poly " << mask_poly << " ";
+   if(mask_poly_str) js << "-mask_poly " << mask_poly_str << " ";
+
+   // mask_sid
+   if(mask_sid_str) js << "-mask_sid " << mask_sid_str << " ";
 
    // out_line_type
    if(out_line_type.n_elements() > 0) {
@@ -2193,23 +2226,32 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
 void STATAnalysisJob::process_mask_grid() {
 
+   // List the grid masking file
+   mlog << Debug(1)
+        << "Grid Masking: " << mask_grid_str << "\n";
+
    //
    // Locate the requested grid
    //
-   if(!find_grid_by_name(mask_grid, grid_mask)) {
+   if(!find_grid_by_name(mask_grid_str, mask_grid)) {
       mlog << Error << "\nSTATAnalysisJob::process_mask_grid() -> "
            << "Can't find requested masking grid name \""
-           << mask_grid << "\".\n\n";
+           << mask_grid_str << "\".\n\n";
 
       throw(1);
    }
+
+   // List the grid mask
+   mlog << Debug(2)
+        << "Parsed Masking Grid: " << mask_grid.name() << " ("
+        << mask_grid.nx() << " x " << mask_grid.ny() << ")\n";
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 //
-// To apply a masking polyline, the -mask_grid option must first be
+// To apply a masking polyline, the -mask_grid_str option must first be
 // specified to define the grid to which the polyline should applied.
 // The lat/lon masking polyline is then converted to grid x/y.
 //
@@ -2217,8 +2259,42 @@ void STATAnalysisJob::process_mask_grid() {
 
 void STATAnalysisJob::process_mask_poly() {
 
-   poly_mask.clear();
-   poly_mask.load(mask_poly);
+   // List the polyline masking file
+   mlog << Debug(1)
+        << "Polyline Masking File: " << mask_poly_str << "\n";
+
+   mask_poly.clear();
+   mask_poly.load(mask_poly_str);
+
+   // List the polyline mask
+   mlog << Debug(2)
+        << "Parsed Masking Polyline: " << mask_poly.name()
+        << " containing " <<  mask_poly.n_points() << " points\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// The -mask_sid option specifies the list of desired station ID's.
+// It can either be a comma-separated list of stations of a filename
+// containing that list.
+//
+////////////////////////////////////////////////////////////////////////
+
+void STATAnalysisJob::process_mask_sid() {
+   ConcatString mask_name;
+
+   // List the station ID mask
+   mlog << Debug(1)
+        << "Station ID Mask: " << mask_sid_str << "\n";
+
+   parse_sid_mask(mask_sid_str, mask_sid, mask_name);
+
+   // List the length of the station ID mask
+   mlog << Debug(2)
+        << "Parsed Station ID Mask: " << mask_name
+        << " containing " << mask_sid.n_elements() << " points\n";
 
    return;
 }
@@ -2233,10 +2309,10 @@ int STATAnalysisJob::is_in_mask_grid(double lat, double lon) const {
    //
    // Only check if a masking grid has been specified
    //
-   if(mask_grid) {
+   if(mask_grid_str) {
 
       // Convert degrees_east to degrees_west.
-      grid_mask.latlon_to_xy(lat, -1.0*lon, x, y);
+      mask_grid.latlon_to_xy(lat, -1.0*lon, x, y);
       x_int = nint(x);
       y_int = nint(y);
 
@@ -2244,8 +2320,8 @@ int STATAnalysisJob::is_in_mask_grid(double lat, double lon) const {
       // Convert lat/lon to grid x/y and check to see if it's on the
       // grid.
       //
-      if(x_int < 0 || x_int >= grid_mask.nx() ||
-         y_int < 0 || y_int >= grid_mask.ny()) r = 0;
+      if(x_int < 0 || x_int >= mask_grid.nx() ||
+         y_int < 0 || y_int >= mask_grid.ny()) r = 0;
    }
 
    return(r);
@@ -2259,7 +2335,20 @@ int STATAnalysisJob::is_in_mask_poly(double lat, double lon) const {
    //
    // Only check if a masking poly has been specified
    //
-   if(mask_poly) r = poly_mask.latlon_is_inside_dege(lat, lon);
+   if(mask_poly_str) r = mask_poly.latlon_is_inside_dege(lat, lon);
+
+   return(r);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int STATAnalysisJob::is_in_mask_sid(const char *sid) const {
+   int r = 1;
+
+   //
+   // Only check if a masking SID list has been specified
+   //
+   if(mask_sid_str) r = mask_sid.has(sid);
 
    return(r);
 }

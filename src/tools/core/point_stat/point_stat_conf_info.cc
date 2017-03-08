@@ -575,7 +575,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
    // Parse out the station ID masks
    for(i=0; i<sid_list.n_elements(); i++) {
       mlog << Debug(3)
-           << "Processing sid mask: " << sid_list[i] << "\n";
+           << "Processing station ID mask: " << sid_list[i] << "\n";
       parse_sid_mask(sid_list[i], mask_sid[i], s);
       mask_name.add(s);
    }

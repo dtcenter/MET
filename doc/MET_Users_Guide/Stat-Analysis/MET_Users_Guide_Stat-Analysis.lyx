@@ -3129,10 +3129,26 @@ mask1,mask2,mask3
 -mask_poly file
 \end_layout
 
+\begin_layout LyX-Code
+
+\series bold
+-mask_sid  file|list
+\end_layout
+
 \begin_layout Standard
 When processing input MPR lines, these options may be used to define a masking
- grid or polyline to filter the matched pair data geographically prior to
- computing statistics.
+ grid, polyline, or list of station ID's to filter the matched pair data
+ geographically prior to computing statistics.
+ The 
+\series bold
+-mask_sid
+\series default
+ option may be set to 
+\series medium
+a filename or a comma-separated list of station ID's.
+ For a list of length one, the mask name is set to the single station value.
+ For a list of length greater than one, the first element is stored as the
+ mask name.
 \end_layout
 
 \begin_layout LyX-Code

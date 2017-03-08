@@ -39,7 +39,7 @@
 //   012    07-23-14  Halley Gotway  Add message_type_map configuration
 //                                     file option.
 //   013    09-21-15  Prestopnik     Add Aeronet observations.
-//                                    
+//
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
    mlog << Debug(1)
         << "Config File: " << config_filename << "\n";
    config_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
-   
+
    //
    // Create the file handler based on the ascii format specified on
    // the command line.  If one wasn't specified, we'll look in the
@@ -200,25 +200,25 @@ int main(int argc, char *argv[]) {
    //
    FileHandler *file_handler = create_file_handler(ascii_format,
                                                    asfile_list[0]);
-   
+
    if (file_handler == 0)
      return 0;
-   
+
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = config_info.get_compression_level();
    file_handler->setCompressionLevel(deflate_level);
-   
+
    //
    // Set the masking grid and polyline, if specified.
    //
    if(grid_mask.nx() > 0 || grid_mask.ny() > 0) file_handler->setGridMask(grid_mask);
    if(poly_mask.n_points() > 0)                 file_handler->setPolyMask(poly_mask);
-   
+
    //
    // Load the message type map
    //
    file_handler->setMessageTypeMap(config_info.getMessageTypeMap());
-   
+
    //
    // Process the files.  If a configuration file was specified, do any
    // extra processing specified.
@@ -237,10 +237,10 @@ int main(int argc, char *argv[]) {
 
    int status = file_handler->writeNetcdfFile(ncfile.text());
    delete file_handler;
-   
+
    if (!status)
      return(1);
-   
+
    return(0);
 }
 
@@ -259,17 +259,17 @@ FileHandler *create_file_handler(const ASCIIFormat format,
   {
     return (FileHandler *)new MetHandler(program_name);
   }
-  
+
   case ASCIIFormat_Little_R:
   {
     return (FileHandler *)new LittleRHandler(program_name);
   }
-  
+
   case ASCIIFormat_SurfRad:
   {
     return (FileHandler *)new SurfradHandler(program_name);
   }
-  
+
   case ASCIIFormat_WWSIS:
   {
     return (FileHandler *)new WwsisHandler(program_name);
@@ -284,7 +284,7 @@ FileHandler *create_file_handler(const ASCIIFormat format,
   {
     return determine_ascii_format(ascii_filename);
   }
-  
+
   }
 
   return 0;
@@ -309,86 +309,86 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
          << "\" for reading\n\n";
     exit(1);
   }
-   
+
   //
   // See if this is a MET file.
   //
   f_in.rewind();
   MetHandler *met_file = new MetHandler(program_name);
-  
+
   if (met_file->isFileType(f_in))
   {
     f_in.close();
     return (FileHandler *)met_file;
   }
-  
+
   delete met_file;
-  
+
   //
   // See if this is a Little R file.
   //
   f_in.rewind();
   LittleRHandler *little_r_file = new LittleRHandler(program_name);
-  
+
   if (little_r_file->isFileType(f_in))
   {
     f_in.close();
     return (FileHandler *)little_r_file;
   }
-  
+
   delete little_r_file;
-  
+
   //
   // See if this is a SURFRAD file.
   //
   f_in.rewind();
   SurfradHandler *surfrad_file = new SurfradHandler(program_name);
-  
+
   if (surfrad_file->isFileType(f_in))
   {
     f_in.close();
     return (FileHandler *)surfrad_file;
   }
-  
+
   delete surfrad_file;
-  
+
   //
   // See if this is a WWSIS file.
   //
   f_in.rewind();
   WwsisHandler *wwsis_file = new WwsisHandler(program_name);
-  
+
   if (wwsis_file->isFileType(f_in))
   {
     f_in.close();
     return (FileHandler *)wwsis_file;
   }
-  
+
   delete wwsis_file;
-  
+
   //
   // See if this is a Aeronet file.
   //
   f_in.rewind();
   AeronetHandler *aeronet_file = new AeronetHandler(program_name);
-  
+
   if (aeronet_file->isFileType(f_in))
   {
     f_in.close();
     return (FileHandler *)aeronet_file;
   }
-  
+
   delete aeronet_file;
-  
+
   //
   // If we get here, we didn't recognize the file contents.
   //
-  
+
   mlog << Error << "\ndetermine_ascii_format() -> "
        << "could not determine file format based on file contents\n\n";
-  
+
   f_in.close();
-  
+
   return 0;
 }
 
@@ -404,7 +404,7 @@ void usage() {
         << "\t[-config file]\n"
         << "\t[-mask_grid string]\n"
         << "\t[-mask_poly file]\n"
-        << "\t[-mask_sid station_ids]\n"
+        << "\t[-mask_sid file|list]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -432,9 +432,11 @@ void usage() {
         << "\t\t\"-mask_poly file\" is a polyline masking file for filtering "
         << "the point observations spatially (optional).\n"
 
-        << "\t\t\"-mask_sid station_ids\" is a comma separated station list "
-        << "or a file with station list for filtering the point observations "
-        << "spatially (optional).\n"
+        << "\t\t\"-mask_sid file|list\" is a station ID masking file or a "
+        << "comma-separated list of station ID's for filtering the point "
+        << "observations spatially (optional).\n"
+        << "\t\t   For a list of length greater than one, the first element is "
+        << "stored as the mask name (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -467,7 +469,7 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_format(const StringArray & a) {
-  
+
   if(MetHandler::getFormatString() == a[0]) {
     ascii_format = ASCIIFormat_MET;
   }
@@ -504,7 +506,7 @@ void set_logfile(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_config(const StringArray & a)
-{  
+{
   config_filename = a[0];
 }
 
@@ -517,7 +519,7 @@ void set_mask_grid(const StringArray & a) {
   // List the grid masking file
   mlog << Debug(1)
        << "Grid Masking: " << a[0] << "\n";
-  
+
   // First, try to find the grid by name.
   if(!find_grid_by_name(a[0], grid_mask)) {
 
@@ -535,7 +537,7 @@ void set_mask_grid(const StringArray & a) {
 
     delete datafile; datafile = (Met2dDataFile *) 0;
   }
-  
+
   // List the grid mask
   mlog << Debug(2)
        << "Parsed Masking Grid: " << grid_mask.name() << " ("
@@ -552,11 +554,28 @@ void set_mask_poly(const StringArray & a) {
 
   // Parse the polyline file.
   poly_mask.load(replace_path(a[0]));
-  
+
   // List the polyline mask
   mlog << Debug(2)
        << "Parsed Masking Polyline: " << poly_mask.name()
        << " containing " <<  poly_mask.n_points() << " points\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_mask_sid(const StringArray & a) {
+   ConcatString mask_name;
+
+   // List the station ID mask
+   mlog << Debug(1)
+        << "Station ID Mask: " << a[0] << "\n";
+
+   parse_sid_mask(a[0], mask_sid, mask_name);
+
+   // List the length of the station ID mask
+   mlog << Debug(2)
+        << "Parsed Station ID Mask: " << mask_name
+        << " containing " << mask_sid.n_elements() << " points\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -569,20 +588,6 @@ void set_verbosity(const StringArray & a) {
 
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_mask_sid(const StringArray & a) {
-   ConcatString mask_name;
-   StringArray sa, *sid_list;
-
-   sa.parse_css(a[0]);
-   sid_list = new StringArray [sa.n_elements()];
-   for(int i=0; i<sa.n_elements(); i++) {
-      parse_sid_mask(sa[i], sid_list[i], mask_name);
-      mask_sid.add(sid_list[i]);
-   }
 }
 
 ////////////////////////////////////////////////////////////////////////
