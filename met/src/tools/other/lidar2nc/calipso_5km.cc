@@ -57,9 +57,9 @@ inline float km_to_meters(float km) {
    //  we're assuming that bit #1 is the high-order bit
    //
 
-static const unsigned short mask_3 = (unsigned short) 7;
-static const unsigned short mask_2 = (unsigned short) 3;
-static const unsigned short mask_1 = (unsigned short) 1;
+static const unsigned short mask_3 = (unsigned short) 7;   //  2^3 - 1
+static const unsigned short mask_2 = (unsigned short) 3;   //  2^2 - 1
+static const unsigned short mask_1 = (unsigned short) 1;   //  2^1 - 1
 
 static const unsigned short type_mask            = mask_3;
 static const unsigned short type_qa_mask         = mask_2;
@@ -69,6 +69,11 @@ static const unsigned short subtype_mask         = mask_3;
 static const unsigned short cloud_aerosol_mask   = mask_1;
 static const unsigned short h_average_mask       = mask_3;
 
+   //
+   //  shifts for bit #1 = highest order bit
+   //
+
+
 static const int            type_shift           = 13;
 static const int            type_qa_shift        = 11;
 static const int            ice_water_shift      =  9;
@@ -77,6 +82,19 @@ static const int            subtype_shift        =  4;
 static const int            cloud_aerosol_shift  =  3;
 static const int            h_average_shift      =  0;
 
+
+   //
+   //  shifts for bit #1 = lowest order bit
+   //
+/*
+static const int            type_shift           =  0;
+static const int            type_qa_shift        =  3;
+static const int            ice_water_shift      =  5;
+static const int            ice_water_qa_shift   =  7;
+static const int            subtype_shift        =  9;
+static const int            cloud_aerosol_shift  = 12;
+static const int            h_average_shift      = 13;
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +115,7 @@ return ( u >> 13 );
    //
    //  masking 3 low bits
    //
-/*
+
 inline unsigned short fclass_mask(unsigned short u)
 
 {
@@ -105,7 +123,7 @@ inline unsigned short fclass_mask(unsigned short u)
 return ( u & 7 );
 
 }
-*/
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -686,7 +704,8 @@ clear_float_buf(record);
 
 if ( n_layers == 0 )  return;
 
-const int layer = 0;
+// const int layer = 0;
+const int layer = n_layers - 1;
 
 Calipso_5km_Obs::get_layer_base_record(hdr_id, layer, record);
 
@@ -712,7 +731,8 @@ clear_float_buf(record);
 
 if ( n_layers == 0 )  return;
 
-const int layer = n_layers - 1;
+// const int layer = n_layers - 1;
+const int layer = 0;
 
 Calipso_5km_Obs::get_layer_top_record(hdr_id, layer, record);
 
@@ -760,6 +780,8 @@ if ( n_layers == 0 )  return;
 fclass_record_header(hdr_id, layer, ftype_grib_code, record);
 
 record [ obs_index ] = (float) extract_bits(fclass[layer], type_mask, type_shift);
+
+cout << record [ obs_index ] << '\n';
 
    //
    //  done
