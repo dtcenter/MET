@@ -108,6 +108,10 @@ class PointStatConfInfo {
       StringArray *     sid_exc;            // Array of station ID's to exclude [n_vx]
       StringArray *     obs_qty;            // Array for quality flags [n_vx]
 
+      vector<DuplicateType> dup_flgs;
+      vector<ObsSummary> obs_smry;
+      vector<int> obs_percs;
+      
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
       DataPlane *       mask_dp;            // Array for masking regions [n_mask_area]
@@ -126,9 +130,7 @@ class PointStatConfInfo {
       HiRAInfo          hira_info;          // HiRA verification logic
 
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
-      DuplicateType     duplicate_flag;     // Duplicate observation behavior
-      ObsSummary        obs_summary;        // selecting observations behavior
-      int               obs_perc_value;     // used only with PERC obs_summary
+
       bool              rank_corr_flag;     // Flag for computing rank correlations
 
       ConcatString      tmp_dir;            // Directory for temporary files

@@ -88,9 +88,6 @@ void EnsembleStatConfInfo::clear() {
    interp_wdth.clear();
    rng_type.clear();
    rng_seed.clear();
-   duplicate_flag = DuplicateType_None;
-   obs_summary = ObsSummary_Single;
-   obs_perc_value = bad_data_int;
    grid_weight_flag = GridWeightType_None;
    output_prefix.clear();
    version.clear();
@@ -108,7 +105,10 @@ void EnsembleStatConfInfo::clear() {
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }
    if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)        0; }
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)         0; }
-
+   if(dup_flgs.size() != 0)     { dup_flgs.clear(); }
+   if(obs_smry.size() != 0)     { obs_smry.clear(); }
+   if(obs_percs.size() != 0)    { obs_percs.clear(); }   
+   
    // Clear ens_info
    if(ens_info) {
       for(i=0; i<n_vx; i++)
@@ -316,6 +316,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       msg_typ = new StringArray        [n_vx];
       sid_exc = new StringArray        [n_vx];
       obs_qty = new StringArray        [n_vx];
+      dup_flgs.reserve(n_vx);
+      obs_smry.reserve(n_vx);
+      obs_percs.reserve(n_vx);
 
       // Parse the fcst field information
       for(i=0; i<n_vx; i++) {
@@ -332,10 +335,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
 
          // Conf: duplicate_flag
-         vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_obs_dict));
+	 dup_flgs[i] = parse_conf_duplicate_flag(&i_obs_dict);
 
          // Conf: obs_summary
-         vx_pd[i].set_obs_summary((ObsSummary)parse_conf_obs_summary(&i_obs_dict));
+         obs_smry[i] = parse_conf_obs_summary(&i_obs_dict);
 
          // Conf: obs_perc_value
          vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_obs_dict));
@@ -539,6 +542,11 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
       // Add the interpolation methods to the vx_pd objects
       for(j=0; j<n_interp; j++)
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
+
+      vx_pd[i].set_duplicate_flag(dup_flgs[i]);
+      vx_pd[i].set_obs_summary(obs_smry[i]);	 
+      vx_pd[i].set_obs_perc_value(obs_percs[i]);
+
    } // end for i
 
    return;

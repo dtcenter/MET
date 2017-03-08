@@ -41,8 +41,8 @@ INTERSECTION   = 3;
 SYMDIFF        = 4;
 
 // Interpolation method
-MIN            = 1;
-MAX            = 2;
+NONE           = 1;
+NEAREST        = 2;
 MEDIAN         = 3;
 UW_MEAN        = 4;
 DW_MEAN        = 5;
@@ -57,6 +57,9 @@ UPPER_LEFT     = 13;
 UPPER_RIGHT    = 14;
 LOWER_RIGHT    = 15;
 LOWER_LEFT     = 16;
+PERC           = 17;
+MIN            = 18;
+MAX            = 19;
 
 // Interpolation types
 NONE           = 1;
@@ -92,7 +95,6 @@ AREA           = 3;
 // Duplicate flag settings
 NONE           = 1;
 UNIQUE         = 2;
-SINGLE         = 3;
 
 // Grid decomposition flag settings
 NONE           = 1;

@@ -1269,8 +1269,8 @@ void VxPairDataEnsemble::set_obs_summary(ObsSummary obs_summary) {
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
 	   switch (obs_summary) {
-              case ObsSummary_Single:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_SINGLE);
+              case ObsSummary_Nearest:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_NEAREST);
 		break;
               case ObsSummary_Min:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MIN);
@@ -1281,8 +1281,8 @@ void VxPairDataEnsemble::set_obs_summary(ObsSummary obs_summary) {
               case ObsSummary_UwMean:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_UWMEAN);
 		break;		
-              case ObsSummary_TwMean:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_TWMEAN);
+              case ObsSummary_DwMean:
+		pd[i][j][k].set_obs_summary(OBS_SUMMARY_DWMEAN);
 		break;
               case ObsSummary_Median:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MEDIAN);

@@ -1072,7 +1072,7 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_single)) {
      mlog << Error << "\nparse_conf_duplicate_flag() -> "
 	  << "duplicate_flag = SINGLE has been deprecated\n"
-	  << "Please use obs_summary = SINGLE;\n\n";
+	  << "Please use obs_summary = NEAREST;\n\n";
      exit(1);
    }
    else {
@@ -1101,11 +1101,12 @@ ObsSummary parse_conf_obs_summary(Dictionary *dict) {
    v = dict->lookup_int(conf_key_obs_summary);
 
    // Convert integer to enumerated ObsSummary
-   if(v == conf_const.lookup_int(conf_val_single)) t = ObsSummary_Single;
-   else if(v == conf_const.lookup_int(conf_val_min)) t = ObsSummary_Min;
+   if(v == conf_const.lookup_int(conf_val_none)) t = ObsSummary_None;
+   else if(v == conf_const.lookup_int(conf_val_nearest)) t = ObsSummary_Nearest;
+   else if(v == conf_const.lookup_int(conf_val_min)) t = ObsSummary_Min;   
    else if(v == conf_const.lookup_int(conf_val_max)) t = ObsSummary_Max;
    else if(v == conf_const.lookup_int(conf_val_uw_mean)) t = ObsSummary_UwMean;
-   else if(v == conf_const.lookup_int(conf_val_tw_mean)) t = ObsSummary_TwMean;
+   else if(v == conf_const.lookup_int(conf_val_dw_mean)) t = ObsSummary_DwMean;
    else if(v == conf_const.lookup_int(conf_val_median)) t = ObsSummary_Median;
    else if(v == conf_const.lookup_int(conf_val_perc)) t = ObsSummary_Perc;
    else {
@@ -1114,7 +1115,7 @@ ObsSummary parse_conf_obs_summary(Dictionary *dict) {
            << conf_key_obs_summary << "\".\n\n";
       exit(1);
    }
-
+   
    return(t);
 }
 

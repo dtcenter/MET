@@ -85,6 +85,7 @@ void PairBase::clear() {
 
    obs_select = OBS_SUMMARY_NONE;
    obs_perc_value = bad_data_int;
+   check_unique = false;
 
    map_val.clear();
 
@@ -194,7 +195,6 @@ void PairBase::set_check_unique(bool check){
 }
 
 void PairBase::set_obs_summary(obs_summary_enum o) {
-
   obs_select = o;
   
   return;
@@ -243,7 +243,7 @@ bool PairBase::add_obs(const char *sid,
                        unixtime ut, double lvl, double elv,
                        double o, const char *qc,
                        double cmn, double csd, double wgt) {
-
+   bool ret = false;
    //  build a uniqueness test key
    string sng_key = str_format("%.3f:%.3f:%.2f:%.2f",
 			      lat,         //  lat
@@ -255,47 +255,53 @@ bool PairBase::add_obs(const char *sid,
    ob_val_t ob_val;
    ob_val.ut = ut;	
    ob_val.val = o;
-      // if key exists, add new ob to vector, else add new pair
-      map<string,station_values_t>::iterator it = map_val.find(sng_key);
+   ob_val.qc = qc;
+   // if key exists, add new ob to vector, else add new pair
+   map<string,station_values_t>::iterator it = map_val.find(sng_key);
    if(it != map_val.end()) {
-     /*
-     if(check_unique && (*it).second.ut == ut);
-     {
+      if(check_unique && (*it).second.ut == ut)
          return false;
-     }
-     */
-     (*it).second.obs.push_back(ob_val);
+      (*it).second.obs.push_back(ob_val);
    } else {
       station_values_t val;
       val.sid = string(sid);
       val.ut = fcst_ut;
+      val.cmn = cmn;
+      val.csd = csd;
+      val.wgt = wgt;
+      val.x = x;
+      val.y = y;
       val.obs.push_back(ob_val);
       map_val.insert( pair<string,station_values_t>(sng_key, val) );
+      ret = true;
+   }
+
+   if(obs_select == OBS_SUMMARY_NONE) {
+      sid_sa.add(sid);
+      lat_na.add(lat);
+      lon_na.add(lon);
+      x_na.add(x);
+      y_na.add(y);
+      vld_ta.add(ut);
+      lvl_na.add(lvl);
+      elv_na.add(elv);
+      o_na.add(o);
+      o_qc_sa.add(qc);
+      cmn_na.add(cmn);
+      csd_na.add(csd);
+      wgt_na.add(wgt);
+
+      // Increment the number of pairs
+      n_obs += 1;
+      ret = true;
    }
    
-   sid_sa.add(sid);
-   lat_na.add(lat);
-   lon_na.add(lon);
-   x_na.add(x);
-   y_na.add(y);
-   vld_ta.add(ut);
-   lvl_na.add(lvl);
-   elv_na.add(elv);
-   o_na.add(o);
-   o_qc_sa.add(qc);
-   cmn_na.add(cmn);
-   csd_na.add(csd);
-   wgt_na.add(wgt);
-
-   // Increment the number of pairs
-   n_obs += 1;
-
-   return true;
+   return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ob_val_t PairBase::compute_single(string sng_key) {
+ob_val_t PairBase::compute_nearest(string sng_key) {
    station_values_t svt = map_val[sng_key];
    vector<ob_val_t>::iterator it = svt.obs.begin();
    ob_val_t out = (*it);
@@ -346,14 +352,17 @@ ob_val_t PairBase::compute_max(string sng_key) {
 ob_val_t PairBase::compute_uwmean(string sng_key) {
    double total = 0.0;
    int count = 0;
+   ob_val_t out;
    station_values_t svt = map_val[sng_key];
    vector<ob_val_t>::iterator it = svt.obs.begin();
+   out.qc = (*it).qc;
    for(; it != svt.obs.end(); it++) {
      total += (*it).val;
+     if( (*it).qc != out.qc ) {
+       out.qc = "NA";
+     }
      count++;
    }
-
-   ob_val_t out;
    out.ut = svt.ut;
    out.val = total / double(count);
    return out;
@@ -361,19 +370,25 @@ ob_val_t PairBase::compute_uwmean(string sng_key) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ob_val_t PairBase::compute_twmean(string sng_key) {
+ob_val_t PairBase::compute_dwmean(string sng_key) {
    double total = 0.0;
    double weight = 0.0;
    double total_weight = 0.0;
+   ob_val_t out;
    station_values_t svt = map_val[sng_key];
    vector<ob_val_t>::iterator it = svt.obs.begin();
+   out.qc = (*it).qc;
    for(; it != svt.obs.end(); it++) {
-     weight = 1 / pow( labs( svt.ut - (*it).ut ),2);
+     if( svt.ut == (*it).ut) return *it;
+     weight = 1.0 / pow( labs( svt.ut - (*it).ut ),2);
+     
      total_weight += weight;
      total += (*it).val * weight;
+     if( (*it).qc != out.qc ) {
+       out.qc = "NA";
+     }
    }
 
-   ob_val_t out;
    out.ut = svt.ut;
    out.val = total / total_weight;
    return out;
@@ -385,7 +400,6 @@ ob_val_t PairBase::compute_twmean(string sng_key) {
 ob_val_t PairBase::compute_percentile(string sng_key, int perc) {
    station_values_t svt = map_val[sng_key];
    vector<ob_val_t> obs = svt.obs;
-
    std::sort(obs.begin(), obs.end(), sort_obs);
 
    int index = ceil((perc/100.0) * (obs.size()-1));
@@ -396,23 +410,23 @@ ob_val_t PairBase::compute_percentile(string sng_key, int perc) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::print_duplicate_report(){
-  if(obs_select == OBS_SUMMARY_NONE) return;
-
-  if( 3 > mlog.verbosity_level() || ! map_val.size() ) return;
+  if(obs_select == OBS_SUMMARY_NONE ||
+     3 > mlog.verbosity_level() ||
+     ! map_val.size() ) return;
 
   //  iterate over the keys in the unique station id map
   mlog << Debug(3) << "\nDuplicate point observations for -single setting:\n";
-  for( map<string,station_values_t>::iterator it_single = map_val.begin();
-       it_single != map_val.end(); ++it_single ){
+  for( map<string,station_values_t>::iterator it = map_val.begin();
+       it != map_val.end(); ++it ){
 
     int num_val = 0;
-    string key_single_val = (*it_single).first;
+    string key_val = (*it).first;
 
     //  parse the single key string
     char** mat = NULL;
-    if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5, key_single_val.c_str(), mat) ){
+    if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5, key_val.c_str(), mat) ){
       mlog << Error << "\nPairBase::print_duplicate_report() - regex_apply failed "
-	   << "to parse '" << key_single_val.c_str() << "'\n\n";
+	   << "to parse '" << key_val.c_str() << "'\n\n";
       exit(1);
     }
 
@@ -420,19 +434,19 @@ void PairBase::print_duplicate_report(){
 				mat[1], mat[2], mat[3], mat[4]).text();
     regex_clean(mat);
 
-    int ut_diff = labs((*it_single).second.ut - (*it_single).second.out_ob.ut);
+    int ut_diff = labs((*it).second.ut - fcst_ut);
     string msg_val = str_format("%s (HHMMSS)", sec_to_hhmmss( ut_diff ).text()).text();
  
     string msg = "  " + msg_key + " - used point ob with valid time offset of " + msg_val;
 
     //  parse and print the point obs information for the current key
 
-    vector<ob_val_t>::iterator o_it = (*it_single).second.obs.begin();
+    vector<ob_val_t>::iterator o_it = (*it).second.obs.begin();
 
-    for(; o_it != (*it_single).second.obs.end(); o_it++) {
+    for(; o_it != (*it).second.obs.end(); o_it++) {
 
       string msg_ob = str_format("[sid: %6s  vld: %s  ob_val: %8d]",
-				 (*it_single).second.sid.c_str(),
+				 (*it).second.sid.c_str(),
 				 unix_to_yyyymmdd_hhmmss( (*o_it).ut ).text(),
 				 (*o_it).val).text();
 	   
@@ -450,52 +464,73 @@ void PairBase::print_duplicate_report(){
 
 void PairBase::calc_obs_summary(){
   //  iterate over the keys in the unique station id map
-  for( map<string,station_values_t>::iterator it_single = map_val.begin();
-       it_single != map_val.end(); ++it_single ){
+  for( map<string,station_values_t>::iterator it = map_val.begin();
+       it != map_val.end(); ++it ){
 
     int num_val = 0;
-    string key_single_val = (*it_single).first;
-
+    string key_val = (*it).first;
     //  parse the single key string
     char** mat = NULL;
-    if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5, key_single_val.c_str(), mat) ){
+    if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5, key_val.c_str(), mat) ){
       mlog << Error << "\nPairBase::calc_obs_summary() - regex_apply failed "
-	   << "to parse '" << key_single_val.c_str() << "'\n\n";
+	   << "to parse '" << key_val.c_str() << "'\n\n";
       exit(1);
     }
 
     string msg_key = str_format("%s:%s:%s:%s",	 
 				mat[1], mat[2], mat[3], mat[4]).text();
+
+    ob_val_t ob;
+    
+    int lat = atoi(mat[1]);
+    int lon = atoi(mat[2]);
+    int lvl = atoi(mat[3]);
+    int elev = atoi(mat[4]);
+
     regex_clean(mat);
 
-    ob_val_t single_ob;
-
     switch(obs_select) {
-    case OBS_SUMMARY_SINGLE:
-      single_ob = compute_single(msg_key);
+    case OBS_SUMMARY_NEAREST:
+      ob = compute_nearest(msg_key);
       break;
     case OBS_SUMMARY_MIN:
-      single_ob = compute_min(msg_key);
+      ob = compute_min(msg_key);
       break;
     case OBS_SUMMARY_MAX:
-      single_ob = compute_max(msg_key);
+      ob = compute_max(msg_key);
       break;
     case OBS_SUMMARY_UWMEAN:
-      single_ob = compute_uwmean(msg_key);
+      ob = compute_uwmean(msg_key);
       break;
-    case OBS_SUMMARY_TWMEAN:
-      single_ob = compute_twmean(msg_key);
+    case OBS_SUMMARY_DWMEAN:
+      ob = compute_dwmean(msg_key);
       break;	      	      	      
     case OBS_SUMMARY_MEDIAN:
-      single_ob = compute_percentile(msg_key, 50);
+      ob = compute_percentile(msg_key, 50);
       break;
     case OBS_SUMMARY_PERC:
-      single_ob = compute_percentile(msg_key, obs_perc_value);
-      break;    	      	      
+      ob = compute_percentile(msg_key, obs_perc_value);
+      break;
+    case OBS_SUMMARY_NONE:
+      return;
     }
 
-    (*it_single).second.out_ob = single_ob;
+    sid_sa.add((*it).second.sid.c_str());
+    lat_na.add(lat);
+    lon_na.add(lon);
+    x_na.add((*it).second.x);
+    y_na.add((*it).second.y);
+    vld_ta.add(ob.ut);
+    lvl_na.add(lvl);
+    elv_na.add(elev);
+    o_na.add(ob.val);
+    o_qc_sa.add(ob.qc.c_str());
+    cmn_na.add((*it).second.cmn);
+    csd_na.add((*it).second.csd);
+    wgt_na.add((*it).second.wgt);
 
+    // Increment the number of pairs
+    n_obs += 1;
   }
 }
 

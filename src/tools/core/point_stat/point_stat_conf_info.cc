@@ -102,9 +102,6 @@ void PointStatConfInfo::clear() {
    interp_thresh = bad_data_double;
    interp_wdth.clear();
    hira_info.clear();
-   duplicate_flag = DuplicateType_None;
-   obs_summary = ObsSummary_Single;
-   obs_perc_value = bad_data_int;
    rank_corr_flag = false;
    tmp_dir.clear();
    output_prefix.clear();
@@ -128,6 +125,9 @@ void PointStatConfInfo::clear() {
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)        0; }
    if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)      0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataPoint *)  0; }
+   if(dup_flgs.size() != 0)     { dup_flgs.clear(); }
+   if(obs_smry.size() != 0)     { obs_smry.clear(); }
+   if(obs_percs.size() != 0)    { obs_percs.clear(); }   
 
    return;
 }
@@ -241,6 +241,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    msg_typ    = new StringArray     [n_vx];
    sid_exc    = new StringArray     [n_vx];
    obs_qty    = new StringArray     [n_vx];
+   dup_flgs.reserve(n_vx);
+   obs_smry.reserve(n_vx);
+   obs_percs.reserve(n_vx);
 
    // Parse the fcst and obs field information
    for(i=0; i<n_vx; i++) {
@@ -254,14 +257,14 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       i_odict = parse_conf_i_vx_dict(odict, i);
 
       // Conf: duplicate_flag
-      vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_odict));
+      dup_flgs[i] = parse_conf_duplicate_flag(&i_odict);
 
       // Conf: obs_summary
-      vx_pd[i].set_obs_summary((ObsSummary)parse_conf_obs_summary(&i_odict));
-
+      obs_smry[i] = parse_conf_obs_summary(&i_odict);
+     
       // Conf: obs_perc_value
-      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_odict));
-
+      obs_percs[i] = parse_conf_percentile(&i_odict);
+      cout << "XXX" << i << ": " << obs_percs[i] << endl;
       // Conf: desc
       vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));
 
@@ -618,6 +621,10 @@ void PointStatConfInfo::set_vx_pd() {
       // Add the interpolation methods to the vx_pd objects
       for(j=0; j<n_interp; j++)
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
+
+      vx_pd[i].set_duplicate_flag(dup_flgs[i]);
+      vx_pd[i].set_obs_summary(obs_smry[i]);
+      vx_pd[i].set_obs_perc_value(obs_percs[i]);
    } // end for i
 
    return;
