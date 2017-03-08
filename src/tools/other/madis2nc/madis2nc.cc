@@ -89,7 +89,7 @@ static bool write_nc_obs_data(int buf_size);
 static MadisType get_madis_type(NcFile *&f_in);
 static void      convert_wind_wdir_to_u_v(float wind, float wdir,
                                           float &u, float &v);
-static bool      check_masks(double lat, double lon);
+static bool      check_masks(double lat, double lon, const char *sid);
 
 static void process_madis_metar(NcFile *&f_in);
 static void process_madis_raob(NcFile *&f_in);
@@ -717,7 +717,7 @@ void convert_wind_wdir_to_u_v(float wind, float wdir,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool check_masks(double lat, double lon) {
+bool check_masks(double lat, double lon, const char *sid) {
    double grid_x, grid_y;
 
    //
@@ -742,6 +742,16 @@ bool check_masks(double lat, double lon) {
       }
    }
 
+   //
+   // Check station ID masking.
+   //
+   if(mask_sid.n_elements() > 0) {
+      if(!mask_sid.has(sid)) {
+         rej_sid++;
+         return false;
+      }
+   }
+
    return true;
 }
 
@@ -750,12 +760,12 @@ bool check_masks(double lat, double lon) {
 void print_rej_counts() {
 
    mlog << Debug(2)
-        << "Rejected recs based on masking grid\t= " << rej_grid << "\n"
-        << "Rejected recs based on masking poly\t= " << rej_poly << "\n"
-        << "Rejected recs based on masking station ids\t= " << rej_sid << "\n"
-        << "Rejected based on fill value\t\t= " << rej_fill << "\n"
-        << "Rejected based on quality control\t= " << rej_qc << "\n"
-        << "Total observations retained or derived\t= " << i_obs << "\n";
+        << "Rejected recs based on masking grid\t\t= " << rej_grid << "\n"
+        << "Rejected recs based on masking poly\t\t= " << rej_poly << "\n"
+        << "Rejected recs based on masking station ID's\t= " << rej_sid << "\n"
+        << "Rejected based on fill value\t\t\t= " << rej_fill << "\n"
+        << "Rejected based on quality control\t\t= " << rej_qc << "\n"
+        << "Total observations retained or derived\t\t= " << i_obs << "\n";
 
    return;
 }
@@ -825,7 +835,7 @@ void process_madis_metar(NcFile *&f_in) {
    //
    setup_netcdf_out(nhdr);
 
-   mlog << Debug(2) << "Processing METAR recs\t\t\t= " << rec_end - rec_beg << "\n";
+   mlog << Debug(2) << "Processing METAR recs\t\t\t\t= " << rec_end - rec_beg << "\n";
 
    //
    // Initialize variables for processing observations
@@ -972,10 +982,11 @@ void process_madis_metar(NcFile *&f_in) {
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
+
          //
          // Check masking regions.
          //
-         if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
          //
          // Process the header type.
@@ -991,7 +1002,6 @@ void process_madis_metar(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
@@ -1473,7 +1483,7 @@ void process_madis_raob(NcFile *&f_in) {
          //
          // Check masking regions.
          //
-         if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
          //
          // Process the header type.
@@ -1487,7 +1497,6 @@ void process_madis_raob(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
@@ -2112,10 +2121,11 @@ void process_madis_profiler(NcFile *&f_in) {
          hdr_arr[0] = hdr_lat_arr[i_idx];
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
+
          //
          // Check masking regions.
          //
-         if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
          //
          // Process the header type.
@@ -2129,7 +2139,6 @@ void process_madis_profiler(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
@@ -2415,7 +2424,7 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          // Check masking regions.
          //
-         if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
          //
          // Process the header type.
@@ -2429,7 +2438,6 @@ void process_madis_maritime(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
@@ -2808,7 +2816,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
          // Check masking regions.
          //
-         if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
          //
          // Encode the header type as ADPSFC for MESONET observations.
@@ -2820,7 +2828,6 @@ void process_madis_mesonet(NcFile *&f_in) {
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
          strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
          hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
@@ -3178,8 +3185,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       float hdr_elv_arr[buf_size][maxLevels];
       char hdr_sid_arr[buf_size][hdr_sid_len];
 
-      //float pressure_arr[buf_size];
-
       int obsTimeOfDay_arr[buf_size][maxLevels];
       float temperature_arr[buf_size][maxLevels];
       float dewpoint_arr[buf_size][maxLevels];
@@ -3199,7 +3204,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       get_nc_data(&in_hdr_lat_var, (float *)hdr_lat_arr, dim, cur);
       get_nc_data(&in_hdr_lon_var, (float *)hdr_lon_arr, dim, cur);
       get_filtered_nc_data(in_hdr_elv_var, (float *)hdr_elv_arr, buf_size, i_hdr_s);
-      //get_filtered_nc_data(in_pressure_var, (float *)pressure_arr, buf_size, i_hdr_s);
 
       if (!IS_INVALID_NC(in_temperatureQty_var)) get_nc_data(&in_temperatureQty_var, (char *)&temperatureQty_arr, dim, cur);
       if (!IS_INVALID_NC(in_dewpointQty_var))    get_nc_data(&in_dewpointQty_var, (char *)&dewpointQty_arr, dim, cur);
@@ -3219,6 +3223,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       dim[0] = 1;
       dim[1] = 1;
 
+      //
       // Process the header type.
       // For ACARS, store as AIRCFT.
       //
@@ -3239,7 +3244,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
          // Process the station i.e. airport name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         if (0 < mask_sid.n_elements() && !mask_sid.has(hdr_sid)) continue;
 
          //
          // Process the observation time.
@@ -3292,13 +3296,11 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Check masked regions
             //
-            if(!check_masks(hdr_arr[0], hdr_arr[1])) continue;
+            if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid)) continue;
 
             //
             // Get the number of levels  and height for this level
             //
-            //obs_arr[3] = get_nc_obs(f_in, "altitude", dim, cur);
-            //obs_arr[2] = get_nc_obs(f_in, "nLevels", dim, cur);
             obs_arr[3] = hdr_elv_arr[i_idx][i_lvl];
 
 
