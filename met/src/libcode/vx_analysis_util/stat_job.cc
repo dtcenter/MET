@@ -792,6 +792,18 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       if(!str_it->second.has(L.get_item(str_it->first, false))) return(0);
    }
 
+   //
+   // For MPR lines, check mask_grid, mask_poly, and mask_sid
+   //
+   if(string_to_statlinetype(L.line_type()) == stat_mpr) {
+      double lat = atof(L.get_item("OBS_LAT"));
+      double lon = atof(L.get_item("OBS_LON"));
+
+      if(!is_in_mask_grid(lat, lon) ||
+         !is_in_mask_poly(lat, lon) ||
+         !is_in_mask_sid (L.get_item("OBS_SID"))) return(0);
+   }
+
    return(1);
 }
 

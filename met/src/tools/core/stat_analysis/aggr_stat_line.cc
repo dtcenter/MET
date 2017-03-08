@@ -1763,13 +1763,6 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &j,
          parse_mpr_line(line, cur);
 
          //
-         // Check the grid and poly masks if specified.
-         //
-         if(!j.is_in_mask_grid(cur.obs_lat, cur.obs_lon) ||
-            !j.is_in_mask_poly(cur.obs_lat, cur.obs_lon))
-            continue;
-
-         //
          // Check for bad data
          //
          if(is_bad_data(cur.fcst) || is_bad_data(cur.obs)) continue;
