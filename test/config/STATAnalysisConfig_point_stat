@@ -63,10 +63,25 @@ weight = [];
 // Array of STAT-Analysis jobs to be performed on the filtered data
 //
 jobs = [
-   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 -line_type MPR -out_line_type CNT -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_dump.stat -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_out.stat -set_hdr VX_MASK CONUS",
-   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 -line_type MPR -out_line_type CNT -by VX_MASK -n_boot_rep 0 -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_by_vx_mask_out.stat",
-   "-job aggregate      -fcst_var TMP -fcst_lev Z2 -line_type CTC                    -by FCST_THRESH -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh_out.stat -set_hdr VX_MASK CONUS",
-   "-job aggregate_stat -line_type MPR -out_line_type WDIR -fcst_lev Z10 -out_wind_thresh >0 -out_wind_logic INTERSECTION -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat"
+   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
+    -line_type MPR -out_line_type CNT \
+    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_dump.stat \
+    -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_out.stat \
+    -set_hdr VX_MASK CONUS",
+   "-job aggregate_stat -fcst_var TMP -fcst_lev Z2 \
+    -line_type MPR -out_line_type CNT -by VX_MASK -n_boot_rep 0 \
+    -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_cnt_by_vx_mask_out.stat",
+   "-job aggregate -fcst_var TMP -fcst_lev Z2 \
+    -line_type CTC -by FCST_THRESH \
+    -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh_out.stat \
+    -set_hdr VX_MASK CONUS",
+   "-job aggregate_stat -fcst_lev Z10 \
+    -line_type MPR -out_line_type WDIR \
+    -out_wind_thresh >0 -out_wind_logic INTERSECTION \
+    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat",
+   "-job filter -fcst_var TMP -fcst_lev Z2 \
+    -line_type MPR -mask_sid ${CONFIG_DIR}/SID_CO.txt \
+    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_sid.stat"
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
