@@ -420,17 +420,17 @@ if ( have_pairs )  {
 
 
    //
-   //  calculate 2d attributes
+   //  calculate 2d simple attributes
    //
 
 int t;
-SingleAtt2DArray fcst_att_2d, obs_att_2d;
+SingleAtt2DArray fcst_simple_att_2d, obs_simple_att_2d;
 SingleAtt2D att_2;
 MtdIntFile mask_2d;
 
-   //   fcst objects
+   //   fcst simple objects
 
-mlog << Debug(2) << "Calculating 2D fcst attributes\n";
+mlog << Debug(2) << "Calculating 2D simple fcst attributes\n";
 
 for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
@@ -450,15 +450,15 @@ for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       att_2.set_time_index(t);
 
-      fcst_att_2d.add(att_2);
+      fcst_simple_att_2d.add(att_2);
 
    }   //  for k
 
 }   //  for j
 
-   //   obs objects
+   //   obs simple objects
 
-mlog << Debug(2) << "Calculating 2D obs attributes\n";
+mlog << Debug(2) << "Calculating 2D simple obs attributes\n";
 
 for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
@@ -478,11 +478,13 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 
       att_2.set_time_index(t);
 
-      obs_att_2d.add(att_2);
+      obs_simple_att_2d.add(att_2);
 
    }   //  for k
 
 }   //  for j
+
+
 
 
 
@@ -556,7 +558,7 @@ if ( have_pairs )  {
 
       a.increment(1);
 
-      mask = fcst_obj.select(a);   //  1-based
+      mask = fcst_obj.select_cluster(a);   //  1-based
 
       att_3 = calc_3d_single_atts(mask, fcst_raw, config.model);
 
@@ -581,7 +583,7 @@ if ( have_pairs )  {
 
       a.increment(1);
 
-      mask = obs_obj.select(a);   //  1-based
+      mask = obs_obj.select_cluster(a);   //  1-based
 
       att_3 = calc_3d_single_atts(mask, obs_raw, config.model);
 
@@ -619,7 +621,7 @@ if ( have_pairs )  {
 
       a.increment(1);
 
-      fo = fcst_obj.select(a);   //  1-based
+      fo = fcst_obj.select_cluster(a);   //  1-based
 
       for (k=0; k<n_clusters; ++k)  {
 
@@ -627,7 +629,7 @@ if ( have_pairs )  {
 
          b.increment(1);
 
-         oo = obs_obj.select(b);   //  1-based
+         oo = obs_obj.select_cluster(b);   //  1-based
 
          p = calc_3d_pair_atts(fo, oo, fcst_cluster_att[j], obs_cluster_att[k]);
 
@@ -650,6 +652,86 @@ if ( have_pairs )  {
 }   //  if have_pairs
 
    //
+   //  calculate 2d cluster attributes
+   //
+
+SingleAtt2DArray fcst_cluster_att_2d, obs_cluster_att_2d;
+
+
+if ( have_pairs )  {
+
+   mlog << Debug(2) << "Calculating 2D cluster fcst attributes\n";
+
+   for (j=0; j<n_clusters; ++j)  {
+
+      att_3 = fcst_cluster_att[j];
+
+      a = engine.fcst_composite(j);   //  0-based
+
+      a.increment(1);
+
+      mask = fcst_obj.select_cluster(a);   //  1-based
+
+      for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
+
+         mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
+
+         att_2 = calc_2d_single_atts(mask_2d, j + 1);
+
+         att_2.set_fcst();
+
+         att_2.set_valid_time(fcst_obj.start_time() + t*(fcst_obj.delta_t()));
+
+         att_2.set_cluster_number (j + 1);   //  1-based
+
+         att_2.set_time_index(t);
+
+         fcst_cluster_att_2d.add(att_2);
+
+      }   //  for t
+
+   }   //  for j
+
+       ///////////////////////////////////
+
+   mlog << Debug(2) << "Calculating 2D cluster obs attributes\n";
+
+   for (j=0; j<n_clusters; ++j)  {
+
+      att_3 = obs_cluster_att[j];
+
+      a = engine.obs_composite(j);   //  0-based
+
+      a.increment(1);
+
+      mask = obs_obj.select_cluster(a);   //  1-based
+
+      for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
+
+         mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
+
+         att_2 = calc_2d_single_atts(mask_2d, j + 1);
+
+         att_2.set_obs();
+
+         att_2.set_valid_time(obs_obj.start_time() + t*(obs_obj.delta_t()));
+
+         att_2.set_cluster_number (j + 1);   //  1-based
+
+         att_2.set_time_index(t);
+
+         obs_cluster_att_2d.add(att_2);
+
+      }   //  for t
+
+   }   //  for j
+
+
+
+
+}   //  if have pairs
+
+   //
    //  patch the cluster ids
    //
 
@@ -661,8 +743,8 @@ if ( have_pairs )  {
    fcst_cluster_att.patch_cluster_numbers(engine);
     obs_cluster_att.patch_cluster_numbers(engine);
 
-   fcst_att_2d.patch_cluster_numbers(engine);
-    obs_att_2d.patch_cluster_numbers(engine);
+   fcst_simple_att_2d.patch_cluster_numbers(engine);
+    obs_simple_att_2d.patch_cluster_numbers(engine);
 
    pa_simple.patch_cluster_numbers(engine);
    pa_cluster.patch_cluster_numbers(engine);
@@ -670,7 +752,7 @@ if ( have_pairs )  {
 }
 
    //
-   //  write 2d attributes for each simple object for each time slice
+   //  write 2d attributes for each simple & cluster object for each time slice
    //
 
 path << cs_erase
@@ -681,7 +763,8 @@ mlog << Debug(2)
      << "Creating 2D constant-time slice attributes file: \""
      << path << "\"\n";
 
-do_2d_txt_output(fcst_att_2d, obs_att_2d, config, path);
+do_2d_txt_output(fcst_simple_att_2d,  obs_simple_att_2d, 
+                 fcst_cluster_att_2d, obs_cluster_att_2d, config, path);
 
    //
    //  write simple single attributes

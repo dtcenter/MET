@@ -1611,13 +1611,13 @@ return ( s );
 ////////////////////////////////////////////////////////////////////////
 
 
-MtdIntFile MtdIntFile::select(const IntArray & a) const   //  1-based
+MtdIntFile MtdIntFile::select_cluster(const IntArray & a) const   //  1-based
 
 {
 
 if ( (a.min() < 0) || (a.max() > Nobjects) )  {
 
-   mlog << Error << "\n\n  MtdIntFile::select(const IntArray &) -> range check error\n\n";
+   mlog << Error << "\n\n  MtdIntFile::select_cluster(const IntArray &) -> range check error\n\n";
 
    exit ( 1 );
 

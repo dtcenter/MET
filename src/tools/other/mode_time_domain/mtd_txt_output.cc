@@ -337,8 +337,10 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_2d_txt_output(const SingleAtt2DArray & fcst_att,
-                      const SingleAtt2DArray &  obs_att,
+void do_2d_txt_output(const SingleAtt2DArray & fcst_simple_att,
+                      const SingleAtt2DArray &  obs_simple_att,
+                      const SingleAtt2DArray & fcst_cluster_att,
+                      const SingleAtt2DArray &  obs_cluster_att,
                       const MtdConfigInfo & config,
                       const char * output_filename)
 
@@ -349,7 +351,7 @@ if ( !(config.do_2d_att_ascii) )  return;
 int j, r, c;
 ofstream out;
 AsciiTable table;
-const int n_total = fcst_att.n() + obs_att.n();
+const int n_total = fcst_simple_att.n() + obs_simple_att.n() + fcst_cluster_att.n() + obs_cluster_att.n();
 
 
 out.open(output_filename);
@@ -409,22 +411,41 @@ for (j=0; j<n_total; ++j)  {
 const int fcst_valid_column = 3;   //  0-based
 const int  obs_valid_column = 5;   //  0-based
 
+r = 0;
 
-for (j=0; j<(fcst_att.n()); ++j)  {
+for (j=0; j<(fcst_simple_att.n()); ++j)  {
 
-   r = j + 1;
+   ++r;
 
-   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_att.valid_time(j)));
+   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_simple_att.valid_time(j)));
    table.set_entry(r,  obs_valid_column, na_str);
 
 }
 
-for (j=0; j<(obs_att.n()); ++j)  {
+for (j=0; j<(obs_simple_att.n()); ++j)  {
 
-   r = fcst_att.n() + j + 1;
+   ++r;
 
    table.set_entry(r, fcst_valid_column, na_str);
-   table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_att.valid_time(j)));
+   table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_simple_att.valid_time(j)));
+
+}
+
+for (j=0; j<(fcst_cluster_att.n()); ++j)  {
+
+   ++r;
+
+   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_cluster_att.valid_time(j)));
+   table.set_entry(r,  obs_valid_column, na_str);
+
+}
+
+for (j=0; j<(obs_cluster_att.n()); ++j)  {
+
+   ++r;
+
+   table.set_entry(r, fcst_valid_column, na_str);
+   table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_cluster_att.valid_time(j)));
 
 }
 
@@ -434,15 +455,27 @@ for (j=0; j<(obs_att.n()); ++j)  {
 
 r = 1;
 
-for (j=0; j<(fcst_att.n()); ++j)  {
+for (j=0; j<(fcst_simple_att.n()); ++j)  {
 
-   fcst_att[j].write_txt(table, r++);
+   fcst_simple_att[j].write_txt(table, r++);
 
 }
 
-for (j=0; j<(obs_att.n()); ++j)  {
+for (j=0; j<(obs_simple_att.n()); ++j)  {
 
-   obs_att[j].write_txt(table, r++);
+   obs_simple_att[j].write_txt(table, r++);
+
+}
+
+for (j=0; j<(fcst_cluster_att.n()); ++j)  {
+
+   fcst_cluster_att[j].write_txt(table, r++);
+
+}
+
+for (j=0; j<(obs_cluster_att.n()); ++j)  {
+
+   obs_cluster_att[j].write_txt(table, r++);
 
 }
 
