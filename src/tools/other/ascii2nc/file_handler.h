@@ -55,16 +55,17 @@ public:
   virtual ~FileHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const = 0;
-  
-  void setGridMask(Grid     &g);
-  void setPolyMask(MaskPoly &p);
+
+  void setGridMask(Grid        &g);
+  void setPolyMask(MaskPoly    &p);
+  void setSIDMask (StringArray &s);
   void setMessageTypeMap(map<ConcatString, ConcatString> m);
-  
+
   bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
   bool writeNetcdfFile(const string &nc_filename);
-  
+
   bool summarizeObs(const TimeSummaryInfo &summary_info);
-  
+
   void setCompressionLevel(int compressoion_level);
 
 protected:
@@ -78,14 +79,14 @@ protected:
   static const long MAX_STRING_LEN;
 
   static const float FILL_VALUE;
-  
+
 
   ///////////////////////
   // Protected members //
   ///////////////////////
 
   string _programName;
-  
+
   // Variables for writing output NetCDF file
 
   NcFile *_ncFile;
@@ -100,19 +101,20 @@ protected:
 
   int _hdrNum;
   int _obsNum;
-  
+
   int _gridMaskNum;
   int _polyMaskNum;
   int _sidMaskNum;
 
-  Grid     *_gridMask;
-  MaskPoly *_polyMask;
+  Grid        *_gridMask;
+  MaskPoly    *_polyMask;
+  StringArray *_sidMask;
 
   map<ConcatString, ConcatString> _messageTypeMap;
 
   bool _dataSummarized;
-  TimeSummaryInfo _summaryInfo;  
-  
+  TimeSummaryInfo _summaryInfo;
+
   // List of observations read from the ascii files
 
   vector< Observation > _observations;
@@ -123,7 +125,7 @@ protected:
   int   obs_data_offset;
   int   hdr_data_idx;
   int   hdr_data_offset;
-  
+
   char   hdr_typ_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
   char   hdr_sid_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
   char   hdr_vld_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
@@ -142,18 +144,18 @@ protected:
   // this method.
 
   void _countHeaders();
-  
+
   time_t _getValidTime(const string &time_string) const;
-  
+
   // Read the observations from the given file.
 
   virtual bool _readObservations(LineDataFile &ascii_file) = 0;
-  
+
   // Apply filtering logic to the observations and add them to the
   // _observations vector.
-  
+
   bool _addObservations(const Observation &obs);
- 
+
   // Write the observations in the _observations vector into the current
   // netCDF file.
 
@@ -163,14 +165,14 @@ protected:
   // calculators needed.
 
   vector< SummaryCalc* > _getSummaryCalculators(const TimeSummaryInfo &info) const;
-  
+
   // Use the configuration file time summary information to figure out the
   // time intervals for our summaries
 
   vector< TimeSummaryInterval > _getTimeIntervals(const time_t first_data_time,
 						  const time_t last_data_time,
 						  const TimeSummaryInfo &info) const;
-  
+
   // Check to see if the given time is within the defined time interval
 
   bool _isInTimeInterval(const time_t curr_time,
@@ -181,18 +183,18 @@ protected:
   string _getSummaryHeaderType(const string &header_type,
 			       const string &summary_type,
 			       const int summary_width_secs) const;
-  
+
   // Convert the unix time to number of seconds since the beginning of
   // the day
 
   static int _unixtimeToSecs(const time_t unix_time)
   {
     struct tm *time_struct = gmtime(&unix_time);
-    
+
     return (time_struct->tm_hour * 3600) +
       (time_struct->tm_min * 60) + time_struct->tm_sec;
   }
-  
+
   // Convert the number of seconds from the beginning of the day to a string
 
   static string _secsToTimeString(const int secs)
@@ -205,16 +207,16 @@ protected:
     int minute = remaining_secs / 60;
     remaining_secs -= minute * 60;
     int second = remaining_secs;
-  
+
     // Create the string
 
     char string_buffer[20];
-    
+
     sprintf(string_buffer, "%02d%02d%02d", hour, minute, second);
-    
+
     return string(string_buffer);
   }
-  
+
   // Get the first possible interval time after 0:00Z
 
   static time_t _getFirstIntervalOfDay(const time_t test_time,
@@ -224,14 +226,14 @@ protected:
     struct tm *time_struct = gmtime(&test_time);
 
     int start_of_day_secs = 0;
-    
+
     if (begin_secs < end_secs)
     {
       // This is the "normal" case.  We can just take the begin time and
       // start there.
 
       start_of_day_secs = begin_secs;
-      
+
     }
     else
     {
@@ -244,18 +246,18 @@ protected:
 
       start_of_day_secs = begin_secs % step;
     }
-    
+
     time_struct->tm_hour = start_of_day_secs / 3600;
     start_of_day_secs -= time_struct->tm_hour * 3600;
-    
+
     time_struct->tm_min = start_of_day_secs / 60;
     start_of_day_secs -= time_struct->tm_min * 60;
-      
+
     time_struct->tm_sec = start_of_day_secs;
 
     return timegm(time_struct);
   }
-  
+
   // Get the interval time of the interval that contains the given data
   // time.
 
@@ -272,15 +274,15 @@ protected:
     // Loop through the day until we find the first interval the includes the
     // given time or is later than the given time (because the user could define
     // the intervals so that there are unprocessed times between them).
-    
+
     while (test_time > test_interval + ((width / 2) + 1))
     {
       test_interval += step;
     }
-    
+
     return test_interval;
   }
-  
+
   static time_t _getEndOfDay(const time_t unix_time)
   {
     struct tm *time_struct = gmtime(&unix_time);
@@ -288,24 +290,24 @@ protected:
     time_struct->tm_hour = 23;
     time_struct->tm_min = 59;
     time_struct->tm_sec = 59;
-    
+
     return timegm(time_struct);
   }
-  
+
   static string _timeToString(const time_t unix_time)
   {
     struct tm *time_struct = gmtime(&unix_time);
-    
+
     char time_string[80];
-    
+
     sprintf(time_string, "%04d%02d%02d_%02d%02d%02d",
 	    time_struct->tm_year + 1900, time_struct->tm_mon + 1,
 	    time_struct->tm_mday,
 	    time_struct->tm_hour, time_struct->tm_min, time_struct->tm_sec);
-    
+
     return time_string;
   }
-  
+
   static time_t _stringToTime(const string &time_string)
   {
     struct tm time_struct;
@@ -329,12 +331,13 @@ protected:
 		     double lat, double lon, double elv);
   bool _writeObsInfo(int gc, float prs, float hgt, float obs,
 		     const ConcatString &qty);
-  
+
 };
 
 inline void FileHandler::setCompressionLevel(int compressoion_level) { deflate_level = compressoion_level; }
-inline void FileHandler::setGridMask(Grid     &g) { _gridMask = &g; }
-inline void FileHandler::setPolyMask(MaskPoly &p) { _polyMask = &p; }
+inline void FileHandler::setGridMask(Grid        &g) { _gridMask = &g; }
+inline void FileHandler::setPolyMask(MaskPoly    &p) { _polyMask = &p; }
+inline void FileHandler::setSIDMask (StringArray &s) { _sidMask  = &s; }
 inline void FileHandler::setMessageTypeMap(map<ConcatString, ConcatString> m) {
    _messageTypeMap = m;
 }

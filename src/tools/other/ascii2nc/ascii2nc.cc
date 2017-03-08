@@ -109,9 +109,9 @@ static ConcatString ncfile;
 static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 static Ascii2NcConfInfo config_info;
 
-static Grid grid_mask;      // Grid masking region from the named Grid
-static MaskPoly poly_mask;
-StringArray mask_sid;
+static Grid        mask_grid;
+static MaskPoly    mask_poly;
+static StringArray mask_sid;
 
 static int compress_level = -1;
 
@@ -211,8 +211,9 @@ int main(int argc, char *argv[]) {
    //
    // Set the masking grid and polyline, if specified.
    //
-   if(grid_mask.nx() > 0 || grid_mask.ny() > 0) file_handler->setGridMask(grid_mask);
-   if(poly_mask.n_points() > 0)                 file_handler->setPolyMask(poly_mask);
+   if(mask_grid.nx() > 0 || mask_grid.ny() > 0) file_handler->setGridMask(mask_grid);
+   if(mask_poly.n_points() > 0)                 file_handler->setPolyMask(mask_poly);
+   if(mask_sid.n_elements() > 0)                file_handler->setSIDMask(mask_sid);
 
    //
    // Load the message type map
@@ -521,7 +522,7 @@ void set_mask_grid(const StringArray & a) {
        << "Grid Masking: " << a[0] << "\n";
 
   // First, try to find the grid by name.
-  if(!find_grid_by_name(a[0], grid_mask)) {
+  if(!find_grid_by_name(a[0], mask_grid)) {
 
     // If that doesn't work, try to open a data file.
     datafile = factory.new_met_2d_data_file(replace_path(a[0]));
@@ -533,15 +534,15 @@ void set_mask_grid(const StringArray & a) {
     }
 
     // Store the data file's grid
-    grid_mask = datafile->grid();
+    mask_grid = datafile->grid();
 
     delete datafile; datafile = (Met2dDataFile *) 0;
   }
 
   // List the grid mask
   mlog << Debug(2)
-       << "Parsed Masking Grid: " << grid_mask.name() << " ("
-       << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
+       << "Parsed Masking Grid: " << mask_grid.name() << " ("
+       << mask_grid.nx() << " x " << mask_grid.ny() << ")\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -553,12 +554,12 @@ void set_mask_poly(const StringArray & a) {
        << "Polyline Masking File: " << a[0] << "\n";
 
   // Parse the polyline file.
-  poly_mask.load(replace_path(a[0]));
+  mask_poly.load(replace_path(a[0]));
 
   // List the polyline mask
   mlog << Debug(2)
-       << "Parsed Masking Polyline: " << poly_mask.name()
-       << " containing " <<  poly_mask.n_points() << " points\n";
+       << "Parsed Masking Polyline: " << mask_poly.name()
+       << " containing " <<  mask_poly.n_points() << " points\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
