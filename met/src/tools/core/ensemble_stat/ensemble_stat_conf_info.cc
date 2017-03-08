@@ -333,15 +333,15 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
          // Conf: duplicate_flag
          vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_obs_dict));
-	 
+
          // Conf: obs_summary
          vx_pd[i].set_obs_summary((ObsSummary)parse_conf_obs_summary(&i_obs_dict));
 
          // Conf: obs_perc_value
-         vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_obs_dict));	 
+         vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_obs_dict));
 
          // Conf: desc
-         vx_pd[i].set_desc(parse_conf_string(&i_obs_dict, conf_key_desc));	 
+         vx_pd[i].set_desc(parse_conf_string(&i_obs_dict, conf_key_desc));
 
          // Conf: message_type
          msg_typ[i] = parse_conf_message_type(&i_obs_dict, point_vx);
@@ -422,7 +422,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
-   
+
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
@@ -474,7 +474,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    // Parse out the masking poly areas
    for(i=0,j=mask_grid.n_elements(); i<mask_poly.n_elements(); i++,j++) {
       mlog << Debug(3)
-           << "Processing poly mask: " << mask_poly[i] << "\n"; 
+           << "Processing poly mask: " << mask_poly[i] << "\n";
       parse_poly_mask(mask_poly[i], grid, mask_dp[j], s);
       mask_name.add(s);
    }
@@ -485,7 +485,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    // Parse out the station ID masks
    for(i=0; i<sid_list.n_elements(); i++) {
       mlog << Debug(3)
-           << "Processing sid mask: " << sid_list[i] << "\n";
+           << "Processing station ID mask: " << sid_list[i] << "\n";
       parse_sid_mask(sid_list[i], mask_sid[i], s);
       mask_name.add(s);
    }

@@ -138,8 +138,11 @@ class STATAnalysisJob {
       int  set_job_type (const char *);
       void set_dump_row (const char *);
       void set_stat_file(const char *);
+
       void set_mask_grid(const char *);
       void set_mask_poly(const char *);
+      void set_mask_sid (const char *);
+
       void set_boot_rng (const char *);
       void set_boot_seed(const char *);
 
@@ -253,11 +256,13 @@ class STATAnalysisJob {
       // Variables used for the stat_job_aggr_mpr job type
       //
 
-      char        *mask_grid;
-      char        *mask_poly;
+      char        *mask_grid_str;
+      char        *mask_poly_str;
+      char        *mask_sid_str;
 
-      Grid         grid_mask;
-      MaskPoly     poly_mask;
+      Grid         mask_grid;
+      MaskPoly     mask_poly;
+      StringArray  mask_sid;
 
       //
       // Variables used for the stat_job_ramp job type
@@ -314,9 +319,11 @@ class STATAnalysisJob {
 
       void process_mask_grid();
       void process_mask_poly();
+      void process_mask_sid ();
 
       int is_in_mask_grid(double, double) const;
       int is_in_mask_poly(double, double) const;
+      int is_in_mask_sid (const char *)  const;
 };
 
 ////////////////////////////////////////////////////////////////////////

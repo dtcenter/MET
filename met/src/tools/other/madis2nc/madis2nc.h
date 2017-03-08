@@ -109,8 +109,8 @@ static StringArray  lvl_dim_sa;
 static int          rec_beg = 0;
 static int          rec_end = 0;
 static ConcatString argv_str;
-static Grid         grid_mask;
-static MaskPoly     poly_mask;
+static Grid         mask_grid;
+static MaskPoly     mask_poly;
 static StringArray  mask_sid;
 
 static int compress_level = -1;
@@ -132,26 +132,11 @@ static int          rej_sid  = 0;
 // Output NetCDF file
 NcFile *f_out = (NcFile *) 0;
 
-// Output NetCDF dimensions
-//static NcDim *strl_dim    = (NcDim *)  0; // Maximum string length
-//static NcDim *hdr_arr_dim = (NcDim *)  0; // Header array width
-//static NcDim *obs_arr_dim = (NcDim *)  0; // Observation array width
-//static NcDim *hdr_dim     = (NcDim *)  0; // Header array length
-//static NcDim *obs_dim     = (NcDim *)  0; // Observation array length
-
 static NcDim strl_dim    ; // Maximum string length
 static NcDim hdr_arr_dim ; // Header array width
 static NcDim obs_arr_dim ; // Observation array width
 static NcDim hdr_dim     ; // Header array length
 static NcDim obs_dim     ; // Observation array length
-
-// Output NetCDF variables
-//static NcVar *hdr_typ_var = (NcVar *)  0; // Message type
-//static NcVar *hdr_sid_var = (NcVar *)  0; // Station ID
-//static NcVar *hdr_vld_var = (NcVar *)  0; // Valid time
-//static NcVar *hdr_arr_var = (NcVar *)  0; // Header array
-//static NcVar *obs_qty_var = (NcVar *)  0; // Quality Flag
-//static NcVar *obs_arr_var = (NcVar *)  0; // Observation array
 
 static NcVar hdr_typ_var ; // Message type
 static NcVar hdr_sid_var ; // Station ID
@@ -160,12 +145,12 @@ static NcVar hdr_arr_var ; // Header array
 static NcVar obs_qty_var ; // Quality Flag
 static NcVar obs_arr_var ; // Observation array
 
-int   obs_buf_size;
-int   processed_count;
-int   obs_data_idx;
-int   obs_data_offset;
-int   hdr_data_idx;
-int   hdr_data_offset;
+int    obs_buf_size;
+int    processed_count;
+int    obs_data_idx;
+int    obs_data_offset;
+int    hdr_data_idx;
+int    hdr_data_offset;
 
 char   hdr_typ_buf[BUFFER_SIZE][strl_len];
 char   hdr_sid_buf[BUFFER_SIZE][strl_len];
@@ -180,92 +165,6 @@ char   hdr_vld_out_buf[BUFFER_SIZE][strl_len];
 float  hdr_arr_out_buf[BUFFER_SIZE][hdr_arr_len];
 float obs_data_out_buf[BUFFER_SIZE][obs_arr_len];
 char  qty_data_out_buf[BUFFER_SIZE][strl_len];
-
-
-// float  hdr_lat_arr[BUFFER_SIZE];
-// float  hdr_lon_arr[BUFFER_SIZE];
-// float  hdr_elv_arr[BUFFER_SIZE];
-// double tmp_dbl_arr[BUFFER_SIZE];
-
-//float pressure_arr[BUFFER_SIZE];
-
-// //float seaLevelPress_arr[BUFFER_SIZE];
-// float visibility_arr[BUFFER_SIZE];
-// float temperature_arr[BUFFER_SIZE];
-// float dewpoint_arr[BUFFER_SIZE];
-// float windDir_arr[BUFFER_SIZE];
-// float windSpeed_arr[BUFFER_SIZE];
-// float windGust_arr[BUFFER_SIZE];
-// float minTemp24Hour_arr[BUFFER_SIZE];
-// float maxTemp24Hour_arr[BUFFER_SIZE];
-// float precip1Hour_arr[BUFFER_SIZE];
-// float precip3Hour_arr[BUFFER_SIZE];
-// float precip6Hour_arr[BUFFER_SIZE];
-// float precip24Hour_arr[BUFFER_SIZE];
-// float snowCover_arr[BUFFER_SIZE];
-// 
-// char seaLevelPressQty_arr[BUFFER_SIZE];
-// char visibilityQty_arr[BUFFER_SIZE];
-// char temperatureQty_arr[BUFFER_SIZE];
-// char dewpointQty_arr[BUFFER_SIZE];
-// char windDirQty_arr[BUFFER_SIZE];
-// char windSpeedQty_arr[BUFFER_SIZE];
-// char windGustQty_arr[BUFFER_SIZE];
-// char minTemp24HourQty_arr[BUFFER_SIZE];
-// char maxTemp24HourQty_arr[BUFFER_SIZE];
-// char precip1HourQty_arr[BUFFER_SIZE];
-// char precip3HourQty_arr[BUFFER_SIZE];
-// char precip6HourQty_arr[BUFFER_SIZE];
-// char precip24HourQty_arr[BUFFER_SIZE];
-// char snowCoverQty_arr[BUFFER_SIZE];
-// 
-// //float temperature_arr[BUFFER_SIZE];
-// //float dewpoint_arr[BUFFER_SIZE];
-// float relHumidity_arr[BUFFER_SIZE];
-// float stationPressure_arr[BUFFER_SIZE];
-// float seaLevelPressure_arr[BUFFER_SIZE];
-// fl//oat windDir_arr[BUFFER_SIZE];
-// //float windSpeed_arr[BUFFER_SIZE];
-// //float windGust_arr[BUFFER_SIZE];
-// //float visibility_arr[BUFFER_SIZE];
-// float precipRate_arr[BUFFER_SIZE];
-// float solarRadiation_arr[BUFFER_SIZE];
-// float seaSurfaceTemp_arr[BUFFER_SIZE];
-// float totalColumnPWV_arr[BUFFER_SIZE];
-// float soilTemperature_arr[BUFFER_SIZE];
-// //float minTemp24Hour_arr[BUFFER_SIZE];
-// //float maxTemp24Hour_arr[BUFFER_SIZE];
-// float precip3hr_arr[BUFFER_SIZE];
-// float precip6hr_arr[BUFFER_SIZE];
-// float precip12hr_arr[BUFFER_SIZE];
-// float precip10min_arr[BUFFER_SIZE];
-// float precip1min_arr[BUFFER_SIZE];
-// float windDir10_arr[BUFFER_SIZE];
-// float windSpeed10_arr[BUFFER_SIZE];
-// 
-// //char temperatureQty_arr[BUFFER_SIZE];
-// //char dewpointQty_arr[BUFFER_SIZE];
-// char relHumidityQty_arr[BUFFER_SIZE];
-// char stationPressureQty_arr[BUFFER_SIZE];
-// char seaLevelPressureQty_arr[BUFFER_SIZE];
-// //char windDirQty_arr[BUFFER_SIZE];
-// //char windSpeedQty_arr[BUFFER_SIZE];
-// //char windGustQty_arr[BUFFER_SIZE];
-// //char visibilityQty_arr[BUFFER_SIZE];
-// char precipRateQty_arr[BUFFER_SIZE];
-// char solarRadiationQty_arr[BUFFER_SIZE];
-// char seaSurfaceTempQty_arr[BUFFER_SIZE];
-// char totalColumnPWVQty_arr[BUFFER_SIZE];
-// char soilTemperatureQty_arr[BUFFER_SIZE];
-// //char minTemp24HourQty_arr[BUFFER_SIZE];
-// //char maxTemp24HourQty_arr[BUFFER_SIZE];
-// char precip3hrQty_arr[BUFFER_SIZE];
-// char precip6hrQty_arr[BUFFER_SIZE];
-// char precip12hrQty_arr[BUFFER_SIZE];
-// char precip10minQty_arr[BUFFER_SIZE];
-// char precip1minQty_arr[BUFFER_SIZE];
-// char windDir10Qty_arr[BUFFER_SIZE];
-// char windSpeed10Qty_arr[BUFFER_SIZE];
 
 ////////////////////////////////////////////////////////////////////////
 

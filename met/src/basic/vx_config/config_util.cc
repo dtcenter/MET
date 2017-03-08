@@ -342,11 +342,11 @@ StringArray parse_conf_sid_exc(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// This function is passed a string containing either a single station ID or
-// a file name containing a list of station ID's.  For a single station ID,
-// store it in the output StringArray, and store it's value as the mask name.
-// For a file name, parse the list of stations into the output StringArray,
-// and store the first entry in the file as the mask name.
+// This function is passed a string containing either a file name containing a
+// list of station ID's or a comma separated list of stations ID's.  For a
+// comma-separated list, store them in the output StringArray. For a file name,
+// parse the list of stations into the output StringArray, and store the first
+// entry in the file as the mask name.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -420,9 +420,21 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
          exit(1);
       }
 
-      // Store the single station ID
-      mask_sid.add(mask_sid_str);
-      mask_name = mask_sid_str;
+      // Parse the input string as a comma-separated list
+      StringArray sa;
+      sa.add_css(mask_sid_str);
+
+      // For length == 1, set the mask name as the station ID name.
+      if(sa.n_elements() == 1) {
+         mask_name = sa[0];
+         mask_sid  = sa;
+      }
+      // Otherwise for length >  1, set the mask name as the first
+      // list entry and the remainer as the station ID values.
+      else {
+         mask_name = sa[0];
+         for(int i=1; i<sa.n_elements(); i++) mask_sid.add(sa[i]);
+      }
    }
 
    return;

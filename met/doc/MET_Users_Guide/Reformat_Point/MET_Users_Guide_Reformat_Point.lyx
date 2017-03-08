@@ -2572,7 +2572,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-mask_sid station_ids]
+[-mask_sid file|list]
 \end_layout
 
 \begin_layout LyX-Code
@@ -2729,10 +2729,12 @@ mask_poly file
 7.
  The 
 \series bold
--mask_sid station_ids 
+-mask_sid file|list 
 \series medium
-option specifies a comma separated station list or a file contains station
- list for filtering the point observations spatially.
+option is a station ID masking file or a comma-separated list of station
+ ID's for filtering the point observations spatially.
+ For a list of length greater than one, the first element is stored as the
+ mask name.
 \end_layout
 
 \begin_layout Description
@@ -3403,7 +3405,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-mask_sid station_ids]
+[-mask_sid file|list]
 \end_layout
 
 \begin_layout LyX-Code
@@ -3576,10 +3578,12 @@ Optional arguments for madis2nc
 9.
  The 
 \series bold
--mask_sid station_ids 
+-mask_sid file|list 
 \series medium
-option specifies a comma separated station list or a file contains station
- list for filtering the point observations spatially.
+option is a station ID masking file or a comma-separated list of station
+ ID's for filtering the point observations spatially.
+ For a list of length greater than one, the first element is stored as the
+ mask name.
 \end_layout
 
 \begin_layout Description
