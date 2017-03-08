@@ -87,7 +87,7 @@ sid_exc        = [];
 obs_quality    = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
-obs_percentile = 50;
+obs_perc_value = 50;
 
 ////////////////////////////////////////////////////////////////////////////////
 

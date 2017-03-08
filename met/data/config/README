@@ -928,9 +928,6 @@ rank_corr_flag = FALSE;
 //    - "NONE" to use all point observations (legacy behavior)
 //    - "UNIQUE" if two or more observations match identically except in the
 //       station ID field, only use a single observation
-//    - "SINGLE" if two or more observations appear at a single location
-//      (lat, lon, level, elv), use only the observation that has the valid
-//      time closest to the forecast valid time
 //
 // The reporting mechanism for this feature can be activated by specifying
 // a verbosity level of three or higher.  The report will show information
@@ -938,6 +935,35 @@ rank_corr_flag = FALSE;
 // in those cases.
 //
 duplicate_flag = NONE;
+
+//
+// The "obs_summary" entry specifies how to compute statistics on
+// observations that appear at a single location (lat,lon,level,elev)
+// in Point-Stat and Ensemble-Stat.  Eight techniques are
+// currently supported:
+//
+//    - "NONE" to use all point observations (legacy behavior)
+//    - "NEAREST" use only the observation that has the valid
+//      time closest to the forecast valid time
+//    - "MIN" use only the observation that has the lowest value 
+//    - "MAX" use only the observation that has the highest value
+//    - "UW_MEAN" compute an unweighted mean of the observations
+//    - "DW_MEAN" compute a weighted mean of the observations based
+//      on the time of the observation
+//    - "MEDIAN" use the median observation
+//    - "PERC" use the Nth percentile observation where N = obs_perc_value
+//
+// The reporting mechanism for this feature can be activated by specifying
+// a verbosity level of three or higher.  The report will show information
+// about where duplicates were detected and which observations were used
+// in those cases.
+//
+obs_summary = NONE;
+
+//
+// Percentile value to use when obs_summary = PERC
+//
+obs_perc_value = 50;
 
 //
 // The "obs_quality" entry specifies the quality flag values that are to be

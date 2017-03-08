@@ -91,6 +91,9 @@ class EnsembleStatConfInfo {
       StringArray *        msg_typ;             // Array of message types [n_vx]
       StringArray *        sid_exc;             // Array of station ID's to exclude [n_vx]
       StringArray *        obs_qty;             // Observation quality flags for filtering[n_vx]
+      vector<DuplicateType> dup_flgs;
+      vector<ObsSummary> obs_smry;
+      vector<int> obs_percs;
       StringArray          mask_name;           // Masking region names [n_mask]
       NumArray             ens_ssvar_bin_size;  // Ensemble spread/skill variance bin size [n_vx]
       ConcatString         ens_ssvar_file;      // Ensemble mean file name
@@ -107,9 +110,6 @@ class EnsembleStatConfInfo {
       ConcatString         rng_type;            // GSL random number generator
       ConcatString         rng_seed;            // GSL RNG seed value
       GridWeightType       grid_weight_flag;    // Grid weighting flag
-      DuplicateType        duplicate_flag;      // Duplicate observation behavior
-      ObsSummary           obs_summary;         // selecting observations behavior
-      double               obs_perc_value;      // only used in obs_summary PERC
       ConcatString         output_prefix;       // String to customize output file names
       ConcatString         version;             // Config file version
 

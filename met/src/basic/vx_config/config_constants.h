@@ -302,14 +302,14 @@ enum DuplicateType {
 //
 
 enum ObsSummary {
-   ObsSummary_None,
-   ObsSummary_Single, // Keep only a single observation per station
-   ObsSummary_Min,    // Keep only smallest value
-   ObsSummary_Max,    // Keep only largest valueXS
-   ObsSummary_UwMean, // Calculate un-weighted mean
-   ObsSummary_TwMean, // Calculate time weighted mean
-   ObsSummary_Median, // Calculate median
-   ObsSummary_Perc   // Calculate precentile
+   ObsSummary_None,     // Keep all observations, no statistics
+   ObsSummary_Nearest, // Keep only the observation closest in time
+   ObsSummary_Min,     // Keep only smallest value
+   ObsSummary_Max,     // Keep only largest valueXS
+   ObsSummary_UwMean,  // Calculate un-weighted mean
+   ObsSummary_DwMean,  // Calculate time weighted mean
+   ObsSummary_Median,  // Calculate median
+   ObsSummary_Perc     // Calculate precentile
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -478,7 +478,7 @@ static const char conf_key_nc_pairs_flag[]     = "nc_pairs_flag";
 static const char conf_key_grid_weight_flag[]  = "grid_weight_flag";
 static const char conf_key_duplicate_flag[]    = "duplicate_flag";
 static const char conf_key_obs_summary[]       = "obs_summary";
-static const char conf_key_percentile[]        = "obs_percentile";
+static const char conf_key_percentile[]        = "obs_perc_value";
 static const char conf_key_rank_corr_flag[]    = "rank_corr_flag";
 static const char conf_key_tmp_dir[]           = "tmp_dir";
 static const char conf_key_output_prefix[]     = "output_prefix";
@@ -875,14 +875,14 @@ static const char conf_val_area[]    = "AREA";
 
 // Duplicate flag values
 static const char conf_val_unique[] = "UNIQUE";
-static const char conf_val_false[] = "FALSE";
 
 // Obs Summary values
+static const char conf_val_nearest[] = "NEAREST";
 static const char conf_val_single[] = "SINGLE";
 static const char conf_val_min[] = "MIN";
 static const char conf_val_max[] = "MAX";
 static const char conf_val_uw_mean[] = "UW_MEAN";
-static const char conf_val_tw_mean[] = "TW_MEAN";
+static const char conf_val_dw_mean[] = "DW_MEAN";
 static const char conf_val_median[] = "MEDIAN";
 static const char conf_val_perc[] = "PERC";
 

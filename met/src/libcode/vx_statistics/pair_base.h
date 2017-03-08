@@ -20,22 +20,28 @@
 struct ob_val_t {
   int ut;
   double val;
+  string qc;
 };
 
 struct station_values_t {
   string sid;
   int ut;
+  double cmn;
+  double csd;
+  double wgt;
+  int x;
+  int y;
   vector<ob_val_t> obs;
-  ob_val_t out_ob;
+  //  ob_val_t out_ob;
 };
 
 enum obs_summary_enum {
   OBS_SUMMARY_NONE,
-  OBS_SUMMARY_SINGLE,
+  OBS_SUMMARY_NEAREST,
   OBS_SUMMARY_MIN,
   OBS_SUMMARY_MAX,
   OBS_SUMMARY_UWMEAN,
-  OBS_SUMMARY_TWMEAN,
+  OBS_SUMMARY_DWMEAN,
   OBS_SUMMARY_MEDIAN,
   OBS_SUMMARY_PERC
 };
@@ -123,11 +129,11 @@ class PairBase {
       int  has_obs_rec(const char *, double, double, double, double,
                        double, double, int &);
 
-      ob_val_t compute_single(string sng_key);
+      ob_val_t compute_nearest(string sng_key);
       ob_val_t compute_min(string sng_key);
       ob_val_t compute_max(string sng_key);
       ob_val_t compute_uwmean(string sng_key);
-      ob_val_t compute_twmean(string sng_key);
+      ob_val_t compute_dwmean(string sng_key);
       ob_val_t compute_median(string sng_key);
       ob_val_t compute_percentile(string sng_key, int perc);
       

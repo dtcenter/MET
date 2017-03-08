@@ -1106,7 +1106,6 @@ void process_scores() {
 
                // Write out the MPR lines
                if(conf_info.output_flag[i_mpr] != STATOutputType_None) {
-
                   write_mpr_row(shc, pd_ptr,
                      conf_info.output_flag[i_mpr] == STATOutputType_Both,
                      stat_at, i_stat_row,
@@ -1361,7 +1360,7 @@ void process_scores() {
                } // end Compute PCT
 
             } // end for l
-
+	    
             // Apply HiRA verification logic
             if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
                 conf_info.hira_info.flag                &&
