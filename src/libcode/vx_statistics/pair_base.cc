@@ -243,6 +243,7 @@ bool PairBase::add_obs(const char *sid,
                        unixtime ut, double lvl, double elv,
                        double o, const char *qc,
                        double cmn, double csd, double wgt) {
+   
    bool ret = false;
    //  build a uniqueness test key
    string sng_key = str_format("%.3f:%.3f:%.2f:%.2f",
@@ -259,8 +260,12 @@ bool PairBase::add_obs(const char *sid,
    // if key exists, add new ob to vector, else add new pair
    map<string,station_values_t>::iterator it = map_val.find(sng_key);
    if(it != map_val.end()) {
-      if(check_unique && (*it).second.ut == ut)
-         return false;
+     if(check_unique) {
+        vector<ob_val_t>::iterator o_it = (*it).second.obs.begin();
+        for(;o_it != (*it).second.obs.end(); o_it++) {
+	  if( (*o_it).ut == ut) return false; 
+        }
+     }
       (*it).second.obs.push_back(ob_val);
    } else {
       station_values_t val;
