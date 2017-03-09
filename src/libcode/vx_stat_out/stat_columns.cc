@@ -342,11 +342,12 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
    at.set_entry(r, c+2, rhist_columns[2]);
    at.set_entry(r, c+3, rhist_columns[3]);
    at.set_entry(r, c+4, rhist_columns[4]);
+   at.set_entry(r, c+5, rhist_columns[5]);
 
    // Write RANK_i for each rank
-   for(i=0, col=c+5; i<n_rank; i++) {
+   for(i=0, col=c+6; i<n_rank; i++) {
 
-      sprintf(tmp_str, "%s%i", rhist_columns[5], i+1);
+      sprintf(tmp_str, "%s%i", rhist_columns[6], i+1);
       at.set_entry(r, col, tmp_str); // Counts for each rank
       col++;
    }
@@ -425,6 +426,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+12+n_ens, orank_columns[13]);
    at.set_entry(r, c+13+n_ens, orank_columns[14]);
    at.set_entry(r, c+14+n_ens, orank_columns[15]);
+   at.set_entry(r, c+15+n_ens, orank_columns[16]);
 
    return;
 }
@@ -2837,7 +2839,8 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    // Ensemble Ranked Histogram
    // Dump out the RHIST line:
    //    TOTAL,   CRPS,   IGN,
-   //    N_RANKS, CRPSS,  [RANK_] (for each bin)
+   //    N_RANKS, CRPSS,  SPREAD,
+   //    [RANK_] (for each bin)
    //
    at.set_entry(r, c+0,  // Total Number of Ranked Observations
       nint(pd_ptr->rhist_na.sum()));
@@ -2854,10 +2857,13 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    at.set_entry(r, c+4,  // Continuous Ranked Probability Skill Score
       pd_ptr->crpss);
 
+   at.set_entry(r, c+5,  // Average ensemble spread
+      pd_ptr->spread_na.mean());
+
    //
    // Write RANK_i count for each bin
    //
-   for(i=0, col=c+5; i<pd_ptr->rhist_na.n_elements(); i++) {
+   for(i=0, col=c+6; i<pd_ptr->rhist_na.n_elements(); i++) {
 
       at.set_entry(r, col, // RANK_i
          nint(pd_ptr->rhist_na[i]));
@@ -2914,7 +2920,8 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //    OBS_ELV,     OBS,         PIT,
    //    RANK,        N_ENS_VLD,   N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,      ENS_MEAN,    CLIMO
+   //    OBS_QC,      ENS_MEAN,    CLIMO,
+   //    ENS_SPREAD
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);
@@ -2973,6 +2980,10 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    // Climatology value
    at.set_entry(r, c+14+pd_ptr->n_ens,
       pd_ptr->cmn_na[i]);
+
+   // Ensemble spread values
+   at.set_entry(r, c+15+pd_ptr->n_ens,
+      pd_ptr->spread_na[i]);
 
    return;
 }

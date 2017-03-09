@@ -71,8 +71,9 @@ class PairDataEnsemble : public PairBase {
       NumArray   rhist_na;        // Ranked Histogram [n_ens+1]
       NumArray   phist_na;        // PIT Histogram [n_phist_bin]
 
-      NumArray   var_na;          // Ensemble member value variance [n_obs]
+      NumArray   spread_na;       // Ensemble spread (standard deviation) value [n_obs]
       NumArray   mn_na;           // Ensemble mean value [n_obs]
+
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
       double     phist_bin_size;  // Ensemble PIT histogram bin width
@@ -221,13 +222,13 @@ class VxPairDataEnsemble {
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
 
-      void set_obs_summary(ObsSummary obs_summary);      
+      void set_obs_summary(ObsSummary obs_summary);
 
       void set_obs_perc_value(int percentile);
-    
+
       void print_duplicate_report();
 
-      void calc_obs_summary();     
+      void calc_obs_summary();
 };
 
 ////////////////////////////////////////////////////////////////////////

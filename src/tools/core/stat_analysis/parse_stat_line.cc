@@ -314,6 +314,7 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    r_data.ign    = atof(l.get_item("IGN"));
    r_data.n_rank = atoi(l.get_item("N_RANK"));
    r_data.crpss  = atof(l.get_item("CRPSS"));
+   r_data.spread = atof(l.get_item("SPREAD"));
 
    r_data.rhist_na.clear();
 
@@ -375,9 +376,10 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
       o_data.ens_na.add(atof(l.get_item(col_str)));
    }
 
-   o_data.obs_qc    = l.get_item("OBS_QC", false);
-   o_data.ens_mean  = atof(l.get_item("ENS_MEAN"));
-   o_data.climo     = atof(l.get_item("CLIMO"));
+   o_data.obs_qc     = l.get_item("OBS_QC", false);
+   o_data.ens_mean   = atof(l.get_item("ENS_MEAN"));
+   o_data.climo      = atof(l.get_item("CLIMO"));
+   o_data.ens_spread = atof(l.get_item("ENS_SPREAD"));
 
    return;
 }
