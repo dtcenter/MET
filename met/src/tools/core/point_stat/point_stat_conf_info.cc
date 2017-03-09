@@ -264,7 +264,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
      
       // Conf: obs_perc_value
       obs_percs[i] = parse_conf_percentile(&i_odict);
-      cout << "XXX" << i << ": " << obs_percs[i] << endl;
+
       // Conf: desc
       vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));
 
