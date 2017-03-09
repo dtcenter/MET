@@ -28,6 +28,7 @@
 //                    with ATCF id's ending in '3'.
 //   007    06/01/16  Halley Gotway   Add support for EDecks.
 //   008    09/29/16  Halley Gotway   Add DESC output column.
+//   009    03/09/17  Halley Gotway   Define BEST track time step.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1694,8 +1695,11 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
    ut_min = min(adeck.valid_min(), bdeck.valid_min());
    ut_max = max(adeck.valid_max(), bdeck.valid_max());
 
-   // Use the BDECK spacing to determine the valid increment
-   ut_inc = bdeck.valid_inc();
+   // Determine the valid increment
+   // For BEST tracks, use a constant time step
+   // For non-BEST tracks, select the most common BDECK time step
+   if(bdeck.is_best_track()) ut_inc = best_track_time_step;
+   else                      ut_inc = bdeck.valid_inc();
 
    // Round the valid times to the nearest valid increment
    if(ut_min%ut_inc != 0) ut_min = (ut_min/ut_inc + 1)*ut_inc;
