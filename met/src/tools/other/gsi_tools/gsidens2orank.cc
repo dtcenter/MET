@@ -627,6 +627,7 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, cs);                       // OBS_QC
    at.set_entry(row, col++, ens_pd.mn_na[i_obs]);      // ENS_MEAN
    at.set_entry(row, col++, bad_data_double);          // CLIMO
+   at.set_entry(row, col++, ens_pd.spread_na[i_obs]);  // ENS_SPREAD
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
@@ -687,6 +688,7 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, cs);                       // OBS_QC
    at.set_entry(row, col++, ens_pd.mn_na[i_obs]);      // ENS_MEAN
    at.set_entry(row, col++, bad_data_double);          // CLIMO
+   at.set_entry(row, col++, ens_pd.spread_na[i_obs]);  // ENS_SPREAD
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
