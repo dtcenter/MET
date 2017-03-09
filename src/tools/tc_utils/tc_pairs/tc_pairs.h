@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    03/14/12  Halley Gotway   New
+//   001    03/09/17  Halley Gotway   Define BEST track time step.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -59,6 +60,9 @@ static const char * atcf_suffix = ".dat";
 // Default configuration file name
 static const char * default_config_filename =
    "MET_BASE/config/TCPairsConfig_default";
+
+// BEST track time step (6 hours)
+static const int best_track_time_step = 21600;
 
 ////////////////////////////////////////////////////////////////////////
 //
