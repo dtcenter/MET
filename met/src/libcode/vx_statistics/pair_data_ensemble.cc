@@ -98,7 +98,7 @@ void PairDataEnsemble::clear() {
    pit_na.clear();
    rhist_na.clear();
    phist_na.clear();
-   var_na.clear();
+   spread_na.clear();
    mn_na.clear();
 
    if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
@@ -125,7 +125,7 @@ void PairDataEnsemble::extend(int n) {
    pit_na.extend(n);
    rhist_na.extend(n);
    phist_na.extend(n);
-   var_na.extend(n);
+   spread_na.extend(n);
    mn_na.extend(n);
 
    return;
@@ -145,26 +145,26 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    set_interp_mthd(pd.interp_mthd);
    set_interp_dpth(pd.interp_dpth);
 
-   sid_sa   = pd.sid_sa;
-   lat_na   = pd.lat_na;
-   lon_na   = pd.lon_na;
-   x_na     = pd.x_na;
-   y_na     = pd.y_na;
-   vld_ta   = pd.vld_ta;
-   lvl_na   = pd.lvl_na;
-   elv_na   = pd.elv_na;
-   o_na     = pd.o_na;
-   v_na     = pd.v_na;
-   r_na     = pd.r_na;
-   crps_na  = pd.crps_na;
-   ign_na   = pd.ign_na;
-   pit_na   = pd.pit_na;
-   rhist_na = pd.rhist_na;
-   phist_na = pd.phist_na;
-   var_na   = pd.var_na;
-   mn_na    = pd.mn_na;
+   sid_sa    = pd.sid_sa;
+   lat_na    = pd.lat_na;
+   lon_na    = pd.lon_na;
+   x_na      = pd.x_na;
+   y_na      = pd.y_na;
+   vld_ta    = pd.vld_ta;
+   lvl_na    = pd.lvl_na;
+   elv_na    = pd.elv_na;
+   o_na      = pd.o_na;
+   v_na      = pd.v_na;
+   r_na      = pd.r_na;
+   crps_na   = pd.crps_na;
+   ign_na    = pd.ign_na;
+   pit_na    = pd.pit_na;
+   rhist_na  = pd.rhist_na;
+   phist_na  = pd.phist_na;
+   spread_na = pd.spread_na;
+   mn_na     = pd.mn_na;
 
-   n_obs    = pd.n_obs;
+   n_obs     = pd.n_obs;
 
    if(pd.ssvar_bins){
       ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
@@ -208,10 +208,14 @@ void PairDataEnsemble::set_ens_size(int n) {
 
 void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
    int i, j, k, n_vld, n_bel, n_tie;
-   NumArray src_na, dest_na;
+   NumArray src_na, dest_na, cur_ens;
+   double mean, spread;
 
    // Compute the rank for each observation
    for(i=0; i<o_na.n_elements(); i++) {
+
+      // Initialize
+      cur_ens.erase();
 
       // Compute the number of ensemble values less than the observation
       for(j=0, n_vld=0, n_bel=0, n_tie=0; j<n_ens; j++) {
@@ -222,11 +226,21 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
             // Increment the valid count
             n_vld++;
 
+            // Store the current ensemble value
+            cur_ens.add(e_na[j][i]);
+
             // Keep track of the number of ties and the number below
             if(is_eq(e_na[j][i], o_na[i])) n_tie++;
             else if(e_na[j][i] < o_na[i])  n_bel++;
          }
+
       } // end for j
+
+      // Compute ensemble mean and spread for current point
+      cur_ens.compute_mean_stdev(mean, spread);
+
+      // Store the spread but the mean is set by PairDataEnsemble::add_ens()
+      spread_na.add(spread);
 
       // Store the number of valid ensemble values
       v_na.add(n_vld);
@@ -1274,19 +1288,19 @@ void VxPairDataEnsemble::set_obs_summary(ObsSummary obs_summary) {
 		break;
               case ObsSummary_Min:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MIN);
-		break;		
+		break;
               case ObsSummary_Max:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MAX);
 		break;
               case ObsSummary_UwMean:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_UWMEAN);
-		break;		
+		break;
               case ObsSummary_DwMean:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_DWMEAN);
 		break;
               case ObsSummary_Median:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MEDIAN);
-		break;		
+		break;
               case ObsSummary_Perc:
 		pd[i][j][k].set_obs_summary(OBS_SUMMARY_PERC);
 		break;

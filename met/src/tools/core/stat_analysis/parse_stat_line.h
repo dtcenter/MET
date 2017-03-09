@@ -60,7 +60,7 @@ struct MPRData {
 // Ranked Histogram (RHIST) data structure
 struct RHISTData {
    int total, n_rank;
-   double crps, ign, crpss;
+   double crps, ign, crpss, spread;
    NumArray rhist_na;
 };
 
@@ -75,7 +75,7 @@ struct PHISTData {
 struct ORANKData {
    int total, index;
    ConcatString obs_sid, obs_qc;
-   double obs_lat, obs_lon, obs_lvl, obs_elv, obs, pit, ens_mean, climo;
+   double obs_lat, obs_lon, obs_lvl, obs_elv, obs, pit, ens_mean, climo, ens_spread;
    int rank, n_ens_vld, n_ens;
    NumArray ens_na;
 };

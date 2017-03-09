@@ -2175,6 +2175,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].ens_pd.crps_na.add(cur.crps);
          m[key].ens_pd.ign_na.add(cur.ign);
          m[key].ens_pd.wgt_na.add(cur.total);
+         m[key].ens_pd.spread_na.add(cur.spread);
 
          //
          // Compute and store climatological CRPS
@@ -2388,10 +2389,12 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
 
          //
          // Store the observation, ensemble mean, climatology,
-         // ensemble member values, and valid ensemble count
+         // ensemble spread, ensemble member values, and
+         // valid ensemble count
          //
          m[key].ens_pd.add_obs(0.0, 0.0, cur.obs, cur.climo, bad_data_double);
          m[key].ens_pd.mn_na.add(cur.ens_mean);
+         m[key].ens_pd.spread_na.add(cur.ens_spread);
          for(i=0, n_valid=0; i<m[key].ens_pd.n_ens; i++) {
             m[key].ens_pd.add_ens(i, cur.ens_na[i]);
             if(!is_bad_data(cur.ens_na[i])) n_valid++;
