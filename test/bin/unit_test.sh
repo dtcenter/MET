@@ -23,6 +23,8 @@ fi
 PERL_UNIT=${MET_TEST_BASE}/perl/unit.pl
 
 # Unit test XML
+# removed  unit_modis.xml  \
+# removed  unit_mode_graphics.xml \
 UNIT_XML="unit_ascii2nc.xml \
           unit_madis2nc.xml \
           unit_trmm2nc.xml \
@@ -32,6 +34,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_wwmca_regrid.xml \
           unit_point_stat.xml \
           unit_duplicate_flag.xml \
+          unit_obs_summary.xml \
           unit_grid_stat.xml \
           unit_wavelet_stat.xml \
           unit_ensemble_stat.xml \
@@ -46,9 +49,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_tc_pairs.xml \
           unit_tc_stat.xml \
           unit_met_test_scripts.xml  \
-          unit_modis.xml  \
           unit_ref_config.xml \
-          unit_mode_graphics.xml \
           unit_regrid.xml \
           unit_gsi_tools.xml \
           unit_aeronet.xml \
