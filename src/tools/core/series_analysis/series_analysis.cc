@@ -584,7 +584,7 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int nxny, i, x, y, i_read, n_reads, i_series, i_point;
+   int nxny, i, x, y, i_read, n_reads, i_series, i_point, i_fcst;
    VarInfo *fcst_info = (VarInfo *) 0;
    VarInfo *obs_info  = (VarInfo *) 0;
    NumArray *f_na = (NumArray *) 0;
@@ -622,10 +622,11 @@ void process_scores() {
       // Loop over the series variable
       for(i_series=0; i_series<n_series; i_series++) {
 
+          // Get the index for the forecast and climo VarInfo objects
+         i_fcst = (conf_info.get_n_fcst() > 1 ? i_series : 0);
+
          // Store the current VarInfo objects
-         fcst_info = (conf_info.get_n_fcst() > 1 ?
-                      conf_info.fcst_info[i_series] :
-                      conf_info.fcst_info[0]);
+         fcst_info = conf_info.fcst_info[i_fcst];
          obs_info  = (conf_info.get_n_obs() > 1 ?
                       conf_info.obs_info[i_series] :
                       conf_info.obs_info[0]);
@@ -636,7 +637,7 @@ void process_scores() {
          // Read climatology data for the current series entry
          cmn_dp = read_climo_data_plane(
                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                  i_series, fcst_dp.valid(), grid);
+                  i_fcst, fcst_dp.valid(), grid);
 
          cmn_flag = (cmn_dp.nx() == fcst_dp.nx() && cmn_dp.ny() == fcst_dp.ny());
          mlog << Debug(3)
