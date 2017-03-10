@@ -12,15 +12,19 @@ using namespace std;
 
 #include <cstdlib>
 #include <iostream>
+#include <limits>
+
 #include <math.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "interp_util.h"
 #include "interp_mthd.h"
+#include "GridTemplate.h"
 
 #include "vx_math.h"
 #include "vx_log.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -28,34 +32,98 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-double interp_min(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
-   int x, y, count;
-   double v, min_v;
+double interp_min(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t)
+{
 
-   // Search the neighborhood for the minimum value
-   count = 0;
-   min_v = 1.0e30;
-   for(x=x_ll; x<x_ll+wdth; x++) {
-      if(x < 0 || x >= dp.nx()) continue;
+	int num_good_points = 0;
+	int num_points = gt.size();
+	double min_v = bad_data_double;
+	// Search the neighborhood
+	GridPoint *gp = NULL;
+	for(gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny() );
+	     gp != NULL; gp = gt.getNextInGrid()){
 
-      for(y=y_ll; y<y_ll+wdth; y++) {
-         if(y < 0 || y >= dp.ny())     continue;
-         if(is_bad_data(dp.get(x, y))) continue;
+		double v = dp.get(gp->x,gp->y);
+		if (is_bad_data(v)) continue;
 
-         v = dp.get(x, y);
-         if(v < min_v) min_v = v;
-         count++;
-      } // end for y
-   } // end for x
+		if (is_bad_data(min_v) || v < min_v){
+			min_v = v;
+		}
+		num_good_points++;
 
-   // Check whether enough valid grid points were found to trust
-   // the minimum value computed
-   if( (double) count/(wdth*wdth) < t || count == 0) {
-      min_v = bad_data_double;
-   }
+	}
+	
+	// Check whether enough valid grid points were found to trust
+	// the value computed
+	if ( (num_points == 0) ||
+	     ((static_cast<double>(num_good_points) / num_points) < t ))
+		min_v = bad_data_double;
 
-   return(min_v);
+	return min_v;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+double interp_min(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
+	int x, y, count;
+	double v, min_v;
+
+	// Search the neighborhood for the minimum value
+	count = 0;
+	min_v = 1.0e30;
+	for(x=x_ll; x<x_ll+wdth; x++) {
+		if(x < 0 || x >= dp.nx()) continue;
+
+		for(y=y_ll; y<y_ll+wdth; y++) {
+			if(y < 0 || y >= dp.ny())     continue;
+			if(is_bad_data(dp.get(x, y))) continue;
+
+			v = dp.get(x, y);
+			if(v < min_v) min_v = v;
+			count++;
+		} // end for y
+	} // end for x
+
+	// Check whether enough valid grid points were found to trust
+	// the minimum value computed
+	if( (double) count/(wdth*wdth) < t || count == 0) {
+		min_v = bad_data_double;
+	}
+
+	return(min_v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double interp_max(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
+
+	int num_good_points = 0;
+	int num_points = gt.size();
+	double max_v = bad_data_double;
+	
+	// Search the neighborhood
+	for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+	     gp != NULL; gp = gt.getNextInGrid()){
+
+		double v = dp.get(gp->x,gp->y);
+		if (is_bad_data(v)) continue;
+
+		if (is_bad_data(max_v) || v > max_v){
+			max_v = v;
+		}
+		num_good_points++;
+	}
+	
+	// Check whether enough valid grid points were found to trust
+	// the value computed
+	if ((num_points == 0) ||
+	    ((static_cast<double>(num_good_points) / num_points) < t ))
+		max_v = bad_data_double;
+
+	return max_v;
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -87,6 +155,44 @@ double interp_max(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
 
    return(max_v);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+double interp_median(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
+
+	double *data = (double *) 0;
+	int num_good_points = 0;
+	int num_points = gt.size();
+	double median_v = bad_data_double;
+ 
+	// Allocate space to store the data points for sorting
+	data = new double [gt.size()];
+
+	// Search the neighborhood
+	for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+	     gp != NULL; gp = gt.getNextInGrid()){
+
+		double v = dp.get(gp->x,gp->y);
+		if (is_bad_data(v)) continue;
+
+		data[num_good_points] = v;
+		num_good_points++;
+	}
+	
+	// Check whether enough valid grid points were found to trust
+	// the value computed
+	if ((num_points == 0) ||
+	    ((static_cast<double>(num_good_points) / num_points) < t )){
+		median_v = bad_data_double;
+	}
+	else {
+		sort(data, num_good_points);
+		median_v = percentile(data, num_good_points, 0.50);
+	}
+	
+	return median_v;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -127,6 +233,39 @@ double interp_median(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 
    return(median_v);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt, int x, int y, double t) {
+
+	double sum = 0;	
+	int num_good_points = 0;
+	int num_points = gt.size();
+	double uw_mean_v = bad_data_double;
+ 
+	// Sum the valid data in the neighborhood
+	for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+	     gp != NULL; gp = gt.getNextInGrid()){
+
+		double v = dp.get(gp->x,gp->y);
+		if (is_bad_data(v)) continue;
+		sum += v;
+		num_good_points++;
+	}
+	
+	// Check whether enough valid grid points were found to trust
+	// the value computed
+	if ((num_points == 0) ||
+	    ((static_cast<double>(num_good_points) / num_points) < t )){
+		uw_mean_v = bad_data_double;
+	}
+	else {
+		uw_mean_v = sum / num_good_points;
+	}
+	
+	return uw_mean_v;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 

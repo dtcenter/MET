@@ -19,7 +19,7 @@
 
 
 #include <iostream>
-
+#include <ostream>
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +56,7 @@ class StringArray {
 
       void extend(int);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       const char * operator[](int) const;
 

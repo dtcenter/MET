@@ -29,6 +29,9 @@
 #include "interp_mthd.h"
 #include "num_array.h"
 
+//forward declaration
+class GridTemplate;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Utility functions operating on a DataPlane
@@ -39,6 +42,9 @@ extern void rescale_probability(DataPlane &);
 
 extern void smooth_field(const DataPlane &, DataPlane &,
                          InterpMthd mthd, int wdth, double t);
+
+extern void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
+                         InterpMthd mthd, const GridTemplate &gt, double t);
 
 extern void fractional_coverage(const DataPlane &, DataPlane &,
                                 int, SingleThresh, double);

@@ -27,6 +27,10 @@
 
 #include "data_plane.h"
 #include "interp_mthd.h"
+//#include "GridTemplate.h"
+
+//forward declaration
+class GridTemplate;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -43,6 +47,12 @@ extern double interp_min     (const DataPlane &, int x_ll, int y_ll, int w, doub
 extern double interp_max     (const DataPlane &, int x_ll, int y_ll, int w, double t);
 extern double interp_median  (const DataPlane &, int x_ll, int y_ll, int w, double t);
 extern double interp_uw_mean (const DataPlane &, int x_ll, int y_ll, int w, double t);
+
+// version that uses GridTemplate & takes center x/y instead of LL corner
+extern double interp_min	   (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
+extern double interp_max	   (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
+extern double interp_median	 (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
+extern double interp_uw_mean (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
 
 extern void  dp_interp_min     (const DataPlane & fat, DataPlane & out, int w, double t);
 extern void  dp_interp_max     (const DataPlane & fat, DataPlane & out, int w, double t);
