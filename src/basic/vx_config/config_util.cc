@@ -18,6 +18,8 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_util.h"
 
+#include "GridTemplate.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 // MetConfig object containing config value constants
@@ -736,6 +738,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    InterpInfo info;
    NumArray mthd_na, wdth_na;
    InterpMthd method;
+   
    int i, j, k, v, width, n_entries;
    bool is_correct_type = false;
 
@@ -744,7 +747,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
            << "empty dictionary!\n\n";
       exit(1);
    }
-
+   
    // Conf: interp
    interp_dict = dict->lookup_dictionary(conf_key_interp);
 
@@ -765,6 +768,19 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
            << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
+
+   // Conf: shape
+   v = interp_dict->lookup_int(conf_key_shape, false);   
+   if (interp_dict->last_lookup_status()) {
+	   info.shape = int_to_gridtemplate(v);
+   }
+   else {
+	   //default is square
+	   // TODO: Is this the standard way to set the default value?
+	   mlog << Warning << "\nNo shape given in interp dictionary, defaulting to square.\n\n";
+	   info.shape = GridTemplateFactory::GridTemplate_Square;
+   }
+   mlog << "got that shape!\n";   
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
@@ -1546,6 +1562,24 @@ FieldType int_to_fieldtype(int v) {
 
    return(t);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+GridTemplateFactory::GridTemplates int_to_gridtemplate(int v) {
+	GridTemplateFactory::GridTemplates t;
+
+	// Convert integer to enumerated FieldType
+	if(v == conf_const.lookup_int(conf_val_square)) t = GridTemplateFactory::GridTemplate_Square;
+	else if(v == conf_const.lookup_int(conf_val_circle)) t = GridTemplateFactory::GridTemplate_Circle;
+	else {
+		mlog << Error << "\nint_to_gridtemplate() -> "
+		     << "Unexpected value of " << v << ".\n\n";
+		exit(1);
+	}
+
+	return(t);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 

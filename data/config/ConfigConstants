@@ -67,6 +67,10 @@ BOTH           = 2;
 FCST           = 3;
 OBS            = 4;
 
+// Grid Shapes
+SQUARE         = 1;
+CIRCLE         = 2;
+
 // Track types
 NONE           = 1;
 BOTH           = 2;

@@ -53,7 +53,13 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                mask_poly.h mask_poly.cc \
                read_fortran_binary.h read_fortran_binary.cc \
                met_buffer.h met_buffer.cc \
-               vx_util.h
+               vx_util.h \
+               CircularTemplate.h CircularTemplate.cc \
+               GridTemplate.h GridTemplate.cc \
+               GridPoint.h GridPoint.cc \
+               GridOffset.h GridOffset.cc \
+               RectangularTemplate.h RectangularTemplate.cc
+               
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 # If we are in development mode, generate the "to_string" files and

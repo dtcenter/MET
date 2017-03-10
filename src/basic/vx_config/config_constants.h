@@ -11,7 +11,7 @@
 #define __CONFIG_CONSTANTS_H__
 
 #include "vx_util.h"
-
+#include "GridTemplate.h"
 ////////////////////////////////////////////////////////////////////////
 
 //
@@ -217,7 +217,8 @@ struct InterpInfo {
    double      vld_thresh; // Valid data interpolation threshold
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
-   IntArray    width;      // Interpolation widths
+	 IntArray    width;      // Interpolation widths
+	GridTemplateFactory::GridTemplates shape;      //  Interpolation shapes
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -510,6 +511,8 @@ static const char conf_key_do_3d_att_flag   [] = "attributes_3d";
 
 static const char conf_key_grib_ens_hi_res_ctl [] = "hi_res_ctl";
 static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
+
+static const char conf_key_shape[]             = "shape";
 
 //
 // Climatology parameter key names
@@ -851,6 +854,11 @@ static const char conf_val_stat[] = "STAT";
 // Field types: NONE, BOTH, FCST, OBS
 static const char conf_val_fcst[] = "FCST";
 static const char conf_val_obs[]  = "OBS";
+
+
+// Grid shapes:
+static const char conf_val_circle[] = "CIRCLE";
+static const char conf_val_square[] = "SQUARE";
 
 // Set Logic types: NONE, UNION, INTERSECTION, SYMDIFF
 static const char conf_val_union[]        = "UNION";

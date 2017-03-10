@@ -311,7 +311,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    if(output_flag[i_vl1l2]  != STATOutputType_None ||
       output_flag[i_val1l2] != STATOutputType_None) {
 
-      for(i=0, n_vx_vect = 0; i<n_vx; i++) {
+	   for(i=0, n_vx_vect = 0; i<n_vx; i++) {
 
 	if(fcst_info[i]->is_u_wind()   &&
            obs_info[i]->is_u_wind() ) {
@@ -351,8 +351,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Compute the number of scalar and probability fields to be verified.
    for(i=0, n_vx_prob = 0, n_vx_scal = 0; i<n_vx; i++) {
-      if(fcst_info[i]->is_prob()) n_vx_prob++;
-      else                        n_vx_scal++;
+	   if(fcst_info[i]->is_prob()) n_vx_prob++;
+	   else                        n_vx_scal++;
    }
 
    // Initialize maximum threshold counts
@@ -365,80 +365,80 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    // Parse and sanity check thresholds
    for(i=0; i<n_vx; i++) {
 
-      // Get the current dictionaries
-      i_fdict = parse_conf_i_vx_dict(fdict, i);
-      i_odict = parse_conf_i_vx_dict(odict, i);
+	   // Get the current dictionaries
+	   i_fdict = parse_conf_i_vx_dict(fdict, i);
+	   i_odict = parse_conf_i_vx_dict(odict, i);
 
-      // Conf: cat_thresh
-      fcat_ta[i] = i_fdict.lookup_thresh_array(conf_key_cat_thresh);
-      ocat_ta[i] = i_odict.lookup_thresh_array(conf_key_cat_thresh);
+	   // Conf: cat_thresh
+	   fcat_ta[i] = i_fdict.lookup_thresh_array(conf_key_cat_thresh);
+	   ocat_ta[i] = i_odict.lookup_thresh_array(conf_key_cat_thresh);
 
-      // Conf: cnt_thresh
-      fcnt_ta[i] = i_fdict.lookup_thresh_array(conf_key_cnt_thresh);
-      ocnt_ta[i] = i_odict.lookup_thresh_array(conf_key_cnt_thresh);
+	   // Conf: cnt_thresh
+	   fcnt_ta[i] = i_fdict.lookup_thresh_array(conf_key_cnt_thresh);
+	   ocnt_ta[i] = i_odict.lookup_thresh_array(conf_key_cnt_thresh);
 
-      // Conf: cnt_logic
-      cnt_logic[i] = check_setlogic(
-                        int_to_setlogic(i_fdict.lookup_int(conf_key_cnt_logic)),
-                        int_to_setlogic(i_odict.lookup_int(conf_key_cnt_logic)));
+	   // Conf: cnt_logic
+	   cnt_logic[i] = check_setlogic(
+	                                 int_to_setlogic(i_fdict.lookup_int(conf_key_cnt_logic)),
+	                                 int_to_setlogic(i_odict.lookup_int(conf_key_cnt_logic)));
 
-      // Conf: wind_thresh
-      fwind_ta[i] = i_fdict.lookup_thresh_array(conf_key_wind_thresh);
-      owind_ta[i] = i_odict.lookup_thresh_array(conf_key_wind_thresh);
+	   // Conf: wind_thresh
+	   fwind_ta[i] = i_fdict.lookup_thresh_array(conf_key_wind_thresh);
+	   owind_ta[i] = i_odict.lookup_thresh_array(conf_key_wind_thresh);
 
-      // Conf: wind_logic
-      wind_logic[i] = check_setlogic(
-                         int_to_setlogic(i_fdict.lookup_int(conf_key_wind_logic)),
-                         int_to_setlogic(i_odict.lookup_int(conf_key_wind_logic)));
+	   // Conf: wind_logic
+	   wind_logic[i] = check_setlogic(
+	                                  int_to_setlogic(i_fdict.lookup_int(conf_key_wind_logic)),
+	                                  int_to_setlogic(i_odict.lookup_int(conf_key_wind_logic)));
 
-      // Dump the contents of the current thresholds
-      if(mlog.verbosity_level() >= 5) {
-         mlog << Debug(5)
-              << "Parsed threshold settings for field number " << i+1 << "...\n"
-              << "Forecast categorical thresholds: "  << fcat_ta[i].get_str() << "\n"
-              << "Observed categorical thresholds: "  << ocat_ta[i].get_str() << "\n"
-              << "Forecast continuous thresholds: "   << fcnt_ta[i].get_str() << "\n"
-              << "Observed continuous thresholds: "   << ocnt_ta[i].get_str() << "\n"
-              << "Continuous threshold logic: "       << setlogic_to_string(cnt_logic[i]) << "\n"
-              << "Forecast wind speed thresholds: "   << fwind_ta[i].get_str() << "\n"
-              << "Observed wind speed thresholds: "   << owind_ta[i].get_str() << "\n"
-              << "Wind speed threshold logic: "       << setlogic_to_string(wind_logic[i]) << "\n";
-      }
+	   // Dump the contents of the current thresholds
+	   if(mlog.verbosity_level() >= 5) {
+		   mlog << Debug(5)
+		        << "Parsed threshold settings for field number " << i+1 << "...\n"
+		        << "Forecast categorical thresholds: "  << fcat_ta[i].get_str() << "\n"
+		        << "Observed categorical thresholds: "  << ocat_ta[i].get_str() << "\n"
+		        << "Forecast continuous thresholds: "   << fcnt_ta[i].get_str() << "\n"
+		        << "Observed continuous thresholds: "   << ocnt_ta[i].get_str() << "\n"
+		        << "Continuous threshold logic: "       << setlogic_to_string(cnt_logic[i]) << "\n"
+		        << "Forecast wind speed thresholds: "   << fwind_ta[i].get_str() << "\n"
+		        << "Observed wind speed thresholds: "   << owind_ta[i].get_str() << "\n"
+		        << "Wind speed threshold logic: "       << setlogic_to_string(wind_logic[i]) << "\n";
+	   }
 
-      // Verifying a probability field
-      if(fcst_info[i]->is_prob()) {
-         fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
-      }
+	   // Verifying a probability field
+	   if(fcst_info[i]->is_prob()) {
+		   fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
+	   }
 
-      // Check for equal threshold length for non-probability fields
-      if(!fcst_info[i]->is_prob() &&
-         fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
+	   // Check for equal threshold length for non-probability fields
+	   if(!fcst_info[i]->is_prob() &&
+	      fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
 
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
-              << "The number of thresholds for each field in \"fcst."
-              << conf_key_cat_thresh
-              << "\" must match the number of thresholds for each "
-              << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
-         exit(1);
-      }
+		   mlog << Error << "\nGridStatConfInfo::process_config() -> "
+		        << "The number of thresholds for each field in \"fcst."
+		        << conf_key_cat_thresh
+		        << "\" must match the number of thresholds for each "
+		        << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
+		   exit(1);
+	   }
 
-      // Add default continuous thresholds until the counts match
-      n = max(fcnt_ta[i].n_elements(), ocnt_ta[i].n_elements());
-      while(fcnt_ta[i].n_elements() < n) fcnt_ta[i].add(na_str);
-      while(ocnt_ta[i].n_elements() < n) ocnt_ta[i].add(na_str);
+	   // Add default continuous thresholds until the counts match
+	   n = max(fcnt_ta[i].n_elements(), ocnt_ta[i].n_elements());
+	   while(fcnt_ta[i].n_elements() < n) fcnt_ta[i].add(na_str);
+	   while(ocnt_ta[i].n_elements() < n) ocnt_ta[i].add(na_str);
 
-      // Add default wind speed thresholds until the counts match
-      n = max(fwind_ta[i].n_elements(), owind_ta[i].n_elements());
-      while(fwind_ta[i].n_elements() < n) fwind_ta[i].add(na_str);
-      while(owind_ta[i].n_elements() < n) owind_ta[i].add(na_str);
+	   // Add default wind speed thresholds until the counts match
+	   n = max(fwind_ta[i].n_elements(), owind_ta[i].n_elements());
+	   while(fwind_ta[i].n_elements() < n) fwind_ta[i].add(na_str);
+	   while(owind_ta[i].n_elements() < n) owind_ta[i].add(na_str);
 
-      // Verifying with multi-category contingency tables
-      if(!fcst_info[i]->is_prob() &&
-         (output_flag[i_mctc] != STATOutputType_None ||
-          output_flag[i_mcts] != STATOutputType_None)) {
-         check_mctc_thresh(fcat_ta[i]);
-         check_mctc_thresh(ocat_ta[i]);
-      }
+	   // Verifying with multi-category contingency tables
+	   if(!fcst_info[i]->is_prob() &&
+	      (output_flag[i_mctc] != STATOutputType_None ||
+	       output_flag[i_mcts] != STATOutputType_None)) {
+		   check_mctc_thresh(fcat_ta[i]);
+		   check_mctc_thresh(ocat_ta[i]);
+	   }
 
       // Look for the maximum number of thresholds
       if(!fcst_info[i]->is_prob()) {
@@ -471,38 +471,46 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    boot_rng      = boot_info.rng;
    boot_seed     = boot_info.seed;
 
+   
    // Conf: interp
    interp_info   = parse_conf_interp(&conf);
    interp_field  = interp_info.field;
    interp_thresh = interp_info.vld_thresh;
    n_interp      = interp_info.n_interp;
    interp_wdth   = interp_info.width;
-
+   interp_shape  = interp_info.shape;
+   
    // Allocate memory to store the interpolation methods
    interp_mthd = new InterpMthd [n_interp];
    for(i=0; i<n_interp; i++) {
-      interp_mthd[i] = string_to_interpmthd(interp_info.method[i]);
+	   interp_mthd[i] = string_to_interpmthd(interp_info.method[i]);
 
-      // Check for DW_MEAN, LS_FIT, and BILIN
-      if(interp_mthd[i] == InterpMthd_DW_Mean ||
-         interp_mthd[i] == InterpMthd_LS_Fit  ||
-         interp_mthd[i] == InterpMthd_Bilin) {
+	   // Check for DW_MEAN, LS_FIT, BILIN and others
+	   
+	     if(interp_mthd[i] == InterpMthd_DW_Mean ||
+	     interp_mthd[i] == InterpMthd_LS_Fit  ||
+	     interp_mthd[i] == InterpMthd_Bilin) {
+		     /*
+	   if(interp_mthd[i] != InterpMthd_Min &&
+	      interp_mthd[i] != InterpMthd_Max &&
+	      interp_mthd[i] != InterpMthd_Median &&
+	      interp_mthd[i] != InterpMthd_UW_Mean){
+		     */       
+		   mlog << Error << "\nGridStatConfInfo::process_config() -> "
+		        << "The interpolation method may only be set to MIN, MAX, MEDIAN or UW_MEAN "
+		        << "for grid_stat.\n\n";
+		   exit(1);
+	   }
 
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
-              << "The interpolation method may not be set to DW_MEAN, "
-              << "LS_FIT, or BILIN for grid_stat.\n\n";
-         exit(1);
-      }
+	   // Check for valid interpolation width
+	   if(interp_wdth[i] < 1 || interp_wdth[i]%2 == 0) {
 
-      // Check for valid interpolation width
-      if(interp_wdth[i] < 1 || interp_wdth[i]%2 == 0) {
-
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
-              << "The interpolation width must be set to odd values "
-              << "greater than or equal to 1 ("
-              << interp_wdth[i] << ").\n\n";
-         exit(1);
-      }
+		   mlog << Error << "\nGridStatConfInfo::process_config() -> "
+		        << "The interpolation width must be set to odd values "
+		        << "greater than or equal to 1 ("
+		        << interp_wdth[i] << ").\n\n";
+		   exit(1);
+	   }
    } // end for i
 
    // Conf: nbrhd

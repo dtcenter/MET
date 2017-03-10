@@ -23,6 +23,8 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_log.h"
 
+#include "GridTemplate.h"
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Utility functions operating on a DataPlane
@@ -103,6 +105,9 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    // Check for a width value of 1 for which no smoothing is done
    if(wdth <= 1) return;
 
+   // if NEAREST, no smoothing is done.
+   if(mthd == InterpMthd_Nearest) return;
+
    // Otherwise, apply smoothing to each grid point
    for(x=0; x<dp.nx(); x++) {
       for(y=0; y<dp.ny(); y++) {
@@ -129,6 +134,74 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
             case(InterpMthd_UW_Mean): // Unweighted Mean
                v = interp_uw_mean(dp, x_ll, y_ll, wdth, t);
+               break;
+
+            // Distance-weighted mean, least-squares fit, and bilinear
+            // interpolation are omitted here since they are not
+            // options for gridded data
+
+            default:
+               mlog << Error << "\nsmooth_field() -> "
+                    << "unexpected interpolation method encountered: "
+                    << mthd << "\n\n";
+               exit(1);
+               break;
+         }
+
+         // Store the smoothed value
+         smooth_dp.set(v, x, y);
+
+      } // end for y
+   } // end for x
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Smooth the DataPlane values using the interpolation method and
+// Grid Template specified.
+//
+////////////////////////////////////////////////////////////////////////
+
+void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
+                  InterpMthd mthd, const GridTemplate &gt, double t) {
+   double v;
+   int x, y, x_ll, y_ll;
+   
+   mlog << Debug(3)
+        << "Smoothing field using the " << interpmthd_to_string(mthd)
+        << "(" << gt.getClassName() << ") interpolation method.\n";
+
+   // Initialize the smoothed field to the raw field
+   smooth_dp = dp;
+
+   // if grid template is just 1 point (i.e. width == 1)
+   // or method == NEAREST, no smoothing is done.
+   if (gt.size() == 1) return;
+   if(mthd == InterpMthd_Nearest) return;
+
+   // Otherwise, apply smoothing to each grid point
+   for(x=0; x<dp.nx(); x++) {
+      for(y=0; y<dp.ny(); y++) {
+
+         // Compute the smoothed value based on the interpolation method
+         switch(mthd) {
+
+            case(InterpMthd_Min):     // Minimum
+	            v = interp_min(dp, gt, x, y, t);
+               break;
+
+            case(InterpMthd_Max):     // Maximum
+	            v = interp_max(dp, gt, x, y, t);
+               break;
+
+            case(InterpMthd_Median):  // Median
+	            v = interp_median(dp, gt, x, y, t);
+               break;
+
+            case(InterpMthd_UW_Mean): // Unweighted Mean
+	            v = interp_uw_mean(dp, gt, x, y, t);
                break;
 
             // Distance-weighted mean, least-squares fit, and bilinear

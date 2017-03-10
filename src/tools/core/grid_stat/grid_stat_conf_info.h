@@ -155,6 +155,11 @@ class GridStatConfInfo {
       double            interp_thresh;      // Proportion of valid data values
       InterpMthd *      interp_mthd;        // Array for interpolation methods [n_interp]
       IntArray          interp_wdth;        // Array for interpolation widths [n_interp]
+      
+      GridTemplateFactory::GridTemplates
+	                      interp_shape;	      // Grid shape for Interpolation
+      
+      
 
       double            nbrhd_thresh;       // Proportion of valid data values
       IntArray          nbrhd_wdth;         // Array for neighborhood widths
