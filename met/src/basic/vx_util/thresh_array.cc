@@ -473,10 +473,11 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
    ThreshArray prob_ta;
    bool status = true;
 
-   // Check for at least three thresholds
-   if(ta.n_elements() < 3) status = false;
+   // Check for probability thresholds
+   if(!check_prob_thresh(ta, false)) status = false;
 
-   // Use the second threshold to construct probability threshold array
+   // Use the second threshold to construct a probability threshold array
+   // and check for equality
    if(status) {
       s << "==" << ta[1].get_value();
       prob_ta = string_to_prob_thresh(s);
@@ -491,7 +492,7 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_prob_thresh(const ThreshArray &ta) {
+bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
    int i, n;
 
    n = ta.n_elements();
@@ -501,36 +502,49 @@ void check_prob_thresh(const ThreshArray &ta) {
       !is_eq(ta[0].get_value(),   0.0) ||
       !is_eq(ta[n-1].get_value(), 1.0)) {
 
-      mlog << Error << "\ncheck_prob_thresh() -> "
-           << "When verifying a probability field, you must "
-           << "select at least 3 thresholds beginning with 0.0 "
-           << "and ending with 1.0.\n\n";
-      exit(1);
+      if(error_out) {
+         mlog << Error << "\ncheck_prob_thresh() -> "
+              << "When verifying a probability field, you must "
+              << "select at least 3 thresholds beginning with 0.0 "
+              << "and ending with 1.0.\n\n";
+         exit(1);
+      }
+      else {
+         return(false);
+      }
    }
 
    for(i=0; i<n; i++) {
 
       // Check that all threshold types are greater than or equal to
       if(ta[i].get_type() != thresh_ge) {
-         mlog << Error << "\ncheck_prob_thresh() -> "
-              << "When verifying a probability field, all "
-              << "thresholds must be greater than or equal to, "
-              << "using \"ge\" or \">=\".\n\n";
-         exit(1);
+         if(error_out) {
+            mlog << Error << "\ncheck_prob_thresh() -> "
+                 << "When verifying a probability field, all "
+                 << "thresholds must be greater than or equal to, "
+                 << "using \"ge\" or \">=\".\n\n";
+            exit(1);
+         }
+         else {
+            return(false);
+         }
       }
 
       // Check that all thresholds are in [0, 1].
-      if(ta[i].get_value() < 0.0 ||
-         ta[i].get_value() > 1.0) {
-
-         mlog << Error << "\ncheck_prob_thresh() -> "
-              << "When verifying a probability field, all "
-              << "thresholds must be between 0 and 1.\n\n";
-         exit(1);
+      if(ta[i].get_value() < 0.0 || ta[i].get_value() > 1.0) {
+         if(error_out) {
+            mlog << Error << "\ncheck_prob_thresh() -> "
+                 << "When verifying a probability field, all "
+                 << "thresholds must be between 0 and 1.\n\n";
+            exit(1);
+         }
+         else {
+            return(false);
+         }
       }
    } // end for i
 
-   return;
+   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////

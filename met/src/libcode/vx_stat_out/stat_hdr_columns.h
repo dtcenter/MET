@@ -244,7 +244,7 @@ inline ConcatString StatHdrColumns::get_obs_thresh_str    () const { return(obs_
 inline SetLogic     StatHdrColumns::get_thresh_logic      () const { return(thresh_logic);                        }
 
 inline ThreshArray  StatHdrColumns::get_cov_thresh        () const { return(cov_thresh);                          }
-inline ConcatString StatHdrColumns::get_cov_thresh_str    () const { return(cov_thresh.get_str());                }
+inline ConcatString StatHdrColumns::get_cov_thresh_str    () const { return(prob_thresh_to_string(cov_thresh));   }
 
 inline double       StatHdrColumns::get_alpha             () const { return(alpha);                               }
 
