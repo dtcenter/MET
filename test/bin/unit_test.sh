@@ -58,7 +58,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_test_grib_tables.xml \
           unit_grid_weight.xml \
           unit_netcdf.xml \
-          unit_hira.xml"
+          unit_hira.xml \
+          unit_interp_shape.xml"
 
 # Removed broken unit_mtd.xml test on 3/9/17
 #          unit_mtd.xml \
