@@ -50,7 +50,9 @@ class GridInfo {
       void init_from_scratch();
 
       void assign(const GridInfo &);
-
+      
+      bool swap_to_north;       // The raw latitude data is north to south
+      
    public:
 
       GridInfo();
@@ -66,6 +68,8 @@ class GridInfo {
       void set(const StereographicData &);
       void set(const LatLonData        &);
       void set(const MercatorData      &);
+      void set_swap_to_north(bool swap_to_north);
+      bool get_swap_to_north();
 
       void create_grid(Grid &) const;
 
@@ -201,6 +205,7 @@ class Grid : public GridInterface {
       void set (const StereographicData &);
       void set (const LatLonData        &);
       void set (const MercatorData      &);
+      void set_swap_to_north(bool swap_to_north);
 
       void latlon_to_xy(double lat, double lon, double & x, double & y) const;
 
