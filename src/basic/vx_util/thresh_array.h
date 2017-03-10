@@ -76,7 +76,7 @@ inline int ThreshArray::n_elements() const { return ( Nelements ); }
 
 extern ThreshArray  string_to_prob_thresh(const char *);
 extern ConcatString prob_thresh_to_string(const ThreshArray &);
-extern void         check_prob_thresh    (const ThreshArray &);
+extern bool         check_prob_thresh    (const ThreshArray &, bool error_out = true);
 
 
 ////////////////////////////////////////////////////////////////////////
