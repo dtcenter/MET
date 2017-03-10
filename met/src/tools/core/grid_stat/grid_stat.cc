@@ -711,9 +711,7 @@ void process_scores() {
 	      GridTemplateFactory gtf;
 	       
 	      string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[j]).text();
-	      mlog << "interp_mthd: " << interp_mthd << "\n";
 	      interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
-	      mlog << "interp_mthd2: " << interp_mthd << "\n";
 	       shc.set_interp_mthd(interp_mthd.c_str());
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 

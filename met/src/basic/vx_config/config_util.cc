@@ -780,7 +780,6 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 	   mlog << Warning << "\nNo shape given in interp dictionary, defaulting to square.\n\n";
 	   info.shape = GridTemplateFactory::GridTemplate_Square;
    }
-   mlog << "got that shape!\n";   
 
    // Conf: type
    const DictionaryEntry * type_entry = interp_dict->lookup(conf_key_type);
