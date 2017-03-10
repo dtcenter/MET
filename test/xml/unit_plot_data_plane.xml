@@ -243,6 +243,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_north_to_south">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/north_to_south_CMORPH_8KM-30MIN_2016020712.nc \
+      &OUTPUT_DIR;/plot_data_plane/north_to_south_CMORPH_8KM-30MIN_2016020712.ps \
+      'name = "CMORPH"; level = "(0,*,*)";' \
+      -title "NCCF Latitude/Longitude North to South" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/north_to_south_CMORPH_8KM-30MIN_2016020712.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_GRIB2_PROB">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
@@ -287,6 +301,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_TRMM_3B42_daily_packed">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42_daily.2013.11.30.7.G3_packed.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_packed.ps \
+      'name="precipitation"; level="(*,*)";' \
+      -color_table &MET_BASE;/colortables/trmm_daily_precip.ctable \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_packed.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_CESM_SSMI_microwave">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
@@ -313,6 +341,7 @@
     </output>
   </test>
 
+  <!--
   <test name="plot_data_plane_EaSM_CMIP5_histroical">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
@@ -325,6 +354,7 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_historical_r1i1p1_20000101-20051231.ps</ps>
     </output>
   </test>
+  -->
 
   <test name="plot_data_plane_EaSM_CMIP5_rcp85">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
