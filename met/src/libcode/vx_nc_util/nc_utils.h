@@ -79,6 +79,8 @@ extern int       get_att_value_int   (const NcFile *, const ConcatString& );
 extern long long get_att_value_llong (const NcFile *, const ConcatString& );
 extern double    get_att_value_double(const NcFile *, const ConcatString& );
 
+extern bool      get_att_no_leap_year(const NcVar *);
+
 extern NcVarAtt    get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = false);
 extern NcGroupAtt  get_nc_att(const NcFile *, const ConcatString &, bool exit_on_error = false);
 //extern NcVarAtt   *get_nc_att(const NcVar  *, const ConcatString &, bool exit_on_error = true);
