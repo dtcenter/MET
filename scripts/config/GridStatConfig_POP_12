@@ -122,6 +122,7 @@ boot = {
 interp = {
    field      = FCST;
    vld_thresh = 1.0;
+   shape      = SQUARE;
 
    type = [
       {

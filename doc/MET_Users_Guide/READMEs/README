@@ -730,6 +730,10 @@ boot = {
 //      This variable will typically come into play only along the boundaries of
 //      the verification region chosen.
 //
+//    - The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
+//      of the smoothing area.  This option is available only in Grid-Stat but
+//      support will be added to the other MET tools in future releases.
+//
 //    - The "type" entry is an array of dictionaries, each specifying an
 //      interpolation method.  Interpolation is performed over a N by N box
 //      centered on each point, where N is the width specified.  Each of these
@@ -936,7 +940,7 @@ duplicate_flag = NONE;
 //    - "NONE" to use all point observations (legacy behavior)
 //    - "NEAREST" use only the observation that has the valid
 //      time closest to the forecast valid time
-//    - "MIN" use only the observation that has the lowest value 
+//    - "MIN" use only the observation that has the lowest value
 //    - "MAX" use only the observation that has the highest value
 //    - "UW_MEAN" compute an unweighted mean of the observations
 //    - "DW_MEAN" compute a weighted mean of the observations based

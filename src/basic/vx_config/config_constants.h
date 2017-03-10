@@ -217,8 +217,8 @@ struct InterpInfo {
    double      vld_thresh; // Valid data interpolation threshold
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
-	 IntArray    width;      // Interpolation widths
-	GridTemplateFactory::GridTemplates shape;      //  Interpolation shapes
+   IntArray    width;      // Interpolation widths
+   GridTemplateFactory::GridTemplates shape; //  Interpolation shapes
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -902,7 +902,7 @@ static const char conf_val_perc[] = "PERC";
 static const char conf_val_auto[] = "AUTO";
 static const char conf_val_tile[] = "TILE";
 static const char conf_val_pad[]  = "PAD";
- 
+
 // Supported wavelet types
 static const char conf_val_haar[]         = "HAAR";
 static const char conf_val_haar_cntr[]    = "HAAR_CNTR";

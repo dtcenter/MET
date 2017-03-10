@@ -81,7 +81,7 @@
 //                                   output line types.
 //   034    05/10/16  Halley Gotway  Add grid weighting.
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
-//   036    02/14/17  Win            MET-621 enhancement support- additional          
+//   036    02/14/17  Win            MET-621 enhancement support- additional
 //                                   nc_pairs_flag 'apply_mask'
 //
 ////////////////////////////////////////////////////////////////////////
@@ -166,12 +166,9 @@ static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
-static bool read_data_plane(VarInfo* info,
-			    RegridInfo regrid_info,
-			    DataPlane& dp,
-			    Met2dDataFile* mtddf,
-			    ConcatString filename);
-
+static bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
+                            DataPlane& dp, Met2dDataFile* mtddf,
+                            ConcatString filename);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -624,9 +621,8 @@ void process_scores() {
            << conf_info.fcst_info[i]->magic_str() << ".\n";
 
       // Read the gridded data from the input forecast file
-      if(!read_data_plane(conf_info.fcst_info[i],
-			 conf_info.regrid_info,
-			  fcst_dp, fcst_mtddf, fcst_file)) continue;
+      if(!read_data_plane(conf_info.fcst_info[i], conf_info.regrid_info,
+                          fcst_dp, fcst_mtddf, fcst_file)) continue;
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
 
@@ -639,9 +635,8 @@ void process_scores() {
            << conf_info.obs_info[i]->magic_str() << ".\n";
 
       // Read the gridded data from the input observation file
-      if(!read_data_plane(conf_info.obs_info[i],
-			 conf_info.regrid_info,
-			 obs_dp, obs_mtddf, obs_file)) continue;
+      if(!read_data_plane(conf_info.obs_info[i], conf_info.regrid_info,
+                          obs_dp, obs_mtddf, obs_file)) continue;
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -708,11 +703,11 @@ void process_scores() {
       for(j=0; j<conf_info.get_n_interp(); j++) {
 
          // Store the interpolation method and width being applied
-	      GridTemplateFactory gtf;
-	       
-	      string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[j]).text();
-	      interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
-	       shc.set_interp_mthd(interp_mthd.c_str());
+         GridTemplateFactory gtf;
+
+         string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[j]).text();
+         interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
+         shc.set_interp_mthd(interp_mthd.c_str());
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 
          GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,conf_info.interp_wdth[j]);
@@ -919,7 +914,7 @@ void process_scores() {
 
             // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
             if(!conf_info.fcst_info[i]->is_prob() &&
-	        conf_info.fcst_info[i]->is_v_wind() &&
+                conf_info.fcst_info[i]->is_v_wind() &&
                 conf_info.fcst_info[i]->uv_index() >= 0  &&
                (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
                 conf_info.output_flag[i_val1l2] != STATOutputType_None) ) {
@@ -936,13 +931,13 @@ void process_scores() {
                // Read the gridded data from the input forecast file for UGRD
                int ui = conf_info.fcst_info[i]->uv_index();
                if(!read_data_plane(conf_info.fcst_info[ui],
-			 conf_info.regrid_info,
-			  fu_dp, fcst_mtddf, fcst_file)) continue;
+                                   conf_info.regrid_info,
+                                   fu_dp, fcst_mtddf, fcst_file)) continue;
 
                if(!read_data_plane(conf_info.obs_info[ui],
-			 conf_info.regrid_info,
-			  ou_dp, obs_mtddf, obs_file)) continue;	       
-	       
+                                   conf_info.regrid_info,
+                                   ou_dp, obs_mtddf, obs_file)) continue;
+
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
                if(conf_info.interp_field == FieldType_Fcst ||
@@ -978,11 +973,8 @@ void process_scores() {
                apply_mask(wgt_dp,       mask_dp, w_na);
 
                // Compute VL1L2
-               do_vl1l2(vl1l2_info, i,
-                        fu_na, f_na,
-			ou_na, o_na,
-                        cmnu_na, c_na,
-			w_na);
+               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na,
+                        cmnu_na, c_na, w_na);
 
                // Loop through all of the wind speed thresholds
                for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
@@ -1696,11 +1688,11 @@ void write_nc(const GridStatNcOutInfo & nc_info,
    // behavior is to generate fields for each masking region.
    num_masking_regions = conf_info.get_n_mask();
    if(!apply_mask_flag){
-        // Generate the FCST, OBS, DIFF, etc. for the 
+        // Generate the FCST, OBS, DIFF, etc. for the
         // full domain
         num_masking_regions = 1;
-   } 
-       
+   }
+
 
    // Compute the difference field for each of the masking regions
    for(i=0; i<num_masking_regions; i++) {
@@ -2237,15 +2229,13 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_outdir(const StringArray & a)
-{
+void set_outdir(const StringArray & a) {
    out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray & a)
-{
+void set_logfile(const StringArray & a) {
    ConcatString filename;
 
    filename = a[0];
@@ -2255,8 +2245,7 @@ void set_logfile(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_verbosity(const StringArray & a)
-{
+void set_verbosity(const StringArray & a) {
    mlog.set_verbosity_level(atoi(a[0]));
 }
 
@@ -2269,9 +2258,9 @@ void set_compress(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
-		     DataPlane& dp, Met2dDataFile* mtddf,
-		     ConcatString filename)
-{
+                     DataPlane& dp, Met2dDataFile* mtddf,
+                     ConcatString filename) {
+
    bool status = mtddf->data_plane(*info, dp);
 
    if(!status) {
@@ -2288,11 +2277,13 @@ bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
            << "Regridding forecast "
            << info->magic_str()
            << " to the verification grid.\n";
-      dp = met_regrid(dp, mtddf->grid(),
-		      grid, regrid_info);
+      dp = met_regrid(dp, mtddf->grid(), grid, regrid_info);
    }
 
    // Rescale probabilities from [0, 100] to [0, 1]
    if(info->p_flag()) rescale_probability(dp);
-   return true;
+
+   return(true);
 }
+
+////////////////////////////////////////////////////////////////////////

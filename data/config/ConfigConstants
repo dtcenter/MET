@@ -67,7 +67,7 @@ BOTH           = 2;
 FCST           = 3;
 OBS            = 4;
 
-// Grid Shapes
+// Interpolation Shapes
 SQUARE         = 1;
 CIRCLE         = 2;
 
