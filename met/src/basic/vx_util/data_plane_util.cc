@@ -64,7 +64,7 @@ void rescale_probability(DataPlane &dp) {
 
       mlog << Debug(3)
            << "Rescaling probabilistic field from [0,100] to [0,1].\n";
-     
+
       //
       // Divide each value by 100
       //
@@ -94,7 +94,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int wdth, double t) {
    double v;
    int x, y, x_ll, y_ll;
-   
+
    mlog << Debug(3)
         << "Smoothing field using the " << interpmthd_to_string(mthd)
         << "(" << wdth*wdth << ") interpolation method.\n";
@@ -168,18 +168,18 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, const GridTemplate &gt, double t) {
    double v;
    int x, y, x_ll, y_ll;
-   
+
    mlog << Debug(3)
         << "Smoothing field using the " << interpmthd_to_string(mthd)
-        << "(" << gt.getClassName() << ") interpolation method.\n";
+        << "(" << wdth*wdth << ") " << gt.getClassName()
+        << " interpolation method.\n";
 
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
 
    // if grid template is just 1 point (i.e. width == 1)
    // or method == NEAREST, no smoothing is done.
-   if (gt.size() == 1) return;
-   if(mthd == InterpMthd_Nearest) return;
+   if(gt.size() == 1 || mthd == InterpMthd_Nearest) return;
 
    // Otherwise, apply smoothing to each grid point
    for(x=0; x<dp.nx(); x++) {
@@ -189,19 +189,19 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
          switch(mthd) {
 
             case(InterpMthd_Min):     // Minimum
-	            v = interp_min(dp, gt, x, y, t);
+               v = interp_min(dp, gt, x, y, t);
                break;
 
             case(InterpMthd_Max):     // Maximum
-	            v = interp_max(dp, gt, x, y, t);
+               v = interp_max(dp, gt, x, y, t);
                break;
 
             case(InterpMthd_Median):  // Median
-	            v = interp_median(dp, gt, x, y, t);
+               v = interp_median(dp, gt, x, y, t);
                break;
 
             case(InterpMthd_UW_Mean): // Unweighted Mean
-	            v = interp_uw_mean(dp, gt, x, y, t);
+               v = interp_uw_mean(dp, gt, x, y, t);
                break;
 
             // Distance-weighted mean, least-squares fit, and bilinear
@@ -243,7 +243,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         << "Computing fractional coverage field using the " << t.get_str()
         << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
         << "(" << wdth*wdth << ") interpolation method.\n";
-   
+
    // Check that width is set to 1 or greater
    if(wdth < 1) {
       mlog << Error << "\nfractional_coverage() -> "
