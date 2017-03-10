@@ -220,7 +220,7 @@ bool NcCfFile::open(const char * filepath)
   }
   else
   {
-
+    
     // Store the dimension for the time variable as the time dimension
     tDim = get_nc_dim(valid_time_var, 0);
     _tDim = &tDim;
@@ -230,10 +230,8 @@ bool NcCfFile::open(const char * filepath)
     NcVarAtt units_att = get_nc_att(valid_time_var, "units", false);
     if (!IS_INVALID_NC(units_att))
     {
-      //char *units = units_att->getValues(att->as_string(0);
       get_att_value_chars(&units_att, units);
-      //get_var_att(units_att, units);
-
+      
       if (units.length() == 0)
       {
          mlog << Warning << "\nNcCfFile::open() -> "
@@ -256,11 +254,20 @@ bool NcCfFile::open(const char * filepath)
     // Determine the number of times present.
     int n_times = (int) get_data_size(valid_time_var);
 
-    for(int i=0; i<n_times; i++)
-    {
-      double time_value = get_double_var(valid_time_var, i);
-      ValidTime.add((unixtime)ut + sec_per_unit * time_value);
-    }
+    //bool no_leap_year = get_att_no_leap_year(valid_time_var);
+    //if (sec_per_unit == 86400 && no_leap_year) {
+    //  for(int i=0; i<n_times; i++) {
+    //    double time_value = get_double_var(valid_time_var, i);
+    //    ValidTime.add(add_days_to_unix_no_leap((unixtime)ut, (int)time_value));
+    //  }
+    //}
+    //else {
+      for(int i=0; i<n_times; i++)
+      {
+        double time_value = get_double_var(valid_time_var, i);
+        ValidTime.add((unixtime)ut + sec_per_unit * time_value);
+      }
+    //}
   }
 
   NcVar init_time_var = get_var(_ncFile, "forecast_reference_time");
@@ -307,6 +314,11 @@ bool NcCfFile::open(const char * filepath)
 
     double time_value = get_double_var(&init_time_var,(int)0);
     InitTime = (unixtime)ut + sec_per_unit * time_value;
+    
+    //bool no_leap_year = get_att_no_leap_year(&init_time_var);
+    //if (sec_per_unit == 86400 && no_leap_year) {
+    //  InitTime = add_days_to_unix_no_leap((unixtime)ut, (int)time_value);
+    //}
   }
 
   // Pull out the variables
@@ -921,7 +933,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   int y_offset;
   bool swap_to_north = false;
-  if (grid.info().ll != 0) swap_to_north = grid.info().ll->swap_to_north;
+  if (grid.info().ll != 0) swap_to_north = grid.info().get_swap_to_north();
 
   //  get the data
   int    i[nx];
@@ -2062,6 +2074,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     // will probably also need to reorder the data itself.
   
     LatLonData data;
+    bool swap_to_north = false;
   
     data.name = latlon_proj_type;
     data.lat_ll = lat_values[0];
@@ -2070,14 +2083,14 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     data.delta_lon = dlon;
     data.Nlat = lat_counts;
     data.Nlon = lon_counts;
-    data.swap_to_north = false;
-    //if (dlat < 0) {
-    //  data.delta_lat = -dlat;
-    //  data.lat_ll = lat_values[lat_counts-1];
-    //  data.swap_to_north = true;
-    //}
+    if (dlat < 0) {
+      data.delta_lat = -dlat;
+      data.lat_ll = lat_values[lat_counts-1];
+      swap_to_north = true;
+    }
   
     grid.set(data);
+    grid.set_swap_to_north(swap_to_north);
   }
   
   return true;
@@ -2300,6 +2313,7 @@ bool NcCfFile::get_grid_from_dimensions()
   // will probably also need to reorder the data itself.
 
   LatLonData data;
+  bool swap_to_north = false;
 
   data.name = latlon_proj_type;
   data.lat_ll = lat_values[0];
@@ -2308,13 +2322,13 @@ bool NcCfFile::get_grid_from_dimensions()
   data.delta_lon = dlon;
   data.Nlat = _yDim->getSize();
   data.Nlon = _xDim->getSize();
-  data.swap_to_north = false;
-  //if (dlat < 0) {
-  //  data.delta_lat = -dlat;
-  //  data.lat_ll = lat_values[lat_counts-1];
-  //  data.swap_to_north = true;
-  //}
+  if (dlat < 0) {
+    data.delta_lat = -dlat;
+    data.lat_ll = lat_values[lat_counts-1];
+    swap_to_north = true;
+  }
   grid.set(data);
+  grid.set_swap_to_north(swap_to_north);
 
   return true;
 }
