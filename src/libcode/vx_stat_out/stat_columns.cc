@@ -2858,7 +2858,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
       pd_ptr->crpss);
 
    at.set_entry(r, c+5,  // Average ensemble spread
-      pd_ptr->spread_na.mean());
+      pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
 
    //
    // Write RANK_i count for each bin

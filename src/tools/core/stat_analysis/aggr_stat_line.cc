@@ -2170,12 +2170,12 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
          }
 
          //
-         // Store the current statistics and weight
+         // Store the current statistics and weight (TOTAL column)
          //
          m[key].ens_pd.crps_na.add(cur.crps);
          m[key].ens_pd.ign_na.add(cur.ign);
-         m[key].ens_pd.wgt_na.add(cur.total);
          m[key].ens_pd.spread_na.add(cur.spread);
+         m[key].ens_pd.wgt_na.add(cur.total);
 
          //
          // Compute and store climatological CRPS
