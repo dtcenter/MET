@@ -171,7 +171,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
    mlog << Debug(3)
         << "Smoothing field using the " << interpmthd_to_string(mthd)
-        << "(" << wdth*wdth << ") " << gt.getClassName()
+        << "(" << gt.size() << ") " << gt.getClassName()
         << " interpolation method.\n";
 
    // Initialize the smoothed field to the raw field
