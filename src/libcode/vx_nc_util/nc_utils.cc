@@ -165,6 +165,19 @@ double  get_att_value_double(const NcFile *nc, const ConcatString &att_name) {
    return get_att_value_double(&att);
 }
 
+bool    get_att_no_leap_year(const NcVar *var) {
+   bool no_leap_year = false;
+   NcVarAtt calendar_att = get_nc_att(var, "calendar", false);
+   if (!IS_INVALID_NC(calendar_att)) {
+     ConcatString calendar_value;
+     get_att_value_chars(&calendar_att, calendar_value);
+     no_leap_year = (strcmp("noleap",calendar_value) == 0)
+         || (strcmp("365_day",calendar_value) == 0)
+         || (strcmp("365 days",calendar_value) == 0);
+   }
+   return no_leap_year;
+}
+
 
 //long long get_att_value_long_long(const NcAtt *att) {
 //   long long value;
