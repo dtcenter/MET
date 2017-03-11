@@ -704,13 +704,16 @@ void process_scores() {
 
          // Store the interpolation method and width being applied
          GridTemplateFactory gtf;
+         GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
+                                        conf_info.interp_wdth[j]);
 
+         // Set the interp header columns
          string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[j]).text();
-         interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
+         if(conf_info.interp_wdth[j] > 1) {
+            interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
+         }
          shc.set_interp_mthd(interp_mthd.c_str());
-         shc.set_interp_wdth(conf_info.interp_wdth[j]);
-
-         GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,conf_info.interp_wdth[j]);
+         shc.set_interp_pnts(gt->size());
 
          // If requested in the config file, smooth the forecast field
          if(conf_info.interp_field == FieldType_Fcst ||

@@ -58,7 +58,7 @@ void StatHdrColumns::clear() {
    obs_valid_beg    = (unixtime) 0;
    obs_valid_end    = (unixtime) 0;
 
-   interp_wdth = bad_data_int;
+   interp_pnts = bad_data_int;
 
    alpha = bad_data_double;
 
@@ -216,10 +216,22 @@ void StatHdrColumns::set_interp_mthd(const InterpMthd m) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Assume width of a square and set interp_pnts = w * w
+//
+////////////////////////////////////////////////////////////////////////
 
 void StatHdrColumns::set_interp_wdth(const int w) {
-   interp_wdth = w;
-   set_interp_pnts_str();
+   interp_pnts = w * w;
+   interp_pnts_str << cs_erase << interp_pnts;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrColumns::set_interp_pnts(const int n) {
+   interp_pnts = n;
+   interp_pnts_str << cs_erase << interp_pnts;
    return;
 }
 
@@ -367,19 +379,6 @@ void StatHdrColumns::set_obs_valid_beg_str() {
 void StatHdrColumns::set_obs_valid_end_str() {
 
    obs_valid_end_str = unix_to_yyyymmdd_hhmmss(obs_valid_end);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void StatHdrColumns::set_interp_pnts_str() {
-   char tmp_str[max_str_len];
-
-   if(interp_wdth == bad_data_int) strcpy(tmp_str, na_str);
-   else                            sprintf(tmp_str, "%i",
-                                           interp_wdth*interp_wdth);
-   interp_pnts_str = tmp_str;
 
    return;
 }
