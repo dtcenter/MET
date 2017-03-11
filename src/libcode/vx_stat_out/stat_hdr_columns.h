@@ -72,11 +72,9 @@ class StatHdrColumns {
       // Verification region
       ConcatString mask;
 
-      // Interpolation method
+      // Interpolation method and size
       ConcatString interp_mthd;
-
-      // Size of interpolation neighborhood
-      int          interp_wdth;
+      int          interp_pnts;
       ConcatString interp_pnts_str;
 
       // Line type
@@ -101,7 +99,6 @@ class StatHdrColumns {
       void set_obs_lead_str();
       void set_obs_valid_beg_str();
       void set_obs_valid_end_str();
-      void set_interp_pnts_str();
 
    public:
 
@@ -133,6 +130,7 @@ class StatHdrColumns {
 
       void set_interp_mthd   (const char *);
       void set_interp_mthd   (const InterpMthd);
+      void set_interp_pnts   (const int);
       void set_interp_wdth   (const int);
 
       void set_line_type     (const char *);
@@ -179,7 +177,7 @@ class StatHdrColumns {
       ConcatString get_mask              () const;
 
       ConcatString get_interp_mthd       () const;
-      int          get_interp_wdth       () const;
+      int          get_interp_pnts       () const;
       ConcatString get_interp_pnts_str   () const;
 
       ConcatString get_line_type         () const;
@@ -231,7 +229,7 @@ inline ConcatString StatHdrColumns::get_obtype            () const { return(obty
 inline ConcatString StatHdrColumns::get_mask              () const { return(mask.contents(na_str));               }
 
 inline ConcatString StatHdrColumns::get_interp_mthd       () const { return(interp_mthd.contents(na_str));        }
-inline int          StatHdrColumns::get_interp_wdth       () const { return(interp_wdth);                         }
+inline int          StatHdrColumns::get_interp_pnts       () const { return(interp_pnts);                         }
 inline ConcatString StatHdrColumns::get_interp_pnts_str   () const { return(interp_pnts_str.contents(na_str));    }
 
 inline ConcatString StatHdrColumns::get_line_type         () const { return(line_type.contents(na_str));          }
