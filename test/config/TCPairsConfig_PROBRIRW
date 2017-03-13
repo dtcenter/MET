@@ -65,6 +65,11 @@ init_mask  = "";
 valid_mask = "";
 
 //
+// Select tracks which contain all required lead times.
+//
+lead_req = [];
+
+//
 // Specify if the code should check for duplicate ATCF lines
 //
 check_dup = TRUE;

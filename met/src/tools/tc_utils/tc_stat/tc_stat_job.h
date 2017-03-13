@@ -156,6 +156,7 @@ struct TCLineCounts {
    int RejEventEqual;
    int RejOutInitMask;
    int RejOutValidMask;
+   int RejLeadReq;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -259,6 +260,7 @@ class TCStatJob {
       TimeArray InitExc;
       NumArray  InitHour;
       NumArray  Lead;
+      NumArray  LeadReq;
 
       // Valid Times
       unixtime  ValidBeg, ValidEnd;

@@ -153,7 +153,7 @@ landfall_end = "00";
 // tracks should be retained.  May modify using the "-match_points" job command
 // option.
 //
-match_points = TRUE;
+match_points = FALSE;
 
 //
 // Specify whether only those cases common to all models in the dataset should
@@ -177,9 +177,9 @@ out_valid_mask = "";
 // Array of TCStat analysis jobs to be performed on the filtered data
 //
 jobs = [ 
-   "-job summary -column TRACK -by AMODEL      -dump_row ${MET_TEST_OUTPUT}/tc_stat/TC_STAT_LEAD_REQ_AHWI_vs_BCLP.tcst",
-   "-job summary -column TRACK -by AMODEL,INIT -dump_row ${MET_TEST_OUTPUT}/tc_stat/TC_STAT_LEAD_REQ_AHWI_vs_BCLP_by_INIT.tcst",
-   "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh >=30  -rirw_exact FALSE -dump_row ${MET_TEST_OUTPUT}/tc_stat/TC_STAT_LEAD_REQ_AHWI_ri.tcst"
+   "-job summary -column TRACK -by AMODEL      -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_LEAD_REQ_AHWI_vs_BCLP.tcst",
+   "-job summary -column TRACK -by AMODEL,INIT -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_LEAD_REQ_AHWI_vs_BCLP_by_INIT.tcst",
+   "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh >=30  -rirw_exact FALSE -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_LEAD_REQ_AHWI_ri.tcst"
 ];
 
 //

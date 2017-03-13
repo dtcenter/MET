@@ -18,6 +18,9 @@
 
 
   <test name="tc_stat_ALAL2010">
+    <env>
+       <pair><name>LEAD_REQ</name><value></value></pair>
+    </env>
     <exec>&MET_DIR;/bin/tc_stat</exec>
     <param> \
       -lookin &OUTPUT_DIR;/tc_pairs \
@@ -34,8 +37,29 @@
     </output>
   </test>
 
+  <test name="tc_stat_LEAD_REQ">
+    <env>
+       <pair><name>LEAD_REQ</name><value>"72","84","96","108"</value></pair>
+    </env>
+    <exec>&MET_DIR;/bin/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs \
+      -config &CONFIG_DIR;/TCStatConfig_LEAD_REQ \
+      -out &OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ_stat.out \
+      -v 2
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ_stat.out</exist>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ_AHWI_vs_BCLP_by_INIT.tcst</stat>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_LEAD_REQ_AHWI_vs_BCLP.tcst</stat>
+    </output>
+  </test>
+
   <test name="tc_stat_PROBRIRW">
     <exec>&MET_DIR;/bin/tc_stat</exec>
+    <env>
+       <pair><name>LEAD_REQ</name><value></value></pair>
+    </env>
     <param> \
       -lookin &OUTPUT_DIR;/tc_pairs/alal2015_PROBRIRW.tcst \
       -config &CONFIG_DIR;/TCStatConfig_PROBRIRW \

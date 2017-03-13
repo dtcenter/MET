@@ -59,6 +59,12 @@ valid_end = "";
 init_hour = [];
 
 //
+// Required lead time
+//
+lead_req = [];
+
+
+//
 // lat/lon polylines defining masking regions
 //
 init_mask  = "";

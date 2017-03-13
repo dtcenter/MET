@@ -76,6 +76,11 @@ valid_hour = [];
 lead       = [];
 
 //
+// Required lead time in hours
+//
+lead_req = [ ];
+
+//
 // Stratify by the INIT_MASK and VALID_MASK columns.
 //
 init_mask  = [];

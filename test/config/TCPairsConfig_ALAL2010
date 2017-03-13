@@ -1,3 +1,4 @@
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Default TCPairs configuration file
@@ -57,6 +58,11 @@ valid_end = "";
 // Model initialization hours
 //
 init_hour = [];
+
+//
+// Required lead time in hours
+//
+lead_req = [ ${LEAD_REQ} ];
 
 //
 // lat/lon polylines defining masking regions

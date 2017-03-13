@@ -16,6 +16,9 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="tc_pairs_ALAL2010">
+    <env>
+      <pair><name>LEAD_REQ</name> <value></value></pair>
+    </env>
     <exec>&MET_DIR;/bin/tc_pairs</exec>
     <param> \
       -adeck &DATA_DIR;/adeck/*2010.dat \
@@ -78,6 +81,24 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_pairs/alal2015_PROBRIRW.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_pairs_LEAD_REQ">
+    <env>
+      <pair><name>LEAD_REQ</name> <value>"06","18"</value></pair>
+    </env>
+    <exec>&MET_DIR;/bin/tc_pairs</exec>
+    <param> \
+      -adeck &DATA_DIR;/adeck/*2010.dat \
+      -bdeck &DATA_DIR;/bdeck/*2010.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_ALAL2010 \
+      -out &OUTPUT_DIR;/tc_pairs/alal2010_LEAD_REQ \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_LEAD_REQ.log \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/alal2010_LEAD_REQ.tcst</stat>
     </output>
   </test>
 

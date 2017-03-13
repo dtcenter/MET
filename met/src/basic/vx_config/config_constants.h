@@ -791,6 +791,7 @@ static const char conf_key_valid_inc[]                = "valid_inc";
 static const char conf_key_valid_exc[]                = "valid_exc";
 static const char conf_key_valid_hour[]               = "valid_hour";
 static const char conf_key_lead[]                     = "lead";
+static const char conf_key_lead_req[]                 = "lead_req";
 static const char conf_key_init_mask[]                = "init_mask";
 static const char conf_key_valid_mask[]               = "valid_mask";
 static const char conf_key_check_dup[]                = "check_dup";

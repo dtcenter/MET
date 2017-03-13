@@ -57,6 +57,7 @@ class TCPairsConfInfo {
       TimeArray InitInc;
       TimeArray InitExc;
       NumArray  InitHour;
+      NumArray  LeadReq;
       unixtime  ValidBeg, ValidEnd;
 
       // Polyline masking regions
