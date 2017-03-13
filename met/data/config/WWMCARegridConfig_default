@@ -54,6 +54,17 @@ accum_time    = "01";
 //
 // Maximum pixel age in minutes
 //
-max_minutes   = 120;
+max_minutes = 120;
+
+//
+// Swap endianess of binary pixel age files 
+//
+swap_endian = TRUE;
+
+//
+// Write the pixel age in minutes instead of cloud data
+//
+write_pixel_age = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
+

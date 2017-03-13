@@ -132,6 +132,8 @@ if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) 0; }
 
 AFDataFile::clear();
 
+SwapEndian = true;
+
 return;
 
 }
@@ -153,6 +155,8 @@ Buf = new unsigned char [af_nx*af_ny*pixel_time_record_size];
 memset(Buf, 0, af_nx*af_ny*pixel_time_record_size);
 
 AFDataFile::assign(a);
+
+SwapEndian = a.SwapEndian;
 
 return;
 
@@ -227,7 +231,7 @@ int *ibuf = (int *)Buf;
 
 int minutes = ibuf[n];
 
-if ( native_endian != big_endian )  shuffle_4(&minutes);
+if ( SwapEndian )  shuffle_4(&minutes);
 
 if (minutes == 0)  k = 0;
 else {

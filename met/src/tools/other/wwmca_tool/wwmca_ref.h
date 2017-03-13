@@ -19,8 +19,6 @@
 
 #include <iostream>
 
-//#include <netcdf.hh>
-
 #include "af_file.h"
 #include "af_cp_file.h"
 #include "af_pt_file.h"
@@ -89,6 +87,8 @@ class WwmcaRegridder {
 
       double Fraction;     //  fraction of good data needed for interpolation
 
+      bool WritePixelAge;  //  write pixel age instead of cloud data
+
       InterpFunction * interp_func;
 
 
@@ -124,8 +124,8 @@ class WwmcaRegridder {
       void set_cp_nh_file(const char *);
       void set_cp_sh_file(const char *);
 
-      void set_pt_nh_file(const char *);
-      void set_pt_sh_file(const char *);
+      void set_pt_nh_file(const char *, bool);
+      void set_pt_sh_file(const char *, bool);
 
       void set_config(MetConfig &, const char * filename);
 

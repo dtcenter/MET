@@ -130,6 +130,8 @@ interp_func = 0;
 
 Fraction = 0.0;   //  is this a good default value?
 
+WritePixelAge = false;
+
 
 return;
 
@@ -191,6 +193,7 @@ if ( ToGrid ) {
 out << prefix << "Interpolation Method   = " << interpmthd_to_string(Method) << "\n";
 out << prefix << "Interpolation Width    = " << Width    << "\n";
 out << prefix << "Interpolation Fraction = " << Fraction << "\n";
+out << prefix << "Write Pixel Age        = " << bool_to_string(WritePixelAge) << "\n";
 
 
 out << prefix << "ConfigFilename = ";
@@ -262,7 +265,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void WwmcaRegridder::set_pt_nh_file(const char * filename)
+void WwmcaRegridder::set_pt_nh_file(const char * filename, bool swap)
 
 {
 
@@ -270,11 +273,14 @@ AFPixelTimeFile * f = new AFPixelTimeFile;
 
 if ( !(f->read(filename, 'N')) )  {
 
-   mlog << Error << "\nWwmcaRegridder::set_pt_nh_file(const char *) -> unable to open pixel time file \"" << filename << "\"\n\n";
+   mlog << Error << "\nWwmcaRegridder::set_pt_nh_file(const char *) -> "
+        << "unable to open pixel time file \"" << filename << "\"\n\n";
 
    exit ( 1 );
 
 }
+
+f->set_swap_endian(swap);
 
 pt_nh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) 0;
 
@@ -286,7 +292,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void WwmcaRegridder::set_pt_sh_file(const char * filename)
+void WwmcaRegridder::set_pt_sh_file(const char * filename, bool swap)
 
 {
 
@@ -300,6 +306,8 @@ if ( !(f->read(filename, 'S')) )  {
    exit ( 1 );
 
 }
+
+f->set_swap_endian(swap);
 
 pt_sh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) 0;
 
@@ -330,6 +338,28 @@ Width = regrid_info.width;
 Method = InterpMthd_Nearest;
 
 Fraction = regrid_info.vld_thresh;
+
+WritePixelAge = Config->lookup_bool(conf_key_write_pixel_age);
+
+   //
+   //  writing pixel age instead of cloud data
+   //
+
+if ( WritePixelAge )  {
+
+   mlog << Debug(2)
+        << "Writing pixel age times instead of cloud data.\n";
+
+   if( pt_nh == 0 && pt_sh == 0 )  {
+
+      mlog << Error << "\nWwmcaRegridder::set_config() -> "
+           << "when the \"" << conf_key_write_pixel_age << "\" configuration option is enabled, "
+           << "at least one pixel time file must be specified on the command line.\n\n";
+
+      exit ( 1 );
+
+   }
+}
 
 if ( Width > 1 )  {
 
@@ -509,7 +539,8 @@ if ( Width == 1 )  {
 
          if ( cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes )  {
 
-            v = (double) ((*cloud)(from_x, from_y));
+            if ( WritePixelAge )  v = (double) pixel_age_minutes;
+            else                  v = (double) ((*cloud)(from_x, from_y));
 
          }
 
@@ -566,7 +597,8 @@ for (x=0; x<(dp.nx()); ++x)  {
 
             } else {
 
-               v = (double) ((*cloud)(from_x, from_y));
+              if ( WritePixelAge )  v = pixel_age_minutes;
+              else                  v = (double) ((*cloud)(from_x, from_y));
 
             }
 
@@ -737,7 +769,8 @@ if ( Width == 1 )  {
 
          if ( cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes )  {
 
-            v = (double) (cloud->cloud_pct(from_x, from_y));
+            if ( WritePixelAge )  v = (double) pixel_age_minutes;
+            else                  v = (double) cloud->cloud_pct(from_x, from_y);
 
          }
 
@@ -808,7 +841,8 @@ for (x=0; x<(dp.nx()); ++x)  {
 
             if ( cloud->xy_is_ok(from_x, from_y) && pixel_age_minutes < max_minutes )  {
 
-               v = (double) (cloud->cloud_pct(from_x, from_y));
+               if ( WritePixelAge )  v = (double) pixel_age_minutes;
+               else                  v = (double) cloud->cloud_pct(from_x, from_y);
 
             }
 
