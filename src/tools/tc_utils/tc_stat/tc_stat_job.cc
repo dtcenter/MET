@@ -206,6 +206,7 @@ void TCStatJob::clear() {
    InitInc.clear();
    InitExc.clear();
    InitHour.clear();
+   LeadReq.clear();
    Lead.clear();
    ValidBeg = ValidEnd = (unixtime) 0;
    ValidInc.clear();
@@ -277,6 +278,7 @@ void TCStatJob::assign(const TCStatJob & j) {
    InitExc = j.InitExc;
    InitHour = j.InitHour;
    Lead = j.Lead;
+   LeadReq = j.LeadReq;
    ValidBeg = j.ValidBeg;
    ValidEnd = j.ValidEnd;
    ValidInc = j.ValidInc;
@@ -579,6 +581,23 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       }
    }
 
+   // MET-667 Check for required lead times (defined in the
+   // configuration file) in this track.
+   // If no required lead times were defined, do nothing.
+   if(keep == true && LeadReq.n_elements() > 0){
+	   // Loop through the points and see if any of the
+	   // lead times are in the list of required lead times
+	   // defined in the configuration file.
+       for(int j=0; j<LeadReq.n_elements(); j++){
+    	 if(pair.adeck().lead_index(LeadReq[j]) == -1){
+    		// If we don't have a match, break and discard this track.
+    		keep = false;
+                n.RejLeadReq++;
+    		break;
+    	 }
+       }
+   }
+
    // Update counts
    if(!keep) n.NKeep -= pair.n_points();
 
@@ -820,6 +839,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(strcasecmp(c, "-init_exc"          ) == 0) { InitExc.add_css(a[i+1]);                   a.shift_down(i, 1); }
       else if(strcasecmp(c, "-init_hour"         ) == 0) { InitHour.add_css_sec(a[i+1]);              a.shift_down(i, 1); }
       else if(strcasecmp(c, "-lead"              ) == 0) { Lead.add_css_sec(a[i+1]);                  a.shift_down(i, 1); }
+      else if(strcasecmp(c, "-lead_req"          ) == 0) { LeadReq.add_css_sec(a[i+1]);               a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_beg"         ) == 0) { ValidBeg = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_end"         ) == 0) { ValidEnd = timestring_to_unix(a[i+1]);     a.shift_down(i, 1); }
       else if(strcasecmp(c, "-valid_inc"         ) == 0) { ValidInc.add_css(a[i+1]);                  a.shift_down(i, 1); }
@@ -1069,6 +1089,8 @@ ConcatString TCStatJob::serialize() const {
       s << "-init_hour " << sec_to_hhmmss(nint(InitHour[i])) << " ";
    for(i=0; i<Lead.n_elements(); i++)
       s << "-lead " << sec_to_hhmmss(nint(Lead[i])) << " ";
+   for(i=0; i<LeadReq.n_elements(); i++)
+         s << "-lead_req " << sec_to_hhmmss(nint(LeadReq[i])) << " ";
    if(ValidBeg > 0)
       s << "-valid_beg " << unix_to_yyyymmdd_hhmmss(ValidBeg) << " ";
    if(ValidEnd > 0)

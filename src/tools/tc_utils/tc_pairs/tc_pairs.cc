@@ -29,6 +29,8 @@
 //   007    06/01/16  Halley Gotway   Add support for EDecks.
 //   008    09/29/16  Halley Gotway   Add DESC output column.
 //   009    03/09/17  Halley Gotway   Define BEST track time step.
+//   010    03/02/17  Win             MET-667 Add support for tracks that contain
+//                                    all required lead times.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -773,13 +775,13 @@ bool is_keeper(const ATCFLineBase * line) {
 
 void filter_tracks(TrackInfoArray &tracks) {
    int i, j;
-   int n_name, n_vld, n_mask_init, n_mask_vld;
+   int n_name, n_vld, n_mask_init, n_mask_vld, n_req_lead;
    bool status;
    TrackInfoArray t = tracks;
 
    // Initialize
    tracks.clear();
-   n_name = n_vld = n_mask_init = n_mask_vld = 0;
+   n_name = n_vld = n_mask_init = n_mask_vld = n_req_lead = 0;
 
    // Loop through the tracks and determine which should be retained
    // The is_keeper() function has already filtered by model, storm id,
@@ -810,6 +812,24 @@ void filter_tracks(TrackInfoArray &tracks) {
          continue;
       }
 
+      // MET-667 Incorporate support for required lead times.
+      // These are used in determining whether to keep or discard a track; keep a track
+      // if all the required lead times are present.  If no required lead times are
+      // specified in the config file, then ignore checking and proceed as usual.
+      if(conf_info.LeadReq.n_elements() > 0){
+         for(j=0; j < conf_info.LeadReq.n_elements(); j++){
+      	    if(t[i].lead_index(conf_info.LeadReq[j]) == -1){
+               // Not all required lead times are present, discard
+               // this storm track and increment the n_req_lead counter.
+               mlog << Debug(4)
+                    << "Discarding track " << i+1
+                    << " for not containing all required lead times. \n";
+               n_req_lead++;
+               continue;
+            }
+         }
+      }
+
       // Initialization location mask
       if(conf_info.InitMask.n_points() > 0 &&
          !conf_info.InitMask.latlon_is_inside_dege(t[i][0].lat(),
@@ -821,6 +841,7 @@ void filter_tracks(TrackInfoArray &tracks) {
          n_mask_init++;
          continue;
       }
+
 
       // Valid location mask
       if(conf_info.ValidMask.n_points() > 0) {
@@ -852,12 +873,13 @@ void filter_tracks(TrackInfoArray &tracks) {
 
    // Print summary filtering info
    mlog << Debug(3)
-        << "Total tracks read       = " << t.n_tracks()      << "\n"
-        << "Total tracks kept       = " << tracks.n_tracks() << "\n"
-        << "Rejected for storm name = " << n_name            << "\n"
-        << "Rejected for valid time = " << n_vld             << "\n"
-        << "Rejected for init mask  = " << n_mask_init       << "\n"
-        << "Rejected for valid mask = " << n_mask_vld        << "\n";
+        << "Total tracks read                   = " << t.n_tracks()      << "\n"
+        << "Total tracks kept                   = " << tracks.n_tracks() << "\n"
+        << "Rejected for storm name             = " << n_name            << "\n"
+        << "Rejected for valid time             = " << n_vld             << "\n"
+	<< "Rejected for requested lead times   = " << n_req_lead        << "\n"
+        << "Rejected for init mask              = " << n_mask_init       << "\n"
+        << "Rejected for valid mask             = " << n_mask_vld        << "\n";
 
    return;
 }

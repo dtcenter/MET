@@ -156,6 +156,11 @@ void TCStatConfInfo::process_config() {
    for(i=0; i<sa.n_elements(); i++)
       Filter.Lead.add(timestring_to_sec(sa[i]));
 
+   // Conf: TCStatJob::LeadReq
+   sa = Conf.lookup_string_array(conf_key_lead_req);
+   for(i=0; i<sa.n_elements(); i++)
+      Filter.LeadReq.add(timestring_to_sec(sa[i]));
+
    // Conf: TCStatJob::InitMask
    Filter.InitMask = Conf.lookup_string_array(conf_key_init_mask);
 
