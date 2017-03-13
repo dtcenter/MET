@@ -1502,37 +1502,43 @@ nc_pairs_flag = {
 \begin_layout LyX-Code
 
 \series bold
-   latlon = TRUE;
+   latlon     = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   raw    = TRUE;
+   raw        = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   diff   = TRUE;
+   diff       = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   climo  = TRUE;
+   climo      = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   weight = FALSE;
+   weight     = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   nbrhd  = FALSE;
+   nbrhd      = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+   
+\series bold
+apply_mask = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1597,6 +1603,16 @@ TRUE
 nbrhd
 \series medium
  output may lead to very large output files.
+ The 
+\series bold
+apply_mask
+\series medium
+ entry controls whether to create the FCST, OBS, and DIFF output variables
+ for all defined masking regions.
+ Setting this to TRUE will create the FCST, OBS, and DIFF output variables
+ for all defined masking regions.
+ Setting this to FALSE will create the FCST, OBS, and DIFF output variables
+ for only the FULL verification domain.
 \end_layout
 
 \begin_layout Subsection
