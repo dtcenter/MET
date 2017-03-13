@@ -339,16 +339,18 @@ valid_exc = [];
 // Stratify by the initialization and valid hours and lead time.
 // Specify a comma-separated list of initialization hours,
 // valid hours, and lead times in HH[MMSS] format.
-// May add using the "-init_hour", "-valid_hour", and "-lead"
-// job command options.
+// May add using the "-init_hour", "-valid_hour", "-lead",
+// and "-lead_req" job command options.
 //
 // e.g. init_hour  = [ "00" ];
 //      valid_hour = [ "12" ];
 //      lead       = [ "24", "36" ];
+//      lead_req   = [ "72", "84", "96", "108" ];
 //
 init_hour  = [];
 valid_hour = [];
 lead       = [];
+lead_req   = [];
 
 //
 // Stratify by the LINE_TYPE column.  May add using the "-line_type"

@@ -891,7 +891,15 @@ output_flag = {
 // the output of all the different fields).  A value of false means no
 // netcdf output will be generated.
 //
-nc_pairs_flag = TRUE;
+nc_pairs_flag   = {
+   latlon     = TRUE;
+   raw        = TRUE;
+   diff       = TRUE;
+   climo      = TRUE;
+   weight     = FALSE;
+   nbrhd      = FALSE;
+   apply_mask = TRUE;
+}
 
 //
 // The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
