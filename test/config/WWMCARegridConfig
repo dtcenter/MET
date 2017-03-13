@@ -47,4 +47,14 @@ level         = "SFC";
 //
 max_minutes   = ${PIXEL_AGE};
 
+//
+// Swap endianess of binary pixel age files
+//
+swap_endian = TRUE;
+
+//
+// Write the pixel age in minutes instead of cloud data
+//
+write_pixel_age = ${WRITE_PIXEL_AGE};
+
 ////////////////////////////////////////////////////////////////////////////////
