@@ -541,7 +541,7 @@ For each set of edeck probabilities that were parsed, search for a matching
 
 \begin_layout Itemize
 For each edeck/bdeck pair, write paired edeck probabilities and matching
- bdeck values to output PROBRIRW lines.
+ bdeck values to output PROBRI lines.
 \end_layout
 
 \begin_layout Subsection
@@ -667,6 +667,12 @@ init_mask    = [];
 \begin_layout LyX-Code
 
 \series bold
+lead_req     = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 valid_mask   = [];
 \end_layout
 
@@ -685,8 +691,16 @@ version      = "VN.N";
 \begin_layout Standard
 
 \series medium
-The configuration options listed above are common to many MET tools and
- are described in Section 
+The configuration options listed above are common to many MET to
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+ols and are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:IO_MET-TC-Config-Options"
@@ -1913,7 +1927,7 @@ LINE_TYPE
 \begin_inset Text
 
 \begin_layout Plain Layout
-Output line type (TCMPR or PROBRIRW)
+Output line type (TCMPR or PROBRI)
 \end_layout
 
 \end_inset
@@ -3331,8 +3345,8 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for PROBRIRW (Probability of Rapid Intensification or
- Weakening) output line type.
+Format information for PROBRI (Probability of Rapid Intensification) output
+ line type.
 \end_layout
 
 \end_inset
@@ -3362,7 +3376,7 @@ name "PROBRI Line Type"
 \begin_layout Plain Layout
 
 \series bold
-PROBRIRW OUTPUT FORMAT
+PROBRI OUTPUT FORMAT
 \end_layout
 
 \end_inset
@@ -3435,7 +3449,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-PROBRIRW
+PROBRI
 \end_layout
 
 \end_inset
@@ -3444,7 +3458,7 @@ PROBRIRW
 \begin_inset Text
 
 \begin_layout Plain Layout
-Probability of Rapid Intensification or Weakening line type
+Probability of Rapid Intensification line type
 \end_layout
 
 \end_inset

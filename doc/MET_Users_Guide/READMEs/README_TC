@@ -86,6 +86,17 @@ valid_end = "";
 init_hour = [];
 
 //
+// Specify the required lead time in HH[MMSS] format.
+// Tracks that contain all of these required times will be
+// used. If a track has additional lead times, it will be
+// retained.  An empty list indicates that no lead times
+// are required to determine which tracks are to be used;
+// all lead times will be used.
+//
+lead_req  = [];
+
+
+//
 // Specify lat/lon polylines defining masking regions to be applied.
 // Tracks whose initial location falls within init_mask will be used.
 // Tracks for which all locations fall within valid_mask will be used.
