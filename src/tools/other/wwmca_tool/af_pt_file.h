@@ -39,6 +39,8 @@ class AFPixelTimeFile : public AFDataFile {
 
       unsigned char * Buf;
 
+      bool SwapEndian;
+
    public:
 
       AFPixelTimeFile();
@@ -47,6 +49,8 @@ class AFPixelTimeFile : public AFDataFile {
       AFPixelTimeFile & operator=(const AFPixelTimeFile &);
 
       void clear();
+
+      void set_swap_endian(bool b);
 
       int pixel_age_sec(int x, int y) const;
 
@@ -60,7 +64,8 @@ class AFPixelTimeFile : public AFDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int AFPixelTimeFile::operator()(int x, int y) const { return ( pixel_age_sec(x, y) ); }
+inline void AFPixelTimeFile::set_swap_endian(bool b)        { SwapEndian = b; return;         }
+inline int  AFPixelTimeFile::operator()(int x, int y) const { return ( pixel_age_sec(x, y) ); }
 
 
 ////////////////////////////////////////////////////////////////////////

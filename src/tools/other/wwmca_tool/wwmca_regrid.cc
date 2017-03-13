@@ -74,7 +74,7 @@ static void set_outfile     (const StringArray &);
 static void set_config      (const StringArray &);
 static void set_logfile     (const StringArray &);
 static void set_verbosity   (const StringArray &);
-static void set_compress(const StringArray &);
+static void set_compress    (const StringArray &);
 
 static void sanity_check();
 
@@ -97,14 +97,14 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
-cline.add(set_nh_filename, "-nh",    -1);
-cline.add(set_sh_filename, "-sh",    -1);
+cline.add(set_nh_filename, "-nh",      -1);
+cline.add(set_sh_filename, "-sh",      -1);
 
-cline.add(set_outfile,     "-out",    1);
-cline.add(set_config,      "-config", 1);
-cline.add(set_logfile,     "-log",    1);
-cline.add(set_verbosity,   "-v",      1);
-cline.add(set_compress,  "-compress",  1);
+cline.add(set_outfile,     "-out",      1);
+cline.add(set_config,      "-config",   1);
+cline.add(set_logfile,     "-log",      1);
+cline.add(set_verbosity,   "-v",        1);
+cline.add(set_compress,    "-compress", 1);
 
 cline.parse();
 
@@ -141,14 +141,20 @@ config.read(config_filename);
 
 if ( mlog.verbosity_level() >= 5 ) config.dump(cout);
 
+    //
+    //  parse swap endian
+    //
+
+bool swap = config.lookup_bool(conf_key_swap_endian);
+
    //
    //  load up regridder
    //
 
 if ( cp_nh_filename.length() > 0 )  regridder.set_cp_nh_file(cp_nh_filename);
 if ( cp_sh_filename.length() > 0 )  regridder.set_cp_sh_file(cp_sh_filename);
-if ( pt_nh_filename.length() > 0 )  regridder.set_pt_nh_file(pt_nh_filename);
-if ( pt_sh_filename.length() > 0 )  regridder.set_pt_sh_file(pt_sh_filename);
+if ( pt_nh_filename.length() > 0 )  regridder.set_pt_nh_file(pt_nh_filename, swap);
+if ( pt_sh_filename.length() > 0 )  regridder.set_pt_sh_file(pt_sh_filename, swap);
 
 regridder.set_config(config, config_filename);
 
@@ -222,7 +228,7 @@ if ( a.n_elements() != 1 && a.n_elements() != 2 )  {
         << ").\n\n";
    exit ( 1 );
 }
-  
+
 cp_nh_filename = a[0];
 if ( a.n_elements() == 2)  pt_nh_filename = a[1];
 
@@ -244,7 +250,7 @@ if ( a.n_elements() != 1 && a.n_elements() != 2 )  {
         << ").\n\n";
    exit ( 1 );
 }
- 
+
 cp_sh_filename = a[0];
 if ( a.n_elements() == 2)  pt_sh_filename = a[1];
 

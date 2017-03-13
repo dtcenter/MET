@@ -12,6 +12,7 @@
 
 #include "vx_util.h"
 #include "GridTemplate.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 //
@@ -760,10 +761,12 @@ static const char conf_key_interest_max[]                   = "interest_max";
 // WWMCA specific parameter key names
 //
 
-static const char conf_key_max_minutes[]   = "max_minutes";
-static const char conf_key_variable_name[] = "variable_name";
-static const char conf_key_units[]         = "units";
-static const char conf_key_long_name[]     = "long_name";
+static const char conf_key_variable_name[]   = "variable_name";
+static const char conf_key_units[]           = "units";
+static const char conf_key_long_name[]       = "long_name";
+static const char conf_key_max_minutes[]     = "max_minutes";
+static const char conf_key_swap_endian[]     = "swap_endian";
+static const char conf_key_write_pixel_age[] = "write_pixel_age";
 
 //
 // Series-Analysis specific parameter key names
