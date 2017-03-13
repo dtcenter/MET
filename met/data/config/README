@@ -2364,4 +2364,18 @@ level         = "";
 //
 // Maximum pixel age in minutes
 //
-max_minutes   = 120;
+max_minutes = 120;
+
+//
+// The WWMCA pixel age data is stored in binary data files in 4-byte blocks.
+// The swap_endian option indicates whether the endian-ness of the data should
+// be swapped after reading.
+//
+swap_endian = TRUE;
+
+//
+// By default, wwmca_regrid writes the cloud percent data specified on the
+// command line to the output file.  This option writes the pixel age data,
+// in minutes, to the output file instead.
+//
+write_pixel_age = FALSE;

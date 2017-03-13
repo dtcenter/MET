@@ -3881,5 +3881,61 @@ The settings listed above are strings which specify the timing information
  If not empty, these values override the times parsed from the filename.
 \end_layout
 
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+max_minutes     = 120;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+swap_endian     = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+write_pixel_age = FALSE;
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The settings listed above are control the processing of the WWMCA pixel
+ age data.
+ This data is stored in binary data files in 4-byte blocks.
+ The 
+\series bold
+swap_endian
+\series medium
+ option indicates whether the endian-ness of the data should be swapped
+ after reading.
+ The 
+\series bold
+max_minutes
+\series default
+ option specifies a maximum allowed age for the cloud data in minutes.
+ Any data values older than this value are set to bad data in the output.
+ The 
+\series bold
+write_pixel_age
+\series default
+ option writes the pixel age data, in minutes, to the output file instead
+ of the cloud data.
+\end_layout
+
 \end_body
 \end_document
