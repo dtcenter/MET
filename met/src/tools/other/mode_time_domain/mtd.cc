@@ -674,7 +674,10 @@ if ( have_pairs )  {
 
       for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
 
-         mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
+         // mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
+         mask_2d = mask.const_t_mask(t, 1);   //  1-based
+
+         // cout << "j = " << j << ",   vol = " << mask_2d.object_volume(0) << '\n';
 
          att_2 = calc_2d_single_atts(mask_2d, j + 1);
 
@@ -708,7 +711,8 @@ if ( have_pairs )  {
 
       for (t=(att_3.tmin()); t<=(att_3.tmax()); ++t)  {
 
-         mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
+         // mask_2d = mask.const_t_mask(t, j + 1);   //  1-based
+         mask_2d = mask.const_t_mask(t, 1);   //  1-based
 
          att_2 = calc_2d_single_atts(mask_2d, j + 1);
 
