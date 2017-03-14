@@ -101,6 +101,7 @@ storm_id = [];
 
 //
 // Specify a comma-separated list of basins to be used.
+// Expected format is 2-letter basin identifier.
 // An empty list indicates that all should be used.
 //   Valid basins: WP, IO, SH, CP, EP, AL, SL
 //
@@ -127,9 +128,10 @@ storm_name = [];
 
 //
 // Specify a model initialization time window in YYYYMMDD[_HH[MMSS]] format
-// or provide a list of specific initialization times to include or exclude.
-// Tracks whose initial time meets the specified criteria will be used.
-// An empty string indicates that all times should be used.
+// or provide a list of specific initialization times to include (inc)
+// or exclude (exc). Tracks whose initial time meets the specified
+// criteria will be used. An empty string indicates that all times
+// should be used.
 //
 // e.g. init_beg = "20100101";
 //      init_end = "20101231";
@@ -161,7 +163,7 @@ valid_end = "";
 init_hour = [];
 
 //
-// Specify the required lead time in HH[MMSS] format.  
+// Specify the required lead time in HH[MMSS] format.
 // Tracks that contain all of these required times will be
 // used. If a track has additional lead times, it will be
 // retained.  An empty list indicates that no lead times
