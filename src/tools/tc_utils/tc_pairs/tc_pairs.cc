@@ -316,12 +316,6 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
                        (conf_info.AnlyTrack == TrackType_ADeck ||
                         conf_info.AnlyTrack == TrackType_Both));
 
-   // Filter the ADECK tracks using the config file information
-   mlog << Debug(2)
-        << "Filtering " << adeck_tracks.n_tracks()
-        << " ADECK tracks based on config file settings.\n";
-   filter_tracks(adeck_tracks);
-
    //
    // Derive new track types
    //
@@ -357,6 +351,12 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    i = derive_baseline(adeck_tracks, bdeck_tracks);
    mlog << Debug(2)
         << "Added " << i << " CLIPER/SHIFOR baseline track(s).\n";
+
+   // Filter the ADECK tracks using the config file information
+   mlog << Debug(2)
+        << "Filtering " << adeck_tracks.n_tracks()
+        << " ADECK tracks based on config file settings.\n";
+   filter_tracks(adeck_tracks);
 
    //
    // Loop through the ADECK tracks and find a matching BDECK track
@@ -816,17 +816,25 @@ void filter_tracks(TrackInfoArray &tracks) {
       // These are used in determining whether to keep or discard a track; keep a track
       // if all the required lead times are present.  If no required lead times are
       // specified in the config file, then ignore checking and proceed as usual.
-      if(conf_info.LeadReq.n_elements() > 0){
-         for(j=0; j < conf_info.LeadReq.n_elements(); j++){
-      	    if(t[i].lead_index(conf_info.LeadReq[j]) == -1){
-               // Not all required lead times are present, discard
-               // this storm track and increment the n_req_lead counter.
-               mlog << Debug(4)
-                    << "Discarding track " << i+1
-                    << " for not containing all required lead times. \n";
-               n_req_lead++;
-               continue;
+      if(conf_info.LeadReq.n_elements() > 0) {
+
+         // Loop over the required lead times
+         for(j=0, status=true; j<conf_info.LeadReq.n_elements(); j++) {
+
+            // If required lead time is missing, break out
+            if(t[i].lead_index(conf_info.LeadReq[j]) == -1) {
+               status = false;
+               break;
             }
+         }
+
+         // For bad status, discard this track and increment counter
+         if(!status) {
+            mlog << Debug(4)
+                 << "Discarding track " << i+1
+                 << " for not containing all required lead times. \n";
+            n_req_lead++;
+            continue;
          }
       }
 
@@ -842,14 +850,13 @@ void filter_tracks(TrackInfoArray &tracks) {
          continue;
       }
 
-
       // Valid location mask
       if(conf_info.ValidMask.n_points() > 0) {
 
          // Loop over all the points in the current track
          for(j=0, status=true; j<t[i].n_points(); j++) {
 
-            // In the TrackPoint falls outside of the polyline break out
+            // If the TrackPoint falls outside of the polyline break out
             if(!conf_info.ValidMask.latlon_is_inside_dege(t[i][j].lat(),
                                                           t[i][j].lon())) {
                status = false;
@@ -873,13 +880,13 @@ void filter_tracks(TrackInfoArray &tracks) {
 
    // Print summary filtering info
    mlog << Debug(3)
-        << "Total tracks read                   = " << t.n_tracks()      << "\n"
-        << "Total tracks kept                   = " << tracks.n_tracks() << "\n"
-        << "Rejected for storm name             = " << n_name            << "\n"
-        << "Rejected for valid time             = " << n_vld             << "\n"
-	<< "Rejected for requested lead times   = " << n_req_lead        << "\n"
-        << "Rejected for init mask              = " << n_mask_init       << "\n"
-        << "Rejected for valid mask             = " << n_mask_vld        << "\n";
+        << "Total tracks read                = " << t.n_tracks()      << "\n"
+        << "Total tracks kept                = " << tracks.n_tracks() << "\n"
+        << "Rejected for storm name          = " << n_name            << "\n"
+        << "Rejected for valid time          = " << n_vld             << "\n"
+        << "Rejected for required lead times = " << n_req_lead        << "\n"
+        << "Rejected for init mask           = " << n_mask_init       << "\n"
+        << "Rejected for valid mask          = " << n_mask_vld        << "\n";
 
    return;
 }
