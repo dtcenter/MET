@@ -588,6 +588,7 @@ obs_window = {
 //      verification should be performed over the entire grid on which the data
 //      resides.
 //      http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html
+//      The "grid" entry can be the gridded data file defining grid.
 //
 //    - The "poly" entry contains a comma-separated list of files that define
 //      verification masking regions. These masking regions may be specified in
@@ -771,6 +772,7 @@ boot = {
 interp = {
    field      = BOTH;
    vld_thresh = 1.0;
+   shape      = SQUARE;
 
    type = [
       {
@@ -881,7 +883,15 @@ output_flag = {
 // the output of all the different fields).  A value of false means no
 // netcdf output will be generated.
 //
-nc_pairs_flag = TRUE;
+nc_pairs_flag   = {
+   latlon     = TRUE;
+   raw        = TRUE;
+   diff       = TRUE;
+   climo      = TRUE;
+   weight     = FALSE;
+   nbrhd      = FALSE;
+   apply_mask = TRUE;
+}
 
 //
 // The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
