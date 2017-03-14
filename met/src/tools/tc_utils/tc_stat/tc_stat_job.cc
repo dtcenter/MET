@@ -540,7 +540,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          // Check the column threshold
          if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) {
            keep = false;
-           n.RejInitThresh++;
+           n.RejInitThresh += pair.n_points();
            break;
          }
       }
@@ -576,26 +576,25 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
                pair.adeck()[i_init].lat(),
                pair.adeck()[i_init].lon())) {
             keep = false;
-            n.RejOutInitMask++;
+            n.RejOutInitMask += pair.n_points();
          }
       }
    }
 
-   // MET-667 Check for required lead times (defined in the
-   // configuration file) in this track.
+   // MET-667 Check this track for required lead times
    // If no required lead times were defined, do nothing.
    if(keep == true && LeadReq.n_elements() > 0){
-	   // Loop through the points and see if any of the
-	   // lead times are in the list of required lead times
-	   // defined in the configuration file.
-       for(int j=0; j<LeadReq.n_elements(); j++){
-    	 if(pair.adeck().lead_index(LeadReq[j]) == -1){
-    		// If we don't have a match, break and discard this track.
-    		keep = false;
-                n.RejLeadReq++;
-    		break;
-    	 }
-       }
+      // Loop through the points and see if any of the
+      // lead times are in the list of required lead times
+      // defined in the configuration file.
+      for(int j=0; j<LeadReq.n_elements(); j++){
+         if(pair.adeck().lead_index(LeadReq[j]) == -1){
+            // If we don't have a match, break out and discard this track.
+            keep = false;
+            n.RejLeadReq += pair.n_points();
+            break;
+         }
+      }
    }
 
    // Update counts
