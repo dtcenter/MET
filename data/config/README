@@ -193,14 +193,6 @@ obtype = "ANALYS";
 //         - latlon Nx Ny lat_ll lon_ll delta_lat delta_lon
 //         - mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
 //
-//         - Specify a grid subset tile:
-//            - tile fcst|obs Nx Ny lat_cen lon_cen [lat_prv lon_prv]
-//            - tile lambert  Nx Ny lat_cen lon_cen  lat_prv lon_prv D_km
-//            - tile stereo   Nx Ny lat_cen lon_cen  lat_prv lon_prv D_km
-//
-//            Tile rotation, defined by (lat_prv, lon_prv), is only supported
-//            for lambert conformal and stereographic projections.
-//
 //    - The "vld_thresh" entry specifies a proportion between 0 and 1 to define
 //      the required ratio of valid data points.  When regridding, compute
 //      a ratio of the number of valid data points to the total number of
