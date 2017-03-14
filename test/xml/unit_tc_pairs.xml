@@ -86,7 +86,7 @@
 
   <test name="tc_pairs_LEAD_REQ">
     <env>
-      <pair><name>LEAD_REQ</name> <value>"06","18"</value></pair>
+      <pair><name>LEAD_REQ</name> <value>"96","108"</value></pair>
     </env>
     <exec>&MET_DIR;/bin/tc_pairs</exec>
     <param> \
