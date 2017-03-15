@@ -66,8 +66,7 @@ wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
 	max_interp.cc max_interp.h \
 	ave_interp.cc ave_interp.h \
 	nearest_interp.cc nearest_interp.h \
-	wwmca_ref.cc wwmca_ref.h \
-	nc_output.cc
+	wwmca_ref.cc wwmca_ref.h
 wwmca_plot_CPPFLAGS = ${MET_CPPFLAGS}
 wwmca_plot_LDFLAGS = ${MET_LDFLAGS}
 wwmca_plot_LDADD = -lvx_pxm \

@@ -59,8 +59,6 @@ static ConcatString output_directory;
 
 static int max_minutes = 120;
 
-static int compress_level = -1;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -103,8 +101,6 @@ static void set_max_minutes(const StringArray &);
 static void set_logfile(const StringArray &);
 
 static void set_verbosity(const StringArray &);
-
-static void set_compress(const StringArray &);
 
 static void process(const char * filename);
 
@@ -151,8 +147,6 @@ cline.add(set_logfile, "-log", 1);
 
 cline.add(set_verbosity, "-v", 1);
 
-cline.add(set_compress,  "-compress",  1);
-
 cline.parse();
 
 if ( cline.n() == 0 )  usage();
@@ -195,7 +189,6 @@ cout << "\nUsage: " << program_name << "\n"
      << "\t[-max max_minutes]\n"
      << "\t[-log file]\n"
      << "\t[-v level]\n"
-     << "\t[-compress level]\n"
      << "\twwmca_cloud_pct_file_list\n\n"
      << "\twhere\t\"-outdir path\" overrides the default output "
      << "directory (.) (optional).\n"
@@ -205,7 +198,6 @@ cout << "\nUsage: " << program_name << "\n"
      << "file (optional).\n"
      << "\t\t\"-v level\" overrides the default level of logging ("
      << mlog.verbosity_level() << ") (optional).\n"
-     << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n"
      << "\t\t\"wwmca_cloud_pct_file_list\" is a list of one or "
      << "more wwmca cloud percent files to plot.\n\n";
 
@@ -275,19 +267,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-int get_compress() {
-   //return ((compress_level < 0)? 0 : compress_level);
-   return compress_level;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_compress(const StringArray & a) {
-   compress_level = atoi(a[0]);
-}
 
 ////////////////////////////////////////////////////////////////////////
 
