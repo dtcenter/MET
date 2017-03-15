@@ -75,7 +75,7 @@
 \begin_body
 
 \begin_layout Chapter
-Regional Verification using Masking and Tiles
+Regional Verification using Spatial Masking
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:Masking"
