@@ -863,9 +863,6 @@ void process_obs_file(int i_nc) {
                strncpy(hdr_vld_str, hdr_vld_str_block[headerOffset], str_length);
                hdr_vld_str[str_length] = bad_data_char;
 
-   //cout << " str_length: " << str_length << " sizeof: " << str_length2 << ", [" << hdr_sid_str_block[headerOffset][0] << "] " << " hdr_vld_str_block[headerOffset]: [" << (hdr_vld_str_block[headerOffset]) << "] hdr_vld_str: [" << hdr_vld_str << "] headerOffset: " << headerOffset << " i_obs: " << i_obs << "\n";
-   //cout << " hdr_vld_str: [" << hdr_vld_str << "] headerOffset: " << headerOffset << " i_obs: " << i_obs << "\n";
-
                prev_hdr_offset = headerOffset;
             }
          }
@@ -951,7 +948,6 @@ void process_obs_file(int i_nc) {
 
 
          // Convert string to a unixtime
-         //cout << "  --------------- hdr_vld_str: " << hdr_vld_str << " i_obs: " << i_obs << " hdrOffste: " << headerOffset << "\n";
          hdr_ut = timestring_to_unix(hdr_vld_str);
 
          // Check each conf_info.vx_pd object to see if this observation

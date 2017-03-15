@@ -1925,8 +1925,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     int count = sa.n_elements();
     x_dim_var_name = sa[count-2];
     y_dim_var_name = sa[count-1];
-    //cout << "     DEBUG] " << method_name  << " xName: " << x_dim_var_name << ", yName: " << y_dim_var_name << endl;
-    
+ 
     float lat_missing_value = bad_data_double;
     float lon_missing_value = bad_data_double;
     for (int var_num = 0; var_num < Nvars; ++var_num) {
@@ -1982,7 +1981,6 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
 
     long lat_counts = GET_NC_SIZE(yDim);
     long lon_counts = GET_NC_SIZE(xDim);
-    //cout << "     DEBUG] " << method_name  << " lat_counts: " << lat_counts << ", lon_counts: " << lon_counts << endl;
     bool two_dim_corrd = false;
     
     if (get_data_size(_xCoordVar) == (lon_counts*lat_counts) ||
@@ -2014,8 +2012,6 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       length[1] = lon_counts;
       length[0] = 1;
       get_nc_data(_xCoordVar,lon_values, length, cur);
-      //cout << "     DEBUG] " << method_name  << " lat_values[0]=" << lat_values[0] << ", lat_values[1]=" << lat_values[1] << endl;
-      //cout << "     DEBUG] " << method_name  << " lon_values[0]=" << lon_values[0] << ", lon_values[1]=" << lon_values[1] << endl;
     }
     else {
       get_nc_data(_yCoordVar,lat_values);

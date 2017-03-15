@@ -906,8 +906,6 @@ L -= 180.0;
 
 data.lon_orient = L;
 
-// cout << "\n\n  Lon orient = " << (data.lon_orient) << "\n\n";
-
    //
    //  done
    //

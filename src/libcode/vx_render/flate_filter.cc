@@ -95,8 +95,6 @@ inbytes = 0;
 
 flush_mode = Z_NO_FLUSH;
 
-// cout << "\n\n  Deallocating FlateEncode filter\n\n";
-
 }
 
 

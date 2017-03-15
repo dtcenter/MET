@@ -740,8 +740,6 @@ for (x=0; x<Nx; ++x)  {
 
 }
 
-// cout << "ModeNcOutputFile::select_obj() -> count = " << count << "\n" << flush;
-
 return ( fdata );
 
 }

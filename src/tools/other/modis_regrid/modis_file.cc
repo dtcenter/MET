@@ -547,9 +547,6 @@ get_data_field(Field, name);
 
 NumberType = Field->numbertype();
 
-// get_scale_offset();
-
-// Field->dump(cout);
 
 return;
 
@@ -629,8 +626,6 @@ ConcatString _field_name = field->name();
 
 char * field_name = (char *) (const char *) _field_name;
 
-// cout << "field_name = " << field_name << "\n" << flush;
-
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
@@ -683,8 +678,6 @@ start[1] = n1;
 ConcatString _field_name = field->name();
 
 char * field_name = (char *) (const char *) _field_name;
-
-// cout << "field_name = " << field_name << "\n" << flush;
 
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
@@ -739,8 +732,6 @@ ConcatString _field_name = field->name();
 
 char * field_name = (char *) (const char *) _field_name;
 
-// cout << "field_name = " << field_name << "\n" << flush;
-
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 
 if ( status < 0 )  {
@@ -793,8 +784,6 @@ start[1] = n1;
 ConcatString _field_name = field->name();
 
 char * field_name = (char *) (const char *) _field_name;
-
-// cout << "field_name = " << field_name << "\n" << flush;
 
 status = SWreadfield(Swath->swath_id(), field_name, start, 0, edge_2, buf);
 

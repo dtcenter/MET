@@ -180,10 +180,6 @@ int main(int argc, char * argv[])
       //
    grid = met_ptr->grid();
 
-   // double x, y;
-   // grid.latlon_to_xy(40.0, -105.0, x, y);
-   // cout << "(x, y} = (" << x << ", " << y << ")\n";
-
       //
       // read in the color table file and scale the color table to fit
       // the data

@@ -627,7 +627,6 @@ plane.set_size(Nx, Ny);
       short  short_array[Nx];
       float  float_array[Nx];
       dim[x_slot] = Nx;
-      //cout << "  =================== read Column (Nx)  ==================" << endl;
       for (y=0; y<Ny; ++y)  {
          cur[y_slot] = y;
          switch ( type_id )  {
@@ -681,7 +680,6 @@ plane.set_size(Nx, Ny);
       short  short_array[Ny];
       float  float_array[Ny];
       dim[y_slot] = Ny;
-      //cout << "  =================== read Row (Ny)  ==================" << endl;
       for (x=0; x<Nx; ++x)  {
          cur[x_slot] = x;
          switch ( type_id )  {

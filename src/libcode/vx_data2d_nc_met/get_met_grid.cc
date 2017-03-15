@@ -375,7 +375,7 @@ data.lon_orient *= -1.0;
 get_global_att(ncfile, "d_km", data.d_km);
 //data.d_km = atof(att->getValues(att->as_string(0));
 //att->getValues(&data.d_km);
-cout << "   get_lambert_data_v3: data.d_km: " << data.d_km << "\n";
+
    // Radius of the earth
 get_global_att(ncfile, "r_km", data.r_km);
 //data.r_km = atof(att->getValues(att->as_string(0));

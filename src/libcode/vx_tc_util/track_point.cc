@@ -224,7 +224,7 @@ void QuadInfo::set_seas(const ATCFTrackLine &l) {
 void QuadInfo::set_quad_vals(QuadrantType ref_quad,
                              int rad1, int rad2, int rad3, int rad4) {
 
-   // Switch logic based on the reference quadrant, couting clockwise.
+   // Switch logic based on the reference quadrant, counting clockwise.
    switch(ref_quad) {
 
      // Full circle radius is stored in the first radius
