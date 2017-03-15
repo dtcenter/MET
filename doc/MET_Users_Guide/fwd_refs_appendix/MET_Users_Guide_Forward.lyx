@@ -142,7 +142,7 @@ name "sec:New-for-MET"
 \begin_layout Standard
 
 \series medium
-ETv6.0 includes several enhancements to existing tools, including t
+METv6.0 includes several enhancements to existing tools, including t
 \series default
 he NetCDF4 enhanced mode.
 \end_layout
@@ -155,18 +155,29 @@ NetCDF4 supports the compression for variables.
  Lower number is faster and higher number is better compression.
  Some tools can override this by using tool specific configuration file.
  Indivisual user has an option to override the compression level with the
- environment variable MET_NC_COMPRESS or with the command line argument
- 
+ environment variable 
+\series bold
+MET_NC_COMPRESS
+\series default
+ or with the command line argument 
+\series bold
+
 \begin_inset Quotes eld
 \end_inset
 
 -compress level
+\series default
+
 \begin_inset Quotes erd
 \end_inset
 
 .
- THe command line argument has the precedence over the environment variable
- MET_NC_COMPRESS.
+ The command line argument has the precedence over the environment variable
+ 
+\series bold
+MET_NC_COMPRESS
+\series default
+.
 \end_layout
 
 \begin_layout Standard
