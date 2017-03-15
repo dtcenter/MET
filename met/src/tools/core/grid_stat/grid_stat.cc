@@ -702,12 +702,13 @@ void process_scores() {
       // Loop through and apply each of the smoothing operations
       for(j=0; j<conf_info.get_n_interp(); j++) {
 
-         // Store the interpolation method and width being applied
+	       //create appropriate grid template for iterating over the grid shape
          GridTemplateFactory gtf;
          GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
                                         conf_info.interp_wdth[j]);
 
          // Set the interp header columns
+         // Store the interpolation method and width being applied
          string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[j]).text();
          if(conf_info.interp_wdth[j] > 1) {
             interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
@@ -941,13 +942,18 @@ void process_scores() {
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
 
+               //create appropriate grid template for iterating over the grid shape
+               GridTemplateFactory gtf;
+               GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
+                                        conf_info.interp_wdth[j]);
+               
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
                if(conf_info.interp_field == FieldType_Fcst ||
                   conf_info.interp_field == FieldType_Both) {
                   smooth_field(fu_dp, fu_dp_smooth,
                                conf_info.interp_mthd[j],
-                               conf_info.interp_wdth[j],
+                               *gt,
                                conf_info.interp_thresh);
                }
                // Do not smooth the forecast field
@@ -961,7 +967,7 @@ void process_scores() {
                   conf_info.interp_field == FieldType_Both) {
                   smooth_field(ou_dp, ou_dp_smooth,
                                conf_info.interp_mthd[j],
-                               conf_info.interp_wdth[j],
+                               *gt,
                                conf_info.interp_thresh);
                }
                // Do not smooth the observation field
