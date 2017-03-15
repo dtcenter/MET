@@ -783,11 +783,6 @@ bool has_key(const char *key, int & index) {
          }
       }
    }
-   //bool found_key2 = obs_key.has(key, index);
-   //if (found_key2 != found_key ) {
-   //   cout << " key: " << key << ", result_1: " << found_key << ", result_2: " << found_key2 << endl;
-   //   cout << " int_key: " << int_key << ", result_1: " << found_key << ", result_2: " << found_key2 << endl;
-   //}
    return(found_key);
 }
 

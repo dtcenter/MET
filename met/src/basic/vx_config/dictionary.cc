@@ -2397,8 +2397,6 @@ if ( Nelements >= max_dictionary_depth )  {
 
 }
 
-// cout << "\n\n  In DictionaryStack::push() ...\n\n\n" << flush;
-
 D[Nelements++] = new Dictionary;
 
 return;
@@ -2412,8 +2410,6 @@ return;
 void DictionaryStack::push_array()
 
 {
-
-// cout << "\n\n  In DictionaryStack::push_array() ...\n\n\n" << flush;
 
 push();
 

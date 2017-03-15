@@ -919,10 +919,6 @@ for (j=0; j<N; ++j)  {
 
       info->kern = fix_to_float(k_delta.x);
 
-      // info->kern +=  10.0;   //  just to see what happens
-
-      // if ( info->kern != 0.0 )  cout << " kern " << new_string[j - 1] << ' ' << new_string[j] << " is " << info->kern << "\n" << ::flush;
-
       x_char_origin += info->kern;   //  move this char
 
    }
@@ -2096,14 +2092,6 @@ cout << "horiBearingX " << t*(m.horiBearingX) << '\n';
 cout << "horiBearingY " << t*(m.horiBearingY) << '\n';
 cout << "horiAdvance  " << t*(m.horiAdvance)  << '\n';
 
-// cout << '\n';
-// 
-// cout << "vertBearingX " << t*(m.vertBearingX) << '\n';
-// cout << "vertBearingY " << t*(m.vertBearingY) << '\n';
-// cout << "vertAdvance  " << t*(m.vertAdvance)  << '\n';
-
-
-
 cout << "\n\n";
 
 
@@ -2171,10 +2159,6 @@ while ( j < N )  {
    }
 
 }   //  while
-
-
-// cout << "s = \"" << s << "\"\n\n";
-
 
    //
    //  done
@@ -2278,8 +2262,6 @@ y3 = (info->y_offset) + fix_to_float(to->y);
 info->cgraph->curveto(x1, y1, x2, y2, x3, y3);
 
 info->have_path = true;
-
-// cout << "Cubic x_to = " << x3 << '\n';
 
 return ( 0 );
 

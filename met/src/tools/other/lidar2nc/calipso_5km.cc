@@ -783,8 +783,6 @@ fclass_record_header(hdr_id, layer, ftype_grib_code, record);
 
 record [ obs_index ] = (float) extract_bits(fclass[layer], type_mask, type_shift);
 
-// cout << record [ obs_index ] << '\n';
-
    //
    //  done
    //

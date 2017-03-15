@@ -144,7 +144,7 @@ modis_filename = cline[0];
 
 get_grid();
 
-cout << "Processing " << modis_filename << "\n" << flush;
+mlog << Debug(1) << "Processing " << modis_filename << "\n";
 
 process(modis_filename);
 
@@ -385,21 +385,16 @@ if ( ! in.open(input_filename) )  {
 
 }
 
-// in.dump(cout);
-
 in.select_data_field(modis_field);
 
 in.set_data_scale(data_scale);
 in.set_data_offset(data_offset);
 in.set_data_fill_value(data_fill_value);
 
-// mlog << Warning
-//      << "Need to fix scale/offset values!\n\n";
-
 in.latlon_range(lat_min, lat_max, lon_min, lon_max);
 
-cout << "Lat range is " << lat_min << " to " << lat_max << "\n";
-cout << "Lon range is " << lon_min << " to " << lon_max << "\n";
+mlog << Debug(2) << "Lat range is " << lat_min << " to " << lat_max << "\n";
+mlog << Debug(2) << "Lon range is " << lon_min << " to " << lon_max << "\n";
 
 plane.set_size(grid.nx(), grid.ny());
 
@@ -465,9 +460,9 @@ for (x=0; x<nx; ++x)  {
 
 }
 
-cout << "Data range is " << data_min << " to " << data_max << "\n" << flush;
+mlog << Debug(2) << "Data range is " << data_min << " to " << data_max << "\n";
 
-cout << "Nonzero count is " << nonzero_count << "\n" << flush;
+mlog << Debug(2) << "Nonzero count is " << nonzero_count << "\n";
 
 ConcatString output_field_name = modis_field;
 

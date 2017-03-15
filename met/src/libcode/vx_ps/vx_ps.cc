@@ -445,8 +445,6 @@ void PSfile::choose_font(int n, double s)
 
 ConcatString data_dir;
 
-// cout << "PSfile::choose_font(int n, double s) -> default_met_data_dir = \"" << default_met_data_dir << "\n";
-
 data_dir = replace_path(default_met_data_dir);
 
 choose_font_with_dir(n, s, data_dir);

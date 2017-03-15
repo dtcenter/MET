@@ -1379,15 +1379,6 @@ for (c=0; c<Ncols; ++c)  {
 
    if ( w_new < w_old )  w_new = w_old;
 
-/*
-   cout << "\n"
-        << "col       = " << c         << '\n'
-        << "max_left  = " << max_left  << '\n'
-        << "max_right = " << max_right << '\n'
-        << "w_old     = " << w_old     << "\n"
-        << "w_new     = " << w_new     << "\n\n";
-*/
-
       //
       //  pad each entry in that column
       //
@@ -1705,10 +1696,6 @@ for (j=0; j<N; ++j)  {
 
 left  = j + 1;
 right = N - left;
-
-// cout << "text = \"" << text  << "\"\n";
-// cout << "L    = "   << left  << "\n";
-// cout << "R    = "   << right << "\n\n";
 
 return;
 

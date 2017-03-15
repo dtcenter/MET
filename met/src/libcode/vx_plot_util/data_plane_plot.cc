@@ -340,8 +340,6 @@ void fill_colorbar_image(Ppm & image, const ColorTable & ctable)
  
    m = (dmax - dmin)/(num_cbar_vals - 1);
 
-   // cout << "\n\n  range is " << dmin << ", " << dmax << "\n\n" << flush;
-
    for (i = 0; i < num_cbar_vals; i++)
    {
          //
@@ -361,9 +359,6 @@ void fill_colorbar_image(Ppm & image, const ColorTable & ctable)
 
    }
 
-// image.write("test.ppm");
-
-//cout << "\n\n  Image size is " << image.nx() << " x " << image.ny() << "\n\n";
 
 }
 

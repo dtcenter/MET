@@ -411,8 +411,6 @@ if ( have_pairs )  {
 
       }
 
-      // cout.put('\n');
-
    }
 
 }   //  if have_pairs
@@ -644,8 +642,6 @@ if ( have_pairs )  {
          pa_cluster.add(p);
 
       }
-
-      // cout.put('\n');
 
    }
 
