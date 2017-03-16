@@ -1158,9 +1158,6 @@ void process_point_scores() {
 
                pd_ptr = &conf_info.vx_pd[i].pd[j][k][l];
 
-               // Compute the ranks for the observations
-               pd_ptr->compute_rank(rng_ptr);
-
                mlog << Debug(2)
                     << "Processing point verification "
                     << conf_info.vx_pd[i].fcst_info->magic_str()
@@ -1175,6 +1172,9 @@ void process_point_scores() {
 
                // Continue if there are no points
                if(pd_ptr->n_obs == 0) continue;
+
+               // Compute the ranks for the observations
+               pd_ptr->compute_rank(rng_ptr);
 
                // Compute ensemble statistics
                pd_ptr->compute_rhist();
@@ -1216,6 +1216,9 @@ void process_point_scores() {
                // Write SSVAR scores
                if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
                   pd_ptr->compute_ssvar();
+
+                  // Check for no bins
+                  if(!pd_ptr->ssvar_bins) break;
 
                   // Add rows to the output AsciiTables for SSVAR
                   stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin *
@@ -1622,19 +1625,19 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void clear_counts(const DataPlane &dp, int i_vx) {
-   int i, j, n;
+   int i, j;
 
    // Number of grid points
-   n = dp.nx()*dp.ny();
+   const int Nxy = dp.nx()*dp.ny();
 
    // Allocate memory in one big chunk based on grid size, if needed
-   count_na.extend(n);
-   min_na.extend(n);
-   max_na.extend(n);
-   sum_na.extend(n);
-   sum_sq_na.extend(n);
+   count_na.extend(Nxy);
+   min_na.extend(Nxy);
+   max_na.extend(Nxy);
+   sum_na.extend(Nxy);
+   sum_sq_na.extend(Nxy);
    for(i=0; i<conf_info.get_max_n_thresh(); i++) {
-      thresh_count_na[i].extend(n);
+      thresh_count_na[i].extend(Nxy);
    }
 
    // Erase existing values
@@ -1648,7 +1651,7 @@ void clear_counts(const DataPlane &dp, int i_vx) {
    }
 
    // Initialize arrays
-   for(i=0; i<n; i++) {
+   for(i=0; i<Nxy; i++) {
       count_na.add(0);
       min_na.add(bad_data_double);
       max_na.add(bad_data_double);
@@ -1665,36 +1668,50 @@ void clear_counts(const DataPlane &dp, int i_vx) {
 ////////////////////////////////////////////////////////////////////////
 
 void track_counts(const DataPlane &dp, int i_vx) {
-   int x, y, n, i;
+   int i, j;
    double v;
 
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+   // Number of grid points
+   const int Nxy = dp.nx()*dp.ny();
 
-         n = dp.two_to_one(x, y);
-         v = dp.get(x, y);
+   // Pointers to data buffers for faster access
+   const double *Data = dp.data();
+   double *CountBuf   = count_na.buf();
+   double *MinBuf     = min_na.buf();
+   double *MaxBuf     = max_na.buf();
+   double *SumBuf     = sum_na.buf();
+   double *SumSqBuf   = sum_sq_na.buf();
 
-         // Skip the bad data value
-         if(is_bad_data(v)) continue;
+   const int Nthresh = conf_info.ens_ta[i_vx].n_elements();
+   SingleThresh *ThreshBuf = conf_info.ens_ta[i_vx].buf();
 
-         // Otherwise, add to counts and sums
-         else {
-            count_na.set(n, count_na[n] + 1);
+   // Increment counts for each grid point
+   for(i=0; i<Nxy; i++) {
 
-            if(v <= min_na[n] || is_bad_data(min_na[n])) min_na.set(n, v);
-            if(v >= max_na[n] || is_bad_data(max_na[n])) max_na.set(n, v);
+      // Get current value
+      v = *Data++;
 
-            sum_na.set(n, sum_na[n] + v);
-            sum_sq_na.set(n, sum_sq_na[n] + v*v);
+      // Skip the bad data value
+      if(is_bad_data(v)) continue;
 
-            for(i=0; i<conf_info.ens_ta[i_vx].n_elements(); i++) {
-               if(conf_info.ens_ta[i_vx][i].check(v))
-                  thresh_count_na[i].set(n, thresh_count_na[i][n] + 1);
-            }
+      // Otherwise, update counts and sums
+      else {
+
+         CountBuf[i] += 1;
+
+         if(v <= MinBuf[i] || is_bad_data(MinBuf[i])) MinBuf[i] = v;
+         if(v >= MaxBuf[i] || is_bad_data(MaxBuf[i])) MaxBuf[i] = v;
+
+         SumBuf[i]   += v;
+         SumSqBuf[i] += v*v;
+
+         for(j=0; j<Nthresh; j++) {
+            if(ThreshBuf[j].check(v)) thresh_count_na[j].inc(i, 1);
          }
 
-      } // end for y
-   } // end for x
+      } // end else
+
+   } // end for i
 
    return;
 }
