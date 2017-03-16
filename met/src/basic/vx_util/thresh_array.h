@@ -47,6 +47,9 @@ class ThreshArray {
       bool operator==(const ThreshArray &) const;
       SingleThresh operator[](int) const;
 
+      const SingleThresh * thresh() const;
+      SingleThresh * buf() const;
+
       void add(const SingleThresh &);
       void add(const double, const ThreshType);
       void add(const char *);
@@ -70,14 +73,15 @@ class ThreshArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int ThreshArray::n_elements() const { return ( Nelements ); }
+inline int                  ThreshArray::n_elements() const { return ( Nelements ); }
+inline const SingleThresh * ThreshArray::thresh()     const { return ( t );         }
+inline       SingleThresh * ThreshArray::buf()        const { return ( t );         }
 
 ////////////////////////////////////////////////////////////////////////
 
 extern ThreshArray  string_to_prob_thresh(const char *);
 extern ConcatString prob_thresh_to_string(const ThreshArray &);
 extern bool         check_prob_thresh    (const ThreshArray &, bool error_out = true);
-
 
 ////////////////////////////////////////////////////////////////////////
 
