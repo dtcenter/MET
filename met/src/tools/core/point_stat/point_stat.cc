@@ -689,14 +689,6 @@ void process_obs_file(int i_nc) {
    char hdr_sid_str_block[hdr_buf_size][strl_len];
    char hdr_vld_str_block[hdr_buf_size][strl_len];
    float    hdr_arr_block[hdr_buf_size][hdr_arr_len];
-   //float **hdr_arr_full = (float **) 0, **obs_arr_block = (float **) 0;
-   //for (int i=0; i<hdr_buf_size; i++) {
-   //   for (j=0; j<strl_len; j++) {
-   //      hdr_typ_str_block[i][j] = bad_data_char;
-   //      hdr_sid_str_block[i][j] = bad_data_char;
-   //      hdr_vld_str_block[i][j] = bad_data_char;
-   //   }
-   //}
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
@@ -826,19 +818,16 @@ void process_obs_file(int i_nc) {
              obs_arr[j] = obs_arr_block[i_block_idx][j];
          }
          strcpy(obs_qty_str, obs_qty_block[i_block_idx]);
-         //obs_qty_str[str_length] = bad_data_char;
 
          int headerOffset = obs_arr[0];
-         //if ((hdr_count == obs_count) || ((0 <= headerOffset) && (headerOffset < hdr_buf_size))) {
+
          if ((hdr_count == obs_count) || (headerOffset < hdr_buf_size)) {
             int str_length;
 
             if (obs_count == hdr_count) headerOffset = i_block_idx;
-            //if (hdr_count == obs_count) headerOffset = i_block_idx;
-            //if ((headerOffset < 0) || headerOffset >= hdr_count) {
-            //   continue;
-            //}
+
             if (prev_hdr_offset != headerOffset) {
+
                // Read the corresponding header array for this observation
                for (int k=0; k < hdr_arr_len; k++)
                   hdr_arr[k] = hdr_arr_block[headerOffset][k];
@@ -856,10 +845,8 @@ void process_obs_file(int i_nc) {
                hdr_sid_str[str_length] = bad_data_char;
 
                // Read the corresponding valid time for this observation
-               str_length = strlen(hdr_sid_str_block[headerOffset]);
-               int str_length2 = sizeof(hdr_vld_str_block[headerOffset]);
+               str_length = strlen(hdr_vld_str_block[headerOffset]);
                if (str_length > strl_len) str_length = strl_len;
-               str_length = strl_len;
                strncpy(hdr_vld_str, hdr_vld_str_block[headerOffset], str_length);
                hdr_vld_str[str_length] = bad_data_char;
 
@@ -963,7 +950,7 @@ void process_obs_file(int i_nc) {
          }
       }
 
-   } // end for i_obs
+   } // end for i_block_start_idx
 
    // Print the duplicate report
    for(j=0; j<conf_info.get_n_vx(); j++) {
@@ -972,9 +959,10 @@ void process_obs_file(int i_nc) {
    }
 
    // Deallocate and clean up
-   //obs_in->close();
-   delete obs_in;
-   obs_in = (NcFile *) 0;
+   if(obs_in) {
+      delete obs_in;
+      obs_in = (NcFile *) 0;
+   }
 
    return;
 }
@@ -1356,7 +1344,7 @@ void process_scores() {
                } // end Compute PCT
 
             } // end for l
-	    
+
             // Apply HiRA verification logic
             if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
                 conf_info.hira_info.flag                &&
