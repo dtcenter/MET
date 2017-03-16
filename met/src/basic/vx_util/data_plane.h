@@ -50,6 +50,8 @@ class DataPlane {
 
       void clear();
 
+      void erase();
+
       void dump(ostream &, int = 0) const;
 
          //
@@ -70,7 +72,7 @@ class DataPlane {
          //
 
       int      nx() const;
-      int      ny() const; 
+      int      ny() const;
       unixtime init() const;
       unixtime valid() const;
       int      lead() const;
@@ -78,14 +80,15 @@ class DataPlane {
       double   get(int x, int y) const;
       double   operator () (int x, int y) const;
 
-      const double * data () const;
+      const double * data() const;
+      double * buf() const;
 
          //
          // Do stuff
          //
 
       void threshold(const SingleThresh &);
-      
+
       int  two_to_one(int x, int y) const;
       void one_to_two(int n, int &x, int &y) const;
 
@@ -113,6 +116,7 @@ inline int      DataPlane::accum() const { return (AccumTime); }
 inline double DataPlane::operator()(int x, int y) const { return(get(x, y)); }
 
 inline const double * DataPlane::data() const { return ( Data ); }
+inline       double * DataPlane::buf()  const { return ( Data ); }
 
 
 ////////////////////////////////////////////////////////////////////////
