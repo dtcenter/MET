@@ -685,7 +685,6 @@ void process_ensemble() {
 
    // Close the output NetCDF file
    if(nc_out) {
-      //nc_out->close();
       delete nc_out;
       nc_out = (NcFile *) 0;
    }
@@ -977,29 +976,29 @@ void process_point_obs(int i_nc) {
          strncpy(obs_qty_str, obs_qty_str_block[i_offset], str_length);
          obs_qty_str[str_length] = bad_data_char;
 
-         int headerOffset  = i_obs;
+         int headerOffset  = obs_arr[0];
+
          // Read the corresponding header array for this observation
-         for (int k=0; k < obs_arr_len; k++)
+         for (int k=0; k < hdr_arr_len; k++)
             hdr_arr[k] = hdr_arr_full[headerOffset][k];
 
-        // Read the corresponding header type for this observation
-         str_length = strlen(hdr_typ_str_full[i_offset]);
+         // Read the corresponding header type for this observation
+         str_length = strlen(hdr_typ_str_full[headerOffset]);
          if (str_length > mxstr_len) str_length = mxstr_len;
          strncpy(hdr_typ_str, hdr_typ_str_full[headerOffset], str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
          // Read the corresponding header Station ID for this observation
-         str_length = strlen(hdr_sid_str_full[i_offset]);
+         str_length = strlen(hdr_sid_str_full[headerOffset]);
          if (str_length > mxstr_len) str_length = mxstr_len;
          strncpy(hdr_sid_str, hdr_sid_str_full[headerOffset], str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
          // Read the corresponding valid time for this observation
-         str_length = strlen(hdr_vld_str_full[i_offset]);
+         str_length = strlen(hdr_vld_str_full[headerOffset]);
          if (str_length > mxstr_len) str_length = mxstr_len;
          strncpy(hdr_vld_str, hdr_vld_str_full[headerOffset], str_length);
          hdr_vld_str[str_length] = bad_data_char;
-
 
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
@@ -1013,18 +1012,18 @@ void process_point_obs(int i_nc) {
                                        hdr_ut, obs_qty_str, obs_arr, grid);
          }
       }
-   } // end for i_obs
+   } // end for i_start
 
-   // Print the duplicate report
+   // Calculate observation summaries and print duplicate report
    for(j=0; j < conf_info.get_n_vx(); j++) {
-     conf_info.vx_pd[j].calc_obs_summary();
-     conf_info.vx_pd[j].print_duplicate_report();
+      conf_info.vx_pd[j].calc_obs_summary();
+      conf_info.vx_pd[j].print_duplicate_report();
    }
 
    // Deallocate and clean up
    if(obs_in) {
-      //obs_in->close();
-      delete obs_in; obs_in = (NcFile *) 0;
+      delete obs_in;
+      obs_in = (NcFile *) 0;
    }
 
    return;
@@ -1559,7 +1558,7 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
    int i, j, x, y, n_miss;
    double v, cmn;
 
-   // Allocate memory in on big chunk based on grid size
+   // Allocate memory in one big chunk based on grid size
    pd.extend(grid.nx()*grid.ny());
 
    // Climatology flags
@@ -1623,20 +1622,33 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void clear_counts(const DataPlane &dp, int i_vx) {
-   int i, j;
+   int i, j, n;
 
-   // Clear arrays
-   count_na.clear();
-   min_na.clear();
-   max_na.clear();
-   sum_na.clear();
-   sum_sq_na.clear();
+   // Number of grid points
+   n = dp.nx()*dp.ny();
+
+   // Allocate memory in one big chunk based on grid size, if needed
+   count_na.extend(n);
+   min_na.extend(n);
+   max_na.extend(n);
+   sum_na.extend(n);
+   sum_sq_na.extend(n);
    for(i=0; i<conf_info.get_max_n_thresh(); i++) {
-      thresh_count_na[i].clear();
+      thresh_count_na[i].extend(n);
+   }
+
+   // Erase existing values
+   count_na.erase();
+   min_na.erase();
+   max_na.erase();
+   sum_na.erase();
+   sum_sq_na.erase();
+   for(i=0; i<conf_info.get_max_n_thresh(); i++) {
+      thresh_count_na[i].erase();
    }
 
    // Initialize arrays
-   for(i=0; i<dp.nx()*dp.ny(); i++) {
+   for(i=0; i<n; i++) {
       count_na.add(0);
       min_na.add(bad_data_double);
       max_na.add(bad_data_double);
