@@ -66,6 +66,7 @@ class NumArray {
       double operator[](int) const;
 
       const double * vals() const;
+      double * buf() const;
 
       int has(int)    const;
       int has(double) const;
@@ -78,6 +79,10 @@ class NumArray {
 
       void set(int, int);
       void set(int, double);
+
+      // Increment value
+      void inc(int, int);
+      void inc(int, double);
 
       void   sort_array();
       void   reorder(const NumArray &);
@@ -107,8 +112,11 @@ class NumArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int            NumArray::n_elements() const { return ( Nelements ); }
-inline const double * NumArray::vals()       const { return ( e );         }
+inline int            NumArray::n_elements()         const { return ( Nelements ); }
+inline const double * NumArray::vals()               const { return ( e );         }
+inline       double * NumArray::buf()                const { return ( e );         }
+inline void           NumArray::inc(int i, int v)          { e[i] += v; return;    }
+inline void           NumArray::inc(int i, double v)       { e[i] += v; return;    }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,5 +126,3 @@ inline const double * NumArray::vals()       const { return ( e );         }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
