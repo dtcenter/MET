@@ -484,6 +484,9 @@ void PairDataEnsemble::compute_ssvar() {
         << "Built " << n_bin << " variance spread/skill bins from "
         << o_na.n_elements() << " observations\n";
 
+   // Check for no bins
+   if(n_bin == 0) return; 
+
    // Build a list of SSVARInfo objects
    ssvar_bins = new SSVARInfo[n_bin];
    i=0;
