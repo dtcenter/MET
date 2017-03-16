@@ -32,7 +32,6 @@ struct station_values_t {
   int x;
   int y;
   vector<ob_val_t> obs;
-  //  ob_val_t out_ob;
 };
 
 enum obs_summary_enum {
