@@ -114,6 +114,18 @@ void DataPlane::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::erase() {
+
+   memset(Data, 0, Nxy*sizeof(double));
+
+   InitTime = ValidTime = (unixtime) 0;
+   LeadTime = AccumTime = 0;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 void DataPlane::dump(ostream & out, int depth) const {
    ConcatString time_str;
@@ -123,13 +135,13 @@ void DataPlane::dump(ostream & out, int depth) const {
    out << prefix << "Nx        = " << Nx  << '\n';
    out << prefix << "Ny        = " << Ny  << '\n';
    out << prefix << "Nxy       = " << Nxy << '\n';
-   
+
    time_str = unix_to_yyyymmdd_hhmmss(InitTime);
    out << prefix << "InitTime  = " << time_str << " (" << InitTime  << ")\n";
-   
+
    time_str = unix_to_yyyymmdd_hhmmss(ValidTime);
    out << prefix << "ValidTime = " << time_str << " (" << ValidTime << ")\n";
-   
+
    time_str = sec_to_hhmmss(LeadTime);
    out << prefix << "LeadTime  = " << time_str << " (" << LeadTime  << ")\n";
 
@@ -148,6 +160,23 @@ void DataPlane::dump(ostream & out, int depth) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::set_size(int x, int y) {
+
+      //
+      //  if already requested size, erase existing data
+      //
+
+   if ( Nx == x && Ny == y ) {
+      erase();
+      return;
+   }
+
+      //
+      //  delete exisiting data, if necessary
+      //
+
+   if ( Data != (double *) 0 ) {
+      clear();
+   }
 
    Nx = x;
    Ny = y;
@@ -234,6 +263,8 @@ double DataPlane::get(int x, int y) const {
    return(Data[n]);
 }
 
+// JHG
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -245,13 +276,13 @@ void DataPlane::threshold(const SingleThresh &st) {
    //   1.0 if it meets the threshold criteria
    //   0.0 if it does not
    //
-   
+
    for(j=0; j<Nxy; ++j) {
-     
+
       if( is_bad_data(Data[j]) )  continue;
       if( st.check(Data[j]) )     Data[j] = 1.0;
       else                        Data[j] = 0.0;
-      
+
    }
 
    return;
@@ -298,7 +329,7 @@ bool DataPlane::s_is_on(int x, int y) const {
    //
    // Return true if the current point is non-zero.
    //
-   
+
    return( !is_eq(get(x, y), 0) );
 }
 
@@ -310,7 +341,7 @@ bool DataPlane::f_is_on(int x, int y) const {
    // Consider the box defined by (x,y) as the upper-right corner.
    // Return true if any corner of that box is non-zero.
    //
-  
+
    if( s_is_on(x, y) )                                return(true);
 
    if( (x > 0) && s_is_on(x - 1, y) )                 return(true);
@@ -364,7 +395,7 @@ void DataPlane::shift_right(int N)
 
 if ( !Data )  {
 
-   mlog << Error 
+   mlog << Error
         << "\n\n  DataPlane::shift_right(int) -> data plane is empty!\n\n";
 
    exit ( 1 );
