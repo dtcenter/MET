@@ -26,7 +26,7 @@
     <exec>&EXECUTABLE;</exec>
     <param>  -out &DATA_DIR_OUT;/calipso.nc  &CALIPSO_FILE; </param>   
     <output>
-      </point_nc>&DATA_DIR_OUT;/calipso.nc</point_nc>
+      <point_nc>&DATA_DIR_OUT;/calipso.nc</point_nc>
     </output>
   </test>
   
