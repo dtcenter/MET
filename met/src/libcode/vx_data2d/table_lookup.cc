@@ -40,8 +40,8 @@ TableFlatFile GribTable (0);
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char table_data_dir   [] = "MET_BASE/table_files";      //  relative to MET_BASE
-
+static const char table_data_dir  [] = "MET_BASE/table_files"; //  relative to MET_BASE
+static const char met_grib_tables [] = "MET_GRIB_TABLES";      //  environment variable name
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -558,66 +558,46 @@ TableFlatFile::TableFlatFile(int) {
    init_from_scratch();
 
    ConcatString path;
-   ConcatString path1;
+   StringArray filtered_file_names;
 
+   //
+   //  read user-specified GRIB1 tables followed by default tables
+   //
    readUserGribTables("grib1");
 
-   path1 << cs_erase << table_data_dir;
+   path = replace_path(table_data_dir);
 
-   path1 = replace_path(path1);
-   vector<ConcatString> filtered_file_names = vector<ConcatString>();
-
-   get_table_files(path1, "grib1", ".txt", filtered_file_names);
+   filtered_file_names = get_filenames(path, "grib1", ".txt", true);
 
    //
    //  read the default grib1 table file, expanding MET_BASE
    //
-   for (unsigned int i = 0; i < filtered_file_names.size(); i++) {
-
-      path << cs_erase << table_data_dir << '/' << filtered_file_names[i];
-
-      path = replace_path(path);
-
-      if (!read(path)) {
-
+   for (int i = 0; i < filtered_file_names.n_elements(); i++) {
+      if (!read(filtered_file_names[i])) {
          mlog << Error << "\nTableFlatFile::TableFlatFile(int) -> "
-              << "unable to read table file \"" << path << "\"\n\n";
-
+              << "unable to read table file \"" << filtered_file_names[i]
+              << "\"\n\n";
          exit(1);
-
       }
    }
-   //
-   //  read the default grib2 table file, expanding MET_BASE
-   //
-   path1.clear();
 
+   //
+   //  read user-specified GRIB2 tables followed by default tables
+   //
    readUserGribTables("grib2");
-
-   path1 << cs_erase << table_data_dir;
-
-   path1 = replace_path(path1);
 
    filtered_file_names.clear();
 
-   get_table_files(path1, "grib2", ".txt", filtered_file_names);
+   filtered_file_names = get_filenames(path, "grib2", ".txt", true);
 
-   for (unsigned int i = 0; i < filtered_file_names.size(); i++)
+   for (int i = 0; i < filtered_file_names.n_elements(); i++)
    {
-
-      path << cs_erase << table_data_dir << '/' << filtered_file_names[i];
-
-      path = replace_path(path);
-
-      if (!read(path)) {
-
+      if (!read(filtered_file_names[i])) {
          mlog << Error << "\nTableFlatFile::TableFlatFile(int) ->"
-              << "unable to read table file \"" << path << "\"\n\n";
-
+              << "unable to read table file \"" << filtered_file_names[i]
+              << "\"\n\n";
          exit(1);
-
       }
-
    }
 
    //
@@ -631,29 +611,23 @@ TableFlatFile::TableFlatFile(int) {
 
 
 void TableFlatFile::readUserGribTables(const char * table_type) {
-   ConcatString path_to_user_tables;
    ConcatString path;
-   char *ptr;
-   vector<ConcatString> filtered_file_names_user = vector<ConcatString>();
+   StringArray filtered_file_names;
+   char * ptr;
 
-   if((ptr = getenv("USER_GRIB_TABLES")) != NULL)
-   {
-      path_to_user_tables = ptr;
+   if((ptr = getenv(met_grib_tables)) != NULL) {
 
-      get_table_files(path_to_user_tables, table_type, ".txt", filtered_file_names_user);
+      path = ptr;
 
-      for (unsigned int i = 0; i < filtered_file_names_user.size(); i++) {
+      filtered_file_names = get_filenames(path, table_type, ".txt", true);
 
-         path << cs_erase << path_to_user_tables << '/' << filtered_file_names_user[i];
-
-         if (!read(path)) {
-
+      for (int i = 0; i < filtered_file_names.n_elements(); i++) {
+         if (!read(filtered_file_names[i])) {
             mlog << Error << "\nTableFlatFile::readUserGribTables() -> "
                  << "unable to read user-defined " << table_type
-                 << " table file \"" << path << "\"\n\n";
-
+                 << " table file \"" << filtered_file_names[i]
+                 << "\"\n\n";
             exit(1);
-
          }
       }
    }
@@ -1122,45 +1096,6 @@ N_grib2_elements += j;
 
 return ( true );
 
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TableFlatFile::get_table_files(const char *dir, const char *prefix, const char *postfix, vector<ConcatString> &files)
-{
-   DIR *dp;
-   struct dirent *dirp;
-   size_t prefix_length = strlen(prefix);
-   size_t postfix_length = strlen(postfix);
-   size_t max_length = prefix_length;
-
-   if(max_length < postfix_length)
-   {
-      max_length=postfix_length;
-   }
-
-   dp = opendir( dir );
-   if(dp == NULL)
-   {
-      mlog << Error << "\nError(" << errno << ") opening " << dir << "\n\n";
-      return errno;
-   }
-
-   while ((dirp = readdir(dp)) != NULL)
-   {
-      char filename[512];
-      struct stat st;
-      snprintf(filename, sizeof(filename), "%s/%s", dir, dirp->d_name);
-      lstat(filename, &st);
-      if( !S_ISDIR(st.st_mode) && strlen(dirp->d_name) > max_length && strncmp(prefix,dirp->d_name,prefix_length) == 0  && strcmp(dirp->d_name+ strlen(dirp->d_name) - postfix_length, postfix) == 0)
-      {
-         files.push_back(dirp->d_name);
-      }
-   }
-   closedir(dp);
-   return 0;
 }
 
 

@@ -492,7 +492,7 @@ void get_atcf_files(const StringArray &source,
                     const StringArray &model_suffix,
                     StringArray &files,
                     StringArray &files_model_suffix) {
-   StringArray cur_source, find_suffix, cur_files;
+   StringArray cur_source, cur_files;
    int i, j;
 
    if(source.n_elements() != model_suffix.n_elements()) {
@@ -506,14 +506,11 @@ void get_atcf_files(const StringArray &source,
    files.clear();
    files_model_suffix.clear();
 
-   // Search for ATCF files ending in .dat
-   find_suffix.add(atcf_suffix);
-
    // Build list of files and corresponding model suffix list
    for(i=0; i<source.n_elements(); i++) {
       cur_source.clear();
       cur_source.add(source[i]);
-      cur_files = get_filenames(cur_source, find_suffix);
+      cur_files = get_filenames(cur_source, NULL, atcf_suffix);
 
       for(j=0; j<cur_files.n_elements(); j++) {
          files.add(cur_files[j]);

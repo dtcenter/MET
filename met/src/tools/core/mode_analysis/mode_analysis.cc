@@ -158,7 +158,7 @@ if ( config_filename.length() > 0 )  {
    config.read(config_filename);
 
    job->set_precision(config.output_precision());
-   
+
    config_to_att(config, config_atts);
 
    job->atts.augment(config_atts);
@@ -204,7 +204,7 @@ void parse_command_line(int argc, char **argv)
 {
 
 CommandLine cline;
-StringArray cmd_line, suffix_list;
+StringArray cmd_line;
 int j;
 
    //
@@ -302,11 +302,9 @@ if ( cmd_line.n_elements() != 0 )  {
 
 }
 
-suffix_list.add("_obj.txt");
-
 StringArray a;
 
-a = get_filenames(lookin_dirs, suffix_list);
+a = get_filenames(lookin_dirs, NULL, "_obj.txt");
 
 mode_files.add(a);
 

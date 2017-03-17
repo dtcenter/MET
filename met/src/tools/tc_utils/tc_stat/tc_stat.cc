@@ -144,13 +144,9 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_search_dirs() {
-   StringArray suffix_list;
-
-   // Search for files with the .tcst suffix
-   suffix_list.add(tc_stat_file_ext);
 
    // Retrieve the file lists
-   tcst_files = get_filenames(tcst_source, suffix_list);
+   tcst_files = get_filenames(tcst_source, NULL, tc_stat_file_ext);
 
    // Check for matching files
    if(tcst_files.n_elements() == 0) {
