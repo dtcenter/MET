@@ -231,8 +231,10 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
          //  if did not find with params from the header - try default
          if( !GribTable.lookup_grib1(field_name, default_grib1_ptv, field_code, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
          {
-            mlog << Error << "\nVarInfoGrib::add_grib_code() - unrecognized GRIB1 field abbreviation '"
-            << field_name << "' for table version " << field_ptv << "\n\n";
+            mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
+                 << "unrecognized GRIB1 field abbreviation '"
+                 << field_name << "' for table version " << field_ptv
+                 << "\n\n";
             exit(1);
          }
 
@@ -245,8 +247,9 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
 
       //  if either the field name or the indices are specified, bail
       if( bad_data_int == field_ptv || bad_data_int == field_code ){
-         mlog << Error << "\nVarInfoGrib::add_grib_code() - either name or GRIB1_ptv "
-         << "and GRIB1_code must be specified in field information\n\n";
+         mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
+              << "either name or GRIB1_ptv and GRIB1_code must be "
+              << "specified in field information\n\n";
          exit(1);
       }
 
@@ -255,10 +258,12 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
          //if did not find with params from the header - try default
          if( !GribTable.lookup_grib1(field_code, default_grib1_ptv, default_grib1_center, default_grib1_subcenter,tab) )
          {
-            mlog << Error << "\nVarInfoGrib::add_grib_code() - no parameter found with matching "
-            << "GRIB1_ptv (" << field_ptv << ") "
-            << "GRIB1_code (" << field_code << ")\n\n";
-            exit (1);
+            mlog << Error << "\nVarInfoGrib::add_grib_code() -> "
+                 << "no parameter found with matching GRIB1_ptv ("
+                 << field_ptv << ") " << "GRIB1_code (" << field_code
+                 << "). Use the MET_GRIB_TABLES environment variable "
+                 << "to define custom GRIB tables.\n\n";
+            exit(1);
          }
       }
    }
@@ -328,8 +333,9 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    //  look up the probability field abbreviation
    if( !GribTable.lookup_grib1(prob_name, field_ptv, field_code, tab, tab_match) ){
-      mlog << Error << "\nVarInfoGrib::set_dict() - unrecognized GRIB1 probability field "
-           << "abbreviation '" << prob_name << "'\n\n";
+      mlog << Error << "\nVarInfoGrib::set_dict() -> "
+           << "unrecognized GRIB1 probability field abbreviation '"
+           << prob_name << "'\n\n";
       exit(1);
    }
 
