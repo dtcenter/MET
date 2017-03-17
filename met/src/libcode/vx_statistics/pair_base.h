@@ -18,19 +18,23 @@
 #include "vx_data2d.h"
 
 struct ob_val_t {
-  int ut;
+  unixtime ut;
   double val;
   string qc;
 };
 
 struct station_values_t {
   string sid;
-  int ut;
+  double lat;
+  double lon;
+  double x;
+  double y;
+  double wgt;
+  unixtime ut;
+  double lvl;
+  double elv;
   double cmn;
   double csd;
-  double wgt;
-  int x;
-  int y;
   double summary_val;
   vector<ob_val_t> obs;
 };
