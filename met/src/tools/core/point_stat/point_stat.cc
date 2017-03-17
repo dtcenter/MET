@@ -160,6 +160,12 @@ int main(int argc, char *argv[]) {
       process_obs_file(i);
    }
 
+   // Calculate and print observation summaries
+   for(i=0; i<conf_info.get_n_vx(); i++) {
+      conf_info.vx_pd[i].calc_obs_summary();
+      conf_info.vx_pd[i].print_obs_summary();
+   }
+
    // Compute the scores and write them out
    process_scores();
 
@@ -997,10 +1003,6 @@ void process_scores() {
 
    // Compute scores for each PairData object and write output
    for(i=0; i<conf_info.get_n_vx(); i++) {
-
-      // Calculate and print obs summaries
-      conf_info.vx_pd[i].calc_obs_summary();
-      conf_info.vx_pd[i].print_obs_summary();
 
       // Check for no forecast fields
       if(conf_info.vx_pd[i].fcst_dpa.n_planes() == 0) continue;
