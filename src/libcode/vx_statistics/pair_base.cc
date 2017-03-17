@@ -70,6 +70,7 @@ void PairBase::clear() {
    lon_na.clear();
    x_na.clear();
    y_na.clear();
+   wgt_na.clear();
    vld_ta.clear();
    lvl_na.clear();
    elv_na.clear();
@@ -77,7 +78,6 @@ void PairBase::clear() {
    o_qc_sa.clear();
    cmn_na.clear();
    csd_na.clear();
-   wgt_na.clear();
 
    n_obs = 0;
 
@@ -101,6 +101,7 @@ void PairBase::extend(int n) {
    lon_na.extend(n);
    x_na.extend(n);
    y_na.extend(n);
+   wgt_na.extend(n);
    vld_ta.extend(n);
    lvl_na.extend(n);
    elv_na.extend(n);
@@ -108,7 +109,6 @@ void PairBase::extend(int n) {
    o_qc_sa.extend(n);
    cmn_na.extend(n);
    csd_na.extend(n);
-   wgt_na.extend(n);
 
    return;
 }
@@ -214,10 +214,9 @@ void PairBase::set_obs_perc_value(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int PairBase::has_obs_rec(const char *sid,
-                          double lat, double lon,
-                          double x, double y,
-                          double lvl, double elv, int &i_obs) {
+int PairBase::has_obs_rec(const char *sid, double lat, double lon,
+                          double x, double y, double lvl, double elv,
+                          int &i_obs) {
    int i, status = 0;
 
    //
@@ -258,9 +257,9 @@ bool PairBase::add_obs(const char *sid,
 
    //  add a single value reporting string to the reporting map
    ob_val_t ob_val;
-   ob_val.ut = ut;
+   ob_val.ut  = ut;
    ob_val.val = o;
-   ob_val.qc = qc;
+   ob_val.qc  = qc;
 
    //  if key exists, add new observation to vector, else add new pair
    map<string,station_values_t>::iterator it = map_val.find(obs_key);
@@ -284,12 +283,17 @@ bool PairBase::add_obs(const char *sid,
    } else {
       station_values_t val;
       val.sid = string(sid);
-      val.ut = fcst_ut;
+      val.lat = lat;
+      val.lon = lon;
+      val.x   = x;
+      val.y   = y;
+      val.wgt = wgt;
+      val.ut  = fcst_ut;
+      val.lvl = lvl;
+      val.elv = elv;
       val.cmn = cmn;
       val.csd = csd;
-      val.wgt = wgt;
-      val.x = x;
-      val.y = y;
+
       val.obs.push_back(ob_val);
       map_val.insert( pair<string,station_values_t>(obs_key, val) );
       ret = true;
@@ -301,6 +305,7 @@ bool PairBase::add_obs(const char *sid,
       lon_na.add(lon);
       x_na.add(x);
       y_na.add(y);
+      wgt_na.add(wgt);
       vld_ta.add(ut);
       lvl_na.add(lvl);
       elv_na.add(elv);
@@ -308,7 +313,6 @@ bool PairBase::add_obs(const char *sid,
       o_qc_sa.add(qc);
       cmn_na.add(cmn);
       csd_na.add(csd);
-      wgt_na.add(wgt);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -382,7 +386,7 @@ ob_val_t PairBase::compute_uw_mean(string obs_key) {
      }
      count++;
    }
-   out.ut = svt.ut;
+   out.ut  = svt.ut;
    out.val = total / double(count);
    return out;
 }
@@ -408,7 +412,7 @@ ob_val_t PairBase::compute_dw_mean(string obs_key) {
      }
    }
 
-   out.ut = svt.ut;
+   out.ut  = svt.ut;
    out.val = total / total_weight;
    return out;
 }
@@ -484,11 +488,6 @@ void PairBase::calc_obs_summary(){
 
       ob_val_t ob;
 
-      int lat = atoi(mat[1]);
-      int lon = atoi(mat[2]);
-      int lvl = atoi(mat[3]);
-      int elev = atoi(mat[4]);
-
       regex_clean(mat);
 
       switch(obs_summary) {
@@ -522,18 +521,18 @@ void PairBase::calc_obs_summary(){
       (*it).second.summary_val = ob.val;
 
       sid_sa.add((*it).second.sid.c_str());
-      lat_na.add(lat);
-      lon_na.add(lon);
+      lat_na.add((*it).second.lat);
+      lon_na.add((*it).second.lon);
       x_na.add((*it).second.x);
       y_na.add((*it).second.y);
+      wgt_na.add((*it).second.wgt);
       vld_ta.add(ob.ut);
-      lvl_na.add(lvl);
-      elv_na.add(elev);
+      lvl_na.add((*it).second.lvl);
+      elv_na.add((*it).second.elv);
       o_na.add(ob.val);
       o_qc_sa.add(ob.qc.c_str());
       cmn_na.add((*it).second.cmn);
       csd_na.add((*it).second.csd);
-      wgt_na.add((*it).second.wgt);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -553,6 +552,7 @@ void PairBase::add_obs(double x, double y, double o,
    lon_na.add(bad_data_double);
    x_na.add(x);
    y_na.add(y);
+   wgt_na.add(wgt);
    vld_ta.add(bad_data_int);
    lvl_na.add(bad_data_double);
    elv_na.add(bad_data_double);
@@ -560,7 +560,6 @@ void PairBase::add_obs(double x, double y, double o,
    o_qc_sa.add(na_str);
    cmn_na.add(cmn);
    csd_na.add(csd);
-   wgt_na.add(wgt);
 
    // Increment the number of observations
    n_obs += 1;
@@ -589,6 +588,7 @@ void PairBase::set_obs(int i_obs, const char *sid,
    lon_na.set(i_obs, lon);
    x_na.set(i_obs, x);
    y_na.set(i_obs, y);
+   wgt_na.set(i_obs, wgt);
    vld_ta.set(i_obs, ut);
    lvl_na.set(i_obs, lvl);
    elv_na.set(i_obs, elv);
@@ -596,7 +596,6 @@ void PairBase::set_obs(int i_obs, const char *sid,
    o_qc_sa.set(i_obs, qc);
    cmn_na.set(i_obs, cmn);
    csd_na.set(i_obs, csd);
-   wgt_na.set(i_obs, wgt);
 
    return;
 }
@@ -618,6 +617,7 @@ void PairBase::set_obs(int i_obs, double x, double y,
    lon_na.set(i_obs, bad_data_double);
    x_na.set(i_obs, x);
    y_na.set(i_obs, y);
+   wgt_na.set(i_obs, wgt);
    vld_ta.set(i_obs, bad_data_int);
    lvl_na.set(i_obs, bad_data_double);
    elv_na.set(i_obs, bad_data_double);
@@ -625,7 +625,6 @@ void PairBase::set_obs(int i_obs, double x, double y,
    o_qc_sa.set(i_obs, na_str);
    cmn_na.set(i_obs, cmn);
    csd_na.set(i_obs, csd);
-   wgt_na.set(i_obs, wgt);
 
    return;
 }
