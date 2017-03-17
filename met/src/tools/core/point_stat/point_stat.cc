@@ -610,7 +610,6 @@ void process_obs_file(int i_nc) {
    obs_in = open_ncfile(obs_file[i_nc]);
 
    if(IS_INVALID_NC_P(obs_in)) {
-      //obs_in->close();
       delete obs_in;
       obs_in = (NcFile *) 0;
 
