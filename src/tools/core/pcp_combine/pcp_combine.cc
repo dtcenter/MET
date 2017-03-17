@@ -581,7 +581,7 @@ void sum_data_files(Grid & grid, DataPlane & plane)
 
    } // end for i
 
-    /////////////////////////////
+   /////////////////////////////
 
    //
    // Open each of the files found and parse the data.
@@ -710,7 +710,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut, ConcatString & cu
          Met2dDataFileFactory factory;
          Met2dDataFile * datafile = (Met2dDataFile *) 0;
          VarInfoFactory var_fac;
-         VarInfo* var;
+         VarInfo * var = (VarInfo *) 0;
 
          //  create a data file object
          datafile = factory.new_met_2d_data_file(cur_file);
@@ -1090,8 +1090,8 @@ void write_netcdf(unixtime nc_init, unixtime nc_valid, int nc_accum,
       mlog << Error << "\nwrite_netcdf() -> "
            << "trouble opening output file " << out_filename
            << "\n\n";
-      //f_out->close();
-      delete f_out;  f_out = (NcFile *) 0;
+      delete f_out;
+      f_out = (NcFile *) 0;
 
       exit(1);
    }
@@ -1267,7 +1267,7 @@ void usage()
 
         << "\t\t\"-v level\" overrides the default level of logging ("
         << verbosity << ") (optional).\n"
-        
+
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << config.nc_compression() << ") (optional).\n"
 
