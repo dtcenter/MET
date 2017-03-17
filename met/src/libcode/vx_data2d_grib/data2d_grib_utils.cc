@@ -169,8 +169,9 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
       //  if either the field name or the indices are specified, bail
       if( bad_data_int == vinfo_ptv || bad_data_int == code_for_lookup ){
-         mlog << Error << "\nis_prelim_match() - either name or GRIB1_ptv "
-         << "and GRIB1_code must be specified in field information\n\n";
+         mlog << Error << "\nis_prelim_match() -> "
+              << "either name or GRIB1_ptv and GRIB1_code must be "
+              << "specified in field information\n\n";
          exit(1);
       }
 
@@ -179,10 +180,12 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          //if did not find with params from the header - try default
          if( !GribTable.lookup_grib1(code_for_lookup, default_grib1_ptv, default_grib1_center, default_grib1_subcenter, tab) )
          {
-            mlog << Error << "\ns_prelim_match() - no parameter found with matching "
-            << "GRIB1_ptv (" << vinfo_ptv << ") "
-            << "GRIB1_code (" << vinfo.field_rec() << ")\n\n";
-            exit (1);
+            mlog << Error << "\nis_prelim_match() -> "
+                 << "no parameter found with matching GRIB1_ptv ("
+                 << vinfo_ptv << ") " << "GRIB1_code ("
+                 << vinfo.field_rec() << "). Use the MET_GRIB_TABLES "
+                 << "environment variable to define custom GRIB tables.\n\n";
+            exit(1);
          }
       }
    }

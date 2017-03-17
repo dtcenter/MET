@@ -294,7 +294,9 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
               << "no parameter found with matching "
               << "GRIB2_disc ("     << field_disc     << ") "
               << "GRIB2_parm_cat (" << field_parm_cat << ") "
-              << "GRIB2_parm ("     << field_parm     << ")\n\n";
+              << "GRIB2_parm ("     << field_parm     << "). "
+              << "Use the MET_GRIB_TABLES environment variable to "
+              << "define custom GRIB tables.\n\n";
          exit(1);
       }
 
