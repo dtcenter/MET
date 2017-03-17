@@ -196,14 +196,14 @@ class VxPairDataPoint {
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
 
-      void set_obs_summary(ObsSummary obs_summary);      
+      void set_obs_summary(ObsSummary obs_summary);
 
       void set_obs_perc_value(int percentile);
-      
-      void print_duplicate_report();
+
+      void print_obs_summary();
 
       void calc_obs_summary();
-      
+
       // Member functions for incrementing the counts
       void inc_count(int ***&, int);
       void inc_count(int ***&, int, int);

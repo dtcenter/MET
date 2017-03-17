@@ -304,12 +304,12 @@ enum DuplicateType {
 //
 
 enum ObsSummary {
-   ObsSummary_None,     // Keep all observations, no statistics
+   ObsSummary_None,    // Keep all observations, no statistics
    ObsSummary_Nearest, // Keep only the observation closest in time
    ObsSummary_Min,     // Keep only smallest value
    ObsSummary_Max,     // Keep only largest valueXS
-   ObsSummary_UwMean,  // Calculate un-weighted mean
-   ObsSummary_DwMean,  // Calculate time weighted mean
+   ObsSummary_UW_Mean, // Calculate un-weighted mean
+   ObsSummary_DW_Mean, // Calculate time weighted mean
    ObsSummary_Median,  // Calculate median
    ObsSummary_Perc     // Calculate precentile
 };
@@ -890,13 +890,13 @@ static const char conf_val_unique[] = "UNIQUE";
 
 // Obs Summary values
 static const char conf_val_nearest[] = "NEAREST";
-static const char conf_val_single[] = "SINGLE";
-static const char conf_val_min[] = "MIN";
-static const char conf_val_max[] = "MAX";
+static const char conf_val_single[]  = "SINGLE";
+static const char conf_val_min[]     = "MIN";
+static const char conf_val_max[]     = "MAX";
 static const char conf_val_uw_mean[] = "UW_MEAN";
 static const char conf_val_dw_mean[] = "DW_MEAN";
-static const char conf_val_median[] = "MEDIAN";
-static const char conf_val_perc[] = "PERC";
+static const char conf_val_median[]  = "MEDIAN";
+static const char conf_val_perc[]    = "PERC";
 
 //
 // Wavelet-Stat specific parameter value names
@@ -936,7 +936,6 @@ static const char conf_val_no_merge[]   = "NO_MERGE";
 static const int default_grib1_ptv = 2;
 static const int default_grib1_center = 7;
 static const int default_grib1_subcenter = 1;
-
 
 ////////////////////////////////////////////////////////////////////////
 

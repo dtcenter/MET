@@ -92,6 +92,8 @@ extern ConcatString interp12type_to_string(Interp12Type);
 extern MergeType    int_to_mergetype(int);
 extern ConcatString mergetype_to_string(MergeType);
 
+extern ConcatString obssummary_to_string(ObsSummary, int);
+
 extern MatchType    int_to_matchtype(int);
 extern ConcatString matchtype_to_string(MatchType);
 

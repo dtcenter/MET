@@ -1115,14 +1115,14 @@ ObsSummary parse_conf_obs_summary(Dictionary *dict) {
    v = dict->lookup_int(conf_key_obs_summary);
 
    // Convert integer to enumerated ObsSummary
-   if(v == conf_const.lookup_int(conf_val_none)) t = ObsSummary_None;
+        if(v == conf_const.lookup_int(conf_val_none))    t = ObsSummary_None;
    else if(v == conf_const.lookup_int(conf_val_nearest)) t = ObsSummary_Nearest;
-   else if(v == conf_const.lookup_int(conf_val_min)) t = ObsSummary_Min;
-   else if(v == conf_const.lookup_int(conf_val_max)) t = ObsSummary_Max;
-   else if(v == conf_const.lookup_int(conf_val_uw_mean)) t = ObsSummary_UwMean;
-   else if(v == conf_const.lookup_int(conf_val_dw_mean)) t = ObsSummary_DwMean;
-   else if(v == conf_const.lookup_int(conf_val_median)) t = ObsSummary_Median;
-   else if(v == conf_const.lookup_int(conf_val_perc)) t = ObsSummary_Perc;
+   else if(v == conf_const.lookup_int(conf_val_min))     t = ObsSummary_Min;
+   else if(v == conf_const.lookup_int(conf_val_max))     t = ObsSummary_Max;
+   else if(v == conf_const.lookup_int(conf_val_uw_mean)) t = ObsSummary_UW_Mean;
+   else if(v == conf_const.lookup_int(conf_val_dw_mean)) t = ObsSummary_DW_Mean;
+   else if(v == conf_const.lookup_int(conf_val_median))  t = ObsSummary_Median;
+   else if(v == conf_const.lookup_int(conf_val_perc))    t = ObsSummary_Perc;
    else {
       mlog << Error << "\nparse_conf_obs_summary() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -1880,6 +1880,33 @@ ConcatString mergetype_to_string(MergeType type) {
       default:
          mlog << Error << "\nmergetype_to_string() -> "
               << "Unexpected MergeType value of " << type << ".\n\n";
+         exit(1);
+         break;
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
+   ConcatString s;
+
+   // Convert enumerated ObsSummary to string
+   switch(type) {
+      case(ObsSummary_None):    s = conf_val_none;       break;
+      case(ObsSummary_Nearest): s = conf_val_nearest;    break;
+      case(ObsSummary_Min):     s = conf_val_min;        break;
+      case(ObsSummary_Max):     s = conf_val_max;        break;
+      case(ObsSummary_UW_Mean): s = conf_val_uw_mean;    break;
+      case(ObsSummary_DW_Mean): s = conf_val_dw_mean;    break;
+      case(ObsSummary_Median):  s = conf_val_median;     break;
+      case(ObsSummary_Perc):
+         s << conf_val_perc << "(" << perc_val << ")";
+         break;
+      default:
+         mlog << Error << "\nobssummary_to_string() -> "
+              << "Unexpected ObsSummary value of " << type << ".\n\n";
          exit(1);
          break;
    }

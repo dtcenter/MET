@@ -485,7 +485,7 @@ void PairDataEnsemble::compute_ssvar() {
         << o_na.n_elements() << " observations\n";
 
    // Check for no bins
-   if(n_bin == 0) return; 
+   if(n_bin == 0) return;
 
    // Build a list of SSVARInfo objects
    ssvar_bins = new SSVARInfo[n_bin];
@@ -1276,43 +1276,22 @@ void VxPairDataEnsemble::set_duplicate_flag(DuplicateType duplicate_flag) {
       }
    }
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_obs_summary(ObsSummary obs_summary) {
+void VxPairDataEnsemble::set_obs_summary(ObsSummary s) {
 
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
-	   switch (obs_summary) {
-              case ObsSummary_Nearest:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_NEAREST);
-		break;
-              case ObsSummary_Min:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MIN);
-		break;
-              case ObsSummary_Max:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MAX);
-		break;
-              case ObsSummary_UwMean:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_UWMEAN);
-		break;
-              case ObsSummary_DwMean:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_DWMEAN);
-		break;
-              case ObsSummary_Median:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_MEDIAN);
-		break;
-              case ObsSummary_Perc:
-		pd[i][j][k].set_obs_summary(OBS_SUMMARY_PERC);
-		break;
-	   }
-
+            pd[i][j][k].set_obs_summary(s);
          }
       }
    }
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1327,20 +1306,22 @@ void VxPairDataEnsemble::set_obs_perc_value(int percentile) {
       }
    }
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::print_duplicate_report() {
+void VxPairDataEnsemble::print_obs_summary() {
 
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
-            pd[i][j][k].print_duplicate_report();
+            pd[i][j][k].print_obs_summary();
          }
       }
    }
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1355,6 +1336,7 @@ void VxPairDataEnsemble::calc_obs_summary() {
       }
    }
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
