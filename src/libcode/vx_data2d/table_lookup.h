@@ -51,7 +51,7 @@ class Grib1TableEntry {
       int subcenter;
 
 
-    ConcatString parm_name;
+      ConcatString parm_name;
 
       ConcatString full_name;
 
@@ -137,15 +137,13 @@ class TableFlatFile {
 
       void init_from_scratch();
 
-      void assign(const TableFlatFile &); 
+      void assign(const TableFlatFile &);
 
       bool read_grib1(istream &, const char * filename, const int n);
       bool read_grib2(istream &, const char * filename, const int n);
 
       void extend_grib1(int);
       void extend_grib2(int);
-
-      int get_table_files(const char *dir, const char *prefix, const char *postfix, std::vector<ConcatString> &a);
 
       Grib1TableEntry ** g1e;   //  elements ... allocated
       Grib2TableEntry ** g2e;   //  elements ... allocated

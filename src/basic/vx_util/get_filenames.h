@@ -24,9 +24,19 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern StringArray get_filenames(const StringArray & search_dirs, const StringArray & suffix);
+extern StringArray get_filenames(const StringArray & search_dir_list,
+                      const char * prefix, const char * suffix,
+                      bool check_regular = false);
 
-extern StringArray get_filenames_from_dir(const char * directory_path, const StringArray & suffix);
+extern StringArray get_filenames(const ConcatString & search_dir,
+                      const char * prefix, const char * suffix,
+                      bool check_regular = false);
+
+extern StringArray get_filenames_from_dir(const char * directory_path,
+                      const char * prefix, const char * suffix);
+
+extern bool        check_prefix_suffix(const char * path,
+                      const char * prefix, const char * suffix);
 
 extern StringArray parse_ascii_file_list(const char * path);
 

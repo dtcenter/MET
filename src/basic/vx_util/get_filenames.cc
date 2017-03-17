@@ -25,6 +25,7 @@ using namespace std;
 #include <limits.h>
 #include <cmath>
 
+#include "vx_cal.h"
 #include "vx_log.h"
 
 #include "get_filenames.h"
@@ -34,46 +35,86 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray get_filenames(const StringArray & search_dirs, const StringArray & suffix)
+StringArray get_filenames(const StringArray & search_dir_list,
+                          const char * prefix, const char * suffix,
+                          bool check_regular)
 
 {
 
 int j;
-const int N = search_dirs.n_elements();
-StringArray a, b;
-struct stat sbuf;
-
+const int N = search_dir_list.n_elements();
+StringArray a;
 
 for (j=0; j<N; ++j)  {
 
-   if ( stat(search_dirs[j], &sbuf) < 0 )  {
+   a.add(get_filenames(search_dir_list[j], prefix, suffix, check_regular));
 
-      mlog << Warning << "\nget_filenames() -> "
-           << "can't stat \"" << search_dirs[j] << "\"\n\n";
+}
 
-      continue;
 
-   }
+return ( a );
 
-   if ( S_ISDIR(sbuf.st_mode) )  {
+}
 
-      b = get_filenames_from_dir(search_dirs[j], suffix);
+////////////////////////////////////////////////////////////////////////
 
-      a.add(b);
 
-      b.clear();
+StringArray get_filenames(const ConcatString & search_dir,
+                          const char * prefix, const char * suffix,
+                          bool check_regular)
 
-   } else if ( S_ISREG(sbuf.st_mode) )  {
+{
+
+StringArray a, b;
+struct stat sbuf;
+
+if ( stat(search_dir, &sbuf) < 0 )  {
+
+   mlog << Warning << "\nget_filenames() -> "
+        << "can't stat \"" << search_dir << "\"\n\n";
+
+   return ( a );
+
+}
+
+if ( S_ISDIR(sbuf.st_mode) )  {
+
+   //
+   //  process directory
+   //
+
+   b = get_filenames_from_dir(search_dir, prefix, suffix);
+
+   a.add(b);
+
+   b.clear();
+
+} else if ( S_ISREG(sbuf.st_mode) )  {
+
+   //
+   //  process regular files and, if requested, enforce that the
+   //  prefix and suffix match
+   //
+
+   if ( check_regular ) {
 
       //
-      //  process any explicitly specified regular files
-      //  regardless of suffix
+      //  get the file name
       //
- 
-      a.add(search_dirs[j]);
+
+      const char * ptr = strrchr(search_dir, '/');
+      if ( !ptr )  ptr = search_dir;
+      else         ++ptr;
+
+      if ( check_prefix_suffix(ptr, prefix, suffix) )  {
+         a.add(search_dir);
+      }
+
+   } else  {
+
+      a.add(search_dir);
 
    }
-
 }
 
 
@@ -85,7 +126,9 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray get_filenames_from_dir(const char * directory_path, const StringArray & suffix)
+StringArray get_filenames_from_dir(const char * directory_path,
+                                   const char * prefix,
+                                   const char * suffix)
 
 {
 
@@ -93,7 +136,7 @@ DIR * directory = (DIR *) 0;
 struct dirent * entry = (struct dirent *) 0;
 StringArray a, b;
 char entry_path[PATH_MAX];
-ConcatString cur_suffix;
+ConcatString regex;
 struct stat sbuf;
 
 
@@ -126,7 +169,7 @@ while ( (entry = readdir(directory)) != NULL )  {
 
    if ( S_ISDIR(sbuf.st_mode) )  {
 
-      b = get_filenames_from_dir(entry_path, suffix);
+      b = get_filenames_from_dir(entry_path, prefix, suffix);
 
       a.add(b);
 
@@ -134,17 +177,8 @@ while ( (entry = readdir(directory)) != NULL )  {
 
    } else if ( S_ISREG(sbuf.st_mode) )  {
 
-      // check if the file name ends with one of the suffixes by applying a regular expression
-      for( int i=0; i<= suffix.n_elements()-1; i++ ){
-         char** mat = NULL;
-         char regex[strlen(suffix[i]) +1];
-         strcpy (regex,suffix[i]);
-         strcat (regex,"$");
-         if( 1 == regex_apply(regex, 1, entry_path, mat) ){
-            a.add(entry_path);
-            break;
-         }
-
+      if ( check_prefix_suffix(entry->d_name, prefix, suffix) )  {
+         a.add(entry_path);
       }
 
    }
@@ -165,6 +199,43 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool check_prefix_suffix(const char * path,
+                         const char * prefix, const char * suffix)
+{
+   ConcatString regex;
+   bool keep = true;
+
+   //
+   //  check the prefix
+   //
+
+   if ( keep && prefix ) {
+
+      regex << cs_erase << "^" << prefix;
+
+      keep = check_reg_exp(regex, path);
+
+   }
+
+   //
+   //  check the suffix
+   //
+
+   if ( keep && suffix ) {
+
+      regex << cs_erase << suffix << "$";
+
+      keep = check_reg_exp(regex, path);
+
+   }
+
+   return(keep);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 StringArray parse_ascii_file_list(const char * path)
 
 {
@@ -172,7 +243,7 @@ StringArray parse_ascii_file_list(const char * path)
 ifstream f_in;
 StringArray a;
 char file_name[PATH_MAX];
-   
+
    //
    //  Open the input ascii file
    //
