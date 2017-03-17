@@ -952,12 +952,6 @@ void process_obs_file(int i_nc) {
 
    } // end for i_block_start_idx
 
-   // Print the duplicate report
-   for(j=0; j<conf_info.get_n_vx(); j++) {
-      conf_info.vx_pd[j].calc_obs_summary();
-      conf_info.vx_pd[j].print_duplicate_report();
-   }
-
    // Deallocate and clean up
    if(obs_in) {
       delete obs_in;
@@ -1003,6 +997,10 @@ void process_scores() {
 
    // Compute scores for each PairData object and write output
    for(i=0; i<conf_info.get_n_vx(); i++) {
+
+      // Calculate and print obs summaries
+      conf_info.vx_pd[i].calc_obs_summary();
+      conf_info.vx_pd[i].print_obs_summary();
 
       // Check for no forecast fields
       if(conf_info.vx_pd[i].fcst_dpa.n_planes() == 0) continue;

@@ -31,18 +31,8 @@ struct station_values_t {
   double wgt;
   int x;
   int y;
+  double summary_val;
   vector<ob_val_t> obs;
-};
-
-enum obs_summary_enum {
-  OBS_SUMMARY_NONE,
-  OBS_SUMMARY_NEAREST,
-  OBS_SUMMARY_MIN,
-  OBS_SUMMARY_MAX,
-  OBS_SUMMARY_UWMEAN,
-  OBS_SUMMARY_DWMEAN,
-  OBS_SUMMARY_MEDIAN,
-  OBS_SUMMARY_PERC
 };
 
 static bool sort_obs(ob_val_t a, ob_val_t b) { return a.val<b.val; }
@@ -100,10 +90,11 @@ class PairBase {
 
       unixtime    fcst_ut; // Forecast valid time
 
-      bool check_unique;   // Check for duplicates, keeping unique obs
-      obs_summary_enum obs_select; // Summarize multiple observations
-      int obs_perc_value; // percentile value to use in PERC obs_select
-      map<string,station_values_t> map_val;  // Storage for single obs values      
+      bool       check_unique;   // Check for duplicates, keeping unique obs
+      ObsSummary obs_summary;    // Summarize multiple observations
+      int        obs_perc_value; // Percentile value for ObsSummary_Perc
+
+      map<string,station_values_t> map_val; // Storage for single obs values
 
       //////////////////////////////////////////////////////////////////
 
@@ -122,8 +113,8 @@ class PairBase {
 
       void set_fcst_ut(unixtime ut);
       void set_check_unique(bool check);
-      void set_obs_summary(obs_summary_enum o);
-      void set_obs_perc_value(int i);      
+      void set_obs_summary(ObsSummary s);
+      void set_obs_perc_value(int i);
 
       int  has_obs_rec(const char *, double, double, double, double,
                        double, double, int &);
@@ -131,11 +122,11 @@ class PairBase {
       ob_val_t compute_nearest(string sng_key);
       ob_val_t compute_min(string sng_key);
       ob_val_t compute_max(string sng_key);
-      ob_val_t compute_uwmean(string sng_key);
-      ob_val_t compute_dwmean(string sng_key);
+      ob_val_t compute_uw_mean(string sng_key);
+      ob_val_t compute_dw_mean(string sng_key);
       ob_val_t compute_median(string sng_key);
       ob_val_t compute_percentile(string sng_key, int perc);
-      
+
       bool add_obs(const char *, double, double, double, double,
                    unixtime, double, double, double, const char *,
                    double, double,
@@ -152,9 +143,10 @@ class PairBase {
       void set_obs(int, double, double, double, double, double,
                    double wgt = default_grid_weight);
 
+      void print_obs_summary();
+
       void calc_obs_summary();
 
-      void print_duplicate_report();
 };
 
 ////////////////////////////////////////////////////////////////////////

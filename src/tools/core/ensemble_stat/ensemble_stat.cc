@@ -753,6 +753,12 @@ void process_point_vx() {
       process_point_obs(i);
    }
 
+   // Calculate and print observation summaries
+   for(i=0; i<conf_info.get_n_vx(); i++) {
+      conf_info.vx_pd[i].calc_obs_summary();
+      conf_info.vx_pd[i].print_obs_summary();
+   }
+
    // Process each ensemble file
    for(i=0, n_miss=0; i<ens_file_list.n_elements(); i++) {
 
@@ -1013,12 +1019,6 @@ void process_point_obs(int i_nc) {
          }
       }
    } // end for i_start
-
-   // Calculate observation summaries and print duplicate report
-   for(j=0; j < conf_info.get_n_vx(); j++) {
-      conf_info.vx_pd[j].calc_obs_summary();
-      conf_info.vx_pd[j].print_duplicate_report();
-   }
 
    // Deallocate and clean up
    if(obs_in) {
