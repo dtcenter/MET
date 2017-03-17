@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test
+[
+  <!ENTITY MET_DIR        "/d3/projects/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met">
+  <!ENTITY TEST_DIR       "/d3/projects/MET/MET_test/test">
+  <!ENTITY DATA_DIR       "/d3/projects/MET/MET_test_data/unit_test">
+
+  <!ENTITY EXECUTABLE     "&MET_DIR;/bin/lidar2nc">
+  <!ENTITY DATA_DIR_OUT   "&DATA_DIR;/output/lidar2nc">
+  
+  <!ENTITY CALIPSO_FILE   "&DATA_DIR;/lidar2nc/CAL_LID_L2_05kmCLay-Prov-V3-40.2016-12-01T01-24-58ZN.hdf">
+
+]>
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+
+  <!--              -->
+  <!--  lidar2nc    -->
+  <!--              -->
+
+  <test name="lidar2nc_CALIPSO">
+    <exec>&EXECUTABLE;</exec>
+    <param>  -out &DATA_DIR_OUT;/calipso.nc  &CALIPSO_FILE; </param>   
+    <output>
+      </point_nc>&DATA_DIR_OUT;/calipso.nc</point_nc>
+    </output>
+  </test>
+  
+
+</met_test>
