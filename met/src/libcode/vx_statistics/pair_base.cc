@@ -293,8 +293,9 @@ bool PairBase::add_obs(const char *sid,
       val.elv = elv;
       val.cmn = cmn;
       val.csd = csd;
-
+      
       val.obs.push_back(ob_val);
+      map_key.add(obs_key.c_str());
       map_val.insert( pair<string,station_values_t>(obs_key, val) );
       ret = true;
    }
@@ -438,23 +439,24 @@ void PairBase::print_obs_summary(){
       4 > mlog.verbosity_level() ||
       ! map_val.size() ) return;
 
-   //  iterate over the keys in the unique station id map
-   for( map<string,station_values_t>::iterator it = map_val.begin();
-        it != map_val.end(); ++it ){
+   //  iterate over ordered list map keys in the station id map
+   for(int i=0; i<map_key.n_elements(); i++) {
+
+      station_values_t cur = map_val[map_key[i]];
 
       mlog << Debug(4)
            << "Computed " << obssummary_to_string(obs_summary, obs_perc_value)
-           << " of " << (int) (*it).second.obs.size()
-           << " observations = " << (*it).second.summary_val
+           << " of " << (int) cur.obs.size()
+           << " observations = " << cur.summary_val
            << " for [lat:lon:level:elevation] = ["
-           << (*it).first << "]\n";
+           << map_key[i] << "]\n";
 
       //  parse and print the point obs information for the current key
-      vector<ob_val_t>::iterator o_it = (*it).second.obs.begin();
+      vector<ob_val_t>::iterator o_it = cur.obs.begin();
 
-      for(; o_it != (*it).second.obs.end(); o_it++) {
+      for(; o_it != cur.obs.end(); o_it++) {
          mlog << Debug(4) << "  "
-              << "[sid: " << (*it).second.sid.c_str()
+              << "[sid: " << cur.sid.c_str()
               << " vld: " << unix_to_yyyymmdd_hhmmss( (*o_it).ut )
               << " obs: " << (*o_it).val << "]\n";
       }
@@ -468,18 +470,17 @@ void PairBase::print_obs_summary(){
 void PairBase::calc_obs_summary(){
 
    //  iterate over the keys in the unique station id map
-   for( map<string,station_values_t>::iterator it = map_val.begin();
-        it != map_val.end(); ++it ){
+   for(int i=0; i<map_key.n_elements(); i++) {
 
-      string key_val = (*it).first;
+      station_values_t cur = map_val[map_key[i]];
 
       //  parse the single key string
       char** mat = NULL;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
-                           key_val.c_str(), mat) ){
+                           map_key[i], mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "
               << "regex_apply failed to parse '"
-              << key_val.c_str() << "'\n\n";
+              << map_key[i] << "'\n\n";
          exit(1);
       }
 
@@ -518,21 +519,21 @@ void PairBase::calc_obs_summary(){
       }
 
       // Store summarized value in the map
-      (*it).second.summary_val = ob.val;
+      cur.summary_val = ob.val;
 
-      sid_sa.add((*it).second.sid.c_str());
-      lat_na.add((*it).second.lat);
-      lon_na.add((*it).second.lon);
-      x_na.add((*it).second.x);
-      y_na.add((*it).second.y);
-      wgt_na.add((*it).second.wgt);
-      vld_ta.add(ob.ut);
-      lvl_na.add((*it).second.lvl);
-      elv_na.add((*it).second.elv);
-      o_na.add(ob.val);
+      sid_sa.add (cur.sid.c_str());
+      lat_na.add (cur.lat);
+      lon_na.add (cur.lon);
+      x_na.add   (cur.x);
+      y_na.add   (cur.y);
+      wgt_na.add (cur.wgt);
+      vld_ta.add (ob.ut);
+      lvl_na.add (cur.lvl);
+      elv_na.add (cur.elv);
+      o_na.add   (ob.val);
       o_qc_sa.add(ob.qc.c_str());
-      cmn_na.add((*it).second.cmn);
-      csd_na.add((*it).second.csd);
+      cmn_na.add (cur.cmn);
+      csd_na.add (cur.csd);
 
       // Increment the number of pairs
       n_obs += 1;
