@@ -87,6 +87,7 @@ void PairBase::clear() {
    obs_perc_value = bad_data_int;
    check_unique = false;
 
+   map_key.clear();
    map_val.clear();
 
    return;
@@ -109,6 +110,8 @@ void PairBase::extend(int n) {
    o_qc_sa.extend(n);
    cmn_na.extend(n);
    csd_na.extend(n);
+
+   map_key.extend(n);
 
    return;
 }
@@ -442,21 +445,21 @@ void PairBase::print_obs_summary(){
    //  iterate over ordered list map keys in the station id map
    for(int i=0; i<map_key.n_elements(); i++) {
 
-      station_values_t cur = map_val[map_key[i]];
+      station_values_t svt = map_val[map_key[i]];
 
       mlog << Debug(4)
            << "Computed " << obssummary_to_string(obs_summary, obs_perc_value)
-           << " of " << (int) cur.obs.size()
-           << " observations = " << cur.summary_val
+           << " of " << (int) svt.obs.size()
+           << " observations = " << svt.summary_val
            << " for [lat:lon:level:elevation] = ["
            << map_key[i] << "]\n";
 
       //  parse and print the point obs information for the current key
-      vector<ob_val_t>::iterator o_it = cur.obs.begin();
+      vector<ob_val_t>::iterator o_it = svt.obs.begin();
 
-      for(; o_it != cur.obs.end(); o_it++) {
+      for(; o_it != svt.obs.end(); o_it++) {
          mlog << Debug(4) << "  "
-              << "[sid: " << cur.sid.c_str()
+              << "[sid: " << svt.sid.c_str()
               << " vld: " << unix_to_yyyymmdd_hhmmss( (*o_it).ut )
               << " obs: " << (*o_it).val << "]\n";
       }
@@ -472,7 +475,7 @@ void PairBase::calc_obs_summary(){
    //  iterate over the keys in the unique station id map
    for(int i=0; i<map_key.n_elements(); i++) {
 
-      station_values_t cur = map_val[map_key[i]];
+      station_values_t svt = map_val[map_key[i]];
 
       //  parse the single key string
       char** mat = NULL;
@@ -519,21 +522,21 @@ void PairBase::calc_obs_summary(){
       }
 
       // Store summarized value in the map
-      cur.summary_val = ob.val;
+      svt.summary_val = ob.val;
 
-      sid_sa.add (cur.sid.c_str());
-      lat_na.add (cur.lat);
-      lon_na.add (cur.lon);
-      x_na.add   (cur.x);
-      y_na.add   (cur.y);
-      wgt_na.add (cur.wgt);
+      sid_sa.add (svt.sid.c_str());
+      lat_na.add (svt.lat);
+      lon_na.add (svt.lon);
+      x_na.add   (svt.x);
+      y_na.add   (svt.y);
+      wgt_na.add (svt.wgt);
       vld_ta.add (ob.ut);
-      lvl_na.add (cur.lvl);
-      elv_na.add (cur.elv);
+      lvl_na.add (svt.lvl);
+      elv_na.add (svt.elv);
       o_na.add   (ob.val);
       o_qc_sa.add(ob.qc.c_str());
-      cmn_na.add (cur.cmn);
-      csd_na.add (cur.csd);
+      cmn_na.add (svt.cmn);
+      csd_na.add (svt.csd);
 
       // Increment the number of pairs
       n_obs += 1;
