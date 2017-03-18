@@ -98,6 +98,7 @@ class PairBase {
       ObsSummary obs_summary;    // Summarize multiple observations
       int        obs_perc_value; // Percentile value for ObsSummary_Perc
 
+      StringArray map_key;
       map<string,station_values_t> map_val; // Storage for single obs values
 
       //////////////////////////////////////////////////////////////////
