@@ -631,18 +631,19 @@ obs_window = {
 //         Any grid point where it is non-zero, the mask is turned on.
 //         e.g. "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 //
-//    - The "sid" entry is an array of strings. Each entry in that array is
-//      either a filename of a comma-separated list. For a comma-separated list
-//      of length one, the mask "name" will be set to the single station ID
-//      value. For a comma-separated list of length greater than one, the first
-//      element is stored as the mask name. For a filename, the file must
-//      contain the mask "name" followed by a whitespace-separated list of
-//      station ID's to be used.
-//      That mask "name" entry is what MET writes in the VX_MASK output column.
-//      This provides a way to define one or more groups of individual stations
-//      over which to compute statistics. This is an alternative to defining a
-//      masking region using a polyline or grid and is more convenient if you
-//      have a specific list of station ID's you'd like to use.
+//    - The "sid" entry is an array of strings which define groups of
+//      observation station ID's over which to compute statistics. Each entry
+//      in the array is either a filename of a comma-separated list.
+//       - For a comma-separated list of length one, the mask "name" and "value"
+//         are both set to the single station ID string.
+//       - For a comma-separated list of length greater than one, the first
+//         string is the mask "name" and the remaining strings are the station
+//         ID's to be used.
+//       - For a filename, the strings are whitespace-separated.  The first
+//         string is the mask "name" and the remaining strings are the station
+//         ID's to be used.
+//       - The "name" of the station ID mask is written to the VX_MASK column
+//         of the MET output files.
 //
 mask = {
    grid    = [ "FULL" ];
