@@ -20,7 +20,7 @@
   <test name="tc_stat_ALAL2010">
     <exec>&MET_DIR;/bin/tc_stat</exec>
     <param> \
-      -lookin &OUTPUT_DIR;/tc_pairs \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
       -config &CONFIG_DIR;/TCStatConfig_ALAL2010 \
       -out &OUTPUT_DIR;/tc_stat/ALAL2010_stat.out \
       -v 2
