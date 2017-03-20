@@ -344,11 +344,13 @@ StringArray parse_conf_sid_exc(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// This function is passed a string containing either a file name containing a
-// list of station ID's or a comma separated list of stations ID's.  For a
-// comma-separated list, store them in the output StringArray. For a file name,
-// parse the list of stations into the output StringArray, and store the first
-// entry in the file as the mask name.
+// This function is passed a string containing either a file name or a list of
+// values.  If it's a filename, parse out whitespace-separated values.  The
+// first value is the name of the mask and the remaining values are the station
+// ID's to be used.  If it's a string, interpret anything before a colon as the
+// name of the mask and parse after the colon as a comma-separated list of
+// station ID's to be used.  If no colon is present, select a default mask name.
+// Store the results in the output StringArray.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -368,7 +370,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
    // Replace any instances of MET_BASE with it's expanded value
    tmp_file = replace_path(mask_sid_str);
 
-   // Process string as a file name, if possible
+   // Process file name
    if(file_exists(tmp_file)) {
 
       mlog << Debug(4) << "parse_sid_mask() -> "
@@ -398,7 +400,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
            << "parsed " << mask_sid.n_elements() << " station ID's for the \""
            << mask_name << "\" mask from file \"" << tmp_file << "\"\n";
    }
-   // Otherwise, process it as a single station ID
+   // Process list of strings
    else {
 
       // Print a warning if the string contains a dot which suggests
@@ -417,26 +419,32 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       if(check_reg_exp(ws_reg_exp, mask_sid_str) ||
          check_reg_exp("[/]", mask_sid_str)) {
          mlog << Error << "\nparse_sid_mask() -> "
-              << "masking station ID name can't contain whitespace or slashes \""
-              << mask_sid_str << "\".\n\n";
+              << "masking station ID string can't contain whitespace or "
+              << "slashes \"" << mask_sid_str << "\".\n\n";
          exit(1);
       }
 
-      // Parse the input string as a comma-separated list
+      // Check for the optional mask name
       StringArray sa;
-      sa.add_css(mask_sid_str);
+      sa = mask_sid_str.split(":");
 
-      // For length == 1, set the mask name as the station ID name.
+      // One elements means no colon was specified
       if(sa.n_elements() == 1) {
-         mask_name = sa[0];
-         mask_sid  = sa;
+         mask_sid.add_css(sa[0]);
+         mask_name = ( mask_sid.n_elements() == 1 ? mask_sid[0] : "MASK_SID" );
       }
-      // Otherwise for length >  1, set the mask name as the first
-      // list entry and the remainer as the station ID values.
+      // Two elements means one colon was specified
+      else if(sa.n_elements() == 2) {
+         mask_name = sa[0];
+         mask_sid.add_css(sa[1]);
+      }
       else {
-         mask_name = sa[0];
-         for(int i=1; i<sa.n_elements(); i++) mask_sid.add(sa[i]);
+         mlog << Error << "\nparse_sid_mask() -> "
+              << "masking station ID string may contain at most one colon to "
+              << "specify the mask name \"" << mask_sid_str << "\".\n\n";
+         exit(1);
       }
+
    }
 
    return;
