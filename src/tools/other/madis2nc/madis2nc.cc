@@ -649,6 +649,11 @@ float get_nc_obs(NcFile *&f_in, const char *in_str,
    ConcatString in_dd_str, dd_str;
 
    //
+   // Check for requested variable.
+   //
+   if(!has_var(f_in, in_str)) return(bad_data_float);
+
+   //
    // Setup the QC search string.
    //
    in_dd_str = in_str;
