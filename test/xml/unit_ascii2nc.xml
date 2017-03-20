@@ -198,7 +198,7 @@
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.19.ascii \
       &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.20.ascii \
       &OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_sid.nc \
-      -mask_sid "N526UA,N567UA,N571UA,N594UA" \
+      -mask_sid "MASK_SID,N526UA,N567UA,N571UA,N594UA" \
       -v 1
     </param>
     <output>
