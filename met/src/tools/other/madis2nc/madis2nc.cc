@@ -764,8 +764,8 @@ void print_rej_counts() {
         << "Rejected recs based on masking grid\t\t= " << rej_grid << "\n"
         << "Rejected recs based on masking poly\t\t= " << rej_poly << "\n"
         << "Rejected recs based on masking station ID's\t= " << rej_sid << "\n"
-        << "Rejected based on fill value\t\t\t= " << rej_fill << "\n"
-        << "Rejected based on quality control\t\t= " << rej_qc << "\n"
+        << "Rejected obs  based on fill value\t\t= " << rej_fill << "\n"
+        << "Rejected obs  based on quality control\t\t= " << rej_qc << "\n"
         << "Total observations retained or derived\t\t= " << i_obs << "\n";
 
    return;
