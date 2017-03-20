@@ -39,7 +39,7 @@
       &DATA_DIR_OBS;/madis/metar/metar_2012040912_F000.nc \
       &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.mask_sid.nc \
       -log &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.log \
-      -mask_sid "MASK_SID,OIKB,OIBB,OIKK,OICK,OICC,OIIP,OIIK,OIMM,OIAA,OIAH" \
+      -mask_sid "OIKB,OIBB,OIKK,OICK,OICC,OIIP,OIIK,OIMM,OIAA,OIAH" \
       -type metar -rec_beg 2000 -rec_end 6000 -v 2
     </param>
     <output>
