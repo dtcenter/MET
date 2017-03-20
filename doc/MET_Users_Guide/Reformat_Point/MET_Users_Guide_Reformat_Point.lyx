@@ -2733,8 +2733,22 @@ mask_poly file
 \series medium
 option is a station ID masking file or a comma-separated list of station
  ID's for filtering the point observations spatially.
- For a list of length greater than one, the first element is stored as the
- mask name.
+ See the description of the 
+\begin_inset Quotes eld
+\end_inset
+
+sid
+\begin_inset Quotes erd
+\end_inset
+
+ entry in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Description
@@ -3582,8 +3596,22 @@ Optional arguments for madis2nc
 \series medium
 option is a station ID masking file or a comma-separated list of station
  ID's for filtering the point observations spatially.
- For a list of length greater than one, the first element is stored as the
- mask name.
+ See the description of the 
+\begin_inset Quotes eld
+\end_inset
+
+sid
+\begin_inset Quotes erd
+\end_inset
+
+ entry in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Description

@@ -3139,16 +3139,30 @@ mask1,mask2,mask3
 When processing input MPR lines, these options may be used to define a masking
  grid, polyline, or list of station ID's to filter the matched pair data
  geographically prior to computing statistics.
- The 
+ 
+\series medium
+The 
 \series bold
 -mask_sid
-\series default
- option may be set to 
 \series medium
-a filename or a comma-separated list of station ID's.
- For a list of length one, the mask name is set to the single station value.
- For a list of length greater than one, the first element is stored as the
- mask name.
+ option is a station ID masking file or a comma-separated list of station
+ ID's for filtering the matched pairs spatially.
+ See the description of the 
+\begin_inset Quotes eld
+\end_inset
+
+sid
+\begin_inset Quotes erd
+\end_inset
+
+ entry in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout LyX-Code
