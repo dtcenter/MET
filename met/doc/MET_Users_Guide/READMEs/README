@@ -634,14 +634,18 @@ obs_window = {
 //    - The "sid" entry is an array of strings which define groups of
 //      observation station ID's over which to compute statistics. Each entry
 //      in the array is either a filename of a comma-separated list.
-//       - For a comma-separated list of length one, the mask "name" and "value"
-//         are both set to the single station ID string.
-//       - For a comma-separated list of length greater than one, the first
-//         string is the mask "name" and the remaining strings are the station
-//         ID's to be used.
 //       - For a filename, the strings are whitespace-separated.  The first
 //         string is the mask "name" and the remaining strings are the station
 //         ID's to be used.
+//       - For a comma-separated list, optionally use a colon to specify a name.
+//         For "MY_LIST:SID1,SID2", name = MY_LIST and values = SID1 and SID2.
+//       - For a comma-separated list of length one with no name specified, the
+//         mask "name" and value are both set to the single station ID string.
+//         For "SID1", name = SID1 and value = SID1.
+//       - For a comma-separated list of length greater than one with no name
+//         specified, the name is set to MASK_SID and the values are the station
+//         ID's to be used.
+//         For "SID1,SID2", name = MASK_SID and values = SID1 and SID2.
 //       - The "name" of the station ID mask is written to the VX_MASK column
 //         of the MET output files.
 //
