@@ -313,8 +313,21 @@ http://www.unidata.ucar.edu/software/netcdf
 .
  The same family of compilers used to build NetCDF should be used when building
  MET.
- MET is compatible with most NetCDF version 3 releases, but it is not yet
- compatible with the enhanced data model provide in NetCDF version 4.
+ MET is now compatible with the enhanced data model provided in NetCDF version
+ 4.
+ The support for NetCDF version 4 requires HDF5 which is freely available
+ for download at 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://support.hdfgroup.org/HDF5/
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Description
@@ -550,7 +563,20 @@ http://www.unidata.ucar.edu/software/netcdf/docs/netcdf-install/
 
 \end_inset
 
+.
+ Support for NetCDF version 4 requires HDF5.
+ Detailed installation instructions for HDF5 are available at 
+\begin_inset Flex URL
+status open
 
+\begin_layout Plain Layout
+
+https://support.hdfgroup.org/HDF5/release/obtainsrc.html
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Description
@@ -621,8 +647,9 @@ LIB=libgrib2c.a.
 
 \series medium
 5.
- Users wishing to compile MODIS-regrid will need to install both the HDF4
- and HDF-EOS2 libraries available from the HDF group websites (
+ Users wishing to compile MODIS-regrid and/or lidar2nc will need to install
+ both the HDF4 and HDF-EOS2 libraries available from the HDF group websites
+ (
 \begin_inset Flex URL
 status open
 
@@ -1126,6 +1153,10 @@ The following environment variables should also be set:
 \end_layout
 
 \begin_layout Standard
+- Set $MET_HDF5 to point to the main HDF5 directory.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 - Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRLIB
@@ -1155,9 +1186,10 @@ The following environment variables should also be set:
 \begin_layout Standard
 
 \series medium
-- If compiling MODIS-Regrid, set $MET_HDF to point to the main HDF directory,
- or set $MET_HDFINC to point to the directory with the HDF include files
- and set $MET_HDFLIB to point to the directory with the HDF library files.
+- If compiling MODIS-Regrid and/or lidar2nc, set $MET_HDF to point to the
+ main HDF4 directory, or set $MET_HDFINC to point to the directory with
+ the HDF4 include files and set $MET_HDFLIB to point to the directory with
+ the HDF4 library files.
  Also, set $MET_HDFEOS to point to the main HDF EOS directory, or set $MET_HDFEO
 SINC to point to the directory with the HDF EOS include files and set $MET_HDFEO
 SLIB to point to the directory with the HDF EOS library files.
@@ -1210,6 +1242,7 @@ To configure MET to install all of the available tools in the "bin" subdirectory
 \series medium
 1.
  ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-mode_graphics
+ --enable-lidar2nc
 \end_layout
 
 \begin_layout LyX-Code
@@ -1271,6 +1304,10 @@ If all tools are enabled and the build is successful, the "<prefix>/bin"
 
 \begin_layout LyX-Code
 - gsidens2orank
+\end_layout
+
+\begin_layout LyX-Code
+- lidar2nc
 \end_layout
 
 \begin_layout LyX-Code
@@ -1509,6 +1546,18 @@ Disable compilation of gen_vx_mask
 
 \series medium
 Disable compilation of grid_stat
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+--enable-lidar2nc
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Enable compilation of lidar2nc
 \end_layout
 
 \begin_layout Standard
