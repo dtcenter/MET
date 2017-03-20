@@ -1263,10 +1263,9 @@ void process_scores() {
                   // Loop through all of the wind speed thresholds
                   for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
 
-                     if(vl1l2_info[m].vcount == 0) continue;
-
                      // Write out VL1L2
-                     if(conf_info.output_flag[i_vl1l2] != STATOutputType_None) {
+                     if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
+                        vl1l2_info[m].vcount > 0) {
                         write_vl1l2_row(shc, vl1l2_info[m],
                            conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
                            stat_at, i_stat_row,
@@ -1274,7 +1273,8 @@ void process_scores() {
                      }
 
                      // Write out VAL1L2
-                     if(conf_info.output_flag[i_val1l2] != STATOutputType_None) {
+                     if(conf_info.output_flag[i_val1l2] != STATOutputType_None &&
+                        vl1l2_info[m].vacount > 0) {
                         write_val1l2_row(shc, vl1l2_info[m],
                            conf_info.output_flag[i_val1l2] == STATOutputType_Both,
                            stat_at, i_stat_row,
