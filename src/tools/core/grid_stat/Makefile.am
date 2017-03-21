@@ -35,8 +35,7 @@ grid_stat_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lnetcdf_c++4 \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = grid_stat.h \
 	grid_stat_conf_info.h

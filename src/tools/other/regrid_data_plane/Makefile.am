@@ -31,5 +31,4 @@ regrid_data_plane_LDADD = -lvx_statistics \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lnetcdf_c++4 \
-	-lm -lnetcdf_c++ -lnetcdf
+	-lm -lnetcdf_c++4 -lnetcdf

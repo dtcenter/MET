@@ -43,7 +43,6 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_solar \
 	-lvx_cal \
 	-lvx_log \
-	-lnetcdf_c++4 \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = gen_vx_mask.h

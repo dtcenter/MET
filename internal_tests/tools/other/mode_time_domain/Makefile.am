@@ -66,5 +66,4 @@ test_velocity_LDADD = \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lnetcdf_c++4 \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas -lz
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
