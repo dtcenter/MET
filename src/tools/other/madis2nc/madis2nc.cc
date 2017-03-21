@@ -342,7 +342,7 @@ void setup_netcdf_out(int nhdr) {
    hdr_arr_dim = add_dim(f_out, "hdr_arr_len", (long) hdr_arr_len);
    obs_arr_dim = add_dim(f_out, "obs_arr_len", (long) obs_arr_len);
    obs_dim     = add_dim(f_out, "nobs"); // unlimited dimension
-   hdr_dim     = add_dim(f_out, "nhdr", (long) nhdr);
+   hdr_dim     = add_dim(f_out, "nhdr");
 
    //
    // Define netCDF variables
@@ -965,7 +965,6 @@ void process_madis_metar(NcFile *&f_in) {
          //
 
          i_hdr = i_hdr_s + i_idx;
-         hdr_data_idx = i_idx;
 
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
@@ -1023,7 +1022,7 @@ void process_madis_metar(NcFile *&f_in) {
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
          //
-         obs_arr[0] = (float) i_hdr;   // Index into header array
+         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);   // Index into header array
          obs_arr[2] = bad_data_float;  // Level: accum(sec) or pressure
          obs_arr[3] = bad_data_float;  // Height
 
@@ -1139,12 +1138,23 @@ void process_madis_metar(NcFile *&f_in) {
          process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
                      snowCover_var);
 
+         hdr_data_idx++;
+         if (hdr_data_idx >= buf_size) {
+            write_nc_hdr_data(buf_size);
+            reset_header_buffer(buf_size);
+         }
       }
 
-      write_nc_hdr_data(buf_size);
-      reset_header_buffer(buf_size);
+      if (hdr_data_idx >= buf_size) {
+         write_nc_hdr_data(buf_size);
+         reset_header_buffer(buf_size);
+      }
    } // end for i_hdr
 
+   if (hdr_data_idx > 0) {
+      write_nc_hdr_data(hdr_data_idx);
+      reset_header_buffer(hdr_data_idx);
+   }
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
    }
@@ -1512,12 +1522,16 @@ void process_madis_raob(NcFile *&f_in) {
             hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
          }
 
-         hdr_data_idx++;
-
          //
          // Initialize the observation array: hdr_id
          //
-         obs_arr[0] = (float) i_hdr;
+         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
+
+         hdr_data_idx++;
+         if (hdr_data_idx >= buf_size) {
+            write_nc_hdr_data(buf_size);
+            reset_header_buffer(buf_size);
+         }
 
          //
          // Loop through the mandatory levels
@@ -1947,9 +1961,6 @@ void process_madis_raob(NcFile *&f_in) {
 
       } // end for i_hdr
 
-      if (0 < hdr_data_idx) {
-         write_nc_hdr_data(hdr_data_idx);
-      }
    } // end for i_hdr
 
    if (0 < hdr_data_idx) {
@@ -2100,7 +2111,6 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          cur[0] = i_hdr;
          cur[1] = 0;
-         hdr_data_idx = i_idx;
 
          //
          // Process the latitude, longitude, and elevation.
@@ -2146,11 +2156,16 @@ void process_madis_profiler(NcFile *&f_in) {
             hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
          }
 
-
          //
          // Initialize the observation array: hdr_id
          //
-         obs_arr[0] = (float) i_hdr;
+         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
+
+         hdr_data_idx++;
+         if (hdr_data_idx >= buf_size) {
+            write_nc_hdr_data(buf_size);
+            reset_header_buffer(buf_size);
+         }
 
          //
          // Get the pressure for the current level
@@ -2194,10 +2209,12 @@ void process_madis_profiler(NcFile *&f_in) {
 
       } // end for i_hdr
 
-      write_nc_hdr_data(buf_size);
-      reset_header_buffer(buf_size);
    } // end for i_hdr
 
+   if (hdr_data_idx > 0) {
+      write_nc_hdr_data(hdr_data_idx);
+      reset_header_buffer(hdr_data_idx);
+   }
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
    }
@@ -2395,7 +2412,6 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          cur[0] = i_hdr;
          cur[1] = 0;
-         hdr_data_idx = i_idx;
 
          //
          // Process the latitude, longitude, and elevation.
@@ -2444,7 +2460,7 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          // Initialize the observation array: hdr_id
          //
-         obs_arr[0] = (float) i_hdr;
+         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
 
          //
          // Get the pressure for the current level
@@ -2522,12 +2538,21 @@ void process_madis_maritime(NcFile *&f_in) {
          process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
                      in_precip24Hour_var);
 
+         hdr_data_idx++;
+         if (hdr_data_idx >= buf_size) {
+            write_nc_hdr_data(buf_size);
+            reset_header_buffer(buf_size);
+         }
+         
       }
 
-      write_nc_hdr_data(buf_size);
-      reset_header_buffer(buf_size);
    } // end for i_hdr
 
+   if (hdr_data_idx > 0) {
+      write_nc_hdr_data(hdr_data_idx);
+      reset_header_buffer(hdr_data_idx);
+   }
+      
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
    }
@@ -2785,7 +2810,6 @@ void process_madis_mesonet(NcFile *&f_in) {
          // Use cur to index into the NetCDF variables.
          //
          cur[0] = i_hdr;
-         hdr_data_idx = i_idx;
 
          //
          // Process the latitude, longitude, and elevation.
@@ -2832,10 +2856,16 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
          //
-         obs_arr[0] = (float) i_hdr;   // Index into header array
+         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);   // Index into header array
          obs_arr[2] = bad_data_float;  // Level: accum(sec) or pressure
          obs_arr[3] = 0;               // Height for surface is 0 meters
 
+         hdr_data_idx++;
+         if (hdr_data_idx >= buf_size) {
+            write_nc_hdr_data(buf_size);
+            reset_header_buffer(buf_size);
+         }
+         
          // Temperature
          obs_arr[4] = temperature_arr[i_idx];
          process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx],
@@ -3034,10 +3064,13 @@ void process_madis_mesonet(NcFile *&f_in) {
          }
       }
 
-      write_nc_hdr_data(buf_size);
-      reset_header_buffer(buf_size);
    } // end for i
 
+   if (hdr_data_idx > 0) {
+      write_nc_hdr_data(hdr_data_idx);
+      reset_header_buffer(hdr_data_idx);
+   }
+     
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
    }
@@ -3263,7 +3296,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             // Use cur to index into the NetCDF variables.
             //
             cur[1] = i_lvl;
-            obs_arr[0] = (float) i_cnt;
+            obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
 
             //
             // Process the latitude, longitude, and elevation.
@@ -3318,8 +3351,9 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             }
 
             hdr_data_idx++;
-            if (hdr_data_idx == BUFFER_SIZE) {
+            if (hdr_data_idx >= BUFFER_SIZE) {
                write_nc_hdr_data(BUFFER_SIZE);
+               reset_header_buffer(BUFFER_SIZE);
             }
 
             //
