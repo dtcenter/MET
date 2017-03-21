@@ -336,6 +336,24 @@ ASCII2NC
  to the format of the output from the PB2NC tool.
 \end_layout
 
+\begin_layout Standard
+Similarly, the 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf LIDAR2NC}
+\end_layout
+
+\end_inset
+
+ tool reformats Calipso satellite HDF files into a NetCDF output file similar
+ in format to ASCII2NC and PB2NC.
+\end_layout
+
 \begin_layout Section
 Output data formats
 \begin_inset CommandInset label
@@ -601,6 +619,37 @@ Output
 4.
  
 \series bold
+LIDAR2NC Tool
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: One Calipso satellite HDF file
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: One NetCDF file containing the reformatted observations.
+\end_layout
+
+\end_deeper
+\begin_layout Description
+
+\series medium
+5.
+ 
+\series bold
 Pcp-Combine Tool
 \end_layout
 
@@ -653,8 +702,10 @@ Output
 \end_deeper
 \begin_layout Description
 
+\series medium
+6.
+
 \series bold
-5.
  Regrid-Data-Plane Tool
 \end_layout
 
@@ -684,7 +735,7 @@ Output
 \begin_layout Description
 
 \series medium
-6.
+7.
 
 \series bold
  Shift-Data-Plane Tool
@@ -715,7 +766,7 @@ Output
 \begin_layout Description
 
 \series medium
-7.
+8.
  
 \series bold
 MODIS-Regrid Tool
@@ -747,7 +798,7 @@ Output
 \begin_layout Description
 
 \series medium
-8.
+9.
  
 \series bold
 Gen-VX-Mask Tool
@@ -780,7 +831,7 @@ Output
 \begin_layout Description
 
 \series medium
-9.
+10.
  
 \series bold
 Point-Stat Tool
@@ -814,7 +865,7 @@ Output
 \begin_layout Description
 
 \series medium
-10.
+11.
  
 \series bold
 Grid-Stat Tool
@@ -849,7 +900,7 @@ Output
 \begin_layout Description
 
 \series medium
-11.
+12.
  
 \series bold
 Ensemble Stat Tool
@@ -884,7 +935,7 @@ Output
 \begin_layout Description
 
 \series medium
-12.
+13.
  
 \series bold
 Wavelet-Stat Tool
@@ -927,7 +978,7 @@ ISC
 \begin_layout Description
 
 \series medium
-13.
+14.
  
 \series bold
 GSID2MPR Tool
@@ -959,7 +1010,7 @@ Output
 \begin_layout Description
 
 \series medium
-14.
+15.
  
 \series bold
 GSID2ORANK Tool
@@ -991,7 +1042,7 @@ Output
 \begin_layout Description
 
 \series medium
-15.
+16.
  
 \series bold
 Stat-Analysis Tool
@@ -1033,7 +1084,7 @@ Output
 \begin_layout Description
 
 \series medium
-16.
+17.
  
 \series bold
 Series Analysis Tool
@@ -1067,7 +1118,7 @@ Output
 \begin_layout Description
 
 \series medium
-17.
+18.
  
 \series bold
 MODE Tool
@@ -1103,7 +1154,7 @@ Output
 \begin_layout Description
 
 \series medium
-18.
+19.
  
 \series bold
 MODE-Analysis Tool
@@ -1145,7 +1196,7 @@ Output
 \begin_layout Description
 
 \series medium
-19.
+20.
  
 \series bold
 MODE-TD Tool
@@ -1179,7 +1230,7 @@ Output
 \begin_layout Description
 
 \series medium
-20.
+21.
  
 \series bold
 TC-Dland Tool
@@ -1213,7 +1264,7 @@ Output
 \begin_layout Description
 
 \series medium
-21.
+22.
  
 \series bold
 TC-Pair Tool
@@ -1256,7 +1307,7 @@ Output
 \begin_layout Description
 
 \series medium
-22.
+23.
  
 \series bold
 TC-Stat Tool
@@ -1298,7 +1349,7 @@ Output
 \begin_layout Description
 
 \series medium
-23.
+24.
  
 \series bold
 Plot-Point-Obs Tool
@@ -1330,7 +1381,7 @@ Output
 \begin_layout Description
 
 \series medium
-24.
+25.
  
 \series bold
 Plot-Data-Plane Tool
@@ -1361,7 +1412,7 @@ Output
 \begin_layout Description
 
 \series medium
-25.
+26.
  
 \series bold
 Plot-MODE-Field Tool
