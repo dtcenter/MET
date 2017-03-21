@@ -3724,5 +3724,529 @@ reference "sub:pb2nc-output"
 .
 \end_layout
 
+\begin_layout Section
+LIDAR2NC tool
+\end_layout
+
+\begin_layout Standard
+The LIDAR2NC tool creates a NetCDF point observation file (similar to the
+ output of ASCII2NC and PB2NC) from a Calipso HDF data file.
+ Not all of the data present in the Calipso file is reproduced in the output,
+ however.
+ Instead, the output focuses mostly on information about clouds (as opposed
+ to aerosols) as seen by the satellite along its ground track.
+\end_layout
+
+\begin_layout Subsection
+lidar2nc usage
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The usage statement for LIDAR2NC tool is shown below:
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+Usage:
+\series default
+ lidar2nc
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+-out nc_filename
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[ -log log_filename ]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+calipso_filename
+\end_layout
+
+\begin_layout Standard
+Unlike most of the MET tools, lidar2nc does not use a config file.
+ Currently, the options needed to run lidar2nc are not complex enough to
+ reqire one.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Required arguments for lidar2nc
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+1.
+ The
+\series bold
+ calipso_filename
+\series medium
+ argument indicates the name of the calipso HDF data file to be processed.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+2.
+ The 
+\series bold
+nc_filename
+\series medium
+ argument indicates the name given to the output NetCDF file.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\bar under
+Optional arguments for lidar2nc
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+1.
+ The
+\series bold
+ log_filename
+\series medium
+ argument indicates the name of an optional log file where all screen output
+ from the tool will be duplicated.
+\end_layout
+
+\begin_layout Subsection
+lidar2nc output
+\end_layout
+
+\begin_layout Standard
+Each observation type in the lidar2nc output is assigned a grib code.
+ These are outlined in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "lidar2nc_grib_code_table"
+
+\end_inset
+
+.
+ Grib codes were assigned to these fields arbitrarily, with grib codes in
+ the 600s denoting individual bit fields taken from the feature classification
+ flag field in the calipso file.
+\end_layout
+
+\begin_layout Standard
+We will not give a detailed description of each calipso data product that
+ lidar2nc reads.
+ Users should refer to existing calipso documentation for this information.
+ We will, however, give some explanation of how the cloud layer base and
+ top information is encoded in the lidar2nc NetCDF output file.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Layer base
+\series default
+ gives the elevation in meters of the cloud base for each cloud level at
+ each obs location.
+ Similarly, 
+\series bold
+layer top
+\series default
+ gives the elevation of the top of each cloud layer.
+ Note that if there are multiple cloud layers at a particular obs location,
+ then there will be more than one base (or top) given for that location.
+ For convenience, 
+\series bold
+base-base
+\series default
+ and 
+\series bold
+top-top
+\series default
+ give, respectively, the base elevation for the bottom cloud layer, and
+ the top elevation for the top cloud layer.
+ For these data types, there will be only one value per obs location regardless
+ of how many cloud layers there are at that location.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+lidar2nc grib codes and their meaning
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "lidar2nc_grib_code_table"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="14" columns="2">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Grib Code
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Meaning
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+500
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Layer Base
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+501
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Layer Top
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+502
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Opacity
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+503
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CAD Score
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+504
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Base Base
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+505
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Top Top
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+601
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Feature Type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+602
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Feature Type QA
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+603
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ice/Water Phase
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+604
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ice/Water Phase QA
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+605
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Feature Sub-Type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+606
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Cloud/Aerosol/PSC Type QA
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+607
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Horizontal Averaging
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document
