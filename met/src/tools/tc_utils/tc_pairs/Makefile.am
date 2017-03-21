@@ -29,8 +29,7 @@ tc_pairs_LDADD = -lvx_config \
 	-lvx_cal \
 	-lvx_log \
 	-lm \
-	-lnetcdf_c++4 \
-	-lnetcdf_c++ -lnetcdf \
+	-lnetcdf_c++4 -lnetcdf \
 	$(FLIBS)
 
 EXTRA_DIST = tc_pairs_conf_info.h \

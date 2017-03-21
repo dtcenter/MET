@@ -41,7 +41,6 @@ madis2nc_LDADD = -lvx_shapedata \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	-lnetcdf_c++4 \
-	-lm -lnetcdf_c++ -lnetcdf -lgsl -lgslcblas
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = madis2nc.h
