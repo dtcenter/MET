@@ -76,6 +76,11 @@ valid_hour = [];
 lead       = [];
 
 //
+// Select tracks which contain all required lead times.
+//
+lead_req = [];
+
+//
 // Stratify by the INIT_MASK and VALID_MASK columns.
 //
 init_mask  = [];
