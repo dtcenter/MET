@@ -870,6 +870,61 @@ hbox{th}}$
 \end_layout
 
 \begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Centroid distance travelled}
+\end_layout
+
+\end_inset
+
+ is the total great circle distance, in kilometers, travelled by the 2D
+ spatial centroid over the lifetime of the object.
+ In other words, at each time 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$t$
+\end_layout
+
+\end_inset
+
+ for which the 3D object exists, the set of points in the object also have
+ that value of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$t$
+\end_layout
+
+\end_inset
+
+ will together form a 2D spatial object.
+ That 2D object will have a spatial centroid, which will move around as
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$t$
+\end_layout
+
+\end_inset
+
+ varies.
+ This attribute represents this total 2D centroid movement over time.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 Finally, MTD calculates several 
@@ -1222,6 +1277,27 @@ bf Intersection volume}
 \end_layout
 
 \begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+bf Duration difference}
+\end_layout
+
+\end_inset
+
+ is the difference in the lifetimes of the two objects constituting the
+ pair, in the sense of ``forecast minus obs.'' For example, if the forecast
+ object of the pair has a lifetime of 5 time steps, and the observed object
+ has a lifetime of 3 time steps, then this attribute has the value 2.
+ Note that we do not take absolute values of the difference, so this attribute
+ can be positive, negative, or zero.
+\end_layout
+
+\begin_layout Standard
 
 \series medium
 Finally, the 
@@ -1305,6 +1381,8 @@ i.e
 \emph default
 ., constant-time) slices of a spacetime object.
  This is so that the behavior of these attributes over time can be examined.
+ These 2D constant-time attributes are written out for both simple and cluster
+ objects.
 \end_layout
 
 \begin_layout Standard
@@ -1764,7 +1842,7 @@ name "sec:Using-MTD"
 \end_layout
 
 \begin_layout Subsection
-mtd input
+MTD input
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MTD_Data-Files"
@@ -1795,7 +1873,7 @@ As shown in the next section, filenames for each time used must be given.
 \end_layout
 
 \begin_layout Subsection
-mtd usage
+MTD usage
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MTD_usage"
@@ -2179,7 +2257,7 @@ on GRIB files in the obs_files director.
 \end_layout
 
 \begin_layout Subsection
-mtd configuration file
+MTD configuration file
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:MTD_The-Config-File"
@@ -4053,7 +4131,7 @@ name "table_mtd-3D-single-attributes"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="20" columns="3">
+<lyxtabular version="3" rows="21" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -4543,6 +4621,36 @@ Object end time
 \begin_inset Text
 
 \begin_layout Plain Layout
+CDIST_TRAVELLED
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total great circle distance travelled by the 2D spatial centroid over the
+ lifetime of the 3D object
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 INTENSITY_10
 \end_layout
 
@@ -4575,7 +4683,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+32
 \end_layout
 
 \end_inset
@@ -4616,7 +4724,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+33
 \end_layout
 
 \end_inset
@@ -4657,7 +4765,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+34
 \end_layout
 
 \end_inset
@@ -4698,7 +4806,7 @@ hbox{th}}$
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+35
 \end_layout
 
 \end_inset
@@ -4774,7 +4882,7 @@ name "table_mtd-3D-Pair-Attribute"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="14" columns="3">
+<lyxtabular version="3" rows="15" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -5198,11 +5306,40 @@ Volume
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DURATION_DIFF
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dfference in the lifetimes of the two objects
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
 \end_layout
 
 \end_inset
