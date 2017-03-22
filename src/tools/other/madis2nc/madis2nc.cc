@@ -2543,7 +2543,7 @@ void process_madis_maritime(NcFile *&f_in) {
             write_nc_hdr_data(buf_size);
             reset_header_buffer(buf_size);
          }
-         
+
       }
 
    } // end for i_hdr
@@ -2552,7 +2552,7 @@ void process_madis_maritime(NcFile *&f_in) {
       write_nc_hdr_data(hdr_data_idx);
       reset_header_buffer(hdr_data_idx);
    }
-      
+
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
    }
@@ -2865,7 +2865,7 @@ void process_madis_mesonet(NcFile *&f_in) {
             write_nc_hdr_data(buf_size);
             reset_header_buffer(buf_size);
          }
-         
+
          // Temperature
          obs_arr[4] = temperature_arr[i_idx];
          process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx],
@@ -3070,7 +3070,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       write_nc_hdr_data(hdr_data_idx);
       reset_header_buffer(hdr_data_idx);
    }
-     
+
    if (0 < obs_data_idx) {
       write_nc_obs_data(obs_data_idx);
    }
@@ -3505,7 +3505,8 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
 
-        << "\t\t\"-compress level\" specifies the compression level of NetCDF variable (optional).\n"
+        << "\t\t\"-compress level\" specifies the compression level of "
+        << "output NetCDF variable (optional).\n\n"
 
         << flush;
 

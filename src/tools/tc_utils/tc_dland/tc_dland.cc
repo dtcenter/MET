@@ -348,7 +348,8 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
         
-        << "\t\t\"-compress level\" specifies the compression level of NetCDF variable (optional)\n\n"
+        << "\t\t\"-compress level\" specifies the compression level of "
+        << "output NetCDF variable (optional).\n\n"
 
         << flush;
 
