@@ -111,24 +111,4 @@
     </output>
   </test>
   
-  <test name="pb2nc_NDAS_mask_grid_data_cmd">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_grid_data.nc \
-      &CONFIG_DIR;/PB2NCConfig \
-      -mask_grid &TEST_DIR;/data/mnc/test_grid_valid.nc \
-      -v 1
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.mask_grid_data.nc</point_nc>
-    </output>
-  </test>
-  
 </met_test>
