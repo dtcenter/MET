@@ -23,7 +23,7 @@
     <exec>&MET_DIR;/bin/lidar2nc</exec>
     <param> \
        -out &OUTPUT_DIR;/lidar2nc/calipso.nc \
-       &INPUT_DIR;/lidar2nc/CAL_LID_L2_05kmCLay-Prov-V3-40.2016-12-01T01-24-58ZN.hdf
+       &DATA_DIR_OBS;/lidar/calipso/CAL_LID_L2_05kmCLay-Prov-V3-40.2016-12-01T01-24-58ZN.hdf
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/lidar2nc/calipso.nc</point_nc>
