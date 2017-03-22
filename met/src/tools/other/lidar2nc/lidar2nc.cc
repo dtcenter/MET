@@ -167,7 +167,7 @@ static NcFile ncf(output_filename.text(), NcFile::replace, NcFile::nc4);
    //  process the lidar file
    //
 
-mlog << "Processing \"" << cline[0] << "\"\n";
+mlog << Debug(1) << "Processing Lidar File: " << cline[0] << "\n";
 
 process_calipso_file(ncf, cline[0]);
 
@@ -391,6 +391,8 @@ buf_size = max<int>(buf_size, hdr_vld_bytes);
 buf_size = max<int>(buf_size, hdr_arr_bytes);
 
 
+mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
+
 
    //
    //  add some dimensions to the netcdf file
@@ -559,7 +561,6 @@ if ( gethostname(junk, sizeof(junk) - 1) < 0 )  s << " on unknown host";
 else                                            s << " on host " << junk;
 
 (void) out.putAtt(string("FileOrigins"), string( s.text() ));
-// (void) out.putAtt(string("MET_version"), string( VERSION ));
 (void) out.putAtt(string("MET_version"), string( met_version ));
 (void) out.putAtt(string("MET_tool"),    string(program_name.text()));
 
@@ -573,6 +574,9 @@ buf = new unsigned char [buf_size];
 
 char  * const cbuf = (char *)  buf;
 float * const fbuf = (float *) buf;
+
+
+mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
 
    //
@@ -739,20 +743,6 @@ for (j=0; j<n_data; ++j)  {
 }   //  for j
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    //
    //  close hdf file
    //
@@ -765,6 +755,7 @@ if ( SDend(hdf_sd_id) < 0 )  {
    exit ( 1 );
 
 }
+
 
    //
    //  done
