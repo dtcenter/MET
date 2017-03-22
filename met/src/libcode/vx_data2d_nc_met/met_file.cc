@@ -143,8 +143,7 @@ bool MetNcFile::open(const char * filename)
 int j, k;
 const char * c = (const char *) 0;
 long long ill, vll;
-//NcVar * v   = (NcVar *) 0;
-NcVar  v;
+NcVar v;
 
 
 close();
@@ -157,8 +156,6 @@ if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
    //  grid
    //
 
-// if ( ! get_met_grid(*Nc, grid) )  { close();  return ( false ); }
-
 read_netcdf_grid(Nc, grid);
 
    //
@@ -167,17 +164,15 @@ read_netcdf_grid(Nc, grid);
 
 StringArray gDimNames;
 get_dim_names(Nc, &gDimNames);
-   
+
 for (j=0; j<Ndims; ++j)  {
    c = gDimNames[j];
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
    if ( strcmp(c, x_dim_name) == 0 ) {
-      //Xdim = Dim[j];
       Xdim = &dim;
    }
    if ( strcmp(c, y_dim_name) == 0 ) {
-      //Ydim = Dim[j];
       Ydim = &dim;
    }
 
@@ -189,23 +184,23 @@ for (j=0; j<Ndims; ++j)  {
 
    StringArray varNames;
    Nvars = get_var_names(Nc, &varNames);
-   
+
    Var = new NcVarInfo [Nvars];
-   
-   
+
+
    for (j=0; j<Nvars; ++j)  {
-   
+
       v = get_var(Nc, varNames[j]);
-   
+
       Var[j].var = new NcVar(v);
-   
+
       Var[j].name = GET_NC_NAME(v).c_str();
-   
+
       int dim_count = GET_NC_DIM_COUNT(v);
       Var[j].Ndims = dim_count;
-   
+
       Var[j].Dims = new NcDim * [Var[j].Ndims];
-   
+
       //
       //  parse the variable attributes
       //
@@ -214,29 +209,26 @@ for (j=0; j<Ndims; ++j)  {
       get_att_str( Var[j], level_att_name,      Var[j].level_att     );
       get_att_str( Var[j], units_att_name,      Var[j].units_att     );
       get_att_int( Var[j], accum_time_att_name, Var[j].AccumTime     );
-   
+
       get_att_unixtime( Var[j], init_time_att_name,  ill);
       get_att_unixtime( Var[j], valid_time_att_name, vll);
-   
+
       if ( !is_bad_data(ill) )   InitTime = ill;
       if ( !is_bad_data(vll) )  ValidTime = vll;
-   
+
       StringArray dimNames;
       get_dim_names(&v, &dimNames);
-   
+
       for (k=0; k<(dim_count); ++k)  {
          c = gDimNames[k];
          NcDim dim = get_nc_dim(&v, dimNames[k]);
          Var[j].Dims[k] = &dim;
-   
-         //if ( GET_NC_NAME_P(Var[j].Dims[k]) == GET_NC_NAME_P(Xdim) )  Var[j].x_slot = k;
-         //if ( GET_NC_NAME_P(Var[j].Dims[k]) == GET_NC_NAME_P(Ydim) )  Var[j].y_slot = k;
-   
+
          if ( strcmp(c, x_dim_name) == 0 ) Var[j].x_slot = k;
          if ( strcmp(c, y_dim_name) == 0 ) Var[j].y_slot = k;
-         
+
       }   //  for k
-   
+
    }   //  for j
 
    //
@@ -417,13 +409,13 @@ switch ( GET_NC_TYPE_ID_P(var) )  {
       d = (double) (i);
       status = true;
       break;
-  
+
    case NcType::nc_SHORT:
       get_nc_data(var, &s, (long *)a);
       d = (double) (s);
       status = true;
       break;
-  
+
    case NcType::nc_FLOAT:
       get_nc_data(var, &f, (long *)a);
       d = (double) (f);
@@ -436,7 +428,7 @@ switch ( GET_NC_TYPE_ID_P(var) )  {
       get_nc_data(var, &d, (long *)a);
       status = true;
       break;
-      
+
    default:
       mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
            << " bad type (" << GET_NC_TYPE_ID_P(var) << ") for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
@@ -462,7 +454,6 @@ if ( !status )  {
    //  done
    //
 
-//return ( d[0] );
 return ( d );
 
 }
@@ -636,31 +627,31 @@ plane.set_size(Nx, Ny);
                   data_array[x] = (double)int_array[x];
                }
                break;
-           
+
             case NcType::nc_SHORT:
                get_nc_data(v, short_array, dim, cur);
                for (x=0; x<Nx; ++x) {
                   data_array[x] = (double)short_array[x];
                }
                break;
-           
+
             case NcType::nc_FLOAT:
                get_nc_data(v, float_array, dim, cur);
                for (x=0; x<Nx; ++x) {
                   data_array[x] = (double)float_array[x];
                }
                break;
-         
+
             case NcType::nc_DOUBLE:
                get_nc_data(v, data_array, dim, cur);
                break;
-               
+
             default:
                mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
                     << " bad type (" << GET_NC_TYPE_NAME_P(v) << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
                exit ( 1 );
                break;
-         
+
          }   //  switch
          for (x=0; x<Nx; ++x)  {
             value = data_array[x];
@@ -689,31 +680,31 @@ plane.set_size(Nx, Ny);
                   data_array[y] = (double)int_array[y];
                }
                break;
-           
+
             case NcType::nc_SHORT:
                get_nc_data(v, short_array, dim, cur);
                for (y=0; y<Ny; ++y) {
                   data_array[y] = (double)short_array[y];
                }
                break;
-           
+
             case NcType::nc_FLOAT:
                get_nc_data(v, float_array, dim, cur);
                for (y=0; y<Ny; ++y) {
                   data_array[y] = (double)float_array[y];
                }
                break;
-         
+
             case NcType::nc_DOUBLE:
                get_nc_data(v, data_array, dim, cur);
                break;
-               
+
             default:
                mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
                     << " bad type (" << GET_NC_TYPE_ID_P(v) << ") for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
                exit ( 1 );
                break;
-         
+
          }   //  switch
          for (y=0; y<Ny; ++y)  {
             value = data_array[y];
