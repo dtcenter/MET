@@ -5,11 +5,21 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
+//
+////////////////////////////////////////////////////////////////////////
+//
+//   Filename:   lidar2nc.cc
+//
+//   Description:
+//      Parse HDF Lidar files and reformat them into the NetCDF point
+//      observation format used by the other MET tools.
+//
+//   Mod#   Date      Name           Description
+//   ----   ----      ----           -----------
+//   000    03-22-17  Bullock Gotway New
+//
 ////////////////////////////////////////////////////////////////////////
 
-
-static const char na_string               [] = "NA";
 
 static const char mxstr_dim_name          [] = "mxstr";
 static const int  mxstr_dim_size             = 40;
@@ -54,10 +64,7 @@ using namespace std;
 #include <unistd.h>
 #include <vector>
 
-//#include "netcdf.hh"
 #include <netcdf>
-// #include <netcdfcpp.h>
-// using namespace netCDF;
 
 #include "hdf.h"
 #include "mfhdf.h"
@@ -68,6 +75,7 @@ using namespace std;
 #include "vx_nc_util.h"
 #include "vx_util.h"
 #include "vx_math.h"
+#include "vx_cal.h"
 #include "vx_log.h"
 
 #include "calipso_5km.h"
@@ -80,7 +88,7 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int na_len = strlen(na_string);
+static const int na_len = strlen(na_str);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -105,6 +113,7 @@ static void usage();
 static void set_logfile   (const StringArray &);
 static void set_outfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
+static void set_compress  (const StringArray &);
 static void set_grib_code (const StringArray &);
 
 static void process_calipso_file (NcFile &, const char * filename);
@@ -135,10 +144,11 @@ cline.set(argc, argv);
 
 cline.set_usage(usage);
 
-cline.add(set_logfile,   "-log",       1);
 cline.add(set_outfile,   "-out",       1);
+cline.add(set_logfile,   "-log",       1);
 cline.add(set_verbosity, "-v",         1);
 cline.add(set_grib_code, "-grib_code", 1);
+cline.add(set_compress,  "-compress",  1);
 
 cline.parse();
 
@@ -173,33 +183,33 @@ return ( 0 );
 
 ////////////////////////////////////////////////////////////////////////
 
+void usage() {
 
-void usage()
+cout << "\nUsage: "
+     << program_name << "\n"
+     << "\tlidar_file\n"
+     << "\t-out nc_file\n"
+     << "\t[-log file]\n"
+     << "\t[-v level]\n"
+     << "\t[-compress level]\n\n"
 
-{
+     << "\twhere\t\"lidar_file\" is the HDF lidar point observation "
+     << "file (required).\n"
 
-ConcatString tab;
+     << "\t\t\"-out nc_file\" is the output NetCDF file (required).\n"
 
-tab.set_repeat(' ', 5 + program_name.length());
+     << "\t\t\"-log file\" outputs log messages to the specified "
+     << "file (optional).\n"
 
-cout << "\n\n"
+     << "\t\t\"-v level\" overrides the default level of logging ("
+     << mlog.verbosity_level() << ") (optional).\n"
 
-     << "   usage: " << program_name << "\n\n"
+     << "\t\t\"-compress level\" specifies the compression level of "
+     << "the output NetCDF variable (optional).\n\n"
 
-     << tab << "-out nc_filename\n\n"
-
-     << tab << "[ -log filename ]\n\n"
-
-     // << tab << "[ -grib_code value ]    (default: " << default_grib_code << ")\n\n"
-
-     << tab << "   lidar_filename\n"
-
-     << "\n\n";
-
+     << flush;
 
 exit (1);
-
-return;
 
 }
 
@@ -233,20 +243,6 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-/*
-
-void set_config(const StringArray & a)
-
-{
-
-config_filename = a[0];
-
-return;
-
-}
-
-*/
-////////////////////////////////////////////////////////////////////////
 
 
 void set_verbosity(const StringArray & a)
@@ -259,6 +255,17 @@ return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a)
+
+{
+
+compress_level = atoi(a[0]);
+
+return;
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -590,7 +597,7 @@ memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*mxstr_dim_size, na_string);
+   strcpy(cbuf + j*mxstr_dim_size, na_str);
 
 }
 
@@ -599,12 +606,12 @@ hdr_sid_var.putVar(cbuf);
    //
    //  populate the obs_qty variable
    //
-/* 
+/*
 memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*mxstr_dim_size, na_string);
+   strcpy(cbuf + j*mxstr_dim_size, na_str);
 
 }
 
@@ -804,7 +811,7 @@ index.at(1) = 0;
 count.at(0) = 1;
 count.at(1) = na_len;
 
-obs_qty_var.putVar(index, count, na_string);
+obs_qty_var.putVar(index, count, na_str);
 
    //
    //  done
