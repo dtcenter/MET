@@ -945,8 +945,10 @@ rank_corr_flag = FALSE;
 // currently supported:
 //
 //    - "NONE" to use all point observations (legacy behavior)
-//    - "UNIQUE" if two or more observations match identically except in the
-//       station ID field, only use a single observation
+//    - "UNIQUE" only use a single observation if two or more observations match.
+//             Matching observations are determined if they contain identical
+//             latitude, longitude, level, elevation, and time information.
+//             They may contain different observation values or station IDs
 //
 // The reporting mechanism for this feature can be activated by specifying
 // a verbosity level of three or higher.  The report will show information
