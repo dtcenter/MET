@@ -287,6 +287,125 @@ sub-directory, or the MET Online Tutorial:
 Release Notes
 ================================================================================
 
+Version 6.0 Release Notes:
+-------------------------
+
+- What's New:
+    - METv6.0 includes new tools and enhancements
+      - New Tools: lidar2nc
+      - Major Enhancements: NetCDF4 support, MET-TC E-Decks, HiRA verification,
+        description header column
+
+- New Tools:
+    - The lidar2nc reformats HDF4 Calipso data files into a NetCDF point
+      observation format for use by Point-Stat and Ensemble-Stat.
+
+- Enhancements to Existing Tools:
+    - Distribute the latest set of bugfixes, details not listed here.
+    - Enhance MET to handle southern polar stereographic grids.
+    - NetCDF
+       - Enhance MET tools to read/write NetCDF4 files and support a
+         configurable compression level ("nc_compression" configuration option,
+         ${MET_NC_COMPRESS} environment variable, and "-compress"
+         command line option, listed in order of precedence).
+       - Support "add_offset" and "scale_factor" attributes to read NetCDF
+         variables of type short, int, float, and double.
+    - GRIB1 and GRIB2 files
+       - Refine logic for defining custom GRIB tables using the
+         ${MET_GRIB_TABLES} environment variable (previously named
+         ${USER_GRIB_TABLES}).
+       - Support filtering GRIB2 data by product definition template, generating
+         process, ensemble type, or derived product type using "GRIB2_pdt",
+         "GRIB2_process", "GRIB2_ens_type", and "GRIB2_der_type" configuration
+         options, respectively.
+    - Probabilities
+       - Support shorthand convention for reading/writing probabilistic
+         thresholds where "==n" is interpreted as equally spaced thresholds
+         (e.g. "==0.25" means ">=0.00,>=0.25,>=0.50,>=0.75,>=1.00").
+       - Add new "prob_as_scalar" configuration option to disable the
+         application of probabilistic verification methods.
+    - Additional configuration options
+       - Add new description ("DESC") header column to MET ASCII output files.
+         The description string may be set separately for each verification task
+         defined in the configuration file.
+       - Add ${MET_TMP_DIR} environment variable to specify where temporary
+         files should be written and override the "tmp_dir" configuration
+         option.
+       - Remove restriction that UGRD must be immediately followed by VGRD at
+         the same level to compute VL1L2 and VAL1L2 output.
+    - ASCII2NC and MADIS2NC
+       - Add "-mask_sid" command line option to define a group of station ID's.
+       - Reduce runtime by reading blocks of observations.
+    - PB2NC
+       - Enable "grid" configuration option in "mask" to be set to a named grid
+         or gridded data file.
+    - Point-Stat
+       - Add "hira" configuration options to support High Resolution Assessment
+         (HiRA) verification, a neighborhood verification method for point
+         observations.
+    - Ensemble-Stat
+       - Add ensemble spread to the output: "SPREAD" column in RHIST line type
+         and "ENS_SPREAD" in the ORANK line type.
+       - Dramatically reduce runtime with more efficient memory management and
+         data access methods.
+    - Point-Stat and Ensemble-Stat
+       - Refine logic for the "duplicate_flag" configuration option to check for
+         duplicate observations at the same station.
+       - Add "obs_summary" and "obs_perc_value" configuration options to derive
+         summary metrics for multiple observations at the same station within
+         the time window: "NONE", "MIN", "MAX", "UW_MEAN", "DW_MEAN", "MEDIAN",
+         or "PERC" to use all observations, the minimum, maximum, average,
+         time-weighted average, median, or a particular percentile,
+         respectively.
+       - Add five new "method" options in the "interp" section: "UPPER_LEFT",
+         "UPPER_RIGHT", "LOWER_RIGHT", and "LOWER_LEFT" to select the forecast
+         value at a particular grid box corner and "BEST" to select the forecast
+         value which most closely matches the observation value.
+    - Gen-Vx-Mask
+       - Add support for masking by the position of the sun using the solar
+         altitude ("solar_alt") option azimuth ("solar_azi") "-type" options.
+    - PCP-Combine
+       - Switch error for subtracting data with different initialization times
+         to a warning.
+    - Grid-Stat
+       - Add "shape" configuration option (SQUARE or CIRCLE) to the "interp"
+         dictionary.  Will be applied to other MET tools in future releases.
+       - Add "apply_mask" configuration option to "nc_pairs_flag" to indicate
+         whether matched pairs should be written for each masking region.
+       - Allow Grid-Stat to run with only matched pairs output requested
+         ("nc_pairs_flag") but no statistics computed ("output_flag").
+       - Dramatically reduce runtime with more efficient memory management.
+    - MODE
+       - Add support for arrays in the "merge_thresh" configuration option.
+    - MODE-Analysis
+       - Allow "-lookin" option to be set to a directory or filename.
+    - MTD
+       - Add cluster object centroid coordinates to the 2D attributes file.
+       - Add "DURATION_DIFF" column to the 3D pair attributes file.
+       - Add "CDIST_TRAVELLED" column to the 3D simple attributes file to
+         indicate the total distance travelled for 2D object slices.
+    - STAT-Analysis
+       - Add "-mask_sid" job command option to define a group of station ID's.
+    - WWMCA-Regrid
+       - Generalize to handle a wider variety of input naming conventions.
+       - Add "write_pixel_age" and "swap_endian" configuration options to
+         process pixel age data rather than cloud data.
+    - MET-TC
+       - Enhance TC-Pairs to read E-Deck files using the "-edeck" command line
+         option and write the new PROBRIRW line type containing probabilities
+         of rapid intensity changes.
+       - Enhance TC-Stat to parse and filter PROBRIRW lines.
+       - Add new "probrirw" job type to TC-Stat to apply probabilistic
+         methods to PROBRIRW lines and write PCT, PSTD, PRC, and PJC lines.
+       - Add "lead_req" configuration option to TC-Pairs and TC-Stat to specify
+         required lead times that must be present for a track to be retained.
+       - Modify TC-Pairs to derive interp12, consensus, lag, and baseline tracks
+         before applying track filtering logic.
+       - Distribute enhancements to the plot_tcmpr.R Rscript plotting utility.
+    - Enhance logic of STAT-Analysis, MODE-Analysis, and TC-Stat to process
+      output from all previous versions of MET by reading version-specific
+      column offset files rather than hard-coding those values.
+
 Version 5.2 Release Notes:
 -------------------------
 
