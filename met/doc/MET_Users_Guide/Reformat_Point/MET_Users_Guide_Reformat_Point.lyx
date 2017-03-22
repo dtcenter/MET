@@ -278,22 +278,6 @@ hskip 0.5in}
 
 \end_inset
 
-[-mask_grid name]
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-{
-\backslash
-hskip 0.5in}
-\end_layout
-
-\end_inset
-
 [-dump path]
 \end_layout
 
@@ -466,24 +450,6 @@ num_messages
 5.
  The 
 \series bold
--mask_grid name
-\series medium
- option may be used to override the setting at the configuration (mask.grid)
- which filters out the PrepBufr observation spatially.
- The 
-\series bold
-name
-\series medium
- specifies a named grid or a gridded data file for filtering the point observati
-ons spatially.
-\end_layout
-
-\begin_layout Description
-
-\series medium
-6.
- The 
-\series bold
 -dump path
 \series medium
  option may be used to dump the entire contents of the PrepBufr file to
@@ -507,7 +473,7 @@ path
 \begin_layout Description
 
 \series medium
-7.
+6.
  The 
 \series bold
 -log file
@@ -527,7 +493,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-8.
+7.
  The 
 \series bold
 -v level
@@ -549,7 +515,7 @@ level
 \begin_layout Description
 
 \series medium
-9.
+8.
 
 \series default
  The 
