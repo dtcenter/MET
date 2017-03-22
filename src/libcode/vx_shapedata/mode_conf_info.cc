@@ -110,9 +110,6 @@ void ModeConfInfo::clear()
    fcst_inten_perc_thresh.clear();
    obs_inten_perc_thresh.clear();
 
-   // fcst_merge_thresh.clear();
-   // obs_merge_thresh.clear();
-
    fcst_merge_flag = MergeType_None;
    obs_merge_flag = MergeType_None;
 
@@ -195,7 +192,7 @@ void ModeConfInfo::read_config(const char *default_file_name, const char *user_f
    conf.read(user_file_name);
 
    nc_info.set_compress_level(conf.nc_compression());
-   
+
    return;
 
 }
@@ -366,11 +363,6 @@ PlotInfo plot_info;
 
       // Conf: fcst.merge_thresh and obs.merge_thresh
 
-   // fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
-   // obs_merge_thresh  = obs_dict->lookup_thresh(conf_key_merge_thresh);
-
-      // Conf: fcst.merge_thresh and obs.merge_thresh
-
    fcst_merge_thresh_array = fcst_dict->lookup_thresh_array(conf_key_merge_thresh);
     obs_merge_thresh_array =  obs_dict->lookup_thresh_array(conf_key_merge_thresh);
 
@@ -393,24 +385,8 @@ PlotInfo plot_info;
 
    }
 
-//    if ( fcst_merge_thresh_array.n_elements() != fcst_conv_thresh_array.n_elements() )  {
-//
-//       mlog << Error << "\nModeConfInfo::process_config() -> "
-//            << "convolution threshold arrays and merge threshold arrays need to be the same size\n\n";
-//
-//       exit ( 1 );
-//
-//    }
-
    if ( fcst_merge_thresh_array.n_elements() == 1 )  fcst_merge_thresh = fcst_merge_thresh_array[0];
    if (  obs_merge_thresh_array.n_elements() == 1 )   obs_merge_thresh =  obs_merge_thresh_array[0];
-
-
-
-
-
-
-
 
       // Conf: mask_missing_flag
 
