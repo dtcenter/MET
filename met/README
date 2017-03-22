@@ -310,6 +310,7 @@ Version 6.0 Release Notes:
          command line option, listed in order of precedence).
        - Support "add_offset" and "scale_factor" attributes to read NetCDF
          variables of type short, int, float, and double.
+       - Add logic to reorient latitudes to be south to north, if needed.
     - GRIB1 and GRIB2 files
        - Refine logic for defining custom GRIB tables using the
          ${MET_GRIB_TABLES} environment variable (previously named
