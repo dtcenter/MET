@@ -232,7 +232,7 @@ void process_madis_file(const char *madis_file) {
    // Print out current file name
    mlog << Debug(1) << "Reading MADIS File:\t" << madis_file << "\n";
 
-   // Open the input NetCDF file   mlog << Debug(1) << "   ---1111 \n";
+   // Open the input NetCDF file
    NcFile *f_in = open_ncfile(madis_file);
 
    // Check for a valid file
