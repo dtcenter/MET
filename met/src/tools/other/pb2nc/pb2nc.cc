@@ -397,7 +397,6 @@ void open_netcdf() {
       mlog << Error << "\nopen_netcdf() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
 
-      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
 
@@ -1215,7 +1214,6 @@ void write_netcdf_hdr_data() {
 void clean_up() {
 
    if(f_out) {
-      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
    }
@@ -1600,40 +1598,6 @@ void set_verbosity(const StringArray & a)
 
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_mask_grid(const StringArray & a) {
-  Met2dDataFileFactory factory;
-  Met2dDataFile * datafile = (Met2dDataFile *) 0;
-
-  // List the grid masking file
-  mlog << Debug(1)
-       << "Grid Masking: " << a[0] << "\n";
-
-  // First, try to find the grid by name.
-  if(!find_grid_by_name(a[0], grid_mask)) {
-
-    // If that doesn't work, try to open a data file.
-    datafile = factory.new_met_2d_data_file(replace_path(a[0]));
-
-    if(!datafile) {
-      mlog << Error << "\nset_mask_grid() -> "
-           << "can't open data file \"" << a[0] << "\"\n\n";
-      exit(1);
-    }
-
-    // Store the data file's grid
-    grid_mask = datafile->grid();
-
-    delete datafile; datafile = (Met2dDataFile *) 0;
-  }
-
-  // List the grid mask
-  mlog << Debug(2)
-       << "Parsed Masking Grid: " << grid_mask.name() << " ("
-       << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
