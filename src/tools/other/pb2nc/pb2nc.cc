@@ -169,7 +169,6 @@ static ConcatString dump_dir = ".";
 static ConcatString data_plane_filename;
 
 static int compress_level = -1;
-static Grid grid_mask;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -270,7 +269,6 @@ static void   set_dump_path(const StringArray &);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
-static void   set_mask_grid(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -460,7 +458,10 @@ void process_pbfile(int i_pb) {
    float    quality_mark, dl_category;
    float    obs_arr[obs_arr_len];
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
-   Grid     local_grid_mask;
+
+   bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
+                           conf_info.grid_mask.ny() > 0);
+   bool apply_poly_mask = (conf_info.poly_mask.n_points() > 0);
 
    // List the PrepBufr file being processed
    mlog << Debug(1) << "Processing PrepBufr File:\t" << pbfile[i_pb]
@@ -536,18 +537,12 @@ void process_pbfile(int i_pb) {
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { OBS_BUFFER_SIZE, 1} ;
-   
+
    //processed_count = 0;
    obs_data_idx = 0;
    obs_data_offset = 0;
    hdr_data_offset = 0;
-   
-   local_grid_mask = grid_mask;
-   if(grid_mask.nx() == 0 && grid_mask.ny() == 0
-         && conf_info.grid_mask.nx() > 0 && conf_info.grid_mask.ny() > 0) {
-      local_grid_mask = conf_info.grid_mask;
-   }
-          
+
    // Loop through the PrepBufr messages from the input file
    cout << "   npbmsg: " << npbmsg << "\n";
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
@@ -691,10 +686,10 @@ void process_pbfile(int i_pb) {
 
       // If the lat/lon for the PrepBufr message is not on the
       // grid_mask, continue to the next PrepBufr message
-      if(local_grid_mask.nx() > 0 && local_grid_mask.ny() > 0) {
-         local_grid_mask.latlon_to_xy(hdr_arr_lat, (-1.0*hdr_arr_lon), x, y);
-         if(x < 0 || x >= local_grid_mask.nx() ||
-            y < 0 || y >= local_grid_mask.ny()) {
+      if(apply_grid_mask) {
+         conf_info.grid_mask.latlon_to_xy(hdr_arr_lat, (-1.0*hdr_arr_lon), x, y);
+         if(x < 0 || x >= conf_info.grid_mask.nx() ||
+            y < 0 || y >= conf_info.grid_mask.ny()) {
             rej_grid++;
             continue;
          }
@@ -703,7 +698,7 @@ void process_pbfile(int i_pb) {
       // If the lat/lon for the PrepBufr message is not inside the mask
       // polyline continue to the next PrepBufr message.  Multiply by
       // -1 to convert from degrees_east to degrees_west
-      if(conf_info.poly_mask.n_points() > 0 &&
+      if(apply_poly_mask &&
          !conf_info.poly_mask.latlon_is_inside_dege(hdr_arr_lat, hdr_arr_lon)) {
          rej_poly++;
          continue;
@@ -898,7 +893,7 @@ void process_pbfile(int i_pb) {
             // Write the quality flag to the netCDF file
             ConcatString quality_mark_str;
             quality_mark_str.format("%d", nint(quality_mark));
-            
+
             strncpy(qty_data_buf[obs_data_idx], quality_mark_str, quality_mark_str.length());
             //qty_data_idx++;
 
@@ -926,7 +921,7 @@ void process_pbfile(int i_pb) {
                offsets[0] += OBS_BUFFER_SIZE;
                obs_data_idx = 0;
             }
-            
+
             // Increment the current and total observations counts
             n_file_obs++;
             n_total_obs++;
@@ -967,12 +962,12 @@ void process_pbfile(int i_pb) {
                quality_mark_str.format("%d", nint(quality_mark));
 
                strncpy(qty_data_buf[obs_data_idx], quality_mark_str, quality_mark_str.length());
-               
+
                // Write the observation array to the netCDF file
                for (int idx=0; idx<obs_arr_len; idx++) {
                   obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
                }
-               
+
                obs_data_idx++;
                if (obs_data_idx >= OBS_BUFFER_SIZE) {
                   lengths[1] = strl_len;
@@ -992,7 +987,7 @@ void process_pbfile(int i_pb) {
                   offsets[0] += OBS_BUFFER_SIZE;
                   obs_data_idx = 0;
                }
-               
+
                // Increment the current and total observations counts
                n_file_obs++;
                n_total_obs++;
@@ -1043,7 +1038,7 @@ void process_pbfile(int i_pb) {
          exit(1);
       }
    }
-   
+
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
    mlog << Debug(2) << "Total PrepBufr Messages processed\t= "
@@ -1141,9 +1136,9 @@ void write_netcdf_hdr_data() {
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { hdr_typ_sa.n_elements(), strl_len } ;
-   
+
    // Loop through and write out the header data
- 
+
    for(i=0; i<hdr_typ_sa.n_elements(); i++) {
 
       // PrepBufr Message type
@@ -1167,10 +1162,10 @@ void write_netcdf_hdr_data() {
       for (int idx=0; idx<hdr_arr_len; idx++) {
          hdr_arr_buf[i][idx] = hdr_arr[idx];
       }
-     
+
    } // end for i
 
-   
+
    lengths[1] = strl_len;
    if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
       mlog << Error << "\nwrite_netcdf_hdr_data() -> "
@@ -1205,7 +1200,7 @@ void write_netcdf_hdr_data() {
            << "netCDF file\n\n";
       exit(1);
    }
-   
+
    return;
 }
 
@@ -1279,7 +1274,7 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 
       // Initialize to the top of the event stack
       ev = 0;
-     
+
       // Loop through the event stack
       for(i=0; i<mxr8vn && evns[i_var][i][i_lvl][0]<r8bfms; i++) {
 
@@ -1371,7 +1366,7 @@ bool keep_valid_time(const unixtime ut,
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_pb_report_type(int type) {
-  
+
    return(conf_info.pb_report_type.n_elements() == 0 ||
           conf_info.pb_report_type.has(type));
 }
@@ -1533,7 +1528,7 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n"
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << conf_info.conf.nc_compression() << ") (optional).\n"
+        << conf_info.conf.nc_compression() << ") (optional).\n\n"
 
         << flush;
 
