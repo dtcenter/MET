@@ -1691,7 +1691,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-name str] 
+[-name list] 
 \end_layout
 
 \begin_layout LyX-Code
@@ -1857,9 +1857,10 @@ The
 \series default
 The 
 \series bold
--name str
+-name list
 \series default
- option specifies the output variable name
+ specifies a comma-seperated list of output variable names for each field
+ specified.
 \end_layout
 
 \begin_layout Description
