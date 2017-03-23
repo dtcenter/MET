@@ -188,7 +188,7 @@ void usage() {
 cout << "\nUsage: "
      << program_name << "\n"
      << "\tlidar_file\n"
-     << "\t-out nc_file\n"
+     << "\t-out out_file\n"
      << "\t[-log file]\n"
      << "\t[-v level]\n"
      << "\t[-compress level]\n\n"
@@ -196,7 +196,7 @@ cout << "\nUsage: "
      << "\twhere\t\"lidar_file\" is the HDF lidar point observation "
      << "file (required).\n"
 
-     << "\t\t\"-out nc_file\" is the output NetCDF file (required).\n"
+     << "\t\t\"-out out_file\" is the output NetCDF file (required).\n"
 
      << "\t\t\"-log file\" outputs log messages to the specified "
      << "file (optional).\n"
