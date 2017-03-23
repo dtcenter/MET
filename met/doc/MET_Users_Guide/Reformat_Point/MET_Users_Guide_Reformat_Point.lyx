@@ -2746,7 +2746,19 @@ standard out and error
 -v level
 \series medium
  option indicates the desired level of verbosity.
- The value of 'level' will override the default setting of 2.
+ The value of 
+\series default
+
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+
+\series medium
+ will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity above 1 will increase the amount of logging.
 \end_layout
@@ -3609,7 +3621,19 @@ standard out and error
 -v level
 \series medium
  option indicates the desired level of verbosity.
- The value of 'level' will override the default setting of 2.
+ The value of 
+\series default
+
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+
+\series medium
+ will override the default setting of 2.
  Setting the verbosity to 0 will make the tool run with no log messages,
  while increasing the verbosity will increase the amount of logging.
 \end_layout
@@ -3734,7 +3758,7 @@ hskip 0.5in}
 
 \end_inset
 
--out nc_filename
+lidar_file
 \end_layout
 
 \begin_layout LyX-Code
@@ -3750,7 +3774,7 @@ hskip 0.5in}
 
 \end_inset
 
-[ -log log_filename ]
+-out out_file
 \end_layout
 
 \begin_layout LyX-Code
@@ -3766,7 +3790,39 @@ hskip 0.5in}
 
 \end_inset
 
-calipso_filename
+[-log file]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-v level]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
+[-compress level]
 \end_layout
 
 \begin_layout Standard
@@ -3783,15 +3839,17 @@ Unlike most of the MET tools, lidar2nc does not use a config file.
 Required arguments for lidar2nc
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
 1.
- The
+ The 
 \series bold
- calipso_filename
+lidar_file
 \series medium
- argument indicates the name of the calipso HDF data file to be processed.
+ argument indicates the name of the input HDF lidar data file to be processed.
+ Currently, Calipso files are supported but support for additional file
+ types will be added in future releases.
 \end_layout
 
 \begin_layout Description
@@ -3800,9 +3858,9 @@ Required arguments for lidar2nc
 2.
  The 
 \series bold
-nc_filename
+out_file
 \series medium
- argument indicates the name given to the output NetCDF file.
+ argument indicates the name of the output NetCDF file.
 \end_layout
 
 \begin_layout Standard
@@ -3812,16 +3870,79 @@ nc_filename
 Optional arguments for lidar2nc
 \end_layout
 
-\begin_layout Standard
+\begin_layout Description
 
 \series medium
-1.
- The
+3.
+ The 
 \series bold
- log_filename
+-log file 
 \series medium
- argument indicates the name of an optional log file where all screen output
- from the tool will be duplicated.
+option directs output and errors to the specified log file.
+ All messages will be written to that file as well as 
+\series default
+standard out and error
+\series medium
+.
+ Thus, users can save the messages without having to redirect the output
+ on the command line.
+ The default behavior is no logfile.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+4.
+ The 
+\series bold
+-v level
+\series medium
+ option indicates the desired level of verbosity.
+ The value of 
+\series default
+
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+
+\series medium
+ will override the default setting of 2.
+ Setting the verbosity to 0 will make the tool run with no log messages,
+ while increasing the verbosity above 1 will increase the amount of logging.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+5.
+ 
+\series default
+The 
+\series bold
+-compress level
+\series default
+ option indicates the desired level of compression (deflate level) for NetCDF
+ variables.
+ Tha valid level is between 0 and 9.
+ The value of 
+\begin_inset Quotes eld
+\end_inset
+
+level
+\begin_inset Quotes erd
+\end_inset
+
+ will override the default setting of 0 from the configuration file or the
+ environment variable MET_NC_COMPRESS.
+ Setting the compression level to 0 will make no compression for the NetCDF
+ output.
+ Lower number is for fast compression and higher number is for better compressio
+n.
 \end_layout
 
 \begin_layout Subsection
@@ -3829,7 +3950,7 @@ lidar2nc output
 \end_layout
 
 \begin_layout Standard
-Each observation type in the lidar2nc output is assigned a grib code.
+Each observation type in the lidar2nc output is assigned a GRIB code.
  These are outlined in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3838,7 +3959,7 @@ reference "lidar2nc_grib_code_table"
 \end_inset
 
 .
- Grib codes were assigned to these fields arbitrarily, with grib codes in
+ GRIB codes were assigned to these fields arbitrarily, with GRIB codes in
  the 600s denoting individual bit fields taken from the feature classification
  flag field in the calipso file.
 \end_layout
@@ -3895,7 +4016,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-lidar2nc grib codes and their meaning
+lidar2nc GRIB codes and their meaning
 \end_layout
 
 \end_inset
