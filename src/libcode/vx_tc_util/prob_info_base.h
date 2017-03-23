@@ -82,7 +82,7 @@ class ProbInfoBase {
          //  get stuff
          //
 
-      const ATCFLineType   type()           const;
+            ATCFLineType   type()           const;
       const ConcatString & storm_id()       const;
       const ConcatString & basin()          const;
       const ConcatString & cyclone()        const;
@@ -112,7 +112,7 @@ class ProbInfoBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ATCFLineType   ProbInfoBase::type()           const { return(Type);                    }
+inline       ATCFLineType   ProbInfoBase::type()           const { return(Type);                    }
 inline const ConcatString & ProbInfoBase::storm_id()       const { return(StormId);                 }
 inline const ConcatString & ProbInfoBase::basin()          const { return(Basin);                   }
 inline const ConcatString & ProbInfoBase::cyclone()        const { return(Cyclone);                 }
