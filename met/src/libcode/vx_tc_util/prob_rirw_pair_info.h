@@ -78,23 +78,23 @@ class ProbRIRWPairInfo {
          //  get stuff
          //
 
-      const ProbRIRWInfo & prob_rirw()    const;
+      const ProbRIRWInfo & prob_rirw()  const;
       const TrackInfo *    bdeck()      const;
       const ConcatString & storm_name() const;
       const ConcatString & bmodel()     const;
-      const double         blat()       const;
-      const double         blon()       const;
-      const double         adland()     const;
-      const double         bdland()     const;
-      const double         track_err()  const;
-      const double         x_err()      const;
-      const double         y_err()      const;
-      const double         bbegv()      const;
-      const double         bendv()      const;
-      const double         bminv()      const;
-      const double         bmaxv()      const;
-      const CycloneLevel   bbeglev()    const;
-      const CycloneLevel   bendlev()    const;
+            double         blat()       const;
+            double         blon()       const;
+            double         adland()     const;
+            double         bdland()     const;
+            double         track_err()  const;
+            double         x_err()      const;
+            double         y_err()      const;
+            double         bbegv()      const;
+            double         bendv()      const;
+            double         bminv()      const;
+            double         bmaxv()      const;
+            CycloneLevel   bbeglev()    const;
+            CycloneLevel   bendlev()    const;
       const TCStatLine &   line()       const;
 
          //
@@ -115,19 +115,19 @@ inline const ProbRIRWInfo & ProbRIRWPairInfo::prob_rirw()  const { return(ProbRI
 inline const TrackInfo *    ProbRIRWPairInfo::bdeck()      const { return(BDeck);     }
 inline const ConcatString & ProbRIRWPairInfo::storm_name() const { return(StormName); }
 inline const ConcatString & ProbRIRWPairInfo::bmodel()     const { return(BModel);    }
-inline const double         ProbRIRWPairInfo::blat()       const { return(BLat);      }
-inline const double         ProbRIRWPairInfo::blon()       const { return(BLon);      }
-inline const double         ProbRIRWPairInfo::adland()     const { return(ADLand);    }
-inline const double         ProbRIRWPairInfo::bdland()     const { return(BDLand);    }
-inline const double         ProbRIRWPairInfo::track_err()  const { return(TrackErr);  }
-inline const double         ProbRIRWPairInfo::x_err()      const { return(XErr);      }
-inline const double         ProbRIRWPairInfo::y_err()      const { return(YErr);      }
-inline const double         ProbRIRWPairInfo::bbegv()      const { return(BBegV);     }
-inline const double         ProbRIRWPairInfo::bendv()      const { return(BEndV);     }
-inline const double         ProbRIRWPairInfo::bminv()      const { return(BMinV);     }
-inline const double         ProbRIRWPairInfo::bmaxv()      const { return(BMaxV);     }
-inline const CycloneLevel   ProbRIRWPairInfo::bbeglev()    const { return(BBegLev);   }
-inline const CycloneLevel   ProbRIRWPairInfo::bendlev()    const { return(BEndLev);   }
+inline       double         ProbRIRWPairInfo::blat()       const { return(BLat);      }
+inline       double         ProbRIRWPairInfo::blon()       const { return(BLon);      }
+inline       double         ProbRIRWPairInfo::adland()     const { return(ADLand);    }
+inline       double         ProbRIRWPairInfo::bdland()     const { return(BDLand);    }
+inline       double         ProbRIRWPairInfo::track_err()  const { return(TrackErr);  }
+inline       double         ProbRIRWPairInfo::x_err()      const { return(XErr);      }
+inline       double         ProbRIRWPairInfo::y_err()      const { return(YErr);      }
+inline       double         ProbRIRWPairInfo::bbegv()      const { return(BBegV);     }
+inline       double         ProbRIRWPairInfo::bendv()      const { return(BEndV);     }
+inline       double         ProbRIRWPairInfo::bminv()      const { return(BMinV);     }
+inline       double         ProbRIRWPairInfo::bmaxv()      const { return(BMaxV);     }
+inline       CycloneLevel   ProbRIRWPairInfo::bbeglev()    const { return(BBegLev);   }
+inline       CycloneLevel   ProbRIRWPairInfo::bendlev()    const { return(BEndLev);   }
 inline const TCStatLine &   ProbRIRWPairInfo::line()       const { return(Line);      }
 
 inline void ProbRIRWPairInfo::set_adland(double d) { ADLand = d; return; }
