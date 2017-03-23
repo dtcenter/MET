@@ -18,6 +18,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    01-29-15  Halley Gotway  New
+//   001    03-23-17  Halley Gotway  Change -name to an array.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +63,7 @@ static ConcatString InputFilename;
 static ConcatString OutputFilename;
 static StringArray FieldSA;
 static RegridInfo RGInfo;
-static ConcatString VarName;
+static StringArray VarNameSA;
 static int compress_level = -1;
 
 // Output NetCDF file
@@ -76,7 +77,7 @@ static void process_command_line(int, char **);
 static void process_data_file();
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
-                     const VarInfo *vinfo, const GrdFileType& ftype);
+                     const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage();
 static void set_field(const StringArray &);
@@ -159,6 +160,16 @@ void process_command_line(int argc, char **argv) {
       usage();
    }
 
+   // Check that the number of output names and fields match
+   if(VarNameSA.n_elements() > 0 &&
+      VarNameSA.n_elements() != FieldSA.n_elements()) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "When the -name option is used, the number of entries ("
+           << VarNameSA.n_elements() << ") must match the number of "
+           << "-field entries (" << FieldSA.n_elements() << ")!\n\n";
+      usage();
+   }
+
    // Check the nearest neighbor special case
    if(RGInfo.method != InterpMthd_Nearest && RGInfo.width == 1) {
       mlog << Warning << "\nprocess_command_line() -> "
@@ -190,7 +201,7 @@ void process_data_file() {
    Grid fr_grid, to_grid;
    GrdFileType ftype;
    double dmin, dmax;
-   ConcatString run_cs;
+   ConcatString run_cs, vname;
 
    // Initialize configuration object
    MetConfig config;
@@ -278,8 +289,23 @@ void process_data_file() {
               << dmin << " to " << dmax << ".\n";
       }
 
+      // Select output variable name
+      if(VarNameSA.n_elements() == 0) {
+         vname << cs_erase << vinfo->name();
+         if(vinfo->level().type() != LevelType_Accum &&
+            ftype != FileType_NcMet &&
+            ftype != FileType_General_Netcdf &&
+            ftype != FileType_NcPinterp &&
+            ftype != FileType_NcCF) {
+            vname << "_" << vinfo->level_name();
+         }
+      }
+      else {
+         vname = VarNameSA[i];
+      }
+
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, fr_mtddf->file_type());
+      write_nc(to_dp, to_grid, vinfo, vname);
 
    } // end for i
 
@@ -329,29 +355,14 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_nc(const DataPlane &dp, const Grid &grid,
-              const VarInfo *vinfo, const GrdFileType &ftype) {
-   ConcatString nc_var_name;
-
-   // Define output variable name, if not already set
-   if(VarName.length() == 0) {
-      nc_var_name << cs_erase << vinfo->name();
-      if(vinfo->level().type() != LevelType_Accum &&
-            ftype != FileType_NcMet &&
-            ftype != FileType_General_Netcdf &&
-            ftype != FileType_NcPinterp &&
-            ftype != FileType_NcCF) {
-         nc_var_name << "_" << vinfo->level_name();
-      }
-   }
-   else {
-      nc_var_name = VarName;
-   }
+              const VarInfo *vinfo, const char *vname) {
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
 
-   NcVar data_var = add_var(nc_out, (string)nc_var_name, ncFloat, lat_dim, lon_dim, deflate_level);
-   add_att(&data_var, "name", (string)nc_var_name);
+   NcVar data_var = add_var(nc_out, (string)vname, ncFloat,
+                            lat_dim, lon_dim, deflate_level);
+   add_att(&data_var, "name", (string)vname);
    add_att(&data_var, "long_name", (string)vinfo->long_name());
    add_att(&data_var, "level", (string)vinfo->level_name());
    add_att(&data_var, "units", (string)vinfo->units());
@@ -388,7 +399,7 @@ void close_nc() {
 
    // Clean up
    if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) 0; 
+      delete nc_out; nc_out = (NcFile *) 0;
    }
 
    // List the output file
@@ -413,7 +424,7 @@ void usage() {
         << "\t[-method type]\n"
         << "\t[-width n]\n"
         << "\t[-vld_thresh n]\n"
-        << "\t[-name str]\n"
+        << "\t[-name list]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -442,8 +453,8 @@ void usage() {
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
         << ") (optional).\n"
 
-        << "\t\t\"-name str\" specifies the output variable name "
-        << "(optional).\n"
+        << "\t\t\"-name list\" specifies a comma-seperated list of "
+        << "output variable names for each field specified (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -489,7 +500,7 @@ void set_vld_thresh(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_name(const StringArray & a) {
-   VarName = a[0];
+   VarNameSA.add_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

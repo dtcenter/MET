@@ -365,6 +365,9 @@ Version 6.0 Release Notes:
     - Gen-Vx-Mask
        - Add support for masking by the position of the sun using the solar
          altitude ("solar_alt") option azimuth ("solar_azi") "-type" options.
+    - Regrid-Data-Plane
+       - Change the "-namme" command line option to a comma-seperated list of
+         output variable names for each field specified.
     - PCP-Combine
        - Switch error for subtracting data with different initialization times
          to a warning.
