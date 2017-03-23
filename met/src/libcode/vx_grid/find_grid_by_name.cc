@@ -24,13 +24,13 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_lambert_grid(const StringArray &, Grid &);
+static bool parse_lambert_grid(const StringArray &, Grid &);
 
-bool parse_latlon_grid(const StringArray &, Grid &);
+static bool parse_latlon_grid(const StringArray &, Grid &);
 
-bool parse_stereographic_grid(const StringArray &, Grid &);
+static bool parse_stereographic_grid(const StringArray &, Grid &);
 
-bool parse_mercator_grid(const StringArray &, Grid &);
+static bool parse_mercator_grid(const StringArray &, Grid &);
 
 
 ////////////////////////////////////////////////////////////////////////

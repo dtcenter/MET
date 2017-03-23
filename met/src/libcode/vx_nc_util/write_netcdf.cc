@@ -29,8 +29,8 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-extern void write_netcdf_latlon_1d(NcFile *, NcDim *, NcDim *, const Grid &);
-extern void write_netcdf_latlon_2d(NcFile *, NcDim *, NcDim *, const Grid &);
+static void write_netcdf_latlon_1d(NcFile *, NcDim *, NcDim *, const Grid &);
+static void write_netcdf_latlon_2d(NcFile *, NcDim *, NcDim *, const Grid &);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -140,24 +140,9 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
    // Write the lat data
    put_nc_data(&lat_var, &lat_data[0], lat_dim->getSize(), 0);
-   //if(!lat_var->putVar(&lat_data[0], lat_dim->getSize())) {
-   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
-   //        << "error with lat_var->put\n\n";
-   //   exit(1);
-   //}
 
    // Write the lon data
-   //lon_var->putVar(count, offset, &lon_data[0]);
    put_nc_data(&lon_var, &lon_data[0], lon_dim->getSize(), 0);
-   //if(!lon_var->put(&lon_data[0], lon_dim->getSize())) {
-   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
-   //        << "error with lon_var->put\n\n";
-   //   exit(1);
-   //}
-
-   // Clean up
-   //if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
-   //if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
 
    return;
 }
@@ -212,23 +197,9 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
    // Write the lat data
    put_nc_data(&lat_var, &lat_data[0], counts, offsets);
-   //if(!lat_var->put(&lat_data[0], grid.ny(), grid.nx())) {
-   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
-   //        << "error with lat_var->put\n\n";
-   //   exit(1);
-   //}
 
    // Write the lon data
    put_nc_data(&lon_var, &lon_data[0], counts, offsets);
-   //if(!lon_var->put(&lon_data[0], grid.ny(), grid.nx())) {
-   //   mlog << Error << "\nwrite_netcdf_latlon() -> "
-   //        << "error with lon_var->put\n\n";
-   //   exit(1);
-   //}
-
-   // Clean up
-   //if(lat_data) { delete [] lat_data; lat_data = (float *) 0; }
-   //if(lon_data) { delete [] lon_data; lon_data = (float *) 0; }
 
    return;
 }
@@ -285,11 +256,6 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    count.push_back(wgt_dp.ny());
    count.push_back(wgt_dp.nx());
    put_nc_data_with_dims(&wgt_var, &wgt_data[0], wgt_dp.ny(), wgt_dp.nx());
-   //if(!wgt_var->put(&wgt_data[0], wgt_dp.ny(), wgt_dp.nx())) {
-   //   mlog << Error << "\nwrite_netcdf_grid_weight() -> "
-   //        << "error with wgt_var->put\n\n";
-   //   exit(1);
-   //}
 
    // Clean up
    if(wgt_data) { delete [] wgt_data; wgt_data = (float *) 0; }

@@ -33,7 +33,7 @@ enum ThreshType {
 
    thresh_complex = -2,
 
-   no_thresh_type = -1,
+   no_thresh_type = -1
 
 };
 
