@@ -1859,7 +1859,7 @@ The
 \series bold
 -name list
 \series default
- specifies a comma-seperated list of output variable names for each field
+ specifies a comma-separated list of output variable names for each field
  specified.
 \end_layout
 

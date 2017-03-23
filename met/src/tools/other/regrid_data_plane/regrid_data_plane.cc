@@ -453,7 +453,7 @@ void usage() {
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
         << ") (optional).\n"
 
-        << "\t\t\"-name list\" specifies a comma-seperated list of "
+        << "\t\t\"-name list\" specifies a comma-separated list of "
         << "output variable names for each field specified (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
