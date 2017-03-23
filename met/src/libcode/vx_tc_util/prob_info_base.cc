@@ -91,7 +91,6 @@ void ProbInfoBase::clear() {
 
 void ProbInfoBase::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    out << prefix << "Type            = \"" << atcflinetype_to_string(Type) << "\"\n";
    out << prefix << "StormId         = \"" << (StormId ? StormId.text() : "(nul)") << "\"\n";
@@ -157,7 +156,6 @@ ConcatString ProbInfoBase::serialize_r(int n, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void ProbInfoBase::assign(const ProbInfoBase &t) {
-   int i;
 
    clear();
 

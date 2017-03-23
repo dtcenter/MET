@@ -186,9 +186,7 @@ int j, k;
 int month, day, year, hour, minute, second, str_len;
 char time_str[max_str_len];
 const char * c = (const char *) 0;
-//NcVar * v   = (NcVar *) 0;
 NcVar v;
-NcGroupAtt * att = (NcGroupAtt *) 0;
 
 
 close();
@@ -210,15 +208,12 @@ if ( ! get_pinterp_grid(*Nc, grid) )  { close();  return ( false ); }
    //
 Ndims = get_dim_count(Nc);
 Dim = new NcDim*[Ndims];
-//get_global_dims(Nc, &Ndims, Dim, &DimNames);
 
 StringArray gDimNames;
 get_dim_names(Nc, &gDimNames);
    
 for (j=0; j<Ndims; ++j)  {
    c = gDimNames[j];
-   //mlog << Debug(10) << "\nPinterpFile::open()  global dimension: "
-   //     << c << ".\n\n";
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
    if ( strcasecmp(c, t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
@@ -253,11 +248,6 @@ if ( has_var(Nc, times_var_name) ) {
    for (j=0; j<Ntimes; ++j)  {
       ConcatString tmp_time_str;
       get_string_val(&v, j, str_len, tmp_time_str);
-      //if(!v->set_cur(j, 0) ||
-      //   !v->get(time_str, 1, str_len)) {
-      //   close();
-      //   return ( false );
-      //}
       strncpy ( time_str, tmp_time_str, str_len );
       time_str[str_len] = '\0';
 
@@ -299,7 +289,6 @@ else {
 
 ConcatString att_value;
 get_global_att(Nc, init_time_att_name, att_value);
-//att = get_att(Nc, init_time_att_name);
 
 InitTime = parse_init_time(att_value);
 
@@ -312,13 +301,11 @@ InitTime = parse_init_time(att_value);
    StringArray dimNames;
    Nvars = get_var_names(Nc, &varNames);
    Var = new NcVarInfo [Nvars];
-   //get_vars_info(Nc, &Var);
 
    for (j=0; j<Nvars; ++j)  {
       v = get_var(Nc, varNames[j]);
   
       Var[j].var = new NcVar(v);
-      //*(Var[j].var) = v;
   
       Var[j].name = GET_NC_NAME(v).c_str();
   
@@ -679,8 +666,6 @@ if ( dim_count != a.n_elements() )  {
 
    exit ( 1 );
 
-   // return ( false );
-
 }
 
 if ( dim_count >= max_pinterp_args )  {
@@ -739,8 +724,6 @@ if ( (var->x_slot < 0) || (var->y_slot < 0) )  {
         << "can't find needed dimensions(s) for variable \""
         << var_name << "\" ... one of the dimensions may be staggered.\n\n";
 
-   // exit ( 1 );
-
    return ( false );
 
 }
@@ -786,7 +769,6 @@ if ( count != 2 )  {
 const int x_slot = var->x_slot;
 const int y_slot = var->y_slot;
 const int z_slot = var->z_slot;
-// const int t_slot = var->t_slot;
 
 if ( (x_slot < 0) || (y_slot < 0) )  {
 
@@ -814,8 +796,6 @@ float  f[Ny];
 
 long offsets[dim_count];
 long lengths[dim_count];
-//lengths[dim_count-2] = Nx;
-//lengths[dim_count-1] = Ny;
 float add_offset   = 0.f;
 float scale_factor = 1.f;
 NcVarAtt att_add_offset   = get_nc_att(v, "add_offset");
@@ -859,7 +839,6 @@ for (x=0; x<Nx; ++x)  {
    
       case NcType::nc_DOUBLE:
          get_nc_data(v, (double *)&d, lengths, offsets);
-         //get_nc_data(v, (double *)&d);
          break;
          
       default:
@@ -874,8 +853,6 @@ for (x=0; x<Nx; ++x)  {
    b[x_slot] = x;
 
    for (y=0; y<Ny; ++y)  {
-      //b[y_slot] = y;
-      //value = data(v, b);
       value = d[y];
 
       if ( is_bad_data_pinterp( value ) ) {

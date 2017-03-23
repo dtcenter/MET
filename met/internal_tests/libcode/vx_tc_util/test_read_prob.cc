@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
    LineDataFile f;
    ATCFProbLine p_line;
    ProbInfoArray probs;
-   int count, i;
+   int count;
 
    if(!f.open(input_filename)) {
       mlog << Error

@@ -183,8 +183,6 @@ bool NcCfFile::open(const char * filepath)
   // Pull out the dimensions
   _numDims = get_dim_count(_ncFile);
   _dims = new NcDim*[_numDims];
-  //get_global_dims(_ncFile, &_numDims, _dims, &_dimNames);
-  //get_global_dims(Nc, &Ndims, Dim, &DimNames);
 
   StringArray gDimNames;
   get_dim_names(_ncFile, &gDimNames);
@@ -330,7 +328,6 @@ bool NcCfFile::open(const char * filepath)
   //get_vars_info(Nc, &Var);
 
   for (int j=0; j<Nvars; ++j)  {
-    const char * c = (const char *) 0;
     NcVar v = get_var(_ncFile, varNames[j]);
 
     Var[j].var = new NcVar(v);

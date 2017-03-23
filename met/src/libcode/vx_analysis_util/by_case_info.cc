@@ -202,7 +202,6 @@ void ByCaseInfo::add(const ModeLine & L)
 
 int fcst, matched;
 double x;
-const char * c = (const char *) 0;
 
 
 fcst      = L.is_fcst();

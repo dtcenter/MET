@@ -384,7 +384,6 @@ if ( dimCount >= max_met_args )  {
 
 }
 
-int j;
 int i;
 short s;
 float f;
@@ -422,9 +421,7 @@ switch ( GET_NC_TYPE_ID_P(var) )  {
       status = true;
       break;
 
-   //case ncDouble:
    case NcType::nc_DOUBLE:
-      //var->getVar(start, count, d);
       get_nc_data(var, &d, (long *)a);
       status = true;
       break;

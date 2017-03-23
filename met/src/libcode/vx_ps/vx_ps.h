@@ -78,7 +78,7 @@ enum DocumentOrientation {
    OrientationPortrait, 
    OrientationLandscape, 
 
-   no_document_orientation, 
+   no_document_orientation
 
 };
 

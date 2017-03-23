@@ -891,9 +891,8 @@ void filter_tracks(TrackInfoArray &tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 void filter_probs(ProbInfoArray &probs) {
-   int i, j;
+   int i;
    int n_vld, n_mask_init, n_mask_vld;
-   bool status;
    ProbInfoArray p = probs;
 
    // Initialize

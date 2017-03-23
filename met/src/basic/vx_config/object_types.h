@@ -28,7 +28,7 @@ enum ConfigObjectType {
    FunctionType, 
    ThresholdType, 
 
-   no_config_object_type, 
+   no_config_object_type
 
 };
 

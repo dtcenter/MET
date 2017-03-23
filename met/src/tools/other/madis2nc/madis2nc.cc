@@ -451,8 +451,6 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
    bool status;
    int in_fill_value;
 
-   float *data2D[dim[1]];
-
    if(!(status = get_nc_data(&var, data, dim, cur))) return status;
 
    get_nc_att(&var, in_fillValue_str, in_fill_value);
@@ -852,7 +850,6 @@ void process_madis_metar(NcFile *&f_in) {
    dim[0] = 1;
 
    long lengths[2] = {BUFFER_SIZE, 1};
-   long offsets[2] = {0,0};
 
    obs_buf_size = 0;
    processed_count = 0;
@@ -2308,11 +2305,6 @@ void process_madis_maritime(NcFile *&f_in) {
    long *dim = new long [3];
    dim[0] = dim[1] = dim[2] = 1;
 
-   long hdr_offsets[2] = { 0, 0 };
-   long hdr_lengths[2] = { BUFFER_SIZE, strl_len };
-   long obs_offsets[2] = { 0, 0 };
-   long obs_lengths[2] = { BUFFER_SIZE, obs_arr_len };
-
    obs_data_idx = 0;
    obs_data_offset = 0;
    hdr_data_idx = 0;
@@ -3097,7 +3089,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    char tmp_str[max_str_len], qty;
    ConcatString hdr_typ, hdr_sid, hdr_vld;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
-   float pressure, v, wdir, wind, ugrd, vgrd;
+   float pressure, wdir, wind, ugrd, vgrd;
 
    //
    // Input header variables:
