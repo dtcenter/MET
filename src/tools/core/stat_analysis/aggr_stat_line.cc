@@ -49,11 +49,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern bool is_precip_var_name(const ConcatString &s);
-extern ConcatString write_css(const StringArray &sa);
-extern ConcatString write_css(const ThreshArray &sa);
-extern ConcatString write_css(const NumArray &na);
-extern ConcatString write_css_hhmmss(const NumArray &na);
+static bool is_precip_var_name(const ConcatString &s);
+static ConcatString write_css(const StringArray &sa);
+static ConcatString write_css(const ThreshArray &sa);
+static ConcatString write_css(const NumArray &na);
+static ConcatString write_css_hhmmss(const NumArray &na);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -2286,7 +2286,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
             //
             // Check for BIN_SIZE remaining constant
             //
-            if(m[key].ens_pd.phist_bin_size != cur.bin_size) {
+            if(!is_eq(m[key].ens_pd.phist_bin_size, cur.bin_size)) {
                mlog << Error << "\naggr_phist_lines() -> "
                     << "the \"BIN_SIZE\" column must remain constant ("
                     << m[key].ens_pd.phist_bin_size << " != " << cur.bin_size

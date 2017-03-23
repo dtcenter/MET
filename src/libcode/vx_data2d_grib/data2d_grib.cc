@@ -28,9 +28,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern bool is_grid_relative(const GribRecord &);
+static bool is_grid_relative(const GribRecord &);
 
-extern int  get_bit_from_octet(unsigned char, int);
+static int  get_bit_from_octet(unsigned char, int);
 
 
 ////////////////////////////////////////////////////////////////////////

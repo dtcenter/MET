@@ -53,7 +53,7 @@ static const int concat_string_max_precision     = 12;
 enum CSInlineCommand {
 
    cs_erase,
-   cs_clear,
+   cs_clear
 
 };
 

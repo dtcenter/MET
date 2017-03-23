@@ -33,9 +33,9 @@ struct Vector3D {
    double x, y, z;
 };
 
-extern Vector3D latlon_to_xyz(double lat, double lon);
-extern void xyz_to_latlon(Vector3D v, double &lat, double &lon);
-extern Vector3D cross_product(Vector3D v1, Vector3D v2);
+static Vector3D latlon_to_xyz(double lat, double lon);
+static void xyz_to_latlon(Vector3D v, double &lat, double &lon);
+static Vector3D cross_product(Vector3D v1, Vector3D v2);
    
 
 //////////////////////////////////////////////////////////////////
