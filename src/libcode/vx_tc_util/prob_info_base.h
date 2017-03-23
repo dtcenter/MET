@@ -62,7 +62,7 @@ class ProbInfoBase {
    public:
 
       ProbInfoBase();
-     ~ProbInfoBase();
+      virtual ~ProbInfoBase();
       ProbInfoBase(const ProbInfoBase &);
       ProbInfoBase & operator=(const ProbInfoBase &);
 

@@ -332,11 +332,6 @@ void process_calipso_file(NcFile & out, const char * filename)
 
 int j;
 int hdf_sd_id;
-int hdf_lat_index, hdf_lat_id;
-int hdf_lon_index, hdf_lon_id;
-int hdf_time_index, hdf_time_id;
-int hdf_data_index, hdf_data_id;
-int hdf_rank, hdf_atts, hdf_type;
 int n_data;
 int hdf_start[MAX_VAR_DIMS], hdf_stride[MAX_VAR_DIMS], hdf_edge[MAX_VAR_DIMS];
 NcDim nc_dim;
@@ -649,11 +644,9 @@ hdr_arr_var.putVar(fbuf);
    //    the time in the hdf file is seconds from Jan 1, 1993 0h
    //
 
-int k;
 HdfVarInfo info;
 int layer;
 unixtime t;
-double dd;
 
 
 

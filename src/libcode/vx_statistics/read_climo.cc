@@ -26,11 +26,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void read_climo_file(
+static void read_climo_file(
           const char *, GrdFileType, Dictionary *, unixtime, bool, int,
           const Grid &, const RegridInfo &, DataPlaneArray &dpa);
 
-extern DataPlaneArray climo_time_interp(
+static DataPlaneArray climo_time_interp(
           const DataPlaneArray &, unixtime, InterpMthd);
 
 ////////////////////////////////////////////////////////////////////////

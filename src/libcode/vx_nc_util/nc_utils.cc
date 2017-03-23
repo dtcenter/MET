@@ -427,7 +427,6 @@ NcVarAtt *get_var_att(const NcVar *var, const ConcatString &att_name, bool exit_
 bool has_att(NcFile * ncfile, const char * att_name, bool exit_on_error)
 {
    bool status = false;
-   //NcGroupAtt *att = (NcGroupAtt *) 0;
    NcGroupAtt att;
 
    att = get_nc_att(ncfile, att_name);
@@ -500,8 +499,6 @@ bool get_global_att(const NcFile *nc, const char *att_name,
    // Initialize
    att_val = bad_data_int;
 
-   //att = get_nc_att(nc, att_name);
-
    if(get_global_att(nc, att_name, att_value, error_out)) {
       att_val = atoi(att_value);
       status = true;
@@ -549,10 +546,7 @@ bool get_global_att(const NcFile *nc, const char *att_name,
 
 bool get_global_att(const NcFile *nc, const char *att_name,
                     double &att_val, bool error_out) {
-   //NcGroupAtt *att = (NcGroupAtt *) 0;
-   //NcGroupAtt att_T;
    bool status = false;
-   char values[1024];
    ConcatString att_value;
 
    // Initialize
@@ -570,7 +564,6 @@ bool get_global_att(const NcFile *nc, const char *att_name,
       exit(1);
    }
 
-   //return(get_global_att_double(nc, att_name, att_val, error_out));
    return (status);
 }
 
@@ -2105,7 +2098,6 @@ vector<NcDim> get_dims(const NcVar *var, int *dim_count) {
 ////////////////////////////////////////////////////////////////////////
 
 NcFile *open_ncfile(const char * nc_name, bool write) {
-   //return new NcFile(nc_name, file_mode);
    NcFile *nc = (NcFile *)0;
 
    try {
@@ -2128,7 +2120,6 @@ NcFile *open_ncfile(const char * nc_name, bool write) {
 // Implement the old API var->num_vals()
 
 int get_data_size(NcVar *var) {
-   int dimSize = 0;
    int dimCount = 0;
    int data_size = 1;
 

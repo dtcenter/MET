@@ -28,8 +28,8 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void process_poly_mask(const ConcatString &, const Grid &,
-                       DataPlane &, ConcatString&);
+static void process_poly_mask(const ConcatString &, const Grid &,
+                              DataPlane &, ConcatString&);
 
 ///////////////////////////////////////////////////////////////////////////////
 

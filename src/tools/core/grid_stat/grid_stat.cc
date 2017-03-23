@@ -552,7 +552,6 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 void process_scores() {
    int i, j, k, m, n;
-   bool status;
    int n_cat, n_cnt, n_wind, n_prob, n_cov;
 
    // Forecast and observation fields

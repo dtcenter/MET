@@ -85,7 +85,6 @@ void ProbRIRWInfo::clear() {
 
 void ProbRIRWInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    ProbInfoBase::dump(out, indent_depth);
 
@@ -128,7 +127,6 @@ ConcatString ProbRIRWInfo::serialize_r(int n, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void ProbRIRWInfo::assign(const ProbRIRWInfo &p) {
-   int i;
 
    clear();
 
@@ -136,8 +134,8 @@ void ProbRIRWInfo::assign(const ProbRIRWInfo &p) {
 
    Value    = p.Value;
    Initials = p.Initials;
-   RIRWBeg    = p.RIRWBeg;
-   RIRWEnd    = p.RIRWEnd;
+   RIRWBeg  = p.RIRWBeg;
+   RIRWEnd  = p.RIRWEnd;
 
    return;
 }

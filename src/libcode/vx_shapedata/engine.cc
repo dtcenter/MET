@@ -196,7 +196,6 @@ void ModeFuzzyEngine::init_from_scratch() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::clear_features() {
-   int j;
 
    fcst_single.clear();
     obs_single.clear();

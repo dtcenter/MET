@@ -43,7 +43,7 @@ enum ShapeType {
    shape_type_polygon_m    = 25,
    shape_type_multipoint_m = 28,
 
-   shape_type_multipatch   = 31,
+   shape_type_multipatch   = 31
 
 };
 

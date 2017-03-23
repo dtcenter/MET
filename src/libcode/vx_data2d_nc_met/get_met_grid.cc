@@ -204,7 +204,7 @@ return;
 
 
 int has_variable(NcFile *f_in, const char *var_name) {
-   int n_var, i, found;
+   int found;
 
    //
    // Initialize to not found

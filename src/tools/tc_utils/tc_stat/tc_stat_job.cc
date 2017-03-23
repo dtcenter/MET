@@ -38,10 +38,10 @@ static const char *TCStatJobType_ProbRIRWStr = "probrirw";
 ////////////////////////////////////////////////////////////////////////
 
 // Functions for parsing command line options
-extern void         parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
-extern void         parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
-extern void         setup_table        (AsciiTable &, int, int);
-extern ConcatString build_map_key      (const char *, const TCStatLine &, const StringArray &);
+static void         parse_thresh_option(const char *, const char *, map<ConcatString,ThreshArray> &);
+static void         parse_string_option(const char *, const char *, map<ConcatString,StringArray> &);
+static void         setup_table        (AsciiTable &, int, int);
+static ConcatString build_map_key      (const char *, const TCStatLine &, const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -3394,7 +3394,6 @@ void TCStatJobProbRIRW::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::clear() {
-   int i;
 
    TCStatJob::clear();
 

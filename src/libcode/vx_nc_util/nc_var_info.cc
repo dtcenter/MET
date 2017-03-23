@@ -288,13 +288,10 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name, ConcatStrin
 
 {
 
-   int j, n;
-   //NcVarAtt * att = (NcVarAtt *) 0;
    NcVarAtt att ;
    bool found = false;
    string att_value_str;
    
-   //n = info.var->num_atts();
    att_value.clear();
    
    att = get_nc_att(info.var, att_name, false);
@@ -328,8 +325,6 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name, int &att_va
 
 {
 
-   int j, n;
-   //NcVarAtt * att = (NcVarAtt *) 0;
    NcVarAtt att;
    bool found = false;
    att_value = bad_data_int;
@@ -365,7 +360,6 @@ bool get_att_unixtime(const NcVarInfo &info, const ConcatString att_name, unixti
 
 {
 
-   int j, n;
    NcVarAtt att;
    bool found = false;
    

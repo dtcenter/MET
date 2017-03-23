@@ -90,7 +90,6 @@ void ProbRIRWPairInfo::clear() {
 
 void ProbRIRWPairInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    out << prefix << "ProbRIRWPairInfo:\n"
        << prefix << "StormName = " << StormName << "\n"
@@ -166,7 +165,6 @@ ConcatString ProbRIRWPairInfo::serialize() const {
 ConcatString ProbRIRWPairInfo::serialize_r(int n, int indent_depth) const {
    Indent prefix(indent_depth), prefix2(indent_depth+1);
    ConcatString s;
-   int i;
 
    s << prefix << "[" << n << "] " << serialize() << "\n";
 

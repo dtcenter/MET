@@ -44,7 +44,7 @@ class GsiRecord {
    public:
 
       GsiRecord();
-     ~GsiRecord();
+      virtual ~GsiRecord();
 
       void gsi_clear();
 
