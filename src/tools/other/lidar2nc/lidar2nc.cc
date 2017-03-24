@@ -690,6 +690,8 @@ for (j=0; j<n_data; ++j)  {
 
    hdf_5km.get_obs(j, obs);
 
+   if ( obs.n_layers == 0 )  continue;
+
    for (layer=0; layer<(obs.n_layers); ++layer)  {
 
       obs.get_layer_base_record         (j, layer, f);
