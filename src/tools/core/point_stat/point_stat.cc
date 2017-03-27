@@ -826,7 +826,7 @@ void process_obs_file(int i_nc) {
 
          int headerOffset = obs_arr[0];
 
-         if ((hdr_count == obs_count) || (headerOffset < hdr_buf_size)) {
+         if ((hdr_count == obs_count) || ((headerOffset >= 0) && (headerOffset < hdr_buf_size)) )  {
             int str_length;
 
             if (obs_count == hdr_count) headerOffset = i_block_idx;
