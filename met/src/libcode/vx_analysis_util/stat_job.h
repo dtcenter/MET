@@ -40,7 +40,6 @@ static const char   default_boot_rng[]     = "mt19937";
 static const char   default_boot_seed[]    = "";
 static const int    default_rank_corr_flag = 1;
 static const int    default_vif_flag       = 0;
-//static const char   default_tmp_dir[]      = "/tmp";
 
 //
 // Ramp job type defaults

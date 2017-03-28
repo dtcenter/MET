@@ -235,10 +235,11 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+
 ConcatString MetConfig::get_tmp_dir()
 {
    char *ptr;
-   ConcatString tmp_dir; 
+   ConcatString tmp_dir;
 
    // Use the MET_TMP_DIR environment variable, if set.
    if((ptr = getenv("MET_TMP_DIR")) != NULL) {
@@ -246,14 +247,13 @@ ConcatString MetConfig::get_tmp_dir()
    }
    else {
       const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
-      const ConcatString *tmp_dir2 = _e->string_value(); 
-      tmp_dir = *tmp_dir2;
-      if ( !LastLookupStatus ) tmp_dir = default_tmp_dir;
+      if ( LastLookupStatus )  tmp_dir = *(_e->string_value());
+      else                     tmp_dir = default_tmp_dir;
    }
 
    return ( tmp_dir );
-
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -298,15 +298,12 @@ bool MetConfig::read(const char * name)
 
 if ( empty(name) )  {
 
-   mlog << Error
-        << "\nMetConfig::read(const char *) -> "
+   mlog << Error << "\nMetConfig::read(const char *) -> "
         << "empty filename!\n\n";
 
    exit ( 1 );
 
 }
-
-// clear();
 
 DictionaryStack DS(*this);
 
@@ -326,8 +323,7 @@ configdebug = (Debug ? 1 : 0);
 
 if ( (configin = fopen(bison_input_filename, "r")) == NULL )  {
 
-   mlog << Error
-        << "\nMetConfig::read(const char *) -> "
+   mlog << Error << "\nMetConfig::read(const char *) -> "
         << "unable to open input file \"" << name << "\"\n\n";
 
    exit ( 1 );
@@ -342,7 +338,7 @@ if ( configin )  {
 
    fclose(configin);
    configin = (FILE *) 0;
- 
+
 }
 
 if ( parse_status != 0 )  {
@@ -351,22 +347,17 @@ if ( parse_status != 0 )  {
 
 }
 
-// DS.pop_dict("base");
-
 if ( DS.n_elements() != 1 )  {
 
-   mlog << Error 
-        << "\nMetConfig::read(const char *) -> "
+   mlog << Error << "\nMetConfig::read(const char *) -> "
         << "should be only one dictionary left after parsing! ...("
         << DS.n_elements() << ")\n\n";
 
    DS.dump(cout);
    DS.dump_config_format(cout);
 
-   mlog << Error 
-        << "\n"
-        << "parse failed!\n"
-        << "\n";
+   mlog << Error << "\n"
+        << "parse failed!\n\n";
 
    exit ( 1 );
 
@@ -404,32 +395,30 @@ bool MetConfig::read_string(const char * s)
 
 if ( empty(s) )  {
 
-   mlog << Error
-        << "\nMetConfig::read_string(const char *) -> empty input string!\n\n";
+   mlog << Error << "\nMetConfig::read_string(const char *) -> "
+        << "empty input string!\n\n";
 
    exit ( 1 );
 
 }
 
+   //
+   //  write temporary config file
+   //  default to the current directory
+   //
+
 ofstream out;
-ConcatString temp_filename = make_temp_file_name("config", ".temp");
+ConcatString temp_filename = get_tmp_dir();
+
+temp_filename << "/" << make_temp_file_name("config", ".temp");
 
 out.open(temp_filename);
 
-if ( ! out ) {
-   string tmp_path = string(get_tmp_dir());
-   tmp_path += "/config";
-   const ConcatString temp_filename2 = make_temp_file_name(tmp_path.c_str(), ".temp");
-   out.close();
-   out.open(temp_filename2);
-   if ( out ) temp_filename = temp_filename2;
-}
-
 if ( ! out )  {
 
-   mlog << Error
-        << "\nMetConfig::read_string(const char *) -> unable to open temp file \""
-        << temp_filename << "\"\n\n";
+   mlog << Error << "\nMetConfig::read_string(const char *) -> "
+        << "unable to open temp file \"" << temp_filename << "\".\n"
+        << "Set MET_TMP_DIR to specify a temporary directory.\n\n";
 
    exit ( 1 );
 
