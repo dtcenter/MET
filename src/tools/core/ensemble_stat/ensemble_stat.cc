@@ -983,6 +983,16 @@ void process_point_obs(int i_nc) {
 
          int headerOffset  = obs_arr[0];
 
+         // Range check the header offset
+         if(headerOffset < 0 || headerOffset >= hdr_buf_size) {
+            mlog << Warning << "\nprocess_point_obs() -> "
+                 << "range check error for header index " << headerOffset
+                 << " from observation number " << i_obs
+                 << " of point observation file: "
+                 << point_obs_file_list[i_nc] << "\n\n";
+            continue;
+         }
+
          // Read the corresponding header array for this observation
          for (int k=0; k < hdr_arr_len; k++)
             hdr_arr[k] = hdr_arr_full[headerOffset][k];

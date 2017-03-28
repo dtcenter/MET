@@ -826,7 +826,17 @@ void process_obs_file(int i_nc) {
 
          int headerOffset = obs_arr[0];
 
-         if ((hdr_count == obs_count) || ((headerOffset >= 0) && (headerOffset < hdr_buf_size)) )  {
+         // Range check the header offset
+         if(headerOffset < 0 || headerOffset >= hdr_buf_size) {
+            mlog << Warning << "\nprocess_obs_file() -> "
+                 << "range check error for header index " << headerOffset
+                 << " from observation number " << i_obs
+                 << " of point observation file: " << obs_file[i_nc]
+                 << "\n\n";
+            continue;
+         }
+
+         if ((hdr_count == obs_count) || (headerOffset < hdr_buf_size)) {
             int str_length;
 
             if (obs_count == hdr_count) headerOffset = i_block_idx;
@@ -862,14 +872,6 @@ void process_obs_file(int i_nc) {
             offsets[0] = headerOffset;
             lengths[0] = 1;
             lengths[1] = hdr_arr_len;
-
-            if ((offsets[0] < 0) || offsets[0] >= hdr_count) {
-               mlog << Error << "\nprocess_obs_file() -> "
-                    << "for header index " << headerOffset
-                    << ", can't read the header array record for header "
-                    << "number " << obs_arr[0] << " (" <<  hdr_count << ")\n\n";
-               exit(1);
-            }
 
             if (prev_hdr_offset != headerOffset) {
                if(!get_nc_data(&hdr_arr_var, hdr_arr, lengths, offsets)) {
