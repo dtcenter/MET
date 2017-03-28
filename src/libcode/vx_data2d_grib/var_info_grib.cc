@@ -267,9 +267,10 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
          }
       }
    }
-   set_code (tab.code);
-   set_units     ( tab.units        );
-   set_long_name ( tab.full_name    );
+   set_code      ( tab.code      );
+   set_name      ( tab.parm_name );
+   set_long_name ( tab.full_name );
+   set_units     ( tab.units     );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
