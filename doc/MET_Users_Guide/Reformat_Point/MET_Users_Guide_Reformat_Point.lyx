@@ -3989,11 +3989,11 @@ Layer_Top
  then there will be more than one base (or top) given for that location.
  For convenience, 
 \series bold
-Lowest_Base
+Min_Base
 \series default
  and 
 \series bold
-Highest_Top
+Max_Top
 \series default
  give, respectively, the base elevation for the bottom cloud layer, and
  the top elevation for the top cloud layer.
@@ -4253,7 +4253,7 @@ CAD_Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-Lowest Cloud Base AGL
+Minimum Cloud Base AGL
 \end_layout
 
 \end_inset
@@ -4271,7 +4271,7 @@ m
 \begin_inset Text
 
 \begin_layout Plain Layout
-Lowest_Base
+Min_Base
 \end_layout
 
 \end_inset
@@ -4291,7 +4291,7 @@ Lowest_Base
 \begin_inset Text
 
 \begin_layout Plain Layout
-Highest Cloud Top AGL
+Maximum Cloud Top AGL
 \end_layout
 
 \end_inset
@@ -4309,7 +4309,7 @@ m
 \begin_inset Text
 
 \begin_layout Plain Layout
-Highest_Top
+Max_Top
 \end_layout
 
 \end_inset
