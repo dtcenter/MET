@@ -93,7 +93,7 @@ static const double grib_earth_radius_km = 6371.20;
 static const int default_nc_compression = 0;
 static const int default_precision = 5;
 static const double default_grid_weight = 1.0;
-static const char default_tmp_dir[] = "/dev/shm";
+static const char default_tmp_dir[] = "/tmp";
 
 ////////////////////////////////////////////////////////////////////////
 
