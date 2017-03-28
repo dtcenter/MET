@@ -390,7 +390,14 @@ void StatHdrColumns::set_obs_valid_end_str() {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString check_hdr_str(const char *s) {
-   if(check_reg_exp(ws_reg_exp, s) == true ) {
+
+   if(!s) {
+      mlog << Warning << "\ncheck_hdr_str() -> "
+           << "null string!\n\n";
+      return(na_str);
+   }
+
+   if(check_reg_exp(ws_reg_exp, s)) {
       mlog << Error << "\ncheck_hdr_str() -> "
            << "output header column value (\"" << s
            << "\") should contain no embedded whitespace!\n\n";
