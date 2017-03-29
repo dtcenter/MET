@@ -22,7 +22,6 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-//#include <netcdf.hh>
 #include <netcdf>
 using namespace netCDF;
 

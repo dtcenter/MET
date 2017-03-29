@@ -23,7 +23,6 @@
 
 #include <ostream>
 
-//#include <netcdf.hh>
 #include <netcdf>
 using namespace netCDF;
 

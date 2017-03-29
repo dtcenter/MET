@@ -40,10 +40,8 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
 #include <netcdf>
 using namespace netCDF;
-//typedef signed char ncbyte; // from ncvalues.h
 
 #include "wavelet_stat_conf_info.h"
 

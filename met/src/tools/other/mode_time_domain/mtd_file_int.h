@@ -20,8 +20,6 @@
 
 #include <iostream>
 
-//#include "netcdf.hh"
-
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"

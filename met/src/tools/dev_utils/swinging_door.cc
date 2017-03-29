@@ -39,8 +39,6 @@ using namespace std;
 #include <unistd.h>
 #include <vector>
 
-//#include "netcdf.hh"
-
 #include "vx_nc_util.h"
 #include "vx_util.h"
 #include "vx_math.h"

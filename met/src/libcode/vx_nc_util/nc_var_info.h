@@ -21,10 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-//#include <netcdf.hh>
 #include <netcdf>
 using namespace netCDF;
-typedef signed char ncbyte; // from ncvalues.h
 
 #include "vx_util.h"
 

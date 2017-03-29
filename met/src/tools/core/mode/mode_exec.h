@@ -22,7 +22,6 @@
 
 #include <iostream>
 
-//#include "netcdf.hh"
 #include <netcdf>
 using namespace netCDF;
 

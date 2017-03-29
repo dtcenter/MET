@@ -22,7 +22,6 @@
 #include <time.h>
 #include <vector>
 
-//#include "netcdf.hh"
 #include <netcdf>
 using namespace netCDF;
 

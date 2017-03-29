@@ -42,8 +42,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
-
 #include "nc_utils.h"
 #include "vx_log.h"
 #include "data_plane.h"

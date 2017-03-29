@@ -42,7 +42,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
 #include <netcdf>
 using namespace netCDF;
 
