@@ -124,8 +124,10 @@ type "mailto:"
 \series medium
 This User's Guide was prepared by the developers of the MET, including Tressa
  Fowler, John Halley Gotway, Randy Bullock, Kathryn Newman, Julie Prestopnik,
- Lisa Goodrich, Tara Jensen, Barbara Brown, Nancy Rehak, Paul Oldenburg,
- Anne Holmes, Lacey Holland, David Ahijevych, Eric Gilleland and Bonny Strong.
+ Lisa Goodrich, Tara Jensen, Barbara Brown, Howard Soh, Tatiana Burek, Minna
+ Win-Gildenmeister, George McCabe, Paul Prestopnik, Eric Gilleland, Nancy
+ Rehak, Paul Oldenburg, Anne Holmes, Lacey Holland, David Ahijevych and
+ Bonny Strong.
 \end_layout
 
 \begin_layout Section*
@@ -144,7 +146,7 @@ name "sec:New-for-MET"
 \series medium
 METv6.0 includes several enhancements to existing tools, including t
 \series default
-he NetCDF4 enhanced mode.
+he NetCDF4 enhanced model.
 \end_layout
 
 \begin_layout Standard
@@ -152,10 +154,10 @@ NetCDF4 supports the compression for variables.
  The default compresison level is defined in the ConfigConstants file.
  The valid range is between 0 and 9.
  The compression level 0 disables the compression.
- Lower number is faster and higher number is better compression.
- Some tools can override this by using tool specific configuration file.
- Indivisual user has an option to override the compression level with the
- environment variable 
+ Lower numbers are faster and higher numbers provide better compression.
+ Some tools can override this by using the tool specific configuration file.
+ Individual users have an option to override the compression level with
+ the environment variable 
 \series bold
 MET_NC_COMPRESS
 \series default
@@ -172,7 +174,7 @@ MET_NC_COMPRESS
 \end_inset
 
 .
- The command line argument has the precedence over the environment variable
+ The command line argument takes precedence over the environment variable
  
 \series bold
 MET_NC_COMPRESS
@@ -183,9 +185,19 @@ MET_NC_COMPRESS
 \begin_layout Standard
 
 \series medium
-METv5.2 includes several enhancements to existing tools, including improved
- GRIB1/2 table support, grid box area weighting, and usability features.
+METv6.0 includes one new tool (lidar2nc), and several enhancements to existing
+ tools, including NetCDF4 support, MET-TC E-Decks, High Resolution Assessment
+ (HiRA) verification framework, and description header column.
  Additional details on these changes are listed below.
+\end_layout
+
+\begin_layout Subsection*
+New Tools:
+\end_layout
+
+\begin_layout Standard
+The lidar2nc tool reformats HDF4 CALIPSO data files into a NetCDF point
+ observation format for use by Point-Stat and Ensemble-Stat.
 \end_layout
 
 \begin_layout Subsection*
@@ -199,50 +211,34 @@ Distribute the latest set of bugfixes, details not listed here.
 \end_layout
 
 \begin_layout Itemize
-
-\series medium
-Update all tools to support 
-\begin_inset Quotes eld
-\end_inset
-
--version
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
--help
-\begin_inset Quotes erd
-\end_inset
-
- command line options.
+Enhance MET to handle southern polar stereographic grids.
 \end_layout
 
 \begin_layout Itemize
-
-\series medium
-Update map data used for plotting and provide both low (default) and high
- resolution verions.
- The data comes from a 2016 GIS database.
+NetCDF
 \end_layout
 
+\begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add new 
-\begin_inset Quotes eld
-\end_inset
-
-FORCE
-\begin_inset Quotes erd
-\end_inset
-
- interpolation method to compare gridded datasets whose grid dimensions
- match but full grid definitions do not.
+Enhance MET tools to read/write NetCDF4 files and support a configurable
+ compression level ("nc_compression" configuration option, ${MET_NC_COMPRESS}
+ environment variable, and "-compress" command line option, listed in order
+ of precedence).
 \end_layout
 
+\begin_layout Itemize
+Support "add_offset" and "scale_factor" attributes to read NetCDF variables
+ of type short, int, float, and double.
+ 
+\end_layout
+
+\begin_layout Itemize
+Add logic to reorient latitudes to be south to north, if needed.
+\end_layout
+
+\end_deeper
 \begin_layout Itemize
 
 \series medium
@@ -258,146 +254,79 @@ Enhance GRIB1/2 table support by updating GRIB table definitions and enhancing
 \end_layout
 
 \begin_layout Itemize
-
-\series medium
-Support ${USER_GRIB_TABLES} environment variable to define the location
- of custom, user-defined GRIB tables.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add configuration file support for 
-\begin_inset Quotes eld
-\end_inset
-
-GRIB1_center
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-GRIB1_subcenter
-\begin_inset Quotes erd
-\end_inset
-
- to specify the GRIB1 center and sub-center values to be found.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add configuration file support for 
-\begin_inset Quotes eld
-\end_inset
-
-GRIB2_cntr
-\begin_inset Quotes erd
-\end_inset
-
-, 
-\begin_inset Quotes eld
-\end_inset
-
-GRIB2_ltab
-\begin_inset Quotes erd
-\end_inset
-
-, and 
-\begin_inset Quotes eld
-\end_inset
-
-GRIB2_mtab
-\begin_inset Quotes erd
-\end_inset
-
- to specify the GRIB2 center, local table, and master table values to be
- found.
+Refine logic for defining custom GRIB tables using the ${MET_GRIB_TABLES}
+ environment variable (previously named ${USER_GRIB_TABLES}).
  
 \end_layout
 
 \begin_layout Itemize
+Support filtering GRIB2 data by product definition template, generating
+ process, ensemble type, or derived product type using "GRIB2_pdt", "GRIB2_proce
+ss", "GRIB2_ens_type", and "GRIB2_der_type" configuration options, respectively.
+\end_layout
 
-\series medium
-Enhance MET to parse ensemble information from the extended PDS following
- NCEP's usage.
+\end_deeper
+\begin_layout Itemize
+Probabilities 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Support shorthand convention for reading/writing probabilistic thresholds
+ where "==n" is interpreted as equally spaced thresholds (e.g.
+ "==0.25" means ">=0.00,>=0.25,>=0.50,>=0.75,>=1.00").
+ 
 \end_layout
 
 \begin_layout Itemize
+Add new "prob_as_scalar" configuration option to disable the application
+ of probabilistic verification methods.
+ 
+\end_layout
 
-\series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
+\end_deeper
+\begin_layout Itemize
+Additional configuration options 
+\end_layout
 
-GRIB_ens
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to specify which ensemble member should be extracted.
+\begin_deeper
+\begin_layout Itemize
+Add new description ("DESC") header column to MET ASCII output files.
+ The description string may be set separately for each verification task
+ defined in the configuration file.
+ 
 \end_layout
 
 \begin_layout Itemize
+Add ${MET_TMP_DIR} environment variable to specify where temporary files
+ should be written and override the "tmp_dir" configuration option.
+ 
+\end_layout
 
-\series medium
-Rename 
-\begin_inset Quotes eld
-\end_inset
-
-GRIB1_rec
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to 
-\begin_inset Quotes eld
-\end_inset
-
-GRIB1_code
-\begin_inset Quotes erd
-\end_inset
-
- to more accurately reflect its function.
+\begin_layout Itemize
+Remove restriction that UGRD must be immediately followed by VGRD at the
+ same level to compute VL1L2 and VAL1L2 output.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-ASCII2NC
+ASCII2NC and MADIS2NC
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
+Add "-mask_sid" command line option to define a group of station ID's.
+ 
+\end_layout
 
-vld_freq
-\begin_inset Quotes erd
-\end_inset
+\begin_layout Itemize
 
- and 
-\begin_inset Quotes eld
-\end_inset
-
-vld_thresh
-\begin_inset Quotes erd
-\end_inset
-
- entries to the 
-\begin_inset Quotes eld
-\end_inset
-
-time_summary
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to specify the expected frequency of observations
- and omit output when not enough valid data is present.
+\series medium
+Reduce runtime by reading blocks of observations.
 \end_layout
 
 \end_deeper
@@ -411,16 +340,81 @@ Gen-Vx-Mask
 \begin_layout Itemize
 
 \series medium
-Add support for 
-\begin_inset Quotes eld
-\end_inset
+Add support for masking by the position of the sun using the solar altitude
+ ("solar_alt") option azimuth ("solar_azi") "-type" options.
+\end_layout
 
-box
-\begin_inset Quotes erd
-\end_inset
+\end_deeper
+\begin_layout Itemize
+PB2NC 
+\end_layout
 
- masking type to mask out a square of configurable width around each lat/lon
- location.
+\begin_deeper
+\begin_layout Itemize
+Enable "grid" configuration option in "mask" to be set to a named grid or
+ gridded data file.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+PCP-Combine 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Switch error for subtracting data with different initialization times to
+ a warning.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Regrid-Data-Plane 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Change the "-name" command line option to a comma-separated list of output
+ variable names for each field specified.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Point-Stat 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Add "hira" configuration options to support High Resolution Assessment (HiRA)
+ verification, a neighborhood verification method for point observations.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Point-Stat and Ensemble-Stat 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Refine logic for the "duplicate_flag" configuration option to check for
+ duplicate observations at the same station.
+ 
+\end_layout
+
+\begin_layout Itemize
+Add "obs_summary" and "obs_perc_value" configuration options to derive summary
+ metrics for multiple observations at the same station within the time window:
+ "NONE", "MIN", "MAX", "UW_MEAN", "DW_MEAN", "MEDIAN", or "PERC" to use
+ all observations, the minimum, maximum, average, time-weighted average,
+ median, or a particular percentile, respectively.
+ 
+\end_layout
+
+\begin_layout Itemize
+Add five new "method" options in the "interp" section: "UPPER_LEFT", "UPPER_RIGH
+T", "LOWER_RIGHT", and "LOWER_LEFT" to select the forecast value at a particular
+ grid box corner and "BEST" to select the forecast value which most closely
+ matches the observation value.
+ 
 \end_layout
 
 \end_deeper
@@ -434,61 +428,31 @@ Grid-Stat
 \begin_layout Itemize
 
 \series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
-
-grid_weight_flag
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to apply grid box area weighting for grid-to-grid
- verification.
+Add "shape" configuration option (SQUARE or CIRCLE) to the "interp" dictionary.
+ Will be applied to other MET tools in future releases.
+ 
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
-
-weight
-\begin_inset Quotes erd
-\end_inset
-
- to the 
-\begin_inset Quotes eld
-\end_inset
-
-nc_pairs_flag
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to write out the grid box area weights.
+Add "apply_mask" configuration option to "nc_pairs_flag" to indicate whether
+ matched pairs should be written for each masking region.
+ 
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
+Allow Grid-Stat to run with only matched pairs output requested ("nc_pairs_flag"
+) but no statistics computed ("output_flag").
+ 
+\end_layout
 
-nbrhd
-\begin_inset Quotes erd
-\end_inset
+\begin_layout Itemize
 
- to the 
-\begin_inset Quotes eld
-\end_inset
-
-nc_pairs_flag
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to write out the fractional coverage fields computed
- for neighborhood verification.
+\series medium
+Dramatically reduce runtime with more efficient memory management.
 \end_layout
 
 \end_deeper
@@ -502,38 +466,41 @@ Ensemble-Stat
 \begin_layout Itemize
 
 \series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
-
-grid_weight_flag
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to apply grid box area weighting for grid-to-grid
- verification.
+Add ensemble spread to the output: "SPREAD" column in RHIST line type and
+ "ENS_SPREAD" in the ORANK line type.
+ 
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
+Dramatically reduce runtime with more efficient memory management and data
+ access methods.
+\end_layout
 
-weight
-\begin_inset Quotes erd
-\end_inset
+\end_deeper
+\begin_layout Itemize
 
- to the 
-\begin_inset Quotes eld
-\end_inset
+\series medium
+STAT-Analysis
+\end_layout
 
-ensemble_flag
-\begin_inset Quotes erd
-\end_inset
+\begin_deeper
+\begin_layout Itemize
 
- configuration option to write out the grid box area weights.
+\series medium
+Add "-mask_sid" job command option to define a group of station ID's.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+STAT-Analysis, MODE-Analysis, and TC-Stat 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Enhance logic to process output from all previous versions of MET by reading
+ version-specific column offset files rather than hard-coding those values.
 \end_layout
 
 \end_deeper
@@ -547,68 +514,108 @@ MODE
 \begin_layout Itemize
 
 \series medium
-Enhance MODE to run multiple convolution radii and thresholds in a single
- call.
+Add support for arrays in the "merge_thresh" configuration option.
+ - MODE-Analysis 
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Enable the 
-\begin_inset Quotes eld
-\end_inset
-
-conv_radius
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-conv_thresh
-\begin_inset Quotes erd
-\end_inset
-
- configuration options to be specified as single values or arrays.
+Allow "-lookin" option to be set to a directory or filename.
+ 
 \end_layout
 
+\end_deeper
 \begin_layout Itemize
+MODE-Analysis 
+\end_layout
 
-\series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
-
-quilt
-\begin_inset Quotes erd
-\end_inset
-
- configuration option to specify whether all permutations of convolution
- radii and threshold should be run.
+\begin_deeper
+\begin_layout Itemize
+Allow "-lookin" option to be set to a directory or filename.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-Series-Analysis
+MTD 
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
+Add cluster object centroid coordinates to the 2D attributes file.
+ 
+\end_layout
 
--paired
-\begin_inset Quotes erd
-\end_inset
+\begin_layout Itemize
 
- command line option to enable missing data to result in a warning rather
- than an error.
+\series medium
+Add "DURATION_DIFF" column to the 3D pair attributes file.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add "CDIST_TRAVELLED" column to the 3D simple attributes file to indicate
+ the total distance travelled for 2D object slices.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+MET-TC 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Enhance TC-Pairs to read E-Deck files using the "-edeck" command line option
+ and write the new PROBRIRW line type containing probabilities of rapid
+ intensity changes.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enhance TC-Stat to parse and filter PROBRIRW lines.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add new "probrirw" job type to TC-Stat to apply probabilistic methods to
+ PROBRIRW lines and write PCT, PSTD, PRC, and PJC lines.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add "lead_req" configuration option to TC-Pairs and TC-Stat to specify required
+ lead times that must be present for a track to be retained.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Modify TC-Pairs to derive interp12, consensus, lag, and baseline tracks
+ before applying track filtering logic.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Distribute enhancements to the plot_tcmpr.R Rscript plotting utility.
 \end_layout
 
 \end_deeper
@@ -622,97 +629,15 @@ WWMCA-Regrid
 \begin_layout Itemize
 
 \series medium
-Enhance logic to read a many datasets written in the WWMCA binary format.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
-
-init_time
-\begin_inset Quotes erd
-\end_inset
-
-, 
-\begin_inset Quotes eld
-\end_inset
-
-valid_time
-\begin_inset Quotes erd
-\end_inset
-
-, and 
-\begin_inset Quotes eld
-\end_inset
-
-accum_time
-\begin_inset Quotes erd
-\end_inset
-
- configuration options to override the default values parsed from the input
- filename.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Refactor tool to use regridding functionality common to many MET tools.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-
-\series medium
-TC-Pairs
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Refine Interp12 logic to also apply logic to models ending with '3'.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
-
-best_technique
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-oper_technique
-\begin_inset Quotes erd
-\end_inset
-
- configuration options to specify the model names for BEST and operational
- tracks.
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add 
-\begin_inset Quotes eld
-\end_inset
-
-anly_track
-\begin_inset Quotes erd
-\end_inset
-
- configuration options to specify whether model analysis tracks should be
- found in the ADECK, BDECK, or both.
+Generalize to handle a wider variety of input naming conventions.
  
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add "write_pixel_age" and "swap_endian" configuration options to process
+ pixel age data rather than cloud data.
 \end_layout
 
 \end_deeper
@@ -945,25 +870,6 @@ ic Research (NCAR) through grants from the National Science Foundation (NSF),
  NCAR is sponsored by the United States National Science Foundation." 
 \end_layout
 
-\begin_layout Plain Layout
-
-\series bold
-If MET-TC is used, the following notice shall be displayed on any scholarly
- works associated with, related to or derived from the Software:
-\end_layout
-
-\begin_layout Plain Layout
-
-\shape italic
-"Model Evaluation Tools - Tropical Cyclone (MET-TC) was developed at the
- National Center for Atmospheric Research (NCAR) through a grant from the
- National Oceanic and Atmospheric Administration (NOAA) through the Hurricane
- Forecast Improvement Project (HFIP).
- Model Evaluation Tools (MET) was developed through a grant from the United
- States Air Force (USAF).
- NCAR is sponsored by the United States National Science Foundation."
-\end_layout
-
 \end_inset
 </cell>
 </row>
@@ -979,6 +885,23 @@ If MET-TC is used, the following notice shall be displayed on any scholarly
 \series bold
 By using or downloading the Software, you agree to be bound by the terms
  and conditions of this Agreement.
+\end_layout
+
+\begin_layout Standard
+The citation for tEhis User's Guide should be:
+\end_layout
+
+\begin_layout Standard
+Brown, B., R.
+ Bullock, T.
+ Fowler, J.
+ Halley Gotway, K.
+ Newman and T.
+ Jensen, 2017: The Model Evaluation Tools v6.0 (METv6.0) User’s Guide.
+ Developmental Testbed Center.
+ Available at: http://www.dtcenter.org/met/users/docs/users_guide/MET_Users_Guide_
+v6.0.pdf.
+ 329 pp.
 \end_layout
 
 \begin_layout Chapter*
@@ -1001,11 +924,11 @@ We thank the the National Science Foundation (NSF), the National Oceanic
  and Atmospheric Administration (NOAA), the United States Air Force (USAF),
  and the United States Department of Energy (DOE) for their support of this
  work.
- Funding for the development of MET-TC is from the National Oceanic and
- Atmospheric Administration (NOAA)'s Hurricane Forecast Improvement Project
- (HFIP) through the Developmental Testbed Center (DTC).
- The DTC is funded by the NOAA, the Air Force Weather Agency (AFWA), and
- the National Science Foundation (NSF).
+ Funding for the development of MET-TC is from the NOAA's Hurricane Forecast
+ Improvement Project (HFIP) through the Developmental Testbed Center (DTC).
+ Funding for the expansion of capability to address many methods pertinent
+ to global and climate simulations was provided by NOAA's Next Generation
+ Global Prediction System (NGGPS) and NSF Earth System Model 2 (EaSM2) projects.
  The National Center for Atmospheric Research (NCAR) is sponsored by NSF.
  We would like to thank James Franklin at the National Hurricane Center
  (NHC) for his insight into the original development of the existing NHC

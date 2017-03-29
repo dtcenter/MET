@@ -880,9 +880,9 @@ solar_alt
 \series medium
 ) and solar azimuth (
 \series bold
-solar_alt
+solar_a
 \series medium
-) masking computes the solar alitude and azimuth values at each grid point
+zi) masking computes the solar alitude and azimuth values at each grid point
  for the time defined by the 
 \series bold
 mask_file
