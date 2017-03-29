@@ -544,7 +544,6 @@ void process_pbfile(int i_pb) {
    hdr_data_offset = 0;
 
    // Loop through the PrepBufr messages from the input file
-   cout << "   npbmsg: " << npbmsg << "\n";
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
       if(mlog.verbosity_level() > 0) {
