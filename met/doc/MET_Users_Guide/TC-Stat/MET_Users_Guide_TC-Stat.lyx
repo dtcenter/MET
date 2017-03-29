@@ -147,11 +147,15 @@ rirw
  or weakening events, populates a 2x2 contingency table, and derives contingency
  table statistics.
  The 
-\series bold
-probri
+\series default
+probrirw
 \series medium
- job process PROBRI lines, populates an Nx2 probabilistic contingency table,
- and derives probabilistic statistics.
+job process 
+\series default
+PROBRIRW 
+\series medium
+lines, populates an Nx2 probabilistic contingency table, and derives probabilist
+ic statistics.
  The statistical aspects are described in 
 \series default
 Section
@@ -437,11 +441,17 @@ name "sub:tc_stat-probri"
 \begin_layout Standard
 
 \series medium
-The TC-Stat tool can be used to accumulate multiple PROBRI lines and derive
- probabilistic statistics summarizing performance.
- The PROBRI line contains a probabilistic forecast for a specified intensity
- change along with the actual intensity change that occurred in the BEST
- track.
+The TC-Stat tool can be used to accumulate multiple 
+\series default
+PROBRIRW 
+\series medium
+lines and derive probabilistic statistics summarizing performance.
+ The 
+\series default
+PROBRIRW 
+\series medium
+line contains a probabilistic forecast for a specified intensity change
+ along with the actual intensity change that occurred in the BEST track.
  Accurately forecast the likelihood of large changes in intensity is a challengi
 ng problem and this job helps quanity a model's ability to do so.
 \end_layout
@@ -2046,8 +2056,15 @@ h ge20
 \begin_layout LyX-Code
 
 \series bold
-      -job probri  -line_type PROBRI -column_thresh RI_WINDOW ==24 -probri_thres
-h 30 -probri_prob_thresh ==0.25
+      -job 
+\series default
+probrirw
+\series bold
+ -line_type 
+\series default
+PROBRIRW 
+\series bold
+-column_thresh RI_WINDOW ==24 -probri_thresh 30 -probri_prob_thresh ==0.25
 \end_layout
 
 \begin_layout Standard
@@ -2675,8 +2692,12 @@ Job: PROBRI
 \begin_layout Standard
 
 \series medium
-The PROBRI job produces probabilistic contingency table counts and statistics
- defined by placing forecast probabilities and BEST track rapid intensification
+The 
+\series default
+PROBRIRW 
+\series medium
+job produces probabilistic contingency table counts and statistics defined
+ by placing forecast probabilities and BEST track rapid intensification
  events into an Nx2 contingency table.
  Users may specify several job command options to configure the behavior
  of this job:
@@ -2694,7 +2715,11 @@ option is required and defines which probability threshold should be evaluated.
 \series bold
  PROB_i
 \series medium
- column from the PROBRI line type is selected for the job.
+ column from the 
+\series default
+PROBRIRW 
+\series medium
+line type is selected for the job.
  For example, use 
 \series bold
 -prob_thresh 30 
@@ -2777,7 +2802,7 @@ Users may also specify the
 \series bold
 RI_WINDOW 
 \series default
-column cannot be combined in a single PROBRI job since BEST track intensity
+column cannot be combined in a single PROBRIRW job since BEST track intensity
  threshold should change for each.
  Using the 
 \series bold
@@ -2791,7 +2816,7 @@ column cannot be combined in a single PROBRI job since BEST track intensity
 \end_layout
 
 \begin_layout Standard
-Users should note that for the PROBRI line type, 
+Users should note that for the PROBRIRW line type, 
 \series bold
 PROBRI_PROB
 \series default

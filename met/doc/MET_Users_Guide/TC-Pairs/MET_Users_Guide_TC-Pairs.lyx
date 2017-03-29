@@ -541,7 +541,7 @@ For each set of edeck probabilities that were parsed, search for a matching
 
 \begin_layout Itemize
 For each edeck/bdeck pair, write paired edeck probabilities and matching
- bdeck values to output PROBRI lines.
+ bdeck values to output PROBRIRW lines.
 \end_layout
 
 \begin_layout Subsection
@@ -3345,7 +3345,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for PROBRI (Probability of Rapid Intensification) output
+Format information for PROBRIRW (Probability of Rapid Intensification) output
  line type.
 \end_layout
 
@@ -3376,7 +3376,7 @@ name "PROBRI Line Type"
 \begin_layout Plain Layout
 
 \series bold
-PROBRI OUTPUT FORMAT
+PROBRIRW OUTPUT FORMAT
 \end_layout
 
 \end_inset
