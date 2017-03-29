@@ -50,15 +50,11 @@ static const int top_top_grib_code        = 505;
    //  these are from the feature classification bits
    //
 
-static const int ftype_grib_code          = 601;
-static const int ftype_qa_grib_code       = 602;
-
-static const int ice_water_grib_code      = 603;
-static const int ice_water_qa_grib_code   = 604;
-
-static const int subtype_grib_code        = 605;
-static const int cloud_aerosol_grib_code  = 606;
-static const int h_average_grib_code      = 607;
+static const int ftype_grib_code             = 600;
+static const int ice_water_grib_code         = 601;
+static const int subtype_grib_code           = 602;
+static const int cloud_aerosol_qa_grib_code  = 603;
+static const int h_average_grib_code         = 604;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -107,14 +103,17 @@ struct Calipso_5km_Obs  {
       //
 
    void get_feature_type_record       (int hdr_id, int layer, float *);
-   void get_feature_type_qa_record    (int hdr_id, int layer, float *);
+   // void get_feature_type_qa_record    (int hdr_id, int layer, float *);
+   int  get_feature_type_qa_value     (int layer);
 
    void get_ice_water_record          (int hdr_id, int layer, float *);
-   void get_ice_water_qa_record       (int hdr_id, int layer, float *);
+   // void get_ice_water_qa_record       (int hdr_id, int layer, float *);
+   int  get_ice_water_qa_value        (int layer);
 
    void get_subtype_record            (int hdr_id, int layer, float *);
 
-   void get_cloud_aerosol_record      (int hdr_id, int layer, float *);
+   void get_cloud_aerosol_qa_record   (int hdr_id, int layer, float *);
+   int  get_cloud_aerosol_qa_value    (int layer);
 
    void get_h_average_record          (int hdr_id, int layer, float *);
 

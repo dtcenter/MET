@@ -118,7 +118,7 @@ static void set_grib_code (const StringArray &);
 
 static void process_calipso_file (NcFile &, const char * filename);
 
-static void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f);
+static void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value = -1);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -685,6 +685,7 @@ Calipso_5km_Obs obs;
 memset(buf, 0, buf_size);
 
 float f[5];
+int qc_value;
 
 for (j=0; j<n_data; ++j)  {
 
@@ -706,26 +707,28 @@ for (j=0; j<n_data; ++j)  {
       obs.get_cad_score_record          (j, layer, f);
          write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_feature_type_record       (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
-
-      obs.get_feature_type_qa_record    (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
-
       obs.get_ice_water_record          (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
-
-      obs.get_ice_water_qa_record       (j, layer, f);
          write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
       obs.get_subtype_record            (j, layer, f);
          write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
-      obs.get_cloud_aerosol_record      (j, layer, f);
+      obs.get_cloud_aerosol_qa_record   (j, layer, f);
          write_nc_record                (out, obs_qty_var, obs_arr_var, f);
 
       obs.get_h_average_record          (j, layer, f);
          write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+
+           /////////////////////////////////
+
+
+                 obs.get_feature_type_record   (j, layer, f);
+      qc_value = obs.get_feature_type_qa_value (layer);
+         write_nc_record                       (out, obs_qty_var, obs_arr_var, f, qc_value);
+
+                 obs.get_ice_water_record      (j, layer, f);
+      qc_value = obs.get_ice_water_qa_value    (layer);
+         write_nc_record                       (out, obs_qty_var, obs_arr_var, f, qc_value);
 
    }   //  for layer
 
@@ -763,7 +766,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f)
+void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value)
 
 {
 
@@ -791,13 +794,28 @@ obs_arr_var.putVar(index, count, f);
    //  write obs_qty record
    //
 
+char junk[mxstr_dim_size];
+
+
 index.at(0) = pos;
 index.at(1) = 0;
 
 count.at(0) = 1;
-count.at(1) = na_len;
 
-obs_qty_var.putVar(index, count, na_str);
+if ( qc_value < 0 )  {
+
+   count.at(1) = na_len;
+
+   obs_qty_var.putVar(index, count, na_str);
+
+} else {
+
+   snprintf(junk, sizeof(junk), "%d", qc_value);
+
+   count.at(1) = strlen(junk);
+
+   obs_qty_var.putVar(index, count, junk);
+}
 
    //
    //  done
