@@ -4035,7 +4035,7 @@ name "lidar2nc_grib_code_table"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="14" columns="4">
+<lyxtabular version="3" rows="12" columns="4">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -4320,7 +4320,7 @@ Max_Top
 \begin_inset Text
 
 \begin_layout Plain Layout
-601
+600
 \end_layout
 
 \end_inset
@@ -4358,45 +4358,7 @@ Feature_Type
 \begin_inset Text
 
 \begin_layout Plain Layout
-602
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Feature Type QA
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-NA
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Feature_Type_QA
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-603
+601
 \end_layout
 
 \end_inset
@@ -4434,45 +4396,7 @@ Ice_Water_Phase
 \begin_inset Text
 
 \begin_layout Plain Layout
-604
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Ice/Water Phase QA
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-NA
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Ice_Water_Phase_QA
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-605
+602
 \end_layout
 
 \end_inset
@@ -4510,7 +4434,7 @@ Feature_Sub_Type
 \begin_inset Text
 
 \begin_layout Plain Layout
-606
+603
 \end_layout
 
 \end_inset
@@ -4548,7 +4472,7 @@ Cloud_Aerosol_PSC_Type_QA
 \begin_inset Text
 
 \begin_layout Plain Layout
-607
+604
 \end_layout
 
 \end_inset
