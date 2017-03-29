@@ -811,7 +811,7 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
       obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
    }
 
-   obs_qty = (qty.length() == 0 ? na_str : qty);
+   obs_qty = (qty.length() == 0 ? na_str : qty.text());
    strncpy(qty_data_buf[obs_data_idx], obs_qty, obs_qty.length());
 
    if ( _observations.size() == _obsNum && OBS_BUFFER_SIZE == obs_buf_size) {

@@ -665,7 +665,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
          mlog << Debug(4)
               << "Found ADECK RI/RW: " << case_info()
               << ", VALID = " << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << ", "
-              << "LEAD = " << (is_bad_data(ADeck[i].lead()) ? na_str : sec_to_hhmmss(ADeck[i].lead())) << ", "
+              << "LEAD = " << (is_bad_data(ADeck[i].lead()) ? na_str : sec_to_hhmmss(ADeck[i].lead()).text()) << ", "
               << sec_to_hhmmss(sec_adeck)
               << (exact_adeck ? " exact " : " maximum " ) << "ADECK change "
               << aprv << " to " << acur << ", "
@@ -676,7 +676,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
          mlog << Debug(4)
               << "Found BDECK RI/RW: " << case_info()
               << ", VALID = " << unix_to_yyyymmdd_hhmmss(BDeck[i].valid()) << ", "
-              << "LEAD = " << (is_bad_data(BDeck[i].lead()) ? na_str : sec_to_hhmmss(BDeck[i].lead())) << ", "
+              << "LEAD = " << (is_bad_data(BDeck[i].lead()) ? na_str : sec_to_hhmmss(BDeck[i].lead()).text()) << ", "
               << sec_to_hhmmss(sec_bdeck)
               << (exact_bdeck ? " exact " : " maximum " ) << "BDECK change "
               << bprv << " to " << bcur << ", "

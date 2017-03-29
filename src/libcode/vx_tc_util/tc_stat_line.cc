@@ -334,9 +334,9 @@ ConcatString TCStatLine::header() const {
    hdr << bmodel() << sep
        << basin() << sep
        << cyclone() << sep
-       << (init() > 0 ? unix_to_yyyymmdd_hhmmss(init()) : na_str) << sep
-       << (!is_bad_data(lead()) ? sec_to_hhmmss(lead()) : na_str) << sep
-       << (valid() > 0 ? unix_to_yyyymmdd_hhmmss(valid()) : na_str);
+       << (init() > 0 ? unix_to_yyyymmdd_hhmmss(init()).text() : na_str) << sep
+       << (!is_bad_data(lead()) ? sec_to_hhmmss(lead()).text() : na_str) << sep
+       << (valid() > 0 ? unix_to_yyyymmdd_hhmmss(valid()).text() : na_str);
 
    return(hdr);
 }

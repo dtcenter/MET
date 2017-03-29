@@ -124,9 +124,9 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "TechniqueNumber = " << TechniqueNumber << "\n";
    out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
    out << prefix << "Initials        = \"" << (Initials ? Initials.text() : "(nul)") << "\"\n";
-   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str) << "\n";
-   out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : na_str) << "\n";
-   out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str) << "\n";
+   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\n";
+   out << prefix << "MinValidTime    = \"" << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime).text() : na_str) << "\n";
+   out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str) << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
    out << prefix << "NTrackLines     = " << TrackLines.n_elements() << "\n";
@@ -159,9 +159,9 @@ ConcatString TrackInfo::serialize() const {
      << ", TechniqueNumber = " << TechniqueNumber
      << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
      << ", Initials = \"" << (Initials ? Initials.text() : "(nul)") << "\""
-     << ", InitTime = " << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str)
-     << ", MinValidTime = " << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime) : na_str)
-     << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime) : na_str)
+     << ", InitTime = " << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str)
+     << ", MinValidTime = " << (MinValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MinValidTime).text() : na_str)
+     << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str)
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
      << ", NTrackLines = " << TrackLines.n_elements();

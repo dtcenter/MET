@@ -296,7 +296,7 @@ int ATCFTrackLine::max_seas() const {
 
 ConcatString ATCFTrackLine::initials() const {
    return(InitialsOffset < N_items ?
-          get_item(InitialsOffset) :
+          get_item(InitialsOffset).text() :
           "");
 }
 
@@ -320,7 +320,7 @@ int ATCFTrackLine::storm_speed() const {
 
 ConcatString ATCFTrackLine::storm_name() const {
    return(StormNameOffset < N_items ?
-          get_item(StormNameOffset) :
+          get_item(StormNameOffset).text() :
           "");
 }
 

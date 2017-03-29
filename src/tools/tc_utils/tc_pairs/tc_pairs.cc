@@ -994,7 +994,7 @@ void derive_interp12(TrackInfoArray &tracks) {
                  << tracks[i].technique() << sep
                  << tracks[i].storm_id() << sep
                  << (tracks[i].init() > 0 ?
-                     unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
+                     unix_to_yyyymmdd_hhmmss(tracks[i].init()).text() : na_str);
       track_case_list.add(track_case);
    }
 
@@ -1014,7 +1014,7 @@ void derive_interp12(TrackInfoArray &tracks) {
                     << amodel << sep
                     << tracks[i].storm_id() << sep
                     << (tracks[i].init() > 0 ?
-                       unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
+                       unix_to_yyyymmdd_hhmmss(tracks[i].init()).text() : na_str);
          if(track_case_list.has(track_case)) continue;
       }
 
@@ -1033,7 +1033,7 @@ void derive_interp12(TrackInfoArray &tracks) {
                  << amodel << sep
                  << tracks[i].storm_id() << sep
                  << (tracks[i].init() > 0 ?
-                    unix_to_yyyymmdd_hhmmss(tracks[i].init()) : na_str);
+                    unix_to_yyyymmdd_hhmmss(tracks[i].init()).text() : na_str);
 
       // If the 'I' track doesn't exist, add the new interp track.
       if(!track_case_list.has(track_case, j)) {

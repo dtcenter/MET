@@ -97,8 +97,8 @@ void ProbInfoBase::dump(ostream &out, int indent_depth) const {
    out << prefix << "Basin           = \"" << (Basin ? Basin.text() : "(nul)") << "\"\n";
    out << prefix << "Cyclone         = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\"\n";
    out << prefix << "Technique       = \"" << (Technique ? Technique.text() : "(nul)") << "\"\n";
-   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str) << "\"\n";
-   out << prefix << "ValidTime       = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime) : na_str) << "\"\n";
+   out << prefix << "InitTime        = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\"\n";
+   out << prefix << "ValidTime       = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\"\n";
    out << prefix << "Lat             = "   << Lat << "\n";
    out << prefix << "Lon             = "   << Lon << "\n";
    out << prefix << "NProb           = "   << NProb << "\n";
@@ -126,8 +126,8 @@ ConcatString ProbInfoBase::serialize() const {
      << ", Basin = \"" << (Basin ? Basin.text() : "(nul)") << "\""
      << ", Cyclone = \"" << (Cyclone ? Cyclone.text() : "(nul)") << "\""
      << ", Technique = \"" << (Technique ? Technique.text() : "(nul)") << "\""
-     << ", InitTime = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime) : na_str) << "\""
-     << ", ValidTime = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime) : na_str) << "\""
+     << ", InitTime = \"" << (InitTime > 0 ? unix_to_yyyymmdd_hhmmss(InitTime).text() : na_str) << "\""
+     << ", ValidTime = \"" << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\""
      << ", Lat = " << Lat
      << ", Lon = " << Lon
      << ", NProb = " << NProb;
