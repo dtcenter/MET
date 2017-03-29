@@ -18,9 +18,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-//#include "netcdf.hh"
-//typedef signed char ncbyte; // from ncvalues.h
-
 #include "concat_string.h"
 #include "vx_cal.h"
 #include "nc_utils.h"

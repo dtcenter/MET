@@ -38,8 +38,6 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "netcdf.hh"
-
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"

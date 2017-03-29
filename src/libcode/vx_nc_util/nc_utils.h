@@ -13,11 +13,12 @@
 #define  __NC_UTILS_H__
 
 ////////////////////////////////////////////////////////////////////////
+
 using namespace std;
+
 #include <string.h>
 #include <time.h>
 
-//#include <netcdf.hh>
 #include <netcdf>
 using namespace netCDF;
 typedef signed char ncbyte; // from ncvalues.h
