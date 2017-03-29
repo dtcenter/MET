@@ -63,39 +63,39 @@ static const unsigned short mask_1 = (unsigned short) 1;   //  2^1 - 1
    //  mask sizes don't depend on bit order
    //
 
-static const unsigned short type_mask            = mask_3;
-static const unsigned short type_qa_mask         = mask_2;
-static const unsigned short ice_water_mask       = mask_2;
-static const unsigned short ice_water_qa_mask    = mask_2;
-static const unsigned short subtype_mask         = mask_3;
-static const unsigned short cloud_aerosol_mask   = mask_1;
-static const unsigned short h_average_mask       = mask_3;
+static const unsigned short type_mask               = mask_3;
+static const unsigned short type_qa_mask            = mask_2;
+static const unsigned short ice_water_mask          = mask_2;
+static const unsigned short ice_water_qa_mask       = mask_2;
+static const unsigned short subtype_mask            = mask_3;
+static const unsigned short cloud_aerosol_qa_mask   = mask_1;
+static const unsigned short h_average_mask          = mask_3;
 
    //
    //  shifts for bit #1 = highest order bit
    //
 
 /*
-static const int            type_shift           = 13;
-static const int            type_qa_shift        = 11;
-static const int            ice_water_shift      =  9;
-static const int            ice_water_qa_shift   =  7;
-static const int            subtype_shift        =  4;
-static const int            cloud_aerosol_shift  =  3;
-static const int            h_average_shift      =  0;
+static const int            type_shift              = 13;
+static const int            type_qa_shift           = 11;
+static const int            ice_water_shift         =  9;
+static const int            ice_water_qa_shift      =  7;
+static const int            subtype_shift           =  4;
+static const int            cloud_aerosol_qa_shift  =  3;
+static const int            h_average_shift         =  0;
 */
 
    //
    //  shifts for bit #1 = lowest order bit
    //
 
-static const int            type_shift           =  0;
-static const int            type_qa_shift        =  3;
-static const int            ice_water_shift      =  5;
-static const int            ice_water_qa_shift   =  7;
-static const int            subtype_shift        =  9;
-static const int            cloud_aerosol_shift  = 12;
-static const int            h_average_shift      = 13;
+static const int            type_shift              =  0;
+static const int            type_qa_shift           =  3;
+static const int            ice_water_shift         =  5;
+static const int            ice_water_qa_shift      =  7;
+static const int            subtype_shift           =  9;
+static const int            cloud_aerosol_qa_shift  = 12;
+static const int            h_average_shift         = 13;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -794,7 +794,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void Calipso_5km_Obs::get_feature_type_qa_record(int hdr_id, int layer, float * record)
 
 {
@@ -810,6 +810,24 @@ record [ obs_index ] = (float) extract_bits(fclass[layer], type_qa_mask, type_qa
    //
 
 return;
+
+}
+*/
+
+////////////////////////////////////////////////////////////////////////
+
+
+int Calipso_5km_Obs::get_feature_type_qa_value(int layer)
+
+{
+
+if ( n_layers == 0 )  return ( -1 );
+
+int k;
+
+k = extract_bits(fclass[layer], type_qa_mask, type_qa_shift);
+
+return ( k );
 
 }
 
@@ -838,7 +856,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void Calipso_5km_Obs::get_ice_water_qa_record(int hdr_id, int layer, float * record)
 
 {
@@ -854,6 +872,24 @@ record [ obs_index ] = (float) extract_bits(fclass[layer], ice_water_qa_mask, ic
    //
 
 return;
+
+}
+*/
+
+////////////////////////////////////////////////////////////////////////
+
+
+int Calipso_5km_Obs::get_ice_water_qa_value(int layer)
+
+{
+
+if ( n_layers == 0 )  return ( -1 );
+
+int k;
+
+k = extract_bits(fclass[layer], ice_water_qa_mask, ice_water_qa_shift);
+
+return ( k );
 
 }
 
@@ -883,21 +919,39 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Calipso_5km_Obs::get_cloud_aerosol_record(int hdr_id, int layer, float * record)
+void Calipso_5km_Obs::get_cloud_aerosol_qa_record(int hdr_id, int layer, float * record)
 
 {
 
 if ( n_layers == 0 )  return;
 
-fclass_record_header(hdr_id, layer, cloud_aerosol_grib_code, record);
+fclass_record_header(hdr_id, layer, cloud_aerosol_qa_grib_code, record);
 
-record [ obs_index ] = (float) extract_bits(fclass[layer], cloud_aerosol_mask, cloud_aerosol_shift);
+record [ obs_index ] = (float) get_cloud_aerosol_qa_value(layer);
 
    //
    //  done
    //
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int Calipso_5km_Obs::get_cloud_aerosol_qa_value(int layer)
+
+{
+
+if ( n_layers == 0 )  return ( -1 );
+
+int k;
+
+k = extract_bits(fclass[layer], cloud_aerosol_qa_mask, cloud_aerosol_qa_shift);
+
+return ( k );
 
 }
 
