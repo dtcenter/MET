@@ -455,9 +455,9 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "EventEqualLead ...\n";
    EventEqualLead.dump(out, depth + 1);
 
-   out << prefix << "OutInitMask = " << (OutInitMask.name() ? OutInitMask.name() : na_str) << "\n";
+   out << prefix << "OutInitMask = " << (OutInitMask.name() ? OutInitMask.name().text() : na_str) << "\n";
 
-   out << prefix << "OutValidMask = " << (OutValidMask.name() ? OutValidMask.name() : na_str) << "\n";
+   out << prefix << "OutValidMask = " << (OutValidMask.name() ? OutValidMask.name().text() : na_str) << "\n";
 
    out << prefix << "DumpFile = " << (DumpFile ? DumpFile.text() : na_str) << "\n";
 
@@ -2952,7 +2952,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
                  << sec_to_hhmmss(RIRWWindowBeg) << " to " << sec_to_hhmmss(RIRWWindowEnd)
                  << " window) for " << pair.case_info() << ", "
                  << "VALID = " << unix_to_yyyymmdd_hhmmss(pair.valid(i)) << ", "
-                 << "LEAD = " << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << "\n";
+                 << "LEAD = " << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead).text()) << "\n";
          }
       }
 
@@ -2996,7 +2996,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
           << pair.line(i)->bmodel() << sep
           << pair.line(i)->storm_id() << sep
           << unix_to_yyyymmdd_hhmmss(pair.line(i)->init()) << sep
-          << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead)) << sep
+          << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead).text()) << sep
           << unix_to_yyyymmdd_hhmmss(pair.line(i)->valid()) << sep
           << aprv << sep << acur << sep << adlt << sep
           << (is_bad_data(a) ? na_str : bool_to_string(a)) << sep

@@ -169,7 +169,7 @@ ConcatString ProbRIRWPairInfo::serialize_r(int n, int indent_depth) const {
    s << prefix << "[" << n << "] " << serialize() << "\n";
 
    s << prefix2 << "ProbRIRW = " << ProbRIRW.serialize() << "\n"
-     << prefix2 << "BDeck  = " << (BDeck ? BDeck->serialize() : "(nul)")
+     << prefix2 << "BDeck  = " << (BDeck ? BDeck->serialize().text() : "(nul)")
      << "\n";
 
    return(s);
