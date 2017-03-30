@@ -146,8 +146,8 @@ sub-directory, or the MET Online Tutorial:
   ones if finds may or may not be compatible with those used to compile the needed
   third party libraries.
 
-- If compiling on a big endian machine, such as an IBM, set the $CXXFLAGS
-  environment variable to include '-DBIGENDIAN'.
+- If compiling on a big endian machine set the $CXXFLAGS environment variable to
+  include '-DBIGENDIAN'.
 
 - Set environment variables to point to the locations of the needed third party
   libraries.  For each library, there are three possible environment variables.
@@ -300,7 +300,7 @@ Version 6.0 Release Notes:
         description header column
 
 - New Tools:
-    - The lidar2nc reformats HDF4 Calipso data files into a NetCDF point
+    - The lidar2nc reformats HDF4 CALIPSO data files into a NetCDF point
       observation format for use by Point-Stat and Ensemble-Stat.
 
 - Enhancements to Existing Tools:
