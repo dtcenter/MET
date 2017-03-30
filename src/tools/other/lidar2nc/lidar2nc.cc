@@ -102,8 +102,6 @@ static ConcatString output_filename;
 
 static int compress_level = -1;
 
-static int grib_code = 500;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,7 +112,6 @@ static void set_logfile   (const StringArray &);
 static void set_outfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
 static void set_compress  (const StringArray &);
-static void set_grib_code (const StringArray &);
 
 static void process_calipso_file (NcFile &, const char * filename);
 
@@ -147,7 +144,6 @@ cline.set_usage(usage);
 cline.add(set_outfile,   "-out",       1);
 cline.add(set_logfile,   "-log",       1);
 cline.add(set_verbosity, "-v",         1);
-cline.add(set_grib_code, "-grib_code", 1);
 cline.add(set_compress,  "-compress",  1);
 
 cline.parse();
@@ -262,19 +258,6 @@ void set_compress(const StringArray & a)
 {
 
 compress_level = atoi(a[0]);
-
-return;
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-void set_grib_code(const StringArray & a)
-
-{
-
-grib_code = atoi(a[0]);
 
 return;
 
@@ -690,6 +673,13 @@ int qc_value;
 for (j=0; j<n_data; ++j)  {
 
    hdf_5km.get_obs(j, obs);
+
+   //
+   //  write the number of layers
+   //
+
+   obs.get_n_layers_record              (j, f);
+      write_nc_record                   (out, obs_qty_var, obs_arr_var, f);
 
    if ( obs.n_layers == 0 )  continue;
 
