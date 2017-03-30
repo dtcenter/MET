@@ -4035,7 +4035,7 @@ name "lidar2nc_grib_code_table"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="12" columns="4">
+<lyxtabular version="3" rows="13" columns="4">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -4101,6 +4101,44 @@ Abbreviation
 \begin_inset Text
 
 \begin_layout Plain Layout
+Number of Cloud Layers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NLayers
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+501
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 Cloud Layer Base AGL
 \end_layout
 
@@ -4130,7 +4168,7 @@ Layer_Base
 \begin_inset Text
 
 \begin_layout Plain Layout
-501
+502
 \end_layout
 
 \end_inset
@@ -4168,7 +4206,7 @@ Layer_Top
 \begin_inset Text
 
 \begin_layout Plain Layout
-502
+503
 \end_layout
 
 \end_inset
@@ -4206,7 +4244,7 @@ Opacity
 \begin_inset Text
 
 \begin_layout Plain Layout
-503
+504
 \end_layout
 
 \end_inset
@@ -4244,7 +4282,7 @@ CAD_Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-504
+505
 \end_layout
 
 \end_inset
@@ -4282,7 +4320,7 @@ Min_Base
 \begin_inset Text
 
 \begin_layout Plain Layout
-505
+506
 \end_layout
 
 \end_inset

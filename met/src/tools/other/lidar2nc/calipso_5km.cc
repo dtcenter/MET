@@ -523,9 +523,9 @@ if ( SDreaddata(fclass.id, hdf_start, hdf_stride, hdf_edge, &(obs.fclass)) < 0 )
 }
 
 // for (j=0; j<hdf_max_layers; ++j)  {
-// 
+//
 //    // obs.fclass[j] = fclass_mask(obs.fclass[j]);
-// 
+//
 // }
 
    //
@@ -583,6 +583,30 @@ for (j=0; j<hdf_max_layers; ++j)  {
    fclass         [j] = 0;
 
 }
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Calipso_5km_Obs::get_n_layers_record(int hdr_id, float * record)
+
+{
+
+clear_float_buf(record);
+
+record [    hdr_id_index ] = (float) hdr_id;
+record [ grib_code_index ] = (float) n_layers_grib_code;
+record [  pressure_index ] = FILL_VALUE;
+record [    height_index ] = FILL_VALUE;
+record [       obs_index ] = (float) n_layers;
 
    //
    //  done
