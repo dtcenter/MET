@@ -234,7 +234,6 @@ int main(int argc, char *argv[]) {
    if(!f_in || IS_INVALID_NC_P(f_in)) {
       mlog << Error << "\nmain() -> trouble opening netCDF file "
            << nc_file << "\n\n";
-      //f_in->close();
       delete f_in;
       f_in = (NcFile *) 0;
 
@@ -561,7 +560,6 @@ int main(int argc, char *argv[]) {
    // Deallocate memory and clean up
    //
    if(f_in)    {
-      //f_in->close();
       delete f_in; f_in = (NcFile *) 0; 
    }
    if(hdr_arr) { delete hdr_arr; hdr_arr = (float *) 0; }
