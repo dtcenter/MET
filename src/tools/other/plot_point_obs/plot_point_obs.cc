@@ -379,7 +379,6 @@ int main(int argc, char *argv[]) {
    char hdr_typ_str_full[hdr_buf_size][strl_count];
    char hdr_sid_str_full[hdr_buf_size][strl_count];
    char hdr_vld_str_full[hdr_buf_size][strl_count];
-   //float **hdr_arr_full = (float **) 0, **obs_arr_block = (float **) 0;
 
    hdr_arr = new float[hdr_arr_len];
    obs_arr = new float[obs_arr_len];
