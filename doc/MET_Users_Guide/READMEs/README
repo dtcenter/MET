@@ -941,8 +941,7 @@ rank_corr_flag = FALSE;
 
 //
 // The "duplicate_flag" entry specifies how to handle duplicate point
-// observations in Point-Stat and Ensemble-Stat.  Three techniques are
-// currently supported:
+// observations in Point-Stat and Ensemble-Stat:
 //
 //    - "NONE" to use all point observations (legacy behavior)
 //    - "UNIQUE" only use a single observation if two or more observations match.
