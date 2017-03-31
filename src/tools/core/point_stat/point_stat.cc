@@ -827,7 +827,7 @@ void process_obs_file(int i_nc) {
          int headerOffset = obs_arr[0];
 
          // Range check the header offset
-         if(headerOffset < 0 || headerOffset >= hdr_buf_size) {
+         if(headerOffset < 0 || headerOffset >= hdr_count) {
             mlog << Warning << "\nprocess_obs_file() -> "
                  << "range check error for header index " << headerOffset
                  << " from observation number " << i_obs
