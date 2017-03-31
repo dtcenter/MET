@@ -42,6 +42,7 @@ TableFlatFile GribTable (0);
 
 static const char table_data_dir  [] = "MET_BASE/table_files"; //  relative to MET_BASE
 static const char met_grib_tables [] = "MET_GRIB_TABLES";      //  environment variable name
+static const char user_grib_tables[] = "USER_GRIB_TABLES";     //  deprecated environment variable name
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -194,98 +195,49 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Grib1TableEntry::parse_line(const char * line) {
+bool Grib1TableEntry::parse_line(const char * line)
 
-   clear();
+{
 
-   int j, n;
-   int *i[5];
-   const char i_delim[] = "{} \"";
-   const char s_delim[] = "\"";
-   const char *c = (const char *) 0;
-   char *line2 = (char *) 0;
-   char *L = (char *) 0;
+clear();
 
-
-   n = strlen(line);
-
-   line2 = new char[1 + n];
-
-   memset(line2, 0, 1 + n);
-
-   strncpy(line2, line, n);
-
-   L = line2;
-
-   clear();
-
-   i[0] = &code;
-   i[1] = &table_number;
-   i[2] = &center;
-   i[3] = &subcenter;
+int j;
+StringArray tok;
 
    //
-   //  grab the first 3 ints
+   //  grab the first 4 whitespace separated integers
    //
 
-   for (j = 0; j < 4; ++j) {
+tok.parse_wsss(line);
 
-      if(!(c = strtok(L, i_delim))) return (false);
+if (tok.n_elements() < 4) return (false);
 
-      if(!is_number(c))             return (false);
+for (j=0; j<4; ++j) {
+   if(!is_number(tok[j])) return (false);
+}
 
-      *(i[j]) = atoi(c);
-
-      L = (char *) 0;
-
-   }   //  while
-
-   //
-   //  parm_name
-   //
-
-   if(!(c = strtok(0, s_delim))) return (false);
-
-   parm_name = c;
-
-   if(!(c = strtok(0, s_delim))) return (false);
+code         = atoi(tok[0]);
+table_number = atoi(tok[1]);
+center       = atoi(tok[2]);
+subcenter    = atoi(tok[3]);
 
    //
-   //  full_name
+   //  grab the 3 strings separated by double quotes
    //
 
-   if(!(c = strtok(0, s_delim))) return (false);
+tok.parse_delim(line, "\"");
 
-   full_name = c;
+if (tok.n_elements() < 6) return (false);
 
-   if(!(c = strtok(0, s_delim))) return (false);
+parm_name = tok[1];
+full_name = tok[3];
+units     = tok[5];  // may be empty
+
+if (units == "\n" || units == "\n\n") units.clear();
 
    //
-   //  units (may be empty)
+   //  done
    //
-
-   c = strtok(0, s_delim);
-
-   if (c)
-   {
-      if (*c == ' ') {
-         units.clear();
-      }
-      else {
-         units = c;
-      }
-   }
-   else
-   {
-      return (false) ;
-
-   }
-
-      //
-      //  done
-      //
-
-delete [] line2;  line2 = (char *) 0;
 
 return ( true );
 
@@ -456,74 +408,47 @@ bool Grib2TableEntry::parse_line(const char * line)
 
 clear();
 
-int j, n;
-int * i[8];
-ConcatString * s[8];
-const char i_delim [] = "{} \"";
-const char s_delim [] = "\"";
-const char * c = (const char *) 0;
-char * line2 = (char *) 0;
-char * L = (char *) 0;
-
-n = strlen(line);
-
-line2 = new char [1 + n];
-
-strncpy(line2, line, n);
-
-L = line2;
-
-clear();
-
-i[0] = &index_a;
-i[1] = &mtab_set;
-i[2] = &mtab_low;
-i[3] = &mtab_high;
-i[4] = &cntr;
-i[5] = &ltab;
-i[6] = &index_b;
-i[7] = &index_c;
-
-s[0] = &parm_name;
-s[1] = &full_name;
-s[2] = &units;
+int j;
+StringArray tok;
 
    //
-   //  grab the first 8 ints
+   //  grab the first 8 whitespace separated integers
    //
 
-for (j=0; j<8; ++j)  {
+tok.parse_wsss(line);
 
-   if(!(c = strtok(L, i_delim))) return (false);
+if (tok.n_elements() < 8) return (false);
 
-   if(!is_number(c))             return (false);
+for (j=0; j<8; ++j) {
+   if(!is_number(tok[j])) return (false);
+}
 
-   *(i[j]) = atoi(c);
-
-   L = (char *) 0;
-
-}   //  while
+index_a   = atoi(tok[0]);
+mtab_set  = atoi(tok[1]);
+mtab_low  = atoi(tok[2]);
+mtab_high = atoi(tok[3]);
+cntr      = atoi(tok[4]);
+ltab      = atoi(tok[5]);
+index_b   = atoi(tok[6]);
+index_c   = atoi(tok[7]);
 
    //
-   //  grab the strings
+   //  grab the 3 strings separated by double quotes
    //
 
-for (j=0; j<3; ++j)  {
+tok.parse_delim(line, "\"");
 
-   if(!(c = strtok(L, s_delim))) return (false);
-   if(!(c = strtok(L, s_delim))) return (false);
+if (tok.n_elements() < 6) return (false);
 
-   *(s[j]) = c;
+parm_name = tok[1];
+full_name = tok[3];
+units     = tok[5];  // may be empty
 
-   L = (char *) 0;
-
-}   //  while
+if (units == "\n" || units == "\n\n") units.clear();
 
    //
    //  done
    //
-
-delete [] line2;  line2 = (char *) 0;
 
 return ( true );
 
@@ -615,13 +540,30 @@ void TableFlatFile::readUserGribTables(const char * table_type) {
    StringArray filtered_file_names;
    char * ptr;
 
-   if((ptr = getenv(met_grib_tables)) != NULL) {
+   //
+   //  search for MET_GRIB_TABLES environment variable
+   //  if not defined, try the older USER_GRIB_TABLES ones
+   //
+   ptr = getenv(met_grib_tables);
+
+   if(ptr == NULL) ptr = getenv(user_grib_tables);
+
+   if(ptr != NULL) {
 
       path = ptr;
 
       filtered_file_names = get_filenames(path, table_type, ".txt", true);
 
       for (int i = 0; i < filtered_file_names.n_elements(); i++) {
+
+         //
+         //  pass message through warning since the mlog constructor
+         //  has not yet been called.
+         //
+         mlog << Warning << "Reading user-defined " << table_type << " "
+              << met_grib_tables << " file: " << filtered_file_names[i]
+              << "\n";
+
          if (!read(filtered_file_names[i])) {
             mlog << Error << "\nTableFlatFile::readUserGribTables() -> "
                  << "unable to read user-defined " << table_type
@@ -889,8 +831,6 @@ return;
 bool TableFlatFile::read(const char * filename)
 
 {
-
-// clear();
 
 ifstream in;
 ConcatString line;
