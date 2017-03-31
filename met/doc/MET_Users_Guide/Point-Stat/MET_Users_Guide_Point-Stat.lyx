@@ -651,6 +651,85 @@ This method is performed using the four closest grid squares.
  then the other to the location of the observation.
 \end_layout
 
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Upper Left, Upper Right, Lower Left, Lower Right Interpolation
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This method is performed using the four closest grid squares.
+ The forecast values are interpolated to the specified grid point.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Best Interpolation
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This method is performed using the four closest grid squares.
+ The forecast values are interpolated to the grid point which most closely
+ matches the observation value
+\end_layout
+
+\begin_layout Subsection
+HiRA framework
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:PS_HiRA_framework"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The Point-Stat tool has been enhanced to include the High Resolution Assessment
+ (HiRA) verification logic (Mittermaier, 2014).
+ HiRA is analogous to neighborhood verification but for point observations.
+ The HiRA logic converts scalar forecast values into a fractional coverage
+ value which Point-Stat evaluates as if it were a probability forecast.
+ For each observation value, the forecast fractional coverage is computed
+ as the ratio of forecast values around the observation that meet the categorica
+l forecast threshold criteria.
+ If applying HiRA, users should enable matched pair or probabilistic line
+ types (MPR, PCT, PSTD, PJC, or PRC) in the output_flag dictionary.
+ The number of HiRA output lines is determined by the number of categorical
+ forecast thresholds and HiRA neighborhood widths chosen.
+\end_layout
+
 \begin_layout Subsection
 Statistical measures
 \begin_inset CommandInset label
@@ -839,6 +918,18 @@ Probabilistic forecast values are assumed to have a range of either 0 to
  range is defined as: t1 <= p < t2.
  The exception is for the highest set of thresholds, when the range includes
  1: t1 <= p <= 1.
+ To make configuration easier, in METv6.0, these probabilities may be specfied
+ in the configuration file as a list (>0.00,>0.25,>0.50,>0.75,>1.00) or using
+ shorthand notation (==0.25) for bins of equal width.
+\end_layout
+
+\begin_layout Standard
+In METv6.0, when the "prob" entry is set as a dictionary to define the field
+ of interest, setting "prob_as_scalar = TRUE" indicates that this data should
+ be processed as regular scalars rather than probabilities.For example, this
+ option can be used to compute traditional 2x2 contingency tables and neighborho
+od verification statistics for probability data.
+ It can also be used to compare two probabilityfields directly.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1812,7 +1903,13 @@ version        = "VN.N";
 \begin_layout Standard
 
 \series medium
-The configuration options listed above are common to many MET tools and
+The 
+\series bold
+duplicate_flag
+\series medium
+ option has expanded logic as of METv6.0 for how to handle multiple observations
+ at the same station within the time window.
+ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
