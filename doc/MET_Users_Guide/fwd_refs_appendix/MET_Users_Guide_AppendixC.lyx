@@ -5406,7 +5406,14 @@ SPREAD
 \begin_layout Standard
 
 \series medium
-{JOHN FILL IN PLEASE}
+The ensemble spread for a single observation is the standard deviation of
+ the ensemble member forecast values at that location.
+ When verifying against point observations, these values are written to
+ the ENS_SPREAD column of the Observation Rank (ORANK) line type.
+ The ensemble spread computed over a spatial masking region is the average
+ of the spread values for all observations falling within the mask.
+ These values are written to the SPREAD column of the Ranked Histogram (RHIST)
+ line type.
 \end_layout
 
 \begin_layout Section
