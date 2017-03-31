@@ -350,7 +350,7 @@ bf LIDAR2NC}
 
 \end_inset
 
- tool reformats Calipso satellite HDF files into a NetCDF output file similar
+ tool reformats CALIPSO satellite HDF files into a NetCDF output file similar
  in format to ASCII2NC and PB2NC.
 \end_layout
 
@@ -630,7 +630,11 @@ LIDAR2NC Tool
 \series bold
 Input
 \series medium
-: One Calipso satellite HDF file
+: One 
+\series default
+CALIPSO
+\series medium
+ satellite HDF file
 \end_layout
 
 \begin_layout Description

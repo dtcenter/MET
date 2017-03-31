@@ -3046,7 +3046,7 @@ There are two WWMCA tools available.
  The WWMCA-Plot tool makes a PostScript plot of one or more WWMCA cloud
  percent files and the WWMCA-Regrid tool regrids binary WWMCA data files
  and reformats them into netCDF files that the other MET tools can read.
- In version 5.2, the WWMCA-Regrid tool was generalized to more broadly support
+ In METv5.2, the WWMCA-Regrid tool was generalized to more broadly support
  any data stored in the WWMCA binary format.
 \end_layout
 

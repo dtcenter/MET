@@ -312,7 +312,18 @@ Probabilistic forecast values are assumed to have a range of either 0 to
  For example, with a forecast probability p, and thresholds t1 and t2, the
  range is defined as: t1 <= p < t2.
  The exception is for the highest set of thresholds, when the range includes
- 1: t1 <= p <= 1.
+ 1: t1 <= p <= 1.To make configuration easier, in METv6.0, these probabilities
+ may be specfied in the configuration file as a list (>0.00,>0.25,>0.50,>0.75,>1.00)
+ or using shorthand notation (==0.25) for bins of equal width.
+\end_layout
+
+\begin_layout Standard
+In METv6.0, when the "prob" entry is set as a dictionary to define the field
+ of interest, setting "prob_as_scalar = TRUE" indicates that this data should
+ be processed as regular scalars rather than probabilities.For example, this
+ option can be used to compute traditional 2x2 contingency tables and neighborho
+od verification statistics for probability data.
+ It can also be used to compare two probabilityfields directly.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1025,7 +1036,7 @@ boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
 \begin_layout LyX-Code
 
 \series bold
-interp         = { field = BOTH; vld_thresh = 1.0;
+interp         = { field = BOTH; vld_thresh = 1.0; shape = CIRCLE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1061,8 +1072,8 @@ version        = "VN.N";
 \begin_layout Standard
 
 \series medium
-The configuration options listed above are common to many MET tools and
- are described in Section 
+Except for the shape configuration option listed above, many of the others
+ are common to many MET tools and are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:IO_General-MET-Config-Options"
@@ -1562,6 +1573,11 @@ The
 FALSE
 \series medium
  disables its creation.
+ This is done regardless of if 
+\series bold
+output_flag
+\series medium
+ dictionary indicates any statistics should be computed.
  The 
 \series bold
 latlon
