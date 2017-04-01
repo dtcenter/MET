@@ -605,7 +605,7 @@ clear_float_buf(record);
 record [    hdr_id_index ] = (float) hdr_id;
 record [ grib_code_index ] = (float) n_layers_grib_code;
 record [  pressure_index ] = FILL_VALUE;
-record [    height_index ] = FILL_VALUE;
+record [    height_index ] = (float) 0;
 record [       obs_index ] = (float) n_layers;
 
    //
