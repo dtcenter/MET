@@ -1151,14 +1151,14 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
 
       for(vector<Grib1TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
-         mlog << Warning << "  parm_name: "      << (*it)->parm_name
-                         << ", table_number = "  << (*it)->table_number
-                         << ", code = "          << (*it)->code << "\n";
+         mlog << Warning << "  parm_name: "     << (*it)->parm_name
+                         << ", table_number = " << (*it)->table_number
+                         << ", code = "         << (*it)->code << "\n";
 
       mlog << Warning << "Using: "
-           << "  parm_name: "      << e.parm_name
-           << ", table_number = "  << e.table_number
-           << ", code = "          << e.code << "\n\n";
+                      << "  parm_name: "     << e.parm_name
+                      << ", table_number = " << e.table_number
+                      << ", code = "         << e.code << "\n\n";
 
    }
 
@@ -1211,17 +1211,17 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
       for(vector<Grib1TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
       {
-         mlog << Warning << "  parm_name: " << (*it)->parm_name
-         << ", table_number = "  << (*it)->table_number
-         << ", code = "          << (*it)->code
-         << ", center = "        << (*it)->center
-         << ", subcenter = "     << (*it)->subcenter << "\n";
+         mlog << Warning << "  parm_name: "     << (*it)->parm_name
+                         << ", table_number = " << (*it)->table_number
+                         << ", code = "         << (*it)->code
+                         << ", center = "       << (*it)->center
+                         << ", subcenter = "    << (*it)->subcenter << "\n";
       }
 
       mlog << Warning << "Using: "
-      << "  parm_name: "      << e.parm_name
-      << ", table_number = "  << e.table_number
-      << ", code = "          << e.code << "\n\n";
+                      << "  parm_name: "     << e.parm_name
+                      << ", table_number = " << e.table_number
+                      << ", code = "         << e.code << "\n\n";
 
    }
 
@@ -1356,10 +1356,10 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
                          << ", index_c = "  << (*it)->index_c << "\n";
 
       mlog << Warning << "Using: "
-           << "  parm_name: " << e.parm_name
-           << ", index_a = "  << e.index_a
-           << ", index_b = "  << e.index_b
-           << ", index_c = "  << e.index_c << "\n\n";
+                      << "  parm_name: " << e.parm_name
+                      << ", index_a = "  << e.index_a
+                      << ", index_b = "  << e.index_b
+                      << ", index_c = "  << e.index_c << "\n\n";
 
    }
 
@@ -1416,24 +1416,24 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
 
       for(vector<Grib2TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
-         mlog << Warning << "  parm_name: " << (*it)->parm_name
-         << ", index_a = "  << (*it)->index_a
-         << ", grib2_mtab = "  << (*it)->mtab_set
-         << ", grib2_cntr = "  << (*it)->cntr
-         << ", grib2_ltab = "  << (*it)->ltab
-         << ", index_b = "  << (*it)->index_b
-         << ", index_c = "  << (*it)->index_c
-         << "\n";
+         mlog << Warning << "  parm_name: "   << (*it)->parm_name
+                         << ", index_a = "    << (*it)->index_a
+                         << ", grib2_mtab = " << (*it)->mtab_set
+                         << ", grib2_cntr = " << (*it)->cntr
+                         << ", grib2_ltab = " << (*it)->ltab
+                         << ", index_b = "    << (*it)->index_b
+                         << ", index_c = "    << (*it)->index_c
+                         << "\n";
 
       mlog << Warning << "Using: "
-      << "  parm_name: " << e.parm_name
-      << ", index_a = "  << e.index_a
-      << ", grib2_mtab = "  << e.mtab_set
-      << ", grib2_cntr = "  << e.cntr
-      << ", grib2_ltab = "  << e.ltab
-      << ", index_b = "  << e.index_b
-      << ", index_c = "  << e.index_c
-      << "\n\n";
+                      << "  parm_name: "   << e.parm_name
+                      << ", index_a = "    << e.index_a
+                      << ", grib2_mtab = " << e.mtab_set
+                      << ", grib2_cntr = " << e.cntr
+                      << ", grib2_ltab = " << e.ltab
+                      << ", index_b = "    << e.index_b
+                      << ", index_c = "    << e.index_c
+                      << "\n\n";
 
    }
 
