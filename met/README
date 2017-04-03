@@ -391,6 +391,8 @@ Version 6.0 Release Notes:
        - Add "DURATION_DIFF" column to the 3D pair attributes file.
        - Add "CDIST_TRAVELLED" column to the 3D simple attributes file to
          indicate the total distance travelled for 2D object slices.
+    - GSID2MPR
+       - Reduce runtime by refining the logic of checking for duplicates.
     - STAT-Analysis
        - Add "-mask_sid" job command option to define a group of station ID's.
     - WWMCA-Regrid
