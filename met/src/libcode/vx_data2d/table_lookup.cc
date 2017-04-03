@@ -557,12 +557,11 @@ void TableFlatFile::readUserGribTables(const char * table_type) {
       for (int i = 0; i < filtered_file_names.n_elements(); i++) {
 
          //
-         //  pass message through warning since the mlog constructor
-         //  has not yet been called.
+         //  write to cout since mlog may not have been constructed yet
          //
-         mlog << Warning << "Reading user-defined " << table_type << " "
+         cout << "DEBUG 1: Reading user-defined " << table_type << " "
               << met_grib_tables << " file: " << filtered_file_names[i]
-              << "\n";
+              << "\n"; 
 
          if (!read(filtered_file_names[i])) {
             mlog << Error << "\nTableFlatFile::readUserGribTables() -> "
