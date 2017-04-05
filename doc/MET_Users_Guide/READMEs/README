@@ -373,11 +373,14 @@ regrid = {
 //         or "-n", for the n-th ensemble member.
 //       - The "GRIB1_ptv" entry specifies the GRIB1 parameter table version number.
 //       - The "GRIB1_code" entry specifies the GRIB1 code (wgrib kpds5 value).
+//       - The "GRIB1_center" entry specifies the originating center.
+//       - The "GRIB1_subcenter" entry specifies the originating subcenter.
 //       - The "GRIB2_disc" entry specifies the GRIB2 discipline code.
 //       - The "GRIB2_parm_cat" entry specifies the parameter category code.
 //       - The "GRIB2_parm" entry specifies the parameter code.
 //       - The "GRIB2_pdt" entry specifies the product definition template (Table 4.0).
 //       - The "GRIB2_process" entry specifies the generating process (Table 4.3).
+//       - The "GRIB2_cntr" entry specifies the originating center.
 //       - The "GRIB2_ens_type" entry specifies the ensemble type (Table 4.6).
 //       - The "GRIB2_der_type" entry specifies the derived product type (Table 4.7).
 //
