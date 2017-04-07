@@ -20,6 +20,7 @@
 //                    timing information through to the output.
 //   003    06/02/16  Halley Gotway   Add box masking type.
 //   004    11/15/16  Halley Gotway   Add solar masking types.
+//   005    04/08/17  Halley Gotway   Add lat/lon masking types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +66,7 @@ int main(int argc, char *argv[]) {
 
    // Process the mask file
    process_mask_file(dp_mask);
+
    // Apply combination logic if the current mask is binary
    if(mask_type == MaskType_Poly ||
       mask_type == MaskType_Box  ||
@@ -208,14 +210,18 @@ void process_mask_file(DataPlane &dp) {
            << " containing " << poly_mask.n_points() << " points\n";
    }
    // For solar masking, check for a date/time string
-   else if(is_datestring(mask_filename) &&
-           is_solar_masktype(mask_type)) {
+   else if(is_solar_masktype(mask_type) &&
+           is_datestring(mask_filename)) {
 
       solar_ut = timestring_to_unix(mask_filename);
 
       mlog << Debug(2)
            << "Solar Time String:\t"
            << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
+   }
+   // Nothing to do for Lat/Lon masking types
+   else if(mask_type == MaskType_Lat ||
+           mask_type == MaskType_Lon) {
    }
    // Otherwise, process the mask file as a gridded data file
    else {
@@ -309,6 +315,10 @@ void process_mask_file(DataPlane &dp) {
       case MaskType_Solar_Alt:
       case MaskType_Solar_Azi:
          apply_solar_mask(dp);
+         break;
+      case MaskType_Lat:
+      case MaskType_Lon:
+         apply_lat_lon_mask(dp);
          break;
       default:
          mlog << Error << "\nprocess_mask_file() -> "
@@ -768,7 +778,7 @@ void apply_solar_mask(DataPlane &dp) {
       mlog << Warning
            << "\napply_solar_mask() -> since \"-thresh\" was not used "
            << "the raw " << masktype_to_string(mask_type)
-           << " value will be written.\n\n";
+           << " values will be written.\n\n";
    }
 
    // Compute solar value for each grid point Lat/Lon
@@ -808,13 +818,84 @@ void apply_solar_mask(DataPlane &dp) {
            << masktype_to_string(mask_type) << " mask.\n";
    }
 
-   const char *solar_str = (mask_type == MaskType_Solar_Alt ?
-                            "Altitude" : "Azimuth");
+   const char *mask_str = (mask_type == MaskType_Solar_Alt ?
+                           "Altitude" : "Azimuth");
 
    // List the number of points inside the mask
    if(thresh.get_type() != thresh_na) {
       mlog << Debug(3)
-           << "Solar Masking:\t\t" << n_in << " of "
+           << "Solar " << mask_str << " Masking:\t\t"
+           << n_in << " of " << grid.nx() * grid.ny()
+           << " points inside\n";
+   }
+   // Otherwise, list the min/max distances computed
+   else {
+      double dmin, dmax;
+      dp.data_range(dmin, dmax);
+      mlog << Debug(3)
+           << "Solar " << mask_str << " Masking:\t\t"
+           << "Values ranging from " << dmin << " to " << dmax << "\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void apply_lat_lon_mask(DataPlane &dp) {
+   int x, y, n_in;
+   double lat, lon, alt, azi, v;
+   bool check;
+
+   // Check for no threshold
+   if(thresh.get_type() == thresh_na) {
+      mlog << Warning
+           << "\napply_lat_lon_mask() -> since \"-thresh\" was not used "
+           << "the raw " << masktype_to_string(mask_type)
+           << " values will be written.\n\n";
+   }
+
+   // Compute Lat/Lon value for each grid point
+   for(x=0,n_in=0; x<grid.nx(); x++) {
+      for(y=0; y<grid.ny(); y++) {
+
+         // Lat/Lon value for the current grid point
+         grid.xy_to_latlon(x, y, lat, lon);
+         v = (mask_type == MaskType_Lat ? lat :
+              rescale_deg(-1.0*lon, -180.0, 180.0));
+
+         // Apply threshold, if specified
+         if(thresh.get_type() != thresh_na) {
+            check = thresh.check(v);
+
+            // Check the complement
+            if(complement) check = !check;
+
+            // Increment count
+            n_in += check;
+
+            v = (check ? 1.0 : 0.0);
+         }
+
+         // Store the current solar value
+         dp.set(v, x, y);
+
+      } // end for y
+   } // end for x
+
+   if(thresh.get_type() != thresh_na && complement) {
+      mlog << Debug(3)
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
+   }
+
+   const char *mask_str = (mask_type == MaskType_Lat ?
+                           "Latitude" : "Longitude");
+
+   // List the number of points inside the mask
+   if(thresh.get_type() != thresh_na) {
+      mlog << Debug(3)
+           << mask_str << " Masking:\t\t" << n_in << " of "
            << grid.nx() * grid.ny()<< " points inside\n";
    }
    // Otherwise, list the min/max distances computed
@@ -822,7 +903,7 @@ void apply_solar_mask(DataPlane &dp) {
       double dmin, dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
-           << "Solar Masking:\t\tValues ranging from "
+           << mask_str << " Masking:\t\tValues ranging from "
            << dmin << " to " << dmax << "\n";
    }
 
@@ -1030,6 +1111,8 @@ MaskType string_to_masktype(const char *s) {
    else if(strcasecmp(s, "data")      == 0) t = MaskType_Data;
    else if(strcasecmp(s, "solar_alt") == 0) t = MaskType_Solar_Alt;
    else if(strcasecmp(s, "solar_azi") == 0) t = MaskType_Solar_Azi;
+   else if(strcasecmp(s, "lat")       == 0) t = MaskType_Lat;
+   else if(strcasecmp(s, "lon")       == 0) t = MaskType_Lon;
    else {
       mlog << Error << "\nstring_to_masktype() -> "
            << "unsupported masking type \"" << s << "\"\n\n";
@@ -1053,6 +1136,8 @@ const char * masktype_to_string(const MaskType t) {
       case MaskType_Data:      s = "data";           break;
       case MaskType_Solar_Alt: s = "solar_alt";      break;
       case MaskType_Solar_Azi: s = "solar_azi";      break;
+      case MaskType_Lat:       s = "lat";            break;
+      case MaskType_Lon:       s = "lon";            break;
       case MaskType_None:      s = na_str;           break;
       default:                 s = (const char *) 0; break;
    }
@@ -1085,37 +1170,39 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"input_file\" is the input gridded data file "
-        << "(required).\n"
-        << "\t\t   If " << program_name << " output, automatically read mask data.\n"
+        << "\twhere\t\"input_file\" is a gridded data file which specifies the grid definition (required).\n"
+        << "\t\t   If output from " << program_name << ", automatically read mask data as the \"input_field\".\n"
 
-        << "\t\t\"mask_file\" defines the masking information (required).\n"
-        << "\t\t   ASCII Lat/Lon file for \"poly\", \"box\", \"circle\", and \"track\" masking.\n"
-        << "\t\t   Gridded data file for \"grid\" and \"data\" masking.\n"
-        << "\t\t   Gridded data file or YYYYMMDD[_HH[MMSS]] timestring for \"solar_alt\" and \"solar_azi\" masking.\n"
+        << "\t\t\"mask_file\" defines the masking information, see below (required).\n"
+        << "\t\t   For \"poly\", \"box\", \"circle\", and \"track\" masking, specify an ASCII Lat/Lon file.\n"
+        << "\t\t   For \"grid\" and \"data\" masking, specify a gridded data file.\n"
+        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, specify a gridded data file or a timestring in YYYYMMDD[_HH[MMSS]] format.\n"
+        << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" needed, simply repeat the path for \"input_file\".\n"
 
         << "\t\t\"out_file\" is the output NetCDF mask file to be written (required).\n"
 
         << "\t\t\"-type string\" overrides the default masking type ("
         << masktype_to_string(default_mask_type) << ") (optional):\n"
-        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", \"data\", \"solar_alt\", or \"solar_azi\"\n"
+        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"lat\", or \"lon\"\n"
 
-        << "\t\t\"-input_field string\" to read existing mask data from \"input_file\" (optional).\n"
+        << "\t\t\"-input_field string\" reads existing mask data from \"input_file\" (optional).\n"
 
-        << "\t\t\"-mask_field string\" to define the field from \"mask_file\" to be used for \"data\" masking (optional).\n"
+        << "\t\t\"-mask_field string\" (optional)\n"
+        << "\t\t   For \"data\" masking, define the field from \"mask_file\" to be used.\n"
 
-        << "\t\t\"-complement\" to compute the complement of the area defined in \"mask_file\" (optional).\n"
+        << "\t\t\"-complement\" to compute the complement of the area defined by \"mask_file\" (optional).\n"
 
         << "\t\t\"-union | -intersection | -symdiff\" to specify how to combine the "
         << "masks from \"input_file\" and \"mask_file\" (optional).\n"
 
         << "\t\t\"-thresh string\" defines the threshold to be applied (optional).\n"
-        << "\t\t   Distance (km) for \"circle\" and \"track\" masking.\n"
-        << "\t\t   Raw input values for \"data\" masking.\n"
-        << "\t\t   Computed values for \"solar_alt\" and \"solar_azi\" masking.\n"
+        << "\t\t   For \"circle\" and \"track\" masking, threshold the distance (km).\n"
+        << "\t\t   For \"data\" masking, threshold the values of \"mask_field\".\n"
+        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, threshold the computed solar values.\n"
+        << "\t\t   For \"lat\" and \"lon\" masking, threshold the latitude and longitude values.\n"
 
-        << "\t\t\"-height n\" and \"-width n\" set the size in grid units "
-        << "for \"box\" masking (optional).\n"
+        << "\t\t\"-height n\" and \"-width n\" (optional)\n"
+        << "\t\t   For \"box\" masking, specify these dimensions in grid units.\n"
 
         << "\t\t\"-value n\" overrides the default output mask data value ("
         << default_mask_val << ") (optional).\n"

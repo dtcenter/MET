@@ -441,8 +441,13 @@ arguments for gen_vx_mask
 \series bold
 input_file
 \series medium
- argument indicates the name of a gridded data file that defines the domain
- over which the masking bitmap is to be defined.
+ argument is a gridded data file which specifies the grid definition for
+ the domain over which the masking bitmap is to be defined.
+ If output from gen_vx_mask, automatically read mask data as the 
+\series bold
+input_field
+\series medium
+.
 \end_layout
 
 \begin_layout Description
@@ -453,8 +458,12 @@ input_file
 \series bold
 mask_file
 \series medium
- argument indicates the name of the file data file that defines the masking
- region - ASCII Lat/Lon polyline file for 
+ argument defines the masking information, see below.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+For 
 \begin_inset Quotes eld
 \end_inset
 
@@ -486,7 +495,11 @@ track
 \begin_inset Quotes erd
 \end_inset
 
- masking; Gridded data file for 
+ masking, specify an ASCII Lat/Lon file.
+\end_layout
+
+\begin_layout Itemize
+For 
 \begin_inset Quotes eld
 \end_inset
 
@@ -502,7 +515,11 @@ data
 \begin_inset Quotes erd
 \end_inset
 
- masking; Gridded data file or YYYYMMDD[_HH[MMSS]] timestring for 
+ masking, specify a gridded data file.
+\end_layout
+
+\begin_layout Itemize
+For 
 \begin_inset Quotes eld
 \end_inset
 
@@ -518,9 +535,47 @@ solar_azi
 \begin_inset Quotes erd
 \end_inset
 
- masking.
+ masking, specify a gridded data file or a timestring in YYYYMMDD[_HH[MMSS]]
+ format.
 \end_layout
 
+\begin_layout Itemize
+For 
+\begin_inset Quotes eld
+\end_inset
+
+lat
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+lon
+\begin_inset Quotes erd
+\end_inset
+
+ masking, no 
+\begin_inset Quotes eld
+\end_inset
+
+mask_file
+\begin_inset Quotes erd
+\end_inset
+
+ needed, simply repeat the path for 
+\begin_inset Quotes eld
+\end_inset
+
+input_file
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
 \begin_layout Description
 
 \series medium
@@ -529,7 +584,7 @@ solar_azi
 \series bold
 out_file
 \series medium
- argument indicates the name given to the output NetCDF mask file.
+ argument is the output NetCDF mask file to be written.
 \end_layout
 
 \begin_layout Description
@@ -560,7 +615,15 @@ arguments for gen_vx_mask
 \series bold
 -input_field string
 \series medium
- option can be used to read existing mask data from "input_file".
+ option can be used to read existing mask data from 
+\begin_inset Quotes eld
+\end_inset
+
+input_file
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Description
@@ -571,8 +634,23 @@ arguments for gen_vx_mask
 \series bold
 -mask_field string
 \series medium
- option can be used to define the field from "mask_file" to be used for
- "data" masking.
+ option can be used to define the field from 
+\begin_inset Quotes eld
+\end_inset
+
+mask_file
+\begin_inset Quotes erd
+\end_inset
+
+ to be used for 
+\begin_inset Quotes eld
+\end_inset
+
+data
+\begin_inset Quotes erd
+\end_inset
+
+ masking.
 \end_layout
 
 \begin_layout Description
@@ -583,8 +661,16 @@ arguments for gen_vx_mask
 \series bold
 -complement
 \series medium
- option can be used to to compute the complement of the area defined in
- "mask_file".
+ option can be used to to compute the complement of the area defined by
+ 
+\begin_inset Quotes eld
+\end_inset
+
+mask_file
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Description
@@ -595,8 +681,23 @@ arguments for gen_vx_mask
 \series bold
 -union | -intersection | -symdiff
 \series medium
- option can be used to specify how to combine the masks from "input_file"
- and "mask_file".
+ option can be used to specify how to combine the masks from 
+\begin_inset Quotes eld
+\end_inset
+
+input_file
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+mask_file
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Description
@@ -607,9 +708,58 @@ arguments for gen_vx_mask
 \series bold
 -thresh string
 \series medium
- option can be used to define the threshold to be applied - Distance (km)
- for "circle" and "track" masking; Raw input values for "data" masking;
- Computed values for 
+ option can be used to define the threshold to be applied.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+For 
+\begin_inset Quotes eld
+\end_inset
+
+circle
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+track
+\begin_inset Quotes erd
+\end_inset
+
+ masking, threshold the distance (km).
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+For 
+\begin_inset Quotes eld
+\end_inset
+
+data
+\begin_inset Quotes erd
+\end_inset
+
+ masking, threshold the values of 
+\begin_inset Quotes eld
+\end_inset
+
+mask_field
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+For 
 \begin_inset Quotes eld
 \end_inset
 
@@ -625,9 +775,33 @@ solar_azi
 \begin_inset Quotes erd
 \end_inset
 
- masking.
+ masking, threshold the computed solar values.
 \end_layout
 
+\begin_layout Itemize
+
+\series medium
+For 
+\begin_inset Quotes eld
+\end_inset
+
+lat
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+lon
+\begin_inset Quotes erd
+\end_inset
+
+ masking, threshold the latitude and longitude values.
+ 
+\end_layout
+
+\end_deeper
 \begin_layout Description
 
 \series medium
@@ -640,7 +814,15 @@ and
 \series bold
 -width n
 \series medium
- options set the size in grid units for "box" masking.
+ options set the size in grid units for 
+\begin_inset Quotes eld
+\end_inset
+
+box
+\begin_inset Quotes erd
+\end_inset
+
+masking.
 \end_layout
 
 \begin_layout Description
@@ -910,6 +1092,45 @@ mask_file
  This option is useful when defining a day/night mask.
 \end_layout
 
+\begin_layout Description
+
+\series medium
+8.
+ Latitude (
+\series bold
+lat
+\series medium
+) and longitude (
+\series bold
+lon
+\series medium
+) masking computes the latitude and longitude value at each grid point.
+ This logic only requires the definition of the grid, specified by the 
+\series bold
+input_file
+\series medium
+.
+ Technically, the 
+\series bold
+mask_file
+\series medium
+ is not needed, but a value must be specified for the command line to parse
+ correctly.
+ Users are advised to simple repeat the
+\series bold
+ input_file
+\series medium
+ setting twice.
+ If the 
+\series bold
+-thresh
+\series default
+ command line option is not used, the raw latitude or longitude values for
+ each grid point will be written to the output.
+ This option is useful when defining latitude or longitude bands over which
+ to compute statistics.
+\end_layout
+
 \begin_layout Standard
 The polyline, box, circle, and track masking methods all read an ASCII file
  containing Lat/Lon locations.
@@ -919,30 +1140,168 @@ The polyline, box, circle, and track masking methods all read an ASCII file
 \end_layout
 
 \begin_layout Standard
-The Gen-Vx-Mask tool reads the 
+The Gen-Vx-Mask tool performs three main steps, described below.
+\end_layout
+
+\begin_layout Enumerate
+Determine the 
+\series bold
+input_field
+\series default
+ and grid definition.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Read the 
 \series bold
 input_file
 \series default
- file and extracts the grid definition from the file.
- If the 
+ to determine the grid over which the mask should be defined.
+\end_layout
+
+\begin_layout Itemize
+By default, initialize the 
+\series bold
+input_field
+\series default
+ at each grid point to a value of zero.
+\end_layout
+
+\begin_layout Itemize
+If the 
 \series bold
 -input_field
 \series default
- command line option is used, it will read the specified field of data and
- initialize each grid point to the value of that field.
- If that option is not used, the tool will check to see if the 
+ option was specified, initialize the 
+\series bold
+input_field
+\series default
+ at each grid point to the value of that field.
+\end_layout
+
+\begin_layout Itemize
+If the 
 \series bold
 input_file
 \series default
- file was generated by the Gen-Vx-Mask tool.
- If so, it will read the previously defined mask data and initialize each
- grid point to the value of that mask.
- If not, it will simply initialize each grid point to a value of zero.
+ is the output from a previous run of Gen-Vx-Mask, automatically initialize
+ the 
+\series bold
+input_field
+\series default
+ at each grid point to the input mask value.
 \end_layout
 
+\end_deeper
+\begin_layout Enumerate
+Determine the 
+\series bold
+mask_field
+\series default
+.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Read the 
+\series bold
+mask_file
+\series default
+, process it based on the 
+\series bold
+-type
+\series default
+ setting (as described above), and define the 
+\series bold
+mask_field
+\series default
+ value for each grid point to specify whether or not it is included in the
+ mask.
+\end_layout
+
+\begin_layout Itemize
+By default, store the mask value as 1 unless the 
+\series bold
+-value
+\series default
+ option was specified to override that default value.
+\end_layout
+
+\begin_layout Itemize
+If the 
+\series bold
+-complement 
+\series default
+option was specified, the opposite of the masking area is selected.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Apply logic to combine the 
+\series bold
+input_field
+\series default
+ and 
+\series bold
+mask_field
+\series default
+ and write the 
+\series bold
+out_file
+\series default
+.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+By default, the output value at each grid point is set to the value of 
+\series bold
+mask_field
+\series default
+ if included in the mask, or the value of 
+\series bold
+input_field
+\series default
+ if not included.
+\end_layout
+
+\begin_layout Itemize
+If the 
+\series bold
+-union
+\series default
+, 
+\series bold
+-intersection
+\series default
+, or 
+\series bold
+-symdiff
+\series default
+ option was specified, apply that logic to the 
+\series bold
+input_field
+\series default
+ and 
+\series bold
+mask_field
+\series default
+ values at each grid point to determine the output value.
+\end_layout
+
+\begin_layout Itemize
+Write the output value for each grid point to the 
+\series bold
+out_file
+\series default
+.
+\end_layout
+
+\end_deeper
 \begin_layout Standard
-This feature enables the Gen-Vx-Mask tool to be run iteratively on its own
- output to generate complex masking areas.
+This three step process enables the Gen-Vx-Mask tool to be run iteratively
+ on its own output to generate complex masking areas.
  Additionally, the 
 \series bold
 -union

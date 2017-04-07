@@ -14,8 +14,7 @@
 <met_test>
 
   <!--                                                                  -->
-  <!-- gen_vx_mask:                                                     -->
-  <!-- test all 5 masking types: poly, circle, track, grid, and data    -->
+  <!-- gen_vx_mask: test all masking types                              -->
   <!--                                                                  -->
 
   <test_dir>&TEST_DIR;</test_dir>
@@ -364,6 +363,40 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SOLAR_AZI_raw.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- LAT: latitude band                                               -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_LAT">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &MET_DIR;/data/sample_fcst/2005080700/wrfprs_ruc13_24.tm00_G212 \
+      &OUTPUT_DIR;/gen_vx_mask/LAT_mask.nc \
+      -type lat -thresh 'ge30&amp;&amp;le50' -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/LAT_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- LON: longitude band intersected with the previous latitude mask  -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_LON">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &OUTPUT_DIR;/gen_vx_mask/LAT_mask.nc \
+      &OUTPUT_DIR;/gen_vx_mask/LAT_mask.nc \
+      &OUTPUT_DIR;/gen_vx_mask/LON_mask.nc \
+      -type lon -thresh 'le-70&amp;&amp;ge-130' -intersection -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/LON_mask.nc</grid_nc>
     </output>
   </test>
 
