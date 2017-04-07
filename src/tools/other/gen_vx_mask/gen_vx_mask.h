@@ -50,6 +50,8 @@ enum MaskType {
    MaskType_Data,      // Data masking type
    MaskType_Solar_Alt, // Solar altitude masking type
    MaskType_Solar_Azi, // Solar azimuth masking type
+   MaskType_Lat,       // Latitude masking type
+   MaskType_Lon,       // Longitude masking type
    MaskType_None
 };
 
@@ -113,6 +115,7 @@ static void      apply_track_mask(DataPlane &dp);
 static void      apply_grid_mask(DataPlane &dp);
 static void      apply_data_mask(DataPlane &dp);
 static void      apply_solar_mask(DataPlane &dp);
+static void      apply_lat_lon_mask(DataPlane &dp);
 static DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask, SetLogic);
 static void      write_netcdf(const DataPlane &dp);
 static void      usage();
