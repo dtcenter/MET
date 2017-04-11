@@ -42,6 +42,8 @@ TESTS := $(shell grep "define ENABLE_" ../config.h | cut -d" " -f2 | cut -b8- | 
 
 all: ${TESTS}
 	@ echo
+	@ echo "   *** Finished Testing the Model Evaluation Tools Project ***"
+	@ echo
 
 
 ########################################################################
