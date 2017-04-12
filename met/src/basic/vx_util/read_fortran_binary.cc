@@ -19,6 +19,8 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <string.h>
 
 #include "read_fortran_binary.h"
 #include "check_endian.h"
@@ -41,6 +43,8 @@ typedef void (*ShuffleFunc)(void *);
 
 
 static long long get_rec_size(unsigned char * buf, const int rec_pad_length);
+
+static bool try_fb(int fd, const off_t file_size, const unsigned int test_pad_len, const bool swap_endian);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -241,6 +245,213 @@ if ( rec_pad_length == 4 )  {
 
 
 return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool get_fb_params(int fd, int & rec_pad_length, bool & swap_endian)
+
+{
+
+   //
+   //  get file size
+   //
+
+struct stat s;
+off_t file_size;
+
+if ( fstat(fd, &s) < 0 )  {
+
+   mlog << Error
+        << "\n\n  get_fb_params() -> fstat failed! ... "
+        << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+file_size = s.st_size;
+
+   //
+   //  loop through possibilities
+   //
+
+int j, k;
+bool status = false;
+
+const bool swap            [2] = { true, false };
+
+const unsigned int pad_len [2] = { 4, 8 };
+
+
+for (j=0; j<2; ++j)  {
+
+   for (k=0; k<2; ++k)  {
+
+      if ( try_fb(fd, file_size, pad_len[j], swap[k]) )  {
+
+         rec_pad_length = pad_len[j];
+
+         swap_endian    = swap[k];
+
+         status = true;
+
+         break;
+
+      }
+
+   }
+
+}
+
+
+   //
+   //  seek to beginning of file again
+   //
+
+if ( lseek(fd, 0, SEEK_SET) < 0 )  {
+
+   mlog << Error
+        << "\n\n  get_fb_params() -> lseek error ... "
+        << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  nope
+   //
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool try_fb(int fd, const off_t file_size, const unsigned int test_pad_len, const bool swap_endian)
+
+{
+
+unsigned long long rec_size_1, rec_size_2;
+int n_read, bytes;
+off_t offset;
+unsigned char buf[8];
+int * ibuf = (int *) buf;
+long long * llbuf = (long long *) buf;
+bool status = false;
+
+
+   //
+   //  seek to beginning of file
+   //
+
+offset = (off_t) 0;
+
+if ( lseek(fd, offset, SEEK_SET) < 0 )  {
+
+   mlog << Error
+        << "\n\n  try_4() -> lseek error (1) ... "
+        << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  get 1st pad
+   //
+
+bytes = test_pad_len;
+
+if ( (n_read = read(fd, buf, bytes)) < 0 )  {
+
+   mlog << Error
+        << "\n\n  try_fb() -> read error (1) ... "
+        << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( test_pad_len == 4 )  {
+
+   if ( swap_endian )  shuffle_4(buf);
+
+   rec_size_1 = (unsigned long long) (*ibuf);
+
+} else {
+
+   if ( swap_endian )  shuffle_8(buf);
+
+   rec_size_1 = *llbuf;
+
+}
+
+
+if ( (rec_size_1 + 2*test_pad_len) > ((unsigned long long) file_size) )  return ( false );
+
+   //
+   //  lseek to the end of this data record
+   //
+
+if ( lseek(fd, rec_size_1, SEEK_CUR) < 0 )  {
+
+   mlog << Error
+        << "\n\n  try_fb() -> lseek error (2) ... "
+        << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  get 2nd pad
+   //
+
+bytes = test_pad_len;
+
+if ( (n_read = read(fd, buf, bytes)) < 0 )  {
+
+   mlog << Error
+        << "\n\n  try_fb() -> read error (2) ... "
+        << strerror(errno) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( test_pad_len == 4 )  {
+
+   if ( swap_endian )  shuffle_4(buf);
+
+   rec_size_2 = (unsigned long long) (*ibuf);
+
+} else {
+
+   if ( swap_endian )  shuffle_8(buf);
+
+   rec_size_2 = *llbuf;
+
+}
+
+   //
+   //  compare rec sizes
+   //
+
+if ( rec_size_1 == rec_size_2 )  status = true;
+
+
+   //
+   //  nope
+   //
+
+return ( status );
 
 }
 

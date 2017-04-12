@@ -39,6 +39,16 @@ extern long long peek_record_size(int fd, const int rec_pad_length, const bool s
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  try to figure out the record pad size and the endian-ness of a file
+   //
+
+extern bool get_fb_params(int fd, int & rec_pad_length, bool & swap_endian);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   /*  __VX_READ_FORTRAN_BINARY_H__  */
 
 
