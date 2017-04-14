@@ -311,7 +311,7 @@ void usage()
 
         << "\t\t\"-color_table color_table_name\" overrides the "
         << "default color table "
-        << "(\"${MET_BASE}/colortables/met_default.ctable\") "
+        << "(\"colortables/met_default.ctable\") "
         << "(optional).\n"
 
         << "\t\t\"-plot_range min max\" defines the range of the "
