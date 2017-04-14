@@ -1134,23 +1134,31 @@ void write_netcdf_hdr_data() {
    add_att(&hdr_arr_var, "elv_units", "meters above sea level (msl)");
 
    long offsets[2] = { 0, 0 };
-   long lengths[2] = { hdr_typ_sa.n_elements(), strl_len } ;
+   long lengths[2] = { OBS_BUFFER_SIZE, strl_len } ;
 
    // Loop through and write out the header data
 
+   int hdr_idx = 0;
+   int hdr_str_len;
    for(i=0; i<hdr_typ_sa.n_elements(); i++) {
 
       // PrepBufr Message type
-      strncpy(hdr_typ_buf[i], hdr_typ_sa[i], strlen(hdr_typ_sa[i]));
-      hdr_typ_buf[i][strlen(hdr_typ_sa[i])] = bad_data_char;
+      hdr_str_len = strlen(hdr_typ_sa[i]);
+      if (hdr_str_len > strl_len) hdr_str_len = strl_len;
+      strncpy(hdr_typ_buf[hdr_idx], hdr_typ_sa[i], hdr_str_len);
+      hdr_typ_buf[hdr_idx][hdr_str_len] = bad_data_char;
 
       // Station ID
-      strncpy(hdr_sid_buf[i], hdr_sid_sa[i], strlen(hdr_sid_sa[i]));
-      hdr_sid_buf[i][strlen(hdr_sid_sa[i])] = bad_data_char;
+      hdr_str_len = strlen(hdr_sid_sa[i]);
+      if (hdr_str_len > strl_len) hdr_str_len = strl_len;
+      strncpy(hdr_sid_buf[hdr_idx], hdr_sid_sa[i], hdr_str_len);
+      hdr_sid_buf[hdr_idx][hdr_str_len] = bad_data_char;
 
       // Valid Time
-      strncpy(hdr_vld_buf[i], hdr_vld_sa[i], strlen(hdr_vld_sa[i]));
-      hdr_vld_buf[i][strlen(hdr_vld_sa[i])] = bad_data_char;
+      hdr_str_len = strlen(hdr_vld_sa[i]);
+      if (hdr_str_len > strl_len) hdr_str_len = strl_len;
+      strncpy(hdr_vld_buf[hdr_idx], hdr_vld_sa[i], hdr_str_len);
+      hdr_vld_buf[hdr_idx][hdr_str_len] = bad_data_char;
 
       // Write the header array which consists of the following:
       //    LAT LON ELV
@@ -1159,45 +1167,88 @@ void write_netcdf_hdr_data() {
       hdr_arr[2] = (float) hdr_arr_elv_na[i];
 
       for (int idx=0; idx<hdr_arr_len; idx++) {
-         hdr_arr_buf[i][idx] = hdr_arr[idx];
+         hdr_arr_buf[hdr_idx][idx] = hdr_arr[idx];
       }
 
+      hdr_idx++;
+      if (hdr_idx >= OBS_BUFFER_SIZE) {
+         lengths[1] = strl_len;
+         if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
+            mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+                 << "error writing the prepbufr message type string to "
+                 << "the netCDF file\n\n";
+            exit(1);
+         }
+         
+         // Station ID
+         if(!put_nc_data(&hdr_sid_var, (char *)hdr_sid_buf[0], lengths, offsets)) {
+            mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+                 << "error writing the station id string to the "
+                 << "netCDF file\n\n";
+            exit(1);
+         }
+         
+         // Valid Time
+         if(!put_nc_data(&hdr_vld_var, (char *)hdr_vld_buf[0], lengths, offsets)) {
+            mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+                 << "error writing the valid time to the "
+                 << "netCDF file\n\n";
+            exit(1);
+         }
+         
+         // Write the header array which consists of the following:
+         //    LAT LON ELV
+         
+         lengths[1] = hdr_arr_len;
+         if(!put_nc_data(&hdr_arr_var, (float *)hdr_arr_buf[0], lengths, offsets)) {
+            mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+                 << "error writing the header array to the "
+                 << "netCDF file\n\n";
+            exit(1);
+         }
+         
+         offsets[0] += OBS_BUFFER_SIZE;
+         hdr_idx = 0;
+      }
    } // end for i
 
 
-   lengths[1] = strl_len;
-   if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
-      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-           << "error writing the prepbufr message type string to "
-           << "the netCDF file\n\n";
-      exit(1);
-   }
-
-   // Station ID
-   if(!put_nc_data(&hdr_sid_var, (char *)hdr_sid_buf[0], lengths, offsets)) {
-      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-           << "error writing the station id string to the "
-           << "netCDF file\n\n";
-      exit(1);
-   }
-
-   // Valid Time
-   if(!put_nc_data(&hdr_vld_var, (char *)hdr_vld_buf[0], lengths, offsets)) {
-      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-           << "error writing the valid time to the "
-           << "netCDF file\n\n";
-      exit(1);
-   }
-
-   // Write the header array which consists of the following:
-   //    LAT LON ELV
-
-   lengths[1] = hdr_arr_len;
-   if(!put_nc_data(&hdr_arr_var, (float *)hdr_arr_buf[0], lengths, offsets)) {
-      mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-           << "error writing the header array to the "
-           << "netCDF file\n\n";
-      exit(1);
+   if (hdr_idx > 0) {
+      lengths[0] = hdr_idx;
+      lengths[1] = strl_len;
+      if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+              << "error writing the prepbufr message type string to "
+              << "the netCDF file\n\n";
+         exit(1);
+      }
+      
+      // Station ID
+      if(!put_nc_data(&hdr_sid_var, (char *)hdr_sid_buf[0], lengths, offsets)) {
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+              << "error writing the station id string to the "
+              << "netCDF file\n\n";
+         exit(1);
+      }
+      
+      // Valid Time
+      if(!put_nc_data(&hdr_vld_var, (char *)hdr_vld_buf[0], lengths, offsets)) {
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+              << "error writing the valid time to the "
+              << "netCDF file\n\n";
+         exit(1);
+      }
+      
+      // Write the header array which consists of the following:
+      //    LAT LON ELV
+      
+      lengths[1] = hdr_arr_len;
+      if(!put_nc_data(&hdr_arr_var, (float *)hdr_arr_buf[0], lengths, offsets)) {
+         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
+              << "error writing the header array to the "
+              << "netCDF file\n\n";
+         exit(1);
+      }
    }
 
    return;
