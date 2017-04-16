@@ -1169,16 +1169,21 @@ int parse_conf_percentile(Dictionary *dict) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString parse_conf_tmp_dir(Dictionary *dict) {
+   char *ptr;
    ConcatString s;
 
-   if(!dict) {
-      mlog << Error << "\nparse_conf_tmp_dir() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
+   if((ptr = getenv("MET_TMP_DIR")) != NULL && (opendir(ptr) != NULL )) {
+      s = ptr;
    }
-
-   // Read the temporary directory
-   s = dict->lookup_string(conf_key_tmp_dir);
+   else {
+      if(!dict) {
+         mlog << Error << "\nparse_conf_tmp_dir() -> "
+              << "empty dictionary!\n\n";
+         exit(1);
+      }
+      // Read the temporary directory
+      s = dict->lookup_string(conf_key_tmp_dir);
+   }
 
    // Make sure that it exists
    if(opendir(s) == NULL ) {
