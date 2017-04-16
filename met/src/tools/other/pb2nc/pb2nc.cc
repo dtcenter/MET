@@ -1206,7 +1206,14 @@ void write_netcdf_hdr_data() {
                  << "netCDF file\n\n";
             exit(1);
          }
-         
+
+         for(int hi=0; hi<OBS_BUFFER_SIZE; hi++) {
+            for(int hj=0; hj<strl_len; hj++) {
+               hdr_typ_buf[hi][hj] = bad_data_char;
+               hdr_sid_buf[hi][hj] = bad_data_char;
+            }
+         }
+
          offsets[0] += OBS_BUFFER_SIZE;
          hdr_idx = 0;
       }
