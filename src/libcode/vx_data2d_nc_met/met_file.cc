@@ -220,7 +220,7 @@ for (j=0; j<Ndims; ++j)  {
       get_dim_names(&v, &dimNames);
 
       for (k=0; k<(dim_count); ++k)  {
-         c = gDimNames[k];
+         c = dimNames[k];
          NcDim dim = get_nc_dim(&v, dimNames[k]);
          Var[j].Dims[k] = &dim;
 
