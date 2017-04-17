@@ -9,7 +9,6 @@ GRIB2
 0 14 0 255 57 0 1 1 "RH" "Relative humidity" "percent"
 0 14 0 255 57 0 1 3 "PWAT" "Precipitable water" "kilogramsPerMeterSquared"
 0 14 0 255 57 0 1 8 "APCP" "Total accumulated precipitation" "kilogramsPerMeterSquared"
-0 14 0 255 57 0 1 8 "APCP" "Total precipitation" "kilogramsPerMeterSquared"
 0 14 0 255 57 0 1 9 "NCPCPA" "Large scale precipitation" "kilogramsPerMeterSquared"
 0 14 0 255 57 0 1 10 "ACPCP" "Convective precipitation" "kilogramsPerMeterSquared"
 0 14 0 255 57 0 1 13 "WEASD" "Water equiv. of accum. snow depth" "kilogramsPerMeterSquared"
