@@ -155,6 +155,127 @@ return ( rec_size_1 );
 ////////////////////////////////////////////////////////////////////////
 
 
+long long read_fortran_binary_realloc(const int fd, void * & buf, int & buf_size, 
+                                      const int rec_pad_length, 
+                                      const bool swap_endian)
+
+{
+
+ShuffleFunc shuffle = 0;
+
+   //
+   //  we don't "shuffle" the data ... only the record pads
+   //
+
+switch ( rec_pad_length )  {
+
+   case 4:  shuffle = shuffle_4;  break;
+   case 8:  shuffle = shuffle_8;  break;
+
+   default:
+      mlog << Error << "\n\n  read_fortran_binary() -> bad record pad size ... "
+           << rec_pad_length << "\n\n";
+      exit ( 1 );
+      break;
+
+}
+
+int n_read;
+long long rec_size_1, rec_size_2;
+
+   //
+   //  first record length pad
+   //
+
+n_read = ::read(fd, local_buf, rec_pad_length);
+
+if ( n_read == 0 )  return ( 0LL );
+
+if ( n_read < 0 )  return ( (long long) (-1) );
+
+if ( swap_endian )  shuffle(local_buf);
+
+rec_size_1 = get_rec_size(local_buf, rec_pad_length);
+
+   //
+   //  reallocate buffer, if needed
+   //
+
+if ( rec_size_1 > buf_size )  {
+
+   unsigned char * B = (unsigned char *) buf;
+
+   if ( B )  { delete [] B;  B = 0; }
+
+   buf = new unsigned char [rec_size_1];
+
+   buf_size = rec_size_1;
+
+}
+
+   //
+   //  data
+   //
+
+if ( rec_size_1 < 0 || rec_size_1 > buf_size )  {
+
+   mlog << Error << "\n\n  read_fortran_binary() -> buffer too small ... "
+        << "increase buffer size to at least " << rec_size_1 << " bytes!\n"
+        << "  Try using the -swap option to switch the endianness of the "
+        << "input binary files.\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( (n_read = read(fd, buf, rec_size_1)) != rec_size_1 )  {
+
+   mlog << Error << "\n\n  read_fortran_binary() -> read error ... "
+        << "tried to read " << rec_size_1 << " bytes, got "
+        << n_read << "\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  second record length pad
+   //
+
+n_read = ::read(fd, local_buf, rec_pad_length);
+
+if ( n_read != rec_pad_length )  {
+
+   mlog << Error << "\n\n  read_fortran_binary() -> trouble reading second record pad\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( swap_endian )  shuffle(local_buf);
+
+rec_size_2 = get_rec_size(local_buf, rec_pad_length);
+
+if ( rec_size_2 != rec_size_1 )  {
+
+   mlog << Error << "\n\n  read_fortran_binary() -> first and second record pads don't match!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  done
+   //
+
+return ( rec_size_1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 long long peek_record_size(int fd, const int rec_pad_length, const bool swap_endian)
 
 {

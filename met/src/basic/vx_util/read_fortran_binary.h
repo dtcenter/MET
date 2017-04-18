@@ -30,6 +30,21 @@ extern long long read_fortran_binary(const int fd, void * buf, const int buf_siz
 
 
    //
+   //  returns number of bytes read, not counting record pads
+   //
+   //    reallocates the buffer if needed
+   //
+
+extern long long read_fortran_binary_realloc(const int fd, 
+                                             void * & buf, int & buf_size, 
+                                             const int rec_pad_length, 
+                                             const bool swap_endian);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
    //  report the value in the next record length pad, without moving the read pointer
    //
 
