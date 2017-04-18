@@ -509,9 +509,9 @@ double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
       // Southwest Corner
       if(!is_bad_data(bilin_v) && !is_eq(wtsw, 0.0)) {
          if(x < 0 || x >= dp.nx() || y < 0 || y >= dp.ny())
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else if(is_bad_data(dp.get(x, y)))
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else
             bilin_v += wtsw * dp.get(x, y);
       }
@@ -519,9 +519,9 @@ double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
       // Southeast Corner
       if(!is_bad_data(bilin_v) && !is_eq(wtse, 0.0)) {
          if(x+1 < 0 || x+1 >= dp.nx() || y < 0 || y >= dp.ny())
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else if(is_bad_data(dp.get(x+1, y)))
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else
             bilin_v += wtse * dp.get(x+1, y);
       }
@@ -529,9 +529,9 @@ double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
       // Northwest Corner
       if(!is_bad_data(bilin_v) && !is_eq(wtnw, 0.0)) {
          if(x < 0 || x >= dp.nx() || y+1 < 0 || y+1 >= dp.ny())
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else if(is_bad_data(dp.get(x, y+1)))
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else
             bilin_v += wtnw * dp.get(x, y+1);
       }
@@ -539,9 +539,9 @@ double interp_bilin(const DataPlane &dp, double obs_x, double obs_y) {
       // Northeast Corner
       if(!is_bad_data(bilin_v) && !is_eq(wtne, 0.0)) {
          if(x+1 < 0 || x+1 >= dp.nx() || y+1 < 0 || y+1 >= dp.ny())
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else if(is_bad_data(dp.get(x+1, y+1)))
-            bilin_v == bad_data_double;
+            bilin_v = bad_data_double;
          else
             bilin_v += wtne * dp.get(x+1, y+1);
       }
