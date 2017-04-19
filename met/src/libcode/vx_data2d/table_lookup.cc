@@ -561,7 +561,7 @@ void TableFlatFile::readUserGribTables(const char * table_type) {
          //
          cout << "DEBUG 1: Reading user-defined " << table_type << " "
               << met_grib_tables << " file: " << filtered_file_names[i]
-              << "\n"; 
+              << "\n";
 
          if (!read(filtered_file_names[i])) {
             mlog << Error << "\nTableFlatFile::readUserGribTables() -> "
@@ -1137,7 +1137,7 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
 
    }
 
-   //  if there are multiple matches, print a descriptive warning
+   //  if there are multiple matches, print a descriptive message
    if( 1 < n_matches ){
 
       ConcatString msg;
@@ -1146,18 +1146,18 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
       if( bad_data_int != table_number ) msg << ", table_number = " << table_number;
       if( bad_data_int != code         ) msg << ", code = "         << code;
       msg << "):\n";
-      mlog << Warning << "\n" << msg;
+      mlog << Debug(3) << "\n" << msg;
 
       for(vector<Grib1TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
-         mlog << Warning << "  parm_name: "     << (*it)->parm_name
-                         << ", table_number = " << (*it)->table_number
-                         << ", code = "         << (*it)->code << "\n";
+         mlog << Debug(3) << "  parm_name: "     << (*it)->parm_name
+                          << ", table_number = " << (*it)->table_number
+                          << ", code = "         << (*it)->code << "\n";
 
-      mlog << Warning << "Using: "
-                      << "  parm_name: "     << e.parm_name
-                      << ", table_number = " << e.table_number
-                      << ", code = "         << e.code << "\n\n";
+      mlog << Debug(3) << "Using: "
+                       << "  parm_name: "     << e.parm_name
+                       << ", table_number = " << e.table_number
+                       << ", code = "         << e.code << "\n\n";
 
    }
 
@@ -1196,7 +1196,7 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
 
    }
 
-   //  if there are multiple matches, print a descriptive warning
+   //  if there are multiple matches, print a descriptive message
    if( 1 < n_matches ){
 
       ConcatString msg;
@@ -1205,22 +1205,22 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
       if( bad_data_int != table_number ) msg << ", table_number = " << table_number;
       if( bad_data_int != code         ) msg << ", code = "         << code;
       msg << "):\n";
-      mlog << Warning << "\n" << msg;
+      mlog << Debug(3) << "\n" << msg;
 
       for(vector<Grib1TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
       {
-         mlog << Warning << "  parm_name: "     << (*it)->parm_name
-                         << ", table_number = " << (*it)->table_number
-                         << ", code = "         << (*it)->code
-                         << ", center = "       << (*it)->center
-                         << ", subcenter = "    << (*it)->subcenter << "\n";
+         mlog << Debug(3) << "  parm_name: "     << (*it)->parm_name
+                          << ", table_number = " << (*it)->table_number
+                          << ", code = "         << (*it)->code
+                          << ", center = "       << (*it)->center
+                          << ", subcenter = "    << (*it)->subcenter << "\n";
       }
 
-      mlog << Warning << "Using: "
-                      << "  parm_name: "     << e.parm_name
-                      << ", table_number = " << e.table_number
-                      << ", code = "         << e.code << "\n\n";
+      mlog << Debug(3) << "Using: "
+                       << "  parm_name: "     << e.parm_name
+                       << ", table_number = " << e.table_number
+                       << ", code = "         << e.code << "\n\n";
 
    }
 
@@ -1335,7 +1335,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
 
    }
 
-   //  if there are multiple matches, print a descriptive warning
+   //  if there are multiple matches, print a descriptive message
    if( 1 < n_matches ){
 
       ConcatString msg;
@@ -1345,20 +1345,20 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
       if( bad_data_int != b ) msg << ", index_b = " << b;
       if( bad_data_int != c ) msg << ", index_c = " << c;
       msg << "):\n";
-      mlog << Warning << "\n" << msg;
+      mlog << Debug(3) << "\n" << msg;
 
       for(vector<Grib2TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
-         mlog << Warning << "  parm_name: " << (*it)->parm_name
-                         << ", index_a = "  << (*it)->index_a
-                         << ", index_b = "  << (*it)->index_b
-                         << ", index_c = "  << (*it)->index_c << "\n";
+         mlog << Debug(3) << "  parm_name: " << (*it)->parm_name
+                          << ", index_a = "  << (*it)->index_a
+                          << ", index_b = "  << (*it)->index_b
+                          << ", index_c = "  << (*it)->index_c << "\n";
 
-      mlog << Warning << "Using: "
-                      << "  parm_name: " << e.parm_name
-                      << ", index_a = "  << e.index_a
-                      << ", index_b = "  << e.index_b
-                      << ", index_c = "  << e.index_c << "\n\n";
+      mlog << Debug(3) << "Using: "
+                       << "  parm_name: " << e.parm_name
+                       << ", index_a = "  << e.index_a
+                       << ", index_b = "  << e.index_b
+                       << ", index_c = "  << e.index_c << "\n\n";
 
    }
 
@@ -1398,7 +1398,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
 
    }
 
-   //  if there are multiple matches, print a descriptive warning
+   //  if there are multiple matches, print a descriptive message
    if( 1 < n_matches ){
 
       ConcatString msg;
@@ -1411,28 +1411,28 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
       if( bad_data_int != b ) msg << ", index_b = " << b;
       if( bad_data_int != c ) msg << ", index_c = " << c;
       msg << "):\n";
-      mlog << Warning << "\n" << msg;
+      mlog << Debug(3) << "\n" << msg;
 
       for(vector<Grib2TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
-         mlog << Warning << "  parm_name: "   << (*it)->parm_name
-                         << ", index_a = "    << (*it)->index_a
-                         << ", grib2_mtab = " << (*it)->mtab_set
-                         << ", grib2_cntr = " << (*it)->cntr
-                         << ", grib2_ltab = " << (*it)->ltab
-                         << ", index_b = "    << (*it)->index_b
-                         << ", index_c = "    << (*it)->index_c
-                         << "\n";
+         mlog << Debug(3) << "  parm_name: "   << (*it)->parm_name
+                          << ", index_a = "    << (*it)->index_a
+                          << ", grib2_mtab = " << (*it)->mtab_set
+                          << ", grib2_cntr = " << (*it)->cntr
+                          << ", grib2_ltab = " << (*it)->ltab
+                          << ", index_b = "    << (*it)->index_b
+                          << ", index_c = "    << (*it)->index_c
+                          << "\n";
 
-      mlog << Warning << "Using: "
-                      << "  parm_name: "   << e.parm_name
-                      << ", index_a = "    << e.index_a
-                      << ", grib2_mtab = " << e.mtab_set
-                      << ", grib2_cntr = " << e.cntr
-                      << ", grib2_ltab = " << e.ltab
-                      << ", index_b = "    << e.index_b
-                      << ", index_c = "    << e.index_c
-                      << "\n\n";
+      mlog << Debug(3) << "Using: "
+                       << "  parm_name: "   << e.parm_name
+                       << ", index_a = "    << e.index_a
+                       << ", grib2_mtab = " << e.mtab_set
+                       << ", grib2_cntr = " << e.cntr
+                       << ", grib2_ltab = " << e.ltab
+                       << ", index_b = "    << e.index_b
+                       << ", index_c = "    << e.index_c
+                       << "\n\n";
 
    }
 
