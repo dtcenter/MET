@@ -2142,7 +2142,7 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n"
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << conf_info.get_compression_level() << ") (optional).\n" << flush;
+        << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
    exit(1);
 }
