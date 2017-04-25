@@ -2046,7 +2046,7 @@ output_stats = {
 //          -line_type MCTC           -out_line_type MCTS
 //          -line_type SL1L2, SAL1L2, -out_line_type CNT
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
-// //          -line_type PCT,           -out_line_type PSTD, PJC, PRC
+//          -line_type PCT,           -out_line_type PSTD, PJC, PRC
 //          -line_type NBRCTC,        -out_line_type NBRCTS
 //          -line_type ORANK,         -out_line_type RHIST, PHIST, SSVAR
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
