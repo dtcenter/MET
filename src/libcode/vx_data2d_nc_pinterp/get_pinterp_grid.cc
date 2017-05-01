@@ -49,7 +49,7 @@ static const char ny_dimension_name         [] = "south_north";
 
 static const char ps_default_gridname       [] = "polar";
 static const char lambert_default_gridname  [] = "lambert";
-static const char mercator_default_gridname [] = "lambert";
+static const char mercator_default_gridname [] = "mercator";
 
 static const double default_grib_radius_km     = 6371.20;
 
