@@ -34,6 +34,10 @@ extern long long read_fortran_binary(const int fd, void * buf, const int buf_siz
    //
    //    reallocates the buffer if needed
    //
+   //
+   //    NOTE: "buf", if nonzero, MUST point to heap memory, 
+   //           not stack or text segment memory
+   //
 
 extern long long read_fortran_binary_realloc(const int fd, 
                                              void * & buf, int & buf_size, 
