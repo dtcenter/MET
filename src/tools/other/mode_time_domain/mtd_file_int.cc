@@ -1515,9 +1515,11 @@ for (x=0; x<Nx; ++x)  {
 
 if ( count == 0 )  {
 
-   mlog << Error << "\n\n  MtdIntFile::calc_2d_centroid_at_t() const -> empty object!\n\n";
+   // mlog << Error << "\n\n  MtdIntFile::calc_2d_centroid_at_t() const -> empty object!\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return;
 
 }
 

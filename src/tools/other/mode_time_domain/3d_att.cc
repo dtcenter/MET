@@ -1265,9 +1265,9 @@ a.Volume = mask.volume(0);
 
 mask.calc_3d_bbox(a.Xmin, a.Xmax, a.Ymin, a.Ymax, a.Tmin, a.Tmax);
 
-bbox_volume =  (a.Xmax - a.Xmin - 1.0)
-              *(a.Ymax - a.Ymin - 1.0)
-              *(a.Tmax - a.Tmin - 1.0);
+bbox_volume =  (a.Xmax - a.Xmin + 1.0)
+              *(a.Ymax - a.Ymin + 1.0)
+              *(a.Tmax - a.Tmin + 1.0);
 
 a.Complexity = ((double) (a.Volume))/bbox_volume;
 
