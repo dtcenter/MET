@@ -321,9 +321,11 @@ moments = mask_2d.calc_2d_moments();
 
 if ( moments.N == 0 )  {
 
-   mlog << Error << "\n\n  calc_2d_single_atts() -> empty object!\n\n";
+   // mlog << Error << "\n\n  calc_2d_single_atts() -> empty object!\n\n";
 
-   exit ( 1 );
+   // exit ( 1 );
+
+   return ( a );
 
 }
 
