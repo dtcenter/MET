@@ -506,13 +506,13 @@ if ( e && (e->is_number()) && (! is_lhs) )  {
 
       set_int(configlval.nval, e->i_value());
 
-      return ( INTEGER ); 
+      return ( INTEGER );
 
    } else {
 
       set_double(configlval.nval, e->d_value());
 
-      return ( FLOAT ); 
+      return ( FLOAT );
 
    }
 
@@ -682,7 +682,8 @@ void start_string_scan(const char * s)
 
 if ( empty(s) )  {
 
-   cerr << "\n\n  void start_string_scan(const char *) -> empty string!\n\n";
+   mlog << Error
+        << "\nvoid start_string_scan(const char *) -> empty string!\n\n";
 
    exit ( 1 );
 
@@ -756,7 +757,8 @@ n = strlen(yytext);
 
 if ( n >= (int) (sizeof(junk) - 1) )  {
 
-   cerr << "\n\n  do_env() -> environment variable name too long\n\n";
+   mlog << Error
+        << "\ndo_env() -> environment variable name too long\n\n";
 
    exit ( 1 );
 
@@ -770,7 +772,9 @@ value = getenv(junk);
 
 if ( !value )  {
 
-   cerr << "\n\n  do_env() -> can't get value of environment variable \"" << junk << "\"\n\n";
+   mlog << Error
+        << "\ndo_env() -> can't get value of environment variable \""
+        << junk << "\"\n\n";
 
    exit ( 1 );
 
