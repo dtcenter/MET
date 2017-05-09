@@ -107,12 +107,15 @@ Dependencies
 ------------
 
 - MET requires the following to be installed on your system prior to building:
-   - UniData's NetCDF Library
+   - UniData's NetCDF4 Library
       - http://www.unidata.ucar.edu/software/netcdf
+      - Both NetCDF-C and NetCDF-CXX are required
    - GNU Scientific Library (GSL), developer's version
       - http://www.gnu.org/software/gsl
    - Zlib
       - http://www.zlib.net
+   - HDF5, to support NetCDF4
+     - https://support.hdfgroup.org/ftp/HDF5
    - NCEP's BUFRLIB Library, if wishing to compile PB2NC
       - http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB
    - NCEP's GRIB2 Library in C (g2clib), if wishing to compile GRIB2 support
@@ -164,6 +167,8 @@ sub-directory, or the MET Online Tutorial:
      $MET_NETCDFINC to point to the directory with the NetCDF include files
      and set $MET_NETCDFLIB to point to the directory with the NetCDF
      library files.
+
+   - Set $MET_HDF5 to point to the main HDF5 directory.
 
    - Set $MET_BUFR to point to the main BUFR directory, or set $MET_BUFRLIB
      to point to the directory with the BUFR library files.  Because we don't
