@@ -34,7 +34,7 @@
 ##
 ########################################################################
 
-library(ncdf)
+library(ncdf4)
 
 ########################################################################
 #
@@ -98,7 +98,7 @@ while(i <= length(args)) {
 ########################################################################
 
 print(paste("Reading:", nc_file));
-nc = open.ncdf(nc_file, write=F);
+nc = nc_open(nc_file, write=F);
 
 # Get lat/lon values
 lat = round(nc$dim[["lat"]]$vals, prec);
@@ -115,31 +115,31 @@ for(i in 1:length(var_list)) {
   print(paste("Processing:", var_list[i]));
   fstr  = paste("FCST_", var_list[i], sep="");
   ostr  = paste("OBS_",  var_list[i], sep="");
-  fvar  = round(get.var.ncdf(nc, fstr), prec);
-  ovar  = round(get.var.ncdf(nc, ostr), prec);
+  fvar  = round(ncvar_get(nc, fstr), prec);
+  ovar  = round(ncvar_get(nc, ostr), prec);
   ind   = !is.na(fvar) & !is.na(ovar);
-  flead = as.numeric(att.get.ncdf(nc, fstr, "valid_time_ut")$value) -
-          as.numeric(att.get.ncdf(nc, fstr, "init_time_ut")$value);
-  olead = as.numeric(att.get.ncdf(nc, ostr, "valid_time_ut")$value) -
-          as.numeric(att.get.ncdf(nc, ostr, "init_time_ut")$value);
+  flead = as.numeric(ncatt_get(nc, fstr, "valid_time_ut")$value) -
+          as.numeric(ncatt_get(nc, fstr, "init_time_ut")$value);
+  olead = as.numeric(ncatt_get(nc, ostr, "valid_time_ut")$value) -
+          as.numeric(ncatt_get(nc, ostr, "init_time_ut")$value);
   mpr   = data.frame(
-            VERSION=att.get.ncdf(nc, 0, "MET_version")$value,
-            MODEL=att.get.ncdf(nc, 0, "model")$value,
-            DESC=att.get.ncdf(nc, fstr, "desc")$value,
+            VERSION=ncatt_get(nc, 0, "MET_version")$value,
+            MODEL=ncatt_get(nc, 0, "model")$value,
+            DESC=ncatt_get(nc, fstr, "desc")$value,
             FCST_LEAD=sprintf("%02d%02d%02d", round(flead/3600, 0), round(flead%%3600/60, 0), flead%%60),
-            FCST_VALID_BEG=att.get.ncdf(nc, fstr, "valid_time")$value,
-            FCST_VALID_END=att.get.ncdf(nc, fstr, "valid_time")$value,
+            FCST_VALID_BEG=ncatt_get(nc, fstr, "valid_time")$value,
+            FCST_VALID_END=ncatt_get(nc, fstr, "valid_time")$value,
             OBS_LEAD=sprintf("%02d%02d%02d", round(olead/3600, 0), round(olead%%3600/60, 0), olead%%60),
-            OBS_VALID_BEG=att.get.ncdf(nc, ostr, "valid_time")$value,
-            OBS_VALID_END=att.get.ncdf(nc, ostr, "valid_time")$value,
-            FCST_VAR=att.get.ncdf(nc, fstr, "name")$value,
-            FCST_LEV=att.get.ncdf(nc, fstr, "level")$value,
-            OBS_VAR=att.get.ncdf(nc, ostr, "name")$value,
-            OBS_LEV=att.get.ncdf(nc, ostr, "level")$value,
-            OBTYPE=att.get.ncdf(nc, 0, "obtype")$value,
-            VX_MASK=att.get.ncdf(nc, fstr, "masking_region")$value,
-            INTERP_MTHD=att.get.ncdf(nc, fstr, "smoothing_method")$value,
-            INTERP_PNTS=att.get.ncdf(nc, fstr, "smoothing_neighborhood")$value,
+            OBS_VALID_BEG=ncatt_get(nc, ostr, "valid_time")$value,
+            OBS_VALID_END=ncatt_get(nc, ostr, "valid_time")$value,
+            FCST_VAR=ncatt_get(nc, fstr, "name")$value,
+            FCST_LEV=ncatt_get(nc, fstr, "level")$value,
+            OBS_VAR=ncatt_get(nc, ostr, "name")$value,
+            OBS_LEV=ncatt_get(nc, ostr, "level")$value,
+            OBTYPE=ncatt_get(nc, 0, "obtype")$value,
+            VX_MASK=ncatt_get(nc, fstr, "masking_region")$value,
+            INTERP_MTHD=ncatt_get(nc, fstr, "smoothing_method")$value,
+            INTERP_PNTS=ncatt_get(nc, fstr, "smoothing_neighborhood")$value,
             FCST_THRESH=NA, OBS_THRESH=NA, COV_THRESH=NA, ALPHA=NA,
             LINE_TYPE="MPR",
             TOTAL=sum(ind), INDEX=seq(1, sum(ind)), OBS_SID=NA,

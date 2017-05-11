@@ -26,7 +26,7 @@
 ##
 ########################################################################
 
-library(ncdf)
+library(ncdf4)
 
 ########################################################################
 #
@@ -47,15 +47,15 @@ if(length(args) < 1) {
 ########################################################################
 
 # Open the input NetCDF file
-nc = open.ncdf(args[1])
+nc = nc_open(args[1])
 
 # Retrieve the data
-fcst_raw     = get.var.ncdf(nc, "fcst_raw")
-obs_raw      = get.var.ncdf(nc, "obs_raw")
-fcst_obj_id  = get.var.ncdf(nc, "fcst_obj_id")
-obs_obj_id   = get.var.ncdf(nc, "obs_obj_id")
-fcst_clus_id = get.var.ncdf(nc, "fcst_clus_id")
-obs_clus_id  = get.var.ncdf(nc, "obs_clus_id")
+fcst_raw     = ncvar_get(nc, "fcst_raw")
+obs_raw      = ncvar_get(nc, "obs_raw")
+fcst_obj_id  = ncvar_get(nc, "fcst_obj_id")
+obs_obj_id   = ncvar_get(nc, "obs_obj_id")
+fcst_clus_id = ncvar_get(nc, "fcst_clus_id")
+obs_clus_id  = ncvar_get(nc, "obs_clus_id")
 
 # Forecast simple object areas
 for(i in 1:max(fcst_obj_id, na.rm=T)) {
@@ -122,4 +122,4 @@ for(i in 1:max(fcst_clus_id, na.rm=T)) {
 }
 
 # Close
-close.ncdf(nc)
+nc_close(nc)
