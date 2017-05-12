@@ -121,6 +121,8 @@ enum STATLineType {
    stat_phist,
    stat_orank,
    stat_ssvar,
+   stat_relp,
+   stat_econ,
    stat_header,
    no_stat_line_type
 };
@@ -155,6 +157,8 @@ static const char stat_rhist_str[]  = "RHIST";
 static const char stat_phist_str[]  = "PHIST";
 static const char stat_orank_str[]  = "ORANK";
 static const char stat_ssvar_str[]  = "SSVAR";
+static const char stat_relp_str[]   = "RELP";
+static const char stat_econ_str[]   = "ECON";
 static const char stat_header_str[] = "LINE_TYPE";
 static const char stat_na_str[]     = "NA";
 
