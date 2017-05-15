@@ -1707,6 +1707,7 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
             f_cov = compute_interp(conf_info.vx_pd[i_vx].fcst_dpa,
                        pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
                        InterpMthd_Nbrhd, conf_info.hira_info.width[j],
+                                   conf_info.hira_info.shape,
                        conf_info.hira_info.vld_thresh, spfh_flag,
                        conf_info.vx_pd[i_vx].fcst_info->level().type(),
                        pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
@@ -1722,6 +1723,7 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
             cmn_cov = compute_interp(conf_info.vx_pd[i_vx].climo_mn_dpa,
                          pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
                          InterpMthd_Nbrhd, conf_info.hira_info.width[j],
+                                     conf_info.hira_info.shape,
                          conf_info.hira_info.vld_thresh, spfh_flag,
                          conf_info.vx_pd[i_vx].fcst_info->level().type(),
                          pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);

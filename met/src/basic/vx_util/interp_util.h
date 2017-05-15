@@ -27,10 +27,8 @@
 
 #include "data_plane.h"
 #include "interp_mthd.h"
-//#include "GridTemplate.h"
+#include "GridTemplate.h"
 
-//forward declaration
-class GridTemplate;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -42,29 +40,43 @@ static const int dw_mean_pow = 2;
 // Utility functions for horizontal interpolation on a DataPlane
 //
 ///////////////////////////////////////////////////////////////////////////////
-
+/*
 extern double interp_min     (const DataPlane &, int x_ll, int y_ll, int w, double t);
 extern double interp_max     (const DataPlane &, int x_ll, int y_ll, int w, double t);
 extern double interp_median  (const DataPlane &, int x_ll, int y_ll, int w, double t);
 extern double interp_uw_mean (const DataPlane &, int x_ll, int y_ll, int w, double t);
-
+*/
 // version that uses GridTemplate & takes center x/y instead of LL corner
 extern double interp_min	   (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
 extern double interp_max	   (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
 extern double interp_median	 (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
 extern double interp_uw_mean (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t);
-
+/*
 extern void  dp_interp_min     (const DataPlane & fat, DataPlane & out, int w, double t);
 extern void  dp_interp_max     (const DataPlane & fat, DataPlane & out, int w, double t);
 extern void  dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int w, double t);
+*/
 
+extern void  dp_interp_min     (const DataPlane & fat, DataPlane & out, const GridTemplate &gt, double t);
+extern void  dp_interp_max     (const DataPlane & fat, DataPlane & out, const GridTemplate &gt, double t);
+extern void  dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, const GridTemplate &gt, double t);
+
+/*
 extern double interp_dw_mean (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, int i_pow, double t);
 extern double interp_ls_fit  (const DataPlane &, int x_ll, int y_ll, int w, double obs_x, double obs_y, double t);
+*/
+// version that uses GridTemplate & takes center x/y instead of LL corner
+extern double interp_dw_mean (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t);
+extern double interp_ls_fit  (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t);
 
-extern double interp_nbrhd   (const DataPlane &, int x_ll, int y_ll, int w, double t, const SingleThresh *);
+//extern double interp_nbrhd   (const DataPlane &, int x_ll, int y_ll, int w, double t, const SingleThresh *);
 extern double interp_bilin   (const DataPlane &, double obs_x, double obs_y);
 extern double interp_xy      (const DataPlane &, int x, int y);
-extern double interp_best    (const DataPlane &, int x_ll, int y_ll, int w, double o, double t);
+//extern double interp_best    (const DataPlane &, int x_ll, int y_ll, int w, double o, double t);
+
+extern double interp_best(const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t);
+
+extern double interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *);
 
 extern void   get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
 
@@ -73,9 +85,15 @@ extern void   get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &
 // Utility functions for horizontal and vertical interpolation
 //
 ///////////////////////////////////////////////////////////////////////////////
-
+/*
 extern double compute_horz_interp(const DataPlane &, double, double, double, int, int, double,
                                   const SingleThresh *cat_thresh = 0);
+*/
+extern double compute_horz_interp(const DataPlane &dp,
+                                  double obs_x, double obs_y, double obs_v,
+                                  int mthd, const int width, const GridTemplateFactory::GridTemplates shape, double interp_thresh,
+                                  const SingleThresh *cat_thresh = 0);
+
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);
 

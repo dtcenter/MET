@@ -46,7 +46,7 @@ enum GridHemisphere {
 ////////////////////////////////////////////////////////////////////////
 
 
-typedef void InterpFunction (const DataPlane & fat, DataPlane & out, int w, double);
+typedef void InterpFunction (const DataPlane & fat, DataPlane & out, const GridTemplate & gt, double);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -84,6 +84,8 @@ class WwmcaRegridder {
       InterpMthd Method;   //  interpolation
 
       int Width;           //  interpolation
+      
+      GridTemplateFactory::GridTemplates Shape; //  Interpolation shape
 
       double Fraction;     //  fraction of good data needed for interpolation
 

@@ -1161,10 +1161,26 @@ void process_point_scores() {
             // Loop through the interpolation methods
             for(l=0; l<conf_info.get_n_interp(); l++) {
 
-               // Store the interpolation method and width being applied
-               shc.set_interp_mthd(conf_info.interp_mthd[l]);
-               shc.set_interp_wdth(conf_info.interp_wdth[l]);
+               //TODO:  I think I need to add the shape to the interp_mthd, but
+	            // check on this:
+	            /*
+	            //create appropriate grid template for iterating over the grid shape
+	            GridTemplateFactory gtf;
+	            GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
+                                        conf_info.interp_wdth[l]);
 
+	            // Store the interpolation method and width being applied
+	            string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[l]).text();
+	            if(conf_info.interp_wdth[l] > 1) {
+		            interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
+	            }
+	            delete gt;
+	            */
+               // Store the interpolation method and width being applied
+               //shc.set_interp_mthd(conf_info.interp_mthd[l]);
+	             shc.set_interp_mthd(conf_info.interp_mthd[l],conf_info.interp_shape);
+               shc.set_interp_wdth(conf_info.interp_wdth[l]);
+               
                pd_ptr = &conf_info.vx_pd[i].pd[j][k][l];
 
                mlog << Debug(2)
@@ -1420,22 +1436,25 @@ void process_grid_vx() {
          }
 
          // Set the interpolation method and width
-         shc.set_interp_mthd(conf_info.interp_mthd[j]);
+         shc.set_interp_mthd(conf_info.interp_mthd[j], conf_info.interp_shape);
          shc.set_interp_wdth(conf_info.interp_wdth[j]);
 
          // If requested in the config file, smooth the forecast field
          for(k=0; k<ens_file_list.n_elements(); k++) {
 
+	          
             if(conf_info.interp_field == FieldType_Fcst ||
                conf_info.interp_field == FieldType_Both) {
                smooth_field(fcst_dp[k], fcst_dp_smooth[k],
                             conf_info.interp_mthd[j],
                             conf_info.interp_wdth[j],
+                            conf_info.interp_shape,
                             conf_info.interp_thresh);
                if(conf_info.ens_ssvar_flag) {
                   smooth_field(emn_dp, emn_dp_smooth,
                                conf_info.interp_mthd[j],
                                conf_info.interp_wdth[j],
+                               conf_info.interp_shape,
                                conf_info.interp_thresh);
                }
             }
@@ -1452,13 +1471,14 @@ void process_grid_vx() {
             smooth_field(obs_dp, obs_dp_smooth,
                          conf_info.interp_mthd[j],
                          conf_info.interp_wdth[j],
+                         conf_info.interp_shape,
                          conf_info.interp_thresh);
          }
          // Do not smooth the observation field
          else {
             obs_dp_smooth = obs_dp;
          }
-
+         
          // Loop through the masks to be applied
          for(k=0; k<conf_info.get_n_mask_area(); k++) {
 

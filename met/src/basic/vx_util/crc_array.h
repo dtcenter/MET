@@ -128,6 +128,8 @@ class CRC_Array {
       void add(const CRC_Array <T> &);
       void add_css_sec(const char *);
 
+      void set(unsigned int ix, const T & val); 
+      
       void sort_increasing();
 
       void increment(const T &);   //  adds a constant value to all elements
@@ -365,6 +367,17 @@ return;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+template <typename T>
+void CRC_Array<T>::set(unsigned int ix, const T & elem)
+{
+	if ( (ix < 0) || (ix >= Nelements) )  {
+		mlog << Error << "\nCRC_Array::set(unsigned int, T) const -> range check error\n\n";
+		exit ( 1 );
+	}
+	e[ix] = elem;
+}
 
 ////////////////////////////////////////////////////////////////////////
 

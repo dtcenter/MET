@@ -518,6 +518,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    nbrhd_thresh = nbrhd_info.vld_thresh;
    nbrhd_wdth   = nbrhd_info.width;
    nbrhd_cov_ta = nbrhd_info.cov_ta;
+   nbrhd_shape  = nbrhd_info.shape;
 
    // Conf: nc_pairs_flag
    parse_nc_info();

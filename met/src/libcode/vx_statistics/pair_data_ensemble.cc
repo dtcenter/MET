@@ -144,6 +144,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    set_interp_mthd(pd.interp_mthd);
    set_interp_dpth(pd.interp_dpth);
+   set_interp_shape(pd.interp_shape);
 
    sid_sa    = pd.sid_sa;
    lat_na    = pd.lat_na;
@@ -889,13 +890,15 @@ void VxPairDataEnsemble::set_mask_sid(int i_mask, const char *name,
 
 void VxPairDataEnsemble::set_interp(int i_interp,
                                     const char *interp_mthd_str,
-                                    int wdth) {
+                                    int width, GridTemplateFactory::GridTemplates shape) {
    int i, j;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
          pd[i][j][i_interp].set_interp_mthd(interp_mthd_str);
-         pd[i][j][i_interp].set_interp_dpth(wdth);
+         pd[i][j][i_interp].set_interp_dpth(width);
+         pd[i][j][i_interp].set_interp_shape(shape);
+         
       }
    }
 
@@ -905,13 +908,14 @@ void VxPairDataEnsemble::set_interp(int i_interp,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
-                                    int wdth) {
+                                     int width, GridTemplateFactory::GridTemplates shape) {
    int i, j;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
          pd[i][j][i_interp].set_interp_mthd(mthd);
-         pd[i][j][i_interp].set_interp_dpth(wdth);
+         pd[i][j][i_interp].set_interp_dpth(width);
+         pd[i][j][i_interp].set_interp_shape(shape);
       }
    }
 
@@ -1151,6 +1155,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // Compute the interpolated climatology mean
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                                    pd[0][0][k].interp_shape,
                        interp_thresh, spfh_flag,
                        fcst_info->level().type(),
                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
@@ -1171,6 +1176,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // Compute the interpolated climatology standard deviation
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
                         pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                                    pd[0][0][k].interp_shape,
                         interp_thresh, spfh_flag,
                         fcst_info->level().type(),
                         to_lvl, csd_lvl_blw, csd_lvl_abv);
@@ -1231,8 +1237,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                            pd[i][j][k].x_na[l],
                            pd[i][j][k].y_na[l],
                            pd[i][j][k].o_na[l],
-                           pd[0][0][k].interp_mthd,
-                           pd[0][0][k].interp_dpth,
+                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                                    pd[0][0][k].interp_shape,
                            interp_thresh, spfh_flag,
                            fcst_info->level().type(),
                            to_lvl, f_lvl_blw, f_lvl_abv);

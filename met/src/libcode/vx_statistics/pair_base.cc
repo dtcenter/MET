@@ -63,7 +63,7 @@ void PairBase::clear() {
    mask_sid_ptr = (StringArray *) 0;  // Not allocated
 
    interp_mthd = InterpMthd_None;
-   interp_dpth = bad_data_int;
+   interp_shape = GridTemplateFactory::GridTemplate_None;
 
    sid_sa.clear();
    lat_na.clear();
@@ -171,10 +171,16 @@ void PairBase::set_interp_mthd(InterpMthd m) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
 void PairBase::set_interp_dpth(int n) {
 
    interp_dpth = n;
+
+   return;
+}
+
+void PairBase::set_interp_shape(GridTemplateFactory::GridTemplates shape) {
+
+	interp_shape = shape;
 
    return;
 }
@@ -702,6 +708,61 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 
 double compute_interp(const DataPlaneArray &dpa,
                       const double obs_x, const double obs_y, const double obs_v,
+                      const InterpMthd method, const int width, const GridTemplateFactory::GridTemplates shape,
+                      const double thresh,
+                      const bool spfh_flag, const LevelType lvl_typ,
+                      const double to_lvl, const int i_blw, const int i_abv,
+                      const SingleThresh *cat_thresh) {
+   double v, v_blw, v_abv, t;
+
+   // Check for no data
+   if(dpa.n_planes() == 0) return(bad_data_double);
+
+   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v,
+                               method, width, shape, thresh, cat_thresh);
+
+   if(i_blw == i_abv) {
+      v = v_blw;
+   }
+   else {
+      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v,
+                                  method, width, shape, thresh, cat_thresh);
+
+      // Check for bad data prior to vertical interpolation
+      if(is_bad_data(v_blw) || is_bad_data(v_abv)) {
+         return(bad_data_double);
+      }
+
+      // If verifying specific humidity, do vertical interpolation in
+      // the natural log of q
+      if(spfh_flag) {
+         t = compute_vert_pinterp(log(v_blw), dpa.lower(i_blw),
+                                  log(v_abv), dpa.lower(i_abv),
+                                  to_lvl);
+         v = exp(t);
+      }
+      // Vertically interpolate to the observation pressure level
+      else if(lvl_typ == LevelType_Pres) {
+         v = compute_vert_pinterp(v_blw, dpa.lower(i_blw),
+                                  v_abv, dpa.lower(i_abv),
+                                  to_lvl);
+      }
+      // Vertically interpolate to the observation height
+      else {
+         v = compute_vert_zinterp(v_blw, dpa.lower(i_blw),
+                                  v_abv, dpa.lower(i_abv),
+                                  to_lvl);
+      }
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+// old version without GridTemplates
+/*
+double compute_interp(const DataPlaneArray &dpa,
+                      const double obs_x, const double obs_y, const double obs_v,
                       const InterpMthd method, const int width, const double thresh,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
@@ -750,5 +811,5 @@ double compute_interp(const DataPlaneArray &dpa,
 
    return(v);
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////

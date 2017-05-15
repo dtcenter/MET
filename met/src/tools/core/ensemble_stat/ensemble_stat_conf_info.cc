@@ -24,6 +24,8 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_log.h"
 
+#include "GridTemplate.h"
+
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class EnsembleStatConfInfo
@@ -91,7 +93,8 @@ void EnsembleStatConfInfo::clear() {
    grid_weight_flag = GridWeightType_None;
    output_prefix.clear();
    version.clear();
-
+   interp_shape = GridTemplateFactory::GridTemplate_None;
+   
    for(i=0; i<n_txt; i++) output_flag[i]   = STATOutputType_None;
    for(i=0; i<n_nc;  i++) ensemble_flag[i] = false;
 
@@ -118,7 +121,7 @@ void EnsembleStatConfInfo::clear() {
 
    // Reset count
    n_ens_var = 0;
-
+   
    return;
 }
 
@@ -413,6 +416,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    interp_thresh = interp_info.vld_thresh;
    n_interp      = interp_info.n_interp;
    interp_wdth   = interp_info.width;
+   interp_shape  = interp_info.shape;
 
    // Allocate memory to store the interpolation methods
    interp_mthd = new InterpMthd [n_interp];
@@ -541,7 +545,7 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
 
       // Add the interpolation methods to the vx_pd objects
       for(j=0; j<n_interp; j++)
-         vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
+	      vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
 
       vx_pd[i].set_duplicate_flag(dup_flgs[i]);
       vx_pd[i].set_obs_summary(obs_smry[i]);	 

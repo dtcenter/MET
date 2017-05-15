@@ -154,16 +154,15 @@ class GridStatConfInfo {
       FieldType         interp_field;       // How to apply interpolation options
       double            interp_thresh;      // Proportion of valid data values
       InterpMthd *      interp_mthd;        // Array for interpolation methods [n_interp]
-      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]
-      
+      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]      
       GridTemplateFactory::GridTemplates
-	                      interp_shape;	      // Grid shape for Interpolation
-      
-      
+	                      interp_shape;	      // Grid shape for Interpolation      
 
       double            nbrhd_thresh;       // Proportion of valid data values
       IntArray          nbrhd_wdth;         // Array for neighborhood widths
       ThreshArray       nbrhd_cov_ta;       // Neighborhood coverage thresholds
+      GridTemplateFactory::GridTemplates
+	                      nbrhd_shape;	      // Grid shape for Interpolation
 
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
       GridStatNcOutInfo nc_info;            // Output NetCDF pairs file contents

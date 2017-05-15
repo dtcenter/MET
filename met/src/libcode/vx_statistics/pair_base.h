@@ -14,6 +14,8 @@
 #include <map>
 #include <utility>
 
+#include "GridTemplate.h"
+
 #include "vx_util.h"
 #include "vx_data2d.h"
 
@@ -70,10 +72,11 @@ class PairBase {
       // The verifying message type
       ConcatString msg_typ;
 
-      // Interpolation method and width used
+      // Interpolation method and shape used
       InterpMthd interp_mthd;
       int        interp_dpth;
-
+      GridTemplateFactory::GridTemplates interp_shape;
+      
       // Observation Information
       StringArray sid_sa;  // Station ID [n_obs]
       NumArray    lat_na;  // Latitude [n_obs]
@@ -115,6 +118,7 @@ class PairBase {
       void set_interp_mthd(const char *);
       void set_interp_mthd(InterpMthd);
       void set_interp_dpth(int);
+      void set_interp_shape(GridTemplateFactory::GridTemplates);
 
       void set_fcst_ut(unixtime ut);
       void set_check_unique(bool check);
@@ -163,12 +167,24 @@ class PairBase {
 extern void find_vert_lvl(const DataPlaneArray &, const double,
                           int &, int &);
 
+// old version that doesn't use GridTemplates
+/*
 extern double compute_interp(const DataPlaneArray &,
                              const double, const double, const double,
                              const InterpMthd, const int, const double,
                              const bool, const LevelType,
                              const double, const int, const int,
                              const SingleThresh *cat_thresh = 0);
+*/
+
+extern double compute_interp(const DataPlaneArray &dpa,
+                      const double obs_x, const double obs_y, const double obs_v,
+                      const InterpMthd method, const int width, const GridTemplateFactory::GridTemplates shape,
+                      const double thresh,
+                      const bool spfh_flag, const LevelType lvl_typ,
+                      const double to_lvl, const int i_blw, const int i_abv,
+                      const SingleThresh *cat_thresh = 0);
+	
 
 ////////////////////////////////////////////////////////////////////////
 

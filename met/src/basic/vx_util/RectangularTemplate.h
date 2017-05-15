@@ -91,7 +91,7 @@ class RectangularTemplate : public GridTemplate
   
   // Destructor
 
-  ~RectangularTemplate(void);
+  virtual ~RectangularTemplate(void);
   
   // Print the offset list to the given stream.  This is used for debugging.
 
@@ -99,12 +99,12 @@ class RectangularTemplate : public GridTemplate
   
   // Access methods
 
-  double getHeight(void)
+  double getHeight(void) const
   {
     return _height;
   }
 
-  double getWidth(void)
+  double getWidth(void) const
   {
     return _width;
   }

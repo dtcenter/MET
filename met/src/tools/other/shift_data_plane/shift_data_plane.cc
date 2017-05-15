@@ -39,6 +39,8 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "GridTemplate.h"
+
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -62,6 +64,7 @@ static ConcatString OutputFilename;
 static ConcatString FieldString;
 static InterpMthd Method = InterpMthd_DW_Mean;
 static int Width = 2;
+static GridTemplateFactory::GridTemplates Shape = GridTemplateFactory::GridTemplate_Square;
 static int compress_level = -1;
 
 // Static global variables
@@ -77,6 +80,7 @@ static void usage();
 static void set_from(const StringArray &);
 static void set_to(const StringArray &);
 static void set_method(const StringArray &);
+static void set_shape(const StringArray &);
 static void set_width(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
@@ -124,6 +128,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_to,        "-to",     2);
    cline.add(set_method,    "-method", 1);
    cline.add(set_width,     "-width",  1);
+   cline.add(set_shape, 	  "-shape",  1);
    cline.add(set_logfile,   "-log",    1);
    cline.add(set_verbosity, "-v",      1);
    cline.add(set_compress,  "-compress",  1);
@@ -251,12 +256,13 @@ void process_data_file() {
 
    mlog << Debug(2) << shift_cs << "\n";
 
-   // Shift the data
+   // Shift the data   
+   
    dp_shift = dp_in;
    for(x=0; x<dp_shift.nx(); x++) {
       for(y=0; y<dp_shift.ny(); y++) {
          v = compute_horz_interp(dp_in, x - dx, y - dy, bad_data_double,
-                                 Method, Width, 1.0);
+                                 Method, Width, Shape, 1.0);
          dp_shift.set(v, x, y);
       } // end for y
    } // end for x
@@ -325,6 +331,9 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    write_netcdf_var_times(&data_var, dp);
    add_att(&data_var, "smoothing_method", (string)interpmthd_to_string(Method));
    add_att(&data_var, "smoothing_neighborhood", Width*Width);
+   
+   GridTemplateFactory gtf;
+   add_att(&data_var, "smoothing_shape", gtf.enum2String(Shape));
 
    // Allocate memory to store data values for each grid point
    float *data = new float [grid.nx()*grid.ny()];
@@ -372,6 +381,7 @@ void usage() {
         << "\t-to   lat lon\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
+	      << "\t[-shape SHAPE]\n"	 
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -398,6 +408,11 @@ void usage() {
 
         << "\t\t\"-width\" overrides the default interpolation width (2) "
         << "(optional).\n"
+
+        << "\t\t\"-shape\" overrides the default interpolation shape (SQUARE) "
+        << "(optional).\n"
+
+	   
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -435,6 +450,14 @@ void set_method(const StringArray &a) {
 void set_width(const StringArray &a) {
    Width = atoi(a[0]);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void set_shape(const StringArray &a) {
+	GridTemplateFactory gtf;
+	Shape = gtf.string2Enum(a[0]);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -217,8 +217,9 @@ void GridTemplate::_addOffset(int x_offset, int y_offset)
 GridTemplateFactory::GridTemplateFactory() {
 	enum_to_string.resize(GridTemplate_NUM_TEMPLATES);
 	
+	enum_to_string[GridTemplate_None] = "";
 	enum_to_string[GridTemplate_Square] = "SQUARE";
-	enum_to_string[GridTemplate_Circle] = "CIRCLE";			
+	enum_to_string[GridTemplate_Circle] = "CIRCLE";
 	//enum_to_string[GridTemplate_Rectangle] = "RECTANGLE";
 }
 

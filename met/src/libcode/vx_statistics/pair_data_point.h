@@ -185,9 +185,13 @@ class VxPairDataPoint {
       void set_msg_typ(int, const char *);
       void set_mask_dp(int, const char *, DataPlane *);
       void set_mask_sid(int, const char *, StringArray *);
-      void set_interp(int, const char *, int);
-      void set_interp(int, InterpMthd, int);
-
+      //void set_interp(int, const char *, int);
+      //void set_interp(int, InterpMthd, int);
+      void set_interp(int i_interp, const char *interp_mthd_str,
+                      int width, GridTemplateFactory::GridTemplates shape);
+      void set_interp(int i_interp, InterpMthd mthd,
+                      int width, GridTemplateFactory::GridTemplates shape);
+      
       void add_obs(float *, const char *, const char *, unixtime,
                    const char *, float *, Grid &,
                    const DataPlane * = 0);

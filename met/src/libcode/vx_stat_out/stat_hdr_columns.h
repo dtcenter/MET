@@ -128,8 +128,10 @@ class StatHdrColumns {
       void set_obtype        (const char *);
       void set_mask          (const char *);
 
-      void set_interp_mthd   (const char *);
-      void set_interp_mthd   (const InterpMthd);
+      void set_interp_mthd   (const char *s,
+                              GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplate_None);
+      void set_interp_mthd   (const InterpMthd m,
+                              GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplate_None);
       void set_interp_pnts   (const int);
       void set_interp_wdth   (const int);
 
