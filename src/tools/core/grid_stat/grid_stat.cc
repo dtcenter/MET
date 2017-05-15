@@ -939,18 +939,13 @@ void process_scores() {
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
                
-               //create appropriate grid template for iterating over the grid shape
-               GridTemplateFactory gtf;
-               GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
-                                        conf_info.interp_wdth[j]);
-               
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
                if(conf_info.interp_field == FieldType_Fcst ||
                   conf_info.interp_field == FieldType_Both) {
                   smooth_field(fu_dp, fu_dp_smooth,
                                conf_info.interp_mthd[j],
-                               *gt,
+                               conf_info.interp_wdth[j],
                                conf_info.interp_shape,
                                conf_info.interp_thresh);
                }
@@ -965,7 +960,7 @@ void process_scores() {
                   conf_info.interp_field == FieldType_Both) {
                   smooth_field(ou_dp, ou_dp_smooth,
                                conf_info.interp_mthd[j],
-                               *gt,
+                               conf_info.interp_wdth[j],
                                conf_info.interp_shape,
                                conf_info.interp_thresh);
                }
