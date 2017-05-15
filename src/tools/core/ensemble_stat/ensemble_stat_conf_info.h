@@ -105,6 +105,8 @@ class EnsembleStatConfInfo {
       double               interp_thresh;       // Proportion of valid data values
       InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]
       IntArray             interp_wdth;         // Array for interpolation widths [n_interp]
+      GridTemplateFactory::GridTemplates interp_shape;  //Shape for interpolation
+      
       STATOutputType       output_flag[n_txt];  // Flag for each output line type
       bool                 ensemble_flag[n_nc]; // Boolean for each ensemble field type
       ConcatString         rng_type;            // GSL random number generator

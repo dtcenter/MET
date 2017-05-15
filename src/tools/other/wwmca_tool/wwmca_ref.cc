@@ -124,6 +124,8 @@ ConfigFilename.clear();
 
 Width = 0;
 
+Shape = GridTemplateFactory::GridTemplate_None;
+
 Method = InterpMthd_None;
 
 interp_func = 0;
@@ -192,6 +194,10 @@ if ( ToGrid ) {
 
 out << prefix << "Interpolation Method   = " << interpmthd_to_string(Method) << "\n";
 out << prefix << "Interpolation Width    = " << Width    << "\n";
+
+GridTemplateFactory gtf; 
+out << prefix << "Interpolation Shape    = " << gtf.enum2String(Shape)    << "\n";
+ 
 out << prefix << "Interpolation Fraction = " << Fraction << "\n";
 out << prefix << "Write Pixel Age        = " << bool_to_string(WritePixelAge) << "\n";
 
@@ -335,6 +341,8 @@ const RegridInfo regrid_info = parse_conf_regrid(Config);
 
 Width = regrid_info.width;
 
+Shape = regrid_info.shape;
+ 
 Method = InterpMthd_Nearest;
 
 Fraction = regrid_info.vld_thresh;
@@ -613,8 +621,14 @@ for (x=0; x<(dp.nx()); ++x)  {
 }   //  for x
 
 
-interp_func(fat, dp, Width, Fraction);
+// build the grid template
+GridTemplateFactory gtf;
+GridTemplate* gt = gtf.buildGT(Shape, Width);         
 
+ 
+interp_func(fat, dp, *gt, Fraction);
+ 
+delete gt;
 
 
 
@@ -856,10 +870,13 @@ for (x=0; x<(dp.nx()); ++x)  {
 
 }   //  for x
 
-
-interp_func(fat, dp, Width, Fraction);
-
-
+// build the grid template
+GridTemplateFactory gtf;
+GridTemplate* gt = gtf.buildGT(Shape, Width);         
+ 
+interp_func(fat, dp, *gt, Fraction);
+ 
+delete gt;
 
 
 

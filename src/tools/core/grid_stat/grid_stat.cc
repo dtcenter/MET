@@ -83,7 +83,7 @@
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   036    02/14/17  Win            MET-621 enhancement support- additional
 //                                   nc_pairs_flag 'apply_mask'
-//
+//   037    
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -701,26 +701,22 @@ void process_scores() {
       // Loop through and apply each of the smoothing operations
       for(j=0; j<conf_info.get_n_interp(); j++) {
 
-	       //create appropriate grid template for iterating over the grid shape
+	       //Need to create the grid template to find the # of points
          GridTemplateFactory gtf;
          GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
                                         conf_info.interp_wdth[j]);
 
-         // Set the interp header columns
-         // Store the interpolation method and width being applied
-         string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[j]).text();
-         if(conf_info.interp_wdth[j] > 1) {
-            interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
-         }
-         shc.set_interp_mthd(interp_mthd.c_str());
+         shc.set_interp_mthd(conf_info.interp_mthd[j], conf_info.interp_shape);                                        
          shc.set_interp_pnts(gt->size());
+         delete gt;
 
          // If requested in the config file, smooth the forecast field
          if(conf_info.interp_field == FieldType_Fcst ||
             conf_info.interp_field == FieldType_Both) {
             smooth_field(fcst_dp, fcst_dp_smooth,
                          conf_info.interp_mthd[j],
-                         *gt,
+                         conf_info.interp_wdth[j],
+                         conf_info.interp_shape,
                          conf_info.interp_thresh);
          }
          // Do not smooth the forecast field
@@ -733,13 +729,15 @@ void process_scores() {
             conf_info.interp_field == FieldType_Both) {
             smooth_field(obs_dp, obs_dp_smooth,
                          conf_info.interp_mthd[j],
-                         *gt,
+                         conf_info.interp_wdth[j],
+                         conf_info.interp_shape,                         
                          conf_info.interp_thresh);
          }
          // Do not smooth the observation field
          else {
             obs_dp_smooth = obs_dp;
          }
+
 
          // Loop through the masks to be applied
          for(k=0; k<conf_info.get_n_mask(); k++) {
@@ -940,7 +938,7 @@ void process_scores() {
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
-
+               
                //create appropriate grid template for iterating over the grid shape
                GridTemplateFactory gtf;
                GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
@@ -953,6 +951,7 @@ void process_scores() {
                   smooth_field(fu_dp, fu_dp_smooth,
                                conf_info.interp_mthd[j],
                                *gt,
+                               conf_info.interp_shape,
                                conf_info.interp_thresh);
                }
                // Do not smooth the forecast field
@@ -967,6 +966,7 @@ void process_scores() {
                   smooth_field(ou_dp, ou_dp_smooth,
                                conf_info.interp_mthd[j],
                                *gt,
+                               conf_info.interp_shape,
                                conf_info.interp_thresh);
                }
                // Do not smooth the observation field
@@ -1100,8 +1100,7 @@ void process_scores() {
          // Loop through and apply each of the neighborhood widths
          for(j=0; j<conf_info.get_n_nbrhd_wdth(); j++) {
 
-            // Store the interpolation method and width being applied
-            shc.set_interp_mthd(InterpMthd_Nbrhd);
+            shc.set_interp_mthd(InterpMthd_Nbrhd, conf_info.interp_shape);
             shc.set_interp_wdth(conf_info.nbrhd_wdth[j]);
 
             // Loop through and apply each of the raw threshold values
@@ -1117,11 +1116,13 @@ void process_scores() {
                // Compute the thresholded fractional coverage field
                fractional_coverage(fcst_dp, fcst_dp_smooth,
                                    conf_info.nbrhd_wdth[j],
+                                   conf_info.interp_shape,
                                    conf_info.fcat_ta[i][k],
                                    conf_info.nbrhd_thresh);
 
                fractional_coverage(obs_dp, obs_dp_smooth,
                                    conf_info.nbrhd_wdth[j],
+                                   conf_info.interp_shape,                                   
                                    conf_info.ocat_ta[i][k],
                                    conf_info.nbrhd_thresh);
 

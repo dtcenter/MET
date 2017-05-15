@@ -223,7 +223,8 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
-   GridTemplateFactory::GridTemplates shape; //  Interpolation shapes
+   GridTemplateFactory::GridTemplates shape; //  Interpolation shape
+	 void 		    validate();   // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -240,12 +241,13 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
-
+	 GridTemplateFactory::GridTemplates shape; //  Interpolation shape
    RegridInfo();
 
    void *       hook;       //  not allocated
 
    void         clear();
+	 void 		    validate();   // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -258,6 +260,8 @@ struct NbrhdInfo {
    double      vld_thresh; // Valid data neighborhood threshold
    IntArray    width;      // Neighborhood widths
    ThreshArray cov_ta;     // Fractional coverage thresholds
+	 GridTemplateFactory::GridTemplates shape; //  Neighborhood shape
+	
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -271,9 +275,9 @@ struct HiRAInfo {
    IntArray    width;      // Array for HiRA widths
    double      vld_thresh; // Proportion of valid data values
    ThreshArray cov_ta;     // HiRA coverage (probability) thresholds
+	 GridTemplateFactory::GridTemplates shape; // Area shape
 
    HiRAInfo();
-
    void clear();
 };
 

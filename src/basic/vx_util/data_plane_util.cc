@@ -89,7 +89,8 @@ void rescale_probability(DataPlane &dp) {
 // box width specified.
 //
 ////////////////////////////////////////////////////////////////////////
-
+/*
+//old method without GridTemplate
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int wdth, double t) {
    double v;
@@ -156,6 +157,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
    return;
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -165,21 +167,25 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
-                  InterpMthd mthd, const GridTemplate &gt, double t) {
+                  InterpMthd mthd, int width, const GridTemplateFactory::GridTemplates shape, double t) {
    double v;
    int x, y, x_ll, y_ll;
-
-   mlog << Debug(3)
-        << "Smoothing field using the " << interpmthd_to_string(mthd)
-        << "(" << gt.size() << ") " << gt.getClassName()
-        << " interpolation method.\n";
 
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
 
-   // if grid template is just 1 point (i.e. width == 1)
-   // or method == NEAREST, no smoothing is done.
-   if(gt.size() == 1 || mthd == InterpMthd_Nearest) return;
+   // Check that grid template is at least 1 point 
+   if(width == 1 || mthd == InterpMthd_Nearest) return;
+   
+   // build the grid template
+   GridTemplateFactory gtf;
+   GridTemplate* gt = gtf.buildGT(shape, width);         
+
+   mlog << Debug(3)
+        << "Smoothing field using the " << interpmthd_to_string(mthd)
+        << "(" << gt->size() << ") " << gt->getClassName()
+        << " interpolation method.\n";
+
 
    // Otherwise, apply smoothing to each grid point
    for(x=0; x<dp.nx(); x++) {
@@ -189,19 +195,19 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
          switch(mthd) {
 
             case(InterpMthd_Min):     // Minimum
-               v = interp_min(dp, gt, x, y, t);
+               v = interp_min(dp, *gt, x, y, t);
                break;
 
             case(InterpMthd_Max):     // Maximum
-               v = interp_max(dp, gt, x, y, t);
+               v = interp_max(dp, *gt, x, y, t);
                break;
 
             case(InterpMthd_Median):  // Median
-               v = interp_median(dp, gt, x, y, t);
+               v = interp_median(dp, *gt, x, y, t);
                break;
 
             case(InterpMthd_UW_Mean): // Unweighted Mean
-               v = interp_uw_mean(dp, gt, x, y, t);
+               v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
             // Distance-weighted mean, least-squares fit, and bilinear
@@ -221,8 +227,77 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 
       } // end for y
    } // end for x
-
+   delete gt;
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Convert the DataPlane field to the corresponding fractional coverage
+// using the threshold critea specified.
+//
+////////////////////////////////////////////////////////////////////////
+
+void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
+                          int width, const GridTemplateFactory::GridTemplates shape, SingleThresh t, double vld_t) {
+
+	 // Check that width is set to 1 or greater
+	 if(width < 1) {
+      mlog << Error << "\nfractional_coverage() -> "
+           << "Grid must have at one point in it. \n\n";
+      exit(1);
+   }
+
+	 // build the grid template
+   GridTemplateFactory gtf;
+   GridTemplate* gt = gtf.buildGT(shape, width);         
+
+   mlog << Debug(3)
+        << "Computing fractional coverage field using the " << t.get_str()
+        << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
+      << "(" << gt->size() << ")  " << gt->getClassName() << " interpolation method.\n";
+ 
+	 
+	 // Initialize the fractional coverage field
+   frac_dp = dp;
+   frac_dp.set_constant(bad_data_double);
+
+   // Compute the fractional coverage meeting the threshold criteria
+   for(int x=0; x<dp.nx(); x++) {	   
+	   for(int y=0; y<dp.ny(); y++) {
+	    
+		   int count_vld = 0;
+		   int count_thr = 0;
+		   
+		   GridPoint *gp = NULL;
+		   for(gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny() );
+		       gp != NULL; gp = gt->getNextInGrid()){
+		   
+			   double v = dp.get(gp->x,gp->y);
+	     
+			   if (is_bad_data(v)) continue;
+			   
+			   count_vld++;
+			   
+			   if(t.check(v)) {
+				   count_thr++;			     
+			   }
+		   }
+	     
+		   // Check whether enough valid grid points were found or leave it as bad_data
+		   if( static_cast<double>(count_vld)/gt->size() >= vld_t &&
+		       count_vld != 0) {
+		     
+			   // Compute and store the fractional coverage
+			   double frac = (double) count_thr/count_vld;
+			   frac_dp.set(frac, x, y);
+		   }
+
+
+	   }
+   }
+
+   delete gt;
 }
 
 ////////////////////////////////////////////////////////////////////////

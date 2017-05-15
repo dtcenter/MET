@@ -203,15 +203,23 @@ void StatHdrColumns::set_mask(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void StatHdrColumns::set_interp_mthd(const char *s) {
-   interp_mthd = check_hdr_str(s);
+void StatHdrColumns::set_interp_mthd(const char *s,
+                                     GridTemplateFactory::GridTemplates shape) {
+   ConcatString mthd = s;
+   if(shape != GridTemplateFactory::GridTemplate_None &&
+      mthd  != interpmthd_nearest_str) {
+      GridTemplateFactory gtf;
+      mthd << '_' << gtf.enum2String(shape).c_str();
+   }
+   interp_mthd = check_hdr_str(mthd);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void StatHdrColumns::set_interp_mthd(const InterpMthd m) {
-   set_interp_mthd(interpmthd_to_string(m));
+void StatHdrColumns::set_interp_mthd(const InterpMthd m,
+                                     GridTemplateFactory::GridTemplates shape) {
+   set_interp_mthd(interpmthd_to_string(m), shape);
    return;
 }
 

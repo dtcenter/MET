@@ -106,7 +106,8 @@ void PointStatConfInfo::clear() {
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
-
+   interp_shape = GridTemplateFactory::GridTemplate_None;
+   
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    // Deallocate memory
@@ -501,7 +502,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    interp_thresh = interp_info.vld_thresh;
    n_interp      = interp_info.n_interp;
    interp_wdth   = interp_info.width;
-
+   interp_shape  = interp_info.shape;
+   
    // Allocate memory to store the interpolation methods
    interp_mthd = new InterpMthd [n_interp];
    for(i=0; i<n_interp; i++)
@@ -620,7 +622,7 @@ void PointStatConfInfo::set_vx_pd() {
 
       // Add the interpolation methods to the vx_pd objects
       for(j=0; j<n_interp; j++)
-         vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j]);
+	      vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
 
       vx_pd[i].set_duplicate_flag(dup_flgs[i]);
       vx_pd[i].set_obs_summary(obs_smry[i]);

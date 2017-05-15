@@ -34,12 +34,65 @@ void RegridInfo::clear() {
    name.clear();
    method = InterpMthd_None;
    width = bad_data_int;
+   shape = GridTemplateFactory::GridTemplate_None;
+   
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 RegridInfo::RegridInfo() {
    clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RegridInfo::validate() {
+	
+   // Check for unsupported regridding options
+   if(method == InterpMthd_Best) {
+      mlog << Error << "\nparse_conf_regrid() -> "
+           << "\"" << interpmthd_to_string(method)
+           << "\" not valid for regridding, only interpolating.\n\n";
+      exit(1);
+   }
+
+   // Check the nearest neighbor special case
+   if(width  == 1 &&
+      method != InterpMthd_Nearest &&
+      method != InterpMthd_Force &&
+      method != InterpMthd_Upper_Left &&
+      method != InterpMthd_Upper_Right &&
+      method != InterpMthd_Lower_Right &&
+      method != InterpMthd_Lower_Left) {
+	   mlog << Warning << "\n" //parse_conf_regrid() -> "
+           << "Resetting the regridding method from \""
+           << interpmthd_to_string(method) << "\" to \""
+           << interpmthd_nearest_str
+           << "\" since the regridding width is 1.\n\n";
+      method = InterpMthd_Nearest;
+   }
+
+   // check if method is nearest, that width is 1
+   if ((method == InterpMthd_Nearest) &&
+       (width != 1)){
+	   mlog << Warning << "\n"
+	        << "Resetting the regridding width from "
+	        << width << " to 1 for regridding method \""
+	        << interpmthd_nearest_str << "\".\n\n";
+	   width = 1;
+   }	   
+
+   // Check the bilinear and budget special cases
+   if((method == InterpMthd_Bilin ||
+       method == InterpMthd_Budget) &&
+      width != 2) {
+	   mlog << Warning << "\n"//parse_conf_regrid() -> "
+           << "Resetting the regridding width from "
+           << width << " to 2 for regridding method \""
+           << interpmthd_to_string(method) << "\".\n\n";
+      width = 2;
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -700,42 +753,64 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    info.method     = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
    info.width      = regrid_dict->lookup_int(conf_key_width);
 
-   // Check for unsupported regridding options
-   if(info.method == InterpMthd_Best) {
-      mlog << Error << "\nparse_conf_regrid() -> "
-           << "\"" << interpmthd_to_string(info.method)
-           << "\" not valid for regridding, only interpolating.\n\n";
-      exit(1);
+
+   // Conf: shape
+   v = regrid_dict->lookup_int(conf_key_shape, false);
+   if (regrid_dict->last_lookup_status()) {
+      info.shape = int_to_gridtemplate(v);
+   }
+   else {
+      // If not specified, use the default square shape
+      info.shape = GridTemplateFactory::GridTemplate_Square;
    }
 
-   // Check the nearest neighbor special case
-   if(info.width  == 1 &&
-      info.method != InterpMthd_Nearest &&
-      info.method != InterpMthd_Force &&
-      info.method != InterpMthd_Upper_Left &&
-      info.method != InterpMthd_Upper_Right &&
-      info.method != InterpMthd_Lower_Right &&
-      info.method != InterpMthd_Lower_Left) {
-      mlog << Warning << "\nparse_conf_regrid() -> "
-           << "Resetting the regridding method from \""
-           << interpmthd_to_string(info.method) << "\" to \""
-           << interpmthd_nearest_str
-           << "\" since the regridding width is 1.\n\n";
-      info.method = InterpMthd_Nearest;
-   }
-
-   // Check the bilinear and budget special cases
-   if((info.method == InterpMthd_Bilin ||
-       info.method == InterpMthd_Budget) &&
-      info.width != 2) {
-      mlog << Warning << "\nparse_conf_regrid() -> "
-           << "Resetting the regridding width from "
-           << info.width << " to 2 for regridding method \""
-           << interpmthd_to_string(info.method) << "\".\n\n";
-      info.width = 2;
-   }
-
+   info.validate();
    return(info);
+}
+
+////////////////////////////////////////////////////////////////////////
+void InterpInfo::validate(){
+
+	for (unsigned int i=0; i < n_interp; i++){
+
+		InterpMthd methodi = string_to_interpmthd(method[i]);
+		// Check the nearest neighbor special case
+		if(width[i]  == 1 &&
+		   methodi != InterpMthd_Nearest &&
+		   methodi != InterpMthd_Force &&
+		   methodi != InterpMthd_Upper_Left &&
+		   methodi != InterpMthd_Upper_Right &&
+		   methodi != InterpMthd_Lower_Right &&
+		   methodi != InterpMthd_Lower_Left) {
+			mlog << Warning << "\n" //parse_conf_regrid() -> "
+			     << "Resetting interpolation method " << (int)i << " from \""
+			     << method[i] << "\" to \""
+			     << interpmthd_nearest_str
+			     << "\" since the interpolation width is 1.\n\n";
+			method.set(i,interpmthd_nearest_str);
+		}
+
+		// check if method is nearest, that width is 1
+		if ((methodi == InterpMthd_Nearest) &&
+		    (width[i] != 1)){
+			mlog << Warning << "\n"
+			     << "Resetting interpolation width " << (int)i << " from "
+			     << width[i] << " to 1 for interpolation method \""
+			     << interpmthd_nearest_str << "\".\n\n";
+			width.set(i, 1);
+		}	   
+
+		// Check the bilinear and budget special cases
+		if((methodi == InterpMthd_Bilin ||
+		    methodi == InterpMthd_Budget) &&
+		   width[i] != 2) {
+			mlog << Warning << "\n"//parse_conf_regrid() -> "
+			     << "Resetting interpolation width " << (int)i << " from "
+			     << width[i] << " to 2 for interpolation method \""
+			     << method[i] << "\".\n\n";
+			width.set(i, 2);
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -784,7 +859,6 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    }
    else {
       // If not specified, use the default square shape
-      // TODO: Is this the standard way to set the default value?
       info.shape = GridTemplateFactory::GridTemplate_Square;
    }
 
@@ -844,6 +918,8 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
             // Store the current width
             width = nint(wdth_na[k]);
 
+            //TODO:  I think this checking can be removed and replaced with a call to info.validate() at the end.
+            
             // Check the nearest neighbor special case
             if(width  == 1 &&
                method != InterpMthd_Nearest &&
@@ -885,6 +961,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
       exit(1);
    }
 
+   info.validate();
    return(info);
 }
 
@@ -893,7 +970,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
    Dictionary *nbrhd_dict = (Dictionary *) 0;
    NbrhdInfo info;
-   int i;
+   int i, v;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_nbrhd() -> "
@@ -936,6 +1013,16 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
          exit(1);
       }
    }
+   
+   // Conf: shape
+   v = nbrhd_dict->lookup_int(conf_key_shape, false);
+   if (nbrhd_dict->last_lookup_status()) {
+      info.shape = int_to_gridtemplate(v);
+   }
+   else {
+      // If not specified, use the default square shape
+      info.shape = GridTemplateFactory::GridTemplate_Square;
+   }
 
    // Conf: cov_thresh
    info.cov_ta = nbrhd_dict->lookup_thresh_array(conf_key_cov_thresh);
@@ -969,6 +1056,7 @@ void HiRAInfo::clear() {
    width.clear();
    vld_thresh = bad_data_double;
    cov_ta.clear();
+   shape = GridTemplateFactory::GridTemplate_None;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -982,7 +1070,7 @@ HiRAInfo::HiRAInfo() {
 HiRAInfo parse_conf_hira(Dictionary *dict) {
    Dictionary *hira_dict = (Dictionary *) 0;
    HiRAInfo info;
-   int i;
+   int i,v;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_hira() -> "
@@ -1031,6 +1119,17 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
          exit(1);
       }
    }
+
+   // Conf: shape    
+   v = hira_dict->lookup_int(conf_key_shape, false);
+   if (hira_dict->last_lookup_status()) {
+      info.shape = int_to_gridtemplate(v);
+   }
+   else {
+      // If not specified, use the default square shape
+      info.shape = GridTemplateFactory::GridTemplate_Square;
+   }
+
 
    // Conf: cov_thresh
    info.cov_ta = hira_dict->lookup_thresh_array(conf_key_cov_thresh);

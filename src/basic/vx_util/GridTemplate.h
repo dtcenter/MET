@@ -51,6 +51,7 @@
 
 #include <vector>
 #include <cstdio>
+#include <memory>
 #include "GridOffset.h"
 #include "GridPoint.h"
 
@@ -67,7 +68,7 @@ class GridTemplate
   
   // Destructor
 
-  ~GridTemplate(void);
+  virtual ~GridTemplate(void);
   
   // Methods for iterating through the template within the grid centered
   // on the given point.  To use these methods, first call getFirstInGrid()
@@ -114,7 +115,8 @@ class GridTemplate
   }
 
   virtual const char* getClassName(void) const = 0;
-  
+
+  virtual double getWidth() const = 0;
   
  protected:
 
@@ -150,8 +152,10 @@ class GridTemplateFactory {
 	
 	// do not assign specific values to these enumes.
 	// other code requires them to start at zero and increase by 1
-	// make sure GridTemplate_NUM_TEMPLATES is always last. 
+	// make sure GridTemplate_NUM_TEMPLATES is always last.
+	// TODO: rename this Shape
 	enum GridTemplates {
+		GridTemplate_None,
 		GridTemplate_Square,
 		GridTemplate_Circle,
 		//GridTemplate_Rectangle,
@@ -176,6 +180,15 @@ class GridTemplateFactory {
 /////////////////////////////////////////////////////////////////
 // Caller assumes ownership of the returned pointer.
 	GridTemplate* buildGT(GridTemplates gt, int width);
+
+	//FUTURE DEV NOTE:
+	// If we ever decide to support rectangles or elipses, we are going to
+	// need to modify these methods to take more than just a single width & shape
+	// to define the grid template.  I suggest building a structure/union that holds
+	// all the defining characteristics of a grid template (shape, height, width, radius, etc.)
+	// and passing that around everywhere that we currently pass around a shape & width.
+	
+	
 };
 	
 #endif

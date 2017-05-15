@@ -203,8 +203,8 @@ class VxPairDataEnsemble {
       void set_msg_typ(int, const char *);
       void set_mask_dp(int, const char *, DataPlane *);
       void set_mask_sid(int, const char *, StringArray *);
-      void set_interp(int, const char *, int);
-      void set_interp(int, InterpMthd, int);
+      void set_interp(int i_interp, const char *interp_mthd_str, int width, GridTemplateFactory::GridTemplates shape);
+      void set_interp(int i_interp, InterpMthd mthd, int width, GridTemplateFactory::GridTemplates shape);
 
       // Call set_ens_size before add_ens
       void set_ens_size(int n);

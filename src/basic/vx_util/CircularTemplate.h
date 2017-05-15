@@ -68,7 +68,7 @@ class CircularTemplate : public GridTemplate
   
   // Destructor
 
-  ~CircularTemplate(void);
+  virtual ~CircularTemplate(void);
   
   // Print the offset list to the given stream.  This is used for debugging.
 
@@ -79,6 +79,12 @@ class CircularTemplate : public GridTemplate
   double getRadius(void) const
   {
     return _radius;
+  }
+
+  double getWidth(void) const
+  {
+	  //inverse of how GridTemplateFactory::buildGT gets the radius from a width
+	  return _radius*2 + 1;
   }
   
   void setRadius(const double radius);

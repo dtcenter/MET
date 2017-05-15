@@ -47,6 +47,8 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_statistics.h"
 
+#include "GridTemplate.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
@@ -80,6 +82,7 @@ static void close_nc();
 static void usage();
 static void set_field(const StringArray &);
 static void set_method(const StringArray &);
+static void set_shape(const StringArray &);
 static void set_width(const StringArray &);
 static void set_vld_thresh(const StringArray &);
 static void set_name(const StringArray &);
@@ -117,6 +120,7 @@ void process_command_line(int argc, char **argv) {
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
    RGInfo.vld_thresh = DefaultVldThresh;
+   RGInfo.shape      = GridTemplateFactory::GridTemplate_Square;
 
    // Check for zero arguments
    if(argc == 1) usage();
@@ -129,7 +133,8 @@ void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_field,      "-field",      1);
-   cline.add(set_method,     "-method",     1);
+   cline.add(set_method,     "-method",     1);  
+   cline.add(set_shape,   	 "-shape",  	  1);
    cline.add(set_width,      "-width",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
    cline.add(set_name,       "-name",       1);
@@ -168,6 +173,10 @@ void process_command_line(int argc, char **argv) {
       usage();
    }
 
+   RGInfo.validate();
+
+   /*
+
    // Check the nearest neighbor special case
    if(RGInfo.method != InterpMthd_Nearest && RGInfo.width == 1) {
       mlog << Warning << "\nprocess_command_line() -> "
@@ -188,7 +197,7 @@ void process_command_line(int argc, char **argv) {
            << interpmthd_to_string(RGInfo.method) << "\".\n\n";
       RGInfo.width = 2;
    }
-
+   */
    return;
 }
 
@@ -232,9 +241,11 @@ void process_data_file() {
    to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
    mlog << Debug(2) << "Output grid: " << to_grid.serialize() << "\n";
 
+   GridTemplateFactory gtf;
    mlog << Debug(2) << "Interpolation options: "
         << "method = " << interpmthd_to_string(RGInfo.method)
         << ", width = " << RGInfo.width
+        << ", shape = " << gtf.enum2String(RGInfo.shape)
         << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
 
    // Build the run command string
@@ -410,7 +421,8 @@ void close_nc() {
 ////////////////////////////////////////////////////////////////////////
 
 void usage() {
-
+   
+   GridTemplateFactory gtf;
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
 
@@ -421,6 +433,7 @@ void usage() {
         << "\t-field string\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
+	      << "\t[-shape SHAPE]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
@@ -446,6 +459,10 @@ void usage() {
 
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
+
+        << "\t\t\"-shape\" overrides the default interpolation shape ("
+        << gtf.enum2String(RGInfo.shape) << ") "
+        <<  "(optional).\n"
 
         << "\t\t\"-vld_thresh n\" overrides the default required "
         << "ratio of valid data for regridding (" << RGInfo.vld_thresh
@@ -481,6 +498,14 @@ void set_method(const StringArray &a) {
 
 void set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0]);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void set_shape(const StringArray &a) {
+	GridTemplateFactory gtf;
+	RGInfo.shape = gtf.string2Enum(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

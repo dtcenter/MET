@@ -110,6 +110,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
 
    set_interp_mthd(pd.interp_mthd);
    set_interp_dpth(pd.interp_dpth);
+   set_interp_shape(pd.interp_shape);
 
    // Handle point data
    if(pd.sid_sa.n_elements() == pd.n_obs) {
@@ -600,6 +601,8 @@ void VxPairDataPoint::set_mask_sid(int i_mask, const char *name,
 
    return;
 }
+/*
+// old versions without GridTemplate
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -628,6 +631,41 @@ void VxPairDataPoint::set_interp(int i_interp, InterpMthd mthd,
       for(j=0; j<n_mask; j++) {
          pd[i][j][i_interp].set_interp_mthd(mthd);
          pd[i][j][i_interp].set_interp_dpth(wdth);
+      }
+   }
+
+   return;
+}
+*/
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_interp(int i_interp,
+                                 const char *interp_mthd_str,
+                                 int width, GridTemplateFactory::GridTemplates shape) {
+   int i, j;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_mask; j++) {
+         pd[i][j][i_interp].set_interp_mthd(interp_mthd_str);
+         pd[i][j][i_interp].set_interp_dpth(width);
+         pd[i][j][i_interp].set_interp_shape(shape);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_interp(int i_interp, InterpMthd mthd,
+                                 int width, GridTemplateFactory::GridTemplates shape) {
+   int i, j;
+
+   for(i=0; i<n_msg_typ; i++) {
+      for(j=0; j<n_mask; j++) {
+         pd[i][j][i_interp].set_interp_mthd(mthd);
+         pd[i][j][i_interp].set_interp_dpth(width);
+         pd[i][j][i_interp].set_interp_shape(shape);         
       }
    }
 
@@ -875,7 +913,8 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
             fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                                    pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                                    pd[0][0][k].interp_shape,
                         interp_thresh, spfh_flag,
                         fcst_info->level().type(),
                         to_lvl, f_lvl_blw, f_lvl_abv);
@@ -888,6 +927,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // Compute the interpolated climatology mean
             cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
                         pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                                   pd[0][0][k].interp_shape,
                         interp_thresh, spfh_flag,
                         fcst_info->level().type(),
                         to_lvl, cmn_lvl_blw, cmn_lvl_abv);
@@ -907,7 +947,8 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Compute the interpolated climatology standard deviation
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_dpth,
+                        pd[0][0][k].interp_mthd,  pd[0][0][k].interp_dpth,
+                                   pd[0][0][k].interp_shape,
                         interp_thresh, spfh_flag,
                         fcst_info->level().type(),
                         to_lvl, csd_lvl_blw, csd_lvl_abv);

@@ -17,6 +17,8 @@ using namespace std;
 
 #include "interp_mthd.h"
 
+#include "GridTemplate.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -111,13 +113,12 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
          value = bad_data_float;
 
       } else {
-
          value = compute_horz_interp(from_data, x_from, y_from, bad_data_double,
-                                     info.method, info.width, info.vld_thresh);
+                                     info.method,  info.width, info.shape, info.vld_thresh);
 
       }
 
-      to_data.put(value, xt, yt);
+      to_data.put(value, xt, yt);   int          width;      // Regridding width
 
    }   //  for yt
 
