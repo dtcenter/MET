@@ -230,11 +230,17 @@ obtype = "ANALYS";
 //   - The "width" entry specifies a regridding width, when applicable.
 //      - width = 4;        To regrid using a 4x4 box.
 //
+//    - The "shape" entry defines the shape of the neighborhood.
+//      Valid values are "SQUARE" or "CIRCLE"
+//
+
+//
 regrid = {
    to_grid    = NONE;
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 //
@@ -749,8 +755,7 @@ boot = {
 //      the verification region chosen.
 //
 //    - The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
-//      of the smoothing area.  This option is available only in Grid-Stat but
-//      support will be added to the other MET tools in future releases.
+//      of the smoothing area. 
 //
 //    - The "type" entry is an array of dictionaries, each specifying an
 //      interpolation method.  Interpolation is performed over a N by N box
@@ -812,10 +817,14 @@ interp = {
 //      computing categorical statistics for the neighborhood fractional
 //      coverage field.
 //
+//    - The "shape" entry defines the shape of the neighborhood.
+//      Valid values are "SQUARE" or "CIRCLE"
+//
 nbrhd = {
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
+   shape      = SQUARE;
 }
 
 //
@@ -845,11 +854,15 @@ nbrhd = {
 //      populate the Nx2 probabilistic contingency table written to the PCT
 //      output line and used for computing probabilistic statistics.
 //
+//    - The "shape" entry defines the shape of the neighborhood.
+//      Valid values are "SQUARE" or "CIRCLE"
+//
 hira = {
    flag       = FALSE;
    width      = [ 2, 3, 4, 5 ];
    vld_thresh = 1.0;
    cov_thresh = [ ==0.25 ];
+   shape      = SQUARE;
 }
 
 //

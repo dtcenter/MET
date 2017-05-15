@@ -31,6 +31,7 @@ regrid = {
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,6 +69,7 @@ climo_mean = {
       method     = NEAREST;
       width      = 1;
       vld_thresh = 0.5;
+      shape      = SQUARE;
    }
 
    time_interp_method = DW_MEAN;
