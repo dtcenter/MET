@@ -80,6 +80,7 @@ obs_quality    = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_perc_value = 50;
+skip_const     = FALSE;
 
 //
 // Ensemble bin sizes
@@ -166,6 +167,8 @@ output_flag = {
    phist = BOTH;
    orank = BOTH;
    ssvar = BOTH;
+   relp  = NONE;
+   econ  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +178,8 @@ output_flag = {
 //
 ensemble_flag = {
    mean      = TRUE;
+   median    = FALSE;
+   mode      = FALSE;
    stdev     = TRUE;
    minus     = TRUE;
    plus      = TRUE;

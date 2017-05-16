@@ -94,7 +94,7 @@ void EnsembleStatConfInfo::clear() {
    output_prefix.clear();
    version.clear();
    interp_shape = GridTemplateFactory::GridTemplate_None;
-   
+
    for(i=0; i<n_txt; i++) output_flag[i]   = STATOutputType_None;
    for(i=0; i<n_nc;  i++) ensemble_flag[i] = false;
 
@@ -108,10 +108,7 @@ void EnsembleStatConfInfo::clear() {
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }
    if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)        0; }
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)         0; }
-   if(dup_flgs.size() != 0)     { dup_flgs.clear(); }
-   if(obs_smry.size() != 0)     { obs_smry.clear(); }
-   if(obs_percs.size() != 0)    { obs_percs.clear(); }   
-   
+
    // Clear ens_info
    if(ens_info) {
       for(i=0; i<n_vx; i++)
@@ -121,7 +118,7 @@ void EnsembleStatConfInfo::clear() {
 
    // Reset count
    n_ens_var = 0;
-   
+
    return;
 }
 
@@ -319,9 +316,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       msg_typ = new StringArray        [n_vx];
       sid_exc = new StringArray        [n_vx];
       obs_qty = new StringArray        [n_vx];
-      dup_flgs.reserve(n_vx);
-      obs_smry.reserve(n_vx);
-      obs_percs.reserve(n_vx);
 
       // Parse the fcst field information
       for(i=0; i<n_vx; i++) {
@@ -336,15 +330,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          // Get the current dictionaries
          i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
          i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
-
-         // Conf: duplicate_flag
-	 dup_flgs[i] = parse_conf_duplicate_flag(&i_obs_dict);
-
-         // Conf: obs_summary
-         obs_smry[i] = parse_conf_obs_summary(&i_obs_dict);
-
-         // Conf: obs_perc_value
-         vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_obs_dict));
 
          // Conf: desc
          vx_pd[i].set_desc(parse_conf_string(&i_obs_dict, conf_key_desc));
@@ -504,6 +489,10 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
 void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
    int i, j, n_msg_typ;
+   Dictionary i_obs_dict;
+
+   // Parse configuration settings specific to each verification task
+   Dictionary *obs_dict = conf.lookup_array(conf_key_obs_field);
 
    // EnsPairData is stored in the vx_pd objects in the following order:
    // [n_msg_typ][n_mask][n_interp]
@@ -545,11 +534,22 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
 
       // Add the interpolation methods to the vx_pd objects
       for(j=0; j<n_interp; j++)
-	      vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
+         vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
 
-      vx_pd[i].set_duplicate_flag(dup_flgs[i]);
-      vx_pd[i].set_obs_summary(obs_smry[i]);	 
-      vx_pd[i].set_obs_perc_value(obs_percs[i]);
+      // Get the current observation dictionary
+      i_obs_dict = parse_conf_i_vx_dict(obs_dict, i);
+
+      // Conf: duplicate_flag
+      vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_obs_dict));
+
+      // Conf: obs_summary
+      vx_pd[i].set_obs_summary(parse_conf_obs_summary(&i_obs_dict));
+
+      // Conf: obs_perc_value
+      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_obs_dict));
+
+      // Conf: skip_const
+      vx_pd[i].set_skip_const(i_obs_dict.lookup_bool(conf_key_skip_const));
 
    } // end for i
 
@@ -584,7 +584,9 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
 
       case(i_rhist):
       case(i_phist):
-         // Maximum number of Rank and PIT Histogram lines possible =
+      case(i_relp):
+      case(i_econ):
+         // Maximum number of RHIST, PHIST, RELP, and ECON  lines possible =
          //    Fields * Masks * Interpolations * Message Type [Point Obs]
          //    Fields * Masks * Interpolations [Grid Obs]
          n =   n_vx * n_mask * n_interp * max_n_msg_typ

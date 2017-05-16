@@ -555,15 +555,16 @@ static const char conf_key_ens[]                     = "ens";
 static const char conf_key_ens_field[]               = "ens.field";
 static const char conf_key_ens_ens_thresh[]          = "ens.ens_thresh";
 static const char conf_key_ens_vld_thresh[]          = "ens.vld_thresh";
+static const char conf_key_skip_const[]              = "skip_const";
 static const char conf_key_rng_type[]                = "rng.type";
 static const char conf_key_rng_seed[]                = "rng.seed";
 static const char conf_key_ensemble_flag[]           = "ensemble_flag";
 static const char conf_key_ssvar_bin[]               = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]               = "ens_phist_bin_size";
 static const char * conf_key_ensemble_flag_entries[] = {
-   "mean",  "stdev", "minus",     "plus",      "min",
-   "max",   "range", "vld_count", "frequency", "rank",
-   "weight"
+   "mean",      "median", "mode", "stdev",  "minus",
+   "plus",      "min",    "max",  "range",  "vld_count",
+   "frequency", "rank",   "weight"
 };
 static const int n_conf_key_ensemble_flag_entries =
                     sizeof(conf_key_ensemble_flag_entries)/

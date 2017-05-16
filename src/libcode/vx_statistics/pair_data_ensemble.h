@@ -36,6 +36,7 @@ struct ens_ssvar_pt {
 
 typedef deque<ens_ssvar_pt>       ssvar_pt_list;
 typedef map<string,ssvar_pt_list> ssvar_bin_map;  // Indexed by bin min
+typedef CRC_Array<bool>           BoolArray;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -67,6 +68,11 @@ class PairDataEnsemble : public PairBase {
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
       int        n_ens;           // Number of ensemble members
+
+      int        n_pair;          // Number of valid pairs, n_obs - sum(skip_pair)
+      bool       skip_const;      // Skip cases where the observation and
+                                  // all ensemble members are constant
+      BoolArray  skip_pair;       // Flag for each observation
 
       NumArray   rhist_na;        // Ranked Histogram [n_ens+1]
       NumArray   phist_na;        // PIT Histogram [n_phist_bin]
@@ -229,6 +235,8 @@ class VxPairDataEnsemble {
       void print_obs_summary();
 
       void calc_obs_summary();
+
+      void set_skip_const(bool);
 };
 
 ////////////////////////////////////////////////////////////////////////

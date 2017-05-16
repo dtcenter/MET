@@ -141,8 +141,6 @@ static int compress_level = -1;
 // Output NetCDF file
 static StringArray  out_nc_file_list;
 static NcFile      *nc_out  = (NcFile *) 0;
-//static NcDim       *lat_dim = (NcDim *)  0;
-//static NcDim       *lon_dim = (NcDim *)  0;
 static NcDim       lat_dim;
 static NcDim       lon_dim;
 
