@@ -175,29 +175,6 @@ void process_command_line(int argc, char **argv) {
 
    RGInfo.validate();
 
-   /*
-
-   // Check the nearest neighbor special case
-   if(RGInfo.method != InterpMthd_Nearest && RGInfo.width == 1) {
-      mlog << Warning << "\nprocess_command_line() -> "
-           << "Resetting the regridding method from \""
-           << interpmthd_to_string(RGInfo.method) << "\" to \""
-           << interpmthd_nearest_str
-           << "\" since the regridding width is 1.\n\n";
-      RGInfo.method = InterpMthd_Nearest;
-   }
-
-   // Check the bilinear and budget special cases
-   if((RGInfo.method == InterpMthd_Bilin ||
-       RGInfo.method == InterpMthd_Budget) &&
-      RGInfo.width != 2) {
-      mlog << Warning << "\nprocess_command_line() -> "
-           << "Resetting the regridding width from "
-           << RGInfo.width << " to 2 for regridding method \""
-           << interpmthd_to_string(RGInfo.method) << "\".\n\n";
-      RGInfo.width = 2;
-   }
-   */
    return;
 }
 
