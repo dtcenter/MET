@@ -68,8 +68,6 @@ class CRC_Array {
 
       void assign(const CRC_Array &);
 
-      void extend(int);
-
 
       T * e;
 
@@ -98,6 +96,8 @@ class CRC_Array {
       CRC_Array <T> & operator=(const NumArray &);
 
       void clear();
+
+      void extend(int);
 
       void dump(ostream &, int depth = 0) const;
 
@@ -128,8 +128,8 @@ class CRC_Array {
       void add(const CRC_Array <T> &);
       void add_css_sec(const char *);
 
-      void set(unsigned int ix, const T & val); 
-      
+      void set(unsigned int ix, const T & val);
+
       void sort_increasing();
 
       void increment(const T &);   //  adds a constant value to all elements
@@ -508,7 +508,7 @@ extend(Nelements + sa.n_elements());
 int j;
 
 for (j=0; j<(sa.n_elements()); j++)  {
-   
+
    add(timestring_to_sec(sa[j]));
 
 }
