@@ -905,6 +905,45 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+skip_const = FALSE;
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series medium
+Setting 
+\series bold
+skip_const
+\series medium
+ to true tells Ensemble-Stat to exclude pairs where all the ensemble members
+ and the observation have a constant value.
+ For example, exclude points with zero precipitation amounts from all output
+ line types.
+ This option may be set separately for each 
+\series bold
+obs.field
+\series medium
+ entry.
+ When set to false, constant points are and the observation rank is chosen
+ at random.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 sid_exc            = [];
 \end_layout
 
@@ -1004,7 +1043,13 @@ The
 \series bold
 sid_exc
 \series medium
- entry, defined in the 
+ entr
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+y, defined in the 
 \series bold
 obs
 \series medium
@@ -1107,7 +1152,7 @@ output_flag
 \series bold
 RHIST
 \series medium
- for Rankd Histogram Counts
+ for Ranked Histogram Counts
 \end_layout
 
 \begin_layout Description

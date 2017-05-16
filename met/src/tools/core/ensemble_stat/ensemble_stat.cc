@@ -43,6 +43,8 @@
 //   016    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   017    08/09/16  Halley Gotway  Fixed n_ens_vld vs n_vx_vld bug.
 //   018    05/15/17  Prestonik P    Added shape for regrid and interp
+//   019    05/15/17  Halley Gotway  Add RELP and ECON line types,
+//                    ensemble median and mode, and skip_const option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -265,9 +267,7 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   //
    // Store the config file name
-   //
    config_file = cline[cline.n() - 1];
 
    // Create the default config file name
@@ -711,7 +711,7 @@ void process_vx() {
       // Process masks Grids and Polylines in the config file
       conf_info.process_masks(grid);
 
-      // Setup the GCPairData objects
+      // Setup the PairDataEnsemble objects
       conf_info.set_vx_pd(n_vx_vld);
 
       // Process the point observations
@@ -1162,26 +1162,11 @@ void process_point_scores() {
             // Loop through the interpolation methods
             for(l=0; l<conf_info.get_n_interp(); l++) {
 
-               //TODO:  I think I need to add the shape to the interp_mthd, but
-	            // check on this:
-	            /*
-	            //create appropriate grid template for iterating over the grid shape
-	            GridTemplateFactory gtf;
-	            GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
-                                        conf_info.interp_wdth[l]);
-
-	            // Store the interpolation method and width being applied
-	            string interp_mthd = interpmthd_to_string(conf_info.interp_mthd[l]).text();
-	            if(conf_info.interp_wdth[l] > 1) {
-		            interp_mthd += ("_" + gtf.enum2String(conf_info.interp_shape));
-	            }
-	            delete gt;
-	            */
                // Store the interpolation method and width being applied
-               //shc.set_interp_mthd(conf_info.interp_mthd[l]);
-	             shc.set_interp_mthd(conf_info.interp_mthd[l],conf_info.interp_shape);
+               shc.set_interp_mthd(conf_info.interp_mthd[l],
+                                   conf_info.interp_shape);
                shc.set_interp_wdth(conf_info.interp_wdth[l]);
-               
+
                pd_ptr = &conf_info.vx_pd[i].pd[j][k][l];
 
                mlog << Debug(2)
@@ -1443,7 +1428,7 @@ void process_grid_vx() {
          // If requested in the config file, smooth the forecast field
          for(k=0; k<ens_file_list.n_elements(); k++) {
 
-	          
+
             if(conf_info.interp_field == FieldType_Fcst ||
                conf_info.interp_field == FieldType_Both) {
                smooth_field(fcst_dp[k], fcst_dp_smooth[k],
@@ -1479,7 +1464,7 @@ void process_grid_vx() {
          else {
             obs_dp_smooth = obs_dp;
          }
-         
+
          // Loop through the masks to be applied
          for(k=0; k<conf_info.get_n_mask_area(); k++) {
 
@@ -1489,6 +1474,7 @@ void process_grid_vx() {
             // Initialize
             pd.clear();
             pd.set_ens_size(n_vx_vld[i]);
+            pd.skip_const = conf_info.vx_pd[i].pd[0][0][0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
@@ -1509,6 +1495,9 @@ void process_grid_vx() {
 
             // Continue if there are no points
             if(pd.n_obs == 0) continue;
+
+            // Compute the ranks for the observations
+            pd.compute_rank(rng_ptr);
 
             // Set the PHIST bin size
             pd.phist_bin_size = conf_info.ens_phist_bin_size[i];
@@ -1576,7 +1565,6 @@ void process_grid_vx() {
 
    // Close the output NetCDF file
    if(nc_out) {
-      //nc_out->close();
       delete nc_out; nc_out = (NcFile *) 0;
    }
 
@@ -1643,11 +1631,6 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
          pd.add_ens(j-n_miss, v);
       } // end for j
    } // end for i
-
-   if(pd.n_obs > 0) {
-      // Compute the ranks for the observations
-      pd.compute_rank(rng_ptr);
-   }
 
    return;
 }

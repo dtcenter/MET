@@ -91,6 +91,10 @@ void PairDataEnsemble::clear() {
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
    n_ens = 0;
 
+   n_pair = 0;
+   skip_const = false;
+   skip_pair.clear();
+
    v_na.clear();
    r_na.clear();
    crps_na.clear();
@@ -119,10 +123,12 @@ void PairDataEnsemble::extend(int n) {
 
    for(i=0; i<n_ens; i++) e_na[i].extend(n);
 
+   v_na.extend(n);
    r_na.extend(n);
    crps_na.extend(n);
    ign_na.extend(n);
    pit_na.extend(n);
+   skip_pair.extend(n);
    rhist_na.extend(n);
    phist_na.extend(n);
    spread_na.extend(n);
@@ -146,26 +152,29 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    set_interp_dpth(pd.interp_dpth);
    set_interp_shape(pd.interp_shape);
 
-   sid_sa    = pd.sid_sa;
-   lat_na    = pd.lat_na;
-   lon_na    = pd.lon_na;
-   x_na      = pd.x_na;
-   y_na      = pd.y_na;
-   vld_ta    = pd.vld_ta;
-   lvl_na    = pd.lvl_na;
-   elv_na    = pd.elv_na;
-   o_na      = pd.o_na;
-   v_na      = pd.v_na;
-   r_na      = pd.r_na;
-   crps_na   = pd.crps_na;
-   ign_na    = pd.ign_na;
-   pit_na    = pd.pit_na;
-   rhist_na  = pd.rhist_na;
-   phist_na  = pd.phist_na;
-   spread_na = pd.spread_na;
-   mn_na     = pd.mn_na;
+   sid_sa     = pd.sid_sa;
+   lat_na     = pd.lat_na;
+   lon_na     = pd.lon_na;
+   x_na       = pd.x_na;
+   y_na       = pd.y_na;
+   vld_ta     = pd.vld_ta;
+   lvl_na     = pd.lvl_na;
+   elv_na     = pd.elv_na;
+   o_na       = pd.o_na;
+   v_na       = pd.v_na;
+   r_na       = pd.r_na;
+   crps_na    = pd.crps_na;
+   ign_na     = pd.ign_na;
+   pit_na     = pd.pit_na;
+   n_pair     = pd.n_pair;
+   skip_const = pd.skip_const;
+   skip_pair  = pd.skip_pair;
+   rhist_na   = pd.rhist_na;
+   phist_na   = pd.phist_na;
+   spread_na  = pd.spread_na;
+   mn_na      = pd.mn_na;
 
-   n_obs     = pd.n_obs;
+   n_obs      = pd.n_obs;
 
    if(pd.ssvar_bins){
       ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
@@ -209,11 +218,12 @@ void PairDataEnsemble::set_ens_size(int n) {
 
 void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
    int i, j, k, n_vld, n_bel, n_tie;
+   int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens;
    double mean, spread;
 
    // Compute the rank for each observation
-   for(i=0; i<o_na.n_elements(); i++) {
+   for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n_elements(); i++) {
 
       // Initialize
       cur_ens.erase();
@@ -246,8 +256,27 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
       // Store the number of valid ensemble values
       v_na.add(n_vld);
 
-      // Compute rank only when all ensemble members are valid
-      if(n_vld == n_ens) {
+      // Skip points missing ensemble data
+      if(n_vld != n_ens) {
+         n_skip_vld++;
+         skip_pair.add(true);
+      }
+      // Skip points with constant value, if requested
+      else if(skip_const && n_tie == n_ens) {
+         n_skip_const++;
+         skip_pair.add(true);
+      }
+      // Increment the n_pair counter
+      else {
+         n_pair++;
+         skip_pair.add(false);
+      }
+
+      // Compute the rank
+      if(skip_pair[i]) {
+         r_na.add(bad_data_int);
+      }
+      else {
 
          // With no ties, the rank is the number below plus 1
          if(n_tie == 0) {
@@ -268,14 +297,20 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
             // Store the rank
             r_na.add(nint(dest_na[0]));
          }
-
       }
-      // Can't compute the rank when there is data missing
-      else {
-         r_na.add(bad_data_int);
-      }
-
    } // end for i
+
+   if(n_skip_vld > 0) {
+      mlog << Debug(3)
+           << "Skipping " << n_skip_vld << " of " << o_na.n_elements()
+           << " points due to missing ensemble values.\n";
+   }
+
+   if(skip_const) {
+      mlog << Debug(3)
+           << "Skipping " << n_skip_const << " of " << o_na.n_elements()
+           << " points with constant value.\n";
+   }
 
    return;
 }
@@ -321,7 +356,7 @@ void PairDataEnsemble::compute_phist() {
    // Loop through the PIT values and populate the histogram.
    for(i=0; i<pit_na.n_elements(); i++) {
 
-      if(is_bad_data(pit_na[i])) continue;
+      if(skip_pair[i] || is_bad_data(pit_na[i])) continue;
 
       if(pit_na[i] < 0.0 || pit_na[i] > 1.0) {
          mlog << Warning << "PairDataEnsemble::compute_phist() -> "
@@ -359,8 +394,8 @@ void PairDataEnsemble::compute_stats() {
    // Loop through the pairs and compute CRPS for each
    for(i=0; i<n_obs; i++) {
 
-      // Don't compute if any of the ensemble members are missing
-      if(nint(v_na[i]) != n_ens) {
+      // Skip constant points, if requested, and missing ensemble data
+      if(skip_pair[i]) {
          crps_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
@@ -431,6 +466,9 @@ void PairDataEnsemble::compute_ssvar() {
 
    // Compute the variance of ensemble member values at each point
    for(i=0; i<o_na.n_elements(); i++) {
+
+      // Check if point should be skipped
+      if(skip_pair[i]) continue;
 
       // Add the deviation of each ensemble member
       for(j=0, n_vld=0, var=0; j<n_ens; j++) {
@@ -898,7 +936,7 @@ void VxPairDataEnsemble::set_interp(int i_interp,
          pd[i][j][i_interp].set_interp_mthd(interp_mthd_str);
          pd[i][j][i_interp].set_interp_dpth(width);
          pd[i][j][i_interp].set_interp_shape(shape);
-         
+
       }
    }
 
@@ -1338,6 +1376,21 @@ void VxPairDataEnsemble::calc_obs_summary() {
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
             pd[i][j][k].calc_obs_summary();
+         }
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_skip_const(bool tf) {
+
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].skip_const = tf;
          }
       }
    }

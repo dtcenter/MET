@@ -31,11 +31,13 @@ static const int i_rhist    = 0;
 static const int i_phist    = 1;
 static const int i_orank    = 2;
 static const int i_ssvar    = 3;
-static const int n_txt      = 4;
+static const int i_relp     = 4;
+static const int i_econ     = 5;
+static const int n_txt      = 6;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_rhist, stat_phist, stat_orank, stat_ssvar
+   stat_rhist, stat_phist, stat_orank, stat_ssvar, stat_relp, stat_econ
 };
 
 // Indices for the ensemble flag types in the configuration file
@@ -50,7 +52,9 @@ static const int i_nc_vld    = 7;
 static const int i_nc_freq   = 8;
 static const int i_nc_orank  = 9;
 static const int i_nc_weight = 10;
-static const int n_nc        = 11;
+static const int i_median    = 11;
+static const int i_mode      = 12;
+static const int n_nc        = 13;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -90,10 +94,7 @@ class EnsembleStatConfInfo {
       VxPairDataEnsemble * vx_pd;               // Array for ensemble pair data [n_vx]
       StringArray *        msg_typ;             // Array of message types [n_vx]
       StringArray *        sid_exc;             // Array of station ID's to exclude [n_vx]
-      StringArray *        obs_qty;             // Observation quality flags for filtering[n_vx]
-      vector<DuplicateType> dup_flgs;
-      vector<ObsSummary> obs_smry;
-      vector<int> obs_percs;
+      StringArray *        obs_qty;             // Observation quality flags for filtering [n_vx]
       StringArray          mask_name;           // Masking region names [n_mask]
       NumArray             ens_ssvar_bin_size;  // Ensemble spread/skill variance bin size [n_vx]
       ConcatString         ens_ssvar_file;      // Ensemble mean file name
