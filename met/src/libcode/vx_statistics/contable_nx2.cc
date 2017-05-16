@@ -889,8 +889,9 @@ double halfwidth;
 const double N = (double) n();
 const double Ninv = 1.0/N;
 
+// N must be > 1 so that degf > 0 in the call to gsl_cdf_tdist_Pinv()
 
-if(is_bad_data(bs = brier_score()))  return ( bad_data_double );
+if(is_bad_data(bs = brier_score()) || N <= 1)  return ( bad_data_double );
 
 degf = N - 1.0;
 
