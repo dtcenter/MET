@@ -78,6 +78,7 @@
 //   031    07/30/15  Halley Gotway  Add conditional continuous verification.
 //   032    09/11/15  Halley Gotway  Add climatology to config file.
 //   033    02/27/17  Halley Gotway  Add HiRA verification.
+//   034    05/15/17  Prestopnik P   Added shape for HiRA, interp and regrid
 //
 ////////////////////////////////////////////////////////////////////////
 

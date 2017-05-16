@@ -83,7 +83,7 @@
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   036    02/14/17  Win            MET-621 enhancement support- additional
 //                                   nc_pairs_flag 'apply_mask'
-//   037    
+//   037    05/15/17  Prestopnik P   Added shape for regrid, nbrhd and interp
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;

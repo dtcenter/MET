@@ -22,6 +22,7 @@
 //   004    08/04/15  Halley Gotway   Add conditional continuous verification.
 //   005    09/21/15  Halley Gotway   Add climatology and SAL1L2 output.
 //   006    04/20/16  Halley Gotway   Add -paired command line option.
+//   007    05/15/17  Prestopnikk P   Add shape for regrid 
 //
 ////////////////////////////////////////////////////////////////////////
 

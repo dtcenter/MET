@@ -350,74 +350,6 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 }
 
 
-// old method without grid template
-/*
-double interp_dw_mean(const DataPlane &dp, int x_ll, int y_ll, int wdth,
-                      double obs_x, double obs_y, int i_pow, double t) {
-   double *data = (double *) 0;
-   double *dist = (double *) 0;
-   int i, x, y, count;
-   double v, dw_mean_v, w, wght_sum;
-
-   // Allocate space to store the data points
-   data = new double [wdth*wdth];
-   dist = new double [wdth*wdth];
-
-   // Search the neighborhood for valid data points
-   count = 0;
-   for(x=x_ll; x<x_ll+wdth; x++) {
-      if(x < 0 || x >= dp.nx()) continue;
-
-      for(y=y_ll; y<y_ll+wdth; y++) {
-         if(y < 0 || y >= dp.ny())     continue;
-         if(is_bad_data(dp.get(x, y))) continue;
-
-         v = dp.get(x, y);
-         data[count] = v;
-         dist[count] = sqrt(pow((obs_x-x), 2) + pow((obs_y-y), 2));
-         count++;
-      } // end for y
-   } // end for x
-
-   // Check whether enough valid grid points were found to compute
-   // a distance weighted mean value
-   if( (double) count/(wdth*wdth) < t || count == 0) {
-      dw_mean_v = bad_data_double;
-   }
-   else {
-
-      // Compute the sum of the weights
-      for(i=0, wght_sum=0; i<count; i++) {
-
-         // If the distance is very close to zero,
-         // break out of the loop
-         if(dist[i] <= 0.001) break;
-
-         // Otherwise, compute the sum of the weights
-         wght_sum += pow(dist[i], -1*i_pow);
-      }
-
-      for(i=0, dw_mean_v=0; i<count; i++) {
-
-         // If the distance is very close to zero, set the dw_mean_v
-         // value to the current data value and break out of the loop
-         if(dist[i] <= 0.001) {
-            dw_mean_v = data[i];
-            break;
-         }
-
-         w = pow(dist[i], -1*i_pow)/wght_sum;
-         dw_mean_v += w*data[i];
-      }
-   }
-
-   if(data) { delete [] data; data = (double *) 0; }
-   if(dist) { delete [] dist; dist = (double *) 0; }
-
-   return(dw_mean_v);
-}
-*/
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute a least-squares fit interpolation
@@ -427,9 +359,11 @@ double interp_dw_mean(const DataPlane &dp, int x_ll, int y_ll, int wdth,
 double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
                      double obs_x, double obs_y, double t) {
 
-   // DEV NOTE: We are restricting the GridTemplate to a square, because the LS methods in this function are designed around a square shape.
-   //           Because we have chosen not to refactor this function to be more general, I am going to simply pull out the relevant values from the GT object,
-   //           and leave the rest of the function to work the same way as before.   
+   // DEV NOTE: We are restricting the GridTemplate to a square,
+ 	 // because the LS methods in this function are designed around a square shape.
+   // Because we have chosen not to refactor this function to be more general,
+	 // I am going to simply pull out the relevant values from the GT object,
+   // and leave the rest of the function to work the same way as before.   
    const RectangularTemplate* tmpGT = dynamic_cast<const RectangularTemplate*>(&gt);
    if ((tmpGT == NULL ) ||
        (tmpGT->getHeight() != tmpGT->getWidth()))
@@ -507,73 +441,6 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
    return(z);
 }
 
-// old non-GT method
-/*
-double interp_ls_fit(const DataPlane &dp, int x_ll, int y_ll, int wdth,
-                     double obs_x, double obs_y, double t) {
-   int i, j, x, y, count;
-   const int N  = wdth;
-   const int N2 = N*N;
-   const double alpha     = (N2*(N2 - 1.0))/12.0;
-   const double beta      = 0.5*(N - 1.0);
-   const double x_center  = x_ll + beta;
-   const double y_center  = y_ll + beta;
-   const double u_test    = obs_x - x_center;
-   const double v_test    = obs_y - y_center;
-   double A, B, C;
-   double suz, svz, sz;
-   double u, v, z;
-
-   if(N < 2) {
-      mlog << Error << "\ninterp_ls_fit() -> "
-           << "the interpolation width (" << N
-           << ") must be set >= 2\n\n";
-
-      exit (1);
-   }
-
-   suz = svz = sz = 0.0;
-
-   // Search the neighborhood
-   count = 0;
-   for(i=0; i<N; i++) {
-
-      u = i - beta;
-      x = x_ll + i;
-
-      if(x < 0 || x >= dp.nx()) continue;
-
-      for(j=0; j<N; j++) {
-
-         v = j - beta;
-         y = y_ll + j;
-
-         if(y < 0 || y >= dp.ny())     continue;
-         if(is_bad_data(dp.get(x, y))) continue;
-
-         z = dp.get(x, y);
-         count++;
-
-         suz += u*z;
-         svz += v*z;
-         sz  += z;
-      }
-   }
-
-   A = suz/alpha;
-   B = svz/alpha;
-   C = sz/N2;
-
-   z = A*u_test + B*v_test + C;
-
-   // Check for not enough valid data
-   if( (double) count/N2 < t || count == 0) {
-      z = bad_data_double;
-   }
-
-   return(z);
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute neighborhood fractional coverage.
@@ -606,38 +473,6 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
    return (double) count_thr/count;
 }
 
-// Old version that does not use grid templates
-/*
-double interp_nbrhd(const DataPlane &dp, int x_ll, int y_ll, int wdth,
-                    double t, const SingleThresh *st) {
-   int x, y, count, count_thr;
-   double nbrhd_cov;
-
-   // Compute the ratio of events within the neighborhood
-   count = count_thr = 0;
-   for(x=x_ll; x<x_ll+wdth; x++) {
-      if(x < 0 || x >= dp.nx()) continue;
-
-      for(y=y_ll; y<y_ll+wdth; y++) {
-         if(y < 0 || y >= dp.ny())     continue;
-         if(is_bad_data(dp.get(x, y))) continue;
-
-         count++;
-         if(st->check(dp.get(x,y))) count_thr++;
-      } // end for y
-   } // end for x
-
-   // Check whether enough valid grid points were found
-   if( (double) count/(wdth*wdth) < t || count == 0) {
-      nbrhd_cov = bad_data_double;
-   }
-   else {
-      nbrhd_cov = (double) count_thr/count;
-   }
-
-   return(nbrhd_cov);
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 //
 // Compute bilinear interpolation.
@@ -778,41 +613,6 @@ double interp_best(const DataPlane &dp, const GridTemplate &gt,
    return(min_v);
 }
 
-// old version that does not use Grid Templates
-/*
-double interp_best(const DataPlane &dp, int x_ll, int y_ll, int wdth,
-                   double obs_v, double t) {
-   int x, y, count;
-   double v, min_d, min_v;
-
-   // Search the neighborhood for the best match to the observation
-   count = 0;
-   min_d = min_v = bad_data_double;
-   for(x=x_ll; x<x_ll+wdth; x++) {
-      if(x < 0 || x >= dp.nx()) continue;
-
-      for(y=y_ll; y<y_ll+wdth; y++) {
-         if(y < 0 || y >= dp.ny())     continue;
-         if(is_bad_data(dp.get(x, y))) continue;
-
-         v = dp.get(x, y);
-         if(is_bad_data(min_d) || fabs(v - obs_v) < min_d) {
-            min_d = abs(v - obs_v);
-            min_v = v;
-         }
-         count++;
-      } // end for y
-   } // end for x
-
-   // Check whether enough valid grid points were found to trust
-   // the maximum value computed
-   if( (double) count/(wdth*wdth) < t || count == 0) {
-      min_v = bad_data_double;
-   }
-
-   return(min_v);
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 //
 // Determine the lower-left (x, y) based on height and width parity.
@@ -931,92 +731,6 @@ double compute_horz_interp(const DataPlane &dp,
    delete gt;
    return(v);
 }
-/*
-// old non GT method
-
-double compute_horz_interp(const DataPlane &dp,
-                           double obs_x, double obs_y, double obs_v,
-                           int mthd, int wdth, double interp_thresh,
-                           const SingleThresh *cat_thresh) {
-   double v;
-   int x_ll, y_ll;
-
-   // Get the lower-left x, y
-   get_xy_ll(obs_x, obs_y, wdth, wdth, x_ll, y_ll);
-
-   // Compute the interpolated value for the fields above and below
-   switch(mthd) {
-
-      case(InterpMthd_Min):        // Minimum
-         v = interp_min(dp, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(InterpMthd_Max):         // Maximum
-         v = interp_max(dp, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(InterpMthd_Median):      // Median
-         v = interp_median(dp, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(InterpMthd_UW_Mean):     // Unweighted Mean
-         v = interp_uw_mean(dp, x_ll, y_ll, wdth, interp_thresh);
-         break;
-
-      case(InterpMthd_DW_Mean):     // Distance-Weighted Mean
-         v = interp_dw_mean(dp, x_ll, y_ll, wdth, obs_x, obs_y,
-                            dw_mean_pow, interp_thresh);
-         break;
-
-      case(InterpMthd_LS_Fit):      // Least-squares fit
-         v = interp_ls_fit(dp, x_ll, y_ll, wdth, obs_x, obs_y,
-                           interp_thresh);
-         break;
-
-      case(InterpMthd_Nbrhd):      // Neighborhood fractional coverage
-         v = interp_nbrhd(dp, x_ll, y_ll, wdth,
-                          interp_thresh, cat_thresh);
-         break;
-
-      case(InterpMthd_Bilin):       // Bilinear interpolation
-         v = interp_bilin(dp, obs_x, obs_y);
-         break;
-
-      case(InterpMthd_Nearest):     // Nearest Neighbor
-         v = interp_xy(dp, nint(obs_x), nint(obs_y));
-         break;
-
-      case(InterpMthd_Best):        // Best Match
-         v = interp_best(dp, x_ll, y_ll, wdth, obs_v, interp_thresh);
-         break;
-
-      case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
-         v = interp_xy(dp, floor(obs_x), ceil(obs_y));
-         break;
-
-      case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
-         v = interp_xy(dp, ceil(obs_x), ceil(obs_y));
-         break;
-
-      case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
-         v = interp_xy(dp, ceil(obs_x), floor(obs_y));
-         break;
-
-      case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
-         v = interp_xy(dp, floor(obs_x), floor(obs_y));
-         break;
-
-      default:
-         mlog << Error << "\ncompute_horz_interp() -> "
-              << "unexpected interpolation method encountered: "
-              << mthd << "\n\n";
-         exit(1);
-         break;
-   }
-
-   return(v);
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 //
 // Interpolate lineary in the log of pressure between values "v1" and
@@ -1211,47 +925,6 @@ void dp_interp_min (const DataPlane & fat, DataPlane & out, const GridTemplate &
 	return;
 }
 
-// old version that doesnt use GridTemplates
-/*
-void dp_interp_min (const DataPlane & fat, DataPlane & out, int width, double fraction)
-
-{
-
-   //
-   //  we expect that the size of the "out" dataplane has already been set
-   //
-
-int x, y, x_fat_ll, y_fat_ll;
-double v;
-
-
-for (x=0; x<(out.nx()); ++x)  {
-
-   x_fat_ll = x*width;
-
-   for (y=0; y<(out.ny()); ++y)  {
-
-      y_fat_ll = y*width;
-
-      v = interp_min(fat, x_fat_ll, y_fat_ll, width, fraction);
-
-      out.put(v, x, y);
-
-   }   //  for x
-
-}   //  for x
-
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-*/
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -1276,46 +949,6 @@ void dp_interp_max (const DataPlane & fat, DataPlane & out, const GridTemplate& 
 	} 
 	return;
 }
-// old version that doesn't use GridTempaltes
-/*
-void dp_interp_max (const DataPlane & fat, DataPlane & out, int width, double fraction)
-
-{
-
-   //
-   //  we expect that the size of the "out" dataplane has already been set
-   //
-
-int x, y, x_fat_ll, y_fat_ll;
-double v;
-
-
-for (x=0; x<(out.nx()); ++x)  {
-
-   x_fat_ll = x*width;
-
-   for (y=0; y<(out.ny()); ++y)  {
-
-      y_fat_ll = y*width;
-
-      v = interp_max(fat, x_fat_ll, y_fat_ll, width, fraction);
-
-      out.put(v, x, y);
-
-   }   //  for x
-
-}   //  for x
-
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1338,48 +971,6 @@ void dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, const GridTempla
 	}
 	return;
 }
-//old version that doesn't use grid templates
-/*
-void dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int width, double fraction)
-
-{
-
-   //
-   //  we expect that the size of the "out" dataplane has already been set
-   //
-
-int x, y, x_fat_ll, y_fat_ll;
-double v;
-
-
-for (x=0; x<(out.nx()); ++x)  {
-
-   x_fat_ll = x*width;
-
-   for (y=0; y<(out.ny()); ++y)  {
-
-      y_fat_ll = y*width;
-
-      v = interp_uw_mean(fat, x_fat_ll, y_fat_ll, width, fraction);
-
-      out.put(v, x, y);
-
-   }   //  for x
-
-}   //  for x
-
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-*/
-
-
 ////////////////////////////////////////////////////////////////////////
 
 

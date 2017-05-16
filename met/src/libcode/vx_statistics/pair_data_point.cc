@@ -601,42 +601,6 @@ void VxPairDataPoint::set_mask_sid(int i_mask, const char *name,
 
    return;
 }
-/*
-// old versions without GridTemplate
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_interp(int i_interp,
-                                 const char *interp_mthd_str,
-                                 int wdth) {
-   int i, j;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         pd[i][j][i_interp].set_interp_mthd(interp_mthd_str);
-         pd[i][j][i_interp].set_interp_dpth(wdth);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_interp(int i_interp, InterpMthd mthd,
-                                 int wdth) {
-   int i, j;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         pd[i][j][i_interp].set_interp_mthd(mthd);
-         pd[i][j][i_interp].set_interp_dpth(wdth);
-      }
-   }
-
-   return;
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::set_interp(int i_interp,

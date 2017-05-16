@@ -167,16 +167,6 @@ class PairBase {
 extern void find_vert_lvl(const DataPlaneArray &, const double,
                           int &, int &);
 
-// old version that doesn't use GridTemplates
-/*
-extern double compute_interp(const DataPlaneArray &,
-                             const double, const double, const double,
-                             const InterpMthd, const int, const double,
-                             const bool, const LevelType,
-                             const double, const int, const int,
-                             const SingleThresh *cat_thresh = 0);
-*/
-
 extern double compute_interp(const DataPlaneArray &dpa,
                       const double obs_x, const double obs_y, const double obs_v,
                       const InterpMthd method, const int width, const GridTemplateFactory::GridTemplates shape,

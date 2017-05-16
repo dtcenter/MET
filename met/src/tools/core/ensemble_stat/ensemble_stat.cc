@@ -42,6 +42,7 @@
 //   015    05/10/16  Halley Gotway  Add grid weighting.
 //   016    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   017    08/09/16  Halley Gotway  Fixed n_ens_vld vs n_vx_vld bug.
+//   018    05/15/17  Prestonik P    Added shape for regrid and interp
 //
 ////////////////////////////////////////////////////////////////////////
 
