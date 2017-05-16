@@ -33,6 +33,7 @@
 //   009    11/12/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output files.
 //   010    02/25/15  Halley Gotway  Add automated regridding.
+//   011    05/15/17  Prestopnik P.  Added shape to regrid options
 //
 ////////////////////////////////////////////////////////////////////////
 

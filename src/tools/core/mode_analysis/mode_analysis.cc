@@ -28,6 +28,7 @@
 //                                    multiple config files.
 //   004    05/14/12  Halley Gotway   Switch to using vx_config library.
 //   005    05/20/16  Prestopnik J    Removed -version (now in command_line.cc)
+//   006    05/15/17  Prestopnik P    Added shape for regrid
 //
 ////////////////////////////////////////////////////////////////////////
 
