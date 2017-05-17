@@ -220,10 +220,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
        // generate any ASCII output text files. Set the ascii_output_flat
        // to false, it is set to true by default.
        mlog <<Debug(3)
-            <<"\n No STAT type requested, proceeding with ascii output flag to false.\n";
+            <<"\nNo STAT type requested, proceeding with ASCII output flag to false.\n";
        set_ascii_output_flag(false);
-
-
    }
 
    // Conf: fcst.field, obs.field, and climo.field
