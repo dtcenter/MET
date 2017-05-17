@@ -877,7 +877,6 @@ if ( info.all_false() )  return;
    if(IS_INVALID_NC_P(f_out)) {
       mlog << Error << "\nwrite_obj_netcdf() -> trouble opening output file "
            << out_file << "\n\n";
-      //f_out->close();
       delete f_out;
       f_out = (NcFile *) 0;
 
@@ -1200,15 +1199,15 @@ if ( info.all_false() )  return;
    // Delete allocated memory
    //
 
-   if (fcst_raw_data)      { delete fcst_raw_data;      fcst_raw_data     = (float *) 0; }
-   if (fcst_obj_raw_data)  { delete fcst_obj_raw_data;  fcst_obj_raw_data = (float *) 0; }
-   if (fcst_obj_data)      { delete fcst_obj_data;      fcst_obj_data     = (int *) 0; }
-   if (fcst_clus_data)     { delete fcst_clus_data;     fcst_clus_data    = (int *) 0; }
+   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = (float *) 0; }
+   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = (float *) 0; }
+   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = (int *) 0; }
+   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = (int *) 0; }
 
-   if (obs_raw_data)       { delete obs_raw_data;       obs_raw_data      = (float *) 0; }
-   if (obs_obj_raw_data)   { delete obs_obj_raw_data;   obs_obj_raw_data  = (float *) 0; }
-   if (obs_obj_data)       { delete obs_obj_data;       obs_obj_data      = (int *) 0; }
-   if (obs_clus_data)      { delete obs_clus_data;      obs_clus_data     = (int *) 0; }
+   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = (float *) 0; }
+   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = (float *) 0; }
+   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *) 0; }
+   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *) 0; }
 
       //
       // Write out the values of the vertices of the polylines.
@@ -1219,7 +1218,6 @@ if ( info.all_false() )  return;
    //
    // Close the NetCDF file
    //
-   //f_out->close();
    delete f_out;
    f_out = (NcFile *) 0;
 
@@ -1543,13 +1541,13 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Delete allocated memory
    //
-   if(poly)       { delete poly;       poly       = (Polyline **) 0; }
-   if(poly_start) { delete poly_start; poly_start = (int       *) 0; }
-   if(poly_npts)  { delete poly_npts;  poly_npts  = (int       *) 0; }
-   if(poly_lat)   { delete poly_lat;   poly_lat   = (float     *) 0; }
-   if(poly_lon)   { delete poly_lon;   poly_lon   = (float     *) 0; }
-   if(poly_x)     { delete poly_x;     poly_x     = (int       *) 0; }
-   if(poly_y)     { delete poly_y;     poly_y     = (int       *) 0; }
+   if(poly)       { delete [] poly;       poly       = (Polyline **) 0; }
+   if(poly_start) { delete [] poly_start; poly_start = (int       *) 0; }
+   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) 0; }
+   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) 0; }
+   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) 0; }
+   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) 0; }
+   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) 0; }
 
    return;
 }
