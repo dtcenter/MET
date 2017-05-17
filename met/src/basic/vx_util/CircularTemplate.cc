@@ -57,10 +57,52 @@ using namespace std;
  * Constructor
  */
 
-CircularTemplate::CircularTemplate(const double radius) :
-  GridTemplate()
+CircularTemplate::CircularTemplate(const int width) :
+	GridTemplate(),
+	_width(width)
 {
-  setRadius(radius);
+	//bool evenWidth = ((width % 2) == 0);
+	
+	double radius = (width-1)/2.0;
+	
+  // Create the offsets list.  If the radius is small, then just make the
+  // template cover the current grid square.
+
+  if (radius < 1.0)
+  {
+    _addOffset(0, 0);
+    return;
+  }
+
+  int r = ceil(radius);
+  
+  for (int y = 0; y <= r; y++)
+  {
+    for (int x = 0; x <= r; x++)
+    {
+	    double double_x = (double)x;
+	    double double_y = (double)y;
+
+	    double distance= sqrt((double_x * double_x) + (double_y * double_y));
+
+	    if (distance <= radius)
+		    {
+			    _addOffset(x, y);
+	
+			    if (x != 0 && y != 0)
+				    _addOffset(-x, -y);
+	
+			    if (x != 0)
+				    _addOffset(-x, y);
+	
+			    if (y != 0)
+				    _addOffset(x, -y);
+		    }
+      
+    } /* endfor - x */
+    
+  } /* endfor - y */
+  
 }
 
 
@@ -82,64 +124,12 @@ CircularTemplate::~CircularTemplate(void)
 void CircularTemplate::printOffsetList(FILE *stream)
 {
   fprintf(stream, "\n\n");
-  fprintf(stream, "Circular template with radius %f grid spaces:\n",
-	  _radius);
+  fprintf(stream, "Circular template with width %f grid spaces:\n",
+	  _width);
   
   GridTemplate::printOffsetList(stream);
 }
 
-
-/**********************************************************************
- * setRadius() - Set the radius to the new value.
- */
-
-void CircularTemplate::setRadius(const double radius)
-{
-  // Save the radius
-
-  _radius = radius;
-  
-  // Empty out the current offsets list.
-
-  _offsetList.erase(_offsetList.begin(), _offsetList.end());
-  
-  // Create the offsets list.  If the radius is small, then just make the
-  // template cover the current grid square.
-
-  if (radius < 1.0)
-  {
-    _addOffset(0, 0);
-    return;
-  }
-
-  for (int y = 0; y <= (int)radius; y++)
-  {
-    for (int x = 0; x <= (int)radius; x++)
-    {
-	    double double_x = (double)x;
-	    double double_y = (double)y;
-      
-	    double distance = sqrt((double_x * double_x) + (double_y * double_y));
-      
-	    if (distance <= _radius)
-		    {
-			    _addOffset(x, y);
-	
-			    if (x != 0 && y != 0)
-				    _addOffset(-x, -y);
-	
-			    if (x != 0)
-				    _addOffset(-x, y);
-	
-			    if (y != 0)
-				    _addOffset(x, -y);
-		    }
-      
-    } /* endfor - x */
-    
-  } /* endfor - y */
-  
-}
 
 
 /**********************************************************************

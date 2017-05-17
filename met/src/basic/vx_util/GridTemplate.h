@@ -116,7 +116,7 @@ class GridTemplate
 
   virtual const char* getClassName(void) const = 0;
 
-  virtual double getWidth() const = 0;
+  virtual int getWidth() const = 0;
   
  protected:
 

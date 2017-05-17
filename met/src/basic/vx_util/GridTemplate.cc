@@ -273,8 +273,7 @@ GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width) {
 		return new RectangularTemplate(width,width);
 
 	case(GridTemplate_Circle):
-		// circle takes a radius, not a width		
-		return new CircularTemplate((width-1)/2);
+		return new CircularTemplate(width);
 
 	default:
 		mlog << Error << "\nbuildGT() -> "
