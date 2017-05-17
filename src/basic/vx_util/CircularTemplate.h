@@ -64,7 +64,7 @@ class CircularTemplate : public GridTemplate
 
   // Constructor
 
-  CircularTemplate(const double radius = 0.0); // Radius in number of grid squares
+  CircularTemplate(int width = 0); 
   
   // Destructor
 
@@ -76,18 +76,11 @@ class CircularTemplate : public GridTemplate
   
   // Access methods
 
-  double getRadius(void) const
+  int getWidth(void) const
   {
-    return _radius;
-  }
-
-  double getWidth(void) const
-  {
-	  //inverse of how GridTemplateFactory::buildGT gets the radius from a width
-	  return _radius*2 + 1;
+	  return _width;
   }
   
-  void setRadius(const double radius);
   
   virtual const char* getClassName(void) const{
 	  return _className();
@@ -95,9 +88,7 @@ class CircularTemplate : public GridTemplate
 
  private:
 
-  // The circle radius in number of grid squares
-
-  double _radius;
+  int _width;
   
   // Return the class name for error messages.
   static const char* _className(void)

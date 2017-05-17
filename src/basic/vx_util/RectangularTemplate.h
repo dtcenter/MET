@@ -85,9 +85,8 @@ class RectangularTemplate : public GridTemplate
 {
  public:
 
-  // Constructor - if the width and height are not odd, they will get
-	// 			         rounded down to the nearest odd integer.	
-  RectangularTemplate(double height, double width);
+  // Constructor 
+  RectangularTemplate(int height, int width);
   
   // Destructor
 
@@ -99,12 +98,12 @@ class RectangularTemplate : public GridTemplate
   
   // Access methods
 
-  double getHeight(void) const
+  int getHeight(void) const
   {
     return _height;
   }
 
-  double getWidth(void) const
+  int getWidth(void) const
   {
     return _width;
   }
@@ -117,8 +116,8 @@ class RectangularTemplate : public GridTemplate
 
   // The box dimensions
 
-  double _width;
-  double _height;
+  int _width;
+  int _height;
   
   // Return the class name for error messages.
   static const char* _className(void)

@@ -314,9 +314,16 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
    double count = 0;
    double wght_sum = 0;
    double numerator = 0;
+   
    int x = nint(obs_x);
    int y = nint(obs_y);
    
+ 	 // if width is even, push center to lower left instead of nearest for squares
+   if (( (gt.getWidth() % 2 ) == 0) && (dynamic_cast<const RectangularTemplate*>(&gt) != NULL)){
+		 x = floor(obs_x);
+		 y = floor(obs_y);
+	 }
+  
    for( GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
         gp != NULL; gp = gt.getNextInGrid()){
 	   
@@ -654,7 +661,14 @@ double compute_horz_interp(const DataPlane &dp,
 
 	 int x = nint(obs_x);
 	 int y = nint(obs_y);
-	 
+
+	 // if width is even, push center to lower left point instead of nearest for squares
+	 if ( ( (width % 2 ) == 0) && (shape == GridTemplateFactory::GridTemplate_Square)){
+		 x = static_cast<int>(floor(obs_x));
+		 y = static_cast<int>(floor(obs_y));
+	 }
+
+
 	 GridTemplateFactory gtf;
 	 const GridTemplate* gt = gtf.buildGT(shape,width);
 
