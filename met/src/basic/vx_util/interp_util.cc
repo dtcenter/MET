@@ -318,8 +318,8 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
    int x = nint(obs_x);
    int y = nint(obs_y);
    
- 	 // if width is even, push center to lower left instead of nearest for squares
-   if (( (gt.getWidth() % 2 ) == 0) && (dynamic_cast<const RectangularTemplate*>(&gt) != NULL)){
+ 	 // if width is even, push center to lower left instead of nearest
+   if ( (gt.getWidth() % 2 ) == 0){
 		 x = floor(obs_x);
 		 y = floor(obs_y);
 	 }
@@ -662,8 +662,8 @@ double compute_horz_interp(const DataPlane &dp,
 	 int x = nint(obs_x);
 	 int y = nint(obs_y);
 
-	 // if width is even, push center to lower left point instead of nearest for squares
-	 if ( ( (width % 2 ) == 0) && (shape == GridTemplateFactory::GridTemplate_Square)){
+	 // if width is even, push center to lower left point instead of nearest
+	 if ( (width % 2 ) == 0){
 		 x = static_cast<int>(floor(obs_x));
 		 y = static_cast<int>(floor(obs_y));
 	 }
