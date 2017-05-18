@@ -611,6 +611,16 @@ void process_scores() {
         << " pass(es) through the " << grid.nx() << " x "
         << grid.ny() << " grid.\n";
 
+   // Print a warning for too many passes through the data
+   if(n_reads > 4) {
+      mlog << Warning
+           << "\nA block size of " << conf_info.block_size << " for a "
+           << grid.nx() << " x " << grid.ny() << " grid requires "
+           << n_reads << " passes through the data which will be slow.\n"
+           << "Consider increasing \"block_size\" in the configuration "
+           << "file based on available memory.\n\n";
+   }
+
    // Loop over the data reads
    for(i_read=0; i_read<n_reads; i_read++) {
 
