@@ -207,7 +207,12 @@ void StatHdrColumns::set_interp_mthd(const char *s,
                                      GridTemplateFactory::GridTemplates shape) {
    ConcatString mthd = s;
    if(shape != GridTemplateFactory::GridTemplate_None &&
-      mthd  != interpmthd_nearest_str) {
+      mthd  != interpmthd_nearest_str &&
+      mthd  != interpmthd_force_str  &&
+      mthd  != interpmthd_upper_left_str  &&
+      mthd  != interpmthd_upper_right_str  &&
+      mthd  != interpmthd_lower_right_str  &&
+      mthd  != interpmthd_lower_left_str ) {
       GridTemplateFactory gtf;
       mthd << '_' << gtf.enum2String(shape).c_str();
    }

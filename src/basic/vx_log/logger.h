@@ -218,7 +218,7 @@ class Logger
          //
       ConcatString LogFilename;
 
-      ofstream * out;  // allocated
+      std::ofstream * out;  // allocated
 
          //
          // do stuff
@@ -238,7 +238,7 @@ class Logger
 
       void clear();
 
-      void dump (ostream &, int = 1) const;
+      void dump (std::ostream &, int = 1) const;
 
          //
          // get stuff
@@ -266,7 +266,7 @@ class Logger
       void open_log_file(const char *);
 
       Logger & operator<<(const char *);
-      Logger & operator<<(string);
+      Logger & operator<<(std::string);
       Logger & operator<<(const int);
       Logger & operator<<(const long);
       Logger & operator<<(const long long);
@@ -291,7 +291,7 @@ inline int Logger::verbosity_level() const { return (VerbosityLevel); }
 
 inline bool Logger::is_open() const { return (out != 0); }
 
-inline Logger & Logger::operator<<(string s){ return *this << s.c_str(); }
+inline Logger & Logger::operator<<(std::string s){ return *this << s.c_str(); }
 
 
 //////////////////////////////////////////////////////////////////
