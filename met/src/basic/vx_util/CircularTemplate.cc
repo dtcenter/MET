@@ -48,10 +48,14 @@
 #include <math.h>
 #include <cstdio>
 
+#include "logger.h"
+
 #include <CircularTemplate.h>
 #include <GridOffset.h>
 #include <GridTemplate.h>
+
 using namespace std;
+
 
 /**********************************************************************
  * Constructor
@@ -61,12 +65,19 @@ CircularTemplate::CircularTemplate(const int width) :
 	GridTemplate(),
 	_width(width)
 {
+
+	//width less than 3 is not supported
+	if (width < 3){
+		mlog << Error << "CircularTemplate::CircularTemplate() -> unsupported width of " << width
+		     << ".  Width must be at least 3 for circles.\n";
+		exit(1);
+	}
 	
 	bool evenWidth = ((width % 2) == 0);
 	// if the width is even, that means we are dealing with a point interpolation
 	// because grid interpolation has to be odd.
 
-	// for an ODD WIDTH the center point is the nearest grid point
+	// for an ODD WIDTH the reference point is the same as the center point and is the nearest grid point
 	
 	// for an EVEN WIDTH, we move the "reference" point, to the lower left grid point,
 	// this means offsets are stored relative to the lower left corner of the true center.
@@ -79,13 +90,15 @@ CircularTemplate::CircularTemplate(const int width) :
 
 	// If the radius is small, then just make the
   // template cover the current grid square.
-
+	// radius < 1 no longer supported.
+	/*
   if (radius < 1.0)
   {
     _addOffset(0, 0);
     return;
   }
-
+	*/
+	
   // need to increase the area we look at if the width is even, because
   // some valid offset points will actually be farther from the reference point
   // than the radius, because the reference point is offset from the true

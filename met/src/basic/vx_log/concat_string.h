@@ -160,7 +160,7 @@ class ConcatString {
 
       int format(const char *format, ...);
 
-      bool read_line(istream &);   //  read a line from the input stream
+      bool read_line(std::istream &);   //  read a line from the input stream
 
       //  replace all occurences of target with replacement
       //  if "replacement" is an environment variable, use it's value
@@ -204,7 +204,7 @@ extern ConcatString to_lower(const ConcatString &);
    //
 
 
-extern ostream & operator<<(ostream &, const ConcatString &);
+extern std::ostream & operator<<(std::ostream &, const ConcatString &);
 
 
 ////////////////////////////////////////////////////////////////////////
