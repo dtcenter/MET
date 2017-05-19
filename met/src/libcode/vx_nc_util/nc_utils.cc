@@ -59,8 +59,8 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
       att->getValues(att_value);
       att_value[att_size] = '\0';
       value = att_value;
-      status = true;
       if(att_value) { delete [] att_value; att_value = 0; }
+      status = true;
    }
    return status;
 }
@@ -83,11 +83,13 @@ double get_att_value_double(const NcAtt *att) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double *get_att_value_doubles(const NcAtt *att) {
+void get_att_value_doubles(const NcAtt *att, NumArray &value) {
+   value.erase();
    double *values = new double[att->getAttLength()];
    att->getValues(values);
+   for(int i=0; i<=att->getAttLength(); i++) value.add(values[i]);
    if(values) { delete [] values; values = 0; }
-   return values;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

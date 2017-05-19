@@ -25,6 +25,7 @@ typedef signed char ncbyte; // from ncvalues.h
 
 #include "concat_string.h"
 #include "long_array.h"
+#include "num_array.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -67,7 +68,7 @@ extern bool      get_att_value_chars  (const NcAtt *, ConcatString &);
 extern int       get_att_value_int    (const NcAtt *);
 extern long long get_att_value_llong  (const NcAtt *);
 extern double    get_att_value_double (const NcAtt *);
-extern double*   get_att_value_doubles(const NcAtt *);
+extern void      get_att_value_doubles(const NcAtt *, NumArray &);
 extern float     get_att_value_float  (const NcAtt *);
 
 extern bool      get_att_value_string(const NcVar *, const ConcatString &, ConcatString &);
