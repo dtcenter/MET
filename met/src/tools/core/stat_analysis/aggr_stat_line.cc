@@ -2393,6 +2393,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          // valid ensemble count
          //
          m[key].ens_pd.add_obs(0.0, 0.0, cur.obs, cur.climo, bad_data_double);
+         m[key].ens_pd.skip_pair(false);
          m[key].ens_pd.mn_na.add(cur.ens_mean);
          m[key].ens_pd.spread_na.add(cur.ens_spread);
          for(i=0, n_valid=0; i<m[key].ens_pd.n_ens; i++) {
