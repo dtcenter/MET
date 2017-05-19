@@ -19,8 +19,7 @@ bin_PROGRAMS    = chk4copyright \
 	gribtab_dat_to_flat  \
 	nceptab_to_flat  \
 	insitu_nc_to_ascii \
-	swinging_door \
-	climobin2nc
+	swinging_door
 
 chk4copyright_SOURCES = chk4copyright.cc
 chk4copyright_CPPFLAGS = ${MET_CPPFLAGS}
@@ -92,17 +91,6 @@ swinging_door_SOURCES = swinging_door.cc \
 swinging_door_CPPFLAGS = ${MET_CPPFLAGS}
 swinging_door_LDFLAGS = ${MET_LDFLAGS}
 swinging_door_LDADD = -lvx_time_series \
-	-lvx_nc_util \
-	-lvx_util \
-	-lvx_math \
-	-lvx_cal \
-	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf
-
-climobin2nc_SOURCES = climobin2nc.cc
-climobin2nc_CPPFLAGS = ${MET_CPPFLAGS}
-climobin2nc_LDFLAGS = ${MET_LDFLAGS}
-climobin2nc_LDADD = \
 	-lvx_nc_util \
 	-lvx_util \
 	-lvx_math \
