@@ -46,7 +46,7 @@ static const char dim_lat_nt[] = "nlat";
 static const char dim_lon_nt[] = "nlon";
 static const char var_lat_nt[] = "tlat";
 static const char var_lon_nt[] = "tlon";
-           
+
 static ConcatString x_dim_var_name;
 static ConcatString y_dim_var_name;
 //const char * t_dim_var_name;
@@ -218,7 +218,7 @@ bool NcCfFile::open(const char * filepath)
   }
   else
   {
-    
+
     // Store the dimension for the time variable as the time dimension
     tDim = get_nc_dim(valid_time_var, 0);
     _tDim = &tDim;
@@ -229,7 +229,7 @@ bool NcCfFile::open(const char * filepath)
     if (!IS_INVALID_NC(units_att))
     {
       get_att_value_chars(&units_att, units);
-      
+
       if (units.length() == 0)
       {
          mlog << Warning << "\nNcCfFile::open() -> "
@@ -312,7 +312,7 @@ bool NcCfFile::open(const char * filepath)
 
     double time_value = get_double_var(&init_time_var,(int)0);
     InitTime = (unixtime)ut + sec_per_unit * time_value;
-    
+
     //bool no_leap_year = get_att_no_leap_year(&init_time_var);
     //if (sec_per_unit == 86400 && no_leap_year) {
     //  InitTime = add_days_to_unix_no_leap((unixtime)ut, (int)time_value);
@@ -1571,11 +1571,10 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   // the center of the earth rather than the regular map coordinate system.
 
   LambertData data;
-  //double *double_data = new double[2];
   double double_data;
-  double *double_datas;
+  NumArray double_datas;
   data.name = lambert_proj_type;
-  double_datas = get_att_value_doubles(&std_parallel_att);
+  get_att_value_doubles(&std_parallel_att, double_datas);
   data.scale_lat_1 = double_datas[0];
   if (std_parallel_att.getAttLength() == 1)
     data.scale_lat_2 = data.scale_lat_1;
@@ -1583,7 +1582,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     data.scale_lat_2 = double_datas[1];
   double_data = get_att_value_double(&proj_origin_lat_att);
   data.lat_pin = double_data;
-  double_datas = get_att_value_doubles(&central_lon_att);
+  get_att_value_doubles(&central_lon_att, double_datas);
   data.lon_pin = -double_datas[0];
   data.x_pin = x_pin;
   data.y_pin = y_pin;
@@ -1922,7 +1921,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     int count = sa.n_elements();
     x_dim_var_name = sa[count-2];
     y_dim_var_name = sa[count-1];
- 
+
     float lat_missing_value = bad_data_double;
     float lon_missing_value = bad_data_double;
     for (int var_num = 0; var_num < Nvars; ++var_num) {
@@ -1941,7 +1940,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
         }
       }
     }
-    
+
     if (_xCoordVar == 0) {
       mlog << Error << "\n" << method_name << " -> "
            << "Didn't find X coord variable (" << x_dim_var_name
@@ -1949,7 +1948,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       //exit(1);
       return true;
     }
-  
+
     if (_yCoordVar == 0) {
       mlog << Error << "\n" << method_name << " -> "
            << "Didn't find Y coord variable (" << y_dim_var_name
@@ -1957,7 +1956,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       //exit(1);
       return true;
     }
-    
+
     StringArray dimNames;
     get_dim_names(_xCoordVar, &dimNames);
     NcDim xDim, yDim;
@@ -1979,7 +1978,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     long lat_counts = GET_NC_SIZE(yDim);
     long lon_counts = GET_NC_SIZE(xDim);
     bool two_dim_corrd = false;
-    
+
     if (get_data_size(_xCoordVar) == (lon_counts*lat_counts) ||
         get_data_size(_yCoordVar) == (lon_counts*lat_counts)) {
       two_dim_corrd = true;
@@ -1991,12 +1990,12 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
            << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
       exit(1);
     }
-  
+
     // Figure out the dlat/dlon values from the dimension variables
-  
+
     double lat_values[lat_counts];
     double lon_values[lon_counts];
-  
+
     //_yCoordVar->get(lat_values, &lat_counts);
     if (two_dim_corrd) {
       long cur[2], length[2];
@@ -2014,23 +2013,23 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       get_nc_data(_yCoordVar,lat_values);
       get_nc_data(_xCoordVar,lon_values);
     }
-  
+
     // Calculate dlat and dlon assuming they are constant.  MET requires that
     // dlat be equal to dlon
-  
+
     double dlat = lat_values[1] - lat_values[0];
     double dlon = rescale_lon(lon_values[1] - lon_values[0]);
-  
+
     if (fabs(dlat - dlon) > DELTA_TOLERANCE)
     {
       mlog << Error << "\n" << method_name << " -> "
            << "MET can only process Latitude/Longitude files where the delta lat and delta lon are the same\n\n";
       exit(1);
     }
-  
+
     // As a sanity check, make sure that the deltas are constant through the
     // entire grid.  CF compliancy doesn't require this, but MET does.
-  
+
     for (int i = 1; i < (int)lat_counts; ++i)
     {
       if ((fabs(lat_missing_value - lat_values[i]) < DELTA_TOLERANCE) ||
@@ -2043,7 +2042,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
         exit(1);
       }
     }
-  
+
     for (int i = 1; i < (int)lon_counts; ++i)
     {
       if ((fabs(lon_missing_value - lon_values[i]) < DELTA_TOLERANCE) ||
@@ -2056,19 +2055,19 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
         exit(1);
       }
     }
-  
+
     // Fill in the data structure.  Remember to negate the longitude
     // values since MET uses the mathematical coordinate system centered on
     // the center of the earth rather than the regular map coordinate system.
-  
+
     // Note that I am assuming that the data is ordered from the lower-left
     // corner.  I think this will generally be the case, but it is not
     // guaranteed anywhere that I see.  But if this is not the case, then we
     // will probably also need to reorder the data itself.
-  
+
     LatLonData data;
     bool swap_to_north = false;
-  
+
     data.name = latlon_proj_type;
     data.lat_ll = lat_values[0];
     data.lon_ll = -lon_values[0];
@@ -2081,11 +2080,11 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       data.lat_ll = lat_values[lat_counts-1];
       swap_to_north = true;
     }
-  
+
     grid.set(data);
     grid.set_swap_to_north(swap_to_north);
   }
-  
+
   return true;
 }
 
