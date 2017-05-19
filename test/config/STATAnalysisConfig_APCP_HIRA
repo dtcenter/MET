@@ -67,7 +67,7 @@ jobs = [
     -by INTERP_MTHD,INTERP_PNTS \
     -out_stat ${OUTPUT_DIR}/stat_analysis_CONFIG_HIRA_agg_pct_out.stat",
 
-   "-job aggregate_stat -line_type MPR -out_line_type CTC -interp_mthd NBRHD \
+   "-job aggregate_stat -line_type MPR -out_line_type CTC -interp_mthd NBRHD_SQUARE \
     -by INTERP_PNTS,FCST_THRESH \
     -out_fcst_thresh ge0.5 -out_obs_thresh gt0 \
     -out_stat ${OUTPUT_DIR}/stat_analysis_CONFIG_HIRA_agg_stat_mpr_ctc_out.stat"
