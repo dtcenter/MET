@@ -76,6 +76,7 @@ obs = fcst;
 //
 message_type   = [ "ADPUPA" ];
 sid_exc        = [];
+obs_thresh     = [];
 obs_quality    = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
@@ -88,6 +89,7 @@ skip_const     = FALSE;
 //
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
+ens_econ_bin_size  = 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -148,7 +150,7 @@ interp = {
    field      = BOTH;
    vld_thresh = 1.0;
    shape  = SQUARE;
-   
+
    type = [
       {
          method = NEAREST;
