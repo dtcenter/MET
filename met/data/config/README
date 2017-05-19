@@ -233,7 +233,6 @@ obtype = "ANALYS";
 //    - The "shape" entry defines the shape of the neighborhood.
 //      Valid values are "SQUARE" or "CIRCLE"
 //
-
 //
 regrid = {
    to_grid    = NONE;
@@ -1186,20 +1185,30 @@ ens = {
 }
 
 //
-// The fcst and obs entries is as described above and used by Ensemble-Stat to
-// compute rank histograms, probability integral transform histograms, spread-skill
-// variance, and a other statistics. In this application the cat_thresh is not
-// needed but "ens_ssvar_bin_size" and "ens_phist_bin_size" may be.
-// The "ens_ssvar_bin_size" entry sets the width of the variance bins.  Smaller values
-// provide the user with more flexibility in how data are binned during analysis.
-// The "ens_phist_bin_size" is set to a value between 0 and 1.  The number of bins
-// for the probability integral transform histogram in the PHIST line type is
-// defined as the ceiling of 1.0 / ens_phist_bin_size.
+// The fcst and obs entries define the fields for which Ensemble-Stat should
+// compute rank histograms, probability integral transform histograms,
+// spread-skill variance, relative position histograms, economic value, and
+// other statistics.
+//
+// The "ens_ssvar_bin_size" entry sets the width of the variance bins.  Smaller
+// bin sizes provide the user with more flexibility in how data are binned
+// during analysis.  The actual variance of the ensemble data will determine the
+// number of bins written to the SSVAR output lines.
+//
+// The "ens_phist_bin_size" is set to a value between 0 and 1.  The number of
+// bins for the probability integral transform histogram in the PHIST line type
+// is defined as the ceiling of 1.0 / ens_phist_bin_size.  For example, a bin
+// size of 0.05 results in 20 PHIST bins.
+//
+// The "ens_econ_bin_size" is set to a value between 0 and 1.  The number of
+// economic value cost/loss bins written to the ECON output line is determined
+// by this bin size.
 //
 fcst = {
    message_type = [ "ADPUPA" ];
    ens_ssvar_bin_size = 1;
    ens_phist_bin_size = 0.05;
+   ens_econ_bin_size  = 0.05;
 
    field = [
       {
@@ -1208,6 +1217,13 @@ fcst = {
       }
    ];
 }
+
+//
+// The "obs_thresh" entry is an array of thresholds for filtering observation
+// values prior to applying ensemble verification logic.  The default setting
+// of NA means that no observations should be filtered out.
+//
+obs_thresh = [ NA ];
 
 //
 // Setting "skip_const" to true tells Ensemble-Stat to exclude pairs where all the
