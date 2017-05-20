@@ -753,7 +753,6 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    info.method     = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
    info.width      = regrid_dict->lookup_int(conf_key_width);
 
-
    // Conf: shape
    v = regrid_dict->lookup_int(conf_key_shape, false);
    if (regrid_dict->last_lookup_status()) {
@@ -765,52 +764,59 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    }
 
    info.validate();
+
    return(info);
 }
 
 ////////////////////////////////////////////////////////////////////////
+
 void InterpInfo::validate(){
 
-	for (unsigned int i=0; i < n_interp; i++){
+   for(unsigned int i=0; i<n_interp; i++) {
 
-		InterpMthd methodi = string_to_interpmthd(method[i]);
-		// Check the nearest neighbor special case
-		if(width[i]  == 1 &&
-		   methodi != InterpMthd_Nearest &&
-		   methodi != InterpMthd_Force &&
-		   methodi != InterpMthd_Upper_Left &&
-		   methodi != InterpMthd_Upper_Right &&
-		   methodi != InterpMthd_Lower_Right &&
-		   methodi != InterpMthd_Lower_Left) {
-			mlog << Warning << "\n" //parse_conf_regrid() -> "
-			     << "Resetting interpolation method " << (int)i << " from \""
-			     << method[i] << "\" to \""
-			     << interpmthd_nearest_str
-			     << "\" since the interpolation width is 1.\n\n";
-			method.set(i,interpmthd_nearest_str);
-		}
+      InterpMthd methodi = string_to_interpmthd(method[i]);
 
-		// check if method is nearest, that width is 1
-		if ((methodi == InterpMthd_Nearest) &&
-		    (width[i] != 1)){
-			mlog << Warning << "\n"
-			     << "Resetting interpolation width " << (int)i << " from "
-			     << width[i] << " to 1 for interpolation method \""
-			     << interpmthd_nearest_str << "\".\n\n";
-			width.set(i, 1);
-		}	   
+      // Check the nearest neighbor special case
+      if(width[i] == 1 &&
+         methodi  != InterpMthd_Nearest &&
+         methodi  != InterpMthd_Force &&
+         methodi  != InterpMthd_Upper_Left &&
+         methodi  != InterpMthd_Upper_Right &&
+         methodi  != InterpMthd_Lower_Right &&
+         methodi  != InterpMthd_Lower_Left) {
+         mlog << Warning << "\nInterpInfo::validate() -> "
+              << "Resetting interpolation method " << (int) i << " from \""
+              << method[i] << "\" to \""
+              << interpmthd_nearest_str
+              << "\" since the interpolation width is 1.\n\n";
+         method.set(i, interpmthd_nearest_str);
+      }
 
-		// Check the bilinear and budget special cases
-		if((methodi == InterpMthd_Bilin ||
-		    methodi == InterpMthd_Budget) &&
-		   width[i] != 2) {
-			mlog << Warning << "\n"//parse_conf_regrid() -> "
-			     << "Resetting interpolation width " << (int)i << " from "
-			     << width[i] << " to 2 for interpolation method \""
-			     << method[i] << "\".\n\n";
-			width.set(i, 2);
-		}
-	}
+      // Check for some methods, that width is 1
+      if((methodi == InterpMthd_Nearest || 
+          methodi == InterpMthd_Upper_Left || 
+          methodi == InterpMthd_Upper_Right || 
+          methodi == InterpMthd_Lower_Right ||
+          methodi == InterpMthd_Lower_Left) &&
+         width[i] != 1) {
+         mlog << Warning << "\nInterpInfo::validate() -> "
+              << "Resetting interpolation width " << (int) i << " from "
+              << width[i] << " to 1 for interpolation method \""
+              << method[i] << "\".\n\n";
+         width.set(i, 1);
+      }
+
+      // Check the bilinear and budget special cases
+      if((methodi == InterpMthd_Bilin ||
+          methodi == InterpMthd_Budget) &&
+         width[i] != 2) {
+         mlog << Warning << "\nInterpInfo::validate() -> "
+              << "Resetting interpolation width " << (int) i << " from "
+              << width[i] << " to 2 for interpolation method \""
+              << method[i] << "\".\n\n";
+         width.set(i, 2);
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -918,33 +924,6 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
             // Store the current width
             width = nint(wdth_na[k]);
 
-            //TODO:  I think this checking can be removed and replaced with a call to info.validate() at the end.
-            
-            // Check the nearest neighbor special case
-            if(width  == 1 &&
-               method != InterpMthd_Nearest &&
-               method != InterpMthd_Upper_Left &&
-               method != InterpMthd_Upper_Right &&
-               method != InterpMthd_Lower_Right &&
-               method != InterpMthd_Lower_Left) {
-               mlog << Warning << "\nparse_conf_interp() -> "
-                    << "Resetting the interpolation method from \""
-                    << interpmthd_to_string(method) << "\" to \""
-                    << interpmthd_nearest_str
-                    << "\" since the regridding width is 1.\n\n";
-               method = InterpMthd_Nearest;
-            }
-
-            // Check the bilinear special case
-            if(width  != 2 &&
-               method == InterpMthd_Bilin) {
-               mlog << Warning << "\nparse_conf_interp() -> "
-                    << "Resetting the interpolation width from "
-                    << width << " to 2 for interpolation method \""
-                    << interpmthd_to_string(method) << "\".\n\n";
-               width = 2;
-            }
-
             // Add the current entries
             info.n_interp += 1;
             info.method.add(interpmthd_to_string(method));
@@ -962,6 +941,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    }
 
    info.validate();
+
    return(info);
 }
 
