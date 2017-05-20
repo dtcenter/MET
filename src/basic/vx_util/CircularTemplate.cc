@@ -66,11 +66,11 @@ CircularTemplate::CircularTemplate(const int width) :
 	_width(width)
 {
 
-	//width less than 3 is not supported
-	if (width < 3){
+	//width of 2 is not supported
+	if (width == 2){
 		mlog << Error << "\nCircularTemplate::CircularTemplate() -> "
                      << "unsupported width of " << width
-		     << ".  Width must be at least 3 for circles.\n\n";
+		     << " for circles.\n\n";
 		exit(1);
 	}
 	
