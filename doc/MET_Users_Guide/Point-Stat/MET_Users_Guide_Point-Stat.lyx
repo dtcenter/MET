@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -145,7 +147,7 @@ The statistical methods and measures computed by the Point-Stat tool are
  In addition, Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:PS_Interpolation/matching-methods"
+reference "subsec:PS_Interpolation/matching-methods"
 
 \end_inset
 
@@ -155,7 +157,7 @@ reference "sub:PS_Interpolation/matching-methods"
  briefly in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:PS_Statistical-measures"
+reference "subsec:PS_Statistical-measures"
 
 \end_inset
 
@@ -170,7 +172,7 @@ reference "chap:App_C-Verification-Measures"
  Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:PS_Statistical-confidence-intervals"
+reference "subsec:PS_Statistical-confidence-intervals"
 
 \end_inset
 
@@ -190,7 +192,7 @@ reference "chap:App_D-Confidence-Intervals"
 Interpolation/matching methods
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PS_Interpolation/matching-methods"
+name "subsec:PS_Interpolation/matching-methods"
 
 \end_inset
 
@@ -706,7 +708,7 @@ This method is performed using the four closest grid squares.
 HiRA framework
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PS_HiRA_framework"
+name "subsec:PS_HiRA_framework"
 
 \end_inset
 
@@ -730,11 +732,78 @@ l forecast threshold criteria.
  forecast thresholds and HiRA neighborhood widths chosen.
 \end_layout
 
+\begin_layout Standard
+The HiRA framework provides a unique method for evaluating models in the
+ neighborhood of point observations, allowing for some spatial and temporal
+ uncertainty in the forecast and / or the observations.
+ Additionally, the HiRA framework can be used to compare deterministic forecasts
+ to ensemble forecasts.
+ In MET, the neighborhood is a circle or square centered on the grid point
+ closest to the observation location.
+ An event is defined, then the proportion of points with events in the neighborh
+ood is calculated.
+ This proportion is treated as an ensemble probability, though it is likely
+ to be uncalibrated.
+ 
+\end_layout
+
+\begin_layout Standard
+Figure1.3 shows a couple of examples of how the HiRA proportion is derived
+ at a single model level using square neighborhoods.
+ Events (in our case, model accretion values > 0) are separated from non-events
+ (model accretion value = 0).
+ Then, in each neighborhood, the total proportion of events is calculated.
+ In the leftmost panel, four events exist in the 25 point neighborhood,
+ making the HiRA proportion is 4/25 = 0.16.
+ For the neighborhood of size 9 centered in that same panel, the HiRA proportion
+ is 1/9.
+ In the right panel, the size 25 neighborhood has HiRA proportion of 6/25,
+ with the centered 9-point neighborhood having a HiRA value of 2/9.
+ To extend this method into 3-dimensions, all layers within the user-defined
+ layer are also included in the calculation of the proportion in the same
+ manner.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fig4.3.png
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset CommandInset label
+LatexCommand label
+name "Fig_HiRA_Example"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Often, the neighborhood size is chosen so that multiple models to be compared
+ have approximately the same horizontal resolution.
+ Then, standard metrics for probabilistic forecasts, such as Brier Score,
+ can be used to compare those forecasts.
+ HiRA was developed using surface observation stations so the neighborhood
+ lies completely within the horizontal plane.
+ With any type of upper air observation, the vertical neighborhood must
+ also be defined.
+ 
+\end_layout
+
 \begin_layout Subsection
 Statistical measures
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PS_Statistical-measures"
+name "subsec:PS_Statistical-measures"
 
 \end_inset
 
@@ -940,7 +1009,7 @@ Measures for comparison against climatology
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Climatology"
+name "subsec:Climatology"
 
 \end_inset
 
@@ -984,7 +1053,7 @@ Often, the sample climatology is used as a reference by a skill score.
 Statistical confidence intervals
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PS_Statistical-confidence-intervals"
+name "subsec:PS_Statistical-confidence-intervals"
 
 \end_inset
 
@@ -1390,7 +1459,7 @@ reference "chap:Re-Formatting-of-Point"
  in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:PS_Interpolation/matching-methods"
+reference "subsec:PS_Interpolation/matching-methods"
 
 \end_inset
 
@@ -1404,7 +1473,7 @@ reference "sub:PS_Interpolation/matching-methods"
 point_stat usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:point_stat-usage"
+name "subsec:point_stat-usage"
 
 \end_inset
 
@@ -1746,7 +1815,7 @@ sample_pb.nc
 point_stat configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:point_stat-configuration-file"
+name "subsec:point_stat-configuration-file"
 
 \end_inset
 
@@ -1783,7 +1852,7 @@ Note that environment variables may be used when editing configuration files,
  as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-configuration-file"
+reference "subsec:pb2nc-configuration-file"
 
 \end_inset
 
@@ -1913,7 +1982,7 @@ duplicate_flag
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -1946,7 +2015,7 @@ obs
  dictionaries of the configuration file is described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2346,7 +2415,7 @@ Note that the first two line types are easily derived from each other.
  The output line types are described in more detail in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:point_stat-output"
+reference "subsec:point_stat-output"
 
 \end_inset
 
@@ -2374,7 +2443,7 @@ If all line types corresponding to a particular verificaiton method are
 point_stat output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:point_stat-output"
+name "subsec:point_stat-output"
 
 \end_inset
 
@@ -2490,7 +2559,7 @@ name "table_PS_header_info_point-stat_out"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="9cm">
@@ -3260,7 +3329,7 @@ name "table_PS_format_info_FHO"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -3521,7 +3590,7 @@ name "table_PS_format_info_CTC"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -3813,7 +3882,7 @@ name "table_PS_format_info_CTS"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -4399,7 +4468,7 @@ name "table_PS_format_info_CTS_cont"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="12" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -4952,7 +5021,7 @@ name "table_PS_format_info_CNT"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.2cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -5597,7 +5666,7 @@ name "table_PS_format_info_CNT_cont"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.2cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -6179,7 +6248,7 @@ name "table_PS_format_info_MCTC"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -6409,7 +6478,7 @@ name "table_PS_format_info_MCTS"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -6746,7 +6815,7 @@ name "table_PS_format_info_PCT"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.5cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -7064,7 +7133,7 @@ name "table_PS_format_info_PSTD"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.2cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -7549,7 +7618,7 @@ name "table_PS_format_info_PJC"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.5cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -7987,7 +8056,7 @@ name "table_PS_format_info_PRC"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -8304,7 +8373,7 @@ name "table_PS_format_info_SL1L2"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -8667,7 +8736,7 @@ name "table_PS_format_info_SAL1L2"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -9030,7 +9099,7 @@ name "table_PS_format_info_VL1L2"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -9441,7 +9510,7 @@ name "table_PS_format_info_VAL1L2"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -9851,7 +9920,7 @@ name "table_PS_format_info_MPR"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
