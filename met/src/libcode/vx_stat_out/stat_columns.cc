@@ -323,6 +323,41 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_eclv_header_row(int hdr_flag, int n_bin, AsciiTable &at,
+                           int r, int c) {
+   int i, col;
+   char tmp_str[max_str_len];
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_header_columns; i++)
+         at.set_entry(r, i+c, hdr_columns[i]);
+
+      c += n_header_columns;
+   }
+
+   // Write the columns names specific to the ECLV line type
+   at.set_entry(r, c+0, eclv_columns[0]);
+   at.set_entry(r, c+1, eclv_columns[1]);
+   at.set_entry(r, c+2, eclv_columns[2]);
+
+   // Write COST_i and LOSS_i for each bin
+   for(i=0, col=c+3; i<n_bin; i++) {
+
+      sprintf(tmp_str, "%s%i", eclv_columns[3], i+1);
+      at.set_entry(r, col, tmp_str);
+      col++;
+
+      sprintf(tmp_str, "%s%i", eclv_columns[4], i+1);
+      at.set_entry(r, col, tmp_str);
+      col++;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
                             int r, int c) {
    int i, col;
@@ -427,6 +462,35 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+13+n_ens, orank_columns[14]);
    at.set_entry(r, c+14+n_ens, orank_columns[15]);
    at.set_entry(r, c+15+n_ens, orank_columns[16]);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
+                           int r, int c) {
+   int i, col;
+   char tmp_str[max_str_len];
+
+   // Write the header column names if requested
+   if(hdr_flag) {
+      for(i=0; i<n_header_columns; i++)
+         at.set_entry(r, i+c, hdr_columns[i]);
+
+      c += n_header_columns;
+   }
+
+   // Write the columns names specific to the RELP line type
+   at.set_entry(r, c+0, relp_columns[0]);
+   at.set_entry(r, c+1, relp_columns[1]);
+
+   // Write RELP_i for each ensemble member
+   for(i=0, col=c+2; i<n_ens; i++) {
+      sprintf(tmp_str, "%s%i", relp_columns[2], i+1);
+      at.set_entry(r, col, tmp_str);
+      col++;
+   }
 
    return;
 }
@@ -1018,6 +1082,43 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_eclv_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
+                    bool txt_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+
+   // ECLV line type
+   shc.set_line_type(stat_eclv_str);
+
+   // Not Applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+   shc.set_alpha(bad_data_double);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_eclv_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(txt_flag) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
                    bool txt_flag,
                    AsciiTable &stat_at, int &stat_row,
@@ -1408,6 +1509,43 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
       stat_row++;
 
    } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
+                    bool txt_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+
+   // RELP line type
+   shc.set_line_type(stat_relp_str);
+
+   // Not Applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+   shc.set_alpha(bad_data_double);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_relp_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(txt_flag) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
 
    return;
 }
@@ -2614,6 +2752,48 @@ void write_prc_cols(const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_eclv_cols(const PairDataEnsemble *pd_ptr,
+                     AsciiTable &at, int r, int c) {
+
+/* TODO write the ECLV output line
+
+   int i, col;
+
+   //
+   // Economic Cost/Loss Value
+   // Dump out the ECLV line:
+   //    TOTAL,   BIN_SIZE, N_BIN,
+   //    [COST_], [LOSS_] (for each bin)
+   //
+   at.set_entry(r, c+0,  // Total Number of pairs
+      pd_ptr->n_pair);
+
+   at.set_entry(r, c+1,  // Bin size
+      pd_ptr->eclv_bin_size);
+
+   at.set_entry(r, c+2,  // Number of bins
+      pd_ptr->eclv_cost_na.n_elements());
+
+   //
+   // Write COST_i and LOSS_i count for each bin
+   //
+   for(i=0, col=c+3; i<pd_ptr->eclv_cost_na.n_elements(); i++) {
+
+      at.set_entry(r, col, // COST_i
+         pd_ptr->eclv_cost_na[i]);
+      col++;
+
+      at.set_entry(r, col, // LOSS_i
+         pd_ptr->eclv_loss_na[i]);
+      col++;
+   }
+*/
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_nbrctc_cols(const NBRCTSInfo &nbrcts_info,
                        AsciiTable &at, int r, int c) {
 
@@ -2829,6 +3009,7 @@ void write_isc_cols(const ISCInfo &isc_info, int i,
 
    return;
 }
+
 ////////////////////////////////////////////////////////////////////////
 
 void write_rhist_cols(const PairDataEnsemble *pd_ptr,
@@ -3124,6 +3305,36 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
 
    at.set_entry(r, c+34, // Root Mean Squared Error
       cnt_info.rmse.v);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_relp_cols(const PairDataEnsemble *pd_ptr,
+                     AsciiTable &at, int r, int c) {
+   int i, col;
+
+   //
+   // Relative Position
+   // Dump out the RELP line:
+   //    TOTAL,   N_ENS, [RELP_] (for each ensemble member)
+   //
+   at.set_entry(r, c+0,  // Total Number of pairs
+      pd_ptr->n_pair);
+
+   at.set_entry(r, c+1,  // Ensemble size
+      pd_ptr->n_ens);
+
+   //
+   // Write RELP_i count for each bin
+   //
+   for(i=0, col=c+2; i<pd_ptr->relp_na.n_elements(); i++) {
+
+      at.set_entry(r, col, // RELP_i
+         pd_ptr->relp_na[i]);
+      col++;
+   }
 
    return;
 }

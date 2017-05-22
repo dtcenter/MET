@@ -75,6 +75,9 @@ class PairDataEnsemble : public PairBase {
       BoolArray  skip_pair;       // Flag for each observation
 
       NumArray   rhist_na;        // Ranked Histogram [n_ens+1]
+      NumArray   relp_na;         // Relative Position Histogram [n_ens]
+
+      double     phist_bin_size;  // Ensemble PIT histogram bin width
       NumArray   phist_na;        // PIT Histogram [n_phist_bin]
 
       NumArray   spread_na;       // Ensemble spread (standard deviation) value [n_obs]
@@ -82,7 +85,6 @@ class PairDataEnsemble : public PairBase {
 
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
-      double     phist_bin_size;  // Ensemble PIT histogram bin width
 
       double     crpss;           // Continuous ranked probability skill score
 
@@ -100,6 +102,7 @@ class PairDataEnsemble : public PairBase {
       void compute_phist();
       void compute_stats();
       void compute_ssvar();
+      void compute_relp();
 };
 
 ////////////////////////////////////////////////////////////////////////

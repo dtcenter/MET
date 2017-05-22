@@ -35,7 +35,7 @@ void RegridInfo::clear() {
    method = InterpMthd_None;
    width = bad_data_int;
    shape = GridTemplateFactory::GridTemplate_None;
-   
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ RegridInfo::RegridInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 void RegridInfo::validate() {
-	
+
    // Check for unsupported regridding options
    if(method == InterpMthd_Best) {
       mlog << Error << "\nparse_conf_regrid() -> "
@@ -80,7 +80,7 @@ void RegridInfo::validate() {
 	        << width << " to 1 for regridding method \""
 	        << interpmthd_nearest_str << "\".\n\n";
 	   width = 1;
-   }	   
+   }
 
    // Check the bilinear and budget special cases
    if((method == InterpMthd_Bilin ||
@@ -793,9 +793,9 @@ void InterpInfo::validate(){
       }
 
       // Check for some methods, that width is 1
-      if((methodi == InterpMthd_Nearest || 
-          methodi == InterpMthd_Upper_Left || 
-          methodi == InterpMthd_Upper_Right || 
+      if((methodi == InterpMthd_Nearest ||
+          methodi == InterpMthd_Upper_Left ||
+          methodi == InterpMthd_Upper_Right ||
           methodi == InterpMthd_Lower_Right ||
           methodi == InterpMthd_Lower_Left) &&
          width[i] != 1) {
@@ -993,7 +993,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
          exit(1);
       }
    }
-   
+
    // Conf: shape
    v = nbrhd_dict->lookup_int(conf_key_shape, false);
    if (nbrhd_dict->last_lookup_status()) {
@@ -1100,7 +1100,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
       }
    }
 
-   // Conf: shape    
+   // Conf: shape
    v = hira_dict->lookup_int(conf_key_shape, false);
    if (hira_dict->last_lookup_status()) {
       info.shape = int_to_gridtemplate(v);
@@ -1572,6 +1572,7 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_pstd):         s = stat_pstd_str;    break;
       case(stat_pjc):          s = stat_pjc_str;     break;
       case(stat_prc):          s = stat_prc_str;     break;
+      case(stat_eclv):         s = stat_eclv_str;    break;
       case(stat_mpr):          s = stat_mpr_str;     break;
       case(stat_nbrctc):       s = stat_nbrctc_str;  break;
       case(stat_nbrcts):       s = stat_nbrcts_str;  break;
@@ -1583,7 +1584,6 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_orank):        s = stat_orank_str;   break;
       case(stat_ssvar):        s = stat_ssvar_str;   break;
       case(stat_relp):         s = stat_relp_str;    break;
-      case(stat_econ):         s = stat_econ_str;    break;
       case(stat_header):       s = stat_header_str;  break;
       case(no_stat_line_type): s = stat_na_str;      break;
       default:                 s = (const char *) 0; break;
@@ -1620,6 +1620,7 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_pstd_str)   == 0) t = stat_pstd;
    else if(strcasecmp(s, stat_pjc_str)    == 0) t = stat_pjc;
    else if(strcasecmp(s, stat_prc_str)    == 0) t = stat_prc;
+   else if(strcasecmp(s, stat_eclv_str)   == 0) t = stat_eclv;
    else if(strcasecmp(s, stat_mpr_str)    == 0) t = stat_mpr;
    else if(strcasecmp(s, stat_nbrctc_str) == 0) t = stat_nbrctc;
    else if(strcasecmp(s, stat_nbrcts_str) == 0) t = stat_nbrcts;
@@ -1631,7 +1632,6 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_orank_str)  == 0) t = stat_orank;
    else if(strcasecmp(s, stat_ssvar_str)  == 0) t = stat_ssvar;
    else if(strcasecmp(s, stat_relp_str)   == 0) t = stat_relp;
-   else if(strcasecmp(s, stat_econ_str)   == 0) t = stat_econ;
    else if(strcasecmp(s, stat_header_str) == 0) t = stat_header;
    else                                         t = no_stat_line_type;
 

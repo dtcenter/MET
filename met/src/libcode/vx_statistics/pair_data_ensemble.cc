@@ -100,10 +100,12 @@ void PairDataEnsemble::clear() {
    crps_na.clear();
    ign_na.clear();
    pit_na.clear();
-   rhist_na.clear();
-   phist_na.clear();
    spread_na.clear();
    mn_na.clear();
+
+   rhist_na.clear();
+   phist_na.clear();
+   relp_na.clear();
 
    if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
 
@@ -119,6 +121,10 @@ void PairDataEnsemble::clear() {
 void PairDataEnsemble::extend(int n) {
    int i;
 
+   // Allocate memory for the number of observations.
+   // Only applies to arrays sized by n_obs which does not include:
+   //   rhist_na, phist_na, relp_na
+
    PairBase::extend(n);
 
    for(i=0; i<n_ens; i++) e_na[i].extend(n);
@@ -129,8 +135,6 @@ void PairDataEnsemble::extend(int n) {
    ign_na.extend(n);
    pit_na.extend(n);
    skip_pair.extend(n);
-   rhist_na.extend(n);
-   phist_na.extend(n);
    spread_na.extend(n);
    mn_na.extend(n);
 
@@ -152,29 +156,31 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    set_interp_dpth(pd.interp_dpth);
    set_interp_shape(pd.interp_shape);
 
-   sid_sa     = pd.sid_sa;
-   lat_na     = pd.lat_na;
-   lon_na     = pd.lon_na;
-   x_na       = pd.x_na;
-   y_na       = pd.y_na;
-   vld_ta     = pd.vld_ta;
-   lvl_na     = pd.lvl_na;
-   elv_na     = pd.elv_na;
-   o_na       = pd.o_na;
-   v_na       = pd.v_na;
-   r_na       = pd.r_na;
-   crps_na    = pd.crps_na;
-   ign_na     = pd.ign_na;
-   pit_na     = pd.pit_na;
-   n_pair     = pd.n_pair;
-   skip_const = pd.skip_const;
-   skip_pair  = pd.skip_pair;
-   rhist_na   = pd.rhist_na;
-   phist_na   = pd.phist_na;
-   spread_na  = pd.spread_na;
-   mn_na      = pd.mn_na;
+   sid_sa       = pd.sid_sa;
+   lat_na       = pd.lat_na;
+   lon_na       = pd.lon_na;
+   x_na         = pd.x_na;
+   y_na         = pd.y_na;
+   vld_ta       = pd.vld_ta;
+   lvl_na       = pd.lvl_na;
+   elv_na       = pd.elv_na;
+   o_na         = pd.o_na;
+   v_na         = pd.v_na;
+   r_na         = pd.r_na;
+   crps_na      = pd.crps_na;
+   ign_na       = pd.ign_na;
+   pit_na       = pd.pit_na;
+   n_pair       = pd.n_pair;
+   skip_const   = pd.skip_const;
+   skip_pair    = pd.skip_pair;
+   spread_na    = pd.spread_na;
+   mn_na        = pd.mn_na;
 
-   n_obs      = pd.n_obs;
+   rhist_na     = pd.rhist_na;
+   phist_na     = pd.phist_na;
+   relp_na      = pd.relp_na;
+
+   n_obs        = pd.n_obs;
 
    if(pd.ssvar_bins){
       ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
@@ -575,6 +581,56 @@ void PairDataEnsemble::compute_ssvar() {
       }
 
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::compute_relp() {
+   int i, j, n;
+   double d, min_d;
+   NumArray min_ens;
+
+   // Clear the RELP histogram
+   relp_na.clear();
+
+   // Allocate space
+   min_ens.extend(n_ens);
+
+   // Initialize counts to 0
+   for(i=0; i<n_ens; i++) relp_na.add(0);
+
+   // Loop through the observations and update the counts
+   for(i=0; i<o_na.n_elements(); i++) {
+
+      if(skip_pair[i]) continue;
+
+      // Search for the minimum difference
+      for(j=0, min_d=1.0e10; j<n_ens; j++) {
+
+         // Absolute value of the difference
+         d = abs(e_na[j][i] - o_na[i]);
+
+         // Store the closest member
+         if(d < min_d) {
+            min_ens.erase();
+            min_ens.add(j);
+            min_d = d;
+         }
+         // Store all members tied for closest
+         else if(is_eq(d, min_d)) {
+            min_ens.add(j);
+         }
+      } // end for j
+
+      // Increment fractional RELP counts for each closest member
+      for(j=0, n=min_ens.n_elements(); j<n; j++) {
+
+         relp_na.set(min_ens[j], relp_na[(min_ens[j])] + (double) 1.0/n);
+      }
+
+   } // end for i
 
    return;
 }

@@ -32,28 +32,27 @@ static const int i_phist    = 1;
 static const int i_orank    = 2;
 static const int i_ssvar    = 3;
 static const int i_relp     = 4;
-static const int i_econ     = 5;
-static const int n_txt      = 6;
+static const int n_txt      = 5;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_rhist, stat_phist, stat_orank, stat_ssvar, stat_relp, stat_econ
+   stat_rhist, stat_phist, stat_orank, stat_ssvar, stat_relp
 };
 
 // Indices for the ensemble flag types in the configuration file
 static const int i_nc_mean   = 0;
-static const int i_nc_stdev  = 1;
-static const int i_nc_minus  = 2;
-static const int i_nc_plus   = 3;
-static const int i_nc_min    = 4;
-static const int i_nc_max    = 5;
-static const int i_nc_range  = 6;
-static const int i_nc_vld    = 7;
-static const int i_nc_freq   = 8;
-static const int i_nc_orank  = 9;
-static const int i_nc_weight = 10;
-static const int i_median    = 11;
-static const int i_mode      = 12;
+static const int i_nc_median = 1;
+static const int i_nc_mode   = 2;
+static const int i_nc_stdev  = 3;
+static const int i_nc_minus  = 4;
+static const int i_nc_plus   = 5;
+static const int i_nc_min    = 6;
+static const int i_nc_max    = 7;
+static const int i_nc_range  = 8;
+static const int i_nc_vld    = 9;
+static const int i_nc_freq   = 10;
+static const int i_nc_orank  = 11;
+static const int i_nc_weight = 12;
 static const int n_nc        = 13;
 
 ////////////////////////////////////////////////////////////////////////
@@ -95,10 +94,9 @@ class EnsembleStatConfInfo {
       StringArray *        msg_typ;             // Array of message types [n_vx]
       StringArray *        sid_exc;             // Array of station ID's to exclude [n_vx]
       StringArray *        obs_qty;             // Observation quality flags for filtering [n_vx]
+      ThreshArray *        othr_ta;             // Arrays of observation filetering thresholds [n_vx]
       StringArray          mask_name;           // Masking region names [n_mask]
-      NumArray             ens_ssvar_bin_size;  // Ensemble spread/skill variance bin size [n_vx]
       ConcatString         ens_ssvar_file;      // Ensemble mean file name
-      NumArray             ens_phist_bin_size;  // Ensemble PIT histogram bin size
       DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
       StringArray *        mask_sid;            // Masking station id's [n_mask_sid]
       NumArray             ci_alpha;            // Alpha value for confidence intervals
@@ -107,7 +105,7 @@ class EnsembleStatConfInfo {
       InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]
       IntArray             interp_wdth;         // Array for interpolation widths [n_interp]
       GridTemplateFactory::GridTemplates interp_shape;  //Shape for interpolation
-      
+
       STATOutputType       output_flag[n_txt];  // Flag for each output line type
       bool                 ensemble_flag[n_nc]; // Boolean for each ensemble field type
       ConcatString         rng_type;            // GSL random number generator
@@ -118,6 +116,8 @@ class EnsembleStatConfInfo {
 
       bool                 ens_ssvar_flag;      // Indicator for calculation of ensemble spread/skill
       ConcatString         ens_ssvar_mean;      // Ensemble mean for spread/skill calculations
+
+      NumArray             phist_bin_size;      // PHIST bin sizes
 
       EnsembleStatConfInfo();
      ~EnsembleStatConfInfo();

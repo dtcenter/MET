@@ -122,7 +122,7 @@ enum STATLineType {
    stat_orank,
    stat_ssvar,
    stat_relp,
-   stat_econ,
+   stat_eclv,
    stat_header,
    no_stat_line_type
 };
@@ -147,6 +147,7 @@ static const char stat_pct_str[]    = "PCT";
 static const char stat_pstd_str[]   = "PSTD";
 static const char stat_pjc_str[]    = "PJC";
 static const char stat_prc_str[]    = "PRC";
+static const char stat_eclv_str[]   = "ECLV";
 static const char stat_mpr_str[]    = "MPR";
 static const char stat_nbrctc_str[] = "NBRCTC";
 static const char stat_nbrcts_str[] = "NBRCTS";
@@ -158,7 +159,6 @@ static const char stat_phist_str[]  = "PHIST";
 static const char stat_orank_str[]  = "ORANK";
 static const char stat_ssvar_str[]  = "SSVAR";
 static const char stat_relp_str[]   = "RELP";
-static const char stat_econ_str[]   = "ECON";
 static const char stat_header_str[] = "LINE_TYPE";
 static const char stat_na_str[]     = "NA";
 
@@ -223,8 +223,8 @@ struct InterpInfo {
    int         n_interp;   // Number of interpolation types
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
-   GridTemplateFactory::GridTemplates shape; //  Interpolation shape
-	 void 		    validate();   // ensure that width and method are accordant
+   GridTemplateFactory::GridTemplates shape; // Interpolation shape
+   void        validate(); // Ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -241,13 +241,13 @@ struct RegridInfo {
                             // or explicit grid definition.
    InterpMthd   method;     // Regridding method
    int          width;      // Regridding width
-	 GridTemplateFactory::GridTemplates shape; //  Interpolation shape
+   GridTemplateFactory::GridTemplates shape; // Interpolation shape
    RegridInfo();
 
-   void *       hook;       //  not allocated
+   void *       hook;       // not allocated
 
    void         clear();
-	 void 		    validate();   // ensure that width and method are accordant
+   void         validate(); // ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -260,8 +260,7 @@ struct NbrhdInfo {
    double      vld_thresh; // Valid data neighborhood threshold
    IntArray    width;      // Neighborhood widths
    ThreshArray cov_ta;     // Fractional coverage thresholds
-	 GridTemplateFactory::GridTemplates shape; //  Neighborhood shape
-	
+   GridTemplateFactory::GridTemplates shape; // Neighborhood shape
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -275,7 +274,7 @@ struct HiRAInfo {
    IntArray    width;      // Array for HiRA widths
    double      vld_thresh; // Proportion of valid data values
    ThreshArray cov_ta;     // HiRA coverage (probability) thresholds
-	 GridTemplateFactory::GridTemplates shape; // Area shape
+   GridTemplateFactory::GridTemplates shape; // Area shape
 
    HiRAInfo();
    void clear();
@@ -522,6 +521,7 @@ static const char conf_key_grib_ens_hi_res_ctl [] = "hi_res_ctl";
 static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
 
 static const char conf_key_shape[]             = "shape";
+static const char conf_key_eclv_bin[]          = "eclv_bin_size";
 
 //
 // Climatology parameter key names
@@ -867,7 +867,6 @@ static const char conf_val_stat[] = "STAT";
 // Field types: NONE, BOTH, FCST, OBS
 static const char conf_val_fcst[] = "FCST";
 static const char conf_val_obs[]  = "OBS";
-
 
 // Grid shapes:
 static const char conf_val_circle[] = "CIRCLE";
