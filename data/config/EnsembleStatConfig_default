@@ -89,7 +89,6 @@ skip_const     = FALSE;
 //
 ens_ssvar_bin_size = 1.0;
 ens_phist_bin_size = 0.05;
-ens_econ_bin_size  = 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -170,7 +169,6 @@ output_flag = {
    orank = BOTH;
    ssvar = BOTH;
    relp  = NONE;
-   econ  = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

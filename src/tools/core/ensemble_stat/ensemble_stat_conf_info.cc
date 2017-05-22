@@ -88,12 +88,17 @@ void EnsembleStatConfInfo::clear() {
    interp_field = FieldType_None;
    interp_thresh = bad_data_double;
    interp_wdth.clear();
+   interp_shape = GridTemplateFactory::GridTemplate_None;
    rng_type.clear();
    rng_seed.clear();
    grid_weight_flag = GridWeightType_None;
    output_prefix.clear();
    version.clear();
-   interp_shape = GridTemplateFactory::GridTemplate_None;
+
+   ens_ssvar_flag = false;
+   ens_ssvar_mean.clear();
+
+   phist_bin_size.clear();
 
    for(i=0; i<n_txt; i++) output_flag[i]   = STATOutputType_None;
    for(i=0; i<n_nc;  i++) ensemble_flag[i] = false;
@@ -105,6 +110,7 @@ void EnsembleStatConfInfo::clear() {
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
    if(sid_exc)     { delete [] sid_exc;     sid_exc     = (StringArray *)        0; }
    if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)        0; }
+   if(othr_ta)     { delete [] othr_ta;     othr_ta     = (ThreshArray *)        0; }
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }
    if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)        0; }
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)         0; }
@@ -316,6 +322,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       msg_typ = new StringArray        [n_vx];
       sid_exc = new StringArray        [n_vx];
       obs_qty = new StringArray        [n_vx];
+      othr_ta = new ThreshArray        [n_vx];
 
       // Parse the fcst field information
       for(i=0; i<n_vx; i++) {
@@ -348,11 +355,11 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          obs_qty[i] = parse_conf_obs_qty(&i_obs_dict);
          vx_pd[i].set_obs_qty_filt(obs_qty[i]);
 
-         // Conf: ssvar_bin_size
-         ens_ssvar_bin_size.add(i_obs_dict.lookup_double(conf_key_ssvar_bin));
-
          // Conf: phist_bin_size
-         ens_phist_bin_size.add(i_obs_dict.lookup_double(conf_key_phist_bin));
+         phist_bin_size.add(i_obs_dict.lookup_double(conf_key_phist_bin));
+
+         // Conf: obs_thresh
+         othr_ta[i] = i_obs_dict.lookup_thresh_array(conf_key_obs_thresh);
 
          // Set the current dictionaries
          vx_pd[i].fcst_info->set_dict(i_fcst_dict);
@@ -389,7 +396,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
                  << "the range of forecast levels.  Instead, they will be "
                  << "matched to the single nearest forecast level.\n\n";
          }
-      }
+      } // end for i
    } // end if n_vx > 0
 
    // Conf: ci_alpha
@@ -510,10 +517,6 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
       // Set the ensemble spread/skill information
       vx_pd[i].ens_ssvar_flag = ens_ssvar_flag;
       vx_pd[i].ens_ssvar_mean = ens_ssvar_mean;
-      vx_pd[i].set_ssvar_bin_size(ens_ssvar_bin_size[i]);
-
-      // Set the PIT histogram bin size
-      vx_pd[i].set_phist_bin_size(ens_phist_bin_size[i]);
 
       // Add the verifying message type to the vx_pd objects
       for(j=0; j<n_msg_typ; j++)
@@ -538,6 +541,12 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
 
       // Get the current observation dictionary
       i_obs_dict = parse_conf_i_vx_dict(obs_dict, i);
+
+      // Conf: ssvar_bin_size
+      vx_pd[i].set_ssvar_bin_size(i_obs_dict.lookup_double(conf_key_ssvar_bin));
+
+      // Conf: phist_bin_size
+      vx_pd[i].set_phist_bin_size(i_obs_dict.lookup_double(conf_key_phist_bin));
 
       // Conf: duplicate_flag
       vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_obs_dict));
@@ -585,8 +594,7 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_rhist):
       case(i_phist):
       case(i_relp):
-      case(i_econ):
-         // Maximum number of RHIST, PHIST, RELP, and ECON  lines possible =
+         // Maximum number of RHIST, PHIST, and RELP lines possible =
          //    Fields * Masks * Interpolations * Message Type [Point Obs]
          //    Fields * Masks * Interpolations [Grid Obs]
          n =   n_vx * n_mask * n_interp * max_n_msg_typ
