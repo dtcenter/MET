@@ -1221,7 +1221,9 @@ fcst = {
 //
 // The "obs_thresh" entry is an array of thresholds for filtering observation
 // values prior to applying ensemble verification logic.  The default setting
-// of NA means that no observations should be filtered out.
+// of NA means that no observations should be filtered out.  Verification output 
+// will be computed separately for each threshold specified. This option may be 
+// set separately for each obs.field entry.
 //
 obs_thresh = [ NA ];
 
