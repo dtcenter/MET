@@ -46,7 +46,7 @@ enum GridHemisphere {
 ////////////////////////////////////////////////////////////////////////
 
 
-typedef void InterpFunction (const DataPlane & fat, DataPlane & out, const GridTemplate & gt, double);
+typedef void InterpFunction (const DataPlane & fat, DataPlane & out, int w, double);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,6 @@ class WwmcaRegridder {
       WwmcaRegridder & operator=(const WwmcaRegridder &);
 
       void init_from_scratch();
-
 
       void get_interpolated_data(DataPlane &) const;
 
@@ -84,8 +83,6 @@ class WwmcaRegridder {
       InterpMthd Method;   //  interpolation
 
       int Width;           //  interpolation
-      
-      GridTemplateFactory::GridTemplates Shape; //  Interpolation shape
 
       double Fraction;     //  fraction of good data needed for interpolation
 
@@ -144,6 +141,14 @@ class WwmcaRegridder {
 
 
 inline GridHemisphere WwmcaRegridder::hemi() const { return ( Hemi ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern void dp_interp_min     (const DataPlane & fat, DataPlane & out, int w, double t);
+extern void dp_interp_max     (const DataPlane & fat, DataPlane & out, int w, double t);
+extern void dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int w, double t);
 
 
 ////////////////////////////////////////////////////////////////////////

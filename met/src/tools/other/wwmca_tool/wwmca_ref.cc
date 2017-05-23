@@ -124,8 +124,6 @@ ConfigFilename.clear();
 
 Width = 0;
 
-Shape = GridTemplateFactory::GridTemplate_None;
-
 Method = InterpMthd_None;
 
 interp_func = 0;
@@ -194,10 +192,6 @@ if ( ToGrid ) {
 
 out << prefix << "Interpolation Method   = " << interpmthd_to_string(Method) << "\n";
 out << prefix << "Interpolation Width    = " << Width    << "\n";
-
-GridTemplateFactory gtf; 
-out << prefix << "Interpolation Shape    = " << gtf.enum2String(Shape)    << "\n";
- 
 out << prefix << "Interpolation Fraction = " << Fraction << "\n";
 out << prefix << "Write Pixel Age        = " << bool_to_string(WritePixelAge) << "\n";
 
@@ -341,8 +335,6 @@ const RegridInfo regrid_info = parse_conf_regrid(Config);
 
 Width = regrid_info.width;
 
-Shape = regrid_info.shape;
- 
 Method = InterpMthd_Nearest;
 
 Fraction = regrid_info.vld_thresh;
@@ -621,14 +613,8 @@ for (x=0; x<(dp.nx()); ++x)  {
 }   //  for x
 
 
-// build the grid template
-GridTemplateFactory gtf;
-GridTemplate* gt = gtf.buildGT(Shape, Width);         
+interp_func(fat, dp, Width, Fraction);
 
- 
-interp_func(fat, dp, *gt, Fraction);
- 
-delete gt;
 
 
 
@@ -870,13 +856,10 @@ for (x=0; x<(dp.nx()); ++x)  {
 
 }   //  for x
 
-// build the grid template
-GridTemplateFactory gtf;
-GridTemplate* gt = gtf.buildGT(Shape, Width);         
- 
-interp_func(fat, dp, *gt, Fraction);
- 
-delete gt;
+
+interp_func(fat, dp, Width, Fraction);
+
+
 
 
 
@@ -1098,3 +1081,139 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for external utility functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void dp_interp_min (const DataPlane & fat, DataPlane & out, int width, double fraction)
+
+{
+
+   //
+   //  we expect that the size of the "out" dataplane has already been set
+   //
+
+int x, y, x_fat_ll, y_fat_ll;
+double v;
+
+
+for (x=0; x<(out.nx()); ++x)  {
+
+   x_fat_ll = x*width;
+
+   for (y=0; y<(out.ny()); ++y)  {
+
+      y_fat_ll = y*width;
+
+      v = interp_min_ll(fat, x_fat_ll, y_fat_ll, width, fraction);
+
+      out.put(v, x, y);
+
+   }   //  for x
+
+}   //  for x
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void dp_interp_max (const DataPlane & fat, DataPlane & out, int width, double fraction)
+
+{
+
+   //
+   //  we expect that the size of the "out" dataplane has already been set
+   //
+
+int x, y, x_fat_ll, y_fat_ll;
+double v;
+
+
+for (x=0; x<(out.nx()); ++x)  {
+
+   x_fat_ll = x*width;
+
+   for (y=0; y<(out.ny()); ++y)  {
+
+      y_fat_ll = y*width;
+
+      v = interp_max_ll(fat, x_fat_ll, y_fat_ll, width, fraction);
+
+      out.put(v, x, y);
+
+   }   //  for x
+
+}   //  for x
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void dp_interp_uw_mean (const DataPlane & fat, DataPlane & out, int width, double fraction)
+
+{
+
+   //
+   //  we expect that the size of the "out" dataplane has already been set
+   //
+
+int x, y, x_fat_ll, y_fat_ll;
+double v;
+
+
+
+for (x=0; x<(out.nx()); ++x)  {
+
+   x_fat_ll = x*width;
+
+   for (y=0; y<(out.ny()); ++y)  {
+
+      y_fat_ll = y*width;
+
+      v = interp_uw_mean_ll(fat, x_fat_ll, y_fat_ll, width, fraction);
+
+      out.put(v, x, y);
+
+   }   //  for x
+
+}   //  for x
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
