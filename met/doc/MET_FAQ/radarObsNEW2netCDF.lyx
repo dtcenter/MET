@@ -1,0 +1,389 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Converting RadarObsNEW.nc into a usable NetCDF3 file.
+\end_layout
+
+\begin_layout Standard
+Currently MET only supports the classic data model...
+ i.e.
+ NetCDF3, and not the RadarObsNEW.nc file.
+\end_layout
+
+\begin_layout Standard
+Running "file RadarObsNEW.nc" shows that the file is not "NetCDF Data Format
+ data", but rather: RadarObsNEW.nc: Hierarchical Data Format (version 5)
+ data.
+\end_layout
+
+\begin_layout Standard
+A NetCDF3 file can be created or use the "nccopy" command to create a NetCDF3
+ file.
+ However, "nccopy" didn't work with the RadarObsNEW.nc file, until some changes
+ were made.
+ "ncatted" was used to remove the "L" from the value of the following attributes
+: parameter_table_version, parameter_number, level_indicator, nx, and ny.
+ Below are the commands that were used to create a NetCDF3 file, plot the
+ data, and get a successful run from grid_stat.
+\end_layout
+
+\begin_layout LyX-Code
+# Update attributes to remove longs 
+\end_layout
+
+\begin_layout LyX-Code
+/usr/local/nco/bin/ncatted 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-a parameter_table_version,REFC,o,f,129 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-a parameter_number,REFC,o,f,212 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-a level_indicator,REFC,o,f,200 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-a nx,global,o,i,674 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-a ny,global,o,i,620 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+RadarObsNEW.nc RadarObsNEW_mod.nc
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Convert from NC4 to NC3 
+\end_layout
+
+\begin_layout LyX-Code
+/usr/local/netcdf/bin/nccopy -3 RadarObsNEW_mod.nc RadarObsNEW_mod_v3.nc
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Regrid to global grid 
+\end_layout
+
+\begin_layout LyX-Code
+/usr/local/{MET_BASE}/bin/regrid_data_plane 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+RadarObsNEW_mod_v3.nc G004 RadarObsNEW_mod_v3_G004.nc 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-field 'name="REFC"; level="(*,*)";'
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Plot the result 
+\end_layout
+
+\begin_layout LyX-Code
+/usr/local/{MET_BASE}/bin/plot_data_plane 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+RadarObsNEW_mod_v3_G004.nc RadarObsNEW_mod_v3_G004.ps 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+'name="REFC"; level="(*,*)";'
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Display plot 
+\end_layout
+
+\begin_layout LyX-Code
+convert -rotate 90 -background white -flatten RadarObsNEW_mod_v3_G004.ps
+ 
+\end_layout
+
+\begin_layout LyX-Code
+RadarObsNEW_mod_v3_G004.png 
+\end_layout
+
+\begin_layout LyX-Code
+display RadarObsNEW_mod_v3_G004.png&
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Plot forecast 
+\end_layout
+
+\begin_layout LyX-Code
+REFC /usr/local/{MET_BASE}/bin/plot_data_plane 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+ForecastFile.grb refc_fcst.ps 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+'name="REFC"; level="L0"; GRIB1_ptv=129;'
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Display plot 
+\end_layout
+
+\begin_layout LyX-Code
+convert -rotate 90 -background white -flatten refc_fcst.ps 
+\end_layout
+
+\begin_layout LyX-Code
+refc_fcst.png 
+\end_layout
+
+\begin_layout LyX-Code
+display refc_fcst.png&
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Run grid_stat 
+\end_layout
+
+\begin_layout LyX-Code
+/usr/local/{MET_BASE}/bin/grid_stat ForecastFile.grb RadarObsNEW_mod_v3.nc
+ 
+\end_layout
+
+\begin_layout LyX-Code
+GridStatConfig_dbz -outdir out/
+\end_layout
+
+\begin_layout Standard
+***Attached is the NetCDF3 file that we produced after using ncatted and
+ nccopy.***
+\end_layout
+
+\end_body
+\end_document

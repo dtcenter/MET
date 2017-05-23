@@ -1,0 +1,122 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+pcp_combine options with lat-lon grid data
+\end_layout
+
+\begin_layout Standard
+Rather than converting to GRIB1 use the wgrib2 utility to do the regridding:
+\end_layout
+
+\begin_layout Standard
+gfsrain06.grb is a GRIB2 file on a global lat/lon grid.
+\end_layout
+
+\begin_layout LyX-Code
+wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1 25:121:0.1 gfsrain06_regrid.grb2
+\end_layout
+
+\begin_layout Standard
+And then run that GRIB2 file through pcp_combine:
+\end_layout
+
+\begin_layout LyX-Code
+pcp_combine -add gfsrain06_regrid.grb2 'name="APCP"; level="A6";' gfsrain06_regri
+d.nc
+\end_layout
+
+\begin_layout Standard
+Then the output NetCDF file does not have this problem:
+\end_layout
+
+\begin_layout LyX-Code
+ncdump -h 2a_wgrib2_regrid.nc | grep "_ll"
+\end_layout
+
+\begin_layout LyX-Code
+:lat_ll = "25.000000 degrees_north" ;
+\end_layout
+
+\begin_layout LyX-Code
+:lon_ll = "112.000000 degrees_east" ;
+\end_layout
+
+\begin_layout Standard
+MET can read both GRIB1 and GRIB2 data.
+ Also, MET version 5.2 includes an automated regridding feature.
+ So the data can pass to grid_stat on different grids...
+ and instruct grid_stat to regrid one to the other.
+ That would avoid the need to do regridding using copygb or wgrib2 at all.
+\end_layout
+
+\end_body
+\end_document

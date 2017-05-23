@@ -1,0 +1,217 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Working with GRIB files on different grids using pcp_combine
+\end_layout
+
+\begin_layout Standard
+MET assumes that all records in a GRIB file are defined on the same grid.
+ This assumption is violated in the example data.
+ MET extracts the grid information from the first record of that GRIB file,
+ which is defined on a 361 x 281 grid: 
+\end_layout
+
+\begin_layout LyX-Code
+wgrib -V -d 1 20150825_48_grid_simple.grib1
+\end_layout
+
+\begin_layout Standard
+However, the TP data in record number 165 is defined on a 2880 x 1441 grid:
+ 
+\end_layout
+
+\begin_layout LyX-Code
+wgrib -V -d 165 20150825_48_grid_simple.grib1
+\end_layout
+
+\begin_layout Standard
+pcp_combine has only allocated space to store data for that 361 x 281 grid,
+ this creates an error when trying to write 2880 x 1441 values into that
+ array.
+\end_layout
+
+\begin_layout Standard
+To make sure there aren't other problems, run the following commands to
+ strip out those single GRIB records and run them through pcp_combine:
+\end_layout
+
+\begin_layout Standard
+# Extract TP records
+\end_layout
+
+\begin_layout LyX-Code
+wgrib 20150825_48_grid_simple.grib1 | grep TP | 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+wgrib -i -grib -o 20150825_48_grid_simple_TP.grib1 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+20150825_48_grid_simple.grib1
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+wgrib 20150825_72_grid_simple.grib1 | grep TP | 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+wgrib -i -grib -o 20150825_72_grid_simple_TP.grib1 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+20150825_72_grid_simple.grib1
+\end_layout
+
+\begin_layout Standard
+# Run pcp_combine subraction 
+\end_layout
+
+\begin_layout LyX-Code
+{MET_BASE}/bin/pcp_combine -subtract 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+20150825_72_grid_simple_TP.grib1 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+'name="TP"; level="L0"; GRIB1_ptv=128;' 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+20150825_48_grid_simple_TP.grib1 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+'name="TP"; level="L0"; GRIB1_ptv=128;' 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+diff_72_48.nc
+\end_layout
+
+\begin_layout Standard
+# Plot the result 
+\end_layout
+
+\begin_layout LyX-Code
+{MET_BASE}/bin/plot_data_plane diff_72_48.nc diff_72_48.ps 'name="TP_L0";
+ level="(*,*)";'
+\end_layout
+
+\begin_layout Standard
+***The resulting image is attached.***
+\end_layout
+
+\end_body
+\end_document

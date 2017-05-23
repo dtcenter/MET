@@ -1,0 +1,140 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+MET compatibility with NetCDF files
+\end_layout
+
+\begin_layout Standard
+MET doesn't support all types of gridded NetCDF files.
+ It only supports the MET NetCDF format (e.g.
+ the output of the pcp_combine tool), the output of the WRF pinterp (or
+ wrfinterp) utilities, and CF-compliant NetCDF files.
+\end_layout
+
+\begin_layout Standard
+When using a new data file format, instead of running it through MODE, use
+ plot_data_plane to make sure MET is reading it correctly.
+ This will make sure the name and level settings work as expected, and it
+ also creates an output plot so I can see that MET is (or is not) reading/plotti
+ng the data as expected.
+\end_layout
+
+\begin_layout Standard
+Here is an example for {MET_BASE}/plot_data_plane:
+\end_layout
+
+\begin_layout LyX-Code
+/scratch4/BMC/dtc/MET/{MET_BASE}/bin/plot_data_plane 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+prwin_ctr.7278.pgbf90.gfs.2006022500.ver.nc 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+lsp_6h.ps 'name="LSP_6h"; level="(*,*)"; file_type=NETCDF_NCCF;'
+\end_layout
+
+\begin_layout Standard
+***The resulting image is attached.*** There are several issues here: 
+\end_layout
+
+\begin_layout Description
+- plot_data_plane had to be told to interpret this as CF-compliant NetCDF
+ using NETCDF_NCCF.
+ 
+\end_layout
+
+\begin_layout Description
+- The timing info in that file isn't specified in the CF-compliant way...
+ so MET can't discern the initialization, valid, and lead times.
+ 
+\end_layout
+
+\begin_layout Description
+- And then there's the obvious problem (in the image) of the world being
+ upside down and backwards!
+\end_layout
+
+\begin_layout Standard
+It is possible to get *something*, there are obviously a lot of issues.
+ Basically, MET doesn't support the gridded NetCDF file format.
+ Is this data possibly available in GRIB? Is there any control over the
+ NetCDF file format in use?
+\end_layout
+
+\end_body
+\end_document
