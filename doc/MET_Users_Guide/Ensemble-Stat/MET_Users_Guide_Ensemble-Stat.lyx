@@ -905,6 +905,47 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+obs_thresh = [ NA ];
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series medium
+The 
+\series bold
+obs_thresh
+\series medium
+ entry is an array of thresholds for filtering observation values prior
+ to applying ensemble verification logic.
+ The default setting of 
+\series bold
+NA
+\series medium
+ means that no observations should be filtered out.
+ Verification output will be computed separately for each threshold specified.
+ This option may be set separately for each 
+\series bold
+obs.field
+\series medium
+ entry.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 skip_const = FALSE;
 \end_layout
 
@@ -2962,7 +3003,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Format information for RELP (Relative Poisition) output line type.
+Format information for RELP (Relative Position) output line type.
 \end_layout
 
 \end_inset
@@ -3162,7 +3203,7 @@ RELP_i
 \begin_inset Text
 
 \begin_layout Plain Layout
-Number of time the i-th ensemble member's value was closest to the observation
+Number of times the i-th ensemble member's value was closest to the observation
  (repeated).
  When n members tie, 1/n is assigned to each member.
 \end_layout
