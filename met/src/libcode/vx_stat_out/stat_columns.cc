@@ -3024,7 +3024,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    //    [RANK_] (for each bin)
    //
    at.set_entry(r, c+0,  // Total Number of Ranked Observations
-      pd_ptr->n_pair);
+      nint(pd_ptr->rhist_na.sum()));
 
    at.set_entry(r, c+1,  // Continuous Ranked Probability Score
       pd_ptr->crps_na.wmean(pd_ptr->wgt_na));
@@ -3066,7 +3066,7 @@ void write_phist_cols(const PairDataEnsemble *pd_ptr,
    //    TOTAL, BIN_SIZE, N_BIN, [BIN_] (for each bin)
    //
    at.set_entry(r, c+0,  // Total Number of PIT values
-      pd_ptr->n_pair);
+      nint(pd_ptr->phist_na.sum()));
 
    at.set_entry(r, c+1,  // Bin size
       pd_ptr->phist_bin_size);
