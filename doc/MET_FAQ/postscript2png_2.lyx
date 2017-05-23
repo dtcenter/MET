@@ -1,0 +1,186 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Another example of PostScript to PNG
+\end_layout
+
+\begin_layout Standard
+Run Grid-Stat twice.
+ Here are the steps:
+\end_layout
+
+\begin_layout Enumerate
+Use wget to grab some recent data:
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+wget 
+\end_layout
+
+\begin_layout LyX-Code
+ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.2016121400/gfs.t00z.pgrb2.0p25.f0
+00 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+wget 
+\end_layout
+
+\begin_layout LyX-Code
+ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.20161214/
+\end_layout
+
+\begin_layout LyX-Code
+nam.t00z.conusnest.hiresf00.tm00.grib2
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Set up attached GridStatConfig file.
+ *** help, automatic numbering is incorrect***
+\end_layout
+
+\begin_layout Enumerate
+Run the shell script listed below to run Grid-Stat, call Plot-Data-Plane
+ to plot the resulting difference field, and call convert to reformat from
+ PostScript to PNG.
+\end_layout
+
+\begin_layout LyX-Code
+#!/bin/sh
+\end_layout
+
+\begin_layout LyX-Code
+for case in `echo "FCST OBS"`; do 
+\end_layout
+
+\begin_layout LyX-Code
+export TO_GRID=${case} 
+\end_layout
+
+\begin_layout LyX-Code
+/usr/local/{MET_BASE}/bin/grid_stat gfs.t00z.pgrb2.0p25.f000 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig /usr/local/{MET_BASE}/bin/plot_
+data_plane 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+*TO_GRID_${case}*_pairs.nc TO_GRID_${case}.ps 'name="DIFF_TMP_P500_TMP_P500_FULL";
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+level="(*,*)";' 
+\end_layout
+
+\begin_layout LyX-Code
+convert -rotate 90 -background white -flatten TO_GRID_${case}.ps 
+\end_layout
+
+\begin_layout LyX-Code
+TO_GRID_${case}.png 
+\end_layout
+
+\begin_layout LyX-Code
+done
+\end_layout
+
+\end_body
+\end_document

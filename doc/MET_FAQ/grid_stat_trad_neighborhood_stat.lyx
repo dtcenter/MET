@@ -1,0 +1,226 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Using the Grid-Stat tool to compute traditional and neighborhood statistics.
+\end_layout
+
+\begin_layout Standard
+Using the NetCDF output of the pcp-combine tool ( NCEP.20150731_00_24h_8km_sum.nc)
+, 
+\end_layout
+
+\begin_layout Standard
+a GRIB1 file (LIS.GLOBAL.00.24.TP.9999), 
+\end_layout
+
+\begin_layout Standard
+and a Point-Stat configuration file (lis_ST4_point_stat.cfg.default).
+\end_layout
+
+\begin_layout Standard
+Run this data through the Grid-Stat tool to compute traditional and neighborhood
+ statistics.
+\end_layout
+
+\begin_layout Standard
+See below for some commands and ***attached some output***:
+\end_layout
+
+\begin_layout LyX-Code
+# Plot the LIS data, convert to png, and attached output 
+\end_layout
+
+\begin_layout LyX-Code
+METv4.1/bin/plot_data_plane LIS.GLOBAL.00.24.TP.9999 LIS.GLOBAL.00.24.TP.9999.ps 'name="APCP
+"; 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+level="A24"; convert -rotate 90 -background white -flatten LIS.GLOBAL.00.24.TP.9999.ps
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+LIS.GLOBAL.00.24.TP.9999.png
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Plot the pcp_combine output, convert to png, ***and attached output***
+ 
+\end_layout
+
+\begin_layout LyX-Code
+METv4.1/bin/plot_data_plane NCEP.20150731_00_24h_8km_sum.nc NCEP.20150731_00_24h_8km
+_sum.ps 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+'name="APCP_24"; level="(*,*)";' convert -rotate 90 -background white -flatten
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+NCEP.20150731_00_24h_8km_sum.ps NCEP.20150731_00_24h_8km_sum.png
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Run these through grid-stat, ***configuration file attached***
+\end_layout
+
+\begin_layout LyX-Code
+METv4.1/bin/grid_stat LIS.GLOBAL.00.24.TP.9999 NCEP.20150731_00_24h_8km_sum.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+lis_ST4_grid_stat.cfg.default -outdir out -v 4
+\end_layout
+
+\begin_layout Standard
+When running this Grid-Stat command, the following error appears:
+\end_layout
+
+\begin_layout LyX-Code
+process_command_line() -> The forecast and observation grids do not match:
+ Projection: Lat/Lon 
+\end_layout
+
+\begin_layout LyX-Code
+Nx: 1440 Ny: 600 lat_ll: -59.875 lon_ll: 179.875 delta_lat: 0.250 delta_lon:
+ 0.250 
+\end_layout
+
+\begin_layout LyX-Code
+!= Projection: Lat/Lon Nx: 720 Ny: 360 lat_ll: -89.750 lon_ll: -0.250 delta_lat:
+ 0.500 
+\end_layout
+
+\begin_layout LyX-Code
+delta_lon: 0.500
+\end_layout
+
+\begin_layout Standard
+This says that these files aren't on the same grid.
+ In this example it’s already regridded the Stage4 data to a global 1/2
+ degree grid.
+ Presumably, copygb was used to do that.
+ Edit the calls to copygb to put it on the 1/4 degree global grid that LIS
+ is using.
+\end_layout
+
+\end_body
+\end_document

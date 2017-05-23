@@ -1,0 +1,176 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Troubleshooting using the MET plot_data_plane
+\end_layout
+
+\begin_layout Standard
+Run this forecast data through Grid-Stat using the two different versions,
+ and turning on the NetCDF matched pairs output file.
+ Then use the MET plot_data_plane tool to plot the resulting observation
+ field and the problem is obvious.
+\end_layout
+
+\begin_layout Standard
+***The attached images*** show that regridding using /scratch4/BMC/dtc/MET/{MET_
+BASE}/bin/grid_stat works file, while regridding using /contrib/MET/5.1/bin/grid_
+stat produces bad output.
+\end_layout
+
+\begin_layout Standard
+Here are the plotting commands: 
+\end_layout
+
+\begin_layout LyX-Code
+plot_data_plane out1/grid_stat_MODEL_DOMAIN_FNONE_01h_REFC_170000L_20151030_2300
+00V_pairs.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+obs1.ps 'name="OBS_REFC_L0_FULL"; level="(*,*)";' -plot_range -20 50
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+plot_data_plane out2/grid_stat_MODEL_DOMAIN_FNONE_01h_REFC_170000L_20151030_2300
+00V_pairs.nc 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+obs2.ps 'name="OBS_REFC_L0_FULL"; level="(*,*)";' -plot_range -20 50
+\end_layout
+
+\begin_layout Standard
+Now the question is why is there a difference?
+\end_layout
+
+\begin_layout Standard
+Those two different builds contain different patch levels.
+ The following commands reveal the patch level of these versions:
+\end_layout
+
+\begin_layout LyX-Code
+head -3 /contrib/MET/5.1/README 
+\end_layout
+
+\begin_layout LyX-Code
+head -3 /scratch4/BMC/dtc/MET/{MET_BASE}/README
+\end_layout
+
+\begin_layout Standard
+Revision 3569 versus 3613.
+\end_layout
+
+\begin_layout Standard
+Unfortunately, looking at the notes on bugfixes, the offending issue is
+ not obvious:
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.dtcenter.org/met/users/support/known_issues/METv5.1/index.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Attempt recompiling /contrib/MET/5.1 with the latest set of patches to fix
+ the problem.
+\end_layout
+
+\end_body
+\end_document
