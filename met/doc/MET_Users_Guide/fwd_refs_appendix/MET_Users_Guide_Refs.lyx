@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -136,7 +138,7 @@ Weather and Forecasting
 \series default
 24
 \series medium
-, 1748--1754.
+, 1748–1754.
 \end_layout
 
 \begin_layout Description
@@ -467,6 +469,23 @@ M., 2013: A strategy for verifying near-convection-resolving model forecasts
  at observing sites.
  Wea.
  Forecasting, 29, 185-204.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+Mood
+\series default
+, A.
+ M., F.
+ A. Graybill and D.
+ C. Boes, 1974:
+\emph on
+ Introduction to the Theory of Statistics
+\emph default
+,  McGraw-Hill, pp.
+ 299-338.
+ 
 \end_layout
 
 \begin_layout Description
