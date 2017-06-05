@@ -766,6 +766,18 @@ Figure1.3 shows a couple of examples of how the HiRA proportion is derived
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
 \begin_inset Graphics
 	filename fig4.3.png
 	scale 40
@@ -773,14 +785,20 @@ Figure1.3 shows a couple of examples of how the HiRA proportion is derived
 \end_inset
 
 
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example showing how HiRA proportions are calculated.
 \end_layout
 
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset CommandInset label
-LatexCommand label
-name "Fig_HiRA_Example"
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
 
 \end_inset
 
