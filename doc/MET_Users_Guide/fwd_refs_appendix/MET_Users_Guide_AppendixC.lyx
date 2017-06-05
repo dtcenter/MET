@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 1
@@ -197,7 +199,7 @@ j
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -2325,7 +2327,7 @@ where NC is the number of "concordant" pairs and ND is the number of "discordant
 \end_inset
 
 , 
-\begin_inset Formula $o{}_{i}$
+\begin_inset Formula $o_{i}$
 \end_inset
 
 ) pairs according to 
@@ -2513,7 +2515,7 @@ Called "MSE" in CNT output (Table 4-6)
 \series medium
 MSE measures the average squared error of the forecasts.
  Specifically, 
-\begin_inset Formula $MSE=\frac{1}{n}\sum\left(f{}_{i}-o_{i}\right)^{2}$
+\begin_inset Formula $MSE=\frac{1}{n}\sum\left(f_{i}-o_{i}\right)^{2}$
 \end_inset
 
 .
@@ -2912,6 +2914,62 @@ Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect
  correlation and a value of -1 indicates perfect negative correlation.
  A value of 0 indicates that the forecast and observed anomalies are not
  correlated.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2) (Tables 4-11, 4-12, 4-13,
+ and 4-14)
+\end_layout
+
+\begin_layout Standard
+The SL1L2, SAL1L2, VL1L2, and VAL1L2 line types are used to store data summaries
+ (e.g.
+ partial sums) that can later be accumulated into verification statistics.
+ These are divided according to scalar or vector summaries (S or V).
+ The climate anomaly values (A) can be stored in place of the actuals, which
+ is just a recentering of the values around the climatological average.
+ L1 and L2 refer to the L1 and L2 norms, the distance metrics commonly referred
+ to as the “city block” and “Euclidean” distances.
+ The city block is the absolute value of a distance while the Euclidean
+ distance is the square root of the squared distance.
+ 
+\end_layout
+
+\begin_layout Standard
+The partial sums can be accumulated over individual cases to produce statistics
+ for a longer period without any loss of information because these sums
+ are 
+\emph on
+sufficient
+\emph default
+ for resulting statistics such as RMSE, bias, correlation coefficient, and
+ MAE (Mood et al, 1974).
+ Thus, the individual errors need not be stored, all of the information
+ relevant to calculation of statistics are contained in the sums.
+ As an example, the sum of all data points and the sum of all squared data
+ points (or equivalently, the sample mean and sample variance) are 
+\emph on
+jointly sufficient
+\emph default
+ for estimates of the Gaussian distribution mean and variance.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Minimally
+\emph default
+ sufficient statistics are those that condense the data most, with no loss
+ of information.
+ Statistics based on L1 and L2 norms allow for good compression of information.
+ Statistics based on other norms, such as order statistics, do not result
+ in good compression of information.
+ For this reason, statistics such as RMSE are often preferred to statistics
+ such as the median absolute deviation.
+ The partial sums are not sufficient for order statistics, such as the median
+ or quartiles.
  
 \end_layout
 
@@ -3765,7 +3823,7 @@ represents the observations.
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
