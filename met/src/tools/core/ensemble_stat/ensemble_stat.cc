@@ -1204,6 +1204,7 @@ void process_point_scores() {
 
                // Write RHIST counts
                if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
+
                   pd_ptr->compute_rhist();
 
                   write_rhist_row(shc, pd_ptr,
@@ -1214,18 +1215,20 @@ void process_point_scores() {
 
                // Write PHIST counts if greater than 0
                if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+
                   pd_ptr->compute_phist();
 
-                  if(pd_ptr->phist_na.sum() == 0) break;
-
-                  write_phist_row(shc, pd_ptr,
-                     conf_info.output_flag[i_phist],
-                     stat_at, i_stat_row,
-                     txt_at[i_phist], i_txt_row[i_phist]);
+                  if(pd_ptr->phist_na.sum() > 0) {
+                     write_phist_row(shc, pd_ptr,
+                        conf_info.output_flag[i_phist],
+                        stat_at, i_stat_row,
+                        txt_at[i_phist], i_txt_row[i_phist]);
+                  }
                }
 
                // Write SSVAR scores
                if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
+
                   pd_ptr->compute_ssvar();
 
                   // Check for no bins
@@ -1251,6 +1254,7 @@ void process_point_scores() {
 
                // Write RELP counts
                if(conf_info.output_flag[i_relp] != STATOutputType_None) {
+ 
                   pd_ptr->compute_relp();
 
                   write_relp_row(shc, pd_ptr,
