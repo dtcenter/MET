@@ -19,6 +19,7 @@
 tablefilesdir = $(pkgdatadir)/table_files
 
 tablefiles_DATA = \
+        met_header_columns_V6.1.txt \
         met_header_columns_V6.0.txt \
         met_header_columns_V5.2.txt \
         met_header_columns_V5.1.txt \
