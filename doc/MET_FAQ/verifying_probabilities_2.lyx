@@ -82,8 +82,7 @@ An example of verifying a probability of precipitation field is included
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/scripts/test_grid_stat.sh.
- 
+{MET_BASE}/scripts/test_grid_stat.sh
 \end_layout
 
 \begin_layout Standard

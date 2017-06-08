@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -74,9 +76,7 @@ tc_pairs example with duplicate thermo params
 \end_layout
 
 \begin_layout Standard
-Below is a command example to run.
- ***attached the config file used, the output log file, and the output tcst
- file***:
+Below is a command example to run:
 \end_layout
 
 \begin_layout LyX-Code
@@ -124,18 +124,34 @@ Below is a warning message:
 \end_layout
 
 \begin_layout LyX-Code
-WARNING: TrackInfo::add(const ATCFLine &) -> skipping ATCFLine since the
- valid time is not
+WARNING: TrackInfo::add(const ATCFLine &) -> 
 \end_layout
 
 \begin_layout LyX-Code
-increasing (20140801_000000 < 20140806_060000): WARNING: AL, 03, 2014080100,
- 03, H4HW, 000,
+skipping ATCFLine since the valid time is not
 \end_layout
 
 \begin_layout LyX-Code
-120N, 547W, 38, 1009, XX, 34, NEQ, 0084, 0000, 0000, 0083, -99, -99, 59,
- 0, 0, , 0, , 0, 0,
+increasing (20140801_000000 < 20140806_060000):
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+WARNING: AL, 03, 2014080100, 03, H4HW, 000,
+\end_layout
+
+\begin_layout LyX-Code
+120N, 547W, 38, 1009, XX, 34, NEQ, 0084, 0000, 
+\end_layout
+
+\begin_layout LyX-Code
+0000, 0083, -99, -99, 59, 0, 0, , 0, , 0, 0,
 \end_layout
 
 \begin_layout Standard
@@ -157,27 +173,57 @@ grep H4HW aal*.dat | grep 2014080100 | grep ", 000,"
 \end_layout
 
 \begin_layout LyX-Code
-aal032014.h4hw.dat:AL, 03, 2014080100, 03, H4HW, 000, 120N, 547W, 38, 1009,
- XX, 34, NEQ, 0084,
+\begin_inset VSpace defskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout LyX-Code
-0000, 0000, 0083, -99, -99, 59, 0, 0, , 0, , 0, 0, , , , , 0, 0, 0, 0, THERMO
- PARAMS, -9999,
+aal032014.h4hw.dat:AL, 03, 2014080100, 03, H4HW, 000, 
 \end_layout
 
 \begin_layout LyX-Code
--9999, -9999, Y, 10, DT, -999 aal032014_hfip_d2014_BERTHA.dat:AL, 03, 2014080100,
- 03, H4HW,
+120N, 547W, 38, 1009, XX, 34, NEQ, 0084,
 \end_layout
 
 \begin_layout LyX-Code
-000, 120N, 547W, 38, 1009, XX, 34, NEQ, 0084, 0000, 0000, 0083, -99, -99,
- 59, 0, 0, , 0, , 0,
+0000, 0000, 0083, -99, -99, 59, 0, 0, , 
 \end_layout
 
 \begin_layout LyX-Code
-0, , , , , 0, 0, 0, 0, THERMOPARAMS, -9999 ,-9999 ,-9999 ,Y ,10 ,DT ,-999
+0, , 0, 0, , , , , 0, 0, 0, 0, THERMO PARAMS, 
+\end_layout
+
+\begin_layout LyX-Code
+-9999, -9999, -9999, Y, 10, DT, -999 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+aal032014_hfip_d2014_BERTHA.dat:AL, 03, 2014080100, 
+\end_layout
+
+\begin_layout LyX-Code
+03, H4HW, 000, 120N, 547W, 38, 1009, XX, 34, NEQ, 
+\end_layout
+
+\begin_layout LyX-Code
+0084, 0000, 0000, 0083, -99, -99, 59, 0, 0, , 0, , 0,
+\end_layout
+
+\begin_layout LyX-Code
+0, , , , , 0, 0, 0, 0, THERMOPARAMS, -9999 ,-9999 ,
+\end_layout
+
+\begin_layout LyX-Code
+-9999 ,Y ,10 ,DT ,-999
 \end_layout
 
 \begin_layout Standard
@@ -202,7 +248,7 @@ If this really is duplicate track data, work on the logic for where/how
 \end_layout
 
 \begin_layout LyX-Code
-/d1/johnhg/MET/MET_releases/{MET_BASE}/bin/tc_pairs 
+{MET_BASE}/bin/tc_pairs 
 \backslash
  
 \end_layout
