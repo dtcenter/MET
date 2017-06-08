@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -74,23 +76,11 @@ TC rapid intensification verification
 \end_layout
 
 \begin_layout Standard
-The build can be found in: 
-\end_layout
-
-\begin_layout LyX-Code
-/scratch1/portfolios/BMC/dtc/MET/met-rev2577
-\end_layout
-
-\begin_layout Standard
-2577 is just the revision number of the MET subversion repository.
-\end_layout
-
-\begin_layout Standard
 To get the most output, run something like this...
 \end_layout
 
 \begin_layout LyX-Code
-/scratch1/portfolios/BMC/dtc/MET/met-rev2577/bin/tc_stat 
+{MET_BASE}/bin/tc_stat 
 \backslash
  
 \end_layout
@@ -116,7 +106,7 @@ Please search for "rirw" in here:
 \end_layout
 
 \begin_layout LyX-Code
-/scratch1/portfolios/BMC/dtc/MET/met-rev2577/data/config/README_TC 
+{MET_BASE}/share/met/config/README_TC 
 \end_layout
 
 \begin_layout Standard
