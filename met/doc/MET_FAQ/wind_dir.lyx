@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -76,15 +78,110 @@ Evaluating wind direction
 \begin_layout Standard
 Evaluating wind direction is currently a 2-step process in MET.
  Use Grid-Stat or Point-Stat to generate VL1L2 output lines (or MPR lines
- from Point-Stat) and then run Stat-Analysis to derived wind direction errors.
+ from Point-Stat) and then run Stat-Analysis to derive wind direction errors.
+\end_layout
+
+\begin_layout Standard
+Wind direction errors can be calculated in two different ways.
+ The AGGR_WDIR method accumulates the forecast vectors into a single vector
+ and the observation vectors into a single vector.
+ Then, the overall direction error between them is calculated.
+ An example is shown the figure below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename AGGR_WDIR.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example showing two wind vectors accumulated, then the difference in direction
+ calculated.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Row_MEAN_WDIR method finds the direction error between each forecast
+ and observed wind vector, then averages those errors.
+ An example is shown the figure below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename ROW_MEAN_WDIR.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example showing two wind vector differences, averaged together to find the
+ row mean wind direction error.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 This example will include the actual forecast and observed wind directions,
  not just their errors.
  In order to do that, the MPR output from the Point-Stat tool is needed.
- By way of example, ***is attached a file containing UGRD and VGRD MPR output
- from point-stat named "ugrd_vgrd_mpr.stat".***
+ By way of example, an input file containing UGRD and VGRD MPR output from
+ point-stat named 
+\begin_inset Quotes eld
+\end_inset
+
+ugrd_vgrd_mpr.stat" is used in the command below.
+\end_layout
+
+\begin_layout Standard
+When aggregating, wind directions can cancel out.
+ It is best to verify over regions with unimodal wind direction.
+ Alternately, one can verify u and v components separately.
 \end_layout
 
 \begin_layout Standard
@@ -92,19 +189,22 @@ Here are some stat-analysis jobs that can run on this:
 \end_layout
 
 \begin_layout Enumerate
-Wind direction errors using all 1960 pairs 
+Wind direction errors using all pairs 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-{MET_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR -out_line_type
- wdir 
+{MET_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
--lookin ugrd_vgrd_mpr.stat
+-out_line_type wdir -lookin ugrd_vgrd_mpr.stat
 \end_layout
 
 \begin_layout LyX-Code
@@ -112,14 +212,19 @@ Wind direction errors using all 1960 pairs
 \end_layout
 
 \begin_layout LyX-Code
-JOB_LIST: -job aggregate_stat -line_type MPR -out_line_type 
-\backslash
+JOB_LIST: -job aggregate_stat -line_type MPR -out_line_type WDIR
+\end_layout
+
+\begin_layout LyX-Code
 
 \end_layout
 
 \begin_layout LyX-Code
-WDIR COL_NAME: TOTAL FBAR OBAR ME MAE ROW_MEAN_WDIR: 673 28.89987 335.41566
- 12.49552 46.15238
+COL_NAME: TOTAL FBAR OBAR ME MAE 
+\end_layout
+
+\begin_layout LyX-Code
+ROW_MEAN_WDIR: 673 28.89987 335.41566 12.49552 46.15238
 \end_layout
 
 \begin_layout LyX-Code
@@ -128,17 +233,19 @@ AGGR_WDIR: 980 11.93629 331.96443 39.97186 NA
 
 \end_deeper
 \begin_layout Enumerate
-Wind direction error for each of the 1960 pairs separately, writing the
- output to ***a file which is attached*** 
-\end_layout
-
-\begin_layout LyX-Code
-{MET_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR -out_line_type
+Wind direction error for each of the obseration stations separately, writing
+ the output to a text file.
  
 \end_layout
 
 \begin_layout LyX-Code
-wdir -lookin ugrd_vgrd_mpr.stat -by OBS_SID -out wdir_by_sid.txt
+{MET_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-out_line_type wdir -lookin ugrd_vgrd_mpr.stat -by OBS_SID -out wdir_by_sid.txt
 \end_layout
 
 \begin_layout Standard
@@ -147,7 +254,7 @@ In the second command the "-by" option was used to run the same job separately
  The FBAR and OBAR output columns contain the forecast and observed wind
  directions for each station.
  Notice that the wind direction is NA in many cases because wind direction
- is undefined when by U and V are 0.
+ is undefined when U and V are 0.
 \end_layout
 
 \end_body
