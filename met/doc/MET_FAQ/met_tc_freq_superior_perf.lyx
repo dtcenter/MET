@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -74,22 +76,27 @@ Frequency of Superior Performance
 \end_layout
 
 \begin_layout Standard
-Here is an example of using a verbosity level of 4 (-v 4), with the following
- line printed to the screen: DEBUG 4: Skipping frequency of superior performance
- since the case information does not contain "AMODEL".
+\noindent
+Frequency of Superior Performance (FSP) is only computed for tropical cyclone
+ evaluations when there is separate output for multiple models.
+ This can be requested using the "-by AMODEL" option with the tc_stat tool.
+ Here is an example of using a verbosity level of 4 (-v 4).
 \end_layout
 
 \begin_layout Standard
-In this case the tc_stat job that ran looked at the 48 hour lead time for
- the HWRF and H3HW models but grouped together all the output.
- FSP is only computed when there is separate output for each model.
- This can be requested using the "-by AMODEL" option.
+\noindent
+In this case the tc_stat job looked at the 48 hour lead time for the HWRF
+ and H3HW models.
+ Without the 
+\begin_inset Quotes eld
+\end_inset
+
+-by AMODEL
+\begin_inset Quotes erd
+\end_inset
+
+ option, the output would be all grouped together and no FSP could be calculated.
  
-\end_layout
-
-\begin_layout Standard
-***I've attached the output created when running the following job on some
- sample data (note that I've used -by AMODEL)***:
 \end_layout
 
 \begin_layout LyX-Code
@@ -111,14 +118,18 @@ In this case the tc_stat job that ran looked at the 48 hour lead time for
 \end_layout
 
 \begin_layout LyX-Code
--job summary -lead 480000 -column TRACK -amodel HWFI,H3WI -by AMODEL -out
- sample.out
+-job summary -lead 480000 -column TRACK -amodel HWFI,H3WI 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-by AMODEL -out sample.out
 \end_layout
 
 \begin_layout Standard
-Try adding "-by AMODEL" and see if that does the trick.
- If not, try using debug level 4 (-v 4) to see if there's any more useful
- log messages.
+As with any MET trouble, try using debug level 4 (-v 4) to see if there
+ are any more useful log messages.
 \end_layout
 
 \end_body
