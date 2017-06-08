@@ -1231,30 +1231,31 @@ void process_point_scores() {
 
                   pd_ptr->compute_ssvar();
 
-                  // Check for no bins
-                  if(!pd_ptr->ssvar_bins) break;
+                  // Make sure there are bins to process
+                  if(pd_ptr->ssvar_bins) {
 
-                  // Add rows to the output AsciiTables for SSVAR
-                  stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin *
-                                   conf_info.ci_alpha.n_elements());
+                     // Add rows to the output AsciiTables for SSVAR
+                     stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin *
+                                      conf_info.ci_alpha.n_elements());
 
-                  if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
-                     txt_at[i_ssvar].add_rows(pd_ptr->ssvar_bins[0].n_bin *
-                                              conf_info.ci_alpha.n_elements());
-                  }
+                     if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
+                        txt_at[i_ssvar].add_rows(pd_ptr->ssvar_bins[0].n_bin *
+                                                 conf_info.ci_alpha.n_elements());
+                     }
 
-                  // Write the SSVAR data for each alpha value
-                  for(m=0; m<conf_info.ci_alpha.n_elements(); m++) {
-                     write_ssvar_row(shc, pd_ptr, conf_info.ci_alpha[m],
-                        conf_info.output_flag[i_ssvar],
-                        stat_at, i_stat_row,
-                        txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                     // Write the SSVAR data for each alpha value
+                     for(m=0; m<conf_info.ci_alpha.n_elements(); m++) {
+                        write_ssvar_row(shc, pd_ptr, conf_info.ci_alpha[m],
+                           conf_info.output_flag[i_ssvar],
+                           stat_at, i_stat_row,
+                           txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                     }
                   }
                }
 
                // Write RELP counts
                if(conf_info.output_flag[i_relp] != STATOutputType_None) {
- 
+
                   pd_ptr->compute_relp();
 
                   write_relp_row(shc, pd_ptr,
@@ -1518,6 +1519,7 @@ void process_grid_vx() {
 
             // Write RHIST counts
             if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
+
                pd.compute_rhist();
 
                write_rhist_row(shc, &pd,
@@ -1528,23 +1530,26 @@ void process_grid_vx() {
 
             // Write PHIST counts if greater than 0
             if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+
                pd.phist_bin_size = conf_info.vx_pd[i].pd[0][0][0].phist_bin_size;
                pd.compute_phist();
 
-               if(pd.phist_na.sum() == 0) break;
-
-               write_phist_row(shc, &pd,
-                  conf_info.output_flag[i_phist],
-                  stat_at, i_stat_row,
-                  txt_at[i_phist], i_txt_row[i_phist]);
+               if(pd.phist_na.sum() > 0) {
+                  write_phist_row(shc, &pd,
+                     conf_info.output_flag[i_phist],
+                     stat_at, i_stat_row,
+                     txt_at[i_phist], i_txt_row[i_phist]);
+               }
             }
 
             // Write out the smoothed forecast, observation, and difference
-            if(conf_info.ensemble_flag[i_nc_orank])
+            if(conf_info.ensemble_flag[i_nc_orank]) {
                write_orank_nc(pd, obs_dp_smooth, i, j, k);
+            }
 
             // Write SSVAR scores
             if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
+
                pd.ssvar_bin_size = conf_info.vx_pd[i].pd[0][0][0].ssvar_bin_size;
                pd.compute_ssvar();
 
@@ -1568,6 +1573,7 @@ void process_grid_vx() {
 
             // Write RELP counts
             if(conf_info.output_flag[i_relp] != STATOutputType_None) {
+
                pd.compute_relp();
 
                write_relp_row(shc, &pd,
