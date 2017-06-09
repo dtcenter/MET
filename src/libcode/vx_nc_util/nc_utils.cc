@@ -55,11 +55,19 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    bool status = false;
    if (!att->isNull()) {
       int att_size = att->getAttLength();
-      char *att_value = new char[att_size+1];
-      att->getValues(att_value);
-      att_value[att_size] = '\0';
-      value = att_value;
-      if(att_value) { delete [] att_value; att_value = 0; }
+      nc_type attType = att->getType().getId();
+      if (attType == NC_CHAR) {
+         char *att_value = new char[att_size+1];
+         att->getValues(att_value);
+         att_value[att_size] = '\0';
+         value = att_value;
+      }
+      else { // MET-788: to handle a custom modified NetCDF
+         mlog << Error << "\nget_att_value_chars(NcAtt) -> "
+              << "Please convert data type of \"" << GET_NC_NAME_P(att)
+              << "\" to NC_CHAR type.\n\n";
+         exit(1);
+      }
       status = true;
    }
    return status;
@@ -90,6 +98,12 @@ void get_att_value_doubles(const NcAtt *att, NumArray &value) {
    for(int i=0; i<=att->getAttLength(); i++) value.add(values[i]);
    if(values) { delete [] values; values = 0; }
    return;
+}
+
+double *get_att_value_doubles(const NcAtt *att) {
+   double *values = new double[att->getAttLength()];
+   att->getValues(values);
+   return values;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -162,11 +176,12 @@ bool    get_att_no_leap_year(const NcVar *var) {
    bool no_leap_year = false;
    NcVarAtt calendar_att = get_nc_att(var, "calendar", false);
    if (!IS_INVALID_NC(calendar_att)) {
-     ConcatString calendar_value;
-     get_att_value_chars(&calendar_att, calendar_value);
-     no_leap_year = (strcmp("noleap",calendar_value) == 0)
-         || (strcmp("365_day",calendar_value) == 0)
-         || (strcmp("365 days",calendar_value) == 0);
+      ConcatString calendar_value;
+      if (get_att_value_chars(&calendar_att, calendar_value)) {
+         no_leap_year = (strcmp("noleap",calendar_value) == 0)
+                        || (strcmp("365_day",calendar_value) == 0)
+                        || (strcmp("365 days",calendar_value) == 0);
+      }
    }
    return no_leap_year;
 }
@@ -850,7 +865,35 @@ double get_double_var(NcVar * var, const int index) {
    if (!var->isNull()) {
       start.push_back(index);
       count.push_back(1);
-      var->getVar(start, count, &k);
+      
+      int vi;
+      short vs;
+      float vf;
+      int dataType = GET_NC_TYPE_ID_P(var);
+      switch (dataType) {
+         case NC_DOUBLE:
+            var->getVar(start, count, &k);
+            break;
+         case NC_FLOAT:
+            var->getVar(start, count, &vf);
+            k = (double)vf;
+            break;
+         case NC_SHORT:
+            var->getVar(start, count, &vs);
+            k = (double)vs;
+            break;
+         case NC_INT:
+            var->getVar(start, count, &vi);
+            k = (double)vi;
+            break;
+         default:
+            mlog << Error << "\nget_double_var() -> "
+                 << "data type mismatch (double vs. \"" << GET_NC_TYPE_NAME_P(var)
+                 << "\").\nIt won't be converted because of dimension issue.\n"
+                 << "Please correct the data type to double for variable \"" << GET_NC_NAME_P(var) << "\".\n\n";
+            exit(1);
+            break;
+      }
    }
 
    return(k);
