@@ -1755,6 +1755,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
             case(stat_prc):
             case(stat_rhist):
             case(stat_phist):
+            case(stat_relp):
             case(stat_orank):
                write_header_row((const char **) 0, 0, 1, dump_at, 0, 0);
                break;
