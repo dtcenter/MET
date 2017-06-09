@@ -1553,21 +1553,25 @@ void process_grid_vx() {
                pd.ssvar_bin_size = conf_info.vx_pd[i].pd[0][0][0].ssvar_bin_size;
                pd.compute_ssvar();
 
-               // Add rows to the output AsciiTables for SSVAR
-               stat_at.add_rows(pd.ssvar_bins[0].n_bin *
-                                conf_info.ci_alpha.n_elements());
+               // Make sure there are bins to process
+               if(pd.ssvar_bins) {
 
-               if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
-                  txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
-                                           conf_info.ci_alpha.n_elements());
-               }
+                  // Add rows to the output AsciiTables for SSVAR
+                  stat_at.add_rows(pd.ssvar_bins[0].n_bin *
+                                   conf_info.ci_alpha.n_elements());
 
-               // Write the SSVAR data for each alpha value
-               for(l=0; l<conf_info.ci_alpha.n_elements(); l++) {
-                  write_ssvar_row(shc, &pd, conf_info.ci_alpha[l],
-                     conf_info.output_flag[i_ssvar],
-                     stat_at, i_stat_row,
-                     txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                  if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
+                     txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
+                                              conf_info.ci_alpha.n_elements());
+                  }
+
+                  // Write the SSVAR data for each alpha value
+                  for(l=0; l<conf_info.ci_alpha.n_elements(); l++) {
+                     write_ssvar_row(shc, &pd, conf_info.ci_alpha[l],
+                        conf_info.output_flag[i_ssvar],
+                        stat_at, i_stat_row,
+                        txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                  }
                }
             }
 
