@@ -20,6 +20,7 @@
 //   002    05/03/12  Halley Gotway   Switch to using vx_config library.
 //   003    02/04/13  Halley Gotway   Add -by case option.
 //   004    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
+//   005    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -80,7 +81,7 @@ extern void write_job_aggr_hdr(STATAnalysisJob &,
 
 extern void write_job_aggr_ctc(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrCTCInfo> &, AsciiTable &);
-               
+
 extern void write_job_aggr_mctc(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrMCTCInfo> &, AsciiTable &);
 
@@ -94,16 +95,19 @@ extern void write_job_aggr_wind(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrWindInfo> &, AsciiTable &);
 
 extern void write_job_aggr_rhist(STATAnalysisJob &, STATLineType,
-               map<ConcatString, AggrRHISTInfo> &, AsciiTable &);
+               map<ConcatString, AggrENSInfo> &, AsciiTable &);
 
 extern void write_job_aggr_phist(STATAnalysisJob &, STATLineType,
-               map<ConcatString, AggrPHISTInfo> &, AsciiTable &);
+               map<ConcatString, AggrENSInfo> &, AsciiTable &);
+
+extern void write_job_aggr_relp(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrENSInfo> &, AsciiTable &);
 
 extern void write_job_aggr_ssvar(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrSSVARInfo> &, AsciiTable &);
 
 extern void write_job_aggr_orank(STATAnalysisJob &, STATLineType,
-               map<ConcatString, AggrORANKInfo> &, AsciiTable &);
+               map<ConcatString, AggrENSInfo> &, AsciiTable &);
 
 extern void write_job_aggr_isc(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrISCInfo> &, AsciiTable &);

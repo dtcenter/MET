@@ -21,6 +21,7 @@
 //   003    03/07/13  Halley Gotway   Add parse_ssvar_line.
 //   004    05/19/14  Halley Gotway   Add OBS_QC to MPR and ORANK lines.
 //   005    06/03/14  Halley Gotway   Add PHIST line type.
+//   006    06/09/17  Halley Gotway   Add RELP line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +72,12 @@ struct PHISTData {
    NumArray phist_na;
 };
 
+// Relative Position (RELP) data structure
+struct RELPData {
+   int total, n_ens;
+   NumArray relp_na;
+};
+
 // Observation Rank (ORANK) data structure
 struct ORANKData {
    int total, index;
@@ -98,6 +105,7 @@ extern void parse_isc_line     (STATLine &, ISCInfo &, int &);
 extern void parse_nbrcnt_line  (STATLine &, NBRCNTInfo &);
 extern void parse_rhist_line   (STATLine &, RHISTData &);
 extern void parse_phist_line   (STATLine &, PHISTData &);
+extern void parse_relp_line    (STATLine &, RELPData &);
 extern void parse_orank_line   (STATLine &, ORANKData &);
 extern void parse_ssvar_line   (STATLine &, SSVARInfo &);
 

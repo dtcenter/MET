@@ -23,6 +23,7 @@
 //   005    02/05/15  Halley Gotway   Add StatHdrInfo to keep track of
 //                    unique header entries for each aggregation.
 //   006    03/30/15  Halley Gotway   Add ramp job type.
+//   007    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -118,20 +119,10 @@ struct AggrISCInfo {
    NumArray *total_na, *mse_na, *fen_na, *oen_na, *baser_na, *fbias_na;
 };
 
-struct AggrRHISTInfo {
+struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
    NumArray crps_climo_na;
-};
-
-struct AggrPHISTInfo {
-   StatHdrInfo hdr;
-   PairDataEnsemble ens_pd;
-};
-
-struct AggrORANKInfo {
-   StatHdrInfo hdr;
-   PairDataEnsemble ens_pd;
 };
 
 // Define struct used to perform comparisons for SSVAR bins
@@ -213,17 +204,22 @@ extern void aggr_isc_lines(
 
 extern void aggr_rhist_lines(
                LineDataFile &, STATAnalysisJob &,
-               map<ConcatString, AggrRHISTInfo> &,
+                  map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_phist_lines(
                LineDataFile &, STATAnalysisJob &,
-               map<ConcatString, AggrPHISTInfo> &,
+               map<ConcatString, AggrENSInfo> &,
+               int &, int &);
+
+extern void aggr_relp_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_orank_lines(
                LineDataFile &, STATAnalysisJob &,
-               map<ConcatString, AggrORANKInfo> &,
+               map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_ssvar_lines(

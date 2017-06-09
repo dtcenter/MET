@@ -25,6 +25,7 @@
 //   006    06/03/14  Halley Gotway   Add PHIST line type.
 //   007    01/04/17  Halley Gotway   Switch integer offsets to version
 //                    independent column names.
+//   008    06/09/17  Halley Gotway   Add RELP line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -343,6 +344,26 @@ void parse_phist_line(STATLine &l, PHISTData &p_data) {
    for(i=0; i<p_data.n_bin; i++) {
       sprintf(col_str, "BIN_%i", i+1);
       p_data.phist_na.add(atoi(l.get_item(col_str)));
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_relp_line(STATLine &l, RELPData &r_data) {
+   int i;
+   char col_str[max_str_len];
+
+   r_data.total    = atoi(l.get_item("TOTAL"));
+   r_data.n_ens    = atoi(l.get_item("N_ENS"));
+
+   r_data.relp_na.clear();
+
+   // Parse out RELP_i
+   for(i=0; i<r_data.n_ens; i++) {
+      sprintf(col_str, "RELP_%i", i+1);
+      r_data.relp_na.add(atof(l.get_item(col_str)));
    }
 
    return;

@@ -27,6 +27,7 @@
 //   008    02/05/15  Halley Gotway   Add StatHdrInfo to keep track of
 //                    unique header entries for each aggregation.
 //   009    03/30/15  Halley Gotway   Add ramp job type.
+//   008    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2106,15 +2107,15 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &j,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
-                      map<ConcatString, AggrRHISTInfo> &m,
+                      map<ConcatString, AggrENSInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
-   AggrRHISTInfo aggr;
+   AggrENSInfo aggr;
    RHISTData cur;
    ConcatString key;
    int i;
    double crps_fcst, crps_climo;
-   map<ConcatString, AggrRHISTInfo>::iterator it;
+   map<ConcatString, AggrENSInfo>::iterator it;
 
    //
    // Process the STAT lines
@@ -2160,7 +2161,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
 
          //
          // Check for N_RANK remaining constant
-          //
+         //
          if(m[key].ens_pd.rhist_na.n_elements() != cur.n_rank) {
             mlog << Error << "\naggr_rhist_lines() -> "
                  << "the \"N_RANK\" column must remain constant ("
@@ -2229,14 +2230,14 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
-                      map<ConcatString, AggrPHISTInfo> &m,
+                      map<ConcatString, AggrENSInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
-   AggrPHISTInfo aggr;
+   AggrENSInfo aggr;
    PHISTData cur;
    ConcatString key;
    int i;
-   map<ConcatString, AggrPHISTInfo>::iterator it;
+   map<ConcatString, AggrENSInfo>::iterator it;
 
    //
    // Process the STAT lines
@@ -2316,15 +2317,102 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &j,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
-                      map<ConcatString, AggrORANKInfo> &m,
+void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &j,
+                      map<ConcatString, AggrENSInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
-   AggrORANKInfo aggr;
+   AggrENSInfo aggr;
+   RELPData cur;
+   ConcatString key;
+   int i;
+   map<ConcatString, AggrENSInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         j.dump_stat_line(line);
+
+         if(line.type() != stat_relp) {
+            mlog << Error << "\naggr_relp_lines() -> "
+                 << "should only encounter relative position (RELP) "
+                 << "line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current PHIST line
+         //
+         parse_relp_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.ens_pd.relp_na = cur.relp_na;
+            aggr.hdr.clear();
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+
+            //
+            // Check for N_ENS remaining constant
+            //
+            if(m[key].ens_pd.relp_na.n_elements() != cur.n_ens) {
+               mlog << Error << "\naggr_relp_lines() -> "
+                    << "the \"N_ENS\" column must remain constant ("
+                    << m[key].ens_pd.relp_na.n_elements() << " != " << cur.n_ens
+                    << ").  Try setting \"-column_eq N_ENS n\".\n\n";
+               throw(1);
+            }
+
+            //
+            // Aggregate the RELP histogram counts
+            //
+            for(i=0; i<m[key].ens_pd.relp_na.n_elements(); i++) {
+               m[key].ens_pd.relp_na.set(i, m[key].ens_pd.relp_na[i] + cur.relp_na[i]);
+            }
+         } // end else
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
+                      map<ConcatString, AggrENSInfo> &m,
+                      int &n_in, int &n_out) {
+   STATLine line;
+   AggrENSInfo aggr;
    ORANKData cur;
    ConcatString key;
    int i, n_valid, n_bin;
-   map<ConcatString, AggrORANKInfo>::iterator it;
+   map<ConcatString, AggrENSInfo>::iterator it;
 
    //
    // Process the STAT lines
