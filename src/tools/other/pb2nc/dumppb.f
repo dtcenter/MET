@@ -331,9 +331,7 @@ C
 C*      Open the output files.
 C
         TID = 69
-        DID = 70
         OPEN  ( UNIT = TID, FILE = TBL_NAME(1:LEN1) )
-        OPEN  ( UNIT = DID, FILE = TBL_NAME(1:LEN1) // ".dump")
 
 C
 C*      Open the input file.
@@ -348,16 +346,11 @@ C
         IF ( ierrpb .eq. -1 )  THEN
             STOP
         END IF
-C        CALL UFDUMP  ( FID, DID )
-C        IF ( ierrpb .eq. -1 )  THEN
-C            STOP
-C        END IF
 C
 C*      Close the input file
 C
 C        CLOSBF( FID )
         CLOSE  ( UNIT = FID )
-        CLOSE  ( UNIT = DID )
 C
         RETURN
         END
