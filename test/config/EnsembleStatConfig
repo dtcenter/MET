@@ -81,6 +81,26 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+obs_thresh     = [];
+obs_quality    = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_perc_value = 50;
+skip_const     = ${SKIP_CONST};
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Point observation time window
 //
 obs_window = {
@@ -162,7 +182,6 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-duplicate_flag   = NONE;
 output_prefix    = "${OUTPUT_PREFIX}";
 version          = "V6.1";
 

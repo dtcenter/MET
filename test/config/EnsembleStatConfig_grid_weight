@@ -62,6 +62,26 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+obs_thresh     = [];
+obs_quality    = [];
+duplicate_flag = NONE;
+obs_summary    = NONE;
+obs_perc_value = 50;
+skip_const     = FALSE;
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Climatology mean data
 //
 climo_mean = {
@@ -170,8 +190,6 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = ${GRID_WEIGHT};
-obs_quality      = [];
-duplicate_flag   = NONE;
 output_prefix    = "${OUTPUT_PREFIX}";
 version          = "V6.1";
 

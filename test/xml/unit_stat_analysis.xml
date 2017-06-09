@@ -57,6 +57,24 @@
     </output>
   </test>
 
+  <test name="stat_analysis_AGG_RELP">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
+      -job aggregate -line_type RELP -by FCST_VAR -vx_mask NWC,GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_RELP_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_RELP_out.stat \
+      -set_hdr VX_MASK NWC_AND_GRB \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_RELP.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_RELP_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_RELP_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_RELP.out</exist>
+    </output>
+  </test>
+
   <test name="stat_analysis_AGG_STAT_ORANK_RHIST">
     <exec>&MET_DIR;/bin/stat_analysis</exec>
     <param> \
@@ -90,6 +108,24 @@
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_dump.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST_out.stat</stat>
       <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_PHIST.out</exist>
+    </output>
+  </test>
+
+  <test name="stat_analysis_AGG_STAT_ORANK_RELP">
+    <exec>&MET_DIR;/bin/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/ensemble_stat/ensemble_stat_SKIP_CONST_20120410_120000V.stat \
+      -job aggregate_stat -line_type ORANK -out_line_type RELP \
+      -fcst_var APCP_24 -vx_mask NWC,GRB \
+      -dump_row &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_dump.stat \
+      -out_stat &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_out.stat \
+      -out &OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP_out.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis/AGG_STAT_ORANK_RELP.out</exist>
     </output>
   </test>
 
