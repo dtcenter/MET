@@ -287,8 +287,8 @@ The Stat-Analysis tool can be used to aggregate multiple STAT lines of the
  MCTS, or NBRCTS) line type will be written out.
  If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, a continuous
  statistics (CNT) line type will be written out.
- For ensembles, the ORANK line type can ba accumulated into RHIST, PHIST,
- or RELP output.
+ For ensembles, the ORANK line type can be accumulated into RHIST, PHIST,
+ RELP, or SSVAR output.
  If the matched pair line type (MPR) has been aggregated, the user may choose
  the line type to be output (FHO, CTC, CTS, CNT, MCTC, MCTS, WDIR, SL1L2,
  SAL1L2, PCT, PSTD, PJC, or PRC).
@@ -3968,7 +3968,7 @@ ORANK
 \begin_inset Text
 
 \begin_layout Plain Layout
-RHIST, PHIST, RELP
+RHIST, PHIST, RELP, SSVAR
 \end_layout
 
 \end_inset
