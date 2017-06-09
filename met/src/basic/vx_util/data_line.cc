@@ -119,8 +119,8 @@ N_items = 0;
 
 N_chars = N_ints = 0;
 
-Delimiter = new char[2];
-strcpy(Delimiter, " ");
+Delimiter = new char[strlen(dataline_default_delim) + 1];
+strcpy(Delimiter, dataline_default_delim);
 
 File = (LineDataFile *) 0;
 
@@ -531,7 +531,7 @@ int pos, count;
    //
    //  get a line from the file using the specified widths
    //
-   
+
 pos = count = 0;
 
 for( i=0; i<n_wdth; i++ )  {
@@ -540,24 +540,24 @@ for( i=0; i<n_wdth; i++ )  {
 
    extend_char(pos + wdth[i] + 1);   //  better safe than sorry
    extend_int(++count);
-   
+
    //
    //  get the next entry
    //
-   f.read(buf, wdth[i]);             
+   f.read(buf, wdth[i]);
 
    //
    //  store the offset to this entry
    //
    Offset[count - 1] = pos;
-   
+
    //
    //  store this entry
    //
    for( j=0; j<wdth[i]; j++ )  {
 
      Line[pos++] = buf[j];
-     
+
      //
      //  check for embedded newline
      //
@@ -578,7 +578,7 @@ for( i=0; i<n_wdth; i++ )  {
    //
    //  advance to the end of the line
    //
-   
+
 while ( f.get(c) )  {
 
    if ( !f )  { clear();  return ( 0 ); }
@@ -632,7 +632,7 @@ void DataLine::set_delimiter(const char *delimiter)
 
 {
   delete [] Delimiter;
-  
+
   Delimiter = new char[strlen(delimiter) + 1];
   strcpy(Delimiter, delimiter);
 }
@@ -825,11 +825,11 @@ return;
 void LineDataFile::rewind()
 
 {
-  
+
    //
    //  clear any error status and rewind to beginning
    //
-   
+
 if ( in )  {
 
    in->clear();
@@ -837,7 +837,7 @@ if ( in )  {
    in->seekg(0, ios::beg);
 
    Last_Line_Number = 0;
-   
+
 }
 
 return;
@@ -871,7 +871,7 @@ int LineDataFile::operator>>(DataLine & a)
 
 int status;
 
-do { 
+do {
 
    status = a.read_line(this);
 
@@ -895,15 +895,15 @@ return ( 1 );
 void LineDataFile::set_header(DataLine & a)
 
 {
-   
+
 int j;
 
 Header.clear();
 
 for (j=0; j<a.n_items(); ++j)  {
-   
+
    Header.add(a.get_item(j));
-   
+
 }
 
 return;

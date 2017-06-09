@@ -27,9 +27,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int dataline_charextend_alloc_inc = 512;
+static const int  dataline_charextend_alloc_inc = 512;
 
-static const int dataline_intextend_alloc_inc  = 100;
+static const int  dataline_intextend_alloc_inc  = 100;
+
+static const char dataline_default_delim[]      = " \t";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,7 +75,7 @@ class DataLine {
       char *Delimiter;
 
       LineDataFile * File;  //  not allocated
-      
+
    public:
 
       DataLine();
@@ -119,7 +121,7 @@ class DataLine {
       virtual int is_header() const;
 
       virtual void set_delimiter(const char *delimiter);
-      
+
 };
 
 
