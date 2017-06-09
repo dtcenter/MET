@@ -259,7 +259,7 @@ The Stat-Analysis tool can be used to create aggregated values from multiple
  The aggregated data are output as the same line type as the user specified.
  The STAT line types which may be aggregated in this way are the contingency
  table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2,
- and VAL1L2), and other (ISC, RHIST, PHIST, NBRCNT, SSVAR) line types.
+ and VAL1L2), and other (ISC, RHIST, PHIST, RELP, NBRCNT, SSVAR) line types.
 \end_layout
 
 \begin_layout Subsection
@@ -287,8 +287,8 @@ The Stat-Analysis tool can be used to aggregate multiple STAT lines of the
  MCTS, or NBRCTS) line type will be written out.
  If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, a continuous
  statistics (CNT) line type will be written out.
- For ensembles, the ORANK line type can ba accumulated into RHIST or PHIST
- output.
+ For ensembles, the ORANK line type can ba accumulated into RHIST, PHIST,
+ or RELP output.
  If the matched pair line type (MPR) has been aggregated, the user may choose
  the line type to be output (FHO, CTC, CTS, CNT, MCTC, MCTS, WDIR, SL1L2,
  SAL1L2, PCT, PSTD, PJC, or PRC).
@@ -3968,7 +3968,7 @@ ORANK
 \begin_inset Text
 
 \begin_layout Plain Layout
-RHIST, PHIST
+RHIST, PHIST, RELP
 \end_layout
 
 \end_inset
