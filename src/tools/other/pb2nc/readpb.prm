@@ -22,7 +22,9 @@ C*
 C*                                   Maximum length of a file name
 C*
        REAL*8    hdr ( MXR8PM ),
-     +           evns ( MXR8PM, MXR8LV, MXR8VN, MXR8VT )
+     +           evns ( MXR8PM, MXR8LV, MXR8VN, MXR8VT ),
+     +           obse ( MXR8PM, MXR8LV, MXR8VN ),
+     +           obsi ( MXR8PM, MXR8LV )
 C*
-       COMMON    / PREPBC / hdr, evns, nlev
+       COMMON    / PREPBC / hdr, evns, obse, onsi, nlev
 C*
