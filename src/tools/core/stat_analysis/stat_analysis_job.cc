@@ -31,6 +31,7 @@
 //   011    07/28/14  Halley Gotway   Add aggregate_stat for MPR to WDIR.
 //   012    02/12/15  Halley Gotway   Write STAT output lines.
 //   013    03/30/15  Halley Gotway   Add ramp job type.
+//   014    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -529,8 +530,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrPCTInfo>   pct_map;
    map<ConcatString, AggrPSumInfo>  psum_map;
    map<ConcatString, AggrISCInfo>   isc_map;
-   map<ConcatString, AggrRHISTInfo> rhist_map;
-   map<ConcatString, AggrPHISTInfo> phist_map;
+   map<ConcatString, AggrENSInfo>   ens_map;
    map<ConcatString, AggrSSVARInfo> ssvar_map;
 
    //
@@ -558,13 +558,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_val1l2 && lt != stat_pct    &&
       lt != stat_nbrctc && lt != stat_nbrcnt &&
       lt != stat_rhist  && lt != stat_phist  &&
-      lt != stat_isc    && lt != stat_ssvar) {
+      lt != stat_relp   && lt != stat_ssvar  &&
+      lt != stat_isc) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, NBRCNT, ISC,\n"
-           << "\tRHIST, PHIST, SSVAR\n\n";
+           << "\tRHIST, PHIST, RELP, SSVAR\n\n";
       throw(1);
    }
 
@@ -627,16 +628,24 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Sum the RHIST line types
    //
    else if(lt == stat_rhist) {
-      aggr_rhist_lines(f, j, rhist_map, n_in, n_out);
-      write_job_aggr_rhist(j, lt, rhist_map, out_at);
+      aggr_rhist_lines(f, j, ens_map, n_in, n_out);
+      write_job_aggr_rhist(j, lt, ens_map, out_at);
    }
 
    //
    // Sum the PHIST line types
    //
    else if(lt == stat_phist) {
-      aggr_phist_lines(f, j, phist_map, n_in, n_out);
-      write_job_aggr_phist(j, lt, phist_map, out_at);
+      aggr_phist_lines(f, j, ens_map, n_in, n_out);
+      write_job_aggr_phist(j, lt, ens_map, out_at);
+   }
+
+   //
+   // Sum the RELP line types
+   //
+   else if(lt == stat_relp) {
+      aggr_relp_lines(f, j, ens_map, n_in, n_out);
+      write_job_aggr_relp(j, lt, ens_map, out_at);
    }
 
    //
@@ -687,7 +696,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrPCTInfo>   pct_map;
    map<ConcatString, AggrPSumInfo>  psum_map;
    map<ConcatString, AggrWindInfo>  wind_map;
-   map<ConcatString, AggrORANKInfo> orank_map;
+   map<ConcatString, AggrENSInfo>   orank_map;
    map<ConcatString, AggrMPRInfo>   mpr_map;
 
    //
@@ -722,7 +731,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //                                             SL1L2, SAL1L2,
    //                                             PCT, PSTD, PJC, PRC,
    //                                             WDIR (wind direction)
-   //    -line_type ORANK,         -out_line_type RHIST, PHIST, SSVAR
+   //    -line_type ORANK,         -out_line_type RHIST, PHIST, RELP, SSVAR
    //
 
    //
@@ -804,12 +813,11 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the observation rank line types:
-   //    ORANK -> RHIST, PHIST, SSVAR
+   //    ORANK -> RHIST, PHIST, RELP, SSVAR
    //
    else if(in_lt == stat_orank &&
-           (out_lt == stat_rhist ||
-            out_lt == stat_phist ||
-            out_lt == stat_ssvar)) {
+           (out_lt == stat_rhist || out_lt == stat_phist ||
+            out_lt == stat_relp  || out_lt == stat_ssvar)) {
       aggr_orank_lines(f, j, orank_map, n_in, n_out);
       write_job_aggr_orank(j, out_lt, orank_map, out_at);
    }
@@ -1689,9 +1697,9 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
-                          map<ConcatString, AggrRHISTInfo> &m,
+                          map<ConcatString, AggrENSInfo> &m,
                           AsciiTable &at) {
-   map<ConcatString, AggrRHISTInfo>::iterator it;
+   map<ConcatString, AggrENSInfo>::iterator it;
    int n, n_row, n_col, r, c;
    StatHdrColumns shc;
 
@@ -1756,9 +1764,9 @@ void write_job_aggr_rhist(STATAnalysisJob &j, STATLineType lt,
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
-                          map<ConcatString, AggrPHISTInfo> &m,
+                           map<ConcatString, AggrENSInfo> &m,
                           AsciiTable &at) {
-   map<ConcatString, AggrPHISTInfo>::iterator it;
+   map<ConcatString, AggrENSInfo>::iterator it;
    int n, n_row, n_col, r, c;
    StatHdrColumns shc;
 
@@ -1815,6 +1823,73 @@ void write_job_aggr_phist(STATAnalysisJob &j, STATLineType lt,
       write_case_cols(it->first, at, r, c);
       write_phist_cols(&(it->second.ens_pd), at, r, c);
       if(j.stat_out) write_phist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_relp(STATAnalysisJob &j, STATLineType lt,
+                         map<ConcatString, AggrENSInfo> &m,
+                         AsciiTable &at) {
+   map<ConcatString, AggrENSInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
+
+   //
+   // Determine the maximum number of RELP values
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n = max(it->second.ens_pd.relp_na.n_elements(), n);
+   }
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements() + get_n_relp_columns(n);
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_relp_header_row(0, n, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   j.setup_stat_file(n_row, n);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      if(j.stat_out) {
+         write_header_cols(shc, j.stat_at, r);
+      }
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // RELP output line
+      //
+      at.set_entry(r, c++, "RELP:");
+      write_case_cols(it->first, at, r, c);
+      write_relp_cols(&(it->second.ens_pd), at, r, c);
+      if(j.stat_out) write_relp_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
    } // end for it
 
    return;
@@ -1994,19 +2069,23 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
 ////////////////////////////////////////////////////////////////////////
 
 void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
-                          map<ConcatString, AggrORANKInfo> &m,
+                          map<ConcatString, AggrENSInfo> &m,
                           AsciiTable &at) {
-   map<ConcatString, AggrORANKInfo>::iterator it;
+   map<ConcatString, AggrENSInfo>::iterator it;
    int i, n, n_row, n_col, r, c;
    StatHdrColumns shc;
 
    //
-   // Determine the maximum number of ranks for RHIST and PHIST or
-   // the total number of SSVAR bins.
+   // Determine the maximum number of:
+   // - Ranks for RHIST and PHIST
+   // - SSVAR bins
+   // - Ensemble members for RELP
+   // for RELP.
    //
    for(it = m.begin(), n = 0; it != m.end(); it++) {
            if(lt == stat_rhist) n  = max(it->second.ens_pd.rhist_na.n_elements(), n);
       else if(lt == stat_phist) n  = max(it->second.ens_pd.phist_na.n_elements(), n);
+      else if(lt == stat_relp)  n  = max(it->second.ens_pd.n_ens, n);
       else if(lt == stat_ssvar) {
          it->second.ens_pd.compute_ssvar();
          if(it->second.ens_pd.ssvar_bins) n += it->second.ens_pd.ssvar_bins[0].n_bin;
@@ -2025,6 +2104,10 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       n_row  = 1 + m.size();
       n_col += get_n_phist_columns(n);
    }
+   else if(lt == stat_relp) {
+      n_row  = 1 + m.size();
+      n_col += get_n_relp_columns(n);
+   }
    else if(lt == stat_ssvar) {
       n_row  = 1 + n;
       n_col += n_ssvar_columns;
@@ -2037,6 +2120,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    c = 1 + j.column_case.n_elements();
         if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
    else if(lt == stat_phist) write_phist_header_row(0, n, at, 0, c);
+   else if(lt == stat_relp)  write_relp_header_row (0, n, at, 0, c);
    else if(lt == stat_ssvar) write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
 
    //
@@ -2044,6 +2128,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
         if(lt == stat_rhist) j.setup_stat_file(n_row, n);
    else if(lt == stat_phist) j.setup_stat_file(n_row, n);
+   else if(lt == stat_relp)  j.setup_stat_file(n_row, n);
    else if(lt == stat_ssvar) j.setup_stat_file(n_row, 0);
 
    mlog << Debug(2) << "Computing output for "
@@ -2095,6 +2180,22 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
          if(j.stat_out) {
             write_header_cols(shc, j.stat_at, r);
             write_phist_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+         }
+         // Increment row counter
+         r++;
+      }
+
+      //
+      // RELP output line
+      //
+      else if(lt == stat_relp) {
+         it->second.ens_pd.compute_relp();
+         at.set_entry(r, c++, "RELP:");
+         write_case_cols(it->first, at, r, c);
+         write_relp_cols(&(it->second.ens_pd), at, r, c);
+         if(j.stat_out) {
+            write_header_cols(shc, j.stat_at, r);
+            write_relp_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
          }
          // Increment row counter
          r++;

@@ -1564,6 +1564,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_wdir:   c = n_job_wdir_columns;     break;
          case stat_rhist:  c = get_n_rhist_columns(n); break;
          case stat_phist:  c = get_n_phist_columns(n); break;
+         case stat_relp:   c = get_n_relp_columns(n);  break;
          case stat_orank:  c = n_orank_columns;        break;
          case stat_ssvar:  c = n_ssvar_columns;        break;
          default:
@@ -1617,6 +1618,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
       case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
       case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
+      case stat_relp:   write_relp_header_row  (1, n,                                    stat_at, 0, 0); break;
       case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
       case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
 
