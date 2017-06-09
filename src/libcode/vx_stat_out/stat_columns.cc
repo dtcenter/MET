@@ -1354,6 +1354,10 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
 
+   // Check for data to write.  Running Ensemble-Stat with skip_const
+   // set to true may result in no data.
+   if(nint(pd_ptr->rhist_na.sum()) == 0) return;
+
    // RHIST line type
    shc.set_line_type(stat_rhist_str);
 
@@ -1390,6 +1394,10 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                      bool txt_flag,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row) {
+
+   // Check for data to write.  Running Ensemble-Stat with skip_const
+   // set to true may result in no data.
+   if(nint(pd_ptr->phist_na.sum()) == 0) return;
 
    // PHIST line type
    shc.set_line_type(stat_phist_str);
@@ -1519,6 +1527,10 @@ void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                     bool txt_flag,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
+
+   // Check for data to write.  Running Ensemble-Stat with skip_const
+   // set to true may result in no data.
+   if(nint(pd_ptr->relp_na.sum()) == 0) return;
 
    // RELP line type
    shc.set_line_type(stat_relp_str);
@@ -3321,10 +3333,10 @@ void write_relp_cols(const PairDataEnsemble *pd_ptr,
    //    TOTAL,   N_ENS, [RELP_] (for each ensemble member)
    //
    at.set_entry(r, c+0,  // Total Number of pairs
-      pd_ptr->n_pair);
+      nint(pd_ptr->relp_na.sum()));
 
    at.set_entry(r, c+1,  // Ensemble size
-      pd_ptr->n_ens);
+      pd_ptr->relp_na.n_elements());
 
    //
    // Write RELP_i count for each bin
