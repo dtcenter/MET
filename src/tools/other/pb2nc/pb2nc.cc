@@ -522,9 +522,17 @@ void process_command_line(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file, config_file);
-
+   
    // Process the configuration
    conf_info.process_config();
+
+   if (!use_custom_vars && 0 < conf_info.bufr_var_name.n_elements()) {
+      use_custom_vars = true;
+      for (int idx=0; idx<conf_info.bufr_var_name.n_elements(); idx++) {
+         if (0 < bufr_target_variables.length()) bufr_target_variables.add(" ");
+         bufr_target_variables.add(conf_info.bufr_var_name[idx]);
+      }
+   }
 
    // Check that valid_end_ut >= valid_beg_ut
    if(valid_beg_ut != (unixtime) 0 &&

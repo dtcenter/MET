@@ -68,6 +68,7 @@ void PB2NCConfInfo::clear() {
    beg_level = end_level = bad_data_double;
    level_category.clear();
    obs_grib_code.clear();
+   bufr_var_name.clear();
    quality_mark_thresh = bad_data_int;
    event_stack_flag = false;
    tmp_dir.clear();
@@ -219,6 +220,10 @@ void PB2NCConfInfo::process_config() {
    // Convert strings to GRIB codes
    for(i=0; i<sa.n_elements(); i++) obs_grib_code.add(str_to_grib_code(sa[i]));
 
+   // Conf: bufr_var_name
+   sa = conf.lookup_string_array(conf_key_bufr_var_name);
+   for(i=0; i<sa.n_elements(); i++) bufr_var_name.add(sa[i]);
+   
    // Conf: quality_mark_thresh
    quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
 

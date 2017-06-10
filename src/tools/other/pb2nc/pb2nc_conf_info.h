@@ -51,6 +51,7 @@ class PB2NCConfInfo {
       double       end_level;
       NumArray     level_category;      // Level categories to be retained
       NumArray     obs_grib_code;       // GRIB1 code for the observation type
+      StringArray  bufr_var_name;       // BUFR variiable names for the observation type
       int          quality_mark_thresh; // Quality marks to be retained
       bool         event_stack_flag;    // True for top, false for bottom
       ConcatString tmp_dir;             // Directory for temporary files
