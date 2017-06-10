@@ -174,6 +174,7 @@ static ConcatString dump_dir = ".";
 
 static bool do_all_vars     = false;
 static bool use_custom_vars = false;
+static bool use_met_code    = false;
 static bool find_valid_vars = false;
 static ConcatString bufr_target_variables;
 
@@ -343,8 +344,9 @@ static void   set_valid_end_time(const StringArray &);
 static void   set_nmsg(const StringArray &);
 static void   set_dump_path(const StringArray &);
 static void   set_do_all_variables(const StringArray & a);
-static void   set_target_variables(const StringArray & a);
 static void   set_find_valid_vars(const StringArray &);
+static void   set_target_variables(const StringArray & a);
+static void   set_use_met_code(const StringArray &);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
@@ -496,6 +498,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_do_all_variables,  "-all",  0);
    cline.add(set_find_valid_vars,  "-index",  0);
    cline.add(set_target_variables, "-vars", 1);
+   cline.add(set_use_met_code, "-met_codes", 0);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_compress,  "-compress",  1);
@@ -728,6 +731,14 @@ void open_netcdf() {
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
+   const char *attribute_str;
+   if (use_met_code) {
+      attribute_str = "true";
+   }
+   else {
+      attribute_str = "false";
+   }
+   add_att(f_out, "use_met_code", attribute_str);
 
    // Add variable attributes
    add_att(&obs_qty_var, "long_name", "quality flag");
@@ -1173,7 +1184,12 @@ void process_pbfile(int i_pb) {
             // corresponding grib code and store as the second element
             // of obs_arr
             grib_code = var_gc[kk];
-            obs_arr[1] = (float) bufr_var_code[kk];
+            if (use_met_code) {
+               obs_arr[1] = (float) bufr_var_code[kk];
+            }
+            else {
+               obs_arr[1] = (float) grib_code;
+            }
 
       
             // Get the event index to be used based on the contents of
@@ -1330,7 +1346,12 @@ void process_pbfile(int i_pb) {
                   continue;
       
                // Store the grib code to be derived
-               obs_arr[1] = bufr_derive_code[i];
+               if (use_met_code) {
+                  obs_arr[1] = (float)bufr_derive_code[i];
+               }
+               else {
+                  obs_arr[1] = derive_gc[i];
+               }
 
                // Derive the value for the grib code
                obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
@@ -2607,6 +2628,7 @@ void set_dump_path(const StringArray & a)
 void set_do_all_variables(const StringArray & a)
 {
    do_all_vars = true;
+   use_met_code = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2632,7 +2654,15 @@ void set_logfile(const StringArray & a)
 void set_target_variables(const StringArray & a)
 {
    use_custom_vars = true;
+   use_met_code = true;
    bufr_target_variables.add(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_use_met_code(const StringArray & a)
+{
+   use_met_code = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
