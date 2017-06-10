@@ -747,7 +747,13 @@ void open_netcdf() {
    add_att(&obs_arr_var, "_FillValue", fill_value);
    add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
    add_att(&obs_arr_var, "hdr_id_long_name", "index of matching header data");
-   add_att(&obs_arr_var, "gc_long_name", "index of BUFR variable corresponding to the observation type");
+   if (use_met_code) {
+      attribute_str = "index of BUFR variable corresponding to the observation type";
+   }
+   else {
+      attribute_str = "grib code corresponding to the observation type";
+   }
+   add_att(&obs_arr_var, "gc_long_name", attribute_str);
    add_att(&obs_arr_var, "lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
    add_att(&obs_arr_var, "hgt_long_name", "height in meters above sea level (msl)");
    add_att(&obs_arr_var, "ob_long_name", "observation value");
