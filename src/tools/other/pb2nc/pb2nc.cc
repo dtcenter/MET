@@ -237,6 +237,7 @@ static StringArray tableB_descs;
 static ConcatString bufr_hdrs;      // header name list to read header
 static StringArray bufr_hdr_arr;    // available header name list
 static StringArray bufr_obs_arr;    // available obs. name list
+static StringArray filtered_times;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -748,10 +749,13 @@ void process_pbfile(int i_pb) {
 
    unixtime file_ut = (unixtime) 0;
    unixtime msg_ut, beg_ut, end_ut;
+   unixtime min_msg_ut, max_msg_ut;
 
    ConcatString file_name, blk_prefix, blk_file;
    char     prefix[max_str_len];
-   char     time_str[max_str_len], time_str2[max_str_len];
+   char     time_str[max_str_len];
+   char     start_time_str[max_str_len], end_time_str[max_str_len];
+   char     min_time_str[max_str_len], max_time_str[max_str_len];
 
    char     hdr_typ[max_str_len], hdr_sid[max_str_len];
    double   hdr_arr_lat, hdr_arr_lon, hdr_arr_elv;
@@ -770,6 +774,12 @@ void process_pbfile(int i_pb) {
    mlog << Debug(1) << "Processing PrepBufr File:\t" << pbfile[i_pb]
         << "\n";
 
+   // Initialize
+   filtered_times.clear();
+   min_msg_ut = max_msg_ut = (unixtime) 0;
+   min_time_str[0] = bad_data_char;
+   max_time_str[0] = bad_data_char;
+   
    // Set the file name for the PrepBufr file
    file_name << pbfile[i_pb];
 
@@ -901,15 +911,16 @@ void process_pbfile(int i_pb) {
       
          if(end_ut != (unixtime) 0) {
             unix_to_mdyhms(end_ut, mon, day, yr, hr, min, sec);
-            sprintf(time_str2, "%.4i%.2i%.2i_%.2i%.2i%.2i",
+            sprintf(end_time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
                      yr, mon, day, hr, min, sec);
          }
          else {
-            strcpy(time_str2, "NO_END_TIME");
+            strcpy(end_time_str, "NO_END_TIME");
          }
+         strcpy(start_time_str, time_str);
       
-         mlog << Debug(2) << "Searching Time Window:\t\t" << time_str << " to "
-              << time_str2 << "\n";
+         mlog << Debug(2) << "Searching Time Window:\t\t" << start_time_str
+              << " to " << end_time_str << "\n";
       
          mlog << Debug(2) << "Processing " << npbmsg
               << " PrepBufr messages...\n";
@@ -947,11 +958,11 @@ void process_pbfile(int i_pb) {
             sec = nint(bufr_obs[0][9]);
             if (hr  > r8bfms) hr = 0;
             if (min > r8bfms) min = 0;
-            if (sec > r8bfms) sec = 0;
+            if (sec > r8bfms || sec < 0) sec = 0;
             file_ut = mdyhms_to_unix(mon, day, yr, hr, min, sec);
             sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
                     yr, mon, day, hr, min, sec);
-            mlog << Debug(10) << "PrepBufr obs_time:\t\t" << time_str << "\n\n";
+            mlog << Debug(7) << "Bufr obs_time:\t" << time_str << "\n\n";
             for (index=0; index<mxr8lv; index++) {
                bufr_pres_lv[index] = fill_value;
                bufr_msl_lv[index]  = fill_value;
@@ -974,12 +985,6 @@ void process_pbfile(int i_pb) {
       // Convert the SID to a string and null terminate
       dbl2str(&hdr[0], hdr_sid);
       hdr_sid[mxr8nm] = '\0';
-      //if (0 == strlen(hdr_sid)) {
-      //   mlog << Debug(10) <<  "hdr_sid: " << hdr_sid << " from " << hdr[0]  << "\n";
-      //   const char *fmt_str = "%d";
-      //   sprintf(hdr_sid, fmt_str, nint(hdr[0]));
-      //   mlog << Debug(10) <<  "hdr_sid: " << hdr_sid << " from " << hdr[0]  << "\n";
-      //}
 
       // Change the first blank space to a null
       for(i=0; i<(mxr8nm+1); i++) {
@@ -1027,7 +1032,18 @@ void process_pbfile(int i_pb) {
       // Compute the valid time and check if it is within the
       // specified valid range
       hdr_vld_ut = file_ut + (unixtime) (hdr[3]*sec_per_hour);
+      if (0 == min_msg_ut || min_msg_ut < hdr_vld_ut) {
+         min_msg_ut = hdr_vld_ut;
+         strcpy(min_time_str, time_str);
+      }
+      if (max_msg_ut < hdr_vld_ut) {
+         max_msg_ut = hdr_vld_ut;
+         strcpy(max_time_str, time_str);
+      }
       if(!keep_valid_time(hdr_vld_ut, beg_ut, end_ut)) {
+         if (!filtered_times.has(time_str)) {
+            filtered_times.add(time_str);
+         }
          rej_vld++;
          continue;
       }
@@ -1387,7 +1403,7 @@ void process_pbfile(int i_pb) {
             isMilliBar = false;
             char unit_str[BUFR_UNIT_LEN];
             if (var_names.has(var_name, var_index)) {
-               mlog << Debug(5) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
+               //mlog << Debug(5) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
                if (0 == strcmp("DEG C", var_units[var_index])) {
                   isDegC = true;
                }
@@ -1509,6 +1525,7 @@ void process_pbfile(int i_pb) {
          rej_nobs++;
       }
    } // end for
+   cout << endl;
 
    if (obs_data_idx > 0) {
       lengths[0] = obs_data_idx;
@@ -1556,6 +1573,20 @@ void process_pbfile(int i_pb) {
         << i_msg << "\n"
         << "Total observations retained or derived\t= "
         << n_file_obs << "\n";
+
+   if (npbmsg == rej_vld && 0 < rej_vld) {
+      mlog << Warning << "\nprocess_pbfile() -> "
+           << "All messages were filtered out by valid time.\n"
+           << "\tPlease adjust time range with \"-valid_beg\" and \"-valid_end\".\n"
+           << "\tmin/max obs time from BUFR file: " << min_time_str 
+           << " and " << max_time_str << ".\n"
+           << "\ttime range: " << start_time_str << " and " << end_time_str << ".\n";
+   }
+   else {
+      mlog << Debug(3) << "\tMin obs_time = " << min_time_str 
+           << " \tMax obs_time = " << max_time_str << "\n";
+       
+   }
 
    // Close the PREPBUFR file
    closepb_(&unit);
@@ -1610,6 +1641,7 @@ void process_pbfile_metadata(int i_pb) {
    unit = dump_unit;
    ConcatString tbl_filename = save_bufr_table_file(blk_file, unit);
    get_variable_info(tbl_filename);
+   remove_temp_file(tbl_filename);
 
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
@@ -1624,8 +1656,8 @@ void process_pbfile_metadata(int i_pb) {
 
    // Check for zero messages to process
    if(npbmsg <= 0) {
-      mlog << Warning << "\nprocess_pbfile() -> "
-           << "No Bufr messages (metadata) to process in file: "
+      mlog << Warning << "\nprocess_pbfile_metadata() -> "
+           << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
       closepb_(&unit);
@@ -1897,6 +1929,7 @@ void process_pbfile_metadata(int i_pb) {
          }  //end for lv
       }  // end for vIdx
    } // end for
+   cout << endl;
 
    // Close the PREPBUFR file
    closepb_(&unit);
