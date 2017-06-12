@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -84,18 +86,24 @@ It is possible to compute the fractions skill score for comparing forecast
 \end_layout
 
 \begin_layout Standard
-Also, applying it to rainfall (and monsoons) would be fine as well.
+Also, applying it to rainfall (and monsoons) would be fine.
  Keep in mind that Grid-Stat is the tool that computes FSS.
- And Grid-Stat will need to be run once for each evaluation time.
- For evaluating once per day, run Grid-Stat 122 times for the 122 days of
- monsoon.
- And this will end up with 122 FSS values.
+ Grid-Stat will need to be run once for each evaluation time.
+ As an example, to evaluating once per day, run Grid-Stat 122 times for
+ the 122 days of a monsoon season.
+ This will result in 122 FSS values.
  These can be viewed as a time series, or the Stat-Analysis tool could be
  used to aggregate them together into a single FSS value, like this:
 \end_layout
 
 \begin_layout LyX-Code
-stat_analysis -job aggregate -line_type NBRCNT -lookin out/grid_stat
+stat_analysis -job aggregate -line_type NBRCNT 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-lookin out/grid_stat
 \end_layout
 
 \begin_layout Standard
