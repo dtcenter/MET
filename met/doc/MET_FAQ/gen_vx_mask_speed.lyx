@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -70,31 +72,28 @@
 \begin_body
 
 \begin_layout Section
-Improving speed with gen_poly_mask
+Improving speed with gen_vx_mask
 \end_layout
 
 \begin_layout Standard
-The main reason to use gen_poly_mask is to make the MET statistics tools
- (i.e.
- point_stat or grid_stat) run a bit faster.
+The main reason to use gen_vx_mask is to make the MET statistics tools (i.e.
+ point_stat or grid_stat) run faster.
  It can be slow to figure out which points are inside/outside a polyline
- region if the polyline contains thousands of point.
- In that case, run gen_poly_mask to create the mask once rather than having
+ region if the polyline contains thousands of points.
+ In that case, run gen_vx_mask to create the mask once rather than having
  to recreate it each time a MET statistics tool is run.
- But if the polyline only contains a small number of points, running gen_poly_ma
-sk first would only save a second or two.
+ But if the polyline only contains a small number of points, running gen_vx_mask
+ first would only save a second or two.
 \end_layout
 
 \begin_layout Standard
-In the case of trying to use a smaller grid to create a mask for a larger
- grid, the gen_poly_mask tool does support this.
- Since METv5.0, the “gen-"poly"-mask is poorly named, and in the next release
- it'll be replaced by a more generalized tool named gen_vx_mask.
- It willinclude some more flexible options.
+The gen_vx_mask tool supports use of a smaller grid to create a mask for
+ a larger grid.
+ 
 \end_layout
 
 \begin_layout Standard
-The usage statement for gen_poly_mask, the "mask_file" is an ASCII Lat/Lon
+In the usage statement for gen_vx_mask, the "mask_file" is an ASCII Lat/Lon
  polyline file or gridded data file defining the masking region.
 \end_layout
 
@@ -109,7 +108,7 @@ Here's an example of that using data from the MET tarball:
 \end_layout
 
 \begin_layout LyX-Code
-cd {MET_BASE} bin/gen_poly_mask 
+{MET_BASE}/bin/gen_vx_mask 
 \backslash
  
 \end_layout
@@ -142,13 +141,13 @@ The polyline mask for the different grids is producing slightly different
 \end_layout
 
 \begin_layout Enumerate
-There's some missing data values somewhere in the forecast and observations
+There are some missing data values somewhere in the forecast and observations
  causing slightly different matched pairs.
 \end_layout
 
 \begin_layout Standard
-To change this run a configuring point_stat to dump out the MPR lines for
- those three runs.
+To investigate this, run a configuration of point_stat to dump out the MPR
+ lines for those three runs.
  Then take a closer look at them to see where the differences lie.
  Identifying the stations where the differences occur is the first step
  in finding an explanation.
