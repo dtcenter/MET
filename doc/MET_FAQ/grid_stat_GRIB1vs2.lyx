@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -78,7 +80,7 @@ In this example, there is a problem running data though the grid_stat tool.
  The problem is due to the suffix of those files.
  MET interprets .gb, .grb, and .grib to be GRIB1 files and .gb2, .grb2, and .grib2
  to be GRIB2 files.
- So it's trying to read a GRIB2 file as a GRIB1 file.
+ So the software is trying to read a GRIB2 file as a GRIB1 file.
 \end_layout
 
 \begin_layout Standard
@@ -99,7 +101,7 @@ file_type = GRIB2;
 \end_layout
 
 \begin_layout Standard
-That'll get past that error, but here's the next problem: 
+That will get past that error, but there is another problem: 
 \end_layout
 
 \begin_layout LyX-Code
@@ -110,7 +112,7 @@ WARNING: process_scores() -> APCP/A24 not found in file: for.grb
 Typically precipitation is encoded in GRIB files as an accumulation from
  time 1 to time 2.
  However, if the data is stored as an instantaneous forecast value...
- not an accumulation interval.
+ not an accumulation interval, then MET cannot do verification.
 \end_layout
 
 \begin_layout Standard
@@ -118,7 +120,7 @@ To troubleshoot try the following settings: name = "APCP"; level = "Z0";
 \end_layout
 
 \begin_layout Standard
-But that didn't match it either.
+But that did not match it either.
  Using wgrib2 to look at the level value for this data, look at the following:
  
 \end_layout

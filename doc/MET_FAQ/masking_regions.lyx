@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -75,10 +77,10 @@ Defining masking regions
 
 \begin_layout Standard
 Here is an example to define some new masking regions.
- The sample POLAND.poly polyline file contains "^M" characters at the end
- of each line.
+ Suppose we have a sample file, POLAND.poly, but that polyline file contains
+ "^M" characters at the end of each line.
  Those show up in files generated on Windows machines.
- Running this polyline file through the gen_vx_mask, the "^M" caused a runtime
+ Running this polyline file through the gen_vx_mask, the "^M" causes a runtime
  error since NetCDF doesn't like including that character in the NetCDF
  variable name.
 \end_layout
@@ -137,12 +139,9 @@ Run the MET plot_data_plane tool to display the resulting mask field:
 \end_layout
 
 \begin_layout Standard
-***Attached is a PNG version of the resulting output.***
-\end_layout
-
-\begin_layout Standard
-The mask is in roughly the right spot, but there are obvious problems with
- the latitude and longitude values used to define that mask for Poland.
+In this example, the mask is in roughly the right spot, but there are obvious
+ problems with the latitude and longitude values used to define that mask
+ for Poland.
 \end_layout
 
 \end_body
