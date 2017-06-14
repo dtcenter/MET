@@ -72,97 +72,100 @@
 \begin_body
 
 \begin_layout Section
-Problems with data structure in MADIS
+MODE Time Dimension Conversion Postscript to png
 \end_layout
 
 \begin_layout Standard
-Here are some commands to try:
+MET supports a few different flavors of gridded NetCDF data, but different
+ kinds cannot be mixed together.
+ If this is happening, try editing one of the NetCDF files by removing the
+ time dimension, like this:
 \end_layout
 
 \begin_layout LyX-Code
-# Load R 
+netcdf st_20101226_1410 { 
 \end_layout
 
 \begin_layout LyX-Code
-module load R
+dimensions: 
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-noindent
-\backslash
-vskip 0.1in
-\end_layout
-
-\end_inset
-
-
+lat = 801 ; 
 \end_layout
 
 \begin_layout LyX-Code
-# Run madis2nc 
+lon = 801 ; 
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/madis2nc 
-\backslash
-
+variables: float dbz(lat, lon) ; 
 \end_layout
 
 \begin_layout LyX-Code
-/raob_2015050400_arc.nc 
-\backslash
-
+dbz:long_name = "dbz" ; 
 \end_layout
 
 \begin_layout LyX-Code
-~/raob_2015050400_arc_madis2nc.nc -type raob
+dbz:units = "dbz" ; 
 \end_layout
 
 \begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-noindent
-\backslash
-vskip 0.1in
-\end_layout
-
-\end_inset
-
-
+dbz:level = "1kmAGL" ; 
 \end_layout
 
 \begin_layout LyX-Code
-# Run Rscript 
+dbz:_FillValue = -9999.f ; 
 \end_layout
 
 \begin_layout LyX-Code
-Rscript 
+dbz:init_time = "20101226_1405" ; 
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/scripts/Rscripts/pntnc2ascii.R 
-\backslash
-
+dbz:valid_time = "20101226_1410" ; 
 \end_layout
 
 \begin_layout LyX-Code
-~/raob_2015050400_arc_madis2nc.nc > ~/raob_2015050400_arc_madis2nc.txt
+dbz:init_time_ut = 1293372300 ; 
+\end_layout
+
+\begin_layout LyX-Code
+dbz:valid_time_ut = 1293372600 ; 
+\end_layout
+
+\begin_layout LyX-Code
+dbz:accum_time_sec = 300 ; 
+\end_layout
+
+\begin_layout LyX-Code
+dbz:accum_time = "5" ;
 \end_layout
 
 \begin_layout Standard
+Then try running the plot_data_plane tool.
+ That's a great way of easily testing to see if MET can read your gridded
+ data: 
+\end_layout
 
+\begin_layout LyX-Code
+{MET_BASE}/bin/plot_data_plane /home/sara/MET/{MET_BASE}/stitched/20101226/cf/
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+st_20101226_1405.nc plot_dbz.ps 'name="dbz"; level="(*,*)";'
+\end_layout
+
+\begin_layout Standard
+That will create a PostScript file which can be converted to png like this:
+ 
+\end_layout
+
+\begin_layout LyX-Code
+convert -rotate 90 -background white plot_dbz.ps plot_dbz.png
 \end_layout
 
 \end_body
