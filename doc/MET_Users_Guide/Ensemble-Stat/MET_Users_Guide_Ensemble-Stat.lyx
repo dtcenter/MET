@@ -1273,18 +1273,6 @@ ensemble_flag = {
 \begin_layout LyX-Code
 
 \series bold
-   median    = TRUE; 
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   mode      = TRUE; 
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
    stdev     = TRUE; 
 \end_layout
 
@@ -1363,15 +1351,6 @@ ensemble_flag
 
 \begin_layout Enumerate
 Ensemble Mean Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Median Field
-\end_layout
-
-\begin_layout Enumerate
-Ensemble Mode Field (i.e.
- 3*median - 2*mean)
 \end_layout
 
 \begin_layout Enumerate
