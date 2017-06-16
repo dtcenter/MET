@@ -165,6 +165,8 @@ read_netcdf_grid(Nc, grid);
 StringArray gDimNames;
 get_dim_names(Nc, &gDimNames);
 
+Ndims = gDimNames.n_elements();
+
 for (j=0; j<Ndims; ++j)  {
    c = gDimNames[j];
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
