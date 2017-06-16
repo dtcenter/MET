@@ -580,13 +580,28 @@ int EnsembleStatConfInfo::get_n_msg_typ(int i) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
-   int i, n, max_n_msg_typ;
+int EnsembleStatConfInfo::get_n_othr(int i) const {
 
-   // Determine the maximum number of message types being used
-   for(i=0, max_n_msg_typ=0; i<n_vx; i++)
-      if(get_n_msg_typ(i) > max_n_msg_typ)
-         max_n_msg_typ = get_n_msg_typ(i);
+   if(i < 0 || i >= n_vx) {
+      mlog << Error << "\nEnsembleStatConfInfo::get_n_othr(int i) -> "
+           << "range check error for i = " << i << "\n\n";
+      exit(1);
+   }
+
+   return(othr_ta[i].n_elements());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
+   int i, n, max_n_msg_typ, max_n_othr;
+
+   // Determine the maximum number of message types and observation
+   // thresholds being used
+   for(i=0, max_n_msg_typ=0, max_n_othr=0; i<n_vx; i++) {
+      if(get_n_msg_typ(i) > max_n_msg_typ) max_n_msg_typ = get_n_msg_typ(i);
+      if(get_n_othr(i)    > max_n_othr)    max_n_othr    = get_n_othr(i);
+   }
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -595,10 +610,10 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_phist):
       case(i_relp):
          // Maximum number of RHIST, PHIST, and RELP lines possible =
-         //    Fields * Masks * Interpolations * Message Type [Point Obs]
-         //    Fields * Masks * Interpolations [Grid Obs]
-         n =   n_vx * n_mask * n_interp * max_n_msg_typ
-             + n_vx * n_mask * n_interp;
+         //    Point Vx: Fields * Masks * Interpolations * Obs Thresholds * Message Types
+         //     Grid Vx: Fields * Masks * Interpolations * Obs Thresholds
+         n =   n_vx * n_mask * n_interp * max_n_othr * max_n_msg_typ
+             + n_vx * n_mask * n_interp * max_n_othr;
          break;
 
       case(i_orank):
@@ -608,6 +623,9 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
          for(i=0, n=0; i<n_vx; i++) {
             n += vx_pd[i].get_n_pair();
          }
+
+         // Multiply by the number of observation thresholds
+         n *= max_n_othr;
          break;
 
       case(i_ssvar):

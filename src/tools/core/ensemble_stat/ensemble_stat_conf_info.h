@@ -41,19 +41,17 @@ static const STATLineType txt_file_type[n_txt] = {
 
 // Indices for the ensemble flag types in the configuration file
 static const int i_nc_mean   = 0;
-static const int i_nc_median = 1;
-static const int i_nc_mode   = 2;
-static const int i_nc_stdev  = 3;
-static const int i_nc_minus  = 4;
-static const int i_nc_plus   = 5;
-static const int i_nc_min    = 6;
-static const int i_nc_max    = 7;
-static const int i_nc_range  = 8;
-static const int i_nc_vld    = 9;
-static const int i_nc_freq   = 10;
-static const int i_nc_orank  = 11;
-static const int i_nc_weight = 12;
-static const int n_nc        = 13;
+static const int i_nc_stdev  = 1;
+static const int i_nc_minus  = 2;
+static const int i_nc_plus   = 3;
+static const int i_nc_min    = 4;
+static const int i_nc_max    = 5;
+static const int i_nc_range  = 6;
+static const int i_nc_vld    = 7;
+static const int i_nc_freq   = 8;
+static const int i_nc_orank  = 9;
+static const int i_nc_weight = 10;
+static const int n_nc        = 11;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -134,6 +132,7 @@ class EnsembleStatConfInfo {
       int get_max_n_thresh()   const;
       int get_n_vx()           const;
       int get_n_msg_typ(int i) const;
+      int get_n_othr(int i)    const;
       int get_n_interp()       const;
       int get_n_mask()         const;
       int get_n_mask_area()    const;
