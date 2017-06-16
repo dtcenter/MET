@@ -1536,6 +1536,11 @@ void process_grid_vx() {
             pd_all.compute_rank(rng_ptr);
             pd_all.compute_pair_vals();
 
+            // Write out the unfiltered observation rank field.
+            if(conf_info.ensemble_flag[i_nc_orank]) {
+               write_orank_nc(pd_all, obs_dp_smooth, i, j, k);
+            }
+
             // Process each filtering threshold
             for(l=0; l<conf_info.othr_ta[i].n_elements(); l++) {
 
@@ -1619,11 +1624,6 @@ void process_grid_vx() {
                }
 
             } // end for l
-
-            // Write out the unfiltered observation rank field.
-            if(conf_info.ensemble_flag[i_nc_orank]) {
-               write_orank_nc(pd, obs_dp_smooth, i, j, k);
-            }
 
          } // end for k
       } // end for j
