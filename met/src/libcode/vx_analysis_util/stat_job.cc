@@ -1806,7 +1806,7 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    //
    for(i=0; i<column_case.n_elements(); i++) {
       key << (i == 0 ? "" : ":")
-          << L.get_item(column_case[i]);
+          << L.get_item(column_case[i], false);
    }
 
    return(key);
