@@ -446,40 +446,38 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          }  //  END: if( level match )
 
          //  if seeking a probabilistic field, check the prob info
-         if( (rec_match_ex || rec_match_rn) && vinfo->p_flag() ){
+         if( (rec_match_ex || rec_match_rn) && vinfo->p_flag() && (*it)->ProbFlag ){
 
             rec_match_ex = rec_match_rn = false;
-            if( (*it)->ProbFlag ){
 
-               SingleThresh v_thr_lo = vinfo->p_thresh_lo();
-               SingleThresh v_thr_hi = vinfo->p_thresh_hi();
+            SingleThresh v_thr_lo = vinfo->p_thresh_lo();
+            SingleThresh v_thr_hi = vinfo->p_thresh_hi();
 
-               //  if both thresholds are in effect, check both values
-               if( !is_bad_data(v_thr_lo.get_value()) &&
-                   !is_bad_data(v_thr_hi.get_value()) ){
-                  rec_match_ex = ( is_eq(v_thr_lo.get_value(), (*it)->ProbLower) &&
-                                   is_eq(v_thr_hi.get_value(), (*it)->ProbUpper) &&
-                                   2 == (*it)->ProbType
-                                 );
-               }
-
-               //  compare the single upper threshold case
-               else if( !is_bad_data(v_thr_hi.get_value()) ){
-                  rec_match_ex = ( 0 == (*it)->ProbType &&
-                                   is_eq(v_thr_hi.get_value(), (*it)->ProbLower) ) ||
-                                 ( 4 == (*it)->ProbType &&
-                                   is_eq(v_thr_hi.get_value(), (*it)->ProbUpper) );
-               }
-
-               //  compare the single lower threshold case
-               else if( !is_bad_data(v_thr_lo.get_value()) ){
-                  rec_match_ex = ( 1 == (*it)->ProbType &&
-                                   is_eq(v_thr_lo.get_value(), (*it)->ProbUpper) ) ||
-                                 ( 3 == (*it)->ProbType &&
-                                   is_eq(v_thr_lo.get_value(), (*it)->ProbLower) );
-               }
-
+            //  if both thresholds are in effect, check both values
+            if( !is_bad_data(v_thr_lo.get_value()) &&
+                !is_bad_data(v_thr_hi.get_value()) ){
+               rec_match_ex = ( is_eq(v_thr_lo.get_value(), (*it)->ProbLower) &&
+                                is_eq(v_thr_hi.get_value(), (*it)->ProbUpper) &&
+                                2 == (*it)->ProbType
+                              );
             }
+
+            //  compare the single upper threshold case
+            else if( !is_bad_data(v_thr_hi.get_value()) ){
+               rec_match_ex = ( 0 == (*it)->ProbType &&
+                                is_eq(v_thr_hi.get_value(), (*it)->ProbLower) ) ||
+                              ( 4 == (*it)->ProbType &&
+                                is_eq(v_thr_hi.get_value(), (*it)->ProbUpper) );
+            }
+
+            //  compare the single lower threshold case
+            else if( !is_bad_data(v_thr_lo.get_value()) ){
+               rec_match_ex = ( 1 == (*it)->ProbType &&
+                                is_eq(v_thr_lo.get_value(), (*it)->ProbUpper) ) ||
+                              ( 3 == (*it)->ProbType &&
+                                is_eq(v_thr_lo.get_value(), (*it)->ProbLower) );
+            }
+
          }
       }  //  END: else if( parameter match )
 
