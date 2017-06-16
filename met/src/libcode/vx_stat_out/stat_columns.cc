@@ -1363,7 +1363,6 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
    shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
@@ -1404,7 +1403,6 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
    shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
@@ -1442,7 +1440,6 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
    shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
@@ -1488,7 +1485,6 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
    shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
 
@@ -1537,7 +1533,6 @@ void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
    shc.set_thresh_logic(SetLogic_None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);

@@ -43,8 +43,7 @@
 //   016    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   017    08/09/16  Halley Gotway  Fixed n_ens_vld vs n_vx_vld bug.
 //   018    05/15/17  Prestonik P    Added shape for regrid and interp
-//   019    05/15/17  Halley Gotway  Add RELP line type, ensemble median
-//                    and mode, and skip_const option.
+//   019    05/15/17  Halley Gotway  Add RELP line type and skip_const.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -834,9 +833,9 @@ void process_point_obs(int i_nc) {
    }
 
    // Define dimensions
-   NcDim strl_dim    ; // Maximum string length
-   NcDim obs_dim     ; // Number of observations
-   NcDim hdr_dim     ; // Number of PrepBufr messages
+   NcDim strl_dim; // Maximum string length
+   NcDim obs_dim;  // Number of observations
+   NcDim hdr_dim;  // Number of PrepBufr messages
 
    // Define variables
    NcVar obs_arr_var;
@@ -1108,7 +1107,8 @@ int process_point_ens(int i_ens, int &n_miss) {
 
 void process_point_scores() {
    PairDataEnsemble *pd_ptr = (PairDataEnsemble *) 0;
-   int i, j, k, l, m;
+   PairDataEnsemble pd;
+   int i, j, k, l, m, n;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1185,12 +1185,95 @@ void process_point_scores() {
                // Continue if there are no points
                if(pd_ptr->n_obs == 0) continue;
 
-               // Compute observation ranks and statistics
+               // Compute observation ranks and pair values
                pd_ptr->compute_rank(rng_ptr);
-               pd_ptr->compute_stats();
+               pd_ptr->compute_pair_vals();
 
-               // Write out the ORANK lines
+               // Process each filtering threshold
+               for(m=0; m<conf_info.othr_ta[i].n_elements(); m++) {
+
+                  // Set the header column
+                  shc.set_obs_thresh(conf_info.othr_ta[i][m]);
+
+                  // Subset pairs using the current obs_thresh
+                  pd = pd_ptr->subset_pairs(conf_info.othr_ta[i][m]);
+
+                  // Compute ensemble statistics
+                  pd.compute_stats();
+
+                  // Write RHIST counts
+                  if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
+
+                     pd.compute_rhist();
+
+                     if(pd.rhist_na.sum() > 0) {
+                        write_rhist_row(shc, &pd,
+                           conf_info.output_flag[i_rhist],
+                           stat_at, i_stat_row,
+                           txt_at[i_rhist], i_txt_row[i_rhist]);
+                     }
+                  }
+
+                  // Write PHIST counts if greater than 0
+                  if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+
+                     pd.compute_phist();
+
+                     if(pd.phist_na.sum() > 0) {
+                        write_phist_row(shc, &pd,
+                           conf_info.output_flag[i_phist],
+                           stat_at, i_stat_row,
+                           txt_at[i_phist], i_txt_row[i_phist]);
+                     }
+                  }
+
+                  // Write RELP counts
+                  if(conf_info.output_flag[i_relp] != STATOutputType_None) {
+
+                     pd.compute_relp();
+
+                     if(pd.relp_na.sum() > 0) {
+                        write_relp_row(shc, &pd,
+                           conf_info.output_flag[i_relp],
+                           stat_at, i_stat_row,
+                           txt_at[i_relp], i_txt_row[i_relp]);
+                     }
+                  }
+
+                  // Write SSVAR scores
+                  if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
+
+                     pd.compute_ssvar();
+
+                     // Make sure there are bins to process
+                     if(pd.ssvar_bins) {
+
+                        // Add rows to the output AsciiTables for SSVAR
+                        stat_at.add_rows(pd.ssvar_bins[0].n_bin *
+                                         conf_info.ci_alpha.n_elements());
+
+                        if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
+                           txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
+                                                    conf_info.ci_alpha.n_elements());
+                        }
+
+                        // Write the SSVAR data for each alpha value
+                        for(n=0; n<conf_info.ci_alpha.n_elements(); n++) {
+                           write_ssvar_row(shc, &pd, conf_info.ci_alpha[n],
+                              conf_info.output_flag[i_ssvar],
+                              stat_at, i_stat_row,
+                              txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                        }
+                     }
+                  }
+
+               } // end for m
+
+               // Write out the unfiltered ORANK lines
                if(conf_info.output_flag[i_orank] != STATOutputType_None) {
+
+                  // Set the header column
+                  shc.set_obs_thresh(na_str);
 
                   write_orank_row(shc, pd_ptr,
                      conf_info.output_flag[i_orank],
@@ -1200,68 +1283,6 @@ void process_point_scores() {
                   // Reset the observation valid time
                   shc.set_obs_valid_beg(conf_info.vx_pd[i].beg_ut);
                   shc.set_obs_valid_end(conf_info.vx_pd[i].end_ut);
-               }
-
-               // Write RHIST counts
-               if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
-
-                  pd_ptr->compute_rhist();
-
-                  write_rhist_row(shc, pd_ptr,
-                     conf_info.output_flag[i_rhist],
-                     stat_at, i_stat_row,
-                     txt_at[i_rhist], i_txt_row[i_rhist]);
-               }
-
-               // Write PHIST counts if greater than 0
-               if(conf_info.output_flag[i_phist] != STATOutputType_None) {
-
-                  pd_ptr->compute_phist();
-
-                  if(pd_ptr->phist_na.sum() > 0) {
-                     write_phist_row(shc, pd_ptr,
-                        conf_info.output_flag[i_phist],
-                        stat_at, i_stat_row,
-                        txt_at[i_phist], i_txt_row[i_phist]);
-                  }
-               }
-
-               // Write SSVAR scores
-               if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
-
-                  pd_ptr->compute_ssvar();
-
-                  // Make sure there are bins to process
-                  if(pd_ptr->ssvar_bins) {
-
-                     // Add rows to the output AsciiTables for SSVAR
-                     stat_at.add_rows(pd_ptr->ssvar_bins[0].n_bin *
-                                      conf_info.ci_alpha.n_elements());
-
-                     if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
-                        txt_at[i_ssvar].add_rows(pd_ptr->ssvar_bins[0].n_bin *
-                                                 conf_info.ci_alpha.n_elements());
-                     }
-
-                     // Write the SSVAR data for each alpha value
-                     for(m=0; m<conf_info.ci_alpha.n_elements(); m++) {
-                        write_ssvar_row(shc, pd_ptr, conf_info.ci_alpha[m],
-                           conf_info.output_flag[i_ssvar],
-                           stat_at, i_stat_row,
-                           txt_at[i_ssvar], i_txt_row[i_ssvar]);
-                     }
-                  }
-               }
-
-               // Write RELP counts
-               if(conf_info.output_flag[i_relp] != STATOutputType_None) {
-
-                  pd_ptr->compute_relp();
-
-                  write_relp_row(shc, pd_ptr,
-                     conf_info.output_flag[i_relp],
-                     stat_at, i_stat_row,
-                     txt_at[i_relp], i_txt_row[i_relp]);
                }
 
             } // end for l
@@ -1275,14 +1296,14 @@ void process_point_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_vx() {
-   int i, j, k, l, n_miss;
+   int i, j, k, l, m, n_miss;
    bool found;
    DataPlane *fcst_dp = (DataPlane *) 0;
    DataPlane *fcst_dp_smooth = (DataPlane *) 0;
    DataPlane  obs_dp, obs_dp_smooth;
    DataPlane  emn_dp, emn_dp_smooth;
    DataPlane  cmn_dp;
-   PairDataEnsemble pd;
+   PairDataEnsemble pd_all, pd;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1487,14 +1508,14 @@ void process_grid_vx() {
             shc.set_mask(conf_info.mask_name[k]);
 
             // Initialize
-            pd.clear();
-            pd.set_ens_size(n_vx_vld[i]);
-            pd.skip_const = conf_info.vx_pd[i].pd[0][0][0].skip_const;
+            pd_all.clear();
+            pd_all.set_ens_size(n_vx_vld[i]);
+            pd_all.skip_const = conf_info.vx_pd[i].pd[0][0][0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
                                 emn_dp_smooth, cmn_dp,
-                                conf_info.mask_dp[k], pd);
+                                conf_info.mask_dp[k], pd_all);
 
             mlog << Debug(2)
                  << "Processing gridded verification "
@@ -1506,84 +1527,102 @@ void process_grid_vx() {
                  << ", for interpolation method "
                  << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
-                 << "), using " << pd.n_obs << " pairs.\n";
+                 << "), using " << pd_all.n_obs << " pairs.\n";
 
             // Continue if there are no points
-            if(pd.n_obs == 0) continue;
+            if(pd_all.n_obs == 0) continue;
 
-            // Compute observation ranks and statistics
-            pd.compute_rank(rng_ptr);
-            pd.compute_stats();
+            // Compute observation ranks and pair values
+            pd_all.compute_rank(rng_ptr);
+            pd_all.compute_pair_vals();
 
-            if(i == 0) setup_txt_files();
+            // Process each filtering threshold
+            for(l=0; l<conf_info.othr_ta[i].n_elements(); l++) {
 
-            // Write RHIST counts
-            if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
+               // Set the header column
+               shc.set_obs_thresh(conf_info.othr_ta[i][l]);
 
-               pd.compute_rhist();
+               // Subset pairs using the current obs_thresh
+               pd = pd_all.subset_pairs(conf_info.othr_ta[i][l]);
 
-               write_rhist_row(shc, &pd,
-                  conf_info.output_flag[i_rhist],
-                  stat_at, i_stat_row,
-                  txt_at[i_rhist], i_txt_row[i_rhist]);
-            }
+               // Compute ensemble statistics
+               pd.compute_stats();
 
-            // Write PHIST counts if greater than 0
-            if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+               if(i == 0) setup_txt_files();
 
-               pd.phist_bin_size = conf_info.vx_pd[i].pd[0][0][0].phist_bin_size;
-               pd.compute_phist();
+               // Write RHIST counts
+               if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
 
-               if(pd.phist_na.sum() > 0) {
-                  write_phist_row(shc, &pd,
-                     conf_info.output_flag[i_phist],
-                     stat_at, i_stat_row,
-                     txt_at[i_phist], i_txt_row[i_phist]);
+                  pd.compute_rhist();
+
+                  if(pd.rhist_na.sum() > 0) {
+                     write_rhist_row(shc, &pd,
+                        conf_info.output_flag[i_rhist],
+                        stat_at, i_stat_row,
+                        txt_at[i_rhist], i_txt_row[i_rhist]);
+                  }
                }
-            }
 
-            // Write out the smoothed forecast, observation, and difference
+               // Write PHIST counts if greater than 0
+               if(conf_info.output_flag[i_phist] != STATOutputType_None) {
+
+                  pd.phist_bin_size = conf_info.vx_pd[i].pd[0][0][0].phist_bin_size;
+                  pd.compute_phist();
+
+                  if(pd.phist_na.sum() > 0) {
+                     write_phist_row(shc, &pd,
+                        conf_info.output_flag[i_phist],
+                        stat_at, i_stat_row,
+                        txt_at[i_phist], i_txt_row[i_phist]);
+                  }
+               }
+
+               // Write RELP counts
+               if(conf_info.output_flag[i_relp] != STATOutputType_None) {
+
+                  pd.compute_relp();
+
+                  if(pd.relp_na.sum() > 0) {
+                     write_relp_row(shc, &pd,
+                        conf_info.output_flag[i_relp],
+                        stat_at, i_stat_row,
+                        txt_at[i_relp], i_txt_row[i_relp]);
+                  }
+               }
+
+               // Write SSVAR scores
+               if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
+
+                  pd.ssvar_bin_size = conf_info.vx_pd[i].pd[0][0][0].ssvar_bin_size;
+                  pd.compute_ssvar();
+
+                  // Make sure there are bins to process
+                  if(pd.ssvar_bins) {
+
+                     // Add rows to the output AsciiTables for SSVAR
+                     stat_at.add_rows(pd.ssvar_bins[0].n_bin *
+                                      conf_info.ci_alpha.n_elements());
+
+                     if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
+                        txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
+                                                 conf_info.ci_alpha.n_elements());
+                     }
+
+                     // Write the SSVAR data for each alpha value
+                     for(m=0; m<conf_info.ci_alpha.n_elements(); m++) {
+                        write_ssvar_row(shc, &pd, conf_info.ci_alpha[m],
+                           conf_info.output_flag[i_ssvar],
+                           stat_at, i_stat_row,
+                           txt_at[i_ssvar], i_txt_row[i_ssvar]);
+                     }
+                  }
+               }
+
+            } // end for l
+
+            // Write out the unfiltered observation rank field.
             if(conf_info.ensemble_flag[i_nc_orank]) {
                write_orank_nc(pd, obs_dp_smooth, i, j, k);
-            }
-
-            // Write SSVAR scores
-            if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
-
-               pd.ssvar_bin_size = conf_info.vx_pd[i].pd[0][0][0].ssvar_bin_size;
-               pd.compute_ssvar();
-
-               // Make sure there are bins to process
-               if(pd.ssvar_bins) {
-
-                  // Add rows to the output AsciiTables for SSVAR
-                  stat_at.add_rows(pd.ssvar_bins[0].n_bin *
-                                   conf_info.ci_alpha.n_elements());
-
-                  if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
-                     txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
-                                              conf_info.ci_alpha.n_elements());
-                  }
-
-                  // Write the SSVAR data for each alpha value
-                  for(l=0; l<conf_info.ci_alpha.n_elements(); l++) {
-                     write_ssvar_row(shc, &pd, conf_info.ci_alpha[l],
-                        conf_info.output_flag[i_ssvar],
-                        stat_at, i_stat_row,
-                        txt_at[i_ssvar], i_txt_row[i_ssvar]);
-                  }
-               }
-            }
-
-            // Write RELP counts
-            if(conf_info.output_flag[i_relp] != STATOutputType_None) {
-
-               pd.compute_relp();
-
-               write_relp_row(shc, &pd,
-                  conf_info.output_flag[i_relp],
-                  stat_at, i_stat_row,
-                  txt_at[i_relp], i_txt_row[i_relp]);
             }
 
          } // end for k
@@ -2062,8 +2101,6 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
-
-   // TODO: Must add in hooks for writing the ensemble median and mode
 
    // Add the ensemble standard deviation if requested
    if(conf_info.ensemble_flag[i_nc_stdev]) {

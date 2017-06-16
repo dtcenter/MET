@@ -93,7 +93,7 @@ void PairDataEnsemble::clear() {
 
    n_pair = 0;
    skip_const = false;
-   skip_pair.clear();
+   skip_ba.clear();
 
    v_na.clear();
    r_na.clear();
@@ -104,8 +104,8 @@ void PairDataEnsemble::clear() {
    mn_na.clear();
 
    rhist_na.clear();
-   phist_na.clear();
    relp_na.clear();
+   phist_na.clear();
 
    if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
 
@@ -123,7 +123,7 @@ void PairDataEnsemble::extend(int n) {
 
    // Allocate memory for the number of observations.
    // Only applies to arrays sized by n_obs which does not include:
-   //   rhist_na, phist_na, relp_na
+   //   rhist_na, relp_na, phist_na
 
    PairBase::extend(n);
 
@@ -134,7 +134,7 @@ void PairDataEnsemble::extend(int n) {
    crps_na.extend(n);
    ign_na.extend(n);
    pit_na.extend(n);
-   skip_pair.extend(n);
+   skip_ba.extend(n);
    spread_na.extend(n);
    mn_na.extend(n);
 
@@ -156,15 +156,21 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    set_interp_dpth(pd.interp_dpth);
    set_interp_shape(pd.interp_shape);
 
+   // PairBase
+   n_obs        = pd.n_obs;
    sid_sa       = pd.sid_sa;
    lat_na       = pd.lat_na;
    lon_na       = pd.lon_na;
    x_na         = pd.x_na;
    y_na         = pd.y_na;
+   wgt_na       = pd.wgt_na;
    vld_ta       = pd.vld_ta;
    lvl_na       = pd.lvl_na;
    elv_na       = pd.elv_na;
    o_na         = pd.o_na;
+   o_qc_sa      = pd.o_qc_sa;
+
+   // PairDataEnsemble
    v_na         = pd.v_na;
    r_na         = pd.r_na;
    crps_na      = pd.crps_na;
@@ -172,15 +178,13 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    pit_na       = pd.pit_na;
    n_pair       = pd.n_pair;
    skip_const   = pd.skip_const;
-   skip_pair    = pd.skip_pair;
+   skip_ba      = pd.skip_ba;
    spread_na    = pd.spread_na;
    mn_na        = pd.mn_na;
 
    rhist_na     = pd.rhist_na;
-   phist_na     = pd.phist_na;
    relp_na      = pd.relp_na;
-
-   n_obs        = pd.n_obs;
+   phist_na     = pd.phist_na;
 
    if(pd.ssvar_bins){
       ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
@@ -228,6 +232,9 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
    NumArray src_na, dest_na, cur_ens;
    double mean, spread;
 
+   // Check if the ranks have already been computed
+   if(r_na.n_elements() == o_na.n_elements()) return;
+
    // Compute the rank for each observation
    for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n_elements(); i++) {
 
@@ -265,21 +272,21 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
       // Skip points missing ensemble data
       if(n_vld != n_ens) {
          n_skip_vld++;
-         skip_pair.add(true);
+         skip_ba.add(true);
       }
       // Skip points with constant value, if requested
       else if(skip_const && n_tie == n_ens) {
          n_skip_const++;
-         skip_pair.add(true);
+         skip_ba.add(true);
       }
       // Increment the n_pair counter
       else {
          n_pair++;
-         skip_pair.add(false);
+         skip_ba.add(false);
       }
 
       // Compute the rank
-      if(skip_pair[i]) {
+      if(skip_ba[i]) {
          r_na.add(bad_data_int);
       }
       else {
@@ -323,73 +330,9 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::compute_rhist() {
-   int i, rank;
-
-   // Clear the ranked histogram
-   rhist_na.clear();
-
-   // Initialize the histogram counts to 0
-   for(i=0; i<=n_ens; i++) rhist_na.add(0);
-
-   // The compute_rank() routine should have already been called.
-   // Loop through the ranks and populate the histogram.
-   for(i=0; i<r_na.n_elements(); i++) {
-
-      // Get the current rank
-      rank = nint(r_na[i]);
-
-      // Increment the histogram counts
-      if(!is_bad_data(rank)) rhist_na.set(rank-1, rhist_na[rank-1]+1);
-
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairDataEnsemble::compute_phist() {
-   int i, bin;
-
-   // Clear the PIT histogram
-   phist_na.clear();
-
-   // Initialize the histogram counts to 0
-   for(i=0; i<ceil(1.0/phist_bin_size); i++) phist_na.add(0);
-
-   // The compute_stats() routine should have already been called.
-   // Loop through the PIT values and populate the histogram.
-   for(i=0; i<pit_na.n_elements(); i++) {
-
-      if(skip_pair[i] || is_bad_data(pit_na[i])) continue;
-
-      if(pit_na[i] < 0.0 || pit_na[i] > 1.0) {
-         mlog << Warning << "PairDataEnsemble::compute_phist() -> "
-              << "probability integral transform value ("
-              << pit_na[i] << ") is outside of valid range [0, 1].\n\n";
-         continue;
-      }
-
-      // Determine the bin
-      bin = (is_eq(pit_na[i], 1.0) ?
-             phist_na.n_elements() - 1 :
-             floor(pit_na[i]/phist_bin_size));
-
-      // Increment the histogram counts
-      phist_na.set(bin, phist_na[bin]+1);
-
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairDataEnsemble::compute_stats() {
+void PairDataEnsemble::compute_pair_vals() {
    int i, j;
-   double crps, ign, pit, w, w_sum;
-   double crps_climo, ccbar, oobar, cobar;
+   double crps, ign, pit;
    NumArray cur;
 
    // Initialize
@@ -401,7 +344,7 @@ void PairDataEnsemble::compute_stats() {
    for(i=0; i<n_obs; i++) {
 
       // Skip constant points, if requested, and missing ensemble data
-      if(skip_pair[i]) {
+      if(skip_ba[i]) {
          crps_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
@@ -409,7 +352,7 @@ void PairDataEnsemble::compute_stats() {
       }
 
       // Store ensemble values for the current observation
-      for(j=0, cur.clear(); j<n_ens; j++) cur.add(e_na[j][i]);
+      for(j=0, cur.erase(); j<n_ens; j++) cur.add(e_na[j][i]);
 
       // Compute the stats
       compute_crps_ign_pit(o_na[i], cur, crps, ign, pit);
@@ -421,7 +364,19 @@ void PairDataEnsemble::compute_stats() {
 
    } // end for i
 
-   // Compute CRPS Skill Score
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::compute_stats() {
+   int i;
+   double w, w_sum;
+   double crps, crps_climo, ccbar, oobar, cobar;
+   NumArray cur;
+
+   // The compute_pair_vals() routine should have already been called.
+   // Compute CRPS Skill Score.
 
    // Get the average ensemble CRPS value
    crps = crps_na.wmean(wgt_na);
@@ -458,6 +413,119 @@ void PairDataEnsemble::compute_stats() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairDataEnsemble::compute_rhist() {
+   int i, rank;
+
+   // Clear the ranked histogram
+   rhist_na.clear();
+
+   // Initialize the histogram counts to 0
+   for(i=0; i<=n_ens; i++) rhist_na.add(0);
+
+   // The compute_rank() routine should have already been called.
+   // Loop through the ranks and populate the histogram.
+   for(i=0; i<r_na.n_elements(); i++) {
+
+      // Get the current rank
+      rank = nint(r_na[i]);
+
+      // Increment the histogram counts
+      if(!is_bad_data(rank)) rhist_na.set(rank-1, rhist_na[rank-1]+1);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::compute_relp() {
+   int i, j, n;
+   double d, min_d;
+   NumArray min_ens;
+
+   // Clear the RELP histogram
+   relp_na.clear();
+
+   // Allocate space
+   min_ens.extend(n_ens);
+
+   // Initialize counts to 0
+   for(i=0; i<n_ens; i++) relp_na.add(0);
+
+   // Loop through the observations and update the counts
+   for(i=0; i<o_na.n_elements(); i++) {
+
+      if(skip_ba[i]) continue;
+
+      // Search for the minimum difference
+      for(j=0, min_d=1.0e10; j<n_ens; j++) {
+
+         // Absolute value of the difference
+         d = abs(e_na[j][i] - o_na[i]);
+
+         // Store the closest member
+         if(d < min_d) {
+            min_ens.erase();
+            min_ens.add(j);
+            min_d = d;
+         }
+         // Store all members tied for closest
+         else if(is_eq(d, min_d)) {
+            min_ens.add(j);
+         }
+      } // end for j
+
+      // Increment fractional RELP counts for each closest member
+      for(j=0, n=min_ens.n_elements(); j<n; j++) {
+
+         relp_na.set(min_ens[j], relp_na[(min_ens[j])] + (double) 1.0/n);
+      }
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::compute_phist() {
+   int i, bin;
+
+   // Clear the PIT histogram
+   phist_na.clear();
+
+   // Initialize the histogram counts to 0
+   for(i=0; i<ceil(1.0/phist_bin_size); i++) phist_na.add(0);
+
+   // The compute_pair_vals() routine should have already been called.
+   // Loop through the PIT values and populate the histogram.
+   for(i=0; i<pit_na.n_elements(); i++) {
+
+      if(skip_ba[i] || is_bad_data(pit_na[i])) continue;
+
+      if(pit_na[i] < 0.0 || pit_na[i] > 1.0) {
+         mlog << Warning << "PairDataEnsemble::compute_phist() -> "
+              << "probability integral transform value ("
+              << pit_na[i] << ") is outside of valid range [0, 1].\n\n";
+         continue;
+      }
+
+      // Determine the bin
+      bin = (is_eq(pit_na[i], 1.0) ?
+             phist_na.n_elements() - 1 :
+             floor(pit_na[i]/phist_bin_size));
+
+      // Increment the histogram counts
+      phist_na.set(bin, phist_na[bin]+1);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 // Comparison method for ssvar bins
 struct ssvar_bin_comp {
   bool operator() (const string& lhs, const string& rhs) const {
@@ -474,7 +542,7 @@ void PairDataEnsemble::compute_ssvar() {
    for(i=0; i<o_na.n_elements(); i++) {
 
       // Check if point should be skipped
-      if(skip_pair[i]) continue;
+      if(skip_ba[i]) continue;
 
       // Add the deviation of each ensemble member
       for(j=0, n_vld=0, var=0; j<n_ens; j++) {
@@ -586,53 +654,69 @@ void PairDataEnsemble::compute_ssvar() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Apply conditional observation threshold and return a subset of pairs.
+// The compute_rank() and compute_pair_vals() functions should have
+// already been called.  After retrieving the subset, the compute
+// statistics functions should be called again.
+//
+////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::compute_relp() {
-   int i, j, n;
-   double d, min_d;
-   NumArray min_ens;
+PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
 
-   // Clear the RELP histogram
-   relp_na.clear();
+   // Check for no work to be done
+   if(ot.get_type() == thresh_na) return(*this);
 
-   // Allocate space
-   min_ens.extend(n_ens);
+   int i, j;
+   PairDataEnsemble pd;
 
-   // Initialize counts to 0
-   for(i=0; i<n_ens; i++) relp_na.add(0);
+   // Allocate memory for output pairs and set the ensemble size
+   pd.extend(n_obs);
+   pd.set_ens_size(n_ens);
+   pd.phist_bin_size = phist_bin_size;
+   pd.ssvar_bin_size = ssvar_bin_size;
 
-   // Loop through the observations and update the counts
-   for(i=0; i<o_na.n_elements(); i++) {
+   // Loop over the pairs
+   for(i=0; i<n_obs; i++) {
 
-      if(skip_pair[i]) continue;
+      // Check for bad data and apply observation threshold
+      if(is_bad_data(o_na[i]) || skip_ba[i] || !ot.check(o_na[i])) continue;
 
-      // Search for the minimum difference
-      for(j=0, min_d=1.0e10; j<n_ens; j++) {
+      // Add data for the current observation but only include data
+      // required for ensemble output line types.
+      //
+      // Include in subset:
+      //   wgt_na, o_na, r_na, crps_na, ign_na, pit_na, spread_na,
+      //   mn_na, e_na
+      //
+      // Exclude from subset:
+      //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
+      //   o_qc_sa, v_na
 
-         // Absolute value of the difference
-         d = abs(e_na[j][i] - o_na[i]);
+      pd.wgt_na.add(wgt_na[i]);
+      pd.o_na.add(o_na[i]);
+      pd.skip_ba.add(false);
+      pd.r_na.add(r_na[i]);
+      pd.crps_na.add(crps_na[i]);
+      pd.ign_na.add(ign_na[i]);
+      pd.pit_na.add(pit_na[i]);
+      pd.spread_na.add(spread_na[i]);
+      pd.mn_na.add(mn_na[i]);
 
-         // Store the closest member
-         if(d < min_d) {
-            min_ens.erase();
-            min_ens.add(j);
-            min_d = d;
-         }
-         // Store all members tied for closest
-         else if(is_eq(d, min_d)) {
-            min_ens.add(j);
-         }
-      } // end for j
+      for(j=0; j<n_ens; j++) pd.e_na[j].add(e_na[j][i]);
 
-      // Increment fractional RELP counts for each closest member
-      for(j=0, n=min_ens.n_elements(); j<n; j++) {
-
-         relp_na.set(min_ens[j], relp_na[(min_ens[j])] + (double) 1.0/n);
-      }
+      // Increment counters
+      pd.n_obs++;
+      pd.n_pair++;
 
    } // end for i
 
-   return;
+   mlog << Debug(3)
+        << "Using " << pd.n_obs << " of " << n_obs
+        << " ensemble pairs for observation filtering threshold "
+        << ot.get_str() << ".\n";
+
+   return(pd);
 }
 
 ////////////////////////////////////////////////////////////////////////

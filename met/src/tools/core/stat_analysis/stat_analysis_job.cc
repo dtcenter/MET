@@ -2158,6 +2158,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       // RHIST output line
       //
       if(lt == stat_rhist) {
+         it->second.ens_pd.compute_pair_vals();
          it->second.ens_pd.compute_stats();
          at.set_entry(r, c++, "RHIST:");
          write_case_cols(it->first, at, r, c);

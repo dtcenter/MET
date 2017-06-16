@@ -69,10 +69,10 @@ class PairDataEnsemble : public PairBase {
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
       int        n_ens;           // Number of ensemble members
 
-      int        n_pair;          // Number of valid pairs, n_obs - sum(skip_pair)
+      int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
       bool       skip_const;      // Skip cases where the observation and
                                   // all ensemble members are constant
-      BoolArray  skip_pair;       // Flag for each observation
+      BoolArray  skip_ba;         // Flag for each observation [n_obs]
 
       NumArray   rhist_na;        // Ranked Histogram [n_ens+1]
       NumArray   relp_na;         // Relative Position Histogram [n_ens]
@@ -98,11 +98,15 @@ class PairDataEnsemble : public PairBase {
       void set_ens_size(int);
 
       void compute_rank(const gsl_rng *);
-      void compute_rhist();
-      void compute_phist();
+      void compute_pair_vals();
+
       void compute_stats();
-      void compute_ssvar();
+      void compute_rhist();
       void compute_relp();
+      void compute_phist();
+      void compute_ssvar();
+
+      PairDataEnsemble subset_pairs(const SingleThresh &ot) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -242,6 +246,10 @@ class VxPairDataEnsemble {
       void set_skip_const(bool);
 };
 
+////////////////////////////////////////////////////////////////////////
+//
+// Miscellanous functions
+//
 ////////////////////////////////////////////////////////////////////////
 
 extern void compute_crps_ign_pit(double, const NumArray &,
