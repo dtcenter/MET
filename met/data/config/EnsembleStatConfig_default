@@ -76,7 +76,7 @@ obs = fcst;
 //
 message_type   = [ "ADPUPA" ];
 sid_exc        = [];
-obs_thresh     = [];
+obs_thresh     = [ NA ];
 obs_quality    = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
@@ -178,8 +178,6 @@ output_flag = {
 //
 ensemble_flag = {
    mean      = TRUE;
-   median    = FALSE;
-   mode      = FALSE;
    stdev     = TRUE;
    minus     = TRUE;
    plus      = TRUE;
