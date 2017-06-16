@@ -562,9 +562,9 @@ static const char conf_key_ensemble_flag[]           = "ensemble_flag";
 static const char conf_key_ssvar_bin[]               = "ens_ssvar_bin_size";
 static const char conf_key_phist_bin[]               = "ens_phist_bin_size";
 static const char * conf_key_ensemble_flag_entries[] = {
-   "mean",      "median", "mode", "stdev",  "minus",
-   "plus",      "min",    "max",  "range",  "vld_count",
-   "frequency", "rank",   "weight"
+   "mean", "stdev", "minus",     "plus",      "min",
+   "max",  "range", "vld_count", "frequency", "rank",
+   "weight"
 };
 static const int n_conf_key_ensemble_flag_entries =
                     sizeof(conf_key_ensemble_flag_entries)/
