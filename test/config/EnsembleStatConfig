@@ -84,7 +84,7 @@ obs = fcst;
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-obs_thresh     = [];
+obs_thresh     = [ NA ];
 obs_quality    = [];
 duplicate_flag = NONE;
 obs_summary    = NONE;
