@@ -319,6 +319,12 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    //  call the parent to set the level information
    set_level_info_grib(dict);
 
+   //  check for a probability boolean setting
+   if( dict.lookup_bool(conf_key_prob, false) ){
+      set_p_flag( true );
+      return;
+   }
+
    //  if the level type is a record number, set the data member
    set_record( Level.type() == LevelType_RecNumber ? nint(Level.lower()) : -1 );
 
