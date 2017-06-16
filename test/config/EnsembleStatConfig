@@ -15,7 +15,7 @@ model = "WRF";
 // Output description to be written
 // May be set separately in each "obs.field" entry
 //
-desc = "NA";
+desc = "${DESC}";
 
 //
 // Output observation type to be written
@@ -51,7 +51,7 @@ ens = {
       {
          name       = "APCP";
          level      = "A24";
-         cat_thresh = [ >0.0  ];
+         cat_thresh = [ >0.0 ];
       }
    ];
 }
@@ -71,8 +71,9 @@ fcst = {
          level = "Z2";
       },
       {
-         name  = "APCP";
-         level = "A24";
+         name       = "APCP";
+         level      = "A24";
+         obs_thresh = [ NA, >0, >=2.54 ];
       }
    ];
 }

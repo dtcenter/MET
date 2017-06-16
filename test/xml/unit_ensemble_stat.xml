@@ -27,6 +27,7 @@
   <test name="ensemble_stat_CMD_LINE">
     <exec>&MET_DIR;/bin/ensemble_stat</exec>
     <env>
+      <pair><name>DESC</name>           <value>NA</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>CMD_LINE</value></pair>
     </env>
@@ -66,6 +67,7 @@
                 > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
           &MET_DIR;/bin/ensemble_stat</exec>
     <env>
+      <pair><name>DESC</name>           <value>NA</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>FILE_LIST</value></pair>
     </env>
@@ -130,6 +132,7 @@
                 > &OUTPUT_DIR;/ensemble_stat/input_file_list; \
           &MET_DIR;/bin/ensemble_stat</exec>
     <env>
+      <pair><name>DESC</name>           <value>SKIP_CONST</value></pair>
       <pair><name>SKIP_CONST</name>     <value>TRUE</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>SKIP_CONST</value></pair>
     </env>
