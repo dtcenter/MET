@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -82,7 +84,13 @@ gfsrain06.grb is a GRIB2 file on a global lat/lon grid.
 \end_layout
 
 \begin_layout LyX-Code
-wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1 25:121:0.1 gfsrain06_regrid.grb2
+wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+25:121:0.1 gfsrain06_regrid.grb2
 \end_layout
 
 \begin_layout Standard
@@ -90,8 +98,13 @@ And then run that GRIB2 file through pcp_combine:
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -add gfsrain06_regrid.grb2 'name="APCP"; level="A6";' gfsrain06_regri
-d.nc
+pcp_combine -add gfsrain06_regrid.grb2 'name="APCP"; 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+level="A6";' gfsrain06_regrid.nc
 \end_layout
 
 \begin_layout Standard
@@ -112,7 +125,7 @@ ncdump -h 2a_wgrib2_regrid.nc | grep "_ll"
 
 \begin_layout Standard
 MET can read both GRIB1 and GRIB2 data.
- Also, MET version 5.2 includes an automated regridding feature.
+ Also, MET versions above 5.2 include an automated regridding feature.
  So the data can pass to grid_stat on different grids...
  and instruct grid_stat to regrid one to the other.
  That would avoid the need to do regridding using copygb or wgrib2 at all.

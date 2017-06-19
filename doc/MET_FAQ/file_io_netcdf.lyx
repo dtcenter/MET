@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -74,7 +76,7 @@ MET compatibility with NetCDF files
 \end_layout
 
 \begin_layout Standard
-MET doesn't support all types of gridded NetCDF files.
+MET does not support all types of gridded NetCDF files.
  It only supports the MET NetCDF format (e.g.
  the output of the pcp_combine tool), the output of the WRF pinterp (or
  wrfinterp) utilities, and CF-compliant NetCDF files.
@@ -109,7 +111,7 @@ lsp_6h.ps 'name="LSP_6h"; level="(*,*)"; file_type=NETCDF_NCCF;'
 \end_layout
 
 \begin_layout Standard
-***The resulting image is attached.*** There are several issues here: 
+There are several issues here: 
 \end_layout
 
 \begin_layout Description
@@ -131,7 +133,7 @@ lsp_6h.ps 'name="LSP_6h"; level="(*,*)"; file_type=NETCDF_NCCF;'
 
 \begin_layout Standard
 It is possible to get *something*, there are obviously a lot of issues.
- Basically, MET doesn't support the gridded NetCDF file format.
+ Basically, MET does not support the gridded NetCDF file format.
  Is this data possibly available in GRIB? Is there any control over the
  NetCDF file format in use?
 \end_layout

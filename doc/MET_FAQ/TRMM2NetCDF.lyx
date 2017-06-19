@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -81,13 +83,9 @@ Run the trmmbin2nc.R script to convert them to NetCDF.
 
 \begin_layout Standard
 The relative error binary files are not needed, just the precipitation ones.
- Here's an example of commands that could be used to process 2 of these
+ Here is an example of commands that could be used to process 2 of these
  files.
  They could easily put this inside a loop to process all 8 of them.
-\end_layout
-
-\begin_layout Standard
-***The resulting png image file is attached.***
 \end_layout
 
 \begin_layout LyX-Code
@@ -167,12 +165,41 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-Rscript trmmbin2nc.R 3B42.130522.00z.7.precipitation.bin 3B42.130522.00z.7.precipitation.nc
- 
+Rscript trmmbin2nc.R 3B42.130522.00z.7.precipitation.bin 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
-Rscript trmmbin2nc.R 3B42.130522.03z.7.precipitation.bin 3B42.130522.03z.7.precipitation.nc
+3B42.130522.00z.7.precipitation.nc 
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+Rscript trmmbin2nc.R 3B42.130522.03z.7.precipitation.bin 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+3B42.130522.03z.7.precipitation.nc
 \end_layout
 
 \begin_layout LyX-Code
