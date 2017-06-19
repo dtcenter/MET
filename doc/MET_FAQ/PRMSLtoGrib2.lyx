@@ -1,0 +1,221 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass book
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+PRMSL to GRIB2 file
+\end_layout
+
+\begin_layout Standard
+This is an example of selecting the PRMSL record from a GRIB2 file.
+ This is a detailed accounting of how to troubleshoot this problem.
+\end_layout
+
+\begin_layout LyX-Code
+# Pull a recent GFS file: 
+\end_layout
+
+\begin_layout LyX-Code
+wget http://www.ftp.ncep.noaa.gov/data/nccf/com/gfs/prod/gfs.
+ 2017022812/gfs.t12z.pgrb2.0p25.f006
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Use wgrib2 to find PRMSL (it's in record number 414) 
+\end_layout
+
+\begin_layout LyX-Code
+wgrib2 gfs.t12z.pgrb2.0p25.f006 | grep PRMSL 414:234612707:d=2017022812 <%28201%29%2
+0702-2812>:PRMSL:mean sea level:6 hour fcst:
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+# Run MET's plot_data_plane tool to try to grab that data and plot it met-5.2/bin
+/plot_data_plane gfs.t12z.pgrb2.0p25.f006 prmsl.ps 'name="PRMSL"; level="L0";'
+ -v 3
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+DEBUG 1: Opening data file: gfs.t12z.pgrb2.0p25.f006 
+\end_layout
+
+\begin_layout LyX-Code
+DEBUG 3: Switching the GRIB2 radius of the earth value of 6371.23 km to 6371.2
+ km for internal consistency.
+ 
+\end_layout
+
+\begin_layout LyX-Code
+DEBUG 3: MetGrib2DataFile::data_plane() - Found exact match for 'PRMSL/L0'
+ in GRIB2 record 414 field 1 of GRIB2 file 'gfs.t12z.pgrb2.0p25.f006' 
+\end_layout
+
+\begin_layout LyX-Code
+DEBUG 1: Creating postscript file: prmsl.ps
+\end_layout
+
+\begin_layout Standard
+MET version 5.2 correctly finds PRMSL in record 414 ***and the resulting
+ image is attached.*** Using either "L0" or "Z0" works.
+\end_layout
+
+\begin_layout Standard
+The met_help history has an example that may be related to this example
+ from Matt Sittel: 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://mailman.ucar.edu/pipermail/met_help/2016-August/002638.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Please read through that message history.
+ 
+\end_layout
+
+\begin_layout Standard
+========
+\end_layout
+
+\begin_layout Standard
+Subject: Grib2 PRMSL Level 
+\end_layout
+
+\begin_layout Standard
+From: John Halley Gotway 
+\end_layout
+
+\begin_layout Standard
+Time: Tue Feb 28 16:00:38 2017
+\end_layout
+
+\end_body
+\end_document
