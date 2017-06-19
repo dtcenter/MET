@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -122,7 +124,7 @@ http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
 \begin_layout Standard
 The default logic for pcp_combine is to look for GRIB code 61 (i.e.
  APCP) defined with an accumulation interval (TR = 4).
- Since this data doesn't meet that criteria, the default logic of pcp_combine
+ Since this data does not meet that criteria, the default logic of pcp_combine
  won't work.
  Being more specific in the arguments to tell pcp_combine exactly what to
  do will fix this problem.

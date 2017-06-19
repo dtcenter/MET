@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -74,20 +76,26 @@ Using plot_data_plane
 \end_layout
 
 \begin_layout Standard
-The "narr.2015102812.RS.sfc_regridded.grb" file encodes APCP using GRIB parameter
- table version number 131, as shown in the wgrib command below:
+The "narr.2015102812.RS.sfc_regridded.grb" example file encodes APCP using GRIB
+ parameter table version number 131, as shown in the wgrib command below:
 \end_layout
 
 \begin_layout LyX-Code
-24:3248052:d=15102812:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=0:P2=3:TimeU=1:sfc:0
-- 3hr 
+24:3248052:d=15102812:APCP:kpds5=61:kpds6=1:kpds7=0:
+\end_layout
+
+\begin_layout LyX-Code
+TR=4:P1=0:P2=3:TimeU=1:sfc:0- 3hr 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
-acc:NAve=0:PDS10= 0 0 28 131 7 140 255 128 61 1 0 0 15 10 28 12 0 1 0 3
- 4 0 0 0 21 15 0 0
+acc:NAve=0:PDS10= 0 0 28 131 7 140 255 128 
+\end_layout
+
+\begin_layout LyX-Code
+61 1 0 0 15 10 28 12 0 1 0 3 4 0 0 0 21 15 0 0
 \end_layout
 
 \begin_layout Standard
@@ -100,8 +108,13 @@ The plot_data_plane utility can be used to test this out.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane nmbprs_d01.12 nmbprs_d01.12.ps 'name="APCP";
- level="A03";
+{MET_BASE}/bin/plot_data_plane nmbprs_d01.12 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+nmbprs_d01.12.ps 'name="APCP"; level="A03";
 \end_layout
 
 \begin_layout LyX-Code
@@ -123,13 +136,25 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane narr.2015102812.RS.sfc_regridded.grb 
+{MET_BASE}/bin/plot_data_plane 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
-narr.2015102812.RS.sfc_regridded.ps 'name="APCP"; level="A03"; GRIB1_ptv = 131;'
+narr.2015102812.RS.sfc_regridded.grb 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+narr.2015102812.RS.sfc_regridded.ps 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+'name="APCP"; level="A03"; GRIB1_ptv = 131;'
 \end_layout
 
 \begin_layout Standard

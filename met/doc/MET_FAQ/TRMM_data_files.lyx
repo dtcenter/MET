@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -75,7 +77,7 @@ TRMM data files
 
 \begin_layout Standard
 Here is an example of NetCDF that the MET software is not expecting.
- Here's an option for accessing that same TRMM data, following links from
+ Here is an option for accessing that same TRMM data, following links from
  the MET website:
 \begin_inset Flex URL
 status open
@@ -193,7 +195,13 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-Rscript trmmbin2nc.R 3B42.100921.00z.7.precipitation.bin 3B42.100921.00z.7.precipitation.nc
+Rscript trmmbin2nc.R 3B42.100921.00z.7.precipitation.bin 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+3B42.100921.00z.7.precipitation.nc
 \end_layout
 
 \begin_layout LyX-Code
@@ -226,10 +234,6 @@ vskip 0.1in
 
 \begin_layout LyX-Code
 3B42.100921.00z.7.precipitation.ps 'name="APCP_03"; level="(*,*)";'
-\end_layout
-
-\begin_layout Standard
-***Attached a PNG version of resulting image.***
 \end_layout
 
 \begin_layout Standard

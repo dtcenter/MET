@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -80,6 +82,10 @@ Run Grid-Stat twice.
 
 \begin_layout Enumerate
 Use wget to grab some recent data:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -125,7 +131,7 @@ nam.t00z.conusnest.hiresf00.tm00.grib2
 \end_deeper
 \begin_layout Enumerate
 Set up attached GridStatConfig file.
- *** help, automatic numbering is incorrect***
+ 
 \end_layout
 
 \begin_layout Enumerate
@@ -153,8 +159,13 @@ export TO_GRID=${case}
 \end_layout
 
 \begin_layout LyX-Code
-nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig /usr/local/{MET_BASE}/bin/plot_
-data_plane 
+nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+/usr/local/{MET_BASE}/bin/plot_data_plane 
 \backslash
 
 \end_layout

@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -83,7 +85,7 @@ APCP_24:init_time_ut = 1306886400 ; "ut"
 
 \begin_layout Standard
 stands for UNIX time, which is the number of seconds since Jan 1, 1970.
- It's a convenient way of storing timing information since it's easy to
+ It is a convenient way of storing timing information since it is easy to
  add/subtract.
  The UNIX date command can be used to convert back/forth between unix time
  and time strings:
@@ -142,7 +144,7 @@ http://www.dtcenter.org/met/users/downloads/observation_data.php
 \begin_layout Standard
 Follow the TRMM binary links to either the 3 or 24-hour accumulations, save
  the files, and run them through that script.
- That's the faster and easier than trying to get an ASCII dump.
+ That is the faster and easier than trying to get an ASCII dump.
  That Rscript can also subset the TRMM data if needed.
  Look for the section of it titled: 
 \end_layout

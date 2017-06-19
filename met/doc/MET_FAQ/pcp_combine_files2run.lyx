@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -188,7 +190,7 @@ Technically, the "lead_time" doesn’t need to be specified at all, pcp_combine
 
 \begin_layout Enumerate
 The default output variable name pcp_combine would write would be "APCP_L0".
- However, to indicate that its a 50 minute "accumulation interval" use a
+ However, to indicate that its a 50-minute "accumulation interval" use a
  different output variable name (APCP_A005000).
  Of course any string name is possible....
  Maybe "Precip50Minutes" or "RAIN50".

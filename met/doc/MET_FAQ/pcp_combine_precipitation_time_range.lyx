@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -124,13 +126,41 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-1:0:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=0:P2=12:TimeU=1:sfc:0-
- 12hr acc:NAve=0
+1:0:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=0: 
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
-2:31408:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=9:P2=12:TimeU=1:sfc:9-
- 12hr acc:NAve=0
+P2=12:TimeU=1:sfc:0- 12hr acc:NAve=0
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+2:31408:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4: 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+P1=9:P2=12:TimeU=1:sfc:9- 12hr acc:NAve=0
 \end_layout
 
 \begin_layout Standard
@@ -149,14 +179,13 @@ wgrib rmf_gra_2016040600.24 | grep APCP
 \end_layout
 
 \begin_layout LyX-Code
-291:28360360:d=16040600:APCP:kpds5=61:kpds6=1:kpds7=0:TR=5:P1=0:P2=24:TimeU=1:sf
-c:0- 
+291:28360360:d=16040600:APCP:kpds5=61:kpds6=1:kpds7=0: 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
-24hr diff:NAve=0
+TR=5:P1=0:P2=24:TimeU=1:sfc:0-24hr diff:NAve=0
 \end_layout
 
 \begin_layout Standard

@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -74,51 +76,26 @@ pcp_combine example
 \end_layout
 
 \begin_layout Standard
-If wgrib is able to read the GRIB1 files then hopefully the MET tools will
- be able to as well.
- However there are some issues to consider...
+Using precip variables other APCP in the pco_combine tool:
 \end_layout
 
 \begin_layout Standard
-(1) The default settings for pcp_combine expect accumulated precipitation
- to be stored in GRIB code 61 (for APCP).
- The total precip (TP) variable likely is not stored in GRIB code 61.
+The default settings for pcp_combine expect accumulated precipitation to
+ be stored in GRIB code 61 (for APCP).
+ As an example, the total precip (TP) variable likely is not stored in GRIB
+ code 61.
  Based on the wgrib output, it's stored in GRIB code 228 (i.e.
  kpds5=228).
 \end_layout
 
 \begin_layout Standard
-(2) The original email example mentioned MET version 5.0.
- The MET version 5.2 release included some major updates to GRIB tables...
- so using 5.0 versus 5.2 will have a pretty big impact.
- The GRIB table updates in 5.2 are described here: 
-\begin_inset Flex URL
-status open
-
-\begin_layout Plain Layout
-
-http://www.dtcenter.org/met/users/support/release_notes/METv5.2_release_notes.php
-\end_layout
-
-\end_inset
-
- The GRIB tables in MET 5.2 include information about center 98 and table
- number 228, whereas MET 5.0 is limited to NCEP's GRIB table usage.
-\end_layout
-
-\begin_layout Standard
-Using 5.0, setting 'name="TP";' will likely not work while it may work in
- 5.2.
-\end_layout
-
-\begin_layout Standard
-Regardless, instead of specifying the name, let's try explicitly specifying
- the GRIB code and parameter table version number.
- Does the following command work?
+Instead of specifying the name, try explicitly specifying the GRIB code
+ and parameter table version number.
+ 
 \end_layout
 
 \begin_layout LyX-Code
-../met-install/bin/pcp_combine -subtract 
+{MET_BASE}/bin/pcp_combine -subtract 
 \backslash
 
 \end_layout
@@ -148,7 +125,7 @@ ${TP_dir}/${datebefore}00/sfc_${datebefore}_${hh1}_grid_simple.grib1
 \end_layout
 
 \begin_layout LyX-Code
-${pcp_dir}/output_EC/${datebefore}00/3hr_TP_${datebefore}_${hh}_grid_simple.
+${pcp_dir}/${datebefore}00/3hr_TP_${datebefore}_${hh}_grid_simple.
  nc
 \end_layout
 
@@ -164,7 +141,7 @@ It may be helpful to visualize data like this using the plot data plane
 \end_layout
 
 \begin_layout LyX-Code
-../met-install/bin/plot_data_plane 
+{MET_BASE}/bin/plot_data_plane 
 \backslash
 
 \end_layout
