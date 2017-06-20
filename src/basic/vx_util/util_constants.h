@@ -52,13 +52,14 @@ static const char stereographic_proj_type  [] = "Polar Stereographic";
 static const char vld_msg_typ_str[] =
    "ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW MSONET \
     PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG SFCSHP SPSSMI \
-    SYNDAT VADWND ANYAIR ANYSFC ONLYSF";
+    SYNDAT VADWND ANYAIR ANYSFC ONLYSF ASCATW WDSATR";
 
 // Array of valid PrepBufr message types
 static const char *vld_msg_typ_list[] = {
    "ADPUPA", "AIRCAR", "AIRCFT", "ADPSFC", "ERS1DA", "GOESND",
    "GPSIPW", "MSONET", "PROFLR", "QKSWND", "RASSDA", "SATEMP",
-   "SATWND", "SFCBOG", "SFCSHP", "SPSSMI", "SYNDAT", "VADWND" };
+   "SATWND", "SFCBOG", "SFCSHP", "SPSSMI", "SYNDAT", "VADWND",
+   "ASCATW", "WDSATR"  };
 
 // Number of valid PrepBufr message types
 static const int n_vld_msg_typ =
