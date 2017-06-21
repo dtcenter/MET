@@ -2278,7 +2278,7 @@ bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
    // Regrid, if necessary
    if(!(mtddf->grid() == grid)) {
       mlog << Debug(1)
-           << "Regridding forecast "
+           << "Regridding field "
            << info->magic_str()
            << " to the verification grid.\n";
       dp = met_regrid(dp, mtddf->grid(), grid, regrid_info);
