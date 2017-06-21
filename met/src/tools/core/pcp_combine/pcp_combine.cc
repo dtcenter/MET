@@ -1284,7 +1284,6 @@ void usage()
         << "\t\tout_accum\n"
         << "\t\tout_file\n"
         << "\t\t[-pcpdir path]\n"
-        << "\t\t[-pcpdir path]\n"
         << "\t\t[-pcprx reg_exp]\n\n"
 
         << "\t\twhere\t\"init_time\" indicates the initialization "
