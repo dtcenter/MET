@@ -701,12 +701,12 @@ void process_scores() {
       // Loop through and apply each of the smoothing operations
       for(j=0; j<conf_info.get_n_interp(); j++) {
 
-	       //Need to create the grid template to find the # of points
+         // Create grid template to find the number of points
          GridTemplateFactory gtf;
          GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
                                         conf_info.interp_wdth[j]);
 
-         shc.set_interp_mthd(conf_info.interp_mthd[j], conf_info.interp_shape);                                        
+         shc.set_interp_mthd(conf_info.interp_mthd[j], conf_info.interp_shape);
          shc.set_interp_pnts(gt->size());
          delete gt;
 
@@ -730,7 +730,7 @@ void process_scores() {
             smooth_field(obs_dp, obs_dp_smooth,
                          conf_info.interp_mthd[j],
                          conf_info.interp_wdth[j],
-                         conf_info.interp_shape,                         
+                         conf_info.interp_shape,
                          conf_info.interp_thresh);
          }
          // Do not smooth the observation field
@@ -745,9 +745,13 @@ void process_scores() {
             // Store the current mask
             mask_dp = conf_info.mask_dp[k];
 
-            // Turn off the mask for bad forecast or observation values
+            // Turn off the mask for missing data values
             mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
             mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+            if(cmn_dp.nx() == fcst_dp_smooth.nx() &&
+               cmn_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_dp, cmn_dp, 0.0);
+            }
 
             // Apply the current mask to the current fields
             apply_mask(fcst_dp_smooth, mask_dp, f_na);
@@ -938,7 +942,7 @@ void process_scores() {
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
-               
+
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
                if(conf_info.interp_field == FieldType_Fcst ||
@@ -1117,7 +1121,7 @@ void process_scores() {
 
                fractional_coverage(obs_dp, obs_dp_smooth,
                                    conf_info.nbrhd_wdth[j],
-                                   conf_info.interp_shape,                                   
+                                   conf_info.interp_shape,
                                    conf_info.ocat_ta[i][k],
                                    conf_info.nbrhd_thresh);
 
