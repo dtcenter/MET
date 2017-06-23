@@ -747,9 +747,13 @@ void process_scores() {
             // Store the current mask
             mask_dp = conf_info.mask_dp[k];
 
-            // Turn off the mask for bad forecast or observation values
+            // Turn off the mask for missing data values
             mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
             mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+            if(cmn_dp.nx() == fcst_dp_smooth.nx() &&
+               cmn_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_dp, cmn_dp, 0.0);
+            }
 
             // Apply the current mask to the current fields
             apply_mask(fcst_dp_smooth, mask_dp, f_na);
@@ -945,7 +949,7 @@ void process_scores() {
                GridTemplateFactory gtf;
                GridTemplate* gt = gtf.buildGT(conf_info.interp_shape,
                                         conf_info.interp_wdth[j]);
-               
+
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
                if(conf_info.interp_field == FieldType_Fcst ||
