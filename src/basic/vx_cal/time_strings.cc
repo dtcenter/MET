@@ -641,8 +641,8 @@ bool is_hhmmss(const char * text)
 
 {
 
-// Allow negative times and 2 or 3 digits for the number of hours
-return ( check_reg_exp("^-*[0-9]\\{6,7\\}$", text) );
+// Allow negative times and 2 to 5 digits for the number of hours
+return ( check_reg_exp("^-*[0-9]\\{6,9\\}$", text) );
 
 }
 
@@ -654,8 +654,8 @@ bool is_hh(const char * text)
 
 {
 
-// Allow negative times and 1, 2, or 3 digits for the number of hours
-return ( check_reg_exp("^-*[0-9]\\{1,3\\}$", text) );
+// Allow negative times and 1 to 5 digits for the number of hours
+return ( check_reg_exp("^-*[0-9]\\{1,5\\}$", text) );
 
 }
 
