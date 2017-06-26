@@ -89,6 +89,7 @@ void GridStatConfInfo::clear() {
    obtype.clear();
    regrid_info.clear();
    desc.clear();
+   eclv_bin_size.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -277,6 +278,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       // Conf: desc
       desc.add(parse_conf_string(&i_odict, conf_key_desc));
 
+      // Conf: desc
+      eclv_bin_size.add(i_odict.lookup_double(conf_key_eclv_bin));
+
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
@@ -316,8 +320,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
             // Search for corresponding v wind
             for(int j=0; j<n_vx; j++) {
                if(fcst_info[j]->is_v_wind() && obs_info[j]->is_v_wind() &&
-                  fcst_info[i]->req_level_name() == fcst_info[j]->req_level_name() &&
-                  obs_info[i]->req_level_name()  == obs_info[j]->req_level_name()) {
+                  fcst_info[i]->req_level_name() ==
+                  fcst_info[j]->req_level_name() &&
+                  obs_info[i]->req_level_name()  ==
+                  obs_info[j]->req_level_name()) {
 
                   fcst_info[i]->set_uv_index(j);
                   obs_info[i]->set_uv_index(j);
@@ -332,8 +338,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
             // Search for corresponding u wind
             for(int j=0; j<n_vx; j++) {
                if(fcst_info[j]->is_u_wind() && obs_info[j]->is_u_wind() &&
-                  fcst_info[i]->req_level_name() == fcst_info[j]->req_level_name() &&
-                  obs_info[i]->req_level_name()  == obs_info[j]->req_level_name()) {
+                  fcst_info[i]->req_level_name() ==
+                  fcst_info[j]->req_level_name() &&
+                  obs_info[i]->req_level_name()  ==
+                  obs_info[j]->req_level_name()) {
 
                   fcst_info[i]->set_uv_index(j);
                   obs_info[i]->set_uv_index(j);
@@ -749,6 +757,19 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          //    Alphas
          n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
              get_n_ci_alpha();
+         break;
+
+      case(i_eclv):
+         // Maximum number of CTC -> ECLV lines possible =
+         //    Fields * Masks * Smoothing Methods * Max Thresholds
+         n = n_vx_scal * n_mask * n_interp * max_n_cat_thresh;
+
+         // Maximum number of PCT -> ECLV lines possible =
+         //    Probability Fields * Masks * Smoothing Methods *
+         //    Max Observation Probability Thresholds *
+         //    Max Forecast Probability Thresholds
+         n += n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
+              max_n_fprob_thresh;
          break;
 
       default:

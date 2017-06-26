@@ -73,8 +73,8 @@ static const char **txt_columns[n_txt] = {
    mctc_columns,   mcts_columns,   cnt_columns,
    sl1l2_columns,  sal1l2_columns, vl1l2_columns,
    val1l2_columns, pct_columns,    pstd_columns,
-   pjc_columns,    prc_columns,    nbrctc_columns,
-   nbrcts_columns, nbrcnt_columns
+   pjc_columns,    prc_columns,    eclv_columns,
+   nbrctc_columns,  nbrcts_columns, nbrcnt_columns
 };
 
 // Length of header columns
@@ -83,8 +83,8 @@ static const int n_txt_columns[n_txt] = {
    n_mctc_columns,   n_mcts_columns,   n_cnt_columns,
    n_sl1l2_columns,  n_sal1l2_columns, n_vl1l2_columns,
    n_val1l2_columns, n_pct_columns,    n_pstd_columns,
-   n_pjc_columns,    n_prc_columns,    n_nbrctc_columns,
-   n_nbrcts_columns, n_nbrcnt_columns
+   n_pjc_columns,    n_prc_columns,    n_eclv_columns,
+   n_nbrctc_columns, n_nbrcts_columns, n_nbrcnt_columns
 };
 
 // Text file abbreviations
@@ -93,8 +93,8 @@ static const char *txt_file_abbr[n_txt] = {
    "mctc",   "mcts",   "cnt",
    "sl1l2",  "sal1l2", "vl1l2",
    "val1l2", "pct",    "pstd",
-   "pjc",    "prc",    "nbrctc",
-   "nbrcts", "nbrcnt"
+   "pjc",    "prc",    "eclv",
+   "nbrctc", "nbrcts", "nbrcnt"
 };
 
 ////////////////////////////////////////////////////////////////////////

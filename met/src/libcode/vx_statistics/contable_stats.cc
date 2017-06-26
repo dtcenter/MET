@@ -301,17 +301,17 @@ double TTContingencyTable::bagss() const {
 
    lf = log((double) oy() / fn_oy());
    lw = sf_lambert_W0((double) oy() / fy_on() * lf);
-   
+
    if(is_bad_data(lw) || is_bad_data(lf) || is_eq(lf, 0.0)) {
       return(bad_data_double);
    }
    else {
       ha = (double) oy() - (fy_on() / lf) * lw;
    }
-   
+
    num = ha - (oy() * oy() / n());
    den = 2.0*oy() - ha - (oy() * oy() / n());
-   
+
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
@@ -430,10 +430,10 @@ double TTContingencyTable::lodds() const {
       v = bad_data_double;
    }
    else {
-      v = log((double) fy_oy()) + log((double) fn_on()) - 
+      v = log((double) fy_oy()) + log((double) fn_on()) -
           log((double) fy_on()) - log((double) fn_oy());
    }
-   
+
    return(v);
 }
 
@@ -461,7 +461,7 @@ double TTContingencyTable::lodds_ci(double alpha,
 
    v = lodds();
    s = slor2();
-   
+
    if(is_bad_data(v) || is_bad_data(s)) {
       cl = cu = bad_data_double;
       return(v);
@@ -471,7 +471,7 @@ double TTContingencyTable::lodds_ci(double alpha,
    // Compute the standard error
    //
    se = sqrt(s);
-   
+
    compute_normal_ci(v, alpha, se, cl, cu);
 
    return(v);
@@ -484,7 +484,7 @@ double TTContingencyTable::orss() const {
 
    num = fy_oy() * fn_on() - fy_on() * fn_oy();
    den = fy_oy() * fn_on() + fy_on() * fn_oy();
-   
+
    if(den == 0) v = bad_data_double;
    else         v = (double) num / den;
 
@@ -505,7 +505,7 @@ double TTContingencyTable::orss_ci(double alpha,
       cl = cu = bad_data_double;
       return(v);
    }
-   
+
    //
    // Compute the standard error
    //
@@ -527,9 +527,9 @@ double TTContingencyTable::orss_ci(double alpha,
 
 double TTContingencyTable::eds() const {
    double v, num, den;
-   
+
    if(fy_oy() == 0 || fy_oy() + fn_oy() == 0 || n() == 0) {
-      v = bad_data_double;  
+      v = bad_data_double;
    }
    else {
       num = log((double) (fy_oy() + fn_oy()) / n());
@@ -557,7 +557,7 @@ double TTContingencyTable::eds_ci(double alpha,
       cl = cu = bad_data_double;
       return(v);
    }
-   
+
    //
    // Compute the standard error
    //
@@ -566,7 +566,7 @@ double TTContingencyTable::eds_ci(double alpha,
         sqrt(h * (1 - h) / (b * n()));
 
    compute_normal_ci(v, alpha, se, cl, cu);
-   
+
    return(v);
 }
 
@@ -574,16 +574,16 @@ double TTContingencyTable::eds_ci(double alpha,
 
 double TTContingencyTable::seds() const {
    double v, num, den;
-   
+
    if(fy_oy()           == 0           || n()     == 0 ||
       fy_oy() + fn_oy() == 0 || fy_oy() + fy_on() == 0) {
-      v = bad_data_double;  
+      v = bad_data_double;
    }
    else {
       num = log((double) (fy_oy() + fy_on()) / n()) +
             log((double) (fy_oy() + fn_oy()) / n());
       den = log((double) fy_oy() / n());
-      
+
       if(is_eq(den, 0.0)) v = bad_data_double;
       else                v = num / den - 1.0;
    }
@@ -615,7 +615,7 @@ double TTContingencyTable::seds_ci(double alpha,
         (h * pow(log(h * b), 2.0)));
 
    compute_normal_ci(v, alpha, se, cl, cu);
-   
+
    return(v);
 }
 
@@ -656,7 +656,7 @@ double TTContingencyTable::edi_ci(double alpha,
       cl = cu = bad_data_double;
       return(v);
    }
-   
+
    //
    // Compute the standard error
    //
@@ -665,7 +665,7 @@ double TTContingencyTable::edi_ci(double alpha,
         sqrt(h * (1.0 - h) / (b * n()));
 
    compute_normal_ci(v, alpha, se, cl, cu);
-   
+
    return(v);
 }
 
@@ -709,7 +709,7 @@ double TTContingencyTable::sedi_ci(double alpha,
       cl = cu = bad_data_double;
       return(v);
    }
-   
+
    //
    // Compute the standard error
    //
@@ -723,6 +723,37 @@ double TTContingencyTable::sedi_ci(double alpha,
         sqrt(h * mh / (b * n()));
 
    compute_normal_ci(v, alpha, se, cl, cu);
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Cost/Loss Relative Value
+//  Reference: Eq. 8.75b, page 380 in Wilks, 3rd Ed. 2011
+//
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::cost_loss(double cl) const {
+   double num, den, h, m, f, b, v;
+
+   // Hit rate, miss rate, false alarm rate, and base rate
+   h = (double) fy_oy() / n();
+   m = (double) fn_oy() / n();
+   f = (double) fy_on() / n();
+   b = baser();
+
+   if(cl < b) {
+      num = (cl * (h + f - 1)) + m;
+      den =  cl * (b - 1);
+   }
+   else {
+      num = (cl * (h + f)) + m - b;
+      den =  b  * (cl - 1);
+   }
+
+   if(is_eq(den, 0.0)) v = bad_data_double;
+   else                v = num/den;
 
    return(v);
 }

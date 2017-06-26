@@ -235,7 +235,7 @@ class Nx2ContingencyTable : public ContingencyTable {
       double row_event_likelihood    (int row) const;
       double row_nonevent_likelihood (int row) const;
 
-      TTContingencyTable roc_point_by_row(int row) const;
+      TTContingencyTable ctc_by_row  (int row) const;
       double             roc_auc() const;
 
 };
@@ -397,7 +397,8 @@ class TTContingencyTable : public ContingencyTable {
       double edi        () const;
       double edi_ci     (double alpha, double &cl, double &cu) const;
       double sedi       () const;
-      double sedi_ci    (double alpha, double &cl, double &cu) const;      
+      double sedi_ci    (double alpha, double &cl, double &cu) const;
+      double cost_loss  (double) const;
 };
 
 

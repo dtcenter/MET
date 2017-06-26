@@ -92,6 +92,7 @@ void PointStatConfInfo::clear() {
    model.clear();
    regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
+   eclv_bin_size.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -107,7 +108,7 @@ void PointStatConfInfo::clear() {
    output_prefix.clear();
    version.clear();
    interp_shape = GridTemplateFactory::GridTemplate_None;
-   
+
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    // Deallocate memory
@@ -128,7 +129,7 @@ void PointStatConfInfo::clear() {
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataPoint *)  0; }
    if(dup_flgs.size() != 0)     { dup_flgs.clear(); }
    if(obs_smry.size() != 0)     { obs_smry.clear(); }
-   if(obs_percs.size() != 0)    { obs_percs.clear(); }   
+   if(obs_percs.size() != 0)    { obs_percs.clear(); }
 
    return;
 }
@@ -262,7 +263,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
       // Conf: obs_summary
       obs_smry[i] = parse_conf_obs_summary(&i_odict);
-     
+
       // Conf: obs_perc_value
       obs_percs[i] = parse_conf_percentile(&i_odict);
 
@@ -279,6 +280,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       // Conf: obs_qty
       obs_qty[i] = parse_conf_obs_qty(&i_odict);
       vx_pd[i].set_obs_qty_filt(obs_qty[i]);
+
+      // Conf: eclv_bin_size
+      eclv_bin_size.add(i_odict.lookup_double(conf_key_eclv_bin));
 
       // Set the current dictionaries
       vx_pd[i].fcst_info->set_dict(i_fdict);
@@ -340,37 +344,40 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
       for(i=0, n_vx_vect = 0; i<n_vx; i++) {
 
-	if( vx_pd[i].fcst_info->is_u_wind()   &&
-            vx_pd[i].obs_info->is_u_wind() ) {
-          for(int j=0; j < n_vx; j++) {
-            if(vx_pd[j].fcst_info->is_v_wind() &&
-               vx_pd[j].obs_info->is_v_wind()  &&
-	       vx_pd[i].fcst_info->req_level_name() == vx_pd[j].fcst_info->req_level_name() &&
-               vx_pd[i].obs_info->req_level_name()  == vx_pd[j].obs_info->req_level_name()) {
+         if( vx_pd[i].fcst_info->is_u_wind()   &&
+             vx_pd[i].obs_info->is_u_wind() ) {
+            for(int j=0; j < n_vx; j++) {
+               if(vx_pd[j].fcst_info->is_v_wind() &&
+                  vx_pd[j].obs_info->is_v_wind()  &&
+                  vx_pd[i].fcst_info->req_level_name() ==
+                  vx_pd[j].fcst_info->req_level_name() &&
+                  vx_pd[i].obs_info->req_level_name()  ==
+                  vx_pd[j].obs_info->req_level_name()) {
 
-	      vx_pd[i].fcst_info->set_uv_index(j);
-              vx_pd[i].obs_info->set_uv_index(j);
-              // Increment the number of vector fields to be verified
-              n_vx_vect++;
+                  vx_pd[i].fcst_info->set_uv_index(j);
+                  vx_pd[i].obs_info->set_uv_index(j);
 
+                  // Increment the number of vector fields to be verified
+                  n_vx_vect++;
+               }
             }
-	  }
-	}
+         }
 
-	if( vx_pd[i].fcst_info->is_v_wind()   &&
-            vx_pd[i].obs_info->is_v_wind() ) {
-          for(int j=0; j < n_vx; j++) {
-            if(vx_pd[j].fcst_info->is_u_wind() &&
-               vx_pd[j].obs_info->is_u_wind()  &&
-	       vx_pd[i].fcst_info->req_level_name() == vx_pd[j].fcst_info->req_level_name() &&
-               vx_pd[i].obs_info->req_level_name()  == vx_pd[j].obs_info->req_level_name()) {
+         if( vx_pd[i].fcst_info->is_v_wind()   &&
+             vx_pd[i].obs_info->is_v_wind() ) {
+            for(int j=0; j < n_vx; j++) {
+               if(vx_pd[j].fcst_info->is_u_wind() &&
+                  vx_pd[j].obs_info->is_u_wind()  &&
+                  vx_pd[i].fcst_info->req_level_name() ==
+                  vx_pd[j].fcst_info->req_level_name() &&
+                  vx_pd[i].obs_info->req_level_name()  ==
+                  vx_pd[j].obs_info->req_level_name()) {
 
-	      vx_pd[i].fcst_info->set_uv_index(j);
-              vx_pd[i].obs_info->set_uv_index(j);
-
+                  vx_pd[i].fcst_info->set_uv_index(j);
+                  vx_pd[i].obs_info->set_uv_index(j);
+               }
             }
-	  }
-	}
+         }
       } // end for
    } // end if
 
@@ -503,7 +510,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    n_interp      = interp_info.n_interp;
    interp_wdth   = interp_info.width;
    interp_shape  = interp_info.shape;
-   
+
    // Allocate memory to store the interpolation methods
    interp_mthd = new InterpMthd [n_interp];
    for(i=0; i<n_interp; i++)
@@ -622,7 +629,7 @@ void PointStatConfInfo::set_vx_pd() {
 
       // Add the interpolation methods to the vx_pd objects
       for(j=0; j<n_interp; j++)
-	      vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
+         vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
 
       vx_pd[i].set_duplicate_flag(dup_flgs[i]);
       vx_pd[i].set_obs_summary(obs_smry[i]);
@@ -718,7 +725,6 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_pct):
       case(i_pjc):
       case(i_prc):
-
          // Maximum number of PCT, PJC, or PRC lines possible =
          //    Probability Fields * Message Types * Masks * Smoothing Methods *
          //    Max Observation Probability Thresholds
@@ -736,7 +742,6 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       case(i_pstd):
-
          // Maximum number of PSTD lines possible =
          //    Probability Fields * Message Types * Masks * Smoothing Methods *
          //    Max Observation Probability Thresholds * Alphas
@@ -751,6 +756,22 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
                  max_n_cat_thresh * hira_info.width.n_elements() *
                  get_n_ci_alpha();
          }
+
+         break;
+
+      case(i_eclv):
+         // Maximum number of CTC -> ECLV lines possible =
+         //    Fields * Message Types * Masks * Smoothing Methods *
+         //    Max Thresholds
+         n = n_vx_scal * max_n_msg_typ * n_mask * n_interp *
+             max_n_cat_thresh;
+
+         // Maximum number of PCT -> ECLV lines possible =
+         //    Probability Fields * Message Types * Masks * Smoothing Methods *
+         //    Max Observation Probability Thresholds *
+         //    Max Forecast Probability Thresholds
+         n += n_vx_prob * max_n_msg_typ * n_mask * n_interp *
+              max_n_oprob_thresh * max_n_fprob_thresh;
 
          break;
 

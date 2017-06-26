@@ -42,8 +42,9 @@ static const int i_pct       = 10;
 static const int i_pstd      = 11;
 static const int i_pjc       = 12;
 static const int i_prc       = 13;
-static const int i_mpr       = 14;
-static const int n_txt       = 15;
+static const int i_eclv      = 14;
+static const int i_mpr       = 15;
+static const int n_txt       = 16;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -51,7 +52,8 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_mctc,   stat_mcts,   stat_cnt,
    stat_sl1l2,  stat_sal1l2, stat_vl1l2,
    stat_val1l2, stat_pct,    stat_pstd,
-   stat_pjc,    stat_prc,    stat_mpr
+   stat_pjc,    stat_prc,    stat_eclv,
+   stat_mpr
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -108,10 +110,12 @@ class PointStatConfInfo {
       StringArray *     sid_exc;            // Array of station ID's to exclude [n_vx]
       StringArray *     obs_qty;            // Array for quality flags [n_vx]
 
+      NumArray          eclv_bin_size;      // ECLV bin sizes [n_vx]
+
       vector<DuplicateType> dup_flgs;
       vector<ObsSummary> obs_smry;
       vector<int> obs_percs;
-      
+
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
       DataPlane *       mask_dp;            // Array for masking regions [n_mask_area]
@@ -126,7 +130,7 @@ class PointStatConfInfo {
 
       double            interp_thresh;      // Proportion of valid data values
       InterpMthd *      interp_mthd;        // Array for interpolation methods [n_interp]
-      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]      
+      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]
       GridTemplateFactory::GridTemplates interp_shape;  //Shape for interpolation
       HiRAInfo          hira_info;          // HiRA verification logic
 
