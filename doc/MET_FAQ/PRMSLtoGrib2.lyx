@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -176,45 +178,12 @@ DEBUG 1: Creating postscript file: prmsl.ps
 \end_layout
 
 \begin_layout Standard
-MET version 5.2 correctly finds PRMSL in record 414 ***and the resulting
- image is attached.*** Using either "L0" or "Z0" works.
+MET correctly finds PRMSL in record 414.
+ Using either "L0" or "Z0" works.
 \end_layout
 
 \begin_layout Standard
-The met_help history has an example that may be related to this example
- from Matt Sittel: 
-\begin_inset Flex URL
-status open
 
-\begin_layout Plain Layout
-
-http://mailman.ucar.edu/pipermail/met_help/2016-August/002638.html
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Please read through that message history.
- 
-\end_layout
-
-\begin_layout Standard
-========
-\end_layout
-
-\begin_layout Standard
-Subject: Grib2 PRMSL Level 
-\end_layout
-
-\begin_layout Standard
-From: John Halley Gotway 
-\end_layout
-
-\begin_layout Standard
-Time: Tue Feb 28 16:00:38 2017
 \end_layout
 
 \end_body

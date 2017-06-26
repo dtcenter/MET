@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -106,14 +108,20 @@ However, there is currently no "-mask_sid" option.
 \end_layout
 
 \begin_layout Standard
-With met-5.2, one option is to apply column string matching using the "-column_st
-r" option to define the list of station ID's you'd like to aggregate.
+With met-5.2 and later versions, one option is to apply column string matching
+ using the "-column_str" option to define the list of station ID's you'd
+ like to aggregate.
  That job would look something like this:
 \end_layout
 
 \begin_layout LyX-Code
-stat_analysis -lookin path/to/mpr/directory -job aggregate_stat -line_type
- MPR -out_line_type CNT 
+stat_analysis -lookin path/to/mpr/directory 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-job aggregate_stat -line_type MPR -out_line_type CNT 
 \backslash
  
 \end_layout
@@ -143,22 +151,6 @@ Where SID1...SIDN is a comma-separated list of the station id's in the group.
  output would say.
  Use "-set_hdr" to explicitly set the output value.
  
-\end_layout
-
-\begin_layout Standard
-=======
-\end_layout
-
-\begin_layout Standard
-Subject: SID Filters 
-\end_layout
-
-\begin_layout Standard
-From: John Halley Gotway 
-\end_layout
-
-\begin_layout Standard
-Time: Thu Feb 23 10:04:41 2017
 \end_layout
 
 \end_body

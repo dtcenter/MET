@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -90,9 +92,23 @@ In this example the RTMA file is named rtma.grb2 and the UPP file is named
 \end_layout
 
 \begin_layout LyX-Code
-met-5.2/bin/plot_data_plane wrf.grb wrf_wind.ps 'name"WIND"; level="Z10";'
- -v 3 met-5.2/bin/plot_data_plane rtma.grb2 rtma_wind.ps 'name"WIND"; level="Z10";'
- -v 3
+{MET_BASE}/bin/plot_data_plane wrf.grb wrf_wind.ps 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+'name"WIND"; level="Z10";' -v 3 
+\end_layout
+
+\begin_layout LyX-Code
+{MET_BASE}/bin/plot_data_plane rtma.grb2 rtma_wind.ps 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+'name"WIND"; level="Z10";' -v 3
 \end_layout
 
 \begin_layout Standard
@@ -100,8 +116,11 @@ In the first call, the log message should be similar to this:
 \end_layout
 
 \begin_layout LyX-Code
-DEBUG 3: MetGrib1DataFile::data_plane_array() -> Attempt to derive winds
- from U and V components.
+DEBUG 3: MetGrib1DataFile::data_plane_array() -> 
+\end_layout
+
+\begin_layout LyX-Code
+Attempt to derive winds from U and V components.
 \end_layout
 
 \begin_layout Standard
@@ -110,19 +129,7 @@ In the second one, this won't appear since wind speed already exists in
 \end_layout
 
 \begin_layout Standard
-=========
-\end_layout
 
-\begin_layout Standard
-Subject: question about file-format and wind speed calculation in MET 
-\end_layout
-
-\begin_layout Standard
-From: John Halley Gotway 
-\end_layout
-
-\begin_layout Standard
-Time: Mon Mar 20 15:31:26 2017
 \end_layout
 
 \end_body

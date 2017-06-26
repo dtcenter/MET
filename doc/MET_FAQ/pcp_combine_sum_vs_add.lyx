@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -79,7 +81,7 @@ To run a project faster, -pcprx is an option.
 \end_layout
 
 \begin_layout LyX-Code
-/scratch4/BMC/dtc/MET/met-5.1/bin/pcp_combine 
+{MET_BASE}/bin/pcp_combine 
 \backslash
 
 \end_layout
@@ -97,7 +99,7 @@ gfs_APCP_24_20160221_18_F00_F24.nc
 \end_layout
 
 \begin_layout LyX-Code
--pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp 
+-pcpdir /pre2016c3_corr 
 \backslash
 
 \end_layout
@@ -123,12 +125,37 @@ The "-add" command could be used instead of the
 \end_layout
 
 \begin_layout LyX-Code
-/scratch4/BMC/dtc/MET/met-5.1/bin/pcp_combine -add /scratch4/BMC/shout/ptmp/Andre
-w.Kren/pre2016c3_corr/temp/pgbq06.gfs.2016022118 06 /scratch4/BMC/shout/ptmp/Andrew.
-Kren/pre2016c3_corr/temp/pgbq12.gfs.2016022118 06 /scratch4/BMC/shout/ptmp/Andrew.K
-ren/pre2016c3_corr/temp/pgbq18.gfs.2016022118 06 /scratch4/BMC/shout/ptmp/Andrew.Kr
-en/pre2016c3_corr/temp/pgbq24.gfs.2016022118 06 gfs_APCP_24_20160221_18_F00_F24_AD
-D.nc
+{MET_BASE}/bin/pcp_combine -add 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+/pre2016c3_corr/pgbq06.gfs.2016022118 06 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+/pre2016c3_corr/pgbq12.gfs.2016022118 06 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+/pre2016c3_corr/pgbq18.gfs.2016022118 06 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+/pre2016c3_corr/pgbq24.gfs.2016022118 06 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+gfs_APCP_24_20160221_18_F00_F24_ADD.nc
 \end_layout
 
 \begin_layout Standard
@@ -138,19 +165,7 @@ The -sum and -add options both do the same thing...
 \end_layout
 
 \begin_layout Standard
-==========
-\end_layout
 
-\begin_layout Standard
-Subject: using pcp combine on GFS grib files 
-\end_layout
-
-\begin_layout Standard
-From: John Halley Gotway 
-\end_layout
-
-\begin_layout Standard
-Time: Mon Jan 30 15:19:01 2017
 \end_layout
 
 \end_body
