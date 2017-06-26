@@ -32,11 +32,15 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cat_thresh  = [ NA ];
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
+//
+// May be set separately in each "field" entry
+//
+cat_thresh    = [ NA ];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_bin_size = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -198,6 +202,7 @@ output_flag = {
    pstd   = BOTH;
    pjc    = BOTH;
    prc    = BOTH;
+   eclv   = BOTH;
    mpr    = BOTH;
 }
 

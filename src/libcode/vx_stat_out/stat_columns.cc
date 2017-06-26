@@ -341,7 +341,7 @@ void write_eclv_header_row(int hdr_flag, int n_bin, AsciiTable &at,
    at.set_entry(r, c+1, eclv_columns[1]);
    at.set_entry(r, c+2, eclv_columns[2]);
 
-   // Write COST_i and LOSS_i for each bin
+   // Write RATIO_i and VALUE_i for each bin
    for(i=0, col=c+3; i<n_bin; i++) {
 
       sprintf(tmp_str, "%s%i", eclv_columns[3], i+1);
@@ -1082,26 +1082,29 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_eclv_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
-                    bool txt_flag,
+void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
+                    double bin_size, bool txt_flag,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
    // ECLV line type
    shc.set_line_type(stat_eclv_str);
 
+   // Thresholds
+   shc.set_fcst_thresh(cts_info.fthresh);
+   shc.set_obs_thresh(cts_info.othresh);
+
    // Not Applicable
-   shc.set_fcst_thresh(na_str);
-   shc.set_obs_thresh(na_str);
    shc.set_thresh_logic(SetLogic_None);
-   shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
+   shc.set_cov_thresh(na_str);
 
    // Write the header columns
    write_header_cols(shc, stat_at, stat_row);
 
    // Write the data columns
-   write_eclv_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+   write_eclv_cols(cts_info.cts, bin_size,
+                   stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
    if(txt_flag) {
@@ -1113,6 +1116,54 @@ void write_eclv_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Increment the STAT row counter
    stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
+                    double bin_size, bool txt_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+   int i;
+
+   // ECLV line type
+   shc.set_line_type(stat_eclv_str);
+
+   // Set the threshold columns, if requested.
+   shc.set_obs_thresh(pct_info.othresh);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+
+   // Not Applicable
+   shc.set_alpha(bad_data_double);
+
+   // Write ECLV line for each PCT row
+   for(i=0; i<pct_info.pct.nrows(); i++) {
+
+      // Update the forecast threshold
+      shc.set_fcst_thresh(pct_info.fthresh[i]);
+
+      // Write the header columns
+      write_header_cols(shc, stat_at, stat_row);
+
+      // Write the data for the 2x2 contingency table for this row
+      write_eclv_cols(pct_info.pct.ctc_by_row(i), bin_size,
+                      stat_at, stat_row, n_header_columns);
+
+      // If requested, copy row to the text file
+      if(txt_flag) {
+         copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+         // Increment the text row counter
+         txt_row++;
+      }
+
+      // Increment the STAT row counter
+      stat_row++;
+
+   } // end for i
 
    return;
 }
@@ -2733,7 +2784,7 @@ void write_prc_cols(const PCTInfo &pct_info,
       //
       // Get the 2x2 contingency table for this row
       //
-      ct = pct_info.pct.roc_point_by_row(i);
+      ct = pct_info.pct.ctc_by_row(i);
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
@@ -2759,42 +2810,41 @@ void write_prc_cols(const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_eclv_cols(const PairDataEnsemble *pd_ptr,
+void write_eclv_cols(const TTContingencyTable &ct, double bin_size,
                      AsciiTable &at, int r, int c) {
+   int i, col, n_bin;
 
-/* TODO write the ECLV output line
-
-   int i, col;
+   // Exclude ratios of 0.0 and 1.0.
+   n_bin = ceil(1.0/bin_size) - 1;
 
    //
    // Economic Cost/Loss Value
    // Dump out the ECLV line:
    //    TOTAL,   BIN_SIZE, N_BIN,
-   //    [COST_], [LOSS_] (for each bin)
+   //    [RATIO_], [VALUE_] (for each bin)
    //
    at.set_entry(r, c+0,  // Total Number of pairs
-      pd_ptr->n_pair);
+      ct.n());
 
    at.set_entry(r, c+1,  // Bin size
-      pd_ptr->eclv_bin_size);
+      bin_size);
 
    at.set_entry(r, c+2,  // Number of bins
-      pd_ptr->eclv_cost_na.n_elements());
+      n_bin);
 
    //
-   // Write COST_i and LOSS_i count for each bin
+   // Write RATIO_i and VALUE_i count for each bin
    //
-   for(i=0, col=c+3; i<pd_ptr->eclv_cost_na.n_elements(); i++) {
+   for(i=1, col=c+3; i<=n_bin; i++) {
 
-      at.set_entry(r, col, // COST_i
-         pd_ptr->eclv_cost_na[i]);
+      at.set_entry(r, col, // RATIO_i
+         i*bin_size);
       col++;
 
-      at.set_entry(r, col, // LOSS_i
-         pd_ptr->eclv_loss_na[i]);
+      at.set_entry(r, col, // VALUE_i
+         ct.cost_loss(i*bin_size));
       col++;
    }
-*/
 
    return;
 }

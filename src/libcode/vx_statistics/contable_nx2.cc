@@ -773,7 +773,7 @@ return ( x );
 ////////////////////////////////////////////////////////////////////////
 
 
-TTContingencyTable Nx2ContingencyTable::roc_point_by_row(int row) const
+TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const
 
 {
 
@@ -781,7 +781,7 @@ TTContingencyTable tt;
 
 if ( (row < 0) || (row >= Nrows) )  {
 
-   mlog << Error << "\nNx2ContingencyTable::roc_point_by_row(int) const -> range check error\n\n";
+   mlog << Error << "\nNx2ContingencyTable::ctc_by_row(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -841,7 +841,7 @@ x_prev = y_prev = 1.0;
 for(j=0, area=bad_data_double; j<Nrows; ++j)  {
 
    // 2x2 Contingency Table for this row
-   ct = roc_point_by_row(j);
+   ct = ctc_by_row(j);
 
    // Retrieve the ROC point for this row
    x = ct.pofd();

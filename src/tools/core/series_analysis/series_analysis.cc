@@ -1894,7 +1894,7 @@ void store_stat_prc(int n, const ConcatString &col,
       }
 
       // Get the 2x2 contingency table for this row
-      ct = pct_info.pct.roc_point_by_row(i);
+      ct = pct_info.pct.ctc_by_row(i);
 
    }  // end if
 

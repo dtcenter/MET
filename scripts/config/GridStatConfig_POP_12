@@ -163,6 +163,7 @@ output_flag = {
    pstd   = BOTH;
    pjc    = BOTH;
    prc    = BOTH;
+   eclv   = BOTH;
    nbrctc = NONE;
    nbrcts = NONE;
    nbrcnt = NONE;

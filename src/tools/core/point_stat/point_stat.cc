@@ -78,7 +78,8 @@
 //   031    07/30/15  Halley Gotway  Add conditional continuous verification.
 //   032    09/11/15  Halley Gotway  Add climatology to config file.
 //   033    02/27/17  Halley Gotway  Add HiRA verification.
-//   034    05/15/17  Prestopnik P   Added shape for HiRA, interp and regrid
+//   034    05/15/17  Prestopnik P   Add shape for HiRA, interp and regrid.
+//   035    06/16/17  Halley Gotway  Add ECLV line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -303,7 +304,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat;
+   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv_bin;
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -316,8 +317,9 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = conf_info.get_max_n_fprob_thresh();
-   n_cat  = conf_info.get_max_n_cat_thresh() + 1;
+   n_prob     = conf_info.get_max_n_fprob_thresh();
+   n_cat      = conf_info.get_max_n_cat_thresh() + 1;
+   n_eclv_bin = ceil(1.0 / conf_info.eclv_bin_size.min()) - 1;
 
    // Check for HiRA output
    if(conf_info.hira_info.flag) {
@@ -398,6 +400,10 @@ void setup_txt_files() {
                max_col = get_n_prc_columns(n_prob) + n_header_columns + 1;
                break;
 
+            case(i_eclv):
+               max_col = get_n_eclv_columns(n_eclv_bin) + n_header_columns + 1;
+               break;
+
             default:
                max_col = n_txt_columns[i] + n_header_columns + 1;
                break;
@@ -428,6 +434,10 @@ void setup_txt_files() {
 
             case(i_prc):
                write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
+               break;
+
+            case(i_eclv):
+               write_eclv_header_row(1, n_eclv_bin, txt_at[i], 0, 0);
                break;
 
             default:
@@ -1105,9 +1115,10 @@ void process_scores() {
                // Compute CTS scores
                if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
                    conf_info.fcat_ta[i].n_elements() > 0   &&
-                  (conf_info.output_flag[i_fho] != STATOutputType_None ||
-                   conf_info.output_flag[i_ctc] != STATOutputType_None ||
-                   conf_info.output_flag[i_cts] != STATOutputType_None)) {
+                  (conf_info.output_flag[i_fho]  != STATOutputType_None ||
+                   conf_info.output_flag[i_ctc]  != STATOutputType_None ||
+                   conf_info.output_flag[i_cts]  != STATOutputType_None ||
+                   conf_info.output_flag[i_eclv] != STATOutputType_None)) {
 
                   // Initialize
                   for(m=0; m<n_cat; m++) cts_info[m].clear();
@@ -1142,6 +1153,14 @@ void process_scores() {
                            conf_info.output_flag[i_cts] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_cts], i_txt_row[i_cts]);
+                     }
+
+                     // Write out ECLV
+                     if(conf_info.output_flag[i_eclv] != STATOutputType_None) {
+                        write_eclv_row(shc, cts_info[m], conf_info.eclv_bin_size[i],
+                           conf_info.output_flag[i_eclv] == STATOutputType_Both,
+                           stat_at, i_stat_row,
+                           txt_at[i_eclv], i_txt_row[i_eclv]);
                      }
                   } // end for m
                } // end Compute CTS scores
@@ -1298,7 +1317,8 @@ void process_scores() {
                   (conf_info.output_flag[i_pct]  != STATOutputType_None ||
                    conf_info.output_flag[i_pstd] != STATOutputType_None ||
                    conf_info.output_flag[i_pjc]  != STATOutputType_None ||
-                   conf_info.output_flag[i_prc]  != STATOutputType_None)) {
+                   conf_info.output_flag[i_prc]  != STATOutputType_None ||
+                   conf_info.output_flag[i_eclv] != STATOutputType_None)) {
 
                   // Initialize
                   for(m=0; m<n_prob; m++) pct_info[m].clear();
@@ -1341,6 +1361,14 @@ void process_scores() {
                            conf_info.output_flag[i_prc] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_prc], i_txt_row[i_prc]);
+                     }
+
+                     // Write out ECLV
+                     if(conf_info.output_flag[i_eclv] != STATOutputType_None) {
+                        write_eclv_row(shc, pct_info[m], conf_info.eclv_bin_size[i],
+                           conf_info.output_flag[i_eclv] == STATOutputType_Both,
+                           stat_at, i_stat_row,
+                           txt_at[i_eclv], i_txt_row[i_eclv]);
                      }
                   } // end for m
                } // end Compute PCT

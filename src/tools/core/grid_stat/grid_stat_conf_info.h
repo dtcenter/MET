@@ -42,10 +42,11 @@ static const int i_pct    = 10;
 static const int i_pstd   = 11;
 static const int i_pjc    = 12;
 static const int i_prc    = 13;
-static const int i_nbrctc = 14;
-static const int i_nbrcts = 15;
-static const int i_nbrcnt = 16;
-static const int n_txt    = 17;
+static const int i_eclv   = 14;
+static const int i_nbrctc = 15;
+static const int i_nbrcts = 16;
+static const int i_nbrcnt = 17;
+static const int n_txt    = 18;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -53,8 +54,8 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_mctc,   stat_mcts,   stat_cnt,
    stat_sl1l2,  stat_sal1l2, stat_vl1l2,
    stat_val1l2, stat_pct,    stat_pstd,
-   stat_pjc,    stat_prc,    stat_nbrctc,
-   stat_nbrcts, stat_nbrcnt
+   stat_pjc,    stat_prc,    stat_eclv,
+   stat_nbrctc, stat_nbrcts, stat_nbrcnt
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,6 +140,8 @@ class GridStatConfInfo {
       ThreshArray *     fwind_ta;           // Array for fcst wind speed thresholds [n_vx]
       ThreshArray *     owind_ta;           // Array for obs wind speed thresholds [n_vx]
       SetLogic *        wind_logic;         // Array of wind speed field logic [n_vx]
+
+      NumArray          eclv_bin_size;      // ECLV bin sizes [n_vx]
 
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
