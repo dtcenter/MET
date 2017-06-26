@@ -13,11 +13,11 @@ GRID_STAT_EXEC = ${CORE_DIR}/grid_stat/grid_stat
    ##
    ##  grid_stat
    ##
-   ##     prerequisites:  pcp_combine
+   ##     prerequisites:  pcp_combine and gen_vx_mask
    ##
 
 
-grid_stat: ${GRID_STAT_EXEC} pcp_combine
+grid_stat: ${GRID_STAT_EXEC} pcp_combine gen_vx_mask
 	@ echo
 	@ echo "*** Running Grid-Stat on APCP using netCDF input for both forecast and observation ***"
 	${GRID_STAT_EXEC} \
