@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -91,22 +93,44 @@ Most of the hurricane track analysis and plotting is done using the plot_tcmpr.R
  Rscript.
  It makes a call to the tc_stat tool to the track data down to the desired
  subset, compute pairwise difference if needed, and then plot the result.
- By way of example, *** there is an attached a sample file containing a
- bunch of output from tc_pairs, along with the commands that could be used
- to compute a pairwise difference:***
+ 
 \end_layout
 
 \begin_layout LyX-Code
-cd met-5.2 wget ftp://ftp.rap.ucar.edu/incoming/irap/met_help/penny_data/tc_pairs_ou
-tput.tcst setenv MET_BUILD_BASE `pwd` Rscript scripts/Rscripts/plot_tcmpr.R
- -lookin tc_pairs_output.tcst -filter '-amodel AHWI,GFSI' -series AMODEL
- AHWI,GFSI,AHWI-GFSI -plot MEAN,BOXPLOT
+ setenv MET_BUILD_BASE `pwd` 
+\end_layout
+
+\begin_layout LyX-Code
+Rscript scripts/Rscripts/plot_tcmpr.R 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-lookin tc_pairs_output.tcst 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-filter '-amodel AHWI,GFSI' 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-series AMODEL AHWI,GFSI,AHWI-GFSI 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-plot MEAN,BOXPLOT
 \end_layout
 
 \begin_layout Standard
-***The resulting plots it created are attached.
- They include three series...
- one for AHWI, one for GFSI, and one for their pairwise difference.***
+The resulting plots include three series...
+ one for AHWI, one for GFSI, and one for their pairwise difference.
 \end_layout
 
 \begin_layout Standard
@@ -114,22 +138,6 @@ It's a bit cumbersome to understand all the options available, but this
  may be really useful.
  If nothing else, it could adapted to dump out the pairwise differences
  that are needed.
-\end_layout
-
-\begin_layout Standard
-========
-\end_layout
-
-\begin_layout Standard
-Subject: CI for MET-TC tc_stat 
-\end_layout
-
-\begin_layout Standard
-From: John Halley Gotway 
-\end_layout
-
-\begin_layout Standard
-Time: Fri Mar 03 17:49:53 2017
 \end_layout
 
 \end_body
