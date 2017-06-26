@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -171,9 +173,16 @@ Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
 
 \begin_layout Enumerate
 Define the mask by reading 6-hour precip from the mask file (fcst.grb) and
- looking for values > 0 (4) Apply intersection logic when combining the
- "input" value with the "mask" value (5) Name the output NetCDF variable
- as "FREEZING_PRECIP".
+ looking for values > 0 
+\end_layout
+
+\begin_layout Enumerate
+Apply intersection logic when combining the "input" value with the "mask"
+ value.
+\end_layout
+
+\begin_layout Enumerate
+Name the output NetCDF variable as "FREEZING_PRECIP".
  This is totally optional, but convenient.
 \end_layout
 
@@ -184,19 +193,7 @@ Script up multiple calls to gen_vx_mask to apply to complex masking logic...
 \end_layout
 
 \begin_layout Standard
-========
-\end_layout
 
-\begin_layout Standard
-Subject: Complex masking region in Grid-Stat 
-\end_layout
-
-\begin_layout Standard
-From: John Halley Gotway 
-\end_layout
-
-\begin_layout Standard
-Time: Mon Feb 27 13:23:38 2017 
 \end_layout
 
 \end_body

@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -80,11 +82,15 @@ This example starts with a 0.5 degree GFS and completes the following steps:
 \begin_layout Enumerate
 Use the regrid_data_plane tool to regrid 2m temperature to a smaller domain
  centered on China:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-met-5.2/bin/regrid_data_plane 
+{MET_BASE}/bin/regrid_data_plane 
 \backslash
  
 \end_layout
@@ -114,11 +120,15 @@ china_tmp_2m.nc
 \end_deeper
 \begin_layout Enumerate
 Run plot_data_plane to plot with the default map background:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-met-5.2/bin/plot_data_plane 
+{MET_BASE}/bin/plot_data_plane 
 \end_layout
 
 \begin_layout LyX-Code
@@ -134,11 +144,15 @@ china_tmp_2m.nc china_tmp_2m.ps
 \end_deeper
 \begin_layout Enumerate
 Re-run but pointing only to the admin_China_data:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-met-5.2/bin/plot_data_plane 
+{MET_BASE}/bin/plot_data_plane 
 \end_layout
 
 \begin_layout LyX-Code
@@ -160,7 +174,7 @@ map_data = { source = [
 \end_layout
 
 \begin_layout LyX-Code
-"MET_BASE/map/admin_by_country/admin_China_data"; 
+"{MET_BASE}/map/admin_by_country/admin_China_data"; 
 \end_layout
 
 \begin_layout LyX-Code
@@ -177,10 +191,6 @@ map_data = { source = [
 
 \end_deeper
 \begin_layout Standard
-***I've attached the resulting images.*** 
-\end_layout
-
-\begin_layout Standard
 An arbitrary number of map_data "file_name" entries can be listed.
  However, using "country_data" doesn't look very good with the "admin_China_data
 ".
@@ -193,22 +203,6 @@ To apply this to MODE runs, just cut-and-paste the "map_data" section listed
  file.
  Alternatively, update the default map data files in that ConfigMapData
  file.
-\end_layout
-
-\begin_layout Standard
-=======
-\end_layout
-
-\begin_layout Standard
-Subject: China map 
-\end_layout
-
-\begin_layout Standard
-From: John Halley Gotway 
-\end_layout
-
-\begin_layout Standard
-Time: Thu Feb 02 17:20:11 2017
 \end_layout
 
 \end_body
