@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -78,8 +80,15 @@ This example shows a problem with NetCDF in the make_install.log file:
 \end_layout
 
 \begin_layout LyX-Code
-/usr/bin/ld: warning: libnetcdf.so.11, needed by /home/zzheng25/metinstall//lib/li
-bnetcdf_c++4.so, may conflict with libnetcdf.so.7
+/usr/bin/ld: warning: libnetcdf.so.11, 
+\end_layout
+
+\begin_layout LyX-Code
+needed by /home/zzheng25/metinstall//lib/libnetcdf_c++4.so, 
+\end_layout
+
+\begin_layout LyX-Code
+may conflict with libnetcdf.so.7
 \end_layout
 
 \begin_layout Standard
@@ -104,27 +113,15 @@ MET_NETCDFLIB='/home/zzheng25/local/lib'
 Either MET_NETCDF *or* MET_NETCDFINC *and *MET_NETCDFLIB need to be set
 \series default
 .
- If the NetCDF include files are in /home/zzheng25/local/include and the
- NetCDF library files are in /home/zzheng25/local/lib, unset the MET_NETCDF
+ If the NetCDF include files are in /home/username/local/include and the
+ NetCDF library files are in /home/username/local/lib, unset the MET_NETCDF
  environment variable, then run "make clean", reconfigure, and then run
  "make install" and "make test" again.
  
 \end_layout
 
 \begin_layout Standard
-----------
-\end_layout
 
-\begin_layout Standard
-Subject: MET make failed 
-\end_layout
-
-\begin_layout Standard
-From: Julie Prestopnik 
-\end_layout
-
-\begin_layout Standard
-Time: Fri May 12 09:42:40 2017 
 \end_layout
 
 \end_body
