@@ -173,7 +173,7 @@ static bool dump_flag = false;
 static ConcatString dump_dir = ".";
 
 static bool do_all_vars     = false;
-static bool use_var_id      = true;
+static bool use_var_id      = false;
 static bool use_met_vars    = false;
 static bool find_valid_vars = false;
 static ConcatString bufr_target_variables;
