@@ -220,9 +220,20 @@ void PB2NCConfInfo::process_config() {
    // Convert strings to GRIB codes
    for(i=0; i<sa.n_elements(); i++) obs_grib_code.add(str_to_grib_code(sa[i]));
 
-   // Conf: bufr_var_name
-   sa = conf.lookup_string_array(conf_key_bufr_var_name);
+   // Conf: var_name
+   sa = conf.lookup_string_array(conf_key_obs_var, false);
    for(i=0; i<sa.n_elements(); i++) bufr_var_name.add(sa[i]);
+   
+   // Conf: use_var_id
+   bool cnf_use_var_id = conf.lookup_bool(conf_key_use_var_id, false);
+   if (cnf_use_var_id) {
+      mlog << Error << "\nPB2NCConfInfo::process_config() -> "
+           << "the \"" << conf_key_use_var_id
+           << "\" entry (" << cnf_use_var_id
+           << ") must be supported.\n\n";
+      exit(1);
+      
+   }
    
    // Conf: quality_mark_thresh
    quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);

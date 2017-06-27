@@ -294,8 +294,17 @@ void process_command_line(int argc, char **argv) {
    // Store the input ensemble file type
    etype = ens_mtddf->file_type();
 
+   bool use_var_id = false;     // Use a variable index from var_name instead of GRIB code
    // Determine the input observation file type
-   if(point_obs_flag)      otype = FileType_Gb1;
+   if(point_obs_flag) {
+      otype = FileType_Gb1;
+      if(point_obs_file_list.n_elements() > 0) {
+         ConcatString attr_name = nc_att_use_var_id;
+         if (!get_global_att(point_obs_file_list[0], attr_name, use_var_id)) {
+            use_var_id = false;
+         }
+      }
+   }
    else if(!grid_obs_flag) otype = FileType_None;
    else {
 
@@ -315,7 +324,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Process the configuration
-   conf_info.process_config(etype, otype, point_obs_flag);
+   conf_info.process_config(etype, otype, point_obs_flag, use_var_id);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.regrid_info, &(ens_mtddf->grid()),
@@ -845,10 +854,23 @@ void process_point_obs(int i_nc) {
    NcVar hdr_vld_var;
    NcVar hdr_arr_var;
 
+   int var_num = 0;
+   int var_name_len = 0;
+   bool use_var_id = false;
+   if (!get_global_att(obs_in, nc_att_use_var_id, use_var_id)) {
+      use_var_id = false;
+   }
+   
    // Read the dimensions
    strl_dim = get_nc_dim(obs_in, "mxstr");
    obs_dim  = get_nc_dim(obs_in, "nobs");
    hdr_dim  = get_nc_dim(obs_in, "nhdr");
+   if (use_var_id) {
+      NcDim var_dim    = get_nc_dim(obs_in,nc_dim_nvar);
+      NcDim vname_dim  = get_nc_dim(obs_in,nc_dim_name);
+      var_num       = get_dim_size(&var_dim);
+      var_name_len  = get_dim_size(&vname_dim);
+   }
 
    if(IS_INVALID_NC(strl_dim) ||
       IS_INVALID_NC(obs_dim)  ||
@@ -883,6 +905,28 @@ void process_point_obs(int i_nc) {
    if(IS_INVALID_NC(obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file.\n";
 
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { 1, 1 };
+   StringArray var_names;
+   char var_name[var_name_len+1];
+   strcpy(var_name, "");
+   if (use_var_id) {
+      lengths[1] = var_name_len;
+      NcVar name_var = get_nc_var(obs_in, nc_var_name);
+      for (int idx=0; idx<var_num; idx++) {
+         if(!get_nc_data(&name_var, var_name, lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "trouble getting var_name\n\n";
+            exit(1);
+         }
+         else {
+            var_names.add(var_name);
+         }
+         offsets[0]++;
+      }
+   }
+
+  
    int hdr_buf_size = GET_NC_SIZE(hdr_dim);
    int obs_count = GET_NC_SIZE(obs_dim);
    mlog << Debug(2) << "Searching " << (obs_count)
@@ -891,8 +935,6 @@ void process_point_obs(int i_nc) {
 
    int mxstr_len = GET_NC_SIZE(strl_dim);
    int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
-   long lengths[2] = { hdr_buf_size, mxstr_len };
-   long offsets[2] = { 0, 0 };
    float obs_arr_block[buf_size][obs_arr_len];
    char obs_qty_str_block[buf_size][mxstr_len];
 
@@ -907,7 +949,8 @@ void process_point_obs(int i_nc) {
    char hdr_sid_str_full[hdr_buf_size][mxstr_len];
    char hdr_vld_str_full[hdr_buf_size][mxstr_len];
 
-
+   offsets[0] = 0;
+   offsets[1] = 0;
    lengths[0] = hdr_buf_size;
    lengths[1] = mxstr_len;
 
@@ -1019,13 +1062,20 @@ void process_point_obs(int i_nc) {
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
 
+         if (use_var_id && obs_arr[1] < var_names.n_elements()) {
+            strcpy(var_name, var_names[obs_arr[1]]);
+         }
+         else {
+            strcpy(var_name, "");
+         }
+
          // Check each conf_info.vx_pd object to see if this observation
          // should be added
          for(j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the conf_info.vx_pd object
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                       hdr_ut, obs_qty_str, obs_arr, grid);
+                                       hdr_ut, obs_qty_str, obs_arr, grid, var_name);
          }
       }
    } // end for i_start

@@ -24,6 +24,8 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_log.h"
 
+extern bool use_var_id;
+
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class PointStatConfInfo
@@ -153,7 +155,7 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::process_config(GrdFileType ftype) {
+void PointStatConfInfo::process_config(GrdFileType ftype, bool use_var_id) {
    int i, n;
    ConcatString s;
    StringArray sa;
@@ -287,9 +289,10 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       // Set the current dictionaries
       vx_pd[i].fcst_info->set_dict(i_fdict);
       vx_pd[i].obs_info->set_dict(i_odict);
-
-      // Set the GRIB code for point observations
-      vx_pd[i].obs_info->add_grib_code(i_odict);
+      if (!use_var_id) {
+         // Set the GRIB code for point observations
+         vx_pd[i].obs_info->add_grib_code(i_odict);
+      }
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {

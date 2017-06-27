@@ -173,8 +173,8 @@ static bool dump_flag = false;
 static ConcatString dump_dir = ".";
 
 static bool do_all_vars     = false;
-static bool use_custom_vars = false;
-static bool use_met_code    = false;
+static bool use_var_id      = true;
+static bool use_met_vars    = false;
 static bool find_valid_vars = false;
 static ConcatString bufr_target_variables;
 
@@ -346,7 +346,7 @@ static void   set_dump_path(const StringArray &);
 static void   set_do_all_variables(const StringArray & a);
 static void   set_find_valid_vars(const StringArray &);
 static void   set_target_variables(const StringArray & a);
-static void   set_use_met_code(const StringArray &);
+static void   set_use_var_id(const StringArray &);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
@@ -498,7 +498,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_do_all_variables,  "-all",  0);
    cline.add(set_find_valid_vars,  "-index",  0);
    cline.add(set_target_variables, "-vars", 1);
-   cline.add(set_use_met_code, "-met_codes", 0);
+   cline.add(set_use_var_id, "-use_var_id", 0);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_compress,  "-compress",  1);
@@ -529,8 +529,8 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config();
 
-   if (!use_custom_vars && 0 < conf_info.bufr_var_name.n_elements()) {
-      use_custom_vars = true;
+   if (!use_met_vars && 0 < conf_info.bufr_var_name.n_elements()) {
+      use_met_vars = true;
       for (int idx=0; idx<conf_info.bufr_var_name.n_elements(); idx++) {
          if (0 < bufr_target_variables.length()) bufr_target_variables.add(" ");
          bufr_target_variables.add(conf_info.bufr_var_name[idx]);
@@ -732,28 +732,28 @@ void open_netcdf() {
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
    const char *attribute_str;
-   if (use_met_code) {
+   if (use_var_id) {
       attribute_str = "true";
    }
    else {
       attribute_str = "false";
    }
-   add_att(f_out, "use_met_code", attribute_str);
+   add_att(f_out, nc_att_use_var_id, attribute_str);
 
    // Add variable attributes
    add_att(&obs_qty_var, "long_name", "quality flag");
    add_att(&obs_arr_var, "long_name", "array of observation values");
    add_att(&obs_arr_var, "missing_value", fill_value);
    add_att(&obs_arr_var, "_FillValue", fill_value);
-   add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
    add_att(&obs_arr_var, "hdr_id_long_name", "index of matching header data");
-   if (use_met_code) {
-      attribute_str = "index of BUFR variable corresponding to the observation type";
+   if (use_var_id) {
+      add_att(&obs_arr_var, "columns", "hdr_id var_id lvl hgt ob");
+      add_att(&obs_arr_var, "var_id_long_name", "index of BUFR variable corresponding to the observation type");
    }
    else {
-      attribute_str = "grib code corresponding to the observation type";
+      add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
+      add_att(&obs_arr_var, "gc_long_name", "grib code corresponding to the observation type");
    }
-   add_att(&obs_arr_var, "gc_long_name", attribute_str);
    add_att(&obs_arr_var, "lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
    add_att(&obs_arr_var, "hgt_long_name", "height in meters above sea level (msl)");
    add_att(&obs_arr_var, "ob_long_name", "observation value");
@@ -1190,7 +1190,7 @@ void process_pbfile(int i_pb) {
             // corresponding grib code and store as the second element
             // of obs_arr
             grib_code = var_gc[kk];
-            if (use_met_code) {
+            if (use_var_id) {
                obs_arr[1] = (float) bufr_var_code[kk];
             }
             else {
@@ -1352,7 +1352,7 @@ void process_pbfile(int i_pb) {
                   continue;
       
                // Store the grib code to be derived
-               if (use_met_code) {
+               if (use_var_id) {
                   obs_arr[1] = (float)bufr_derive_code[i];
                }
                else {
@@ -1409,7 +1409,7 @@ void process_pbfile(int i_pb) {
          } // end for i
       } // end for lv
       
-      if (do_all_vars || use_custom_vars) {
+      if (do_all_vars || use_met_vars) {
          //quality_mark = 0;
          ConcatString quality_mark_str;
          //quality_mark_str.format("%d", nint(quality_mark));
@@ -1918,7 +1918,7 @@ void process_pbfile_metadata(int i_pb) {
             }
          }
              
-         if (use_custom_vars) {
+         if (use_met_vars) {
             StringArray taregt_vars = bufr_target_variables.split(",+");
             for (index=0; index<taregt_vars.n_elements(); index++) {
                if (!tableB_vars.has(taregt_vars[index])) {
@@ -2000,10 +2000,10 @@ void write_netcdf_hdr_data() {
    hdr_dim = add_dim(f_out, "nhdr", (long) hdr_typ_sa.n_elements());
 
    dim_count = bufr_obs_arr.n_elements();
-   bufr_var_dim  = add_dim(f_out, "nvar", (long)dim_count);
-   bufr_name_dim = add_dim(f_out, "bufr_name_len", (long) BUFR_NAME_LEN);
-   bufr_unit_dim = add_dim(f_out, "bufr_unit_len", (long) BUFR_UNIT_LEN);
-   bufr_desc_dim = add_dim(f_out, "bufr_desc_dim", (long) BUFR_DESCRIPTION_LEN);
+   bufr_var_dim  = add_dim(f_out, nc_dim_nvar, (long)dim_count);
+   bufr_name_dim = add_dim(f_out, nc_dim_name, (long)BUFR_NAME_LEN);
+   bufr_unit_dim = add_dim(f_out, nc_dim_unit, (long)BUFR_UNIT_LEN);
+   bufr_desc_dim = add_dim(f_out, nc_dim_desc, (long)BUFR_DESCRIPTION_LEN);
 
    
    int deflate_level = compress_level;
@@ -2015,9 +2015,9 @@ void write_netcdf_hdr_data() {
    hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  hdr_dim, strl_dim,    deflate_level);
    hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim, deflate_level);
 
-   bufr_var_var  = add_var(f_out, "var_names", ncChar, bufr_var_dim, bufr_name_dim, deflate_level);
-   bufr_unit_var = add_var(f_out, "var_units", ncChar, bufr_var_dim, bufr_unit_dim, deflate_level);
-   bufr_desc_var = add_var(f_out, "var_descs", ncChar, bufr_var_dim, bufr_desc_dim, deflate_level);
+   bufr_var_var  = add_var(f_out, nc_var_name, ncChar, bufr_var_dim, bufr_name_dim, deflate_level);
+   bufr_unit_var = add_var(f_out, nc_var_unit, ncChar, bufr_var_dim, bufr_unit_dim, deflate_level);
+   bufr_desc_var = add_var(f_out, nc_var_desc, ncChar, bufr_var_dim, bufr_desc_dim, deflate_level);
    
    add_att(&hdr_typ_var, "long_name", "message type");
    add_att(&hdr_sid_var, "long_name", "station identification");
@@ -2538,6 +2538,10 @@ void usage() {
         << "\t[-valid_beg time]\n"
         << "\t[-valid_end time]\n"
         << "\t[-nmsg n]\n"
+        << "\t[-all]\n"
+        << "\t[-index]\n"
+        << "\t[-use_var_id]\n"
+        << "\t[-vars var1,var2]\n"
         << "\t[-dump path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -2570,14 +2574,19 @@ void usage() {
         << "\"prepbufr_file\" should also be dumped to text files "
         << "in the directory specified (optional).\n"
 
+        << "\t\t\"-use_var_id\" indicates that the MET variable index "
+        << "is saved instead of the GRIB code (optional). This option will be "
+        << "automatically enabled if \"-all\" or \"-vars\" option is given.\n"
+
         << "\t\t\"-all\" indicates that all variables are extracted from"
-        << " \"prepbufr_file\".\n"
+        << " \"prepbufr_file\" (optional). Auotomatically enables -use_var_id.\n"
 
         << "\t\t\"-index\" indicates that the meta data (available variables and headers)"
-        << " is extracted from \"prepbufr_file\". No NetCDF outputs. \"-all\" is ignored.\n"
+        << " is extracted from \"prepbufr_file\" (optional). "
+        << "No NetCDF outputs. \"-all\" or \"-vars\" is ignored.\n"
 
         << "\t\t\"-vars variables\" indicates that the comma seperated variables"
-        << " to NetCDF outputs.\n"
+        << " to NetCDF outputs (optional). Auotomatically enables -use_var_id\n\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -2634,7 +2643,7 @@ void set_dump_path(const StringArray & a)
 void set_do_all_variables(const StringArray & a)
 {
    do_all_vars = true;
-   use_met_code = true;
+   use_var_id = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2659,16 +2668,16 @@ void set_logfile(const StringArray & a)
 
 void set_target_variables(const StringArray & a)
 {
-   use_custom_vars = true;
-   use_met_code = true;
+   use_var_id = true;
+   use_met_vars = true;
    bufr_target_variables.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_use_met_code(const StringArray & a)
+void set_use_var_id(const StringArray & a)
 {
-   use_met_code = true;
+   use_var_id = true;
 }
 
 ////////////////////////////////////////////////////////////////////////

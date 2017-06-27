@@ -59,6 +59,16 @@ typedef signed char ncbyte; // from ncvalues.h
 
 #define DEF_NC_BUFFER_SIZE          (64*1024)
 
+static const char nc_dim_nvar[]         = "var_num";
+static const char nc_dim_name[]         = "name_len";
+static const char nc_dim_unit[]         = "unit_len";
+static const char nc_dim_desc[]         = "desc_len";
+static const char nc_var_desc[]         = "var_desc";
+static const char nc_var_name[]         = "var_name";
+static const char nc_var_unit[]         = "var_unit";
+static const char nc_att_use_var_id[]   = "use_var_id";
+
+
 ////////////////////////////////////////////////////////////////////////
 
 //extern bool find_att(const NcFile *, const ConcatString &, NcGroupAtt &);
@@ -103,8 +113,11 @@ extern bool has_att(NcFile *, const char * name, bool exit_on_error = false);
 
 extern bool get_global_att(const NcGroupAtt *, ConcatString &);
 //extern bool get_global_att(const NcFile *, NcGroupAtt *, const char *, bool error_out = false);
+extern bool get_global_att(const char *, const ConcatString &, bool &);
+extern bool get_global_att(const char *, const ConcatString &, ConcatString &);
 extern bool get_global_att(const NcFile *, const ConcatString &, ConcatString &, bool error_out = false);
 extern bool get_global_att(const NcFile *, const char *, int &, bool error_out = false);
+extern bool get_global_att(const NcFile *, const char *, bool &, bool error_out = false);
 extern bool get_global_att(const NcFile *, const char *, float &, bool error_out = false);
 extern bool get_global_att(const NcFile *, const char *, double &, bool error_out = false);
 extern bool get_global_att_double(const NcFile *, const ConcatString &, double &, bool error_out = false);

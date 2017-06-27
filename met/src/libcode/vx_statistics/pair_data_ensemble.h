@@ -227,7 +227,7 @@ class VxPairDataEnsemble {
 
       void add_obs(float *, const char *, const char *, unixtime,
                    const char *, float *, Grid &,
-                   const DataPlane * = 0);
+                   const char * = 0, const DataPlane * = 0);
 
       void add_ens(int, bool mn);
 
