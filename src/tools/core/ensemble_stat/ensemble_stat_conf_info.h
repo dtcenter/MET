@@ -123,7 +123,7 @@ class EnsembleStatConfInfo {
       void clear();
 
       void read_config   (const char *, const char *);
-      void process_config(GrdFileType, GrdFileType, bool);
+      void process_config(GrdFileType, GrdFileType, bool, bool);
       void process_masks (const Grid &);
       void set_vx_pd     (const IntArray &);
 
