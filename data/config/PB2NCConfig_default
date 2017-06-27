@@ -79,9 +79,18 @@ obs_grib_code = [ "SPFH", "TMP", "HGT", "UGRD", "VGRD" ];
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// BUFR variable names to retain
+// Use MET variable index from "var_name" variable instead of GRIB code
 //
-bufr_var_name = [ ];
+use_var_id = false;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// MET variable names (for example, BUFR variable name) to retain or derive
+// instead of obs_grib_code.
+// If this is not empty, use_met_code will be set to true.
+//
+obs_var = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
