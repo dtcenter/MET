@@ -252,11 +252,17 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
+   bool use_var_id;     // Use a variable index from var_name instead of GRIB code
+   ConcatString attr_name = nc_att_use_var_id;
+   if (!get_global_att(obs_file[0], attr_name, use_var_id)) {
+      use_var_id = false;
+   }
+
    // Store the forecast file type
    ftype = fcst_mtddf->file_type();
 
    // Process the configuration
-   conf_info.process_config(ftype);
+   conf_info.process_config(ftype, use_var_id);
 
    // Set the model name
    shc.set_model(conf_info.model);
@@ -642,11 +648,24 @@ void process_obs_file(int i_nc) {
    NcVar hdr_sid_var ;
    NcVar hdr_vld_var ;
    NcVar hdr_arr_var ;
+   
+   int var_num = 0;
+   int var_name_len = 0;
+   bool use_var_id = false;
+   if (!get_global_att(obs_in, nc_att_use_var_id, use_var_id)) {
+      use_var_id = false;
+   }
 
    // Read the dimensions
    strl_dim = get_nc_dim(obs_in,"mxstr");
    obs_dim  = get_nc_dim(obs_in,"nobs");
    hdr_dim  = get_nc_dim(obs_in,"nhdr");
+   if (use_var_id) {
+      NcDim var_dim    = get_nc_dim(obs_in,nc_dim_nvar);
+      NcDim vname_dim  = get_nc_dim(obs_in,nc_dim_name);
+      var_num       = get_dim_size(&var_dim);
+      var_name_len  = get_dim_size(&vname_dim);
+   }
 
    if(IS_INVALID_NC(strl_dim) ||
       IS_INVALID_NC(obs_dim)  ||
@@ -665,6 +684,28 @@ void process_obs_file(int i_nc) {
    hdr_vld_var = get_nc_var(obs_in, "hdr_vld");
    hdr_arr_var = get_nc_var(obs_in, "hdr_arr");
    if (has_var(obs_in, "obs_qty")) obs_qty_var = get_nc_var(obs_in, "obs_qty");
+   
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { 1, 1 };
+
+   StringArray var_names;
+   char var_name[var_name_len+1];
+   strcpy(var_name, "");
+   if (use_var_id) {
+      lengths[1] = var_name_len;
+      NcVar name_var = get_nc_var(obs_in, nc_var_name);
+      for (int idx=0; idx<var_num; idx++) {
+         if(!get_nc_data(&name_var, var_name, lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "trouble getting var_name\n\n";
+            exit(1);
+         }
+         else {
+            var_names.add(var_name);
+         }
+         offsets[0]++;
+      }
+   }
 
    if(IS_INVALID_NC(obs_arr_var) ||
       IS_INVALID_NC(hdr_typ_var) ||
@@ -686,8 +727,8 @@ void process_obs_file(int i_nc) {
    int strl_len  = get_dim_size(&strl_dim);
    mlog << Debug(2)
         << "Searching " << obs_count
-           << " observations from " << hdr_count
-           << " messages.\n";
+        << " observations from " << hdr_count
+        << " messages.\n";
 
 
    int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
@@ -706,9 +747,8 @@ void process_obs_file(int i_nc) {
    char hdr_vld_str_block[hdr_buf_size][strl_len];
    float    hdr_arr_block[hdr_buf_size][hdr_arr_len];
 
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { 1, 1 };
-
+   offsets[0] = 0;
+   offsets[1] = 0;
    lengths[0] = 1;
    lengths[1] = strl_len;
 
@@ -719,7 +759,7 @@ void process_obs_file(int i_nc) {
       lengths[0] = hdr_buf_size;
       lengths[1] = strl_len;
       if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
-         mlog << Error << "\nmain() -> "
+         mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_typ\n\n";
          exit(1);
       }
@@ -728,7 +768,7 @@ void process_obs_file(int i_nc) {
       // Get the corresponding header station id
       //
       if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
-         mlog << Error << "\nmain() -> "
+         mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_sid\n\n";
          exit(1);
       }
@@ -737,7 +777,7 @@ void process_obs_file(int i_nc) {
       // Get the corresponding header valid time
       //
       if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
-         mlog << Error << "\nmain() -> "
+         mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_vld\n\n";
          exit(1);
       }
@@ -747,7 +787,7 @@ void process_obs_file(int i_nc) {
       //
       lengths[1] = hdr_arr_len;
       if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
-         mlog << Error << "\nmain() -> "
+         mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_arr\n\n";
          exit(1);
       }
@@ -955,6 +995,13 @@ void process_obs_file(int i_nc) {
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
 
+         if (use_var_id && obs_arr[1] < var_names.n_elements()) {
+            strcpy(var_name, var_names[obs_arr[1]]);
+         }
+         else {
+            strcpy(var_name, "");
+         }
+
          // Check each conf_info.vx_pd object to see if this observation
          // should be added
          for(j=0; j<conf_info.get_n_vx(); j++) {
@@ -964,7 +1011,7 @@ void process_obs_file(int i_nc) {
 
             // Attempt to add the observation to the conf_info.vx_pd object
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                       hdr_ut, obs_qty_str, obs_arr, grid);
+                                       hdr_ut, obs_qty_str, obs_arr, grid, var_name);
          }
       }
 

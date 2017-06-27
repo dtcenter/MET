@@ -193,7 +193,7 @@ class VxPairDataPoint {
                       int width, GridTemplateFactory::GridTemplates shape);
       
       void add_obs(float *, const char *, const char *, unixtime,
-                   const char *, float *, Grid &,
+                   const char *, float *, Grid &, const char * = 0,
                    const DataPlane * = 0);
 
       int  get_n_pair();

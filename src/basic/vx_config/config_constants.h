@@ -1,4 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2017
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -670,9 +671,9 @@ static const char conf_key_instrument_type[]       = "instrument_type";
 static const char conf_key_level_range[]           = "level_range";
 static const char conf_key_level_category[]        = "level_category";
 static const char conf_key_obs_grib_code[]         = "obs_grib_code";
-static const char conf_key_bufr_var_name[]         = "bufr_var_name";
 static const char conf_key_quality_mark_thresh[]   = "quality_mark_thresh";
 static const char conf_key_event_stack_flag[]      = "event_stack_flag";
+static const char conf_key_use_var_id[]            = "use_var_id";
 
 //
 // MODE-Analysis specific parameter key names

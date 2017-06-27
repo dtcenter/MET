@@ -480,6 +480,41 @@ bool get_global_att(const NcGroupAtt *att, ConcatString &att_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_global_att(const char *nc_name, const ConcatString &att_name,
+                    ConcatString &att_val) {
+   bool status = false;
+
+   // Initialize
+   att_val.clear();
+   
+   NcFile *nc = open_ncfile(nc_name);
+   if (0 != nc && !IS_INVALID_NC_P(nc)) {
+      status = get_global_att(nc, att_name, att_val, false);
+      delete nc;
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_global_att(const char *nc_name, const ConcatString &att_name,
+                    bool &att_val) {
+   bool status = false;
+   ConcatString att_value;
+
+   // Initialize
+   NcFile *nc = open_ncfile(nc_name);
+   if (0 != nc && !IS_INVALID_NC_P(nc)) {
+      status = get_global_att(nc, att_name, att_val, false);
+      delete nc;
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_global_att(const NcFile *nc, const ConcatString &att_name,
                     ConcatString &att_val, bool error_out) {
    bool status = false;
@@ -520,6 +555,33 @@ bool get_global_att(const NcFile *nc, const char *att_name,
 
    if(get_global_att(nc, att_name, att_value, error_out)) {
       att_val = atoi(att_value);
+      status = true;
+   }
+
+   // Check error_out status
+   if(error_out && !status) {
+      mlog << Error << "\nget_global_att(int) -> "
+           << "can't find global NetCDF attribute \"" << att_name
+           << "\".\n\n";
+      exit(1);
+   }
+
+   return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_global_att(const NcFile *nc, const char *att_name,
+                    bool &att_val, bool error_out) {
+   //NcGroupAtt att;
+   bool status = false;
+   ConcatString att_value;
+
+   // Initialize
+   att_val = false;
+   if(get_global_att(nc, att_name, att_value, error_out)) {
+      att_val = (0 == strcmp("true", att_value.text()))
+             || (0 == strcmp("yes", att_value.text()));
       status = true;
    }
 

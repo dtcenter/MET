@@ -149,7 +149,7 @@ void EnsembleStatConfInfo::read_config(const char *default_file_name,
 
 void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           GrdFileType otype,
-                                          bool point_vx) {
+                                          bool point_vx, bool use_var_id) {
    int i;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -366,7 +366,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          vx_pd[i].obs_info->set_dict(i_obs_dict);
 
          // Set the GRIB code for point observations
-         if(point_vx) vx_pd[i].obs_info->add_grib_code(i_obs_dict);
+         if(point_vx && !use_var_id) vx_pd[i].obs_info->add_grib_code(i_obs_dict);
 
          // Dump the contents of the current VarInfo
          if(mlog.verbosity_level() >= 5) {
