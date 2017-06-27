@@ -172,10 +172,10 @@ static int nmsg = -1;
 static bool dump_flag = false;
 static ConcatString dump_dir = ".";
 
-static bool do_all_vars     = false;
-static bool use_var_id      = false;
-static bool use_met_vars    = false;
-static bool find_valid_vars = false;
+static bool do_all_vars      = false;
+static bool use_var_id       = false;
+static bool use_met_vars     = false;
+static bool collect_metadata = false;
 static ConcatString bufr_target_variables;
 
 static ConcatString data_plane_filename;
@@ -344,12 +344,15 @@ static void   set_valid_end_time(const StringArray &);
 static void   set_nmsg(const StringArray &);
 static void   set_dump_path(const StringArray &);
 static void   set_do_all_variables(const StringArray & a);
-static void   set_find_valid_vars(const StringArray &);
+static void   set_collect_metadata(const StringArray &);
 static void   set_target_variables(const StringArray & a);
 static void   set_use_var_id(const StringArray &);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
+
+static void   display_bufr_variables(const StringArray &, const StringArray &,
+                                     const StringArray &, const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -366,43 +369,21 @@ int main(int argc, char *argv[]) {
    process_command_line(argc, argv);
 
    // Open the NetCDF file
-   if (!find_valid_vars) open_netcdf();
+   if (!collect_metadata) open_netcdf();
 
    // Process each PrepBufr file
    for(i=0; i<pbfile.n_elements(); i++) {
       process_pbfile_metadata(i);
-      if (!find_valid_vars) process_pbfile(i);
+      if (!collect_metadata) process_pbfile(i);
    }
    
-
    // Write the NetCDF file
-   if (!find_valid_vars) {
+   if (!collect_metadata) {
       write_netcdf_hdr_data();
    }
    else {
-      int index;
-      char description[BUFR_DESCRIPTION_LEN+1];
-      
-      printf("\n   %s\n", "Header variables:");
-      for(i=0; i<bufr_hdr_arr.n_elements(); i++) {
-         if (tableB_vars.has(bufr_hdr_arr[i], index)) {
-            strcpy(description, tableB_descs[index]);
-         }
-         else {
-             strcpy(description, "");
-         }
-         printf("   %8s: %s\n", bufr_hdr_arr[i], description);
-      }
-      printf("\n   %s\n", "Observation and header variables:");
-      for(i=0; i<bufr_obs_arr.n_elements(); i++) {
-         if (tableB_vars.has(bufr_obs_arr[i], index)) {
-            strcpy(description, tableB_descs[index]);
-         }
-         else {
-            strcpy(description, "");
-         }
-         printf("   %8s: %s\n", bufr_obs_arr[i], description);
-      }
+      display_bufr_variables(tableB_vars, tableB_descs,
+                             bufr_hdr_arr, bufr_obs_arr);
    }
 
    // Deallocate memory and clean up
@@ -496,7 +477,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_nmsg, "-nmsg", 1);
    cline.add(set_dump_path, "-dump", 1);
    cline.add(set_do_all_variables,  "-all",  0);
-   cline.add(set_find_valid_vars,  "-index",  0);
+   cline.add(set_collect_metadata,  "-index",  0);
    cline.add(set_target_variables, "-vars", 1);
    cline.add(set_use_var_id, "-use_var_id", 0);
    cline.add(set_logfile, "-log", 1);
@@ -1648,6 +1629,7 @@ void process_pbfile_metadata(int i_pb) {
 
    double   x, y;
 
+   bool check_all = do_all_vars || collect_metadata;
    unixtime file_ut = (unixtime) 0;
    char     time_str[max_str_len];
    char     hdr_typ[max_str_len];
@@ -1658,7 +1640,8 @@ void process_pbfile_metadata(int i_pb) {
    bufr_obs_arr.clear();
    
    // List the PrepBufr file being processed
-   mlog << Debug(1) << "Processing Bufr File (metadata):\t" << pbfile[i_pb] << "\n";
+   mlog << Debug(1) << "\nPre-processing Bufr File for metadata"
+                    << " (BUFR variable names) from " << pbfile[i_pb] << "\n";
 
    // Set the file name for the PrepBufr file
    file_name << pbfile[i_pb];
@@ -1667,7 +1650,7 @@ void process_pbfile_metadata(int i_pb) {
    blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
    blk_file = make_temp_file_name(blk_prefix, '\0');
 
-   mlog << Debug(1) << "Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
+   mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
 
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
@@ -1710,7 +1693,6 @@ void process_pbfile_metadata(int i_pb) {
    bool is_prepbufr = is_prepbufr_file(&event_names);
 
    //
-   
    StringArray headers;
    StringArray tmp_hdr_array;
    headers.add(prepbufr_hdrs);
@@ -1725,7 +1707,7 @@ void process_pbfile_metadata(int i_pb) {
    StringArray unchecked_var_list;
    ConcatString bufr_hdr_strings;
    for(i=0; i<tableB_vars.n_elements(); i++) {
-      if (!headers.has(tableB_vars[i]) && do_all_vars) {
+      if (!headers.has(tableB_vars[i]) && check_all) {
          unchecked_var_list.add(tableB_vars[i]);
       }
    }
@@ -1896,7 +1878,7 @@ void process_pbfile_metadata(int i_pb) {
             bufr_hdrs.add(hdr_name_str);
          }
          
-         if (!find_valid_vars) {
+         if (check_all) {
             for (index=0; index<bufr_hdr_arr.n_elements(); index++) {
                if (unchecked_var_list.has(bufr_hdr_arr[index], var_index)) {
                   unchecked_var_list.shift_down(var_index, 1);
@@ -1931,7 +1913,7 @@ void process_pbfile_metadata(int i_pb) {
                }
             }
          }
-         if (!do_all_vars) break;
+         if (!check_all) break;
       } // if (0 == i_read)
 
       if (0 == unchecked_var_list.n_elements()) break;
@@ -2525,6 +2507,39 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
 
 ////////////////////////////////////////////////////////////////////////
 
+void display_bufr_variables(const StringArray &all_vars, const StringArray &all_descs,
+                            const StringArray &hdr_arr, const StringArray &obs_arr) {
+   int i, index;
+   char description[BUFR_DESCRIPTION_LEN+1];
+   char line_buf[(BUFR_DESCRIPTION_LEN+1)*2];
+   
+   mlog << Debug(1) << "\n   Header variables:\n";
+   for(i=0; i<hdr_arr.n_elements(); i++) {
+      if (all_vars.has(hdr_arr[i], index)) {
+         strcpy(description, all_descs[index]);
+      }
+      else {
+         strcpy(description, "");
+      }
+      sprintf(line_buf, "   %8s: %s\n", hdr_arr[i], description);
+      mlog << Debug(1) << line_buf;
+   }
+   
+   mlog << Debug(1) << "\n   Observation variables:\n";
+   for(i=0; i<obs_arr.n_elements(); i++) {
+      if (all_vars.has(obs_arr[i], index)) {
+         strcpy(description, all_descs[index]);
+      }
+      else {
+         strcpy(description, "");
+      }
+      sprintf(line_buf, "   %8s: %s\n", obs_arr[i], description);
+      mlog << Debug(1) << line_buf;
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
@@ -2648,9 +2663,9 @@ void set_do_all_variables(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_find_valid_vars(const StringArray & a)
+void set_collect_metadata(const StringArray & a)
 {
-   find_valid_vars = true;
+   collect_metadata = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
