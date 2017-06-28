@@ -2794,22 +2794,50 @@ MAD is an estimate of spread, similar to standard error, but is less influenced
 \end_layout
 
 \begin_layout Subsubsection*
-Bias Adjusted Gilbert Skill Score
+Mean Squared Error Skill Score
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Called "BAGSS" in CNT output (Table 4-6)
+Called "MSESS" in CNT output (Table 4-6)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The Bias Adjusted Gilbert Skill Score (BAGSS) is the Gilbert Skill Score,
- but with the contingency table counts adjusted to eliminate as much bias
- in the forecast as possible.
- For details, see Brill and Messinger, 2009.
+The Mean Squared Error Skill Score is one minus the ratio of the forecast
+ MSE to some reference MSE, usually climatology.
+ It is sometimes referred to as Murphy's Mean Squared Error Skill Score.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\emph off
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{MSESS}=1-{{
+\backslash
+displaystyle{
+\backslash
+hbox{MSE}_f}}
+\backslash
+over{
+\backslash
+displaystyle{
+\backslash
+hbox{MSE}_r}}}$
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*
