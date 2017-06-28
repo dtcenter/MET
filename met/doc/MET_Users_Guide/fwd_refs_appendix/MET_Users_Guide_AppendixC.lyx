@@ -1876,6 +1876,111 @@ BAGSS is based on the GSS, but is corrected as much as possible for forecast
  
 \end_layout
 
+\begin_layout Subsubsection*
+Cost Loss Relative Value
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Called "CL" in CNT output (Table 4-5)
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The Cost Loss Relative Value applies a weighting to the contingency table
+ counts to determine the relative value of a forecast based on user-specific
+ information.
+ The cost is incurred to protect against an undesirable outcome, whether
+ that outcome occurs or not
+\series default
+.
+ No cost is incurred if no protection is undertaken.
+ Then, if the event occurs, the user sustains a loss.
+ If the event does not occur, there is neither a cost nor a loss.
+ The maximum forecast value is achieved when the cost/loss ratio equals
+ the climatological probability.
+ When this occurs, the CLRV is equal to the Hanssen and Kuipers discriminant.
+ The Cost Loss Relative Value is defined differently depending on whether
+ the cost / loss ratio is lower than the base rate or higher.
+ The CLRV is a function of the cost / loss ratio (cl), the hit rate (h),
+ the false alarm rate (f), the miss rate (m), and the base rate (b).
+ For cost / loss ratio below the base rate, the CLRV is defined as:
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$ 
+\backslash
+hbox{CLRV}={
+\end_layout
+
+\begin_layout Plain Layout
+
+{ (cl * (h + f - 1)) + m }
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+over {
+\end_layout
+
+\begin_layout Plain Layout
+
+cl * (b - 1) }}.$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For cost / loss ratio above the base rate, the CLRV is defined as:
+\begin_inset Newline newline
+\end_inset
+
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$$ 
+\backslash
+hbox{CLRV}={
+\end_layout
+
+\begin_layout Plain Layout
+
+{ (cl * (h + f)) + m - b }
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+over {
+\end_layout
+
+\begin_layout Plain Layout
+
+b * (cl - 1) }}.$$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 MET verification measures for continuous variables
 \begin_inset CommandInset label
