@@ -51,6 +51,18 @@ static int n_lr_end_wdth = sizeof(lr_end_wdth)/sizeof(*lr_end_wdth);
 static const int lr_grib_codes[] = {
    1, 7, 11, 17, 32, 31, 33, 34, 52, bad_data_int
 };
+static const string lr_grib_names[] = {
+   "PRES",      // 001	PRES	Pressure	Pa
+   "HGT",       // 007	HGT	Geopotential height	gpm
+   "TMP",       // 011	TMP	Temperature	K
+   "DPT",       // 017	DPT	Dewpoint temperature	K
+   "WIND",      // 032	WIND	Wind speed	m s-1
+   "WDIR",      // 031	WDIR	Wind direction	deg
+   "UGRD",      // 033	U GRD	u-component of wind	m s-1
+   "VGRD",      // 034	V GRD	v-component of wind	m s-1
+   "RH",        // 052	R H	Relative humidity	% 
+   "UNKNOWN"    // bad_data_int
+};
 
 // Little-R regular expression used to determine file type
 static const char *lr_rpt_reg_exp = "FM-[0-9]";
@@ -197,17 +209,19 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 			      na_str : data_line[19]);
       obs_qty.ws_strip();
 
+      // 002	PRMSL	Pressure reduced to MSL	Pa
       _addObservations(Observation(hdr_typ.text(),
-					  hdr_sid.text(),
-					  hdr_vld,
-					  hdr_lat,
-					  hdr_lon,
-					  hdr_elv,
-					  obs_qty.text(),
-					  2,
-					  bad_data_float,
-					  hdr_elv,
-					  atof(data_line[18])));
+                                   hdr_sid.text(),
+                                   hdr_vld,
+                                   hdr_lat,
+                                   hdr_lon,
+                                   hdr_elv,
+                                   obs_qty.text(),
+                                   2,
+                                   bad_data_float,
+                                   hdr_elv,
+                                   atof(data_line[18]),
+                                   "PRMSL"));
     }
 
     // Read the data lines
@@ -218,8 +232,8 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
       // Check for the end of report
 
       if (is_eq(atof(data_line[0]), lr_end_value) &&
-	  is_eq(atof(data_line[2]), lr_end_value))
-	break;
+	      is_eq(atof(data_line[2]), lr_end_value))
+        break;
 
       // Retrieve pressure and height
 
@@ -264,7 +278,8 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 					      hdr_lat, hdr_lon, hdr_elv,
 					      obs_qty.text(),
 					      lr_grib_codes[i/2],
-					      obs_prs, obs_hgt, obs_val));
+					      obs_prs, obs_hgt, obs_val,
+                          lr_grib_names[i/2]));
 	}
 
 	// Increment i to skip over the QC entry

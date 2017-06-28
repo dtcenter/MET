@@ -112,9 +112,9 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
       if (data_line.line_number() == 1 &&
           _nFileColumns == n_met_col)
       {
-	mlog << Warning << "\nFound deprecated 10 column input file format, "
-	     << "consider adding quality flag values to file: "
-	     << ascii_file.filename() << "\n\n";
+	    mlog << Warning << "\nFound deprecated 10 column input file format, "
+	         << "consider adding quality flag values to file: "
+	         << ascii_file.filename() << "\n\n";
       }
 
       // Store the header info
@@ -150,13 +150,32 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Save the observation info
 
+    int grib_code = atoi(data_line[6]);
+    for (int i=0; i<strlen(data_line[6]); i++) {
+      if( !isdigit(data_line[6][i]) )  {
+        int var_index;
+        use_var_id = true;
+        if (obs_names.has(data_line[6], var_index)) {
+           grib_code = var_index;
+        }
+        else {
+           obs_names.add(data_line[6]);
+           if (obs_names.has(data_line[6], var_index)) {
+              grib_code = var_index;
+           }
+        }
+        break;
+      }
+    }
+       
     _addObservations(Observation(hdr_typ.text(),
-					hdr_sid.text(),
-					hdr_vld,
-					hdr_lat, hdr_lon, hdr_elv,
-					obs_qty.text(),
-					atoi(data_line[6]),
-					obs_prs, obs_hgt, obs_val));
+                     hdr_sid.text(),
+                     hdr_vld,
+                     hdr_lat, hdr_lon, hdr_elv,
+                     obs_qty.text(),
+                     grib_code,
+                     obs_prs, obs_hgt, obs_val,
+                     data_line[6]));
   } // end while
 
   return true;

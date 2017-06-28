@@ -27,6 +27,7 @@ using namespace std;
 const string WwsisHandler::HEADER_TYPE = "WWSIS";
 
 const int WwsisHandler::GRIB_CODE = 0;
+const string GRIB_NAME = "WWSIS";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -199,13 +200,14 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
     // Add the observation
 
     _addObservations(Observation(HEADER_TYPE, "WWSIS",
-				 valid_time,
-				 _stationLat, _stationLon,
-				 0,
-				 na_str,
-				 GRIB_CODE,
-				 0.0, 0.0,
-				 atof(data_line[0])));
+                                 valid_time,
+                                 _stationLat, _stationLon,
+                                 0,
+                                 na_str,
+                                 GRIB_CODE,
+                                 0.0, 0.0,
+                                 atof(data_line[0]),
+                                 GRIB_NAME));
      
     // Increment the valid time
 
