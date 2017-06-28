@@ -734,7 +734,7 @@ double TTContingencyTable::sedi_ci(double alpha,
 //
 ////////////////////////////////////////////////////////////////////////
 
-double TTContingencyTable::cost_loss(double cl) const {
+double TTContingencyTable::cost_loss(double r) const {
    double num, den, h, m, f, b, v;
 
    // Hit rate, miss rate, false alarm rate, and base rate
@@ -743,13 +743,13 @@ double TTContingencyTable::cost_loss(double cl) const {
    f = (double) fy_on() / n();
    b = baser();
 
-   if(cl < b) {
-      num = (cl * (h + f - 1)) + m;
-      den =  cl * (b - 1);
+   if(r < b) {
+      num = (r * (h + f - 1)) + m;
+      den =  r * (b - 1);
    }
    else {
-      num = (cl * (h + f)) + m - b;
-      den =  b  * (cl - 1);
+      num = (r * (h + f)) + m - b;
+      den =  b  * (r - 1);
    }
 
    if(is_eq(den, 0.0)) v = bad_data_double;

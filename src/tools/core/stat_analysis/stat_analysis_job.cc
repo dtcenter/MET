@@ -32,6 +32,8 @@
 //   012    02/12/15  Halley Gotway   Write STAT output lines.
 //   013    03/30/15  Halley Gotway   Add ramp job type.
 //   014    06/09/17  Halley Gotway   Add aggregate RELP lines.
+//   015    06/28/17  Halley Gotway   Add aggregate_stat for CTC, PCT,
+//                    or MPR to ECLV lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -720,28 +722,29 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Valid combinations of input and output line types:
-   //    -line_type FHO,   CTC,    -out_line_type CTS
+   //    -line_type FHO,   CTC,    -out_line_type CTS, ECLV
    //    -line_type MCTC,          -out_line_type MCTS
    //    -line_type SL1L2, SAL1L2, -out_line_type CNT
    //    -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
-   //    -line_type PCT,           -out_line_type PSTD, PJC, PRC
+   //    -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
    //    -line_type NBRCTC,        -out_line_type NBRCTS
    //    -line_type MPR,           -out_line_type FHO, CTC, CTS,
    //                                             MCTC, MCTS, CNT,
    //                                             SL1L2, SAL1L2,
-   //                                             PCT, PSTD, PJC, PRC,
+   //                                             PCT, PSTD, PJC, PRC, ECLV,
    //                                             WDIR (wind direction)
    //    -line_type ORANK,         -out_line_type RHIST, PHIST, RELP, SSVAR
    //
 
    //
    // Sum up the contingency table type lines:
-   //    FHO, CTC -> CTS
+   //    FHO, CTC -> CTS, ECLV
    //    NBRCTC -> NBRCTS
    //
    if(((in_lt  == stat_fho ||
         in_lt  == stat_ctc) &&
-        out_lt == stat_cts) ||
+       (out_lt == stat_cts ||
+        out_lt == stat_eclv)) ||
       (in_lt   == stat_nbrctc &&
        out_lt  == stat_nbrcts)) {
       aggr_ctc_lines(f, j, ctc_map, n_in, n_out);
@@ -760,12 +763,13 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum up the Nx2 contingency table lines:
-   //    PCT -> PSTD, PJC, PRC
+   //    PCT -> PSTD, PJC, PRC, ECLV
    //
    else if(  in_lt == stat_pct &&
            (out_lt == stat_pstd ||
             out_lt == stat_pjc  ||
-            out_lt == stat_prc)) {
+            out_lt == stat_prc  ||
+            out_lt == stat_eclv)) {
       aggr_pct_lines(f, j, pct_map, n_in, n_out);
       write_job_aggr_pct(j, out_lt, pct_map, out_at);
    }
@@ -825,7 +829,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //
    // Read the matched pair lines:
    //    MPR -> FHO, CTC, CTS, MCTC, MCTS, CNT,
-   //           SL1L2, SAL1L2, PCT, PSTD, PJC, PRC
+   //           SL1L2, SAL1L2, PCT, PSTD, PJC, PRC, ECLV
    //
    else if(in_lt == stat_mpr &&
            (out_lt == stat_fho   || out_lt == stat_ctc    ||
@@ -833,22 +837,24 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             out_lt == stat_mcts  || out_lt == stat_cnt    ||
             out_lt == stat_sl1l2 || out_lt == stat_sal1l2 ||
             out_lt == stat_pct   || out_lt == stat_pstd   ||
-            out_lt == stat_pjc   || out_lt == stat_prc)) {
+            out_lt == stat_pjc   || out_lt == stat_prc    ||
+            out_lt == stat_eclv)) {
 
       //
       // Check output threshold values for 2x2 contingency table
       //
       if(out_lt == stat_fho ||
+         out_lt == stat_fho ||
          out_lt == stat_ctc ||
-         out_lt == stat_cts) {
+         out_lt == stat_eclv) {
 
          if(j.out_fcst_thresh.n_elements() != 1 ||
             j.out_obs_thresh.n_elements()  != 1) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
-                 << "when \"-out_line_type\" is set to FHO, CTC, or "
-                 << "CTS the \"-out_thresh\" option or \"-out_fcst_thresh\" "
-                 << "and \"-out_obs_thresh\" options must specify "
-                 << "exactly one threshold.\n\n";
+                 << "when \"-out_line_type\" is set to FHO, CTC, "
+                 << "CTS, or ECLV, the \"-out_thresh\" option or "
+                 << "\"-out_fcst_thresh\" and \"-out_obs_thresh\" "
+                 << "options must specify exactly one threshold.\n\n";
             throw(1);
          }
       }
@@ -1019,9 +1025,11 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
                         map<ConcatString, AggrCTCInfo> &m,
                         AsciiTable &at) {
    map<ConcatString, AggrCTCInfo>::iterator it;
-   int n_row, n_col, r, c;
+   int n_row, n_col, n_bin, r, c;
    NBRCTSInfo nbrcts_info;
    StatHdrColumns shc;
+
+   n_bin = ceil(1.0/j.out_bin_size) - 1;
 
    //
    // Setup the output table
@@ -1031,6 +1039,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    n_col += n_fho_columns;
    else if(lt == stat_ctc)    n_col += n_ctc_columns;
    else if(lt == stat_cts)    n_col += n_cts_columns;
+   else if(lt == stat_eclv)   n_col += get_n_eclv_columns(n_bin);
    else if(lt == stat_nbrctc) n_col += n_nbrctc_columns;
    else if(lt == stat_nbrcts) n_col += n_nbrcts_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
@@ -1042,13 +1051,14 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
+   else if(lt == stat_eclv)   write_eclv_header_row(        0, n_bin,               at, 0, c);
    else if(lt == stat_nbrctc) write_header_row(nbrctc_columns, n_nbrctc_columns, 0, at, 0, c);
    else if(lt == stat_nbrcts) write_header_row(nbrcts_columns, n_nbrcts_columns, 0, at, 0, c);
 
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(n_row, 0);
+   j.setup_stat_file(n_row, n_bin);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1115,6 +1125,15 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
          write_case_cols(it->first, at, r, c);
          write_cts_cols(it->second.cts_info, 0, at, r, c);
          if(j.stat_out) write_cts_cols(it->second.cts_info, 0, j.stat_at, r, n_header_columns);
+      }
+      //
+      // ECLV output line
+      //
+      else if(lt == stat_eclv) {
+         at.set_entry(r, c++, "ECLV:");
+         write_case_cols(it->first, at, r, c);
+         write_eclv_cols(it->second.cts_info.cts, j.out_bin_size, at, r, c);
+         if(j.stat_out) write_eclv_cols(it->second.cts_info.cts, j.out_bin_size, j.stat_at, r, n_header_columns);
       }
       //
       // NBRCTC output line
@@ -1268,8 +1287,10 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
                         map<ConcatString, AggrPCTInfo> &m,
                         AsciiTable &at) {
    map<ConcatString, AggrPCTInfo>::iterator it;
-   int n, n_row, n_col, r, c;
+   int n, n_row, n_col, n_bin, r, c, i;
    StatHdrColumns shc;
+
+   n_bin = ceil(1.0/j.out_bin_size) - 1;
 
    //
    // Determine the maximum PCT dimension
@@ -1281,12 +1302,14 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output table
    //
-   n_row = 1 + m.size();
+   if(lt == stat_eclv) n_row = 1 + m.size() * n;
+   else                n_row = 1 + m.size();
    n_col = 1 + j.column_case.n_elements();
         if(lt == stat_pct)  n_col += get_n_pct_columns(n);
    else if(lt == stat_pstd) n_col += get_n_pstd_columns(n);
    else if(lt == stat_pjc)  n_col += get_n_pjc_columns(n);
    else if(lt == stat_prc)  n_col += get_n_prc_columns(n);
+   else if(lt == stat_eclv) n_col += get_n_eclv_columns(n_bin);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
@@ -1297,11 +1320,13 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_pstd) write_pstd_header_row(0, n, at, 0, c);
    else if(lt == stat_pjc)  write_pjc_header_row (0, n, at, 0, c);
    else if(lt == stat_prc)  write_prc_header_row (0, n, at, 0, c);
+   else if(lt == stat_eclv) write_eclv_header_row(0, n_bin, at, 0, c);
 
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(n_row, n);
+   if(lt == stat_eclv) j.setup_stat_file(n_row, n_bin);
+   else                j.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1378,6 +1403,26 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
          write_prc_cols(it->second.pct_info, at, r, c);
          if(j.stat_out) write_prc_cols(it->second.pct_info, j.stat_at, r, n_header_columns);
       }
+      //
+      // ECLV output lines
+      //
+      else if(lt == stat_eclv) {
+         ThreshArray prob_ta = string_to_prob_thresh(shc.get_fcst_thresh_str());
+         for(i=0; i<it->second.pct_info.pct.nrows(); i++, r++) {
+            c = 0;
+            at.set_entry(r, c++, "ECLV:");
+            write_case_cols(it->first, at, r, c);
+            write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
+                            j.out_bin_size, at, r, c);
+            if(j.stat_out) {
+               shc.set_fcst_thresh(prob_ta[i]);
+               write_header_cols(shc, j.stat_at, r);
+               write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
+                               j.out_bin_size, j.stat_at, r, n_header_columns);
+            }
+         }
+      }
+
    } // end for it
 
    return;
@@ -2319,6 +2364,8 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    { n_col += n_fho_columns; }
    else if(lt == stat_ctc)    { n_col += n_ctc_columns; }
    else if(lt == stat_cts)    { n_col += n_cts_columns; }
+   else if(lt == stat_eclv)   { n      = ceil(1.0/j.out_bin_size) - 1;
+                                n_col += get_n_eclv_columns(n); }
    else if(lt == stat_mctc)   { n      = j.out_fcst_thresh.n_elements()+1;
                                 n_col += get_n_mctc_columns(n); }
    else if(lt == stat_mcts)   { n_col += n_mcts_columns; }
@@ -2342,6 +2389,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
+   else if(lt == stat_eclv)   write_eclv_header_row(0, n, at, 0, c);
    else if(lt == stat_mctc)   write_mctc_header_row(0, n, at, 0, c);
    else if(lt == stat_mcts)   write_header_row(mcts_columns,   n_mcts_columns,   0, at, 0, c);
    else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
@@ -2418,6 +2466,16 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
          write_case_cols(it->first, at, r, c);
          write_cts_cols(cts_info, 0, at, r, c);
          if(j.stat_out) write_cts_cols(cts_info, 0, j.stat_at, r, n_header_columns);
+      }
+      //
+      // ECLV output line
+      //
+      else if(lt == stat_eclv) {
+         mpr_to_ctc(j, it->second, cts_info);
+         at.set_entry(r, c++, "ECLV:");
+         write_case_cols(it->first, at, r, c);
+         write_eclv_cols(cts_info.cts, j.out_bin_size, at, r, c);
+         if(j.stat_out) write_eclv_cols(cts_info.cts, j.out_bin_size, j.stat_at, r, n_header_columns);
       }
       //
       // MCTC output line
