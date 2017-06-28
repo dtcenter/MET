@@ -1556,6 +1556,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_pstd:   c = get_n_pstd_columns(n);  break;
          case stat_pjc:    c = get_n_pjc_columns(n);   break;
          case stat_prc:    c = get_n_prc_columns(n);   break;
+         case stat_eclv:   c = get_n_eclv_columns(n);  break;
          case stat_mpr:    c = n_mpr_columns;          break;
          case stat_nbrctc: c = n_nbrctc_columns;       break;
          case stat_nbrcts: c = n_nbrcts_columns;       break;
@@ -1610,6 +1611,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       case stat_pstd:   write_pstd_header_row  (1, n,                                    stat_at, 0, 0); break;
       case stat_pjc:    write_pjc_header_row   (1, n,                                    stat_at, 0, 0); break;
       case stat_prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
+      case stat_eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
       case stat_mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
       case stat_nbrctc: write_header_row       (nbrctc_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
       case stat_nbrcts: write_header_row       (nbrcts_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
@@ -1753,6 +1755,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
             case(stat_pstd):
             case(stat_pjc):
             case(stat_prc):
+            case(stat_eclv):
             case(stat_rhist):
             case(stat_phist):
             case(stat_relp):
