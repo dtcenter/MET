@@ -27,10 +27,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 SummaryKey::SummaryKey(const string &header_type,
-		       const string &station_id,
-		       const double lat, const double lon, const double elev,
-		       const int grib_code,
-		       const double height, const double pressure_level) :
+                       const string &station_id,
+                       const double lat, const double lon, const double elev,
+                       const int grib_code,
+                       const double height, const double pressure_level,
+                       const string &var_name) :
   _headerType(header_type),
   _stationId(station_id),
   _latitude(lat),
@@ -38,7 +39,8 @@ SummaryKey::SummaryKey(const string &header_type,
   _elevation(elev),
   _gribCode(grib_code),
   _height(height),
-  _pressureLevel(pressure_level)
+  _pressureLevel(pressure_level),
+  _varName(var_name)
 {
 }
 

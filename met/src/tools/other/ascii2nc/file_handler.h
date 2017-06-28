@@ -124,6 +124,8 @@ protected:
   int   obs_data_offset;
   int   hdr_data_idx;
   int   hdr_data_offset;
+  bool  use_var_id;
+  StringArray obs_names;
 
   char   hdr_typ_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
   char   hdr_sid_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];

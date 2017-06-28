@@ -62,6 +62,7 @@ FileHandler::FileHandler(const string &program_name) :
   _gridMask(0),
   _polyMask(0),
   _sidMask(0),
+  use_var_id(false),
   deflate_level(DEF_DEFLATE_LEVEL),
   _dataSummarized(false)
 {
@@ -195,6 +196,33 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
   if (!_writeObservations())
     return false;
 
+  // Add variable names
+  if (use_var_id) {
+    int max_name_len = _MAX_STRING_LEN;
+    char var_name[max_name_len];
+    add_att(_ncFile, nc_att_use_var_id, "true");
+    NcDim var_dim  = add_dim(_ncFile, nc_dim_nvar, (long)obs_names.n_elements());
+    NcDim name_dim = add_dim(_ncFile, nc_dim_name, (long)max_name_len);
+    NcVar var_var_name  = add_var(_ncFile, nc_var_name, ncChar, var_dim, name_dim, deflate_level);
+    add_att(&var_var_name,  "long_name", "variable names from ASCII input");
+    
+    long offsets[2] = { 0, 0 };
+    long lengths[2] = { 1, max_name_len } ;
+    for(int i=0; i<obs_names.n_elements(); i++) {
+      for(int tIdx=0; tIdx<max_name_len; tIdx++) {
+        var_name[tIdx] = bad_data_char;
+      }
+      strcpy(var_name, obs_names[i]);
+
+      if(!put_nc_data(&var_var_name, (char *)var_name, lengths, offsets)) {
+         mlog << Error << "\nwriteNetcdfFile() -> "
+              << "error writing the variable name to the netCDF file\n\n";
+         exit(1);
+      }
+      offsets[0] += 1;
+    } // end for i
+  }
+  
   // Close the netCDF file.
 
   _closeNetcdf();
@@ -210,12 +238,14 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
 {
   // Save the summary information
+  const char *var_name = 0;
 
   _dataSummarized = true;
   _summaryInfo = summary_info;
 
   // Initialize the list of summary observations
 
+  StringArray summary_vnames;
   vector< Observation > summary_obs;
 
   // Sort the observations.  This will put them in chronological order, with
@@ -291,16 +321,22 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
                                curr_obs->getElevation(),
                                curr_obs->getGribCode(),
                                curr_obs->getHeight(),
-                               curr_obs->getPressureLevel());
+                               curr_obs->getPressureLevel(),
+                               curr_obs->getVarName());
 
+        // Collect variable names
+        var_name = curr_obs->getVarName().c_str();
+        if (0 < strlen(var_name) && !summary_vnames.has(var_name)) {
+          summary_vnames.add(var_name);
+        }
       // If this is a new key, create a new NumArray
 
-     if (summary_values.find(summary_key) == summary_values.end())
-         summary_values[summary_key] = new NumArray;
+        if (summary_values.find(summary_key) == summary_values.end())
+          summary_values[summary_key] = new NumArray;
 
-       // Add the observation to the correct summary
+      // Add the observation to the correct summary
 
-       summary_values[summary_key]->add(curr_obs->getValue());
+        summary_values[summary_key]->add(curr_obs->getValue());
       }
 
       // Move to the next obs
@@ -344,6 +380,7 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
                  << curr_values->first.getLatitude() << ", "
                  << curr_values->first.getLongitude() << ", "
                  << curr_values->first.getElevation() << ", "
+                 << curr_values->first.getVarName() << ", "
                  << curr_values->first.getGribCode() << "\n";
             continue;
           }
@@ -352,16 +389,17 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
         summary_obs.push_back(Observation(_getSummaryHeaderType(curr_values->first.getHeaderType(),
                                                                 calc->getType(),
                                                                 summary_info.width),
-                                                                curr_values->first.getStationId(),
-                                                                time_interval->getBaseTime(),
-                                                                curr_values->first.getLatitude(),
-                                                                curr_values->first.getLongitude(),
-                                                                curr_values->first.getElevation(),
-                                                                "",
-                                                                curr_values->first.getGribCode(),
-                                                                curr_values->first.getPressureLevel(),
-                                                                curr_values->first.getHeight(),
-                                                                calc->calcSummary(*curr_values->second)));
+                                          curr_values->first.getStationId(),
+                                          time_interval->getBaseTime(),
+                                          curr_values->first.getLatitude(),
+                                          curr_values->first.getLongitude(),
+                                          curr_values->first.getElevation(),
+                                          "",
+                                          curr_values->first.getGribCode(),
+                                          curr_values->first.getPressureLevel(),
+                                          curr_values->first.getHeight(),
+                                          calc->calcSummary(*curr_values->second),
+                                          curr_values->first.getVarName()));
 
       } /* endfor - calc */
 
@@ -378,6 +416,9 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
   // Replace the observations vector with the summary observations
 
   _observations = summary_obs;
+  for (int idx=0; idx<summary_vnames.n_elements(); idx++) {
+    if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
+  }
 
   // Reclaim memory
 
@@ -657,9 +698,15 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    add_att(&_obsArrayVar, "long_name", "array of observation values");
    add_att(&_obsArrayVar, "missing_value", FILL_VALUE);
    add_att(&_obsArrayVar, "_FillValue", FILL_VALUE);
-   add_att(&_obsArrayVar, "columns", "hdr_id gc lvl hgt ob");
    add_att(&_obsArrayVar, "hdr_id_long_name", "index of matching header data");
-   add_att(&_obsArrayVar, "gc_long_name", "grib code corresponding to the observation type");
+   if (use_var_id) {
+      add_att(&_obsArrayVar, "columns", "hdr_id var_id lvl hgt ob");
+      add_att(&_obsArrayVar, "var_id_long_name", "index of variable names at var_name");
+   }
+   else {
+      add_att(&_obsArrayVar, "columns", "hdr_id gc lvl hgt ob");
+      add_att(&_obsArrayVar, "gc_long_name", "grib code corresponding to the observation type");
+   }
    add_att(&_obsArrayVar, "lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
    add_att(&_obsArrayVar, "hgt_long_name", "height in meters above sea level or ground level (msl or agl)");
    add_att(&_obsArrayVar, "ob_long_name", "observation value");
@@ -896,14 +943,20 @@ bool FileHandler::_addObservations(const Observation &obs)
    }
 
    _observations.push_back(obs);
+   
+   const char *var_name = obs.getVarName().c_str();
+   if (0 < strlen(var_name) && !obs_names.has(var_name)) {
+      obs_names.add(var_name);
+   }
 
-  return true;
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool FileHandler::_writeObservations()
 {
+  int grib_code;
   string prev_header_type = "";
   string prev_station_id = "";
   time_t prev_valid_time = 0;

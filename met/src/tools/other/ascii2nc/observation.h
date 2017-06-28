@@ -31,20 +31,22 @@ class Observation
 public:
 
   Observation(const string &header_type, const string &station_id,
-	      const time_t valid_time,
-	      const double latitude, const double longitude,
-	      const double elevation,
-	      const string &quality_flag,
-	      const int grib_code, const double pressure_level_hpa,
-	      const double height_m, const double value);
+              const time_t valid_time,
+              const double latitude, const double longitude,
+              const double elevation,
+              const string &quality_flag,
+              const int grib_code, const double pressure_level_hpa,
+              const double height_m, const double value,
+              const string &var_name = "");
   
   Observation(const string &header_type, const string &station_id,
-	      const time_t start_time, const time_t end_time,
-	      const double latitude, const double longitude,
-	      const double elevation,
-	      const string &quality_flag,
-	      const int grib_code, const double pressure_level_hpa,
-	      const double height_m, const double value);
+              const time_t start_time, const time_t end_time,
+              const double latitude, const double longitude,
+              const double elevation,
+              const string &quality_flag,
+              const int grib_code, const double pressure_level_hpa,
+              const double height_m, const double value,
+              const string &var_name = "");
   
   virtual ~Observation();
 
@@ -113,6 +115,11 @@ public:
     return _value;
   }
   
+  string getVarName() const
+  {
+    return _varName;
+  }
+  
   ///////////////
   // Operators //
   ///////////////
@@ -134,6 +141,9 @@ public:
     if (_stationId != other._stationId)
       return _stationId < other._stationId;
     
+    if (_varName != other._varName)
+      return _varName < other._varName;
+    
     // Final sort on grib code
 
     return _gribCode < other._gribCode;
@@ -147,6 +157,7 @@ protected:
 
   string _headerType;
   string _stationId;
+  string _varName;
   time_t _validTime;
   double _latitude;
   double _longitude;

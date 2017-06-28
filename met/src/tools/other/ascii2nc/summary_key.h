@@ -28,10 +28,11 @@ class SummaryKey
 public:
 
   SummaryKey(const string &header_type,
-	     const string &station_id,
-	     const double lat, const double lon, const double elev,
-	     const int grib_code,
-	     const double height_m, const double pressure_level);
+             const string &station_id,
+             const double lat, const double lon, const double elev,
+             const int grib_code,
+             const double height_m, const double pressure_level,
+             const string &var_name = "");
   
   virtual ~SummaryKey();
 
@@ -80,6 +81,11 @@ public:
     return _pressureLevel;
   }
 
+  string getVarName() const
+  {
+    return _varName;
+  }
+  
   ///////////////
   // Operators //
   ///////////////
@@ -122,6 +128,10 @@ public:
 
     if (_pressureLevel != other._pressureLevel)
       return _pressureLevel < other._pressureLevel;
+
+    // Var name
+    if (_varName != other._varName)
+      return _varName < other._varName;
     
     // Grib code
 
@@ -136,6 +146,7 @@ protected:
 
   string _headerType;
   string _stationId;
+  string _varName;
   double _latitude;
   double _longitude;
   double _elevation;

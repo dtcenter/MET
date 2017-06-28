@@ -36,6 +36,8 @@ const int AeronetHandler::NUM_OBS_COLS = 45;
 const string AeronetHandler::HEADER_TYPE = "";  /////
 
 const int AeronetHandler::AOT_GRIB_CODE = 129;
+const string AOT_NAME = "AOT";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -214,14 +216,15 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 
 	if(strcmp(data_line[k], AERONET_NA_STR) == 0) continue;
 
-	_addObservations(Observation(header_type, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 na_str,
-					 AOT_GRIB_CODE,
-					 dlevel, dheight,
-					 atof(data_line[k])));
+    _addObservations(Observation(header_type, _stationId,
+                                 valid_time,
+                                 _stationLat, _stationLon,
+                                 _stationAlt,
+                                 na_str,
+                                 AOT_GRIB_CODE,
+                                 dlevel, dheight,
+                                 atof(data_line[k]),
+                                 AOT_NAME));
       }
     }
   } // end while

@@ -49,7 +49,29 @@ const int SurfradHandler::RH_GRIB_CODE = 52;
 const int SurfradHandler::WINDSPD_GRIB_CODE = 32;
 const int SurfradHandler::WINDDIR_GRIB_CODE = 31;
 const int SurfradHandler::PRESSURE_GRIB_CODE = 1;
+const string DW_PSP_NAME       = "DW_PSP";
+const string UW_PSP_NAME       = "UW_PSP";
+const string DIRECT_NAME       = "DIRECT";
+const string DIFFUSE_NAME      = "DIFFUSE";
+const string DW_PIR_NAME       = "DW_PIR";
+const string DW_CASETEMP_NAME  = "DW_CASETEMP";
+const string DW_DOMETEMP_NAME  = "DW_DOMETEMP";
+const string UW_PIR_NAME       = "UW_PIR_GRIB";
+const string UW_CASETEMP_NAME  = "UW_CASETEMP";
+const string UW_DOMETEMP_NAME  = "UW_DOMETEMP";
+const string UVB_NAME          = "UVB";
+const string PAR_NAME          = "PAR";
+const string NETSOLAR_NAME     = "NETSOLAR";
+const string NETIR_NAME        = "NETIR";
+const string TOTALNET_NAME     = "TOTALNET";
+const string TEMP_NAME         = "TMP";
+const string RH_NAME           = "RH;";
+const string WINDSPD_NAME      = "WSPD";
+const string WINDDIR_NAME      = "WDIR";
+const string PRESSURE_NAME     = "PRES";
 
+
+  
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -144,9 +166,9 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      if (data_line.n_items() != NUM_OBS_COLS)
      {
        mlog << Error << "\nSurfradHandler::_readObservations() -> "
-	    << "line number " << data_line.line_number()
-	    << " does not have the correct number of columns  ("
-	    << NUM_OBS_COLS << ").\n\n";
+            << "line number " << data_line.line_number()
+            << " does not have the correct number of columns  ("
+            << NUM_OBS_COLS << ").\n\n";
        return false;
      }
 
@@ -165,222 +187,242 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
      // downwelling global solar (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[9],
-					 DW_PSP_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[8])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[9],
+                                  DW_PSP_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[8]),
+                                  DW_PSP_NAME));
      
      // upwelling global solar (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[11],
-					 UW_PSP_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[10])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[11],
+                                  UW_PSP_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[10]),
+                                  UW_PSP_NAME));
      
      // direct solar (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[13],
-					 DIRECT_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[12])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[13],
+                                  DIRECT_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[12]),
+                                  DIRECT_NAME));
      
      // downwelling diffuse solar (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[15],
-					 DIFFUSE_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[14])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[15],
+                                  DIFFUSE_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[14]),
+                                  DIFFUSE_NAME));
      
      // downwelling thermal infrared (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[17],
-					 DW_PIR_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[16])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[17],
+                                  DW_PIR_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[16]),
+                                  DW_PIR_NAME));
      
      // downwelling PIR case temp (K)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[19],
-					 DW_CASETEMP_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 _tempKtoC(atof(data_line[18]))));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[19],
+                                  DW_CASETEMP_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  _tempKtoC(atof(data_line[18])),
+                                  DW_CASETEMP_NAME));
      
      // downwelling PIR dome temp (K)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[21],
-					 DW_DOMETEMP_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 _tempKtoC(atof(data_line[20]))));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[21],
+                                  DW_DOMETEMP_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  _tempKtoC(atof(data_line[20])),
+                                  DW_DOMETEMP_NAME));
      
      // upwelling thermal infrared (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[23],
-					 UW_PIR_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[22])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[23],
+                                  UW_PIR_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[22]),
+                                  UW_PIR_NAME));
      
      // upwelling PIR case temp (K)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[25],
-					 UW_CASETEMP_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 _tempKtoC(atof(data_line[24]))));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[25],
+                                  UW_CASETEMP_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  _tempKtoC(atof(data_line[24])),
+                                  UW_CASETEMP_NAME));
      
      // upwelling PIR dome temp (K)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[27],
-					 UW_DOMETEMP_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 _tempKtoC(atof(data_line[26]))));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[27],
+                                  UW_DOMETEMP_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  _tempKtoC(atof(data_line[26])),
+                                  UW_DOMETEMP_NAME));
      
      // global UVB (milliWatts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[29],
-					 UVB_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[28])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[29],
+                                  UVB_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[28]),
+                                  UVB_NAME));
      
      // photosynthetically active radiation (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[31],
-					 PAR_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[30])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[31],
+                                  PAR_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[30]),
+                                  PAR_NAME));
      
      // net solar (dw_psp - uw_psp) (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[33],
-					 NETSOLAR_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[32])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[33],
+                                  NETSOLAR_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[32]),
+                                  NETSOLAR_NAME));
      
      // net infrared (dw_pir - uw_pir) (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[35],
-					 NETIR_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[34])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[35],
+                                  NETIR_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[34]),
+                                  NETIR_NAME));
      
      // net radiation (netsolar + netir) (Watts m^-2)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[37],
-					 TOTALNET_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[36])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[37],
+                                  TOTALNET_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[36]),
+                                  TOTALNET_NAME));
      
      // 10-meter air temperature (C)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[39],
-					 TEMP_GRIB_CODE,
-					 bad_data_double, 10.0,
-					 atof(data_line[38])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[39],
+                                  TEMP_GRIB_CODE,
+                                  bad_data_double, 10.0,
+                                  atof(data_line[38]),
+                                  TEMP_NAME));
      
      // relative humidity (%)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[41],
-					 RH_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[40])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[41],
+                                  RH_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[40]),
+                                  RH_NAME));
      
      // wind speed (ms^-1)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[43],
-					 WINDSPD_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[42])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[43],
+                                  WINDSPD_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[42]),
+                                  WINDSPD_NAME));
      
      // wind direction (degrees, clockwise from north)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[45],
-					 WINDDIR_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 atof(data_line[44])));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[45],
+                                  WINDDIR_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  atof(data_line[44]),
+                                  WINDDIR_NAME));
      
      // station pressure (mb)
 
      _addObservations(Observation(HEADER_TYPE, _stationId,
-					 valid_time,
-					 _stationLat, _stationLon,
-					 _stationAlt,
-					 data_line[47],
-					 PRESSURE_GRIB_CODE,
-					 bad_data_double, 0.0,
-					 pressure));
+                                  valid_time,
+                                  _stationLat, _stationLon,
+                                  _stationAlt,
+                                  data_line[47],
+                                  PRESSURE_GRIB_CODE,
+                                  bad_data_double, 0.0,
+                                  pressure,
+                                  PRESSURE_NAME));
    } // end while
 
    return true;
@@ -416,8 +458,8 @@ bool SurfradHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (!(ascii_file >> data_line))
   {
     mlog << Error << "\nSurfradHandler::_readHeaderInfo() -> "
-	 << "error reading station id line from input ASCII file \""
-	 << ascii_file.filename() << "\"\n\n";
+         << "error reading station id line from input ASCII file \""
+         << ascii_file.filename() << "\"\n\n";
 
     return false;
   }
@@ -436,8 +478,8 @@ bool SurfradHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (!(ascii_file >> data_line))
   {
     mlog << Error << "\nSurfradHandler::_readHeaderInfo() -> "
-	 << "error reading location line from input ASCII file \""
-	 << ascii_file.filename() << "\"\n\n";
+         << "error reading location line from input ASCII file \""
+         << ascii_file.filename() << "\"\n\n";
 
     return false;
   }
@@ -445,8 +487,8 @@ bool SurfradHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (data_line.n_items() != NUM_HDR_COLS)
   {
     mlog << Error << "\nSurfradHandler::_readHeaderInfo() -> "
-	 << "SURFRAD file has incorrect number of columns ("
-	 << data_line.n_items() << ") in header line\n\n";
+         << "SURFRAD file has incorrect number of columns ("
+         << data_line.n_items() << ") in header line\n\n";
     return false;
   }
   
