@@ -333,6 +333,12 @@ regrid = {
 //     settings are combined when filtering matched pairs of forecast and
 //     observed wind speeds.
 //
+//   - The "eclv_bin_size" entry specifies a value between 0 and 1.  The number
+//     of economic cost/loss ratios to be written to the ECLV output line is
+//     computed as 1.0/eclv_bin_size - 1.  For example, a bin size of 0.05
+//     results in 1.0/0.05 - 1 = 19 cost/loss ratios.  Cost/loss values are
+//     omitted for ratios of 0.0 and 1.0 since they are undefined.
+//
 //   - The "init_time" entry specifies the initialization time in YYYYMMDD[_HH[MMSS]]
 //     format.  This entry can be included in the "fcst" entry as shown below or
 //     included in the "field" entry if the user would like to use different
@@ -410,14 +416,15 @@ regrid = {
 //
 //
 fcst = {
-   cnt_thresh   = [ NA ];
-   cnt_logic    = UNION;
-   wind_thresh  = [ NA ];
-   wind_logic   = UNION;
-   message_type = [ "ADPSFC" ];
-   init_time    = "20120619_12";
-   valid_time   = "20120620_00";
-   lead_time    = "12";
+   cnt_thresh    = [ NA ];
+   cnt_logic     = UNION;
+   wind_thresh   = [ NA ];
+   wind_logic    = UNION;
+   eclv_bin_size = 0.05;
+   message_type  = [ "ADPSFC" ];
+   init_time     = "20120619_12";
+   valid_time    = "20120620_00";
+   lead_time     = "12";
 
    field = [
       {
@@ -888,6 +895,7 @@ output_flag = {
    pstd   = BOTH;  // Contingency Table Statistics for Probabilistic Forecasts with Dichotomous outcomes
    pjc    = BOTH;  // Joint and Conditional Factorization for Probabilistic Forecasts
    prc    = BOTH;  // Receiver Operating Characteristic for Probabilistic Forecasts
+   eclv   = BOTH;  // Economic Cost/Loss Value derived from CTC and PCT lines
    mpr    = BOTH;  // Matched Pair Data
    nbrctc = BOTH;  // Neighborhood Contingency Table Counts
    nbrcts = BOTH;  // Neighborhood Contingency Table Statistics
@@ -1200,15 +1208,10 @@ ens = {
 // is defined as the ceiling of 1.0 / ens_phist_bin_size.  For example, a bin
 // size of 0.05 results in 20 PHIST bins.
 //
-// The "ens_econ_bin_size" is set to a value between 0 and 1.  The number of
-// economic value cost/loss bins written to the ECON output line is determined
-// by this bin size.
-//
 fcst = {
    message_type = [ "ADPUPA" ];
    ens_ssvar_bin_size = 1;
    ens_phist_bin_size = 0.05;
-   ens_econ_bin_size  = 0.05;
 
    field = [
       {
@@ -2082,17 +2085,17 @@ output_stats = {
 //          the "-line_type" argument.  The output of the job will be the line
 //          type specified using the "-out_line_type" argument.  The valid
 //          combinations of "-line_type" and "-out_line_type" are listed below.
-//          -line_type FHO,   CTC,    -out_line_type CTS
+//          -line_type FHO,   CTC,    -out_line_type CTS, ECLV
 //          -line_type MCTC           -out_line_type MCTS
 //          -line_type SL1L2, SAL1L2, -out_line_type CNT
 //          -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
-//          -line_type PCT,           -out_line_type PSTD, PJC, PRC
+//          -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
 //          -line_type NBRCTC,        -out_line_type NBRCTS
 //          -line_type ORANK,         -out_line_type RHIST, PHIST, RELP, SSVAR
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
-//                                                   PCT, PSTD, PJC, PRC,
+//                                                   PCT, PSTD, PJC, PRC, ECLV,
 //                                                   WDIR (wind direction)
 //          Required Args:
 //             -line_type, -out_line_type
@@ -2107,7 +2110,9 @@ output_stats = {
 //             -out_wind_thresh or -out_fcst_wind_thresh and -out_obs_wind_thresh
 //             -out_wind_logic
 //             When -out_line_type WDIR
-//          Additional Optional Args for -line_type ORANK -out_line_type PHIST, SSVAR:
+//          Additional Optional Args for ...
+//             Job -line_type ORANK -out_line_type PHIST, SSVAR
+//             Job -line_type MPR   -out_line_type ECLV:
 //             -out_bin_size
 //
 //       "ss_index"
