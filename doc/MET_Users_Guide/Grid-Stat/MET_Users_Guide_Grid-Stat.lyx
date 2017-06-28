@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -137,7 +139,7 @@ name "sec:GS_Scientific-and-statistical"
 Statistical measures
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:GS_Statistical-measures"
+name "subsec:GS_Statistical-measures"
 
 \end_inset
 
@@ -345,7 +347,7 @@ The Grid-Stat tool allows evaluation of model forecasts compared with a
  see the relevant section in the Point-Stat Chapter, Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Climatology"
+reference "subsec:Climatology"
 
 \end_inset
 
@@ -373,7 +375,7 @@ The Grid-Stat tool allows evaluation of model forecasts using model analysis
 Statistical confidence intervals
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:GS_Statistical-confidence-intervals"
+name "subsec:GS_Statistical-confidence-intervals"
 
 \end_inset
 
@@ -407,7 +409,7 @@ reference "chap:App_D-Confidence-Intervals"
 Grid weighting
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Grid-weighting"
+name "subsec:Grid-weighting"
 
 \end_inset
 
@@ -425,7 +427,7 @@ When computing continuous statistics on a regular large scale or global
  See 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -436,7 +438,7 @@ for more information.
 Neighborhood methods
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:GS_Neighborhood-methods"
+name "subsec:GS_Neighborhood-methods"
 
 \end_inset
 
@@ -568,7 +570,7 @@ The Grid-Stat tool provides the capability of verifying one or more model
 grid_stat usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:grid_stat-usage"
+name "subsec:grid_stat-usage"
 
 \end_inset
 
@@ -923,7 +925,7 @@ GridStatConfig
 grid_stat configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:grid_stat-configuration-file"
+name "subsec:grid_stat-configuration-file"
 
 \end_inset
 
@@ -959,7 +961,7 @@ Note that environment variables may be used when editing configuration files,
  as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-configuration-file"
+reference "subsec:pb2nc-configuration-file"
 
 \end_inset
 
@@ -1076,7 +1078,7 @@ Except for the shape configuration option listed above, many of the others
  are common to many MET tools and are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -1292,6 +1294,12 @@ output_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   eclv   = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    nbrctc = BOTH;
 \end_layout
 
@@ -1456,6 +1464,14 @@ PRC
 \begin_layout Enumerate
 
 \series bold
+ECLV
+\series default
+ for Cost/Loss Ratio Relative Value
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
 NBRCTC
 \series default
  for Neighborhood Contingency Table Counts
@@ -1485,7 +1501,7 @@ Note that the first two line types are easily derived from one another.
  The output line types are described in more detail in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:grid_stat-output"
+reference "subsec:grid_stat-output"
 
 \end_inset
 
@@ -1635,7 +1651,7 @@ apply_mask
 grid_stat output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:grid_stat-output"
+name "subsec:grid_stat-output"
 
 \end_inset
 
@@ -1697,8 +1713,8 @@ TYPE
 \series medium
  is one of 
 \series default
-fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, pct, pstd, pjc, prc, nbrctc,
- nbrcts
+fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, pct, pstd, pjc, prc, eclv,
+ nbrctc, nbrcts
 \series medium
 , and 
 \series default
@@ -1720,7 +1736,7 @@ Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:point_stat-output"
+reference "subsec:point_stat-output"
 
 \end_inset
 
@@ -1764,7 +1780,7 @@ name "table_GS_header_info_gs_outputs"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -2471,7 +2487,7 @@ LINE_TYPE
 Various line type options, refer to Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:point_stat-output"
+reference "subsec:point_stat-output"
 
 \end_inset
 
@@ -2532,7 +2548,7 @@ name "table_GS_format_info_NBRCTC"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -2823,7 +2839,7 @@ name "table_GS_format_info_NBRCTS"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -3418,7 +3434,7 @@ name "table_GS_format_info_NBRCTS_cont"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -3942,7 +3958,7 @@ name "table_GS_format_info_NBRCNT"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -4378,7 +4394,7 @@ name "table_GS_Dimensions_NetCDF_matched_pair_out"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="10cm">
 <row>
@@ -4519,7 +4535,7 @@ name "table_GS_var_NetCDF_matched_pair_out"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="4.5cm">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="9cm">

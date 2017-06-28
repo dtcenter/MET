@@ -230,11 +230,16 @@ obtype = "ANALYS";
 //   - The "width" entry specifies a regridding width, when applicable.
 //      - width = 4;        To regrid using a 4x4 box.
 //
+//    - The "shape" entry defines the shape of the neighborhood.
+//      Valid values are "SQUARE" or "CIRCLE"
+//
+//
 regrid = {
    to_grid    = NONE;
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 //
@@ -286,7 +291,7 @@ regrid = {
 //        accumulation and "P850" for 850mb).  The "prob" dictionary defines the
 //        event for which the probability is defined.  The "thresh_lo"
 //        (i.e. APCP > 2.54) and/or "thresh_hi" (i.e. TMP < 273) entries are
-//         used to define the event threshold(s).
+//        used to define the event threshold(s).
 //
 //        Probability fields should contain values in the range
 //        [0, 1] or [0, 100]. However, when MET encounters a probability field
@@ -327,6 +332,12 @@ regrid = {
 //     and controls the logic for how the forecast and observed wind_thresh
 //     settings are combined when filtering matched pairs of forecast and
 //     observed wind speeds.
+//
+//   - The "eclv_bin_size" entry specifies a value between 0 and 1.  The number
+//     of economic cost/loss ratios to be written to the ECLV output line is
+//     computed as 1.0/eclv_bin_size - 1.  For example, a bin size of 0.05
+//     results in 1.0/0.05 - 1 = 19 cost/loss ratios.  Cost/loss values are
+//     omitted for ratios of 0.0 and 1.0 since they are undefined.
 //
 //   - The "init_time" entry specifies the initialization time in YYYYMMDD[_HH[MMSS]]
 //     format.  This entry can be included in the "fcst" entry as shown below or
@@ -405,14 +416,15 @@ regrid = {
 //
 //
 fcst = {
-   cnt_thresh   = [ NA ];
-   cnt_logic    = UNION;
-   wind_thresh  = [ NA ];
-   wind_logic   = UNION;
-   message_type = [ "ADPSFC" ];
-   init_time    = "20120619_12";
-   valid_time   = "20120620_00";
-   lead_time    = "12";
+   cnt_thresh    = [ NA ];
+   cnt_logic     = UNION;
+   wind_thresh   = [ NA ];
+   wind_logic    = UNION;
+   eclv_bin_size = 0.05;
+   message_type  = [ "ADPSFC" ];
+   init_time     = "20120619_12";
+   valid_time    = "20120620_00";
+   lead_time     = "12";
 
    field = [
       {
@@ -749,8 +761,7 @@ boot = {
 //      the verification region chosen.
 //
 //    - The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
-//      of the smoothing area.  This option is available only in Grid-Stat but
-//      support will be added to the other MET tools in future releases.
+//      of the smoothing area.
 //
 //    - The "type" entry is an array of dictionaries, each specifying an
 //      interpolation method.  Interpolation is performed over a N by N box
@@ -812,10 +823,14 @@ interp = {
 //      computing categorical statistics for the neighborhood fractional
 //      coverage field.
 //
+//    - The "shape" entry defines the shape of the neighborhood.
+//      Valid values are "SQUARE" or "CIRCLE"
+//
 nbrhd = {
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
+   shape      = SQUARE;
 }
 
 //
@@ -845,11 +860,15 @@ nbrhd = {
 //      populate the Nx2 probabilistic contingency table written to the PCT
 //      output line and used for computing probabilistic statistics.
 //
+//    - The "shape" entry defines the shape of the neighborhood.
+//      Valid values are "SQUARE" or "CIRCLE"
+//
 hira = {
    flag       = FALSE;
    width      = [ 2, 3, 4, 5 ];
    vld_thresh = 1.0;
    cov_thresh = [ ==0.25 ];
+   shape      = SQUARE;
 }
 
 //
@@ -876,6 +895,7 @@ output_flag = {
    pstd   = BOTH;  // Contingency Table Statistics for Probabilistic Forecasts with Dichotomous outcomes
    pjc    = BOTH;  // Joint and Conditional Factorization for Probabilistic Forecasts
    prc    = BOTH;  // Receiver Operating Characteristic for Probabilistic Forecasts
+   eclv   = BOTH;  // Economic Cost/Loss Value derived from CTC and PCT lines
    mpr    = BOTH;  // Matched Pair Data
    nbrctc = BOTH;  // Neighborhood Contingency Table Counts
    nbrcts = BOTH;  // Neighborhood Contingency Table Statistics
