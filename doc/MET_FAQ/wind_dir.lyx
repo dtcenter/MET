@@ -198,7 +198,7 @@ Wind direction errors using all pairs
 
 \begin_deeper
 \begin_layout LyX-Code
-{MET_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR 
+${MET_BUILD_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR 
 \backslash
 
 \end_layout
@@ -239,7 +239,7 @@ Wind direction error for each of the obseration stations separately, writing
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR 
+${MET_BUILD_BASE}/bin/stat_analysis -job aggregate_stat -line_type MPR 
 \backslash
 
 \end_layout

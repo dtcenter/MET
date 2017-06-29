@@ -114,7 +114,7 @@ This can be created by running the "regrid_data_plane" tool to regrid some
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/regrid_data_plane 
+${MET_BUILD_BASE}/bin/regrid_data_plane 
 \backslash
  
 \end_layout

@@ -91,11 +91,11 @@ ng the data as expected.
 \end_layout
 
 \begin_layout Standard
-Here is an example for {MET_BASE}/plot_data_plane:
+Here is an example for ${MET_BUILD_BASE}/plot_data_plane:
 \end_layout
 
 \begin_layout LyX-Code
-/scratch4/BMC/dtc/MET/{MET_BASE}/bin/plot_data_plane 
+/scratch4/BMC/dtc/MET/${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout

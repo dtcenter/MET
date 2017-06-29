@@ -81,7 +81,7 @@ To run a project faster, -pcprx is an option.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine 
+${MET_BUILD_BASE}/bin/pcp_combine 
 \backslash
 
 \end_layout
@@ -125,7 +125,7 @@ The "-add" command could be used instead of the
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -add 
+${MET_BUILD_BASE}/bin/pcp_combine -add 
 \backslash
 
 \end_layout

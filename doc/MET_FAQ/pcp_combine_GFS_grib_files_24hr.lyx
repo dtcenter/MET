@@ -111,7 +111,7 @@ Here is an example.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine 
+${MET_BUILD_BASE}/bin/pcp_combine 
 \backslash
  
 \end_layout
@@ -155,7 +155,7 @@ The following command will compute the 24-hour accumulation between forecast
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine 
+${MET_BUILD_BASE}/bin/pcp_combine 
 \backslash
  
 \end_layout
@@ -196,7 +196,7 @@ cd /d1/SBU/GFS/model_data/20150220
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -add 
+${MET_BUILD_BASE}/bin/pcp_combine -add 
 \backslash
  
 \end_layout

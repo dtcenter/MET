@@ -225,7 +225,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -add 
+${MET_BUILD_BASE}/bin/pcp_combine -add 
 \backslash
  
 \end_layout
@@ -269,7 +269,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout

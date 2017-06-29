@@ -90,7 +90,7 @@ Use the regrid_data_plane tool to regrid 2m temperature to a smaller domain
 
 \begin_deeper
 \begin_layout LyX-Code
-{MET_BASE}/bin/regrid_data_plane 
+${MET_BUILD_BASE}/bin/regrid_data_plane 
 \backslash
  
 \end_layout
@@ -128,7 +128,7 @@ Run plot_data_plane to plot with the default map background:
 
 \begin_deeper
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \end_layout
 
 \begin_layout LyX-Code
@@ -152,7 +152,7 @@ Re-run but pointing only to the admin_China_data:
 
 \begin_deeper
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \end_layout
 
 \begin_layout LyX-Code
@@ -174,7 +174,7 @@ map_data = { source = [
 \end_layout
 
 \begin_layout LyX-Code
-"{MET_BASE}/map/admin_by_country/admin_China_data"; 
+"${MET_BUILD_BASE}/map/admin_by_country/admin_China_data"; 
 \end_layout
 
 \begin_layout LyX-Code

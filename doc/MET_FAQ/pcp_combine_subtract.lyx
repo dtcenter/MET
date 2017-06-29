@@ -135,7 +135,7 @@ Use the command:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -subtract 
+${MET_BUILD_BASE}/bin/pcp_combine -subtract 
 \backslash
  
 \end_layout

@@ -84,7 +84,7 @@ Here is a stat-analysis job that could be used to run, read the MPR lines,
 \end_layout
 
 \begin_layout LyX-Code
-/usr/local/{MET_BASE}/bin/stat_analysis 
+/usr/local/${MET_BUILD_BASE}/bin/stat_analysis 
 \backslash
  
 \end_layout

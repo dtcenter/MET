@@ -95,7 +95,7 @@ Instead of specifying the name, try explicitly specifying the GRIB code
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -subtract 
+${MET_BUILD_BASE}/bin/pcp_combine -subtract 
 \backslash
 
 \end_layout
@@ -141,7 +141,7 @@ It may be helpful to visualize data like this using the plot data plane
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
 
 \end_layout

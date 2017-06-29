@@ -86,7 +86,7 @@ In order to demonstrate that MET can in fact read some data, run the following
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout

@@ -108,7 +108,7 @@ Here's an example of that using data from the MET tarball:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/gen_vx_mask 
+${MET_BUILD_BASE}/bin/gen_vx_mask 
 \backslash
  
 \end_layout

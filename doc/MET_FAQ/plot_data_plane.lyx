@@ -108,7 +108,7 @@ The plot_data_plane utility can be used to test this out.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane nmbprs_d01.12 
+${MET_BUILD_BASE}/bin/plot_data_plane nmbprs_d01.12 
 \backslash
 
 \end_layout
@@ -136,7 +136,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
 
 \end_layout

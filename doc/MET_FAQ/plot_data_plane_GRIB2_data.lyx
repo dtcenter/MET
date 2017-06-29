@@ -81,7 +81,7 @@ Making sure MET can read GRIB2 data.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"
+${MET_BUILD_BASE}/bin/plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"
 ; level="R2";
 \end_layout
 

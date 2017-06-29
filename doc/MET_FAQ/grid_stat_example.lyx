@@ -85,7 +85,7 @@ mkdir out
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/grid_stat 
+${MET_BUILD_BASE}/bin/grid_stat 
 \backslash
  
 \end_layout
@@ -170,7 +170,7 @@ To demonstrate that Grid-Stat worked as expected, run the following commands
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout

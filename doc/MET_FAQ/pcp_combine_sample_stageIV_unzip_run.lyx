@@ -116,7 +116,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -add ST4.2016101512.06h 
+${MET_BUILD_BASE}/bin/pcp_combine -add ST4.2016101512.06h 
 \backslash
 
 \end_layout
@@ -148,7 +148,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -sum 00000000_000000 06 
+${MET_BUILD_BASE}/bin/pcp_combine -sum 00000000_000000 06 
 \backslash
 
 \end_layout

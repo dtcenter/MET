@@ -111,7 +111,7 @@ Instead of using "-out" to write the output to a text file, use "-out_stat"
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/stat_analysis 
+${MET_BUILD_BASE}/bin/stat_analysis 
 \backslash
  
 \end_layout

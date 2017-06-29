@@ -80,7 +80,7 @@ To get the most output, run something like this...
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/tc_stat 
+${MET_BUILD_BASE}/bin/tc_stat 
 \backslash
  
 \end_layout
@@ -106,7 +106,7 @@ Please search for "rirw" in here:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/share/met/config/README_TC 
+${MET_BUILD_BASE}/share/met/config/README_TC 
 \end_layout
 
 \begin_layout Standard

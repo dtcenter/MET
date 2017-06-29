@@ -100,7 +100,7 @@ In this case the tc_stat job looked at the 48 hour lead time for the HWRF
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/tc_stat 
+${MET_BUILD_BASE}/bin/tc_stat 
 \backslash
  
 \end_layout

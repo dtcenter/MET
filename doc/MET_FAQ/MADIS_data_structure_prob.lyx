@@ -110,7 +110,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/madis2nc 
+${MET_BUILD_BASE}/bin/madis2nc 
 \backslash
 
 \end_layout
@@ -152,7 +152,7 @@ Rscript
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/scripts/Rscripts/pntnc2ascii.R 
+${MET_BUILD_BASE}/scripts/Rscripts/pntnc2ascii.R 
 \backslash
 
 \end_layout

@@ -82,7 +82,7 @@ An example of verifying a probability of precipitation field is included
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/scripts/test_grid_stat.sh
+${MET_BUILD_BASE}/scripts/test_grid_stat.sh
 \end_layout
 
 \begin_layout Standard
@@ -91,7 +91,7 @@ The second call to grid_stat is used to evaluate probability of precip using
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/scripts/config/GridStatConfig_POP_12
+${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
 \end_layout
 
 \begin_layout Standard
