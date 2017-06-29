@@ -1143,7 +1143,7 @@ void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    for(i=0; i<pct_info.pct.nrows(); i++) {
 
       // Update the forecast threshold
-      shc.set_fcst_thresh(pct_info.fthresh[i]);
+      shc.set_fcst_thresh(pct_info.fthresh[i+1]);
 
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
