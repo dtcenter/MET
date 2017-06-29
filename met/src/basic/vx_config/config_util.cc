@@ -58,13 +58,14 @@ void RegridInfo::validate() {
 
    // Check the nearest neighbor special case
    if(width  == 1 &&
+      method != InterpMthd_None &&
       method != InterpMthd_Nearest &&
       method != InterpMthd_Force &&
       method != InterpMthd_Upper_Left &&
       method != InterpMthd_Upper_Right &&
       method != InterpMthd_Lower_Right &&
       method != InterpMthd_Lower_Left) {
-	   mlog << Warning << "\n" //parse_conf_regrid() -> "
+      mlog << Warning << "\n"
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
            << interpmthd_nearest_str
@@ -72,21 +73,21 @@ void RegridInfo::validate() {
       method = InterpMthd_Nearest;
    }
 
-   // check if method is nearest, that width is 1
+   // Check if method is nearest, that width is 1
    if ((method == InterpMthd_Nearest) &&
        (width != 1)){
-	   mlog << Warning << "\n"
-	        << "Resetting the regridding width from "
-	        << width << " to 1 for regridding method \""
-	        << interpmthd_nearest_str << "\".\n\n";
-	   width = 1;
+      mlog << Warning << "\n"
+           << "Resetting the regridding width from "
+           << width << " to 1 for regridding method \""
+           << interpmthd_nearest_str << "\".\n\n";
+      width = 1;
    }
 
    // Check the bilinear and budget special cases
    if((method == InterpMthd_Bilin ||
        method == InterpMthd_Budget) &&
       width != 2) {
-	   mlog << Warning << "\n"//parse_conf_regrid() -> "
+      mlog << Warning << "\n"
            << "Resetting the regridding width from "
            << width << " to 2 for regridding method \""
            << interpmthd_to_string(method) << "\".\n\n";
@@ -778,6 +779,7 @@ void InterpInfo::validate(){
 
       // Check the nearest neighbor special case
       if(width[i] == 1 &&
+         methodi  != InterpMthd_None &&
          methodi  != InterpMthd_Nearest &&
          methodi  != InterpMthd_Force &&
          methodi  != InterpMthd_Upper_Left &&

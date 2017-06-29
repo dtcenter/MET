@@ -44,7 +44,7 @@ enum InterpMthd {
 //
 // String corresponding to the enumerated values above
 //
-static const char interpmthd_none_str[]        = "NA";
+static const char interpmthd_none_str[]        = "NONE";
 static const char interpmthd_min_str[]         = "MIN";
 static const char interpmthd_max_str[]         = "MAX";
 static const char interpmthd_median_str[]      = "MEDIAN";
