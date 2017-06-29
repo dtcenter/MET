@@ -1178,7 +1178,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check whether the GRIB code for the observation matches
    // the specified code
    if(obs_info_grib->code() != nint(obs_arr[1])) {
-      if (var_name != 0 && 0 < strlen(var_name) && 0 != strcmp(var_name, obs_info_grib->name())) {
+      if (var_name == 0 || (0 == strlen(var_name)) || 0 != strcmp(var_name, obs_info->name())) {
          return;
       }
    }
