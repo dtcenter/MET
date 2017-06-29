@@ -92,7 +92,7 @@ To confirm this, use the "plot_data_plane" utility to visualize the data.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane radar_file.nc radar_file.ps 'name="RADAR";
+${MET_BUILD_BASE}/bin/plot_data_plane radar_file.nc radar_file.ps 'name="RADAR";
  level="(*,*)";'
 \end_layout
 

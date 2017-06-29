@@ -80,7 +80,7 @@ Below is a command example to run:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/tc_pairs 
+${MET_BUILD_BASE}/bin/tc_pairs 
 \backslash
  
 \end_layout
@@ -248,7 +248,7 @@ If this really is duplicate track data, work on the logic for where/how
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/tc_pairs 
+${MET_BUILD_BASE}/bin/tc_pairs 
 \backslash
  
 \end_layout

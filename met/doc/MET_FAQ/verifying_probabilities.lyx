@@ -82,7 +82,7 @@ There is an example of verifying probabilities in the test scripts included
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/scripts/config/GridStatConfig_POP_12
+${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
 \end_layout
 
 \begin_layout Standard

@@ -153,7 +153,7 @@ export TO_GRID=${case}
 \end_layout
 
 \begin_layout LyX-Code
-/usr/local/{MET_BASE}/bin/grid_stat gfs.t00z.pgrb2.0p25.f000 
+/usr/local/${MET_BUILD_BASE}/bin/grid_stat gfs.t00z.pgrb2.0p25.f000 
 \backslash
 
 \end_layout
@@ -165,7 +165,7 @@ nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig
 \end_layout
 
 \begin_layout LyX-Code
-/usr/local/{MET_BASE}/bin/plot_data_plane 
+/usr/local/${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
 
 \end_layout

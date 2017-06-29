@@ -87,7 +87,7 @@ ERROR : write_netcdf() -> error with pcp_var->put()
 \begin_layout Standard
 The question is why? Let's check to see if the call to gen_vx_mask actually
  did create good output.
- Try running the following command from the top-level {MET_BASE} directory:
+ Try running the following command from the top-level ${MET_BUILD_BASE} directory:
 \end_layout
 
 \begin_layout LyX-Code

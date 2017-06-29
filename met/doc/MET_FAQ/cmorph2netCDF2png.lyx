@@ -111,7 +111,7 @@ Plot the output NetCDF file:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane CMORPH_8KM-30MIN_2016020712.nc CMORPH_8KM-30MIN_20
+${MET_BUILD_BASE}/bin/plot_data_plane CMORPH_8KM-30MIN_2016020712.nc CMORPH_8KM-30MIN_20
 16020712.ps 
 \backslash
 
@@ -150,7 +150,7 @@ Fixing the logic in MET to detect this situation and flip the data after
 \end_layout
 
 \begin_layout Standard
-{MET_BASE} supports automated regridding and also includes a tool named
+${MET_BUILD_BASE} supports automated regridding and also includes a tool named
  regrid_data_plane.
  Here's how you could run it on this data:
 \end_layout
@@ -160,7 +160,7 @@ Regrid to a domain over India using budget interpolation:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/regrid_data_plane CMORPH_8KM-30MIN_2016020712.nc 'latlon 200
+${MET_BUILD_BASE}/bin/regrid_data_plane CMORPH_8KM-30MIN_2016020712.nc 'latlon 200
  200 0 55 0.25 0.25' 
 \backslash
 
@@ -182,7 +182,7 @@ Plot the result and convert to png:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane CMORPH_8KM-30MIN_2016020712_India.nc 
+${MET_BUILD_BASE}/bin/plot_data_plane CMORPH_8KM-30MIN_2016020712_India.nc 
 \backslash
 
 \end_layout

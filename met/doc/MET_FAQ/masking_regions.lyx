@@ -112,7 +112,7 @@ Use the MET regrid_data_plane tool to put some data on a lat/lon grid over
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/regrid_data_plane gfs.t12z.pgrb2.0p50.f000 
+${MET_BUILD_BASE}/bin/regrid_data_plane gfs.t12z.pgrb2.0p50.f000 
 \backslash
 
 \end_layout
@@ -126,7 +126,7 @@ Run the MET gen_vx_mask tool to apply your polyline to the European domain:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
+${MET_BUILD_BASE}/bin/gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
 \end_layout
 
 \begin_layout Standard
@@ -134,7 +134,7 @@ Run the MET plot_data_plane tool to display the resulting mask field:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane POLAND_mask.nc POLAND_mask.ps 'name="POLAND";
+${MET_BUILD_BASE}/bin/plot_data_plane POLAND_mask.nc POLAND_mask.ps 'name="POLAND";
  level="(*,*)";'
 \end_layout
 

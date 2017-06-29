@@ -227,7 +227,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 3B42.100921.00z.7.precipitation.nc 
+${MET_BUILD_BASE}/bin/plot_data_plane 3B42.100921.00z.7.precipitation.nc 
 \backslash
 
 \end_layout

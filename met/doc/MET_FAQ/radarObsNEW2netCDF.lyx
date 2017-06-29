@@ -189,7 +189,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-/usr/local/{MET_BASE}/bin/regrid_data_plane 
+/usr/local/${MET_BUILD_BASE}/bin/regrid_data_plane 
 \backslash
  
 \end_layout
@@ -227,7 +227,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-/usr/local/{MET_BASE}/bin/plot_data_plane 
+/usr/local/${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout
@@ -300,7 +300,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-REFC /usr/local/{MET_BASE}/bin/plot_data_plane 
+REFC /usr/local/${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout
@@ -372,7 +372,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-/usr/local/{MET_BASE}/bin/grid_stat ForecastFile.grb RadarObsNEW_mod_v3.nc
+/usr/local/${MET_BUILD_BASE}/bin/grid_stat ForecastFile.grb RadarObsNEW_mod_v3.nc
  
 \end_layout
 

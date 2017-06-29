@@ -149,7 +149,7 @@ Then try running the plot_data_plane tool.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane /home/sara/MET/{MET_BASE}/stitched/20101226/cf/
+${MET_BUILD_BASE}/bin/plot_data_plane /home/sara/MET/${MET_BUILD_BASE}/stitched/20101226/cf/
  
 \backslash
 

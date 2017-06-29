@@ -84,7 +84,7 @@ The "-sum" command assumes the same initialization time.
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/pcp_combine -add 
+${MET_BUILD_BASE}/bin/pcp_combine -add 
 \backslash
  
 \end_layout
@@ -139,7 +139,7 @@ Here are 3 commands you could use to plot these data files:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc 
+${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc 
 \backslash
 
 \end_layout
@@ -171,7 +171,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb 
+${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb 
 \backslash
 
 \end_layout
@@ -203,7 +203,7 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
+${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
  
 \end_layout
 

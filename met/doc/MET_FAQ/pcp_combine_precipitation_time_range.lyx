@@ -99,7 +99,7 @@ For example, take a look at the APCP in the GRIB files included in the MET
 \end_layout
 
 \begin_layout LyX-Code
-wgrib {MET_BASE}/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 |
+wgrib ${MET_BUILD_BASE}/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 |
  grep APCP
 \end_layout
 

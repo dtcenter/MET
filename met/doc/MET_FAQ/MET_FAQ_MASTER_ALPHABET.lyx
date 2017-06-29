@@ -87,9 +87,22 @@ filename "China_map_example.lyx"
 \begin_inset Newpage pagebreak
 \end_inset
 
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "China_map_example.lyx"
+
+\end_inset
+
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
@@ -106,7 +119,6 @@ filename "cmorph2grib.lyx"
 
 
 \end_layout
-
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand include
@@ -116,6 +128,1102 @@ filename "cmorph2netCDF2png.lyx"
 
 
 \end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "compilation.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "directory_path_confirmation.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "ensemble_stat_command_line.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "environment_variable_settings.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "FCST_VAR_command_usage.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "file_io_netcdf_2.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "file_io_netcdf.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "gen_vx_mask_good_output.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "gen_vx_mask_speed.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "grib2NetCDF.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "grid_stat_analyze_weather.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Grid-Stat_command_line.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Grid-Stat_complex_masking_region.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Grid-Stat_config_file_setup.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "grid_stat_example.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "grid_stat_GRIB1vs2.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "grid_stat_MCTC_range.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "grid_stat_neighborhood_boundaries.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "grid_stat_trad_neighborhood_stat.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "installation.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "lat_long_grid.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "MADIS_data_structure_prob.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "masking_regions_intersection.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "masking_regions.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "met_tc_freq_superior_perf.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "MODE_different_masks.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "NAM2_3hr_accum.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "NetCDF_multiple_types.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_configuring_options.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_data_formats.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_different_initialization_times_add_option.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_example.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_files2run.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_GFS_grib_files_24hr.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_lat-lon_grid_data.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_precipitation.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_precipitation_time_range.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_sample_stageIV_unzip_run.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_subtract.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_sum_vs_add.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_testing_to_run.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_time_format.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "pcp_combine_to_use_specific_file.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "plot_data_plane_example.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "plot_data_plane_GRIB2_data.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "plot_data_plane_Gribvs2.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "plot_data_plane.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "plot_data_plane_time_lag.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "plot_data_plane_windlyx.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "postscript2png_2.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "postscript2png.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "PRMSLtoGrib2.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "radarObsNEW2netCDF.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "single_radar_verif.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "stat_analysis2filter.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "Stat-analysis_ex.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "stat_analysis_MPR.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "STAT_Analysis_run_times.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "tc_pairs.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "TC_rapid_intens_verif.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "tc_stat_pairwise_difference.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "TRMM2NetCDF.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "TRMM_data_files.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "troubleshooting_command_line_quotes.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "unix_time_conversion.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "verifying_probabilities_2.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "verifying_probabilities.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand include
+filename "wind_dir.lyx"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 
 \end_body
 \end_document

@@ -87,7 +87,7 @@ Let's use plot_data_plane as an example:
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane 
+${MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout

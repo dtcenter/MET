@@ -92,7 +92,7 @@ In this example the RTMA file is named rtma.grb2 and the UPP file is named
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane wrf.grb wrf_wind.ps 
+${MET_BUILD_BASE}/bin/plot_data_plane wrf.grb wrf_wind.ps 
 \backslash
 
 \end_layout
@@ -102,7 +102,7 @@ In this example the RTMA file is named rtma.grb2 and the UPP file is named
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/plot_data_plane rtma.grb2 rtma_wind.ps 
+${MET_BUILD_BASE}/bin/plot_data_plane rtma.grb2 rtma_wind.ps 
 \backslash
 
 \end_layout

@@ -86,7 +86,7 @@ Run the following job on the output from Grid-Stat generated when the "make
 \end_layout
 
 \begin_layout LyX-Code
-{MET_BASE}/bin/stat_analysis -lookin out/grid_stat 
+${MET_BUILD_BASE}/bin/stat_analysis -lookin out/grid_stat 
 \backslash
  
 \end_layout
