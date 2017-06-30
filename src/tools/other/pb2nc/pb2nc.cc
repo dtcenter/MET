@@ -443,7 +443,7 @@ void initialize() {
    
    prepbufr_derive_vars.add("D_DWP");
    prepbufr_derive_vars.add("D_WDIR");
-   prepbufr_derive_vars.add("D_WSPD");
+   prepbufr_derive_vars.add("D_WIND");
    prepbufr_derive_vars.add("D_RH");
    prepbufr_derive_vars.add("D_MIXR");
    prepbufr_derive_vars.add("D_PRMSL");
@@ -2149,6 +2149,7 @@ void write_netcdf_hdr_data() {
    lengths[0] = 1 ;
    StringArray nc_obs_arr;
    nc_obs_arr.add(bufr_obs_arr);
+   map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
    for(i=0; i<nc_obs_arr.n_elements(); i++) {
       int var_index;
       char var_name[BUFR_NAME_LEN+1];
@@ -2196,7 +2197,15 @@ void write_netcdf_hdr_data() {
 
       // Variable name
       lengths[1] = BUFR_NAME_LEN;
-      mlog << Debug(10) << "var_name: " << var_name << ", unit_str: " << unit_str<< "\n";
+      if (obs_var_map[var_name]) {
+         ConcatString grib_name = obs_var_map[var_name];
+         if (0 < grib_name.length()) {
+            int name_len = strlen(var_name);
+            strcpy(var_name, grib_name);
+            for (int idx=grib_name.length(); idx<name_len; idx++)
+               var_name[idx] = bad_data_char;
+         }
+      }
       if(!put_nc_data(&bufr_obs_var, (char *)var_name, lengths, offsets)) {
          mlog << Error << "\nwrite_netcdf_hdr_data() -> "
               << "error writing the BUFR variable name to "
