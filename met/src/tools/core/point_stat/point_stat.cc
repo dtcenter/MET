@@ -653,21 +653,18 @@ void process_obs_file(int i_nc) {
    NcVar hdr_arr_var ;
 
    int var_num = 0;
-   int var_name_len = 0;
    bool use_var_id = false;
    if (!get_global_att(obs_in, nc_att_use_var_id, use_var_id)) {
       use_var_id = false;
    }
 
    // Read the dimensions
-   strl_dim = get_nc_dim(obs_in,"mxstr");
-   obs_dim  = get_nc_dim(obs_in,"nobs");
-   hdr_dim  = get_nc_dim(obs_in,"nhdr");
+   strl_dim = get_nc_dim(obs_in, nc_dim_mxstr);
+   obs_dim  = get_nc_dim(obs_in, nc_dim_nobs);
+   hdr_dim  = get_nc_dim(obs_in, nc_dim_nhdr);
    if (use_var_id) {
       NcDim var_dim    = get_nc_dim(obs_in,nc_dim_nvar);
-      NcDim vname_dim  = get_nc_dim(obs_in,nc_dim_name);
       var_num       = get_dim_size(&var_dim);
-      var_name_len  = get_dim_size(&vname_dim);
    }
 
    if(IS_INVALID_NC(strl_dim) ||
@@ -687,28 +684,6 @@ void process_obs_file(int i_nc) {
    hdr_vld_var = get_nc_var(obs_in, "hdr_vld");
    hdr_arr_var = get_nc_var(obs_in, "hdr_arr");
    if (has_var(obs_in, "obs_qty")) obs_qty_var = get_nc_var(obs_in, "obs_qty");
-
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { 1, 1 };
-
-   StringArray var_names;
-   char var_name[var_name_len+1];
-   strcpy(var_name, "");
-   if (use_var_id) {
-      lengths[1] = var_name_len;
-      NcVar name_var = get_nc_var(obs_in, nc_var_name);
-      for (int idx=0; idx<var_num; idx++) {
-         if(!get_nc_data(&name_var, var_name, lengths, offsets)) {
-            mlog << Error << "\nprocess_obs_file() -> "
-                 << "trouble getting var_name\n\n";
-            exit(1);
-         }
-         else {
-            var_names.add(var_name);
-         }
-         offsets[0]++;
-      }
-   }
 
    if(IS_INVALID_NC(obs_arr_var) ||
       IS_INVALID_NC(hdr_typ_var) ||
@@ -733,6 +708,27 @@ void process_obs_file(int i_nc) {
         << " observations from " << hdr_count
         << " messages.\n";
 
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { 1, 1 };
+
+   StringArray var_names;
+   char var_name[strl_len+1];
+   strcpy(var_name, "");
+   if (use_var_id) {
+      lengths[1] = strl_len;
+      NcVar obs_var = get_nc_var(obs_in, nc_var_obs_var);
+      for (int idx=0; idx<var_num; idx++) {
+         if(!get_nc_data(&obs_var, var_name, lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "trouble getting var_name\n\n";
+            exit(1);
+         }
+         else {
+            var_names.add(var_name);
+         }
+         offsets[0]++;
+      }
+   }
 
    int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
    int hdr_buf_size = (hdr_count == obs_count) ? buf_size : hdr_count;
@@ -998,8 +994,10 @@ void process_obs_file(int i_nc) {
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
 
-         if (use_var_id && obs_arr[1] < var_names.n_elements()) {
-            strcpy(var_name, var_names[obs_arr[1]]);
+         int grid_code = obs_arr[1];
+         if (use_var_id && grid_code < var_names.n_elements()) {
+            strcpy(var_name, var_names[grid_code]);
+            obs_arr[1] = bad_data_int;
          }
          else {
             strcpy(var_name, "");
@@ -1016,6 +1014,8 @@ void process_obs_file(int i_nc) {
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
                                        hdr_ut, obs_qty_str, obs_arr, grid, var_name);
          }
+         
+         obs_arr[1] = grid_code;
       }
 
    } // end for i_block_start_idx

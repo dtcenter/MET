@@ -855,21 +855,18 @@ void process_point_obs(int i_nc) {
    NcVar hdr_arr_var;
 
    int var_num = 0;
-   int var_name_len = 0;
    bool use_var_id = false;
    if (!get_global_att(obs_in, nc_att_use_var_id, use_var_id)) {
       use_var_id = false;
    }
    
    // Read the dimensions
-   strl_dim = get_nc_dim(obs_in, "mxstr");
-   obs_dim  = get_nc_dim(obs_in, "nobs");
-   hdr_dim  = get_nc_dim(obs_in, "nhdr");
+   strl_dim = get_nc_dim(obs_in, nc_dim_mxstr);
+   obs_dim  = get_nc_dim(obs_in, nc_dim_nobs);
+   hdr_dim  = get_nc_dim(obs_in, nc_dim_nhdr);
    if (use_var_id) {
       NcDim var_dim    = get_nc_dim(obs_in,nc_dim_nvar);
-      NcDim vname_dim  = get_nc_dim(obs_in,nc_dim_name);
       var_num       = get_dim_size(&var_dim);
-      var_name_len  = get_dim_size(&vname_dim);
    }
 
    if(IS_INVALID_NC(strl_dim) ||
@@ -905,28 +902,6 @@ void process_point_obs(int i_nc) {
    if(IS_INVALID_NC(obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file.\n";
 
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { 1, 1 };
-   StringArray var_names;
-   char var_name[var_name_len+1];
-   strcpy(var_name, "");
-   if (use_var_id) {
-      lengths[1] = var_name_len;
-      NcVar name_var = get_nc_var(obs_in, nc_var_name);
-      for (int idx=0; idx<var_num; idx++) {
-         if(!get_nc_data(&name_var, var_name, lengths, offsets)) {
-            mlog << Error << "\nprocess_obs_file() -> "
-                 << "trouble getting var_name\n\n";
-            exit(1);
-         }
-         else {
-            var_names.add(var_name);
-         }
-         offsets[0]++;
-      }
-   }
-
-  
    int hdr_buf_size = GET_NC_SIZE(hdr_dim);
    int obs_count = GET_NC_SIZE(obs_dim);
    mlog << Debug(2) << "Searching " << (obs_count)
@@ -948,6 +923,27 @@ void process_point_obs(int i_nc) {
    char hdr_typ_str_full[hdr_buf_size][mxstr_len];
    char hdr_sid_str_full[hdr_buf_size][mxstr_len];
    char hdr_vld_str_full[hdr_buf_size][mxstr_len];
+
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { 1, 1 };
+   StringArray var_names;
+   char var_name[mxstr_len+1];
+   strcpy(var_name, "");
+   if (use_var_id) {
+      lengths[1] = mxstr_len;
+      NcVar obs_var = get_nc_var(obs_in, nc_var_obs_var);
+      for (int idx=0; idx<var_num; idx++) {
+         if(!get_nc_data(&obs_var, var_name, lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "trouble getting var_name\n\n";
+            exit(1);
+         }
+         else {
+            var_names.add(var_name);
+         }
+         offsets[0]++;
+      }
+   }
 
    offsets[0] = 0;
    offsets[1] = 0;

@@ -285,13 +285,12 @@ static NcVar hdr_arr_var ; // Header array
 static NcVar obs_qty_var ; // Quality flag
 static NcVar obs_arr_var ; // Observation array
 
-static NcDim bufr_name_dim ;  // BUFR variable name length
-static NcDim bufr_unit_dim ;  // BUFR variable unit length
-static NcDim bufr_desc_dim ;  // BUFR variable description length
-static NcDim bufr_var_dim ;  // BUFR variable names array length
-static NcVar bufr_var_var ;  // BUFR variable names
-static NcVar bufr_unit_var ; // BUFR variable units
-static NcVar bufr_desc_var ; // BUFR variable descriptions
+static NcDim bufr_unit_dim ;    // BUFR variable unit length
+static NcDim bufr_desc_dim ;    // BUFR variable description length
+static NcDim bufr_var_dim ;     // BUFR variable names array length
+static NcVar bufr_obs_var ;     // BUFR variable names
+static NcVar bufr_unit_var ;    // BUFR variable units
+static NcVar bufr_desc_var ;    // BUFR variable descriptions
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -698,10 +697,10 @@ void open_netcdf() {
    }
 
    // Define netCDF dimensions
-   strl_dim    = add_dim(f_out, "mxstr", (long) strl_len);
-   hdr_arr_dim = add_dim(f_out, "hdr_arr_len", (long) hdr_arr_len);
-   obs_arr_dim = add_dim(f_out, "obs_arr_len", (long) obs_arr_len);
-   obs_dim     = add_dim(f_out, "nobs"); // unlimited dimension
+   strl_dim    = add_dim(f_out, nc_dim_mxstr,   (long) strl_len);
+   hdr_arr_dim = add_dim(f_out, nc_dim_hdr_arr, (long) hdr_arr_len);
+   obs_arr_dim = add_dim(f_out, nc_dim_obs_arr, (long) obs_arr_len);
+   obs_dim     = add_dim(f_out, nc_dim_nobs); // unlimited dimension
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
@@ -1979,11 +1978,10 @@ void write_netcdf_hdr_data() {
    }
 
    // Define netCDF dimensions
-   hdr_dim = add_dim(f_out, "nhdr", (long) hdr_typ_sa.n_elements());
+   hdr_dim = add_dim(f_out, nc_dim_nhdr, (long) hdr_typ_sa.n_elements());
 
    dim_count = bufr_obs_arr.n_elements();
    bufr_var_dim  = add_dim(f_out, nc_dim_nvar, (long)dim_count);
-   bufr_name_dim = add_dim(f_out, nc_dim_name, (long)BUFR_NAME_LEN);
    bufr_unit_dim = add_dim(f_out, nc_dim_unit, (long)BUFR_UNIT_LEN);
    bufr_desc_dim = add_dim(f_out, nc_dim_desc, (long)BUFR_DESCRIPTION_LEN);
 
@@ -1997,9 +1995,9 @@ void write_netcdf_hdr_data() {
    hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  hdr_dim, strl_dim,    deflate_level);
    hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim, deflate_level);
 
-   bufr_var_var  = add_var(f_out, nc_var_name, ncChar, bufr_var_dim, bufr_name_dim, deflate_level);
-   bufr_unit_var = add_var(f_out, nc_var_unit, ncChar, bufr_var_dim, bufr_unit_dim, deflate_level);
-   bufr_desc_var = add_var(f_out, nc_var_desc, ncChar, bufr_var_dim, bufr_desc_dim, deflate_level);
+   bufr_obs_var  = add_var(f_out, nc_var_obs_var, ncChar, bufr_var_dim,      strl_dim, deflate_level);
+   bufr_unit_var = add_var(f_out,    nc_var_unit, ncChar, bufr_var_dim, bufr_unit_dim, deflate_level);
+   bufr_desc_var = add_var(f_out,    nc_var_desc, ncChar, bufr_var_dim, bufr_desc_dim, deflate_level);
    
    add_att(&hdr_typ_var, "long_name", "message type");
    add_att(&hdr_sid_var, "long_name", "station identification");
@@ -2017,7 +2015,7 @@ void write_netcdf_hdr_data() {
    add_att(&hdr_arr_var, "elv_long_name", "elevation");
    add_att(&hdr_arr_var, "elv_units", "meters above sea level (msl)");
 
-   add_att(&bufr_var_var,  "long_name", "BUFR variable names from Table B");
+   add_att(&bufr_obs_var,  "long_name", "BUFR variable names from Table B");
    add_att(&bufr_unit_var, "long_name", "BUFR variable units");
    add_att(&bufr_desc_var, "long_name", "BUFR variable descriptions");
    
@@ -2199,7 +2197,7 @@ void write_netcdf_hdr_data() {
       // Variable name
       lengths[1] = BUFR_NAME_LEN;
       mlog << Debug(10) << "var_name: " << var_name << ", unit_str: " << unit_str<< "\n";
-      if(!put_nc_data(&bufr_var_var, (char *)var_name, lengths, offsets)) {
+      if(!put_nc_data(&bufr_obs_var, (char *)var_name, lengths, offsets)) {
          mlog << Error << "\nwrite_netcdf_hdr_data() -> "
               << "error writing the BUFR variable name to "
               << "the netCDF file\n\n";
