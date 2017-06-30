@@ -132,7 +132,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Pressure level (hPa) or precip accumulation interval (sec)
 
-    double obs_prs = (is_precip_grib_code(atoi(data_line[6])) ?
+    double obs_prs = ((is_precip_grib_name(data_line[6]) || is_precip_grib_code(atoi(data_line[6]))) ?
 		      timestring_to_sec(data_line[7]) : atof(data_line[7]));
 
     // Observation height (meters above sea level)
@@ -155,15 +155,12 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
       if( !isdigit(data_line[6][i]) )  {
         int var_index;
         use_var_id = true;
-        if (obs_names.has(data_line[6], var_index)) {
-           grib_code = var_index;
-        }
-        else {
+        grib_code = bad_data_int;
+        if (!obs_names.has(data_line[6], var_index)) {
            obs_names.add(data_line[6]);
-           if (obs_names.has(data_line[6], var_index)) {
-              grib_code = var_index;
-           }
+           obs_names.has(data_line[6], var_index);
         }
+        grib_code = var_index;
         break;
       }
     }

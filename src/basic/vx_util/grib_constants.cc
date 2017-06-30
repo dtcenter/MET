@@ -45,3 +45,25 @@ bool is_precip_grib_code(int gc) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+bool is_precip_grib_name(const char * grib_name) {
+   bool match = false;
+
+   //
+   // Check whether this grib name is a precipitation type:
+   //    - precipitation rate
+   //    - thunderstorm probability
+   //    - total precipitation
+   //    - large scale precipitation
+   //    - convective precipitation
+   //
+   match = (0 == strcmp(grib_name, prate_grib_name) ||
+            0 == strcmp(grib_name, tstm_grib_name)  ||
+            0 == strcmp(grib_name, apcp_grib_name)  ||
+            0 == strcmp(grib_name, ncpcp_grib_name) ||
+            0 == strcmp(grib_name, acpcp_grib_name));
+
+   return(match);
+}
+
+///////////////////////////////////////////////////////////////////////////////
