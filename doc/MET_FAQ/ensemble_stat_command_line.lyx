@@ -72,17 +72,19 @@
 \begin_body
 
 \begin_layout Section
-How to pass in different file names on the command line for ensemble_stat
+Ensemble_Stat - How to Pass in Multiple Files on the Command Line
 \end_layout
 
 \begin_layout Standard
-If the ensemble member files have different file names, just pass them in
- on the command line.
+Ensemble member files generally have different file names or are stored
+ in different directorys.
+ Wild cards may be used to pass the files into Ensemble_Stat on the command
+ line.
  Something like this:
 \end_layout
 
 \begin_layout LyX-Code
-bin/ensemble_stat 
+${MET_BUILD_BASE}/bin/ensemble_stat 
 \backslash
  
 \end_layout

@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-Map for China
+Map Example - China
 \end_layout
 
 \begin_layout Standard
@@ -174,7 +174,7 @@ map_data = { source = [
 \end_layout
 
 \begin_layout LyX-Code
-"${MET_BUILD_BASE}/map/admin_by_country/admin_China_data"; 
+"${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; 
 \end_layout
 
 \begin_layout LyX-Code
@@ -197,8 +197,8 @@ An arbitrary number of map_data "file_name" entries can be listed.
 \end_layout
 
 \begin_layout Standard
-To apply this to MODE runs, just cut-and-paste the "map_data" section listed
- above into the MODE config file.
+To apply this to any MET tool runs, just cut-and-paste the "map_data" section
+ listed above into the appropriate config file.
  That will overwrite the default settings it reads from the ConfigMapData
  file.
  Alternatively, update the default map data files in that ConfigMapData
