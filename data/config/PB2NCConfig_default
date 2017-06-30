@@ -79,6 +79,26 @@ obs_grib_code = [ "SPFH", "TMP", "HGT", "UGRD", "VGRD" ];
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Mapping of BUFR variable name to GRIB name
+//
+obs_var_map = [
+   { key = "POB";     val = "PRES"; },
+   { key = "QOB";     val = "SPFH"; },
+   { key = "TOB";     val = "TMP";  },
+   { key = "ZOB";     val = "HGT";  },
+   { key = "UOB";     val = "UGRD"; },
+   { key = "VOB";     val = "VGRD"; }
+];
+//   ,{ key = "D_DWP";   val = "DWP";  }
+//   ,{ key = "D_WDIR";  val = "WDIR"; }
+//   ,{ key = "D_WIND";  val = "WIND"; }
+//   ,{ key = "D_RH";    val = "RH";   }
+//   ,{ key = "D_MIXR";  val = "MIXR"; }
+//   ,{ key = "D_PRMSL"; val = "PRMSL";}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Use MET variable index from "var_name" variable instead of GRIB code
 //
 use_var_id = false;
