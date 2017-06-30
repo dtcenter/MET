@@ -465,6 +465,7 @@ static const char conf_key_step[]              = "step";
 static const char conf_key_grib_code[]         = "grib_code";
 static const char conf_key_vld_freq[]          = "vld_freq";
 static const char conf_key_message_type_map[]  = "message_type_map";
+static const char conf_key_obs_var_map[]       = "obs_var_map";
 static const char conf_key_key[]               = "key";
 static const char conf_key_val[]               = "val";
 static const char conf_key_boot_interval[]     = "boot.interval";

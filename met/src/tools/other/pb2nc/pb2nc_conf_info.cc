@@ -73,6 +73,7 @@ void PB2NCConfInfo::clear() {
    event_stack_flag = false;
    tmp_dir.clear();
    version.clear();
+   obs_var_map.clear();
 
    return;
 }
@@ -252,6 +253,8 @@ void PB2NCConfInfo::process_config() {
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
+
+   obs_var_map = parse_conf_obs_var_map(&conf);
 
    return;
 }

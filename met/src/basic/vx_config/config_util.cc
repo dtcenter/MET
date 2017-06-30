@@ -664,20 +664,21 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
+map<ConcatString,ConcatString> parse_conf_key_value_map(
+      Dictionary *dict, const char *conf_key_map_name) {
    Dictionary *msg_typ_dict = (Dictionary *) 0;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
    int i;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_message_type_map() -> "
+      mlog << Error << "\nparse_conf_key_value_type_map() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
 
-   // Conf: message_type_map
-   msg_typ_dict = dict->lookup_array(conf_key_message_type_map);
+   // Conf: map_name: message_type_map, obs)var_map, etc
+   msg_typ_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
    for(i=0; i<msg_typ_dict->n_entries(); i++) {
@@ -687,7 +688,7 @@ map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
       val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m.count(key) >= 1) {
-         mlog << Warning << "\nparse_conf_message_type_map() -> "
+         mlog << Warning << "\nparse_conf_key_value_type_map() -> "
               << "found multiple entries for key \""
               << key << "\"!\n\n";
       }
@@ -697,6 +698,18 @@ map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
    }
 
    return(m);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
+   return parse_conf_key_value_map(dict, conf_key_message_type_map);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,ConcatString> parse_conf_obs_var_map(Dictionary *dict) {
+   return parse_conf_key_value_map(dict, conf_key_obs_var_map);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -56,7 +56,8 @@ class PB2NCConfInfo {
       bool         event_stack_flag;    // True for top, false for bottom
       ConcatString tmp_dir;             // Directory for temporary files
       ConcatString version;             // Config file version
-
+      map<ConcatString,ConcatString> obs_var_map;
+  
       bool         anyair_flag;         // Flags for specific message types
       bool         anysfc_flag;
       bool         onlysf_flag;
@@ -69,6 +70,7 @@ class PB2NCConfInfo {
 
       void clear();
 
+      map<ConcatString,ConcatString> getObsVarMap() const {  return obs_var_map; }
       void read_config(const char *, const char *);
       void process_config();
 };
