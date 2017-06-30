@@ -59,13 +59,17 @@ typedef signed char ncbyte; // from ncvalues.h
 
 #define DEF_NC_BUFFER_SIZE          (64*1024)
 
-static const char nc_dim_nvar[]         = "var_num";
-static const char nc_dim_name[]         = "name_len";
+static const char nc_dim_nhdr[]         = "nhdr";
+static const char nc_dim_nobs[]         = "nobs";
+static const char nc_dim_hdr_arr[]      = "hdr_arr_len";
+static const char nc_dim_obs_arr[]      = "obs_arr_len";
+static const char nc_dim_mxstr[]        = "mxstr";
+static const char nc_dim_nvar[]         = "obs_var_num";
 static const char nc_dim_unit[]         = "unit_len";
 static const char nc_dim_desc[]         = "desc_len";
-static const char nc_var_desc[]         = "var_desc";
-static const char nc_var_name[]         = "var_name";
-static const char nc_var_unit[]         = "var_unit";
+static const char nc_var_desc[]         = "obs_desc";
+static const char nc_var_obs_var[]      = "obs_var";
+static const char nc_var_unit[]         = "obs_unit";
 static const char nc_att_use_var_id[]   = "use_var_id";
 
 

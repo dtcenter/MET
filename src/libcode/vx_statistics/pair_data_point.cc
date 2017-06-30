@@ -661,11 +661,15 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check whether the GRIB code for the observation matches
    // the specified code
-   if(obs_info->code() != nint(obs_arr[1])) {
-      if (var_name == 0 || (0 == strlen(var_name)) || 0 != strcmp(var_name, obs_info->name())) {
+   if ((var_name != 0) && (0 < strlen(var_name))) {
+      if (0 != strcmp(var_name, obs_info->name())) {
          rej_gc++;
          return;
       }
+   }
+   else if(obs_info->code() != nint(obs_arr[1])) {
+      rej_gc++;
+      return;
    }
 
    // Check if the observation quality flag is included in the list

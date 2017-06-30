@@ -201,10 +201,10 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
     int max_name_len = _MAX_STRING_LEN;
     char var_name[max_name_len];
     add_att(_ncFile, nc_att_use_var_id, "true");
-    NcDim var_dim  = add_dim(_ncFile, nc_dim_nvar, (long)obs_names.n_elements());
-    NcDim name_dim = add_dim(_ncFile, nc_dim_name, (long)max_name_len);
-    NcVar var_var_name  = add_var(_ncFile, nc_var_name, ncChar, var_dim, name_dim, deflate_level);
-    add_att(&var_var_name,  "long_name", "variable names from ASCII input");
+    NcDim var_dim     = add_dim(_ncFile, nc_dim_nvar, (long)obs_names.n_elements());
+    NcDim strl_dim    = get_nc_dim(_ncFile,  nc_dim_mxstr);
+    NcVar var_obs_var = add_var(_ncFile, nc_var_obs_var, ncChar, var_dim, strl_dim, deflate_level);
+    add_att(&var_obs_var,  "long_name", "variable names from ASCII input");
     
     long offsets[2] = { 0, 0 };
     long lengths[2] = { 1, max_name_len } ;
@@ -214,7 +214,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
       }
       strcpy(var_name, obs_names[i]);
 
-      if(!put_nc_data(&var_var_name, (char *)var_name, lengths, offsets)) {
+      if(!put_nc_data(&var_obs_var, (char *)var_name, lengths, offsets)) {
          mlog << Error << "\nwriteNetcdfFile() -> "
               << "error writing the variable name to the netCDF file\n\n";
          exit(1);
@@ -656,11 +656,11 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Define the NetCDF dimensions
    //
-   NcDim strl_dim    = add_dim(_ncFile,"mxstr", MAX_STRING_LEN);
-   NcDim hdr_arr_dim = add_dim(_ncFile,"hdr_arr_len", HDR_ARRAY_LEN);
-   NcDim obs_arr_dim = add_dim(_ncFile,"obs_arr_len", OBS_ARRAY_LEN);
-   NcDim hdr_dim     = add_dim(_ncFile,"nhdr", _nhdr);
-   NcDim obs_dim     = add_dim(_ncFile,"nobs"); // unlimited dimension
+   NcDim strl_dim    = add_dim(_ncFile,  nc_dim_mxstr, MAX_STRING_LEN);
+   NcDim hdr_arr_dim = add_dim(_ncFile,nc_dim_hdr_arr, HDR_ARRAY_LEN);
+   NcDim obs_arr_dim = add_dim(_ncFile,nc_dim_obs_arr, OBS_ARRAY_LEN);
+   NcDim hdr_dim     = add_dim(_ncFile,nc_dim_nhdr, _nhdr);
+   NcDim obs_dim     = add_dim(_ncFile,nc_dim_nobs); // unlimited dimension
 
    //
    // Add variables to NetCDF file
