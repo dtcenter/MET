@@ -319,7 +319,7 @@ void setup_first_pass(const DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files(unixtime valid_ut, int lead_sec) {
-   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv_bin;
+   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -332,9 +332,12 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob     = conf_info.get_max_n_fprob_thresh();
-   n_cat      = conf_info.get_max_n_cat_thresh() + 1;
-   n_eclv_bin = ceil(1.0 / conf_info.eclv_bin_size.min()) - 1;
+   n_prob = conf_info.get_max_n_fprob_thresh();
+   n_cat  = conf_info.get_max_n_cat_thresh() + 1;
+
+   for(i=0, n_eclv=0; i<conf_info.get_n_vx(); i++) {
+      n_eclv = max(n_eclv, conf_info.eclv_points[i].n_elements());
+   }
 
    max_prob_col = get_n_pjc_columns(n_prob);
    max_mctc_col = get_n_mctc_columns(n_cat);
@@ -411,7 +414,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
                break;
 
             case(i_eclv):
-               max_col = get_n_eclv_columns(n_eclv_bin)  + n_header_columns + 1;
+               max_col = get_n_eclv_columns(n_eclv)  + n_header_columns + 1;
                break;
 
             default:
@@ -447,7 +450,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
                break;
 
             case(i_eclv):
-               write_eclv_header_row(1, n_eclv_bin, txt_at[i], 0, 0);
+               write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
                break;
 
             default:
@@ -836,7 +839,7 @@ void process_scores() {
                   if(conf_info.output_flag[i_eclv] != STATOutputType_None &&
                      cts_info[m].cts.n() > 0) {
 
-                     write_eclv_row(shc, cts_info[m], conf_info.eclv_bin_size[i],
+                     write_eclv_row(shc, cts_info[m], conf_info.eclv_points[i],
                         conf_info.output_flag[i_eclv] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_eclv], i_txt_row[i_eclv]);
@@ -1098,7 +1101,7 @@ void process_scores() {
                   if(conf_info.output_flag[i_eclv] != STATOutputType_None &&
                      pct_info[m].pct.n() > 0) {
 
-                     write_eclv_row(shc, pct_info[m], conf_info.eclv_bin_size[i],
+                     write_eclv_row(shc, pct_info[m], conf_info.eclv_points[i],
                         conf_info.output_flag[i_eclv] == STATOutputType_Both,
                         stat_at, i_stat_row,
                         txt_at[i_eclv], i_txt_row[i_eclv]);

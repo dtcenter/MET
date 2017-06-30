@@ -323,7 +323,7 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_eclv_header_row(int hdr_flag, int n_bin, AsciiTable &at,
+void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
                            int r, int c) {
    int i, col;
    char tmp_str[max_str_len];
@@ -341,8 +341,8 @@ void write_eclv_header_row(int hdr_flag, int n_bin, AsciiTable &at,
    at.set_entry(r, c+1, eclv_columns[1]);
    at.set_entry(r, c+2, eclv_columns[2]);
 
-   // Write RATIO_i and VALUE_i for each bin
-   for(i=0, col=c+3; i<n_bin; i++) {
+   // Write CL_i and VALUE_i for each bin
+   for(i=0, col=c+3; i<n_pnt; i++) {
 
       sprintf(tmp_str, "%s%i", eclv_columns[3], i+1);
       at.set_entry(r, col, tmp_str);
@@ -1083,7 +1083,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
-                    double bin_size, bool txt_flag,
+                    const NumArray &eclv_points, bool txt_flag,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
 
@@ -1103,7 +1103,7 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    write_header_cols(shc, stat_at, stat_row);
 
    // Write the data columns
-   write_eclv_cols(cts_info.cts, bin_size,
+   write_eclv_cols(cts_info.cts, eclv_points,
                    stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
@@ -1123,7 +1123,7 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
-                    double bin_size, bool txt_flag,
+                    const NumArray &eclv_points, bool txt_flag,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
    int i;
@@ -1149,7 +1149,7 @@ void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       write_header_cols(shc, stat_at, stat_row);
 
       // Write the data for the 2x2 contingency table for this row
-      write_eclv_cols(pct_info.pct.ctc_by_row(i), bin_size,
+      write_eclv_cols(pct_info.pct.ctc_by_row(i), eclv_points,
                       stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
@@ -2810,39 +2810,37 @@ void write_prc_cols(const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_eclv_cols(const TTContingencyTable &ct, double bin_size,
+void write_eclv_cols(const TTContingencyTable &ct,
+                     const NumArray &eclv_points,
                      AsciiTable &at, int r, int c) {
-   int i, col, n_bin;
-
-   // Exclude ratios of 0.0 and 1.0.
-   n_bin = ceil(1.0/bin_size) - 1;
+   int i, col;
 
    //
    // Economic Cost/Loss Value
    // Dump out the ECLV line:
-   //    TOTAL,   BIN_SIZE, N_BIN,
-   //    [RATIO_], [VALUE_] (for each bin)
+   //    TOTAL,   BASER,   N_PNT,
+   //    [CL_],   [VALUE_] (for each point)
    //
    at.set_entry(r, c+0,  // Total Number of pairs
       ct.n());
 
-   at.set_entry(r, c+1,  // Bin size
-      bin_size);
+   at.set_entry(r, c+1,  // Base Rate
+      ct.baser());
 
-   at.set_entry(r, c+2,  // Number of bins
-      n_bin);
+   at.set_entry(r, c+2,  // Number of points
+      eclv_points.n_elements());
 
    //
-   // Write RATIO_i and VALUE_i count for each bin
+   // Write CL_i and VALUE_i count for each bin
    //
-   for(i=1, col=c+3; i<=n_bin; i++) {
+   for(i=0, col=c+3; i<eclv_points.n_elements(); i++) {
 
-      at.set_entry(r, col, // RATIO_i
-         i*bin_size);
+      at.set_entry(r, col, // CL_i
+         eclv_points[i]);
       col++;
 
       at.set_entry(r, col, // VALUE_i
-         ct.cost_loss(i*bin_size));
+         ct.cost_loss(eclv_points[i]));
       col++;
    }
 

@@ -57,6 +57,7 @@ void GridStatConfInfo::init_from_scratch() {
    fwind_ta    = (ThreshArray *)  0;
    owind_ta    = (ThreshArray *)  0;
    wind_logic  = (SetLogic *)     0;
+   eclv_points = (NumArray *)     0;
    mask_dp     = (DataPlane *)    0;
    interp_mthd = (InterpMthd *)   0;
    ascii_output_flag = true;
@@ -89,7 +90,6 @@ void GridStatConfInfo::clear() {
    obtype.clear();
    regrid_info.clear();
    desc.clear();
-   eclv_bin_size.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -121,6 +121,8 @@ void GridStatConfInfo::clear() {
    if(fwind_ta)    { delete [] fwind_ta;    fwind_ta    = (ThreshArray *) 0; }
    if(owind_ta)    { delete [] owind_ta;    owind_ta    = (ThreshArray *) 0; }
    if(wind_logic)  { delete [] wind_logic;  wind_logic  = (SetLogic *)    0; }
+
+   if(eclv_points) { delete [] eclv_points; eclv_points = (NumArray *)    0; }
 
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)   0; }
    if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)  0; }
@@ -246,16 +248,17 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    check_climo_n_vx(&conf, n_vx);
 
    // Allocate space based on the number of verification tasks
-   fcst_info  = new VarInfo *   [n_vx];
-   obs_info   = new VarInfo *   [n_vx];
-   fcat_ta    = new ThreshArray [n_vx];
-   ocat_ta    = new ThreshArray [n_vx];
-   fcnt_ta    = new ThreshArray [n_vx];
-   ocnt_ta    = new ThreshArray [n_vx];
-   cnt_logic  = new SetLogic    [n_vx];
-   fwind_ta   = new ThreshArray [n_vx];
-   owind_ta   = new ThreshArray [n_vx];
-   wind_logic = new SetLogic    [n_vx];
+   fcst_info   = new VarInfo *   [n_vx];
+   obs_info    = new VarInfo *   [n_vx];
+   fcat_ta     = new ThreshArray [n_vx];
+   ocat_ta     = new ThreshArray [n_vx];
+   fcnt_ta     = new ThreshArray [n_vx];
+   ocnt_ta     = new ThreshArray [n_vx];
+   cnt_logic   = new SetLogic    [n_vx];
+   fwind_ta    = new ThreshArray [n_vx];
+   owind_ta    = new ThreshArray [n_vx];
+   wind_logic  = new SetLogic    [n_vx];
+   eclv_points = new NumArray    [n_vx];
 
    // Initialize pointers
    for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
@@ -278,8 +281,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       // Conf: desc
       desc.add(parse_conf_string(&i_odict, conf_key_desc));
 
-      // Conf: desc
-      eclv_bin_size.add(i_odict.lookup_double(conf_key_eclv_bin));
+      // Conf: eclv_points
+      eclv_points[i] = parse_conf_eclv_points(&i_odict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {

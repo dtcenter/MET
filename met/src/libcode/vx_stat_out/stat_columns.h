@@ -178,8 +178,8 @@ static const char * prc_columns [] = {
 };
 
 static const char * eclv_columns [] = {
-   "TOTAL",       "BIN_SIZE",    "N_BIN",
-   "RATIO_",      "VALUE_"
+   "TOTAL",       "BASER",    "N_PNT",
+   "CL_",         "VALUE_"
 };
 
 static const char * mpr_columns [] = {
@@ -430,9 +430,9 @@ extern void write_pjc_row   (StatHdrColumns &, const PCTInfo &, bool,
 extern void write_prc_row   (StatHdrColumns &, const PCTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &,
                              bool update_thresh = true);
-extern void write_eclv_row  (StatHdrColumns &, const CTSInfo &, double, bool,
+extern void write_eclv_row  (StatHdrColumns &, const CTSInfo &, const NumArray &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
-extern void write_eclv_row  (StatHdrColumns &, const PCTInfo &, double, bool,
+extern void write_eclv_row  (StatHdrColumns &, const PCTInfo &, const NumArray &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_nbrctc_row(StatHdrColumns &, const NBRCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
@@ -476,7 +476,7 @@ extern void write_pct_cols   (const PCTInfo &,          AsciiTable &, int, int);
 extern void write_pstd_cols  (const PCTInfo &,     int, AsciiTable &, int, int);
 extern void write_pjc_cols   (const PCTInfo &,          AsciiTable &, int, int);
 extern void write_prc_cols   (const PCTInfo &,          AsciiTable &, int, int);
-extern void write_eclv_cols  (const TTContingencyTable &, double, AsciiTable &, int, int);
+extern void write_eclv_cols  (const TTContingencyTable &, const NumArray &, AsciiTable &, int, int);
 extern void write_nbrctc_cols(const NBRCTSInfo &,       AsciiTable &, int, int);
 extern void write_nbrcts_cols(const NBRCTSInfo &,  int, AsciiTable &, int, int);
 extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);

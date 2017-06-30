@@ -33,6 +33,7 @@
 //
 static const double default_alpha          = 0.05;
 static const double default_bin_size       = 0.05;
+static const double default_eclv_points    = 0.05;
 static const int    default_boot_interval  = 1;
 static const double default_boot_rep_prop  = 1.0;
 static const int    default_n_boot_rep     = 1000;
@@ -250,6 +251,7 @@ class STATAnalysisJob {
       SetLogic     out_wind_logic;       // output wind speed thresholding logic
       double       out_alpha;            // output alpha value
       double       out_bin_size;         // output PHIST bin size
+      NumArray     out_eclv_points;      // output ECLV points
 
       //
       // Variables used for the stat_job_aggr_mpr job type

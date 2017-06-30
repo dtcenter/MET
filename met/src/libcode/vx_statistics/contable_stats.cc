@@ -738,9 +738,9 @@ double TTContingencyTable::cost_loss(double r) const {
    double num, den, h, m, f, b, v;
 
    // Hit rate, miss rate, false alarm rate, and base rate
-   h = (double) fy_oy() / n();
-   m = (double) fn_oy() / n();
-   f = (double) fy_on() / n();
+   h = (double) fy_oy() / oy();
+   m = (double) fn_oy() / oy();
+   f = (double) fy_on() / on();
    b = baser();
 
    if(r < b) {

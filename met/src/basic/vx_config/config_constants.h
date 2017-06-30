@@ -522,7 +522,7 @@ static const char conf_key_grib_ens_hi_res_ctl [] = "hi_res_ctl";
 static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
 
 static const char conf_key_shape[]             = "shape";
-static const char conf_key_eclv_bin[]          = "eclv_bin_size";
+static const char conf_key_eclv_points[]       = "eclv_points";
 
 //
 // Climatology parameter key names

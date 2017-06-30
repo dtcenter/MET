@@ -333,11 +333,14 @@ regrid = {
 //     settings are combined when filtering matched pairs of forecast and
 //     observed wind speeds.
 //
-//   - The "eclv_bin_size" entry specifies a value between 0 and 1.  The number
-//     of economic cost/loss ratios to be written to the ECLV output line is
-//     computed as 1.0/eclv_bin_size - 1.  For example, a bin size of 0.05
-//     results in 1.0/0.05 - 1 = 19 cost/loss ratios.  Cost/loss values are
-//     omitted for ratios of 0.0 and 1.0 since they are undefined.
+//   - The "eclv_points" entry specifies the economic cost/loss ratio points 
+//     to be evaluated.  For each cost/loss ratio specified, the relative value
+//     will be computed and written to the ECLV output line.  This entry may 
+//     either be specified as an array of numbers between 0 and 1 or as a single
+//     number.  For an array, each array entry will be evaluated.  For a single
+//     number, all evenly spaced points between 0 and 1 will be evaluated, where
+//     eclv_points defines the spacing.  Cost/loss values are omitted for 
+//     ratios of 0.0 and 1.0 since they are undefined.
 //
 //   - The "init_time" entry specifies the initialization time in YYYYMMDD[_HH[MMSS]]
 //     format.  This entry can be included in the "fcst" entry as shown below or
@@ -416,15 +419,15 @@ regrid = {
 //
 //
 fcst = {
-   cnt_thresh    = [ NA ];
-   cnt_logic     = UNION;
-   wind_thresh   = [ NA ];
-   wind_logic    = UNION;
-   eclv_bin_size = 0.05;
-   message_type  = [ "ADPSFC" ];
-   init_time     = "20120619_12";
-   valid_time    = "20120620_00";
-   lead_time     = "12";
+   cnt_thresh   = [ NA ];
+   cnt_logic    = UNION;
+   wind_thresh  = [ NA ];
+   wind_logic   = UNION;
+   eclv_points  = 0.05;
+   message_typ  = [ "ADPSFC" ];
+   init_time    = "20120619_12";
+   valid_time   = "20120620_00";
+   lead_time    = "12";
 
    field = [
       {

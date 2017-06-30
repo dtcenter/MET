@@ -110,7 +110,7 @@ class PointStatConfInfo {
       StringArray *     sid_exc;            // Array of station ID's to exclude [n_vx]
       StringArray *     obs_qty;            // Array for quality flags [n_vx]
 
-      NumArray          eclv_bin_size;      // ECLV bin sizes [n_vx]
+      NumArray *        eclv_points;        // ECLV points [n_vx]
 
       vector<DuplicateType> dup_flgs;
       vector<ObsSummary> obs_smry;
