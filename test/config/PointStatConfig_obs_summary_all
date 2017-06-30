@@ -37,6 +37,7 @@ wind_logic  = UNION;
 duplicate_flag = UNIQUE;
 obs_summary    = NONE;
 obs_perc_value = 50;
+eclv_points    = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -119,7 +120,7 @@ fcst = {
 	obs_summary = PERC;
 	obs_perc_value = 25;
 	desc = "Obs_Summary:25th_Percentile";
-      }      
+      }
    ];
 
 }
@@ -197,6 +198,7 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
+   eclv   = STAT;
    mpr    = BOTH;
 }
 

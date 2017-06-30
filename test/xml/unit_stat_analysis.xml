@@ -205,6 +205,8 @@
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_sl1l2_out.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_ctc_dump.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_ctc_out.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_dump.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_out.stat</stat>
     </output>
   </test>
 

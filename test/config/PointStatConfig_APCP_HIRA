@@ -29,6 +29,7 @@ cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
 wind_logic  = UNION;
+eclv_points = 0.05;
 
 cat_thresh   = [ >0.254, >2.540 ];
 sid_exc      = [];
@@ -108,6 +109,7 @@ output_flag = {
    pstd   = BOTH;
    pjc    = BOTH;
    prc    = BOTH;
+   eclv   = BOTH;
    mpr    = BOTH;
 }
 

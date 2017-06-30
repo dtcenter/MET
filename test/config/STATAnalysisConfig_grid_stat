@@ -65,7 +65,8 @@ weight = [];
 jobs = [
    "-job filter -line_type CNT -fcst_thresh NA -alpha 0.05 -dump_row ${OUTPUT_DIR}/CONFIG_GRID_STAT_filter.stat",
    "-job aggregate_stat -line_type SL1L2 -fcst_thresh NA -out_line_type CNT -dump_row ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_stat_sl1l2_dump.stat -out_stat ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_stat_sl1l2_out.stat -set_hdr VX_MASK CONUS",
-   "-job aggregate -line_type CTC -fcst_thresh \<273 -dump_row ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_ctc_dump.stat -out_stat ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_ctc_out.stat -set_hdr VX_MASK CONUS"
+   "-job aggregate -line_type CTC -fcst_thresh \<273 -dump_row ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_ctc_dump.stat -out_stat ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_ctc_out.stat -set_hdr VX_MASK CONUS",
+   "-job aggregate_stat -line_type CTC -out_line_type ECLV -fcst_thresh \<273 -dump_row ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_dump.stat -out_stat ${OUTPUT_DIR}/CONFIG_GRID_STAT_agg_stat_ctc_to_eclv_out.stat -set_hdr VX_MASK CONUS"
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

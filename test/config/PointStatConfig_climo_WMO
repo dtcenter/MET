@@ -24,6 +24,7 @@ desc = "WMO_CLIMO";
 //
 regrid = {
    to_grid    = "${CLIMO_DIR}/mslp_mean.grib";
+   to_grid    = "G212";
    method     = BILIN;
    width      = 2;
    vld_thresh = 0.5;
@@ -36,6 +37,7 @@ cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
 wind_logic  = UNION;
+eclv_points = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -47,19 +49,10 @@ fcst = {
    level = ["P500", "P850"];
 
    field = [
-      {
-        name         = "TMP";
-      },
- 
-      {
-        name         = "UGRD";
-      },
-      {
-        name         = "VGRD";
-      },
-      {
-        name         = "WIND";
-      }
+      { name = "TMP";  },
+      { name = "UGRD"; },
+      { name = "VGRD"; },
+      { name = "WIND"; }
    ];
 }
 obs = fcst;
@@ -72,17 +65,17 @@ obs = fcst;
 climo_mean = fcst;
 climo_mean = {
 
-   file_name = [ "${CLIMO_DIR}/t500hPa_mean.grib", 
-                 "${CLIMO_DIR}/t850hPa_mean.grib", 
-                 "${CLIMO_DIR}/u500hPa_mean.grib", 
-                 "${CLIMO_DIR}/u850hPa_mean.grib", 
-                 "${CLIMO_DIR}/v500hPa_mean.grib", 
-                 "${CLIMO_DIR}/v850hPa_mean.grib", 
-                 "${CLIMO_DIR}/ws500hPa_mean.grib", 
+   file_name = [ "${CLIMO_DIR}/t500hPa_mean.grib",
+                 "${CLIMO_DIR}/t850hPa_mean.grib",
+                 "${CLIMO_DIR}/u500hPa_mean.grib",
+                 "${CLIMO_DIR}/u850hPa_mean.grib",
+                 "${CLIMO_DIR}/v500hPa_mean.grib",
+                 "${CLIMO_DIR}/v850hPa_mean.grib",
+                 "${CLIMO_DIR}/ws500hPa_mean.grib",
                  "${CLIMO_DIR}/ws850hPa_mean.grib" ];
 
    regrid = {
-      method     = NEAREST;
+      method     = NONE;
       width      = 1;
       vld_thresh = 0.5;
    }
@@ -176,6 +169,7 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
+   eclv   = NONE;
    mpr    = BOTH;
 }
 
