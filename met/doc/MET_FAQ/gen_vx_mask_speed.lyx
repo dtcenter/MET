@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-Improving speed with gen_vx_mask
+Improving Speed of MET Tools with Gen_Vx_Mask
 \end_layout
 
 \begin_layout Standard
@@ -87,9 +87,7 @@ The main reason to use gen_vx_mask is to make the MET statistics tools (i.e.
 \end_layout
 
 \begin_layout Standard
-The gen_vx_mask tool supports use of a smaller grid to create a mask for
- a larger grid.
- 
+
 \end_layout
 
 \begin_layout Standard

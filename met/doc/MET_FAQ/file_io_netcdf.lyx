@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-MET compatibility with NetCDF files
+File_IO - MET Compatibility with NetCDF Files
 \end_layout
 
 \begin_layout Standard
@@ -86,12 +86,17 @@ MET does not support all types of gridded NetCDF files.
 When using a new data file format, instead of running it through MODE, use
  plot_data_plane to make sure MET is reading it correctly.
  This will make sure the name and level settings work as expected, and it
- also creates an output plot so I can see that MET is (or is not) reading/plotti
-ng the data as expected.
+ also creates an output plot for you to inspect.
 \end_layout
 
 \begin_layout Standard
-Here is an example for ${MET_BUILD_BASE}/plot_data_plane:
+Here is an example
+\end_layout
+
+\begin_layout LyX-Code
+${MET_BUILD_BASE}/plot_data_plane
+\backslash
+
 \end_layout
 
 \begin_layout LyX-Code
