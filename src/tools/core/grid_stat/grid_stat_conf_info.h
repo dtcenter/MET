@@ -141,7 +141,7 @@ class GridStatConfInfo {
       ThreshArray *     owind_ta;           // Array for obs wind speed thresholds [n_vx]
       SetLogic *        wind_logic;         // Array of wind speed field logic [n_vx]
 
-      NumArray          eclv_bin_size;      // ECLV bin sizes [n_vx]
+      NumArray *        eclv_points;        // ECLV points [n_vx]
 
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]

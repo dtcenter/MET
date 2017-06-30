@@ -60,6 +60,7 @@ void PointStatConfInfo::init_from_scratch() {
    msg_typ     = (StringArray *)     0;
    sid_exc     = (StringArray *)     0;
    obs_qty     = (StringArray *)     0;
+   eclv_points = (NumArray *)        0;
    mask_dp     = (DataPlane *)       0;
    interp_mthd = (InterpMthd *)      0;
    vx_pd       = (VxPairDataPoint *) 0;
@@ -94,7 +95,6 @@ void PointStatConfInfo::clear() {
    model.clear();
    regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
-   eclv_bin_size.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -126,6 +126,7 @@ void PointStatConfInfo::clear() {
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)      0; }
    if(sid_exc)     { delete [] sid_exc;     sid_exc     = (StringArray *)      0; }
    if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)      0; }
+   if(eclv_points) { delete [] eclv_points; eclv_points = (NumArray *)         0; }
    if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)        0; }
    if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)      0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataPoint *)  0; }
@@ -233,18 +234,19 @@ void PointStatConfInfo::process_config(GrdFileType ftype, bool use_var_id) {
    check_climo_n_vx(&conf, n_vx);
 
    // Allocate space based on the number of verification tasks
-   vx_pd      = new VxPairDataPoint [n_vx];
-   fcat_ta    = new ThreshArray     [n_vx];
-   ocat_ta    = new ThreshArray     [n_vx];
-   fcnt_ta    = new ThreshArray     [n_vx];
-   ocnt_ta    = new ThreshArray     [n_vx];
-   cnt_logic  = new SetLogic        [n_vx];
-   fwind_ta   = new ThreshArray     [n_vx];
-   owind_ta   = new ThreshArray     [n_vx];
-   wind_logic = new SetLogic        [n_vx];
-   msg_typ    = new StringArray     [n_vx];
-   sid_exc    = new StringArray     [n_vx];
-   obs_qty    = new StringArray     [n_vx];
+   vx_pd       = new VxPairDataPoint [n_vx];
+   fcat_ta     = new ThreshArray     [n_vx];
+   ocat_ta     = new ThreshArray     [n_vx];
+   fcnt_ta     = new ThreshArray     [n_vx];
+   ocnt_ta     = new ThreshArray     [n_vx];
+   cnt_logic   = new SetLogic        [n_vx];
+   fwind_ta    = new ThreshArray     [n_vx];
+   owind_ta    = new ThreshArray     [n_vx];
+   wind_logic  = new SetLogic        [n_vx];
+   msg_typ     = new StringArray     [n_vx];
+   sid_exc     = new StringArray     [n_vx];
+   obs_qty     = new StringArray     [n_vx];
+   eclv_points = new NumArray        [n_vx];
    dup_flgs.reserve(n_vx);
    obs_smry.reserve(n_vx);
    obs_percs.reserve(n_vx);
@@ -283,8 +285,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype, bool use_var_id) {
       obs_qty[i] = parse_conf_obs_qty(&i_odict);
       vx_pd[i].set_obs_qty_filt(obs_qty[i]);
 
-      // Conf: eclv_bin_size
-      eclv_bin_size.add(i_odict.lookup_double(conf_key_eclv_bin));
+      // Conf: eclv_points
+      eclv_points[i] = parse_conf_eclv_points(&i_odict);
 
       // Set the current dictionaries
       vx_pd[i].fcst_info->set_dict(i_fdict);

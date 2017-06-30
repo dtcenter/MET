@@ -1025,11 +1025,11 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
                         map<ConcatString, AggrCTCInfo> &m,
                         AsciiTable &at) {
    map<ConcatString, AggrCTCInfo>::iterator it;
-   int n_row, n_col, n_bin, r, c;
+   int n_row, n_col, n_pnt, r, c;
    NBRCTSInfo nbrcts_info;
    StatHdrColumns shc;
 
-   n_bin = ceil(1.0/j.out_bin_size) - 1;
+   n_pnt = j.out_eclv_points.n_elements();
 
    //
    // Setup the output table
@@ -1039,7 +1039,7 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    n_col += n_fho_columns;
    else if(lt == stat_ctc)    n_col += n_ctc_columns;
    else if(lt == stat_cts)    n_col += n_cts_columns;
-   else if(lt == stat_eclv)   n_col += get_n_eclv_columns(n_bin);
+   else if(lt == stat_eclv)   n_col += get_n_eclv_columns(n_pnt);
    else if(lt == stat_nbrctc) n_col += n_nbrctc_columns;
    else if(lt == stat_nbrcts) n_col += n_nbrcts_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
@@ -1051,14 +1051,14 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
    else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
    else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
-   else if(lt == stat_eclv)   write_eclv_header_row(        0, n_bin,               at, 0, c);
+   else if(lt == stat_eclv)   write_eclv_header_row(        0, n_pnt,               at, 0, c);
    else if(lt == stat_nbrctc) write_header_row(nbrctc_columns, n_nbrctc_columns, 0, at, 0, c);
    else if(lt == stat_nbrcts) write_header_row(nbrcts_columns, n_nbrcts_columns, 0, at, 0, c);
 
    //
    // Setup the output STAT file
    //
-   j.setup_stat_file(n_row, n_bin);
+   j.setup_stat_file(n_row, n_pnt);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1132,8 +1132,8 @@ void write_job_aggr_ctc(STATAnalysisJob &j, STATLineType lt,
       else if(lt == stat_eclv) {
          at.set_entry(r, c++, "ECLV:");
          write_case_cols(it->first, at, r, c);
-         write_eclv_cols(it->second.cts_info.cts, j.out_bin_size, at, r, c);
-         if(j.stat_out) write_eclv_cols(it->second.cts_info.cts, j.out_bin_size, j.stat_at, r, n_header_columns);
+         write_eclv_cols(it->second.cts_info.cts, j.out_eclv_points, at, r, c);
+         if(j.stat_out) write_eclv_cols(it->second.cts_info.cts, j.out_eclv_points, j.stat_at, r, n_header_columns);
       }
       //
       // NBRCTC output line
@@ -1287,10 +1287,8 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
                         map<ConcatString, AggrPCTInfo> &m,
                         AsciiTable &at) {
    map<ConcatString, AggrPCTInfo>::iterator it;
-   int n, n_row, n_col, n_bin, r, c, i;
+   int n, n_row, n_col, n_pnt, r, c, i;
    StatHdrColumns shc;
-
-   n_bin = ceil(1.0/j.out_bin_size) - 1;
 
    //
    // Determine the maximum PCT dimension
@@ -1298,6 +1296,8 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    for(it = m.begin(), n = 0; it != m.end(); it++) {
       n = max(it->second.pct_info.pct.nrows() + 1, n);
    }
+
+   n_pnt = j.out_eclv_points.n_elements();
 
    //
    // Setup the output table
@@ -1309,7 +1309,7 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_pstd) n_col += get_n_pstd_columns(n);
    else if(lt == stat_pjc)  n_col += get_n_pjc_columns(n);
    else if(lt == stat_prc)  n_col += get_n_prc_columns(n);
-   else if(lt == stat_eclv) n_col += get_n_eclv_columns(n_bin);
+   else if(lt == stat_eclv) n_col += get_n_eclv_columns(n_pnt);
    write_job_aggr_hdr(j, n_row, n_col, at);
 
    //
@@ -1320,12 +1320,12 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_pstd) write_pstd_header_row(0, n, at, 0, c);
    else if(lt == stat_pjc)  write_pjc_header_row (0, n, at, 0, c);
    else if(lt == stat_prc)  write_prc_header_row (0, n, at, 0, c);
-   else if(lt == stat_eclv) write_eclv_header_row(0, n_bin, at, 0, c);
+   else if(lt == stat_eclv) write_eclv_header_row(0, n_pnt, at, 0, c);
 
    //
    // Setup the output STAT file
    //
-   if(lt == stat_eclv) j.setup_stat_file(n_row, n_bin);
+   if(lt == stat_eclv) j.setup_stat_file(n_row, n_pnt);
    else                j.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
@@ -1413,12 +1413,12 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
             at.set_entry(r, c++, "ECLV:");
             write_case_cols(it->first, at, r, c);
             write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
-                            j.out_bin_size, at, r, c);
+                            j.out_eclv_points, at, r, c);
             if(j.stat_out) {
                shc.set_fcst_thresh(prob_ta[i]);
                write_header_cols(shc, j.stat_at, r);
                write_eclv_cols(it->second.pct_info.pct.ctc_by_row(i),
-                               j.out_bin_size, j.stat_at, r, n_header_columns);
+                               j.out_eclv_points, j.stat_at, r, n_header_columns);
             }
          }
       }
@@ -2364,7 +2364,7 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
         if(lt == stat_fho)    { n_col += n_fho_columns; }
    else if(lt == stat_ctc)    { n_col += n_ctc_columns; }
    else if(lt == stat_cts)    { n_col += n_cts_columns; }
-   else if(lt == stat_eclv)   { n      = ceil(1.0/j.out_bin_size) - 1;
+   else if(lt == stat_eclv)   { n      = j.out_eclv_points.n_elements();
                                 n_col += get_n_eclv_columns(n); }
    else if(lt == stat_mctc)   { n      = j.out_fcst_thresh.n_elements()+1;
                                 n_col += get_n_mctc_columns(n); }
@@ -2474,8 +2474,8 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
          mpr_to_ctc(j, it->second, cts_info);
          at.set_entry(r, c++, "ECLV:");
          write_case_cols(it->first, at, r, c);
-         write_eclv_cols(cts_info.cts, j.out_bin_size, at, r, c);
-         if(j.stat_out) write_eclv_cols(cts_info.cts, j.out_bin_size, j.stat_at, r, n_header_columns);
+         write_eclv_cols(cts_info.cts, j.out_eclv_points, at, r, c);
+         if(j.stat_out) write_eclv_cols(cts_info.cts, j.out_eclv_points, j.stat_at, r, n_header_columns);
       }
       //
       // MCTC output line

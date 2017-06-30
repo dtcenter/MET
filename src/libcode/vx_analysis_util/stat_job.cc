@@ -196,16 +196,20 @@ void STATAnalysisJob::clear() {
    swing_width     = bad_data_double;
 
    // Set to default values
-   out_alpha      = default_alpha;
-   out_bin_size   = default_bin_size;
-   boot_interval  = default_boot_interval;
-   boot_rep_prop  = default_boot_rep_prop;
-   n_boot_rep     = default_n_boot_rep;
+   out_alpha       = default_alpha;
+   out_bin_size    = default_bin_size;
+   boot_interval   = default_boot_interval;
+   boot_rep_prop   = default_boot_rep_prop;
+   n_boot_rep      = default_n_boot_rep;
    set_boot_rng (default_boot_rng);
    set_boot_seed(default_boot_seed);
-   rank_corr_flag = default_rank_corr_flag;
-   vif_flag       = default_vif_flag;
+   rank_corr_flag  = default_rank_corr_flag;
+   vif_flag        = default_vif_flag;
 
+   for(int i=1; i*default_eclv_points < 1.0; i++) {
+      out_eclv_points.add(i*default_eclv_points);
+   }
+ 
    mask_poly.clear();
    mask_sid.clear();
 
@@ -287,6 +291,7 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    out_wind_logic       = aj.out_wind_logic;
    out_alpha            = aj.out_alpha;
    out_bin_size         = aj.out_bin_size;
+   out_eclv_points      = aj.out_eclv_points;
 
    ramp_type            = aj.ramp_type;
    ramp_time_fcst       = aj.ramp_time_fcst;
@@ -486,6 +491,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "out_bin_size = "
        << out_bin_size << "\n";
+
+   out << prefix << "out_eclv_points ...\n";
+   out_eclv_points.dump(out, depth + 1);
 
    out << prefix << "ramp_type = "
        << timeseriestype_to_string(ramp_type) << "\n";
@@ -919,6 +927,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-out_line_type"  ) == 0) {
          out_line_type.clear();
       }
+      else if(strcmp(jc_array[i], "-out_eclv_points") == 0) {
+         out_eclv_points.clear();
+      }
       else if(strcmp(jc_array[i], "-out_thresh"     ) == 0) {
          out_fcst_thresh.clear();
          out_obs_thresh.clear();
@@ -1261,6 +1272,10 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          out_bin_size = atof(jc_array[i+1]);
          i++;
       }
+      else if(strcmp(jc_array[i], "-out_eclv_points") == 0) {
+         out_eclv_points.add_css(jc_array[i+1]);
+         i++;
+      }
       else if(strcmp(jc_array[i], "-boot_interval") == 0) {
          boot_interval = atoi(jc_array[i+1]);
          i++;
@@ -1299,6 +1314,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       } // end if
 
    } // end for
+
+   // Expand out_eclv_points
+   if(out_eclv_points.n_elements() == 1) {
+      for(i=2; i*out_eclv_points[0] < 1.0; i++) out_eclv_points.add(i*out_eclv_points[0]);
+   }
 
    //
    // Deallocate memory
@@ -2194,6 +2214,18 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
          // out_bin_size
         js << "-out_bin_size " << out_bin_size << " ";
+      }
+   }
+
+   // Jobs which use out_eclv_points
+   if(line_type.n_elements() > 0) {
+      if(string_to_statlinetype(line_type[0]) == stat_mpr &&
+         out_line_type.has(stat_eclv_str)) {
+
+         // out_eclv_points
+         for(i=0; i<out_eclv_points.n_elements(); i++) {
+            js << "-out_eclv_points " << out_eclv_points[i] << " ";
+         }
       }
    }
 

@@ -310,7 +310,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv_bin;
+   int i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -323,9 +323,12 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob     = conf_info.get_max_n_fprob_thresh();
-   n_cat      = conf_info.get_max_n_cat_thresh() + 1;
-   n_eclv_bin = ceil(1.0 / conf_info.eclv_bin_size.min()) - 1;
+   n_prob = conf_info.get_max_n_fprob_thresh();
+   n_cat  = conf_info.get_max_n_cat_thresh() + 1;
+
+   for(i=0, n_eclv=0; i<conf_info.get_n_vx(); i++) {
+      n_eclv = max(n_eclv, conf_info.eclv_points[i].n_elements());
+   }
 
    // Check for HiRA output
    if(conf_info.hira_info.flag) {
@@ -407,7 +410,7 @@ void setup_txt_files() {
                break;
 
             case(i_eclv):
-               max_col = get_n_eclv_columns(n_eclv_bin) + n_header_columns + 1;
+               max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
                break;
 
             default:
@@ -443,7 +446,7 @@ void setup_txt_files() {
                break;
 
             case(i_eclv):
-               write_eclv_header_row(1, n_eclv_bin, txt_at[i], 0, 0);
+               write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
                break;
 
             default:
@@ -648,7 +651,7 @@ void process_obs_file(int i_nc) {
    NcVar hdr_sid_var ;
    NcVar hdr_vld_var ;
    NcVar hdr_arr_var ;
-   
+
    int var_num = 0;
    int var_name_len = 0;
    bool use_var_id = false;
@@ -684,7 +687,7 @@ void process_obs_file(int i_nc) {
    hdr_vld_var = get_nc_var(obs_in, "hdr_vld");
    hdr_arr_var = get_nc_var(obs_in, "hdr_arr");
    if (has_var(obs_in, "obs_qty")) obs_qty_var = get_nc_var(obs_in, "obs_qty");
-   
+
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
 
@@ -1204,7 +1207,7 @@ void process_scores() {
 
                      // Write out ECLV
                      if(conf_info.output_flag[i_eclv] != STATOutputType_None) {
-                        write_eclv_row(shc, cts_info[m], conf_info.eclv_bin_size[i],
+                        write_eclv_row(shc, cts_info[m], conf_info.eclv_points[i],
                            conf_info.output_flag[i_eclv] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_eclv], i_txt_row[i_eclv]);
@@ -1412,7 +1415,7 @@ void process_scores() {
 
                      // Write out ECLV
                      if(conf_info.output_flag[i_eclv] != STATOutputType_None) {
-                        write_eclv_row(shc, pct_info[m], conf_info.eclv_bin_size[i],
+                        write_eclv_row(shc, pct_info[m], conf_info.eclv_points[i],
                            conf_info.output_flag[i_eclv] == STATOutputType_Both,
                            stat_at, i_stat_row,
                            txt_at[i_eclv], i_txt_row[i_eclv]);

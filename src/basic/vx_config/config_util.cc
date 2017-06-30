@@ -558,6 +558,46 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+NumArray parse_conf_eclv_points(Dictionary *dict) {
+   NumArray na;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_eclv_points() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   na = dict->lookup_num_array(conf_key_eclv_points);
+
+   // Check that at least value is provided
+   if(na.n_elements() == 0) {
+      mlog << Error << "\nparse_conf_eclv_points() -> "
+           << "At least one \"" << conf_key_eclv_points
+           << "\" entry must be specified.\n\n";
+      exit(1);
+   }
+
+   // Intrepet a single value as the step size
+   if(na.n_elements() == 1) {
+      for(i=2; i*na[0] < 1.0; i++) na.add(na[0]*i);
+   }
+
+   // Range check cost/loss ratios
+   for(i=0; i<na.n_elements(); i++) {
+      if(na[i] <= 0.0 || na[i] >= 1.0) {
+         mlog << Error << "\nparse_conf_eclv_points() -> "
+              << "All cost/loss ratios (" << na[i]
+              << ") must be greater than 0 and less than 1.\n\n";
+         exit(1);
+      }
+   }
+
+   return(na);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    Dictionary *ts_dict = (Dictionary *) 0;
    TimeSummaryInfo info;
