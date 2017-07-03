@@ -20,6 +20,7 @@ libvx_grid_a_SOURCES = \
               lc_grid.cc lc_grid.h \
               merc_grid_defs.h \
               merc_grid.cc merc_grid.h \
+              gaussian_grid.cc gaussian_grid.h \
               st_grid_defs.h \
               st_grid.cc st_grid.h \
               vx_grid.h
