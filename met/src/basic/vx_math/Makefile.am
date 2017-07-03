@@ -22,6 +22,7 @@ libvx_math_a_SOURCES = viewgravity_to_string.cc viewgravity_to_string.h \
                math_constants.h \
                is_bad_data.h \
                trig.h \
+               legendre.cc legendre.h \
                vx_math.h
 libvx_math_a_CPPFLAGS = ${MET_CPPFLAGS}
 
