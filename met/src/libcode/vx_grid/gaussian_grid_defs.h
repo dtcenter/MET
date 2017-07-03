@@ -1,3 +1,5 @@
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2017
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -8,35 +10,33 @@
 
 
 
-////////////////////////////////////////////////////////////////////////
-
-
-#ifndef  __VX_MATH_H__
-#define  __VX_MATH_H__
-
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "vx_cal.h"
-#include "trig.h"
-#include "angles.h"
-#include "nint.h"
-#include "nti.h"
-#include "hist.h"
-#include "ptile.h"
-#include "math_constants.h"
-#include "pwl.h"
-#include "is_bad_data.h"
-#include "affine.h"
-#include "viewgravity_to_string.h"
-#include "legendre.h"
+#ifndef  __GAUSSIAN_GRID_DEFINITIONS_H__
+#define  __GAUSSIAN_GRID_DEFINITIONS_H__
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   //  __VX_MATH_H__
+struct GaussianData {
+
+   const char * name;   //  not allocated
+
+   double Lon_Zero;     //  longitude that has x = 0
+
+   int Nx;
+   int Ny;
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#endif   /*  __GAUSSIAN_GRID_DEFINITIONS_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

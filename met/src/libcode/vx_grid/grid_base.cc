@@ -114,6 +114,7 @@ lc = (const LambertData *)       0;
 st = (const StereographicData *) 0;
 ll = (const LatLonData *)        0;
 m  = (const MercatorData *)      0;
+g  = (const GaussianData *)      0;
 
 clear();
 
@@ -133,6 +134,7 @@ if ( lc )  { delete lc; lc = (const LambertData *)       0; };
 if ( st )  { delete st; st = (const StereographicData *) 0; };
 if ( ll )  { delete ll; ll = (const LatLonData *)        0; };
 if ( m  )  { delete m;  m  = (const MercatorData *)      0; };
+if ( g  )  { delete g;  g  = (const GaussianData *)      0; };
 
 swap_to_north =  false;
 
@@ -152,6 +154,7 @@ if ( info.lc )  set( *(info.lc) );
 if ( info.st )  set( *(info.st) );
 if ( info.ll )  set( *(info.ll) );
 if ( info.m  )  set( *(info.m ) );
+if ( info.g  )  set( *(info.g ) );
 
 this->swap_to_north = info.swap_to_north;
 
@@ -173,6 +176,7 @@ if ( lc ) ++count;
 if ( st ) ++count;
 if ( ll ) ++count;
 if ( m  ) ++count;
+if ( g  ) ++count;
 
 return ( count == 1 );
 
@@ -182,7 +186,7 @@ return ( count == 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-void GridInfo::create_grid(Grid & g) const
+void GridInfo::create_grid(Grid & gg) const
 
 {
 
@@ -194,12 +198,13 @@ if ( !(ok()) )  {
 
 }
 
-     if ( lc )  g.set( *lc );
-else if ( st )  g.set( *st );
-else if ( ll )  g.set( *ll );
-else if ( m  )  g.set( *m  );
+     if ( lc )  gg.set( *lc );
+else if ( st )  gg.set( *st );
+else if ( ll )  gg.set( *ll );
+else if ( m  )  gg.set( *m  );
+else if ( g  )  gg.set( *g  );
 
-g.set_swap_to_north(swap_to_north);
+gg.set_swap_to_north(swap_to_north);
 
 return;
 
@@ -296,8 +301,32 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+void GridInfo::set(const GaussianData & data)
+
+{
+
+clear();
+
+GaussianData * D = (GaussianData *) 0;
+
+D = new GaussianData;
+
+memcpy(D, &data, sizeof(data));
+
+g = D;  D = (GaussianData *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 void GridInfo::set_swap_to_north(bool swap_to_north) {
+
    this->swap_to_north= swap_to_north ;
+
 }
 
 ////////////////////////////////////////////////////////////////////////

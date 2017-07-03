@@ -30,6 +30,7 @@
 #include "lc_grid_defs.h"
 #include "latlon_grid_defs.h"
 #include "merc_grid_defs.h"
+#include "gaussian_grid_defs.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,6 +69,7 @@ class GridInfo {
       void set(const StereographicData &);
       void set(const LatLonData        &);
       void set(const MercatorData      &);
+      void set(const GaussianData      &);
       void set_swap_to_north(bool swap_to_north);
       bool get_swap_to_north();
 
@@ -81,6 +83,7 @@ class GridInfo {
       const StereographicData * st;   //  allocated
       const LatLonData        * ll;   //  allocated
       const MercatorData      * m;    //  allocated
+      const GaussianData      * g;    //  allocated
 
 };
 
@@ -192,6 +195,7 @@ class Grid : public GridInterface {
       Grid(const StereographicData &);
       Grid(const LatLonData        &);
       Grid(const MercatorData      &);
+      Grid(const GaussianData      &);
       virtual ~Grid();
       Grid(const Grid &);
       Grid & operator=(const Grid &);
@@ -205,6 +209,7 @@ class Grid : public GridInterface {
       void set (const StereographicData &);
       void set (const LatLonData        &);
       void set (const MercatorData      &);
+      void set (const GaussianData      &);
       void set_swap_to_north(bool swap_to_north);
 
       void latlon_to_xy(double lat, double lon, double & x, double & y) const;
