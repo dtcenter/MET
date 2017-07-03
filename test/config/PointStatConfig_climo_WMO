@@ -24,7 +24,6 @@ desc = "WMO_CLIMO";
 //
 regrid = {
    to_grid    = "${CLIMO_DIR}/mslp_mean.grib";
-   to_grid    = "G212";
    method     = BILIN;
    width      = 2;
    vld_thresh = 0.5;

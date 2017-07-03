@@ -1515,7 +1515,8 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 InterpMthd int_to_interpmthd(int i) {
    InterpMthd m;
 
-        if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
+        if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd_None;
+   else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
    else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd_Max;
    else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd_Median;
    else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd_UW_Mean;
