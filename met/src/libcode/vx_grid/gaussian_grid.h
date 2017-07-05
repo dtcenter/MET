@@ -39,10 +39,18 @@ class GaussianGrid : public GridRep {
      ~GaussianGrid();
       GaussianGrid(const GaussianData &);
 
+      double y_to_lat(int y) const;
+
       int Nx;
       int Ny;
 
       double Lon_Zero;   //  longitude that has x = 0
+
+      double Delta_Lon;
+
+      double * North_Latitudes;   //  allocated, increasing order
+
+      int N_north_lats;
 
       ConcatString Name;
 
@@ -87,7 +95,7 @@ class GaussianGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double GaussianGrid::delta_lon() const { return ( Nx == 0 ? 0.0 : (360.0/(Nx - 1.0)) ); }
+inline double GaussianGrid::delta_lon() const { return ( Nx == 0 ? 0.0 : Delta_Lon ); }
 
 
 ////////////////////////////////////////////////////////////////////////
