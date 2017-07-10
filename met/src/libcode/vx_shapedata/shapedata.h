@@ -31,6 +31,7 @@ using namespace std;
 #include "moments.h"
 #include "vx_util.h"
 #include "polyline.h"
+#include "two_d_array.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -56,6 +57,7 @@ enum StepDirection {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+
 
 class ShapeData {
 
@@ -107,14 +109,14 @@ class ShapeData {
 
       void    calc_moments();
 
-      void    centroid(double &xbar, double &ybar)    const;
-      double  angle_degrees()                         const;
-      double  curvature(double &xcurv, double &ycurv) const;
-      double  area()                                  const;
-      void    calc_length_width(double &l, double &w) const;
-      double  length()                                const;
-      double  width()                                 const;
-      double  complexity()                            const;
+      void    centroid(double &xbar, double &ybar)      const;
+      double  angle_degrees()                           const;
+      double  curvature(double &xcurv, double &ycurv)   const;
+      double  area()                                    const;
+      void    calc_length_width(double & l, double & w) const;
+      double  length()                                  const;
+      double  width()                                   const;
+      double  complexity()                              const;
 
          //
          //  object polylines

@@ -38,6 +38,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_math.h"
 
+#include "ihull.h"
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -516,6 +519,72 @@ Polyline ShapeData::convex_hull() const
 
 {
 
+int j, k, x, y;
+int n_in, n_out;
+Polyline hull_poly;
+const int N = nint(area());
+IntPoint * in = new IntPoint [2*(data.ny())];
+
+
+n_in = 0;
+
+for (y=0; y<(data.ny()); ++y)  {
+
+   j = x_left(y);
+
+   if ( j < 0 )  continue;
+
+   in[n_in].x = j;
+   in[n_in].y = y;
+
+   ++n_in;
+
+   k = x_right(y);
+
+   if ( k < 0 )  continue;
+
+   if ( j == k )  continue;
+
+   in[n_in].x = k;
+   in[n_in].y = y;
+
+   ++n_in;
+
+}   //  for y
+
+IntPoint * out = new IntPoint [n_in + 1];
+
+ihull(in, n_in, out, n_out);
+
+hull_poly.extend_points(n_out);
+
+for (j=0; j<n_out; ++j)  {
+
+   hull_poly.add_point(out[j].x, out[j].y);
+
+}
+
+
+   //
+   //  done
+   //
+
+if ( out )  { delete [] out;  out = 0; }
+if (  in )  { delete []  in;   in = 0; }
+
+return ( hull_poly );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+/*
+Polyline ShapeData::convex_hull() const
+
+{
+
    int j, k, n, y;
    int done;
    int *Index = (int *) 0;
@@ -530,7 +599,7 @@ Polyline ShapeData::convex_hull() const
 
    if(area() <= 0) {
 
-      mlog << Error << "\nShapedata::cconvex_hull() -> "
+      mlog << Error << "\nShapedata::convex_hull() -> "
            << "attempting to fit convex hull to a shape with area = 0\n\n";
       exit(1);
    }
@@ -542,7 +611,7 @@ Polyline ShapeData::convex_hull() const
 
    if ( !Index )  {
 
-      mlog << Error << "\nShapedata::cconvex_hull() -> "
+      mlog << Error << "\nShapedata::convex_hull() -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -696,7 +765,7 @@ Polyline ShapeData::convex_hull() const
    return(hull);
 
 }
-
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 
