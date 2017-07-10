@@ -21,5 +21,6 @@ libvx_shapedata_a_SOURCES = \
               mode_columns.h \
               mode_conf_info.cc mode_conf_info.h \
               engine.cc engine.h \
+              ihull.cc ihull.h \
               vx_shapedata.h
 libvx_shapedata_a_CPPFLAGS = ${MET_CPPFLAGS}

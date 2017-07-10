@@ -34,8 +34,8 @@ class TwoD_Array {
 
       void assign(const TwoD_Array <T> &);
 
-      int two_to_one(int _x, int_y) const { return ( _y*Nx + x ); }   //  might want to generalize this later
-                                                                      //  also might want to add range checking
+      int two_to_one(int _x, int _y) const { return ( _y*Nx + _x ); }   //  might want to generalize this later
+                                                                        //  also might want to add range checking
 
       int Nx;
       int Ny;
@@ -70,9 +70,9 @@ class TwoD_Array {
          //  set stuff
          //
 
-      set_size(int _nx, int _ny);
+      void set_size(int _nx, int _ny);
 
-      set_size(int _nx, int _ny, const T & _initial_value);
+      void set_size(int _nx, int _ny, const T & _initial_value);
 
          //
          //  get stuff
@@ -91,6 +91,12 @@ class TwoD_Array {
 
       void put(const T &, int _x, int _y);
 
+      bool s_is_on(int _x, int _y) const;
+      bool f_is_on(int _x, int _y) const;
+
+      int x_left  (const int _y) const;
+      int x_right (const int _y) const;
+
 };
 
 
@@ -99,7 +105,7 @@ class TwoD_Array {
 
 template <typename T>
 
-void TwoD_Array::init_from_scratch()
+void TwoD_Array<T>::init_from_scratch()
 
 {
 
@@ -117,7 +123,7 @@ return;
 
 template <typename T>
 
-void TwoD_Array::clear()
+void TwoD_Array<T>::clear()
 
 {
 
@@ -135,7 +141,7 @@ return;
 
 template <typename T>
 
-void TwoD_Array::assign(const TwoD_Array <T> & _t)
+void TwoD_Array<T>::assign(const TwoD_Array <T> & _t)
 
 {
 
@@ -158,7 +164,7 @@ return;
 
 template <typename T>
 
-void TwoD_Array::set_size(int _nx, int _ny)
+void TwoD_Array<T>::set_size(int _nx, int _ny)
 
 {
 
@@ -189,7 +195,7 @@ return;
 
 template <typename T>
 
-void TwoD_Array::set_size(int _nx, int _ny, const T & _initial_value)
+void TwoD_Array<T>::set_size(int _nx, int _ny, const T & _initial_value)
 
 {
 
@@ -219,7 +225,7 @@ return;
 
 template <typename T>
 
-void TwoD_Array::put(const T & _t, int _x, int _y)
+void TwoD_Array<T>::put(const T & _t, int _x, int _y)
 
 {
 
@@ -235,13 +241,113 @@ return;
 
 template <typename T>
 
-T TwoD_Array::operator()(int _x, int _y) const
+T TwoD_Array<T>::operator()(int _x, int _y) const
 
 {
 
 return ( E[two_to_one(_x, _y)] );
 
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+bool TwoD_Array<T>::s_is_on(int _x, int _y) const
+
+{
+
+return ( (bool) (E[two_to_one(_x, _y)]) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+bool TwoD_Array<T>::f_is_on(int _x, int _y) const
+
+{
+
+if ( s_is_on(_x, _y) )                                 return ( true );
+
+if( (_x > 0) && s_is_on(_x - 1, _y) )                  return ( true );
+
+if( (_x > 0) && (_y > 0) && s_is_on(_x - 1, _y - 1))   return ( true );
+
+if( (_y > 0 ) && s_is_on(_x, _y - 1) )                 return ( true );
+
+return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+int TwoD_Array<T>::x_left(const int _y) const
+
+{
+
+if ( (_y < 0) || (_y >= Ny) )  {
+
+   mlog << Error
+        << "\n\n  TwoD_Array<T>::x_left(const int _y) const -> range check error ... y = " << _y << "\n\n";
+
+   exit ( 1 );
+
+}
+
+int j;
+
+for (j=0; j<Nx; ++j)  {
+
+   if ( f_is_on(j, _y)  )  return ( j );
+
+}
+
+
+return ( -1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+int TwoD_Array<T>::x_right(const int _y) const
+
+{
+
+if ( (_y < 0) || (_y >= Ny) )  {
+
+   mlog << Error
+        << "\n\n  TwoD_Array<T>::x_right(const int _y) const -> range check error ... y = " << _y << "\n\n";
+
+   exit ( 1 );
+
+}
+
+int j;
+
+for (j=(Nx - 1); j>=0; --j)  {
+
+   if ( f_is_on(j, _y)  )  return ( j );
+
+}
+
+
+return ( -1 );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
