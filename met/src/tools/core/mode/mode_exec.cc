@@ -128,6 +128,8 @@ data_min = data_max = 0.0;
 
 R_index = T_index = 0;
 
+
+   //
    //  done
    //
 
@@ -1621,7 +1623,7 @@ void ModeExecutive::write_ct_stats()
    for(i=0; i<n_cts; i++) {
 
       // Write out the header columns
-      write_header_columns(engine, cts_at, i+1);
+      write_header_columns(engine, grid, cts_at, i+1);
 
       c = n_mode_hdr_columns;
 

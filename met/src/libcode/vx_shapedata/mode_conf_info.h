@@ -103,6 +103,8 @@ class ModeConfInfo {
 
       RegridInfo       regrid_info;            // Regridding information
 
+      double           grid_res;
+
       VarInfo *        fcst_info;              // allocated
       VarInfo *         obs_info;              // allocated
 

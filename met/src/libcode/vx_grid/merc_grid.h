@@ -91,6 +91,8 @@ class MercatorGrid : public GridRep {
       int nx() const;
       int ny() const;
 
+      double scale_km() const;
+
       ConcatString name() const;
 
       void dump(ostream &, int = 0) const;
@@ -108,6 +110,12 @@ class MercatorGrid : public GridRep {
       GridRep * copy() const;
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline double MercatorGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -87,6 +87,8 @@ class StereographicGrid : public GridRep {
       int nx() const;
       int ny() const;
 
+      double scale_km() const;
+
       ConcatString name() const;
 
       void dump(ostream &, int = 0) const;
@@ -112,6 +114,7 @@ class StereographicGrid : public GridRep {
 inline bool StereographicGrid::is_north () const { return (   IsNorthHemisphere ); }
 inline bool StereographicGrid::is_south () const { return ( ! IsNorthHemisphere ); }
 
+inline double StereographicGrid::scale_km () const { return ( Data.d_km ); }
 
 ////////////////////////////////////////////////////////////////////////
 

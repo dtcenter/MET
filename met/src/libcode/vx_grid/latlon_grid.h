@@ -65,6 +65,8 @@ class LatLonGrid : public GridRep {
       virtual int nx() const;
       virtual int ny() const;
 
+      double scale_km() const;
+
       virtual ConcatString name() const;
 
       void dump(ostream &, int = 0) const;
@@ -82,6 +84,12 @@ class LatLonGrid : public GridRep {
       GridRep * copy() const;
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline double LatLonGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////

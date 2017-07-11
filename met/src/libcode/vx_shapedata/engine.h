@@ -65,10 +65,11 @@ static const char ymd_hms_fmt [] = "%.4i%.2i%.2i_%.2i%.2i%.2i";
 //
 static const Color unmatched_color(0, 0, 255);
 
-//
-// Standard names for raw field parameters
-//
-static const char grid_res_name               [] = "grid_res";
+   //
+   // Standard names for raw field parameters
+   //
+
+// static const char grid_res_name               [] = "grid_res";
 static const char fcst_grib_code_name         [] = "fcst_grib_code";
 static const char obs_grib_code_name          [] = "obs_grib_code";
 static const char mask_missing_flag_name      [] = "mask_missing_flag";
@@ -314,6 +315,8 @@ class ModeFuzzyEngine {
       int n_obs;
       int n_clus;
 
+      int n_valid;   //  # of data points where both fcst and obs have valid data
+
       SingleFeatureArray fcst_single;
       SingleFeatureArray obs_single;
 
@@ -350,15 +353,15 @@ extern double total_interest(ModeConfInfo &, int, const PairFeature &);
 extern double total_interest_print(ModeConfInfo &, int, const PairFeature &, ostream *);
 extern double interest_percentile(ModeFuzzyEngine &, const double, const int);
 
-extern void write_engine_stats(ModeFuzzyEngine &, const Grid &, AsciiTable &);
-extern void write_header(ModeFuzzyEngine &, AsciiTable &, const int);
-extern void write_header_columns(ModeFuzzyEngine &, AsciiTable & , const int);
-extern void write_fcst_single(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_obs_single(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_pair(ModeFuzzyEngine &, const int, const int, AsciiTable &, int &);
-extern void write_fcst_cluster(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_obs_cluster(ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
-extern void write_cluster_pair(ModeFuzzyEngine &, const int, AsciiTable &, const int);
+extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &);
+extern void write_header_row     (ModeFuzzyEngine &, AsciiTable &, const int row);   //  row usually zero
+extern void write_header_columns (ModeFuzzyEngine &, const Grid &, AsciiTable &, const int row);
+extern void write_fcst_single    (ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_obs_single     (ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_pair           (ModeFuzzyEngine &, const Grid &, const int, const int, AsciiTable &, int &);
+extern void write_fcst_cluster   (ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_obs_cluster    (ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);
+extern void write_cluster_pair   (ModeFuzzyEngine &, const Grid &, const int, AsciiTable &, const int);
 
 // Setup column justification for MODE AsciiTable objects
 extern void justify_mode_cols(AsciiTable &);

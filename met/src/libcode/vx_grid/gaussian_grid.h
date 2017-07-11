@@ -73,6 +73,8 @@ class GaussianGrid : public GridRep {
       virtual int nx() const;
       virtual int ny() const;
 
+      double scale_km() const;
+
       virtual ConcatString name() const;
 
       void dump(ostream &, int = 0) const;
@@ -96,6 +98,8 @@ class GaussianGrid : public GridRep {
 
 
 inline double GaussianGrid::delta_lon() const { return ( Nx == 0 ? 0.0 : Delta_Lon ); }
+
+inline double GaussianGrid::scale_km() const { return ( -1.0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
