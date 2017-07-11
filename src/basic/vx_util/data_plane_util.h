@@ -38,19 +38,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 extern void rescale_probability(DataPlane &);
-/*
-extern void smooth_field(const DataPlane &, DataPlane &,
-                         InterpMthd mthd, int wdth, double t);
-*/
+
 extern void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                          InterpMthd mthd, int width, const GridTemplateFactory::GridTemplates shape, double t);
-/*
-extern void fractional_coverage(const DataPlane &, DataPlane &,
-                                int, SingleThresh, double);
-*/
+
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                                 int width, const GridTemplateFactory::GridTemplates shape, SingleThresh t, double vld_t);
-	
+
 extern void apply_mask(const DataPlane &, const DataPlane &, NumArray &);
 
 extern void apply_mask(DataPlane &, const DataPlane &);
