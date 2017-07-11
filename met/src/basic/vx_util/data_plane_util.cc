@@ -97,12 +97,12 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
 
-   // Check that grid template is at least 1 point 
+   // Check that grid template is at least 1 point
    if(width == 1 || mthd == InterpMthd_Nearest) return;
-   
+
    // build the grid template
    GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width);         
+   GridTemplate* gt = gtf.buildGT(shape, width);
 
    mlog << Debug(3)
         << "Smoothing field using the " << interpmthd_to_string(mthd)
@@ -164,60 +164,58 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                           int width, const GridTemplateFactory::GridTemplates shape, SingleThresh t, double vld_t) {
 
-	 // Check that width is set to 1 or greater
-	 if(width < 1) {
+   // Check that width is set to 1 or greater
+   if(width < 1) {
       mlog << Error << "\nfractional_coverage() -> "
            << "Grid must have at one point in it. \n\n";
       exit(1);
    }
 
-	 // build the grid template
+   // Build the grid template
    GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width);         
+   GridTemplate* gt = gtf.buildGT(shape, width);
 
    mlog << Debug(3)
         << "Computing fractional coverage field using the " << t.get_str()
         << " threshold and the " << interpmthd_to_string(InterpMthd_Nbrhd)
       << "(" << gt->size() << ")  " << gt->getClassName() << " interpolation method.\n";
- 
-	 
-	 // Initialize the fractional coverage field
+
+
+   // Initialize the fractional coverage field
    frac_dp = dp;
    frac_dp.set_constant(bad_data_double);
 
    // Compute the fractional coverage meeting the threshold criteria
-   for(int x=0; x<dp.nx(); x++) {	   
-	   for(int y=0; y<dp.ny(); y++) {
-	    
-		   int count_vld = 0;
-		   int count_thr = 0;
-		   
-		   GridPoint *gp = NULL;
-		   for(gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny() );
-		       gp != NULL; gp = gt->getNextInGrid()){
-		   
-			   double v = dp.get(gp->x,gp->y);
-	     
-			   if (is_bad_data(v)) continue;
-			   
-			   count_vld++;
-			   
-			   if(t.check(v)) {
-				   count_thr++;			     
-			   }
-		   }
-	     
-		   // Check whether enough valid grid points were found or leave it as bad_data
-		   if( static_cast<double>(count_vld)/gt->size() >= vld_t &&
-		       count_vld != 0) {
-		     
-			   // Compute and store the fractional coverage
-			   double frac = (double) count_thr/count_vld;
-			   frac_dp.set(frac, x, y);
-		   }
+   for(int x=0; x<dp.nx(); x++) {
+      for(int y=0; y<dp.ny(); y++) {
 
+         int count_vld = 0;
+         int count_thr = 0;
 
-	   }
+         GridPoint *gp = NULL;
+         for(gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny() );
+             gp != NULL; gp = gt->getNextInGrid()){
+
+            double v = dp.get(gp->x,gp->y);
+
+            if (is_bad_data(v)) continue;
+
+            count_vld++;
+
+            if(t.check(v)) {
+               count_thr++;
+            }
+         }
+
+         // Check whether enough valid grid points were found or leave it as bad_data
+         if( static_cast<double>(count_vld)/gt->size() >= vld_t &&
+             count_vld != 0) {
+
+            // Compute and store the fractional coverage
+            double frac = (double) count_thr/count_vld;
+            frac_dp.set(frac, x, y);
+         }
+      }
    }
 
    delete gt;
