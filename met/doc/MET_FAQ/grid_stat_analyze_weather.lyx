@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-Using grid_stat to analyze weather events
+Using Neighborhood Methods to Compute Fraction Skill Score
 \end_layout
 
 \begin_layout Standard
@@ -107,8 +107,9 @@ stat_analysis -job aggregate -line_type NBRCNT
 \end_layout
 
 \begin_layout Standard
-Be sure to pick thresholds (for the thunderstorms and monsoons) that capture
- the "events" that are of interest in studying.
+Be sure to pick thresholds (e.g.
+ for the thunderstorms and monsoons) that capture the "events" that are
+ of interest in studying.
 \end_layout
 
 \end_body

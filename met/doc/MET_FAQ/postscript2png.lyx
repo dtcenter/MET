@@ -72,100 +72,40 @@
 \begin_body
 
 \begin_layout Section
-MODE Time Dimension Conversion Postscript to png
+Other Utilities - Conversion Postscript to png
 \end_layout
 
 \begin_layout Standard
-MET supports a few different flavors of gridded NetCDF data, but different
- kinds cannot be mixed together.
- If this is happening, try editing one of the NetCDF files by removing the
- time dimension, like this:
-\end_layout
+Use the linux 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout LyX-Code
-netcdf st_20101226_1410 { 
-\end_layout
+convert
+\begin_inset Quotes erd
+\end_inset
 
-\begin_layout LyX-Code
-dimensions: 
-\end_layout
-
-\begin_layout LyX-Code
-lat = 801 ; 
-\end_layout
-
-\begin_layout LyX-Code
-lon = 801 ; 
-\end_layout
-
-\begin_layout LyX-Code
-variables: float dbz(lat, lon) ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:long_name = "dbz" ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:units = "dbz" ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:level = "1kmAGL" ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:_FillValue = -9999.f ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:init_time = "20101226_1405" ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:valid_time = "20101226_1410" ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:init_time_ut = 1293372300 ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:valid_time_ut = 1293372600 ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:accum_time_sec = 300 ; 
-\end_layout
-
-\begin_layout LyX-Code
-dbz:accum_time = "5" ;
-\end_layout
-
-\begin_layout Standard
-Then try running the plot_data_plane tool.
- That is a great way of easily testing to see if MET can read your gridded
- data: 
-\end_layout
-
-\begin_layout LyX-Code
-${MET_BUILD_BASE}/bin/plot_data_plane /home/sara/MET/${MET_BUILD_BASE}/stitched/20101226/cf/
- 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
-st_20101226_1405.nc plot_dbz.ps 'name="dbz"; level="(*,*)";'
-\end_layout
-
-\begin_layout Standard
-That will create a PostScript file which can be converted to png like this:
- 
+ tool to convert a Plot_Data_Plane PostScript file to a png: 
 \end_layout
 
 \begin_layout LyX-Code
 convert -rotate 90 -background white plot_dbz.ps plot_dbz.png
+\end_layout
+
+\begin_layout Standard
+To convert a MODE PostScript to png
+\end_layout
+
+\begin_layout LyX-Code
+convert mode_out.ps mode_out.png
+\end_layout
+
+\begin_layout Standard
+Will result in all 6-7 pages in the PostScript file be written out to a
+ seperate .png with the following naming convention:
+\end_layout
+
+\begin_layout Standard
+mode_out-0.png, mode_out-1.png, mode_out-2.png, etc...
 \end_layout
 
 \end_body

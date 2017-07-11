@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-Installation
+Troubleshooting NetCDF install issues
 \end_layout
 
 \begin_layout Standard
@@ -96,15 +96,16 @@ Below are examples of too many MET_NETCDF options:
 \end_layout
 
 \begin_layout LyX-Code
-MET_NETCDF='/home/zzheng25/metinstall/' 
+MET_NETCDF='/home/username/metinstall/' 
 \end_layout
 
 \begin_layout LyX-Code
-MET_NETCDFINC='/home/zzheng25/local/include' 
+MET_NETCDFINC='/home/username/local/include' 
 \end_layout
 
 \begin_layout LyX-Code
-MET_NETCDFLIB='/home/zzheng25/local/lib'
+MET_NETCDFLIB='/home/username/local/lib'\SpecialChar softhyphen
+
 \end_layout
 
 \begin_layout Standard
@@ -118,10 +119,6 @@ Either MET_NETCDF *or* MET_NETCDFINC *and *MET_NETCDFLIB need to be set
  environment variable, then run "make clean", reconfigure, and then run
  "make install" and "make test" again.
  
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \end_body

@@ -72,15 +72,15 @@
 \begin_body
 
 \begin_layout Section
-pcp_combine options with lat-lon grid data
+Pre-processing - wgrib2 and pcp_combine regrid and reformat
 \end_layout
 
 \begin_layout Standard
-Rather than converting to GRIB1 use the wgrib2 utility to do the regridding:
-\end_layout
-
-\begin_layout Standard
-gfsrain06.grb is a GRIB2 file on a global lat/lon grid.
+If you are extracting only one or two fields from a file, using MET regrid_data_
+plane can be used to generate a Lat-Lon projection.
+ If regridding all fields, the wgrib2 utility may be more useful.
+ Here's an example of using wgrib2 and pcp_combine to generate a NetCDF
+ files MET can read:
 \end_layout
 
 \begin_layout LyX-Code
@@ -94,7 +94,8 @@ wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1
 \end_layout
 
 \begin_layout Standard
-And then run that GRIB2 file through pcp_combine:
+And then run that GRIB2 file through pcp_combine using hte -add option with
+ only one file provided:
 \end_layout
 
 \begin_layout LyX-Code
@@ -124,11 +125,7 @@ ncdump -h 2a_wgrib2_regrid.nc | grep "_ll"
 \end_layout
 
 \begin_layout Standard
-MET can read both GRIB1 and GRIB2 data.
- Also, MET versions above 5.2 include an automated regridding feature.
- So the data can pass to grid_stat on different grids...
- and instruct grid_stat to regrid one to the other.
- That would avoid the need to do regridding using copygb or wgrib2 at all.
+
 \end_layout
 
 \end_body

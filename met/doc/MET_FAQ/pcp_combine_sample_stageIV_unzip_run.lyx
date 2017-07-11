@@ -72,79 +72,37 @@
 \begin_body
 
 \begin_layout Section
-sample commands to grab some StageIV data, unzip it, and run pcp_combine
- on it:
-\end_layout
-
-\begin_layout LyX-Code
-mkdir test_st4 
-\end_layout
-
-\begin_layout LyX-Code
-cd test_st4 
-\end_layout
-
-\begin_layout LyX-Code
-wget ftp://ftp.emc.ncep.noaa.gov/mmb/precip/st2n4.arch/201610/ST4.20161015ST4.20161015
- 
-\end_layout
-
-\begin_layout LyX-Code
-tar -xvf ST4.20161015 gunzip ST4*.06h.gz
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-noindent
-\backslash
-vskip 0.1in 
-\end_layout
-
+Pcp_Combine - 
+\begin_inset Quotes eld
 \end_inset
 
-
-\end_layout
-
-\begin_layout LyX-Code
-# Add 2 files together 
-\end_layout
-
-\begin_layout LyX-Code
-${MET_BUILD_BASE}/bin/pcp_combine -add ST4.2016101512.06h 
-\backslash
-
-\end_layout
-
-\begin_layout LyX-Code
-06 ST4.2016101518.06h 06 ST4.2016101518.APCP_12.nc
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-noindent
-\backslash
-vskip 0.1in 
-\end_layout
-
+-pcprx
+\begin_inset Quotes erd
 \end_inset
 
+ Examples
+\end_layout
+
+\begin_layout LyX-Code
+To run a project faster, the 
+\begin_inset Quotes eld
+\end_inset
+
+-pcprx
+\begin_inset Quotes erd
+\end_inset
+
+ option may be used to narrow the search down to whatever regular expression
+ you provide.
+  Here are a two examples:
+\end_layout
+
+\begin_layout LyX-Code
 
 \end_layout
 
 \begin_layout LyX-Code
-# Use the sum command instead 
+# Only using Stage IV data (ST4)
 \end_layout
 
 \begin_layout LyX-Code
@@ -155,6 +113,42 @@ ${MET_BUILD_BASE}/bin/pcp_combine -sum 00000000_000000 06
 
 \begin_layout LyX-Code
 20161015_18 12 ST4.2016101518.APCP_12_SUM.nc -pcprx "ST4.*.06h"
+\end_layout
+
+\begin_layout LyX-Code
+# Specify that files starting with pgbq[number][number]
+\end_layout
+
+\begin_layout LyX-Code
+be used:
+\end_layout
+
+\begin_layout LyX-Code
+[MET_BUILD_BASE]/bin/pcp_combine 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-sum 20160221_18 06 20160222_18 24 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+gfs_APCP_24_20160221_18_F00_F24.nc 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
 \end_layout
 
 \end_body

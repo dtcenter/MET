@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-Grib vs GRIB2 using plot_data_plane
+Plot_Data_Plane - Specifying GRIB Version
 \end_layout
 
 \begin_layout Standard
@@ -109,65 +109,19 @@ on files (i.e.
 \end_layout
 
 \begin_layout LyX-Code
-${MET_BUILD_BASE}/bin/plot_data_plane 
+{MET_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout
 
 \begin_layout LyX-Code
-HOLYROOD_2.5_prog.grib 
+test_2.5_prog.grib 
 \backslash
  
 \end_layout
 
 \begin_layout LyX-Code
-HOLYROOD_2.5_prog.ps 
-\backslash
- 
-\end_layout
-
-\begin_layout LyX-Code
-'name="TSTM"; level="A0"; file_type=GRIB2;' 
-\backslash
- 
-\end_layout
-
-\begin_layout LyX-Code
--plot_range 0 100
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-noindent
-\backslash
-vskip 0.1in
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-${MET_BUILD_BASE}/bin/plot_data_plane 
-\backslash
- 
-\end_layout
-
-\begin_layout LyX-Code
-HOLYROOD_2.5_radar.grib 
-\backslash
- 
-\end_layout
-
-\begin_layout LyX-Code
-HOLYROOD_2.5_radar.ps 
+test_2.5_prog.ps 
 \backslash
  
 \end_layout
@@ -180,6 +134,10 @@ HOLYROOD_2.5_radar.ps
 
 \begin_layout LyX-Code
 -plot_range 0 100
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \begin_layout Standard

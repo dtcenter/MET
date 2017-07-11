@@ -72,10 +72,8 @@
 \begin_body
 
 \begin_layout Section
-To get 24-hour accumulated precipitation by combining 12-hour accumulated
- precipitation from two different initialization times using the “-add”
- option.
- 
+Pcp_Combine - Combining 12-hour Accumulated Precipitation from Two Different
+ Initialization Times
 \end_layout
 
 \begin_layout Standard
@@ -171,7 +169,8 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb 
+${MET_BUILD_BASE}/bin/plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb
+ 
 \backslash
 
 \end_layout
@@ -203,8 +202,8 @@ vskip 0.1in
 \end_layout
 
 \begin_layout LyX-Code
-${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
- 
+${MET_BUILD_BASE}/bin/plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)"
+;' 
 \end_layout
 
 \end_body
