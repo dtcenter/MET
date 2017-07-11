@@ -164,7 +164,7 @@ The second call is the tricky one...
 \end_layout
 
 \begin_layout Enumerate
-Do data masking (-data)
+Do data masking (-type data)
 \end_layout
 
 \begin_layout Enumerate
@@ -173,16 +173,17 @@ Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
 
 \begin_layout Enumerate
 Define the mask by reading 6-hour precip from the mask file (fcst.grb) and
- looking for values > 0 
+ looking for values > 0 (-mask_field)
 \end_layout
 
 \begin_layout Enumerate
 Apply intersection logic when combining the "input" value with the "mask"
- value.
+ value (-insersection).
+ 
 \end_layout
 
 \begin_layout Enumerate
-Name the output NetCDF variable as "FREEZING_PRECIP".
+Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
  This is totally optional, but convenient.
 \end_layout
 
@@ -190,10 +191,6 @@ Name the output NetCDF variable as "FREEZING_PRECIP".
 Script up multiple calls to gen_vx_mask to apply to complex masking logic...
  and then pass the output mask file to Grid- Stat in its configuration file.
  
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \end_body

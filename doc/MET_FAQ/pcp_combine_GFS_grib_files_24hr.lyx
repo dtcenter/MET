@@ -72,8 +72,27 @@
 \begin_body
 
 \begin_layout Section
-pcp_combine on GFS grib files with 24 hour hour intervals for comparison
- against 24-hourly StageIV precipitation.
+Pcp_Combine - Examples of 
+\begin_inset Quotes eld
+\end_inset
+
+-sum
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+-add
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+-subtract to Achieve Same Accumulation Interval
 \end_layout
 
 \begin_layout Standard
@@ -135,7 +154,7 @@ gfs_APCP_24_20150220_00_F00_F24.nc
 \end_layout
 
 \begin_layout LyX-Code
--pcpdir /d1/SBU/GFS/model_data/20150220
+-pcpdir /d1/model_data/20150220
 \end_layout
 
 \begin_layout Standard
@@ -179,7 +198,7 @@ gfs_APCP_24_20150220_00_F12_F36.nc
 \end_layout
 
 \begin_layout LyX-Code
--pcpdir /d1/SBU/GFS/model_data/20150220
+-pcpdir /d1/model_data/20150220
 \end_layout
 
 \begin_layout Standard
@@ -192,35 +211,31 @@ The "-sum" command is meant to make things easier by searching the directory.
 \end_layout
 
 \begin_layout LyX-Code
-cd /d1/SBU/GFS/model_data/20150220 
-\end_layout
-
-\begin_layout LyX-Code
 ${MET_BUILD_BASE}/bin/pcp_combine -add 
 \backslash
  
 \end_layout
 
 \begin_layout LyX-Code
-/d1/SBU/GFS/model_data/20150220/gfs_4_20150220_0000_018.grb2 06 
+/d1/model_data/20150220/gfs_4_20150220_0000_018.grb2 06 
 \backslash
  
 \end_layout
 
 \begin_layout LyX-Code
-/d1/SBU/GFS/model_data/20150220/gfs_4_20150220_0000_024.grb2 06 
+/d1/model_data/20150220/gfs_4_20150220_0000_024.grb2 06 
 \backslash
  
 \end_layout
 
 \begin_layout LyX-Code
-/d1/SBU/GFS/model_data/20150220/gfs_4_20150220_0000_030.grb2 06 
+/d1/model_data/20150220/gfs_4_20150220_0000_030.grb2 06 
 \backslash
  
 \end_layout
 
 \begin_layout LyX-Code
-/d1/SBU/GFS/model_data/20150220/gfs_4_20150220_0000_036.grb2 06 
+/d1/model_data/20150220/gfs_4_20150220_0000_036.grb2 06 
 \backslash
 
 \end_layout

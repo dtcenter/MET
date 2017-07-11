@@ -72,71 +72,14 @@
 \begin_body
 
 \begin_layout Section
-Another example of PostScript to PNG
+Utilities - Example of Scripting to Call MET
 \end_layout
 
 \begin_layout Standard
-Run Grid-Stat twice.
- Here are the steps:
-\end_layout
-
-\begin_layout Enumerate
-Use wget to grab some recent data:
-\begin_inset Separator latexpar
-\end_inset
-
-
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-wget 
-\end_layout
-
-\begin_layout LyX-Code
-ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.2016121400/gfs.t00z.pgrb2.0p25.f0
-00 
-\end_layout
-
-\begin_layout LyX-Code
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-noindent
-\backslash
-vskip 0.1in
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-wget 
-\end_layout
-
-\begin_layout LyX-Code
-ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/nam/prod/nam.20161214/
-\end_layout
-
-\begin_layout LyX-Code
-nam.t00z.conusnest.hiresf00.tm00.grib2
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-Set up attached GridStatConfig file.
- 
-\end_layout
-
-\begin_layout Enumerate
-Run the shell script listed below to run Grid-Stat, call Plot-Data-Plane
- to plot the resulting difference field, and call convert to reformat from
+The following is an example of how to call MET from a bash script including
+ passing in variables.
+ This shell script listed below to run Grid-Stat, call Plot-Data-Plane to
+ plot the resulting difference field, and call convert to reformat from
  PostScript to PNG.
 \end_layout
 

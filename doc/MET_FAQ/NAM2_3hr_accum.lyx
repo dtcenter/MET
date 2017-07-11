@@ -72,17 +72,12 @@
 \begin_body
 
 \begin_layout Section
-Working with different forecast times.
- Converting NAM data to 3 hour accumulation
+Pcp_Combine - Multiple Examples of Add and Subtract
 \end_layout
 
 \begin_layout Standard
 Run the MET pcp_combine tool to put the NAM data into 3-hourly accumulations.
  
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \begin_layout Standard
@@ -92,7 +87,7 @@ Run the MET pcp_combine tool to put the NAM data into 3-hourly accumulations.
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -add 03_file.grb 03 APCP_00_03.nc
+[MET_BUILD_BASE}/pcp_combine -add 03_file.grb 03 APCP_00_03.nc
 \end_layout
 
 \begin_layout Standard
@@ -101,7 +96,7 @@ pcp_combine -add 03_file.grb 03 APCP_00_03.nc
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
+[MET_BUILD_BASE}/pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
 \end_layout
 
 \begin_layout Standard
@@ -110,7 +105,7 @@ pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
+[MET_BUILD_BASE}/pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
 \end_layout
 
 \begin_layout Standard
@@ -119,7 +114,7 @@ pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -subtract 12_file.grb 12 09_file.grb 09 APCP_09_12.nc
+[MET_BUILD_BASE}/pcp_combine -subtract 12_file.grb 12 09_file.grb 09 APCP_09_12.nc
 \end_layout
 
 \begin_layout Standard
@@ -128,7 +123,7 @@ pcp_combine -subtract 12_file.grb 12 09_file.grb 09 APCP_09_12.nc
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -add 15_file.grb 03 APCP_12_15.nc
+[MET_BUILD_BASE}/pcp_combine -add 15_file.grb 03 APCP_12_15.nc
 \end_layout
 
 \begin_layout Standard
@@ -137,7 +132,7 @@ pcp_combine -add 15_file.grb 03 APCP_12_15.nc
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -subtract 18_file.grb 06 15_file.grb 03 APCP_15_18.nc
+[MET_BUILD_BASE}/pcp_combine -subtract 18_file.grb 06 15_file.grb 03 APCP_15_18.nc
 \end_layout
 
 \begin_layout Standard

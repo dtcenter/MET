@@ -72,15 +72,40 @@
 \begin_body
 
 \begin_layout Section
-Frequency of Superior Performance
+TC_Stat - Using 
+\begin_inset Quotes eld
+\end_inset
+
+-by
+\begin_inset Quotes erd
+\end_inset
+
+ Flag to Stratify Results
 \end_layout
 
 \begin_layout Standard
 \noindent
-Frequency of Superior Performance (FSP) is only computed for tropical cyclone
- evaluations when there is separate output for multiple models.
- This can be requested using the "-by AMODEL" option with the tc_stat tool.
+To perform tropical cyclone evaluations for multiple models use the "-by
+ AMODEL" option with the tc_stat tool.
  Here is an example of using a verbosity level of 4 (-v 4).
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+noindent
+\backslash
+vskip 0.1in
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -95,7 +120,7 @@ In this case the tc_stat job looked at the 48 hour lead time for the HWRF
 \begin_inset Quotes erd
 \end_inset
 
- option, the output would be all grouped together and no FSP could be calculated.
+ option, the output would be all grouped together.
  
 \end_layout
 
@@ -128,7 +153,9 @@ ${MET_BUILD_BASE}/bin/tc_stat
 \end_layout
 
 \begin_layout Standard
-As with any MET trouble, try using debug level 4 (-v 4) to see if there
+This will result in all 48 hour HWFI and H3WI track forecasts to be aggregated
+ (statistics and scores computed) for each model seperately.
+ As with any MET trouble, try using debug level 4 (-v 4) to see if there
  are any more useful log messages.
 \end_layout
 

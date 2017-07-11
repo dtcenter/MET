@@ -72,8 +72,24 @@
 \begin_body
 
 \begin_layout Section
-pcp_combine sum vs.
- add
+pcp_combine - 
+\begin_inset Quotes eld
+\end_inset
+
+-sum
+\begin_inset Quotes erd
+\end_inset
+
+ vs.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+-add
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -99,7 +115,7 @@ gfs_APCP_24_20160221_18_F00_F24.nc
 \end_layout
 
 \begin_layout LyX-Code
--pcpdir /pre2016c3_corr 
+-pcpdir model_out/temp 
 \backslash
 
 \end_layout
@@ -131,25 +147,25 @@ ${MET_BUILD_BASE}/bin/pcp_combine -add
 \end_layout
 
 \begin_layout LyX-Code
-/pre2016c3_corr/pgbq06.gfs.2016022118 06 
+model_out/temp/pgbq06.gfs.2016022118 06 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
-/pre2016c3_corr/pgbq12.gfs.2016022118 06 
+model_out/temp/pgbq12.gfs.2016022118 06 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
-/pre2016c3_corr/pgbq18.gfs.2016022118 06 
+model_out/temp/pgbq18.gfs.2016022118 06 
 \backslash
 
 \end_layout
 
 \begin_layout LyX-Code
-/pre2016c3_corr/pgbq24.gfs.2016022118 06 
+model_out/temp/pgbq24.gfs.2016022118 06 
 \backslash
 
 \end_layout
@@ -160,8 +176,8 @@ gfs_APCP_24_20160221_18_F00_F24_ADD.nc
 
 \begin_layout Standard
 The -sum and -add options both do the same thing...
- it's just that '- sum' finds the files first.
- This could also be accomplished in the calling script.
+ it's just that '- sum' finds the files more quickly.
+ This could also be accomplished by using a calling script.
 \end_layout
 
 \begin_layout Standard

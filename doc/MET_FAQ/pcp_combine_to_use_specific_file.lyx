@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-Setting pcp_combine to use a specific file
+Setting Pcp_Combine to Use a Specific GRIB Record
 \end_layout
 
 \begin_layout Standard
@@ -81,7 +81,7 @@ In this example, record 735 needs to be selected.
 \end_layout
 
 \begin_layout LyX-Code
-pcp_combine -add 20160101_i12_f015_HRRR-NCEP_wrfnat.grb2 
+pcp_combine -add 20160101_i12_f015_HRRR_wrfnat.grb2 
 \backslash
  
 \end_layout
@@ -93,7 +93,7 @@ pcp_combine -add 20160101_i12_f015_HRRR-NCEP_wrfnat.grb2
 \end_layout
 
 \begin_layout LyX-Code
--name "APCP_01" HRRR-NCEP_wrfnat.20160101_i12_f015.nc
+-name "APCP_01" HRRR_wrfnat.20160101_i12_f015.nc
 \end_layout
 
 \begin_layout Standard

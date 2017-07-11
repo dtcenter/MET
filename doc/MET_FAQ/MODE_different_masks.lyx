@@ -71,6 +71,10 @@
 
 \begin_body
 
+\begin_layout Section
+Use of different masks in MET tools - MODE example
+\end_layout
+
 \begin_layout Standard
 You'd like to apply one mask to the forecast field and a *different* mask
  to the observation field.
@@ -99,7 +103,7 @@ Below is an example using sample data that is included with the MET release
 \end_layout
 
 \begin_layout LyX-Code
-cd met-6.0 bin/gen_vx_mask 
+{MET_BUILD_BASE}/bin/gen_vx_mask 
 \backslash
  
 \end_layout
@@ -146,7 +150,7 @@ APCP_03_where_2m_TMPge290.nc
 
 \begin_layout Standard
 So this is a bit confusing.
- Here's what I'm doing...
+ Here's what is happening:
 \end_layout
 
 \begin_layout Standard
@@ -195,7 +199,7 @@ So this is a bit confusing.
 \end_layout
 
 \begin_layout Standard
-I chose my threshold as less than 290 and not -9999 (which is MET's internal
+The example threshold is less than 290 and not -9999 (which is MET's internal
  missing data value).
  So any grid point where the 2 meter temperature is less than 290 K and
  is not bad data will be replaced by a value of 0.
@@ -207,7 +211,7 @@ To more easily demonstrate this, I changed to using "-value 10" and ran
 \end_layout
 
 \begin_layout LyX-Code
-bin/plot_data_plane 
+{MET_BUILD_BASE}/bin/plot_data_plane 
 \backslash
  
 \end_layout

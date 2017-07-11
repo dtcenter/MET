@@ -72,7 +72,7 @@
 \begin_body
 
 \begin_layout Section
-TC rapid intensification verification
+TC_Stat - Rapid Intensification Verification
 \end_layout
 
 \begin_layout Standard
@@ -102,33 +102,79 @@ ${MET_BUILD_BASE}/bin/tc_stat
 \end_layout
 
 \begin_layout Standard
-Please search for "rirw" in here: 
+By default, rapid intensification (RI) is defined as a 24-hour exact change
+ exceeding 30kts.
+ To define RI differently, modify that definition using the ADECK, BDECK,
+ or both using -rirw_time, -rirw_exact, and -rirw_thresh options.
+ Set -rirw_window to something larger than 0 to enable false alarms to be
+ considered hits when they were "close enough" in time.
 \end_layout
 
 \begin_layout LyX-Code
-${MET_BUILD_BASE}/share/met/config/README_TC 
+{MET_BASE}/bin/tc_stat 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-lookin path/to/tc_pairs/output 
+\backslash
+ 
+\end_layout
+
+\begin_layout LyX-Code
+-job rirw -dump_row test 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-rirw_time 36 -rirw_window 12 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-out_line_type CTC,CTS,MPR
 \end_layout
 
 \begin_layout Standard
-For a brief description of the job options.
+To evaluate Rapid Weakening (RW) by setting "-rirw_thresh <=-30".
+ To stratify your results by lead time, you could add "-by LEAD" option.
 \end_layout
 
-\begin_layout Standard
-By default, rapid intensification is defined as a 24-hour exact change exceeding
- 30kts.
- Modify that definition using the ADECK, BDECK, or both using -rapid_inten_time,
- -rapid_inten_exact, and -rapid_inten_thresh options.
- Set -rapid_inten_window to something larger than 0 to enable false alarms
- to be considered hits when they were "close enough" in time.
+\begin_layout LyX-Code
+{MET_BASE}/bin/tc_stat 
+\backslash
+ 
 \end_layout
 
-\begin_layout Standard
-Evaluate rapid weakening by setting "-rapid_inten_thresh <=-30".
+\begin_layout LyX-Code
+-lookin path/to/tc_pairs/output 
+\backslash
+ 
 \end_layout
 
-\begin_layout Standard
-Once the job is working as needed, it can easily run the Same job for different
- lead time using the "-by LEAD" option.
+\begin_layout LyX-Code
+-job rirw -dump_row test 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-rirw_time 36 -rirw_window 12 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-rirw_thresh <=-30 -by LEAD 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-out_line_type CTC,CTS,MPR
 \end_layout
 
 \end_body
