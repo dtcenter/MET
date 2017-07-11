@@ -186,6 +186,8 @@ void ModeFuzzyEngine::init_from_scratch() {
    n_obs            = 0;
    n_clus           = 0;
 
+   n_valid          = 0;
+
    collection.clear();
 
    clear_features();
@@ -2614,7 +2616,10 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) {
+void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at)
+
+{
+
    int i, j, row;
 
    //
@@ -2640,6 +2645,26 @@ void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) 
    at.set_delete_trailing_blank_rows(1);      // No trailing blank rows
 
    //
+   //  calculate n_valid
+   //
+
+int x, y;
+
+eng.n_valid = 0;
+
+for (x=0; x<(grid.nx()); ++x)  {
+
+   for (y=0; y<(grid.ny()); ++y)  {
+
+      if ( eng.fcst_raw->is_bad_data(x, y) || eng.obs_raw->is_bad_data(x, y) )  continue;
+
+      ++(eng.n_valid);
+
+   }
+
+}
+
+   //
    // Initialize row count
    //
    row = 0;
@@ -2647,7 +2672,7 @@ void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) 
    //
    // Column headers
    //
-   write_header(eng, at, row);
+   write_header_row(eng, at, row);
    row++;
 
    //
@@ -2673,7 +2698,7 @@ void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) 
    //
    for(i=0; i<eng.n_fcst; i++) {
       for(j=0; j<eng.n_obs; j++) {
-         write_pair(eng, i, j, at, row);
+         write_pair(eng, grid, i, j, at, row);
       }
    }
 
@@ -2694,7 +2719,7 @@ void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) 
    // Composite Pairs
    //
    for(i=0; i<(eng.collection.n_sets); i++) {
-      write_cluster_pair(eng, i, at, row);
+      write_cluster_pair(eng, grid, i, at, row);
       row++;
    }
 
@@ -2707,16 +2732,21 @@ void write_engine_stats(ModeFuzzyEngine &eng, const Grid &grid, AsciiTable &at) 
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_header(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
+void write_header_row(ModeFuzzyEngine &eng, AsciiTable &at, const int row)
+
+{
+
    int i, c;
    char tmp_str[max_str_len];
 
    //
    // Write out the MODE header columns
    //
-   for(i=0; i<n_mode_hdr_columns; i++) {
-      at.set_entry(row, i, mode_hdr_columns[i]);
-   }
+for(i=0; i<n_mode_hdr_columns; i++) {
+
+   at.set_entry(row, i, mode_hdr_columns[i]);
+
+}
 
    //
    // Write out the MODE objects columns
@@ -2738,8 +2768,12 @@ void write_header(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
+void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at, const int row)
+
+{
+
    int c = 0;
+
 
    // Version
    at.set_entry(row, c++,
@@ -2748,6 +2782,13 @@ void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
    // Model Name
    at.set_entry(row, c++,
                 eng.conf_info.model);
+
+     //  N_valid
+   at.set_entry(row, c++, eng.n_valid);
+
+     //  grid res
+   at.set_entry(row, c++, eng.conf_info.grid_res);
+
 
    // Description
    at.set_entry(row, c++,
@@ -2809,6 +2850,10 @@ void write_header_columns(ModeFuzzyEngine &eng, AsciiTable &at, const int row) {
    at.set_entry(row, c++,
                 eng.conf_info.obs_info->level_name());
 
+
+   // Observation type
+   at.set_entry(row, c++, eng.conf_info.obtype);
+
    return;
 }
 
@@ -2828,7 +2873,7 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    }
 
    // Write out the common header columns
-   write_header_columns(eng, at, row);
+   write_header_columns(eng, grid, at, row);
 
    c = n_mode_hdr_columns;
 
@@ -2949,7 +2994,7 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    }
 
    // Write out the common header columns
-   write_header_columns(eng, at, row);
+   write_header_columns(eng, grid, at, row);
 
    c = n_mode_hdr_columns;
 
@@ -3056,7 +3101,7 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
+void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const int n_o,
                 AsciiTable &at, int &row) {
    int n, i, c, fcst_i, obs_i;
    char tmp_str[max_str_len];
@@ -3079,7 +3124,7 @@ void write_pair(ModeFuzzyEngine &eng, const int n_f, const int n_o,
        eng.conf_info.print_interest_thresh)  return;
 
    // Write out the common header columns
-   write_header_columns(eng, at, row);
+   write_header_columns(eng, grid, at, row);
 
    c = n_mode_hdr_columns;
 
@@ -3161,7 +3206,7 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    char tmp_str[max_str_len];
 
    // Write out the common header columns
-   write_header_columns(eng, at, row);
+   write_header_columns(eng, grid, at, row);
 
    c = n_mode_hdr_columns;
 
@@ -3273,7 +3318,7 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    char tmp_str[max_str_len];
 
    // Write out the common header columns
-   write_header_columns(eng, at, row);
+   write_header_columns(eng, grid, at, row);
 
    c = n_mode_hdr_columns;
 
@@ -3378,13 +3423,13 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_cluster_pair(ModeFuzzyEngine &eng, const int n,
+void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
                           AsciiTable &at, const int row) {
    int i, c;
    char tmp_str[max_str_len];
 
    // Write out the common header columns
-   write_header_columns(eng, at, row);
+   write_header_columns(eng, grid, at, row);
 
    c = n_mode_hdr_columns;
 

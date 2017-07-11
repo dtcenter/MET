@@ -123,6 +123,8 @@ class GridInterface {   //  pure abstract class for grid public interface
       virtual int nx() const = 0;
       virtual int ny() const = 0;
 
+      virtual double scale_km() const = 0;   //  returns -1.0 if scale is unknown
+
       virtual ConcatString name() const = 0;
 
       virtual void dump(ostream &, int = 0) const = 0;
@@ -220,6 +222,8 @@ class Grid : public GridInterface {
 
       int nx() const;
       int ny() const;
+
+      double scale_km() const;   //  returns -1.0 if scale is unknown or inapplicable
 
       ConcatString name() const;
 

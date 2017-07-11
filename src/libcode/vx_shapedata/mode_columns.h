@@ -17,21 +17,28 @@ static const char * mode_hdr_columns [] = {
 
    "VERSION",                    //   1
    "MODEL",                      //   2
-   "DESC",                       //   3
-   "FCST_LEAD",                  //   4
-   "FCST_VALID",                 //   5
-   "FCST_ACCUM",                 //   6
-   "OBS_LEAD",                   //   7
-   "OBS_VALID",                  //   8
-   "OBS_ACCUM",                  //   9
-   "FCST_RAD",                   //  10
-   "FCST_THR",                   //  11
-   "OBS_RAD",                    //  12
-   "OBS_THR",                    //  13
-   "FCST_VAR",                   //  14
-   "FCST_LEV",                   //  15
-   "OBS_VAR",                    //  16
-   "OBS_LEV"                     //  17
+
+   "N_VALID",                    //   3
+   "GRID_RES",                   //   4
+
+   "DESC",                       //   5
+   "FCST_LEAD",                  //   6
+   "FCST_VALID",                 //   7
+   "FCST_ACCUM",                 //   8
+   "OBS_LEAD",                   //   9
+   "OBS_VALID",                  //  10
+   "OBS_ACCUM",                  //  11
+   "FCST_RAD",                   //  12
+   "FCST_THR",                   //  13
+   "OBS_RAD",                    //  14
+   "OBS_THR",                    //  15
+   "FCST_VAR",                   //  16
+   "FCST_LEV",                   //  17
+   "OBS_VAR",                    //  18
+   "OBS_LEV",                    //  19
+
+   "OBTYPE",                     //  20
+
 };
 
 static const char * mode_obj_columns [] = {

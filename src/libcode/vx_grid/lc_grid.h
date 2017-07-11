@@ -107,6 +107,8 @@ class LambertGrid : public GridRep {
 
       GridRep * copy() const;
 
+      double scale_km() const;
+
 };
 
 
@@ -115,6 +117,8 @@ class LambertGrid : public GridRep {
 
 inline bool LambertGrid::is_north() const { return (   IsNorthHemisphere ); }
 inline bool LambertGrid::is_south() const { return ( ! IsNorthHemisphere ); }
+
+inline double LambertGrid::scale_km() const { return ( Data.d_km ); }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -80,6 +80,8 @@ void ModeConfInfo::clear()
 
    mask_missing_flag = FieldType_None;
 
+   grid_res = bad_data_double;
+
    fcst_raw_thresh.clear();
    obs_raw_thresh.clear();
 
@@ -131,6 +133,7 @@ void ModeConfInfo::clear()
    int_area_ratio_wt   = bad_data_double;
    complexity_ratio_wt = bad_data_double;
    inten_perc_ratio_wt = bad_data_double;
+
 
    inten_perc_value = bad_data_int;
 
@@ -238,6 +241,10 @@ PlotInfo plot_info;
       // Conf: regrid
 
    regrid_info = parse_conf_regrid(&conf);
+
+      //  grid_res
+
+   grid_res = conf.lookup_double(conf_key_grid_res);
 
       //  quilt
 
