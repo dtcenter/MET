@@ -20,6 +20,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+
+static const bool use_new = false;
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 using namespace std;
 
 #include <ctime>
@@ -515,7 +521,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Polyline ShapeData::convex_hull() const
+Polyline ShapeData::convex_hull_new() const
 
 {
 
@@ -523,7 +529,7 @@ int j, k, x, y;
 int n_in, n_out;
 Polyline hull_poly;
 const int N = nint(area());
-IntPoint * in = new IntPoint [2*(data.ny())];
+IntPoint * in = new IntPoint [2*(data.ny() + 1)];
 
 
 n_in = 0;
@@ -544,6 +550,10 @@ for (y=0; y<(data.ny()); ++y)  {
    if ( k < 0 )  continue;
 
    if ( j == k )  continue;
+
+   // ++k;
+
+   // if ( k >= data.ny() )  k = data.ny() - 1;
 
    in[n_in].x = k;
    in[n_in].y = y;
@@ -580,8 +590,24 @@ return ( hull_poly );
 ////////////////////////////////////////////////////////////////////////
 
 
-/*
 Polyline ShapeData::convex_hull() const
+
+{
+
+Polyline p;
+
+if ( use_new )  p = convex_hull_new ();
+else            p = convex_hull_old ();
+
+return ( p );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Polyline ShapeData::convex_hull_old() const
 
 {
 
@@ -765,7 +791,7 @@ Polyline ShapeData::convex_hull() const
    return(hull);
 
 }
-*/
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
