@@ -517,7 +517,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 void process_fcst_climo_files() {
    int i, j;
    int n_fcst;
-   DataPlaneArray fcst_dpa, cmn_dpa;
+   DataPlaneArray fcst_dpa, cmn_dpa, csd_dpa;
    unixtime file_ut, beg_ut, end_ut;
 
    // Loop through each of the fields to be verified and extract
@@ -572,10 +572,14 @@ void process_fcst_climo_files() {
       cmn_dpa = read_climo_data_plane_array(
                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
                    i, fcst_dpa[0].valid(), grid);
+      csd_dpa = read_climo_data_plane_array(
+                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   i, fcst_dpa[0].valid(), grid);
 
       // Store data for the current verification task
       conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
       conf_info.vx_pd[i].set_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_pd[i].set_climo_sd_dpa(csd_dpa);
 
       // Get the valid time for the first field
       file_ut = fcst_dpa[0].valid();
@@ -600,8 +604,9 @@ void process_fcst_climo_files() {
       // Dump out the number of levels found
       mlog << Debug(2)
            << "For " << conf_info.vx_pd[i].fcst_info->magic_str()
-           << " found " << n_fcst << " forecast levels and "
-           << cmn_dpa.n_planes() << " climatology levels.\n";
+           << " found " << n_fcst << " forecast levels, "
+           << cmn_dpa.n_planes() << " climatology mean levels, and "
+           << csd_dpa.n_planes() << " climatology standard deviation levels.\n";
 
    } // end for i
 
@@ -1012,9 +1017,10 @@ void process_obs_file(int i_nc) {
 
             // Attempt to add the observation to the conf_info.vx_pd object
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                       hdr_ut, obs_qty_str, obs_arr, grid, var_name);
+                                       hdr_ut, obs_qty_str, obs_arr, grid,
+                                       var_name);
          }
-         
+
          obs_arr[1] = grid_code;
       }
 

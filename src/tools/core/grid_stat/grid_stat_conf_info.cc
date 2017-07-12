@@ -227,7 +227,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
        set_ascii_output_flag(false);
    }
 
-   // Conf: fcst.field, obs.field, and climo.field
+   // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
    odict = conf.lookup_array(conf_key_obs_field);
 

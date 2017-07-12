@@ -20,10 +20,12 @@ using namespace std;
 #include "interp_util.h"
 #include "two_to_one.h"
 
+#include "vx_gsl_prob.h"
 #include "vx_math.h"
 #include "vx_log.h"
 
 #include "GridTemplate.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -450,6 +452,57 @@ void mask_bad_data(DataPlane &dp, const DataPlane &mask_dp, double v) {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
+   DataPlane diff = dp1;
+   double v;
+
+   if(dp1.nx() != dp2.nx() || dp1.ny() != dp2.ny()) {
+      mlog << Error << "\nsubtract() -> "
+           << "grid dimensions do not match\n\n";
+      exit(1);
+   }
+
+   for(int x=0; x<dp1.nx(); x++) {
+      for(int y=0; y<dp1.ny(); y++) {
+         v = (is_bad_data(dp1.get(x,y)) || is_bad_data(dp2.get(x,y)) ?
+              bad_data_double : dp1.get(x,y) - dp2.get(x,y));
+         diff.set(v, x, y);
+      }
+   }
+
+   return(diff);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
+                     const DataPlane &sd) {
+   DataPlane cdf = dp;
+   double v;
+
+   if(dp.nx() != mn.nx() || dp.ny() != mn.ny() ||
+      dp.nx() != sd.nx() || dp.ny() != sd.ny()) {
+      mlog << Error << "\nnormal_cdf_dp() -> "
+           << "grid dimensions do not match\n\n";
+      exit(1);
+   }
+
+   for(int x=0; x<dp.nx(); x++) {
+      for(int y=0; y<dp.ny(); y++) {
+         v = (is_bad_data(dp.get(x,y)) ||
+              is_bad_data(mn.get(x,y)) ||
+              is_bad_data(sd.get(x,y)) ?
+              bad_data_double :
+              normal_cdf(dp.get(x,y), mn.get(x,y), sd.get(x,y)));
+         cdf.set(v, x, y);
+      }
+   }
+
+   return(cdf);
 }
 
 ////////////////////////////////////////////////////////////////////////

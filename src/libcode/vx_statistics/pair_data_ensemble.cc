@@ -1153,7 +1153,8 @@ void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
 void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                                  const char *hdr_sid_str, unixtime hdr_ut,
                                  const char *obs_qty, float *obs_arr,
-                                 Grid &gr, const char *var_name, const DataPlane * wgt_dp) {
+                                 Grid &gr, const char *var_name,
+                                 const DataPlane * wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
@@ -1185,7 +1186,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    else if(obs_info_grib->code() != nint(obs_arr[1])) {
       return;
    }
-   
+
    // Check if the observation quality flag is included in the list
    if(obs_qty_filt.n_elements() && strcmp(obs_qty, "")) {
       bool qty_match = false;

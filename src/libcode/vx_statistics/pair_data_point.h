@@ -55,11 +55,15 @@ class PairDataPoint : public PairBase {
                     const char *, double, double,
                     double wgt = default_grid_weight);
 
-      bool add_pair(double, double, double,
+      bool add_pair(double, double, double, double,
                     double wgt = default_grid_weight);
 
       bool add_pair(const NumArray f_in, const NumArray o_in,
                     const NumArray c_in, const NumArray w_in);
+
+      bool add_pair(const NumArray f_in,   const NumArray o_in,
+                    const NumArray cmn_in, const NumArray csd_in,
+                    const NumArray w_in);
 
       void set_pair(int, const char *, double, double, double, double,
                     unixtime, double, double, double, double,
@@ -185,13 +189,12 @@ class VxPairDataPoint {
       void set_msg_typ(int, const char *);
       void set_mask_dp(int, const char *, DataPlane *);
       void set_mask_sid(int, const char *, StringArray *);
-      //void set_interp(int, const char *, int);
-      //void set_interp(int, InterpMthd, int);
-      void set_interp(int i_interp, const char *interp_mthd_str,
-                      int width, GridTemplateFactory::GridTemplates shape);
+
+      void set_interp(int i_interp, const char *interp_mthd_str, int width,
+                      GridTemplateFactory::GridTemplates shape);
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
-      
+
       void add_obs(float *, const char *, const char *, unixtime,
                    const char *, float *, Grid &, const char * = 0,
                    const DataPlane * = 0);

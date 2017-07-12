@@ -125,7 +125,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    }
    // Handle gridded data
    else {
-      add_pair(pd.f_na, pd.o_na, pd.cmn_na, pd.wgt_na);
+      add_pair(pd.f_na, pd.o_na, pd.cmn_na, pd.csd_na, pd.wgt_na);
    }
 
    return;
@@ -149,11 +149,13 @@ bool PairDataPoint::add_pair(const char *sid, double lat, double lon,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataPoint::add_pair(double f, double o, double c, double w) {
+bool PairDataPoint::add_pair(double f, double o, double cmn, double csd,
+                             double w) {
 
    f_na.add(f);
    o_na.add(o);
-   cmn_na.add(c);
+   cmn_na.add(cmn);
+   csd_na.add(csd);
    wgt_na.add(w);
    n_obs++;
 
@@ -162,12 +164,26 @@ bool PairDataPoint::add_pair(double f, double o, double c, double w) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataPoint::add_pair(const NumArray f_in, const NumArray o_in,
-                             const NumArray c_in, const NumArray w_in) {
+bool PairDataPoint::add_pair(const NumArray f_in,   const NumArray o_in,
+                             const NumArray cmn_in, const NumArray w_in) {
+   NumArray csd_in;
+
+   csd_in.extend(cmn_in.n_elements());
+   for(int i; i<cmn_in.n_elements(); i++) csd_in.add(bad_data_double);
+
+   return(add_pair(f_in, o_in, cmn_in, csd_in, w_in));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairDataPoint::add_pair(const NumArray f_in,   const NumArray o_in,
+                             const NumArray cmn_in, const NumArray csd_in,
+                             const NumArray w_in) {
 
    // Check for constant length
-   if(o_in.n_elements() != f_in.n_elements() ||
-      o_in.n_elements() != c_in.n_elements() ||
+   if(o_in.n_elements() != f_in.n_elements()   ||
+      o_in.n_elements() != cmn_in.n_elements() ||
+      o_in.n_elements() != csd_in.n_elements() ||
       o_in.n_elements() != w_in.n_elements()) {
       mlog << Error << "\nPairDataPoint::add_pair() -> "
            << "arrays must all have the same length!\n\n";
@@ -176,7 +192,8 @@ bool PairDataPoint::add_pair(const NumArray f_in, const NumArray o_in,
 
    f_na.add(f_in);
    o_na.add(o_in);
-   cmn_na.add(c_in);
+   cmn_na.add(cmn_in);
+   csd_na.add(csd_in);
    wgt_na.add(w_in);
 
    // Increment the number of pairs
@@ -604,8 +621,8 @@ void VxPairDataPoint::set_mask_sid(int i_mask, const char *name,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::set_interp(int i_interp,
-                                 const char *interp_mthd_str,
-                                 int width, GridTemplateFactory::GridTemplates shape) {
+                                 const char *interp_mthd_str, int width,
+                                 GridTemplateFactory::GridTemplates shape) {
    int i, j;
 
    for(i=0; i<n_msg_typ; i++) {
@@ -621,15 +638,16 @@ void VxPairDataPoint::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_interp(int i_interp, InterpMthd mthd,
-                                 int width, GridTemplateFactory::GridTemplates shape) {
+void VxPairDataPoint::set_interp(int i_interp,
+                                 InterpMthd mthd, int width,
+                                 GridTemplateFactory::GridTemplates shape) {
    int i, j;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
          pd[i][j][i_interp].set_interp_mthd(mthd);
          pd[i][j][i_interp].set_interp_dpth(width);
-         pd[i][j][i_interp].set_interp_shape(shape);         
+         pd[i][j][i_interp].set_interp_shape(shape);
       }
    }
 
@@ -641,7 +659,8 @@ void VxPairDataPoint::set_interp(int i_interp, InterpMthd mthd,
 void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
                               const char *hdr_sid_str, unixtime hdr_ut,
                               const char *obs_qty, float *obs_arr,
-                              Grid &gr, const char *var_name, const DataPlane *wgt_dp) {
+                              Grid &gr, const char *var_name,
+                              const DataPlane *wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
@@ -918,7 +937,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
             // Compute the interpolated climatology standard deviation
             csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
                         pd[0][0][k].interp_mthd,  pd[0][0][k].interp_dpth,
-                                   pd[0][0][k].interp_shape,
+                        pd[0][0][k].interp_shape,
                         interp_thresh, spfh_flag,
                         fcst_info->level().type(),
                         to_lvl, csd_lvl_blw, csd_lvl_abv);

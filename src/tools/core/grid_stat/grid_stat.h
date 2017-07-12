@@ -122,18 +122,12 @@ static ConcatString out_dir;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static NcFile      *nc_out  = (NcFile *) 0;
-//static NcDim       *lat_dim = (NcDim *)  0;
-//static NcDim       *lon_dim = (NcDim *)  0;
-static NcDim       lat_dim ;
-static NcDim       lon_dim ;
+static NcFile      *nc_out = (NcFile *) 0;
+static NcDim        lat_dim;
+static NcDim        lon_dim;
 
 // List of output NetCDF variable names
-static StringArray fcst_var_sa;
-static StringArray obs_var_sa;
-static StringArray diff_var_sa;
-static StringArray cmn_var_sa;
-static StringArray csd_var_sa;
+static StringArray nc_var_sa;
 
 // Output STAT file
 static ConcatString stat_file;
