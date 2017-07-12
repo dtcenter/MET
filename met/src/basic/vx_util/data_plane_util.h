@@ -51,6 +51,10 @@ extern void apply_mask(DataPlane &, const DataPlane &);
 
 extern void mask_bad_data(DataPlane &, const DataPlane &, double v = bad_data_double);
 
+extern DataPlane subtract(const DataPlane &, const DataPlane &);
+
+extern DataPlane normal_cdf(const DataPlane &, const DataPlane &, const DataPlane &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __DATA_PLANE_UTIL__

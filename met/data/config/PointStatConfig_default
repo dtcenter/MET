@@ -97,7 +97,7 @@ obs_perc_value = 50;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = {
 
@@ -114,6 +114,11 @@ climo_mean = {
    time_interp_method = DW_MEAN;
    match_day          = FALSE;
    time_step          = 21600;
+}
+
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -76,7 +76,7 @@ class PairBase {
       InterpMthd interp_mthd;
       int        interp_dpth;
       GridTemplateFactory::GridTemplates interp_shape;
-      
+
       // Observation Information
       StringArray sid_sa;  // Station ID [n_obs]
       NumArray    lat_na;  // Latitude [n_obs]
@@ -174,7 +174,6 @@ extern double compute_interp(const DataPlaneArray &dpa,
                       const bool spfh_flag, const LevelType lvl_typ,
                       const double to_lvl, const int i_blw, const int i_abv,
                       const SingleThresh *cat_thresh = 0);
-	
 
 ////////////////////////////////////////////////////////////////////////
 

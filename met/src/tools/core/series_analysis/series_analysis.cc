@@ -22,7 +22,7 @@
 //   004    08/04/15  Halley Gotway   Add conditional continuous verification.
 //   005    09/21/15  Halley Gotway   Add climatology and SAL1L2 output.
 //   006    04/20/16  Halley Gotway   Add -paired command line option.
-//   007    05/15/17  Prestopnikk P   Add shape for regrid 
+//   007    05/15/17  Prestopnikk P   Add shape for regrid
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -923,7 +923,7 @@ void do_cnt(int n, const NumArray &f_na, const NumArray &o_na,
       // Store pairs in PairDataPoint object
       pd_all.clear();
       for(j=0; j<o_na.n_elements(); j++) {
-         pd_all.add_pair(f_na[j], o_na[j], c_na[j]);
+         pd_all.add_pair(f_na[j], o_na[j], c_na[j], bad_data_double);
       }
 
       // Apply continuous filtering thresholds to subset pairs

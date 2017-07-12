@@ -73,6 +73,7 @@ class DataPlane {
 
       int      nx() const;
       int      ny() const;
+      bool     is_empty() const;
       unixtime init() const;
       unixtime valid() const;
       int      lead() const;
@@ -107,6 +108,8 @@ class DataPlane {
 
 inline int DataPlane::nx() const { return (Nx); }
 inline int DataPlane::ny() const { return (Ny); }
+
+inline bool DataPlane::is_empty() const { return (Nxy == 0); }
 
 inline unixtime DataPlane::init()  const { return (InitTime);  }
 inline unixtime DataPlane::valid() const { return (ValidTime); }
