@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-static const bool use_new = false;
+static const bool use_new = true;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -562,7 +562,7 @@ for (y=0; y<(data.ny()); ++y)  {
 
 }   //  for y
 
-IntPoint * out = new IntPoint [n_in + 1];
+IntPoint * out = new IntPoint [n_in + 2];
 
 ihull(in, n_in, out, n_out);
 
