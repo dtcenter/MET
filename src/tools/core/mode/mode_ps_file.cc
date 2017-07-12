@@ -1140,6 +1140,9 @@ for (i=0; i<eng.collection.n_sets; i++) {
    if ( fcst ) poly = eng.pair_cluster[i].Fcst[0].convex_hull;
    else        poly = eng.pair_cluster[i].Obs[0].convex_hull;
 
+   // cout << "========= " << (fcst ? "fcst" : "obs") << " " << i << "\n" << flush;
+   // poly.dump(cout);
+
    draw_polyline(poly, HullColor, false);
 
       //

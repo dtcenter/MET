@@ -114,6 +114,42 @@ void Polyline::assign(const Polyline &c) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
+void Polyline::dump(ostream & out, int depth) const
+
+{
+
+int j;
+Indent prefix(depth);
+Indent p2(depth + 1);
+
+out << prefix << "n_points = " << n_points << "\n";
+out << prefix << "n_alloc  = " << n_alloc  << "\n";
+
+for (j=0; j<n_points; ++j)  {
+
+   out << p2 << "point # " << j << " ... ("
+       << u[j] << ", " << v[j] << ")\n";
+
+   if ( (j%5) == 4 )  out << p2 << "\n";
+
+}
+
+
+
+   //
+   //  done
+   //
+
+out.flush();
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 void Polyline::set_name(const char *n) {
 
    if(n) {

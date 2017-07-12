@@ -24,6 +24,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include "vx_util.h"
 #include "vx_math.h"
 
@@ -47,6 +49,8 @@ class Polyline {
       Polyline & operator=(const Polyline &);
 
       void clear();
+
+      void dump(ostream &, int = 0) const;
 
       /////////////////////////////////////////////////////////////////////////
 

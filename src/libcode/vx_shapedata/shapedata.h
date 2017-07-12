@@ -123,6 +123,9 @@ class ShapeData {
          //
 
       Polyline convex_hull()                             const;
+      Polyline convex_hull_new()                         const;
+      Polyline convex_hull_old()                         const;
+
       Polyline single_boundary()                         const;
       Polyline single_boundary(bool, int)                const;
       Polyline single_boundary_offset(double)            const;

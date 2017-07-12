@@ -3535,6 +3535,7 @@ void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    //
    for(i=0; i<eng.collection.n_sets; i++) {
       comp = select(*eng.fcst_clus_split, i+1);
+      // cout << "=================== Fcst " << i << "\n";
       poly = comp.convex_hull();
       poly.bounding_box(bb);
 

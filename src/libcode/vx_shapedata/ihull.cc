@@ -73,8 +73,8 @@ n_hull = 0;
 
 j = 0;
 
-hull[n_hull++] = p[j++];
-hull[n_hull++] = p[j++];
+// hull[n_hull++] = p[j++];
+// hull[n_hull++] = p[j++];
 
 while ( j < n_in )  {
 
@@ -93,6 +93,9 @@ while ( j < n_in )  {
 }   //  while
 
 for (k=0; k<n_hull; ++k)  p[hull[k].orig_index].used = true;
+
+for (k=0; k<n_hull; ++k)  cout << hull[k].x << ' ' << hull[k].y << "\n";
+cout << "\n\n" << flush;
 
 n_old = n_hull;
 
@@ -134,6 +137,7 @@ if ( n_hull > n_old )  --n_hull;
    //  done
    //
 
+if ( p )  { delete [] p;  p = 0; }
 
 return;
 
