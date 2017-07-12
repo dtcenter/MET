@@ -94,8 +94,8 @@ while ( j < n_in )  {
 
 for (k=0; k<n_hull; ++k)  p[hull[k].orig_index].used = true;
 
-for (k=0; k<n_hull; ++k)  cout << hull[k].x << ' ' << hull[k].y << "\n";
-cout << "\n\n" << flush;
+// for (k=0; k<n_hull; ++k)  cout << hull[k].x << ' ' << hull[k].y << "\n";
+// cout << "\n\n" << flush;
 
 n_old = n_hull;
 
@@ -107,7 +107,7 @@ j = n_in - 2;
 
 while ( j >= 0 )  {
 
-   if ( p[j].used )  { --j;  continue; }   //  don't look at points that are part of the upper hull
+   // if ( p[j].used )  { --j;  continue; }   //  don't look at points that are part of the upper hull
 
    hull[n_hull++] = p[j--];   //  this is why the hull array has to be bigger than the input array
 
