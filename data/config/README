@@ -321,7 +321,13 @@ regrid = {
 //
 //   - The "file_type" entry specifies the input file type rather than letting
 //     the code determine it itself.  For valid file_type values, see "File types"
-//     in the data/config/ConfigConstants file.
+//     in the data/config/ConfigConstants file.  This entry should be defined
+//     within the "fcst" or "obs" dictionaries.
+//     e.g.
+//     fcst = {
+//        file_type = NETCDF_NCCF;
+//        ...
+//     }
 //
 //   - The "wind_thresh" entry is an array of thresholds used to filter wind
 //     speed values when computing VL1L2 vector partial sums.  Only those U/V
