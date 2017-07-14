@@ -72,13 +72,54 @@
 \begin_body
 
 \begin_layout Section
-GRIB to NetCDF conversion
+pcp_combine pass through
 \end_layout
 
 \begin_layout Standard
-While it is not necessary to convert to NetCDF prior to running MET tools,
- if this is needed for some reason, it can certainly do that.
- Use the pcp_combine "-add" option to do that: 
+The pcp_combine tool is typically used to modify the accumulation interval
+ of precipitation amounts in model and/or analysis datasets.
+ For example, when verifying model output in GRIB format containing runtime
+ accumulations of precipitation, you may run the pcp_combine -subtract option
+ every 6 hours to create 6-hourly precipitation amounts.
+ In this example, it is not really necessary to run pcp_combine on the 6-hour
+ GRIB forecast file since the model output already contains the 0 to 6 hour
+ accumulation.
+ However, the output of pcp_combine is typically passed to point_stat, grid_stat
+, or mode for verification.
+ Having the 6-hour forecast in GRIB format and all other forecast hours
+ in NetCDF format (output of pcp_combine) makes the logic for configuring
+ the other MET tools messy.
+ To make the configuration consist for all forecast lead times, you may
+ choose to run pcp_combine as a pass-through to simply reformat from GRIB
+ to NetCDF.
+ Listed below is an example of passing a single record to the pcp_combine
+ -add option to do the reformatting:
+\end_layout
+
+\begin_layout LyX-Code
+$MET_BUILD/bin/pcp_combine -add forecast_F06.grb 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+'name="APCP"; level="A6";' 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+forecast_APCP_06_F06.nc -name APCP_06
+\end_layout
+
+\begin_layout Standard
+Reformatting from GRIB to NetCDF may be done for any other reason the user
+ may have.
+ For example, the -name option can be used to define the NetCDF output variable
+ name.
+ Presuming this file is then passed to another MET tool, the new variable
+ (CompositeReflectivity) name will show up in the output from downstream
+ tools:
 \end_layout
 
 \begin_layout LyX-Code
@@ -94,7 +135,7 @@ $MET_BUILD/bin/pcp_combine -add forecast.grb
 \end_layout
 
 \begin_layout LyX-Code
-forecast.nc -name REFC
+forecast.nc -name CompositeReflectivity
 \end_layout
 
 \begin_layout LyX-Code
