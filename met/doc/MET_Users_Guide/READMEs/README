@@ -321,7 +321,13 @@ regrid = {
 //
 //   - The "file_type" entry specifies the input file type rather than letting
 //     the code determine it itself.  For valid file_type values, see "File types"
-//     in the data/config/ConfigConstants file.
+//     in the data/config/ConfigConstants file.  This entry should be defined
+//     within the "fcst" or "obs" dictionaries.
+//     e.g.
+//     fcst = {
+//        file_type = NETCDF_NCCF;
+//        ...
+//     }
 //
 //   - The "wind_thresh" entry is an array of thresholds used to filter wind
 //     speed values when computing VL1L2 vector partial sums.  Only those U/V
@@ -333,13 +339,13 @@ regrid = {
 //     settings are combined when filtering matched pairs of forecast and
 //     observed wind speeds.
 //
-//   - The "eclv_points" entry specifies the economic cost/loss ratio points 
+//   - The "eclv_points" entry specifies the economic cost/loss ratio points
 //     to be evaluated.  For each cost/loss ratio specified, the relative value
-//     will be computed and written to the ECLV output line.  This entry may 
+//     will be computed and written to the ECLV output line.  This entry may
 //     either be specified as an array of numbers between 0 and 1 or as a single
 //     number.  For an array, each array entry will be evaluated.  For a single
 //     number, all evenly spaced points between 0 and 1 will be evaluated, where
-//     eclv_points defines the spacing.  Cost/loss values are omitted for 
+//     eclv_points defines the spacing.  Cost/loss values are omitted for
 //     ratios of 0.0 and 1.0 since they are undefined.
 //
 //   - The "init_time" entry specifies the initialization time in YYYYMMDD[_HH[MMSS]]
