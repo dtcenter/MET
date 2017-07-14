@@ -151,10 +151,6 @@ This tells Grid-Stat to do verification on the "observation" grid.
  comparing them.
 \end_layout
 
-\begin_layout Standard
-1
-\end_layout
-
 \begin_layout LyX-Code
 mask = { grid = [ "FULL" ]; 
 \end_layout
