@@ -117,8 +117,7 @@ Reformatting from GRIB to NetCDF may be done for any other reason the user
  For example, the -name option can be used to define the NetCDF output variable
  name.
  Presuming this file is then passed to another MET tool, the new variable
- (CompositeReflectivity) name will show up in the output from downstream
- tools:
+ name (CompositeReflectivity) will appear in the output of downstream tools:
 \end_layout
 
 \begin_layout LyX-Code
