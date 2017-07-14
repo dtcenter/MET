@@ -79,8 +79,8 @@ pcp_combine pass through
 The pcp_combine tool is typically used to modify the accumulation interval
  of precipitation amounts in model and/or analysis datasets.
  For example, when verifying model output in GRIB format containing runtime
- accumulations of precipitation, you may run the pcp_combine -subtract option
- every 6 hours to create 6-hourly precipitation amounts.
+ accumulations of precipitation, run the pcp_combine -subtract option every
+ 6 hours to create 6-hourly precipitation amounts.
  In this example, it is not really necessary to run pcp_combine on the 6-hour
  GRIB forecast file since the model output already contains the 0 to 6 hour
  accumulation.
@@ -89,8 +89,9 @@ The pcp_combine tool is typically used to modify the accumulation interval
  Having the 6-hour forecast in GRIB format and all other forecast hours
  in NetCDF format (output of pcp_combine) makes the logic for configuring
  the other MET tools messy.
- To make the configuration consist for all forecast hours, you may choose
- to run pcp_combine as a pass-through to simply reformat from GRIB to NetCDF.
+ To make the configuration consist for all forecast hours, one option is
+ to choose to run pcp_combine as a pass-through to simply reformat from
+ GRIB to NetCDF.
  Listed below is an example of passing a single record to the pcp_combine
  -add option to do the reformatting:
 \end_layout
