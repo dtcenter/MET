@@ -1877,7 +1877,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
             n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
             data[n] = (conf_info.mask_dp[i].s_is_on(x, y) ?
-                       bad_data_float : dp.get(x, y));
+                       dp.get(x, y) : bad_data_float);
 
          } // end for y
       } // end for x
