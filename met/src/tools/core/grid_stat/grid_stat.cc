@@ -1712,8 +1712,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    mthd_str = interpmthd_to_string(conf_info.interp_mthd[i_interp]);
    wdth     = conf_info.interp_wdth[i_interp];
 
-   // Only set the interpolation string for multiple methods
-   if(conf_info.get_n_interp() > 1) {
+   // Omit interpolation string for nearest point
+   if(wdth > 1) {
       interp_str << "_" << mthd_str << "_" << wdth*wdth;
    }
 
