@@ -373,6 +373,12 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       double rec_lvl1 = min((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
       double rec_lvl2 = max((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
 
+      //  test the level type number, if specified
+      if ( !is_bad_data(vinfo->level().type_num()) &&
+           vinfo->level().type_num() != (*it)->LvlTyp ){
+         continue;
+      }
+
       //  test the timing information
       if( (!is_bad_data(vinfo->lead())  && vinfo->lead()  != (*it)->LeadTime)  ||
           (vinfo->valid()               && vinfo->valid() != (*it)->ValidTime) ||
