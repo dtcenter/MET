@@ -355,4 +355,28 @@
     </output>
   </test>
 
+  <test name="ascii2nc_by_var_name">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/obs_test_name.txt \
+      &OUTPUT_DIR;/ascii2nc/obs_test_name.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/obs_test_name.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_by_var_name_PB">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/gdas1.20120409.t12z.prepbufr.name.txt \
+      &OUTPUT_DIR;/ascii2nc/gdas1.20120409.t12z.prepbufr.ascii_name.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gdas1.20120409.t12z.prepbufr.ascii_name.nc</point_nc>
+    </output>
+  </test>
+  
 </met_test>
