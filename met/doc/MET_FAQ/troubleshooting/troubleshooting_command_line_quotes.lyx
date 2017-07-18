@@ -92,7 +92,10 @@ Single quotes, double quotes, and escape characters can be difficult for
 
 \begin_layout LyX-Code
 'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
- '
+\end_layout
+
+\begin_layout LyX-Code
+'
 \backslash
 'name="HGT"; level="P500";
 \backslash
