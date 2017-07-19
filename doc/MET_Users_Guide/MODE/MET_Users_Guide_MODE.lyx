@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -219,7 +221,7 @@ The methods used by the MODE tool to identify and match forecast and observed
 Resolving objects
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE_Resolving-objects"
+name "subsec:MODE_Resolving-objects"
 
 \end_inset
 
@@ -622,7 +624,7 @@ $$F(x,y)=M(x,y)f(x,y).$$
 \end_layout
 
 \begin_layout Standard
-Thus, two parameters --- the radius of influence 
+Thus, two parameters — the radius of influence 
 \begin_inset ERT
 status open
 
@@ -644,7 +646,7 @@ $T$
 
 \end_inset
 
- --- control the entire process of resolving objects in the raw data field.
+ — control the entire process of resolving objects in the raw data field.
 \end_layout
 
 \begin_layout Standard
@@ -731,7 +733,7 @@ name "Fig_MODE_object_id"
 Attributes
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE_Attributes"
+name "subsec:MODE_Attributes"
 
 \end_inset
 
@@ -792,7 +794,7 @@ hbox{$(x, y)$}
 \end_inset
 
  and 
-\begin_inset Formula $S{}_{y}$
+\begin_inset Formula $S_{y}$
 \end_inset
 
 , are defined as 
@@ -1015,7 +1017,7 @@ bf Symmetric Difference}
 Fuzzy logic
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE_Fuzzy-logic"
+name "subsec:MODE_Fuzzy-logic"
 
 \end_inset
 
@@ -1215,7 +1217,7 @@ Another merging method is available in MODE, which can be used instead of,
 Summary statistics
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE_Summary-statistics"
+name "subsec:MODE_Summary-statistics"
 
 \end_inset
 
@@ -1234,7 +1236,7 @@ Once MODE has been run, summary statistics are written to an output file.
  Refer to Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MODE-output"
+reference "subsec:MODE-output"
 
 \end_inset
 
@@ -1297,7 +1299,7 @@ MODE provides the capability to select a single model variable/level from
 mode usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE-usage"
+name "subsec:MODE-usage"
 
 \end_inset
 
@@ -1652,7 +1654,7 @@ d precipitation, the MODEConfig_nc file should specify that accumulated
 mode configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE-configuration-file"
+name "subsec:MODE-configuration-file"
 
 \end_inset
 
@@ -1679,7 +1681,7 @@ Note that environment variables may be used when editing configuration files,
  as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-configuration-file"
+reference "subsec:pb2nc-configuration-file"
 
 \end_inset
 
@@ -1748,7 +1750,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -1953,7 +1955,7 @@ entries in the forecast and observation dictionaries specify the model and
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2423,7 +2425,7 @@ poly
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2942,7 +2944,7 @@ plot_max
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -3213,7 +3215,7 @@ When MODE is run on global grids, this parameter specifies how many grid
 mode output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE-output"
+name "subsec:MODE-output"
 
 \end_inset
 
@@ -3277,8 +3279,8 @@ name "CTS_output"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="38" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<lyxtabular version="3" rows="41" columns="3">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.25in">
@@ -3416,6 +3418,64 @@ User provided text string designating model name
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+N_VALID
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of valid data points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GRID_RES
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided nominal grid resolution
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -3440,7 +3500,7 @@ User provided text string describing the verification task
 \begin_inset Text
 
 \begin_layout Plain Layout
-4
+6
 \end_layout
 
 \end_inset
@@ -3469,7 +3529,7 @@ Forecast lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+7
 \end_layout
 
 \end_inset
@@ -3498,7 +3558,7 @@ Forecast valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-6
+8
 \end_layout
 
 \end_inset
@@ -3527,7 +3587,7 @@ Forecast accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-7
+9
 \end_layout
 
 \end_inset
@@ -3557,7 +3617,7 @@ Observation lead time in HHMMSS format; when field2 is actually an observation,
 \begin_inset Text
 
 \begin_layout Plain Layout
-8
+10
 \end_layout
 
 \end_inset
@@ -3586,7 +3646,7 @@ Observation valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-9
+11
 \end_layout
 
 \end_inset
@@ -3615,7 +3675,7 @@ Observation accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-10
+12
 \end_layout
 
 \end_inset
@@ -3644,7 +3704,7 @@ Forecast convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-11
+13
 \end_layout
 
 \end_inset
@@ -3673,7 +3733,7 @@ Forecast convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+14
 \end_layout
 
 \end_inset
@@ -3702,7 +3762,7 @@ Observation convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+15
 \end_layout
 
 \end_inset
@@ -3731,7 +3791,7 @@ Observation convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+16
 \end_layout
 
 \end_inset
@@ -3760,7 +3820,7 @@ Forecast variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+17
 \end_layout
 
 \end_inset
@@ -3789,7 +3849,7 @@ Forecast vertical level
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+18
 \end_layout
 
 \end_inset
@@ -3818,12 +3878,12 @@ Observation variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3832,7 +3892,7 @@ OBS_LEV
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3843,11 +3903,40 @@ Observation vertical level
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBTYPE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided observation type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+21
 \end_layout
 
 \end_inset
@@ -3878,7 +3967,7 @@ Field type for this line:* RAW for the raw input fields* FILTER for the
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+22
 \end_layout
 
 \end_inset
@@ -3907,7 +3996,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-20
+23
 \end_layout
 
 \end_inset
@@ -3936,7 +4025,7 @@ Number of forecast yes and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-21
+24
 \end_layout
 
 \end_inset
@@ -3965,7 +4054,7 @@ Number of forecast yes and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-22
+25
 \end_layout
 
 \end_inset
@@ -3994,7 +4083,7 @@ Number of forecast no and observation yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-23
+26
 \end_layout
 
 \end_inset
@@ -4023,7 +4112,7 @@ Number of forecast no and observation no
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+27
 \end_layout
 
 \end_inset
@@ -4052,7 +4141,7 @@ Base rate
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+28
 \end_layout
 
 \end_inset
@@ -4081,7 +4170,7 @@ Forecast mean
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+29
 \end_layout
 
 \end_inset
@@ -4110,7 +4199,7 @@ Accuracy
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+30
 \end_layout
 
 \end_inset
@@ -4139,7 +4228,7 @@ Frequency Bias
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+31
 \end_layout
 
 \end_inset
@@ -4168,7 +4257,7 @@ Probability of detecting yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+32
 \end_layout
 
 \end_inset
@@ -4197,7 +4286,7 @@ Probability of detecting no
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+33
 \end_layout
 
 \end_inset
@@ -4226,7 +4315,7 @@ Probability of false detection
 \begin_inset Text
 
 \begin_layout Plain Layout
-31
+34
 \end_layout
 
 \end_inset
@@ -4255,7 +4344,7 @@ False alarm ratio
 \begin_inset Text
 
 \begin_layout Plain Layout
-32
+35
 \end_layout
 
 \end_inset
@@ -4284,7 +4373,7 @@ Critical Success Index
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+36
 \end_layout
 
 \end_inset
@@ -4313,7 +4402,7 @@ Gilbert Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-34
+37
 \end_layout
 
 \end_inset
@@ -4342,7 +4431,7 @@ Hanssen-Kuipers Discriminant
 \begin_inset Text
 
 \begin_layout Plain Layout
-35
+38
 \end_layout
 
 \end_inset
@@ -4371,7 +4460,7 @@ Heidke Skill Score
 \begin_inset Text
 
 \begin_layout Plain Layout
-36
+39
 \end_layout
 
 \end_inset
@@ -4666,7 +4755,7 @@ CFNNN
 \series bold
 CONNN
 \series default
-) contain valid data in columns 19--39 and fill data in columns 40--51.
+) contain valid data in columns 19–39 and fill data in columns 40–51.
  The object pair lines (
 \series bold
 FNNN_ONNN
@@ -4675,7 +4764,7 @@ FNNN_ONNN
 \series bold
 CFNNN_CONNN)
 \series default
- contain valid data in columns 40--51 and fill data in columns 19--39.
+ contain valid data in columns 40–51 and fill data in columns 19–39.
  These object identifiers are described in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -4721,7 +4810,7 @@ name "MODE_object_attribute"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="1.1in">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="3.15in">
@@ -5022,8 +5111,8 @@ name "MODE_object_attribute_output"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="34" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<lyxtabular version="3" rows="37" columns="3">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.25in">
@@ -5165,12 +5254,70 @@ User provided text string designating model name
 \begin_inset Text
 
 \begin_layout Plain Layout
-DESC
+N_VALID
 \end_layout
 
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of valid data points
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GRID_RES
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided nominal grid resolution
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DESC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5185,7 +5332,7 @@ User provided text string describing the verification task
 \begin_inset Text
 
 \begin_layout Plain Layout
-4
+6
 \end_layout
 
 \end_inset
@@ -5214,7 +5361,7 @@ Forecast lead time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+7
 \end_layout
 
 \end_inset
@@ -5243,7 +5390,7 @@ Forecast valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-6
+8
 \end_layout
 
 \end_inset
@@ -5272,7 +5419,7 @@ Forecast accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-7
+9
 \end_layout
 
 \end_inset
@@ -5302,7 +5449,7 @@ Observation lead time in HHMMSS format; when field2 is actually an observation,
 \begin_inset Text
 
 \begin_layout Plain Layout
-8
+10
 \end_layout
 
 \end_inset
@@ -5331,7 +5478,7 @@ Observation valid start time in YYYYMMDDHH format
 \begin_inset Text
 
 \begin_layout Plain Layout
-9
+11
 \end_layout
 
 \end_inset
@@ -5360,7 +5507,7 @@ Observation accumulation time in HHMMSS format
 \begin_inset Text
 
 \begin_layout Plain Layout
-10
+12
 \end_layout
 
 \end_inset
@@ -5389,7 +5536,7 @@ Forecast convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-11
+13
 \end_layout
 
 \end_inset
@@ -5418,7 +5565,7 @@ Forecast convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-12
+14
 \end_layout
 
 \end_inset
@@ -5447,7 +5594,7 @@ Observation convolution radius in grid squares
 \begin_inset Text
 
 \begin_layout Plain Layout
-13
+15
 \end_layout
 
 \end_inset
@@ -5476,7 +5623,7 @@ Observation convolution threshold
 \begin_inset Text
 
 \begin_layout Plain Layout
-14
+16
 \end_layout
 
 \end_inset
@@ -5505,12 +5652,12 @@ Forecast variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-15
+17
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5519,7 +5666,7 @@ FCST_LEV
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5530,16 +5677,16 @@ Forecast vertical level
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-16
+18
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5548,7 +5695,7 @@ OBS_VAR
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5559,16 +5706,16 @@ Observation variable
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-17
+19
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5577,7 +5724,7 @@ OBS_LEV
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -5588,11 +5735,40 @@ Observation vertical level
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBTYPE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+User provided observation type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-18
+21
 \end_layout
 
 \end_inset
@@ -5621,7 +5797,7 @@ Object numbered from 1 to the number of objects in each field
 \begin_inset Text
 
 \begin_layout Plain Layout
-19
+22
 \end_layout
 
 \end_inset
@@ -5650,7 +5826,7 @@ Object category indicating to which cluster object it belongs
 \begin_inset Text
 
 \begin_layout Plain Layout
-20-21
+23-24
 \end_layout
 
 \end_inset
@@ -5679,7 +5855,7 @@ Location of the centroid (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-22-23
+25-26
 \end_layout
 
 \end_inset
@@ -5708,7 +5884,7 @@ Location of the centroid (in lat/lon degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-24
+27
 \end_layout
 
 \end_inset
@@ -5737,7 +5913,7 @@ Object axis angle (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-25
+28
 \end_layout
 
 \end_inset
@@ -5766,7 +5942,7 @@ Length of the enclosing rectangle (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-26
+29
 \end_layout
 
 \end_inset
@@ -5795,7 +5971,7 @@ Width of the enclosing rectangle (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+30
 \end_layout
 
 \end_inset
@@ -5824,7 +6000,7 @@ Object area (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-28
+31
 \end_layout
 
 \end_inset
@@ -5854,7 +6030,7 @@ Area of the object containing non-zero data in the filtered field (in grid
 \begin_inset Text
 
 \begin_layout Plain Layout
-29
+32
 \end_layout
 
 \end_inset
@@ -5884,7 +6060,7 @@ Area of the object containing data values in the filtered field that meet
 \begin_inset Text
 
 \begin_layout Plain Layout
-30
+33
 \end_layout
 
 \end_inset
@@ -5914,7 +6090,7 @@ Radius of curvature of the object defined in terms of third order moments
 \begin_inset Text
 
 \begin_layout Plain Layout
-31-32
+34-35
 \end_layout
 
 \end_inset
@@ -5943,7 +6119,7 @@ Center of curvature (in grid coordinates)
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+36
 \end_layout
 
 \end_inset
@@ -5973,7 +6149,7 @@ Ratio of the difference between the area of an object and the area of its
 \begin_inset Text
 
 \begin_layout Plain Layout
-34-38
+37-41
 \end_layout
 
 \end_inset
@@ -6003,7 +6179,7 @@ INTENSITY_10, _25, _50, _75, _90
 \begin_inset Text
 
 \begin_layout Plain Layout
-39
+42
 \end_layout
 
 \end_inset
@@ -6071,7 +6247,7 @@ name "MODE_object_attribute_output_part_2"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="15" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.25in">
@@ -6146,7 +6322,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-40
+43
 \end_layout
 
 \end_inset
@@ -6176,7 +6352,7 @@ Sum of the intensities of the filtered field within the object (variable
 \begin_inset Text
 
 \begin_layout Plain Layout
-41
+44
 \end_layout
 
 \end_inset
@@ -6205,7 +6381,7 @@ Distance between two objects centroids (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-42
+45
 \end_layout
 
 \end_inset
@@ -6234,7 +6410,7 @@ Minimum distance between the boundaries of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-43
+46
 \end_layout
 
 \end_inset
@@ -6267,7 +6443,7 @@ Minimum distance between the convex hulls of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-44
+47
 \end_layout
 
 \end_inset
@@ -6296,7 +6472,7 @@ Difference between the axis angles of two objects (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-45
+48
 \end_layout
 
 \end_inset
@@ -6326,7 +6502,7 @@ Ratio of the areas of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-46
+49
 \end_layout
 
 \end_inset
@@ -6359,7 +6535,7 @@ Intersection area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-47
+50
 \end_layout
 
 \end_inset
@@ -6388,7 +6564,7 @@ Union area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+51
 \end_layout
 
 \end_inset
@@ -6417,7 +6593,7 @@ Symmetric difference of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+52
 \end_layout
 
 \end_inset
@@ -6451,7 +6627,7 @@ Ratio of intersection area to the lesser of the forecast and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+53
 \end_layout
 
 \end_inset
@@ -6485,7 +6661,7 @@ Ratio of complexities of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+54
 \end_layout
 
 \end_inset
@@ -6524,7 +6700,7 @@ Ratio of the nth percentile (column 37) of intensity of the two objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+55
 \end_layout
 
 \end_inset
@@ -6645,7 +6821,7 @@ name "NetCDF_dimensions_for_MODE_output"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1.75in">
 <column alignment="left" valignment="top" width="4.25in">
 <row>
@@ -7075,7 +7251,7 @@ name "Variables_contained_in_MODE_NetCDF_output"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="19" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1.25in">
 <column alignment="left" valignment="top" width="1.25in">
 <column alignment="left" valignment="top" width="3in">
@@ -7701,7 +7877,7 @@ name "Variables_contained_in_MODE_NetCDF_output_part_2"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="26" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="3in">
@@ -8732,7 +8908,7 @@ name "Variables_contained_in_MODE_NetCDF_output_part_3"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="1.25in">
 <column alignment="center" valignment="top" width="3in">
