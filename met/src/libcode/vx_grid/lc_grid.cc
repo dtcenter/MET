@@ -107,6 +107,13 @@ Name.clear();
 
 memset(&Data, 0, sizeof(Data));
 
+Has_SO2 = false;
+
+SO2_Angle = 0.0;
+
+Cos_SO2_Angle = 1.0;
+Sin_SO2_Angle = 0.0;
+
 return;
 
 }
@@ -196,11 +203,33 @@ xy_to_latlon(0.0, 0.0, Lat_LL, Lon_LL);
 
 reduce(Lon_LL);
 
+set_so2(data.so2_angle);
+
 Data = data;
 
    //
    //  Done
    //
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LambertGrid::set_so2(double degrees)
+
+{
+
+SO2_Angle = degrees;
+
+Cos_SO2_Angle = cosd(degrees);
+Sin_SO2_Angle = sind(degrees);
+
+Has_SO2 = (fabs(degrees) > 1.0e-5);
+
+
+return;
 
 }
 
@@ -250,6 +279,18 @@ x = Bx + Alpha*r*H*sind(theta);
 
 y = By - Alpha*r*H*cosd(theta);
 
+if ( Has_SO2 )  {
+
+   x -= Data.x_pin;
+   y -= Data.y_pin;
+
+   so2_forward(x, y);
+
+   x += Data.x_pin;
+   y += Data.y_pin;
+
+}
+
 return;
 
 }
@@ -261,6 +302,18 @@ return;
 void LambertGrid::xy_to_latlon(double x, double y, double & lat, double & lon) const
 
 {
+
+if ( Has_SO2 )  {
+
+   x -= Data.x_pin;
+   y -= Data.y_pin;
+
+   so2_reverse(x, y);
+
+   x += Data.x_pin;
+   y += Data.y_pin;
+
+}
 
 double r, theta;
 const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
@@ -917,6 +970,85 @@ cone = log(t)/log(b);
 
 
 return ( cone );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid create_oriented_lc(bool is_north_projection,
+                        double lat_cen, double lon_cen,
+                        double lat_prev, double lon_prev,
+                        double d_km, double r_km,
+                        int nx, int ny, double bearing)
+
+{
+
+Grid g_old, g_new;
+LambertData data;
+
+
+data.name = "lc_zoom";
+
+data.hemisphere = ( is_north_projection ? 'N' : 'S' );
+
+// const double H = ( is_north_projection ? 1.0 : -1.0 );
+
+data.scale_lat_1 = lat_cen;
+data.scale_lat_2 = lat_cen;
+
+data.lat_pin = lat_cen;
+data.lon_pin = lon_cen;
+
+data.lon_orient = lon_cen;
+
+data.x_pin = 0.5*nx;
+data.y_pin = 0.5*ny;
+
+data.r_km = r_km;
+
+data.d_km = d_km;
+
+data.nx = nx;
+data.ny = ny;
+
+data.so2_angle = 0.0;
+
+g_old.set(data);
+
+   //
+   //  calculate so2 angle
+   //
+
+double x_cen, y_cen, x_prev, y_prev;
+double angle, s;
+
+g_old.latlon_to_xy(lat_cen,  lon_cen,  x_cen,  y_cen);
+g_old.latlon_to_xy(lat_prev, lon_prev, x_prev, y_prev);
+
+angle = atan2d(x_prev - x_cen, y_prev - y_cen);
+
+
+// cout << "create_oriented_lc() -> anagle = " << angle << "\n";
+
+s = angle - bearing;
+
+// cout << "create_oriented_lc() -> s = " << s << "\n";
+
+s -= 360.0*floor((s + 180.0)/360.0);
+
+// cout << "create_oriented_lc() -> s = " << s << "\n";
+
+data.so2_angle = s;
+
+g_new.set(data);
+
+   //
+   //  done
+   //
+
+return ( g_new );
 
 }
 

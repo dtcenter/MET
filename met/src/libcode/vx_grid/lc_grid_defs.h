@@ -44,8 +44,10 @@ struct LambertData {
    int nx;
    int ny;
 
+   double so2_angle;       //  rotation about pin point
 
-   // LambertData();
+
+   // LambertData() { so2_angle = 0.0; };
 
 };
 
