@@ -62,10 +62,27 @@ class LambertGrid : public GridRep {
       int Nx;
       int Ny;
 
+      bool Has_SO2;
+
+      double     SO2_Angle;   //  degrees
+      double Cos_SO2_Angle;
+      double Sin_SO2_Angle;
+
       double  f(double) const;
       double df(double) const;
 
       LambertData Data;
+
+         //
+
+      bool has_so2() const;
+
+      double so2_angle() const;
+
+      void set_so2(double degrees);
+
+      void so2_forward (double & x, double & y) const;
+      void so2_reverse (double & x, double & y) const;
 
          //
 
@@ -119,6 +136,59 @@ inline bool LambertGrid::is_north() const { return (   IsNorthHemisphere ); }
 inline bool LambertGrid::is_south() const { return ( ! IsNorthHemisphere ); }
 
 inline double LambertGrid::scale_km() const { return ( Data.d_km ); }
+
+inline bool LambertGrid::has_so2() const { return ( Has_SO2 ); }
+
+inline double LambertGrid::so2_angle() const { return ( SO2_Angle ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline void LambertGrid::so2_forward (double & x, double & y) const
+
+{
+
+double u = x;
+double v = y;
+
+x = u*Cos_SO2_Angle - v*Sin_SO2_Angle;
+
+y = u*Sin_SO2_Angle + v*Cos_SO2_Angle;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline void LambertGrid::so2_reverse (double & x, double & y) const
+
+{
+
+double u = x;
+double v = y;
+
+x =  u*Cos_SO2_Angle + v*Sin_SO2_Angle;
+
+y = -u*Sin_SO2_Angle + v*Cos_SO2_Angle;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern Grid create_oriented_lc(bool is_north_projection,
+                               double lat_cen,  double lon_cen,
+                               double lat_prev, double lon_prev,
+                               double d_km, double r_km,
+                               int nx, int ny,
+                               double bearing);
 
 
 ////////////////////////////////////////////////////////////////////////
