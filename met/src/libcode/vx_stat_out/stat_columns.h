@@ -178,8 +178,8 @@ static const char * prc_columns [] = {
 };
 
 static const char * eclv_columns [] = {
-   "TOTAL",       "BASER",    "N_PNT",
-   "CL_",         "VALUE_"
+   "TOTAL",       "BASER",    "VALUE_BASER",
+   "N_PNT",       "CL_",      "VALUE_"
 };
 
 static const char * mpr_columns [] = {
@@ -366,7 +366,7 @@ inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_pstd_columns  (int n) { return(16 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
-inline int get_n_eclv_columns  (int n) { return(3  + 2*n);             } // n = N_BINS
+inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = N_PNT
 inline int get_n_rhist_columns (int n) { return(6  + n);               } // n = N_RANK
 inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS
 inline int get_n_relp_columns  (int n) { return(2  + n);               } // n = N_ENS

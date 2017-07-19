@@ -8408,7 +8408,7 @@ name "table_PS_format_info_ECLV"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="9" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
@@ -8551,7 +8551,7 @@ Total number of matched pairs
 \begin_inset Text
 
 \begin_layout Plain Layout
-BIN_SIZE
+BASER
 \end_layout
 
 \end_inset
@@ -8560,14 +8560,14 @@ BIN_SIZE
 \begin_inset Text
 
 \begin_layout Plain Layout
-Cost/Loss ratio frequency
+Base rate
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -8576,20 +8576,20 @@ Cost/Loss ratio frequency
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-N_BIN
+VALUE_BASER
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Number of Cost/Loss ratios
+Economic value of the base rate 
 \end_layout
 
 \end_inset
@@ -8609,7 +8609,36 @@ Number of Cost/Loss ratios
 \begin_inset Text
 
 \begin_layout Plain Layout
-RATIO_i
+N_PNT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of Cost/Loss ratios
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CL_i
 \end_layout
 
 \end_inset
@@ -8629,7 +8658,7 @@ ith Cost/Loss ratio evaluated
 \begin_inset Text
 
 \begin_layout Plain Layout
-27
+28
 \end_layout
 
 \end_inset

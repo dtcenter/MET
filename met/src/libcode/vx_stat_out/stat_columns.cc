@@ -340,15 +340,16 @@ void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
    at.set_entry(r, c+0, eclv_columns[0]);
    at.set_entry(r, c+1, eclv_columns[1]);
    at.set_entry(r, c+2, eclv_columns[2]);
+   at.set_entry(r, c+3, eclv_columns[3]);
 
    // Write CL_i and VALUE_i for each bin
-   for(i=0, col=c+3; i<n_pnt; i++) {
+   for(i=0, col=c+4; i<n_pnt; i++) {
 
-      sprintf(tmp_str, "%s%i", eclv_columns[3], i+1);
+      sprintf(tmp_str, "%s%i", eclv_columns[4], i+1);
       at.set_entry(r, col, tmp_str);
       col++;
 
-      sprintf(tmp_str, "%s%i", eclv_columns[4], i+1);
+      sprintf(tmp_str, "%s%i", eclv_columns[5], i+1);
       at.set_entry(r, col, tmp_str);
       col++;
    }
@@ -2818,8 +2819,8 @@ void write_eclv_cols(const TTContingencyTable &ct,
    //
    // Economic Cost/Loss Value
    // Dump out the ECLV line:
-   //    TOTAL,   BASER,   N_PNT,
-   //    [CL_],   [VALUE_] (for each point)
+   //    TOTAL,   BASER,   BASER_VALUE,
+   //    N_PNT,   [CL_],   [VALUE_] (for each point)
    //
    at.set_entry(r, c+0,  // Total Number of pairs
       ct.n());
@@ -2827,13 +2828,16 @@ void write_eclv_cols(const TTContingencyTable &ct,
    at.set_entry(r, c+1,  // Base Rate
       ct.baser());
 
-   at.set_entry(r, c+2,  // Number of points
+   at.set_entry(r, c+2,  // Cost/Loss value for Base Rate
+      ct.cost_loss(ct.baser()));
+
+   at.set_entry(r, c+3,  // Number of points
       eclv_points.n_elements());
 
    //
    // Write CL_i and VALUE_i count for each bin
    //
-   for(i=0, col=c+3; i<eclv_points.n_elements(); i++) {
+   for(i=0, col=c+4; i<eclv_points.n_elements(); i++) {
 
       at.set_entry(r, col, // CL_i
          eclv_points[i]);
