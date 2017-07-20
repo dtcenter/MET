@@ -38,8 +38,8 @@ static double merc_der_func(double lat_rad);
 
 static double merc_inv_func(double r);
 
-static double merc_lon_to_u(bool full_world, double lon_min, double lon_rad);
-static double merc_u_to_lon(bool full_world, double lon_min, double u);
+static double merc_lon_to_u(double lon_min, double lon_rad);
+static double merc_u_to_lon(double lon_min, double u);
 
 static double mercator_segment_area(double u0, double v0, double u1, double v1);
 
@@ -101,8 +101,6 @@ if ( (lll == 0.0) && (lur == 0.0) )  {
    lll = 359.9999;
    lur =      0.0;
 
-   full_world = true;
-
 } else {
 
       //
@@ -127,8 +125,6 @@ if ( (lll == 0.0) && (lur == 0.0) )  {
 if ( fabs(lur - lll) < 1.0e-2 )  {
 
    lur = lll + 359.9999;
-
-   full_world = true;
 
 }
 
@@ -188,8 +184,6 @@ Data = data;
 void MercatorGrid::clear()
 
 {
-
-full_world = false;
 
 Lat_LL_radians = 0.0;
 Lon_LL_radians = 0.0;
@@ -253,10 +247,7 @@ double u, v;
 lat_rad = lat/deg_per_rad;
 lon_rad = lon/deg_per_rad;
 
-// lon_rad += twopi*floor((Lon_LL_radians - lon_rad)/twopi);
-// lon_rad -= twopi*floor((lon_rad - Lon_LL_radians + pi)/twopi);
-
-u = merc_lon_to_u(full_world, Lon_UR_radians, lon_rad);
+u = merc_lon_to_u(Lon_UR_radians, lon_rad);
 
 v = merc_func(lat_rad);
 
@@ -280,7 +271,7 @@ double u, v;
 
 xy_to_uv(x, y, u, v);
 
-lon_rad = merc_u_to_lon(full_world, Lon_UR_radians, u);
+lon_rad = merc_u_to_lon(Lon_UR_radians, u);
 
 lat_rad = merc_inv_func(v);
 
@@ -497,8 +488,6 @@ out << prefix << "By         = " << By << "\n";
 
 out << prefix << "Nx         = " << Nx << "\n";
 out << prefix << "Ny         = " << Ny << "\n";
-
-out << prefix << "full_world = " << full_world << "\n";
 
    //
    //  done
@@ -734,13 +723,13 @@ return ( answer );
 ////////////////////////////////////////////////////////////////////////
 
 
-double merc_lon_to_u(bool full_world, double lon_min, double lon_rad)
+double merc_lon_to_u(double lon_min, double lon_rad)
 
 {
 
 double u;
 
-if ( full_world )  lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
+lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
 
 u = -lon_rad;
 
@@ -752,7 +741,7 @@ return ( u );
 ////////////////////////////////////////////////////////////////////////
 
 
-double merc_u_to_lon(bool full_world, double lon_min, double u)
+double merc_u_to_lon(double lon_min, double u)
 
 {
 
@@ -760,7 +749,7 @@ double lon_rad;
 
 lon_rad = -u;
 
-if ( full_world )  lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
+lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
 
 return ( lon_rad );
 
