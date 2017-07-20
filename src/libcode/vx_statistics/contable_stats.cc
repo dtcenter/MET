@@ -737,7 +737,7 @@ double TTContingencyTable::sedi_ci(double alpha,
 double TTContingencyTable::cost_loss(double r) const {
    double num, den, h, m, f, b, v;
 
-   // Total proportion of hits, misses, false alarm, and base rate 
+   // Total proportion of hits, misses, false alarms, and observations 
    h = (double) fy_oy() / n();
    m = (double) fn_oy() / n();
    f = (double) fy_on() / n();
