@@ -929,8 +929,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   plane.set_size(nx, ny);
 
   int y_offset;
-  bool swap_to_north = false;
-  if (grid.info().ll != 0) swap_to_north = grid.get_swap_to_north();
+  bool swap_to_north = grid.get_swap_to_north();
   if (swap_to_north) {
     mlog << Debug(2) << "NcCfFile::getData -> data was flipped to north.\n";
   }
@@ -1810,8 +1809,13 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   data.delta_lon = dlon;
   data.Nlat = _yDim->getSize();
   data.Nlon = _xDim->getSize();
+  if (dlat < 0) {
+    data.delta_lat = -dlat;
+    data.lat_ll = lat_values[lat_counts-1];
+  }
 
   grid.set(data);
+  grid.set_swap_to_north((dlat < 0));
 }
 
 
@@ -2070,7 +2074,6 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     // will probably also need to reorder the data itself.
   
     LatLonData data;
-    bool swap_to_north = false;
   
     data.name = latlon_proj_type;
     data.lat_ll = lat_values[0];
@@ -2082,11 +2085,10 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     if (dlat < 0) {
       data.delta_lat = -dlat;
       data.lat_ll = lat_values[lat_counts-1];
-      swap_to_north = true;
     }
   
     grid.set(data);
-    grid.set_swap_to_north(swap_to_north);
+    grid.set_swap_to_north((dlat < 0));
   }
   
   return true;
@@ -2309,7 +2311,6 @@ bool NcCfFile::get_grid_from_dimensions()
   // will probably also need to reorder the data itself.
 
   LatLonData data;
-  bool swap_to_north = false;
 
   data.name = latlon_proj_type;
   data.lat_ll = lat_values[0];
@@ -2321,10 +2322,9 @@ bool NcCfFile::get_grid_from_dimensions()
   if (dlat < 0) {
     data.delta_lat = -dlat;
     data.lat_ll = lat_values[lat_counts-1];
-    swap_to_north = true;
   }
   grid.set(data);
-  grid.set_swap_to_north(swap_to_north);
+  grid.set_swap_to_north((dlat < 0));
 
   return true;
 }
