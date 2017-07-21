@@ -136,8 +136,6 @@ if ( ll )  { delete ll; ll = (const LatLonData *)        0; };
 if ( m  )  { delete m;  m  = (const MercatorData *)      0; };
 if ( g  )  { delete g;  g  = (const GaussianData *)      0; };
 
-swap_to_north =  false;
-
 return;
 
 }
@@ -155,8 +153,6 @@ if ( info.st )  set( *(info.st) );
 if ( info.ll )  set( *(info.ll) );
 if ( info.m  )  set( *(info.m ) );
 if ( info.g  )  set( *(info.g ) );
-
-this->swap_to_north = info.swap_to_north;
 
 return;
 
@@ -203,8 +199,6 @@ else if ( st )  gg.set( *st );
 else if ( ll )  gg.set( *ll );
 else if ( m  )  gg.set( *m  );
 else if ( g  )  gg.set( *g  );
-
-gg.set_swap_to_north(swap_to_north);
 
 return;
 
@@ -320,20 +314,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-void GridInfo::set_swap_to_north(bool swap_to_north) {
-
-   this->swap_to_north= swap_to_north ;
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool GridInfo::get_swap_to_north() {
-   return swap_to_north;
-}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -486,6 +466,7 @@ void Grid::clear()
 {
 
 if ( rep )  { delete rep;  rep = (GridRep *) 0; }
+set_swap_to_north(false);
 
 return;
 
@@ -504,6 +485,7 @@ clear();
 if ( ! (g.rep) )  return;
 
 rep = g.rep->copy();
+set_swap_to_north(g.get_swap_to_north());
 
 return;
 
@@ -537,8 +519,14 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+bool Grid::get_swap_to_north() const {
+   return swap_to_north;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void Grid::set_swap_to_north(bool swap_to_north) {
-   info().set_swap_to_north(swap_to_north);
+   this->swap_to_north = swap_to_north;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -691,7 +679,7 @@ if ( !rep )  {
    exit ( 1 );
 
 }
-
+//cout << " DEBUG HS] rep->info() " << rep->info() << endl;
 return ( rep->info() );
 
 }
