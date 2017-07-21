@@ -256,7 +256,7 @@ bool NcCfFile::open(const char * filepath)
     //if (sec_per_unit == 86400 && no_leap_year) {
     //  for(int i=0; i<n_times; i++) {
     //    double time_value = get_double_var(valid_time_var, i);
-    //    ValidTime.add(add_days_to_unix_no_leap((unixtime)ut, (int)time_value));
+    //    ValidTime.add(add_days_to_unix((unixtime)ut, (int)time_value));
     //  }
     //}
     //else {
@@ -315,7 +315,7 @@ bool NcCfFile::open(const char * filepath)
 
     //bool no_leap_year = get_att_no_leap_year(&init_time_var);
     //if (sec_per_unit == 86400 && no_leap_year) {
-    //  InitTime = add_days_to_unix_no_leap((unixtime)ut, (int)time_value);
+    //  InitTime = add_days_to_unix((unixtime)ut, (int)time_value);
     //}
   }
 
@@ -930,7 +930,10 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   int y_offset;
   bool swap_to_north = false;
-  if (grid.info().ll != 0) swap_to_north = grid.info().get_swap_to_north();
+  if (grid.info().ll != 0) swap_to_north = grid.get_swap_to_north();
+  if (swap_to_north) {
+    mlog << Debug(2) << "NcCfFile::getData -> data was flipped to north.\n";
+  }
 
   //  get the data
   int    i[nx];
