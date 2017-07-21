@@ -930,7 +930,10 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   int y_offset;
   bool swap_to_north = false;
-  if (grid.info().ll != 0) swap_to_north = grid.info().get_swap_to_north();
+  if (grid.info().ll != 0) swap_to_north = grid.get_swap_to_north();
+  if (swap_to_north) {
+    mlog << Debug(2) << "NcCfFile::getData -> data was flipped to north.\n";
+  }
 
   //  get the data
   int    i[nx];
