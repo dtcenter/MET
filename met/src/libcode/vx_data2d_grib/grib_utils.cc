@@ -33,6 +33,7 @@ static const int latlon_type         = 0;
 static const int mercator_type       = 1;
 static const int lambert_type        = 3;
 static const int stereographic_type  = 5;
+static const int gaussian_type       = 4;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -42,6 +43,7 @@ static void gds_to_latlon        (const Section2_Header & gds, LatLonData &);
 static void gds_to_mercator      (const Section2_Header & gds, MercatorData &);
 static void gds_to_lambert       (const Section2_Header & gds, LambertData &);
 static void gds_to_stereographic (const Section2_Header & gds, StereographicData &);
+static void gds_to_gaussian      (const Section2_Header & gds, GaussianData &);
 
 static void scan_flag_to_order(const unsigned char scan_flag, int & xdir, int & ydir, int & order);
 
@@ -62,14 +64,16 @@ LambertData       lc_data;
 StereographicData st_data;
 LatLonData        ll_data;
 MercatorData      mc_data;
+GaussianData       g_data;
 
    //
    // Check GDS for the grid type.
-   // The following 4 Projection types are supported:
+   // The following Projection types are supported:
    //    - Lat/Lon
    //    - Mercator
    //    - Lambert Conformal
    //    - Polar Stereographic
+   //    - Gaussian
    //
 
 
@@ -96,6 +100,12 @@ if ( gds.type == latlon_type )  {
    gds_to_stereographic(gds, st_data);
 
    gr.set(st_data);
+
+} else if ( gds.type == gaussian_type )  {
+
+   gds_to_gaussian(gds, g_data);
+
+   gr.set(g_data);
 
 } else {
 
@@ -124,11 +134,12 @@ void gds_to_order(const Section2_Header & gds, int & xdir, int & ydir, int & ord
 
    //
    // Check GDS for the grid type.
-   // The following 4 Projection types are supported:
+   // The following Projection types are supported:
    //    - Lat/Lon
    //    - Mercator
    //    - Lambert Conformal
    //    - Polar Stereographic
+   //    - Gaussian
    //
 
 
@@ -147,6 +158,10 @@ if ( gds.type == latlon_type )  {
 } else if (gds.type == stereographic_type )  {
 
    scan_flag_to_order(gds.grid_type.stereographic.scan_flag, xdir, ydir, order);
+
+} else if (gds.type == gaussian_type )  {
+
+   scan_flag_to_order(gds.grid_type.gaussian.scan_flag, xdir, ydir, order);
 
 } else {
 
@@ -434,6 +449,37 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void gds_to_gaussian(const Section2_Header & gds, GaussianData & data)
+
+{
+
+data.name = gaussian_proj_type;
+
+   //
+   //  nx, ny
+   //
+
+data.nx = char2_to_int(gds.nx);
+data.ny = char2_to_int(gds.ny);
+
+   //
+   //  lon_zero
+   //
+
+data.lon_zero = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.gaussian.lon1, 3));
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void scan_flag_to_order(const unsigned char scan_flag, int & xdir, int & ydir, int & order)
 
 {
@@ -468,9 +514,9 @@ double answer;
 unsigned char c[3];
 
    //
-   // For all of the lat/lon parameters, the leftmost bit indicates the
-   // parity of the value.  If the leftmost bit is on, the value is
-   // negative.
+   //  For all of the lat/lon parameters, the leftmost bit indicates the
+   //  parity of the value.  If the leftmost bit is on, the value is
+   //  negative.
    //
 
 for(i=0; i<n; i++) c[i] = p[i];

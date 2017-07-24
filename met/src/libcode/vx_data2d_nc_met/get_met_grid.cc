@@ -44,6 +44,8 @@ static void get_lambert_data_v2       (NcFile *, LambertData &);
 static void get_stereographic_data_v2 (NcFile *, StereographicData &);
 static void get_mercator_data_v2      (NcFile *, MercatorData &);
 
+static void get_gaussian_data         (NcFile *, GaussianData &);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -81,6 +83,7 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
    StereographicData st_data;
    LatLonData        ll_data;
    MercatorData      mc_data;
+   GaussianData       g_data;
 
    //
    // Parse the grid specification out of the global attributes
@@ -90,28 +93,43 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr)
 
    //
    // Parse out the grid specification depending on the projection type
-   // The following 4 Projection types are supported:
+   // The following Projection types are supported:
    //    - Lat/Lon
    //    - Mercator
    //    - Lambert Conformal
    //    - Polar Stereographic
+   //    - Gaussian
    //
 
    if (!IS_INVALID_NC(proj_att)) {
       ConcatString proj_att_name;
       get_global_att(&proj_att, proj_att_name);
+
       if ( strcasecmp(proj_att_name, latlon_proj_type) == 0 )  {
+
          get_latlon_data_v3(f_in, ll_data);
          gr.set(ll_data);
+
       } else if ( strcasecmp(proj_att_name, mercator_proj_type) == 0 )  {
+
          get_mercator_data_v3(f_in, mc_data);
          gr.set(mc_data);
+
       } else if ( strcasecmp(proj_att_name, lambert_proj_type) == 0 )  {
+
          get_lambert_data_v3(f_in, lc_data);
          gr.set(lc_data);
+
       } else if ( strcasecmp(proj_att_name, stereographic_proj_type) == 0 )  {
+
          get_stereographic_data_v3(f_in, st_data);
          gr.set(st_data);
+
+      } else if ( strcasecmp(proj_att_name, gaussian_proj_type) == 0 )  {
+
+         get_gaussian_data(f_in, g_data);
+         gr.set(g_data);
+
       } else {   // Unsupported projection type
 
          mlog << Error << "\nread_netcdf_grid_v3() -> "
@@ -665,6 +683,53 @@ mlog << Debug(grid_debug_level)
      << "lon_ll = " << data.lon_ll << "\n"
      << "lat_ur = " << data.lat_ur << "\n"
      << "lon_ur = " << data.lon_ur << "\n"
+     << "ny = " << data.ny << "\n"
+     << "nx = " << data.nx << "\n";
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void get_gaussian_data (NcFile * ncfile, GaussianData & data)
+
+{
+
+
+data.name = gaussian_proj_type;
+
+   //  
+   //  Longitude for x = 0
+   //  
+
+get_global_att(ncfile, "lon_zero", data.lon_zero);
+
+   //
+   //  nx
+   //
+
+get_global_att(ncfile, "nx", data.nx);
+
+   //
+   //  ny
+   //
+
+get_global_att(ncfile, "ny", data.ny);
+
+   //
+   //  dump grid, if needed
+   //
+
+mlog << Debug(grid_debug_level)
+     << "Gaussian Data:\n"
+     << "lon_zero = " << data.lon_zero << "\n"
      << "ny = " << data.ny << "\n"
      << "nx = " << data.nx << "\n";
 

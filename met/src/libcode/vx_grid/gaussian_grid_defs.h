@@ -25,10 +25,10 @@ struct GaussianData {
 
    const char * name;   //  not allocated
 
-   double Lon_Zero;     //  longitude that has x = 0
+   double lon_zero;     //  longitude that has x = 0
 
-   int Nx;
-   int Ny;
+   int nx;
+   int ny;
 
 };
 
