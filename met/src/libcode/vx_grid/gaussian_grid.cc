@@ -214,7 +214,8 @@ void GaussianGrid::latlon_to_xy(double lat, double lon, double & x, double & y) 
 
 {
 
-mlog << Error << "\n\n  GaussianGrid::latlon_to_xy() -> not yet implemented\n\n";
+mlog << Error 
+     << "\n\n  GaussianGrid::latlon_to_xy() not implemented!\n\n";
 
 exit ( 1 );
 
