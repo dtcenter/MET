@@ -47,6 +47,7 @@ static const char latlon_proj_type         [] = "LatLon";
 static const char mercator_proj_type       [] = "Mercator";
 static const char lambert_proj_type        [] = "Lambert Conformal";
 static const char stereographic_proj_type  [] = "Polar Stereographic";
+static const char gaussian_proj_type       [] = "Gaussian";
 
 // String containing all valid PrepBufr message types
 static const char vld_msg_typ_str[] =

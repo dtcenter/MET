@@ -248,12 +248,32 @@ struct Stereographic {
 
 };
 
+
+struct Gaussian {
+
+   unsigned char         lat1[3];             //  11 - 13
+   unsigned char         lon1[3];             //  14 - 16
+
+   unsigned char        res_flag;             //  17
+
+   unsigned char         lat2[3];             //  18 - 20
+   unsigned char         lon2[3];             //  21 - 23
+
+   unsigned char           di[2];             //  24 - 25
+   unsigned char            n[2];             //  26 - 27
+
+   unsigned char        scan_flag;            //  28
+
+};
+
+
 union GridType {
 
    struct LatLon        latlon_grid;         //   Latitude/Longitude Grid
    struct Mercator      mercator;            //   Mercator Grid
    struct LambertConf   lambert_conf;        //   Lambert Conformal Secant Grid
    struct Stereographic stereographic;       //   Stereographic Grid
+   struct Gaussian      gaussian;            //   Gaussian Grid
 
 };
 

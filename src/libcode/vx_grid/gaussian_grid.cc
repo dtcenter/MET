@@ -113,7 +113,7 @@ North_Latitudes = 0;
 
 clear();
 
-Lon_Zero = data.Lon_Zero;
+Lon_Zero = data.lon_zero;
 
 Delta_Lon = 360.0/(Nx - 1.0);
 
@@ -121,9 +121,9 @@ Name = data.name;
 
 Data = data;
 
-Nx = data.Nx;
+Nx = data.nx;
 
-Ny = data.Ny;
+Ny = data.ny;
 
    //
    //  check that Ny is even

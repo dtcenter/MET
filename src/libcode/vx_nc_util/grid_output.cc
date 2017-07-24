@@ -491,7 +491,7 @@ ncfile->putAtt("Projection", "Gaussian");
    //  Lon_Zero
    //
 
-snprintf(junk, sizeof(junk), "%f degrees_east", -(data.Lon_Zero));
+snprintf(junk, sizeof(junk), "%.3f degrees_east", -(data.lon_zero));
 
 ncfile->putAtt("lon_zero", junk);
 
@@ -499,7 +499,7 @@ ncfile->putAtt("lon_zero", junk);
    //  nx
    //
 
-snprintf(junk, sizeof(junk), "%d", data.Nx);
+snprintf(junk, sizeof(junk), "%d", data.nx);
 
 ncfile->putAtt("nx", junk);
 
@@ -507,7 +507,7 @@ ncfile->putAtt("nx", junk);
    //  ny
    //
 
-snprintf(junk, sizeof(junk), "%d", data.Ny);
+snprintf(junk, sizeof(junk), "%d", data.ny);
 
 ncfile->putAtt("ny", junk);
 
