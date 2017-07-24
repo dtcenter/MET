@@ -34,6 +34,7 @@ static void lambert_grid_output       (const GridInfo &, NcFile * ncfile);
 static void latlon_grid_output        (const GridInfo &, NcFile * ncfile);
 static void stereographic_grid_output (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output      (const GridInfo &, NcFile * ncfile);
+static void gaussian_grid_output      (const GridInfo &, NcFile * ncfile);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,6 +57,7 @@ if ( !(info.ok()) )  {
 else if ( info.st )  stereographic_grid_output (info, ncfile);
 else if ( info.ll )  latlon_grid_output        (info, ncfile);
 else if ( info.m  )  mercator_grid_output      (info, ncfile);
+else if ( info.g  )  gaussian_grid_output      (info, ncfile);
 else {
 
    mlog << Error << "\ngrid_output(const GridInfo &, NcFile *) -> can't determine projection!\n\n";
@@ -460,6 +462,55 @@ ncfile->putAtt("nx", junk);
 sprintf(junk, "%d", data.ny);
 
 ncfile->putAtt("ny", junk);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void gaussian_grid_output(const GridInfo & info, NcFile * ncfile)
+
+{
+
+char junk[256];
+double t;
+const GaussianData & data = *(info.g);
+
+
+
+ncfile->putAtt("Projection", "Gaussian");
+
+   //
+   //  Lon_Zero
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_east", -(data.Lon_Zero));
+
+ncfile->putAtt("lon_zero", junk);
+
+   //
+   //  nx
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.Nx);
+
+ncfile->putAtt("nx", junk);
+
+   //
+   //  ny
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.Ny);
+
+ncfile->putAtt("ny", junk);
+
 
    //
    //  done
