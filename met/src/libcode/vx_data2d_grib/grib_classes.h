@@ -264,6 +264,18 @@ struct Gaussian {
 
    unsigned char        scan_flag;            //  28
 
+   unsigned char        unused[4];            //  29 - 32
+
+   unsigned char        sp_lat[3];            //  33 - 35
+   unsigned char        sp_lon[3];            //  36 - 38
+
+   unsigned char      rotation[4];            //  39 - 42
+
+   unsigned char   stretch_lat[3];            //  43 - 45
+   unsigned char   stretch_lon[3];            //  46 - 48
+
+   unsigned char   stretch_fac[4];            //  49 - 52
+
 };
 
 
