@@ -194,6 +194,15 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    vinfo.set_long_name ( tab.full_name    );
 
    //
+   //  test the level type number, if specified
+   //
+
+if ( !is_bad_data(vinfo.level().type_num()) &&
+     vinfo.level().type_num() != (int) pds->type ){
+   return ( false );
+}
+
+   //
    //  store lower and upper level values
    //
 
