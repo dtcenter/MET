@@ -30,6 +30,7 @@ struct GaussianData {
    int nx;
    int ny;
 
+   void dump();
 };
 
 

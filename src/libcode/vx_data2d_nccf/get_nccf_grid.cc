@@ -25,14 +25,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const int grid_debug_level = 4;
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-//static void get_att(NcFile *, NcAtt * & att, const char * name);
-//static bool has_att(NcFile *, const char * name);
-
 static void read_netcdf_grid_v3       (NcFile *, Grid &);
 static void read_netcdf_grid_v2       (NcFile *, Grid &);
 
@@ -127,7 +119,7 @@ NcAtt * proj_att = (NcAtt *) 0;
 
       ConcatString junk;
       junk << proj_att->as_string(0);
-     
+
       mlog << Error << "\nread_netcdf_grid_v3() -> "
            << "Projection type " << junk
            << " not currently supported.\n\n";
@@ -202,7 +194,7 @@ NcAtt * proj_att = (NcAtt *) 0;
 
       ConcatString junk;
       junk << proj_att->as_string(0);
-     
+
       mlog << Error << "\nread_netcdf_grid_v2() -> "
            << "Projection type " << junk
            << " not currently supported.\n\n";
@@ -253,66 +245,6 @@ int has_variable(NcFile *f_in, const char *var_name) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-//void get_att(NcFile * ncfile, NcAtt * & att, const char * name)
-//
-//{
-//
-//att = ncfile->get_att(name);
-//
-//if ( !att )  {
-//
-//   mlog << Error << "\nget_att() -> \"" << name << "\" attribute not found.\n\n";
-//
-//   exit ( 1 );
-//
-//}
-//
-//return;
-//
-//}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-//bool has_att(NcFile * ncfile, const char * att_name)
-//
-//{
-//
-//int i, n;
-//bool status = false;
-//NcAtt *att = (NcAtt *) 0;
-//
-//n = ncfile->num_atts();
-//
-//for ( i=0; i<n; i++ )  {
-//
-//   att = ncfile->get_att(i);
-//
-//   if ( !att )  {
-//
-//      mlog << Error << "\nhas_att() -> "
-//           << "can't read attribute number " << i << ".\n\n";
-//
-//      exit ( 1 );
-//
-//   }
-//
-//   if ( strcmp(att->name(), att_name) == 0 )  {
-//
-//      status = true;
-//      break;
-//   }
-//}
-//
-//return(status);
-//
-//}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 void get_latlon_data_v3(NcFile * ncfile, LatLonData & data)
 
 {
@@ -347,14 +279,7 @@ data.Nlat = atoi(att->as_string(0));
 att = get_nc_att(ncfile, "Nlon");
 data.Nlon = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Latitude/Longitude Grid Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "delta_lat = " << data.delta_lat << "\n"
-     << "delta_lon = " << data.delta_lon << "\n"
-     << "Nlat = " << data.Nlat << "\n"
-     << "Nlon = " << data.Nlon << "\n";
+data.dump();
 
    //
    //  done
@@ -423,19 +348,7 @@ data.nx = atoi(att->as_string(0));
 att = get_nc_att(ncfile, "ny");
 data.ny = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Lambert Conformal Grid Data:\n"
-     << "scale_lat_1 = " << data.scale_lat_1 << "\n"
-     << "scale_lat_2 = " << data.scale_lat_2 << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -506,19 +419,7 @@ data.nx = atoi(att->as_string(0));
 att = get_nc_att(ncfile, "ny");
 data.ny = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Stereographic Grid Data:\n"
-     << "hemisphere = " << data.hemisphere << "\n"
-     << "scale_lat = " << data.scale_lat << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -567,14 +468,7 @@ data.ny = atoi(att->as_string(0));
 att = get_nc_att(ncfile,, "nx");
 data.nx = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Mercator Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "lat_ur = " << data.lat_ur << "\n"
-     << "lon_ur = " << data.lon_ur << "\n"
-     << "ny = " << data.ny << "\n"
-     << "nx = " << data.nx << "\n";
+data.dump();
 
    //
    //  done
@@ -622,14 +516,7 @@ data.Nlat = atoi(att->as_string(0));
 att = get_nc_att(ncfile,, "Nlon");
 data.Nlon = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Latitude/Longitude Grid Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "delta_lat = " << data.delta_lat << "\n"
-     << "delta_lon = " << data.delta_lon << "\n"
-     << "Nlat = " << data.Nlat << "\n"
-     << "Nlon = " << data.Nlon << "\n";
+data.dump();
 
    //
    //  done
@@ -696,19 +583,7 @@ data.nx = atoi(att->as_string(0));
 att = get_nc_att(ncfile,, "ny");
 data.ny = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Lambert Conformal Grid Data:\n"
-     << "scale_lat_1 = " << data.scale_lat_1 << "\n"
-     << "scale_lat_2 = " << data.scale_lat_2 << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -774,19 +649,7 @@ data.nx = atoi(att->as_string(0));
 att = get_nc_att(ncfile,, "ny");
 data.ny = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Stereographic Grid Data:\n"
-     << "hemisphere = " << data.hemisphere << "\n"
-     << "scale_lat = " << data.scale_lat << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -835,14 +698,7 @@ data.ny = atoi(att->as_string(0));
 att = get_nc_att(ncfile,, "Nlon");
 data.nx = atoi(att->as_string(0));
 
-mlog << Debug(grid_debug_level)
-     << "Mercator Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "lat_ur = " << data.lat_ur << "\n"
-     << "lon_ur = " << data.lon_ur << "\n"
-     << "ny = " << data.ny << "\n"
-     << "nx = " << data.nx << "\n";
+data.dump();
 
    //
    //  done

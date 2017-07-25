@@ -90,6 +90,14 @@ const LambertData & data = *(info.lc);
 add_att(ncfile, "Projection", "Lambert Conformal");
 
    //
+   //  hemisphere
+   //
+
+sprintf(junk, "%c", data.hemisphere);
+
+ncfile->putAtt("hemisphere", junk);
+
+   //
    //  scale_lat_1
    //
 

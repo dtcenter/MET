@@ -32,6 +32,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const int grid_debug_level = 4;
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
 inline bool is_even(int k) { return ( (k%2) == 0 ); }
 
 
@@ -39,6 +45,116 @@ inline bool is_even(int k) { return ( (k%2) == 0 ); }
 
 
 static int ll_func(double x_center, int N);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Print grid data definitions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LatLonData::dump()
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nLatitude/Longitude Grid Data:\n"
+     << "     lat_ll: " << lat_ll << "\n"
+     << "     lon_ll: " << lon_ll << "\n"
+     << "  delta_lat: " << delta_lat << "\n"
+     << "  delta_lon: " << delta_lon << "\n"
+     << "       Nlat: " << Nlat << "\n"
+     << "       Nlon: " << Nlon << "\n\n";
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MercatorData::dump()
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nMercator Grid Data:\n"
+     << "  lat_ll: " << lat_ll << "\n"
+     << "  lon_ll: " << lon_ll << "\n"
+     << "  lat_ur: " << lat_ur << "\n"
+     << "  lon_ur: " << lon_ur << "\n"
+     << "      ny: " << ny << "\n"
+     << "      nx: " << nx << "\n\n";
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LambertData::dump()
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nLambert Conformal Grid Data:\n"
+     << "   hemisphere: " << hemisphere << "\n"
+     << "  scale_lat_1: " << scale_lat_1 << "\n"
+     << "  scale_lat_2: " << scale_lat_2 << "\n"
+     << "      lat_pin: " << lat_pin << "\n"
+     << "      lon_pin: " << lon_pin << "\n"
+     << "        x_pin: " << x_pin << "\n"
+     << "        y_pin: " << y_pin << "\n"
+     << "   lon_orient: " << lon_orient << "\n"
+     << "         d_km: " << d_km << "\n"
+     << "         r_km: " << r_km << "\n"
+     << "           nx: " << nx << "\n"
+     << "           ny: " << ny << "\n\n";
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void StereographicData::dump()
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nStereographic Grid Data:\n"
+     << "  hemisphere: " << hemisphere << "\n"
+     << "   scale_lat: " << scale_lat << "\n"
+     << "     lat_pin: " << lat_pin << "\n"
+     << "     lon_pin: " << lon_pin << "\n"
+     << "       x_pin: " << x_pin << "\n"
+     << "       y_pin: " << y_pin << "\n"
+     << "  lon_orient: " << lon_orient << "\n"
+     << "        d_km: " << d_km << "\n"
+     << "        r_km: " << r_km << "\n"
+     << "          nx: " << nx << "\n"
+     << "          ny: " << ny << "\n\n";
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GaussianData::dump()
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nGaussian Grid Data:\n"
+     << "  lon_zero: " << lon_zero << "\n"
+     << "        nx: " << nx << "\n"
+     << "        ny: " << ny << "\n\n";
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -863,7 +979,7 @@ double dx_center, dy_center;
 
 
    //
-   //  find the (floating-point) grid coords corresponding 
+   //  find the (floating-point) grid coords corresponding
    //
    //     to the given point (lat_center, lon_center)
    //
