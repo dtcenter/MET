@@ -37,8 +37,6 @@ extern "C" {
   void g2_miss( gribfield *gfld, float *rmiss, int *nmiss );
 }
 
-static bool print_grid = true;
-
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
@@ -817,6 +815,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
    double d;
    int ResCompFlag;
+   char hem = 0;
 
    Raw_Grid = new Grid();
 
@@ -892,16 +891,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       copy_raw_grid_to_dest();
 
-      if( print_grid ){
-         mlog << Debug(4) << "\n"
-              << "Latitude/Longitude Grid Data:\n"
-              << "     lat_ll: " << data.lat_ll << "\n"
-              << "     lon_ll: " << data.lon_ll << "\n"
-              << "  delta_lat: " << data.delta_lat << "\n"
-              << "  delta_lon: " << data.delta_lon << "\n"
-              << "       Nlat: " << data.Nlat << "\n"
-              << "       Nlon: " << data.Nlon << "\n\n";
-      }
+      data.dump();
 
    }
 
@@ -911,12 +901,11 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       ScanMode = gfld->igdtmpl[17];
 
       //  determine the hemisphere
-      char hem = 0;
       switch(gfld->igdtmpl[16]){
          case 0:  hem = 'N';  break;
          case 1:  hem = 'S';  break;
          default:
-            mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
                  << "unexpected polar stereo projection center (" << gfld->igdtmpl[16] << ")\n\n";
             exit(1);
       }
@@ -951,21 +940,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       copy_raw_grid_to_dest();
 
-      if( print_grid ){
-         mlog << Debug(4) << "\n"
-              << "Stereographic Grid Data:\n"
-              << "  hemisphere: " << data.hemisphere << "\n"
-              << "   scale_lat: " << data.scale_lat << "\n"
-              << "     lat_pin: " << data.lat_pin << "\n"
-              << "     lon_pin: " << data.lon_pin << "\n"
-              << "       x_pin: " << data.x_pin << "\n"
-              << "       y_pin: " << data.y_pin << "\n"
-              << "  lon_orient: " << data.lon_orient << "\n"
-              << "        d_km: " << data.d_km << "\n"
-              << "        r_km: " << data.r_km << "\n"
-              << "          nx: " << data.nx << "\n"
-              << "          ny: " << data.ny << "\n\n";
-      }
+      data.dump();
 
    }
 
@@ -988,16 +963,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       copy_raw_grid_to_dest();
 
-      if( print_grid ){
-         mlog << Debug(4) << "\n"
-              << "Mercator Data:\n"
-              << "  lat_ll: " << data.lat_ll << "\n"
-              << "  lon_ll: " << data.lon_ll << "\n"
-              << "  lat_ur: " << data.lat_ur << "\n"
-              << "  lon_ur: " << data.lon_ur << "\n"
-              << "      ny: " << data.ny << "\n"
-              << "      nx: " << data.nx << "\n\n";
-      }
+      data.dump();
 
    }
 
@@ -1006,9 +972,20 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       ScanMode = gfld->igdtmpl[17];
 
+      //  determine the hemisphere
+      switch(gfld->igdtmpl[16]){
+         case 0:  hem = 'N';  break;
+         case 1:  hem = 'S';  break;
+         default:
+            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+                 << "unexpected lambert conformal projection center (" << gfld->igdtmpl[16] << ")\n\n";
+            exit(1);
+      }
+
       //  build a LambertData struct with the projection information
       LambertData data;
       data.name         = lambert_proj_type;
+      data.hemisphere   = hem;
       data.scale_lat_1  = (double)gfld->igdtmpl[18] / 1000000.0;
       data.scale_lat_2  = (double)gfld->igdtmpl[19] / 1000000.0;
       data.lat_pin      = (double)gfld->igdtmpl[9]  / 1000000.0;
@@ -1036,28 +1013,14 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
       copy_raw_grid_to_dest();
 
-      if( print_grid ){
-         mlog << Debug(4) << "\n"
-              << "Lambert Conformal Grid Data:\n"
-              << "  scale_lat_1: " << data.scale_lat_1 << "\n"
-              << "  scale_lat_2: " << data.scale_lat_2 << "\n"
-              << "      lat_pin: " << data.lat_pin << "\n"
-              << "      lon_pin: " << data.lon_pin << "\n"
-              << "        x_pin: " << data.x_pin << "\n"
-              << "        y_pin: " << data.y_pin << "\n"
-              << "   lon_orient: " << data.lon_orient << "\n"
-              << "         d_km: " << data.d_km << "\n"
-              << "         r_km: " << data.r_km << "\n"
-              << "           nx: " << data.nx << "\n"
-              << "           ny: " << data.ny << "\n\n";
-      }
+      data.dump();
 
    }
 
    //  unrecognized grid
    else {
 
-      mlog << Error << "\nMetGrib2DataFile::data_plane() -> "
+      mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
            << "found unrecognized grid definition (" << gfld->igdtnum << ")\n\n";
       exit(1);
 

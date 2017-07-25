@@ -26,10 +26,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const int grid_debug_level = 4;
-
-///////////////////////////////////////////////////////////////////////////////
-
 
 static void read_netcdf_grid_v3       (NcFile *, Grid &);
 static void read_netcdf_grid_v2       (NcFile *, Grid &);
@@ -261,14 +257,7 @@ get_global_att(ncfile, "Nlat", data.Nlat);
    // Number of points in the Longitudinal (x) direction
 get_global_att(ncfile, "Nlon", data.Nlon);
 
-mlog << Debug(grid_debug_level)
-     << "Latitude/Longitude Grid Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "delta_lat = " << data.delta_lat << "\n"
-     << "delta_lon = " << data.delta_lon << "\n"
-     << "Nlat = " << data.Nlat << "\n"
-     << "Nlon = " << data.Nlon << "\n";
+data.dump();
 
    //
    //  done
@@ -285,8 +274,14 @@ return;
 void get_lambert_data_v3(NcFile * ncfile, LambertData & data)
 {
 
+ConcatString att_value;
+
    // Store the grid name
 data.name = lambert_proj_type;
+
+   // Hemisphere
+get_global_att(ncfile, "hemisphere", att_value);
+data.hemisphere = att_value.char_at(0);
 
    // First scale latitude
 get_global_att(ncfile, "scale_lat_1", data.scale_lat_1);
@@ -323,19 +318,7 @@ get_global_att(ncfile, "nx", data.nx);
    // Number of points in the y-direction
 get_global_att(ncfile, "ny", data.ny);
 
-mlog << Debug(grid_debug_level)
-     << "Lambert Conformal Grid Data:\n"
-     << "scale_lat_1 = " << data.scale_lat_1 << "\n"
-     << "scale_lat_2 = " << data.scale_lat_2 << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -393,19 +376,7 @@ get_global_att(ncfile, "nx", data.nx);
    // Number of points in the y-direction
 get_global_att(ncfile, "ny", data.ny);
 
-mlog << Debug(grid_debug_level)
-     << "Stereographic Grid Data:\n"
-     << "hemisphere = " << data.hemisphere << "\n"
-     << "scale_lat = " << data.scale_lat << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -446,14 +417,7 @@ get_global_att(ncfile, "ny", data.ny);
    // Number of points in the Longitudinal (x) direction
 get_global_att(ncfile, "nx", data.nx);
 
-mlog << Debug(grid_debug_level)
-     << "Mercator Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "lat_ur = " << data.lat_ur << "\n"
-     << "lon_ur = " << data.lon_ur << "\n"
-     << "ny = " << data.ny << "\n"
-     << "nx = " << data.nx << "\n";
+data.dump();
 
    //
    //  done
@@ -493,14 +457,7 @@ get_global_att(ncfile, "Nlat", data.Nlat);
    // Number of points in the Longitudinal (x) direction
 get_global_att(ncfile, "Nlon", data.Nlon);
 
-mlog << Debug(grid_debug_level)
-     << "Latitude/Longitude Grid Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "delta_lat = " << data.delta_lat << "\n"
-     << "delta_lon = " << data.delta_lon << "\n"
-     << "Nlat = " << data.Nlat << "\n"
-     << "Nlon = " << data.Nlon << "\n";
+data.dump();
 
    //
    //  done
@@ -556,19 +513,7 @@ get_global_att(ncfile, "nx", data.nx);
    // Number of points in the y-direction
 get_global_att(ncfile, "ny", data.ny);
 
-mlog << Debug(grid_debug_level)
-     << "Lambert Conformal Grid Data:\n"
-     << "scale_lat_1 = " << data.scale_lat_1 << "\n"
-     << "scale_lat_2 = " << data.scale_lat_2 << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -624,19 +569,7 @@ get_global_att(ncfile, "nx", data.nx);
    // Number of points in the y-direction
 get_global_att(ncfile, "ny", data.ny);
 
-mlog << Debug(grid_debug_level)
-     << "Stereographic Grid Data:\n"
-     << "hemisphere = " << data.hemisphere << "\n"
-     << "scale_lat = " << data.scale_lat << "\n"
-     << "lat_pin = " << data.lat_pin << "\n"
-     << "lon_pin = " << data.lon_pin << "\n"
-     << "x_pin = " << data.x_pin << "\n"
-     << "y_pin = " << data.y_pin << "\n"
-     << "lon_orient = " << data.lon_orient << "\n"
-     << "d_km = " << data.d_km << "\n"
-     << "r_km = " << data.r_km << "\n"
-     << "nx = " << data.nx << "\n"
-     << "ny = " << data.ny << "\n";
+data.dump();
 
    //
    //  done
@@ -677,14 +610,7 @@ get_global_att(ncfile, "Nlat", data.ny);
    // Number of points in the Longitudinal (x) direction
 get_global_att(ncfile, "Nlon", data.nx);
 
-mlog << Debug(grid_debug_level)
-     << "Mercator Data:\n"
-     << "lat_ll = " << data.lat_ll << "\n"
-     << "lon_ll = " << data.lon_ll << "\n"
-     << "lat_ur = " << data.lat_ur << "\n"
-     << "lon_ur = " << data.lon_ur << "\n"
-     << "ny = " << data.ny << "\n"
-     << "nx = " << data.nx << "\n";
+data.dump();
 
    //
    //  done
@@ -705,9 +631,9 @@ void get_gaussian_data (NcFile * ncfile, GaussianData & data)
 
 data.name = gaussian_proj_type;
 
-   //  
+   //
    //  Longitude for x = 0
-   //  
+   //
 
 get_global_att(ncfile, "lon_zero", data.lon_zero);
 
@@ -723,15 +649,7 @@ get_global_att(ncfile, "nx", data.nx);
 
 get_global_att(ncfile, "ny", data.ny);
 
-   //
-   //  dump grid, if needed
-   //
-
-mlog << Debug(grid_debug_level)
-     << "Gaussian Data:\n"
-     << "lon_zero = " << data.lon_zero << "\n"
-     << "ny = " << data.ny << "\n"
-     << "nx = " << data.nx << "\n";
+data.dump();
 
    //
    //  done

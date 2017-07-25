@@ -243,6 +243,8 @@ if ( all_bits_set ( gds.grid_type.latlon_grid.di, 2) )  {
 
 }
 
+data.dump();
+
    //
    //  done
    //
@@ -303,6 +305,8 @@ data.ny = char2_to_int(gds.ny);
    // Number of points in the Longitudinal (x) direction
 data.nx = char2_to_int(gds.nx);
 
+data.dump();
+
    //
    //  done
    //
@@ -319,6 +323,8 @@ void gds_to_lambert(const Section2_Header & gds, LambertData & data)
 
 {
 
+unsigned char c;
+
    // Store the grid name
 data.name = lambert_proj_type;
 
@@ -326,6 +332,11 @@ data.name = lambert_proj_type;
    // Multiply longitude values by -1 since the NCAR code considers
    // degrees west to be positive.
    //
+
+   // Hemisphere
+c = gds.grid_type.lambert_conf.pc_flag;
+if ( c & 128 ) { data.hemisphere = 'S'; }  // South Pole
+else           { data.hemisphere = 'N'; }  // North Pole
 
    // First latitude
 data.scale_lat_1 = decode_lat_lon(gds.grid_type.lambert_conf.latin1, 3);
@@ -367,6 +378,8 @@ data.nx = char2_to_int(gds.nx);
 
    // Number of points in the y-direction
 data.ny = char2_to_int(gds.ny);
+
+data.dump();
 
    //
    //  done
@@ -437,6 +450,8 @@ data.nx = char2_to_int(gds.nx);
    // Number of points in the y-direction
 data.ny = char2_to_int(gds.ny);
 
+data.dump();
+
    //
    //  done
    //
@@ -467,6 +482,8 @@ data.ny = char2_to_int(gds.ny);
    //
 
 data.lon_zero = -1.0*rescale_lon(decode_lat_lon(gds.grid_type.gaussian.lon1, 3));
+
+data.dump();
 
    //
    //  done

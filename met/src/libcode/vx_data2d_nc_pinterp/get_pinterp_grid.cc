@@ -196,6 +196,8 @@ data.r_km = default_grib_radius_km;
 
 grid.set(data);
 
+data.dump();
+
 return ( true );
 
 }
@@ -223,6 +225,13 @@ data.name = lambert_default_gridname;
 
 get_global_att_double(&nc, "TRUELAT1", data.scale_lat_1, true);
 get_global_att_double(&nc, "TRUELAT2", data.scale_lat_2, true);
+
+   //
+   //  hemisphere ... assume north?
+   //
+
+if ( data.scale_lat_1 < 0.0 )  data.hemisphere = 'S';
+else                           data.hemisphere = 'N';
 
    //
    //  Nx, Ny
@@ -263,6 +272,8 @@ data.r_km = default_grib_radius_km;
    //
 
 grid.set(data);
+
+data.dump();
 
 return ( true );
 
@@ -366,6 +377,8 @@ data.lon_ur = mercator_u_to_lon(u);
    //
 
 grid.set(data);
+
+data.dump();
 
 return ( true );
 
