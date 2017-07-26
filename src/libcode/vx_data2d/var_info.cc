@@ -399,19 +399,9 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
       lvl1 = field_lvl_val1;
       lvl2 = (is_bad_data(field_lvl_val2) ? -1 : field_lvl_val2);
 
-      //  set the level type based on the indexes
-      //  from: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
-      //        http://www.nco.ncep.noaa.gov/pmb/docs/on388/table3.html
-      switch( field_lvl_typ ){
-         case 1:
-            lt = LevelType_Accum; lvl_type = "A"; break;
-         case 100: case 108:
-            lt = LevelType_Pres;  lvl_type = "P"; break;
-         case 102: case 103:
-            lt = LevelType_Vert;  lvl_type = "Z"; break;
-         default:
-            lt = LevelType_None;  lvl_type = "L"; break;
-      }
+      //  store as a generic level type
+      lt = LevelType_None;
+      lvl_type= "L";
 
    }
 

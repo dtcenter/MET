@@ -199,6 +199,13 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
 
 if ( !is_bad_data(vinfo.level().type_num()) &&
      vinfo.level().type_num() != (int) pds->type ){
+
+   mlog << Debug(4)
+        << "For GRIB record number " << g.rec_num
+        << ", the requested level type (" << vinfo.level().type_num()
+        << ") does not match the current level type ("
+        << (int) pds->type << ").\n";
+
    return ( false );
 }
 
@@ -374,7 +381,17 @@ read_pds_level(g, grib_lower, grib_upper, grib_type_num);
    //
 
 if ( !is_bad_data(vinfo.level().type_num()) &&
-     vinfo.level().type_num() != grib_type_num )  return ( false );
+     vinfo.level().type_num() != grib_type_num )  {
+
+   mlog << Debug(4)
+        << "For GRIB record number " << g.rec_num
+        << ", the requested level type (" << vinfo.level().type_num()
+        << ") does not match the current level type ("
+        << grib_type_num << ").\n";
+
+   return ( false );
+
+}
 
    //
    //  for non-accumulation intervals and specific record numbers,
@@ -383,7 +400,17 @@ if ( !is_bad_data(vinfo.level().type_num()) &&
 
 if ( ( vinfo.level().type() != LevelType_Accum     ) &&
      ( vinfo.level().type() != LevelType_RecNumber ) &&
-     ( grib_lower != lower || grib_upper != upper ) )  return ( false );
+     ( grib_lower != lower || grib_upper != upper ) )  {
+
+   mlog << Debug(4)
+        << "For GRIB record number " << g.rec_num
+        << ", the requested level values (" << lower << " and " << upper
+        << ") do not match the current level values "
+        << "(" << grib_lower << " and " << grib_upper << ").\n";
+
+   return ( false );
+
+}
 
    //
    //  done
@@ -427,8 +454,16 @@ read_pds_level(g, grib_lower, grib_upper, grib_type_num);
    //
 
 if ( !is_bad_data(vinfo.level().type_num()) &&
-     vinfo.level().type_num() != grib_type_num )  return ( false );
+     vinfo.level().type_num() != grib_type_num )  {
 
+   mlog << Debug(4)
+        << "For GRIB record number " << g.rec_num
+        << ", the requested level type (" << vinfo.level().type_num()
+        << ") does not match the current level type ("
+        << grib_type_num << ").\n";
+
+   return ( false );
+}
    //
    //  for non-accumulation intervals and specific record number,
    //  check if the GRIB levels fall within the requested range
@@ -436,7 +471,16 @@ if ( !is_bad_data(vinfo.level().type_num()) &&
 
 if ( ( vinfo.level().type() != LevelType_Accum     ) &&
      ( vinfo.level().type() != LevelType_RecNumber ) &&
-     ( grib_lower < lower || grib_upper > upper ) )  return ( false );
+     ( grib_lower < lower || grib_upper > upper ) )  {
+
+   mlog << Debug(4)
+        << "For GRIB record number " << g.rec_num
+        << ", the requested level values (" << lower << " and " << upper
+        << ") do not fall within the current range of level values "
+        << "(" << grib_lower << " and " << grib_upper << ").\n";
+
+   return ( false );
+}
 
    //
    //  done
