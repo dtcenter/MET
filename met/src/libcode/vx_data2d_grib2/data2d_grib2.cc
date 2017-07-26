@@ -371,12 +371,6 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       double rec_lvl1 = min((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
       double rec_lvl2 = max((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
 
-      //  test the level type number, if specified
-      if ( !is_bad_data(vinfo->level().type_num()) &&
-           vinfo->level().type_num() != (*it)->LvlTyp ){
-         continue;
-      }
-
       //  test the timing information
       if( (!is_bad_data(vinfo->lead())  && vinfo->lead()  != (*it)->LeadTime)  ||
           (vinfo->valid()               && vinfo->valid() != (*it)->ValidTime) ||
@@ -422,6 +416,19 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                  vinfo->parm()       == (*it)->Parm       ) ||
                vinfo->name().text()  == (*it)->ParmName
              ){
+
+         //  test the level type number, if specified
+         if ( !is_bad_data(vinfo->level().type_num()) &&
+              vinfo->level().type_num() != (*it)->LvlTyp ){
+
+            mlog << Debug(4)
+                 << "For GRIB2 record number " << (*it)->RecNum
+                 << ", the requested level type (" << vinfo->level().type_num()
+                 << ") does not match the current level type ("
+                 << (*it)->LvlTyp << ").\n";
+
+            continue;
+         }
 
          //  record number level type
          if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
