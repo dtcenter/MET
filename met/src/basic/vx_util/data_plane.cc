@@ -26,6 +26,7 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_math.h"
 #include "vx_cal.h"
+#include "math_constants.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -463,6 +464,101 @@ if ( !Data )  {
 const int n = two_to_one(x, y);   //  the two_to_one function does range checking on x and y
 
 Data[n] = value;
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+   //
+   //  Note: this function could be speeded up a lot, I think
+   //
+
+void DataPlane::fitwav_1d(const int start_wave, const int end_wave)
+
+{
+
+int i, j, k;
+double * a = 0;
+double * b = 0;
+double * xa = 0;
+double * xb = 0;
+double xa0, value, angle;
+const int mnw = (Nx + 1)/2;
+
+
+a = new double [mnw];
+b = new double [mnw];
+
+for (j=0; j<Ny; ++j)  {
+
+   xa0 = 0.0;
+
+   for (k=0; k<Nx; ++k)  {
+
+      xa0 += get(k, j);
+
+   }   //  for k
+
+   a[0] = xa0/Nx;
+   b[0] = 0.0;
+
+   /////////////////////////////
+
+   for (i=1; i<=mnw; ++i)  {
+
+      xa[i] = xb[i] = 0.0;
+
+      for (k=0; k<Nx; ++k)  {
+
+         angle = (twopi*i*k)/Nx;
+
+         xa[i] += (get(k, j))*cos(angle);
+         xb[i] += (get(k, j))*sin(angle);
+
+      }   //  for k
+
+      a[i] = (2.0*xa[i])/Nx;
+      b[i] = (2.0*xb[i])/Nx;
+
+   }   //  for i
+
+   /////////////////////////////
+
+   for (k=0; k<Nx; ++k)  {
+
+      value = 0.0;
+
+      for (i=start_wave; i<=end_wave; ++i)  {
+
+         angle = (twopi*i*k)/Nx;
+
+         value += (a[i])*cos(angle);
+
+         value += (a[i])*sin(angle);
+
+      }   //  for i
+
+      put(value, k, j);
+
+   }   //  for k
+
+   /////////////////////////////
+
+}   //  for j
+
+
+   //
+   //  done
+   //
+
+if ( a )  { delete [] a;  a = 0; }
+if ( b )  { delete [] b;  b = 0; }
+
+if ( xa )  { delete [] xa;  xa = 0; }
+if ( xb )  { delete [] xb;  xb = 0; }
 
 return;
 
