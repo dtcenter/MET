@@ -126,7 +126,7 @@ void SeriesAnalysisConfInfo::read_config(const char *default_file_name,
    return;
 }
 
-// ////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
                                             GrdFileType otype) {
