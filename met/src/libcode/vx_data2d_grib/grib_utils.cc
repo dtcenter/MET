@@ -408,7 +408,7 @@ data.name = stereographic_proj_type;
    // degrees west to be positive.
    //
 
-   // Latitude where the scale factor is deteremined is 60.0 degrees
+   // Latitude where the scale factor is determined is 60.0 degrees
    // based on WMO's Guide to Grib
 c = gds.grid_type.stereographic.pc_flag;
 if ( c & 128 ) { parity = -1; data.hemisphere = 'S'; }  // South Pole

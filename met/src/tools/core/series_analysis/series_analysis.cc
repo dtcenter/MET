@@ -241,7 +241,7 @@ void process_command_line(int argc, char **argv) {
         << "Length of observation file list      = "
         << obs_files.n_elements() << "\n";
 
-   // Deteremine the length of the series to be analyzed.  Series is
+   // Determine the length of the series to be analyzed.  Series is
    // defined by the first parameter of length greater than one:
    // - Configuration fcst.field
    // - Configuration obs.field
