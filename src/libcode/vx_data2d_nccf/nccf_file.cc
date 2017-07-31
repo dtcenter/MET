@@ -2072,7 +2072,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   if (fabs(dx_m - dy_m) > DELTA_TOLERANCE)
   {
     mlog << Error << "\n" << method_name << " -> "
-         << "MET can only process Lambert Conformal files where the x-axis and y-axis deltas are the same\n\n";
+         << "MET can only process Polar Stereographic files where the x-axis and y-axis deltas are the same.\n\n";
     exit(1);
   }
 
