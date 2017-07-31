@@ -49,7 +49,8 @@ static const char var_lon_nt[] = "tlon";
 
 static ConcatString x_dim_var_name;
 static ConcatString y_dim_var_name;
-//const char * t_dim_var_name;
+
+static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name);
 
 #define USE_BUFFER  1
 
@@ -1843,13 +1844,254 @@ void NcCfFile::get_grid_mapping_orthographic(const NcVar *grid_mapping_var)
 ////////////////////////////////////////////////////////////////////////
 
 
+double get_nc_var_att_double(const NcVar *nc_var, const char *att_name)
+{
+   NcVarAtt nc_att = get_nc_att(nc_var, att_name);
+
+   if(IS_INVALID_NC(nc_att))
+   {
+      mlog << Error << "\nget_nc_var_att_double() -> "
+           << "Cannot get \"" << att_name << "\" from "
+           << GET_NC_NAME_P(nc_var) << " variable.\n\n";
+      exit(1);
+    }
+
+    return(get_att_value_double(&nc_att));
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_var)
 {
   static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic()";
+  double x_coord_to_m_cf = 1.0;
+  double y_coord_to_m_cf = 1.0;
 
-  mlog << Error << "\n" << method_name << " -> "
-       << "Polar stereographic grid not handled in MET.\n\n";
-  exit(1);
+  // Get projection attributes
+
+  double proj_origin_lat =
+            get_nc_var_att_double(grid_mapping_var,
+                              "latitude_of_projection_origin");
+  double proj_origin_lon =
+            get_nc_var_att_double(grid_mapping_var,
+                              "longitude_of_projection_origin");
+  double proj_vertical_lon =
+            get_nc_var_att_double(grid_mapping_var,
+                              "straight_vertical_longitude_from_pole");
+  double proj_origin_scale_factor =
+            get_nc_var_att_double(grid_mapping_var,
+                              "scale_factor_at_projection_origin");
+
+  // Check that the scale factor at the origin is 1.
+
+  if(!is_eq(proj_origin_scale_factor, 1.0))
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Unexpected attribute value of " << proj_origin_scale_factor
+         << " for the scale_factor_at_projection_origin attribute of the "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
+    exit(1);
+  }
+
+  // Look for the x/y dimensions
+
+  for (int dim_num = 0; dim_num < _numDims; ++dim_num)
+  {
+    // Get the standard name for the coordinate variable
+
+    const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
+    if (IS_INVALID_NC(coord_var))
+      continue;
+
+    const NcVarAtt std_name_att = get_nc_att(&coord_var, "standard_name");
+    if (IS_INVALID_NC(std_name_att))
+      continue;
+
+    ConcatString dim_std_name;
+    if (!get_att_value_chars(&std_name_att, dim_std_name))
+      continue;
+    // See if this is an X or Y dimension
+
+    if (strcmp(dim_std_name, x_dim_key_name) == 0)
+    {
+      _xDim = _dims[dim_num];
+
+      x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+        if (strcmp(Var[var_num].name, x_dim_var_name) == 0)
+        {
+          _xCoordVar = Var[var_num].var;
+          break;
+        }
+      }
+    }
+
+    if (strcmp(dim_std_name, y_dim_key_name) == 0)
+    {
+      _yDim = _dims[dim_num];
+
+      y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+        if (strcmp(Var[var_num].name, y_dim_var_name) == 0)
+        {
+          _yCoordVar = Var[var_num].var;
+          break;
+        }
+      }
+    }
+
+  }
+
+  if (_xDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find X dimension (projection_x_coordinate) in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_yDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find Y dimension (projection_y_coordinate) in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_xCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
+         << ") in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_yCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
+         << ") in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (get_data_size(_xCoordVar) != GET_NC_SIZE_P(_xDim) ||
+      get_data_size(_yCoordVar) != GET_NC_SIZE_P(_yDim))
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
+    exit(1);
+  }
+
+  // Make sure that the coordinate variables are given in meters.  If we get
+  // files that are in other units, we'll have to update the code to do the
+  // units conversions.
+
+  const NcVarAtt x_coord_units_att = get_nc_att(_xCoordVar, "units");
+  if (IS_INVALID_NC(x_coord_units_att))
+  {
+    mlog << Warning << "\n" << method_name << " -> "
+         << "Units not given for X coordinate variable -- assuming meters.\n\n";
+  }
+  else
+  {
+    ConcatString x_coord_units_name;
+    if (!get_att_value_chars(&x_coord_units_att, x_coord_units_name))
+    {
+      mlog << Warning << "\n" << method_name << " -> "
+           << "Cannot extract X coordinate units from netCDF file -- "
+           << "assuming meters.\n\n";
+    }
+    else {
+           if (strcmp(x_coord_units_name, "m" ) == 0) x_coord_to_m_cf = 1.0;
+      else if (strcmp(x_coord_units_name, "km") == 0) x_coord_to_m_cf = 1000.0;
+      else {
+        mlog << Error << "\n" << method_name << " -> "
+             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+        exit(1);
+      }
+    }
+  }
+
+  const NcVarAtt y_coord_units_att = get_nc_att(_yCoordVar, "units");
+  if (IS_INVALID_NC(y_coord_units_att))
+  {
+    mlog << Warning << "\n" << method_name << " -> "
+         << "Units not given for Y coordinate variable -- assuming meters.\n\n";
+  }
+  else
+  {
+    ConcatString y_coord_units_name;
+    if (!get_att_value_chars(&y_coord_units_att, y_coord_units_name))
+    {
+      mlog << Warning << "\n" << method_name << " -> "
+           << "Cannot extract Y coordinate units from netCDF file -- "
+           << "assuming meters.\n\n";
+    }
+    else {
+           if (strcmp(y_coord_units_name, "m" ) == 0) y_coord_to_m_cf = 1.0;
+      else if (strcmp(y_coord_units_name, "km") == 0) y_coord_to_m_cf = 1000.0;
+      else {
+        mlog << Error << "\n" << method_name << " -> "
+             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+        exit(1);
+      }
+    }
+  }
+
+  // Figure out the dx/dy  and x/y pin values from the dimension variables
+
+  long x_counts = GET_NC_SIZE_P(_xDim);
+  double x_values[x_counts];
+
+  get_nc_data(_xCoordVar, x_values);
+
+  long y_counts = GET_NC_SIZE_P(_yDim);
+  double y_values[y_counts];
+
+  get_nc_data(_yCoordVar, y_values);
+
+  // Unit conversion
+
+  for (int i = 0; i<x_counts; ++i) x_values[i] *= x_coord_to_m_cf;
+  for (int i = 0; i<y_counts; ++i) y_values[i] *= y_coord_to_m_cf;
+
+  // Calculate dx and dy assuming they are constant.  MET requires that dx be
+  // equal to dy
+
+  double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
+  double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+
+  if (fabs(dx_m - dy_m) > DELTA_TOLERANCE)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "MET can only process Polar Stereographic files where the x-axis and y-axis deltas are the same.\n\n";
+    exit(1);
+  }
+
+  // Calculate the pin indices.  The pin will be located at the grid's reference
+  // location since that's the only lat/lon location we know about.
+
+  double x_pin = -(x_values[0] / dx_m);
+  double y_pin = -(y_values[0] / dy_m);
+
+  // Fill in the data structure.  Remember to negate the longitude values.
+
+  StereographicData data;
+  data.name = stereographic_proj_type;
+  data.lat_pin = proj_origin_lat;
+  data.lon_pin = -1.0 * proj_origin_lon;
+  data.hemisphere = (data.lat_pin > 0 ? 'N' : 'S');
+  data.x_pin = x_pin;
+  data.y_pin = y_pin;
+  data.scale_lat = proj_origin_lat;
+  data.lon_orient = -1.0 * proj_vertical_lon;
+  data.d_km = dx_m / 1000.0;
+  data.r_km = 6371.20;
+  data.nx = _xDim->getSize();
+  data.ny = _yDim->getSize();
+  grid.set(data);
 }
 
 
@@ -1948,7 +2190,6 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       mlog << Error << "\n" << method_name << " -> "
            << "Didn't find X coord variable (" << x_dim_var_name
            << ") in netCDF file.\n\n";
-      //exit(1);
       return true;
     }
 
@@ -1956,7 +2197,6 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       mlog << Error << "\n" << method_name << " -> "
            << "Didn't find Y coord variable (" << y_dim_var_name
            << ") in netCDF file.\n\n";
-      //exit(1);
       return true;
     }
 
@@ -2090,6 +2330,10 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
 
   return true;
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 bool NcCfFile::get_grid_from_dimensions()
 {
