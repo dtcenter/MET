@@ -32,6 +32,22 @@ static const char  fill_value_att_name    [] = "_FillValue";
 
 ////////////////////////////////////////////////////////////////////////
 
+void replace_comma_to_underscore(string *var_name) {
+   size_t offset;
+   offset = var_name->find(',');
+   while (offset != string::npos) {
+      var_name->replace(offset, 1, "_");
+      offset = var_name->find(',', offset);
+   }
+   offset = var_name->find('*');
+   while (offset != string::npos) {
+      var_name->replace(offset, 1, "all");
+      offset = var_name->find('*', offset);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+   
 bool get_att_value(const NcAtt *att, ConcatString &value) {
    bool status = false;
    if ((0 != att) && !att->isNull()) {
@@ -1948,7 +1964,9 @@ bool has_var(NcFile *nc, const char * var_name) {
 
 NcVar add_var(NcFile *nc, const string var_name, const NcType ncType, const int deflate_level) {
    std::vector<NcDim> ncDimVector;
-   NcVar var = nc->addVar(var_name, ncType, ncDimVector);
+   string new_var_name = var_name;
+   replace_comma_to_underscore(&new_var_name);
+   NcVar var = nc->addVar(new_var_name, ncType, ncDimVector);
 
    if (deflate_level > 0) {
       mlog << Debug(3) << "    nc_utils.add_var() deflate_level: " << deflate_level << "\n";
@@ -1961,7 +1979,9 @@ NcVar add_var(NcFile *nc, const string var_name, const NcType ncType, const int 
 
 NcVar add_var(NcFile *nc, const string var_name, const NcType ncType,
               const NcDim ncDim, const int deflate_level) {
-   NcVar var = nc->addVar(var_name, ncType, ncDim);
+   string new_var_name = var_name;
+   replace_comma_to_underscore(&new_var_name);
+   NcVar var = nc->addVar(new_var_name, ncType, ncDim);
 
    if (deflate_level > 0) {
       mlog << Debug(3) << "    nc_utils.add_var() deflate_level: " << deflate_level << "\n";
@@ -2008,8 +2028,9 @@ NcVar add_var(NcFile *nc, const string var_name, const NcType ncType,
 
 NcVar add_var(NcFile *nc, const string var_name, const NcType ncType,
               const vector<NcDim> ncDims, const int deflate_level) {
-
-   NcVar var = nc->addVar(var_name, ncType, ncDims);
+   string new_var_name = var_name;
+   replace_comma_to_underscore(&new_var_name);
+   NcVar var = nc->addVar(new_var_name, ncType, ncDims);
    if (deflate_level > 0) {
       mlog << Debug(3) << "    nc_utils.add_var() deflate_level: " << deflate_level << "\n";
       var.setCompression(false, true, deflate_level);
