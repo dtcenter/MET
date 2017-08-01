@@ -61,6 +61,7 @@ class PB2NCConfInfo {
       bool         anyair_flag;         // Flags for specific message types
       bool         anysfc_flag;
       bool         onlysf_flag;
+      bool         use_var_id;
 
       // More information on the PrepBufr file format:
       // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc
