@@ -137,7 +137,7 @@ C*                  prepbufr file
 C*
         INCLUDE       'readpb.prm'
 C*
-        INTEGER       cnlev, olen
+        INTEGER       cnlev, olen, max_nlev
         REAL*8        cobs ( MXR8PM, MXR8LV )
 C*
         CHARACTER*(MXSTRL) ostr
@@ -156,7 +156,9 @@ C*      variables passed to the subroutine.
 C
    20   cnlev = nlev
 C
-        DO lv = 1, nlev
+        max_nlev = nlev
+        IF (max_nlev .gt. MXR8LV) max_nlev = MXR8LV
+        DO lv = 1, max_nlev
            DO ii = 1, MXR8PM
               cobs ( ii, lv ) = obsi ( ii, lv )
            END DO
@@ -210,7 +212,7 @@ C*                  prepbufr file
 C*
         INCLUDE       'readpb.prm'
 C*
-        INTEGER       cnlev, olen
+        INTEGER       cnlev, olen, max_nlev
         REAL*8        cobs ( MXR8PM, MXR8LV, MXR8VN )
 C*
         CHARACTER*(MXSTRL) ostr
@@ -228,7 +230,9 @@ C*      variables passed to the subroutine.
 C
    20   cnlev = nlev
 C
-        DO lv = 1, nlev
+        max_nlev = nlev
+        IF (max_nlev .gt. MXR8LV) max_nlev = MXR8LV
+        DO lv = 1, max_nlev
            DO jj = 1, MXR8VN
               DO ii = 1, MXR8PM
                  cobs ( ii, lv, jj ) = obse( ii, lv, jj )
