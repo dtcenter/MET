@@ -103,7 +103,7 @@ static const double r8bfms      = 1.0E10;
 // Maximum number of BUFR parameters
 static const int mxr8pm         = 10;
 // Maximum number of BUFR levels
-static const int mxr8lv         = 255;
+static const int mxr8lv         = 1023;   // was 255;
 // Maximum number of BUFR event sequences
 static const int mxr8vn         = 10;
 // Maximum number of BUFR variable types
@@ -215,7 +215,7 @@ static const char *default_ymd_name = "YEAR MNTH DAYS";
 static const char *default_hms_name = "HOUR MINU SECO";
 
 // Pick the latter one if exists multiuple variables
-static const char *bufr_avail_hid_names = "SID SAID";
+static const char *bufr_avail_sid_names = "SID SAID RPID";
 static const char *bufr_avail_latlon_names = "XOB CLON CLONH YOB CLAT CLATH";
 
 static double bufr_obs[mxr8lv][mxr8pm];
@@ -238,7 +238,7 @@ static StringArray tableB_descs;
 static ConcatString bufr_hdrs;      // header name list to read header
 static StringArray bufr_hdr_arr;    // available header name list
 static StringArray bufr_obs_arr;    // available obs. name list
-static StringArray filtered_times;
+static IntArray filtered_times;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -508,6 +508,7 @@ void process_command_line(int argc, char **argv) {
    
    // Process the configuration
    conf_info.process_config();
+   if (conf_info.use_var_id) use_var_id = true;
 
    if (!use_met_vars && 0 < conf_info.bufr_var_name.n_elements()) {
       use_met_vars = true;
@@ -711,14 +712,7 @@ void open_netcdf() {
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
-   const char *attribute_str;
-   if (use_var_id) {
-      attribute_str = "true";
-   }
-   else {
-      attribute_str = "false";
-   }
-   add_att(f_out, nc_att_use_var_id, attribute_str);
+   add_att(f_out, nc_att_use_var_id, (use_var_id ? "true" : "false"));
 
    // Add variable attributes
    add_att(&obs_qty_var, "long_name", "quality flag");
@@ -770,13 +764,15 @@ void process_pbfile(int i_pb) {
    float    quality_mark, dl_category;
    float    obs_arr[obs_arr_len];
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
+   
+   StringArray variables_big_nlevels;
 
    bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
                            conf_info.grid_mask.ny() > 0);
    bool apply_poly_mask = (conf_info.poly_mask.n_points() > 0);
 
    // List the PrepBufr file being processed
-   mlog << Debug(1) << "Processing PrepBufr File:\t" << pbfile[i_pb]
+   mlog << Debug(1) << "Processing Bufr File:\t" << pbfile[i_pb]
         << "\n";
 
    // Initialize
@@ -792,7 +788,7 @@ void process_pbfile(int i_pb) {
    blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
    blk_file = make_temp_file_name(blk_prefix, '\0');
 
-   mlog << Debug(1) << "Blocking PrepBufr file to:\t" << blk_file
+   mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file
         << "\n";
 
    // Assume that the input PrepBufr file is unblocked.
@@ -808,7 +804,7 @@ void process_pbfile(int i_pb) {
       if(pbfile.n_elements() > 1) {
          mlog << Error << "\nprocess_pbfile() -> "
               << "the \"-dump\" and \"-pbfile\" options may not be "
-              << "used together.  Only one PrepBufr file may be dump "
+              << "used together.  Only one Bufr file may be dump "
               << "to ASCII at a time.\n\n";
          exit(1);
       }
@@ -839,7 +835,7 @@ void process_pbfile(int i_pb) {
    // Check for zero messages to process
    if(npbmsg <= 0) {
       mlog << Warning << "\nprocess_pbfile() -> "
-           << "No PrepBufr messages to process in file: "
+           << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
       // Delete the temporary blocked file
@@ -861,6 +857,7 @@ void process_pbfile(int i_pb) {
    obs_data_offset = 0;
    hdr_data_offset = 0;
 
+   int adjusted_nlev;
    int valid_data_count = 0;
    bool is_prepbufr = is_prepbufr_file(&event_names);
    
@@ -889,8 +886,8 @@ void process_pbfile(int i_pb) {
          unix_to_mdyhms(file_ut, mon, day, yr, hr, min, sec);
          sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
                  yr, mon, day, hr, min, sec);
-         mlog << Debug(2) << "PrepBufr Time Center:\t\t" << time_str
-              << "\n";
+         mlog << Debug(2) << (is_prepbufr ? "PrepBufr" : "Bufr")
+              << " Time Center:\t\t" << time_str << "\n";
       
          // Check if valid_beg_ut and valid_end_ut were set on the
          // command line.  If so, use them.  If not, use beg_ds and
@@ -928,7 +925,7 @@ void process_pbfile(int i_pb) {
               << " to " << end_time_str << "\n";
       
          mlog << Debug(2) << "Processing " << npbmsg
-              << " PrepBufr messages...\n";
+              << (is_prepbufr ? " PrepBufr" : " Bufr") << " messages...\n";
       }
       else if((file_ut != msg_ut) && is_prepbufr) {
          mlog << Error << "\nprocess_pbfile() -> "
@@ -1037,7 +1034,7 @@ void process_pbfile(int i_pb) {
       // Compute the valid time and check if it is within the
       // specified valid range
       hdr_vld_ut = file_ut + (unixtime) (hdr[3]*sec_per_hour);
-      if (0 == min_msg_ut || min_msg_ut < hdr_vld_ut) {
+      if (0 == min_msg_ut || min_msg_ut > hdr_vld_ut) {
          min_msg_ut = hdr_vld_ut;
          strcpy(min_time_str, time_str);
       }
@@ -1046,8 +1043,8 @@ void process_pbfile(int i_pb) {
          strcpy(max_time_str, time_str);
       }
       if(!keep_valid_time(hdr_vld_ut, beg_ut, end_ut)) {
-         if (!filtered_times.has(time_str)) {
-            filtered_times.add(time_str);
+         if (!filtered_times.has(hdr_vld_ut)) {
+            filtered_times.add(hdr_vld_ut);
          }
          rej_vld++;
          continue;
@@ -1115,8 +1112,21 @@ void process_pbfile(int i_pb) {
       // Store the index to the header data
       obs_arr[0] = (float) hdr_typ_sa.n_elements();
       
+      adjusted_nlev = nlev;
+      if (nlev > mxr8lv) {
+         adjusted_nlev = mxr8lv;
+         for(kk=0; kk<mxr8vt; kk++) {
+            if (!variables_big_nlevels.has(bufr_obs_arr[kk])) {
+               mlog << Warning << "\nprocess_pbfile() -> "
+                    << "Too many vertical levels (" << nlev
+                    << ") for " << bufr_obs_arr[kk] 
+                    << "). Ignored the vertical levels above " << mxr8lv << ".\n\n";
+               variables_big_nlevels.add(bufr_obs_arr[kk]);
+            }
+         }
+      }
       // Search through the vertical levels
-      for(lv=0, n_hdr_obs = 0; lv<nlev; lv++) {
+      for(lv=0, n_hdr_obs = 0; lv<adjusted_nlev; lv++) {
       
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
@@ -1170,13 +1180,7 @@ void process_pbfile(int i_pb) {
             // corresponding grib code and store as the second element
             // of obs_arr
             grib_code = var_gc[kk];
-            if (use_var_id) {
-               obs_arr[1] = (float) bufr_var_code[kk];
-            }
-            else {
-               obs_arr[1] = (float) grib_code;
-            }
-
+            obs_arr[1] = (float)(use_var_id ? bufr_var_code[kk] : grib_code);
       
             // Get the event index to be used based on the contents of
             // the event stack flag
@@ -1332,12 +1336,7 @@ void process_pbfile(int i_pb) {
                   continue;
       
                // Store the grib code to be derived
-               if (use_var_id) {
-                  obs_arr[1] = (float)bufr_derive_code[i];
-               }
-               else {
-                  obs_arr[1] = derive_gc[i];
-               }
+               obs_arr[1] = (float)(use_var_id ? bufr_derive_code[i] :derive_gc[i]);
 
                // Derive the value for the grib code
                obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
@@ -1418,7 +1417,7 @@ void process_pbfile(int i_pb) {
             isMilliBar = false;
             char unit_str[BUFR_UNIT_LEN];
             if (var_names.has(var_name, var_index)) {
-               //mlog << Debug(5) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
+               //mlog << Debug(7) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
                if (0 == strcmp("DEG C", var_units[var_index])) {
                   isDegC = true;
                }
@@ -1433,9 +1432,20 @@ void process_pbfile(int i_pb) {
             readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len);
             if (0 >= nlev2) continue;
          
+            adjusted_nlev = nlev2;
+            if (nlev2 > mxr8lv) {
+               adjusted_nlev = mxr8lv;
+               if (!variables_big_nlevels.has(bufr_obs_arr[vIdx])) {
+                  mlog << Warning << "\nprocess_pbfile() -> "
+                       << "Too many vertical levels (" << nlev2
+                       << ") for " << bufr_obs_arr[vIdx] 
+                       << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
+                  variables_big_nlevels.add(bufr_obs_arr[vIdx]);
+               }
+            }
             mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2 << ", vIdx: " << vIdx << ", obs_data_idx: " << obs_data_idx << ", nlev: " << nlev << "\n";
             // Search through the vertical levels
-            for(lv=0; lv<nlev2; lv++) {
+            for(lv=0; lv<adjusted_nlev; lv++) {
          
                // If the observation vertical level is not within the
                // specified valid range, continue to the next vertical level
@@ -1443,7 +1453,7 @@ void process_pbfile(int i_pb) {
          
                // If the pressure level is not valid, continue to the next level
                if (is_prepbufr) {
-                  if ((lv >= nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
+                  if ((lv >= adjusted_nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
                }
          
                if (bufr_obs[lv][0] > r8bfms) continue;
@@ -1561,9 +1571,9 @@ void process_pbfile(int i_pb) {
    }
 
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
-
-   mlog << Debug(2) << "Total PrepBufr Messages processed\t= "
-        << npbmsg << "\n"
+   
+   mlog << Debug(2) << "Total " << (is_prepbufr ? "PrepBufr" : "Bufr")
+        << " Messages processed\t= " << npbmsg << "\n"
         << "Rejected based on message type\t\t= "
         << rej_typ << "\n"
         << "Rejected based on station id\t\t= "
@@ -1599,8 +1609,19 @@ void process_pbfile(int i_pb) {
    }
    else {
       mlog << Debug(3) << "\tMin obs_time = " << min_time_str 
-           << " \tMax obs_time = " << max_time_str << "\n";
+           << "\tMax obs_time = " << max_time_str << "\n";
        
+      int debug_level = 5;
+      if(mlog.verbosity_level() >= debug_level) {
+         for (kk=0; kk<filtered_times.n_elements();kk++) {
+            unix_to_mdyhms(filtered_times[kk], mon, day, yr, hr, min, sec);
+            sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
+                        yr, mon, day, hr, min, sec);
+            mlog << Debug(debug_level) << "\t Filtered time: " << time_str
+                 << " (" << filtered_times[kk] << ")\n";
+         }
+         cout << endl;
+      }
    }
 
    // Close the PREPBUFR file
@@ -1696,7 +1717,7 @@ void process_pbfile_metadata(int i_pb) {
    StringArray tmp_hdr_array;
    headers.add(prepbufr_hdrs);
    tmp_hdr_array.clear();
-   tmp_hdr_array.parse_wsss(bufr_avail_hid_names);
+   tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
    headers.add(tmp_hdr_array);
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
@@ -1764,12 +1785,12 @@ void process_pbfile_metadata(int i_pb) {
          }
          else {
             strcpy(var_name, default_sid_name);
-            strcpy(tmp_str, bufr_avail_hid_names);
+            strcpy(tmp_str, bufr_avail_sid_names);
             length = strlen(tmp_str);
             readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length );
             if (0 < nlev) {
                tmp_hdr_array.clear();
-               tmp_hdr_array.parse_wsss(bufr_avail_hid_names);
+               tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
                for (index=0; index<tmp_hdr_array.n_elements(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      strcpy(var_name, tmp_hdr_array[index]);
@@ -1919,7 +1940,7 @@ void process_pbfile_metadata(int i_pb) {
 
       int var_count = unchecked_var_list.n_elements();
       for (int vIdx=var_count-1; vIdx>=0; vIdx--) {
-         int nlev2;
+         int nlev2, adjusted_nlev;
          int var_name_len;
          char var_name[BUFR_NAME_LEN];
          strcpy(var_name, (char *)unchecked_var_list[vIdx]);
@@ -1929,7 +1950,9 @@ void process_pbfile_metadata(int i_pb) {
          if (0 >= nlev2) continue;
       
          // Search through the vertical levels
-         for(lv=0; lv<nlev2; lv++) {
+         adjusted_nlev = nlev2;
+         if (nlev2 > mxr8lv) adjusted_nlev = mxr8lv;
+         for(lv=0; lv<adjusted_nlev; lv++) {
             if (bufr_obs[lv][0] < r8bfms) {
                if (!bufr_obs_arr.has(var_name) && !bufr_hdr_arr.has(var_name)) {
                   bufr_obs_arr.add(var_name);
@@ -1938,8 +1961,8 @@ void process_pbfile_metadata(int i_pb) {
                   }
                }
                unchecked_var_list.shift_down(vIdx, 1);
-               mlog << Debug(5) << " found valid data: " << bufr_obs[lv][0]
-                    << " for " << var_name << "\n";
+               mlog << Debug(5) << " found valid data: " << var_name
+                    << " (" << bufr_obs[lv][0] << ")\n";
                break;
             }
          }  //end for lv
@@ -2342,10 +2365,15 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 void dbl2str(double *d, char *str) {
    const char *fmt_str = "%s";
 
-   sprintf(str, fmt_str, d);
-   if (0 == strlen(str)) {
-      const char *fmt_str_d = "%d";
-      sprintf(str, fmt_str_d, nint(*d));
+   if (*d < r8bfms) {
+      sprintf(str, fmt_str, d);
+      if (0 == strlen(str)) {
+         const char *fmt_str_d = "%d";
+         sprintf(str, fmt_str_d, nint(*d));
+      }
+   }
+   else {
+      strcpy(str, "N/A");
    }
 
    return;
