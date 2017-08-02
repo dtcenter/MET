@@ -2365,15 +2365,11 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
 void dbl2str(double *d, char *str) {
    const char *fmt_str = "%s";
 
-   if (*d < r8bfms) {
-      sprintf(str, fmt_str, d);
-      if (0 == strlen(str)) {
-         const char *fmt_str_d = "%d";
-         sprintf(str, fmt_str_d, nint(*d));
-      }
-   }
-   else {
-      strcpy(str, "N/A");
+   sprintf(str, fmt_str, d);
+   if (0 == strlen(str)) {
+      cout << "  yyyy dbl2str: " << *d << endl;
+      const char *fmt_str_d = "%d";
+      sprintf(str, fmt_str_d, nint(*d));
    }
 
    return;
