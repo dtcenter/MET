@@ -560,6 +560,7 @@ bool is_prepbufr_file(StringArray *events) {
 void get_variable_info(const char* tbl_filename) {
    int maximumLineLength = 128;
    char *lineBuffer = (char *)malloc(sizeof(char) * maximumLineLength);
+   static const char *method_name = "get_variable_info()";
 
    FILE * fp;
    char * line = NULL;
@@ -575,6 +576,7 @@ void get_variable_info(const char* tbl_filename) {
    tableB_descs.clear();
    
    fp = fopen(tbl_filename, "r");
+cout << " DEBUG " << method_name << ":" << " tbl_filename: " << tbl_filename << endl;
    ConcatString input_data;
    if (fp != NULL) {
       char var_name[BUFR_NAME_LEN+1];
@@ -590,6 +592,8 @@ void get_variable_info(const char* tbl_filename) {
             find_mnemonic = true;
          }
          
+cout << " DEBUG " << method_name << ":" << line
+     << " line[BUFR_NUMBER_START]:" << line[BUFR_NUMBER_START] << endl;
          if ('0' != line[BUFR_NUMBER_START]) continue;
          
          var_count1++;
@@ -766,6 +770,7 @@ void process_pbfile(int i_pb) {
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
    
    StringArray variables_big_nlevels;
+   static const char *method_name = "process_pbfile";
 
    bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
                            conf_info.grid_mask.ny() > 0);
@@ -1646,6 +1651,7 @@ void process_pbfile_metadata(int i_pb) {
    int npbmsg, unit, yr, mon, day, hr, min, sec;
    int i, i_msg, i_read, i_ret, i_date, n_hdr_obs;
    int lv, ev, ev_temp, kk, len1, len2, var_index;
+   int debug_threshold = 10;
 
    double   x, y;
 
@@ -1654,6 +1660,7 @@ void process_pbfile_metadata(int i_pb) {
    char     time_str[max_str_len];
    char     hdr_typ[max_str_len];
    ConcatString file_name, blk_prefix, blk_file;
+   static const char *method_name = "process_pbfile_metadata()";
 
    // Collects the prepbufr variables including headers
    bufr_hdr_arr.clear();
@@ -1679,7 +1686,7 @@ void process_pbfile_metadata(int i_pb) {
    unit = dump_unit;
    ConcatString tbl_filename = save_bufr_table_file(blk_file, unit);
    get_variable_info(tbl_filename);
-   remove_temp_file(tbl_filename);
+   if(mlog.verbosity_level() < debug_threshold) remove_temp_file(tbl_filename);
 
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
@@ -1694,7 +1701,7 @@ void process_pbfile_metadata(int i_pb) {
 
    // Check for zero messages to process
    if(npbmsg <= 0) {
-      mlog << Warning << "\nprocess_pbfile_metadata() -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
@@ -1729,6 +1736,10 @@ void process_pbfile_metadata(int i_pb) {
    for(i=0; i<tableB_vars.n_elements(); i++) {
       if (!headers.has(tableB_vars[i]) && check_all) {
          unchecked_var_list.add(tableB_vars[i]);
+         if(mlog.verbosity_level() >= debug_threshold) {
+            cout << method_name
+                 << " unchecked_var: " << tableB_vars[i] << endl;
+         }
       }
    }
    //Initialize index for prepbufr common variables
@@ -1738,6 +1749,8 @@ void process_pbfile_metadata(int i_pb) {
    for (int index=0; index<n_derive_gc; index++) {
       bufr_derive_code[index] = -1;
    }
+cout << " DEBUG HS" << method_name << " npbmsg: "
+     << npbmsg << " table_B: " << tableB_vars.n_elements() << endl;
 
    int index;
    int length;
@@ -1924,7 +1937,7 @@ void process_pbfile_metadata(int i_pb) {
             StringArray taregt_vars = bufr_target_variables.split(",+");
             for (index=0; index<taregt_vars.n_elements(); index++) {
                if (!tableB_vars.has(taregt_vars[index])) {
-                  mlog << Error << "\nprocess_pbfile_metadata() -> variable \""
+                  mlog << Error << "\n" << method_name << " -> variable \""
                        << taregt_vars[index] <<"\" does not exist at BUFR file\n\n";
                   exit(1);
                }
@@ -1984,6 +1997,7 @@ void write_netcdf_hdr_data() {
    int i, dim_count, buf_len;
    float hdr_arr[hdr_arr_len];
    bool is_prepbufr = is_prepbufr_file(&event_names);
+   static const char *method_name = "write_netcdf_hdr_data()";
 
    // Check for no messages retained
    if(hdr_typ_sa.n_elements() <= 0) {
