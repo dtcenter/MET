@@ -70,6 +70,8 @@ class ThreshNode {
 
       virtual double value() const = 0;
 
+      virtual void multiply_by(const double) = 0;
+
       ConcatString s;
       ConcatString abbr_s;
 
@@ -93,6 +95,8 @@ class Or_Node : public ThreshNode {
       ThreshType type() const;
 
       double value() const;
+
+      void multiply_by(const double);
 
       ThreshNode * left_child;
       ThreshNode * right_child;
@@ -123,6 +127,8 @@ class And_Node : public ThreshNode {
 
       double value() const;
 
+      void multiply_by(const double);
+
       ThreshNode * copy() const;
 
       ThreshNode * left_child;
@@ -152,6 +158,8 @@ class Not_Node : public ThreshNode {
       ThreshType type() const;
 
       double value() const;
+
+      void multiply_by(const double);
 
       ThreshNode * copy() const;
 
@@ -187,6 +195,8 @@ class Simple_Node : public ThreshNode {
       bool check(double) const;
 
       ThreshNode * copy() const;
+
+      void multiply_by(const double);
 
       double T;
 
@@ -229,6 +239,7 @@ class SingleThresh {
 
       ThreshNode * node;   //  allocated
 
+
       void         clear();
 
       void         set(double, ThreshType);
@@ -239,6 +250,8 @@ class SingleThresh {
 
       ThreshType   get_type() const;
       double       get_value() const;
+
+      void         multiply_by(const double);
 
       ConcatString get_str(int precision = thresh_default_precision) const;
       ConcatString get_abbr_str(int precision = thresh_default_precision) const;
@@ -264,3 +277,5 @@ extern bool check_threshold(double, double, int);
 #endif   //  __THRESHOLD_H__
 
 ////////////////////////////////////////////////////////////////////////
+
+
