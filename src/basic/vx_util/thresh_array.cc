@@ -413,6 +413,33 @@ bool ThreshArray::check_dbl(double v) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void ThreshArray::multiply_by(const double x)
+
+{
+
+if ( Nelements == 0 )  return;
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   t[j].multiply_by(x);
+
+}
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 //
 // External utility for parsing probability thresholds.
 //
@@ -492,6 +519,7 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
+
 bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
    int i, n;
 
@@ -547,4 +575,10 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
    return(true);
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
+
+
+
+

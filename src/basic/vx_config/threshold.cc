@@ -141,6 +141,30 @@ return ( n );
 ////////////////////////////////////////////////////////////////////////
 
 
+void Or_Node::multiply_by(const double x)
+
+{
+
+if ( !left_child || !right_child )  {
+
+   mlog << Error
+        << "Or_Node::multiply_by(const double) -> node not populated!\n\n";
+        
+   exit ( 1 );
+
+}
+
+ left_child->multiply_by(x);
+right_child->multiply_by(x);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class And_Node
    //
@@ -211,6 +235,30 @@ return ( n );
 ////////////////////////////////////////////////////////////////////////
 
 
+void And_Node::multiply_by(const double x)
+
+{
+
+if ( !left_child || !right_child )  {
+
+   mlog << Error
+        << "And_Node::multiply_by(const double) -> node not populated!\n\n";
+        
+   exit ( 1 );
+
+}
+
+ left_child->multiply_by(x);
+right_child->multiply_by(x);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class Not_Node
    //
@@ -268,6 +316,29 @@ if ( child )  n->child  = child->copy();
 n->threshnode_assign(this);
 
 return ( n );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Not_Node::multiply_by(const double x)
+
+{
+
+if ( ! child )  {
+
+   mlog << Error
+        << "Not_Node::multiply_by(const double) -> node not populated!\n\n";
+        
+   exit ( 1 );
+
+}
+
+child->multiply_by(x);
+
+return;
 
 }
 
@@ -371,6 +442,20 @@ T = bad_data_double;
 s = na_str;
 
 abbr_s = na_str;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Simple_Node::multiply_by(const double x)
+
+{
+
+T *= x;
 
 return;
 
@@ -713,6 +798,29 @@ out << prefix << "value = " << get_value() << '\n';
    //
 
 out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void SingleThresh::multiply_by(const double x)
+
+{
+
+if ( ! node )  {
+
+   mlog << Error
+        << "SingleThresh::multiply_by(const double) -> empty threshold!\n\n";
+
+   exit ( 1 );
+
+}
+
+node->multiply_by(x);
 
 return;
 

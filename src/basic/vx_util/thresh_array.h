@@ -26,7 +26,7 @@ class ThreshArray {
       void init_from_scratch();
       void assign(const ThreshArray &);
 
-      SingleThresh *t;
+      SingleThresh * t;
 
       int Nelements;
       int Nalloc;
@@ -62,6 +62,8 @@ class ThreshArray {
 
       int has(const SingleThresh &) const;
       int has(const SingleThresh &, int & index) const;
+
+      void multiply_by(const double);
 
       ConcatString get_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
       ConcatString get_abbr_str(const char * = thresh_default_sep, int precision = thresh_default_precision) const;
