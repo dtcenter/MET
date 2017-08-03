@@ -315,12 +315,11 @@ C*
         RETURN
         END
 
-        SUBROUTINE DUMP_TBL( PBFILE, FID, TBL_NAME, LEN1 )
+        SUBROUTINE DUMP_TBL( PBFILE, TBL_NAME, LEN1 )
 C*
         INCLUDE   'readpb.prm'
 C*
         CHARACTER PBFILE* ( FILEMXSTRL )
-        INTEGER   FID
         CHARACTER TBL_NAME* ( FILEMXSTRL )
         INTEGER   LEN1
 C*
@@ -330,17 +329,11 @@ C-----------------------------------------------------------------------
 C
 C*      Open the output files.
 C
-        TID = 69
+        TID = 98
         OPEN  ( UNIT = TID, FILE = TBL_NAME(1:LEN1) )
 
 C
-C*      Open the input file.
-C
-        OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED' )
-        CALL OPENBF  ( FID, 'IN', FID )
-        CALL DATELEN  ( 10 )
-C
-C*      Get the next station report from the input file.
+C*      Dump BUFR table.
 C
         CALL DXDUMP  ( FID, TID )
         IF ( ierrpb .eq. -1 )  THEN
@@ -349,8 +342,7 @@ C
 C
 C*      Close the input file
 C
-C        CLOSBF( FID )
-        CLOSE  ( UNIT = FID )
+        CLOSE  ( UNIT = TID )
 C
         RETURN
         END
