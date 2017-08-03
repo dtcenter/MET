@@ -315,7 +315,7 @@ C*
         RETURN
         END
 
-        SUBROUTINE DUMP_TBL( PBFILE, TBL_NAME, LEN1 )
+        SUBROUTINE DUMP_TBL( PBFILE, FID, TBL_NAME, LEN1 )
 C*
         INCLUDE   'readpb.prm'
 C*
@@ -323,7 +323,7 @@ C*
         CHARACTER TBL_NAME* ( FILEMXSTRL )
         INTEGER   LEN1
 C*
-        INTEGER   TID, DID
+        INTEGER   TID, FID
         LOGICAL     found
 C-----------------------------------------------------------------------
 C

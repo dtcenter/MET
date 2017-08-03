@@ -308,7 +308,7 @@ extern "C" {
    void readpbint_(int *, int *, int *, double[mxr8lv][mxr8pm], char[mxr8lv*mxr8pm], int *);
    void dumppb_(const char *, int *, const char *, int *,
                 const char *, int *, int *);
-   void dump_tbl_(const char *, const char *, int *);
+   void dump_tbl_(const char *, int *, const char *, int *);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -551,7 +551,7 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
            << "Invalid file ID [" << file_id << "] between 1 and 99.\n\n";
    }
    openpb_(blk_file, &file_id);
-   dump_tbl_(blk_file, tbl_filename, &len);
+   dump_tbl_(blk_file, &file_id, tbl_filename, &len);
    closepb_(&file_id);
    return tbl_filename;
 }
