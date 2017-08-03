@@ -120,9 +120,9 @@ static const int hdr_arr_len    = 3;
 static const int obs_arr_len    = 5;
 
 // File unit number for opening the PrepBufr file
-static int file_unit            = 11;
+static const int file_unit      = 11;
 // 2nd file unit number for opening the PrepBufr file
-static int dump_unit            = 22;
+static const int dump_unit      = 22;
 static int msg_typ_ret[n_vld_msg_typ];
 
 // Grib codes corresponding to the variable types
@@ -145,6 +145,8 @@ static int bufr_derive_code[n_derive_gc];
 
 // PREPBUFR VIRTMP program code
 static const double virtmp_prog_code = 8.0;
+static const int MIN_FORTRAN_FILE_ID =  1;
+static const int MAX_FORTRAN_FILE_ID = 99;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -306,7 +308,7 @@ extern "C" {
    void readpbint_(int *, int *, int *, double[mxr8lv][mxr8pm], char[mxr8lv*mxr8pm], int *);
    void dumppb_(const char *, int *, const char *, int *,
                 const char *, int *, int *);
-   void dump_tbl_(const char *, int *, const char *, int *);
+   void dump_tbl_(const char *, const char *, int *);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -534,7 +536,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString save_bufr_table_file(const char *blk_file, int unit) {
+ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
    int len;
    char pid_str[128];
    ConcatString tbl_filename = conf_info.tmp_dir;
@@ -544,7 +546,13 @@ ConcatString save_bufr_table_file(const char *blk_file, int unit) {
    tbl_filename.add(pid_str);
    tbl_filename.add(".tbl");
    len = tbl_filename.length();
-   dump_tbl_(blk_file, &unit, tbl_filename, &len);
+   if (file_id > MAX_FORTRAN_FILE_ID || file_id < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\nsave_bufr_table_to_file() -> "
+           << "Invalid file ID [" << file_id << "] between 1 and 99.\n\n";
+   }
+   openpb_(blk_file, &file_id);
+   dump_tbl_(blk_file, tbl_filename, &len);
+   closepb_(&file_id);
    return tbl_filename;
 }
 
@@ -558,7 +566,7 @@ bool is_prepbufr_file(StringArray *events) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_variable_info(const char* tbl_filename) {
-   int maximumLineLength = 128;
+   static const int maximumLineLength = 128;
    char *lineBuffer = (char *)malloc(sizeof(char) * maximumLineLength);
    static const char *method_name = "get_variable_info()";
 
@@ -576,45 +584,45 @@ void get_variable_info(const char* tbl_filename) {
    tableB_descs.clear();
    
    fp = fopen(tbl_filename, "r");
-cout << " DEBUG " << method_name << ":" << " tbl_filename: " << tbl_filename << endl;
    ConcatString input_data;
    if (fp != NULL) {
       char var_name[BUFR_NAME_LEN+1];
-      char var_description[BUFR_DESCRIPTION_LEN+1];
+      char var_desc[BUFR_DESCRIPTION_LEN+1];
       char var_unit_str[BUFR_UNIT_LEN+1];
       bool find_mnemonic = false;
       
       // Processing section 1
       int var_count1 = 0;
       while ((read = getline(&line, &len, fp)) != -1) {
+         if (NULL != strstr(line,"--------")) continue;
          if (NULL != strstr(line,"MNEMONIC")) {
             if (find_mnemonic) break;
             find_mnemonic = true;
+            continue;
          }
-         
-cout << " DEBUG " << method_name << ":" << line
-     << " line[BUFR_NUMBER_START]:" << line[BUFR_NUMBER_START] << endl;
          if ('0' != line[BUFR_NUMBER_START]) continue;
          
-         var_count1++;
          strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN);
          var_name[BUFR_NAME_LEN] = bad_data_char;
          for (int idx=(BUFR_NAME_LEN-1); idx >=0; idx--) {
             if (' ' != var_name[idx] ) break;
             var_name[idx] = '\0';
          }
+         if (0 == strlen(var_name)) continue;
          
-         strncpy(var_description, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN);
-         var_description[BUFR_DESCRIPTION_LEN] = bad_data_char;
+         var_count1++;
+         strncpy(var_desc, (line+BUFR_DESCRIPTION_START), BUFR_DESCRIPTION_LEN);
+         var_desc[BUFR_DESCRIPTION_LEN] = bad_data_char;
          for (int idx=(BUFR_DESCRIPTION_LEN-1); idx>=0; idx--) {
-            if (' ' != var_description[idx] && '|' != var_description[idx]) {
+            if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
                break;
             }
-            var_description[idx] = '\0';
+            var_desc[idx] = '\0';
          }
-         //printf("   var name: %8s : %s\n", var_name, var_description);
+         mlog << Debug(10) << "   " << method_name << " sec. 1 var name: ["
+              << var_name << "]\tdesc: [" << var_desc << "]\n";
          tableB_vars.add(var_name);
-         tableB_descs.add(var_description);
+         tableB_descs.add(var_desc);
       }
 
       // Skip  section 2
@@ -630,17 +638,18 @@ cout << " DEBUG " << method_name << ":" << line
          }
          //if (NULL == strstr(var_name,"EVENT")) continue;
          
-         strncpy(var_description, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN);
-         var_description[BUFR_SEQUENCE_LEN] = bad_data_char;
+         strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN);
+         var_desc[BUFR_SEQUENCE_LEN] = bad_data_char;
          for (int idx=(BUFR_SEQUENCE_LEN-1); idx>=0; idx--) {
-            if (' ' != var_description[idx] && '|' != var_description[idx]) {
+            if (' ' != var_desc[idx] && '|' != var_desc[idx]) {
                break;
             }
-            var_description[idx] = '\0';
+            var_desc[idx] = '\0';
          }
-         //printf(" event name: %8s : %s\n", var_name, var_description);
+         mlog << Debug(10) << "   " << method_name << " event name: ["
+              << var_name << "]\tdesc: [" << var_desc << "]\n";
          event_names.add(var_name);
-         event_members.add(var_description);
+         event_members.add(var_desc);
       }
       read = getline(&line, &len, fp);
 
@@ -671,6 +680,8 @@ cout << " DEBUG " << method_name << ":" << line
             }
             var_names.add(var_name);
             var_units.add(var_unit_str);
+            mlog << Debug(10) << "   " << method_name << " sec. 3 var name: ["
+                 << var_name << "]\tdesc: [" << var_desc << "]\n";
          }
       }
 
@@ -807,7 +818,7 @@ void process_pbfile(int i_pb) {
 
       // Check for multiple PrepBufr files
       if(pbfile.n_elements() > 1) {
-         mlog << Error << "\nprocess_pbfile() -> "
+         mlog << Error << "\n" << method_name << " -> "
               << "the \"-dump\" and \"-pbfile\" options may not be "
               << "used together.  Only one Bufr file may be dump "
               << "to ASCII at a time.\n\n";
@@ -819,6 +830,10 @@ void process_pbfile(int i_pb) {
       }
 
       unit = dump_unit+i_pb;
+      if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+         mlog << Error << "\n" << method_name << " -> "
+              << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
+      }
       strcpy(prefix, get_short_name(pbfile[i_pb]));
       len1 = strlen(dump_dir);
       len2 = strlen(prefix);
@@ -828,6 +843,10 @@ void process_pbfile(int i_pb) {
 
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
+   }
    openpb_(blk_file, &unit);
 
    // Compute the number of PrepBufr records in the current file.
@@ -980,6 +999,11 @@ void process_pbfile(int i_pb) {
       // Null terminate the message type string
       if (is_prepbufr) hdr_typ[6] = '\0';
       else             hdr_typ[mxr8nm] = '\0';
+      // Change the trailing blank space to a null
+      for (i=mxr8nm-1; i>0; i--) {
+         if (' ' != hdr_typ[i]) break;
+         hdr_typ[i] = '\0';
+      }
       
       // If the message type is not listed in the configuration
       // file and it is not the case that all message types should be
@@ -992,13 +1016,10 @@ void process_pbfile(int i_pb) {
       // Convert the SID to a string and null terminate
       dbl2str(&hdr[0], hdr_sid);
       hdr_sid[mxr8nm] = '\0';
-
-      // Change the first blank space to a null
-      for(i=0; i<(mxr8nm+1); i++) {
-         if(hdr_sid[i] == ' ') {
-            hdr_sid[i] = '\0';
-            break;
-         }
+      // Change the trailing blank space to a null
+      for (i=mxr8nm-1; i>0; i--) {
+         if (' ' != hdr_sid[i]) break;
+         hdr_sid[i] = '\0';
       }
       
       // If the station id is not listed in the configuration
@@ -1659,12 +1680,12 @@ void process_pbfile_metadata(int i_pb) {
    unixtime file_ut = (unixtime) 0;
    char     time_str[max_str_len];
    char     hdr_typ[max_str_len];
+   StringArray local_bufr_obs_arr;
    ConcatString file_name, blk_prefix, blk_file;
    static const char *method_name = "process_pbfile_metadata()";
 
    // Collects the prepbufr variables including headers
    bufr_hdr_arr.clear();
-   bufr_obs_arr.clear();
    
    // List the PrepBufr file being processed
    mlog << Debug(1) << "\nPre-processing Bufr File for metadata"
@@ -1683,13 +1704,17 @@ void process_pbfile_metadata(int i_pb) {
    // Block the PrepBufr file and open it for reading.
    pblock(file_name, blk_file, block);
 
-   unit = dump_unit;
-   ConcatString tbl_filename = save_bufr_table_file(blk_file, unit);
+   unit = dump_unit + i_pb;
+   ConcatString tbl_filename = save_bufr_table_to_file(blk_file, unit);
    get_variable_info(tbl_filename);
    if(mlog.verbosity_level() < debug_threshold) remove_temp_file(tbl_filename);
 
+   unit = dump_unit + i_pb;
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
+   }
    // Open the blocked temp PrepBufr file for reading
-   unit = file_unit + i_pb;
    openpb_(blk_file, &unit);
 
    // Compute the number of PrepBufr records in the current file.
@@ -1736,10 +1761,6 @@ void process_pbfile_metadata(int i_pb) {
    for(i=0; i<tableB_vars.n_elements(); i++) {
       if (!headers.has(tableB_vars[i]) && check_all) {
          unchecked_var_list.add(tableB_vars[i]);
-         if(mlog.verbosity_level() >= debug_threshold) {
-            cout << method_name
-                 << " unchecked_var: " << tableB_vars[i] << endl;
-         }
       }
    }
    //Initialize index for prepbufr common variables
@@ -1749,8 +1770,6 @@ void process_pbfile_metadata(int i_pb) {
    for (int index=0; index<n_derive_gc; index++) {
       bufr_derive_code[index] = -1;
    }
-cout << " DEBUG HS" << method_name << " npbmsg: "
-     << npbmsg << " table_B: " << tableB_vars.n_elements() << endl;
 
    int index;
    int length;
@@ -1919,20 +1938,6 @@ cout << " DEBUG HS" << method_name << " npbmsg: "
             }
          }
          
-         if (is_prepbufr_hdr) {
-            for (index=0; index<prepbufr_vars.n_elements(); index++) {
-               if (tableB_vars.has(prepbufr_vars[index])) {
-                  bufr_obs_arr.add(prepbufr_vars[index]);
-                  bufr_var_code[index] = index;
-               }
-            }
-            length = bufr_obs_arr.n_elements();
-            for (int vIdx=0; vIdx< prepbufr_derive_vars.n_elements(); vIdx++) {
-               bufr_derive_code[vIdx] = length + vIdx;
-               bufr_obs_arr.add(prepbufr_derive_vars[vIdx]);
-            }
-         }
-             
          if (use_met_vars) {
             StringArray taregt_vars = bufr_target_variables.split(",+");
             for (index=0; index<taregt_vars.n_elements(); index++) {
@@ -1941,8 +1946,8 @@ cout << " DEBUG HS" << method_name << " npbmsg: "
                        << taregt_vars[index] <<"\" does not exist at BUFR file\n\n";
                   exit(1);
                }
-               if (!bufr_obs_arr.has(taregt_vars[index])) {
-                  bufr_obs_arr.add(taregt_vars[index]);
+               if (!local_bufr_obs_arr.has(taregt_vars[index])) {
+                  local_bufr_obs_arr.add(taregt_vars[index]);
                }
             }
          }
@@ -1967,8 +1972,8 @@ cout << " DEBUG HS" << method_name << " npbmsg: "
          if (nlev2 > mxr8lv) adjusted_nlev = mxr8lv;
          for(lv=0; lv<adjusted_nlev; lv++) {
             if (bufr_obs[lv][0] < r8bfms) {
-               if (!bufr_obs_arr.has(var_name) && !bufr_hdr_arr.has(var_name)) {
-                  bufr_obs_arr.add(var_name);
+               if (!local_bufr_obs_arr.has(var_name) && !bufr_hdr_arr.has(var_name)) {
+                  local_bufr_obs_arr.add(var_name);
                   if (prepbufr_vars.has(var_name, var_idx)) {
                      bufr_var_code[var_idx] = vIdx;
                   }
@@ -1985,6 +1990,24 @@ cout << " DEBUG HS" << method_name << " npbmsg: "
 
    // Close the PREPBUFR file
    closepb_(&unit);
+   
+   bufr_obs_arr.clear();
+   if (is_prepbufr) {
+      for (index=0; index<prepbufr_vars.n_elements(); index++) {
+         if (tableB_vars.has(prepbufr_vars[index])) {
+            bufr_obs_arr.add(prepbufr_vars[index]);
+            bufr_var_code[index] = index;
+         }
+      }
+      length = bufr_obs_arr.n_elements();
+      for (int vIdx=0; vIdx< prepbufr_derive_vars.n_elements(); vIdx++) {
+         bufr_derive_code[vIdx] = length + vIdx;
+         bufr_obs_arr.add(prepbufr_derive_vars[vIdx]);
+      }
+   }
+   for (i=0; i<local_bufr_obs_arr.n_elements(); i++) {
+      bufr_obs_arr.add(local_bufr_obs_arr[i]);
+   }
 
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
@@ -2381,9 +2404,9 @@ void dbl2str(double *d, char *str) {
 
    sprintf(str, fmt_str, d);
    if (0 == strlen(str)) {
-      cout << "  yyyy dbl2str: " << *d << endl;
-      const char *fmt_str_d = "%d";
-      sprintf(str, fmt_str_d, nint(*d));
+      //const char *fmt_str_d = "%d";
+      //sprintf(str, fmt_str_d, nint(*d));
+      strcpy(str, "NA");
    }
 
    return;
