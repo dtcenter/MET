@@ -1877,19 +1877,19 @@ BAGSS is based on the GSS, but is corrected as much as possible for forecast
 \end_layout
 
 \begin_layout Subsubsection*
-Cost Loss Relative Value
+Economic Cost Loss Relative Value
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-Called "CL" in CNT output (Table 4-5)
+Called "ECLV" in CNT output (Table 4-5)
 \end_layout
 
 \begin_layout Standard
 
 \series medium
-The Economic Cost Loss Relative Value (ECLR) applies a weighting to the
+The Economic Cost Loss Relative Value (ECLV) applies a weighting to the
  contingency table counts to determine the relative value of a forecast
  based on user-specific information.
  The cost is incurred to protect against an undesirable outcome, whether
@@ -1903,18 +1903,22 @@ The Economic Cost Loss Relative Value (ECLR) applies a weighting to the
  the climatological probability.
  When this occurs, the 
 \series medium
-ECLR
+ECLV
 \series default
  is equal to the Hanssen and Kuipers discriminant.
  The Economic Cost Loss Relative Value is defined differently depending
  on whether the cost / loss ratio is lower than the base rate or higher.
  The 
 \series medium
-ECLR
+ECLV
 \series default
  is a function of the cost / loss ratio (cl), the hit rate (h), the false
  alarm rate (f), the miss rate (m), and the base rate (b).
- For cost / loss ratio below the base rate, the CLRV is defined as:
+ 
+\end_layout
+
+\begin_layout Standard
+For cost / loss ratio below the base rate, the ECLV is defined as:
 \begin_inset Newline newline
 \end_inset
 
@@ -1926,7 +1930,7 @@ status open
 
 $$ 
 \backslash
-hbox{ECLR}={
+hbox{ECLV}={
 \end_layout
 
 \begin_layout Plain Layout
@@ -1954,7 +1958,7 @@ cl * (b - 1) }}.$$
 \begin_layout Standard
 For cost / loss ratio above the base rate, the 
 \series medium
-ECLR
+ECLV
 \series default
  is defined as:
 \begin_inset Newline newline
@@ -1968,7 +1972,7 @@ status open
 
 $$ 
 \backslash
-hbox{ECLR}={
+hbox{ECLV}={
 \end_layout
 
 \begin_layout Plain Layout
