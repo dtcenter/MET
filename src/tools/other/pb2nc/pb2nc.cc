@@ -2006,7 +2006,9 @@ void process_pbfile_metadata(int i_pb) {
       }
    }
    for (i=0; i<local_bufr_obs_arr.n_elements(); i++) {
-      bufr_obs_arr.add(local_bufr_obs_arr[i]);
+      if (!bufr_obs_arr.has(local_bufr_obs_arr[i])) {
+         bufr_obs_arr.add(local_bufr_obs_arr[i]);
+      }
    }
 
    // Delete the temporary blocked file
