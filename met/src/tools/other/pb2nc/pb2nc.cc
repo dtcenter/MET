@@ -781,7 +781,7 @@ void process_pbfile(int i_pb) {
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
    
    StringArray variables_big_nlevels;
-   static const char *method_name = "process_pbfile";
+   static const char *method_name = "process_pbfile()";
 
    bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
                            conf_info.grid_mask.ny() > 0);
@@ -858,7 +858,7 @@ void process_pbfile(int i_pb) {
 
    // Check for zero messages to process
    if(npbmsg <= 0) {
-      mlog << Warning << "\nprocess_pbfile() -> "
+      mlog << Warning << "\n" << method_name << "() -> "
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
@@ -881,7 +881,7 @@ void process_pbfile(int i_pb) {
    obs_data_offset = 0;
    hdr_data_offset = 0;
 
-   int adjusted_nlev;
+   int buf_nlev;
    int valid_data_count = 0;
    bool is_prepbufr = is_prepbufr_file(&event_names);
    
@@ -952,9 +952,9 @@ void process_pbfile(int i_pb) {
               << (is_prepbufr ? " PrepBufr" : " Bufr") << " messages...\n";
       }
       else if((file_ut != msg_ut) && is_prepbufr) {
-         mlog << Error << "\nprocess_pbfile() -> "
+         mlog << Error << "\n" << method_name << " -> "
               << "the observation time should remain the same for "
-              << "all PrepBufr messages: " << msg_ut << " != "
+              << "all " << (is_prepbufr ? "PrepBufr" : "Bufr") << " messages: " << msg_ut << " != "
               << file_ut << "\n\n";
          exit(1);
       }
@@ -1138,12 +1138,12 @@ void process_pbfile(int i_pb) {
       // Store the index to the header data
       obs_arr[0] = (float) hdr_typ_sa.n_elements();
       
-      adjusted_nlev = nlev;
+      buf_nlev = nlev;
       if (nlev > mxr8lv) {
-         adjusted_nlev = mxr8lv;
+         buf_nlev = mxr8lv;
          for(kk=0; kk<mxr8vt; kk++) {
             if (!variables_big_nlevels.has(bufr_obs_arr[kk])) {
-               mlog << Warning << "\nprocess_pbfile() -> "
+               mlog << Warning << "\n" << method_name << " -> "
                     << "Too many vertical levels (" << nlev
                     << ") for " << bufr_obs_arr[kk] 
                     << "). Ignored the vertical levels above " << mxr8lv << ".\n\n";
@@ -1152,7 +1152,7 @@ void process_pbfile(int i_pb) {
          }
       }
       // Search through the vertical levels
-      for(lv=0, n_hdr_obs = 0; lv<adjusted_nlev; lv++) {
+      for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
       
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
@@ -1266,20 +1266,19 @@ void process_pbfile(int i_pb) {
                dl_category = (float) evns[kk][0][lv][6];
             }
       
-            // Convert pressure from millibars to pascals
-            if(!is_eq(obs_arr[4], fill_value) &&
-               grib_code == pres_grib_code) {
-               obs_arr[4] *= pa_per_mb;
-            }
-            // Convert specific humidity from mg/kg to kg/kg
-            else if(!is_eq(obs_arr[4], fill_value) &&
-                    grib_code == spfh_grib_code) {
-               obs_arr[4] *= kg_per_mg;
-            }
-            // Convert temperature from celcius to kelvin
-            else if(!is_eq(obs_arr[4], fill_value) &&
-                    grib_code == tmp_grib_code) {
-                obs_arr[4] += c_to_k;
+            if(!is_eq(obs_arr[4], fill_value)) {
+               // Convert pressure from millibars to pascals
+               if(grib_code == pres_grib_code) {
+                  obs_arr[4] *= pa_per_mb;
+               }
+               // Convert specific humidity from mg/kg to kg/kg
+               else if(grib_code == spfh_grib_code) {
+                  obs_arr[4] *= kg_per_mg;
+               }
+               // Convert temperature from celcius to kelvin
+               else if(grib_code == tmp_grib_code) {
+                  obs_arr[4] += c_to_k;
+               }
             }
       
             // If the quality mark is greater than than the quality
@@ -1321,14 +1320,14 @@ void process_pbfile(int i_pb) {
             if (obs_data_idx >= OBS_BUFFER_SIZE) {
                lengths[1] = strl_len;
                if(!put_nc_data(&obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
-                  mlog << Error << "\nprocess_pbfile() -> "
+                  mlog << Error << "\n" << method_name << " -> "
                        << "error writing the quality flag to the "
                        << "netCDF file\n\n";
                   exit(1);
                }
                lengths[1] = obs_arr_len;
                if(!put_nc_data(&obs_arr_var, (float*)obs_data_buf[0], lengths, offsets)) {
-                  mlog << Error << "\nprocess_pbfile() -> "
+                  mlog << Error << "\n" << method_name << " -> "
                        << "error writing the observation array to the "
                        << "netCDF file\n\n";
                   exit(1);
@@ -1388,14 +1387,14 @@ void process_pbfile(int i_pb) {
                if (obs_data_idx >= OBS_BUFFER_SIZE) {
                   lengths[1] = strl_len;
                   if(!put_nc_data(&obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
-                     mlog << Error << "\nprocess_pbfile() -> "
+                     mlog << Error << "\n" << method_name << " -> "
                           << "error writing the quality flag to the "
                           << "netCDF file\n\n";
                      exit(1);
                   }
                   lengths[1] = obs_arr_len;
                   if(!put_nc_data(&obs_arr_var, (float*)obs_data_buf[0], lengths, offsets)) {
-                     mlog << Error << "\nprocess_pbfile() -> "
+                     mlog << Error << "\n" << method_name << " -> "
                           << "error writing the observation array to the "
                           << "netCDF file\n\n";
                      exit(1);
@@ -1434,9 +1433,10 @@ void process_pbfile(int i_pb) {
             int var_name_len;
             var_name = (char *)bufr_obs_arr[vIdx];
             var_name_len = strlen(var_name);
-            if (is_prepbufr && (prepbufr_vars.has(var_name)
-                             || prepbufr_event_members.has(var_name)
-                             || prepbufr_derive_vars.has(var_name))) continue;
+            if (is_prepbufr &&
+                  (prepbufr_vars.has(var_name)
+                   || prepbufr_event_members.has(var_name)
+                   || prepbufr_derive_vars.has(var_name))) continue;
             
             isDegC = false;
             isMgKg = false;
@@ -1458,11 +1458,11 @@ void process_pbfile(int i_pb) {
             readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len);
             if (0 >= nlev2) continue;
          
-            adjusted_nlev = nlev2;
+            buf_nlev = nlev2;
             if (nlev2 > mxr8lv) {
-               adjusted_nlev = mxr8lv;
+               buf_nlev = mxr8lv;
                if (!variables_big_nlevels.has(bufr_obs_arr[vIdx])) {
-                  mlog << Warning << "\nprocess_pbfile() -> "
+                  mlog << Warning << "\n" << method_name << " -> "
                        << "Too many vertical levels (" << nlev2
                        << ") for " << bufr_obs_arr[vIdx] 
                        << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
@@ -1471,7 +1471,7 @@ void process_pbfile(int i_pb) {
             }
             mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2 << ", vIdx: " << vIdx << ", obs_data_idx: " << obs_data_idx << ", nlev: " << nlev << "\n";
             // Search through the vertical levels
-            for(lv=0; lv<adjusted_nlev; lv++) {
+            for(lv=0; lv<buf_nlev; lv++) {
          
                // If the observation vertical level is not within the
                // specified valid range, continue to the next vertical level
@@ -1479,13 +1479,13 @@ void process_pbfile(int i_pb) {
          
                // If the pressure level is not valid, continue to the next level
                if (is_prepbufr) {
-                  if ((lv >= adjusted_nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
+                  if ((lv >= nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
                }
          
                if (bufr_obs[lv][0] > r8bfms) continue;
                mlog << Debug(10) << " value:   bufr_obs[" << lv << "][0]: " << bufr_obs[lv][0] << "\n";
                   
-               obs_arr[1] = (float)vIdx;        // grib code
+               obs_arr[1] = (float)vIdx;        // Burf variable index
                obs_arr[4] = bufr_obs[lv][0];    // observation value
                if(!is_eq(obs_arr[4], fill_value)) {
                   // Convert pressure from millibars to pascals
@@ -1498,7 +1498,7 @@ void process_pbfile(int i_pb) {
                   }
                   // Convert temperature from celcius to kelvin
                   else if(isDegC) {
-                      obs_arr[4] += c_to_k;
+                     obs_arr[4] += c_to_k;
                   }
                }
                
@@ -1526,14 +1526,14 @@ void process_pbfile(int i_pb) {
                if (obs_data_idx >= OBS_BUFFER_SIZE) {
                   lengths[1] = strl_len;
                   if(!put_nc_data(&obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
-                     mlog << Error << "\nprocess_pbfile() -> "
+                     mlog << Error << "\n" << method_name << " -> "
                           << "error writing the quality flag to the "
                           << "netCDF file\n\n";
                      exit(1);
                   }
                   lengths[1] = obs_arr_len;
                   if(!put_nc_data(&obs_arr_var, (float*)obs_data_buf[0], lengths, offsets)) {
-                     mlog << Error << "\nprocess_pbfile() -> "
+                     mlog << Error << "\n" << method_name << " -> "
                           << "error writing the observation array to the "
                           << "netCDF file\n\n";
                      exit(1);
@@ -1582,14 +1582,14 @@ void process_pbfile(int i_pb) {
       lengths[0] = obs_data_idx;
       lengths[1] = strl_len;
       if(!put_nc_data(&obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
-         mlog << Error << "\nprocess_pbfile() -> "
+         mlog << Error << "\n" << method_name << " -> "
               << "error writing the quality flag to the "
               << "netCDF file\n\n";
          exit(1);
       }
       lengths[1] = obs_arr_len;
       if(!put_nc_data(&obs_arr_var, (float*)obs_data_buf[0], lengths, offsets)) {
-         mlog << Error << "\nprocess_pbfile() -> "
+         mlog << Error << "\n" << method_name << " -> "
               << "error writing the observation array to the "
               << "netCDF file\n\n";
          exit(1);
@@ -1620,13 +1620,13 @@ void process_pbfile(int i_pb) {
         << rej_itp << "\n"
         << "Rejected based on zero observations\t= "
         << rej_nobs << "\n"
-        << "Total PrepBufr Messages retained\t= "
+        << "Total " << (is_prepbufr ? "PrepBufr" : "Bufr") << " Messages retained\t= "
         << i_msg << "\n"
         << "Total observations retained or derived\t= "
         << n_file_obs << "\n";
 
    if (npbmsg == rej_vld && 0 < rej_vld) {
-      mlog << Warning << "\nprocess_pbfile() -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "All messages were filtered out by valid time.\n"
            << "\tPlease adjust time range with \"-valid_beg\" and \"-valid_end\".\n"
            << "\tmin/max obs time from BUFR file: " << min_time_str 
@@ -1657,8 +1657,8 @@ void process_pbfile(int i_pb) {
    remove_temp_file(blk_file);
 
    if(i_msg <= 0) {
-      mlog << Warning << "\nprocess_pbfile() -> "
-           << "No PrepBufr messages retained from file: "
+      mlog << Warning << "\n" << method_name << " -> "
+           << "No " << (is_prepbufr ? "PrepBufr" : "Bufr") << " messages retained from file: "
            << pbfile[i_pb] << "\n\n";
       return;
    }
@@ -1958,7 +1958,7 @@ void process_pbfile_metadata(int i_pb) {
 
       int var_count = unchecked_var_list.n_elements();
       for (int vIdx=var_count-1; vIdx>=0; vIdx--) {
-         int nlev2, adjusted_nlev;
+         int nlev2, buf_nlev;
          int var_name_len;
          char var_name[BUFR_NAME_LEN];
          strcpy(var_name, (char *)unchecked_var_list[vIdx]);
@@ -1968,9 +1968,9 @@ void process_pbfile_metadata(int i_pb) {
          if (0 >= nlev2) continue;
       
          // Search through the vertical levels
-         adjusted_nlev = nlev2;
-         if (nlev2 > mxr8lv) adjusted_nlev = mxr8lv;
-         for(lv=0; lv<adjusted_nlev; lv++) {
+         buf_nlev = nlev2;
+         if (nlev2 > mxr8lv) buf_nlev = mxr8lv;
+         for(lv=0; lv<buf_nlev; lv++) {
             if (bufr_obs[lv][0] < r8bfms) {
                if (!local_bufr_obs_arr.has(var_name) && !bufr_hdr_arr.has(var_name)) {
                   local_bufr_obs_arr.add(var_name);
