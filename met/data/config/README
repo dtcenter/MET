@@ -228,7 +228,7 @@ obtype = "ANALYS";
 //         The BEST interpolation option is not valid for regridding.
 //
 //   - The "width" entry specifies a regridding width, when applicable.
-//      - width = 4;        To regrid using a 4x4 box.
+//      - width = 4;     To regrid using a 4x4 box or circle with diameter 4.
 //
 //    - The "shape" entry defines the shape of the neighborhood.
 //      Valid values are "SQUARE" or "CIRCLE"
@@ -777,15 +777,18 @@ boot = {
 //      centered on each point, where N is the width specified.  Each of these
 //      dictionaries must include:
 //
-//      - The "width" entry is an integer which specifies the dimension of the
-//        interpolation box. The neighborhood is simply a square containing the
-//        observation point. The width value specifies the width of that square.
-//        A width value of 1 is interpreted as the nearest neighbor model grid
-//        point to the observation point. A width of 2 defines a 2 x 2 square of
-//        grid points around the observation point (the 4 closest model grid
-//        points), while a width of 3 defines a 3 x 3 square of grid points
-//        around the observation point, and so on.  For grid-to-grid comparisons,
-//        the width must be odd.
+//      - The "width" entry is an integer which specifies the size of the
+//        interpolation area. The area is either a square or circle containing
+//        the observation point. The width value specifies the width of the
+//        square or diameter of the circle. A width value of 1 is interpreted
+//        as the nearest neighbor model grid point to the observation point.
+//        For squares, a width of 2 defines a 2 x 2 box of grid points around
+//        the observation point (the 4 closest model grid points), while a width
+//        of 3 defines a 3 x 3 box of grid points around the observation point,
+//        and so on. For odd widths in grid-to-point comparisons
+//        (i.e. Point-Stat), the interpolation area is centered on the model
+//        grid point closest to the observation point. For grid-to-grid
+//        comparisons (i.e. Grid-Stat), the width must be odd.
 //
 //      - The "method" entry specifies the interpolation procedure to be
 //        applied to the points in the box:
@@ -793,7 +796,8 @@ boot = {
 //         - MAX         for the maximum value
 //         - MEDIAN      for the median value
 //         - UW_MEAN     for the unweighted average value
-//         - DW_MEAN     for the distance-weighted average value (weight = distance^-2)
+//         - DW_MEAN     for the distance-weighted average value
+//                         where weight = distance^-2
 //         - LS_FIT      for a least-squares fit
 //         - BILIN       for bilinear interpolation (width = 2)
 //         - NEAREST     for the nearest grid point (width = 1)
@@ -803,8 +807,9 @@ boot = {
 //         - LOWER_RIGHT for the lower right grid point (width = 1)
 //         - LOWER_LEFT  for the lower left grid point (width = 1)
 //
-//         The BUDGET and FORCE regridding options are not valid for interpolating.
-//         For grid-to-grid comparisons, the only valid options are MIN, MAX, MEDIAN, and UW_MEAN.
+//         The BUDGET and FORCE regridding options are not valid for
+//         interpolating. For grid-to-grid comparisons, the only valid options
+//         are MIN, MAX, MEDIAN, and UW_MEAN.
 //
 interp = {
    field      = BOTH;
