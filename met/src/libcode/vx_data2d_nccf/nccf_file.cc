@@ -253,20 +253,12 @@ bool NcCfFile::open(const char * filepath)
     // Determine the number of times present.
     int n_times = (int) get_data_size(valid_time_var);
 
-    //bool no_leap_year = get_att_no_leap_year(valid_time_var);
-    //if (sec_per_unit == 86400 && no_leap_year) {
-    //  for(int i=0; i<n_times; i++) {
-    //    double time_value = get_double_var(valid_time_var, i);
-    //    ValidTime.add(add_days_to_unix((unixtime)ut, (int)time_value));
-    //  }
-    //}
-    //else {
-      for(int i=0; i<n_times; i++)
-      {
-        double time_value = get_double_var(valid_time_var, i);
-        ValidTime.add((unixtime)ut + sec_per_unit * time_value);
-      }
-    //}
+    bool no_leap_year = get_att_no_leap_year(valid_time_var);
+    for(int i=0; i<n_times; i++)
+    {
+      double time_value = get_double_var(valid_time_var, i);
+      ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_value, no_leap_year));
+    }
   }
 
   NcVar init_time_var = get_var(_ncFile, "forecast_reference_time");
@@ -930,8 +922,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   plane.set_size(nx, ny);
 
   int y_offset;
-  bool swap_to_north = false;
-  if (grid.info().ll != 0) swap_to_north = grid.get_swap_to_north();
+  bool swap_to_north = grid.get_swap_to_north();
   if (swap_to_north) {
     mlog << Debug(2) << "NcCfFile::getData -> data was flipped to north.\n";
   }
@@ -1810,8 +1801,13 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   data.delta_lon = dlon;
   data.Nlat = _yDim->getSize();
   data.Nlon = _xDim->getSize();
+  if (dlat < 0) {
+    data.delta_lat = -dlat;
+    data.lat_ll = lat_values[lat_counts-1];
+  }
 
   grid.set(data);
+  if (dlat < 0) grid.set_swap_to_north(true);
 }
 
 
@@ -2309,8 +2305,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     // will probably also need to reorder the data itself.
 
     LatLonData data;
-    bool swap_to_north = false;
-
+  
     data.name = latlon_proj_type;
     data.lat_ll = lat_values[0];
     data.lon_ll = -lon_values[0];
@@ -2321,11 +2316,10 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     if (dlat < 0) {
       data.delta_lat = -dlat;
       data.lat_ll = lat_values[lat_counts-1];
-      swap_to_north = true;
     }
 
     grid.set(data);
-    grid.set_swap_to_north(swap_to_north);
+    if (dlat < 0) grid.set_swap_to_north(true);
   }
 
   return true;
@@ -2552,7 +2546,6 @@ bool NcCfFile::get_grid_from_dimensions()
   // will probably also need to reorder the data itself.
 
   LatLonData data;
-  bool swap_to_north = false;
 
   data.name = latlon_proj_type;
   data.lat_ll = lat_values[0];
@@ -2564,10 +2557,9 @@ bool NcCfFile::get_grid_from_dimensions()
   if (dlat < 0) {
     data.delta_lat = -dlat;
     data.lat_ll = lat_values[lat_counts-1];
-    swap_to_north = true;
   }
   grid.set(data);
-  grid.set_swap_to_north(swap_to_north);
+  if (dlat < 0) grid.set_swap_to_north(true);
 
   return true;
 }
