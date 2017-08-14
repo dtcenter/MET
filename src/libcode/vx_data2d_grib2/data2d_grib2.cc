@@ -1028,11 +1028,30 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
    else if ( gfld->igdtnum == 40 )  {
 
       GaussianData gauss;
+      const g2int * p = gfld->igdtmpl;
 
-      //  check that the earth is spherical, not oblate
+      gauss.name = gaussian_proj_type;
 
-  
+      ScanMode = p[18];
 
+         //  check that the earth is spherical, not oblate
+
+
+
+
+      gauss.lon_zero = -1.0*rescale_lon( (double)gfld->igdtmpl[12] / 1000000.0 );
+
+
+      gauss.nx = p[7];
+      gauss.ny = p[8];
+
+         //  store the grid information
+
+      Raw_Grid->set(gauss);
+
+      copy_raw_grid_to_dest();
+
+      gauss.dump();
 
    }   //  gaussian
 
@@ -1045,6 +1064,10 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
       exit(1);
 
    }
+
+
+
+return;
 
 }
 
