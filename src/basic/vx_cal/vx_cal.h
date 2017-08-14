@@ -47,6 +47,7 @@ static const int mjd_ut0 = 40587;   //  mjd of Jan 1, 1970
 
 ////////////////////////////////////////////////////////////////////////
 
+extern  unixtime  add_to_unixtime (unixtime u, int sec_per_unit, double time_value, bool no_leap);
 
 extern  unixtime  doyhms_to_unix  (int doy, int year, int hour, int minute, int second);
 
