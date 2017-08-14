@@ -1024,6 +1024,19 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld)
 
    }
 
+   //  Gaussian lat/lon
+   else if ( gfld->igdtnum == 40 )  {
+
+      GaussianData gauss;
+
+      //  check that the earth is spherical, not oblate
+
+  
+
+
+   }   //  gaussian
+
+
    //  unrecognized grid
    else {
 

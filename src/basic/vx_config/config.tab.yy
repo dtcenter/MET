@@ -201,13 +201,13 @@ assignment_list : assignment                    { is_lhs = true; }
                 ;
 
 
-assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean   ($1, $2); }
-           | assign_prefix expression       ';'        { do_assign_exp       ($1, $2); }
-           | assign_prefix IDENTIFIER       ';'        { do_assign_id        ($1, $2); }
-           | assign_prefix piecewise_linear ';'        { do_pwl              ($1); }
+assignment : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1, $2); }
+           | assign_prefix expression         ';'      { do_assign_exp       ($1, $2); }
+           | assign_prefix IDENTIFIER         ';'      { do_assign_id        ($1, $2); }
+           | assign_prefix piecewise_linear   ';'      { do_pwl              ($1); }
 
-           | assign_prefix threshold        ';'        { do_assign_threshold ($1); }
-           | assign_prefix QUOTED_STRING    ';'        { do_assign_string    ($1, $2); }
+           | assign_prefix threshold          ';'      { do_assign_threshold ($1); }
+           | assign_prefix QUOTED_STRING      ';'      { do_assign_string    ($1, $2); }
            | assign_prefix dictionary                  { do_assign_dict      ($1); }
 
            | array_prefix boolean_list    ']' ';'      { do_assign_dict($1); }
@@ -215,7 +215,7 @@ assignment : assign_prefix BOOLEAN          ';'        { do_assign_boolean   ($1
            | array_prefix string_list     ']' ';'      { do_assign_dict($1); }
            | array_prefix threshold_list  ']' ';'      { do_assign_dict($1); }
            | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
-           | array_prefix ']' ';'                      { do_assign_dict($1); }
+           | array_prefix                 ']' ';'      { do_assign_dict($1); }
 
            ;
 
@@ -246,8 +246,8 @@ threshold_list : threshold
                | threshold_list ',' threshold
                ;
 
-threshold : thresh_node       { do_thresh    ($1); }
-          | NA_COMPARISON     { do_na_thresh (); }
+threshold : thresh_node            { do_thresh    ($1); }
+          | NA_COMPARISON          { do_na_thresh (); }
           ;
 
 thresh_node : simple_thresh                          { $$ = $1; }
