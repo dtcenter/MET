@@ -636,7 +636,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 bool Grid::get_swap_to_north() const {
-   return swap_to_north;
+   return swap_to_north && (info().ll != 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -795,7 +795,7 @@ if ( !rep )  {
    exit ( 1 );
 
 }
-//cout << " DEBUG HS] rep->info() " << rep->info() << endl;
+
 return ( rep->info() );
 
 }
