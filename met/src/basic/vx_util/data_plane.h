@@ -192,6 +192,7 @@ class DataPlaneArray {
       void level_range (double & _low, double & _up) const;
 
       double data (int plane, int x, int y) const;
+      void   set  (double, int plane, int x, int y);
 
       DataPlane & operator[](int) const;
 

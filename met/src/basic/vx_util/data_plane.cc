@@ -857,6 +857,29 @@ return ( value );
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void DataPlaneArray::set(double v, int p, int x, int y)
+
+{
+
+if ( (p < 0) || (p >= Nplanes) )  {
+
+   mlog << Error << "\nDataPlaneArray::set() -> range check error!\n\n";
+
+   exit ( 1 );
+
+}
+
+Plane[p]->set(v, x, y);
+
+return;
+
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
