@@ -19,7 +19,8 @@ bin_PROGRAMS    = chk4copyright \
 	gribtab_dat_to_flat  \
 	nceptab_to_flat  \
 	insitu_nc_to_ascii \
-	swinging_door
+	swinging_door \
+	gen_climo_bin
 
 chk4copyright_SOURCES = chk4copyright.cc
 chk4copyright_CPPFLAGS = ${MET_CPPFLAGS}
@@ -97,6 +98,32 @@ swinging_door_LDADD = -lvx_time_series \
 	-lvx_cal \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf
+
+gen_climo_bin_SOURCES = gen_climo_bin.cc
+gen_climo_bin_CPPFLAGS = ${MET_CPPFLAGS}
+gen_climo_bin_LDFLAGS = ${MET_LDFLAGS}
+gen_climo_bin_LDADD = -lvx_stat_out \
+	-lvx_statistics \
+	-lvx_shapedata \
+	-lvx_gsl_prob \
+	-lvx_analysis_util \
+	-lvx_data2d_factory \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nccf \
+	-lvx_data2d \
+	-lvx_nc_util \
+	-lvx_regrid \
+	-lvx_grid \
+	-lvx_config \
+	-lvx_cal \
+	-lvx_util \
+	-lvx_gsl_prob \
+	-lvx_math \
+	-lvx_color \
+	-lvx_log \
+	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 # Build chk4copyright when making a distribution so that we can
 #  add missing copyrights to the source files
