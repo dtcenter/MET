@@ -122,6 +122,12 @@ int main(int argc, char *argv[]) {
    if(!bin_file.empty()) process_binary();
    else                  process_mean_stdev();
 
+   // List the NetCDF file after it is finished
+   mlog << Debug(1)
+        << "Finished writing output file: " << out_file << "\n";
+   delete nc_out;
+   nc_out = (NcFile *) 0;
+
    return(0);
 }
 
@@ -132,7 +138,7 @@ void process_binary() {
    DataPlaneArray dpa;
    StringArray grid_spec;
    int i, j, x, y, nxy, fd;
-   double cdf_y, dmin, dmax;
+   double cdf_y;
    long long n_read_bytes;
    const int buf_size = 512;
    const int n_read_bin = 101;
@@ -199,11 +205,6 @@ void process_binary() {
    // Write data for each climo bin
    for(i=0; i<(n_bin-1); i++) {
       cdf_y  = (double) (i+1)/n_bin;
-      dpa[i].data_range(dmin, dmax);
-      mlog << Debug(2)
-           << "[" << i+1 << " of " << n_bin-1
-           << "] Range of CDF X-values for CDF Y-value = "
-           << cdf_y << ": " << dmin << " to " << dmax << "\n";
       write_nc_bin(dpa[i], i, cdf_y);
    }
 
@@ -213,7 +214,7 @@ void process_binary() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_mean_stdev() {
-   double cdf_y, dmin, dmax;
+   double cdf_y;
    DataPlane mn_dp, sd_dp, cur_dp;
 
    // Read the climo mean and standard deviation fields
@@ -227,19 +228,8 @@ void process_mean_stdev() {
    for(int i=0; i<n_bin-1; i++) {
       cdf_y  = (double) (i+1)/n_bin;
       cur_dp = normal_cdf_inv(cdf_y, mn_dp, sd_dp);
-      cur_dp.data_range(dmin, dmax);
-      mlog << Debug(2)
-           << "[" << i+1 << " of " << n_bin-1
-           << "] Range of CDF X-values for CDF Y-value = "
-           << cdf_y << ": " << dmin << " to " << dmax << "\n";
       write_nc_bin(cur_dp, i, cdf_y);
    }
-
-   // List the NetCDF file after it is finished
-   mlog << Debug(1)
-        << "Finished writing output file: " << out_file << "\n";
-   delete nc_out;
-   nc_out = (NcFile *) 0;
 
    return;
 }
@@ -286,10 +276,17 @@ void setup_nc_file() {
 
 void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
    int x, y, n;
+   double dmin, dmax;
 
    // Allocate memory
    n = grid.nx() * grid.ny();
    float * data = new float [n];
+
+   dp.data_range(dmin, dmax);
+   mlog << Debug(2)
+        << "[" << i_cdf+1 << " of " << n_bin-1
+        << "] Range of CDF X-values for CDF Y-value = "
+        << cdf_y << ": " << dmin << " to " << dmax << "\n";
 
    // Store the data
    for(x=0; x<grid.nx(); x++) {
