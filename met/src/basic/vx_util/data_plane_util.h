@@ -55,6 +55,8 @@ extern DataPlane subtract(const DataPlane &, const DataPlane &);
 
 extern DataPlane normal_cdf(const DataPlane &, const DataPlane &, const DataPlane &);
 
+extern DataPlane normal_cdf_inv(const double, const DataPlane &, const DataPlane &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __DATA_PLANE_UTIL__
