@@ -484,13 +484,15 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
    DataPlane cdf = dp;
    double v;
 
+   // Check grid dimensions
    if(dp.nx() != mn.nx() || dp.ny() != mn.ny() ||
       dp.nx() != sd.nx() || dp.ny() != sd.ny()) {
-      mlog << Error << "\nnormal_cdf_dp() -> "
+      mlog << Error << "\nnormal_cdf() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
 
+   // Compute the normal CDF for each grid point
    for(int x=0; x<dp.nx(); x++) {
       for(int y=0; y<dp.ny(); y++) {
          v = (is_bad_data(dp.get(x,y)) ||
@@ -506,3 +508,39 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
+                     const DataPlane &sd) {
+   DataPlane cdf_inv = mn;
+   double v;
+
+   // Check grid dimensions
+   if(mn.nx() != sd.nx() || mn.ny() != sd.ny()) {
+      mlog << Error << "\nnormal_cdf_inv() -> "
+           << "grid dimensions do not match\n\n";
+      exit(1);
+   }
+
+   // Range check area value
+   if(area <= 0.0 || area >= 1.0) {
+      mlog << Error << "\nnormal_cdf_inv() -> "
+           << "requested area (" << area << ") must be between 0 and 1.\n\n";
+      exit(1);
+   }
+
+   // Compute the inverse of the normal CDF for each grid point
+   for(int x=0; x<mn.nx(); x++) {
+      for(int y=0; y<mn.ny(); y++) {
+         v = (is_bad_data(mn.get(x,y)) ||
+              is_bad_data(sd.get(x,y)) ?
+              bad_data_double :
+              normal_cdf_inv(area, mn.get(x,y), sd.get(x,y)));
+         cdf_inv.set(v, x, y);
+      }
+   }
+
+   return(cdf_inv);
+}
+
+////////////////////////////////////////////////////////////////////////
+
