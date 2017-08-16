@@ -280,5 +280,3 @@ GRIB1
 278 133 57 1 "TINT" "Turbulence Intensity" "NA"
 279 133 57 1 "PTYPE" "Precipitation Type" "NA"
 280 133 57 1 "ICINT" "Icing Intensity" "NA"
-
-
