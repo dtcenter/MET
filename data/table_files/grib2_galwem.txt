@@ -43,7 +43,6 @@ GRIB2
 0 14 0 255 57 0 5 3 "DLWRF" "Downward long wave flux" "wattsPerMeterSquared"
 0 14 0 255 57 0 5 4 "ULWRF" "Upward long wave flux" "wattsPerMeterSquared"
 0 14 0 255 57 0 6 1 "TCDC" "Total cloud cover" "percent"
-
 0 14 0 255 57 0 6 3 "LCDC" "Low Cloud Amount" "percent"
 0 14 0 255 57 0 6 4 "MCDC" "Medium Cloud Amount" "percent"
 0 14 0 255 57 0 6 5 "HCDC" "High Cloud Amount" "percent"
