@@ -75,6 +75,8 @@ struct GridStatNcOutInfo {
 
    bool do_nbrhd;
 
+   bool do_fourier;
+
    bool do_apply_mask;
 
       //////////////////
@@ -167,6 +169,9 @@ class GridStatConfInfo {
       GridTemplateFactory::GridTemplates    // Grid shape for Interpolation
                         nbrhd_shape;
 
+      IntArray          wave_1d_beg;        // Fourier 1-dimensional decomposition
+      IntArray          wave_1d_end;        // beginning and ending wave numbers
+
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
       GridStatNcOutInfo nc_info;            // Output NetCDF pairs file contents
       GridWeightType    grid_weight_flag;   // Grid weighting flag
@@ -200,6 +205,7 @@ class GridStatConfInfo {
 
       int get_n_interp()      const;
       int get_n_nbrhd_wdth()  const;
+      int get_n_wave_1d()     const;
       int get_n_cov_thresh()  const;
       int get_n_ci_alpha()    const;
       int get_vflag()         const;
@@ -231,6 +237,7 @@ inline int GridStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);     
 inline int GridStatConfInfo::get_n_mask()        const { return(n_mask);                    }
 inline int GridStatConfInfo::get_n_interp()      const { return(n_interp);                  }
 inline int GridStatConfInfo::get_n_nbrhd_wdth()  const { return(nbrhd_wdth.n_elements());   }
+inline int GridStatConfInfo::get_n_wave_1d()     const { return(wave_1d_beg.n_elements());  }
 inline int GridStatConfInfo::get_n_cov_thresh()  const { return(nbrhd_cov_ta.n_elements()); }
 inline int GridStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());     }
 inline int GridStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);             }

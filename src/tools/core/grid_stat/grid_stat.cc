@@ -86,6 +86,7 @@
 //   037    05/15/17  Prestopnik P   Added shape for regrid, nbrhd and interp
 //   038    06/26/17  Halley Gotway  Add ECLV line type.
 //   039    07/12/17  Halley Gotway  Add climatology spread.
+//   040    08/18/17  Halley Gotway  Add fourier decomposition.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -150,7 +151,8 @@ static void do_nbrcnt(NBRCNTInfo &, int, int, int,
                       const NumArray &, const NumArray &,
                       const NumArray &);
 
-static void write_nc(const ConcatString &, const DataPlane &, int, int);
+static void write_nc(const ConcatString &, const DataPlane &, int,
+                     const ConcatString &, int, FieldType);
 static void write_nbrhd_nc(const DataPlane &, const DataPlane &, int,
                            const SingleThresh &, const SingleThresh &,
                            int);
@@ -755,7 +757,6 @@ void process_scores() {
             obs_dp_smooth = obs_dp;
          }
 
-
          // Loop through the masks to be applied
          for(k=0; k<conf_info.get_n_mask(); k++) {
 
@@ -1119,22 +1120,32 @@ void process_scores() {
 
          } // end for k
 
+         // Set the data smoothing info
+         ConcatString mthd = interpmthd_to_string(conf_info.interp_mthd[j]);
+         int pnts = conf_info.interp_wdth[j] * conf_info.interp_wdth[j];
+
          // Write out the data fields if requested in the config file
          if(conf_info.nc_info.do_raw) {
-            write_nc("FCST", fcst_dp_smooth, i, j);
-            write_nc("OBS",  obs_dp_smooth,  i, j);
+            write_nc("FCST", fcst_dp_smooth, i, mthd, pnts,
+                     conf_info.interp_field);
+            write_nc("OBS",  obs_dp_smooth, i, mthd, pnts,
+                     conf_info.interp_field);
          }
          if(conf_info.nc_info.do_diff) {
-            write_nc("DIFF", subtract(fcst_dp_smooth, obs_dp_smooth), i, j);
+            write_nc("DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
+                     i, mthd, pnts, conf_info.interp_field);
          }
          if(conf_info.nc_info.do_climo && !cmn_dp.is_empty()) {
-            write_nc("CLIMO_MEAN", cmn_dp, i, j);
+            write_nc("CLIMO_MEAN", cmn_dp, i, mthd, pnts,
+                     conf_info.interp_field);
          }
          if(conf_info.nc_info.do_climo && !csd_dp.is_empty()) {
-            write_nc("CLIMO_STDEV", csd_dp, i, j);
+            write_nc("CLIMO_STDEV", csd_dp, i, mthd, pnts,
+                     conf_info.interp_field);
          }
          if(conf_info.nc_info.do_climo && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
-            write_nc("CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp), i, j);
+            write_nc("CLIMO_CDF", normal_cdf(cmn_dp, csd_dp, obs_dp),
+                     i, mthd, pnts, conf_info.interp_field);
          }
 
       } // end for j
@@ -1289,6 +1300,224 @@ void process_scores() {
             } // end for k
          } // end for j
       } // end if
+
+      // Loop through and apply each Fourier wave
+      for(j=0; j<conf_info.get_n_wave_1d(); j++) {
+
+         // Build string for INTERP_MTHD column
+         ConcatString cs;
+         cs << "WV1_" << conf_info.wave_1d_beg[j];
+         if(conf_info.wave_1d_beg[j] != conf_info.wave_1d_end[j]) {
+            cs << "-" << conf_info.wave_1d_end[j];
+         }
+
+         shc.set_interp_mthd(cs);
+         shc.set_interp_pnts(bad_data_int);
+
+         // Apply Fourier decomposition
+         fcst_dp_smooth = fcst_dp;
+         obs_dp_smooth  = obs_dp;
+         fcst_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                  conf_info.wave_1d_end[j]);
+          obs_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                  conf_info.wave_1d_end[j]);
+
+         // Loop through the masks to be applied
+         for(k=0; k<conf_info.get_n_mask(); k++) {
+
+            // Store the current mask
+            mask_dp = conf_info.mask_dp[k];
+
+            // Turn off the mask for missing data values
+            mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
+            mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+            if(cmn_dp.nx() == fcst_dp_smooth.nx() &&
+               cmn_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_dp, cmn_dp, 0.0);
+            }
+            if(csd_dp.nx() == fcst_dp_smooth.nx() &&
+               csd_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_dp, csd_dp, 0.0);
+            }
+
+            // Apply the current mask to the current fields
+            apply_mask(fcst_dp_smooth, mask_dp, f_na);
+            apply_mask(obs_dp_smooth,  mask_dp, o_na);
+            apply_mask(cmn_dp,         mask_dp, cmn_na);
+            apply_mask(csd_dp,         mask_dp, csd_na);
+            apply_mask(wgt_dp,         mask_dp, w_na);
+
+            // Set the mask name
+            shc.set_mask(conf_info.mask_name[k]);
+
+            mlog << Debug(2)
+                 << "Processing " << conf_info.fcst_info[i]->magic_str()
+                 << " versus " << conf_info.obs_info[i]->magic_str()
+                 << ", for Fourier wave number " << shc.get_interp_mthd()
+                 << ", over region " << shc.get_mask()
+                 << ", using " << f_na.n_elements() << " pairs.\n";
+
+            // Continue if no pairs were found
+            if(f_na.n_elements() == 0) continue;
+
+            // Compute CNT scores
+            if(!conf_info.fcst_info[i]->is_prob() &&
+               conf_info.output_flag[i_cnt] != STATOutputType_None) {
+
+               // Initialize
+               for(m=0; m<n_cnt; m++) cnt_info[m].clear();
+
+               // Compute CNT
+               do_cnt(cnt_info, i, f_na, o_na, cmn_na, csd_na, w_na);
+
+               // Loop through the continuous thresholds
+               for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
+
+                  // Write out CNT
+                  if(conf_info.output_flag[i_cnt] != STATOutputType_None &&
+                     cnt_info[m].n > 0) {
+
+                     write_cnt_row(shc, cnt_info[m],
+                        conf_info.output_flag[i_cnt] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_cnt], i_txt_row[i_cnt]);
+                  }
+               } // end for m
+            } // end Compute CNT
+
+            // Compute SL1L2 and SAL1L2 scores as long as the
+            // vflag is not set
+            if(!conf_info.fcst_info[i]->is_prob() &&
+               (conf_info.output_flag[i_sl1l2]  != STATOutputType_None ||
+                conf_info.output_flag[i_sal1l2] != STATOutputType_None)) {
+
+               // Initialize
+               for(m=0; m<n_cnt; m++) sl1l2_info[m].clear();
+
+               // Compute SL1L2 and SAL1L2
+               do_sl1l2(sl1l2_info, i, f_na, o_na, cmn_na, w_na);
+
+               // Loop through the continuous thresholds
+               for(m=0; m<conf_info.fcnt_ta[i].n_elements(); m++) {
+
+                  // Write out SL1L2
+                  if(conf_info.output_flag[i_sl1l2] != STATOutputType_None &&
+                     sl1l2_info[m].scount > 0) {
+
+                     write_sl1l2_row(shc, sl1l2_info[m],
+                        conf_info.output_flag[i_sl1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_sl1l2], i_txt_row[i_sl1l2]);
+                  }
+
+                  // Write out SAL1L2
+                  if(conf_info.output_flag[i_sal1l2] != STATOutputType_None &&
+                     sl1l2_info[m].sacount > 0) {
+
+                     write_sal1l2_row(shc, sl1l2_info[m],
+                        conf_info.output_flag[i_sal1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_sal1l2], i_txt_row[i_sal1l2]);
+                  }
+               } // end for m
+            }  // end Compute SL1L2 and SAL1L2
+
+            // Compute VL1L2 and VAL1L2 partial sums for UGRD,VGRD
+            if(!conf_info.fcst_info[i]->is_prob() &&
+                conf_info.fcst_info[i]->is_v_wind() &&
+                conf_info.fcst_info[i]->uv_index() >= 0  &&
+               (conf_info.output_flag[i_vl1l2]  != STATOutputType_None ||
+                conf_info.output_flag[i_val1l2] != STATOutputType_None) ) {
+
+               // Store the forecast variable name
+               shc.set_fcst_var(ugrd_vgrd_abbr_str);
+
+               // Store the observation variable name
+               shc.set_obs_var(ugrd_vgrd_abbr_str);
+
+               // Initialize
+               for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
+
+               // Read the gridded data from the input forecast file for UGRD
+               int ui = conf_info.fcst_info[i]->uv_index();
+               if(!read_data_plane(conf_info.fcst_info[ui],
+                                   conf_info.regrid_info,
+                                   fu_dp, fcst_mtddf, fcst_file)) continue;
+
+               if(!read_data_plane(conf_info.obs_info[ui],
+                                   conf_info.regrid_info,
+                                   ou_dp, obs_mtddf, obs_file)) continue;
+
+               // Apply Fourier decomposition to the U-wind fields
+               fu_dp_smooth = fu_dp;
+               ou_dp_smooth = ou_dp;
+               fu_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                      conf_info.wave_1d_end[j]);
+               ou_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                      conf_info.wave_1d_end[j]);
+
+               // Apply the current mask to the U-wind fields
+               apply_mask(fu_dp_smooth, mask_dp, fu_na);
+               apply_mask(ou_dp_smooth, mask_dp, ou_na);
+               apply_mask(cmnu_dp,      mask_dp, cmnu_na);
+               apply_mask(wgt_dp,       mask_dp, w_na);
+
+               // Compute VL1L2
+               do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na,
+                        cmnu_na, cmn_na, w_na);
+
+               // Loop through all of the wind speed thresholds
+               for(m=0; m<conf_info.fwind_ta[i].n_elements(); m++) {
+
+                  // Write out VL1L2
+                  if(conf_info.output_flag[i_vl1l2] != STATOutputType_None &&
+                     vl1l2_info[m].vcount > 0) {
+
+                     write_vl1l2_row(shc, vl1l2_info[m],
+                        conf_info.output_flag[i_vl1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
+                  }
+
+                  // Write out VAL1L2
+                  if(conf_info.output_flag[i_val1l2] != STATOutputType_None &&
+                     vl1l2_info[m].vacount > 0) {
+
+                     write_val1l2_row(shc, vl1l2_info[m],
+                        conf_info.output_flag[i_val1l2] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_val1l2], i_txt_row[i_val1l2]);
+                  }
+               } // end for m
+
+               // Reset the forecast variable name
+               shc.set_fcst_var(conf_info.fcst_info[i]->name());
+
+               // Reset the observation variable name
+               shc.set_obs_var(conf_info.obs_info[i]->name());
+
+            } // end Compute VL1L2
+
+         } // end for k
+
+         // Write out the data fields if requested in the config file
+         if(conf_info.nc_info.do_fourier) {
+
+            // Write out the data fields if requested in the config file
+            if(conf_info.nc_info.do_raw) {
+               write_nc("FCST", fcst_dp_smooth, i, shc.get_interp_mthd(),
+                        bad_data_int,  FieldType_Both);
+               write_nc("OBS",  obs_dp_smooth, i, shc.get_interp_mthd(),
+                        bad_data_int, FieldType_Both);
+            }
+            if(conf_info.nc_info.do_diff) {
+               write_nc("DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
+                        i, shc.get_interp_mthd(), bad_data_int,
+                        FieldType_Both);
+            }
+         } // end if
+
+      } // end for j
    } // end for i
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1702,26 +1931,29 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 ////////////////////////////////////////////////////////////////////////
 
 void write_nc(const ConcatString &field_name, const DataPlane &dp,
-              int i_vx, int i_interp) {
-   int i, x, y, n, n_masks, wdth;
-   ConcatString var_name, interp_str, mthd_str, mask_str;
+              int i_vx, const ConcatString &interp_mthd,
+              int interp_pnts, FieldType field_type) {
+   int i, x, y, n, n_masks;
+   ConcatString var_name, interp_str, mask_str;
    ConcatString name_att, long_att, level_att, units_att;
    NcVar nc_var;
+   bool apply_mask;
 
-   // Set the data smoothing info
-   mthd_str = interpmthd_to_string(conf_info.interp_mthd[i_interp]);
-   wdth     = conf_info.interp_wdth[i_interp];
-
-   // Omit interpolation string for nearest point
-   if(wdth > 1) {
-      interp_str << "_" << mthd_str << "_" << wdth*wdth;
+   // Append smoothing info for all but nearest neighbor
+   if(interp_pnts > 1) {
+      interp_str << "_" << interp_mthd << "_" << interp_pnts;
+   }
+   // Append Fourier decomposition info
+   else if(is_bad_data(interp_pnts)) {
+      interp_str << "_" << interp_mthd;
    }
 
    // Determine the number of masking regions
    // MET-621: When the nc_pairs flag 'apply_mask'= FALSE in the config
    // file, generate the output NetCDF file for the full domain only.
    // The default behavior is to generate fields for each masking region.
-   n_masks = (conf_info.nc_info.do_apply_mask ? conf_info.get_n_mask() : 1);
+   apply_mask = conf_info.nc_info.do_apply_mask;
+   n_masks    = (apply_mask ? conf_info.get_n_mask() : 1);
 
    // Allocate memory
    float *data = (float *) 0;
@@ -1734,10 +1966,9 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    // Process each of the masking regions
    for(i=0; i<n_masks; i++) {
 
-      // MET-621: If apply_mask is true, create fields for each masking
-      // region. Otherwise create only fields for the FULL domain.
-      mask_str = (conf_info.nc_info.do_apply_mask ?
-                  conf_info.mask_name[i] : "FULL");
+      // If apply_mask is true, create fields for each masking region.
+      // Otherwise create only fields for the FULL domain.
+      mask_str = (apply_mask ? conf_info.mask_name[i] : "FULL");
 
       // Build the NetCDF variable name
       if(field_name == "FCST") {
@@ -1746,8 +1977,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.fcst_info[i_vx]->name() << "_"
                    << conf_info.fcst_info[i_vx]->level_name() << "_"
                    << mask_str;
-         if(conf_info.interp_field == FieldType_Fcst ||
-            conf_info.interp_field == FieldType_Both) {
+         if(field_type == FieldType_Fcst ||
+            field_type == FieldType_Both) {
             var_name << interp_str;
          }
          name_att  = shc.get_fcst_var();
@@ -1763,8 +1994,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.obs_info[i_vx]->name() << "_"
                    << conf_info.obs_info[i_vx]->level_name() << "_"
                    << mask_str;
-         if(conf_info.interp_field == FieldType_Obs ||
-            conf_info.interp_field == FieldType_Both) {
+         if(field_type == FieldType_Obs ||
+            field_type == FieldType_Both) {
             var_name << interp_str;
          }
          name_att  = shc.get_obs_var();
@@ -1868,16 +2099,23 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       add_att(&nc_var, "_FillValue", bad_data_float);
       add_var_att_local(&nc_var, "desc", conf_info.desc[i_vx]);
       add_var_att_local(&nc_var, "masking_region", conf_info.mask_name[i]);
-      add_var_att_local(&nc_var, "smoothing_method", mthd_str);
-      add_att(&nc_var, "smoothing_neighborhood", wdth*wdth);
+      add_var_att_local(&nc_var, "smoothing_method", interp_mthd);
+      add_att(&nc_var, "smoothing_neighborhood", interp_pnts);
 
       // Store the data
       for(x=0; x<grid.nx(); x++) {
          for(y=0; y<grid.ny(); y++) {
 
             n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-            data[n] = (conf_info.mask_dp[i].s_is_on(x, y) ?
-                       dp.get(x, y) : bad_data_float);
+
+            // Check apply_mask
+            if(!apply_mask ||
+               (apply_mask && conf_info.mask_dp[i].s_is_on(x, y))) {
+               data[n] = dp.get(x, y);
+            }
+            else {
+               data[n] = bad_data_float;
+            }
 
          } // end for y
       } // end for x
@@ -1912,8 +2150,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
 
-   NcVar fcst_var ;
-   NcVar obs_var  ;
+   NcVar fcst_var;
+   NcVar obs_var;
 
    // Get the interpolation strings
    mthd_str = interpmthd_to_string(InterpMthd_Nbrhd);

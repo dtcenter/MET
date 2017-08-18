@@ -517,6 +517,20 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    nbrhd_cov_ta = nbrhd_info.cov_ta;
    nbrhd_shape  = nbrhd_info.shape;
 
+   // Conf: fourier
+   Dictionary * d = conf.lookup_dictionary(conf_key_fourier);
+   wave_1d_beg = d->lookup_int_array(conf_key_wave_1d_beg);
+   wave_1d_end = d->lookup_int_array(conf_key_wave_1d_end);
+
+   // Check for the same length
+   if(wave_1d_beg.n_elements() != wave_1d_end.n_elements()) {
+      mlog << Error << "\nGridStatConfInfo::process_config() -> "
+           << "The fourier wave_1d_beg and wave_1d_end arrays must have the "
+           << "same length (" << wave_1d_beg.n_elements() << " != "
+           << wave_1d_end.n_elements() << ").\n\n";
+      exit(1);
+   }
+
    // Conf: nc_pairs_flag
    parse_nc_info();
 
@@ -603,6 +617,7 @@ nc_info.do_diff        = d->lookup_bool(conf_key_diff_flag);
 nc_info.do_climo       = d->lookup_bool(conf_key_climo_flag);
 nc_info.do_weight      = d->lookup_bool(conf_key_weight);
 nc_info.do_nbrhd       = d->lookup_bool(conf_key_nbrhd);
+nc_info.do_fourier     = d->lookup_bool(conf_key_fourier);
 nc_info.do_apply_mask  = d->lookup_bool(conf_key_apply_mask_flag);
 
 
@@ -701,24 +716,28 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
 
       case(i_cnt):
          // Maximum number of CNT lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds *
-         //    Alphas
-         n = n_vx_scal * n_mask * n_interp * max_n_cnt_thresh *
-             get_n_ci_alpha();
+         //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
+         //    Max Thresholds * Alphas
+         n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
+             max_n_cnt_thresh * get_n_ci_alpha();
          break;
 
       case(i_sl1l2):
       case(i_sal1l2):
          // Maximum number of SL1L2 or SAL1L2 lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_scal * n_mask * n_interp * max_n_cnt_thresh;
+         //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
+         //    Max Thresholds
+         n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
+             max_n_cnt_thresh;
          break;
 
       case(i_vl1l2):
       case(i_val1l2):
          // Maximum number of VL1L2 or VAL1L2 lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_vect * n_mask * n_interp * max_n_wind_thresh;
+         //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
+         //    Max Thresholds
+         n = n_vx_vect * n_mask * (n_interp + get_n_wave_1d()) *
+             max_n_wind_thresh;
          break;
 
       case(i_nbrctc):
@@ -855,7 +874,8 @@ bool GridStatNcOutInfo::all_false() const
 
 {
 
-bool status = do_latlon || do_raw || do_diff || do_climo || do_apply_mask;
+bool status = do_latlon || do_raw   || do_diff    || do_climo ||
+              do_weight || do_nbrhd || do_fourier || do_apply_mask;
 
 return ( !status );
 
@@ -873,6 +893,9 @@ do_latlon     = false;
 do_raw        = false;
 do_diff       = false;
 do_climo      = false;
+do_weight     = false;
+do_nbrhd      = false;
+do_fourier    = false;
 do_apply_mask = false;
 
 return;
@@ -891,6 +914,9 @@ do_latlon     = true;
 do_raw        = true;
 do_diff       = true;
 do_climo      = true;
+do_weight     = true;
+do_nbrhd      = true;
+do_fourier    = true;
 do_apply_mask = true;
 
 return;
