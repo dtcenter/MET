@@ -148,6 +148,16 @@ nbrhd = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Fourier decomposition
+//
+fourier = {
+   wave_1d_beg = [ 1  ];
+   wave_1d_end = [ 10 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Statistical output types
 //
 output_flag = {
@@ -181,6 +191,7 @@ nc_pairs_flag   = {
    climo      = TRUE;
    weight     = FALSE;
    nbrhd      = FALSE;
+   fourier    = FALSE;
    apply_mask = TRUE;
 }
 
