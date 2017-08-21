@@ -1,0 +1,161 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Grid-Stat configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "GTG";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+//
+// Output observation type to be written
+//
+obtype = "ANALYS";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid = NONE;
+   method  = NEAREST;
+   width   = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+eclv_points = 0.05;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+
+   field = [
+      {
+        name       = "base_series_spei12_annual_mean";
+        level      = [ "(0,*,*)", "(12,*,*)", "(25,*,*)" ];
+        cat_thresh = [ >=0.0, >=0.15, >=0.31 ];
+      }
+   ];
+
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid = [ "G212" ];
+   poly = [ "MET_BASE/poly/EAST.poly",
+            "MET_BASE/poly/WEST.poly"];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Neighborhood methods
+//
+nbrhd = {
+   vld_thresh = 1.0;
+   width      = [ 1 ];
+   cov_thresh = [ >=0.5 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+   fho    = BOTH;
+   ctc    = BOTH;
+   cts    = BOTH;
+   mctc   = BOTH;
+   mcts   = BOTH;
+   cnt    = BOTH;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   eclv   = BOTH;
+   nbrctc = NONE;
+   nbrcts = NONE;
+   nbrcnt = NONE;
+}
+
+//
+// NetCDF matched pairs output file
+//
+nc_pairs_flag   = {
+   latlon     = TRUE;
+   raw        = TRUE;
+   diff       = TRUE;
+   climo      = TRUE;
+   weight     = FALSE;
+   nbrhd      = FALSE;
+   apply_mask = ${APPLY_MASK};
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+grid_weight_flag = NONE;
+rank_corr_flag   = FALSE;
+tmp_dir          = "/tmp";
+output_prefix    = "${OUTPUT_PREFIX}";
+version          = "V6.1";
+
+////////////////////////////////////////////////////////////////////////////////
