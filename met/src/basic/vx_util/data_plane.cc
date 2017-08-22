@@ -489,8 +489,10 @@ double xa0, value, angle;
 const int mnw = (Nx + 1)/2;
 
 
-a = new double [mnw];
-b = new double [mnw];
+a  = new double [mnw+1];
+b  = new double [mnw+1];
+xa = new double [mnw+1];
+xb = new double [mnw+1];
 
 for (j=0; j<Ny; ++j)  {
 
