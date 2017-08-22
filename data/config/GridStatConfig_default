@@ -151,8 +151,8 @@ nbrhd = {
 // Fourier decomposition
 //
 fourier = {
-   wave_1d_beg = [ 1  ];
-   wave_1d_end = [ 10 ];
+   wave_1d_beg = [];
+   wave_1d_end = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
