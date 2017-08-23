@@ -1304,6 +1304,22 @@ void process_scores() {
       // Loop through and apply each Fourier wave
       for(j=0; j<conf_info.get_n_wave_1d(); j++) {
 
+         // Apply Fourier decomposition
+         fcst_dp_smooth = fcst_dp;
+         obs_dp_smooth  = obs_dp;
+
+         if(!fcst_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                      conf_info.wave_1d_end[j]) ||
+             !obs_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                      conf_info.wave_1d_end[j])) {
+            mlog << Debug(2)
+                 << "Skipping Fourier decomposition for waves "
+                 << conf_info.wave_1d_beg[j] << " to "
+                 << conf_info.wave_1d_end[j] << " due to the presence "
+                 << "of bad data values.\n";
+            continue;
+         }
+
          // Build string for INTERP_MTHD column
          ConcatString cs;
          cs << "WV1_" << conf_info.wave_1d_beg[j];
@@ -1313,14 +1329,6 @@ void process_scores() {
 
          shc.set_interp_mthd(cs);
          shc.set_interp_pnts(bad_data_int);
-
-         // Apply Fourier decomposition
-         fcst_dp_smooth = fcst_dp;
-         obs_dp_smooth  = obs_dp;
-         fcst_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
-                                  conf_info.wave_1d_end[j]);
-          obs_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
-                                  conf_info.wave_1d_end[j]);
 
          // Loop through the masks to be applied
          for(k=0; k<conf_info.get_n_mask(); k++) {
@@ -1451,10 +1459,18 @@ void process_scores() {
                // Apply Fourier decomposition to the U-wind fields
                fu_dp_smooth = fu_dp;
                ou_dp_smooth = ou_dp;
-               fu_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
-                                      conf_info.wave_1d_end[j]);
-               ou_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
-                                      conf_info.wave_1d_end[j]);
+
+               if(!fu_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                          conf_info.wave_1d_end[j]),
+                  !ou_dp_smooth.fitwav_1d(conf_info.wave_1d_beg[j],
+                                          conf_info.wave_1d_end[j])) {
+                  mlog << Debug(2)
+                       << "Skipping Fourier decomposition for waves "
+                       << conf_info.wave_1d_beg[j] << " to "
+                       << conf_info.wave_1d_end[j] << " due to the "
+                       << "presence of bad data values in U-wind.\n";
+                  continue;
+               }
 
                // Apply the current mask to the U-wind fields
                apply_mask(fu_dp_smooth, mask_dp, fu_na);
