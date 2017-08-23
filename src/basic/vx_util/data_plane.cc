@@ -476,7 +476,7 @@ return;
    //  Note: this function could be speeded up a lot, I think
    //
 
-void DataPlane::fitwav_1d(const int start_wave, const int end_wave)
+bool DataPlane::fitwav_1d(const int start_wave, const int end_wave)
 
 {
 
@@ -488,6 +488,12 @@ double * xb = 0;
 double xa0, value, angle;
 const int mnw = (Nx + 1)/2;
 
+   //
+   // Check for bad data
+
+for (j=0; j<Nxy; ++j)  {
+   if (is_bad_data(Data[j])) return ( false );
+}
 
 a  = new double [mnw+1];
 b  = new double [mnw+1];
@@ -562,7 +568,7 @@ if ( b )  { delete [] b;  b = 0; }
 if ( xa )  { delete [] xa;  xa = 0; }
 if ( xb )  { delete [] xb;  xb = 0; }
 
-return;
+return(true);
 
 }
 
