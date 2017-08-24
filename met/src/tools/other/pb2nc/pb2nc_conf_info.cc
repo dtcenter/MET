@@ -174,12 +174,11 @@ void PB2NCConfInfo::process_config() {
 
    // Check the values
    for(i=0; i<pb_report_type.n_elements(); i++) {
-      if(pb_report_type[i] < 100 || pb_report_type[i] > 300) {
-         mlog << Error << "\nPB2NCConfInfo::process_config() -> "
+      if(pb_report_type[i] < 100 || pb_report_type[i] > 600) {
+         mlog << Warning << "\nPB2NCConfInfo::process_config() -> "
               << "the \"" << conf_key_pb_report_type
               << "\" entries (" << pb_report_type[i]
-              << ") must be set between 100 and 300.\n\n";
-         exit(1);
+              << ") should be set between 100 and 600.\n\n";
       }
    }
    
@@ -199,11 +198,10 @@ void PB2NCConfInfo::process_config() {
    // Check the values
    for(i=0; i<level_category.n_elements(); i++) {
       if(level_category[i] < 0 || level_category[i] > 7) {
-         mlog << Error << "\nPB2NCConfInfo::process_config() -> "
+         mlog << Warning << "\nPB2NCConfInfo::process_config() -> "
               << "the \"" << conf_key_level_category
               << "\" entries (" << level_category[i]
-              << ") must be set between 0 and 7.\n\n";
-         exit(1);
+              << ") should be set between 0 and 7.\n\n";
       }
    }
 
@@ -233,11 +231,10 @@ void PB2NCConfInfo::process_config() {
 
    // Check the value
    if(quality_mark_thresh < 0 || quality_mark_thresh > 15) {
-      mlog << Error << "\nPB2NCConfInfo::process_config() -> "
+      mlog << Warning << "\nPB2NCConfInfo::process_config() -> "
            << "the \"" << conf_key_quality_mark_thresh
            << "\" entry (" << quality_mark_thresh
-           << ") must be set between 0 and 15.\n\n";
-      exit(1);
+           << ") should be set between 0 and 15.\n\n";
    }
 
    // Conf: event_stack_flag
