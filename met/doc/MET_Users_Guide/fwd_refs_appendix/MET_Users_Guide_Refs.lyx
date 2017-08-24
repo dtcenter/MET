@@ -483,7 +483,7 @@ Mood
 \emph on
  Introduction to the Theory of Statistics
 \emph default
-,  McGraw-Hill, pp.
+, McGraw-Hill, pp.
  299-338.
  
 \end_layout
@@ -563,6 +563,20 @@ Meteor.
 15
 \series medium
 , 41-50.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+Wilks,
+\series default
+ D.S.
+ 2010: Sampling distributions of the Brier score and Brier skill score under
+ serial dependence.
+ Q.J.R.
+ Meteorol.
+ Soc., 136: 2109–2118.
+ doi:10.1002/qj.709
 \end_layout
 
 \begin_layout Description
