@@ -490,10 +490,31 @@ const int mnw = (Nx + 1)/2;
 
    //
    // Check for bad data
+   //
 
 for (j=0; j<Nxy; ++j)  {
    if (is_bad_data(Data[j])) return ( false );
 }
+
+   //
+   // Range check the requested wave numbers
+   //
+
+if ( start_wave < 0   || end_wave < 0 ||
+     start_wave > mnw || end_wave > mnw )  {
+
+   mlog << Error << "\nDataPlane::fitwav_1d() -> "
+        << "Requested wave numbers (" << start_wave << " to " << end_wave
+        << ") must be between 0 and " << mnw << " for data with dimension "
+        << "(Nx, Ny) = (" << Nx << ", " << Ny << ")!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   // Allocate memory
+   //
 
 a  = new double [mnw+1];
 b  = new double [mnw+1];

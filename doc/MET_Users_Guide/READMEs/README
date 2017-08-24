@@ -884,6 +884,33 @@ nbrhd = {
 }
 
 //
+// The "fourier" entry is a dictionary which specifies the application of the
+// Fourier decomposition method.  It consists of two arrays of the same length
+// which define the beginning and ending wave numbers to be included.  If the
+// arrays have length zero, no Fourier decomposition is applied.  For each array
+// entry, the requested Fourier decomposition is applied to the forecast and
+// observation fields.  The beginning and ending wave numbers are indicated in
+// the MET ASCII output files by the INTERP_MTHD column (e.g. WV1_0-3 for waves
+// 0 to 3 or WV1_10 for only wave 10).  1-dimensional Fourier decomposition is
+// only defined when each grid point contains valid data.  If either input
+// field contains missing data, no Fourier decomposition is computed.
+//
+// The available wave numbers start at 0 (the mean of the entire field) and end
+// at (Nx+1)/2 (the finest level of detail), where Nx is the X-dimension of the
+// verification grid:
+//
+//    - The "wave_1d_beg" entry is an array of integers specifying the first
+//      wave number to be included.
+//
+//    - The "wave_1d_end" entry is an array of integers specifying the last
+//      wave number to be included.
+//
+fourier = {
+   wave_1d_beg = [ 0,  5 ];
+   wave_1d_end = [ 3, 10 ];
+}
+
+//
 // The "hira" entry is a dictionary that is very similar to the "interp" and
 // "nbrhd" entries.  It specifies information for applying the High Resolution
 // Assessment (HiRA) verification logic in Point-Stat.  HiRA is analogous to
