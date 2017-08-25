@@ -534,6 +534,28 @@ void MCTSInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void MCTSInfo::set_fthresh(const ThreshArray &ta) {
+
+   // Check that the thresholds are formatted correctly
+   ta.check_bin_thresh();
+   fthresh = ta;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MCTSInfo::set_othresh(const ThreshArray &ta) {
+
+   // Check that the thresholds are formatted correctly
+   ta.check_bin_thresh();
+   othresh = ta;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void MCTSInfo::add(double f, double o) {
    int r, c;
 
