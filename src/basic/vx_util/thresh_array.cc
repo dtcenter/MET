@@ -350,28 +350,36 @@ ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-int ThreshArray::check_bins(double v) const {
-   int i, bin;
-
+ 
+void ThreshArray::check_bin_thresh() const {
+   int i;
+ 
    //
    // Check that the threshold values are monotonically increasing
    // and the threshold types are inequalities that remain the same
    //
    for(i=0; i<Nelements-1; i++) {
-
+ 
       if(t[i].get_value() >  t[i+1].get_value() ||
          t[i].get_type()  != t[i+1].get_type()  ||
          t[i].get_type()  == thresh_eq          ||
          t[i].get_type()  == thresh_ne) {
-
-         mlog << Error << "\nThreshArray::check(double) const -> "
+ 
+         mlog << Error << "\nThreshArray::check_bin_thresh() const -> "
               << "thresholds must be monotonically increasing and be of "
               << "the same inequality type (lt, le, gt, or ge)."
               << "\n\n";
          exit(1);
       }
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ThreshArray::check_bins(double v) const {
+   int i, bin;
 
    // For < and <=, check thresholds left to right.
    if(t[0].get_type() == thresh_lt || t[0].get_type() == thresh_le) {
