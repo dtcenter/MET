@@ -128,6 +128,8 @@ class MCTSInfo {
 
       void clear();
       void allocate_n_alpha(int);
+      void set_fthresh(const ThreshArray &);
+      void set_othresh(const ThreshArray &);
       void add(double, double);
       void compute_stats();
       void compute_ci();
