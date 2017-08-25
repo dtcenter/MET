@@ -2826,8 +2826,8 @@ void mpr_to_mctc(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Setup
    //
    mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
-   mcts_info.fthresh = j.out_fcst_thresh;
-   mcts_info.othresh = j.out_obs_thresh;
+   mcts_info.set_fthresh(j.out_fcst_thresh);
+   mcts_info.set_othresh(j.out_obs_thresh);
 
    //
    // Update the contingency table counts
@@ -2857,8 +2857,8 @@ void mpr_to_mcts(STATAnalysisJob &j, const AggrMPRInfo &info,
    // Setup
    //
    mcts_info.cts.set_size(j.out_fcst_thresh.n_elements() + 1);
-   mcts_info.fthresh = j.out_fcst_thresh;
-   mcts_info.othresh = j.out_obs_thresh;
+   mcts_info.set_fthresh(j.out_fcst_thresh);
+   mcts_info.set_othresh(j.out_obs_thresh);
 
    //
    // Store the out_alpha value

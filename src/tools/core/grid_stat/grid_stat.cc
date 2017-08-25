@@ -1603,8 +1603,8 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    // Set up the MCTSInfo size, thresholds, and alpha values
    //
    mcts_info.cts.set_size(conf_info.fcat_ta[i_vx].n_elements() + 1);
-   mcts_info.fthresh = conf_info.fcat_ta[i_vx];
-   mcts_info.othresh = conf_info.ocat_ta[i_vx];
+   mcts_info.set_fthresh(conf_info.fcat_ta[i_vx]);
+   mcts_info.set_othresh(conf_info.ocat_ta[i_vx]);
    mcts_info.allocate_n_alpha(conf_info.get_n_ci_alpha());
 
    for(i=0; i<conf_info.get_n_ci_alpha(); i++) {

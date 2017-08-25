@@ -855,8 +855,8 @@ void do_mcts(int n, const NumArray &f_na, const NumArray &o_na) {
 
    // Setup the MCTSInfo object
    mcts_info.cts.set_size(conf_info.fcat_ta.n_elements() + 1);
-   mcts_info.fthresh = conf_info.fcat_ta;
-   mcts_info.othresh = conf_info.ocat_ta;
+   mcts_info.set_fthresh(conf_info.fcat_ta);
+   mcts_info.set_othresh(conf_info.ocat_ta);
 
    mcts_info.allocate_n_alpha(conf_info.ci_alpha.n_elements());
    for(i=0; i<conf_info.ci_alpha.n_elements(); i++) {
