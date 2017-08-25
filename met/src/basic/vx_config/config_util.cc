@@ -570,7 +570,7 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
 
    na = dict->lookup_num_array(conf_key_eclv_points);
 
-   // Check that at least value is provided
+   // Check that at least one value is provided
    if(na.n_elements() == 0) {
       mlog << Error << "\nparse_conf_eclv_points() -> "
            << "At least one \"" << conf_key_eclv_points
@@ -594,6 +594,71 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
    }
 
    return(na);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ThreshArray parse_conf_climo_cdf_bins(Dictionary *dict) {
+   NumArray na;
+   ThreshArray cdf_thresh;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   na = dict->lookup_num_array(conf_key_climo_cdf_bins);
+
+   // Check that at least one value is provided
+   if(na.n_elements() == 0) {
+      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
+           << "At least one \"" << conf_key_climo_cdf_bins
+           << "\" entry must be specified.\n\n";
+      exit(1);
+   }
+
+   // Intrepet a single value as the number of equal-area bins
+   if(na.n_elements() == 1) {
+      if(na[0] <= 0) {
+         mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
+              << "The \"" << conf_key_climo_cdf_bins << "\" entry ("
+              << na[0] << ") must be greater than zero.\n\n";
+         exit(1);
+      }
+      for(i=0; i*1.0/na[0] <= 1.0; i++) {
+         cdf_thresh.add(i*1.0/na[0], thresh_ge);
+      }
+   }
+   // Otherwise, the user has specified the actual CDF areas
+   else {
+      for(i=0; i<na.n_elements(); i++) {
+         cdf_thresh.add(na[i], thresh_ge);
+      }
+   }
+
+   // Sanity check the CDF area thresholds
+   if(!is_eq(cdf_thresh[i].get_value(), 0.0) ||
+      !is_eq(cdf_thresh[cdf_thresh.n_elements()-1].get_value(), 1.0)) {
+      mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
+           << "The climo CDF bins must start with 0 and end with 1.\n\n";
+      exit(1);
+   }
+   for(i=0; i<cdf_thresh.n_elements(); i++) {
+      if(cdf_thresh[i].get_value() < 0 ||
+         cdf_thresh[i].get_value() > 1.0) {
+         mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
+              << "The \"" << conf_key_climo_cdf_bins << "\" entries ("
+              << na[i] << ") must be greater than 0 and less than 1.\n\n";
+         exit(1);
+      }
+   }
+
+   // Should be monotonically increasing
+   cdf_thresh.check_bin_thresh();
+
+   return(cdf_thresh);
 }
 
 ////////////////////////////////////////////////////////////////////////
