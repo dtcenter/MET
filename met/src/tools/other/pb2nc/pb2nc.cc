@@ -780,6 +780,10 @@ void process_pbfile(int i_pb) {
    float    obs_arr[obs_arr_len];
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
    
+   const int debug_level_for_performance = 3;
+   int start_t, end_t = clock();
+   int method_end, method_start = clock();
+
    StringArray variables_big_nlevels;
    static const char *method_name = "process_pbfile()";
 
@@ -858,7 +862,7 @@ void process_pbfile(int i_pb) {
 
    // Check for zero messages to process
    if(npbmsg <= 0) {
-      mlog << Warning << "\n" << method_name << "() -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
@@ -884,14 +888,25 @@ void process_pbfile(int i_pb) {
    int buf_nlev;
    int valid_data_count = 0;
    bool is_prepbufr = is_prepbufr_file(&event_names);
+   if(mlog.verbosity_level() >= debug_level_for_performance) {
+      end_t = clock();
+      cout << method_name << " " << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds for preparing" << endl;;
+      start_t = clock();
+   }
    
    int grib_code;
+   map<ConcatString, ConcatString> _messageTypeMap = conf_info.getMessageTypeMap();
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
       if(mlog.verbosity_level() > 0) {
          if(nint(npbmsg/20.0) > 0 && (i_read+1)%nint(npbmsg/20.0) == 0) {
             cout << nint((double) (i_read+1)/npbmsg*100.0) << "% " << flush;
+            if(mlog.verbosity_level() >= debug_level_for_performance) {
+               end_t = clock();
+               cout << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds" << endl;
+               start_t = clock();
+            }
          }
       }
 
@@ -1559,8 +1574,23 @@ void process_pbfile(int i_pb) {
       // store the header data and increment the PrepBufr record
       // counter
       if(n_hdr_obs > 0) {
-      
-         hdr_typ_sa.add(hdr_typ);
+         if (_messageTypeMap[hdr_typ]) {
+            ConcatString mappedMessageType = _messageTypeMap[hdr_typ];
+            mlog << Debug(5) << "\n" << method_name << " -> "
+                 << "Switching report type \"" << hdr_typ
+                 << "\" to message type \"" << mappedMessageType << "\".\n";
+            if (mappedMessageType.length() < strl_len) {
+               hdr_typ_sa.add(mappedMessageType);
+            }
+            else {
+               char tmp_message_type[strl_len];
+               strncpy(tmp_message_type, mappedMessageType.text(), strl_len);
+               hdr_typ_sa.add(tmp_message_type);
+            }
+         }
+         else {
+            hdr_typ_sa.add(hdr_typ);
+         }
          hdr_sid_sa.add(hdr_sid);
          unix_to_mdyhms(hdr_vld_ut, mon, day, yr, hr, min, sec);
          sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
@@ -1655,6 +1685,10 @@ void process_pbfile(int i_pb) {
 
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
+   if(mlog.verbosity_level() >= debug_level_for_performance) {
+      method_end = clock();
+      cout << method_name << " " << (method_end-method_start)/double(CLOCKS_PER_SEC) << " seconds" << endl;
+   }
 
    if(i_msg <= 0) {
       mlog << Warning << "\n" << method_name << " -> "
@@ -1709,7 +1743,6 @@ void process_pbfile_metadata(int i_pb) {
    get_variable_info(tbl_filename);
    if(mlog.verbosity_level() < debug_threshold) remove_temp_file(tbl_filename);
 
-   unit = dump_unit + i_pb;
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
