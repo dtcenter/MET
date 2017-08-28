@@ -639,10 +639,11 @@ ThreshArray parse_conf_climo_cdf_bins(Dictionary *dict) {
    }
 
    // Sanity check the CDF area thresholds
-   if(!is_eq(cdf_thresh[i].get_value(), 0.0) ||
+   if(!is_eq(cdf_thresh[0].get_value(), 0.0) ||
       !is_eq(cdf_thresh[cdf_thresh.n_elements()-1].get_value(), 1.0)) {
       mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
-           << "The climo CDF bins must start with 0 and end with 1.\n\n";
+           << "The \"" << conf_key_climo_cdf_bins << "\" entries must "
+           << "start with 0 and end with 1.\n\n";
       exit(1);
    }
    for(i=0; i<cdf_thresh.n_elements(); i++) {
@@ -650,7 +651,7 @@ ThreshArray parse_conf_climo_cdf_bins(Dictionary *dict) {
          cdf_thresh[i].get_value() > 1.0) {
          mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
               << "The \"" << conf_key_climo_cdf_bins << "\" entries ("
-              << na[i] << ") must be greater than 0 and less than 1.\n\n";
+              << na[i] << ") must be between 0 and 1.\n\n";
          exit(1);
       }
    }
