@@ -74,6 +74,7 @@ void PB2NCConfInfo::clear() {
    tmp_dir.clear();
    version.clear();
    obs_var_map.clear();
+   _messageTypeMap.clear();
 
    return;
 }
@@ -244,6 +245,7 @@ void PB2NCConfInfo::process_config() {
    tmp_dir = parse_conf_tmp_dir(&conf);
 
    obs_var_map = parse_conf_obs_var_map(&conf);
+   _messageTypeMap = parse_conf_message_type_map(&conf);
 
    return;
 }
