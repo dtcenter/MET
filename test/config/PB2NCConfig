@@ -97,6 +97,11 @@ obs_var_map = [
 //   ,{ key = "D_MIXR";  val = "MIXR"; }
 //   ,{ key = "D_PRMSL"; val = "PRMSL";}
 
+//
+// Mapping of report_type (header_type)
+//
+message_type_map = []; 
+   
 ////////////////////////////////////////////////////////////////////////////////
 
 //
