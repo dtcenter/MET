@@ -90,7 +90,7 @@ void GridStatConfInfo::clear() {
    obtype.clear();
    regrid_info.clear();
    desc.clear();
-   climo_cdf_bins.clear();
+   climo_cdf_ta.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
