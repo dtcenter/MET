@@ -145,6 +145,8 @@ class GridStatConfInfo {
 
       NumArray *        eclv_points;        // ECLV points [n_vx]
 
+      ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
+
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
       DataPlane *       mask_dp;            // Array for masking regions [n_mask]
