@@ -619,7 +619,7 @@ ThreshArray parse_conf_climo_cdf_bins(Dictionary *dict) {
       exit(1);
    }
 
-   // Intrepet a single value as the number of equal-area bins
+   // Interpret a single value as the number of equal-area bins
    if(na.n_elements() == 1) {
       if(na[0] <= 0) {
          mlog << Error << "\nparse_conf_climo_cdf_bins() -> "
