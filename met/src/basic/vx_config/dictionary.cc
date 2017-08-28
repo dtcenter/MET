@@ -348,7 +348,7 @@ switch ( Type )  {
          case thresh_na:  out << na_str;  break;
 
          default:
-         mlog << Error 
+         mlog << Error
               << "DictionaryEntry::dump_config_format() -> bad threshold type ... " << Thresh->get_type() << "\n";
          exit ( 1 );
          break;
@@ -1180,11 +1180,11 @@ const DictionaryEntry * Dictionary::lookup(const char * name)
 
 {
 
-  
+
 if ( Nentries == 0 )  {
-  
+
    LastLookupStatus = false;
-   
+
    return ( (const DictionaryEntry *) 0 );
 }
 
@@ -1212,9 +1212,9 @@ for (j=0; j<(scope.n_elements() - 1); ++j)  {
    E = D->lookup(scope[j]);
 
    if ( !E )  {
-     
+
       LastLookupStatus = false;
-      
+
       return ( (const DictionaryEntry *) 0 );
    }
 
@@ -1240,7 +1240,7 @@ E = D->lookup_simple(stub);
 if ( E )  {
 
    LastLookupStatus = (E != 0);
-   
+
    return ( E );
 }
 
@@ -1273,7 +1273,7 @@ const DictionaryEntry * Dictionary::lookup_simple(const char * name)
 if ( Nentries == 0 )  {
 
    LastLookupStatus = false;
-   
+
    return ( (const DictionaryEntry *) 0 );
 }
 
@@ -1514,7 +1514,7 @@ if ( Entry )  is_correct_type = (Entry->type() == ArrayType   ||
                                  Entry->type() == IntegerType ||
                                  Entry->type() == FloatType   ||
                                  Entry->type() == BooleanType);
-                                 
+
 LastLookupStatus = is_correct_type;
 
 if ( !Entry || !is_correct_type )  {
@@ -1538,11 +1538,11 @@ if ( !Entry || !is_correct_type )  {
    //
 
 if ( Entry->type() == IntegerType )  {
-  
+
    array.add( Entry->i_value() );
 
    return ( array );
-   
+
 }
 
    //
@@ -1554,7 +1554,7 @@ if ( Entry->type() == FloatType )  {
    array.add( Entry->d_value() );
 
    return ( array );
-   
+
 }
 
    //
@@ -1575,14 +1575,13 @@ if ( Entry->type() == BooleanType )  {
 
 Dict = Entry->array_value();
 
-   //
    //  Check the array type.
-   //  Error out if array contains unexpected type.
+   //  Populate the NumArray with integers, doubles, or booleans
    //
 
-if ( Dict->n_entries() > 0 )  {
+for (int i=0; i<Dict->n_entries(); i++)  {
 
-   Type = (*Dict)[0]->type();
+   Type = (*Dict)[i]->type();
 
    if( Type != IntegerType &&
        Type != FloatType   &&
@@ -1596,13 +1595,6 @@ if ( Dict->n_entries() > 0 )  {
       exit ( 1 );
 
    }
-}
-
-   //
-   //  Populate the NumArray with integers or doubles
-   //
-
-for (int i=0; i<Dict->n_entries(); i++)  {
 
         if( Type == FloatType   )  array.add((*Dict)[i]->d_value());
    else if( Type == IntegerType )  array.add((*Dict)[i]->i_value());
@@ -1705,7 +1697,7 @@ if ( !Entry || !is_correct_type )  {
    //
    //  Store a single string and return
    //
-   
+
 if ( Entry->type() == StringType )  {
 
    array.add( *(Entry->string_value()) );
@@ -1803,7 +1795,7 @@ const Dictionary * Dict = (const Dictionary *) 0;
 bool is_correct_type = false;
 ThreshArray array;
 
-if ( Entry )  is_correct_type = (Entry->type() == ArrayType || 
+if ( Entry )  is_correct_type = (Entry->type() == ArrayType ||
                                  Entry->type() == ThresholdType);
 
 LastLookupStatus = is_correct_type;
@@ -2117,7 +2109,7 @@ DictionaryStack::DictionaryStack(const DictionaryStack & s)
 {
 
 // init_from_scratch();
-// 
+//
 // assign(s);
 
 mlog << Error
@@ -2137,7 +2129,7 @@ DictionaryStack & DictionaryStack::operator=(const DictionaryStack & s)
 {
 
 // if ( this == &s )  return ( * this );
-// 
+//
 // assign(s);
 
 mlog << Error
