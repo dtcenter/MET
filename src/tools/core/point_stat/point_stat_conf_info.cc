@@ -19,8 +19,6 @@ using namespace std;
 #include <cmath>
 
 #include "point_stat_conf_info.h"
-   // Conf: climo_cdf_bins
-   climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_log.h"
@@ -96,7 +94,7 @@ void PointStatConfInfo::clear() {
    model.clear();
    regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
-   climo_cdf_bins.clear();
+   climo_cdf_ta.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
