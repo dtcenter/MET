@@ -112,6 +112,8 @@ class PointStatConfInfo {
 
       NumArray *        eclv_points;        // ECLV points [n_vx]
 
+      ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
+
       vector<DuplicateType> dup_flgs;
       vector<ObsSummary> obs_smry;
       vector<int> obs_percs;

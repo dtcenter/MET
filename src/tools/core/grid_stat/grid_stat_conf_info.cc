@@ -90,6 +90,7 @@ void GridStatConfInfo::clear() {
    obtype.clear();
    regrid_info.clear();
    desc.clear();
+   climo_cdf_bins.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -246,6 +247,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Check climatology fields
    check_climo_n_vx(&conf, n_vx);
+
+   // Conf: climo_cdf_bins
+   climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
 
    // Allocate space based on the number of verification tasks
    fcst_info   = new VarInfo *   [n_vx];

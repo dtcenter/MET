@@ -19,7 +19,8 @@ using namespace std;
 #include <cmath>
 
 #include "point_stat_conf_info.h"
-
+   // Conf: climo_cdf_bins
+   climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_log.h"
@@ -95,6 +96,7 @@ void PointStatConfInfo::clear() {
    model.clear();
    regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
+   climo_cdf_bins.clear();
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -232,6 +234,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype, bool use_var_id) {
 
    // Check climatology fields
    check_climo_n_vx(&conf, n_vx);
+
+   // Conf: climo_cdf_bins
+   climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
 
    // Allocate space based on the number of verification tasks
    vx_pd       = new VxPairDataPoint [n_vx];
