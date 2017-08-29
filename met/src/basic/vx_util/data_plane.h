@@ -102,7 +102,8 @@ class DataPlane {
 
       void put(const double, const int __x__, const int __y__);
 
-      bool fitwav_1d(const int start_wave, const int end_wave);
+      bool fitwav_1d_old (const int start_wave, const int end_wave);
+      bool fitwav_1d     (const int start_wave, const int end_wave);
 
 };
 

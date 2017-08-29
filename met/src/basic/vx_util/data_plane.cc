@@ -476,7 +476,7 @@ return;
    //  Note: this function could be speeded up a lot, I think
    //
 
-bool DataPlane::fitwav_1d(const int start_wave, const int end_wave)
+bool DataPlane::fitwav_1d_old(const int start_wave, const int end_wave)
 
 {
 
@@ -503,7 +503,7 @@ for (j=0; j<Nxy; ++j)  {
 if ( start_wave < 0   || end_wave < 0 ||
      start_wave > mnw || end_wave > mnw )  {
 
-   mlog << Error << "\nDataPlane::fitwav_1d() -> "
+   mlog << Error << "\nDataPlane::fitwav_1d_old() -> "
         << "Requested wave numbers (" << start_wave << " to " << end_wave
         << ") must be between 0 and " << mnw << " for data with dimension "
         << "(Nx, Ny) = (" << Nx << ", " << Ny << ")!\n\n";
@@ -577,6 +577,129 @@ for (j=0; j<Ny; ++j)  {
    /////////////////////////////
 
 }   //  for j
+
+
+   //
+   //  done
+   //
+
+if ( a )  { delete [] a;  a = 0; }
+if ( b )  { delete [] b;  b = 0; }
+
+if ( xa )  { delete [] xa;  xa = 0; }
+if ( xb )  { delete [] xb;  xb = 0; }
+
+return(true);
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool DataPlane::fitwav_1d(const int start_wave, const int end_wave)
+
+{
+
+int i, x, y;
+double * a = 0;
+double * b = 0;
+double * xa = 0;
+double * xb = 0;
+double xa0, value, angle;
+const int mnw = (Nx + 1)/2;
+// const int mnw = Nx - 1;
+
+   //
+   // Check for bad data
+   //
+
+for (i=0; i<Nxy; ++i)  {
+   if (is_bad_data(Data[i])) return ( false );
+}
+
+   //
+   // Range check the requested wave numbers
+   //
+
+if ( start_wave < 0   || end_wave < 0 ||
+     start_wave > mnw || end_wave > mnw )  {
+
+   mlog << Error << "\nDataPlane::fitwav_1d() -> "
+        << "Requested wave numbers (" << start_wave << " to " << end_wave
+        << ") must be between 0 and " << mnw << " for data with dimension "
+        << "(Nx, Ny) = (" << Nx << ", " << Ny << ")!\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   // Allocate memory
+   //
+
+a  = new double [ mnw + 1 ];
+b  = new double [ mnw + 1 ];
+xa = new double [ mnw + 1 ];
+xb = new double [ mnw + 1 ];
+
+for (y=0; y<Ny; ++y)  {
+
+   xa0 = 0.0;
+
+   for (x=0; x<Nx; ++x)  {
+
+      xa0 += get(x, y);
+
+   }   //  for x
+
+   a[0] = xa0/Nx;
+   b[0] = 0.0;
+
+   /////////////////////////////
+
+   for (i=1; i<=mnw; ++i)  {
+
+      xa[i] = xb[i] = 0.0;
+
+      for (x=0; x<Nx; ++x)  {
+
+         angle = (twopi*i*x)/Nx;
+
+         xa[i] += (get(x, y))*cos(angle);
+         xb[i] += (get(x, y))*sin(angle);
+
+      }   //  for x
+
+      a[i] = (2.0*xa[i])/Nx;
+      b[i] = (2.0*xb[i])/Nx;
+
+   }   //  for i
+
+   /////////////////////////////
+
+   for (x=0; x<Nx; ++x)  {
+
+      value = 0.0;
+
+      for (i=start_wave; i<=end_wave; ++i)  {
+      // for (i=0; i<=mnw; ++i)  {
+
+         angle = (twopi*i*x)/Nx;
+
+         value += (a[i])*cos(angle);
+
+         value += (b[i])*sin(angle);
+
+      }   //  for i
+
+      put(value, x, y);
+
+   }   //  for x
+
+   /////////////////////////////
+
+}   //  for y
 
 
    //
