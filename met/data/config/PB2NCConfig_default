@@ -12,6 +12,11 @@
 message_type = [];
 
 //
+// Mapping of input PrepBufr message types to output message types
+//
+message_type_map = [];
+
+//
 // PrepBufr station ID
 //
 station_id = [];

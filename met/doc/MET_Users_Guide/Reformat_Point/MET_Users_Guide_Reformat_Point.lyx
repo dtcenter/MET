@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -132,7 +134,7 @@ This section describes how to configure and run the PB2NC tool.
 pb2nc usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:pb2nc-usage"
+name "subsec:pb2nc-usage"
 
 \end_inset
 
@@ -585,7 +587,7 @@ sample_pb.nc
 pb2nc configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:pb2nc-configuration-file"
+name "subsec:pb2nc-configuration-file"
 
 \end_inset
 
@@ -723,7 +725,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -757,6 +759,62 @@ Each PrepBufr message is tagged with one of eighteen message types as listed
  value (or 'report') was derived.
  The user may specify a comma-separated list of message types to be retained.
  Providing an empty list indicates that all message types should be retained.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+message_type_map = [ { key = 
+\begin_inset Quotes eld
+\end_inset
+
+AIRCAR
+\begin_inset Quotes erd
+\end_inset
+
+; val = 
+\begin_inset Quotes eld
+\end_inset
+
+AIRCAR_PROFILES
+\begin_inset Quotes erd
+\end_inset
+
+; } ];
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series medium
+The 
+\series bold
+message_type_map
+\series medium
+ entry is an array of dictionaries, each containing a 
+\series bold
+key
+\series medium
+ string and 
+\series bold
+val
+\series medium
+ string.
+ This defines a mapping of input PrepBufr message types to output message
+ types.
+ This provides a method for renaming input PrepBufr message types.
 \end_layout
 
 \begin_layout Standard
@@ -1014,7 +1072,7 @@ name "table_reform-point_pb2nc_level_category"
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="2in">
 <column alignment="center" valignment="top" width="4in">
 <row>
@@ -1330,7 +1388,7 @@ BOTTOM
 pb2nc output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:pb2nc-output"
+name "subsec:pb2nc-output"
 
 \end_inset
 
@@ -1393,7 +1451,7 @@ name "table_reform-point_pb2nc_output_dim"
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2in">
 <column alignment="left" valignment="top" width="4in">
 <row>
@@ -1589,7 +1647,7 @@ name "table_reform-point_pb2nc_output_vars"
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1in">
 <column alignment="left" valignment="top" width="1in">
 <column alignment="left" valignment="top" width="4in">
@@ -1997,7 +2055,7 @@ name "table_reform-point_ascii2nc_format"
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.5in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4in">
@@ -2405,7 +2463,7 @@ Observation value in units consistent with the GRIB code definition.
 ascii2nc usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:ascii2nc-usage"
+name "subsec:ascii2nc-usage"
 
 \end_inset
 
@@ -2710,7 +2768,7 @@ sid
  entry in 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2830,7 +2888,7 @@ sample_ascii_obs.nc
 ascii2nc configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:ascii2nc-configuration-file"
+name "subsec:ascii2nc-configuration-file"
 
 \end_inset
 
@@ -2882,7 +2940,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -3152,7 +3210,7 @@ This entry is an array of dictionaries, each containing a "key" string and
 ascii2nc output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:ascii2nc-output"
+name "subsec:ascii2nc-output"
 
 \end_inset
 
@@ -3166,7 +3224,7 @@ The NetCDF output of the ASCII2NC tool is structured in the same way as
  the output of the PB2NC tool described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-output"
+reference "subsec:pb2nc-output"
 
 \end_inset
 
@@ -3219,7 +3277,7 @@ http://madis.noaa.gov
 madis2nc usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:madis2nc-usage"
+name "subsec:madis2nc-usage"
 
 \end_inset
 
@@ -3585,7 +3643,7 @@ sid
  entry in 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -3693,7 +3751,7 @@ sample_madis_obs_met.nc
 madis2nc output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:madis2nc-output"
+name "subsec:madis2nc-output"
 
 \end_inset
 
@@ -3707,7 +3765,7 @@ The NetCDF output of the MADIS2NC tool is structured in the same way as
  the output of the PB2NC tool described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-output"
+reference "subsec:pb2nc-output"
 
 \end_inset
 
@@ -4040,7 +4098,7 @@ name "lidar2nc_grib_code_table"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
