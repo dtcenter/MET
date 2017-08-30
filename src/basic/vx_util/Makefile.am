@@ -24,6 +24,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                crr_array.h \
                ncrr_array.h \
                int_array.h \
+               two_d_array.h \
                long_array.cc long_array.h \
                num_array.cc num_array.h \
                thresh_array.cc thresh_array.h \
@@ -59,7 +60,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                GridPoint.h GridPoint.cc \
                GridOffset.h GridOffset.cc \
                RectangularTemplate.h RectangularTemplate.cc
-               
+
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 
 # If we are in development mode, generate the "to_string" files and
