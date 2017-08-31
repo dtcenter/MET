@@ -79,4 +79,22 @@
     </output>
   </test>
   
+  <test name="365_days">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>no_leap</value></pair>
+      <pair><name>APPLY_MASK</name> <value>FALSE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/easm/base_series_spei12_annual_mean.nc \
+      &DATA_DIR_MODEL;/easm/base_series_spei12_annual_mean.nc \
+      &CONFIG_DIR;/GridStatConfig_no_leap \
+      -outdir &OUTPUT_DIR;/netcdf/grid_stat -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/netcdf/grid_stat/grid_stat_no_leap_000000L_19860101_000000V.stat</grid_nc>
+    </output>
+  </test>
+  
 </met_test>
