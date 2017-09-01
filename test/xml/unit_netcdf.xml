@@ -93,7 +93,7 @@
       -outdir &OUTPUT_DIR;/netcdf/grid_stat -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/netcdf/grid_stat/grid_stat_no_leap_000000L_19860101_000000V.stat</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/netcdf/grid_stat/grid_stat_no_leap_000000L_19860101_000000V_pairs.nc</grid_nc>
     </output>
   </test>
   
