@@ -209,7 +209,7 @@ void STATAnalysisJob::clear() {
    for(int i=1; i*default_eclv_points < 1.0; i++) {
       out_eclv_points.add(i*default_eclv_points);
    }
- 
+
    mask_poly.clear();
    mask_sid.clear();
 
@@ -1829,7 +1829,7 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
    //
    for(i=0; i<column_case.n_elements(); i++) {
       key << (i == 0 ? "" : ":")
-          << L.get_item(column_case[i], false);
+          << L.get(column_case[i], false);
    }
 
    return(key);
