@@ -3847,7 +3847,7 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
    // Build case information for the map key
    for(i=0; i<case_cols.n_elements(); i++) {
 
-      cur = l.get_item(case_cols[i]);
+      cur = l.get(case_cols[i]);
 
       // For bad data, use the NA string
       if(is_bad_data(atoi(cur))) cur = na_str;

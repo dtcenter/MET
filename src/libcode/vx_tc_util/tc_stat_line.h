@@ -73,6 +73,7 @@ class TCStatLine : public DataLine {
       // Retrieve values of the header columns
       //
 
+      ConcatString get          (const char *, bool check_na = true) const;
       const char * get_item     (const char *, bool check_na = true) const;
       const char * get_item     (int,          bool check_na = true) const;
 

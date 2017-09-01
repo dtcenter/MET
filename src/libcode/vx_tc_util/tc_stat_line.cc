@@ -164,6 +164,26 @@ int TCStatLine::is_header() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString TCStatLine::get(const char *col_str, bool check_na) const {
+
+   ConcatString cs = get_item(col_str, check_na);
+
+   //
+   // If not found, check derivable timing columns
+   //
+   if( cs == bad_data_str ) {
+
+      if(strcasecmp(col_str, conf_key_init_hour) == 0)
+         cs = sec_to_hhmmss(init_hour());
+      else if(strcasecmp(col_str, conf_key_valid_hour) == 0)
+         cs = sec_to_hhmmss(valid_hour());
+   }
+
+   return(cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 const char * TCStatLine::get_item(const char *col_str, bool check_na) const {
    int offset = bad_data_int;
    int dim = bad_data_int;
