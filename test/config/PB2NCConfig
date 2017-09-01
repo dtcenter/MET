@@ -64,7 +64,7 @@ instrument_type = [];
 //
 level_range = {
    beg = 1;
-   end = 255;
+   end = 1024;
 }
 
 level_category = [];
