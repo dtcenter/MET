@@ -321,6 +321,44 @@ return ( Type == stat_header );
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString STATLine::get(const char *col_str, bool check_na) const
+
+{
+
+ConcatString cs = get_item(col_str, check_na);
+
+   //
+   // If not found, check derivable timing columns
+   //
+
+if ( cs == bad_data_str )  {
+
+   if ( strcasecmp(col_str, conf_key_fcst_init_beg) == 0 )
+      cs = unix_to_yyyymmdd_hhmmss(fcst_init_beg());
+   else if ( strcasecmp(col_str, conf_key_fcst_init_end) == 0 )
+      cs = unix_to_yyyymmdd_hhmmss(fcst_init_end());
+   else if ( strcasecmp(col_str, conf_key_fcst_init_hour) == 0 )
+      cs = sec_to_hhmmss(fcst_init_hour());
+   else if ( strcasecmp(col_str, conf_key_fcst_valid_hour) == 0 )
+      cs = sec_to_hhmmss(fcst_valid_hour());
+   else if ( strcasecmp(col_str, conf_key_obs_init_beg) == 0 )
+      cs = unix_to_yyyymmdd_hhmmss(obs_init_beg());
+   else if ( strcasecmp(col_str, conf_key_obs_init_end) == 0 )
+      cs = unix_to_yyyymmdd_hhmmss(obs_init_beg());
+   else if ( strcasecmp(col_str, conf_key_obs_init_hour) == 0 )
+      cs = sec_to_hhmmss(obs_init_hour());
+   else if ( strcasecmp(col_str, conf_key_obs_valid_hour) == 0 )
+      cs = sec_to_hhmmss(obs_valid_hour());
+
+}
+
+return ( cs );
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 const char * STATLine::get_item(const char *col_str, bool check_na) const
 
 {
