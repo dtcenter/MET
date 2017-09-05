@@ -601,14 +601,18 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave)
 
 {
 
-int i, x, y;
+int i, m, x, y;
 double * a = 0;
 double * b = 0;
 double * xa = 0;
 double * xb = 0;
+double * C = 0;
+double * S = 0;
 double xa0, value, angle;
 const int mnw = (Nx + 1)/2;
 // const int mnw = Nx - 1;
+
+// const time_t start_time = time(0);
 
    //
    // Check for bad data
@@ -643,6 +647,21 @@ b  = new double [ mnw + 1 ];
 xa = new double [ mnw + 1 ];
 xb = new double [ mnw + 1 ];
 
+C = new double [ Nx ];
+S = new double [ Nx ];
+
+for (x=0; x<Nx; ++x)  {
+
+   angle = (twopi*x)/Nx;
+
+   C[x] = cos(angle);
+
+   S[x] = sin(angle);
+
+}
+
+
+
 for (y=0; y<Ny; ++y)  {
 
    xa0 = 0.0;
@@ -664,10 +683,15 @@ for (y=0; y<Ny; ++y)  {
 
       for (x=0; x<Nx; ++x)  {
 
-         angle = (twopi*i*x)/Nx;
+         m = (i*x)%Nx;
 
-         xa[i] += (get(x, y))*cos(angle);
-         xb[i] += (get(x, y))*sin(angle);
+         // angle = (twopi*i*x)/Nx;
+
+         // xa[i] += (get(x, y))*cos(angle);
+         // xb[i] += (get(x, y))*sin(angle);
+
+         xa[i] += (get(x, y))*(C[m]);
+         xb[i] += (get(x, y))*(S[m]);
 
       }   //  for x
 
@@ -683,13 +707,16 @@ for (y=0; y<Ny; ++y)  {
       value = 0.0;
 
       for (i=start_wave; i<=end_wave; ++i)  {
-      // for (i=0; i<=mnw; ++i)  {
 
-         angle = (twopi*i*x)/Nx;
+         m = (i*x)%Nx;
 
-         value += (a[i])*cos(angle);
+         // angle = (twopi*i*x)/Nx;
 
-         value += (b[i])*sin(angle);
+         // value += (a[i])*cos(angle);
+         // value += (b[i])*sin(angle);
+
+         value += (a[i])*(C[m]);
+         value += (b[i])*(S[m]);
 
       }   //  for i
 
@@ -711,6 +738,15 @@ if ( b )  { delete [] b;  b = 0; }
 
 if ( xa )  { delete [] xa;  xa = 0; }
 if ( xb )  { delete [] xb;  xb = 0; }
+
+if ( C )  { delete [] C;  C = 0; }
+if ( S )  { delete [] S;  S = 0; }
+
+// cout << "\n\n  Elapsed time: " << (time(0) - start_time) << "\n\n";
+
+   //
+   //  done
+   //
 
 return(true);
 
