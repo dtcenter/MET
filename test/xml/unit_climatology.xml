@@ -84,4 +84,22 @@
     </output>
   </test>
 
+  <test name="climatology_GRID_STAT_WMO_1.5DEG">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>WMO_CLIMO_1.5DEG</value></pair>
+      <pair><name>CLIMO_DIR</name>     <value>&DATA_DIR_CLIMO;/ERA_DAILY_1.5deg</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_climo_WMO \
+      -outdir &OUTPUT_DIR;/climatology -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology/grid_stat_WMO_CLIMO_1.5DEG_240000L_20120410_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/climatology/grid_stat_WMO_CLIMO_1.5DEG_240000L_20120410_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
