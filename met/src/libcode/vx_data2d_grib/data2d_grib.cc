@@ -574,7 +574,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
             mlog << Warning << "\nMetGrib1DataFile::data_plane_array() -> "
                  << "when deriving winds, the number of U-wind records ("
                  << u_plane_array.n_planes() << ") does not match the "
-                 << "number of V-wind record (" << v_plane_array.n_planes()
+                 << "number of V-wind records (" << v_plane_array.n_planes()
                  << " for GRIB file \"" << filename() << "\".\n\n";
             return(0);
          }
