@@ -967,15 +967,23 @@ void process_scores() {
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
-               // Read the gridded data from the input forecast file for UGRD
+               // Index for UGRD
                int ui = conf_info.fcst_info[i]->uv_index();
+
+               // Read forecast data for UGRD
                if(!read_data_plane(conf_info.fcst_info[ui],
                                    conf_info.regrid_info,
                                    fu_dp, fcst_mtddf, fcst_file)) continue;
 
+               // Read observation data for UGRD
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
+
+               // Read climatology data for UGRD
+               cmnu_dp = read_climo_data_plane(
+                           conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                           ui, fcst_dp.valid(), grid);
 
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
@@ -1446,15 +1454,23 @@ void process_scores() {
                // Initialize
                for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
-               // Read the gridded data from the input forecast file for UGRD
+               // Index for UGRD
                int ui = conf_info.fcst_info[i]->uv_index();
+
+               // Read forecast data for UGRD
                if(!read_data_plane(conf_info.fcst_info[ui],
                                    conf_info.regrid_info,
                                    fu_dp, fcst_mtddf, fcst_file)) continue;
 
+               // Read observation data for UGRD
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
+
+               // Read climatology data for UGRD
+               cmnu_dp = read_climo_data_plane(
+                           conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                           ui, fcst_dp.valid(), grid);
 
                // Apply Fourier decomposition to the U-wind fields
                fu_dp_smooth = fu_dp;
