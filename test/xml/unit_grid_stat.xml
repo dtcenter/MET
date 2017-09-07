@@ -9,6 +9,7 @@
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
   <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
 <met_test>
@@ -200,4 +201,23 @@
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MET-621_APPLY_MASK_FALSE_060000L_20130827_180000V_pairs.nc</grid_nc>
     </output>
   </test>
+
+  <test name="grid_stat_GFS_FOURIER">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>GFS_FOURIER</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_fourier \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GFS_FOURIER_240000L_20120410_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_GFS_FOURIER_240000L_20120410_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
