@@ -238,7 +238,7 @@
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_UW_MEAN_9.nc</grid_nc>
     </output>
   </test>
-  
+
 
   <test name="regrid_data_plane_GFS_TO_HMT_DW_MEAN_3">
     <exec>&MET_DIR;/bin/regrid_data_plane</exec>
@@ -296,5 +296,19 @@
       <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_LS_FIT_3.nc</grid_nc>
     </output>
   </test>
-  
+
+  <test name="regrid_data_plane_GFS_TO_HMT_MAX_5_SQUARE">
+    <exec>&MET_DIR;/bin/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
+      &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_MAX_5_SQUARE.nc \
+      -field 'name="TMP";  level="Z2";' \
+      -method MAX -width 5 -shape SQUARE \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_HMT_MAX_5_SQUARE.nc</grid_nc>
+    </output>
+  </test>
 </met_test>
