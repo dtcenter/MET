@@ -168,12 +168,12 @@
     </output>
   </test>
   
-  <test name="pb2nc_NDAS_mask_sid_list_var_id">
+  <test name="pb2nc_NDAS_mask_poly_conus_var_id">
     <exec>&MET_DIR;/bin/pb2nc</exec>
     <env>
-      <pair><name>STATION_ID</name>          <value>"72265","72274","72364","72426"</value></pair>
+      <pair><name>STATION_ID</name>          <value></value></pair>
       <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value>MET_BASE/poly/CONUS.poly</value></pair>
       <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
     </env>
     <param> \
