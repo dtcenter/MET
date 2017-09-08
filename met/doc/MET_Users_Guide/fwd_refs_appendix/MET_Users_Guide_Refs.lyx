@@ -97,12 +97,7 @@ Alberson, S.D., 1998: Five-day Tropical cyclone track forecasts in the North
 \emph on
 Weather & Forecasting
 \emph default
-, 
-\series default
-Vol
-\series medium
-.
- 13, p.1005-1015.
+,  13, 1005-1015.
 \end_layout
 
 \begin_layout Description
@@ -180,7 +175,7 @@ Bullock,
 R., Fowler, T.
  and Brown, B, 2016: Method for Object-Based Diagnostic Evaluation.
  NCAR Tech.
- Note NCAR/TN-532+STR, 66 pp
+ Note NCAR/TN-532+STR, 66 pp.
 \end_layout
 
 \begin_layout Description
@@ -199,7 +194,7 @@ Meteorol.
 \series default
 11
 \series medium
-, 141-154
+, 141-154.
 \end_layout
 
 \begin_layout Description
@@ -254,7 +249,7 @@ J.
 \series default
 A147
 \series medium
-:278-292.
+, 278-292.
 \end_layout
 
 \begin_layout Description
@@ -483,8 +478,7 @@ Mood
 \emph on
  Introduction to the Theory of Statistics
 \emph default
-, McGraw-Hill, pp.
- 299-338.
+, McGraw-Hill, 299-338.
  
 \end_layout
 
@@ -568,6 +562,20 @@ Meteor.
 \begin_layout Description
 
 \series medium
+Weniger
+\series default
+, M., Kapp, F., and Friederichs, P.: Spatial Verification Using Wavelet Transforms:
+ A Review.
+ 
+\shape italic
+Quarterly Journal of the Royal Meteorological Society
+\shape default
+, 143, 120-136.
+\end_layout
+
+\begin_layout Description
+
+\series medium
 Wilks,
 \series default
  D.S.
@@ -575,7 +583,7 @@ Wilks,
  serial dependence.
  Q.J.R.
  Meteorol.
- Soc., 136: 2109–2118.
+ Soc., 136, 2109–2118.
  doi:10.1002/qj.709
 \end_layout
 
