@@ -167,7 +167,11 @@
       <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_all.nc</point_nc>
     </output>
   </test>
-  
+
+  <!-- This is derived from pb2nc_NDAS_mask_poly_conus which saves the grib_code.
+       This unit test saves obs array by using variable index.
+       The output of pb2nc_NDAS_mask_poly_conus_var_id is used as input for point_stat.
+       The mathcing unit test at point_stat is point_stat_GRIB2_NAM_NDAS_var_id. -->
   <test name="pb2nc_NDAS_mask_poly_conus_var_id">
     <exec>&MET_DIR;/bin/pb2nc</exec>
     <env>
