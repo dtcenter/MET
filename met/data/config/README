@@ -588,7 +588,7 @@ fcst = {
 obs = fcst;
 
 //
-// The "climo_mean" dictionary specifies climatology data to read by the
+// The "climo_mean" dictionary specifies climatology data to be read by the
 // Grid-Stat, Point-Stat, and Ensemble-Stat tools.  It consists of several
 // entires defining the climatology file names and fields to be used.
 //
@@ -637,6 +637,51 @@ climo_mean = {
    match_day          = FALSE;
    time_step          = 21600;
 }
+
+//
+// The "climo_stdev" dictionary specifies climatology standard deviation data to
+// be read by the Grid-Stat and Point-Stat tools.  This data is used to subset
+// matched pairs into climatological bins based on where the observation value
+// falls within the climatological distribution.  This dictionary is identical
+// to the "climo_mean" dictionary described above but points to files containing
+// climatological spread values rather than means.  In the example below, this
+// dictionary is set by copying over the "climo_mean" setting and then updating
+// the "file_name" entry.
+//
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [ "/path/to/climatological/standard/deviation" ];
+}
+
+//
+// The "climo_cdf_bins" entry should be set either to an integer or an array of
+// floats between 0 and 1.  When climatological mean and standard deviation data
+// are provided, this entry defines how matched pairs should be subset into
+// climatological bins.  MET uses the climatological mean and standard deviation
+// to construct a normal PDF at each observation location.  The total area under
+// the PDF is 1.  When set to an integer, this entry specifies the number of
+// equal-area climatological bins to be used.  For example, a value of 10
+// results in 10 bins, each representing 10% of the area under the PDF.
+// Alternatively, this entry may be set to an array of floats to explicitly
+// define non-equal area climatological bins.  If set to an array, it must begin
+// with 0.0 and end with 1.0.  Examples of both options are shown below.
+// Setting the number of bins to 1 effectively disables this logic.
+//
+climo_cdf_bins = 1;
+climo_cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
+
+//
+// The "write_climo_bins" entry is a boolean which should be set to TRUE or
+// FALSE.  When climatological mean and standard deviation data are provided
+// the matched pairs are subset into climatological bins, as described above.
+// Partial sums are computed for the pairs in each of the bins.  The final
+// partial sum values reported in the MET output files are the mean across those
+// bins.  Setting this option to TRUE indicates that MET should also write out
+// the partial sums separately for each climatological bin.  The bin information
+// is indicated in the MET output by appending "_BIN#" to the VX_MASK column
+// entry, where # indicates the bin number.
+//
+write_cdf_bins = FALSE;
 
 //
 // The "mask_missing_flag" entry specifies how missing data should be handled
