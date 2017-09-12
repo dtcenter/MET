@@ -60,6 +60,7 @@ typedef struct {
    int EnsType;
    int EnsNumber;
    int DerType;
+   int StatType;
 } Grib2Record;
 
 

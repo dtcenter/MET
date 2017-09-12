@@ -107,6 +107,7 @@ void VarInfoGrib2::assign(const VarInfoGrib2 &v) {
    Process    = v.process();
    EnsType    = v.ens_type();
    DerType    = v.der_type();
+   StatType   = v.stat_type();
 
    return;
 }
@@ -129,6 +130,7 @@ void VarInfoGrib2::clear() {
    Process    = bad_data_int;
    EnsType    = bad_data_int;
    DerType    = bad_data_int;
+   StatType   = bad_data_int;
 
    return;
 }
@@ -148,7 +150,8 @@ void VarInfoGrib2::dump(ostream &out) const {
        << "  PDTmpl     = " << PDTmpl     << "\n"
        << "  Process    = " << Process    << "\n"
        << "  EnsType    = " << EnsType    << "\n"
-       << "  DerType    = " << DerType    << "\n";
+       << "  DerType    = " << DerType    << "\n"
+       << "  StatType   = " << StatType   << "\n";
 
    return;
 }
@@ -225,6 +228,13 @@ void VarInfoGrib2::set_der_type(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfoGrib2::set_stat_type(int v) {
+   StatType = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoGrib2::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Validate the magic_string
@@ -257,6 +267,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    Process                 = dict.lookup_int   (conf_key_GRIB2_process,   false);
    EnsType                 = dict.lookup_int   (conf_key_GRIB2_ens_type,  false);
    DerType                 = dict.lookup_int   (conf_key_GRIB2_der_type,  false);
+   StatType                = dict.lookup_int   (conf_key_GRIB2_stat_type, false);
 
    //  if the name is specified, use it
    if( !field_name.empty() ){

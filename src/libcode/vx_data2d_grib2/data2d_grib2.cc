@@ -387,10 +387,11 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       }
 
       //  test additional config file options
-      if( (!is_bad_data(vinfo->pdt())      && vinfo->pdt()      != (*it)->PdsTmpl ) ||
-          (!is_bad_data(vinfo->process())  && vinfo->process()  != (*it)->Process ) ||
-          (!is_bad_data(vinfo->ens_type()) && vinfo->ens_type() != (*it)->EnsType ) ||
-          (!is_bad_data(vinfo->der_type()) && vinfo->der_type() != (*it)->DerType ) ){
+      if( (!is_bad_data(vinfo->pdt())       && vinfo->pdt()       != (*it)->PdsTmpl  ) ||
+          (!is_bad_data(vinfo->process())   && vinfo->process()   != (*it)->Process  ) ||
+          (!is_bad_data(vinfo->ens_type())  && vinfo->ens_type()  != (*it)->EnsType  ) ||
+          (!is_bad_data(vinfo->der_type())  && vinfo->der_type()  != (*it)->DerType  ) ||
+          (!is_bad_data(vinfo->stat_type()) && vinfo->stat_type() != (*it)->StatType ) ){
          continue;
       }
 
@@ -672,16 +673,21 @@ void MetGrib2DataFile::read_grib2_record_list() {
                exit(1);
          }
 
-         //  ensemble type and number for templates 1 and 11
+         //  ensemble type and number for templates 1 and 11 (Table 4.6)
          if( 1 == gfld->ipdtnum || 11 == gfld->ipdtnum ){
             rec->EnsType   = gfld->ipdtmpl[15];
             rec->EnsNumber = gfld->ipdtmpl[16];
          }
 
-         //  derived type and number for templates 2 to 4 and 12 to 14
+         //  derived type and number for templates 2 to 4 and 12 to 14 (Table 4.7)
          if( (  2 <= gfld->ipdtnum &&  4 >= gfld->ipdtnum ) ||
              ( 12 <= gfld->ipdtnum && 14 >= gfld->ipdtnum ) ){
             rec->DerType = gfld->ipdtmpl[15];
+         }
+
+         //  statistical processing type for template 8 (Table 4.10)
+         if( 8 == gfld->ipdtnum ){
+            rec->StatType = gfld->ipdtmpl[23];
          }
 
          //  depending on the template number, determine the reference times

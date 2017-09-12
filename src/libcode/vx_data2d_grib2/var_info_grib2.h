@@ -51,10 +51,11 @@ class VarInfoGrib2 : public VarInfo
       // Section 4
       int ParmCat;    // Parameter Category by Product Discipline
       int Parm;       // Parameter Number by Product Discipline and Parameter Category
-      int PDTmpl;     // Product Definition Template Number
-      int Process;    // Type of Generating Process
-      int EnsType;    // Type of Ensemble Forecast
-      int DerType;    // Derived Forecast
+      int PDTmpl;     // Product Definition Template Number (Table 4.0)
+      int Process;    // Type of Generating Process (Table 4.3)
+      int EnsType;    // Type of Ensemble Forecast (Table 4.6)
+      int DerType;    // Derived Forecast (Table 4.7)
+      int StatType;   // Statistical Processing Type (Table 4.10)
 
       void init_from_scratch();
       void assign(const VarInfoGrib2 &);
@@ -83,6 +84,7 @@ class VarInfoGrib2 : public VarInfo
       int         process()     const;
       int         ens_type()    const;
       int         der_type()    const;
+      int         stat_type()   const;
 
          //
          // set stuff
@@ -101,6 +103,7 @@ class VarInfoGrib2 : public VarInfo
       void set_process(int);
       void set_ens_type(int);
       void set_der_type(int);
+      void set_stat_type(int);
 
          //
          // do stuff
@@ -131,6 +134,7 @@ inline int         VarInfoGrib2::pdt()        const { return(PDTmpl);       }
 inline int         VarInfoGrib2::process()    const { return(Process);      }
 inline int         VarInfoGrib2::ens_type()   const { return(EnsType);      }
 inline int         VarInfoGrib2::der_type()   const { return(DerType);      }
+inline int         VarInfoGrib2::stat_type()  const { return(StatType);     }
 
 ////////////////////////////////////////////////////////////////////////
 
