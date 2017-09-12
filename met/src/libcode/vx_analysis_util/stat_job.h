@@ -132,6 +132,8 @@ class STATAnalysisJob {
 
       int  is_keeper(const STATLine &) const;
 
+      double get_column_double(const STATLine &, const ConcatString &) const;
+
       void parse_job_command(const char *);
       void add_column_thresh(const char *, const char *);
 

@@ -554,6 +554,7 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 int STATAnalysisJob::is_keeper(const STATLine & L) const {
+   double v_dbl;
 
    //
    // model
@@ -783,9 +784,14 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
        thr_it != column_thresh_map.end(); thr_it++) {
 
       //
-      // Check if the current value meets the threshold criteria
+      // Get the numeric column value
       //
-      if(!thr_it->second.check_dbl(atof(L.get_item(thr_it->first)))) return(0);
+      v_dbl = get_column_double(L, thr_it->first);
+
+      //
+      // Check the column threshold
+      //
+      if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) return(0);
    }
 
    //
@@ -813,6 +819,53 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    }
 
    return(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double STATAnalysisJob::get_column_double(const STATLine &L,
+                                          const ConcatString &col_name) const {
+   StringArray sa;
+   ConcatString in;
+   double v, v_cur;
+   bool abs_flag = false;
+   int i;
+
+   // Check for absolute value
+   if(strncasecmp(col_name, "ABS", 3) == 0) {
+      abs_flag = true;
+      sa = col_name.split("()");
+      in = sa[1];
+   }
+   else {
+      in = col_name;
+   }
+
+   // Split the input column name on hyphens for differences
+   sa = in.split("-");
+
+   // Get the first value
+   v = atof(L.get_item(sa[0]));
+
+   // If multiple columns, compute the requested difference
+   if(sa.n_elements() > 1) {
+
+      // Loop through the column
+      for(i=1; i<sa.n_elements(); i++) {
+
+         // Get the current column value
+         v_cur = atof(L.get_item(sa[i]));
+
+         // Compute the difference, checking for bad data
+         if(is_bad_data(v) || is_bad_data(v_cur)) v  = bad_data_double;
+         else                                     v -= v_cur;
+      }
+   }
+
+   // Apply absolute value, if requested
+   if(abs_flag && !is_bad_data(v)) v = fabs(v);
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
