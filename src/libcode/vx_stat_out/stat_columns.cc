@@ -188,7 +188,7 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
       c += n_header_columns;
    }
 
-   // Write the columns names specific to the pstd line type
+   // Write the columns names specific to the PSTD line type
    at.set_entry(r, c+0,  pstd_columns[0]);
    at.set_entry(r, c+1,  pstd_columns[1]);
    at.set_entry(r, c+2,  pstd_columns[2]);
@@ -205,11 +205,12 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    at.set_entry(r, c+13, pstd_columns[13]);
    at.set_entry(r, c+14, pstd_columns[14]);
    at.set_entry(r, c+15, pstd_columns[15]);
+   at.set_entry(r, c+16, pstd_columns[16]);
 
    // Write THRESH_i for each threshold
-   for(i=0, col=c+16; i<n_thresh; i++) {
+   for(i=0, col=c+17; i<n_thresh; i++) {
 
-      sprintf(tmp_str, "%s%i", pstd_columns[16], i+1);
+      sprintf(tmp_str, "%s%i", pstd_columns[17], i+1);
       at.set_entry(r, col, tmp_str); // Threshold
       col++;
    }
@@ -2630,7 +2631,7 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //    RESOLUTION,  UNCERTAINTY, ROC_AUC,
    //    BRIER,       BRIER_NCL,   BRIER_NCU,
    //    BRIERCL,     BRIERCL_NCL, BRIERCL_NCU,
-   //    BSS,         [THRESH] (for each threshold),
+   //    BSS,         BSS_SMPL,    [THRESH] (for each threshold)
    //
    at.set_entry(r, c+0,  // Total count
       pct_info.pct.n());
@@ -2680,10 +2681,13 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    at.set_entry(r, c+15, // Brier Skill Score
       pct_info.bss);
 
+   at.set_entry(r, c+16, // Brier Skill Score using sample climo
+      pct_info.pct.bss_smpl());
+
    //
    // Write THRESH_i for each probability threshold
    //
-   for(i=0, col=c+16; i<=pct_info.pct.nrows(); i++) {
+   for(i=0, col=c+17; i<=pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));

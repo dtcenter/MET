@@ -593,6 +593,35 @@ return ( b );
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Reference: Equation 8.43, page 340 in Wilks, 3rd Ed.
+   //
+
+double Nx2ContingencyTable::bss_smpl() const
+
+{
+
+double res, rel, unc, bss;
+
+res = resolution();
+rel = reliability();
+unc = uncertainty();
+
+if (is_bad_data(res) || is_bad_data(rel) || is_bad_data(unc))  {
+   bss = bad_data_double;
+}
+else {
+   bss = ( res - rel ) / unc;
+}
+
+return ( bss );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double Nx2ContingencyTable::brier_score() const
 
 {

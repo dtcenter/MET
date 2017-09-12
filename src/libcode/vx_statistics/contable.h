@@ -224,6 +224,7 @@ class Nx2ContingencyTable : public ContingencyTable {
       double reliability  () const;
       double resolution   () const;
       double uncertainty  () const;
+      double bss_smpl     () const;
 
       double row_obar  (int row) const;
       double     obar  ()        const;
