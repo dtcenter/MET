@@ -458,6 +458,7 @@ regrid = {
 //       - The "GRIB2_cntr" entry specifies the originating center.
 //       - The "GRIB2_ens_type" entry specifies the ensemble type (Table 4.6).
 //       - The "GRIB2_der_type" entry specifies the derived product type (Table 4.7).
+//       - The "GRIB2_stat_type" entry specifies the statistical processing type (Table 4.10).
 //
 //    - NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
 //       - The "name" entry specifies the NetCDF variable name.
