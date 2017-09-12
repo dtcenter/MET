@@ -163,7 +163,7 @@ static const char * pstd_columns [] = {
    "RESOLUTION",  "UNCERTAINTY", "ROC_AUC",
    "BRIER",       "BRIER_NCL",   "BRIER_NCU",
    "BRIERCL",     "BRIERCL_NCL", "BRIERCL_NCU",
-   "BSS",         "THRESH_",
+   "BSS",         "BSS_SMPL",    "THRESH_",
 };
 
 static const char * pjc_columns [] = {
@@ -363,7 +363,7 @@ static const int n_relp_columns         = sizeof(relp_columns)/sizeof(*relp_colu
 
 inline int get_n_mctc_columns  (int n) { return(2  + n*n); }
 inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
-inline int get_n_pstd_columns  (int n) { return(16 +    max(1, n)   ); }
+inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = N_PNT
