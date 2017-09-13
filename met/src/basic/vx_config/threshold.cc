@@ -147,9 +147,9 @@ void Or_Node::multiply_by(const double x)
 
 if ( !left_child || !right_child )  {
 
-   mlog << Error
-        << "Or_Node::multiply_by(const double) -> node not populated!\n\n";
-        
+   mlog << Error << "\nOr_Node::multiply_by(const double) -> "
+        << "node not populated!\n\n";
+
    exit ( 1 );
 
 }
@@ -241,9 +241,9 @@ void And_Node::multiply_by(const double x)
 
 if ( !left_child || !right_child )  {
 
-   mlog << Error
-        << "And_Node::multiply_by(const double) -> node not populated!\n\n";
-        
+   mlog << Error << "\nAnd_Node::multiply_by(const double) -> "
+        << "node not populated!\n\n";
+
    exit ( 1 );
 
 }
@@ -329,9 +329,9 @@ void Not_Node::multiply_by(const double x)
 
 if ( ! child )  {
 
-   mlog << Error
-        << "Not_Node::multiply_by(const double) -> node not populated!\n\n";
-        
+   mlog << Error << "\nNot_Node::multiply_by(const double) -> "
+        << "node not populated!\n\n";
+
    exit ( 1 );
 
 }
@@ -384,20 +384,22 @@ if ( op == thresh_na )  return ( true );
 
 bool tf = false;
 const bool eq = is_eq(x, T);
+const bool is_na = is_bad_data(x);
 
 switch ( op )  {
 
-   case thresh_le:   tf = ( eq || (x <= T));  break;
-   case thresh_lt:   tf = (!eq && (x <  T));  break;
+   case thresh_le:   tf = !is_na && ( eq || (x <= T));  break;
+   case thresh_lt:   tf = !is_na && (!eq && (x <  T));  break;
 
-   case thresh_ge:   tf = ( eq || (x >= T));  break;
-   case thresh_gt:   tf = (!eq && (x >  T));  break;
+   case thresh_ge:   tf = !is_na && ( eq || (x >= T));  break;
+   case thresh_gt:   tf = !is_na && (!eq && (x >  T));  break;
 
    case thresh_eq:   tf =  eq;  break;
    case thresh_ne:   tf = !eq;  break;
 
    default:
-      mlog << Error << "\n\n  Simple_Node::check(double) const -> bad op ... " << op << "\n\n";
+      mlog << Error << "\nSimple_Node::check(double) const -> "
+           << "bad op ... " << op << "\n\n";
       exit ( 1 );
       break;
 
@@ -708,7 +710,8 @@ status = config.read_string(cs);
 
 if ( ! status )  {
 
-   mlog << Error << "\n\n  SingleThresh::set(const char *): failed to parse string \"" << cs << "\"\n\n";
+   mlog << Error << "\nSingleThresh::set(const char *) -> "
+        << "failed to parse string \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
@@ -718,7 +721,8 @@ test_mode = false;
 
 if ( ! result )  {
 
-   mlog << Error << "\n\n  SingleThresh::set(const char *): no result from parsing string \"" << cs << "\"\n\n";
+   mlog << Error << "\nSingleThresh::set(const char *) -> "
+        << "no result from parsing string \"" << cs << "\"\n\n";
 
    exit ( 1 );
 
@@ -813,8 +817,8 @@ void SingleThresh::multiply_by(const double x)
 
 if ( ! node )  {
 
-   mlog << Error
-        << "SingleThresh::multiply_by(const double) -> empty threshold!\n\n";
+   mlog << Error << "\nSingleThresh::multiply_by(const double) -> "
+        << "empty threshold!\n\n";
 
    exit ( 1 );
 

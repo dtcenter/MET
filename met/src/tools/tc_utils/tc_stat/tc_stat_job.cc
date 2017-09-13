@@ -538,7 +538,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          v_dbl = get_column_double(*pair.line(i_init), thr_it->first);
 
          // Check the column threshold
-         if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) {
+         if(!thr_it->second.check_dbl(v_dbl)) {
            keep = false;
            n.RejInitThresh += pair.n_points();
            break;
@@ -677,7 +677,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
          v_dbl = get_column_double(line, thr_it->first);
 
          // Check the column threshold
-         if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) {
+         if(!thr_it->second.check_dbl(v_dbl)) {
            keep = false;
            n.RejColumnThresh++;
            break;
