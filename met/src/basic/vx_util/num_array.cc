@@ -616,6 +616,24 @@ return ( v );
 ////////////////////////////////////////////////////////////////////////
 
 
+double NumArray::iqr()
+
+{
+
+double v, v1, v2;
+
+v1 = percentile_array(0.75);
+v2 = percentile_array(0.25);
+v  = (is_bad_data(v1) || is_bad_data(v2) ? bad_data_double : v1 - v2);
+
+return(v);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NumArray::compute_mean_stdev(double &mn, double &stdev) const
 
 {
@@ -799,6 +817,24 @@ for(j=0; j<Nelements; j++) {
 }
 
 return(max_v);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::range() const
+
+{
+
+double v, v1, v2;
+
+v1 = max();
+v2 = min();
+v  = (is_bad_data(v1) || is_bad_data(v2) ? bad_data_double : v1 - v2);
+
+return(v);
 
 }
 

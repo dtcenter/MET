@@ -88,12 +88,14 @@ class NumArray {
       void   reorder(const NumArray &);
       int    rank_array(int &);
       double percentile_array(double);
+      double iqr();
       void   compute_mean_stdev(double &, double &) const;
       double mean() const;
       double sum() const;
       double mode() const;
       double min() const;
       double max() const;
+      double range() const;
 
       ConcatString serialize() const;
 
