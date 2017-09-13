@@ -791,7 +791,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check the column threshold
       //
-      if(is_bad_data(v_dbl) || !thr_it->second.check_dbl(v_dbl)) return(0);
+      if(!thr_it->second.check_dbl(v_dbl)) return(0);
    }
 
    //
