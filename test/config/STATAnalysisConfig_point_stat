@@ -84,7 +84,10 @@ jobs = [
     -out_thresh >273 -out_eclv_points 0.1",
    "-job filter -fcst_var TMP -fcst_lev Z2 \
     -line_type MPR -mask_sid ${CONFIG_DIR}/SID_CO.txt \
-    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_sid.stat"
+    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_sid.stat",
+   "-job filter -fcst_var TMP -fcst_lev Z2 \
+    -line_type MPR -column_thresh abs(fcst-obs) >5 \
+    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_fcst_minus_obs.stat"
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -232,6 +232,7 @@
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_ctc_by_fcst_thresh_out.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_filter_mpr_sid.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/CONFIG_POINT_STAT_filter_mpr_fcst_minus_obs.stat</stat>
     </output>
   </test>
 
