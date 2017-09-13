@@ -65,4 +65,17 @@
     </output>
   </test>
 
+  <test name="tc_stat_FALSE_ALARMS">
+    <exec>&MET_DIR;/bin/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
+      -job filter -lead 24 -column_thresh BLAT ==-9999 \
+      -dump_row &OUTPUT_DIR;/tc_stat/ALAL2010_FALSE_ALARMS_24_hour.tcst \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_stat/ALAL2010_FALSE_ALARMS_24_hour.tcst</stat>
+    </output>
+  </test>
+
 </met_test>
