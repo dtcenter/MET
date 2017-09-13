@@ -37,10 +37,11 @@ static const char netcdf_magic  [] = "CDF";
 static const char hdf_magic     [] = "HDF";
 static const int  netcdf_magic_len = strlen(netcdf_magic);
 
-static const char nccf_att_name[]  = "Conventions";
-static const char nccf_att_name_l[]  = "conventions";
-static const char nccf_att_name_U[]  = "CONVENTIONS";
-static const char nccf_att_value[] = "CF-";
+static const char nccf_att_name[]   = "Conventions";
+static const char nccf_att_name_l[] = "conventions";
+static const char nccf_att_name_U[] = "CONVENTIONS";
+static const char nccf_att_value[]  = "CF-";
+static const char nccf_att_value2[] = "CF ";
 
 static const char ncmet_att_version[]    = "MET_version";
 static const char ncmet_att_projection[] = "Projection";
@@ -96,7 +97,8 @@ bool is_nccf_file(const char * filename)
          if (!found) found = get_global_att(nc_file, nccf_att_name_l, att_val);
          if (!found) found = get_global_att(nc_file, nccf_att_name_U, att_val);
          if (found) {
-            status = (strncmp(att_val, nccf_att_value, strlen(nccf_att_value)) == 0);
+            status = (strncmp(att_val, nccf_att_value, strlen(nccf_att_value)) == 0
+                 || strncmp(att_val, nccf_att_value2, strlen(nccf_att_value2)) == 0);
          }
       }
    }
