@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -108,7 +110,7 @@ Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:TC_Pairs-output"
+reference "subsec:TC_Pairs-output"
 
 \end_inset
 
@@ -127,7 +129,7 @@ Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:tc_stat-configuration-file"
+reference "subsec:tc_stat-configuration-file"
 
 \end_inset
 
@@ -196,7 +198,7 @@ name "sec:Statistical-aspects"
 Filter TCST lines
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_stat-filter"
+name "subsec:tc_stat-filter"
 
 \end_inset
 
@@ -223,7 +225,7 @@ Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:tc_stat-configuration-file"
+reference "subsec:tc_stat-configuration-file"
 
 \end_inset
 
@@ -236,7 +238,7 @@ reference "sub:tc_stat-configuration-file"
 Summary statistics for columns
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_stat-summary"
+name "subsec:tc_stat-summary"
 
 \end_inset
 
@@ -251,8 +253,18 @@ The TC-Stat tool can be used to produce summary information for a single
  After the user specifies the specific column of interest, and any other
  relevant search criteria, summary information is produced from values in
  that column of data.
- The summary statistics produced are: mean, standard deviation, minimum,
- 10th, 25th, 50th, 75th, and 90th percentiles, and maximum.
+ The summary statistics produced are
+\series default
+ listed in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "table_columnar_output_summary_tc_stat"
+
+\end_inset
+
+
+\series medium
+.
 \end_layout
 
 \begin_layout Standard
@@ -375,7 +387,7 @@ The time-series independence evaluates effective forecast separation time
 Rapid Intensification/Weakening
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_stat-rirw"
+name "subsec:tc_stat-rirw"
 
 \end_inset
 
@@ -431,7 +443,7 @@ Users may specify several job command options to configure the behavior
 Probability of Rapid Intensification
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_stat-probri"
+name "subsec:tc_stat-probri"
 
 \end_inset
 
@@ -492,7 +504,7 @@ tc_stat
 tc_stat usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_stat-usage"
+name "subsec:tc_stat-usage"
 
 \end_inset
 
@@ -632,7 +644,7 @@ Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:tc_stat-configuration-file"
+reference "subsec:tc_stat-configuration-file"
 
 \end_inset
 
@@ -682,7 +694,7 @@ JOB COMMAND LINE
  options are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:tc_stat-configuration-file"
+reference "subsec:tc_stat-configuration-file"
 
 \end_inset
 
@@ -794,14 +806,14 @@ TCStatConfig
  See Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:tc_stat-configuration-file"
+reference "subsec:tc_stat-configuration-file"
 
 \end_inset
 
  for options available for job command line and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_MET-TC-Config-Options"
+reference "subsec:IO_MET-TC-Config-Options"
 
 \end_inset
 
@@ -812,7 +824,7 @@ reference "sub:IO_MET-TC-Config-Options"
 tc_stat configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_stat-configuration-file"
+name "subsec:tc_stat-configuration-file"
 
 \end_inset
 
@@ -958,7 +970,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_MET-TC-Config-Options"
+reference "subsec:IO_MET-TC-Config-Options"
 
 \end_inset
 
@@ -1259,6 +1271,12 @@ The following filtering options can be achieved by the following:
 \series bold
 1.
  init_str_name = ["WATCH_WARN"];
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1274,6 +1292,12 @@ init_str_val = ["ALL"];
 \series bold
 2.
  column_str_name = ["WATCH_WARN"];
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1289,6 +1313,12 @@ column_str_val = ["ALL"];
 \series bold
 3.
  init_str_name = ["WATCH_WARN"];
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1304,6 +1334,12 @@ init_str_val = ["NA"];
 \series bold
 4.
  column_str_name = ["WATCH_WARN"];
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -2054,17 +2090,11 @@ h ge20
 \end_layout
 
 \begin_layout LyX-Code
+\noindent
 
 \series bold
-      -job 
-\series default
-probrirw
-\series bold
- -line_type 
-\series default
-PROBRIRW 
-\series bold
--column_thresh RI_WINDOW ==24 -probri_thresh 30 -probri_prob_thresh ==0.25
+      -job probrirw -line_type PROBRIRW -column_thresh RI_WINDOW ==24 -probri_th
+resh 30 -probri_prob_thresh ==0.25
 \end_layout
 
 \begin_layout Standard
@@ -2083,7 +2113,7 @@ height "1pt"
 tc_stat output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_stat-output"
+name "subsec:tc_stat-output"
 
 \end_inset
 
@@ -2171,7 +2201,8 @@ SUMMARY
 
 , which is followed by the total, mean (with confidence intervals), standard
  deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum
- value, sum, time to independence, and frequency of superior performance.
+ value, interquartile range, range, sum, time to independence, and frequency
+ of superior performance.
  The output columns are shown below in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2234,8 +2265,8 @@ name "table_columnar_output_summary_tc_stat"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="15" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<lyxtabular version="3" rows="17" columns="2">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
@@ -2485,11 +2516,51 @@ Maximum Value
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 17
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Interqurtile range (75th - 25th percentile)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Range (Maximum - Minimum)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+19
 \end_layout
 
 \end_inset
@@ -2509,7 +2580,7 @@ Sum
 \begin_inset Text
 
 \begin_layout Plain Layout
-18-19
+20-21
 \end_layout
 
 \end_inset
@@ -2529,7 +2600,7 @@ Independence time
 \begin_inset Text
 
 \begin_layout Plain Layout
-20-23
+22-25
 \end_layout
 
 \end_inset

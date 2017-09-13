@@ -317,7 +317,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     ofstream *sa_out, gsl_rng *rng_ptr) {
    STATLine line;
    int i, k, r, c;
-   double v, min, v10, v25, v50, v75, v90, max;
+   double v, min, v10, v25, v50, v75, v90, max, iqr, range;
    CIInfo mean_ci, stdev_ci;
    AsciiTable out_at;
    ConcatString key;
@@ -445,7 +445,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
 
       //
       // Compute the summary information for this collection of values:
-      // min, max, v10, v25, v50, 75, v90
+      // min, max, v10, v25, v50, 75, v90, iqr, range
       //
       min = it->second.percentile_array(0.00);
       v10 = it->second.percentile_array(0.10);
@@ -454,6 +454,9 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
       v75 = it->second.percentile_array(0.75);
       v90 = it->second.percentile_array(0.90);
       max = it->second.percentile_array(1.00);
+
+      iqr   = (is_bad_data(v75) || is_bad_data(v25) ? bad_data_double : v75 - v25);
+      range = (is_bad_data(max) || is_bad_data(min) ? bad_data_double : max - min);
 
       //
       // Compute a bootstrap confidence interval for the mean of this
@@ -501,6 +504,8 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
       out_at.set_entry(r, c++, v75);
       out_at.set_entry(r, c++, v90);
       out_at.set_entry(r, c++, max);
+      out_at.set_entry(r, c++, iqr);
+      out_at.set_entry(r, c++, range);
 
    } // end for it
 

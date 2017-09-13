@@ -2103,7 +2103,7 @@ void TCStatJobSummary::do_output(ostream &out) {
 
    // Setup the output table
    out_at.set_size((int) SummaryMap.size() + 1,
-                   CaseColumn.n_elements() + 22);
+                   CaseColumn.n_elements() + 24);
 
    // Left-justify case info and right-justify summary output
    for(i=0; i<out_at.ncols(); i++) {
@@ -2144,6 +2144,8 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_entry(r, c++, "P75");
    out_at.set_entry(r, c++, "P90");
    out_at.set_entry(r, c++, "MAX");
+   out_at.set_entry(r, c++, "IQR");
+   out_at.set_entry(r, c++, "RANGE");
    out_at.set_entry(r, c++, "SUM");
    out_at.set_entry(r, c++, "TS_INT");
    out_at.set_entry(r, c++, "TS_IND");
@@ -2218,6 +2220,8 @@ void TCStatJobSummary::do_output(ostream &out) {
       out_at.set_entry(r, c++, v.percentile_array(0.75));
       out_at.set_entry(r, c++, v.percentile_array(0.90));
       out_at.set_entry(r, c++, v.max());
+      out_at.set_entry(r, c++, v.iqr());
+      out_at.set_entry(r, c++, v.range());
       out_at.set_entry(r, c++, v.sum());
       if(is_bad_data(dsec)) out_at.set_entry(r, c++, dsec);
       else                  out_at.set_entry(r, c++, sec_to_hhmmss(dsec));

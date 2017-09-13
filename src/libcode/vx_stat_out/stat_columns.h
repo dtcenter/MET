@@ -282,7 +282,7 @@ static const char * job_sum_columns [] = {
    "STDEV",       "STDEV_BCL",   "STDEV_BCU",
    "MIN",
    "P10",         "P25",         "P50",          "P75",         "P90",
-   "MAX"
+   "MAX",         "IQR",         "RANGE"
 };
 
 static const char * job_go_columns [] = {

@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -112,28 +114,28 @@ The Stat-Analysis tool requires STAT output from Point-Stat, Grid-Stat,
  See Sections 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:point_stat-output"
+reference "subsec:point_stat-output"
 
 \end_inset
 
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:grid_stat-output"
+reference "subsec:grid_stat-output"
 
 \end_inset
 
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:ensemble_stat-output"
+reference "subsec:ensemble_stat-output"
 
 \end_inset
 
 , or 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:wavelet_stat-output"
+reference "subsec:wavelet_stat-output"
 
 \end_inset
 
@@ -203,7 +205,7 @@ The Stat-Analysis tool can be used to simply filter out specific STAT lines
 Summary statistics for columns
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:StA_Summary-statistics-for"
+name "subsec:StA_Summary-statistics-for"
 
 \end_inset
 
@@ -219,7 +221,8 @@ The Stat-Analysis tool can be used to produce summary information for a
  relevant search criteria, summary information is produced from values in
  that column of data.
  The summary statistics produced are: mean, standard deviation, minimum,
- maximum, and the 10th, 25th, 50th, 75th, and 90th percentiles.
+ maximum, the 10th, 25th, 50th, 75th, and 90th percentiles, the interquartile
+ range, and the range.
 \end_layout
 
 \begin_layout Standard
@@ -240,7 +243,7 @@ Confidence intervals are computed for the mean and standard deviation of
 Aggregated values from multiple STAT lines
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:StA_Aggregated-values-from"
+name "subsec:StA_Aggregated-values-from"
 
 \end_inset
 
@@ -266,7 +269,7 @@ The Stat-Analysis tool can be used to create aggregated values from multiple
 Aggregate STAT lines and produce aggregated statistics
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:StA_Aggregate-STAT-lines"
+name "subsec:StA_Aggregate-STAT-lines"
 
 \end_inset
 
@@ -315,7 +318,7 @@ When aggregating the matched pair line type (MPR) and computing an output
 Skill Score Index, including GO Index 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:StA_Skill-Score-Index,"
+name "subsec:StA_Skill-Score-Index,"
 
 \end_inset
 
@@ -386,7 +389,7 @@ name "compute_GO_Index"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="6">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="2cm">
 <column alignment="center" valignment="top" width="2.5cm">
 <column alignment="center" valignment="top">
@@ -1193,7 +1196,7 @@ Mean sea level
 Wind Direction Statistics
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:StA_Wind-Direction-Statistics"
+name "subsec:StA_Wind-Direction-Statistics"
 
 \end_inset
 
@@ -1313,7 +1316,7 @@ The following sections describe the usage statement, required arguments
 stat_analysis usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:stat_analysis-usage"
+name "subsec:stat_analysis-usage"
 
 \end_inset
 
@@ -1467,7 +1470,7 @@ Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:wavelet_stat-configuration-file"
+reference "subsec:wavelet_stat-configuration-file"
 
 \end_inset
 
@@ -1515,7 +1518,7 @@ JOB COMMAND LINE
  is described in Section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:stat_analysis-configuration-file"
+reference "subsec:stat_analysis-configuration-file"
 
 \end_inset
 
@@ -1642,7 +1645,7 @@ stat_analysis
  configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:stat_analysis-configuration-file"
+name "subsec:stat_analysis-configuration-file"
 
 \end_inset
 
@@ -1757,7 +1760,7 @@ Section
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-configuration-file"
+reference "subsec:pb2nc-configuration-file"
 
 \end_inset
 
@@ -1813,7 +1816,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2538,7 +2541,7 @@ name "Des_components_STAT_analysis_tool"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top" width="8cm">
 <column alignment="left" valignment="top" width="3cm">
@@ -2621,8 +2624,8 @@ summary
 \begin_inset Text
 
 \begin_layout Plain Layout
-Computes the mean, standard deviation, and percentiles (min, 10th, 25th,
- 50th, 75th, 90th, and max)
+Computes the mean, standard deviation, percentiles (min, 10th, 25th, 50th,
+ 75th, 90th, and max), interquartile range, and range
 \end_layout
 
 \end_inset
@@ -2722,7 +2725,7 @@ go_index
 Calculates the GO Index as described in section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:StA_Skill-Score-Index,"
+reference "subsec:StA_Skill-Score-Index,"
 
 \end_inset
 
@@ -2844,7 +2847,7 @@ ci_alpha
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2988,7 +2991,7 @@ The column filtering options may be used when the
  Defining thresholds in MET is described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -3158,7 +3161,7 @@ sid
  entry in 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -3246,7 +3249,7 @@ When processing input ORANK lines and writing output RHIST or PHIST lines,
 stat-analysis tool output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Stat-Analysis-tool-output"
+name "subsec:Stat-Analysis-tool-output"
 
 \end_inset
 
@@ -3313,21 +3316,21 @@ dump_row
 The output of this job is the same STAT format described in sections 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:point_stat-output"
+reference "subsec:point_stat-output"
 
 \end_inset
 
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:grid_stat-output"
+reference "subsec:grid_stat-output"
 
 \end_inset
 
 , and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:wavelet_stat-output"
+reference "subsec:wavelet_stat-output"
 
 \end_inset
 
@@ -3372,7 +3375,8 @@ SUMMARY
 \series default
 ", followed by a colon, then the total, mean with confidence intervals,
  standard deviation with confidence intervals, minimum value, percentiles
- (10th, 25th, 50th, 75th, and 90th) and the maximum value.
+ (10th, 25th, 50th, 75th, and 90th), the maximum value, the interquartile
+ range, and the range.
  The output columns are shown in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3415,8 +3419,8 @@ name "Columnar_output"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="12" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<lyxtabular version="3" rows="14" columns="2">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="5.25in">
 <row>
@@ -3646,7 +3650,7 @@ Median (50th percentile)
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3655,11 +3659,51 @@ Median (50th percentile)
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Maximum value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Interquartile range (75th - 25th percentile)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+19
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Range (Maximum - Minimum)
 \end_layout
 
 \end_inset
@@ -3696,21 +3740,21 @@ line_type
  (see Sections 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:point_stat-output"
+reference "subsec:point_stat-output"
 
 \end_inset
 
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:grid_stat-output"
+reference "subsec:grid_stat-output"
 
 \end_inset
 
 , and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:wavelet_stat-output"
+reference "subsec:wavelet_stat-output"
 
 \end_inset
 
@@ -3807,7 +3851,7 @@ name "arg_agg_stat_job"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top" width="10cm">
 <row>
@@ -4079,7 +4123,7 @@ The ramp job operates on a time-series of forecast and observed values and
  in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:tc_stat-output"
+reference "subsec:tc_stat-output"
 
 \end_inset
 
