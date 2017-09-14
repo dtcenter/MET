@@ -317,11 +317,11 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     ofstream *sa_out, gsl_rng *rng_ptr) {
    STATLine line;
    int i, k, r, c;
-   double v, min, v10, v25, v50, v75, v90, max, iqr, range;
+   double val, min, v10, v25, v50, v75, v90, max, iqr, range;
    CIInfo mean_ci, stdev_ci;
    AsciiTable out_at;
    ConcatString key;
-   NumArray value;
+   NumArray val_na;
    StringArray sa;
    map<ConcatString, NumArray> summary_map;
    map<ConcatString, NumArray>::iterator it;
@@ -373,23 +373,19 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
             //
             key = j.column[i];
             key << ":" << j.get_case_info(line);
-
-            //
-            // Retrieve the value
-            //
-            v = atof(line.get_item(j.column[i]));
+            val = j.get_column_double(line, j.column[i]);
 
             //
             // Add value to existing map entry or add a new one
             //
-            if(!is_bad_data(v)) {
+            if(!is_bad_data(val)) {
                if(summary_map.count(key) > 0) {
-                  summary_map[key].add(v);
+                  summary_map[key].add(val);
                }
                else {
-                  value.clear();
-                  value.add(v);
-                  summary_map[key] = value;
+                  val_na.erase();
+                  val_na.add(val_na);
+                  summary_map[key] = val_na;
                }
             }
          } // end for i
