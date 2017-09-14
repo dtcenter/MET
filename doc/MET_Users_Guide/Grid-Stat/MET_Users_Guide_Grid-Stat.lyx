@@ -519,6 +519,54 @@ ion method, size of the smoothing window, and required fraction of valid
  
 \end_layout
 
+\begin_layout Subsection
+Fourier Decomposition 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:GS_Fourier_Decomposition"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The MET software will compute the full one-dimensional Fourier transform,
+ then do a partial inverse transform based on the two user-defined wave
+ numbers.
+ These two wave numbers define a band pass filter in the Fourier domain.
+ This process is conceptually similar to the operation of projecting onto
+ subspace in linear algebra.
+ If one were to sum up all possible wave numbers the result would be to
+ simply reproduce the raw data.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Decomposition via Fourier transform allows the user to evaluate the model
+ separately at each spatial frequency.
+ As an example, the Fourier analysis allows users to examinethe "dieoff",
+ or reduction, in anomaly correlation of geopotential height at various
+ levels for bands of waves.
+ A band of low wave numbers, say 0 - 3, represent larger frequency components,
+ while a band of higher wave numbers,for example 70 - 72, represent smaller
+ freqency components.
+ Generally, anomaly correlation should be higher for frequencies with low
+ wave numbers than for frequencies with high wave numbers, hence the "dieoff".
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Wavelets, and in particular the MET wavelet tool, can also be used to define
+ a band pass filter (Casati et al, 2004; Weniger et al 2016).
+ Both the Fourier and wavelet methods can be used to look at different spatial
+ scales.
+\end_layout
+
 \begin_layout Section
 Practical information
 \begin_inset CommandInset label
