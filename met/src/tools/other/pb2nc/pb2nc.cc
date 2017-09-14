@@ -890,7 +890,7 @@ void process_pbfile(int i_pb) {
    bool is_prepbufr = is_prepbufr_file(&event_names);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
-      cout << method_name << " " << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds for preparing" << endl;;
+      cout << method_name << " " << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds for preparing" << endl;
       start_t = clock();
    }
    
@@ -1606,7 +1606,6 @@ void process_pbfile(int i_pb) {
          rej_nobs++;
       }
    } // end for
-   cout << endl;
 
    if (obs_data_idx > 0) {
       lengths[0] = obs_data_idx;
@@ -1722,8 +1721,8 @@ void process_pbfile_metadata(int i_pb) {
    bufr_hdr_arr.clear();
    
    // List the PrepBufr file being processed
-   mlog << Debug(1) << "\nPre-processing Bufr File for metadata"
-                    << " (BUFR variable names) from " << pbfile[i_pb] << "\n";
+   mlog << Debug(1) << "\nPre-processing Bufr File for metadata "
+                    << "(BUFR variable names) from " << pbfile[i_pb] << "\n\n";
 
    // Set the file name for the PrepBufr file
    file_name << pbfile[i_pb];
@@ -2019,7 +2018,6 @@ void process_pbfile_metadata(int i_pb) {
          }  //end for lv
       }  // end for vIdx
    } // end for
-   cout << endl;
 
    // Close the PREPBUFR file
    closepb_(&unit);
