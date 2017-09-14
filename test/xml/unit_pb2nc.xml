@@ -34,7 +34,7 @@
      <point_nc>&OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc</point_nc>
    </output>
   </test>
-  
+
   <test name="pb2nc_NDAS_mask_poly_conus">
     <exec>&MET_DIR;/bin/pb2nc</exec>
     <env>
@@ -194,8 +194,8 @@
   <test name="pb2nc_vertical_level_500">
    <exec>&MET_DIR;/bin/pb2nc</exec>
    <env>
-     <pair><name>STATION_ID</name>          <value></value></pair>
-     <pair><name>MASK_GRID</name>           <value>G212</value></pair>
+     <pair><name>STATION_ID</name>          <value>"SC-GSP","TX-HGX","KY-HPX"</value></pair>
+     <pair><name>MASK_GRID</name>           <value></value></pair>
      <pair><name>MASK_POLY</name>           <value></value></pair>
      <pair><name>QUALITY_MARK_THRESH</name> <value>9</value></pair>
    </env>
