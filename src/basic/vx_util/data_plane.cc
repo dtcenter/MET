@@ -266,7 +266,6 @@ double DataPlane::get(int x, int y) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 void DataPlane::threshold(const SingleThresh &st) {
    int j;
 
@@ -282,6 +281,23 @@ void DataPlane::threshold(const SingleThresh &st) {
       if( st.check(Data[j]) )     Data[j] = 1.0;
       else                        Data[j] = 0.0;
 
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void DataPlane::replace(const SingleThresh &st, const double new_v) {
+   int j;
+
+   //
+   // Apply the threshold and update with the replacement value.
+   //
+
+   for(j=0; j<Nxy; ++j) {
+      if( st.check(Data[j]) ) Data[j] = new_v;
    }
 
    return;
