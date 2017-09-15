@@ -132,6 +132,12 @@ class GridStatConfInfo {
       VarInfo **        fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
       VarInfo **        obs_info;           // Array of pointers for obs VarInfo [n_vx]
 
+      ThreshArray *     fqc_ta;             // Array for fcst quality control thresholds [n_vx]
+      ThreshArray *     oqc_ta;             // Array for obs quality control thresholds [n_vx]
+
+      NumArray *        fqc_val;            // Array for fcst quality control replacement values [n_vx]
+      NumArray *        oqc_val;            // Array for obs quality control replacement values [n_vx]
+
       ThreshArray *     fcat_ta;            // Array for fcst categorical thresholds [n_vx]
       ThreshArray *     ocat_ta;            // Array for obs categorical thresholds [n_vx]
 

@@ -170,7 +170,9 @@ static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
 static bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
                             DataPlane& dp, Met2dDataFile* mtddf,
-                            ConcatString filename);
+                            const ConcatString &filename,
+                            const ThreshArray &qc_ta,
+                            const NumArray &qc_val);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -636,7 +638,8 @@ void process_scores() {
 
       // Read the gridded data from the input forecast file
       if(!read_data_plane(conf_info.fcst_info[i], conf_info.regrid_info,
-                          fcst_dp, fcst_mtddf, fcst_file)) continue;
+                          fcst_dp, fcst_mtddf, fcst_file,
+                          conf_info.fqc_ta[i], conf_info.fqc_val[i])) continue;
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
 
@@ -650,7 +653,8 @@ void process_scores() {
 
       // Read the gridded data from the input observation file
       if(!read_data_plane(conf_info.obs_info[i], conf_info.regrid_info,
-                          obs_dp, obs_mtddf, obs_file)) continue;
+                          obs_dp, obs_mtddf, obs_file,
+                          conf_info.oqc_ta[i], conf_info.oqc_val[i])) continue;
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -973,12 +977,16 @@ void process_scores() {
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.fcst_info[ui],
                                    conf_info.regrid_info,
-                                   fu_dp, fcst_mtddf, fcst_file)) continue;
+                                   fu_dp, fcst_mtddf, fcst_file,
+                                   conf_info.fqc_ta[ui],
+                                   conf_info.fqc_val[ui])) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
-                                   ou_dp, obs_mtddf, obs_file)) continue;
+                                   ou_dp, obs_mtddf, obs_file,
+                                   conf_info.oqc_ta[ui],
+                                   conf_info.oqc_val[ui])) continue;
 
                // Read climatology data for UGRD
                cmnu_dp = read_climo_data_plane(
@@ -1460,12 +1468,16 @@ void process_scores() {
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.fcst_info[ui],
                                    conf_info.regrid_info,
-                                   fu_dp, fcst_mtddf, fcst_file)) continue;
+                                   fu_dp, fcst_mtddf, fcst_file,
+                                   conf_info.fqc_ta[ui],
+                                   conf_info.fqc_val[ui])) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
-                                   ou_dp, obs_mtddf, obs_file)) continue;
+                                   ou_dp, obs_mtddf, obs_file,
+                                   conf_info.oqc_ta[ui],
+                                   conf_info.oqc_val[ui])) continue;
 
                // Read climatology data for UGRD
                cmnu_dp = read_climo_data_plane(
@@ -2466,7 +2478,9 @@ void set_compress(const StringArray & a) {
 
 bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
                      DataPlane& dp, Met2dDataFile* mtddf,
-                     ConcatString filename) {
+                     const ConcatString &filename,
+                     const ThreshArray &qc_ta,
+                     const NumArray &qc_val) {
 
    bool status = mtddf->data_plane(*info, dp);
 
@@ -2476,6 +2490,14 @@ bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
            << " not found in file: " << filename
            << "\n\n";
       return false;
+   }
+
+   // Apply quality control replacement values
+   for(int i=0; i<qc_ta.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Applying quality control threshold \"" << qc_ta[i].get_str()
+           << "\" and replacing with a value of " << qc_val[i] << ".\n";
+      dp.replace(qc_ta[i], qc_val[i]);
    }
 
    // Regrid, if necessary

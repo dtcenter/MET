@@ -49,6 +49,10 @@ void GridStatConfInfo::init_from_scratch() {
    // Initialize pointers
    fcst_info   = (VarInfo **)     0;
    obs_info    = (VarInfo **)     0;
+   fqc_ta      = (ThreshArray *)  0;
+   oqc_ta      = (ThreshArray *)  0;
+   fqc_val     = (NumArray *)     0;
+   oqc_val     = (NumArray *)     0;
    fcat_ta     = (ThreshArray *)  0;
    ocat_ta     = (ThreshArray *)  0;
    cnt_logic   = (SetLogic *)     0;
@@ -114,6 +118,11 @@ void GridStatConfInfo::clear() {
    // Deallocate memory
    if(fcat_ta)     { delete [] fcat_ta;     fcat_ta     = (ThreshArray *) 0; }
    if(ocat_ta)     { delete [] ocat_ta;     ocat_ta     = (ThreshArray *) 0; }
+
+   if(fqc_ta)      { delete [] fqc_ta ;     fqc_ta      = (ThreshArray *) 0; }
+   if(oqc_ta)      { delete [] oqc_ta ;     oqc_ta      = (ThreshArray *) 0; }
+   if(fqc_val)     { delete [] fqc_val;     fqc_val     = (NumArray *)    0; }
+   if(oqc_val)     { delete [] oqc_val;     oqc_val     = (NumArray *)    0; }
 
    if(fcnt_ta)     { delete [] fcnt_ta;     fcnt_ta     = (ThreshArray *) 0; }
    if(ocnt_ta)     { delete [] ocnt_ta;     ocnt_ta     = (ThreshArray *) 0; }
@@ -254,6 +263,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    // Allocate space based on the number of verification tasks
    fcst_info   = new VarInfo *   [n_vx];
    obs_info    = new VarInfo *   [n_vx];
+   fqc_ta      = new ThreshArray [n_vx];
+   oqc_ta      = new ThreshArray [n_vx];
+   fqc_val     = new NumArray    [n_vx];
+   oqc_val     = new NumArray    [n_vx];
    fcat_ta     = new ThreshArray [n_vx];
    ocat_ta     = new ThreshArray [n_vx];
    fcnt_ta     = new ThreshArray [n_vx];
@@ -378,6 +391,14 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       i_fdict = parse_conf_i_vx_dict(fdict, i);
       i_odict = parse_conf_i_vx_dict(odict, i);
 
+      // Conf: qc_thresh
+      fqc_ta[i] = i_fdict.lookup_thresh_array(conf_key_qc_thresh);
+      oqc_ta[i] = i_odict.lookup_thresh_array(conf_key_qc_thresh);
+
+      // Conf: qc_new_val
+      fqc_val[i] = i_fdict.lookup_num_array(conf_key_qc_new_val);
+      oqc_val[i] = i_odict.lookup_num_array(conf_key_qc_new_val);
+
       // Conf: cat_thresh
       fcat_ta[i] = i_fdict.lookup_thresh_array(conf_key_cat_thresh);
       ocat_ta[i] = i_odict.lookup_thresh_array(conf_key_cat_thresh);
@@ -404,6 +425,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
               << "Parsed threshold settings for field number " << i+1 << "...\n"
+              // JHG
               << "Forecast categorical thresholds: "  << fcat_ta[i].get_str() << "\n"
               << "Observed categorical thresholds: "  << ocat_ta[i].get_str() << "\n"
               << "Forecast continuous thresholds: "   << fcnt_ta[i].get_str() << "\n"
@@ -417,6 +439,18 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       // Verifying a probability field
       if(fcst_info[i]->is_prob()) {
          fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
+      }
+
+      // Check for equal length of quality control thresholds and replacement values
+      if(fqc_ta[i].n_elements() != fqc_val[i].n_elements() ||
+         oqc_ta[i].n_elements() != oqc_val[i].n_elements()) {
+
+         mlog << Error << "\nGridStatConfInfo::process_config() -> "
+              << "The number of quality control thresholds in \""
+              << conf_key_qc_thresh
+              << "\" must match the number of replacement values in \""
+              << conf_key_qc_new_val << "\".\n\n";
+         exit(1);
       }
 
       // Check for equal threshold length for non-probability fields

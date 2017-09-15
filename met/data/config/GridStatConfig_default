@@ -40,7 +40,9 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-cat_thresh  = [ NA ];
+qc_thresh   = [ ];
+qc_new_val  = [ ];
+cat_thresh  = [ ];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
