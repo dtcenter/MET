@@ -384,7 +384,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                }
                else {
                   val_na.erase();
-                  val_na.add(val_na);
+                  val_na.add(val);
                   summary_map[key] = val_na;
                }
             }
