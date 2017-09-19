@@ -428,8 +428,8 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
    //  otherwise, just the numeric value
    ConcatString lvl_name;
    if( lt == LevelType_Accum )   lvl_name.format("%s%s",    lvl_type.data(), lvl_val1.data());
-   else if( !is_eq(lvl2, -1.0) ) lvl_name.format("%s%d-%d", lvl_type.data(), (int)lvl2, (int)lvl1);
-   else                          lvl_name.format("%s%d",    lvl_type.data(), (int)lvl1);
+   else if( !is_eq(lvl2, -1.0) ) lvl_name.format("%s%g-%g", lvl_type.data(), lvl2, lvl1);
+   else                          lvl_name.format("%s%g",    lvl_type.data(), lvl1);
 
    //  set the level information
    Level.set_type(lt);
