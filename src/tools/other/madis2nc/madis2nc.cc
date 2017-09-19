@@ -61,6 +61,8 @@ using namespace netCDF;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
+static const int FIELD_COUNT =  50;
+static int nc_buf_size;
 
 static void initialize();
 static void process_command_line(int, char **);
@@ -417,8 +419,7 @@ void setup_netcdf_out(int nhdr) {
    add_att(f_out, "RunCommand", (string)argv_str);
 
    int buf_size = nhdr;
-   if (buf_size > BUFFER_SIZE) buf_size = BUFFER_SIZE;
-   reset_header_buffer(buf_size);
+   reset_header_buffer(BUFFER_SIZE);
 
    return;
 }
@@ -589,8 +590,8 @@ void process_obs(const int in_gc, const float conversion,
 
       write_qty(qty);
       obs_data_idx++;
-      if (BUFFER_SIZE == obs_data_idx) {
-         write_nc_obs_data(BUFFER_SIZE);
+      if (nc_buf_size <= obs_data_idx) {
+         write_nc_obs_data(nc_buf_size);
       }
       i_obs++;
    }
@@ -678,7 +679,6 @@ bool write_nc_obs_data(int buf_size) {
            << "error writing the obs data to the netCDF file\n\n";
       status = false;
    }
-
 
    obs_data_idx = 0;
    obs_data_offset += buf_size;
@@ -907,6 +907,9 @@ void process_madis_metar(NcFile *&f_in) {
       char hdr_typ_arr[buf_size][hdr_typ_len];
       char hdr_sid_arr[buf_size][hdr_sid_len];
 
+      nc_buf_size = buf_size * FIELD_COUNT;
+      if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
+      
       get_nc_data(&in_hdr_vld_var, &tmp_dbl_arr[0], buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lat_var, &hdr_lat_arr[0], buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lon_var, &hdr_lon_arr[0], buf_size, i_hdr_s);
@@ -1059,34 +1062,12 @@ void process_madis_metar(NcFile *&f_in) {
          convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
          // Write U-component of wind
-         obs_arr[1] = 33;
          obs_arr[4] = ugrd;
-         if(!is_bad_data(ugrd)) {
-            for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-            }
-            write_qty(windSpeedQty[i_idx]);
-            obs_data_idx++;
-            if (buf_size == obs_data_idx) {
-               write_nc_obs_data(buf_size);
-            }
-            i_obs++;
-         }
+         process_obs(33, conversion, obs_arr, windSpeedQty[i_idx], windSpeed_var);
 
          // Write V-component of wind
-         obs_arr[1] = 34;
          obs_arr[4] = vgrd;
-         if(!is_bad_data(vgrd)) {
-            for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-            }
-            write_qty(windSpeedQty[i_idx]);
-            obs_data_idx++;
-            if (buf_size == obs_data_idx) {
-               write_nc_obs_data(buf_size);
-            }
-            i_obs++;
-         }
+         process_obs(34, conversion, obs_arr, windSpeedQty[i_idx], windSpeed_var);
 
          // Wind Gust
          obs_arr[4] = windGust[i_idx];
@@ -1142,10 +1123,6 @@ void process_madis_metar(NcFile *&f_in) {
          }
       }
 
-      if (hdr_data_idx >= buf_size) {
-         write_nc_hdr_data(buf_size);
-         reset_header_buffer(buf_size);
-      }
    } // end for i_hdr
 
    if (hdr_data_idx > 0) {
@@ -1368,6 +1345,9 @@ void process_madis_raob(NcFile *&f_in) {
       //char *hdr_typ_arr_ptr = &hdr_typ_arr[0];
       //char *hdr_sid_arr_ptr = &hdr_sid_arr[0];
 
+      nc_buf_size = buf_size * FIELD_COUNT;
+      if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
+      
       cur[0] = i_hdr_s;
 
       dim[0] = buf_size;
@@ -1583,42 +1563,19 @@ void process_madis_raob(NcFile *&f_in) {
             // Wind Speed
             qty = wsManQty[i_idx][i_lvl];
             obs_arr[4] = wsMan[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty,
-                        wsMan_var);
+            process_obs(32, conversion, obs_arr, qty, wsMan_var);
             wind = obs_arr[4];
 
             // Convert the wind direction and speed into U and V components
             convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
             // Write U-component of wind
-            obs_arr[1] = 33;
             obs_arr[4] = ugrd;
-            if(!is_bad_data(ugrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(33, conversion, obs_arr, qty, wsMan_var);
 
             // Write V-component of wind
-            obs_arr[1] = 34;
             obs_arr[4] = vgrd;
-            if(!is_bad_data(vgrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(34, conversion, obs_arr, qty, wsMan_var);
 
          } // end for i_lvl
 
@@ -1699,34 +1656,12 @@ void process_madis_raob(NcFile *&f_in) {
             convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
             // Write U-component of wind
-            obs_arr[1] = 33;
             obs_arr[4] = ugrd;
-            if(!is_bad_data(ugrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(33, conversion, obs_arr, qty, wsSigW_var);
 
             // Write V-component of wind
-            obs_arr[1] = 34;
             obs_arr[4] = vgrd;
-            if(!is_bad_data(vgrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(34, conversion, obs_arr, qty, wsSigW_var);
 
          } // end for i_lvl
 
@@ -1771,34 +1706,12 @@ void process_madis_raob(NcFile *&f_in) {
             convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
             // Write U-component of wind
-            obs_arr[1] = 33;
             obs_arr[4] = ugrd;
-            if(!is_bad_data(ugrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(33, conversion, obs_arr, qty, wsSigPrW_var);
 
             // Write V-component of wind
-            obs_arr[1] = 34;
             obs_arr[4] = vgrd;
-            if(!is_bad_data(vgrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(34, conversion, obs_arr, qty, wsSigPrW_var);
 
          } // end for i_lvl
 
@@ -1853,34 +1766,12 @@ void process_madis_raob(NcFile *&f_in) {
             convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
             // Write U-component of wind
-            obs_arr[1] = 33;
             obs_arr[4] = ugrd;
-            if(!is_bad_data(ugrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(33, conversion, obs_arr, qty, wsTrop_var);
 
             // Write V-component of wind
-            obs_arr[1] = 34;
             obs_arr[4] = vgrd;
-            if(!is_bad_data(vgrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(34, conversion, obs_arr, qty, wsTrop_var);
 
          } // end for i_lvl
 
@@ -1925,34 +1816,12 @@ void process_madis_raob(NcFile *&f_in) {
             convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
             // Write U-component of wind
-            obs_arr[1] = 33;
             obs_arr[4] = ugrd;
-            if(!is_bad_data(ugrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(33, conversion, obs_arr, qty, wsMaxW_var);
 
             // Write V-component of wind
-            obs_arr[1] = 34;
             obs_arr[4] = vgrd;
-            if(!is_bad_data(vgrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(34, conversion, obs_arr, qty, wsMaxW_var);
 
          } // end for i_lvl
 
@@ -2064,6 +1933,9 @@ void process_madis_profiler(NcFile *&f_in) {
       float vComponent_arr[buf_size][nlvl];
       char uComponentQty_arr[buf_size][nlvl];
       char vComponentQty_arr[buf_size][nlvl];
+
+      nc_buf_size = buf_size * FIELD_COUNT;
+      if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
 
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
@@ -2344,6 +2216,9 @@ void process_madis_maritime(NcFile *&f_in) {
       char precip12HourQty_arr[buf_size];
       char precip18HourQty_arr[buf_size];
       char precip24HourQty_arr[buf_size];
+
+      nc_buf_size = buf_size * FIELD_COUNT;
+      if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
 
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
@@ -2719,6 +2594,9 @@ void process_madis_mesonet(NcFile *&f_in) {
       char windDir10Qty_arr[buf_size];
       char windSpeed10Qty_arr[buf_size];
 
+      nc_buf_size = buf_size * FIELD_COUNT;
+      if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
+
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
 
@@ -2900,34 +2778,12 @@ void process_madis_mesonet(NcFile *&f_in) {
          convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
          // Write U-component of wind
-         obs_arr[1] = 33;
          obs_arr[4] = ugrd;
-         if(!is_bad_data(ugrd)) {
-            for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-            }
-            write_qty(qty);
-            obs_data_idx++;
-            if (BUFFER_SIZE == obs_data_idx) {
-               write_nc_obs_data(BUFFER_SIZE);
-            }
-            i_obs++;
-         }
+         process_obs(33, conversion, obs_arr, qty, in_windSpeed_var);
 
          // Write V-component of wind
-         obs_arr[1] = 34;
          obs_arr[4] = vgrd;
-         if(!is_bad_data(vgrd)) {
-            for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-            }
-            write_qty(qty);
-            obs_data_idx++;
-            if (BUFFER_SIZE == obs_data_idx) {
-               write_nc_obs_data(BUFFER_SIZE);
-            }
-            i_obs++;
-         }
+         process_obs(34, conversion, obs_arr, qty, in_windSpeed_var);
 
          // Wind Gust
          obs_arr[4] = windGust_arr[i_idx];
@@ -3026,34 +2882,12 @@ void process_madis_mesonet(NcFile *&f_in) {
          convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
          // Write U-component of 10m wind
-         obs_arr[1] = 33;
          obs_arr[4] = ugrd;
-         if(!is_bad_data(ugrd)) {
-            for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-            }
-            write_qty(qty);
-            obs_data_idx++;
-            if (BUFFER_SIZE == obs_data_idx) {
-               write_nc_obs_data(BUFFER_SIZE);
-            }
-            i_obs++;
-         }
+         process_obs(33, conversion, obs_arr, qty, in_windSpeed10_var);
 
          // Write V-component of 10m wind
-         obs_arr[1] = 34;
          obs_arr[4] = vgrd;
-         if(!is_bad_data(vgrd)) {
-            for (int idx=0; idx<obs_arr_len; idx++) {
-               obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-            }
-            write_qty(qty);
-            obs_data_idx++;
-            if (BUFFER_SIZE == obs_data_idx) {
-               write_nc_obs_data(BUFFER_SIZE);
-            }
-            i_obs++;
-         }
+         process_obs(34, conversion, obs_arr, qty, in_windSpeed10_var);
       }
 
    } // end for i
@@ -3200,6 +3034,9 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       char windSpeedQty_arr[buf_size][maxLevels];
       char altitudeQty_arr[buf_size][maxLevels];
 
+      nc_buf_size = buf_size * FIELD_COUNT;
+      if (nc_buf_size > BUFFER_SIZE) nc_buf_size = BUFFER_SIZE;
+
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
       dim[1] = maxLevels;
@@ -3343,9 +3180,9 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             }
 
             hdr_data_idx++;
-            if (hdr_data_idx >= BUFFER_SIZE) {
-               write_nc_hdr_data(BUFFER_SIZE);
-               reset_header_buffer(BUFFER_SIZE);
+            if (hdr_data_idx >= buf_size) {
+               write_nc_hdr_data(buf_size);
+               reset_header_buffer(buf_size);
             }
 
             //
@@ -3386,34 +3223,12 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             convert_wind_wdir_to_u_v(wind, wdir, ugrd, vgrd);
 
             // Write U-component of wind
-            obs_arr[1] = 33;
             obs_arr[4] = ugrd;
-            if(!is_bad_data(ugrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(33, conversion, obs_arr, qty, in_windSpeed_var);
 
             // Write V-component of wind
-            obs_arr[1] = 34;
             obs_arr[4] = vgrd;
-            if(!is_bad_data(vgrd)) {
-               for (int idx=0; idx<obs_arr_len; idx++) {
-                  obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-               }
-               write_qty(qty);
-               obs_data_idx++;
-               if (BUFFER_SIZE == obs_data_idx) {
-                  write_nc_obs_data(BUFFER_SIZE);
-               }
-               i_obs++;
-            }
+            process_obs(34, conversion, obs_arr, qty, in_windSpeed_var);
          } // end for i_lvl
       }
    } // end for i_hdr
