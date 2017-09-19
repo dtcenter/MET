@@ -260,7 +260,7 @@
     <param> \
       -lookin &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
       -job summary -line_type MPR -by FCST_VAR,FCST_LEV -column 'FCST,OBS,FCST-OBS,ABS(FCST-OBS)' \
-      -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY.out \
+      -boot_seed 1 -out &OUTPUT_DIR;/stat_analysis/POINT_STAT_SUMMARY.out \
       -v 1
     </param>
     <output>
