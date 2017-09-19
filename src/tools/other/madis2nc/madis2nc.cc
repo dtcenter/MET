@@ -1563,8 +1563,7 @@ void process_madis_raob(NcFile *&f_in) {
             // Wind Speed
             qty = wsManQty[i_idx][i_lvl];
             obs_arr[4] = wsMan[i_idx][i_lvl];
-            process_obs(32, conversion, obs_arr, qty,
-                        wsMan_var);
+            process_obs(32, conversion, obs_arr, qty, wsMan_var);
             wind = obs_arr[4];
 
             // Convert the wind direction and speed into U and V components
@@ -1711,7 +1710,6 @@ void process_madis_raob(NcFile *&f_in) {
             process_obs(33, conversion, obs_arr, qty, wsSigPrW_var);
 
             // Write V-component of wind
-            obs_arr[1] = 34;
             obs_arr[4] = vgrd;
             process_obs(34, conversion, obs_arr, qty, wsSigPrW_var);
 
