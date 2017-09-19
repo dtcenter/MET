@@ -39,6 +39,10 @@ extern "C" {
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
+
+double scaled2dbl(int scale_factor, int scale_value);
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class MetGrib2DataFile
 //
@@ -649,8 +653,10 @@ void MetGrib2DataFile::read_grib2_record_list() {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
          } else {
-            rec->LvlVal1 = gfld->ipdtmpl[11];
-            rec->LvlVal2 = 255 != gfld->ipdtmpl[12] ? gfld->ipdtmpl[14] : rec->LvlVal1;
+            rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[10], gfld->ipdtmpl[11]);
+            rec->LvlVal2 = ( 255 != gfld->ipdtmpl[12] ?
+                             scaled2dbl(gfld->ipdtmpl[13], gfld->ipdtmpl[14]) :
+                             rec->LvlVal1 );
          }
 
          rec->RangeTyp     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
@@ -1258,6 +1264,18 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
    find_record_matches((VarInfoGrib2*)(&vinfo), listMatchExact, listMatchRange);
    return 1 > listMatchExact.size() ? -1 : listMatchExact[0]->Index;
 
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Begin utility functions.
+//
+////////////////////////////////////////////////////////////////////////
+
+double scaled2dbl(int scale_factor, int scale_value) {
+   if (scale_factor == 0) return ( (double) scale_value );
+   if (scale_factor < 0)  return ( scale_value * pow(10.0, -scale_factor) );
+   return                        ( scale_value / pow(10.0,  scale_factor) );
 }
 
 ////////////////////////////////////////////////////////////////////////
