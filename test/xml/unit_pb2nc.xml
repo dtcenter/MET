@@ -111,44 +111,6 @@
     </output>
   </test>
   
-  <test name="pb2nc_NDAS_var">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value>"&CONFIG_DIR;/SID_CO.txt"</value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value></value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var.nc \
-      &CONFIG_DIR;/PB2NCConfig \
-      -v 1 -vars TOB,POB,QOB,ZOB,UOB,VOB
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var.nc</point_nc>
-    </output>
-  </test>
-  
-  <test name="pb2nc_NDAS_mask_poly_conus_var">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value>MET_BASE/poly/CONUS.poly</value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var.nc \
-      &CONFIG_DIR;/PB2NCConfig \
-      -v 1 -vars TOB+POB+QOB+ZOB+UOB+VOB
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var.nc</point_nc>
-    </output>
-  </test>
-  
   <test name="pb2nc_NDAS_var_all">
     <exec>&MET_DIR;/bin/pb2nc</exec>
     <env>
@@ -160,34 +122,11 @@
     <param> \
       &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
       &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_all.nc \
-      &CONFIG_DIR;/PB2NCConfig \
-      -v 1 -all
-    </param>
-    <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_all.nc</point_nc>
-    </output>
-  </test>
-
-  <!-- This is derived from pb2nc_NDAS_mask_poly_conus which saves the grib_code.
-       This unit test saves obs array by using variable index.
-       The output of pb2nc_NDAS_mask_poly_conus_var_id is used as input for point_stat.
-       The mathcing unit test at point_stat is point_stat_GRIB2_NAM_NDAS_var_id. -->
-  <test name="pb2nc_NDAS_mask_poly_conus_var_id">
-    <exec>&MET_DIR;/bin/pb2nc</exec>
-    <env>
-      <pair><name>STATION_ID</name>          <value></value></pair>
-      <pair><name>MASK_GRID</name>           <value></value></pair>
-      <pair><name>MASK_POLY</name>           <value>MET_BASE/poly/CONUS.poly</value></pair>
-      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_id.nc \
-      &CONFIG_DIR;/PB2NCConfig -use_var_id \
+      &CONFIG_DIR;/PB2NCConfig_all \
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_id.nc</point_nc>
+      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.var_all.nc</point_nc>
     </output>
   </test>
 
@@ -202,8 +141,8 @@
    <param> \
      &DATA_DIR_OBS;/bufr/nam_20170502.t00z.radwnd.tm02.bufr_d \
      &OUTPUT_DIR;/pb2nc/nam_20170502.t00z.radwnd.tm02.bufr_d.vlevel_500.nc \
-     &CONFIG_DIR;/PB2NCConfig -valid_end 20170501_22 \
-     -v 1 -vars RSTD,RWAZ,RWND
+     &CONFIG_DIR;/PB2NCConfig_vlevel -valid_end 20170501_22 \
+     -v 1 
    </param>
    <output>
      <point_nc>&OUTPUT_DIR;/pb2nc/nam_20170502.t00z.radwnd.tm02.bufr_d.vlevel_500.nc</point_nc>
