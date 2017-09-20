@@ -43,7 +43,7 @@ extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
 extern map<ConcatString,ConcatString>
-                       parse_conf_obs_var_map(Dictionary *dict);
+                       parse_conf_obs_bufr_map(Dictionary *dict);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(Dictionary *dict);
 extern InterpInfo      parse_conf_interp(Dictionary *dict);
