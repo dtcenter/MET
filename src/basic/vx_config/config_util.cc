@@ -774,8 +774,8 @@ map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-map<ConcatString,ConcatString> parse_conf_obs_var_map(Dictionary *dict) {
-   return parse_conf_key_value_map(dict, conf_key_obs_var_map);
+map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
+   return parse_conf_key_value_map(dict, conf_key_obs_bufr_map);
 }
 
 ////////////////////////////////////////////////////////////////////////

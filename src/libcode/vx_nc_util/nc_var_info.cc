@@ -290,7 +290,6 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name, ConcatStrin
 
    NcVarAtt att ;
    bool found = false;
-   string att_value_str;
    
    att_value.clear();
    
