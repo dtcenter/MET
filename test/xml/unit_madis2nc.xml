@@ -123,4 +123,16 @@
     </output>
   </test>
 
+  <test name="madis2nc_buf_handle">
+    <exec>&MET_DIR;/bin/madis2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/madis/metar/metar_20170118_0000.nc \
+      &OUTPUT_DIR;/madis2nc/metar_20170118_0000.nc \
+      -type metar -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/madis2nc/metar_20170118_0000.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>
