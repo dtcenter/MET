@@ -64,7 +64,7 @@ instrument_type = [];
 //
 level_range = {
    beg = 1;
-   end = 1024;
+   end = 255;
 }
 
 level_category = [];
@@ -72,52 +72,29 @@ level_category = [];
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Observation values to retain or derive
+// BUFR variable names to retain or derive.
+// If emtpy, process all available variables.
 //
-obs_grib_code = [ "SPFH", "TMP",  "HGT",  "UGRD", "VGRD",
-                  "DPT",  "WIND", "RH",   "MIXR" ];
+//obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
+obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB",
+                 "D_DWP", "D_WIND", "D_RH", "D_MIXR" ];
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Mapping of BUFR variable name to GRIB name
 //
-obs_var_map = [
-   { key = "POB";     val = "PRES"; },
-   { key = "QOB";     val = "SPFH"; },
-   { key = "TOB";     val = "TMP";  },
-   { key = "ZOB";     val = "HGT";  },
-   { key = "UOB";     val = "UGRD"; },
-   { key = "VOB";     val = "VGRD"; }
-];
-//   ,{ key = "D_DWP";   val = "DWP";  }
-//   ,{ key = "D_WDIR";  val = "WDIR"; }
-//   ,{ key = "D_WIND";  val = "WIND"; }
-//   ,{ key = "D_RH";    val = "RH";   }
-//   ,{ key = "D_MIXR";  val = "MIXR"; }
-//   ,{ key = "D_PRMSL"; val = "PRMSL";}
+//obs_var_map = [];
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Mapping of report_type (header_type)
 //
 message_type_map = []; 
    
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Use MET variable index from "var_name" variable instead of GRIB code
-//
-use_var_id = false;
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// MET variable names (for example, BUFR variable name) to retain or derive
-// instead of obs_grib_code.
-// If this is not empty, use_met_code will be set to true.
-//
-obs_var = [];
-
 ////////////////////////////////////////////////////////////////////////////////
 
 quality_mark_thresh = ${QUALITY_MARK_THRESH};
