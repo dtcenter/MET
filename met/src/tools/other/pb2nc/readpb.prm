@@ -5,6 +5,7 @@ C*
        PARAMETER ( MXR8PM = 10 )
 C*                                   Maximum number of BUFR parameters
 C*
+       PARAMETER ( MXR8LV_S = 255 )
        PARAMETER ( MXR8LV = 1023 )
 C*                                   Maximum number of BUFR levels
 C*
@@ -22,6 +23,9 @@ C*
 C*                                   Maximum length of a file name
 C*
        REAL*8    hdr ( MXR8PM ),
+     +           evns_s ( MXR8PM, MXR8LV_S, MXR8VN, MXR8VT ),
+     +           obse_s ( MXR8PM, MXR8LV_S, MXR8VN ),
+     +           obsi_s ( MXR8PM, MXR8LV_S ),
      +           evns ( MXR8PM, MXR8LV, MXR8VN, MXR8VT ),
      +           obse ( MXR8PM, MXR8LV, MXR8VN ),
      +           obsi ( MXR8PM, MXR8LV )
