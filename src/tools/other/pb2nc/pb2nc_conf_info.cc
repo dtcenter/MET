@@ -27,6 +27,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class PB2NCConfInfo
+//  Code for class PB2NCConfInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -67,13 +68,12 @@ void PB2NCConfInfo::clear() {
    instrument_type.clear();
    beg_level = end_level = bad_data_double;
    level_category.clear();
-   obs_grib_code.clear();
-   bufr_var_name.clear();
+   obs_bufr_var.clear();
    quality_mark_thresh = bad_data_int;
    event_stack_flag = false;
    tmp_dir.clear();
    version.clear();
-   obs_var_map.clear();
+   obs_bufr_map.clear();
    _messageTypeMap.clear();
 
    return;
@@ -206,26 +206,9 @@ void PB2NCConfInfo::process_config() {
       }
    }
 
-   // Conf: obs_grib_code
-   sa = conf.lookup_string_array(conf_key_obs_grib_code);
-
-   // Check the values
-   if(sa.n_elements() == 0) {
-      mlog << Error << "\nPB2NCConfInfo::process_config() -> "
-           << "the \"" << conf_key_obs_grib_code
-           << "\" entry cannot be empty.\n\n";
-      exit(1);
-   }
-   
-   // Convert strings to GRIB codes
-   for(i=0; i<sa.n_elements(); i++) obs_grib_code.add(str_to_grib_code(sa[i]));
-
-   // Conf: var_name
-   sa = conf.lookup_string_array(conf_key_obs_var, false);
-   for(i=0; i<sa.n_elements(); i++) bufr_var_name.add(sa[i]);
-   
-   // Conf: use_var_id
-   use_var_id = conf.lookup_bool(conf_key_use_var_id, false);
+   // Conf: obs_bufr_var
+   sa = conf.lookup_string_array(conf_key_obs_bufr_var, false);
+   for(i=0; i<sa.n_elements(); i++) obs_bufr_var.add(sa[i]);
    
    // Conf: quality_mark_thresh
    quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
@@ -244,7 +227,7 @@ void PB2NCConfInfo::process_config() {
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
 
-   obs_var_map = parse_conf_obs_var_map(&conf);
+   obs_bufr_map = parse_conf_obs_bufr_map(&conf);
    _messageTypeMap = parse_conf_message_type_map(&conf);
 
    return;

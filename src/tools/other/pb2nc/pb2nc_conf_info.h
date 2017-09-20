@@ -50,19 +50,17 @@ class PB2NCConfInfo {
       double       beg_level;           // Range of level values to be retained
       double       end_level;
       NumArray     level_category;      // Level categories to be retained
-      NumArray     obs_grib_code;       // GRIB1 code for the observation type
-      StringArray  bufr_var_name;       // BUFR variiable names for the observation type
+      StringArray  obs_bufr_var;        // BUFR variiable names for the observation type
       int          quality_mark_thresh; // Quality marks to be retained
       bool         event_stack_flag;    // True for top, false for bottom
       ConcatString tmp_dir;             // Directory for temporary files
       ConcatString version;             // Config file version
-      map<ConcatString,ConcatString> obs_var_map;
+      map<ConcatString,ConcatString> obs_bufr_map;
       map<ConcatString,ConcatString> _messageTypeMap;
   
       bool         anyair_flag;         // Flags for specific message types
       bool         anysfc_flag;
       bool         onlysf_flag;
-      bool         use_var_id;
 
       // More information on the PrepBufr file format:
       // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc
@@ -72,7 +70,7 @@ class PB2NCConfInfo {
 
       void clear();
 
-      map<ConcatString,ConcatString> getObsVarMap() const {  return obs_var_map; }
+      map<ConcatString,ConcatString> getObsVarMap() const {  return obs_bufr_map; }
       map<ConcatString,ConcatString> getMessageTypeMap() const { return _messageTypeMap; }
       void read_config(const char *, const char *);
       void process_config();

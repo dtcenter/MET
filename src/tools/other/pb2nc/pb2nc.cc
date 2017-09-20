@@ -50,6 +50,7 @@
 //   014    07/23/13  Halley Gotway  Update sensible temperature fix
 //                    to handle older GDAS PREPBUFR files.
 //          06/07/17  Howard Soh     Added more options: -vars, -all, and -index.
+//          09/15/17  Howard Soh     Removed options: -all, and -use_var_id.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -103,6 +104,7 @@ static const double r8bfms      = 1.0E10;
 // Maximum number of BUFR parameters
 static const int mxr8pm         = 10;
 // Maximum number of BUFR levels
+static const int mxr8lv_small   = 255;
 static const int mxr8lv         = 1023;   // was 255;
 // Maximum number of BUFR event sequences
 static const int mxr8vn         = 10;
@@ -118,6 +120,7 @@ static const int strl_len       = 16;
 static const int hdr_arr_len    = 3;
 // Observation values length
 static const int obs_arr_len    = 5;
+static const int COUNT_THRESHOLD = 10;
 
 // File unit number for opening the PrepBufr file
 static const int file_unit      = 11;
@@ -175,10 +178,10 @@ static bool dump_flag = false;
 static ConcatString dump_dir = ".";
 
 static bool do_all_vars      = false;
-static bool use_var_id       = false;
-static bool use_met_vars     = false;
+static bool use_small_buffer = false;
+static bool override_vars    = false;
 static bool collect_metadata = false;
-static ConcatString bufr_target_variables;
+static StringArray bufr_target_variables;
 
 static ConcatString data_plane_filename;
 
@@ -241,6 +244,10 @@ static ConcatString bufr_hdrs;      // header name list to read header
 static StringArray bufr_hdr_arr;    // available header name list
 static StringArray bufr_obs_arr;    // available obs. name list
 static IntArray filtered_times;
+static StringArray prepbufr_core_vars;
+static map<ConcatString, int> variableCountMap;
+static map<ConcatString, StringArray> variableTypeMap;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -301,11 +308,12 @@ extern "C" {
    void openpb_(const char *, int *);
    void closepb_(int *);
    void readpb_(int *, int *, int *, double[mxr8pm],
-                double[mxr8vt][mxr8vn][mxr8lv][mxr8pm]);
+                double[mxr8vt][mxr8vn][mxr8lv][mxr8pm], bool *);
    void ireadns_  (int *, char *, int *);
-   void readpbevt_(int *, int *, int *,
-                double[mxr8vn][mxr8lv][mxr8pm], char[mxr8lv*mxr8pm], int *);
-   void readpbint_(int *, int *, int *, double[mxr8lv][mxr8pm], char[mxr8lv*mxr8pm], int *);
+   void readpbevt_(int *, int *, int *, double[mxr8vn][mxr8lv][mxr8pm],
+                   char[mxr8lv*mxr8pm], int *, bool *);
+   void readpbint_(int *, int *, int *, double[mxr8lv][mxr8pm],
+                   char[mxr8lv*mxr8pm], int *, bool *);
    void dumppb_(const char *, int *, const char *, int *,
                 const char *, int *, int *);
    void dump_tbl_(const char *, int *, const char *, int *);
@@ -332,7 +340,7 @@ static bool   keep_valid_time(const unixtime, const unixtime,
 static bool   keep_pb_report_type(int);
 static bool   keep_in_report_type(int);
 static bool   keep_instrument_type(int);
-static bool   keep_obs_grib_code(int);
+static bool   keep_bufr_obs_index(int);
 static bool   keep_level_category(int);
 
 static float  derive_grib_code(int, float *, float *, double,
@@ -347,7 +355,6 @@ static void   set_dump_path(const StringArray &);
 static void   set_do_all_variables(const StringArray & a);
 static void   set_collect_metadata(const StringArray &);
 static void   set_target_variables(const StringArray & a);
-static void   set_use_var_id(const StringArray &);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
@@ -477,10 +484,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_nmsg, "-nmsg", 1);
    cline.add(set_dump_path, "-dump", 1);
-   cline.add(set_do_all_variables,  "-all",  0);
    cline.add(set_collect_metadata,  "-index",  0);
    cline.add(set_target_variables, "-vars", 1);
-   cline.add(set_use_var_id, "-use_var_id", 0);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_compress,  "-compress",  1);
@@ -510,15 +515,6 @@ void process_command_line(int argc, char **argv) {
    
    // Process the configuration
    conf_info.process_config();
-   if (conf_info.use_var_id) use_var_id = true;
-
-   if (!use_met_vars && 0 < conf_info.bufr_var_name.n_elements()) {
-      use_met_vars = true;
-      for (int idx=0; idx<conf_info.bufr_var_name.n_elements(); idx++) {
-         if (0 < bufr_target_variables.length()) bufr_target_variables.add(" ");
-         bufr_target_variables.add(conf_info.bufr_var_name[idx]);
-      }
-   }
 
    // Check that valid_end_ut >= valid_beg_ut
    if(valid_beg_ut != (unixtime) 0 &&
@@ -529,6 +525,11 @@ void process_command_line(int argc, char **argv) {
            << ") must be greater than the beginning time ("
            << unix_to_yyyymmdd_hhmmss(valid_beg_ut) << ").\n\n";
       exit(1);
+   }
+
+   if (!override_vars) {
+      bufr_target_variables = conf_info.obs_bufr_var;
+      do_all_vars = (0 == conf_info.obs_bufr_var.n_elements());
    }
 
    return;
@@ -727,7 +728,7 @@ void open_netcdf() {
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
-   add_att(f_out, nc_att_use_var_id, (use_var_id ? "true" : "false"));
+   add_att(f_out, nc_att_use_var_id, "true");
 
    // Add variable attributes
    add_att(&obs_qty_var, "long_name", "quality flag");
@@ -735,14 +736,8 @@ void open_netcdf() {
    add_att(&obs_arr_var, "missing_value", fill_value);
    add_att(&obs_arr_var, "_FillValue", fill_value);
    add_att(&obs_arr_var, "hdr_id_long_name", "index of matching header data");
-   if (use_var_id) {
-      add_att(&obs_arr_var, "columns", "hdr_id var_id lvl hgt ob");
-      add_att(&obs_arr_var, "var_id_long_name", "index of BUFR variable corresponding to the observation type");
-   }
-   else {
-      add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
-      add_att(&obs_arr_var, "gc_long_name", "grib code corresponding to the observation type");
-   }
+   add_att(&obs_arr_var, "columns", "hdr_id var_id lvl hgt ob");
+   add_att(&obs_arr_var, "var_id_long_name", "index of BUFR variable corresponding to the observation type");
    add_att(&obs_arr_var, "lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
    add_att(&obs_arr_var, "hgt_long_name", "height in meters above sea level (msl)");
    add_att(&obs_arr_var, "ob_long_name", "observation value");
@@ -894,7 +889,8 @@ void process_pbfile(int i_pb) {
       start_t = clock();
    }
    
-   int grib_code;
+   if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
+   int grib_code, bufr_var_index;
    map<ConcatString, ConcatString> _messageTypeMap = conf_info.getMessageTypeMap();
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
@@ -912,7 +908,7 @@ void process_pbfile(int i_pb) {
 
       // Get the next PrepBufr message
       ireadns_(&unit, hdr_typ, &i_date);
-      readpb_(&unit, &i_ret, &nlev, hdr, evns);
+      readpb_(&unit, &i_ret, &nlev, hdr, evns, &use_small_buffer);
 
       sprintf(time_str, "%.10i", i_date);
       msg_ut = yyyymmddhh_to_unix(time_str);
@@ -982,7 +978,7 @@ void process_pbfile(int i_pb) {
          //Read header (station id, lat, lon, ele, time)
          length = bufr_hdrs.length();
          strcpy(tmp_str, bufr_hdrs.text());
-         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length );
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &use_small_buffer );
          
          // Copy sid, lat, and lon
          for (index=0; index<3; index++) {
@@ -1172,8 +1168,8 @@ void process_pbfile(int i_pb) {
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
          // level
-         if(lv+1 < conf_info.beg_level ||
-            lv+1 > conf_info.end_level) continue;
+         if(lv+1 < conf_info.beg_level) continue;
+         if(lv+1 > conf_info.end_level) break;
       
          // Get the pressure level for this set of observations.
          // If not valid, continue to the next level
@@ -1221,7 +1217,8 @@ void process_pbfile(int i_pb) {
             // corresponding grib code and store as the second element
             // of obs_arr
             grib_code = var_gc[kk];
-            obs_arr[1] = (float)(use_var_id ? bufr_var_code[kk] : grib_code);
+            bufr_var_index = bufr_var_code[kk];
+            obs_arr[1] = (float)bufr_var_index;
       
             // Get the event index to be used based on the contents of
             // the event stack flag
@@ -1316,7 +1313,7 @@ void process_pbfile(int i_pb) {
             // If the grib code corrsponding to the observation
             // variable is not listed in the configuration file
             // continue to the next observation variable
-            if(!keep_obs_grib_code(grib_code)) continue;
+            if(!keep_bufr_obs_index(bufr_var_index)) continue;
       
             // Write the quality flag to the netCDF file
             ConcatString quality_mark_str;
@@ -1367,7 +1364,8 @@ void process_pbfile(int i_pb) {
          // P, Q, T, Z, U, V
          for(i=0; i<n_derive_gc; i++) {
       
-            if(keep_obs_grib_code(derive_gc[i])) {
+            bufr_var_index = bufr_derive_code[i];
+            if(keep_bufr_obs_index(bufr_var_index)) {
       
                // Only derive PRMSL for message types ADPSFC and SFCSHP
                // which are stored in the onlysf_msg_typ_str
@@ -1376,7 +1374,7 @@ void process_pbfile(int i_pb) {
                   continue;
       
                // Store the grib code to be derived
-               obs_arr[1] = (float)(use_var_id ? bufr_derive_code[i] :derive_gc[i]);
+               obs_arr[1] = (float)bufr_var_index;
 
                // Derive the value for the grib code
                obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
@@ -1428,7 +1426,8 @@ void process_pbfile(int i_pb) {
          } // end for i
       } // end for lv
       
-      if (do_all_vars || use_met_vars) {
+      //if (do_all_vars) {
+      {
          //quality_mark = 0;
          ConcatString quality_mark_str;
          //quality_mark_str.format("%d", nint(quality_mark));
@@ -1470,27 +1469,29 @@ void process_pbfile(int i_pb) {
                }
             }
              
-            readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len);
+            readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &use_small_buffer);
             if (0 >= nlev2) continue;
          
             buf_nlev = nlev2;
             if (nlev2 > mxr8lv) {
                buf_nlev = mxr8lv;
-               if (!variables_big_nlevels.has(bufr_obs_arr[vIdx])) {
+               if (!variables_big_nlevels.has(var_name)) {
                   mlog << Warning << "\n" << method_name << " -> "
                        << "Too many vertical levels (" << nlev2
-                       << ") for " << bufr_obs_arr[vIdx] 
+                       << ") for " << var_name 
                        << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
-                  variables_big_nlevels.add(bufr_obs_arr[vIdx]);
+                  variables_big_nlevels.add(var_name);
                }
             }
-            mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2 << ", vIdx: " << vIdx << ", obs_data_idx: " << obs_data_idx << ", nlev: " << nlev << "\n";
+            mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2 << ", vIdx: "
+                 << vIdx << ", obs_data_idx: " << obs_data_idx << ", nlev: " << nlev << "\n";
             // Search through the vertical levels
             for(lv=0; lv<buf_nlev; lv++) {
          
                // If the observation vertical level is not within the
                // specified valid range, continue to the next vertical level
-               if((lv+1) < conf_info.beg_level || (lv+1) > conf_info.end_level) continue;
+               if((lv+1) < conf_info.beg_level) continue;
+               if((lv+1) > conf_info.end_level) break;
          
                // If the pressure level is not valid, continue to the next level
                if (is_prepbufr) {
@@ -1574,7 +1575,7 @@ void process_pbfile(int i_pb) {
       // store the header data and increment the PrepBufr record
       // counter
       if(n_hdr_obs > 0) {
-         if (_messageTypeMap[hdr_typ]) {
+         if (0 < _messageTypeMap.count(hdr_typ)) {
             ConcatString mappedMessageType = _messageTypeMap[hdr_typ];
             mlog << Debug(5) << "\n" << method_name << " -> "
                  << "Switching report type \"" << hdr_typ
@@ -1709,11 +1710,12 @@ void process_pbfile_metadata(int i_pb) {
 
    double   x, y;
 
+   bool tmp_use_small_buffer = false;
    bool check_all = do_all_vars || collect_metadata;
    unixtime file_ut = (unixtime) 0;
    char     time_str[max_str_len];
    char     hdr_typ[max_str_len];
-   StringArray local_bufr_obs_arr;
+   StringArray tmp_bufr_obs_arr;
    ConcatString file_name, blk_prefix, blk_file;
    static const char *method_name = "process_pbfile_metadata()";
 
@@ -1789,12 +1791,14 @@ void process_pbfile_metadata(int i_pb) {
    //headers.dump(cout);
    
    StringArray unchecked_var_list;
-   ConcatString bufr_hdr_strings;
-   for(i=0; i<tableB_vars.n_elements(); i++) {
-      if (!headers.has(tableB_vars[i]) && check_all) {
-         unchecked_var_list.add(tableB_vars[i]);
+   if (check_all) {
+      for(i=0; i<tableB_vars.n_elements(); i++) {
+         if (!headers.has(tableB_vars[i]) && check_all) {
+            unchecked_var_list.add(tableB_vars[i]);
+         }
       }
    }
+
    //Initialize index for prepbufr common variables
    for (int index=0; index<mxr8vt; index++) {
       bufr_var_code[index] = -1;
@@ -1807,6 +1811,7 @@ void process_pbfile_metadata(int i_pb) {
    int length;
    int var_idx;
    bool is_prepbufr_hdr = false;
+   use_small_buffer = true;
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
@@ -1828,7 +1833,8 @@ void process_pbfile_metadata(int i_pb) {
 
          strcpy(tmp_str, prepbufr_hdrs_str);
          length = strlen(tmp_str);
-         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length );
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &tmp_use_small_buffer );
+         if (mxr8lv_small < nlev) use_small_buffer = false;
          is_prepbufr_hdr = (0 < nlev);
          if (is_prepbufr_hdr) {
             for (index=0; index<4; index++) {
@@ -1851,7 +1857,7 @@ void process_pbfile_metadata(int i_pb) {
             strcpy(var_name, default_sid_name);
             strcpy(tmp_str, bufr_avail_sid_names);
             length = strlen(tmp_str);
-            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length );
+            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &tmp_use_small_buffer );
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
@@ -1868,7 +1874,7 @@ void process_pbfile_metadata(int i_pb) {
             
             strcpy(tmp_str, bufr_avail_latlon_names);
             length = strlen(tmp_str);
-            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length );
+            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &tmp_use_small_buffer );
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
@@ -1963,27 +1969,30 @@ void process_pbfile_metadata(int i_pb) {
          }
          
          if (check_all) {
+            // Remove variables for headers
             for (index=0; index<bufr_hdr_arr.n_elements(); index++) {
                if (unchecked_var_list.has(bufr_hdr_arr[index], var_index)) {
                   unchecked_var_list.shift_down(var_index, 1);
                }
             }
          }
-         
-         if (use_met_vars) {
-            StringArray taregt_vars = bufr_target_variables.split(",+");
-            for (index=0; index<taregt_vars.n_elements(); index++) {
-               if (!tableB_vars.has(taregt_vars[index])) {
+         else {
+            for (index=0; index<bufr_target_variables.n_elements(); index++) {
+               const char *bufr_var_name = bufr_target_variables[index];
+               if (!tableB_vars.has(bufr_var_name) && !prepbufr_derive_vars.has(bufr_var_name)) {
                   mlog << Error << "\n" << method_name << " -> variable \""
-                       << taregt_vars[index] <<"\" does not exist at BUFR file\n\n";
+                       << bufr_var_name <<"\" does not exist at BUFR file\n\n";
                   exit(1);
                }
-               if (!local_bufr_obs_arr.has(taregt_vars[index])) {
-                  local_bufr_obs_arr.add(taregt_vars[index]);
+               if (!tmp_bufr_obs_arr.has(bufr_var_name)) {
+                  tmp_bufr_obs_arr.add(bufr_var_name);
+               }
+               if (!prepbufr_vars.has(bufr_var_name) && !prepbufr_derive_vars.has(bufr_var_name)) {
+                  use_small_buffer = false;
                }
             }
+            break;
          }
-         if (!check_all) break;
       } // if (0 == i_read)
 
       if (0 == unchecked_var_list.n_elements()) break;
@@ -1996,25 +2005,43 @@ void process_pbfile_metadata(int i_pb) {
          strcpy(var_name, (char *)unchecked_var_list[vIdx]);
          var_name_len = strlen(var_name);
             
-         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len);
+         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &tmp_use_small_buffer);
          if (0 >= nlev2) continue;
       
          // Search through the vertical levels
          buf_nlev = nlev2;
+         if (mxr8lv_small < nlev) use_small_buffer = false;
          if (nlev2 > mxr8lv) buf_nlev = mxr8lv;
          for(lv=0; lv<buf_nlev; lv++) {
             if (bufr_obs[lv][0] < r8bfms) {
-               if (!local_bufr_obs_arr.has(var_name) && !bufr_hdr_arr.has(var_name)) {
-                  local_bufr_obs_arr.add(var_name);
-                  if (prepbufr_vars.has(var_name, var_idx)) {
-                     bufr_var_code[var_idx] = vIdx;
+               if (!tmp_bufr_obs_arr.has(var_name) && !bufr_hdr_arr.has(var_name)) {
+                  tmp_bufr_obs_arr.add(var_name);
+                  //if (prepbufr_vars.has(var_name, var_idx)) {
+                  //   bufr_var_code[var_idx] = vIdx;
+                  //}
+               }
+               if (do_all_vars) {
+                  int count = (0 == variableCountMap.count(var_name)) ? variableCountMap[var_name] : 0;
+                  if (0 == count) {
+                     mlog << Debug(5) << " found valid data: " << var_name
+                          << " (" << bufr_obs[lv][0] << ")\n";
+                  }
+                  count++;
+                  if (COUNT_THRESHOLD < count) {
+                     unchecked_var_list.shift_down(vIdx, 1);
+                  }
+                  else {
+                     variableCountMap[var_name] = count;
                   }
                }
-               unchecked_var_list.shift_down(vIdx, 1);
-               mlog << Debug(5) << " found valid data: " << var_name
-                    << " (" << bufr_obs[lv][0] << ")\n";
-               break;
             }
+            else {
+               StringArray typeArray;
+               if (0 < variableTypeMap.count(var_name)) typeArray = variableTypeMap[var_name];
+               if (!typeArray.has(hdr_typ)) typeArray.add(hdr_typ);
+               variableTypeMap[var_name] = typeArray;
+            }
+            break;
          }  //end for lv
       }  // end for vIdx
    } // end for
@@ -2022,23 +2049,34 @@ void process_pbfile_metadata(int i_pb) {
    // Close the PREPBUFR file
    closepb_(&unit);
    
+   int bufr_var_index = 0;
+   bool has_prepbufr_vars = false;
+   const char * tmp_var_name;
    bufr_obs_arr.clear();
-   if (is_prepbufr) {
-      for (index=0; index<prepbufr_vars.n_elements(); index++) {
-         if (tableB_vars.has(prepbufr_vars[index])) {
-            bufr_obs_arr.add(prepbufr_vars[index]);
-            bufr_var_code[index] = index;
+   for (index=0; index<prepbufr_vars.n_elements(); index++) {
+      tmp_var_name = prepbufr_vars[index];
+      if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
+         if (tableB_vars.has(tmp_var_name)) {
+            bufr_obs_arr.add(tmp_var_name);
+            bufr_var_code[index] = bufr_var_index;
+            bufr_var_index++;
+            has_prepbufr_vars = true;
          }
       }
-      length = bufr_obs_arr.n_elements();
+   }
+   if (has_prepbufr_vars) {
       for (int vIdx=0; vIdx< prepbufr_derive_vars.n_elements(); vIdx++) {
-         bufr_derive_code[vIdx] = length + vIdx;
-         bufr_obs_arr.add(prepbufr_derive_vars[vIdx]);
+         tmp_var_name = prepbufr_derive_vars[vIdx];
+         if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
+            bufr_obs_arr.add(tmp_var_name);
+            bufr_derive_code[vIdx] = bufr_var_index;
+            bufr_var_index++;
+         }
       }
    }
-   for (i=0; i<local_bufr_obs_arr.n_elements(); i++) {
-      if (!bufr_obs_arr.has(local_bufr_obs_arr[i])) {
-         bufr_obs_arr.add(local_bufr_obs_arr[i]);
+   for (i=0; i<tmp_bufr_obs_arr.n_elements(); i++) {
+      if (!bufr_obs_arr.has(tmp_bufr_obs_arr[i])) {
+         bufr_obs_arr.add(tmp_bufr_obs_arr[i]);
       }
    }
 
@@ -2290,7 +2328,7 @@ void write_netcdf_hdr_data() {
 
       // Variable name
       lengths[1] = BUFR_NAME_LEN;
-      if (obs_var_map[var_name]) {
+      if (0 < obs_var_map.count(var_name)) {
          ConcatString grib_name = obs_var_map[var_name];
          if (0 < grib_name.length()) {
             int name_len = strlen(var_name);
@@ -2519,10 +2557,10 @@ bool keep_instrument_type(int type) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool keep_obs_grib_code(int code) {
-   return(conf_info.obs_grib_code.n_elements() == 0 ||
-          conf_info.obs_grib_code.has(code));
+bool keep_bufr_obs_index(int code) {
+   return(code >= 0 && (do_all_vars || code < bufr_target_variables.n_elements()));
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -2634,7 +2672,19 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
       else {
          strcpy(description, "");
       }
-      sprintf(line_buf, "   %8s: %s\n", obs_arr[i], description);
+      if (0 < variableTypeMap.count(obs_arr[i])) {
+         char message_types[(BUFR_DESCRIPTION_LEN+1)*10];
+         message_types[0] = '\0';
+         StringArray typeArray = variableTypeMap[obs_arr[i]];
+         for (int ii=0; ii<typeArray.n_elements(); ii++) {
+            if (0 < strlen(message_types)) sprintf(message_types, "%s ", message_types);
+            sprintf(message_types, "%s%s", message_types, typeArray[ii]);
+         }
+         sprintf(line_buf, "   %8s: %-48s\t\ttypes: %s\n", obs_arr[i], description, message_types);
+      }
+      else {
+         sprintf(line_buf, "   %8s: %s\n", obs_arr[i], description);
+      }
       mlog << Debug(1) << line_buf;
    }
 }
@@ -2654,10 +2704,7 @@ void usage() {
         << "\t[-valid_beg time]\n"
         << "\t[-valid_end time]\n"
         << "\t[-nmsg n]\n"
-        << "\t[-all]\n"
         << "\t[-index]\n"
-        << "\t[-use_var_id]\n"
-        << "\t[-vars var1,var2]\n"
         << "\t[-dump path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -2690,19 +2737,9 @@ void usage() {
         << "\"prepbufr_file\" should also be dumped to text files "
         << "in the directory specified (optional).\n"
 
-        << "\t\t\"-use_var_id\" indicates that the MET variable index "
-        << "is saved instead of the GRIB code (optional). This option will be "
-        << "automatically enabled if \"-all\" or \"-vars\" option is given.\n"
-
-        << "\t\t\"-all\" indicates that all variables are extracted from"
-        << " \"prepbufr_file\" (optional). Auotomatically enables -use_var_id.\n"
-
         << "\t\t\"-index\" indicates that the meta data (available variables and headers)"
         << " is extracted from \"prepbufr_file\" (optional). "
         << "No NetCDF outputs. \"-all\" or \"-vars\" is ignored.\n"
-
-        << "\t\t\"-vars variables\" indicates that the comma seperated variables"
-        << " to NetCDF outputs (optional). Auotomatically enables -use_var_id\n\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -2756,17 +2793,23 @@ void set_dump_path(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_do_all_variables(const StringArray & a)
+void set_collect_metadata(const StringArray & a)
 {
-   do_all_vars = true;
-   use_var_id = true;
+   collect_metadata = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_collect_metadata(const StringArray & a)
+void set_target_variables(const StringArray & a)
 {
-   collect_metadata = true;
+   if (0 == strcmp("_all_", a[0])) {
+      do_all_vars = true;
+   }
+   else {
+     override_vars = true;
+     ConcatString arg = a[0];
+     bufr_target_variables = arg.split(",+ ");
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2778,22 +2821,6 @@ void set_logfile(const StringArray & a)
    filename = a[0];
 
    mlog.open_log_file(filename);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_target_variables(const StringArray & a)
-{
-   use_var_id = true;
-   use_met_vars = true;
-   bufr_target_variables.add(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_use_var_id(const StringArray & a)
-{
-   use_var_id = true;
 }
 
 ////////////////////////////////////////////////////////////////////////

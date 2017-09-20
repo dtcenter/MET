@@ -7,7 +7,7 @@ C*      ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
-        SUBROUTINE READPB  ( lunit, iret, cnlev, chdr, cevns )
+        SUBROUTINE READPB (lunit,iret,cnlev,chdr,cevns,small_buf )
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -51,9 +51,10 @@ C*                  prepbufr file
 C*
         INCLUDE       'readpb.prm'
 C*
-        INTEGER       cnlev
+        INTEGER       cnlev, max_lvl
         REAL*8        chdr ( MXR8PM )
         REAL*8        cevns ( MXR8PM, MXR8LV, MXR8VN, MXR8VT )
+        LOGICAL       small_buf
 C*
         CHARACTER*(MXSTRL) head
      +          / 'SID XOB YOB DHR ELV TYP T29 ITP' /
@@ -83,8 +84,13 @@ C*
         CALL UFBINT  ( lunit, hdr, MXR8PM, 1, jret, head )
 C
         DO ii = 1, MXR8VT
-           CALL UFBEVN  ( lunit, evns ( 1, 1, 1, ii ), MXR8PM, MXR8LV,
-     +                    MXR8VN, nlev, ostr (ii) )
+           IF (small_buf) THEN
+              CALL UFBEVN  ( lunit, evns_s ( 1, 1, 1, ii ), MXR8PM,
+     +                       MXR8LV_S, MXR8VN, nlev, ostr (ii) )
+           ELSE
+              CALL UFBEVN  ( lunit, evns ( 1, 1, 1, ii ), MXR8PM,
+     +                       MXR8LV, MXR8VN, nlev, ostr (ii) )
+           END IF
         END DO
 C
 C*      Prior to returning, copy the contents COMMON block PREPBC into 
@@ -100,7 +106,11 @@ C
            DO kk = 1, MXR8VT
               DO jj = 1, MXR8VN
                  DO ii = 1, MXR8PM
-                    cevns ( ii, lv, jj, kk ) = evns ( ii, lv, jj, kk )
+                    IF (small_buf) THEN
+                       cevns ( ii, lv, jj, kk ) = evns_s(ii,lv,jj,kk)
+                    ELSE
+                       cevns ( ii, lv, jj, kk ) = evns( ii, lv, jj, kk )
+                    END IF
                  END DO
               END DO
            END DO
@@ -110,7 +120,7 @@ C
         END
 
         
-        SUBROUTINE READPBINT  ( lunit, iret, cnlev, cobs, ostr, olen )
+        SUBROUTINE READPBINT (lunit,iret,cnlev,cobs,ostr,olen,small_buf)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -139,6 +149,7 @@ C*
 C*
         INTEGER       cnlev, olen, max_nlev
         REAL*8        cobs ( MXR8PM, MXR8LV )
+        LOGICAL       small_buf
 C*
         CHARACTER*(MXSTRL) ostr
 C*
@@ -148,7 +159,11 @@ C*
 C*      Read the HDR and EVNS data for the subset that is currently
 C*      being pointed to.
 C*
-        CALL UFBINT(lunit,obsi,MXR8PM,MXR8LV,nlev,ostr(1:olen))
+        IF (small_buf) THEN
+           CALL UFBINT(lunit,obsi_s,MXR8PM,MXR8LV_S,nlev,ostr(1:olen))
+        ELSE
+           CALL UFBINT(lunit,obsi,MXR8PM,MXR8LV,nlev,ostr(1:olen))
+        END IF
 C
 C
 C*      Prior to returning, copy the contents COMMON block PREPBC into 
@@ -157,10 +172,18 @@ C
    20   cnlev = nlev
 C
         max_nlev = nlev
-        IF (max_nlev .gt. MXR8LV) max_nlev = MXR8LV
+        IF (small_buf) THEN
+           IF (max_nlev .gt. MXR8LV_S) max_nlev = MXR8LV_S
+        ELSE
+           IF (max_nlev .gt. MXR8LV) max_nlev = MXR8LV
+        END IF
         DO lv = 1, max_nlev
            DO ii = 1, MXR8PM
-              cobs ( ii, lv ) = obsi ( ii, lv )
+              IF (small_buf) THEN
+                 cobs ( ii, lv ) = obsi_s ( ii, lv )
+              ELSE
+                 cobs ( ii, lv ) = obsi ( ii, lv )
+              END IF
            END DO
         END DO
 C
@@ -168,7 +191,7 @@ C
         END
         
         
-        SUBROUTINE READPBEVT  ( lunit, iret, cnlev, cobs, ostr, olen )
+        SUBROUTINE READPBEVT(lunit,iret,cnlev,cobs,ostr,olen,small_buf)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -214,6 +237,7 @@ C*
 C*
         INTEGER       cnlev, olen, max_nlev
         REAL*8        cobs ( MXR8PM, MXR8LV, MXR8VN )
+        LOGICAL       small_buf
 C*
         CHARACTER*(MXSTRL) ostr
 C*
@@ -223,7 +247,12 @@ C*
 C*      Read the one obs data for the subset that is currently
 C*      being pointed to.
 C*
-        CALL UFBEVN(lunit,obse,MXR8PM,MXR8LV,MXR8VN,nlev,ostr(1:olen))
+        IF (small_buf) THEN
+          CALL UFBEVN(lunit,obse_s,MXR8PM,MXR8LV_S,MXR8VN,nlev,
+     +                ostr(1:olen))
+        ELSE
+          CALL UFBEVN(lunit,obse,MXR8PM,MXR8LV,MXR8VN,nlev,ostr(1:olen))
+        END IF
 C
 C*      Prior to returning, copy the contents COMMON block PREPBC into 
 C*      variables passed to the subroutine.
@@ -231,11 +260,19 @@ C
    20   cnlev = nlev
 C
         max_nlev = nlev
-        IF (max_nlev .gt. MXR8LV) max_nlev = MXR8LV
+        IF (small_buf) THEN
+           IF (max_nlev .gt. MXR8LV_S) max_nlev = MXR8LV_S
+        ELSE
+           IF (max_nlev .gt. MXR8LV) max_nlev = MXR8LV
+        END IF
         DO lv = 1, max_nlev
            DO jj = 1, MXR8VN
               DO ii = 1, MXR8PM
-                 cobs ( ii, lv, jj ) = obse( ii, lv, jj )
+                 IF (small_buf) THEN
+                    cobs ( ii, lv, jj ) = obse_s( ii, lv, jj )
+                 ELSE
+                    cobs ( ii, lv, jj ) = obse( ii, lv, jj )
+                 END IF
               END DO
            END DO
         END DO
