@@ -1504,7 +1504,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    if(!DumpOut) {
       mlog << Error << "\nTCStatJobFilter::do_job() -> "
            << "this function may only be called when using the "
-           << "-dump_row option in the job command line: "
+           << "-dump_row option in the job command line:\n"
            << serialize() << "\n\n";
       exit(1);
    }
@@ -1838,7 +1838,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    if(Column.n_elements() == 0) {
       mlog << Error << "\nTCStatJobSummary::do_job() -> "
            << "this function may only be called when using the "
-           << "-column option in the job command line: "
+           << "-column option in the job command line:\n"
            << serialize() << "\n\n";
       exit(1);
    }
@@ -3479,9 +3479,11 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
 void TCStatJobProbRIRW::close_dump_file() {
 
    // Close the current output dump file stream
-   DumpOut->close();
-   delete DumpOut;
-   DumpOut = (ofstream *) 0;
+   if(DumpOut) {
+      DumpOut->close();
+      delete DumpOut;
+      DumpOut = (ofstream *) 0;
+   }
 
    // Prepare nicely formatted AsciiTable object
    AsciiTable out_at;
@@ -3576,6 +3578,15 @@ void TCStatJobProbRIRW::do_job(const StringArray &file_list,
       mlog << Error << "\nTCStatJobProbRIRW::do_job() -> "
            << "must use the -probrirw_thresh job command option "
            << "to define the forecast probabilities to be evaluated.\n\n";
+      exit(1);
+   }
+
+   // Check that the -dump_row option has been supplied
+   if(!DumpOut) {
+      mlog << Error << "\nTCStatJobProbRIRW::do_job() -> "
+           << "this function may only be called when using the "
+           << "-dump_row option in the job command line:\n"
+           << serialize() << "\n\n";
       exit(1);
    }
 
