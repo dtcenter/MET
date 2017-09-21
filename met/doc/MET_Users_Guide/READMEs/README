@@ -1070,6 +1070,7 @@ nc_pairs_flag   = {
    climo      = TRUE;
    weight     = FALSE;
    nbrhd      = FALSE;
+   fourier    = FALSE;
    apply_mask = TRUE;
 }
 
