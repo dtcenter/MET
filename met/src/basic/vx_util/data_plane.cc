@@ -618,12 +618,12 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave)
 {
 
 int i, m, x, y;
-double * a = 0;
-double * b = 0;
+double *  a = 0;
+double *  b = 0;
 double * xa = 0;
 double * xb = 0;
-double * C = 0;
-double * S = 0;
+double *  C = 0;
+double *  S = 0;
 double xa0, value, angle;
 const int mnw = (Nx + 1)/2;
 // const int mnw = Nx - 1;
@@ -663,8 +663,8 @@ b  = new double [ mnw + 1 ];
 xa = new double [ mnw + 1 ];
 xb = new double [ mnw + 1 ];
 
-C = new double [ Nx ];
-S = new double [ Nx ];
+C  = new double [ Nx ];
+S  = new double [ Nx ];
 
 for (x=0; x<Nx; ++x)  {
 
