@@ -77,7 +77,6 @@ level_category = [];
 // BUFR variable names to retain or derive.
 // If emtpy, process all available variables.
 //
-//obs_grib_code = [ "SPFH", "TMP", "HGT", "UGRD", "VGRD", "WIND", "DPT", "PRMSL" ];
 obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB", "D_WIND", "D_DWP", "D_PRMSL" ];
 
 ////////////////////////////////////////////////////////////////////////////////
