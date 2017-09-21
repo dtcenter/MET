@@ -908,6 +908,26 @@ return ( lc );
 ////////////////////////////////////////////////////////////////////////
 
 
+char ConcatString::operator[](const int n) const
+
+{
+
+if ( (n < 0) || (n >= Length) )  {
+
+   cerr << "\n\n  ConcatString::operator[](const int) const -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( s[n] );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString & operator<<(ConcatString & cs, const char c)
 
 {

@@ -123,7 +123,9 @@ class ConcatString {
       bool empty() const;
       bool nonempty() const;
 
-      char char_at(const int idx) const;
+      char char_at(const int idx) const;  //  returns nul if outside range
+
+      char operator [] (const int) const;  //  calls exit() if outside range
 
          //
          //  do stuff
