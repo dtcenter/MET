@@ -30,7 +30,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB_lvl_typ_val_180000L_20170610_180000V.stat</stat>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB_lvl_typ_val_180000L_20170610_180000V_eclv.txt</stat>
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB_lvl_typ_val_180000L_20170610_180000V_pairs.nc</grid_nc>
     </output>
   </test>
