@@ -71,7 +71,7 @@
 
 \begin_body
 
-\begin_layout Chapter*
+\begin_layout Section*
 Improving Speed of MET Tools with Gen_Vx_Mask
 \end_layout
 
@@ -102,7 +102,7 @@ So pass a gridded data file for the nest as the "mask_file" rather than
 \end_layout
 
 \begin_layout Standard
-Here's an example of that using data from the MET tarball: 
+Here's an example of that, using data from the MET tarball: 
 \end_layout
 
 \begin_layout LyX-Code
