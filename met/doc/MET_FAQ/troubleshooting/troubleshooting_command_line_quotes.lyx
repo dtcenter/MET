@@ -83,7 +83,7 @@ Single quotes, double quotes, and escape characters can be difficult for
 \end_layout
 
 \begin_layout LyX-Code
-['/h/WXQC/met-5.1/bin/regrid_data_plane', 
+['/h/WXQC/{MET_BUILD_BASE}/bin/regrid_data_plane', 
 \end_layout
 
 \begin_layout LyX-Code
