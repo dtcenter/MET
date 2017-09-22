@@ -95,7 +95,7 @@ obs_bufr_map = [
    { key = "ZOB";     val = "HGT";   },
    { key = "UOB";     val = "UGRD";  },
    { key = "VOB";     val = "VGRD";  },
-   { key = "D_DWP";   val = "DPT";   },
+   { key = "D_DPT";   val = "DPT";   },
    { key = "D_WDIR";  val = "WDIR";  },
    { key = "D_WIND";  val = "WIND";  },
    { key = "D_RH";    val = "RH";    },
