@@ -76,7 +76,7 @@ level_category = [];
 // If emtpy, process all available variables.
 //
 obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB",
-                 "D_DWP", "D_WIND", "D_RH", "D_MIXR" ];
+                 "D_DPT", "D_WIND", "D_RH", "D_MIXR" ];
 
 ////////////////////////////////////////////////////////////////////////////////
 
