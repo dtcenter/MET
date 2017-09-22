@@ -96,7 +96,7 @@ Nonetheless, there is a way you can accomplish this logic using the gen_vx_mask
 \begin_layout Standard
 Below is an example using sample data that is included with the MET release
  tarball to illustrate...
- using met-6.0.
+ using met.
  This will read 3-hour precip and 2-meter temperature, and resetts the precip
  at any grid point where the temperature is less than 290 K to a value of
  0:
