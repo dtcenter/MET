@@ -71,7 +71,7 @@
 \begin_body
 
 \begin_layout Section*
-Ensemble_Stat
+ensemble_stat
 \end_layout
 
 \begin_layout Labeling
@@ -87,7 +87,7 @@ target "http://www.dtcenter.org/met/users/support/faqs/ensemble_stat/ensemble_st
 \end_layout
 
 \begin_layout Section*
-File_IO
+file_io
 \end_layout
 
 \begin_layout Labeling
