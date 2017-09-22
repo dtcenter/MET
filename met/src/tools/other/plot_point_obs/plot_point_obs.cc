@@ -85,6 +85,8 @@ static Grid         grid("G004");
 static Box          grid_bb;
 static StringArray  ityp;
 static IntArray     ivar;
+static StringArray  svar;
+static StringArray  var_list;
 static ConcatString data_plane_filename;
 static double       dotsize = default_dotsize;
 
@@ -93,6 +95,7 @@ static double       dotsize = default_dotsize;
 static void draw_border(PSfile &, Box &);
 static void usage();
 static void set_grib_code(const StringArray &);
+static void set_obs_var(const StringArray &);
 static void set_msg_type(const StringArray &);
 static void set_data_filename(const StringArray &);
 static void set_dotsize(const StringArray &);
@@ -140,6 +143,7 @@ int main(int argc, char *argv[]) {
    // add the options function calls
    //
    cline.add(set_grib_code, "-gc", 1);
+   cline.add(set_obs_var, "-obs_var", 1);
    cline.add(set_msg_type, "-msg_typ", 1);
    cline.add(set_data_filename, "-data_file", 1);
    cline.add(set_dotsize, "-dotsize", 1);
@@ -201,23 +205,12 @@ int main(int argc, char *argv[]) {
    //
    NcFile *f_in       = (NcFile *) 0;
 
-   //NcDim *hdr_arr_dim = (NcDim *) 0;
-   //NcDim *obs_arr_dim = (NcDim *) 0;
-   //NcDim *nhdr_dim    = (NcDim *) 0;
-   //NcDim *nobs_dim    = (NcDim *) 0;
-   //NcDim *strl_dim    = (NcDim *) 0;
-
    NcDim hdr_arr_dim ;
    NcDim obs_arr_dim ;
    NcDim nhdr_dim    ;
    NcDim nobs_dim    ;
    NcDim strl_dim    ;
 
-   //NcVar *hdr_arr_var = (NcVar *) 0;
-   //NcVar *hdr_typ_var = (NcVar *) 0;
-   //NcVar *hdr_sid_var = (NcVar *) 0;
-   //NcVar *hdr_vld_var = (NcVar *) 0;
-   //NcVar *obs_arr_var = (NcVar *) 0;
    NcVar hdr_arr_var ;
    NcVar hdr_typ_var ;
    NcVar hdr_sid_var ;
@@ -240,6 +233,11 @@ int main(int argc, char *argv[]) {
       exit(1);
    }
 
+   bool use_var_id = false;
+   if (!get_global_att(f_in, nc_att_use_var_id, use_var_id)) {
+      use_var_id = false;
+   }
+   
    //
    // Retrieve the dimensions and variable from the netCDF file
    //
@@ -279,13 +277,28 @@ int main(int argc, char *argv[]) {
    mlog << Debug(2) << "Processing " << (nobs_count) << " observations at "
         << nhdr_count << " locations.\n";
 
-   mlog << Debug(2) << "Observation GRIB codes: ";
-   if(ivar.n_elements() == 0) mlog << "ALL\n";
-   else {
-      for(i=0; i<ivar.n_elements(); i++) mlog << ivar[i] << " ";
-      mlog << "\n";
+   if(use_var_id) {
+      if(ivar.n_elements() != 0) {
+         mlog << Warning << "\n-gc option is ignored!\n\n";
+      }
+      mlog << Debug(2) << "Observation var names: ";
+      if (svar.n_elements() == 0) mlog << "ALL";
+      else {
+         for(i=0; i<svar.n_elements(); i++) mlog << svar[i] << " ";
+      }
    }
-
+   else {
+      if(svar.n_elements() != 0) {
+         mlog << Warning << "\n-obs_var option is ignored!\n\n";
+      }
+      mlog << Debug(2) << "Observation GRIB codes: ";
+      if(ivar.n_elements() == 0) mlog << "ALL";
+      else {
+         for(i=0; i<ivar.n_elements(); i++) mlog << ivar[i] << " ";
+      }
+   }
+   mlog << "\n";
+   
    mlog << Debug(2) << "Observation message types: ";
    if(ityp.n_elements() == 0) mlog << "ALL\n";
    else {
@@ -433,6 +446,24 @@ int main(int argc, char *argv[]) {
            << "trouble getting hdr_arr\n\n";
       exit(1);
    }
+
+   if (use_var_id) {
+      NcDim bufr_var_dim = get_nc_dim(f_in, nc_dim_nvar);
+      long var_count = get_dim_size(&bufr_var_dim);
+      char obs_var_str[var_count][strl_count];
+      NcVar obs_var_var = get_nc_var(f_in, nc_var_obs_var);
+      
+      lengths[0] = var_count;
+      lengths[1] = strl_count;
+      if(!get_nc_data(&obs_var_var, (char *)&obs_var_str[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting " << nc_var_obs_var << "\n\n";
+         exit(1);
+      }
+      for (int index = 0; index<var_count; index++) {
+         var_list.add(obs_var_str[index]);
+      }
+   }
    
    for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
       buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
@@ -483,7 +514,12 @@ int main(int argc, char *argv[]) {
          //
          // Check if we want to plot this variable type.
          //
-         if(ivar.n_elements() > 0 && !ivar.has(v)) continue;
+         if (use_var_id) {
+            if(svar.n_elements() > 0 && !svar.has(var_list[v])) continue;
+         }
+         else {
+            if(ivar.n_elements() > 0 && !ivar.has(v)) continue;
+         }
          
          //
          // Check if we want to plot this message type.
@@ -593,7 +629,7 @@ void usage() {
    cout << "\nUsage: " << program_name << "\n"
         << "\tnc_file\n"
         << "\tps_file\n"
-        << "\t[-gc code]\n"
+        << "\t[-gc code] or [-obs_var variable name]\n"
         << "\t[-msg_typ name]\n"
         << "\t[-data_file name]\n"
         << "\t[-dotsize val]\n"
@@ -606,6 +642,8 @@ void usage() {
         << "generated.\n"
         << "\t\t\"-gc code\" is the GRIB code(s) to be plotted "
         << "(optional).\n"
+        << "\t\t\"-obs_var variable name\" is the variable name(s) to be plotted "
+        << "(optional). The input should have the available variable list.\n"
         << "\t\t\"-msg_typ name\" is the message type(s) to be "
         << "plotted (optional).\n"
         << "\t\t\"-data_file name\" is a data file whose grid should be "
@@ -626,6 +664,13 @@ void usage() {
 void set_grib_code(const StringArray & a)
 {
    ivar.add(atoi(a[0]));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_obs_var(const StringArray & a)
+{
+   svar.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
