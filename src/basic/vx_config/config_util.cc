@@ -50,7 +50,7 @@ void RegridInfo::validate() {
 
    // Check for unsupported regridding options
    if(method == InterpMthd_Best) {
-      mlog << Error << "\nparse_conf_regrid() -> "
+      mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
       exit(1);
