@@ -22,6 +22,7 @@ using namespace std;
 
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
+#include "vx_regrid.h"
 #include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_log.h"
@@ -230,15 +231,6 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
    // Otherwise, process the input data file
    else {
 
-      // Check that the masking grid matches the input grid
-      if(!(mtddf->grid() == grid)) {
-         mlog << Error << "\nparse_poly_mask() -> "
-              << "The masking and verification grids do not match:\n"
-              << mtddf->grid().serialize() << " !=\n" << grid.serialize()
-              << "\n\n";
-         exit(1);
-      }
-
       // Create a new VarInfo object
       info = info_factory.new_var_info(mtddf->file_type());
 
@@ -283,6 +275,23 @@ void parse_poly_mask(const ConcatString &mask_poly_str, const Grid &grid,
 
       // Append threshold info
       if(append_thresh) mask_name << st.get_str();
+
+      // Regrid, if necessary, using nearest neighbor.
+      if(!(mtddf->grid() == grid)) {
+
+         RegridInfo ri;
+         ri.enable = true;
+         ri.method = InterpMthd_Nearest; 
+         ri.width  = 1;
+         ri.shape  = GridTemplateFactory::GridTemplate_Square;
+
+         mlog << Debug(2)
+              << "Regridding mask grid to the verification grid using nearest "
+              << "neighbor interpolation:\n"
+              << mtddf->grid().serialize() << "!=\n" << grid.serialize() << "\n";
+
+         mask_dp = met_regrid(mask_dp, mtddf->grid(), grid, ri);
+      }
    }
 
    // Clean up
