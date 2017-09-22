@@ -296,6 +296,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-index]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-log file]
 \end_layout
 
@@ -478,6 +494,22 @@ path
 6.
  The 
 \series bold
+-index
+\series medium
+ option shows the available variables with valid data from the BUFR input.
+ It collects the available variable list from BUFR input and checks the
+ existance of valid data and directs the variable names with valid data
+ to the screen.
+ The NetCDF output won't be generated.
+ 
+\end_layout
+
+\begin_layout Description
+
+\series medium
+7.
+ The 
+\series bold
 -log file
 \series medium
  option directs output and errors to the specified log file.
@@ -495,7 +527,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-7.
+8.
  The 
 \series bold
 -v level
@@ -517,7 +549,7 @@ level
 \begin_layout Description
 
 \series medium
-8.
+9.
 
 \series default
  The 
@@ -1286,7 +1318,7 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-obs_grib_code = [ 'SPFH', 'TMP', 'HGT', 'UGRD', 'VGRD' ];
+obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
 \end_layout
 
 \begin_layout Standard
@@ -1295,19 +1327,131 @@ obs_grib_code = [ 'SPFH', 'TMP', 'HGT', 'UGRD', 'VGRD' ];
 Each PrepBufr message will likely contain multiple observation variables.
  The 
 \series bold
-obs_grib_code
+obs_bufr_var
 \series medium
  variable is used to specify which observation variables should be retained
  or derived.
- The value from GRIB parameter table version 2 or the corresponding abbreviation
- may be used to specify which observation variables are to be retained or
- derived.
- The following GRIB codes may be retained: SPFH, TMP, HGT, UGRD, and VGRD
- for specific humidity, temperature, height, and the u and v components
- of winds.
- The following GRIB codes may be derived: DPT, WIND, RH, MIXR, and PRMSL
- for dewpoint, wind speed, relative humidity, mixing ratio, and pressure
- reduced to MSL.
+ The variable name comes from BUFR file which includes BUFR table.
+ The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for
+ specific humidity, temperature, height, and the u and v components of winds.
+ The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, and
+ D_PRMSL for dewpoint, wind speed, relative humidity, mixing ratio, and
+ pressure reduced to MSL.
+ This connfiguration replaces 
+\series bold
+obs_grib_code
+\series medium
+.
+ If the list is empty, all BUFR variables are retained.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_bufr_map = [
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'POB';      val = 'PRES';  },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'QOB';      val = 'SPFH';  },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'TOB';      val = 'TMP';   },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'ZOB';      val = 'HGT';   },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'UOB';      val = 'UGRD';  },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'VOB';      val = 'VGRD';  },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_DPT';    val = 'DPT';   },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_WDIR';   val = 'WDIR';  },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_WIND';   val = 'WIND';  },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_RH';     val = 'RH';    },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_MIXR';   val = 'MIXR';  },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+{ key = 'D_PRMSL';  val = 'PRMSL'; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+];
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\series medium
+The BUFR variable names are not shared with other forecast data.
+ This map is used to convert the BUFR name to the common name, like GRIB2.
+ It allows to share the configuration for forecast data with PB2NC observation
+ data.
+ If there is no mapping, the BUFR variable name will be saved to output
+ NetCDF file.
 \end_layout
 
 \begin_layout Standard
