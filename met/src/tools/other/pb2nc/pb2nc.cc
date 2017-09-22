@@ -450,7 +450,7 @@ void initialize() {
    prepbufr_event_members.add(tmp_hdr_array);
    if (0 < tmp_hdr_array.n_elements()) prepbufr_vars.add(tmp_hdr_array[0]);
    
-   prepbufr_derive_vars.add("D_DWP");
+   prepbufr_derive_vars.add("D_DPT");
    prepbufr_derive_vars.add("D_WDIR");
    prepbufr_derive_vars.add("D_WIND");
    prepbufr_derive_vars.add("D_RH");
