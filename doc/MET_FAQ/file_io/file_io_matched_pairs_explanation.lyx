@@ -71,7 +71,7 @@
 
 \begin_body
 
-\begin_layout Chapter*
+\begin_layout Section*
 File_IO - Understanding the Number of Matched Pairs
 \end_layout
 
@@ -82,7 +82,7 @@ In this example the dimension of the grid is 37x37.
  matched pair is not included in the calculations.
  Use the ncview tool to look at an example netCDF file.
  If the forecast field contains missing data around the edge of the domain,
- then that is ae reason there may be 992 matched pairs instead of 1369.
+ then that is a reason there may be 992 matched pairs instead of 1369.
 \end_layout
 
 \end_body
