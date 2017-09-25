@@ -19,8 +19,41 @@
 ncepmasksdir = $(pkgdatadir)/poly/NCEP_masks
 
 ncepmasks_DATA = \
-	NCEP_Regions.nc 
+	NCEP_Regions.nc \
+	APL_mask.nc \
+	ATC_mask.nc \
+	CAM_mask.nc \
+	CAR_mask.nc \
+	ECA_mask.nc \
+	GLF_mask.nc \
+	GMC_mask.nc \
+	GRB_mask.nc \
+	HWI_mask.nc \
+	LMV_mask.nc \
+	MDW_mask.nc \
+	MEX_mask.nc \
+	NAK_mask.nc \
+	NAO_mask.nc \
+	NEC_mask.nc \
+	NMT_mask.nc \
+	NPL_mask.nc \
+	NPO_mask.nc \
+	NSA_mask.nc \
+	NWC_mask.nc \
+	PRI_mask.nc \
+	SAK_mask.nc \
+	SAO_mask.nc \
+	SEC_mask.nc \
+	SMT_mask.nc \
+	SPL_mask.nc \
+	SPO_mask.nc \
+	SWC_mask.nc \
+	SWD_mask.nc \
+	WCA_mask.nc \
+	EAST_mask.nc \
+	WEST_mask.nc \
+	CONUS_mask.nc
 
 EXTRA_DIST = ${ncepmasks_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in
