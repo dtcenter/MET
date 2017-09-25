@@ -38,7 +38,7 @@ config_DATA = \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \
 	README \
-	README_TC \
+	README_TC
 
 EXTRA_DIST = ${config_DATA}
 
