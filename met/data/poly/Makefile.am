@@ -26,38 +26,34 @@ poly_DATA = \
 	ATC.poly \
 	CAM.poly \
 	CAR.poly \
-	CONUS.poly \
-	EAST.poly \
 	ECA.poly \
 	GLF.poly \
 	GMC.poly \
 	GRB.poly \
 	HWI.poly \
 	LMV.poly \
-	Makefile.am \
 	MDW.poly \
 	MEX.poly \
 	NAK.poly \
 	NAO.poly \
-	ncep_vx_regions.pdf \
 	NEC.poly \
 	NMT.poly \
 	NPL.poly \
-	NPO.poly \
 	NSA.poly \
 	NWC.poly \
 	PRI.poly \
-	SAK.poly \
 	SAO.poly \
 	SEC.poly \
 	SMT.poly \
 	SPL.poly \
-	SPO.poly \
 	SWC.poly \
 	SWD.poly \
 	WCA.poly \
+	EAST.poly \
 	WEST.poly \
-	MLB_Stadiums.txt
+	CONUS.poly \
+	MLB_Stadiums.txt \
+	ncep_vx_regions.pdf
 
 EXTRA_DIST = ${poly_DATA}
 
