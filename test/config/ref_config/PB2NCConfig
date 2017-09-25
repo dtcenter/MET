@@ -84,15 +84,15 @@ obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB", "D_WIND", "D_DPT", "D_PRMSL"
 //
 // Mapping of BUFR variable name to GRIB name
 //
-//obs_var_map = [
+//obs_var_map = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Mapping of report_type (header_type)
 //
-message_type_map = []; 
-   
+message_type_map = [];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 quality_mark_thresh = 3;
