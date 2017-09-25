@@ -643,7 +643,7 @@ void usage() {
         << "\t\t\"-gc code\" is the GRIB code(s) to be plotted "
         << "(optional).\n"
         << "\t\t\"-obs_var variable name\" is the variable name(s) to be plotted "
-        << "(optional). The input should have the available variable list.\n"
+        << "(optional).\n"
         << "\t\t\"-msg_typ name\" is the message type(s) to be "
         << "plotted (optional).\n"
         << "\t\t\"-data_file name\" is a data file whose grid should be "
