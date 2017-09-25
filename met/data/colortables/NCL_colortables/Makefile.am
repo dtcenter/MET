@@ -44,7 +44,6 @@ nclctable_DATA = \
 	helix1.ctable \
 	helix.ctable \
 	hotres.ctable \
-	Makefile.am \
 	ncview_default.ctable \
 	nrl_sirkes.ctable \
 	nrl_sirkes_nowhite.ctable \
@@ -79,4 +78,4 @@ nclctable_DATA = \
 
 EXTRA_DIST = ${nclctable_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in

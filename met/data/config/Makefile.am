@@ -19,19 +19,16 @@
 configdir = $(pkgdatadir)/config
 
 config_DATA = \
-	Ascii2NcConfig_default \
 	ConfigConstants \
 	ConfigMapData \
+	Ascii2NcConfig_default \
 	EnsembleStatConfig_default \
 	GridStatConfig_default \
-	Makefile.am \
 	MODEAnalysisConfig_default \
 	MODEConfig_default \
 	MTDConfig_default \
 	PB2NCConfig_default \
 	PointStatConfig_default \
-	README \
-	README_TC \
 	SeriesAnalysisConfig_default \
 	STATAnalysisConfig_default \
 	STATAnalysisConfig_GO_Index \
@@ -39,9 +36,10 @@ config_DATA = \
 	TCStatConfig_default \
 	WaveletStatConfig_default \
 	WWMCARegridConfig_default \
-	PlotModeFieldConfig_default
-
+	PlotModeFieldConfig_default \
+	README \
+	README_TC \
 
 EXTRA_DIST = ${config_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in

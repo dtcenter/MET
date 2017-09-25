@@ -57,4 +57,4 @@ ps_DATA = \
 
 EXTRA_DIST = ${ps_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in
