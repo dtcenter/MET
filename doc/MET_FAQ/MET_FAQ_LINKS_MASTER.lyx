@@ -502,7 +502,7 @@ regrid_data_plane
 \labelwidthstring 00.00.0000
 \begin_inset CommandInset href
 LatexCommand href
-name "data_plane_lat_lon_grid"
+name "lat_lon_grid"
 target "http://www.dtcenter.org/met/users/support/faqs/regrid_data_plane/regrid_data_plane_lat_lon_grid.xhtml"
 
 \end_inset
