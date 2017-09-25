@@ -22,4 +22,4 @@ mapadmin_DATA = *_data
 
 EXTRA_DIST = ${mapadmin_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in

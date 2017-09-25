@@ -16,7 +16,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS 		= admin_by_country
+SUBDIRS = admin_by_country
 
 mapdir = $(pkgdatadir)/map
 

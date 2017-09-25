@@ -16,7 +16,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS 		= NCL_colortables
+SUBDIRS = NCL_colortables
 
 ctabledir = $(pkgdatadir)/colortables
 
@@ -33,4 +33,4 @@ ctable_DATA = \
 
 EXTRA_DIST = ${ctable_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in
