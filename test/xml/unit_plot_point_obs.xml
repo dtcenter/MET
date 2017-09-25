@@ -37,7 +37,7 @@
     <param> \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &OUTPUT_DIR;/plot_point_obs/gdas1.20120409.t12z.prepbufr_TMP_ADPUPA.ps \
-      -gc 11 \
+      -obs_var TMP \
       -msg_typ ADPUPA \
       -v 1
     </param>
