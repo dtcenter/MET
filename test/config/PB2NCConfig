@@ -90,8 +90,8 @@ obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB",
 //
 // Mapping of report_type (header_type)
 //
-message_type_map = []; 
-   
+message_type_map = [];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 quality_mark_thresh = ${QUALITY_MARK_THRESH};
