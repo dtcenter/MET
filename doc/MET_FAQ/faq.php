@@ -13,13 +13,16 @@
       $sub_category = $_GET['category'];
       $include_URL = "$tool_name/$tool_name" . "_" . "$sub_category.xhtml";
    }
-   if (!file_exists($filename)) {
+   if (!file_exists($include_URL)) {
       if($tool_name == "troubleshooting" and $sub_category == "stat_analysis_slow" ) {
          $include_URL = "$tool_name/trouble_shooting_$sub_category.xhtml";
       }
       else if($tool_name == "regrid_data_plane" and $sub_category == "wgrib2" ) {
          $include_URL = "$tool_name/regrid_with_wgrib2.xhtml";
       }
+   }
+   if (!file_exists($include_URL)) {
+      $include_URL = "MET_FAQ_LINKS_MASTER.xhtml";
    }
    
    $absolute_faq_URL = "/met/users/support/faqs/";
