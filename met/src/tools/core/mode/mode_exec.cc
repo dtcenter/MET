@@ -34,7 +34,7 @@ using namespace std;
 
 static const int unmatched_id = -1;
 
-static const char * cts_str[n_cts] = {"RAW", "FILTER", "OBJECT"};
+static const char * cts_str[n_cts] = {"RAW", "OBJECT"};
 
 static const char program_name [] = "mode";
 
@@ -573,17 +573,8 @@ void ModeExecutive::compute_ct_stats()
          fcst_mask.threshold(engine.conf_info.fcst_conv_thresh);
          obs_mask.threshold(engine.conf_info.obs_conv_thresh);
       }
-      // Filtered fields
-      else if(i == 1) {
-         fcst_mask = *engine.fcst_filter;
-         obs_mask  = *engine.obs_filter;
-
-         // Apply the thresholds specified in the config file
-         fcst_mask.threshold(engine.conf_info.fcst_conv_thresh);
-         obs_mask.threshold(engine.conf_info.obs_conv_thresh);
-      }
       // Object fields
-      else if(i == 2) {
+      else if(i == 1) {
          fcst_mask = *engine.fcst_mask;
          obs_mask  = *engine.obs_mask;
       }
@@ -1619,7 +1610,7 @@ void ModeExecutive::write_ct_stats()
    //
    cts_at.clear();
    i = n_mode_hdr_columns + n_mode_cts_columns;
-   cts_at.set_size(4, i);                        // Set table size
+   cts_at.set_size(3, i);                        // Set table size
    justify_mode_cols(cts_at);                    // Justify columns
    cts_at.set_precision(                         // Set the precision
       engine.conf_info.conf.output_precision());
