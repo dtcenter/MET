@@ -52,10 +52,6 @@ ModeFuzzyEngine::~ModeFuzzyEngine() {
       delete fcst_raw;
       fcst_raw = (ShapeData *) 0;
    }
-   if(fcst_filter) {
-      delete fcst_filter;
-      fcst_filter = (ShapeData *) 0;
-   }
    if(fcst_thresh) {
       delete fcst_thresh;
       fcst_thresh = (ShapeData *) 0;
@@ -83,10 +79,6 @@ ModeFuzzyEngine::~ModeFuzzyEngine() {
    if(obs_raw) {
       delete obs_raw;
       obs_raw = (ShapeData *) 0;
-   }
-   if(obs_filter) {
-      delete obs_filter;
-      obs_filter = (ShapeData *) 0;
    }
    if(obs_thresh) {
       delete obs_thresh;
@@ -147,14 +139,12 @@ void ModeFuzzyEngine::init_from_scratch() {
    //
    // Reset all fcst and obs processing flags to initial state
    //
-   need_fcst_filter     = true;
    need_fcst_conv       = true;
    need_fcst_thresh     = true;
    need_fcst_split      = true;
    need_fcst_merge      = true;
    need_fcst_clus_split = true;
 
-   need_obs_filter      = true;
    need_obs_conv        = true;
    need_obs_thresh      = true;
    need_obs_split       = true;
@@ -164,7 +154,6 @@ void ModeFuzzyEngine::init_from_scratch() {
    need_match           = true;
 
    fcst_raw         = new ShapeData;
-   fcst_filter      = new ShapeData;
    fcst_thresh      = new ShapeData;
    fcst_conv        = new ShapeData;
    fcst_mask        = new ShapeData;
@@ -172,7 +161,6 @@ void ModeFuzzyEngine::init_from_scratch() {
    fcst_clus_split  = new ShapeData;
 
    obs_raw          = new ShapeData;
-   obs_filter       = new ShapeData;
    obs_thresh       = new ShapeData;
    obs_conv         = new ShapeData;
    obs_mask         = new ShapeData;
@@ -289,7 +277,6 @@ void ModeFuzzyEngine::set_fcst(const ShapeData &fcst_wd) {
 
    *fcst_raw = fcst_wd;
 
-   need_fcst_filter     = true;
    need_fcst_conv       = true;
    need_fcst_thresh     = true;
    need_fcst_split      = true;
@@ -304,7 +291,6 @@ void ModeFuzzyEngine::set_fcst(const ShapeData &fcst_wd) {
    int k = conf_info.zero_border_size;
    fcst_raw->zero_border(k, bad_data_double);
 
-   do_fcst_filter();
    do_fcst_convolution();
    do_fcst_thresholding();
    do_fcst_splitting();
@@ -318,7 +304,6 @@ void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
 
    *obs_raw = obs_wd;
 
-   need_obs_filter     = true;
    need_obs_conv       = true;
    need_obs_thresh     = true;
    need_obs_split      = true;
@@ -333,7 +318,6 @@ void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
    int k = conf_info.zero_border_size;
    obs_raw->zero_border(k, bad_data_double);
 
-   do_obs_filter();
    do_obs_convolution();
    do_obs_thresholding();
    do_obs_splitting();
@@ -351,7 +335,6 @@ void ModeFuzzyEngine::set_fcst_no_conv(const ShapeData &fcst_wd)
 
    // *fcst_raw = fcst_wd;
 
-   need_fcst_filter     = false;
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
    need_fcst_split      = true;
@@ -366,7 +349,6 @@ void ModeFuzzyEngine::set_fcst_no_conv(const ShapeData &fcst_wd)
    // int k = conf_info.zero_border_size;
    // fcst_raw->zero_border(k, bad_data_double);
 
-   // do_fcst_filter();
    // do_fcst_convolution();
    do_fcst_thresholding();
    do_fcst_splitting();
@@ -382,7 +364,6 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
 
    // *obs_raw = obs_wd;
 
-   need_obs_filter     = false;
    need_obs_conv       = false;
    need_obs_thresh     = true;
    need_obs_split      = true;
@@ -397,7 +378,6 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
    // int k = conf_info.zero_border_size;
    // obs_raw->zero_border(k, bad_data_double);
 
-   // do_obs_filter();
    // do_obs_convolution();
    do_obs_thresholding();
    do_obs_splitting();
@@ -417,79 +397,24 @@ int ModeFuzzyEngine::two_to_one(int n_f, int n_o) const {
    return(n);
 }
 
-///////////////////////////////////////////////////////////////////////
-
-
-void ModeFuzzyEngine::do_fcst_filter() {
-   SingleThresh st;
-
-   if(!need_fcst_filter) return;
-
-   *fcst_filter = *fcst_raw;
-
-      //
-      // Threshold the fcst_filter field applying the fcst_conv_thresh
-      //
-
-   // *fcst_thresh = *fcst_filter;
-   // fcst_thresh->threshold(conf_info.fcst_conv_thresh);
-
-   need_fcst_filter     = false;
-   need_fcst_conv       = true;
-   need_fcst_thresh     = true;
-   need_fcst_split      = true;
-   need_fcst_merge      = true;
-   need_fcst_clus_split = true;
-   need_match           = true;
-
-   return;
-}
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFuzzyEngine::do_obs_filter() {
-   SingleThresh st;
-
-   if(!need_obs_filter) return;
-
-   *obs_filter = *obs_raw;
-
-   //
-   // Threshold the obs_filter field applying the obs_conv_thresh
-   //
-
-   // *obs_thresh = *obs_filter;
-   // obs_thresh->threshold(conf_info.obs_conv_thresh);
-
-   need_obs_filter     = false;
-   need_obs_conv       = true;
-   need_obs_thresh     = true;
-   need_obs_split      = true;
-   need_obs_merge      = true;
-   need_obs_clus_split = true;
-   need_match          = true;
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_fcst_convolution() {
    int r;
-
-   if(need_fcst_filter) do_fcst_filter();
 
    if(!need_fcst_conv) return;
 
    r = conf_info.fcst_conv_radius;
 
-   *fcst_conv = *fcst_filter;
+   *fcst_conv = *fcst_raw;
 
    mlog << Debug(3) << "Applying circular convolution of radius "
         << r << " to the forecast field.\n";
 
    //
-   // Apply a circular convolution to the filtered field
+   // Apply a circular convolution to the raw field
    //
    if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.fcst_vld_thresh);
 
@@ -505,24 +430,24 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    return;
 }
 
+
 ///////////////////////////////////////////////////////////////////////
+
 
 void ModeFuzzyEngine::do_obs_convolution() {
    int r;
-
-   if(need_obs_filter) do_obs_filter();
 
    if(!need_obs_conv) return;
 
    r = conf_info.obs_conv_radius;
 
-   *obs_conv = *obs_filter;
+   *obs_conv = *obs_raw;
 
    mlog << Debug(3) << "Applying circular convolution of radius "
         << r << " to the observation field.\n";
 
    //
-   // Apply a circular convolution to the filtered field
+   // Apply a circular convolution to the raw field
    //
    if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.obs_vld_thresh);
 
@@ -548,7 +473,7 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
 
    *fcst_mask = *fcst_conv;
 
-   *fcst_thresh = *fcst_filter;
+   *fcst_thresh = *fcst_raw;
    fcst_thresh->threshold(conf_info.fcst_conv_thresh);
 
    //
@@ -583,7 +508,7 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
    //
    if(conf_info.fcst_inten_perc_thresh.get_type() != thresh_na) {
 
-      fcst_mask->threshold_intensity(fcst_filter,
+      fcst_mask->threshold_intensity(fcst_raw,
                                      conf_info.fcst_inten_perc_value,
                                      conf_info.fcst_inten_perc_thresh);
 
@@ -617,7 +542,7 @@ void ModeFuzzyEngine::do_obs_thresholding() {
 
    *obs_mask = *obs_conv;
 
-   *obs_thresh = *obs_filter;
+   *obs_thresh = *obs_raw;
    obs_thresh->threshold(conf_info.obs_conv_thresh);
 
    //
@@ -650,7 +575,7 @@ void ModeFuzzyEngine::do_obs_thresholding() {
    // Apply the intensity threshold
    //
    if(conf_info.obs_inten_perc_thresh.get_type() != thresh_na) {
-      obs_mask->threshold_intensity(obs_filter,
+      obs_mask->threshold_intensity(obs_raw,
                                     conf_info.obs_inten_perc_value,
                                     conf_info.obs_inten_perc_thresh);
 
@@ -870,7 +795,7 @@ void ModeFuzzyEngine::do_no_match() {
 
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
+      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -880,7 +805,7 @@ void ModeFuzzyEngine::do_no_match() {
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
+      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
                         conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -931,7 +856,7 @@ void ModeFuzzyEngine::do_match_merge() {
 
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
+      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -941,7 +866,7 @@ void ModeFuzzyEngine::do_match_merge() {
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
+      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
                         conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -1385,14 +1310,11 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
    *(fcst_engine->fcst_raw)    = *(fcst_raw);
    *(fcst_engine->obs_raw)     = *(fcst_raw);
 
-   *(fcst_engine->fcst_filter) = *(fcst_filter);
-   *(fcst_engine->obs_filter)  = *(fcst_filter);
+   *(fcst_engine->fcst_conv)   = *(fcst_conv);
+   *(fcst_engine->obs_conv)    = *(fcst_conv);
 
    *(fcst_engine->fcst_thresh) = *(fcst_thresh);
    *(fcst_engine->obs_thresh)  = *(fcst_thresh);
-
-   *(fcst_engine->fcst_conv)   = *(fcst_conv);
-   *(fcst_engine->obs_conv)    = *(fcst_conv);
 
    *(fcst_engine->fcst_mask)   = *(fcst_mask);
    *(fcst_engine->obs_mask)    = *(fcst_mask);
@@ -1403,14 +1325,12 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
    fcst_engine->n_fcst = n_fcst;
    fcst_engine->n_obs  = n_fcst;
 
-   fcst_engine->need_fcst_filter     = false;
    fcst_engine->need_fcst_conv       = false;
    fcst_engine->need_fcst_thresh     = false;
    fcst_engine->need_fcst_split      = false;
    fcst_engine->need_fcst_merge      = true;
    fcst_engine->need_fcst_clus_split = true;
 
-   fcst_engine->need_obs_filter      = false;
    fcst_engine->need_obs_conv        = false;
    fcst_engine->need_obs_thresh      = false;
    fcst_engine->need_obs_split       = false;
@@ -1556,14 +1476,11 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    *(obs_engine->fcst_raw)    = *(obs_raw);
    *(obs_engine->obs_raw)     = *(obs_raw);
 
-   *(obs_engine->fcst_filter) = *(obs_filter);
-   *(obs_engine->obs_filter)  = *(obs_filter);
+   *(obs_engine->fcst_conv)   = *(obs_conv);
+   *(obs_engine->obs_conv)    = *(obs_conv);
 
    *(obs_engine->fcst_thresh) = *(obs_thresh);
    *(obs_engine->obs_thresh)  = *(obs_thresh);
-
-   *(obs_engine->fcst_conv)   = *(obs_conv);
-   *(obs_engine->obs_conv)    = *(obs_conv);
 
    *(obs_engine->fcst_mask)   = *(obs_mask);
    *(obs_engine->obs_mask)    = *(obs_mask);
@@ -1574,14 +1491,12 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    obs_engine->n_fcst = n_obs;
    obs_engine->n_obs  = n_obs;
 
-   obs_engine->need_fcst_filter     = false;
    obs_engine->need_fcst_conv       = false;
    obs_engine->need_fcst_thresh     = false;
    obs_engine->need_fcst_split      = false;
    obs_engine->need_fcst_merge      = true;
    obs_engine->need_fcst_clus_split = true;
 
-   obs_engine->need_obs_filter      = false;
    obs_engine->need_obs_conv        = false;
    obs_engine->need_obs_thresh      = false;
    obs_engine->need_obs_split       = false;
@@ -1689,7 +1604,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
+      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -1699,7 +1614,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
+      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
                         conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -1867,7 +1782,7 @@ void ModeFuzzyEngine::do_match_only() {
 
    for(j=0; j<n_fcst; j++) {
       fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_filter, *fcst_thresh, fcst_shape[j],
+      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
                          conf_info.inten_perc_value,
                          conf_info.fcst_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -1877,7 +1792,7 @@ void ModeFuzzyEngine::do_match_only() {
 
    for(j=0; j<n_obs; j++) {
       obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_filter, *obs_thresh, obs_shape[j],
+      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
                         conf_info.inten_perc_value,
                         conf_info.obs_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -2119,13 +2034,13 @@ void ModeFuzzyEngine::do_cluster_features() {
 
    for(j=0; j<n_clus; j++) {
       fcst_clus_shape[j] = select(*fcst_clus_split, j+1);
-      fcst_cluster[j].set(*fcst_filter, *fcst_thresh, fcst_clus_shape[j],
+      fcst_cluster[j].set(*fcst_raw, *fcst_thresh, fcst_clus_shape[j],
                        conf_info.inten_perc_value,
                        conf_info.fcst_info->is_precipitation());
       fcst_cluster[j].object_number = j+1;
 
       obs_clus_shape[j] = select(*obs_clus_split, j+1);
-      obs_cluster[j].set(*obs_filter, *obs_thresh, obs_clus_shape[j],
+      obs_cluster[j].set(*obs_raw, *obs_thresh, obs_clus_shape[j],
                       conf_info.inten_perc_value,
                       conf_info.obs_info->is_precipitation());
       obs_cluster[j].object_number = j+1;

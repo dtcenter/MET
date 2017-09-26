@@ -189,9 +189,6 @@ class ModeFuzzyEngine {
 
       int two_to_one(int, int) const;
 
-      void do_fcst_filter();
-      void do_obs_filter();
-
       void do_fcst_convolution();
       void do_obs_convolution();
 
@@ -270,9 +267,6 @@ class ModeFuzzyEngine {
          // Data
          //
 
-      bool need_fcst_filter;
-      bool need_obs_filter;
-
       bool need_fcst_conv;
       bool need_obs_conv;
 
@@ -291,7 +285,6 @@ class ModeFuzzyEngine {
       bool need_obs_clus_split;
 
       ShapeData * fcst_raw;          //  allocated
-      ShapeData * fcst_filter;       //  allocated
       ShapeData * fcst_thresh;       //  allocated
       ShapeData * fcst_conv;         //  allocated
       ShapeData * fcst_mask;         //  allocated
@@ -299,7 +292,6 @@ class ModeFuzzyEngine {
       ShapeData * fcst_clus_split;   //  allocated
 
       ShapeData * obs_raw;           //  allocated
-      ShapeData * obs_filter;        //  allocated
       ShapeData * obs_thresh;        //  allocated
       ShapeData * obs_conv;          //  allocated
       ShapeData * obs_mask;          //  allocated
