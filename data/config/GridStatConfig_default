@@ -40,14 +40,14 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-qc_thresh   = [ ];
-qc_new_val  = [ ];
-cat_thresh  = [ ];
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
-eclv_points = 0.05;
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_points   = 0.05;
 
 //
 // Forecast and observation fields to be verified

@@ -31,10 +31,12 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
+censor_thresh = [];
+censor_val    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
 
 //
 // Forecast and observation fields to be verified

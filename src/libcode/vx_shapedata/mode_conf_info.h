@@ -40,6 +40,7 @@ struct ModeNcOutInfo {
    bool do_polylines;
 
    int compress_level;
+
    ///////////////
 
    ModeNcOutInfo();
@@ -92,7 +93,7 @@ class ModeConfInfo {
       int n_runs() const;   //  # threshs times # radii
 
       int get_compression_level();
-      
+
       // Store data parsed from the MODE configuration object
 
       MetConfig conf;                          // MODE configuration object
@@ -110,8 +111,11 @@ class ModeConfInfo {
 
       bool             quilt;                  //  default: false
 
-      SingleThresh     fcst_raw_thresh;        // Values not meeting threshold set to bad data
-      SingleThresh      obs_raw_thresh;
+      ThreshArray      fcst_csr_thresh_array;  // List of censoring thresholds
+      ThreshArray       obs_csr_thresh_array;  // to be applied
+
+      NumArray         fcst_csr_num_array;     // Reset censored grid points to
+      NumArray          obs_csr_num_array;     // these values
 
       IntArray         fcst_conv_radius_array; // list of convolution radii in grid squares
       IntArray          obs_conv_radius_array;

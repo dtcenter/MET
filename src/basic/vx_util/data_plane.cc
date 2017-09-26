@@ -288,7 +288,6 @@ void DataPlane::threshold(const SingleThresh &st) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 void DataPlane::replace(const SingleThresh &st, const double new_v) {
    int j;
 
@@ -1323,5 +1322,16 @@ return ( *(Plane[n]) );
 ///////////////////////////////////////////////////////////////////////////////
 
 
+void DataPlaneArray::replace(const SingleThresh &st, const double new_v)
+
+{
+
+   int j;
+
+   for(j=0; j<Nplanes; ++j)  Plane[j]->replace(st, new_v);
+
+   return;
+}
 
 
+///////////////////////////////////////////////////////////////////////////////

@@ -56,7 +56,8 @@ fcst = {
       level = "(*,*)";
    }
 
-   raw_thresh        = >=0.0;
+   censor_thresh     = [];
+   censor_val        = [];
    conv_radius       = 5;
    conv_thresh       = >=2.5;
    vld_thresh        = 0.5;

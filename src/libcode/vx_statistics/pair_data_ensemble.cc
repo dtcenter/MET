@@ -1154,7 +1154,9 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                                  const char *hdr_sid_str, unixtime hdr_ut,
                                  const char *obs_qty, float *obs_arr,
                                  Grid &gr, const char *var_name,
-                                 const DataPlane * wgt_dp) {
+                                 const ThreshArray *csr_ta,
+                                 const NumArray *csr_na,
+                                 const DataPlane *wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
@@ -1190,8 +1192,8 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check if the observation quality flag is included in the list
    if(obs_qty_filt.n_elements() && strcmp(obs_qty, "")) {
       bool qty_match = false;
-      for(i=0; i < obs_qty_filt.n_elements() && !qty_match; i++)
-         if( 0 == strcmp(obs_qty, obs_qty_filt[i]) ) qty_match = true;
+      for(i=0; i<obs_qty_filt.n_elements() && !qty_match; i++)
+         if(strcmp(obs_qty, obs_qty_filt[i]) == 0) qty_match = true;
 
       if(!qty_match) return;
    }
@@ -1206,6 +1208,13 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    obs_lvl = obs_arr[2];
    obs_hgt = obs_arr[3];
    obs_v   = obs_arr[4];
+
+   // Apply censor thresholds
+   if(csr_ta && csr_na) {
+      for(i=0; i<csr_ta->n_elements(); i++) {
+         if((*csr_ta)[i].check(obs_v)) obs_v = (*csr_na)[i];
+      }
+   }
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) return;

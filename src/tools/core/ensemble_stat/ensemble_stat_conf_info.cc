@@ -50,8 +50,14 @@ void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
    ens_info    = (VarInfo **)           0;
+   ecsr_ta     = (ThreshArray *)        0;
+   ecsr_na     = (NumArray *)           0;
    ens_ta      = (ThreshArray *)        0;
    vx_pd       = (VxPairDataEnsemble *) 0;
+   fcsr_ta     = (ThreshArray *)        0;
+   ocsr_ta     = (ThreshArray *)        0;
+   fcsr_na     = (NumArray *)           0;
+   ocsr_na     = (NumArray *)           0;
    msg_typ     = (StringArray *)        0;
    sid_exc     = (StringArray *)        0;
    obs_qty     = (StringArray *)        0;
@@ -105,8 +111,14 @@ void EnsembleStatConfInfo::clear() {
 
    // Deallocate memory
    if(ens_info)    { delete [] ens_info;    ens_info    = (VarInfo **)           0; }
+   if(ecsr_ta)     { delete [] ecsr_ta;     ecsr_ta     = (ThreshArray *)        0; }
+   if(ecsr_na)     { delete [] ecsr_na;     ecsr_na     = (NumArray *)           0; }
    if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)        0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataEnsemble *) 0; }
+   if(fcsr_ta)     { delete [] fcsr_ta;     fcsr_ta     = (ThreshArray *)        0; }
+   if(ocsr_ta)     { delete [] ocsr_ta;     ocsr_ta     = (ThreshArray *)        0; }
+   if(fcsr_na)     { delete [] fcsr_na;     fcsr_na     = (NumArray *)           0; }
+   if(ocsr_na)     { delete [] ocsr_na;     ocsr_na     = (NumArray *)           0; }
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
    if(sid_exc)     { delete [] sid_exc;     sid_exc     = (StringArray *)        0; }
    if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)        0; }
@@ -156,7 +168,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    Dictionary *ens_dict  = (Dictionary *) 0;
    Dictionary *fcst_dict = (Dictionary *) 0;
    Dictionary *obs_dict  = (Dictionary *) 0;
-   Dictionary i_ens_dict, i_fcst_dict, i_obs_dict;
+   Dictionary i_edict, i_fdict, i_odict;
    InterpInfo interp_info;
 
    // Dump the contents of the config file
@@ -219,6 +231,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Allocate space based on the number of ensemble fields
    if(n_ens_var > 0) {
       ens_info = new VarInfo *   [n_ens_var];
+      ecsr_ta  = new ThreshArray [n_ens_var];
+      ecsr_na  = new NumArray    [n_ens_var];
       ens_ta   = new ThreshArray [n_ens_var];
    }
 
@@ -232,10 +246,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       ens_info[i] = info_factory.new_var_info(etype);
 
       // Get the current dictionary
-      i_ens_dict = parse_conf_i_vx_dict(ens_dict, i);
+      i_edict = parse_conf_i_vx_dict(ens_dict, i);
 
       // Set the current dictionary
-      ens_info[i]->set_dict(i_ens_dict);
+      ens_info[i]->set_dict(i_edict);
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
@@ -244,11 +258,17 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          ens_info[i]->dump(cout);
       }
 
+      // Conf: censor_thresh
+      ecsr_ta[i] = i_edict.lookup_thresh_array(conf_key_censor_thresh);
+
+      // Conf: censor_val
+      ecsr_na[i] = i_edict.lookup_num_array(conf_key_censor_val);
+
       // Only parse thresholds if relative frequencies are requested
       if(ensemble_flag[i_nc_freq]) {
 
          // Conf: cat_thresh
-         ens_ta[i] = i_ens_dict.lookup_thresh_array(conf_key_cat_thresh);
+         ens_ta[i] = i_edict.lookup_thresh_array(conf_key_cat_thresh);
 
          // Dump the contents of the current thresholds
          if(mlog.verbosity_level() >= 5) {
@@ -319,6 +339,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Allocate space based on the number of verification tasks
       vx_pd   = new VxPairDataEnsemble [n_vx];
+      fcsr_ta = new ThreshArray        [n_vx];
+      fcsr_na = new NumArray           [n_vx];
+      ocsr_ta = new ThreshArray       [n_vx];
+      ocsr_na = new NumArray           [n_vx];
       msg_typ = new StringArray        [n_vx];
       sid_exc = new StringArray        [n_vx];
       obs_qty = new StringArray        [n_vx];
@@ -335,38 +359,46 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          else         vx_pd[i].obs_info = info_factory.new_var_info(otype);
 
          // Get the current dictionaries
-         i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
-         i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
+         i_fdict = parse_conf_i_vx_dict(fcst_dict, i);
+         i_odict = parse_conf_i_vx_dict(obs_dict,  i);
+
+         // Conf: censor_thresh
+         fcsr_ta[i] = i_fdict.lookup_thresh_array(conf_key_censor_thresh);
+         ocsr_ta[i] = i_odict.lookup_thresh_array(conf_key_censor_thresh);
+
+         // Conf: censor_val
+         fcsr_na[i] = i_fdict.lookup_num_array(conf_key_censor_val);
+         ocsr_na[i] = i_odict.lookup_num_array(conf_key_censor_val);
 
          // Conf: desc
-         vx_pd[i].set_desc(parse_conf_string(&i_obs_dict, conf_key_desc));
+         vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));
 
          // Conf: message_type
-         msg_typ[i] = parse_conf_message_type(&i_obs_dict, point_vx);
+         msg_typ[i] = parse_conf_message_type(&i_odict, point_vx);
 
          // If no message type specified, store the obtype value.
          if(msg_typ[i].n_elements() == 0) msg_typ[i].add(obtype);
 
          // Conf: sid_exc
-         sid_exc[i] = parse_conf_sid_exc(&i_obs_dict);
+         sid_exc[i] = parse_conf_sid_exc(&i_odict);
          vx_pd[i].set_sid_exc_filt(sid_exc[i]);
 
          // Conf: obs_qty
-         obs_qty[i] = parse_conf_obs_qty(&i_obs_dict);
+         obs_qty[i] = parse_conf_obs_qty(&i_odict);
          vx_pd[i].set_obs_qty_filt(obs_qty[i]);
 
          // Conf: phist_bin_size
-         phist_bin_size.add(i_obs_dict.lookup_double(conf_key_phist_bin));
+         phist_bin_size.add(i_odict.lookup_double(conf_key_phist_bin));
 
          // Conf: obs_thresh
-         othr_ta[i] = i_obs_dict.lookup_thresh_array(conf_key_obs_thresh);
+         othr_ta[i] = i_odict.lookup_thresh_array(conf_key_obs_thresh);
 
          // Set the current dictionaries
-         vx_pd[i].fcst_info->set_dict(i_fcst_dict);
-         vx_pd[i].obs_info->set_dict(i_obs_dict);
+         vx_pd[i].fcst_info->set_dict(i_fdict);
+         vx_pd[i].obs_info->set_dict(i_odict);
 
          // Set the GRIB code for point observations
-         if(point_vx && !use_var_id) vx_pd[i].obs_info->add_grib_code(i_obs_dict);
+         if(point_vx && !use_var_id) vx_pd[i].obs_info->add_grib_code(i_odict);
 
          // Dump the contents of the current VarInfo
          if(mlog.verbosity_level() >= 5) {
@@ -496,7 +528,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
 void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
    int i, j, n_msg_typ;
-   Dictionary i_obs_dict;
+   Dictionary i_odict;
 
    // Parse configuration settings specific to each verification task
    Dictionary *obs_dict = conf.lookup_array(conf_key_obs_field);
@@ -540,25 +572,25 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
          vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
 
       // Get the current observation dictionary
-      i_obs_dict = parse_conf_i_vx_dict(obs_dict, i);
+      i_odict = parse_conf_i_vx_dict(obs_dict, i);
 
       // Conf: ssvar_bin_size
-      vx_pd[i].set_ssvar_bin_size(i_obs_dict.lookup_double(conf_key_ssvar_bin));
+      vx_pd[i].set_ssvar_bin_size(i_odict.lookup_double(conf_key_ssvar_bin));
 
       // Conf: phist_bin_size
-      vx_pd[i].set_phist_bin_size(i_obs_dict.lookup_double(conf_key_phist_bin));
+      vx_pd[i].set_phist_bin_size(i_odict.lookup_double(conf_key_phist_bin));
 
       // Conf: duplicate_flag
-      vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_obs_dict));
+      vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_odict));
 
       // Conf: obs_summary
-      vx_pd[i].set_obs_summary(parse_conf_obs_summary(&i_obs_dict));
+      vx_pd[i].set_obs_summary(parse_conf_obs_summary(&i_odict));
 
       // Conf: obs_perc_value
-      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_obs_dict));
+      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_odict));
 
       // Conf: skip_const
-      vx_pd[i].set_skip_const(i_obs_dict.lookup_bool(conf_key_skip_const));
+      vx_pd[i].set_skip_const(i_odict.lookup_bool(conf_key_skip_const));
 
    } // end for i
 

@@ -57,7 +57,8 @@ fcst = {
       level = "A03";
    }
 
-   raw_thresh        = NA;
+   censor_thresh     = [];
+   censor_val        = [];
    conv_radius       = 60.0/grid_res; // in grid squares
    conv_thresh       = >=5.0;
    vld_thresh        = 0.5;

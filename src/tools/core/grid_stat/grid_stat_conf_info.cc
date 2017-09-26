@@ -49,10 +49,10 @@ void GridStatConfInfo::init_from_scratch() {
    // Initialize pointers
    fcst_info   = (VarInfo **)     0;
    obs_info    = (VarInfo **)     0;
-   fqc_ta      = (ThreshArray *)  0;
-   oqc_ta      = (ThreshArray *)  0;
-   fqc_val     = (NumArray *)     0;
-   oqc_val     = (NumArray *)     0;
+   fcsr_ta     = (ThreshArray *)  0;
+   ocsr_ta     = (ThreshArray *)  0;
+   fcsr_na     = (NumArray *)     0;
+   ocsr_na     = (NumArray *)     0;
    fcat_ta     = (ThreshArray *)  0;
    ocat_ta     = (ThreshArray *)  0;
    cnt_logic   = (SetLogic *)     0;
@@ -116,13 +116,13 @@ void GridStatConfInfo::clear() {
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    // Deallocate memory
+   if(fcsr_ta)     { delete [] fcsr_ta ;    fcsr_ta     = (ThreshArray *) 0; }
+   if(ocsr_ta)     { delete [] ocsr_ta ;    ocsr_ta     = (ThreshArray *) 0; }
+   if(fcsr_na)     { delete [] fcsr_na;     fcsr_na     = (NumArray *)    0; }
+   if(ocsr_na)     { delete [] ocsr_na;     ocsr_na     = (NumArray *)    0; }
+
    if(fcat_ta)     { delete [] fcat_ta;     fcat_ta     = (ThreshArray *) 0; }
    if(ocat_ta)     { delete [] ocat_ta;     ocat_ta     = (ThreshArray *) 0; }
-
-   if(fqc_ta)      { delete [] fqc_ta ;     fqc_ta      = (ThreshArray *) 0; }
-   if(oqc_ta)      { delete [] oqc_ta ;     oqc_ta      = (ThreshArray *) 0; }
-   if(fqc_val)     { delete [] fqc_val;     fqc_val     = (NumArray *)    0; }
-   if(oqc_val)     { delete [] oqc_val;     oqc_val     = (NumArray *)    0; }
 
    if(fcnt_ta)     { delete [] fcnt_ta;     fcnt_ta     = (ThreshArray *) 0; }
    if(ocnt_ta)     { delete [] ocnt_ta;     ocnt_ta     = (ThreshArray *) 0; }
@@ -263,10 +263,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    // Allocate space based on the number of verification tasks
    fcst_info   = new VarInfo *   [n_vx];
    obs_info    = new VarInfo *   [n_vx];
-   fqc_ta      = new ThreshArray [n_vx];
-   oqc_ta      = new ThreshArray [n_vx];
-   fqc_val     = new NumArray    [n_vx];
-   oqc_val     = new NumArray    [n_vx];
+   fcsr_ta     = new ThreshArray [n_vx];
+   ocsr_ta     = new ThreshArray [n_vx];
+   fcsr_na     = new NumArray    [n_vx];
+   ocsr_na     = new NumArray    [n_vx];
    fcat_ta     = new ThreshArray [n_vx];
    ocat_ta     = new ThreshArray [n_vx];
    fcnt_ta     = new ThreshArray [n_vx];
@@ -391,13 +391,13 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       i_fdict = parse_conf_i_vx_dict(fdict, i);
       i_odict = parse_conf_i_vx_dict(odict, i);
 
-      // Conf: qc_thresh
-      fqc_ta[i] = i_fdict.lookup_thresh_array(conf_key_qc_thresh);
-      oqc_ta[i] = i_odict.lookup_thresh_array(conf_key_qc_thresh);
+      // Conf: censor_thresh
+      fcsr_ta[i] = i_fdict.lookup_thresh_array(conf_key_censor_thresh);
+      ocsr_ta[i] = i_odict.lookup_thresh_array(conf_key_censor_thresh);
 
-      // Conf: qc_new_val
-      fqc_val[i] = i_fdict.lookup_num_array(conf_key_qc_new_val);
-      oqc_val[i] = i_odict.lookup_num_array(conf_key_qc_new_val);
+      // Conf: censor_val
+      fcsr_na[i] = i_fdict.lookup_num_array(conf_key_censor_val);
+      ocsr_na[i] = i_odict.lookup_num_array(conf_key_censor_val);
 
       // Conf: cat_thresh
       fcat_ta[i] = i_fdict.lookup_thresh_array(conf_key_cat_thresh);
@@ -424,16 +424,19 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       // Dump the contents of the current thresholds
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
-              << "Parsed threshold settings for field number " << i+1 << "...\n"
-              // JHG
-              << "Forecast categorical thresholds: "  << fcat_ta[i].get_str() << "\n"
-              << "Observed categorical thresholds: "  << ocat_ta[i].get_str() << "\n"
-              << "Forecast continuous thresholds: "   << fcnt_ta[i].get_str() << "\n"
-              << "Observed continuous thresholds: "   << ocnt_ta[i].get_str() << "\n"
-              << "Continuous threshold logic: "       << setlogic_to_string(cnt_logic[i]) << "\n"
-              << "Forecast wind speed thresholds: "   << fwind_ta[i].get_str() << "\n"
-              << "Observed wind speed thresholds: "   << owind_ta[i].get_str() << "\n"
-              << "Wind speed threshold logic: "       << setlogic_to_string(wind_logic[i]) << "\n";
+              << "Parsed thresholds for field number " << i+1 << "...\n"
+              << "Forecast censor thresholds: "          << fcsr_ta[i].get_str() << "\n"
+              << "Forecast censor replacement values: "  << fcsr_na[i].serialize() << "\n"
+              << "Observed censor thresholds: "          << ocsr_ta[i].get_str() << "\n"
+              << "Observed censor replacement values: "  << ocsr_na[i].serialize() << "\n"
+              << "Forecast categorical thresholds: "     << fcat_ta[i].get_str() << "\n"
+              << "Observed categorical thresholds: "     << ocat_ta[i].get_str() << "\n"
+              << "Forecast continuous thresholds: "      << fcnt_ta[i].get_str() << "\n"
+              << "Observed continuous thresholds: "      << ocnt_ta[i].get_str() << "\n"
+              << "Continuous threshold logic: "          << setlogic_to_string(cnt_logic[i]) << "\n"
+              << "Forecast wind speed thresholds: "      << fwind_ta[i].get_str() << "\n"
+              << "Observed wind speed thresholds: "      << owind_ta[i].get_str() << "\n"
+              << "Wind speed threshold logic: "          << setlogic_to_string(wind_logic[i]) << "\n";
       }
 
       // Verifying a probability field
@@ -441,15 +444,15 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
          fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
       }
 
-      // Check for equal length of quality control thresholds and replacement values
-      if(fqc_ta[i].n_elements() != fqc_val[i].n_elements() ||
-         oqc_ta[i].n_elements() != oqc_val[i].n_elements()) {
+      // Check for equal length of censor thresholds and values
+      if(fcsr_ta[i].n_elements() != fcsr_na[i].n_elements() ||
+         ocsr_ta[i].n_elements() != ocsr_na[i].n_elements()) {
 
          mlog << Error << "\nGridStatConfInfo::process_config() -> "
-              << "The number of quality control thresholds in \""
-              << conf_key_qc_thresh
+              << "The number of censor thresholds in \""
+              << conf_key_censor_thresh
               << "\" must match the number of replacement values in \""
-              << conf_key_qc_new_val << "\".\n\n";
+              << conf_key_censor_val << "\".\n\n";
          exit(1);
       }
 

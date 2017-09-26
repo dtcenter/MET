@@ -42,8 +42,9 @@
 //   015    05/10/16  Halley Gotway  Add grid weighting.
 //   016    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   017    08/09/16  Halley Gotway  Fixed n_ens_vld vs n_vx_vld bug.
-//   018    05/15/17  Prestonik P    Added shape for regrid and interp
+//   018    05/15/17  Prestonik P    Add shape for regrid and interp.
 //   019    05/15/17  Halley Gotway  Add RELP line type and skip_const.
+//   020    09/26/17  Halley Gotway  Add censor_thresh.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -77,9 +78,13 @@ static void process_n_vld         ();
 static void process_ensemble      ();
 static void process_vx            ();
 static bool get_data_plane        (const char *, GrdFileType, VarInfo *,
-                                   DataPlane &, bool regrid = false);
+                                   DataPlane &, bool regrid,
+                                   const ThreshArray &csr_ta,
+                                   const NumArray &csr_na);
 static bool get_data_plane_array  (const char *, GrdFileType, VarInfo *,
-                                   DataPlaneArray &, bool regrid = false);
+                                   DataPlaneArray &, bool regrid,
+                                   const ThreshArray &csr_ta,
+                                   const NumArray &csr_na);
 
 static void process_point_vx      ();
 static void process_point_climo   ();
@@ -467,7 +472,8 @@ void process_n_vld() {
 
          // Check for valid data
          if(!get_data_plane(ens_file_list[j], etype,
-                            conf_info.ens_info[i], dp)) {
+                            conf_info.ens_info[i], dp, false,
+                            conf_info.ecsr_ta[i], conf_info.ecsr_na[i])) {
             mlog << Warning << "\nprocess_n_vld() -> "
                  << "ensemble field \""
                  << conf_info.ens_info[i]->magic_str()
@@ -507,7 +513,8 @@ void process_n_vld() {
          // Check for valid data fields.
          // Call data_plane_array to handle multiple levels.
          if(!get_data_plane_array(ens_file_list[j], etype,
-                                  conf_info.vx_pd[i].fcst_info, dpa)) {
+                                  conf_info.vx_pd[i].fcst_info, dpa, false,
+                                  conf_info.fcsr_ta[i], conf_info.fcsr_na[i])) {
             mlog << Warning << "\nprocess_n_vld() -> "
                  << "no data found for forecast field \""
                  << conf_info.vx_pd[i].fcst_info->magic_str()
@@ -544,8 +551,8 @@ void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane(const char *infile, GrdFileType ftype,
-                    VarInfo *info, DataPlane &dp,
-                    bool regrid) {
+                    VarInfo *info, DataPlane &dp, bool regrid,
+                    const ThreshArray &csr_ta, const NumArray &csr_na) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -558,6 +565,16 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 
    // Read the gridded data field
    if(found = mtddf->data_plane(*info, dp)) {
+
+      // Apply censor thresholds
+      for(int i=0; i<csr_ta.n_elements(); i++) {
+         mlog << Debug(3)
+              << "Applying censor threshold \""
+              << csr_ta[i].get_str()
+              << "\" and replacing with a value of "
+              << csr_na[i] << ".\n";
+         dp.replace(csr_ta[i], csr_na[i]);
+      }
 
       // Regrid, if requested and necessary
       if(regrid && !(mtddf->grid() == grid)) {
@@ -591,8 +608,8 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane_array(const char *infile, GrdFileType ftype,
-                          VarInfo *info, DataPlaneArray &dpa,
-                          bool regrid) {
+                          VarInfo *info, DataPlaneArray &dpa, bool regrid,
+                          const ThreshArray &csr_ta, const NumArray &csr_na) {
    int n, i;
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
@@ -609,6 +626,16 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
    // Check for at least one field
    if(found = (n > 0)) {
+
+      // Apply censor thresholds
+      for(i=0; i<csr_ta.n_elements(); i++) {
+         mlog << Debug(3)
+              << "Applying censor threshold \""
+              << csr_ta[i].get_str()
+              << "\" and replacing with a value of "
+              << csr_na[i] << ".\n";
+         dpa.replace(csr_ta[i], csr_na[i]);
+      }
 
       // Regrid, if requested and necessary
       if(regrid && !(mtddf->grid() == grid)) {
@@ -667,8 +694,8 @@ void process_ensemble() {
 
          // Read the current field
          if(!get_data_plane(ens_file_list[j], etype,
-                            conf_info.ens_info[i], ens_dp,
-                            true)) continue;
+                            conf_info.ens_info[i], ens_dp, true,
+                            conf_info.ecsr_ta[i], conf_info.ecsr_na[i])) continue;
 
          // Create a NetCDF file to store the ensemble output
          if(nc_out == (NcFile *) 0)
@@ -859,7 +886,7 @@ void process_point_obs(int i_nc) {
    if (!get_global_att(obs_in, nc_att_use_var_id, use_var_id)) {
       use_var_id = false;
    }
-   
+
    // Read the dimensions
    strl_dim = get_nc_dim(obs_in, nc_dim_mxstr);
    obs_dim  = get_nc_dim(obs_in, nc_dim_nobs);
@@ -1071,7 +1098,9 @@ void process_point_obs(int i_nc) {
 
             // Attempt to add the observation to the conf_info.vx_pd object
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                       hdr_ut, obs_qty_str, obs_arr, grid, var_name);
+                                       hdr_ut, obs_qty_str, obs_arr, grid,
+                                       var_name, &conf_info.ocsr_ta[j],
+                                       &conf_info.ocsr_na[j]);
          }
       }
    } // end for i_start
@@ -1125,8 +1154,8 @@ int process_point_ens(int i_ens, int &n_miss) {
       }
 
       // Read the gridded data from the input forecast file
-      if(!get_data_plane_array(ens_file, info->file_type(), info,
-                               fcst_dpa, true)) {
+      if(!get_data_plane_array(ens_file, info->file_type(), info, fcst_dpa, true,
+                               conf_info.fcsr_ta[i], conf_info.fcsr_na[i])) {
          n_miss++;
          continue;
       }
@@ -1395,7 +1424,8 @@ void process_grid_vx() {
          if(ens_file_vld[j]) {
             found = get_data_plane(ens_file_list[j], etype,
                                    conf_info.vx_pd[i].fcst_info,
-                                   fcst_dp[j], true);
+                                   fcst_dp[j], true,
+                                   conf_info.fcsr_ta[i], conf_info.fcsr_na[i]);
          }
          else {
             found = false;
@@ -1429,8 +1459,8 @@ void process_grid_vx() {
       for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
 
          found = get_data_plane(grid_obs_file_list[j], otype,
-                                conf_info.vx_pd[i].obs_info, obs_dp,
-                                true);
+                                conf_info.vx_pd[i].obs_info, obs_dp, true,
+                                conf_info.ocsr_ta[i], conf_info.ocsr_na[i]);
 
          // If found, break out of the loop
          if(!found) n_miss++;
@@ -1477,8 +1507,9 @@ void process_grid_vx() {
          }
 
          // Read the gridded data from the mean file
-         found = get_data_plane(mn_file, FileType_None, info,
-                                emn_dp, true);
+         found = get_data_plane(mn_file, FileType_None,
+                                info, emn_dp, true,
+                                conf_info.fcsr_ta[i], conf_info.fcsr_na[i]);
 
          if(!found) {
             mlog << Error << "\nprocess_grid_vx() -> "
@@ -1509,7 +1540,6 @@ void process_grid_vx() {
 
          // If requested in the config file, smooth the forecast field
          for(k=0; k<ens_file_list.n_elements(); k++) {
-
 
             if(conf_info.interp_field == FieldType_Fcst ||
                conf_info.interp_field == FieldType_Both) {

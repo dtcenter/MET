@@ -448,8 +448,8 @@ static const char conf_key_GRIB_ens[]          = "GRIB_ens";
 static const char conf_key_message_type[]      = "message_type";
 static const char conf_key_sid_exc[]           = "sid_exc";
 static const char conf_key_obs_qty[]           = "obs_quality";
-static const char conf_key_qc_thresh[]         = "qc_thresh";
-static const char conf_key_qc_new_val[]        = "qc_new_val";
+static const char conf_key_censor_thresh[]     = "censor_thresh";
+static const char conf_key_censor_val[]        = "censor_val";
 static const char conf_key_cnt_thresh[]        = "cnt_thresh";
 static const char conf_key_cnt_logic[]         = "cnt_logic";
 static const char conf_key_cat_thresh[]        = "cat_thresh";
@@ -619,7 +619,6 @@ static const char conf_key_jobs[]              = "jobs";
 // MODE specific parameter key names
 //
 
-static const char conf_key_raw_thresh[]            = "raw_thresh";
 static const char conf_key_conv_radius[]           = "conv_radius";
 static const char conf_key_conv_thresh[]           = "conv_thresh";
 static const char conf_key_area_thresh[]           = "area_thresh";

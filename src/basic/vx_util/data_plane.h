@@ -203,6 +203,7 @@ class DataPlaneArray {
          //
 
       void add(const DataPlane &, double _low, double _up);   //  for two-level plane
+      void replace(const SingleThresh &, const double);
 
 };
 

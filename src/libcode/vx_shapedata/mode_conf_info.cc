@@ -82,8 +82,11 @@ void ModeConfInfo::clear()
 
    grid_res = bad_data_double;
 
-   fcst_raw_thresh.clear();
-   obs_raw_thresh.clear();
+   fcst_csr_thresh_array.clear();
+   obs_csr_thresh_array.clear();
+
+   fcst_csr_num_array.clear();
+   obs_csr_num_array.clear();
 
    fcst_conv_radius_array.clear();
     obs_conv_radius_array.clear();
@@ -285,10 +288,28 @@ PlotInfo plot_info;
       exit(1);
    }
 
-      // Conf: fcst.raw_thresh and obs.raw_thresh
+      // Conf: fcst.censor_thresh and obs.censor_thresh
 
-   fcst_raw_thresh = fcst_dict->lookup_thresh(conf_key_raw_thresh);
-    obs_raw_thresh =  obs_dict->lookup_thresh(conf_key_raw_thresh);
+   fcst_csr_thresh_array = fcst_dict->lookup_thresh_array(conf_key_censor_thresh);
+    obs_csr_thresh_array =  obs_dict->lookup_thresh_array(conf_key_censor_thresh);
+
+      // Conf: fcst.censor_val and obs.censor_val
+
+   fcst_csr_num_array = fcst_dict->lookup_num_array(conf_key_censor_val);
+    obs_csr_num_array =  obs_dict->lookup_num_array(conf_key_censor_val);
+
+      // Check for equal length of censor thresholds and values
+
+   if( fcst_csr_thresh_array.n_elements() != fcst_csr_num_array.n_elements() ||
+        obs_csr_thresh_array.n_elements() !=  obs_csr_num_array.n_elements() )  {
+
+      mlog << Error << "\nModeConfInfo::process_config() -> "
+           << "the number of censor thresholds in \""
+           << conf_key_censor_thresh
+           << "\" must match the number of replacement values in \""
+           << conf_key_censor_val << "\".\n\n";
+      exit(1);
+   }
 
       // Conf: fcst.conv_radius and obs.conv_radius
 

@@ -22,7 +22,8 @@
 //   004    08/04/15  Halley Gotway   Add conditional continuous verification.
 //   005    09/21/15  Halley Gotway   Add climatology and SAL1L2 output.
 //   006    04/20/16  Halley Gotway   Add -paired command line option.
-//   007    05/15/17  Prestopnikk P   Add shape for regrid
+//   007    05/15/17  Prestopnikk P   Add shape for regrid.
+//   008    09/26/17  Halley Gotway   Add censor_thresh.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +60,8 @@ static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
 static void get_series_entry(int, VarInfo *, const StringArray &,
                              const GrdFileType, StringArray &,
-                             DataPlane &);
+                             DataPlane &, const ThreshArray &,
+                             const NumArray &);
 static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
 
@@ -367,7 +369,8 @@ void get_series_data(int i_series,
 
       case SeriesType_Fcst_Conf:
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp,
+                          conf_info.fcsr_ta, conf_info.fcsr_na);
          if(conf_info.get_n_obs() == 1) {
             obs_info->set_valid(fcst_dp.valid());
             mlog << Debug(3)
@@ -376,12 +379,14 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp,
+                          conf_info.ocsr_ta, conf_info.ocsr_na);
          break;
 
       case SeriesType_Obs_Conf:
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp,
+                          conf_info.ocsr_ta, conf_info.ocsr_na);
          if(conf_info.get_n_fcst() == 1) {
             fcst_info->set_valid(obs_dp.valid());
             mlog << Debug(3)
@@ -390,13 +395,15 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp,
+                          conf_info.fcsr_ta, conf_info.fcsr_na);
          break;
 
       case SeriesType_Fcst_Files:
          found_fcst_files.set(i_series, fcst_files[i_series]);
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp,
+                          conf_info.fcsr_ta, conf_info.fcsr_na);
          if(paired) {
             found_obs_files.set(i_series, obs_files[i_series]);
          }
@@ -408,13 +415,15 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp,
+                          conf_info.ocsr_ta, conf_info.ocsr_na);
          break;
 
       case SeriesType_Obs_Files:
          found_obs_files.set(i_series, obs_files[i_series]);
          get_series_entry(i_series, obs_info, obs_files,
-                          otype, found_obs_files, obs_dp);
+                          otype, found_obs_files, obs_dp,
+                          conf_info.ocsr_ta, conf_info.ocsr_na);
          if(paired) {
             found_fcst_files.set(i_series, fcst_files[i_series]);
          }
@@ -426,7 +435,8 @@ void get_series_data(int i_series,
                  << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ".\n";
          }
          get_series_entry(i_series, fcst_info, fcst_files,
-                          ftype, found_fcst_files, fcst_dp);
+                          ftype, found_fcst_files, fcst_dp,
+                          conf_info.fcsr_ta, conf_info.fcsr_na);
          break;
 
       default:
@@ -461,7 +471,9 @@ void get_series_data(int i_series,
 void get_series_entry(int i_series, VarInfo *info,
                       const StringArray &search_files,
                       const GrdFileType type,
-                      StringArray &found_files, DataPlane &dp) {
+                      StringArray &found_files, DataPlane &dp,
+                      const ThreshArray &csr_ta,
+                      const NumArray &csr_na) {
    int i, j;
    bool found = false;
    Grid cur_grid;
@@ -516,6 +528,16 @@ void get_series_entry(int i_series, VarInfo *info,
            << "Found data for " << info->magic_str()
            << " in file: " << found_files[i_series] << "\n";
 
+      // Apply censor thresholds
+      for(i=0; i<csr_ta.n_elements(); i++) {
+         mlog << Debug(3)
+              << "Applying censor threshold \""
+              << csr_ta[i].get_str()
+              << "\" and replacing with a value of "
+              << csr_na[i] << ".\n";
+         dp.replace(csr_ta[i], csr_na[i]);
+      }
+
       // Regrid, if necessary
       if(!(cur_grid == grid)) {
 
@@ -558,7 +580,8 @@ void get_series_entry(int i_series, VarInfo *info,
 ////////////////////////////////////////////////////////////////////////
 
 bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
-                       const GrdFileType type, DataPlane &dp, Grid &cur_grid) {
+                       const GrdFileType type, DataPlane &dp,
+                       Grid &cur_grid) {
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
    bool found = false;
 

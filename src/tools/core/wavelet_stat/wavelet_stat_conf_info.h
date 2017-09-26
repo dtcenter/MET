@@ -79,7 +79,7 @@ class WaveletStatConfInfo {
       // Wavelet-Stat configuration object
       MetConfig conf;
 
-      // Store data parsed from the Wavelet-Stat configuration object
+//       // Store data parsed from the Wavelet-Stat configuration object
       ConcatString            model;              // Model name
       ConcatString            obtype;             // Observation type
       RegridInfo              regrid_info;        // Regridding information
@@ -87,25 +87,37 @@ class WaveletStatConfInfo {
       StringArray             desc;               // Description
       VarInfo **              fcst_info;          // Array of pointers for fcst VarInfo [n_vx]
       VarInfo **              obs_info;           // Array of pointers for obs VarInfo [n_vx]
-      ThreshArray *           fcst_ta;            // Array for fcst thresholds [n_vx]
-      ThreshArray *           obs_ta;             // Array for obs thresholds [n_vx]
+
+      ThreshArray *           fcsr_ta;            // Array for fcst censor thresholds [n_vx]
+      ThreshArray *           ocsr_ta;            // Array for obs censor thresholds [n_vx]
+      NumArray *              fcsr_na;            // Array for fcst censor replacement values [n_vx]
+      NumArray *              ocsr_na;            // Array for obs censor replacement values [n_vx]
+
+      ThreshArray *           fcat_ta;            // Array for fcst categorical thresholds [n_vx]
+      ThreshArray *           ocat_ta;            // Array for obs categorical thresholds [n_vx]
+
       FieldType               mask_missing_flag;  // Mask missing data between fcst and obs
+
       GridDecompType          grid_decomp_flag;   // Method for grid decomposition
       int                     tile_dim;           // Tile dimension
       NumArray                tile_xll;           // Array of lower-left x coordinates
       NumArray                tile_yll;           // Array of lower-left y coordinates
       Box                     pad_bb;             // Pad bouding box
+
       WaveletType             wvlt_type;          // Wavelet type
       int                     wvlt_member;        // Wavelet member k-value
       gsl_wavelet           * wvlt_ptr;           // GSL wavelet pointer
       gsl_wavelet_workspace * wvlt_work_ptr;      // GSL wavelet workspace
+
       STATOutputType          output_flag[n_txt]; // Flag for each output line type
       WaveletStatNcOutInfo    nc_info;            // Output NetCDF pairs file
       bool                    ps_plot_flag;       // Flag for the output PostScript image file
       ConcatString            met_data_dir;       // MET data directory
+
       PlotInfo                fcst_raw_pi;        // Raw forecast plotting info
       PlotInfo                obs_raw_pi;         // Raw observation plotting info
       PlotInfo                wvlt_pi;            // Wavelet plotting info
+
       ConcatString            output_prefix;      // String to customize output file name
       ConcatString            version;            // Config file version
 
@@ -138,11 +150,11 @@ class WaveletStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int WaveletStatConfInfo::get_n_vx()         const { return(n_vx);          }
-inline int WaveletStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);  }
-inline int WaveletStatConfInfo::get_n_tile()       const { return(n_tile);        }
-inline int WaveletStatConfInfo::get_tile_dim()     const { return(tile_dim);      }
-inline int WaveletStatConfInfo::get_n_scale()      const { return(n_scale);      }
+inline int WaveletStatConfInfo::get_n_vx()         const { return(n_vx);                 }
+inline int WaveletStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);         }
+inline int WaveletStatConfInfo::get_n_tile()       const { return(n_tile);               }
+inline int WaveletStatConfInfo::get_tile_dim()     const { return(tile_dim);             }
+inline int WaveletStatConfInfo::get_n_scale()      const { return(n_scale);              }
 inline int WaveletStatConfInfo::get_compression_level()  { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
