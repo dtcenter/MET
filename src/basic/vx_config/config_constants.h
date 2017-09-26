@@ -471,6 +471,7 @@ static const char conf_key_vld_freq[]          = "vld_freq";
 static const char conf_key_message_type_map[]  = "message_type_map";
 static const char conf_key_obs_bufr_map[]      = "obs_bufr_map";
 static const char conf_key_obs_bufr_var[]      = "obs_bufr_var";
+static const char conf_key_obs_prefbufr_map[]  = "obs_prefbufr_map";
 static const char conf_key_key[]               = "key";
 static const char conf_key_val[]               = "val";
 static const char conf_key_boot_interval[]     = "boot.interval";
