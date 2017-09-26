@@ -93,16 +93,16 @@
   <!-- the international date line                                      -->
   <!--                                                                  -->
 
-  <test name="gen_vx_mask_POLY_GFS_LATLON_SAK">
+  <test name="gen_vx_mask_POLY_GFS_LATLON_NAK">
     <exec>&MET_DIR;/bin/gen_vx_mask</exec>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
-      &MET_BASE;/poly/SAK.poly \
-      &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_SAK_mask.nc \
+      &MET_BASE;/poly/NAK.poly \
+      &OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_NAK_mask.nc \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_SAK_mask.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/POLY_GFS_LATLON_NAK_mask.nc</grid_nc>
     </output>
   </test>
 
