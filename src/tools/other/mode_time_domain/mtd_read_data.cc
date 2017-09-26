@@ -26,7 +26,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-void mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo, const StringArray & filenames, MtdFloatFile & raw)
+void mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo,
+                   const StringArray & filenames, MtdFloatFile & raw,
+                   const ThreshArray &csr_thresh_array,
+                   const NumArray    &csr_num_array)
 
 {
 
@@ -38,7 +41,7 @@ if ( filenames.n() < 2 )  {
 
 }
 
-int j;
+int j, k;
 // Dictionary * dict = 0;
 Met2dDataFile * data_2d_file = 0;
 Met2dDataFileFactory factory;
@@ -75,6 +78,22 @@ for (j=0; j<(filenames.n()); ++j)  {
       exit ( 1 );
 
    }
+
+   //
+   //  apply censor thresholds
+   //
+
+   for(k=0; k<csr_thresh_array.n_elements(); ++k)  {
+
+      mlog << Debug(3)
+           << "Applying censor threshold \""
+           << csr_thresh_array[k].get_str()
+           << "\" and replacing with a value of "
+           << csr_num_array[k] << ".\n";
+
+      plane.replace(csr_thresh_array[k], csr_num_array[k]);
+
+   }   //  for k
 
    valid_times[j] = plane.valid();
 

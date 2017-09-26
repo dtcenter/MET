@@ -27,7 +27,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void mtd_read_data(MtdConfigInfo &, VarInfo &, const StringArray & filenames, MtdFloatFile &);
+extern void mtd_read_data(MtdConfigInfo &, VarInfo &,
+                          const StringArray & filenames, MtdFloatFile &,
+                          const ThreshArray &, const NumArray&);
 
 
 ////////////////////////////////////////////////////////////////////////

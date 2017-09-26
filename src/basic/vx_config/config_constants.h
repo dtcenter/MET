@@ -620,6 +620,7 @@ static const char conf_key_jobs[]              = "jobs";
 // MODE specific parameter key names
 //
 
+static const char conf_key_raw_thresh[]            = "raw_thresh";
 static const char conf_key_conv_radius[]           = "conv_radius";
 static const char conf_key_conv_thresh[]           = "conv_thresh";
 static const char conf_key_area_thresh[]           = "area_thresh";
