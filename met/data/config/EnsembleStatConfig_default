@@ -38,6 +38,13 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+
+//
 // Ensemble product fields to be processed
 //
 ens = {

@@ -363,6 +363,18 @@ regrid = {
 //        fields directly.  When this flag is set, probability values are
 //        automatically rescaled from the range [0, 100] to [0, 1].
 //
+//      - The "censor_thresh" entry is an array of thresholds to be applied
+//        to the raw input data.  The "censor_val" entry is an array of numbers
+//        and must be the same length as "censor_thresh".  For each censor
+//        threshold, any input values meeting the threshold criteria will be
+//        reset to the corresponding censor value.  An empty list indicates that
+//        no censoring should be performed.  The censoring logic is applied
+//        prior to any regridding, and all statistics are computed on the
+//        censored data. These entries may be used to apply quality control
+//        logic by resetting data outside of an expected range to the bad data
+//        value of -9999. These entries are not indicated in the metadata of any
+//        output files, but the user can set the "desc" entry accordingly.
+//
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
 //
@@ -481,15 +493,17 @@ regrid = {
 //
 //
 fcst = {
-   cnt_thresh   = [ NA ];
-   cnt_logic    = UNION;
-   wind_thresh  = [ NA ];
-   wind_logic   = UNION;
-   eclv_points  = 0.05;
-   message_type = [ "ADPSFC" ];
-   init_time    = "20120619_12";
-   valid_time   = "20120620_00";
-   lead_time    = "12";
+   censor_thresh = [];
+   censor_val    = [];
+   cnt_thresh    = [ NA ];
+   cnt_logic     = UNION;
+   wind_thresh   = [ NA ];
+   wind_logic    = UNION;
+   eclv_points   = 0.05;
+   message_type  = [ "ADPSFC" ];
+   init_time     = "20120619_12";
+   valid_time    = "20120620_00";
+   lead_time     = "12";
 
    field = [
       {
@@ -513,10 +527,12 @@ fcst = {
 //     or
 //
 //         fcst = {
-//           cnt_thresh  = [ NA ];
-//           cnt_logic   = UNION;
-//           wind_thresh = [ NA ];
-//           wind_logic  = UNION;
+//           censor_thresh = [];
+//           censor_val    = [];
+//           cnt_thresh    = [ NA ];
+//           cnt_logic     = UNION;
+//           wind_thresh   = [ NA ];
+//           wind_logic    = UNION;
 //
 //           field = [
 //              {
@@ -529,10 +545,12 @@ fcst = {
 //
 //
 //         obs = {
-//           cnt_thresh  = [ NA ];
-//           cnt_logic   = UNION;
-//           wind_thresh = [ NA ];
-//           wind_logic  = UNION;
+//           censor_thresh = [];
+//           censor_val    = [];
+//           cnt_thresh    = [ NA ];
+//           cnt_logic     = UNION;
+//           wind_thresh   = [ NA ];
+//           wind_logic    = UNION;
 //
 //           field = [
 //              {
@@ -553,25 +571,27 @@ fcst = {
 //     than one "message_type" entry is desired within the config file.
 //     e.g.
 //     fcst = {
-//       cnt_thresh  = [ NA ];
-//       cnt_logic   = UNION;
-//       wind_thresh = [ NA ];
-//       wind_logic  = UNION;
+//       censor_thresh = [];
+//       censor_val    = [];
+//       cnt_thresh    = [ NA ];
+//       cnt_logic     = UNION;
+//       wind_thresh   = [ NA ];
+//       wind_logic    = UNION;
 //
 //       field = [
 //          {
 //            message_type = [ "ADPUPA" ];
 //            sid_exc      = [];
-//            name       = "TMP";
-//            level      = [ "P250", "P500", "P700", "P850", "P1000" ];
-//            cat_thresh = [ <=273.0 ];
+//            name         = "TMP";
+//            level        = [ "P250", "P500", "P700", "P850", "P1000" ];
+//            cat_thresh   = [ <=273.0 ];
 //          },
 //          {
 //            message_type = [ "ADPSFC" ];
 //            sid_exc      = [ "KDEN", "KDET" ];
-//            name       = "TMP";
-//            level      = [ "Z2" ];
-//            cat_thresh = [ <=273.0 ];
+//            name         = "TMP";
+//            level        = [ "Z2" ];
+//            cat_thresh   = [ <=273.0 ];
 //          }
 //       ];
 //     }
@@ -1288,6 +1308,8 @@ time_summary = {
 // products should be generated.  This is very similar to the "fcst" and "obs"
 // entries.  This dictionary may include the following entries:
 //
+//    - The "censor_thresh" and "censor_val" entries are described above.
+//
 //    - The "ens_thresh" entry specifies a proportion between 0 and 1 to define
 //      the required ratio of valid input ensemble member files.  If the ratio
 //      of valid input ensemble files to expected ones is too low, the tool
@@ -1306,8 +1328,10 @@ time_summary = {
 //      ensemble field.
 //
 ens = {
-   ens_thresh = 1.0;
-   vld_thresh = 1.0;
+   censor_thresh = [];
+   censor_val    = [];
+   ens_thresh    = 1.0;
+   vld_thresh    = 1.0;
 
    field = [
       {
@@ -1715,8 +1739,8 @@ quilt = false;
 // The object definition settings for MODE are contained within the "fcst" and
 // "obs" entries:
 //
-//    - The "raw_thresh" entry specifies a threshold to be applied to the raw
-//      data fields.  Any values not meeting the threshold are set to bad data.
+//    - The "censor_thresh" and "censor_val" entries are described above.
+//      The entries replace the previously supported "raw_thresh" entry.
 //
 //    - The "conv_radius" entry specifies the convolution radius in grid
 //      squares.  The larger the convolution radius, the smoother the objects.
@@ -1761,7 +1785,8 @@ fcst = {
       level = "A03";
    }
 
-   raw_thresh        = >=0.0;
+   censor_thresh     = [];
+   censor_val        = [];
    conv_radius       = 60.0/grid_res; // in grid squares
    conv_thresh       = >=5.0;
    vld_thresh        = 0.5;

@@ -33,7 +33,8 @@
 //   009    11/12/14  Halley Gotway  Pass the obtype entry from the
 //                    from the config file to the output files.
 //   010    02/25/15  Halley Gotway  Add automated regridding.
-//   011    05/15/17  Prestopnik P.  Added shape to regrid options
+//   011    05/15/17  Prestopnik P.  Add shape to regrid options.
+//   012    09/26/17  Halley Gotway  Add censor_thresh.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -268,6 +269,17 @@ void process_scores() {
          continue;
       }
 
+      // Apply censor thresholds
+      for(j=0; j<conf_info.fcsr_ta[i].n_elements(); j++) {
+         mlog << Debug(3)
+              << "Applying forecast censor threshold \""
+              << conf_info.fcsr_ta[i][j].get_str()
+              << "\" and replacing with a value of "
+              << conf_info.fcsr_na[i][j] << ".\n";
+         fcst_dp.replace(conf_info.fcsr_ta[i][j],
+                         conf_info.fcsr_na[i][j]);
+      }
+
       // Regrid, if necessary
       if(!(fcst_mtddf->grid() == grid)) {
          mlog << Debug(1)
@@ -292,6 +304,17 @@ void process_scores() {
               << conf_info.obs_info[i]->magic_str()
               << " not found in file: " << obs_file << "\n\n";
          continue;
+      }
+
+      // Apply censor thresholds
+      for(j=0; j<conf_info.ocsr_ta[i].n_elements(); j++) {
+         mlog << Debug(3)
+              << "Applying observation censor threshold \""
+              << conf_info.ocsr_ta[i][j].get_str()
+              << "\" and replacing with a value of "
+              << conf_info.ocsr_na[i][j] << ".\n";
+         obs_dp.replace(conf_info.ocsr_ta[i][j],
+                        conf_info.ocsr_na[i][j]);
       }
 
       // Regrid, if necessary
@@ -397,7 +420,7 @@ void process_scores() {
       // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
       isc_info = new ISCInfo * [conf_info.get_n_tile()];
       for(j=0; j<conf_info.get_n_tile(); j++) {
-         isc_info[j] = new ISCInfo [conf_info.fcst_ta[i].n_elements()];
+         isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n_elements()];
       }
 
       // Loop through the tiles to be applied
@@ -418,7 +441,7 @@ void process_scores() {
             do_intensity_scale(f_na, o_na, isc_info[j], i, j);
 
             // Write out the ISC statistics
-            for(k=0; k<conf_info.fcst_ta[i].n_elements(); k++) {
+            for(k=0; k<conf_info.fcat_ta[i].n_elements(); k++) {
 
                // Store the tile definition parameters
                isc_info[j][k].tile_dim = conf_info.get_tile_dim();
@@ -426,8 +449,8 @@ void process_scores() {
                isc_info[j][k].tile_yll = nint(conf_info.tile_xll[j]);
 
                // Set the forecast and observation thresholds
-               shc.set_fcst_thresh(conf_info.fcst_ta[i][k]);
-               shc.set_obs_thresh(conf_info.obs_ta[i][k]);
+               shc.set_fcst_thresh(conf_info.fcat_ta[i][k]);
+               shc.set_obs_thresh(conf_info.ocat_ta[i][k]);
 
                write_isc_row(shc, isc_info[j][k],
                   conf_info.output_flag[i_isc] == STATOutputType_Both,
@@ -442,11 +465,11 @@ void process_scores() {
          // Set the mask name
          shc.set_mask("TILE_TOT");
 
-         for(j=0; j<conf_info.fcst_ta[i].n_elements(); j++) {
+         for(j=0; j<conf_info.fcat_ta[i].n_elements(); j++) {
 
             // Set the forecast and observation thresholds
-            shc.set_fcst_thresh(conf_info.fcst_ta[i][j]);
-            shc.set_obs_thresh(conf_info.obs_ta[i][j]);
+            shc.set_fcst_thresh(conf_info.fcat_ta[i][j]);
+            shc.set_obs_thresh(conf_info.ocat_ta[i][j]);
 
             // Aggregate the tiles for the current threshold
             aggregate_isc_info(isc_info, i, j, isc_aggr);
@@ -937,11 +960,11 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    ns = conf_info.get_n_scale();
 
    // Set up the ISCInfo thresholds and n_scale
-   n_isc = conf_info.fcst_ta[i_vx].n_elements();
+   n_isc = conf_info.fcat_ta[i_vx].n_elements();
    for(i=0; i<n_isc; i++) {
       isc_info[i].clear();
-      isc_info[i].fthresh = conf_info.fcst_ta[i_vx][i];
-      isc_info[i].othresh = conf_info.obs_ta[i_vx][i];
+      isc_info[i].fthresh = conf_info.fcat_ta[i_vx][i];
+      isc_info[i].othresh = conf_info.ocat_ta[i_vx][i];
       isc_info[i].allocate_n_scale(ns);
    }
 
@@ -966,7 +989,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    }
 
    // Apply each threshold
-   for(i=0; i<conf_info.fcst_ta[i_vx].n_elements(); i++) {
+   for(i=0; i<conf_info.fcat_ta[i_vx].n_elements(); i++) {
 
       fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
       obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
@@ -1496,11 +1519,11 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    int dim_count = get_dim_count(&fcst_var);
    long lengths[dim_count];
    long offsets[dim_count];
-   
+
    offsets[0] = i_tile;
    offsets[1] = 0;
    offsets[2] = 0;
- 
+
    lengths[0] = 1;
    lengths[1] = d;
    lengths[2] = d;
@@ -1598,7 +1621,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
       int deflate_level = compress_level;
       if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
-      
+
       // Define the forecast and difference variables
 
       if ( nc_info.do_raw )  {
@@ -1744,7 +1767,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    int dim_count = get_dim_count(&fcst_var);
    long lengths[dim_count];
    long offsets[dim_count];
-   
+
    offsets[0] = i_tile;
    offsets[1] = i_scale+1;
    offsets[2] = 0;

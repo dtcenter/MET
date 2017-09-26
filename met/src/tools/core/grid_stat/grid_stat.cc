@@ -83,10 +83,11 @@
 //   035    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   036    02/14/17  Win            MET-621 enhancement support- additional
 //                                   nc_pairs_flag 'apply_mask'
-//   037    05/15/17  Prestopnik P   Added shape for regrid, nbrhd and interp
+//   037    05/15/17  Prestopnik P   Add shape for regrid, nbrhd and interp
 //   038    06/26/17  Halley Gotway  Add ECLV line type.
 //   039    07/12/17  Halley Gotway  Add climatology spread.
 //   040    08/18/17  Halley Gotway  Add fourier decomposition.
+//   041    09/26/17  Halley Gotway  Add censor_thresh.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -171,8 +172,8 @@ static void set_compress(const StringArray &);
 static bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
                             DataPlane& dp, Met2dDataFile* mtddf,
                             const ConcatString &filename,
-                            const ThreshArray &qc_ta,
-                            const NumArray &qc_val);
+                            const ThreshArray &csr_ta,
+                            const NumArray &csr_na);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -639,7 +640,9 @@ void process_scores() {
       // Read the gridded data from the input forecast file
       if(!read_data_plane(conf_info.fcst_info[i], conf_info.regrid_info,
                           fcst_dp, fcst_mtddf, fcst_file,
-                          conf_info.fqc_ta[i], conf_info.fqc_val[i])) continue;
+                          conf_info.fcsr_ta[i],
+                          conf_info.fcsr_na[i])) continue;
+
       // Set the forecast lead time
       shc.set_fcst_lead_sec(fcst_dp.lead());
 
@@ -654,7 +657,8 @@ void process_scores() {
       // Read the gridded data from the input observation file
       if(!read_data_plane(conf_info.obs_info[i], conf_info.regrid_info,
                           obs_dp, obs_mtddf, obs_file,
-                          conf_info.oqc_ta[i], conf_info.oqc_val[i])) continue;
+                          conf_info.ocsr_ta[i],
+                          conf_info.ocsr_na[i])) continue;
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -978,15 +982,15 @@ void process_scores() {
                if(!read_data_plane(conf_info.fcst_info[ui],
                                    conf_info.regrid_info,
                                    fu_dp, fcst_mtddf, fcst_file,
-                                   conf_info.fqc_ta[ui],
-                                   conf_info.fqc_val[ui])) continue;
+                                   conf_info.fcsr_ta[ui],
+                                   conf_info.fcsr_na[ui])) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file,
-                                   conf_info.oqc_ta[ui],
-                                   conf_info.oqc_val[ui])) continue;
+                                   conf_info.ocsr_ta[ui],
+                                   conf_info.ocsr_na[ui])) continue;
 
                // Read climatology data for UGRD
                cmnu_dp = read_climo_data_plane(
@@ -1469,15 +1473,15 @@ void process_scores() {
                if(!read_data_plane(conf_info.fcst_info[ui],
                                    conf_info.regrid_info,
                                    fu_dp, fcst_mtddf, fcst_file,
-                                   conf_info.fqc_ta[ui],
-                                   conf_info.fqc_val[ui])) continue;
+                                   conf_info.fcsr_ta[ui],
+                                   conf_info.fcsr_na[ui])) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.obs_info[ui],
                                    conf_info.regrid_info,
                                    ou_dp, obs_mtddf, obs_file,
-                                   conf_info.oqc_ta[ui],
-                                   conf_info.oqc_val[ui])) continue;
+                                   conf_info.ocsr_ta[ui],
+                                   conf_info.ocsr_na[ui])) continue;
 
                // Read climatology data for UGRD
                cmnu_dp = read_climo_data_plane(
@@ -2479,8 +2483,8 @@ void set_compress(const StringArray & a) {
 bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
                      DataPlane& dp, Met2dDataFile* mtddf,
                      const ConcatString &filename,
-                     const ThreshArray &qc_ta,
-                     const NumArray &qc_val) {
+                     const ThreshArray &csr_ta,
+                     const NumArray &csr_na) {
 
    bool status = mtddf->data_plane(*info, dp);
 
@@ -2492,12 +2496,14 @@ bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
       return false;
    }
 
-   // Apply quality control replacement values
-   for(int i=0; i<qc_ta.n_elements(); i++) {
+   // Apply censor thresholds
+   for(int i=0; i<csr_ta.n_elements(); i++) {
       mlog << Debug(3)
-           << "Applying quality control threshold \"" << qc_ta[i].get_str()
-           << "\" and replacing with a value of " << qc_val[i] << ".\n";
-      dp.replace(qc_ta[i], qc_val[i]);
+           << "Applying censor threshold \""
+           << csr_ta[i].get_str()
+           << "\" and replacing with a value of "
+           << csr_na[i] << ".\n";
+      dp.replace(csr_ta[i], csr_na[i]);
    }
 
    // Regrid, if necessary

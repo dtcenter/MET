@@ -36,9 +36,11 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cat_thresh  = [ NA ];
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [ NA ];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
 
 //
 // Forecast and observation fields to be verified

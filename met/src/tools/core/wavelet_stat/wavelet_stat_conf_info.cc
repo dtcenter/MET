@@ -49,8 +49,12 @@ void WaveletStatConfInfo::init_from_scratch() {
    // Initialize pointers
    fcst_info     = (VarInfo **)    0;
    obs_info      = (VarInfo **)    0;
-   fcst_ta       = (ThreshArray *) 0;
-   obs_ta        = (ThreshArray *) 0;
+   fcsr_ta       = (ThreshArray *) 0;
+   ocsr_ta       = (ThreshArray *) 0;
+   fcsr_na       = (NumArray *)    0;
+   ocsr_na       = (NumArray *)    0;
+   fcat_ta       = (ThreshArray *) 0;
+   ocat_ta       = (ThreshArray *) 0;
    wvlt_ptr      = (gsl_wavelet *) 0;
    wvlt_work_ptr = (gsl_wavelet_workspace *) 0;
 
@@ -92,8 +96,12 @@ void WaveletStatConfInfo::clear() {
    // Deallocate memory
    if(wvlt_ptr)      { wavelet_free(wvlt_ptr);                }
    if(wvlt_work_ptr) { wavelet_workspace_free(wvlt_work_ptr); }
-   if(fcst_ta)       { delete [] fcst_ta;   fcst_ta   = (ThreshArray *) 0; }
-   if(obs_ta)        { delete [] obs_ta;    obs_ta    = (ThreshArray *) 0; }
+   if(fcsr_ta)       { delete [] fcsr_ta ;  fcsr_ta   = (ThreshArray *) 0; }
+   if(ocsr_ta)       { delete [] ocsr_ta ;  ocsr_ta   = (ThreshArray *) 0; }
+   if(fcsr_na)       { delete [] fcsr_na;   fcsr_na   = (NumArray *)    0; }
+   if(ocsr_na)       { delete [] ocsr_na;   ocsr_na   = (NumArray *)    0; }
+   if(fcat_ta)       { delete [] fcat_ta;   fcat_ta   = (ThreshArray *) 0; }
+   if(ocat_ta)       { delete [] ocat_ta;   ocat_ta   = (ThreshArray *) 0; }
 
    // Clear fcst_info
    if(fcst_info) {
@@ -142,7 +150,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    Dictionary *fcst_dict = (Dictionary *) 0;
    Dictionary *obs_dict  = (Dictionary *) 0;
    Dictionary *dict      = (Dictionary *) 0;
-   Dictionary i_fcst_dict, i_obs_dict;
+   Dictionary i_fdict, i_odict;
    gsl_wavelet_type type;
 
    // Dump the contents of the config file
@@ -209,8 +217,12 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    // Allocate space based on the number of verification tasks
    fcst_info = new VarInfo *   [n_vx];
    obs_info  = new VarInfo *   [n_vx];
-   fcst_ta   = new ThreshArray [n_vx];
-   obs_ta    = new ThreshArray [n_vx];
+   fcsr_ta   = new ThreshArray [n_vx];
+   ocsr_ta   = new ThreshArray [n_vx];
+   fcsr_na   = new NumArray    [n_vx];
+   ocsr_na   = new NumArray    [n_vx];
+   fcat_ta   = new ThreshArray [n_vx];
+   ocat_ta   = new ThreshArray [n_vx];
 
    // Initialize pointers
    for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
@@ -224,15 +236,15 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       obs_info[i]  = info_factory.new_var_info(otype);
 
       // Get the current dictionaries
-      i_fcst_dict = parse_conf_i_vx_dict(fcst_dict, i);
-      i_obs_dict  = parse_conf_i_vx_dict(obs_dict, i);
+      i_fdict = parse_conf_i_vx_dict(fcst_dict, i);
+      i_odict = parse_conf_i_vx_dict(obs_dict, i);
 
       // Set the current dictionaries
-      fcst_info[i]->set_dict(i_fcst_dict);
-      obs_info[i]->set_dict(i_obs_dict);
+      fcst_info[i]->set_dict(i_fdict);
+      obs_info[i]->set_dict(i_odict);
 
       // Conf: desc
-      desc.add(parse_conf_string(&i_obs_dict, conf_key_desc));
+      desc.add(parse_conf_string(&i_odict, conf_key_desc));
 
       // Dump the contents of the current VarInfo
       if(mlog.verbosity_level() >= 5) {
@@ -253,30 +265,55 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          exit(1);
       }
 
+      // Conf: censor_thresh
+      fcsr_ta[i] = i_fdict.lookup_thresh_array(conf_key_censor_thresh);
+      ocsr_ta[i] = i_odict.lookup_thresh_array(conf_key_censor_thresh);
+
+      // Conf: censor_val
+      fcsr_na[i] = i_fdict.lookup_num_array(conf_key_censor_val);
+      ocsr_na[i] = i_odict.lookup_num_array(conf_key_censor_val);
+
       // Conf: cat_thresh
-      fcst_ta[i] = i_fcst_dict.lookup_thresh_array(conf_key_cat_thresh);
-      obs_ta[i]  = i_obs_dict.lookup_thresh_array(conf_key_cat_thresh);
+      fcat_ta[i] = i_fdict.lookup_thresh_array(conf_key_cat_thresh);
+      ocat_ta[i] = i_odict.lookup_thresh_array(conf_key_cat_thresh);
 
       // Dump the contents of the current thresholds
       if(mlog.verbosity_level() >= 5) {
          mlog << Debug(5)
-              << "Parsed thresholds for forecast field number " << i+1 << ":\n";
-         fcst_ta[i].dump(cout);
-         mlog << Debug(5)
-              << "Parsed thresholds for observation field number " << i+1 << ":\n";
-         obs_ta[i].dump(cout);
+              << "Parsed thresholds for field number "  << i+1 << "...\n"
+              << "Forecast censor thresholds: "         << fcsr_ta[i].get_str() << "\n"
+              << "Forecast censor replacement values: " << fcsr_na[i].serialize() << "\n"
+              << "Observed censor thresholds: "         << ocsr_ta[i].get_str() << "\n"
+              << "Observed censor replacement values: " << ocsr_na[i].serialize() << "\n"
+              << "Forecast categorical thresholds: "    << fcat_ta[i].get_str() << "\n"
+              << "Observed categorical thresholds: "    << ocat_ta[i].get_str() << "\n";
+      }
+
+      // Check for equal length of censor thresholds and values
+      if(fcsr_ta[i].n_elements() != fcsr_na[i].n_elements() ||
+         ocsr_ta[i].n_elements() != ocsr_na[i].n_elements()) {
+
+         mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
+              << "The number of censor thresholds in \""
+              << conf_key_censor_thresh
+              << "\" must match the number of replacement values in \""
+              << conf_key_censor_val << "\".\n\n";
+         exit(1);
       }
 
       // Check for the same number of fcst and obs thresholds
-      if(fcst_ta[i].n_elements() != obs_ta[i].n_elements()) {
+      if(fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
+
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "The number of forecast and observation thresholds must match "
-              << "for each field.\n\n";
+              << "The number of thresholds for each field in \"fcst."
+              << conf_key_cat_thresh
+              << "\" must match the number of thresholds for each "
+              << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
          exit(1);
       }
 
       // Keep track of the maximum number of thresholds
-      if(fcst_ta[i].n_elements() > max_n_thresh) max_n_thresh = fcst_ta[i].n_elements();
+      if(fcat_ta[i].n_elements() > max_n_thresh) max_n_thresh = fcat_ta[i].n_elements();
 
    } // end for i
 
@@ -640,9 +677,9 @@ int WaveletStatConfInfo::n_isc_row() {
    // Compute the number of output lines for each verification field
    for(i=0,n=0; i<n_vx; i++) {
 
-      n += (n_scale + 2) * fcst_ta[i].n_elements() * n_tile;
+      n += (n_scale + 2) * fcat_ta[i].n_elements() * n_tile;
 
-      if(n_tile > 1) n += (n_scale + 2) * fcst_ta[i].n_elements();
+      if(n_tile > 1) n += (n_scale + 2) * fcat_ta[i].n_elements();
    }
 
    return(n);

@@ -80,6 +80,7 @@
 //   033    02/27/17  Halley Gotway  Add HiRA verification.
 //   034    05/15/17  Prestopnik P   Add shape for HiRA, interp and regrid.
 //   035    06/16/17  Halley Gotway  Add ECLV line type.
+//   036    09/26/17  Halley Gotway  Add censor_thresh.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -545,6 +546,17 @@ void process_fcst_climo_files() {
 
       // Setup the first pass through the data
       if(is_first_pass) setup_first_pass(fcst_dpa[0], fcst_mtddf->grid());
+
+      // Apply forecast censor thresholds
+      for(j=0; j<conf_info.fcsr_ta[i].n_elements(); j++) {
+         mlog << Debug(3)
+              << "Applying censor threshold \""
+              << conf_info.fcsr_ta[i][j].get_str()
+              << "\" and replacing with a value of "
+              << conf_info.fcsr_na[i][j] << ".\n";
+         fcst_dpa.replace(conf_info.fcsr_ta[i][j],
+                          conf_info.fcsr_na[i][j]);
+      }
 
       // Regrid, if necessary
       if(!(fcst_mtddf->grid() == grid)) {
@@ -1018,7 +1030,8 @@ void process_obs_file(int i_nc) {
             // Attempt to add the observation to the conf_info.vx_pd object
             conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
                                        hdr_ut, obs_qty_str, obs_arr, grid,
-                                       var_name);
+                                       var_name, &conf_info.ocsr_ta[j],
+                                       &conf_info.ocsr_na[j]);
          }
 
          obs_arr[1] = grid_code;

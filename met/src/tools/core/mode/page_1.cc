@@ -45,7 +45,6 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 
 int j;
 char junk[1024];
-// bool drew_line;
 ConcatString label, thresh_str;
 ConcatString tmp1_str, tmp2_str, tmp3_str;
 int i, mon, day, yr, hr, minute, sec;
@@ -670,7 +669,7 @@ double x, y;
 TableHelper t;
 const double w = 240.0;
 
-t.set(*this, 16, 3);
+t.set(*this, 15, 3);
 
 for (j=0; j<(t.nrows()); ++j)  t.set_row_height(j, 15.0);
 
@@ -718,9 +717,9 @@ line(x, t.top(), x, t.bottom());
 
 x = t.col_right(1);
 
-line(x, t.top(), x, t.row_bottom(8));
+line(x, t.top(), x, t.row_bottom(7));
 
-line(x, t.row_bottom(9), x, t.row_bottom(14));
+line(x, t.row_bottom(8), x, t.row_bottom(13));
 
 
 // t.draw_skeleton(0.2);
@@ -734,7 +733,6 @@ t.write_xy1_to_cell(0, 2, dx, dy, 0.0, 0.0,  ObsString);
 j = 1;
 
 t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Mask M/G/P");
-t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Raw Thresh");
 t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Conv Radius");
 t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Conv Thresh");
 t.write_xy1_to_cell(j++, 0, dx, dy, 0.0, 0.0, "Area Thresh");
@@ -789,21 +787,6 @@ roman();
       label << cs_erase << tmp1_str << '/' << tmp2_str << '/' << tmp3_str;
       // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, label);
       t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label);
-
-      ++r;
-      nextline();
-
-      //
-      // Raw threshold
-      //
-      // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Raw Thresh:");
-      thresh_str = eng.conf_info.fcst_raw_thresh.get_str(2);
-      // write_centered_text(1, 1, Htab_b, text_y, 0.0, 0.5, thresh_str);
-      t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, thresh_str);
-
-      thresh_str = eng.conf_info.obs_raw_thresh.get_str(2);
-      // write_centered_text(1, 1, Htab_c, text_y, 0.0, 0.5, thresh_str);
-      t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, thresh_str);
 
       ++r;
       nextline();

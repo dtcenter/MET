@@ -81,8 +81,6 @@ static const char mask_poly_flag_name         [] = "mask_poly_flag";
 //
 // Standard names for object definition parameters
 //
-static const char fcst_raw_thresh_name        [] = "fcst_raw_thresh";
-static const char obs_raw_thresh_name         [] = "obs_raw_thresh";
 static const char fcst_conv_radius_name       [] = "fcst_conv_radius";
 static const char obs_conv_radius_name        [] = "obs_conv_radius";
 static const char bad_data_thresh_name        [] = "bad_data_thresh";
