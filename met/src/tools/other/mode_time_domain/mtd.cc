@@ -215,8 +215,11 @@ MM_Engine engine;
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
-mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
+mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw,
+              config.fcst_csr_thresh_array, config.fcst_csr_num_array);
+
+mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw,
+              config.obs_csr_thresh_array, config.obs_csr_num_array);
 
 if ( fcst_raw.nt() != obs_raw.nt() )  {
 
@@ -764,7 +767,7 @@ mlog << Debug(2)
      << "Creating 2D constant-time slice attributes file: \""
      << path << "\"\n";
 
-do_2d_txt_output(fcst_simple_att_2d,  obs_simple_att_2d, 
+do_2d_txt_output(fcst_simple_att_2d,  obs_simple_att_2d,
                  fcst_cluster_att_2d, obs_cluster_att_2d, config, path);
 
    //
@@ -1104,7 +1107,8 @@ ConcatString path;
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), single_filenames, raw);
+mtd_read_data(config, *(config.fcst_info), single_filenames, raw,
+              config.fcst_csr_thresh_array, config.fcst_csr_num_array);
 
 config.delta_t_seconds = raw.delta_t();
 

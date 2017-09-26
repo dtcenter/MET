@@ -428,20 +428,6 @@ void ModeFuzzyEngine::do_fcst_filter() {
    *fcst_filter = *fcst_raw;
 
       //
-      // Apply censor thresholds
-      //
-
-   for(int i=0; i<conf_info.fcst_csr_thresh_array.n_elements(); i++) {
-      mlog << Debug(3)
-           << "Applying forecast censor threshold \""
-           << conf_info.fcst_csr_thresh_array[i].get_str()
-           << "\" and replacing with a value of "
-           << conf_info.fcst_csr_num_array[i] << ".\n";
-      fcst_filter->data.replace(conf_info.fcst_csr_thresh_array[i],
-                                conf_info.fcst_csr_num_array[i]);
-   }
-
-      //
       // Threshold the fcst_filter field applying the fcst_conv_thresh
       //
 
@@ -467,20 +453,6 @@ void ModeFuzzyEngine::do_obs_filter() {
    if(!need_obs_filter) return;
 
    *obs_filter = *obs_raw;
-
-      //
-      // Apply censor thresholds
-      //
-
-   for(int i=0; i<conf_info.obs_csr_thresh_array.n_elements(); i++) {
-      mlog << Debug(3)
-           << "Applying observation censor threshold \""
-           << conf_info.obs_csr_thresh_array[i].get_str()
-           << "\" and replacing with a value of "
-           << conf_info.obs_csr_num_array[i] << ".\n";
-      obs_filter->data.replace(conf_info.obs_csr_thresh_array[i],
-                               conf_info.obs_csr_num_array[i]);
-   }
 
    //
    // Threshold the obs_filter field applying the obs_conv_thresh

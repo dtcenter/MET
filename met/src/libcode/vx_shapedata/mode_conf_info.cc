@@ -270,7 +270,7 @@ PlotInfo plot_info;
 
       // Dump the contents of the VarInfo objects
 
-   if(mlog.verbosity_level() >= 5) {
+   if(mlog.verbosity_level() >= 5)  {
       mlog << Debug(5)
            << "Parsed forecast field:\n";
       fcst_info->dump(cout);
@@ -281,10 +281,21 @@ PlotInfo plot_info;
 
       // No support for wind direction
 
-   if(fcst_info->is_wind_direction() || obs_info->is_wind_direction()) {
+   if(fcst_info->is_wind_direction() || obs_info->is_wind_direction())  {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "the wind direction field may not be verified "
            << "using MODE.\n\n";
+      exit(1);
+   }
+
+      // Conf: fcst.raw_thresh and obs.raw_thresh are deprecated
+
+   if ( fcst_dict->lookup(conf_key_raw_thresh) ||
+         obs_dict->lookup(conf_key_raw_thresh) )  {
+      mlog << Error << "\nModeConfInfo::process_config() -> "
+           << "the \"" << conf_key_raw_thresh << "\" entry is deprecated in MET "
+           << met_version << "!  Use \"" << conf_key_censor_thresh << "\" and \""
+           << conf_key_censor_val << "\" instead.\n\n";
       exit(1);
    }
 

@@ -215,6 +215,7 @@ void ModeExecutive::setup_fcst_obs_data()
 
 {
 
+   int i;
    // ShapeData fcst_sd, obs_sd;
    double fmin, omin, fmax, omax;
 
@@ -233,6 +234,18 @@ void ModeExecutive::setup_fcst_obs_data()
       mlog << Error << "\nsetup_fcst_obs_data() -> "
            << "can't get data from file \"" << fcst_file << "\"\n\n";
       exit(1);
+   }
+
+      // Apply censor thresholds
+
+   for(i=0; i<engine.conf_info.fcst_csr_thresh_array.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Applying forecast censor threshold \""
+           << engine.conf_info.fcst_csr_thresh_array[i].get_str()
+           << "\" and replacing with a value of "
+           << engine.conf_info.fcst_csr_num_array[i] << ".\n";
+      Fcst_sd.data.replace(engine.conf_info.fcst_csr_thresh_array[i],
+                           engine.conf_info.fcst_csr_num_array[i]);
    }
 
       // Regrid, if necessary
@@ -256,6 +269,18 @@ void ModeExecutive::setup_fcst_obs_data()
       mlog << Error << "\nsetup_fcst_obs_data() -> "
            << "can't get data from file \"" << obs_file << "\"\n\n";
       exit(1);
+   }
+
+      // Apply censor thresholds
+
+   for(i=0; i<engine.conf_info.obs_csr_thresh_array.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Applying observation censor threshold \""
+           << engine.conf_info.obs_csr_thresh_array[i].get_str()
+           << "\" and replacing with a value of "
+           << engine.conf_info.obs_csr_num_array[i] << ".\n";
+      Obs_sd.data.replace(engine.conf_info.obs_csr_thresh_array[i],
+                          engine.conf_info.obs_csr_num_array[i]);
    }
 
       // Regrid, if necessary

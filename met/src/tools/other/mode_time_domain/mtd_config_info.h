@@ -91,8 +91,11 @@ class MtdConfigInfo {
       VarInfo *        fcst_info;              // allocated
       VarInfo *        obs_info;               // allocated
 
-      SingleThresh     fcst_raw_thresh;        // Values not meeting threshold set to bad data
-      SingleThresh     obs_raw_thresh;
+      ThreshArray      fcst_csr_thresh_array;  // List of censoring thresholds
+      ThreshArray       obs_csr_thresh_array;  // to be applied
+
+      NumArray         fcst_csr_num_array;     // Reset censored grid points to
+      NumArray          obs_csr_num_array;     // these values
 
       int              fcst_conv_radius;       // Convolution radius in grid squares
       int              obs_conv_radius;
