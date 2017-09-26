@@ -67,17 +67,28 @@
          <?php print $prev_next_buttons; ?>
       </div>
 
-         <p><strong>Q:</strong> Why was the MET written largely in C++ instead of FORTRAN?<br>
-         <strong>A:</strong> MET relies upon the object-oriented aspects of C++, particularly in using the MODE tool.  Due to time and budget constraints, it also makes use of a pre-existing forecast verification library that was developed at NCAR.</p>
+      <div>
+      <?php include "MET_FAQ_LINKS_MASTER.xhtml"; ?>
+      </div>
 
-         <p><strong>Q:</strong> Why are VSDB and PREPBUFR used?<br>
-         <strong>A:</strong> Mainly because the first goal was to initially replicate the capabilities of other existing verification packages and make these capabilities available to both the DTC and the public.  VSDB was selected as one of the output types supported.</p>
+      <div id="navigationdiv" style="float:right;">
+         <?php print $prev_next_buttons; ?>
+      </div>
+
+      <div>
+      <p>
+      <div id="headingdiv"><h1>Old Frequently Asked Questions</h1></div>
+         <p><strong>Q:</strong> Why was the MET written largely in C++ instead of FORTRAN?<br>
+         <strong>A:</strong> MET relies upon the object-oriented aspects of C++.</p>
+
+         <p><strong>Q:</strong> Why is PREPBUFR used?<br>
+         <strong>A:</strong> The goal was to initially replicate the capabilities of other existing verification packages and make these capabilities available to both the DTC and the public.</p>
 
          <p><strong>Q:</strong> Why is GRIB used?<br>
          <strong>A:</strong> Forecast data from both WRF cores can be processed into GRIB format, and it is a commonly accepted output format for many NWP models.</p>
 
          <p><strong>Q:</strong> Is GRIB2 supported?<br>
-         <strong>A:</strong> Not as of version 1.1.  We plan to add support for forecast output in GRIB2 format in the next version release.</p>
+         <strong>A:</strong> Yes, as of version 5.0.</p>
 
          <p><strong>Q:</strong> How does MET differ from the previously mentioned existing verification packages?<br>
          <strong>A:</strong> MET is an actively maintained, evolving software package that is being made freely available to the public through controlled version releases.</p>
@@ -100,14 +111,13 @@
             MET: Version 1.1 Model Evaluation Tools Users Guide.<br>
             Available at http://www.dtcenter.org/met/users/docs/overview.php.<br>
             168 pp.</em></p>
-      <div id="navigationdiv" style="float:right;">
-         <?php print $prev_next_buttons; ?>
       </div>
 
    </div><!-- end column_pagecontent -->
 
    <div id="column_subcontent_wrap"><!-- begin column_subcontent_wrap -->
       <?php include ($_SERVER['DOCUMENT_ROOT'] . "/met/users/includes/sidenav_met.php");?>
+      <!-- ?php include ($_SERVER['DOCUMENT_ROOT'] . "/met/users/support/faqs/includes/sidenav_faq.html"); ? -->
    </div><!-- end column_subcontent_wrap -->
 
 </div><!-- end wrap_pagecontent -->
