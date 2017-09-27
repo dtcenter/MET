@@ -148,29 +148,15 @@
     </output>
   </test>
 
-  <test name="grid_stat_MET-620_NO_STATS">
-    <exec>&MET_DIR;/bin/grid_stat</exec>
-    <env>
-      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>MET-620_NO_STATS</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
-      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i18.f00.nc \
-      &CONFIG_DIR;/GridStatConfig_GTG_latlon \
-      -outdir &OUTPUT_DIR;/grid_stat -v 1
-    </param>
-    <output>
-      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MET-620_NO_STATS_060000L_20130827_180000V_pairs.nc</grid_nc>
-    </output>
-  </test>
+  <!-- Testing MET-620 and MET-621 to make sure that grid_stat can run with only
+       NetCDF output requested and test apply_mask true/false -->
 
-  <test name="grid_stat_MET-621_APPLY_MASK_TRUE">
+  <test name="grid_stat_APPLY_MASK_TRUE">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>MET-621_APPLY_MASK_TRUE</value></pair>
-      <pair><name>APPLY_MASK</name> <value>TRUE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>APPLY_MASK_TRUE</value></pair>
+      <pair><name>APPLY_MASK</name>      <value>TRUE</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
@@ -179,16 +165,16 @@
       -outdir &OUTPUT_DIR;/grid_stat -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MET-621_APPLY_MASK_TRUE_060000L_20130827_180000V_pairs.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_APPLY_MASK_TRUE_060000L_20130827_180000V_pairs.nc</grid_nc>
     </output>
   </test>
 
-  <test name="grid_stat_MET-621_APPLY_MASK_FALSE">
+  <test name="grid_stat_APPLY_MASK_FALSE">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
       <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>   <value>MET-621_APPLY_MASK_FALSE</value></pair>
-      <pair><name>APPLY_MASK</name> <value>FALSE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>APPLY_MASK_FALSE</value></pair>
+      <pair><name>APPLY_MASK</name>      <value>FALSE</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130827.i12.f06.nc \
@@ -197,7 +183,7 @@
       -outdir &OUTPUT_DIR;/grid_stat -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_MET-621_APPLY_MASK_FALSE_060000L_20130827_180000V_pairs.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_APPLY_MASK_FALSE_060000L_20130827_180000V_pairs.nc</grid_nc>
     </output>
   </test>
 

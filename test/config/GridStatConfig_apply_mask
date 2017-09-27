@@ -117,12 +117,12 @@ nbrhd = {
 // Statistical output types
 //
 output_flag = {
-   fho    = BOTH;
-   ctc    = BOTH;
-   cts    = BOTH;
-   mctc   = BOTH;
-   mcts   = BOTH;
-   cnt    = BOTH;
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
    sl1l2  = NONE;
    sal1l2 = NONE;
    vl1l2  = NONE;
@@ -131,7 +131,7 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   eclv   = BOTH;
+   eclv   = NONE;
    nbrctc = NONE;
    nbrcts = NONE;
    nbrcnt = NONE;
