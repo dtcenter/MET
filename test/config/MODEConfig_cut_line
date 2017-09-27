@@ -55,7 +55,6 @@ fcst = {
       level = "(*,*)";
    }
 
-   raw_thresh        = >=0.0;
    conv_radius       = 2; // in grid squares
    conv_thresh       = >=5.0;
    vld_thresh        = 0.5;

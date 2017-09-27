@@ -52,8 +52,7 @@ fcst = {
       name  = "APCP_06";
       level = "(*,*)";
    }
-   
-   raw_thresh        = >=0.0;
+
    conv_radius       = [ 2, 4 ]; // in grid squares
    conv_thresh       = [ >=5.0, >=10.0 ];
    vld_thresh        = 0.5;
