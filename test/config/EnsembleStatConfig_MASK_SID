@@ -44,9 +44,11 @@ ens = {
 
    field = [
       {
-         name       = "APCP";
-         level      = "A24";
-         cat_thresh = [ >0.0  ];
+         name          = "APCP";
+         level         = "A24";
+         cat_thresh    = [ >0.0  ];
+         censor_thresh = [ ${CENSOR_THRESH} ];
+         censor_val    = [ ${CENSOR_VAL} ];
       }
    ];
 }
@@ -62,8 +64,10 @@ fcst = {
 
    field = [
       {
-         name  = "APCP";
-         level = "A24";
+         name          = "APCP";
+         level         = "A24";
+         censor_thresh = [ ${CENSOR_THRESH} ];
+         censor_val    = [ ${CENSOR_VAL} ];
       }
    ];
 }
@@ -133,11 +137,11 @@ interp = {
 // Statistical output types
 //
 output_flag = {
-   rhist = BOTH;
-   phist = BOTH;
+   rhist = STAT;
+   phist = STAT;
    orank = BOTH;
-   ssvar = BOTH;
-   relp  = BOTH;
+   ssvar = STAT;
+   relp  = STAT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,15 +150,15 @@ output_flag = {
 // Ensemble product output types
 //
 ensemble_flag = {
-   mean      = FALSE;
+   mean      = TRUE;
    stdev     = FALSE;
    minus     = FALSE;
    plus      = FALSE;
-   min       = FALSE;
-   max       = FALSE;
-   range     = FALSE;
+   min       = TRUE;
+   max       = TRUE;
+   range     = TRUE;
    vld_count = FALSE;
-   frequency = FALSE;
+   frequency = TRUE;
    rank      = FALSE;
    weight    = FALSE;
 }

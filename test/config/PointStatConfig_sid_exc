@@ -25,20 +25,32 @@ obs_window = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
-eclv_points = 0.05;
+censor_thresh = [];
+censor_val    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_points   = 0.05;
 
 fcst = {
 
    sid_exc = [ ];
 
    field = [
-      { name = "UGRD"; level = "Z10"; message_type = "ADPSFC"; },
-      { name = "VGRD"; level = "Z10"; message_type = "ADPSFC";
-        sid_exc = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ]; }
+      {
+         name          = "UGRD";
+         level         = "Z10";
+         message_type  = "ADPSFC";
+         censor_thresh = [ ${CENSOR_THRESH} ];
+         censor_val    = [ ${CENSOR_VAL}    ];
+      },
+      {
+         name          = "VGRD";
+         level         = "Z10";
+         message_type  = "ADPSFC";
+         sid_exc       = [ "KNXF", "${CONFIG_DIR}/SID_CO.txt" ];
+      }
    ];
 
 }

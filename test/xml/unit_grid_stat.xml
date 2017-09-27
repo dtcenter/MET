@@ -83,6 +83,24 @@
     </output>
   </test>
 
+  <test name="grid_stat_GRIB1_NAM_STAGE4_CENSOR">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>MET_TEST_OUTPUT</name> <value>&MET_DIR;/out</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>GRIB1_NAM_STAGE4_CENSOR</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
+      &OUTPUT_DIR;/pcp_combine/stage4_2012040912_F012_APCP12.nc \
+      &CONFIG_DIR;/GridStatConfig_st4_censor \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_CENSOR_120000L_20120409_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_GRIB1_NAM_STAGE4_CENSOR_120000L_20120409_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="grid_stat_GTG_lc">
     <exec>&MET_DIR;/bin/grid_stat</exec>
     <env>
