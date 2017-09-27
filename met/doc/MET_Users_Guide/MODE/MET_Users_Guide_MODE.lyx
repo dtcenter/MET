@@ -1880,7 +1880,13 @@ fcst = {
 \begin_layout LyX-Code
 
 \series bold
-   raw_thresh        = NA;
+   censor_thresh     = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   censor_val        = [];
 \end_layout
 
 \begin_layout LyX-Code
@@ -1963,23 +1969,41 @@ reference "subsec:IO_General-MET-Config-Options"
  In the above example, the forecast settings are copied into the observation
  dictionary using 
 \series bold
-obs = fcst;
-\series medium
-.
+obs = fcst;.
 \end_layout
 
 \begin_layout Standard
-The 
+The
+\series bold
+ censor_thresh
+\series default
+ and 
+\series bold
+censor_val
+\series default
+ entries are used to censor the raw data as described in Section
+\series medium
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:IO_General-MET-Config-Options"
+
+\end_inset
+
+.
+
+\series default
+ Their functionality replaces the 
 \series bold
 raw_thresh
 \series default
- entry is used to threshold the raw forecast and/or observation fields.
+ entry, which is deprecated in met-6.1.
  Prior to defining objects, it is recommended that the raw fields should
  be made to look similar to each other.
  For example, if the model only predicts values for a variable above some
  threshold, the observations should be thresholded at that same level.
- The thresholds can be specified using symbols.
- By default, no raw field thresholded is applied.
+ The censor thresholds can be specified using symbols.
+ By default, no censor thresholding is applied.
 \end_layout
 
 \begin_layout Standard
@@ -3954,9 +3978,8 @@ FIELD
 \begin_inset Text
 
 \begin_layout Plain Layout
-Field type for this line:* RAW for the raw input fields* FILTER for the
- raw fields after applying the raw thresholds* OBJECT for the resolved object
- fields
+Field type for this line:* RAW for the raw input fields * OBJECT for the
+ resolved object fields
 \end_layout
 
 \end_inset
@@ -6018,8 +6041,7 @@ AREA_FILTER
 \begin_inset Text
 
 \begin_layout Plain Layout
-Area of the object containing non-zero data in the filtered field (in grid
- squares)
+Area of the object containing non-zero data in the raw field (in grid squares)
 \end_layout
 
 \end_inset
@@ -6048,8 +6070,8 @@ AREA_THRESH
 \begin_inset Text
 
 \begin_layout Plain Layout
-Area of the object containing data values in the filtered field that meet
- the object definition threshold criteria (in grid squares)
+Area of the object containing data values in the raw field that meet the
+ object definition threshold criteria (in grid squares)
 \end_layout
 
 \end_inset
@@ -6167,8 +6189,8 @@ INTENSITY_10, _25, _50, _75, _90
 \begin_inset Text
 
 \begin_layout Plain Layout
-10th, 25th, 50th, 75th, and 90th percentiles of intensity of the filtered
- field within the object (various units)
+10th, 25th, 50th, 75th, and 90th percentiles of intensity of the raw field
+ within the object (various units)
 \end_layout
 
 \end_inset
@@ -6340,8 +6362,7 @@ INTENSITY_SUM
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sum of the intensities of the filtered field within the object (variable
- units)
+Sum of the intensities of the raw field within the object (variable units)
 \end_layout
 
 \end_inset
