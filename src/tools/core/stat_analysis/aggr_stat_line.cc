@@ -1385,14 +1385,14 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
 
             case(stat_vl1l2):
                parse_vl1l2_line(line, cur);
-               convert_u_v_to_unit(cur.ufbar, cur.vfbar, uf, vf);
-               convert_u_v_to_unit(cur.uobar, cur.vobar, uo, vo);
+               convert_u_v_to_unit(cur.uf_bar, cur.vf_bar, uf, vf);
+               convert_u_v_to_unit(cur.uo_bar, cur.vo_bar, uo, vo);
                break;
 
             case(stat_val1l2):
                parse_val1l2_line(line, cur);
-               convert_u_v_to_unit(cur.ufabar, cur.vfabar, uf, vf);
-               convert_u_v_to_unit(cur.uoabar, cur.voabar, uo, vo);
+               convert_u_v_to_unit(cur.ufa_bar, cur.vfa_bar, uf, vf);
+               convert_u_v_to_unit(cur.uoa_bar, cur.voa_bar, uo, vo);
                break;
 
             default:
@@ -1674,17 +1674,17 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Keep running partial sums of matches
          //
-         v_info.vcount  = 1;
-         v_info.ufbar   = it->second.uf_na[i];
-         v_info.vfbar   = it->second.vf_na[i];
-         v_info.uobar   = it->second.uo_na[i];
-         v_info.vobar   = it->second.vo_na[i];
-         v_info.uvfobar = it->second.uf_na[i]*it->second.uo_na[i] +
-                          it->second.vf_na[i]*it->second.vo_na[i];
-         v_info.uvffbar = it->second.uf_na[i]*it->second.uf_na[i] +
-                          it->second.vf_na[i]*it->second.vf_na[i];
-         v_info.uvoobar = it->second.uo_na[i]*it->second.uo_na[i] +
-                          it->second.vo_na[i]*it->second.vo_na[i];
+         v_info.vcount   = 1;
+         v_info.uf_bar   = it->second.uf_na[i];
+         v_info.vf_bar   = it->second.vf_na[i];
+         v_info.uo_bar   = it->second.uo_na[i];
+         v_info.vo_bar   = it->second.vo_na[i];
+         v_info.uvfo_bar = it->second.uf_na[i]*it->second.uo_na[i] +
+                           it->second.vf_na[i]*it->second.vo_na[i];
+         v_info.uvff_bar = it->second.uf_na[i]*it->second.uf_na[i] +
+                           it->second.vf_na[i]*it->second.vf_na[i];
+         v_info.uvoo_bar = it->second.uo_na[i]*it->second.uo_na[i] +
+                           it->second.vo_na[i]*it->second.vo_na[i];
          aggr.vl1l2_info += v_info;
 
          //

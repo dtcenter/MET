@@ -1693,17 +1693,17 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       r++;
 
       if(lt == stat_vl1l2 || lt == stat_mpr) {
-         uf    = it->second.vl1l2_info.ufbar;
-         vf    = it->second.vl1l2_info.vfbar;
-         uo    = it->second.vl1l2_info.uobar;
-         vo    = it->second.vl1l2_info.vobar;
+         uf    = it->second.vl1l2_info.uf_bar;
+         vf    = it->second.vl1l2_info.vf_bar;
+         uo    = it->second.vl1l2_info.uo_bar;
+         vo    = it->second.vl1l2_info.vo_bar;
          count = it->second.vl1l2_info.vcount;
       }
       else if(lt == stat_val1l2) {
-         uf    = it->second.vl1l2_info.ufabar;
-         vf    = it->second.vl1l2_info.vfabar;
-         uo    = it->second.vl1l2_info.uoabar;
-         vo    = it->second.vl1l2_info.voabar;
+         uf    = it->second.vl1l2_info.ufa_bar;
+         vf    = it->second.vl1l2_info.vfa_bar;
+         uo    = it->second.vl1l2_info.uoa_bar;
+         vo    = it->second.vl1l2_info.voa_bar;
          count = it->second.vl1l2_info.vacount;
       }
 

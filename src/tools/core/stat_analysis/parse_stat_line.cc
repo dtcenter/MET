@@ -213,14 +213,14 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
 
    v_info.clear();
 
-   v_info.vcount  = atoi(l.get_item("TOTAL"));
-   v_info.ufbar   = atof(l.get_item("UFBAR"));
-   v_info.vfbar   = atof(l.get_item("VFBAR"));
-   v_info.uobar   = atof(l.get_item("UOBAR"));
-   v_info.vobar   = atof(l.get_item("VOBAR"));
-   v_info.uvfobar = atof(l.get_item("UVFOBAR"));
-   v_info.uvffbar = atof(l.get_item("UVFFBAR"));
-   v_info.uvoobar = atof(l.get_item("UVOOBAR"));
+   v_info.vcount   = atoi(l.get_item("TOTAL"));
+   v_info.uf_bar   = atof(l.get_item("UFBAR"));
+   v_info.vf_bar   = atof(l.get_item("VFBAR"));
+   v_info.uo_bar   = atof(l.get_item("UOBAR"));
+   v_info.vo_bar   = atof(l.get_item("VOBAR"));
+   v_info.uvfo_bar = atof(l.get_item("UVFOBAR"));
+   v_info.uvff_bar = atof(l.get_item("UVFFBAR"));
+   v_info.uvoo_bar = atof(l.get_item("UVOOBAR"));
 
    return;
 }
@@ -231,14 +231,14 @@ void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
 
    v_info.clear();
 
-   v_info.vacount  = atoi(l.get_item("TOTAL"));
-   v_info.ufabar   = atof(l.get_item("UFABAR"));
-   v_info.vfabar   = atof(l.get_item("VFABAR"));
-   v_info.uoabar   = atof(l.get_item("UOABAR"));
-   v_info.voabar   = atof(l.get_item("VOABAR"));
-   v_info.uvfoabar = atof(l.get_item("UVFOABAR"));
-   v_info.uvffabar = atof(l.get_item("UVFFABAR"));
-   v_info.uvooabar = atof(l.get_item("UVOOABAR"));
+   v_info.vacount   = atoi(l.get_item("TOTAL"));
+   v_info.ufa_bar   = atof(l.get_item("UFABAR"));
+   v_info.vfa_bar   = atof(l.get_item("VFABAR"));
+   v_info.uoa_bar   = atof(l.get_item("UOABAR"));
+   v_info.voa_bar   = atof(l.get_item("VOABAR"));
+   v_info.uvfoa_bar = atof(l.get_item("UVFOABAR"));
+   v_info.uvffa_bar = atof(l.get_item("UVFFABAR"));
+   v_info.uvooa_bar = atof(l.get_item("UVOOABAR"));
 
    return;
 }
