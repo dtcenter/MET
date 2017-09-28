@@ -114,7 +114,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_ORANK.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_orank.txt</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_20120410_120000V_ens.nc</grid_nc>
     </output>
   </test>
@@ -142,7 +142,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CENSOR_20120410_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CENSOR_20120410_120000V_ORANK.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CENSOR_20120410_120000V_orank.txt</stat>
       <grid_nc>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_MASK_SID_CENSOR_20120410_120000V_ens.nc</grid_nc>
     </output>
   </test>
