@@ -85,7 +85,19 @@ class ShapeData {
       DataPlane data;        // stores the data
 
          //
-         //  get functions
+         //  expand and shrink the data 
+         //
+         //    useful for the split operation
+         //
+         //    Note: these operate only on the data plane.
+         //          they do not recalculate moments.
+         //
+
+      void expand (const int);
+      void shrink (const int);
+
+         //
+         //  get stuff
          //
 
       Moments moments()  const;

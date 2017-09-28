@@ -23,6 +23,10 @@
 
 static const bool use_new = true;
 
+static const int split_enlarge = 4;   //  used for ShapeData  shrink and expand
+
+static const bool do_split_fatten = true;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -960,10 +964,123 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
 void ShapeData::zero_field()
 
 {
-   data.set_constant(0.0);
 
-   return;
+data.set_constant(0.0);
+
+return;
+
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void ShapeData::expand(const int W)
+
+{
+
+if ( W <= 0 )  {
+
+   mlog << Error
+        << "\n\n  ShapeData::expand(const int) -> bad value ... " << W << "\n\n";
+
+   exit ( 1 );
+
+}
+
+
+int x_old, y_old, x_new, y_new;
+const int nx_old = data.nx();
+const int ny_old = data.ny();
+const int nx_new = nx_old + 2*W;
+const int ny_new = ny_old + 2*W;
+DataPlane old = data;
+
+data.set_size(nx_new, ny_new);
+
+data.set_constant(0.0);
+
+for (x_old=0; x_old<nx_old; ++x_old)  {
+
+   x_new = x_old + W;
+
+   for (y_old=0; y_old<ny_old; ++y_old)  {
+
+      y_new = y_old + W;
+
+      data.put(old.get(x_old, y_old), x_new, y_new);
+
+   }   //  for y_old
+
+}   //  for x_old
+
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void ShapeData::shrink(const int W)
+
+{
+
+if ( W <= 0 )  {
+
+   mlog << Error
+        << "\n\n  ShapeData::shrink(const int) -> bad value ... " << W << "\n\n";
+
+   exit ( 1 );
+
+}
+
+const int nx_old = data.nx();
+const int ny_old = data.ny();
+const int nx_new = nx_old - 2*W;
+const int ny_new = ny_old - 2*W;
+
+if ( (nx_new <= 0) || (ny_new <= 0) )  {
+
+   mlog << Error
+        << "\n\n  ShapeData::shrink(const int) -> value too large ... new grid is empty\n\n";
+
+   exit ( 1 );
+
+}
+
+
+int x_old, y_old, x_new, y_new;
+DataPlane old = data;
+
+
+for (x_new=0; x_new<nx_new; ++x_new)  {
+
+   x_old = x_new + W;
+
+   for (y_new=0; y_new<ny_new; ++y_new)  {
+
+      y_old = y_new + W;
+
+      data.put(old.get(x_old, y_old), x_new, y_new);
+
+   }
+
+}
+
+
+
+
+
+
+
+
+return;
+
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1847,6 +1964,7 @@ if ( inten_object )  { delete [] inten_object;   inten_object = (double *) 0; }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 ShapeData split(const ShapeData & wfd, int & n_shapes)
 
 {
@@ -1857,12 +1975,16 @@ int xx, yy, nx, ny;
 int current_shape;
 bool shape_assigned = false;
 ShapeData d;
-ShapeData q = wfd;
+ShapeData out = wfd;
+ShapeData fat = wfd;
 Partition p;
 
 
-nx = wfd.data.nx();
-ny = wfd.data.ny();
+if ( do_split_fatten )  fat.expand(split_enlarge);
+
+
+nx = fat.data.nx();
+ny = fat.data.ny();
 
 d.data.set_size(nx, ny);
 
@@ -1874,11 +1996,11 @@ n_shapes = 0;
 
 current_shape = 0;
 
-for (y=(wfd.data.ny() - 2); y>=0; --y) {
+for (y=(fat.data.ny() - 2); y>=0; --y) {
 
-   for (x=(wfd.data.nx() - 2); x>=0; --x) {
+   for (x=(fat.data.nx() - 2); x>=0; --x) {
 
-      s = wfd.s_is_on(x, y);
+      s = fat.s_is_on(x, y);
 
       if ( !s ) continue;
 
@@ -1893,7 +2015,7 @@ for (y=(wfd.data.ny() - 2); y>=0; --y) {
 
       if ( (xx >= 0) && (yy < ny) ) {
 
-         s = wfd.s_is_on(xx, yy);
+         s = fat.s_is_on(xx, yy);
 
          if ( s ) {
 
@@ -1917,7 +2039,7 @@ for (y=(wfd.data.ny() - 2); y>=0; --y) {
 
       if ( yy < ny ) {
 
-         s = wfd.s_is_on(xx, yy);
+         s = fat.s_is_on(xx, yy);
 
          if ( s ) {
 
@@ -1941,7 +2063,7 @@ for (y=(wfd.data.ny() - 2); y>=0; --y) {
 
       if ( (xx < nx) && (yy < ny) ) {
 
-         s = wfd.s_is_on(xx, yy);
+         s = fat.s_is_on(xx, yy);
 
          if ( s ) {
 
@@ -1963,7 +2085,7 @@ for (y=(wfd.data.ny() - 2); y>=0; --y) {
 
       if ( xx < nx ) {
 
-         s = wfd.s_is_on(xx, yy);
+         s = fat.s_is_on(xx, yy);
 
          if ( s ) {
 
@@ -1993,18 +2115,23 @@ for (y=(wfd.data.ny() - 2); y>=0; --y) {
 } // for y
 
 
+if ( do_split_fatten )  d.shrink(split_enlarge);
+
+
      ///////////////////////////////////
 
+nx = wfd.data.nx();
+ny = wfd.data.ny();
 
 for (x=0; x<nx; ++x) {
 
    for (y=0; y<ny; ++y) {
 
-      q.data.set(0, x, y);
+      out.data.set(0, x, y);
 
       for (k=0; k<(p.n); ++k) {
 
-         if ( p.c[k]->has(nint(d.data(x, y))) )   q.data.set(k + 1, x, y);
+         if ( p.c[k]->has(nint(d.data(x, y))) )   out.data.set(k + 1, x, y);
 
       }
 
@@ -2018,13 +2145,13 @@ for (x=0; x<nx; ++x) {
 
 n_shapes = p.n;
 
-q.calc_moments();
+out.calc_moments();
 
    //
    //  done
    //
 
-return ( q );
+return ( out );
 
 }
 

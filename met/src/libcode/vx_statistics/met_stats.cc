@@ -1308,25 +1308,25 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    v_info.vcount  = vcount + c.vcount;
 
    if(v_info.vcount > 0) {
-      v_info.ufbar   = (ufbar*vcount   + c.ufbar*c.vcount)  /v_info.vcount;
-      v_info.vfbar   = (vfbar*vcount   + c.vfbar*c.vcount)  /v_info.vcount;
-      v_info.uobar   = (uobar*vcount   + c.uobar*c.vcount)  /v_info.vcount;
-      v_info.vobar   = (vobar*vcount   + c.vobar*c.vcount)  /v_info.vcount;
-      v_info.uvfobar = (uvfobar*vcount + c.uvfobar*c.vcount)/v_info.vcount;
-      v_info.uvffbar = (uvffbar*vcount + c.uvffbar*c.vcount)/v_info.vcount;
-      v_info.uvoobar = (uvoobar*vcount + c.uvoobar*c.vcount)/v_info.vcount;
+      v_info.uf_bar   = (uf_bar*vcount   + c.uf_bar*c.vcount)  /v_info.vcount;
+      v_info.vf_bar   = (vf_bar*vcount   + c.vf_bar*c.vcount)  /v_info.vcount;
+      v_info.uo_bar   = (uo_bar*vcount   + c.uo_bar*c.vcount)  /v_info.vcount;
+      v_info.vo_bar   = (vo_bar*vcount   + c.vo_bar*c.vcount)  /v_info.vcount;
+      v_info.uvfo_bar = (uvfo_bar*vcount + c.uvfo_bar*c.vcount)/v_info.vcount;
+      v_info.uvff_bar = (uvff_bar*vcount + c.uvff_bar*c.vcount)/v_info.vcount;
+      v_info.uvoo_bar = (uvoo_bar*vcount + c.uvoo_bar*c.vcount)/v_info.vcount;
    }
 
    v_info.vacount  = vacount + c.vacount;
 
    if(v_info.vacount > 0) {
-      v_info.ufabar   = (ufabar*vacount   + c.ufabar*c.vacount)  /v_info.vacount;
-      v_info.vfabar   = (vfabar*vacount   + c.vfabar*c.vacount)  /v_info.vacount;
-      v_info.uoabar   = (uoabar*vacount   + c.uoabar*c.vacount)  /v_info.vacount;
-      v_info.voabar   = (voabar*vacount   + c.voabar*c.vacount)  /v_info.vacount;
-      v_info.uvfoabar = (uvfoabar*vacount + c.uvfoabar*c.vacount)/v_info.vacount;
-      v_info.uvffabar = (uvffabar*vacount + c.uvffabar*c.vacount)/v_info.vacount;
-      v_info.uvooabar = (uvooabar*vacount + c.uvooabar*c.vacount)/v_info.vacount;
+      v_info.ufa_bar   = (ufa_bar*vacount   + c.ufa_bar*c.vacount)  /v_info.vacount;
+      v_info.vfa_bar   = (vfa_bar*vacount   + c.vfa_bar*c.vacount)  /v_info.vacount;
+      v_info.uoa_bar   = (uoa_bar*vacount   + c.uoa_bar*c.vacount)  /v_info.vacount;
+      v_info.voa_bar   = (voa_bar*vacount   + c.voa_bar*c.vacount)  /v_info.vacount;
+      v_info.uvfoa_bar = (uvfoa_bar*vacount + c.uvfoa_bar*c.vacount)/v_info.vacount;
+      v_info.uvffa_bar = (uvffa_bar*vacount + c.uvffa_bar*c.vacount)/v_info.vacount;
+      v_info.uvooa_bar = (uvooa_bar*vacount + c.uvooa_bar*c.vacount)/v_info.vacount;
    }
 
    assign(v_info);
@@ -1348,13 +1348,24 @@ void VL1L2Info::init_from_scratch() {
 void VL1L2Info::zero_out() {
 
    // VL1L2 Quantities
-   ufbar    = vfbar    = uobar    = vobar   = 0.0;
-   uvfobar  = uvffbar  = uvoobar  = 0.0;
+   uf_bar    = vf_bar    = uo_bar    = vo_bar   = 0.0;
+   uvfo_bar  = uvff_bar  = uvoo_bar  = 0.0;
+
+   f_bar = o_bar = 0.0;
+
+   me = 0.0;
+
+   mse = 0.0;
+
+   rmse = 0.0;
+
+   speed_bias = 0.0;
+
    vcount   = 0;
 
    // VAL1L2 Quantities
-   ufabar   = vfabar   = uoabar   = voabar  = 0.0;
-   uvfoabar = uvffabar = uvooabar = 0.0;
+   ufa_bar   = vfa_bar   = uoa_bar   = voa_bar  = 0.0;
+   uvfoa_bar = uvffa_bar = uvooa_bar = 0.0;
    vacount  = 0;
 
    return;
@@ -1384,38 +1395,55 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    logic   = c.logic;
 
    // VL1L2 Quantities
-   ufbar    = c.ufbar;
-   vfbar    = c.vfbar;
-   uobar    = c.uobar;
-   vobar    = c.vobar;
-   uvfobar  = c.uvfobar;
-   uvffbar  = c.uvffbar;
-   uvoobar  = c.uvoobar;
-   vcount   = c.vcount;
+   uf_bar    = c.uf_bar;
+   vf_bar    = c.vf_bar;
+   uo_bar    = c.uo_bar;
+   vo_bar    = c.vo_bar;
+   uvfo_bar  = c.uvfo_bar;
+   uvff_bar  = c.uvff_bar;
+   uvoo_bar  = c.uvoo_bar;
+
+   f_bar     = c.f_bar;
+   o_bar     = c.o_bar;
+
+   me        = c.me;
+
+   mse       = c.mse;
+
+   speed_bias = c.speed_bias;
+
+   vcount    = c.vcount;
 
    // VAL1L2 Quantities
-   ufabar   = c.ufabar;
-   vfabar   = c.vfabar;
-   uoabar   = c.uoabar;
-   voabar   = c.voabar;
-   uvfoabar = c.uvfoabar;
-   uvffabar = c.uvffabar;
-   uvooabar = c.uvooabar;
-   vacount  = c.vacount;
+   ufa_bar   = c.ufa_bar;
+   vfa_bar   = c.vfa_bar;
+   uoa_bar   = c.uoa_bar;
+   voa_bar   = c.voa_bar;
+   uvfoa_bar = c.uvfoa_bar;
+   uvffa_bar = c.uvffa_bar;
+   uvooa_bar = c.uvooa_bar;
+   vacount   = c.vacount;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+
 void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
                     const NumArray &uo_in_na, const NumArray &vo_in_na,
                     const NumArray &uc_in_na, const NumArray &vc_in_na,
-                    const NumArray &w_in_na) {
+                    const NumArray &w_in_na)
+
+{
+
    int i;
    double uf, vf, uo, vo, uc, vc, fwind, owind, w, w_sum;
+   double u_diff, v_diff;
    NumArray uf_na, vf_na, uo_na, vo_na, uc_na, vc_na, w_na;
    bool cflag, wflag;
+
+       //////////////////////////////////////////////////////
 
    // Initialize
    zero_out();
@@ -1436,8 +1464,10 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
             vc_in_na.n_elements() == vf_in_na.n_elements());
    wflag = set_climo_flag(uf_in_na, w_in_na);
 
+       //////////////////////////////////////////////////////
+
    // Loop through the pair data and filter
-   for(i=0; i<uf_in_na.n_elements(); i++) {
+   for(i=0; i<uf_in_na.n_elements(); i++)  {
 
       // Retrieve the U,V values
       uf = uf_in_na[i];
@@ -1467,13 +1497,19 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
          vc_na.add(vc);
          w_na.add(w);
       }
-   }
+
+   }   //  for i
+
+       //////////////////////////////////////////////////////
 
    // Get the sum of the weights
    w_sum = w_na.sum();
 
+       //////////////////////////////////////////////////////
+
    // Loop through the filtered pair data compute partial sums
-   for(i=0; i<uf_na.n_elements(); i++) {
+
+   for(i=0; i<uf_na.n_elements(); i++)  {
 
       // Retrieve the U,V values
       uf = uf_na[i];
@@ -1482,30 +1518,51 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
       vo = vo_na[i];
       uc = uc_na[i];
       vc = vc_na[i];
+
+      u_diff = uf - uo;
+      v_diff = vf - vo;
+
       w  = w_na[i]/w_sum;
 
       // VL1L2 sums
-      vcount  += 1;
-      ufbar   += w*uf;
-      vfbar   += w*vf;
-      uobar   += w*uo;
-      vobar   += w*vo;
-      uvfobar += w*(uf*uo+vf*vo);
-      uvffbar += w*(uf*uf+vf*vf);
-      uvoobar += w*(uo*uo+vo*vo);
+      vcount     += 1;
+
+      uf_bar     += w*uf;
+      vf_bar     += w*vf;
+      uo_bar     += w*uo;
+      vo_bar     += w*vo;
+
+      uvfo_bar   += w*(uf*uo + vf*vo);
+      uvff_bar   += w*(uf*uf + vf*vf);
+      uvoo_bar   += w*(uo*uo + vo*vo);
+
+
+      f_bar      += w*sqrt(uf*uf + vf*vf);
+      o_bar      += w*sqrt(uo*uo + vo*vo);
+
+      me         += w*sqrt(u_diff*u_diff + v_diff*v_diff);
+
+      mse        += w*(u_diff*u_diff + v_diff*v_diff);
+
+      speed_bias += w*(sqrt(uf*uf + vf*vf) - sqrt(uo*uo + vo*vo));
+
+
 
       // VAL1L2 sums
       if(!is_bad_data(uc) && !is_bad_data(vc)) {
-         vacount  += 1;
-         ufabar   += w*(uf-uc);
-         vfabar   += w*(vf-vc);
-         uoabar   += w*(uo-uc);
-         voabar   += w*(vo-vc);
-         uvfoabar += w*((uf-uc)*(uo-uc)+(vf-vc)*(vo-vc));
-         uvffabar += w*((uf-uc)*(uf-uc)+(vf-vc)*(vf-vc));
-         uvooabar += w*((uo-uc)*(uo-uc)+(vo-vc)*(vo-vc));
+         vacount   += 1;
+         ufa_bar   += w*(uf-uc);
+         vfa_bar   += w*(vf-vc);
+         uoa_bar   += w*(uo-uc);
+         voa_bar   += w*(vo-vc);
+         uvfoa_bar += w*((uf-uc)*(uo-uc) + (vf-vc)*(vo-vc));
+         uvffa_bar += w*((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
+         uvooa_bar += w*((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
       }
-   } // end for i
+
+   }  //  for i
+
+       //////////////////////////////////////////////////////
 
    mlog << Debug(3)
         << "Using " << vcount << " of " << uf_na.n_elements()
@@ -1514,28 +1571,45 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
         << othresh.get_str() << ", and field logic "
         << setlogic_to_string(logic) << ".\n";
 
+
+       //////////////////////////////////////////////////////
+
    // Check for 0 points
    if(vcount == 0) {
-      ufbar   = bad_data_double;
-      vfbar   = bad_data_double;
-      uobar   = bad_data_double;
-      vobar   = bad_data_double;
-      uvfobar = bad_data_double;
-      uvffbar = bad_data_double;
-      uvoobar = bad_data_double;
+
+      uf_bar     = bad_data_double;
+      vf_bar     = bad_data_double;
+      uo_bar     = bad_data_double;
+      vo_bar     = bad_data_double;
+      uvfo_bar   = bad_data_double;
+      uvff_bar   = bad_data_double;
+      uvoo_bar   = bad_data_double;
+
+      me         = bad_data_double;
+      mse        = bad_data_double;
+      rmse       = bad_data_double;
+      speed_bias = bad_data_double;
+
+   } else {
+
+      rmse       = sqrt(mse);
+
    }
 
    if(vacount == 0) {
-      ufabar   = bad_data_double;
-      vfabar   = bad_data_double;
-      uoabar   = bad_data_double;
-      voabar   = bad_data_double;
-      uvfoabar = bad_data_double;
-      uvffabar = bad_data_double;
-      uvooabar = bad_data_double;
+
+      ufa_bar   = bad_data_double;
+      vfa_bar   = bad_data_double;
+      uoa_bar   = bad_data_double;
+      voa_bar   = bad_data_double;
+      uvfoa_bar = bad_data_double;
+      uvffa_bar = bad_data_double;
+      uvooa_bar = bad_data_double;
+
    }
 
    return;
+
 }
 
 ////////////////////////////////////////////////////////////////////////

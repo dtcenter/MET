@@ -2510,25 +2510,25 @@ void write_vl1l2_cols(const VL1L2Info &vl1l2_info,
       vl1l2_info.vcount);
 
    at.set_entry(r, c+1,  // UFBAR
-      vl1l2_info.ufbar);
+      vl1l2_info.uf_bar);
 
    at.set_entry(r, c+2,  // VFBAR
-      vl1l2_info.vfbar);
+      vl1l2_info.vf_bar);
 
    at.set_entry(r, c+3,  // UOBAR
-      vl1l2_info.uobar);
+      vl1l2_info.uo_bar);
 
    at.set_entry(r, c+4,  // VOBAR
-      vl1l2_info.vobar);
+      vl1l2_info.vo_bar);
 
    at.set_entry(r, c+5,  // UVFOBAR
-      vl1l2_info.uvfobar);
+      vl1l2_info.uvfo_bar);
 
    at.set_entry(r, c+6,  // UVFFBAR
-      vl1l2_info.uvffbar);
+      vl1l2_info.uvff_bar);
 
    at.set_entry(r, c+7,  // UVOOBAR
-      vl1l2_info.uvoobar);
+      vl1l2_info.uvoo_bar);
 
    return;
 }
@@ -2549,25 +2549,25 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info,
       vl1l2_info.vacount);
 
    at.set_entry(r, c+1,  // UFABAR
-      vl1l2_info.ufabar);
+      vl1l2_info.ufa_bar);
 
    at.set_entry(r, c+2,  // VFABAR
-      vl1l2_info.vfabar);
+      vl1l2_info.vfa_bar);
 
    at.set_entry(r, c+3,  // UOABAR
-      vl1l2_info.uoabar);
+      vl1l2_info.uoa_bar);
 
    at.set_entry(r, c+4,  // VOABAR
-      vl1l2_info.voabar);
+      vl1l2_info.voa_bar);
 
    at.set_entry(r, c+5,  // UVFOABAR
-      vl1l2_info.uvfoabar);
+      vl1l2_info.uvfoa_bar);
 
    at.set_entry(r, c+6,  // UVFFABAR
-      vl1l2_info.uvffabar);
+      vl1l2_info.uvffa_bar);
 
    at.set_entry(r, c+7,  // UVOOABAR
-      vl1l2_info.uvooabar);
+      vl1l2_info.uvooa_bar);
    return;
 }
 

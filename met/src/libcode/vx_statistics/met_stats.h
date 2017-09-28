@@ -258,15 +258,41 @@ class VL1L2Info {
       SetLogic     logic;
 
       // VL1L2 Quantities
-      double ufbar, vfbar, uobar, vobar;
-      double uvfobar;
-      double uvffbar, uvoobar;
+      double uf_bar;
+      double vf_bar;
+      double uo_bar;
+      double vo_bar;
+
+      double uvfo_bar;
+      double uvff_bar;
+      double uvoo_bar;
+
+         //
+         //  extra VL1L2 quantities for NCEP
+         //
+
+      double f_bar;  //  fcst wind speed
+      double o_bar;  //   obs wind speed
+
+      double me;     //  mean error
+
+      double mse;    //  mean squared error
+
+      double rmse;   //  root mean squared error
+
+      double speed_bias;
+
       int    vcount;
 
       // VAL1L2 Quantities
-      double ufabar, vfabar, uoabar, voabar;
-      double uvfoabar;
-      double uvffabar, uvooabar;
+      double ufa_bar;
+      double vfa_bar;
+      double uoa_bar;
+      double voa_bar;
+      double uvfoa_bar;
+      double uvffa_bar;
+      double uvooa_bar;
+
       int    vacount;
 
       // Compute sums
