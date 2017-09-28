@@ -583,9 +583,10 @@ PlotInfo plot_info;
 
    zero_border_size = conf.lookup_int(conf_key_zero_border_size);
 
-      // Check that zero_border_size >= 1
+      // // Check that zero_border_size >= 1
+      // Check that zero_border_size >= 0
 
-   if(zero_border_size < 1) {
+   if(zero_border_size < 0) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "zero_border_size (" << zero_border_size
            << ") must be set >= 1.\n\n";

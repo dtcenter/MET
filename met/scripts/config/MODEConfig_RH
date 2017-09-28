@@ -206,7 +206,7 @@ object_plot = {
 // Number of grid boxes to fill with bad data values along the edge of the field
 // to avoid edge effects.
 //
-zero_border_size = 1;
+zero_border_size = 0;
 
 //
 // Boolean for plotting on the region of valid data within the domain
