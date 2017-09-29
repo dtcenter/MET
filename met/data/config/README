@@ -1913,14 +1913,6 @@ total_interest_thresh = 0.7;
 print_interest_thresh = 0.0;
 
 //
-// The MODE tool is not able to define objects that touch the edge of the grid.  After
-// the convolution step is performed the outer columns and rows of data are zeroed out
-// to enable MODE to identify objects.  The zero_border_size variable specifies how
-// many outer columns and rows of data are to be zeroed out.
-//
-zero_border_size = 1;
-
-//
 // When applied, the plot_valid_flag variable indicates that only the region containing
 // valid data after masking is applied should be plotted. TRUE indicates the entire domain
 // should be plotted; FALSE indicates only the region containing valid data after masking

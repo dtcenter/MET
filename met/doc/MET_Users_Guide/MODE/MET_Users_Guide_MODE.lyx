@@ -3009,36 +3009,6 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-zero_border_size = 1;
-\end_layout
-
-\begin_layout Standard
-The MODE tool is not able to define objects that touch the edge of the grid.
- After the convolution step is performed the outer columns and rows of data
- are zeroed out to enable MODE to identify objects.
- The 
-\series bold
-zero_border_size 
-\series default
-entry specifies how many outer columns and rows of data should be set to
- bad data.
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
 plot_valid_flag = FALSE;
 \end_layout
 
