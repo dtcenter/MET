@@ -13,11 +13,12 @@ $navigation_array_key = "navigation_array_key";
 
 function get_url_for_navigation($cur_page_arg, $direction) {
   global $navigation_array, $nav_search_list, $nav_replace_list;
+  $nav_key = trim(str_replace($nav_search_list, $nav_replace_list, $cur_page_arg));
   if (isset($direction) && $direction != "") {
-    $nav_key = trim(str_replace($nav_search_list, $nav_replace_list, $cur_page_arg)) . "." . $direction;
+    $nav_key = $nav_key . "." . $direction;
   }
-  else {
-    $nav_key = trim(str_replace($nav_search_list, $nav_replace_list, $cur_page_arg));
+  if ($local_debug) {
+    print '    nav_key: '. $nav_key . ' value: ' . $navigation_array[$nav_key];
   }
   return $navigation_array[$nav_key];
 }
