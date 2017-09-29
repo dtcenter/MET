@@ -1,9 +1,14 @@
 <?php
    # Set the page title here.
    $title = "MET FAQs";
-   include ($_SERVER['DOCUMENT_ROOT'] . "/includes/begin_dtc.php");
-
    $DOCUMENT_ROOT = $_SERVER['DOCUMENT_ROOT'];
+   include ($DOCUMENT_ROOT . "/includes/begin_dtc.php");
+   
+   $absolute_faq_URL = "/met/users/support/faqs/";
+   $faq_URL = $DOCUMENT_ROOT . $absolute_faq_URL;
+   include ($faq_URL . "includes/sub_navigation.php");
+   include ("$DOCUMENT_ROOT/met/users/includes/tutorial_style.html");
+
    if(!isset($_GET["name"])) {
       $tool_name = 'first_page';
       $include_URL = get_url_for_navigation($tool_name, '');
@@ -25,10 +30,6 @@
       $include_URL = "MET_FAQ_LINKS_MASTER.xhtml";
    }
    
-   $absolute_faq_URL = "/met/users/support/faqs/";
-   $faq_URL = $DOCUMENT_ROOT . $absolute_faq_URL;
-   include ($faq_URL . "includes/sub_navigation.php");
-   include ("$DOCUMENT_ROOT/met/users/includes/tutorial_style.html");
    
    $cur_page_arg = $tool_name;
    if ($sub_category) {
@@ -82,14 +83,14 @@
 </div><!-- end column_pagenav -->
 
 <div id="wrap_pagecontent"><!-- begin wrap_pagecontent -->
-   <div id="navigationdiv" style="position: relative; top: 3em;">
+   <div id="navigationdiv" style="position: relative; top: 4.4em;">
       <?php print $prev_next_buttons; ?>
    </div>
    <div id="column_pagecontent"><!-- begin column_pagecontent -->
       <div id="pagefeature"><!-- begin pagefeature -->
          <div id="headingdiv"><h1>MET FAQ</h1></div>
       </div><!-- end pagefeature -->
-      &nbsp;
+      <!-- &nbsp; -->
       <?php include "$include_URL"; ?>
    </div><!-- end column_pagecontent -->
    
