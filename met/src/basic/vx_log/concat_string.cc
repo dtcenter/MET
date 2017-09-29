@@ -914,7 +914,7 @@ char ConcatString::operator[](const int n) const
 
 if ( (n < 0) || (n >= Length) )  {
 
-   cerr << "\n\n  ConcatString::operator[](const int) const -> range check error\n\n";
+   mlog << Error << "\nConcatString::operator[](const int) const -> range check error\n\n";
 
    exit ( 1 );
 

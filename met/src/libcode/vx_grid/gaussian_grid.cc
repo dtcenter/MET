@@ -131,7 +131,8 @@ Ny = data.ny;
 
 if ( Ny%2 )  {
 
-   cerr << "\n\n  GaussianGrid::GaussianGrid(const GaussianData &) -> Ny must be even!\n\n";
+   mlog << Error << "\nGaussianGrid::GaussianGrid(const GaussianData &) -> "
+        << "Ny must be even!\n\n";
 
    exit ( 1 );
 
@@ -236,7 +237,8 @@ const int iy = nint(y);
 
 if ( (fabs(x - ix) >= int_check_tol) || (fabs(y - iy) >= int_check_tol) )  {
 
-   cerr << "\n\n  GaussianGrid::xy_to_latlon() const -> x and y must be integers\n";
+   mlog << Error << "\nGaussianGrid::xy_to_latlon() const -> "
+        << "x and y must be integers\n";
 
    exit ( 1 );
 
@@ -244,7 +246,8 @@ if ( (fabs(x - ix) >= int_check_tol) || (fabs(y - iy) >= int_check_tol) )  {
 
 if ( (iy < 0) || (iy >= Ny) )  {
 
-   cerr << "\n\n  GaussianGrid::xy_to_latlon() const -> range check error on y\n\n";
+   mlog << Error << "\nGaussianGrid::xy_to_latlon() const -> "
+        << "range check error on y\n\n";
 
    exit ( 1 );
 

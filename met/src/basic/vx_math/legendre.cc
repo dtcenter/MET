@@ -23,6 +23,7 @@ using namespace std;
 #include <cmath>
 
 #include "legendre.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -192,7 +193,8 @@ void Legendre::set_max_degree(int N)
 
 if ( N < lower_degree_limit )  {
 
-   cerr << "\n\n  Legendre::set_max_degree(int) -> max degree can't be less than "
+   mlog << Error << "\nLegendre::set_max_degree(int) -> "
+        << "max degree can't be less than "
         << lower_degree_limit << "\n\n";
 
    exit ( 1 );
