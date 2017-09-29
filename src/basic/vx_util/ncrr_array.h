@@ -217,7 +217,8 @@ T ** u = new T * [N];
 
 if ( !u )  {
 
-   cerr << "NCRR_Array<T>::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nNCRR_Array<T>::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -287,7 +288,8 @@ void NCRR_Array<T>::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   cerr << "NCRR_Array<T>::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "\nNCRR_Array<T>::set_alloc_int(int) -> "
+        << "bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -316,7 +318,8 @@ e[Nelements] = new T;
 
 if ( !(e[Nelements]) )  {
 
-   cerr << "NCRR_Array<T>::add(const T &) -> memory allocation error\n\n";
+   mlog << Error << "\nNCRR_Array<T>::add(const T &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -364,7 +367,8 @@ T & NCRR_Array<T>::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   cerr << "\n\n  NCRR_Array<T>::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\nNCRR_Array<T>::operator[](int) -> "
+        << "range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }

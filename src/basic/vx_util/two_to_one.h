@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <cmath>
 
+#include "vx_log.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -88,7 +90,8 @@ inline void TwoOne::one_to_two (const int _Nx, const int _Ny, const int _n, int 
 
 if ( !OT )  {
 
-   cerr << "\n\n  TwoOne::one_to_two() const -> no function set!\n\n";
+   mlog << Error << "\nTwoOne::one_to_two() const -> "
+        << "no function set!\n\n";
 
    exit ( 1 );
 
@@ -110,7 +113,8 @@ inline int TwoOne::two_to_one (const int _Nx, const int _Ny, const int _x, const
 
 if ( !TO )  {
 
-   cerr << "\n\n  TwoOne::two_to_one() const -> no function set!\n\n";
+   mlog << Error << "\nTwoOne::two_to_one() const -> "
+        << "no function set!\n\n";
 
    exit ( 1 );
 

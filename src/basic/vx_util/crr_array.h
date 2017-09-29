@@ -180,7 +180,8 @@ T * u = new T [N];
 
 if ( !u )  {
 
-   cerr << "CRR_Array::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nCRR_Array::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -268,7 +269,8 @@ void CRR_Array<T>::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   cerr << "CRR_Array::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "\nCRR_Array::set_alloc_int(int) -> "
+        << "bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -335,7 +337,8 @@ T & CRR_Array<T>::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   cerr << "\n\n  CRR_Array::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\nCRR_Array::operator[](int) -> "
+        << "range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }
