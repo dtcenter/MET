@@ -158,9 +158,6 @@ class ShapeData {
 
       void filter(SingleThresh);
 
-      void zero_border(int size);
-      void zero_border(int size, double value);
-
       void zero_field();
 
 };

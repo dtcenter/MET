@@ -284,13 +284,6 @@ void ModeFuzzyEngine::set_fcst(const ShapeData &fcst_wd) {
    need_fcst_clus_split = true;
    need_match           = true;
 
-   mlog << Debug(3) << "Applying zero border of width "
-        << conf_info.zero_border_size
-        << " to the forecast field.\n";
-
-   int k = conf_info.zero_border_size;
-   fcst_raw->zero_border(k, bad_data_double);
-
    do_fcst_convolution();
    do_fcst_thresholding();
    do_fcst_splitting();
@@ -310,13 +303,6 @@ void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
    need_obs_merge      = true;
    need_obs_clus_split = true;
    need_match          = true;
-
-   mlog << Debug(3) << "Applying zero border of width "
-        << conf_info.zero_border_size
-        << " to the observation field.\n";
-
-   int k = conf_info.zero_border_size;
-   obs_raw->zero_border(k, bad_data_double);
 
    do_obs_convolution();
    do_obs_thresholding();
@@ -342,13 +328,6 @@ void ModeFuzzyEngine::set_fcst_no_conv(const ShapeData &fcst_wd)
    need_fcst_clus_split = true;
    need_match           = true;
 
-   // mlog << Debug(3) << "Applying zero border of width "
-   //      << conf_info.zero_border_size
-   //      << " to the forecast field.\n";
-   //
-   // int k = conf_info.zero_border_size;
-   // fcst_raw->zero_border(k, bad_data_double);
-
    // do_fcst_convolution();
    do_fcst_thresholding();
    do_fcst_splitting();
@@ -370,13 +349,6 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
    need_obs_merge      = true;
    need_obs_clus_split = true;
    need_match          = true;
-
-   // mlog << Debug(3) << "Applying zero border of width "
-   //      << conf_info.zero_border_size
-   //      << " to the observation field.\n";
-   //
-   // int k = conf_info.zero_border_size;
-   // obs_raw->zero_border(k, bad_data_double);
 
    // do_obs_convolution();
    do_obs_thresholding();
@@ -418,8 +390,6 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    //
    if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.fcst_vld_thresh);
 
-   fcst_conv->zero_border(conf_info.zero_border_size, bad_data_double);
-
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
    need_fcst_split      = true;
@@ -450,8 +420,6 @@ void ModeFuzzyEngine::do_obs_convolution() {
    // Apply a circular convolution to the raw field
    //
    if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.obs_vld_thresh);
-
-   obs_conv->zero_border(conf_info.zero_border_size, bad_data_double);
 
    need_obs_conv       = false;
    need_obs_thresh     = true;

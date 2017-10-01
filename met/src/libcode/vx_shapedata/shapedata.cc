@@ -2195,60 +2195,6 @@ ShapeData select(const ShapeData &id, int n)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::zero_border(int size) {
-
-   zero_border(size, 0.0);
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void ShapeData::zero_border(int size, double value) {
-   int x, y;
-
-   // top
-
-   for (x=0; x<data.nx(); ++x) {
-      for (y=(data.ny() - size); y<data.ny(); ++y) {
-
-         data.set(value, x, y);
-      } // for y
-   } // for x
-
-   //  bottom
-
-   for (x=0; x<data.nx(); ++x) {
-      for (y=0; y<size; ++y) {
-
-         data.set(value, x, y);
-      } // for y
-   } // for x
-
-   //  left
-
-   for (x=0; x<size; ++x) {
-      for (y=0; y<data.ny(); ++y) {
-
-         data.set(value, x, y);
-      } // for y
-   } // for x
-
-   //  right
-
-   for (x=(data.nx() - size); x<data.nx(); ++x) {
-      for (y=0; y<data.ny(); ++y) {
-
-         data.set(value, x, y);
-      } // for y
-   } // for x
-
-   return;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 
 void ShapeData::filter(SingleThresh t) {
    int x, y;

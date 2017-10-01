@@ -192,8 +192,6 @@ class ModeConfInfo {
       PlotInfo         obs_raw_pi;             // Raw observation plotting info
       PlotInfo         object_pi;              // Object plotting info
 
-      int              zero_border_size;       // Zero out edge rows and columns for object definition
-
       bool             plot_valid_flag;        // Zoom up plot to the sub-region of valid data
       bool             plot_gcarc_flag;        // Plot lines as great-circle arcs
       bool             ps_plot_flag;           // Flag for the output PostScript image file
