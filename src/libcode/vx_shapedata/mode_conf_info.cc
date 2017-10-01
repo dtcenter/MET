@@ -155,8 +155,6 @@ void ModeConfInfo::clear()
 
    met_data_dir.clear();
 
-   zero_border_size = bad_data_int;
-
    plot_valid_flag = false;
    plot_gcarc_flag = false;
    ps_plot_flag    = false;
@@ -578,20 +576,6 @@ PlotInfo plot_info;
       // Conf: object_plot
 
    object_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_object_plot));
-
-      // Conf: zero_border_size
-
-   zero_border_size = conf.lookup_int(conf_key_zero_border_size);
-
-      // // Check that zero_border_size >= 1
-      // Check that zero_border_size >= 0
-
-   if(zero_border_size < 0) {
-      mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "zero_border_size (" << zero_border_size
-           << ") must be set >= 1.\n\n";
-      exit(1);
-   }
 
       // Conf: plot_valid_flag
 

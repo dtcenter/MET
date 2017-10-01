@@ -144,7 +144,6 @@ static const char print_interest_thresh_name  [] = "print_interest_thresh";
 //
 // Standard names for misc items
 //
-static const char zero_border_size_name       [] = "zero_border_size";
 static const char raw_color_table_name        [] = "raw_color_table";
 static const char mode_color_table_name       [] = "mode_color_table";
 static const char ncep_defaults_name          [] = "ncep_defaults";
