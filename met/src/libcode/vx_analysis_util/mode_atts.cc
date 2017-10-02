@@ -196,12 +196,6 @@ area_min                   = 0;
 area_max_set               = 0;
 area_max                   = 0;
 
-area_filter_min_set        = 0;
-area_filter_min            = 0;
-
-area_filter_max_set        = 0;
-area_filter_max            = 0;
-
 area_thresh_min_set        = 0;
 area_thresh_min            = 0;
 
@@ -499,12 +493,6 @@ area_min                   = A.area_min;
 
 area_max_set               = A.area_max_set;
 area_max                   = A.area_max;
-
-area_filter_min_set        = A.area_filter_min_set;
-area_filter_min            = A.area_filter_min;
-
-area_filter_max_set        = A.area_filter_max_set;
-area_filter_max            = A.area_filter_max;
 
 area_thresh_min_set        = A.area_thresh_min_set;
 area_thresh_min            = A.area_thresh_min;
@@ -1074,9 +1062,6 @@ if ( obs_rad.n_elements() > 0 )  {
 if ( area_min_set )  out << prefix << "area_min = " << area_min << "\n";
 if ( area_max_set )  out << prefix << "area_max = " << area_max << "\n";
 
-if ( area_filter_min_set )  out << prefix << "area_filter_min = " << area_filter_min << "\n";
-if ( area_filter_max_set )  out << prefix << "area_filter_max = " << area_filter_max << "\n";
-
 if ( area_thresh_min_set )  out << prefix << "area_thresh_min = " << area_thresh_min << "\n";
 if ( area_thresh_max_set )  out << prefix << "area_thresh_max = " << area_thresh_max << "\n";
 
@@ -1486,16 +1471,6 @@ if ( area_min_set || area_max_set )  {
    if ( !is_bad_data( i ) && area_min_set && (i < area_min) )   return ( 0 );
 
    if ( !is_bad_data( i ) && area_max_set && (i > area_max) )   return ( 0 );
-
-}
-
-if ( area_filter_min_set || area_filter_max_set )  {
-
-   i = L.area_filter();
-
-   if ( !is_bad_data( i ) && area_filter_min_set && (i < area_filter_min) )   return ( 0 );
-
-   if ( !is_bad_data( i ) && area_filter_max_set && (i > area_filter_max) )   return ( 0 );
 
 }
 
@@ -1912,8 +1887,6 @@ while ( j < (a.n_elements()) )  {
 
    else if ( strcmp(c, "-area_min"             ) == 0 )  { set_area_min             (atoi(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-area_max"             ) == 0 )  { set_area_max             (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-area_filter_min"      ) == 0 )  { set_area_filter_min      (atoi(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-area_filter_max"      ) == 0 )  { set_area_filter_max      (atoi(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-area_thresh_min"      ) == 0 )  { set_area_thresh_min      (atoi(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-area_thresh_max"      ) == 0 )  { set_area_thresh_max      (atoi(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-intersection_area_min") == 0 )  { set_intersection_area_min(atoi(a[j + 1]));  a.shift_down(j, 2); }
@@ -2188,9 +2161,6 @@ for (j=0; j<(m.obs_rad.n_elements()); ++j)  {
 
 if ( m.area_min_set )               set_area_min(m.area_min);
 if ( m.area_max_set )               set_area_max(m.area_max);
-
-if ( m.area_filter_min_set )        set_area_filter_min(m.area_filter_min);
-if ( m.area_filter_max_set )        set_area_filter_max(m.area_filter_max);
 
 if ( m.area_thresh_min_set )        set_area_thresh_min(m.area_thresh_min);
 if ( m.area_thresh_max_set )        set_area_thresh_max(m.area_thresh_max);
@@ -2742,38 +2712,6 @@ void ModeAttributes::set_area_max(int i)
 area_max_set = 1;
 
 area_max = i;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ModeAttributes::set_area_filter_min(int i)
-
-{
-
-area_filter_min_set = 1;
-
-area_filter_min = i;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ModeAttributes::set_area_filter_max(int i)
-
-{
-
-area_filter_max_set = 1;
-
-area_filter_max = i;
 
 return;
 
@@ -4028,8 +3966,6 @@ s << "\n"
   << "\n";
 s << "   -area_min              value\n";
 s << "   -area_max              value\n\n";
-s << "   -area_filter_min       value\n";
-s << "   -area_filter_max       value\n\n";
 s << "   -area_thresh_min       value\n";
 s << "   -area_thresh_max       value\n\n";
 s << "   -intersection_area_min value\n";

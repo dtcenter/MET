@@ -63,81 +63,80 @@ class ModeLine : public DataLine {
       const char * get_item (const char *, bool check_na = true) const;
       const char * get_item (int,          bool check_na = true) const;
 
-      const char * version                    () const;   //  column  1
-      const char * model                      () const;   //  column  2
-      const char * desc                       () const;   //  column  3
+      const char * version                    () const;
+      const char * model                      () const;
+      const char * desc                       () const;
 
-      int          fcst_lead                  () const;   //  column  4
-      unixtime     fcst_valid                 () const;   //  column  5
+      int          fcst_lead                  () const;
+      unixtime     fcst_valid                 () const;
       int          fcst_valid_hour            () const;   //  valid%sec_per_day
       unixtime     fcst_init                  () const;   //  Compute as valid - lead
       int          fcst_init_hour             () const;   //  HHMMSS portion of init time
-      int          fcst_accum                 () const;   //  column  6
+      int          fcst_accum                 () const;
 
-      int          obs_lead                   () const;   //  column  7
-      unixtime     obs_valid                  () const;   //  column  8
+      int          obs_lead                   () const;
+      unixtime     obs_valid                  () const;
       int          obs_valid_hour             () const;   //  valid%sec_per_day
       unixtime     obs_init                   () const;   //  Compute as valid - lead
       int          obs_init_hour              () const;   //  HHMMSS portion of init time
-      int          obs_accum                  () const;   //  column  9
+      int          obs_accum                  () const;
 
-      int          fcst_rad                   () const;   //  column 10
-      const char * fcst_thr                   () const;   //  column 11
-      int          obs_rad                    () const;   //  column 12
-      const char * obs_thr                    () const;   //  column 13
+      int          fcst_rad                   () const;
+      const char * fcst_thr                   () const;
+      int          obs_rad                    () const;
+      const char * obs_thr                    () const;
 
-      const char * fcst_var                   () const;   //  column 14
-      const char * fcst_lev                   () const;   //  column 15
-      const char * obs_var                    () const;   //  column 16
-      const char * obs_lev                    () const;   //  column 17
+      const char * fcst_var                   () const;
+      const char * fcst_lev                   () const;
+      const char * obs_var                    () const;
+      const char * obs_lev                    () const;
 
-      const char * object_id                  () const;   //  column 18
-      const char * object_cat                 () const;   //  column 19
+      const char * object_id                  () const;
+      const char * object_cat                 () const;
 
-      double       centroid_x                 () const;   //  column 20
-      double       centroid_y                 () const;   //  column 21
-      double       centroid_lat               () const;   //  column 22
-      double       centroid_lon               () const;   //  column 23
+      double       centroid_x                 () const;
+      double       centroid_y                 () const;
+      double       centroid_lat               () const;
+      double       centroid_lon               () const;
 
-      double       axis_ang                   () const;   //  column 24
+      double       axis_ang                   () const;
 
-      double       length                     () const;   //  column 25
-      double       width                      () const;   //  column 26
+      double       length                     () const;
+      double       width                      () const;
       double       aspect_ratio               () const;   //  Compute as width/length
 
-      int          area                       () const;   //  column 27
-      int          area_filter                () const;   //  column 28
-      int          area_thresh                () const;   //  column 29
+      int          area                       () const;
+      int          area_thresh                () const;
 
-      double       curvature                  () const;   //  column 30
-      double       curvature_x                () const;   //  column 31
-      double       curvature_y                () const;   //  column 32
+      double       curvature                  () const;
+      double       curvature_x                () const;
+      double       curvature_y                () const;
 
-      double       complexity                 () const;   //  column 33
+      double       complexity                 () const;
 
-      double       intensity_10               () const;   //  column 34
-      double       intensity_25               () const;   //  column 35
-      double       intensity_50               () const;   //  column 36
-      double       intensity_75               () const;   //  column 37
-      double       intensity_90               () const;   //  column 38
-      double       intensity_user             () const;   //  column 39
+      double       intensity_10               () const;
+      double       intensity_25               () const;
+      double       intensity_50               () const;
+      double       intensity_75               () const;
+      double       intensity_90               () const;
+      double       intensity_user             () const;
 
-      double       intensity_sum              () const;   //  column 40
-      double       centroid_dist              () const;   //  column 41
-      double       boundary_dist              () const;   //  column 42
-      double       convex_hull_dist           () const;   //  column 43
-      double       angle_diff                 () const;   //  column 44
+      double       intensity_sum              () const;
+      double       centroid_dist              () const;
+      double       boundary_dist              () const;
+      double       convex_hull_dist           () const;
+      double       angle_diff                 () const;
 
-      double       area_ratio                 () const;   //  column 45
-      int          intersection_area          () const;   //  column 46
-      int          union_area                 () const;   //  column 47
-      int          symmetric_diff             () const;   //  column 48
-      double       intersection_over_area     () const;   //  column 49
+      double       area_ratio                 () const;
+      int          intersection_area          () const;
+      int          union_area                 () const;
+      int          symmetric_diff             () const;
+      double       intersection_over_area     () const;
 
-      double       complexity_ratio           () const;   //  column 50
-      double       percentile_intensity_ratio () const;   //  column 51
+      double       complexity_ratio           () const;
+      double       percentile_intensity_ratio () const;
 
-      double       interest                   () const;   //  column 52
+      double       interest                   () const;
 
          //
          //

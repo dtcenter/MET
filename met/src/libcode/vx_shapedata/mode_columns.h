@@ -53,34 +53,33 @@ static const char * mode_obj_columns [] = {
    "LENGTH",                     //  25
    "WIDTH",                      //  26
    "AREA",                       //  27
-   "AREA_FILTER",                //  28
-   "AREA_THRESH",                //  29
-   "CURVATURE",                  //  30
-   "CURVATURE_X",                //  31
-   "CURVATURE_Y",                //  32
-   "COMPLEXITY",                 //  33
-   "INTENSITY_10",               //  34
-   "INTENSITY_25",               //  35
-   "INTENSITY_50",               //  36
-   "INTENSITY_75",               //  37
-   "INTENSITY_90",               //  38
-   "INTENSITY_USER",             //  39
-   "INTENSITY_SUM",              //  40
-   "CENTROID_DIST",              //  41
-   "BOUNDARY_DIST",              //  42
-   "CONVEX_HULL_DIST",           //  43
-   "ANGLE_DIFF",                 //  44
-   "AREA_RATIO",                 //  45
-   "INTERSECTION_AREA",          //  46
-   "UNION_AREA",                 //  47
-   "SYMMETRIC_DIFF",             //  48
-   "INTERSECTION_OVER_AREA",     //  49
-   "COMPLEXITY_RATIO",           //  50
-   "PERCENTILE_INTENSITY_RATIO", //  51
-   "INTEREST"                    //  52
+   "AREA_THRESH",                //  28
+   "CURVATURE",                  //  29
+   "CURVATURE_X",                //  30
+   "CURVATURE_Y",                //  31
+   "COMPLEXITY",                 //  32
+   "INTENSITY_10",               //  33
+   "INTENSITY_25",               //  34
+   "INTENSITY_50",               //  35
+   "INTENSITY_75",               //  36
+   "INTENSITY_90",               //  37
+   "INTENSITY_USER",             //  38
+   "INTENSITY_SUM",              //  39
+   "CENTROID_DIST",              //  40
+   "BOUNDARY_DIST",              //  41
+   "CONVEX_HULL_DIST",           //  42
+   "ANGLE_DIFF",                 //  43
+   "AREA_RATIO",                 //  44
+   "INTERSECTION_AREA",          //  45
+   "UNION_AREA",                 //  46
+   "SYMMETRIC_DIFF",             //  47
+   "INTERSECTION_OVER_AREA",     //  48
+   "COMPLEXITY_RATIO",           //  49
+   "PERCENTILE_INTENSITY_RATIO", //  50
+   "INTEREST"                    //  51
 };
 
-static const int n_mode_single_columns = 21; // CENTROID_X thru INTENSITY_SUM
+static const int n_mode_single_columns = 20; // CENTROID_X thru INTENSITY_SUM
 static const int n_mode_pair_columns   = 12; // CENTROID_DIST thru INTEREST
 
 static const char * mode_cts_columns [] = {

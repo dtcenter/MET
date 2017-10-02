@@ -2801,10 +2801,6 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    at.set_entry(row, c++,
                 nint(eng.fcst_single[n].area));
 
-   // Area in the raw field that is non-zero
-   at.set_entry(row, c++,
-                nint(eng.fcst_single[n].area_filter));
-
    // Area in the raw field that meets the threshold criteria
    at.set_entry(row, c++,
                 nint(eng.fcst_single[n].area_thresh));
@@ -2921,10 +2917,6 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    // Area of object
    at.set_entry(row, c++,
                 nint(eng.obs_single[n].area));
-
-   // Area in the raw field that is non-zero
-   at.set_entry(row, c++,
-                nint(eng.obs_single[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
    at.set_entry(row, c++,
@@ -3132,10 +3124,6 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    at.set_entry(row, c++,
                 nint(eng.fcst_cluster[n].area));
 
-   // Area in the raw field that is non-zero
-   at.set_entry(row, c++,
-                nint(eng.fcst_cluster[n].area_filter));
-
    // Area in the raw field that meets the threshold criteria
    at.set_entry(row, c++,
                 nint(eng.fcst_cluster[n].area_thresh));
@@ -3243,10 +3231,6 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    // Area of object
    at.set_entry(row, c++,
                 nint(eng.obs_cluster[n].area));
-
-   // Area in the raw field that is non-zero
-   at.set_entry(row, c++,
-                nint(eng.obs_cluster[n].area_filter));
 
    // Area in the raw field that meets the threshold criteria
    at.set_entry(row, c++,

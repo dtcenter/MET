@@ -112,7 +112,6 @@ void SingleFeature::clear()
    width               = 0.0;
    aspect_ratio        = 1.0;
    area                = 0.0;
-   area_filter         = 0.0;
    area_thresh         = 0.0;
    curvature           = 0.0;
    curvature_x         = 0.0;
@@ -159,7 +158,6 @@ void SingleFeature::assign(const SingleFeature & s)
    width               = s.width;
    aspect_ratio        = s.aspect_ratio;
    area                = s.area;
-   area_filter         = s.area_filter;
    area_thresh         = s.area_thresh;
    curvature           = s.curvature;
    curvature_x         = s.curvature_x;
@@ -231,12 +229,6 @@ void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
    // Object area
    //
    area = Mask->area();
-
-   //
-   // Object filtered area: the area of the raw field inside the mask
-   // area that is non-zero
-   //
-   area_filter = (double) ShapeData_intersection(*Raw, *Mask);
 
    //
    // Object threshold area: the area of the raw field inside the mask
@@ -535,7 +527,6 @@ ostream & operator<<(ostream & out, const SingleFeature & s)
    out << "Width                  = "  << (s.width)           << "\n";
    out << "Aspect Ratio           = "  << (s.aspect_ratio)    << "\n";
    out << "Area                   = "  << nint(s.area)        << "\n";
-   out << "Area Filter            = "  << nint(s.area_filter) << "\n";
    out << "Area Thresh            = "  << nint(s.area_thresh) << "\n";
    out << "Curvature              = "  << (s.aspect_ratio)    << "\n";
    out << "Center of Curvature    = (" << (s.curvature_x)     << ", "

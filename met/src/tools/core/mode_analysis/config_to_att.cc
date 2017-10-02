@@ -146,12 +146,6 @@ if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_min, error_out)) )
 if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_max, error_out)) )
    atts.set_area_max(v_int);
 
-if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_filter_min, error_out)) )
-   atts.set_area_filter_min(v_int);
-
-if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_filter_max, error_out)) )
-   atts.set_area_filter_max(v_int);
-
 if ( !is_bad_data(v_int = config.lookup_int(conf_key_area_thresh_min, error_out)) )
    atts.set_area_thresh_min(v_int);
 
