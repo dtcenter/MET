@@ -162,6 +162,12 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          status = false;
       }
 
+      // Apply shift to the right
+      if(ShiftRight != 0) plane.shift_right(ShiftRight);
+
+      // Apply censor thresholds
+      plane.censor(vinfo.censor_thresh(), vinfo.censor_val());
+
       // Set the VarInfo object's name, long_name, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
       else                                 vinfo.set_name(info->name);
@@ -228,9 +234,6 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
       status = PinterpNc->data(vinfo_nc->req_name(),
                                cur_dim, cur_plane, pressure, info);
 
-      // Add current plane to the data plane array
-      plane_array.add(cur_plane, pressure, pressure);
-
       // Check that the times match those requested
       if(status) {
 
@@ -255,10 +258,22 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
                  << sec_to_hhmmss(vinfo.lead()) << ")\n\n";
             status = false;
          }
+
+         // Apply shift to the right
+         if(ShiftRight != 0) cur_plane.shift_right(ShiftRight);
+
+         // Apply censor thresholds
+         cur_plane.censor(vinfo.censor_thresh(), vinfo.censor_val());
+
+         // Add current plane to the data plane array
+         plane_array.add(cur_plane, pressure, pressure);
       }
 
       // Check for bad status
       if(!status) return(0);
+
+      // Add current plane to the data plane array
+      plane_array.add(cur_plane, pressure, pressure);
 
       // Set the VarInfo object's name, long_name, and units strings
       if(i==0) {
