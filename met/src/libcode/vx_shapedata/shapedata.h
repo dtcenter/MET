@@ -85,7 +85,7 @@ class ShapeData {
       DataPlane data;        // stores the data
 
          //
-         //  expand and shrink the data 
+         //  expand and shrink the data
          //
          //    useful for the split operation
          //
@@ -109,7 +109,7 @@ class ShapeData {
          //  check if a point or it's neighbors are non-zero
          //
 
-      bool s_is_on(int, int) const;
+      bool s_is_on(int, int, bool error_out = true) const;
       bool f_is_on(int, int) const;
 
       bool is_valid_xy (int x, int y) const;
