@@ -161,9 +161,15 @@ int ShapeData::x_right(int y) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool ShapeData::s_is_on(int x, int y) const
+bool ShapeData::s_is_on(int x, int y, bool error_out) const
 
 {
+
+   // Unless error out is true, return bad status for being off the grid
+
+   if(!error_out) {
+      if(x < 0 || x >= data.nx() || y < 0 || y >= data.ny()) return ( false );
+   }
 
    // Check if the current point is non-zero
 
@@ -1346,7 +1352,7 @@ void Partition::clear()
 
 int j;
 
-if ( c )  { 
+if ( c )  {
 
    for (j=0; j<n_alloc; ++j)  {
 
@@ -1481,7 +1487,7 @@ int j_min, j_max;
 
 if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
 
-   mlog << Error 
+   mlog << Error
         << "\nPartition::merge_cells() -> "
         << "range check error\n\n";
 
@@ -1542,7 +1548,7 @@ j_2 = which_cell(v2);
 
 if ( (j_1 < 0) || (j_2 < 0) ) {
 
-   mlog << Error 
+   mlog << Error
         << "\nvoid Partition::merge_values() -> "
         << "bad values: (v1, v2) = (" << v1 << ", " << v2
         << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
@@ -1618,37 +1624,37 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
    switch(direction) {
 
       case(plus_x):
-         if(sd.s_is_on(xn, yn-1)  ) lr = true;
-         if(sd.s_is_on(xn+1, yn-1)) ur = true;
-         if(sd.s_is_on(xn+1, yn)  ) ul = true;
-         if(sd.s_is_on(xn, yn)    ) ll = true;
+         if(sd.s_is_on(xn,   yn-1, false)) lr = true;
+         if(sd.s_is_on(xn+1, yn-1, false)) ur = true;
+         if(sd.s_is_on(xn+1, yn  , false)) ul = true;
+         if(sd.s_is_on(xn,   yn  , false)) ll = true;
 
          xn += 1;
          break;
 
       case(plus_y):
-         if(sd.s_is_on(xn, yn)    ) lr = true;
-         if(sd.s_is_on(xn, yn+1)  ) ur = true;
-         if(sd.s_is_on(xn-1, yn+1)) ul = true;
-         if(sd.s_is_on(xn-1, yn)  ) ll = true;
+         if(sd.s_is_on(xn,   yn  , false)) lr = true;
+         if(sd.s_is_on(xn,   yn+1, false)) ur = true;
+         if(sd.s_is_on(xn-1, yn+1, false)) ul = true;
+         if(sd.s_is_on(xn-1, yn  , false)) ll = true;
 
          yn += 1;
          break;
 
       case(minus_x):
-         if(sd.s_is_on(xn-1, yn)  ) lr = true;
-         if(sd.s_is_on(xn-2, yn)  ) ur = true;
-         if(sd.s_is_on(xn-2, yn-1)) ul = true;
-         if(sd.s_is_on(xn-1, yn-1)) ll = true;
+         if(sd.s_is_on(xn-1, yn  , false)) lr = true;
+         if(sd.s_is_on(xn-2, yn  , false)) ur = true;
+         if(sd.s_is_on(xn-2, yn-1, false)) ul = true;
+         if(sd.s_is_on(xn-1, yn-1, false)) ll = true;
 
          xn -= 1;
          break;
 
       case(minus_y):
-         if(sd.s_is_on(xn-1, yn-1)) lr = true;
-         if(sd.s_is_on(xn-1, yn-2)) ur = true;
-         if(sd.s_is_on(xn, yn-2)  ) ul = true;
-         if(sd.s_is_on(xn, yn-1)  ) ll = true;
+         if(sd.s_is_on(xn-1, yn-1, false)) lr = true;
+         if(sd.s_is_on(xn-1, yn-2, false)) ur = true;
+         if(sd.s_is_on(xn,   yn-2, false)) ul = true;
+         if(sd.s_is_on(xn,   yn-1, false)) ll = true;
 
          yn -= 1;
          break;
@@ -1784,7 +1790,7 @@ int ShapeData::n_objects() const
 
    // Split the field to number the shapes
    sd = split(*this, n);
-   
+
    return(n);
 }
 
