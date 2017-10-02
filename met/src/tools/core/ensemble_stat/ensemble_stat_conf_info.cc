@@ -50,14 +50,8 @@ void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
    ens_info    = (VarInfo **)           0;
-   ecsr_ta     = (ThreshArray *)        0;
-   ecsr_na     = (NumArray *)           0;
    ens_ta      = (ThreshArray *)        0;
    vx_pd       = (VxPairDataEnsemble *) 0;
-   fcsr_ta     = (ThreshArray *)        0;
-   ocsr_ta     = (ThreshArray *)        0;
-   fcsr_na     = (NumArray *)           0;
-   ocsr_na     = (NumArray *)           0;
    msg_typ     = (StringArray *)        0;
    sid_exc     = (StringArray *)        0;
    obs_qty     = (StringArray *)        0;
@@ -111,14 +105,8 @@ void EnsembleStatConfInfo::clear() {
 
    // Deallocate memory
    if(ens_info)    { delete [] ens_info;    ens_info    = (VarInfo **)           0; }
-   if(ecsr_ta)     { delete [] ecsr_ta;     ecsr_ta     = (ThreshArray *)        0; }
-   if(ecsr_na)     { delete [] ecsr_na;     ecsr_na     = (NumArray *)           0; }
    if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)        0; }
    if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataEnsemble *) 0; }
-   if(fcsr_ta)     { delete [] fcsr_ta;     fcsr_ta     = (ThreshArray *)        0; }
-   if(ocsr_ta)     { delete [] ocsr_ta;     ocsr_ta     = (ThreshArray *)        0; }
-   if(fcsr_na)     { delete [] fcsr_na;     fcsr_na     = (NumArray *)           0; }
-   if(ocsr_na)     { delete [] ocsr_na;     ocsr_na     = (NumArray *)           0; }
    if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
    if(sid_exc)     { delete [] sid_exc;     sid_exc     = (StringArray *)        0; }
    if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)        0; }
@@ -231,8 +219,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Allocate space based on the number of ensemble fields
    if(n_ens_var > 0) {
       ens_info = new VarInfo *   [n_ens_var];
-      ecsr_ta  = new ThreshArray [n_ens_var];
-      ecsr_na  = new NumArray    [n_ens_var];
       ens_ta   = new ThreshArray [n_ens_var];
    }
 
@@ -257,12 +243,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
               << "Parsed ensemble field number " << i+1 << ":\n";
          ens_info[i]->dump(cout);
       }
-
-      // Conf: censor_thresh
-      ecsr_ta[i] = i_edict.lookup_thresh_array(conf_key_censor_thresh);
-
-      // Conf: censor_val
-      ecsr_na[i] = i_edict.lookup_num_array(conf_key_censor_val);
 
       // Only parse thresholds if relative frequencies are requested
       if(ensemble_flag[i_nc_freq]) {
@@ -339,10 +319,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Allocate space based on the number of verification tasks
       vx_pd   = new VxPairDataEnsemble [n_vx];
-      fcsr_ta = new ThreshArray        [n_vx];
-      fcsr_na = new NumArray           [n_vx];
-      ocsr_ta = new ThreshArray       [n_vx];
-      ocsr_na = new NumArray           [n_vx];
       msg_typ = new StringArray        [n_vx];
       sid_exc = new StringArray        [n_vx];
       obs_qty = new StringArray        [n_vx];
@@ -361,14 +337,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          // Get the current dictionaries
          i_fdict = parse_conf_i_vx_dict(fcst_dict, i);
          i_odict = parse_conf_i_vx_dict(obs_dict,  i);
-
-         // Conf: censor_thresh
-         fcsr_ta[i] = i_fdict.lookup_thresh_array(conf_key_censor_thresh);
-         ocsr_ta[i] = i_odict.lookup_thresh_array(conf_key_censor_thresh);
-
-         // Conf: censor_val
-         fcsr_na[i] = i_fdict.lookup_num_array(conf_key_censor_val);
-         ocsr_na[i] = i_odict.lookup_num_array(conf_key_censor_val);
 
          // Conf: desc
          vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));

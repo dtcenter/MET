@@ -111,12 +111,6 @@ class ModeConfInfo {
 
       bool             quilt;                  //  default: false
 
-      ThreshArray      fcst_csr_thresh_array;  // List of censoring thresholds
-      ThreshArray       obs_csr_thresh_array;  // to be applied
-
-      NumArray         fcst_csr_num_array;     // Reset censored grid points to
-      NumArray          obs_csr_num_array;     // these values
-
       IntArray         fcst_conv_radius_array; // list of convolution radii in grid squares
       IntArray          obs_conv_radius_array;
 

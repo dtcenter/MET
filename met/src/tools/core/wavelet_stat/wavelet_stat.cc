@@ -34,7 +34,6 @@
 //                    from the config file to the output files.
 //   010    02/25/15  Halley Gotway  Add automated regridding.
 //   011    05/15/17  Prestopnik P.  Add shape to regrid options.
-//   012    09/26/17  Halley Gotway  Add censor_thresh.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -269,17 +268,6 @@ void process_scores() {
          continue;
       }
 
-      // Apply censor thresholds
-      for(j=0; j<conf_info.fcsr_ta[i].n_elements(); j++) {
-         mlog << Debug(3)
-              << "Applying forecast censor threshold \""
-              << conf_info.fcsr_ta[i][j].get_str()
-              << "\" and replacing with a value of "
-              << conf_info.fcsr_na[i][j] << ".\n";
-         fcst_dp.replace(conf_info.fcsr_ta[i][j],
-                         conf_info.fcsr_na[i][j]);
-      }
-
       // Regrid, if necessary
       if(!(fcst_mtddf->grid() == grid)) {
          mlog << Debug(1)
@@ -304,17 +292,6 @@ void process_scores() {
               << conf_info.obs_info[i]->magic_str()
               << " not found in file: " << obs_file << "\n\n";
          continue;
-      }
-
-      // Apply censor thresholds
-      for(j=0; j<conf_info.ocsr_ta[i].n_elements(); j++) {
-         mlog << Debug(3)
-              << "Applying observation censor threshold \""
-              << conf_info.ocsr_ta[i][j].get_str()
-              << "\" and replacing with a value of "
-              << conf_info.ocsr_na[i][j] << ".\n";
-         obs_dp.replace(conf_info.ocsr_ta[i][j],
-                        conf_info.ocsr_na[i][j]);
       }
 
       // Regrid, if necessary

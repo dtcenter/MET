@@ -64,10 +64,6 @@ void SeriesAnalysisConfInfo::clear() {
    desc.clear();
    obtype.clear();
    regrid_info.clear();
-   fcsr_ta.clear();
-   ocsr_ta.clear();
-   fcsr_na.clear();
-   ocsr_na.clear();
    fcat_ta.clear();
    ocat_ta.clear();
    fcnt_ta.clear();
@@ -308,24 +304,6 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
        output_stats[stat_pjc].n_elements()  +
        output_stats[stat_prc].n_elements()) > 0) {
 
-      // Conf: censor_thresh
-      fcsr_ta = fdict->lookup_thresh_array(conf_key_censor_thresh);
-      ocsr_ta = odict->lookup_thresh_array(conf_key_censor_thresh);
-
-      // Conf: censor_val
-      fcsr_na = fdict->lookup_num_array(conf_key_censor_val);
-      ocsr_na = odict->lookup_num_array(conf_key_censor_val);
-
-      mlog << Debug(5)
-           << "Parsed forecast censor thresholds: "
-           << fcsr_ta.get_str() << "\n"
-           << "Parsed forecast censor replacement values: "
-           << fcsr_na.serialize() << "\n"
-           << "Parsed observed censor thresholds: "
-           << ocsr_ta.get_str() << "\n"
-           << "Parsed observed censor replacement values: "
-           << ocsr_na.serialize() << "\n";
-
       // Conf: fcst.cat_thresh
       fcat_ta = fdict->lookup_thresh_array(conf_key_cat_thresh);
 
@@ -341,18 +319,6 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       // Verifying a probability field
       if(fcst_info[0]->is_prob()) {
          fcat_ta = string_to_prob_thresh(fcat_ta.get_str());
-      }
-
-      // Check for equal length of censor thresholds and values
-      if(fcsr_ta.n_elements() != fcsr_na.n_elements() ||
-         ocsr_ta.n_elements() != ocsr_na.n_elements()) {
-
-         mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
-              << "The number of censor thresholds in \""
-              << conf_key_censor_thresh
-              << "\" must match the number of replacement values in \""
-              << conf_key_censor_val << "\".\n\n";
-         exit(1);
       }
 
       // Verifying non-probability fields

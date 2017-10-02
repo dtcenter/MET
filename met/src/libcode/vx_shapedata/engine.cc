@@ -1275,12 +1275,6 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
    //
    // Copy over the forecast threshold values
    //
-   fcst_engine->conf_info.fcst_csr_thresh_array  = conf_info.fcst_csr_thresh_array;
-   fcst_engine->conf_info.obs_csr_thresh_array   = conf_info.fcst_csr_thresh_array;
-
-   fcst_engine->conf_info.fcst_csr_num_array     = conf_info.fcst_csr_num_array;
-   fcst_engine->conf_info.obs_csr_num_array      = conf_info.fcst_csr_num_array;
-
    fcst_engine->conf_info.fcst_conv_thresh       = conf_info.fcst_conv_thresh;
    fcst_engine->conf_info.obs_conv_thresh        = conf_info.fcst_conv_thresh;
 
@@ -1441,12 +1435,6 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    //
    // Copy over the observation threshold values
    //
-   obs_engine->conf_info.fcst_csr_thresh_array  = conf_info.obs_csr_thresh_array;
-   obs_engine->conf_info.obs_csr_thresh_array   = conf_info.obs_csr_thresh_array;
-
-   obs_engine->conf_info.fcst_csr_num_array     = conf_info.obs_csr_num_array;
-   obs_engine->conf_info.obs_csr_num_array      = conf_info.obs_csr_num_array;
-
    obs_engine->conf_info.fcst_conv_thresh       = conf_info.obs_conv_thresh;
    obs_engine->conf_info.obs_conv_thresh        = conf_info.obs_conv_thresh;
 

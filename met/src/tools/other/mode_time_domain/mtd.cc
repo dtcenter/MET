@@ -215,11 +215,9 @@ MM_Engine engine;
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw,
-              config.fcst_csr_thresh_array, config.fcst_csr_num_array);
+mtd_read_data(config, *(config.fcst_info), fcst_filenames, fcst_raw);
 
-mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw,
-              config.obs_csr_thresh_array, config.obs_csr_num_array);
+mtd_read_data(config, *(config.obs_info),   obs_filenames,  obs_raw);
 
 if ( fcst_raw.nt() != obs_raw.nt() )  {
 
@@ -1107,8 +1105,7 @@ ConcatString path;
    //  read the data files
    //
 
-mtd_read_data(config, *(config.fcst_info), single_filenames, raw,
-              config.fcst_csr_thresh_array, config.fcst_csr_num_array);
+mtd_read_data(config, *(config.fcst_info), single_filenames, raw);
 
 config.delta_t_seconds = raw.delta_t();
 
