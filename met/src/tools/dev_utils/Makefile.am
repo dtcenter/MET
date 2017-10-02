@@ -46,8 +46,9 @@ pbtime_SOURCES = pbtime.cc \
 pbtime_CPPFLAGS = ${MET_CPPFLAGS}
 pbtime_LDFLAGS = ${MET_LDFLAGS}
 pbtime_LDADD = -lvx_pb_util \
-	-lvx_cal \
 	-lvx_util \
+	-lvx_config \
+	-lvx_cal \
 	-lvx_log \
 	-lbufr \
 	$(FLIBS)
@@ -58,8 +59,9 @@ gribtab_dat_to_flat_SOURCES = gribtab.dat_to_flat.cc \
 gribtab_dat_to_flat_CPPFLAGS = ${MET_CPPFLAGS}
 gribtab_dat_to_flat_LDFLAGS = ${MET_LDFLAGS}
 gribtab_dat_to_flat_LDADD = -lvx_pb_util \
-	-lvx_cal \
 	-lvx_util \
+	-lvx_config \
+	-lvx_cal \
 	-lvx_log \
 	-lbufr \
 	$(FLIBS)
@@ -70,8 +72,9 @@ nceptab_to_flat_SOURCES = nceptab_to_flat.cc \
 nceptab_to_flat_CPPFLAGS = ${MET_CPPFLAGS}
 nceptab_to_flat_LDFLAGS = ${MET_LDFLAGS}
 nceptab_to_flat_LDADD = -lvx_pb_util \
-	-lvx_cal \
 	-lvx_util \
+	-lvx_config \
+	-lvx_cal \
 	-lvx_log \
 	-lbufr \
 	$(FLIBS)
@@ -82,8 +85,9 @@ insitu_nc_to_ascii_CPPFLAGS = ${MET_CPPFLAGS}
 insitu_nc_to_ascii_LDFLAGS = ${MET_LDFLAGS}
 insitu_nc_to_ascii_LDADD = -lvx_nc_util \
 	-lvx_util \
-	-lvx_math \
+	-lvx_config \
 	-lvx_cal \
+	-lvx_math \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf
 
@@ -94,8 +98,9 @@ swinging_door_LDFLAGS = ${MET_LDFLAGS}
 swinging_door_LDADD = -lvx_time_series \
 	-lvx_nc_util \
 	-lvx_util \
-	-lvx_math \
+	-lvx_config \
 	-lvx_cal \
+	-lvx_math \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf
 
@@ -116,9 +121,9 @@ gen_climo_bin_LDADD = -lvx_stat_out \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_util \
 	-lvx_config \
 	-lvx_cal \
-	-lvx_util \
 	-lvx_gsl_prob \
 	-lvx_math \
 	-lvx_color \

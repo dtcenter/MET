@@ -34,10 +34,8 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                roman_numeral.cc roman_numeral.h \
                string_fxns.cc string_fxns.h \
                substring.cc substring.h \
-               temp_file.cc temp_file.h \
                fix_float.cc fix_float.h \
                command_line.cc command_line.h \
-               file_exists.cc file_exists.h \
                file_size.cc file_size.h \
                file_linecount.cc file_linecount.h \
                filename_suffix.cc filename_suffix.h \
