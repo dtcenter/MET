@@ -158,12 +158,6 @@ class ModeAttributes {
       int area_max_set;
       int area_max;
 
-      int area_filter_min_set;
-      int area_filter_min;
-
-      int area_filter_max_set;
-      int area_filter_max;
-
       int area_thresh_min_set;
       int area_thresh_min;
 
@@ -434,9 +428,6 @@ class ModeAttributes {
 
       void set_area_min              (int);
       void set_area_max              (int);
-
-      void set_area_filter_min       (int);
-      void set_area_filter_max       (int);
 
       void set_area_thresh_min       (int);
       void set_area_thresh_max       (int);

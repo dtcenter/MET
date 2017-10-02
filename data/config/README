@@ -1564,12 +1564,12 @@ unmatched = FALSE;
 //area_max              = 0;
 
 //
-// These options are used to indicate minimum/maximum values accepted for the area filter.
-// The area filter refers to the number of non-zero values of the raw data found within
-// the object.
+// These options are used to indicate minimum/maximum values accepted for the area thresh.
+// The area thresh is the area of the raw field inside the object that meets the threshold
+// criteria.
 //
-//area_filter_min       = 0;
-//area_filter_max       = 0;
+//area_thresh_min       = 0;
+//area_thresh_max       = 0;
 
 //
 // These options refer to the minimum/maximum values accepted for the intersection area

@@ -1185,24 +1185,6 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 
 
-int ModeLine::area_filter() const
-
-{
-
-int a;
-
-const char * c = get_item("AREA_FILTER");
-
-a = atoi(c);
-
-return ( a );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 int ModeLine::area_thresh() const
 
 {

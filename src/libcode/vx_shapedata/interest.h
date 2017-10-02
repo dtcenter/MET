@@ -69,7 +69,6 @@ class SingleFeature {
       double width;
       double aspect_ratio;
       double area;
-      double area_filter;
       double area_thresh;
       double curvature;
       double curvature_x;

@@ -5104,7 +5104,7 @@ name "MODE_object_attribute_output"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="37" columns="3">
+<lyxtabular version="3" rows="36" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -6002,35 +6002,6 @@ Object area (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-AREA_FILTER
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Area of the object containing non-zero data in the raw field (in grid squares)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-32
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 AREA_THRESH
 \end_layout
 
@@ -6052,7 +6023,7 @@ Area of the object containing data values in the raw field that meet the
 \begin_inset Text
 
 \begin_layout Plain Layout
-33
+32
 \end_layout
 
 \end_inset
@@ -6082,7 +6053,7 @@ Radius of curvature of the object defined in terms of third order moments
 \begin_inset Text
 
 \begin_layout Plain Layout
-34-35
+33-34
 \end_layout
 
 \end_inset
@@ -6111,7 +6082,7 @@ Center of curvature (in grid coordinates)
 \begin_inset Text
 
 \begin_layout Plain Layout
-36
+35
 \end_layout
 
 \end_inset
@@ -6141,7 +6112,7 @@ Ratio of the difference between the area of an object and the area of its
 \begin_inset Text
 
 \begin_layout Plain Layout
-37-41
+36-40
 \end_layout
 
 \end_inset
@@ -6171,7 +6142,7 @@ INTENSITY_10, _25, _50, _75, _90
 \begin_inset Text
 
 \begin_layout Plain Layout
-42
+41
 \end_layout
 
 \end_inset
@@ -6314,7 +6285,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-43
+42
 \end_layout
 
 \end_inset
@@ -6343,7 +6314,7 @@ Sum of the intensities of the raw field within the object (variable units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-44
+43
 \end_layout
 
 \end_inset
@@ -6372,7 +6343,7 @@ Distance between two objects centroids (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-45
+44
 \end_layout
 
 \end_inset
@@ -6401,7 +6372,7 @@ Minimum distance between the boundaries of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-46
+45
 \end_layout
 
 \end_inset
@@ -6434,7 +6405,7 @@ Minimum distance between the convex hulls of two objects (in grid units)
 \begin_inset Text
 
 \begin_layout Plain Layout
-47
+46
 \end_layout
 
 \end_inset
@@ -6463,7 +6434,7 @@ Difference between the axis angles of two objects (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+47
 \end_layout
 
 \end_inset
@@ -6493,7 +6464,7 @@ Ratio of the areas of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+48
 \end_layout
 
 \end_inset
@@ -6526,7 +6497,7 @@ Intersection area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+49
 \end_layout
 
 \end_inset
@@ -6555,7 +6526,7 @@ Union area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+50
 \end_layout
 
 \end_inset
@@ -6584,7 +6555,7 @@ Symmetric difference of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+51
 \end_layout
 
 \end_inset
@@ -6618,7 +6589,7 @@ Ratio of intersection area to the lesser of the forecast and observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-53
+52
 \end_layout
 
 \end_inset
@@ -6652,7 +6623,7 @@ Ratio of complexities of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-54
+53
 \end_layout
 
 \end_inset
@@ -6691,7 +6662,7 @@ Ratio of the nth percentile (column 37) of intensity of the two objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-55
+54
 \end_layout
 
 \end_inset
