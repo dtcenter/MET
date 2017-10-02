@@ -51,12 +51,6 @@ class SeriesAnalysisConfInfo {
       VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
       VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]
 
-      ThreshArray      fcsr_ta;            // Censor fcst thresholds
-      ThreshArray      ocsr_ta;            // Censor obs thresholds
-
-      NumArray         fcsr_na;            // Censor fcst replacement values
-      NumArray         ocsr_na;            // Censor obs replacement values
-
       ThreshArray      fcat_ta;            // Categorical fcst thresholds
       ThreshArray      ocat_ta;            // Categorical obs thresholds
 

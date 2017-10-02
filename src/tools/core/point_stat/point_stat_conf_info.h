@@ -95,12 +95,6 @@ class PointStatConfInfo {
       // Setting for each verification task
       VxPairDataPoint * vx_pd;              // Array pair data [n_vx]
 
-      ThreshArray *     fcsr_ta;            // Array for fcst censor thresholds [n_vx]
-      ThreshArray *     ocsr_ta;            // Array for obs censor thresholds [n_vx]
-
-      NumArray *        fcsr_na;            // Array for fcst censor replacement values [n_vx]
-      NumArray *        ocsr_na;            // Array for obs censor replacement values [n_vx]
-
       ThreshArray *     fcat_ta;            // Array for fcst categorical thresholds [n_vx]
       ThreshArray *     ocat_ta;            // Array for obs categorical thresholds [n_vx]
 

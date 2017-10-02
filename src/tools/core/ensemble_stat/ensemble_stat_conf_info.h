@@ -85,16 +85,10 @@ class EnsembleStatConfInfo {
       int                  beg_ds;              // Begin observation time window offset
       int                  end_ds;              // End observation time window offset
       VarInfo **           ens_info;            // Array of pointers for ensemble [n_ens_var]
-      ThreshArray *        ecsr_ta;             // Array for ensemble censor thresholds [n_ens_var]
-      NumArray *           ecsr_na;             // Array for ensemble censor replacement values [n_ens_var]
       ThreshArray *        ens_ta;              // Array for ensemble thresholds [n_ens_var]
       double               vld_ens_thresh;      // Minimum valid input file ratio
       double               vld_data_thresh;     // Minimum valid data ratio for each point
       VxPairDataEnsemble * vx_pd;               // Array for ensemble pair data [n_vx]
-      ThreshArray *        fcsr_ta;             // Array for fcst censor thresholds [n_vx]
-      ThreshArray *        ocsr_ta;             // Array for obs censor thresholds [n_vx]
-      NumArray *           fcsr_na;             // Array for fcst censor replacement values [n_vx]
-      NumArray *           ocsr_na;             // Array for obs censor replacement values [n_vx]
       StringArray *        msg_typ;             // Array of message types [n_vx]
       StringArray *        sid_exc;             // Array of station ID's to exclude [n_vx]
       StringArray *        obs_qty;             // Observation quality flags for filtering [n_vx]
