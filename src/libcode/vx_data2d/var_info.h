@@ -50,6 +50,9 @@ class VarInfo
       unixtime     Valid;     // Valid time in unixtime
       int          Lead;      // Lead time in seconds
 
+      ThreshArray  CensorThresh; // Censoring thesholds
+      NumArray     CensorVal;    // and replacement values
+
       void init_from_scratch();
       void assign(const VarInfo &);
 
@@ -93,6 +96,9 @@ class VarInfo
       unixtime     valid()          const;
       int          lead()           const;
 
+      ThreshArray  censor_thresh()  const;
+      NumArray     censor_val()     const;
+
          //
          // set stuff
          //
@@ -123,10 +129,12 @@ class VarInfo
       void set_valid(unixtime);
       void set_lead(int);
 
+      void set_censor_thresh(const ThreshArray &);
+      void set_censor_val(const NumArray &);
+
       void set_level_info_grib(Dictionary & dict);
       void set_prob_info_grib(ConcatString prob_name,
                               double thresh_lo, double thresh_hi);
-
 
          //
          // do stuff
@@ -162,11 +170,14 @@ inline SingleThresh VarInfo::p_thresh_lo()    const { return(PThreshLo);        
 inline SingleThresh VarInfo::p_thresh_hi()    const { return(PThreshHi);        }
 inline bool         VarInfo::p_as_scalar()    const { return(PAsScalar);        }
 
-inline int         VarInfo::uv_index()         const { return(UVIndex);            }
+inline int          VarInfo::uv_index()       const { return(UVIndex);          }
 
 inline unixtime     VarInfo::init()           const { return(Init);             }
 inline unixtime     VarInfo::valid()          const { return(Valid);            }
 inline int          VarInfo::lead()           const { return(Lead);             }
+
+inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     } 
+inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        } 
 
 ///////////////////////////////////////////////////////////////////////////////
 

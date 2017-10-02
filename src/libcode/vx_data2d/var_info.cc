@@ -295,6 +295,20 @@ void VarInfo::set_lead(int s) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_censor_thresh(const ThreshArray &a) {
+   CensorThresh = a;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_censor_val(const NumArray &a) {
+   CensorVal = a;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Check for embedded whitespace
@@ -312,6 +326,8 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_dict(Dictionary &dict) {
+   ThreshArray ta;
+   NumArray na;
    ConcatString s;
    bool f;
 
@@ -330,6 +346,24 @@ void VarInfo::set_dict(Dictionary &dict) {
    // Parse prob_as_scalar, if present
    f = dict.lookup_bool(conf_key_prob_as_scalar, false);
    if(dict.last_lookup_status()) set_p_as_scalar(f);
+
+   // Parse censor_thresh, if present
+   ta = dict.lookup_thresh_array(conf_key_censor_thresh, false);
+   if(dict.last_lookup_status()) set_censor_thresh(ta);
+
+   // Parse censor_val, if present
+   na = dict.lookup_num_array(conf_key_censor_val, false);
+   if(dict.last_lookup_status()) set_censor_val(na);
+
+   // Check for equal number of censor thresholds and values
+   if(ta.n_elements() != na.n_elements()) {
+      mlog << Error << "\nVarInfo::set_dict() -> "
+           << "The number of censor thresholds in \""
+           << conf_key_censor_thresh << "\" (" << ta.n_elements()
+           << ") must match the number of replacement values in \""
+           << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
+      exit(1);
+   }
 
    return;
 }
