@@ -660,8 +660,6 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
                               const char *hdr_sid_str, unixtime hdr_ut,
                               const char *obs_qty, float *obs_arr,
                               Grid &gr, const char *var_name,
-                              const ThreshArray *csr_ta,
-                              const NumArray *csr_na,
                               const DataPlane *wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
@@ -719,10 +717,10 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    obs_hgt = obs_arr[3];
    obs_v   = obs_arr[4];
 
-   // Apply censor thresholds
-   if(csr_ta && csr_na) {
-      for(i=0; i<csr_ta->n_elements(); i++) {
-         if((*csr_ta)[i].check(obs_v)) obs_v = (*csr_na)[i];
+   // Apply censor thresholds to point observations
+   for(i=0; i<obs_info->censor_thresh().n_elements(); i++) {
+      if(obs_info->censor_thresh()[i].check(obs_v)) {
+         obs_v = obs_info->censor_val()[i];
       }
    }
 
