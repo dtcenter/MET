@@ -736,7 +736,7 @@ void ModeFuzzyEngine::do_matching() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_no_match() {
-   int j;
+   int j, k, n;
    ShapeData * fcst_shape = (ShapeData *) 0;
    ShapeData * obs_shape = (ShapeData *) 0;
 
@@ -758,7 +758,6 @@ void ModeFuzzyEngine::do_no_match() {
    //
    // Do the single features
    //
-
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
@@ -780,13 +779,43 @@ void ModeFuzzyEngine::do_no_match() {
    }
 
    //
+   // Set all interest values to zero
+   //
+   info_singles.set_size(n_fcst*n_obs);
+
+   for(j=0; j<n_fcst; j++) {
+      for(k=0; k<n_obs; k++) {
+
+         n = two_to_one(j, k);
+
+         info_singles[n].fcst_number    = (j+1);
+         info_singles[n].obs_number     = (k+1);
+         info_singles[n].pair_number    = n;
+         info_singles[n].interest_value = 0.0;
+
+      }
+   }
+
+   //
    // Clear out any empty sets
    //
    collection.clear_empty_sets();
 
    //
+   // Assign the (unmatched) colors
+   //
+   fcst_color.extend(n_fcst);
+
+   for(j=0; j<n_fcst; j++) fcst_color.add(unmatched_color);
+
+   obs_color.extend(n_obs);
+
+   for(j=0; j<n_obs; j++) obs_color.add(unmatched_color);
+
+   //
    // Done
    //
+
    delete [] fcst_shape; fcst_shape = (ShapeData *) 0;
    delete [] obs_shape;  obs_shape  = (ShapeData *) 0;
 
@@ -819,7 +848,6 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Do the single features
    //
-
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
@@ -843,7 +871,6 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Do the pair features
    //
-
    pair_single.set_size(n_fcst*n_obs);
 
    for(j=0; j<n_fcst; j++) {
@@ -860,7 +887,6 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Calculate the interest values
    //
-
    info_singles.set_size(n_fcst*n_obs);
 
    for(j=0; j<n_fcst; j++) {
@@ -947,7 +973,7 @@ void ModeFuzzyEngine::do_match_merge() {
             break;
          }
       }
-  }
+   }
 
    //
    // Done
@@ -1167,7 +1193,6 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
          // completely contained in the merge object.  Meaning,
          // intersection area >= obs area
          //
-
          if(intersection >= obs_shape[k].area()) {
 
             //
@@ -1567,7 +1592,6 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Do the single features
    //
-
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
@@ -1591,7 +1615,6 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Do the pair features
    //
-
    pair_single.set_size(n_fcst*n_obs);
 
    for(j=0; j<n_fcst; j++) {
@@ -1608,7 +1631,6 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Calculate the interest values
    //
-
    info_singles.set_size(n_fcst*n_obs);
 
    for(j=0; j<n_fcst; j++) {
@@ -1745,7 +1767,6 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Do the single features
    //
-
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
@@ -1769,7 +1790,6 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Do the pair features
    //
-
    pair_single.set_size(n_fcst*n_obs);
 
    for(j=0; j<n_fcst; j++) {
@@ -1786,7 +1806,6 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Calculate the interest values
    //
-
    info_singles.set_size(n_fcst*n_obs);
 
    for(j=0; j<n_fcst; j++) {
@@ -1996,7 +2015,6 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Do the single features for clusters
    //
-
    fcst_cluster.set_size(n_clus);
     obs_cluster.set_size(n_clus);
 
@@ -2017,7 +2035,6 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Do the pair features
    //
-
    pair_cluster.set_size(n_clus);
 
    for(j=0; j<n_clus; j++) {
@@ -2029,7 +2046,6 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Calculate the interest values
    //
-
    info_clus.set_size(n_clus);
 
    for(j=0; j<n_clus; j++) {
