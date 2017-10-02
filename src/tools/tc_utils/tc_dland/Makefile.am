@@ -20,9 +20,9 @@ tc_dland_LDADD = -lvx_tc_util \
 	-lvx_grid \
 	-lvx_gnomon \
 	-lvx_nav \
+	-lvx_util \
 	-lvx_config \
 	-lvx_cal \
-	-lvx_util \
 	-lvx_math \
 	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf \

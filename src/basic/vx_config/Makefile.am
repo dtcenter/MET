@@ -29,6 +29,8 @@ libvx_config_a_SOURCES += \
               dictionary.cc dictionary.h \
               config_file.cc config_file.h \
               config_util.cc config_util.h \
+              temp_file.cc temp_file.h \
+              file_exists.cc file_exists.h \
               threshold.cc threshold.h \
               data_file_type.h \
               object_types.h \

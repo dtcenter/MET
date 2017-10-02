@@ -237,7 +237,6 @@ void process_mean_stdev() {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file() {
-   int i, x, y;
 
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file, true);
