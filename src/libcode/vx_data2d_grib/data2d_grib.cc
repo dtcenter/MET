@@ -535,8 +535,14 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                  << " from GRIB file \"" << filename() << "\".\n\n";
             continue;
          }
+         else {
 
-         if ( status && (ShiftRight != 0) )  cur_plane.shift_right(ShiftRight);
+            // Apply shift to the right
+            if(ShiftRight != 0) cur_plane.shift_right(ShiftRight);
+
+            // Apply censor thresholds
+            cur_plane.censor(vinfo_grib->censor_thresh(), vinfo_grib->censor_val());
+         } 
 
          // Add current record to the data plane array
          plane_array.add(cur_plane, (double) lower, (double) upper);
@@ -701,7 +707,17 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
 
          // Read current record
          status = get_data_plane(r, plane);
-         if ( status && (ShiftRight != 0) )  plane.shift_right(ShiftRight);
+
+
+         if(status) {
+
+            // Apply shift to the right
+            if(ShiftRight != 0) plane.shift_right(ShiftRight);
+
+            // Apply censor thresholds
+            plane.censor(vinfo_grib.censor_thresh(), vinfo_grib.censor_val());
+         }
+
          break;
       }
    } // end for loop

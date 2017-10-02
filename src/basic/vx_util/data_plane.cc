@@ -288,6 +288,23 @@ void DataPlane::threshold(const SingleThresh &st) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::censor(const ThreshArray &censor_thresh,
+                       const NumArray &censor_val) {
+   int i;
+
+   // Apply censor thresholds
+   for(i=0; i<censor_thresh.n_elements(); i++) {
+      mlog << Debug(3)
+           << "Applying censor threshold \"" << censor_thresh[i].get_str()
+           << "\" and replacing with a value of " << censor_val[i] << ".\n";
+      replace(censor_thresh[i], censor_val[i]);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void DataPlane::replace(const SingleThresh &st, const double new_v) {
    int j;
 
@@ -401,6 +418,9 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
 void DataPlane::shift_right(int N)
 
 {
+
+   mlog << Debug(3)
+        << "Shifting data to the right " << N << " grid squares.\n";
 
    //
    //  check some stuff
@@ -1316,21 +1336,6 @@ if ( (n < 0) || (n >= Nplanes) )  {
 
 return ( *(Plane[n]) );
 
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void DataPlaneArray::replace(const SingleThresh &st, const double new_v)
-
-{
-
-   int j;
-
-   for(j=0; j<Nplanes; ++j)  Plane[j]->replace(st, new_v);
-
-   return;
 }
 
 

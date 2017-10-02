@@ -15,6 +15,8 @@
 
 #include "two_to_one.h"
 #include "threshold.h"
+#include "thresh_array.h"
+#include "num_array.h"
 
 #include "vx_cal.h"
 
@@ -89,7 +91,8 @@ class DataPlane {
          //
 
       void threshold(const SingleThresh &);
-      void replace(const SingleThresh &, const double);
+      void censor   (const ThreshArray &, const NumArray &);
+      void replace  (const SingleThresh &, const double);
 
       int  two_to_one(int x, int y) const;
       void one_to_two(int n, int &x, int &y) const;
@@ -125,15 +128,11 @@ inline double DataPlane::operator()(int x, int y) const { return(get(x, y)); }
 inline const double * DataPlane::data() const { return ( Data ); }
 inline       double * DataPlane::buf()  const { return ( Data ); }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static const int dataplane_default_alloc_inc = 20;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 class DataPlaneArray {
 
@@ -203,16 +202,11 @@ class DataPlaneArray {
          //
 
       void add(const DataPlane &, double _low, double _up);   //  for two-level plane
-      void replace(const SingleThresh &, const double);
-
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
 inline int DataPlaneArray::n_planes () const { return ( Nplanes ); }
-
 
 ////////////////////////////////////////////////////////////////////////
 
