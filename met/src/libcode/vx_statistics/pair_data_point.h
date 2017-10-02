@@ -197,7 +197,6 @@ class VxPairDataPoint {
 
       void add_obs(float *, const char *, const char *, unixtime,
                    const char *, float *, Grid &, const char * = 0,
-                   const ThreshArray * = 0, const NumArray * = 0,
                    const DataPlane * = 0);
 
       int  get_n_pair();
