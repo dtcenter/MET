@@ -829,7 +829,7 @@ Polyline ShapeData::single_boundary(bool all_points, int clockwise) const {
    // and clockwise set to true
    //
 
-   return( single_boundary_offset(false, 1, 0.0) );
+   return( single_boundary_offset(all_points, clockwise, 0.0) );
 }
 
 /////////////////////////////////////////////////////////////////////////////////
