@@ -542,7 +542,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
 
             // Apply censor thresholds
             cur_plane.censor(vinfo_grib->censor_thresh(), vinfo_grib->censor_val());
-         } 
+         }
 
          // Add current record to the data plane array
          plane_array.add(cur_plane, (double) lower, (double) upper);
@@ -753,6 +753,10 @@ bool is_grid_relative(const GribRecord &r) {
    // LambertConf
    else if(r.gds->type == 3) {
       res_flag = r.gds->grid_type.lambert_conf.res_flag;
+   }
+   // Gaussian
+   else if(r.gds->type == 4) {
+      res_flag = r.gds->grid_type.gaussian.res_flag;
    }
    // Stereographic
    else if(r.gds->type == 5) {

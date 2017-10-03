@@ -216,7 +216,7 @@ void GaussianGrid::latlon_to_xy(double lat, double lon, double & x, double & y) 
 {
 
 mlog << Error 
-     << "\n\n  GaussianGrid::latlon_to_xy() not implemented!\n\n";
+     << "\nGaussianGrid::latlon_to_xy() not implemented!\n\n";
 
 exit ( 1 );
 
@@ -363,7 +363,7 @@ ConcatString GaussianGrid::serialize() const
 
 {
 
-mlog << Error << "\n\n  GaussianGrid::serialize() -> not yet implemented\n\n";
+mlog << Error << "\nGaussianGrid::serialize() -> not yet implemented\n\n";
 
 exit ( 1 );
 
