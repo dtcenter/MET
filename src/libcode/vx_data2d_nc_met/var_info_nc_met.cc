@@ -228,6 +228,8 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
 
 void VarInfoNcMet::set_dict(Dictionary &dict){
 
+   VarInfo::set_dict(dict);
+
    set_magic(dict.lookup_string("name").text(),
              dict.lookup_string("level").text());
    set_req_name(dict.lookup_string("name"));
