@@ -80,11 +80,18 @@ Regarding the timing information in the NetCDF variable attributes...
 \end_layout
 
 \begin_layout LyX-Code
-APCP_24:init_time_ut = 1306886400 ; "ut" 
+APCP_24:init_time_ut = 1306886400 ;
 \end_layout
 
 \begin_layout Standard
-stands for UNIX time, which is the number of seconds since Jan 1, 1970.
+\begin_inset Quotes eld
+\end_inset
+
+ut
+\begin_inset Quotes erd
+\end_inset
+
+ stands for UNIX time, which is the number of seconds since Jan 1, 1970.
  It is a convenient way of storing timing information since it is easy to
  add/subtract.
  The UNIX date command can be used to convert back/forth between unix time
