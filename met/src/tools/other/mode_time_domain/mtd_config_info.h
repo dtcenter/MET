@@ -164,8 +164,6 @@ class MtdConfigInfo {
       bool             do_2d_att_ascii;
       bool             do_3d_att_ascii;
 
-      // int              shift_right;            //  shift amount for global grids
-
       ConcatString     output_prefix;          // String to customize output file name
       ConcatString     version;                // Config file version
 
