@@ -690,8 +690,6 @@ void CNTInfo::clear() {
 
    n_ranks = frank_ties = orank_ties = 0;
 
-   s1 = bad_data_double;
-
    return;
 }
 
@@ -739,7 +737,6 @@ void CNTInfo::assign(const CNTInfo &c) {
    n_ranks     = c.n_ranks;
    frank_ties  = c.frank_ties;
    orank_ties  = c.orank_ties;
-   s1          = c.s1;
 
    return;
 }
@@ -1196,7 +1193,6 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
    cnt_info.n_ranks    = 0;
    cnt_info.frank_ties = 0;
    cnt_info.orank_ties = 0;
-   cnt_info.s1         = bad_data_double;
 
    // Get partial sums
    n     = (aflag ? s.sacount : s.scount);
@@ -3076,11 +3072,6 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
       if(is_eq(den, 0.0)) cnt_info.kt_corr.v = bad_data_double;
       else                cnt_info.kt_corr.v = (concordant - discordant)/den;
    } // end if rank_flag
-
-   //
-   // Compute the S1 score
-   //
-   cnt_info.s1 = bad_data_double;
 
    //
    // Compute normal confidence intervals if the normal_ci_flag is set

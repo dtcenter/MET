@@ -182,9 +182,6 @@ class CNTInfo {
 
       int n_ranks, frank_ties, orank_ties;
 
-      // S1 score with no spatial confidence interval
-      double s1;
-
       void clear();
       void allocate_n_alpha(int);
       void compute_ci();
