@@ -574,7 +574,7 @@ PlotInfo plot_info;
 
       // Conf: shift_right
 
-   shift_right = fcst_dict->lookup_int(conf_key_shift_right_value);
+   shift_right = fcst_dict->lookup_int(conf_key_shift_right);
 
    return;
 

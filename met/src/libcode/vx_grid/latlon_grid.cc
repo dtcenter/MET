@@ -348,6 +348,9 @@ if ( ! is_global() ) {
 
 }
 
+mlog << Debug(3)
+     << "Shifting global LatLon grid to the right " << N
+     << " grid boxes.\n";
 
 N %= Nx;
 

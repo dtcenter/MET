@@ -646,12 +646,11 @@ static const char conf_key_object_plot[]           = "object_plot";
 static const char conf_key_intensity_percentile[]  = "intensity_percentile";
 static const char conf_key_total_interest_thresh[] = "total_interest_thresh";
 static const char conf_key_print_interest_thresh[] = "print_interest_thresh";
-static const char conf_key_zero_border_size[]      = "zero_border_size";
 static const char conf_key_min_volume           [] = "min_volume";
 static const char conf_key_plot_valid_flag[]       = "plot_valid_flag";
 static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
-static const char conf_key_shift_right_value[]     = "shift_right";
+static const char conf_key_shift_right[]           = "shift_right";
 
    //
    //  MTD specific parameter key names

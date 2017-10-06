@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -174,7 +176,7 @@ The MET package can handle gridded input data in one of three formats: GRIB
  See 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -525,6 +527,12 @@ The following is a summary of the input and output formats for each of the
  
 \series bold
 PB2NC Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -556,6 +564,12 @@ Output
  
 \series bold
 ASCII2NC Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -589,6 +603,12 @@ Output
  
 \series bold
 MADIS2NC Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -620,6 +640,12 @@ Output
  
 \series bold
 LIDAR2NC Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -655,6 +681,12 @@ Output
  
 \series bold
 Pcp-Combine Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -711,6 +743,12 @@ Output
 
 \series bold
  Regrid-Data-Plane Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -743,6 +781,12 @@ Output
 
 \series bold
  Shift-Data-Plane Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -774,6 +818,12 @@ Output
  
 \series bold
 MODIS-Regrid Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -806,6 +856,12 @@ Output
  
 \series bold
 Gen-VX-Mask Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -839,6 +895,12 @@ Output
  
 \series bold
 Point-Stat Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -873,6 +935,12 @@ Output
  
 \series bold
 Grid-Stat Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -908,6 +976,12 @@ Output
  
 \series bold
 Ensemble Stat Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -943,6 +1017,12 @@ Output
  
 \series bold
 Wavelet-Stat Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -986,6 +1066,12 @@ ISC
  
 \series bold
 GSID2MPR Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1018,6 +1104,12 @@ Output
  
 \series bold
 GSID2ORANK Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1050,6 +1142,12 @@ Output
  
 \series bold
 Stat-Analysis Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1092,6 +1190,12 @@ Output
  
 \series bold
 Series Analysis Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1126,6 +1230,12 @@ Output
  
 \series bold
 MODE Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1162,6 +1272,12 @@ Output
  
 \series bold
 MODE-Analysis Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1204,6 +1320,12 @@ Output
  
 \series bold
 MODE-TD Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1238,6 +1360,12 @@ Output
  
 \series bold
 TC-Dland Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1272,6 +1400,12 @@ Output
  
 \series bold
 TC-Pair Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1315,6 +1449,12 @@ Output
  
 \series bold
 TC-Stat Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1357,6 +1497,12 @@ Output
  
 \series bold
 Plot-Point-Obs Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1389,6 +1535,12 @@ Output
  
 \series bold
 Plot-Data-Plane Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1420,6 +1572,12 @@ Output
  
 \series bold
 Plot-MODE-Field Tool
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1484,10 +1642,10 @@ Settings common to multiple tools are described in the following sections
 \end_layout
 
 \begin_layout Subsection
-General MET Config Options - Common to many tools
+MET Configuration File Options
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:IO_General-MET-Config-Options"
+name "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -1495,14 +1653,14 @@ name "sub:IO_General-MET-Config-Options"
 \end_layout
 
 \begin_layout Standard
-This information may also be found, along with detailed information regarding
- configuration of individual tools, in the data/config/README file.
+The information listed below may also be found in the data/config/README
+ file.
 \end_layout
 
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand verbatiminput
-filename "../READMEs/README"
+filename "../../../data/config/README"
 
 \end_inset
 
@@ -1510,10 +1668,10 @@ filename "../READMEs/README"
 \end_layout
 
 \begin_layout Subsection
-MET-TC Config Options - Common to all TC tools
+MET-TC Configuration File Options
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:IO_MET-TC-Config-Options"
+name "subsec:IO_MET-TC-Config-Options"
 
 \end_inset
 
@@ -1521,14 +1679,14 @@ name "sub:IO_MET-TC-Config-Options"
 \end_layout
 
 \begin_layout Standard
-This information may also be found, along with detailed information regarding
- configuration of individual tools, in the data/config/README_TC file.
+The information listed below may also be found in the data/config/README_TC
+ file.
 \end_layout
 
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand verbatiminput
-filename "../READMEs/README_TC"
+filename "../../../data/config/README_TC"
 
 \end_inset
 
