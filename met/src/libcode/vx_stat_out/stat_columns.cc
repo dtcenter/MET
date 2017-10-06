@@ -2058,7 +2058,8 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    ME2,         ME2_BCL,       ME2_BCU,
    //    MSESS,       MSESS_BCL,     MSESS_BCU,
    //    RMSFA,       RMSFA_BCL,     RMSFA_BCU,
-   //    RMSOA,       RMSOA_BCL,     RMSOA_BCU
+   //    RMSOA,       RMSOA_BCL,     RMSOA_BCU,
+   //    S1
    //
 
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -2343,6 +2344,9 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    at.set_entry(r, c+93, // Root Mean Squared Observation Anomaly BCU
       cnt_info.rmsoa.v_bcu[i]);
 
+   at.set_entry(r, c+94, // S1 score
+      cnt_info.s1);
+   
    return;
 }
 
