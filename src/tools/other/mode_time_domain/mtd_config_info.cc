@@ -155,8 +155,6 @@ void MtdConfigInfo::clear()
 
    ct_stats_flag   = false;
 
-   // shift_right = 0;
-
    min_volume = default_min_volume;
 
    output_prefix.clear();
@@ -526,19 +524,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       exit(1);
    }
 */
-      // Conf: zero_border_size
 
-//    zero_border_size = conf.lookup_int(conf_key_zero_border_size);
-
-      // Check that zero_border_size >= 1
-/*
-   if(zero_border_size < 1) {
-      mlog << Error << "\nMtdConfigInfo::process_config() -> "
-           << "zero_border_size (" << zero_border_size
-           << ") must be set >= 1.\n\n";
-      exit(1);
-   }
-*/
       // Conf: nc_pairs_flag
 
    parse_nc_info();
@@ -554,10 +540,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: output_prefix
 
    output_prefix = conf.lookup_string(conf_key_output_prefix);
-
-      // Conf: shift_right
-
-   // shift_right = fcst_dict->lookup_int(conf_key_shift_right_value);
 
       // Conf: min_volume
 
