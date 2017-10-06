@@ -3004,6 +3004,51 @@ RMSOA is the square root of the average squared observation anomaly.
 \end_layout
 
 \begin_layout Subsubsection*
+S1 Score
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Called "S1" in CNT output (Table 4-6)
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The S1 score is computed for grid-to-grid verification, not grid-to-point.
+ This score measures accuracy by comparing the gradiant of the forecast
+ to the gradiant of the verifying analysis.
+ A perfect score is 0, meaning that the forecast and analysis gradiants
+ are identical.
+ Historically, scores less than 20 are considered excellent, while scores
+ larger than 70 are worthless.
+ The S1 score is defined as 
+\begin_inset Formula $S1=100(\frac{1}{n}\sum e_{g})/(\frac{1}{n}\sum G_{L})$
+\end_inset
+
+, where
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\begin_inset Formula $e_{g}=TRESSA$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\begin_inset Formula $G_{L}=TRESSA$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
 Percentiles of the errors
 \end_layout
 
