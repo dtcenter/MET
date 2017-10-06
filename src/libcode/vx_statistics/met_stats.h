@@ -171,7 +171,10 @@ class CNTInfo {
 
       // Correlation Coefficients: Pearson's, Spearman's Rank,
       // and Kendall Tau Rank
-      CIInfo pr_corr, sp_corr, kt_corr, anom_corr;
+      CIInfo pr_corr, sp_corr, kt_corr;
+
+      // Anomaly correlation and RMS Anomalies
+      CIInfo anom_corr, rmsfa, rmsoa;
 
       CIInfo me, me2, estdev, mbias, mae, mse, msess, bcmse, rmse;
       CIInfo e10, e25, e50, e75, e90, eiqr;

@@ -669,6 +669,8 @@ void CNTInfo::clear() {
    sp_corr.clear();
    kt_corr.clear();
    anom_corr.clear();
+   rmsfa.clear();
+   rmsoa.clear();
    me.clear();
    me2.clear();
    estdev.clear();
@@ -714,6 +716,8 @@ void CNTInfo::assign(const CNTInfo &c) {
    sp_corr     = c.sp_corr;
    kt_corr     = c.kt_corr;
    anom_corr   = c.anom_corr;
+   rmsfa       = c.rmsfa;
+   rmsoa       = c.rmsoa;
    me          = c.me;
    me2         = c.me2;
    estdev      = c.estdev;
@@ -761,6 +765,8 @@ void CNTInfo::allocate_n_alpha(int i) {
       sp_corr.allocate_n_alpha(n_alpha);
       kt_corr.allocate_n_alpha(n_alpha);
       anom_corr.allocate_n_alpha(n_alpha);
+      rmsfa.allocate_n_alpha(n_alpha);
+      rmsoa.allocate_n_alpha(n_alpha);
       me.allocate_n_alpha(n_alpha);
       me2.allocate_n_alpha(n_alpha);
       estdev.allocate_n_alpha(n_alpha);
@@ -1218,6 +1224,8 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
       cnt_info.anom_corr.v = compute_corr( fbar*n,  obar*n,
                                           ffbar*n, oobar*n,
                                           fobar*n, n);
+      cnt_info.rmsfa.v     = sqrt(ffbar);
+      cnt_info.rmsoa.v     = sqrt(oobar);
    }
    // Handle SL1L2 data
    else {
@@ -1225,6 +1233,8 @@ void compute_cntinfo(const SL1L2Info &s, int aflag, CNTInfo &cnt_info) {
                                           ffbar*n, oobar*n,
                                           fobar*n, n);
       cnt_info.anom_corr.v = bad_data_double;
+      cnt_info.rmsfa.v     = bad_data_double;
+      cnt_info.rmsoa.v     = bad_data_double;
    }
 
    // Compute mean error
@@ -2838,15 +2848,27 @@ void compute_cntinfo(const NumArray &f_na, const NumArray &o_na,
                                      fo_bar*n, n);
 
    //
-   // Compute Anomaly Correlation
+   // Process anomaly scores
    //
    if(cflag) {
+
+      //
+      // Compute Anomaly Correlation
+      //
       cnt_info.anom_corr.v = compute_corr( fa_bar*n,  oa_bar*n,
                                           ffa_bar*n, ooa_bar*n,
                                           foa_bar*n, n);
+
+      //
+      // Compute RMSFA and RMSOA
+      //
+      cnt_info.rmsfa.v     = sqrt(ffa_bar);
+      cnt_info.rmsoa.v     = sqrt(ooa_bar);
    }
    else {
       cnt_info.anom_corr.v = bad_data_double;
+      cnt_info.rmsfa.v     = bad_data_double;
+      cnt_info.rmsoa.v     = bad_data_double;
    }
 
    //

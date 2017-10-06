@@ -23,6 +23,7 @@
 //   005    09/21/15  Halley Gotway   Add climatology and SAL1L2 output.
 //   006    04/20/16  Halley Gotway   Add -paired command line option.
 //   007    05/15/17  Prestopnikk P   Add shape for regrid.
+//   008    10/06/17  Halley Gotway   Add RMSFA and RMSOA stats.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1557,6 +1558,12 @@ void store_stat_cnt(int n, const ConcatString &col,
       else if(c == "MSESS")         { v = cnt_info.msess.v;            }
       else if(c == "MSESS_BCL")     { v = cnt_info.msess.v_bcl[i];     }
       else if(c == "MSESS_BCU")     { v = cnt_info.msess.v_bcu[i];     }
+      else if(c == "RMSFA")         { v = cnt_info.rmsfa.v;            }
+      else if(c == "RMSFA_BCL")     { v = cnt_info.rmsfa.v_bcl[i];     }
+      else if(c == "RMSFA_BCU")     { v = cnt_info.rmsfa.v_bcu[i];     }
+      else if(c == "RMSOA")         { v = cnt_info.rmsoa.v;            }
+      else if(c == "RMSOA_BCL")     { v = cnt_info.rmsoa.v_bcl[i];     }
+      else if(c == "RMSOA_BCU")     { v = cnt_info.rmsoa.v_bcu[i];     }
       else {
         mlog << Error << "\nstore_stat_cnt() -> "
              << "unsupported column name requested \"" << c

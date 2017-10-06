@@ -2057,6 +2057,8 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
    //    MAD,         MAD_BCL,       MAD_BCU
    //    ME2,         ME2_BCL,       ME2_BCU,
    //    MSESS,       MSESS_BCL,     MSESS_BCU,
+   //    RMSFA,       RMSFA_BCL,     RMSFA_BCU,
+   //    RMSOA,       RMSOA_BCL,     RMSOA_BCU
    //
 
    at.set_entry(r, c+0,  // Total Number of Grid Points
@@ -2322,6 +2324,24 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
 
    at.set_entry(r, c+87, // Mean Squared Error Skill Score BCU
       cnt_info.msess.v_bcu[i]);
+
+   at.set_entry(r, c+88, // Root Mean Squared Forecast Anomaly
+      cnt_info.rmsfa.v);
+
+   at.set_entry(r, c+89, // Root Mean Squared Forecast Anomaly BCL
+      cnt_info.rmsfa.v_bcl[i]);
+
+   at.set_entry(r, c+90, // Root Mean Squared Forecast Anomaly BCU
+      cnt_info.rmsfa.v_bcu[i]);
+
+   at.set_entry(r, c+91, // Root Mean Squared Observation Anomaly
+      cnt_info.rmsoa.v);
+
+   at.set_entry(r, c+92, // Root Mean Squared Observation Anomaly BCL
+      cnt_info.rmsoa.v_bcl[i]);
+
+   at.set_entry(r, c+93, // Root Mean Squared Observation Anomaly BCU
+      cnt_info.rmsoa.v_bcu[i]);
 
    return;
 }
