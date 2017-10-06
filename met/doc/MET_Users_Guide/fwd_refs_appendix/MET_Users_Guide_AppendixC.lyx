@@ -2962,6 +2962,48 @@ hbox{MSE}_r}}}$
 \end_layout
 
 \begin_layout Subsubsection*
+Root-mean-squared Forecast Anomaly
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Called "RMSFA" in CNT output (Table 4-6)
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+RMSFA is the square root of the average squared forecast anomaly.
+ Specifically, 
+\begin_inset Formula $RMSFA=\sqrt{\frac{1}{n}\sum\left(f_{i}-c_{i}\right)^{2}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+Root-mean-squared Observation Anomaly
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Called "RMSOA" in CNT output (Table 4-6)
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+RMSOA is the square root of the average squared observation anomaly.
+ Specifically, 
+\begin_inset Formula $RMSOA=\sqrt{\frac{1}{n}\sum\left(o_{i}-c_{i}\right)^{2}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
 Percentiles of the errors
 \end_layout
 
