@@ -1937,7 +1937,8 @@ ct_stats_flag = TRUE;
 // shift the grid to the right.  MODE does not currently connect objects from one side
 // of a global grid to the other, potentially causing objects straddling that longitude
 // to be cut in half.  Shifting the grid by some amount enables the user to control
-// where that longitude cut line occurs.
+// where that longitude cut line occurs.  This option provides a very specialized case
+// of automated regridding.  The much more flexible "regrid" option may be used instead.
 //
 shift_right = 0;
 

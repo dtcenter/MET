@@ -102,6 +102,9 @@ void VarInfo::assign(const VarInfo &v) {
    Lead      = v.lead();
    Ensemble  = v.ens ();
 
+   CensorThresh = v.censor_thresh();
+   CensorVal    = v.censor_val();
+
    return;
 }
 
@@ -131,6 +134,9 @@ void VarInfo::clear() {
    Lead  = bad_data_int;
    Ensemble.clear ();
 
+   CensorThresh.clear();
+   CensorVal.clear();
+
    return;
 }
 
@@ -147,20 +153,22 @@ void VarInfo::dump(ostream &out) const {
 
    // Dump out the contents
    out << "VarInfo::dump():\n"
-       << "  MagicStr  = " << (MagicStr ? MagicStr.text() : "(nul)") << "\n"
-       << "  ReqName   = " << (ReqName ? ReqName.text() : "(nul)") << "\n"
-       << "  Name      = " << (Name ? Name.text() : "(nul)") << "\n"
-       << "  LongName  = " << (LongName ? LongName.text() : "(nul)") << "\n"
-       << "  Units     = " << (Units ? Units.text() : "(nul)") << "\n"
-       << "  PFlag     = " << PFlag << "\n"
-       << "  PName     = " << (PName ? PName.text() : "(nul)") << "\n"
-       << "  PUnits    = " << (PUnits ? PUnits.text() : "(nul)") << "\n"
-       << "  PAsScalar = " << PAsScalar << "\n"
-       << "  UVIndex     = " << UVIndex << "\n"
-       << "  Init      = " << init_str << " (" << Init << ")\n"
-       << "  Valid     = " << valid_str << " (" << Valid << ")\n"
-       << "  Ensemble  = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
-       << "  Lead      = " << lead_str << " (" << Lead << ")\n";
+       << "  MagicStr     = " << (MagicStr ? MagicStr.text() : "(nul)") << "\n"
+       << "  ReqName      = " << (ReqName ? ReqName.text() : "(nul)") << "\n"
+       << "  Name         = " << (Name ? Name.text() : "(nul)") << "\n"
+       << "  LongName     = " << (LongName ? LongName.text() : "(nul)") << "\n"
+       << "  Units        = " << (Units ? Units.text() : "(nul)") << "\n"
+       << "  PFlag        = " << PFlag << "\n"
+       << "  PName        = " << (PName ? PName.text() : "(nul)") << "\n"
+       << "  PUnits       = " << (PUnits ? PUnits.text() : "(nul)") << "\n"
+       << "  PAsScalar    = " << PAsScalar << "\n"
+       << "  UVIndex      = " << UVIndex << "\n"
+       << "  Init         = " << init_str << " (" << Init << ")\n"
+       << "  Valid        = " << valid_str << " (" << Valid << ")\n"
+       << "  Ensemble     = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
+       << "  Lead         = " << lead_str << " (" << Lead << ")\n"
+       << "  CensorThresh = " << CensorThresh.get_str() << ")\n"
+       << "  CensorVal    = " << CensorVal.serialize() << ")\n";
 
    Level.dump(out);
 
@@ -330,6 +338,7 @@ void VarInfo::set_dict(Dictionary &dict) {
    NumArray na;
    ConcatString s;
    bool f;
+   int i;
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
