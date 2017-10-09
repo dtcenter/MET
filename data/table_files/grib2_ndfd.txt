@@ -9,7 +9,7 @@ GRIB2
 0 1 0 255 8 1 19 201  "PXTRMHAIL"  "Probability of extreme hail"  "" 
 0 1 0 255 8 1 19 202  "PXTRMWIND"  "Probability of extreme wind"  "" 
 0 1 0 255 8 1 19 215  "TOTALSVRPROB"  "Total probability of severe thunderstorms"  "" 
-0 1 0 255 8 1 19 215  "TOTALXTRMPROB"  "Total probability of extreme severe thunderstorms"  "" 
+0 1 0 255 8 1 19 216  "TOTALXTRMPROB"  "Total probability of extreme severe thunderstorms"  "" 
 0 1 0 255 8 1 19 217  "WWA"  "Watch Warning Advisory"  "WxInfo" 
 0 1 0 255 8 1 192 192  "FIREWX"  "Critcal Fire Weather"  "" 
 0 1 0 255 8 1 192 194  "DRYLIGHTNING"  "Dry lightning"  ""
