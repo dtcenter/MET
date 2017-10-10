@@ -230,6 +230,13 @@ static const char * nbrcnt_columns [] = {
    "O_RATE",      "O_RATE_BCL",  "O_RATE_BCU"
 };
 
+static const char * grad_columns [] = {
+   "TOTAL",
+   "FGBAR",       "OGBAR",       "MGBAR",
+   "EGBAR",       "S1",          "S1_OG",
+   "FGOG_RATIO"
+};
+
 static const char * isc_columns [] = {
    "TOTAL",
    "TILE_DIM",    "TILE_XLL",    "TILE_YLL",
@@ -346,6 +353,8 @@ static const int n_mpr_columns          = sizeof(mpr_columns)/sizeof(*mpr_column
 static const int n_nbrctc_columns       = sizeof(nbrctc_columns)/sizeof(*nbrctc_columns);
 static const int n_nbrcts_columns       = sizeof(nbrcts_columns)/sizeof(*nbrcts_columns);
 static const int n_nbrcnt_columns       = sizeof(nbrcnt_columns)/sizeof(*nbrcnt_columns);
+static const int n_grad_columns         = sizeof(grad_columns)/sizeof(*grad_columns);
+
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
 
 static const int n_job_sum_columns      = sizeof(job_sum_columns)/sizeof(*job_sum_columns);
@@ -442,6 +451,8 @@ extern void write_nbrcts_row(StatHdrColumns &, const NBRCTSInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_nbrcnt_row(StatHdrColumns &, const NBRCNTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+extern void write_grad_row  (StatHdrColumns &, const GRADInfo &, bool,
+                             AsciiTable &, int &, AsciiTable &, int &);
 extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, bool,
                              AsciiTable &, int &, AsciiTable &, int &,
                              bool update_thresh = true);
@@ -483,6 +494,7 @@ extern void write_nbrctc_cols(const NBRCTSInfo &,       AsciiTable &, int, int);
 extern void write_nbrcts_cols(const NBRCTSInfo &,  int, AsciiTable &, int, int);
 extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
 extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
+extern void write_grad_cols  (const GRADInfo &,         AsciiTable &, int, int);
 extern void write_mpr_cols   (const PairDataPoint *,    int, AsciiTable &, int, int);
 extern void write_isc_cols   (const ISCInfo &,     int, AsciiTable &, int, int);
 extern void write_rhist_cols (const PairDataEnsemble *,      AsciiTable &, int, int);

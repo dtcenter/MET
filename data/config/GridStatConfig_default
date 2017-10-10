@@ -184,6 +184,7 @@ output_flag = {
    nbrctc = BOTH;
    nbrcts = BOTH;
    nbrcnt = BOTH;
+   grad   = BOTH;
 }
 
 //
@@ -197,6 +198,7 @@ nc_pairs_flag   = {
    weight     = FALSE;
    nbrhd      = FALSE;
    fourier    = FALSE;
+   gradient   = FALSE;
    apply_mask = TRUE;
 }
 

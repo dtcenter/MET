@@ -1095,7 +1095,6 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
    int i;
    double f, o, c, w, w_sum;
    PairDataPoint pd_all, pd;
-   bool cflag, wflag;
 
    // Check for mismatch
    if(f_na.n_elements() != o_na.n_elements()) {
@@ -1108,10 +1107,6 @@ void SL1L2Info::set(const NumArray &f_na, const NumArray &o_na,
 
    // Initialize
    zero_out();
-
-   // Flag to process climo and weights
-   cflag = set_climo_flag(f_na, c_na);
-   wflag = set_climo_flag(f_na, w_na);
 
    // Store pairs in PairDataPoint object
    pd_all.add_pair(f_na, o_na, c_na, w_na);
@@ -2437,6 +2432,202 @@ void SSVARInfo::assign(const SSVARInfo &c) {
    var_max    = c.var_max;
    var_mean   = c.var_mean;
    sl1l2_info = c.sl1l2_info;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class GRADInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+GRADInfo::GRADInfo() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GRADInfo::~GRADInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GRADInfo::GRADInfo(const GRADInfo &c) {
+
+   init_from_scratch();
+
+   assign(c);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GRADInfo & GRADInfo::operator=(const GRADInfo &c) {
+
+   if(this == &c) return(*this);
+
+   assign(c);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
+   GRADInfo g_info;
+
+   g_info.total  = total + c.total;
+
+   if(g_info.total > 0) {
+      g_info.fgbar = (fgbar*total + c.fgbar*c.total) / g_info.total;
+      g_info.ogbar = (ogbar*total + c.ogbar*c.total) / g_info.total;
+      g_info.mgbar = (mgbar*total + c.mgbar*c.total) / g_info.total;
+      g_info.egbar = (egbar*total + c.egbar*c.total) / g_info.total;
+   }
+
+   assign(g_info);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GRADInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GRADInfo::clear() {
+
+   // Gradient partial sums
+   fgbar = ogbar = 0.0;
+   mgbar = egbar = 0.0;
+   total = 0;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GRADInfo::assign(const GRADInfo &c) {
+
+   clear();
+
+   // Gradient partial sums
+   fgbar = c.fgbar;
+   ogbar = c.ogbar;
+   mgbar = c.mgbar;
+   egbar = c.egbar;
+   total = c.total;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::s1() const {
+   double v;
+
+   if(is_bad_data(egbar) || is_bad_data(mgbar) || is_eq(mgbar, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      v = 100.0 * egbar / mgbar;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::s1_og() const {
+   double v;
+
+   if(is_bad_data(egbar) || is_bad_data(ogbar) || is_eq(ogbar, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      v = 100.0 * egbar / ogbar;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::fgog_ratio() const {
+   double v;
+
+   if(is_bad_data(fgbar) || is_bad_data(ogbar) || is_eq(ogbar, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      v = fgbar / ogbar;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GRADInfo::set(const NumArray &fgx_na, const NumArray &fgy_na,
+                   const NumArray &ogx_na, const NumArray &ogy_na,
+                   const NumArray &w_na) {
+   int i;
+   double w, w_sum;
+
+   // Check for mismatch
+   if(fgx_na.n_elements() != fgy_na.n_elements() ||
+      fgx_na.n_elements() != ogx_na.n_elements() ||
+      fgx_na.n_elements() != ogy_na.n_elements() ||
+      fgx_na.n_elements() !=   w_na.n_elements()) {
+      mlog << Error << "\nGRADInfo::set() -> "
+           << "count mismatch ("
+           << fgx_na.n_elements() << ", " << fgy_na.n_elements() << ", "
+           << ogx_na.n_elements() << ", " << ogy_na.n_elements() << ", "
+           <<   w_na.n_elements() << ")\n\n";
+      exit(1);
+   }
+
+   // Initialize
+   clear();
+
+   // Check for no matched pairs to process
+   if(fgx_na.n_elements() == 0) return;
+
+   // Get the sum of the weights
+   w_sum = w_na.sum();
+
+   // Loop through the pairs and compute sums
+   for(i=0; i<fgx_na.n_elements(); i++) {
+
+      // Skip bad data
+      if(is_bad_data(fgx_na[i]) || is_bad_data(fgy_na[i]) ||
+         is_bad_data(ogx_na[i]) || is_bad_data(ogy_na[i])) continue;
+
+      // Get current weight
+      w = w_na[i]/w_sum;
+
+      // Gradient sums
+      fgbar += w * (fabs(fgx_na[i]) + fabs(fgy_na[i]));
+      ogbar += w * (fabs(ogx_na[i]) + fabs(ogy_na[i]));
+      mgbar += w * (max(fabs(fgx_na[i]), fabs(ogx_na[i])) +
+                    max(fabs(fgy_na[i]), fabs(ogy_na[i])));
+      egbar += w * (fabs(fgx_na[i] - ogx_na[i]) +
+                    fabs(fgy_na[i] - ogy_na[i]));
+      total++;
+   }
+
+   if(total == 0) {
+      mlog << Error << "\nGRADInfo::set() -> "
+           << "count is zero!\n\n";
+      exit(1);
+   }
 
    return;
 }

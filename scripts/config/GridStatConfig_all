@@ -179,6 +179,10 @@ output_flag = {
    nbrcnt = BOTH;
 }
 
+fourier = {
+   wave_1d_beg = [0];
+   wave_1d_end = [20];
+}
 //
 // NetCDF matched pairs output file
 //
@@ -187,8 +191,10 @@ nc_pairs_flag   = {
    raw        = TRUE;
    diff       = TRUE;
    climo      = TRUE;
-   weight     = FALSE;
-   nbrhd      = FALSE;
+   weight     = TRUE;
+   nbrhd      = TRUE;
+   fourier    = TRUE;
+   gradient   = TRUE;
    apply_mask = TRUE;
 }
 

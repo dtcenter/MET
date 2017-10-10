@@ -87,6 +87,7 @@
 //   038    06/26/17  Halley Gotway  Add ECLV line type.
 //   039    07/12/17  Halley Gotway  Add climatology spread.
 //   040    08/18/17  Halley Gotway  Add fourier decomposition.
+//   041    08/18/17  Halley Gotway  Add GRAD output line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -301,11 +302,9 @@ void setup_first_pass(const DataPlane &dp) {
 
    // Create output text files as requested in the config file
    // only if the ascii_output_flag is true.
-   if(conf_info.get_ascii_output_flag())
-   {
-       setup_txt_files(dp.valid(), dp.lead());
+   if(conf_info.get_ascii_output_flag()){
+      setup_txt_files(dp.valid(), dp.lead());
    }
-
 
    // If requested, create a NetCDF file to store the matched pairs and
    // difference fields for each GRIB code and masking region
@@ -611,6 +610,7 @@ void process_scores() {
    NBRCNTInfo  nbrcnt_info;
    NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
    PCTInfo    *pct_info    = (PCTInfo *) 0;
+   GRADInfo    grad_info;
 
    // Store the maximum number of each threshold type
    n_cnt  = conf_info.get_max_n_cnt_thresh();
@@ -1157,7 +1157,83 @@ void process_scores() {
                      i, mthd, pnts, conf_info.interp_field);
          }
 
-      } // end for j
+         // Compute gradient statistics if requested in the config file
+         if(!conf_info.fcst_info[i]->is_prob() &&
+            conf_info.output_flag[i_grad] != STATOutputType_None) {
+
+            // Compute the gradients
+            DataPlane fgx_dp, fgy_dp, ogx_dp, ogy_dp;
+            fgx_dp = gradient(fcst_dp_smooth, 0);
+            fgy_dp = gradient(fcst_dp_smooth, 1);
+            ogx_dp = gradient(obs_dp_smooth,  0);
+            ogy_dp = gradient(obs_dp_smooth,  1);
+
+            // Allocate memory in one big chunk based on grid size
+            NumArray  fgx_na, fgy_na, ogx_na, ogy_na;
+            fgx_na.extend(grid.nx()*grid.ny());
+            fgy_na.extend(grid.nx()*grid.ny());
+            ogx_na.extend(grid.nx()*grid.ny());
+            ogy_na.extend(grid.nx()*grid.ny());
+
+            // Loop through the masks to be applied
+            for(k=0; k<conf_info.get_n_mask(); k++) {
+
+               // Store the current mask
+               mask_dp = conf_info.mask_dp[k];
+
+               // Turn off the mask for missing data values
+               mask_bad_data(mask_dp, fgx_dp, 0.0);
+               mask_bad_data(mask_dp, fgy_dp, 0.0);
+               mask_bad_data(mask_dp, ogx_dp, 0.0);
+               mask_bad_data(mask_dp, ogy_dp, 0.0);
+
+               // Apply the current mask to the current fields
+               apply_mask(fgx_dp, mask_dp, fgx_na);
+               apply_mask(fgy_dp, mask_dp, fgy_na);
+               apply_mask(ogx_dp, mask_dp, ogx_na);
+               apply_mask(ogy_dp, mask_dp, ogy_na);
+               apply_mask(wgt_dp, mask_dp, w_na);
+
+               // Set the mask name
+               shc.set_mask(conf_info.mask_name[k]);
+
+               mlog << Debug(2) << "Computing Gradient Statistics "
+                    << "over region " << shc.get_mask()
+                    << ", using " << fgx_na.n_elements() << " pairs.\n";
+
+               // Continue if no pairs were found
+               if(fgx_na.n_elements() == 0) continue;
+
+               // Compute GRAD
+               grad_info.set(fgx_na, fgy_na, ogx_na, ogy_na, w_na);
+
+               // Write out GRAD
+               if(conf_info.output_flag[i_grad] != STATOutputType_None &&
+                  grad_info.total > 0) {
+
+                  write_grad_row(shc, grad_info,
+                     conf_info.output_flag[i_grad] == STATOutputType_Both,
+                     stat_at, i_stat_row,
+                     txt_at[i_grad], i_txt_row[i_grad]);
+               }
+
+            } // end for k (n_mask)
+
+            // Write out the gradients if requested in the config file
+            if(conf_info.nc_info.do_gradient) {
+               write_nc("FCST_XGRAD", fgx_dp, i, mthd, pnts,
+                        conf_info.interp_field);
+               write_nc("FCST_YGRAD", fgy_dp, i, mthd, pnts,
+                        conf_info.interp_field);
+               write_nc("OBS_XGRAD",  ogx_dp, i, mthd, pnts,
+                        conf_info.interp_field);
+               write_nc("OBS_YGRAD",  ogy_dp, i, mthd, pnts,
+                        conf_info.interp_field);
+            }
+
+         } // end if GRAD
+
+      } // end for j (n_interp)
 
       // Loop through and apply the Neighborhood methods for each of the
       // neighborhood widths if requested in the config file
@@ -1551,6 +1627,7 @@ void process_scores() {
          } // end if
 
       } // end for j
+
    } // end for i
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -2098,6 +2175,42 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology cumulative distribution function for "
+                   << conf_info.obs_info[i_vx]->name() << " at "
+                   << conf_info.obs_info[i_vx]->level_name();
+         level_att = shc.get_obs_lev();
+         units_att = conf_info.obs_info[i_vx]->units();
+      }
+      else if(field_name == "FCST_XGRAD" || field_name == "FCST_YGRAD") {
+         var_name  << cs_erase
+                   << field_name << "_"
+                   << conf_info.fcst_info[i_vx]->name() << "_"
+                   << conf_info.fcst_info[i_vx]->level_name() << "_"
+                   << mask_str;
+         if(field_type == FieldType_Fcst ||
+            field_type == FieldType_Both) {
+            var_name << interp_str;
+         }
+         name_att  = shc.get_fcst_var();
+         long_att  << cs_erase
+                   << "Gradient of "
+                   << conf_info.fcst_info[i_vx]->name() << " at "
+                   << conf_info.fcst_info[i_vx]->level_name();
+         level_att = shc.get_fcst_lev();
+         units_att = conf_info.fcst_info[i_vx]->units();
+      }
+      else if(field_name == "OBS_XGRAD" || field_name == "OBS_YGRAD") {
+         var_name  << cs_erase
+                   << field_name << "_"
+                   << conf_info.obs_info[i_vx]->name() << "_"
+                   << conf_info.obs_info[i_vx]->level_name() << "_"
+                   << mask_str;
+         if(field_type == FieldType_Obs ||
+            field_type == FieldType_Both) {
+            var_name << interp_str;
+         }
+         name_att  = shc.get_obs_var();
+         long_att  << cs_erase
+                   << "Gradient of "
                    << conf_info.obs_info[i_vx]->name() << " at "
                    << conf_info.obs_info[i_vx]->level_name();
          level_att = shc.get_obs_lev();

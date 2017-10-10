@@ -27,7 +27,8 @@
 //   008    02/05/15  Halley Gotway   Add StatHdrInfo to keep track of
 //                    unique header entries for each aggregation.
 //   009    03/30/15  Halley Gotway   Add ramp job type.
-//   008    06/09/17  Halley Gotway   Add aggregate RELP lines.
+//   010    06/09/17  Halley Gotway   Add aggregate RELP lines.
+//   011    06/09/17  Halley Gotway   Add aggregate GRAD lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1343,6 +1344,80 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &j,
 
       } // end if vif
    } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &j,
+                      map<ConcatString, AggrGRADInfo> &m,
+                      int &n_in, int &n_out) {
+   STATLine line;
+   AggrGRADInfo aggr;
+   GRADInfo cur;
+   ConcatString key;
+   int i;
+   map<ConcatString, AggrENSInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         j.dump_stat_line(line);
+
+         if(line.type() != stat_grad) {
+            mlog << Error << "\naggr_grad_lines() -> "
+                 << "should only encounter gradient (GRAD) line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current PHIST line
+         //
+         parse_grad_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.grad_info = cur;
+            aggr.hdr.clear();
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+
+            //
+            // Aggregate the GRAD partial sums
+            //
+            m[key].grad_info += cur;
+
+         } // end else
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
 
    return;
 }

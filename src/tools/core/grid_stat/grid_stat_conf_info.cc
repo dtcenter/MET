@@ -622,6 +622,7 @@ nc_info.do_climo       = d->lookup_bool(conf_key_climo_flag);
 nc_info.do_weight      = d->lookup_bool(conf_key_weight);
 nc_info.do_nbrhd       = d->lookup_bool(conf_key_nbrhd);
 nc_info.do_fourier     = d->lookup_bool(conf_key_fourier);
+nc_info.do_gradient    = d->lookup_bool(conf_key_gradient);
 nc_info.do_apply_mask  = d->lookup_bool(conf_key_apply_mask_flag);
 
 
@@ -798,6 +799,13 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
               max_n_fprob_thresh;
          break;
 
+      case(i_grad):
+         // Maximum number of GRAD lines possible =
+         //    Fields * Masks * Smoothing Methods
+         n = n_vx_scal * n_mask * n_interp;
+
+         break;
+
       default:
          mlog << Error << "\nGridStatConfInfo::n_txt_row(int) -> "
               << "unexpected output type index value: " << i_txt_row
@@ -900,6 +908,7 @@ do_climo      = false;
 do_weight     = false;
 do_nbrhd      = false;
 do_fourier    = false;
+do_gradient   = false;
 do_apply_mask = false;
 
 return;
@@ -921,6 +930,7 @@ do_climo      = true;
 do_weight     = true;
 do_nbrhd      = true;
 do_fourier    = true;
+do_gradient   = true;
 do_apply_mask = true;
 
 return;

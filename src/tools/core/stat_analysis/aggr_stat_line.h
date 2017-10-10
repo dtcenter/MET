@@ -24,6 +24,7 @@
 //                    unique header entries for each aggregation.
 //   006    03/30/15  Halley Gotway   Add ramp job type.
 //   007    06/09/17  Halley Gotway   Add aggregate RELP lines.
+//   008    06/09/17  Halley Gotway   Add aggregate GRAD lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -98,6 +99,11 @@ struct AggrPSumInfo {
    CNTInfo    cnt_info;
    NBRCNTInfo nbrcnt_info;
    NumArray valid_ts, fbar_ts, obar_ts, me_ts;
+};
+
+struct AggrGRADInfo {
+   StatHdrInfo hdr;
+   GRADInfo grad_info;
 };
 
 struct AggrWindInfo {
@@ -180,6 +186,11 @@ extern void aggr_pct_lines(
 extern void aggr_psum_lines(
                LineDataFile &, STATAnalysisJob &,
                map<ConcatString, AggrPSumInfo> &,
+               int &, int &);
+
+extern void aggr_grad_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrGRADInfo> &,
                int &, int &);
 
 extern void aggr_wind_lines(
