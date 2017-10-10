@@ -581,7 +581,26 @@ name "subsec:GS_Gradient_Statistics"
 \begin_layout Standard
 
 \series medium
-Tressa, please fill me in!
+The S1 score has been in historical use for verification of forecasts, particula
+rly for variables such as pressure and geopotential height.
+ This score compares differences between adjacent grid points in the forecast
+ and observed fields.
+ When the adjacent points in both forecast and observed fields exhibit the
+ same differences, the S1 score will be the perfect value of 0.
+ Larger differences will result in a larger score.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Differences are computed in both of the horizontal grid directions and is
+ not a true mathematical gradient.
+ Because the S1 score focuses on differences only, any bias in the forecast
+ will not be measured.
+ Further, the score depends on the domain and spacing of the grid, so can
+ only be compared on forecasts with identical grids.
+ 
 \end_layout
 
 \begin_layout Section
