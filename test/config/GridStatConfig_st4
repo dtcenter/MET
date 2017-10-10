@@ -31,15 +31,23 @@ regrid = {
    to_grid = NONE;
    method  = NEAREST;
    width   = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
-eclv_points = 0.05;
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_points   = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -96,11 +104,12 @@ boot = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Interpolation methods
+// Data smoothing methods
 //
 interp = {
    field      = FCST;
    vld_thresh = 1.0;
+   shape      = SQUARE;
 
    type = [ { method = NEAREST; width  = 1; } ];
 }
@@ -114,6 +123,17 @@ nbrhd = {
    width      = [ 3, 5 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fourier decomposition
+//
+fourier = {
+   wave_1d_beg = [];
+   wave_1d_end = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +160,7 @@ output_flag = {
    nbrctc = NONE;
    nbrcts = NONE;
    nbrcnt = NONE;
+   grad   = NONE;
 }
 
 //
@@ -152,6 +173,8 @@ nc_pairs_flag   = {
    climo      = TRUE;
    weight     = FALSE;
    nbrhd      = FALSE;
+   fourier    = FALSE;
+   gradient   = FALSE;
    apply_mask = TRUE;
 }
 

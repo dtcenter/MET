@@ -36,7 +36,12 @@ regrid = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cat_thresh  = [ NA ];
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
 cnt_thresh  = [ NA ];
 cnt_logic   = UNION;
 wind_thresh = [ NA ];
@@ -54,7 +59,7 @@ obs  = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
+// Climatology data
 //
 climo_mean = {
 
@@ -105,6 +110,7 @@ boot = {
 interp = {
    field      = BOTH;
    vld_thresh = 1.0;
+   shape      = SQUARE;
 
    type = [
       {
@@ -123,6 +129,17 @@ nbrhd = {
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fourier decomposition
+//
+fourier = {
+   wave_1d_beg = [];
+   wave_1d_end = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,6 +166,7 @@ output_flag = {
    nbrctc = NONE;
    nbrcts = NONE;
    nbrcnt = NONE;
+   grad   = NONE;
 }
 
 //
@@ -161,6 +179,8 @@ nc_pairs_flag   = {
    climo      = TRUE;
    weight     = TRUE;
    nbrhd      = FALSE;
+   fourier    = FALSE;
+   gradient   = FALSE;
    apply_mask = TRUE;
 }
 

@@ -28,19 +28,26 @@ obtype = "GFS-ANL";
 // Verification grid
 //
 regrid = {
-   to_grid = "${CLIMO_MEAN_FILE}";
-   method  = BILIN;
-   width   = 2;
+   to_grid    = "${CLIMO_MEAN_FILE}";
+   method     = BILIN;
+   width      = 2;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cnt_thresh  = [ NA ];
-cat_thresh  = [];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
-eclv_points = 0.05;
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_points   = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -174,6 +181,7 @@ output_flag = {
    nbrctc = NONE;
    nbrcts = NONE;
    nbrcnt = NONE;
+   grad   = NONE;
 }
 
 //
@@ -187,6 +195,7 @@ nc_pairs_flag   = {
    weight     = FALSE;
    nbrhd      = FALSE;
    fourier    = TRUE;
+   gradient   = FALSE;
    apply_mask = FALSE;
 }
 

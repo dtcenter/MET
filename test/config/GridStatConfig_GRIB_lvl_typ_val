@@ -32,15 +32,22 @@ regrid = {
    method     = BILIN;
    width      = 2;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cat_thresh  = [ NA ];
-cnt_thresh  = [ NA ];
-cnt_logic   = UNION;
-wind_thresh = [ NA ];
-wind_logic  = UNION;
+//
+// May be set separately in each "field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+eclv_points   = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -70,14 +77,14 @@ fcst = {
         name = "TMP";
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
-        desc = tropo; 
+        desc = tropo;
       },
       {
         //max wind
         name = "TMP";
         GRIB_lvl_typ = 6;
         GRIB_lvl_val1 = 0;
-        desc = maxw; 
+        desc = maxw;
       },
       {
         // theta 310
@@ -122,7 +129,7 @@ fcst = {
         desc = tropo;
       },
       {
-        // max wind 
+        // max wind
         name = "HGT";
         GRIB_lvl_typ = 76;
         GRIB_lvl_val1 = 0;
@@ -143,34 +150,11 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
-//
-climo_mean = {
-
-   file_name = [];
-   field     = [];
-
-   regrid = {
-      method     = NEAREST;
-      width      = 1;
-      vld_thresh = 0.5;
-   }
-
-   time_interp_method = DW_MEAN;
-   match_day          = FALSE;
-   time_step          = 21600;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
 // Verification masking regions
 //
 mask = {
    grid = [ "FULL" ];
    poly = [];
-           
-            
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,6 +199,17 @@ nbrhd = {
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fourier decomposition
+//
+fourier = {
+   wave_1d_beg = [];
+   wave_1d_end = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,6 +236,7 @@ output_flag = {
    nbrctc = NONE;
    nbrcts = NONE;
    nbrcnt = NONE;
+   grad   = NONE;
 };
 
 //
@@ -253,6 +249,8 @@ nc_pairs_flag = {
    climo      = FALSE;
    weight     = FALSE;
    nbrhd      = FALSE;
+   fourier    = FALSE;
+   gradient   = FALSE;
    apply_mask = FALSE;
 }
 
