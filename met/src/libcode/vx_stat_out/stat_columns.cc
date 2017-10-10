@@ -1310,6 +1310,43 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
+                    bool txt_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+   int i;
+
+   // GRAD line type
+   shc.set_line_type(stat_grad_str);
+
+   // Not applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_obs_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_grad_cols(grad_info, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(txt_flag) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                    bool txt_flag,
                    AsciiTable &stat_at, int &stat_row,
@@ -2974,6 +3011,43 @@ void write_nbrcnt_cols(const NBRCNTInfo &nbrcnt_info, int i,
 
    at.set_entry(r, c+18, // Observation Rate BCU
       nbrcnt_info.o_rate.v_bcu[i]);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_grad_cols(const GRADInfo &grad_info,
+                     AsciiTable &at, int r, int c) {
+
+   //
+   // Gradient Line Type (GRAD)
+   //    TOTAL,       FBAR,        OBAR,
+   //    FOBAR,       FFBAR,       OOBAR
+   //
+   at.set_entry(r, c+0,  // Total Count
+      grad_info.total);
+
+   at.set_entry(r, c+1,  // FGBAR
+      grad_info.fgbar);
+
+   at.set_entry(r, c+2,  // OGBAR
+      grad_info.ogbar);
+
+   at.set_entry(r, c+3,  // MGBAR
+      grad_info.mgbar);
+
+   at.set_entry(r, c+4,  // EGBAR
+      grad_info.egbar);
+
+   at.set_entry(r, c+5,  // S1
+      grad_info.s1());
+
+   at.set_entry(r, c+6,  // S1_OG
+      grad_info.s1_og());
+
+   at.set_entry(r, c+7,  // FGOG_RATIO
+      grad_info.fgog_ratio());
 
    return;
 }

@@ -21,6 +21,7 @@
 //   003    02/04/13  Halley Gotway   Add -by case option.
 //   004    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   005    06/09/17  Halley Gotway   Add aggregate RELP lines.
+//   006    10/09/17  Halley Gotway   Add aggregate GRAD lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -90,6 +91,9 @@ extern void write_job_aggr_pct(STATAnalysisJob &, STATLineType,
 
 extern void write_job_aggr_psum(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrPSumInfo> &, AsciiTable &);
+
+extern void write_job_aggr_grad(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrGRADInfo> &, AsciiTable &);
 
 extern void write_job_aggr_wind(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrWindInfo> &, AsciiTable &);

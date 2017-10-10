@@ -124,6 +124,7 @@ enum STATLineType {
    stat_ssvar,
    stat_relp,
    stat_eclv,
+   stat_grad,
    stat_header,
    no_stat_line_type
 };
@@ -153,6 +154,7 @@ static const char stat_mpr_str[]    = "MPR";
 static const char stat_nbrctc_str[] = "NBRCTC";
 static const char stat_nbrcts_str[] = "NBRCTS";
 static const char stat_nbrcnt_str[] = "NBRCNT";
+static const char stat_grad_str[]   = "GRAD";
 static const char stat_isc_str[]    = "ISC";
 static const char stat_wdir_str[]   = "WDIR";
 static const char stat_rhist_str[]  = "RHIST";
@@ -488,10 +490,6 @@ static const char conf_key_type[]              = "type";
 static const char conf_key_method[]            = "method";
 static const char conf_key_width[]             = "width";
 static const char conf_key_nbrhd[]             = "nbrhd";
-static const char conf_key_fourier[]           = "fourier";
-static const char conf_key_wave_1d_beg[]       = "wave_1d_beg";
-static const char conf_key_wave_1d_end[]       = "wave_1d_end";
-static const char conf_key_hira[]              = "hira";
 static const char conf_key_cov_thresh[]        = "cov_thresh";
 static const char conf_key_ps_plot_flag[]      = "ps_plot_flag";
 static const char conf_key_nc_pairs_flag[]     = "nc_pairs_flag";
@@ -544,6 +542,19 @@ static const char conf_key_climo_cdf_bins[]     = "climo_cdf_bins";
 static const char conf_key_time_interp_method[] = "time_interp_method";
 static const char conf_key_match_day[]          = "match_day";
 static const char conf_key_time_step[]          = "time_step";
+
+//
+// Point-Stat specific parameter key names
+//
+static const char conf_key_hira[] = "hira";
+
+//
+// Grid-Stat specific parameter key names
+//
+static const char conf_key_fourier[]     = "fourier";
+static const char conf_key_wave_1d_beg[] = "wave_1d_beg";
+static const char conf_key_wave_1d_end[] = "wave_1d_end";
+static const char conf_key_gradient[]    = "gradient";
 
 //
 // Wavelet-Stat specific parameter key names
@@ -652,9 +663,9 @@ static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
 static const char conf_key_shift_right[]           = "shift_right";
 
-   //
-   //  MTD specific parameter key names
-   //
+//
+//  MTD specific parameter key names
+//
 
 static const char conf_key_space_centroid_dist [] = "space_centroid_dist";
 static const char conf_key_time_centroid_delta [] = "time_centroid_delta";

@@ -57,6 +57,8 @@ extern DataPlane normal_cdf(const DataPlane &, const DataPlane &, const DataPlan
 
 extern DataPlane normal_cdf_inv(const double, const DataPlane &, const DataPlane &);
 
+extern DataPlane gradient(const DataPlane &, int dim);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __DATA_PLANE_UTIL__

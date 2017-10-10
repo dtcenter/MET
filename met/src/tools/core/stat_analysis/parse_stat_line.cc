@@ -26,6 +26,7 @@
 //   007    01/04/17  Halley Gotway   Switch integer offsets to version
 //                    independent column names.
 //   008    06/09/17  Halley Gotway   Add RELP line type.
+//   009    10/09/17  Halley Gotway   Add GRAD line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -259,6 +260,21 @@ void parse_nbrcnt_line(STATLine &l, NBRCNTInfo &n_info) {
    n_info.ufss.v     = atof(l.get_item("UFSS"));
    n_info.f_rate.v   = atof(l.get_item("F_RATE"));
    n_info.o_rate.v   = atof(l.get_item("O_RATE"));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_grad_line(STATLine &l, GRADInfo &grad_info) {
+
+   grad_info.clear();
+
+   grad_info.total = atoi(l.get_item("TOTAL"));
+   grad_info.fgbar = atof(l.get_item("FGBAR"));
+   grad_info.ogbar = atof(l.get_item("OGBAR"));
+   grad_info.mgbar = atof(l.get_item("MGBAR"));
+   grad_info.egbar = atof(l.get_item("EGBAR"));
 
    return;
 }

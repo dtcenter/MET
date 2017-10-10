@@ -1068,6 +1068,7 @@ output_flag = {
    phist  = BOTH;  // Probability Integral Transform Histogram
    orank  = BOTH;  // Observation Rank
    ssvar  = BOTH;  // Spread Skill Variance
+   grad   = BOTH;  // Gradient statistics (S1 score)
 }
 
 //
@@ -1091,6 +1092,7 @@ nc_pairs_flag   = {
    weight     = FALSE;
    nbrhd      = FALSE;
    fourier    = FALSE;
+   gradient   = FALSE;
    apply_mask = TRUE;
 }
 

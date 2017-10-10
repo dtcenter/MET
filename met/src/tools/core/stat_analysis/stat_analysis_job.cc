@@ -34,6 +34,7 @@
 //   014    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //   015    06/28/17  Halley Gotway   Add aggregate_stat for CTC, PCT,
 //                    or MPR to ECLV lines.
+//   016    10/09/17  Halley Gotway   Add aggregate GRAD lines.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -532,6 +533,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrMCTCInfo>  mctc_map;
    map<ConcatString, AggrPCTInfo>   pct_map;
    map<ConcatString, AggrPSumInfo>  psum_map;
+   map<ConcatString, AggrGRADInfo>  grad_map;
    map<ConcatString, AggrISCInfo>   isc_map;
    map<ConcatString, AggrENSInfo>   ens_map;
    map<ConcatString, AggrSSVARInfo> ssvar_map;
@@ -560,14 +562,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_sal1l2 && lt != stat_vl1l2  &&
       lt != stat_val1l2 && lt != stat_pct    &&
       lt != stat_nbrctc && lt != stat_nbrcnt &&
-      lt != stat_rhist  && lt != stat_phist  &&
-      lt != stat_relp   && lt != stat_ssvar  &&
-      lt != stat_isc) {
+      lt != stat_grad   && lt != stat_rhist  &&
+      lt != stat_phist  && lt != stat_relp   &&
+      lt != stat_ssvar  && lt != stat_isc) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
-           << "\tPCT, NBRCTC, NBRCNT, ISC,\n"
+           << "\tPCT, NBRCTC, NBRCNT, GRAD, ISC,\n"
            << "\tRHIST, PHIST, RELP, SSVAR\n\n";
       throw(1);
    }
@@ -617,6 +619,15 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
            lt == stat_nbrcnt) {
       aggr_psum_lines(f, j, psum_map, n_in, n_out);
       write_job_aggr_psum(j, lt, psum_map, out_at);
+   }
+
+   //
+   // Sum the gradient line type:
+   //    GRAD
+   //
+   else if(lt == stat_grad) {
+      aggr_grad_lines(f, j, grad_map, n_in, n_out);
+      write_job_aggr_grad(j, lt, grad_map, out_at);
    }
 
    //
@@ -949,7 +960,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
             if(j.out_fcst_thresh[i].get_value() < 0.0 ||
                j.out_fcst_thresh[i].get_value() > 1.0) {
 
-               mlog << Error << "\ndo_job_aggr_stat() -> "
+               mlog << Error << "\ndo_job_aggr_stat_stat() -> "
                     << "When verifying a probability field, all "
                     << "forecast probability thresholds must be "
                     << "between 0 and 1.\n\n";
@@ -1566,6 +1577,66 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
          write_nbrcnt_cols(it->second.nbrcnt_info, 0, at, r, c);
          if(j.stat_out) write_nbrcnt_cols(it->second.nbrcnt_info, 0, j.stat_at, r, n_header_columns);
       }
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_grad(STATAnalysisJob &j, STATLineType lt,
+                         map<ConcatString, AggrGRADInfo> &m,
+                         AsciiTable &at) {
+   map<ConcatString, AggrGRADInfo>::iterator it;
+   int n_row, n_col, r, c;
+   StatHdrColumns shc;
+
+   //
+   // Setup the output table
+   //
+   n_row  = 1 + m.size();
+   n_col  = 1 + j.column_case.n_elements();
+   n_col += n_grad_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_header_row(grad_columns,  n_grad_columns,  0, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   j.setup_stat_file(n_row, 0);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      if(j.stat_out) write_header_cols(shc, j.stat_at, r);
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // GRAD output line
+      //
+      at.set_entry(r, c++, "GRAD:");
+      write_case_cols(it->first, at, r, c);
+      write_grad_cols(it->second.grad_info, at, r, c);
+      if(j.stat_out) write_grad_cols(it->second.grad_info, j.stat_at, r, n_header_columns);
+
    } // end for it
 
    return;

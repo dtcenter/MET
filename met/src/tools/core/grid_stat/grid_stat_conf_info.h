@@ -46,7 +46,8 @@ static const int i_eclv   = 14;
 static const int i_nbrctc = 15;
 static const int i_nbrcts = 16;
 static const int i_nbrcnt = 17;
-static const int n_txt    = 18;
+static const int i_grad   = 18;
+static const int n_txt    = 19;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -55,7 +56,8 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_sl1l2,  stat_sal1l2, stat_vl1l2,
    stat_val1l2, stat_pct,    stat_pstd,
    stat_pjc,    stat_prc,    stat_eclv,
-   stat_nbrctc, stat_nbrcts, stat_nbrcnt
+   stat_nbrctc, stat_nbrcts, stat_nbrcnt,
+   stat_grad
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,6 +78,8 @@ struct GridStatNcOutInfo {
    bool do_nbrhd;
 
    bool do_fourier;
+
+   bool do_gradient;
 
    bool do_apply_mask;
 

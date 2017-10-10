@@ -22,6 +22,7 @@
 //   004    05/19/14  Halley Gotway   Add OBS_QC to MPR and ORANK lines.
 //   005    06/03/14  Halley Gotway   Add PHIST line type.
 //   006    06/09/17  Halley Gotway   Add RELP line type.
+//   008    10/09/17  Halley Gotway   Add GRAD line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -103,6 +104,8 @@ extern void parse_val1l2_line  (STATLine &, VL1L2Info &);
 extern void parse_mpr_line     (STATLine &, MPRData &);
 extern void parse_isc_line     (STATLine &, ISCInfo &, int &);
 extern void parse_nbrcnt_line  (STATLine &, NBRCNTInfo &);
+extern void parse_grad_line    (STATLine &, GRADInfo &);
+
 extern void parse_rhist_line   (STATLine &, RHISTData &);
 extern void parse_phist_line   (STATLine &, PHISTData &);
 extern void parse_relp_line    (STATLine &, RELPData &);

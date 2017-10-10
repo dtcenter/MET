@@ -530,6 +530,43 @@ class SSVARInfo {
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Class to store gradient statistics
+//
+////////////////////////////////////////////////////////////////////////
+
+class GRADInfo {
+
+   private:
+      void init_from_scratch();
+      void assign(const GRADInfo &);
+
+   public:
+
+      GRADInfo();
+      ~GRADInfo();
+      GRADInfo(const GRADInfo &);
+      GRADInfo & operator=(const GRADInfo &);
+      GRADInfo & operator+=(const GRADInfo &);
+
+      // Gradient Partial Sums
+      int    total;
+      double fgbar, ogbar, mgbar, egbar;
+
+      // Gradient Statistics
+      double s1()         const; // s1         = 100 * egbar / mgbar
+      double s1_og()      const; // s1_og      = 100 * egbar / ogbar
+      double fgog_ratio() const; // fgog_ratio = fgbar / ogbar
+
+      // Compute sums
+      void set(const NumArray &fgx_na, const NumArray &fgy_na,
+               const NumArray &ogx_na, const NumArray &ogy_na,
+               const NumArray &w_na);
+
+      void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+//
 // Utility functions for parsing data from configuration files
 //
 ////////////////////////////////////////////////////////////////////////

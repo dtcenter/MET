@@ -1738,6 +1738,7 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_nbrctc):       s = stat_nbrctc_str;  break;
       case(stat_nbrcts):       s = stat_nbrcts_str;  break;
       case(stat_nbrcnt):       s = stat_nbrcnt_str;  break;
+      case(stat_grad):         s = stat_grad_str;    break;
       case(stat_isc):          s = stat_isc_str;     break;
       case(stat_wdir):         s = stat_wdir_str;    break;
       case(stat_rhist):        s = stat_rhist_str;   break;
@@ -1786,6 +1787,7 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_nbrctc_str) == 0) t = stat_nbrctc;
    else if(strcasecmp(s, stat_nbrcts_str) == 0) t = stat_nbrcts;
    else if(strcasecmp(s, stat_nbrcnt_str) == 0) t = stat_nbrcnt;
+   else if(strcasecmp(s, stat_grad_str)   == 0) t = stat_grad;
    else if(strcasecmp(s, stat_isc_str)    == 0) t = stat_isc;
    else if(strcasecmp(s, stat_wdir_str)   == 0) t = stat_wdir;
    else if(strcasecmp(s, stat_rhist_str)  == 0) t = stat_rhist;

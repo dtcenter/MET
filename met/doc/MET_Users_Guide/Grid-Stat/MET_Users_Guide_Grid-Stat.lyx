@@ -567,6 +567,23 @@ Wavelets, and in particular the MET wavelet tool, can also be used to define
  scales.
 \end_layout
 
+\begin_layout Subsection
+Gradient Statistics 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:GS_Gradient_Statistics"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Tressa, please fill me in!
+\end_layout
+
 \begin_layout Section
 Practical information
 \begin_inset CommandInset label
@@ -1446,6 +1463,12 @@ output_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   grad   = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 }
 \end_layout
 
@@ -1621,6 +1644,14 @@ NBRCNT
  for Neighborhood Continuous Statistics
 \end_layout
 
+\begin_layout Enumerate
+
+\series bold
+GRAD
+\series default
+ for Gradient Statistics
+\end_layout
+
 \begin_layout Standard
 
 \series medium
@@ -1688,6 +1719,12 @@ nc_pairs_flag = {
 
 \series bold
    nbrhd      = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   gradient   = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1763,6 +1800,12 @@ TRUE
 nbrhd
 \series medium
  output may lead to very large output files.
+ The 
+\series bold
+gradient
+\series medium
+ entry controls the creation of output variables for the FCST and OBS gradients
+ in the grid-x and grid-y directions.
  The 
 \series bold
 apply_mask
@@ -1844,9 +1887,9 @@ TYPE
 fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, pct, pstd, pjc, prc, eclv,
  nbrctc, nbrcts
 \series medium
-, and 
+, 
 \series default
-nbrcnt
+nbrcnt, and grad
 \series medium
  to indicate the line type it contains.
 \end_layout
@@ -1856,7 +1899,7 @@ nbrcnt
 \series medium
 The format of the STAT and ASCII output of the Grid-Stat tool are the same
  as the format of the STAT and ASCII output of the Point-Stat tool with
- the exception of the three additional neighborhood line types.
+ the exception of the four additional neighborhood line types.
  Please refer to the tables in 
 \series default
 Section
@@ -1874,7 +1917,7 @@ point_stat
 \series default
  output) for a description of the common output STAT and optional ASCII
  file line types.
- The formats of the three additional neighborhood line types for grid_stat
+ The formats of the four additional neighborhood line types for grid_stat
  are explained in the following tables.
 \end_layout
 
@@ -4453,6 +4496,375 @@ Observed event frequency including bootstrap upper and lower confidence
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Format information for GRAD (Gradient Statistics) output line type.
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "table_GS_format_info_GRAD"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0.75in">
+<column alignment="left" valignment="top" width="1.5in">
+<column alignment="left" valignment="top" width="3.75in">
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+GRAD OUTPUT FORMAT
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Column Number
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+GRAD Column Name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GRAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gradient Statistics line type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+23
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+TOTAL
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Total number of matched pairs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+24
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FGBAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean of absolute value of forecast gradients
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OGBAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean of absolute value of observed gradients
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+26
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MGBAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean of maximum of absolute values of forecast and observed gradients
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+EGBAR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Mean of absolute value of forecast minus observed gradients
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+S1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+S1 score
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+29
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+S1_OG
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+S1 score with respect to observed gradient
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FGOG_RATIO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of forecast and observed gradients
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
 
 \series medium
 If requested in the 
@@ -4636,10 +5048,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
@@ -4662,7 +5070,7 @@ name "table_GS_var_NetCDF_matched_pair_out"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="5" columns="3">
+<lyxtabular version="3" rows="6" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="4.5cm">
 <column alignment="left" valignment="top">
@@ -4766,7 +5174,7 @@ lat, lon
 \begin_layout Plain Layout
 For each model variable (VAR), vertical level (LVL), masking region (MASK),
  and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS),
- the forecast value is listed for each point in the mask
+ the forecast value is listed for each point in the mask.
 \end_layout
 
 \end_inset
@@ -4796,14 +5204,14 @@ lat, lon
 
 \begin_layout Plain Layout
 For each model variable (VAR), vertical level (LVL), and masking region
- (MASK), the observation value is listed for each point in the mask 
+ (MASK), the observation value is listed for each point in the mask .
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4832,7 +5240,7 @@ _INTERP_PNTS
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4841,14 +5249,56 @@ lat, lon
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 For each model variable (VAR), vertical level (LVL), masking region (MASK),
  and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS),
  the difference (forecast - observation) is computed for each point in the
- mask
+ mask.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FCST_XGRAD
+\begin_inset Newline newline
+\end_inset
+
+FCST_YGRAD
+\begin_inset Newline newline
+\end_inset
+
+OBS_XGRAD
+\begin_inset Newline newline
+\end_inset
+
+OBS_YGRAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lat, lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+List the gradient of the forecast and observation fields computed in the
+ grid-x and grid-y directions.
 \end_layout
 
 \end_inset

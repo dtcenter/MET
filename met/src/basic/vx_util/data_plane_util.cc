@@ -544,3 +544,36 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
 
 ////////////////////////////////////////////////////////////////////////
 
+DataPlane gradient(const DataPlane &dp, int dim) {
+   int x, y, x1, y1;
+   double v, v1, gr;
+   DataPlane grad_dp;
+
+   if(dim != 0 && dim != 1) {
+      mlog << Error << "\ngradient() -> "
+           << "dimension must be set to 0 (x-dim) or 1 (y-dim)!\n\n";
+      exit(1);
+   }
+
+   // Initialize to bad data values
+   grad_dp.set_size(dp.nx(), dp.ny());
+
+   for(x=0; x<dp.nx(); x++) {
+      for(y=0; y<dp.ny(); y++) {
+
+         // dim: 0 for x-dimension, 1 for y-dimension
+         x1 = (dim == 0 ? x+1 : x  );
+         y1 = (dim == 0 ? y   : y+1);
+         v1 = (x1 >= dp.nx() || y1 >= dp.ny() ?
+               bad_data_double : dp.get(x1, y1));
+         v  = dp.get(x, y);
+         gr = (is_bad_data(v1) || is_bad_data(v) ?
+               bad_data_double : v1 - v);
+         grad_dp.set(gr, x, y);
+      }
+   }
+
+   return(grad_dp);
+}
+
+////////////////////////////////////////////////////////////////////////
