@@ -3916,7 +3916,29 @@ IO" in GRAD output (Table 4-??)
 These statistics are only computed by the Grid_Stat tool and require vectors
 \series default
 .
- The measures are defined below:
+ 
+\series medium
+Here 
+\series default
+\emph off
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+nabla$
+\end_layout
+
+\end_inset
+
+
+\emph default
+ is the gradient operator.
+ TOTAL is the count of grid locations used in the calculations.
+ The remaining measures are defined below:
 \end_layout
 
 \begin_layout Standard
@@ -4136,7 +4158,292 @@ sum_{i=1}^n(w_i(G_L)_i}
 
 \begin_layout Plain Layout
 
-}$
+} , $
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the weights are applied at each grid location, with values 
+\emph off
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$w_i = cos
+\backslash
+phi_i$
+\end_layout
+
+\end_inset
+
+
+\emph default
+ , the cosine of the latitude at grid point 
+\emph on
+i
+\emph default
+.
+ The components of the 
+\emph off
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$S1$
+\end_layout
+
+\end_inset
+
+ equation are as follows:
+\emph default
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hspace{36 pt}
+\end_layout
+
+\begin_layout Plain Layout
+
+e_g = 
+\backslash
+displaystyle { 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggl( 
+\backslash
+biggl|
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+frac {
+\backslash
+delta} {
+\backslash
+delta x}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+bigl( f-o 
+\backslash
+bigr)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggr| + 
+\backslash
+biggl|
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+frac {
+\backslash
+delta} {
+\backslash
+delta y}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+bigl( f-o 
+\backslash
+bigr)
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggr| 
+\backslash
+biggr)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hspace{36 pt}
+\end_layout
+
+\begin_layout Plain Layout
+
+G_L = 
+\backslash
+displaystyle { 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{max} 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggl( 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggl|
+\backslash
+frac{
+\backslash
+delta f}{
+\backslash
+delta x}
+\backslash
+biggr|,
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggl|
+\backslash
+frac{
+\backslash
+delta o}{
+\backslash
+delta x}
+\backslash
+biggr|
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggr)
+\end_layout
+
+\begin_layout Plain Layout
+
++
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{max}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggl( 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggl|
+\backslash
+frac{
+\backslash
+delta f}{
+\backslash
+delta y}
+\backslash
+biggr|,
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggl|
+\backslash
+frac{
+\backslash
+delta o}{
+\backslash
+delta y}
+\backslash
+biggr|
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+biggr) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+$
 \end_layout
 
 \end_inset
@@ -4152,7 +4459,9 @@ status open
 
 $
 \backslash
-hbox{S1OG}={
+hbox{S1
+\backslash
+_OG}={
 \backslash
 displaystyle{
 \end_layout
@@ -4198,7 +4507,9 @@ status open
 
 $
 \backslash
-hbox{FGOGRATIO}={
+hbox{FGOG
+\backslash
+_RATIO}={
 \backslash
 displaystyle{
 \end_layout
