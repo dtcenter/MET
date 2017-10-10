@@ -262,7 +262,8 @@ The Stat-Analysis tool can be used to create aggregated values from multiple
  The aggregated data are output as the same line type as the user specified.
  The STAT line types which may be aggregated in this way are the contingency
  table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2,
- and VAL1L2), and other (ISC, RHIST, PHIST, RELP, NBRCNT, SSVAR) line types.
+ and VAL1L2), and other (ISC, RHIST, PHIST, RELP, NBRCNT, SSVAR, and GRAD)
+ line types.
 \end_layout
 
 \begin_layout Subsection
