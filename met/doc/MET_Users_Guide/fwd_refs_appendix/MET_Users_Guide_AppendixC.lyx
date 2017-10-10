@@ -3188,7 +3188,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{FBAR}=
 \backslash
@@ -3198,7 +3198,7 @@ overline{f}=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^nf_i$$
+sum_{i=1}^nf_i$
 \end_layout
 
 \end_inset
@@ -3212,7 +3212,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{OBAR}=
 \backslash
@@ -3222,7 +3222,7 @@ overline{o}=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^no_i$$
+sum_{i=1}^no_i$
 \end_layout
 
 \end_inset
@@ -3236,7 +3236,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{FOBAR}=
 \backslash
@@ -3246,7 +3246,7 @@ overline{fo}=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^nf_io_i$$
+sum_{i=1}^nf_io_i$
 \end_layout
 
 \end_inset
@@ -3260,7 +3260,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{FFBAR}=
 \backslash
@@ -3270,7 +3270,7 @@ overline{f}^2=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^nf^2_i$$
+sum_{i=1}^nf^2_i$
 \end_layout
 
 \end_inset
@@ -3284,7 +3284,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{OOBAR}=
 \backslash
@@ -3294,7 +3294,7 @@ overline{o}^2=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^no^2_i$$
+sum_{i=1}^no^2_i$
 \end_layout
 
 \end_inset
@@ -3334,7 +3334,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{FABAR}=
 \backslash
@@ -3344,7 +3344,7 @@ overline{f-c}=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(f_i-c)$$
+sum_{i=1}^n(f_i-c)$
 \end_layout
 
 \end_inset
@@ -3358,7 +3358,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{OABAR}=
 \backslash
@@ -3368,7 +3368,7 @@ overline{o-c}=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(o_i-c)$$
+sum_{i=1}^n(o_i-c)$
 \end_layout
 
 \end_inset
@@ -3382,7 +3382,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{FOABAR}=
 \backslash
@@ -3392,7 +3392,7 @@ overline{(f-c)(o-c)}=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(f_i-c)(o_i-c)$$
+sum_{i=1}^n(f_i-c)(o_i-c)$
 \end_layout
 
 \end_inset
@@ -3406,7 +3406,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{FFABAR}=
 \backslash
@@ -3416,7 +3416,7 @@ overline{(f-c)}^2=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(f_i-c)^2$$
+sum_{i=1}^n(f_i-c)^2$
 \end_layout
 
 \end_inset
@@ -3430,7 +3430,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{OOABAR}=
 \backslash
@@ -3440,7 +3440,7 @@ overline{(o-c)}^2=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(o_i-c)^2$$
+sum_{i=1}^n(o_i-c)^2$
 \end_layout
 
 \end_inset
@@ -3540,7 +3540,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UFBAR}=
 \backslash
@@ -3550,7 +3550,7 @@ overline{u}_f=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^nu_{fi}$$
+sum_{i=1}^nu_{fi}$
 \end_layout
 
 \end_inset
@@ -3564,7 +3564,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{VFBAR}=
 \backslash
@@ -3574,7 +3574,7 @@ overline{v}_f=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^nv_{fi}$$
+sum_{i=1}^nv_{fi}$
 \end_layout
 
 \end_inset
@@ -3588,7 +3588,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UOBAR}=
 \backslash
@@ -3598,7 +3598,7 @@ overline{u}_o=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^nu_{oi}$$
+sum_{i=1}^nu_{oi}$
 \end_layout
 
 \end_inset
@@ -3612,7 +3612,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{VOBAR}=
 \backslash
@@ -3622,7 +3622,7 @@ overline{v}_o=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^nv_{oi}$$
+sum_{i=1}^nv_{oi}$
 \end_layout
 
 \end_inset
@@ -3636,7 +3636,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UVFOBAR}=
 \backslash
@@ -3644,7 +3644,7 @@ hbox{Mean}(u_fu_o+v_fv_o)=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(u_{fi}u_{oi}+v_{fi}v_{oi})$$
+sum_{i=1}^n(u_{fi}u_{oi}+v_{fi}v_{oi})$
 \end_layout
 
 \end_inset
@@ -3658,7 +3658,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UVFFBAR}=
 \backslash
@@ -3666,7 +3666,7 @@ hbox{Mean}(u_f^2+v_f^2)=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(u_{fi}^2+v_{fi}^2)$$
+sum_{i=1}^n(u_{fi}^2+v_{fi}^2)$
 \end_layout
 
 \end_inset
@@ -3680,7 +3680,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UVOOBAR}=
 \backslash
@@ -3688,7 +3688,7 @@ hbox{Mean}(u_o^2+v_o^2)=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(u_{oi}^2+v_{oi}^2)$$
+sum_{i=1}^n(u_{oi}^2+v_{oi}^2)$
 \end_layout
 
 \end_inset
@@ -3751,7 +3751,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UFABAR}=
 \backslash
@@ -3759,7 +3759,7 @@ hbox{Mean}(u_f-u_c)=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(u_{fi}-u_c)$$
+sum_{i=1}^n(u_{fi}-u_c)$
 \end_layout
 
 \end_inset
@@ -3773,7 +3773,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{VFBAR}=
 \backslash
@@ -3781,7 +3781,7 @@ hbox{Mean}(v_f-v_c)=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(v_{fi}-v_c)$$
+sum_{i=1}^n(v_{fi}-v_c)$
 \end_layout
 
 \end_inset
@@ -3795,7 +3795,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UOABAR}=
 \backslash
@@ -3803,7 +3803,7 @@ hbox{Mean}(u_o-u_c)=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(u_{oi}-u_c)$$
+sum_{i=1}^n(u_{oi}-u_c)$
 \end_layout
 
 \end_inset
@@ -3817,7 +3817,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{VOABAR}=
 \backslash
@@ -3825,7 +3825,7 @@ hbox{Mean}(v_o-v_c)=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(v_{oi}-v_c)$$
+sum_{i=1}^n(v_{oi}-v_c)$
 \end_layout
 
 \end_inset
@@ -3839,7 +3839,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UVFOABAR}=
 \backslash
@@ -3847,7 +3847,7 @@ hbox{Mean}[(u_f-u_c)(u_o-u_c)+(v_f-v_c)(v_o-v_c)]=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n(u_{fi}-u_c)+(u_{oi}-u_c)+(v_{fi}-v_c)(v_{oi}-v_c))$$
+sum_{i=1}^n(u_{fi}-u_c)+(u_{oi}-u_c)+(v_{fi}-v_c)(v_{oi}-v_c))$
 \end_layout
 
 \end_inset
@@ -3861,7 +3861,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UVFFABAR}=
 \backslash
@@ -3869,7 +3869,7 @@ hbox{Mean}[(u_f-u_c)^2+(v_f-v_c)^2]=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n((u_{fi}-u_c)^2+(v_{fi}-v_c)^2))$$
+sum_{i=1}^n((u_{fi}-u_c)^2+(v_{fi}-v_c)^2))$
 \end_layout
 
 \end_inset
@@ -3883,7 +3883,7 @@ status open
 
 \begin_layout Plain Layout
 
-$$
+$
 \backslash
 hbox{UVOOABAR}=
 \backslash
@@ -3891,7 +3891,342 @@ hbox{Mean}[(u_o-u_c)^2+(v_o-v_c)^2]=
 \backslash
 frac{1}{n}
 \backslash
-sum_{i=1}^n((u_{oi}-u_c)^2+(v_{oi}-v_c)^2))$$
+sum_{i=1}^n((u_{oi}-u_c)^2+(v_{oi}-v_c)^2))$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection*
+Gradient values
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RAT
+IO" in GRAD output (Table 4-??)
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+These statistics are only computed by the Grid_Stat tool and require vectors
+\series default
+.
+ The measures are defined below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{FGBAR}=
+\backslash
+hbox{Mean}
+\end_layout
+
+\begin_layout Plain Layout
+
+| 
+\backslash
+nabla{f} |
+\end_layout
+
+\begin_layout Plain Layout
+
+=
+\backslash
+frac{1}{n}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+sum_{i=1}^n
+\end_layout
+
+\begin_layout Plain Layout
+
+|
+\backslash
+nabla{f_i}|$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{OGBAR}=
+\backslash
+hbox{Mean}
+\end_layout
+
+\begin_layout Plain Layout
+
+| 
+\backslash
+nabla{o} |
+\end_layout
+
+\begin_layout Plain Layout
+
+=
+\backslash
+frac{1}{n}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+sum_{i=1}^n
+\end_layout
+
+\begin_layout Plain Layout
+
+|
+\backslash
+nabla{o_i}|$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{MGBAR}=
+\backslash
+displaystyle{
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{Max}
+\end_layout
+
+\begin_layout Plain Layout
+
+(
+\backslash
+hbox{FGBAR}, 
+\backslash
+hbox{OGBAR})
+\end_layout
+
+\begin_layout Plain Layout
+
+}$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{EGBAR}=
+\backslash
+hbox{Mean}
+\end_layout
+
+\begin_layout Plain Layout
+
+| 
+\backslash
+nabla{f} - 
+\backslash
+nabla{o} |
+\end_layout
+
+\begin_layout Plain Layout
+
+=
+\backslash
+frac{1}{n}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+sum_{i=1}^n
+\end_layout
+
+\begin_layout Plain Layout
+
+|
+\backslash
+nabla{f_i}- 
+\backslash
+nabla{o_i}|$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{S1}=100
+\backslash
+displaystyle{ 
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\backslash
+sum_{i=1}^n(w_i(e_g))}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+over
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\backslash
+sum_{i=1}^n(w_i(G_L)_i}
+\end_layout
+
+\begin_layout Plain Layout
+
+}$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{S1OG}={
+\backslash
+displaystyle{
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{EGBAR}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+over
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{OGBAR}
+\end_layout
+
+\begin_layout Plain Layout
+
+}}$
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph off
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$
+\backslash
+hbox{FGOGRATIO}={
+\backslash
+displaystyle{
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{FGBAR}
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+over
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+hbox{OGBAR}
+\end_layout
+
+\begin_layout Plain Layout
+
+}}$
 \end_layout
 
 \end_inset
