@@ -32,16 +32,22 @@ regrid = {
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//
+// May be set separately in each "field" entry
+//
 censor_thresh = [];
 censor_val    = [];
+cat_thresh    = [];
 cnt_thresh    = [ NA ];
 cnt_logic     = UNION;
 wind_thresh   = [ NA ];
 wind_logic    = UNION;
+eclv_points   = 0.05;
 
 //
 // Forecast and observation fields to be verified
@@ -53,7 +59,7 @@ fcst = {
         name       = "POP";
         level      = [ "L0" ];
         prob       = TRUE;
-        cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9, >=1.0 ];
+        cat_thresh = [ ==0.1 ];
       }
    ];
 
@@ -68,27 +74,6 @@ obs = {
       }
    ];
 
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Climatology mean data
-//
-climo_mean = {
-
-   file_name = [];
-   field     = [];
-
-   regrid = {
-      method     = NEAREST;
-      width      = 1;
-      vld_thresh = 0.5;
-   }
-
-   time_interp_method = DW_MEAN;
-   match_day          = FALSE;
-   time_step          = 21600;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +128,17 @@ nbrhd = {
    width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fourier decomposition
+//
+fourier = {
+   wave_1d_beg = [];
+   wave_1d_end = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
