@@ -3907,7 +3907,7 @@ Gradient values
 
 \series medium
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RAT
-IO" in GRAD output (Table 4-??)
+IO" in GRAD output (Table 4-15)
 \end_layout
 
 \begin_layout Standard
@@ -3936,7 +3936,8 @@ nabla$
 
 
 \emph default
- is the gradient operator.
+ is the gradient operator, which in this applications signifies the difference
+ between adjacent grid points in both the grid-x and grid-y directions.
  TOTAL is the count of grid locations used in the calculations.
  The remaining measures are defined below:
 \end_layout
@@ -4167,28 +4168,8 @@ sum_{i=1}^n(w_i(G_L)_i}
 \end_layout
 
 \begin_layout Standard
-where the weights are applied at each grid location, with values 
-\emph off
-
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-$w_i = cos
-\backslash
-phi_i$
-\end_layout
-
-\end_inset
-
-
-\emph default
- , the cosine of the latitude at grid point 
-\emph on
-i
-\emph default
-.
+where the weights are applied at each grid location, with values assigned
+ according to the weight option specified in the configuration file.
  The components of the 
 \emph off
 
