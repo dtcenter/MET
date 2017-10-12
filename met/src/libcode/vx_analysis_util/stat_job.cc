@@ -1634,6 +1634,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_nbrctc: c = n_nbrctc_columns;       break;
          case stat_nbrcts: c = n_nbrcts_columns;       break;
          case stat_nbrcnt: c = n_nbrcnt_columns;       break;
+         case stat_grad:   c = n_grad_columns;         break;
          case stat_isc:    c = n_isc_columns;          break;
          case stat_wdir:   c = n_job_wdir_columns;     break;
          case stat_rhist:  c = get_n_rhist_columns(n); break;
@@ -1689,6 +1690,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       case stat_nbrctc: write_header_row       (nbrctc_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
       case stat_nbrcts: write_header_row       (nbrcts_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
       case stat_nbrcnt: write_header_row       (nbrcnt_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+      case stat_grad:   write_header_row       (grad_columns, n_grad_columns, 1,         stat_at, 0, 0); break;
       case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
       case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
       case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
@@ -1811,6 +1813,10 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
 
             case(stat_nbrcnt):
                write_header_row(nbrcnt_columns, n_nbrcnt_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_grad):
+               write_header_row(grad_columns, n_grad_columns, 1, dump_at, 0, 0);
                break;
 
             case(stat_isc):

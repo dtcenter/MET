@@ -468,6 +468,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/stat_analysis/job_aggregate_FHO.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis/job_aggregate_GRAD.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/job_aggregate_ISC.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/job_aggregate_PCT.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis/job_aggregate_RHIST.stat</stat>
