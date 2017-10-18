@@ -1154,7 +1154,7 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
                           << ", table_number = " << (*it)->table_number
                           << ", code = "         << (*it)->code << "\n";
 
-      mlog << Debug(3) << "Using: "
+      mlog << Debug(3) << "Using the first match found: "
                        << "  parm_name: "     << e.parm_name
                        << ", table_number = " << e.table_number
                        << ", code = "         << e.code << "\n\n";
@@ -1217,7 +1217,7 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
                           << ", subcenter = "    << (*it)->subcenter << "\n";
       }
 
-      mlog << Debug(3) << "Using: "
+      mlog << Debug(3) << "Using the first match found: "
                        << "  parm_name: "     << e.parm_name
                        << ", table_number = " << e.table_number
                        << ", code = "         << e.code << "\n\n";
@@ -1354,7 +1354,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
                           << ", index_b = "  << (*it)->index_b
                           << ", index_c = "  << (*it)->index_c << "\n";
 
-      mlog << Debug(3) << "Using: "
+      mlog << Debug(3) << "Using the first match found: "
                        << "  parm_name: " << e.parm_name
                        << ", index_a = "  << e.index_a
                        << ", index_b = "  << e.index_b
@@ -1424,7 +1424,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
                           << ", index_c = "    << (*it)->index_c
                           << "\n";
 
-      mlog << Debug(3) << "Using: "
+      mlog << Debug(3) << "Using the first match found: "
                        << "  parm_name: "   << e.parm_name
                        << ", index_a = "    << e.index_a
                        << ", grib2_mtab = " << e.mtab_set
