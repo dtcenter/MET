@@ -810,7 +810,7 @@ void CommandLine::show_version() const
 
 {
 
-cout << "\nMET Version:\t" << met_version << "\n";
+cout << "\nMET Version: " << met_version << "\n";
 
    //
    //  print contents of version.txt
