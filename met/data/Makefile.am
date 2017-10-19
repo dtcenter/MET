@@ -25,11 +25,11 @@ SUBDIRS = \
 	table_files \
 	tc_data
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+topdir = $(pkgdatadir)
 
-EXTRA_DIST = \
-	sample_fcst \
-	sample_obs \
-	copyright_notice.txt
+top_DATA = \
+	version.txt
 
+EXTRA_DIST = ${top_DATA}
 
+MAINTAINERCLEANFILES 	= Makefile.in
