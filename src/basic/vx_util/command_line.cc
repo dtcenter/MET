@@ -23,6 +23,7 @@ using namespace std;
 #include "command_line.h"
 #include "is_number.h"
 #include "util_constants.h"
+#include "file_exists.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -809,7 +810,34 @@ void CommandLine::show_version() const
 
 {
 
-cout << "\n\n  " << met_version << "\n\n";
+cout << "\nMET Version:\t" << met_version << "\n";
+
+   //
+   //  print contents of version.txt
+   //
+
+ConcatString version_file;
+version_file = replace_path("MET_BASE/version.txt");
+
+if ( file_exists(version_file) )  {
+
+   ifstream in;
+   in.open(version_file);
+   string line;
+
+   if ( !in )  {
+      mlog << Error << "\nCommandLine::show_version() -> "
+           << "unable to open version file \""
+           << version_file << "\"\n\n";
+      exit(1);
+   }
+
+   while ( getline(in, line) )  cout << line << "\n";
+
+   in.close();
+}
+
+cout << "\n";
 
 exit ( 1 );
 

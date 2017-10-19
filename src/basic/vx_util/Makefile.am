@@ -37,6 +37,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                fix_float.cc fix_float.h \
                command_line.cc command_line.h \
                file_size.cc file_size.h \
+               file_exists.cc file_exists.h \
                file_linecount.cc file_linecount.h \
                filename_suffix.cc filename_suffix.h \
                data_plane.cc data_plane.h \
