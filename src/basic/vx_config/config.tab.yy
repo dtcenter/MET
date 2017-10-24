@@ -91,6 +91,8 @@ static Dictionary DD;
 
 static SingleThresh STH;
 
+static const char print_prefix [] = "config: ";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -145,6 +147,7 @@ static void set_number_string();
 static void set_number_string(const char *);
 
 static void do_print(const Number &);
+static void do_print(const char *, const Number &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -205,36 +208,37 @@ statement_list : statement                { is_lhs = true; }
                | statement_list statement { is_lhs = true; }
 
 
-statement : assignment    { is_lhs = true; }
-          | print_value   { is_lhs = true; }
+statement : assign_stmt   { is_lhs = true; }
+          | print_stmt    { is_lhs = true; }
           | threshold     { }
           ;
 
 
-print_value : PRINT expression ';' { do_print($2); }
-            ;
-
-
-
-assignment : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1, $2); }
-           | assign_prefix expression         ';'      { do_assign_exp       ($1, $2); }
-           | assign_prefix IDENTIFIER         ';'      { do_assign_id        ($1, $2); }
-           | assign_prefix piecewise_linear   ';'      { do_pwl              ($1); }
-
-           | assign_prefix threshold          ';'      { do_assign_threshold ($1); }
-           | assign_prefix QUOTED_STRING      ';'      { do_assign_string    ($1, $2); }
-           | assign_prefix dictionary                  { do_assign_dict      ($1); }
-
-           | array_prefix boolean_list    ']' ';'      { do_assign_dict($1); }
-           | array_prefix expression_list ']' ';'      { do_assign_dict($1); }
-           | array_prefix string_list     ']' ';'      { do_assign_dict($1); }
-           | array_prefix threshold_list  ']' ';'      { do_assign_dict($1); }
-           | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
-           | array_prefix                 ']' ';'      { do_assign_dict($1); }
-
-           | function_prefix expression       ';'      {  }
-
+print_stmt : PRINT expression               ';' { do_print($2); }
+           | PRINT QUOTED_STRING expression ';' { do_print($2, $3); }
            ;
+
+
+
+assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1, $2); }
+            | assign_prefix expression         ';'      { do_assign_exp       ($1, $2); }
+            | assign_prefix IDENTIFIER         ';'      { do_assign_id        ($1, $2); }
+            | assign_prefix piecewise_linear   ';'      { do_pwl              ($1); }
+
+            | assign_prefix threshold          ';'      { do_assign_threshold ($1); }
+            | assign_prefix QUOTED_STRING      ';'      { do_assign_string    ($1, $2); }
+            | assign_prefix dictionary                  { do_assign_dict      ($1); }
+
+            | array_prefix boolean_list    ']' ';'      { do_assign_dict($1); }
+            | array_prefix expression_list ']' ';'      { do_assign_dict($1); }
+            | array_prefix string_list     ']' ';'      { do_assign_dict($1); }
+            | array_prefix threshold_list  ']' ';'      { do_assign_dict($1); }
+            | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
+            | array_prefix                 ']' ';'      { do_assign_dict($1); }
+
+            | function_prefix expression       ';'      {  }
+
+            ;
 
 
 
@@ -1090,12 +1094,21 @@ void do_print(const Number & n)
 
 {
 
-cout << "config: ";
+cout << print_prefix << n << '\n' << flush;
 
-if ( n.is_int )  cout << (n.i);
-else             cout << (n.d);
+return;
 
-cout << '\n' << flush;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_print(const char * s, const Number & n)
+
+{
+
+cout << print_prefix << s << n << '\n' << flush;
 
 return;
 
