@@ -32,6 +32,7 @@ libvx_config_a_SOURCES += \
               config_util.cc config_util.h \
               temp_file.cc temp_file.h \
               threshold.cc threshold.h \
+              number_stack.cc number_stack.h \
               builtin.cc builtin.h \
               icode.cc icode.h \
               data_file_type.h \
