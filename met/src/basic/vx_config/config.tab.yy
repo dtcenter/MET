@@ -93,6 +93,8 @@ static SingleThresh STH;
 
 static const char print_prefix [] = "config: ";
 
+static bool is_function_def = false;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -148,6 +150,8 @@ static void set_number_string(const char *);
 
 static void do_print(const Number &);
 static void do_print(const char *, const Number &);
+
+static void do_function_def();
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -214,8 +218,8 @@ statement : assign_stmt   { is_lhs = true; }
           ;
 
 
-print_stmt : PRINT expression               ';' { do_print($2); }
-           | PRINT QUOTED_STRING expression ';' { do_print($2, $3); }
+print_stmt : PRINT expression                         ';' { do_print($2); }
+           | PRINT QUOTED_STRING opt_comma expression ';' { do_print($2, $4); }
            ;
 
 
@@ -236,7 +240,7 @@ assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($
             | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
             | array_prefix                 ']' ';'      { do_assign_dict($1); }
 
-            | function_prefix expression       ';'      {  }
+            | function_prefix expression       ';'      { do_function_def();  }
 
             ;
 
@@ -247,7 +251,7 @@ id_list : IDENTIFIER             {}
         ;
 
 
-function_prefix : IDENTIFIER '(' id_list ')' '='    {}
+function_prefix : IDENTIFIER '(' id_list ')' '='    { is_function_def = true; }
                 ;
 
 
@@ -307,6 +311,11 @@ boolean_list : BOOLEAN                   { do_boolean($1); }
 opt_semi : ';'
          |  /*  nothing  */
          ;
+
+
+opt_comma : ','
+          |  /*  nothing  */
+          ;
 
 
 expression : number                                     { $$ = $1; }
@@ -1109,6 +1118,26 @@ void do_print(const char * s, const Number & n)
 {
 
 cout << print_prefix << s << n << '\n' << flush;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_function_def()
+
+{
+
+
+
+   //
+   //  done
+   //
+
+is_function_def = false;
 
 return;
 
