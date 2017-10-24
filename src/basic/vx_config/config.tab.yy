@@ -67,7 +67,7 @@ const char *      bison_input_filename  = (const char *) 0;
 
 DictionaryStack * dict_stack            = (DictionaryStack *) 0;
 
-bool              is_lhs                = true;
+bool              is_lhs                = true;    //  used by the scanner
 
 ThreshNode *      result                = 0;   //  for testing
 
@@ -144,6 +144,8 @@ static ThreshNode * do_fortran_thresh(const char *);
 static void set_number_string();
 static void set_number_string(const char *);
 
+static void do_print(const Number &);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -171,6 +173,9 @@ static void set_number_string(const char *);
 %token LOGICAL_OP_NOT LOGICAL_OP_AND LOGICAL_OP_OR
 %token FORTRAN_THRESHOLD
 
+%token FUNCTION_NAME
+%token PRINT
+
 
 %type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix FORTRAN_THRESHOLD
 
@@ -195,10 +200,20 @@ static void set_number_string(const char *);
 
 %%
 
-assignment_list : assignment                    { is_lhs = true; }
-                | assignment_list assignment    { is_lhs = true; }
-                | threshold                     {  }
-                ;
+
+statement_list : statement                { is_lhs = true; }
+               | statement_list statement { is_lhs = true; }
+
+
+statement : assignment    { is_lhs = true; }
+          | print_value   { is_lhs = true; }
+          | threshold     { }
+          ;
+
+
+print_value : PRINT expression ';' { do_print($2); }
+            ;
+
 
 
 assignment : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1, $2); }
@@ -217,7 +232,19 @@ assignment : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1
            | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
            | array_prefix                 ']' ';'      { do_assign_dict($1); }
 
+           | function_prefix expression       ';'      {  }
+
            ;
+
+
+
+id_list : IDENTIFIER             {}
+        | id_list ',' IDENTIFIER {}
+        ;
+
+
+function_prefix : IDENTIFIER '(' id_list ')' '='    {}
+                ;
 
 
 assign_prefix : IDENTIFIER '='     { is_lhs = false;  strcpy($$, $1); }
@@ -228,7 +255,7 @@ array_prefix : assign_prefix '['   { is_lhs = false;  strcpy($$, $1); }
              ;
 
 
-dictionary : '{' assignment_list '}'  opt_semi  { do_dict(); }
+dictionary : '{' statement_list '}'  opt_semi  { do_dict(); }
            ;
 
 
@@ -286,6 +313,7 @@ expression : number                                     { $$ = $1; }
            | expression '^' expression                  { $$ = do_op('^', $1, $3); }
            | '-' expression  %prec UNARY_MINUS          { $$ = do_negate($2); }
            | '(' expression ')'                         { $$ = $2; }
+           | FUNCTION_NAME '(' expression ')'           {  }
            ;
 
 
@@ -1049,6 +1077,25 @@ const int k = (int) (sizeof(number_string));
 strncpy(number_string, text, k);
 
 number_string[k - 1] = (char) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_print(const Number & n)
+
+{
+
+cout << "config: ";
+
+if ( n.is_int )  cout << (n.i);
+else             cout << (n.d);
+
+cout << '\n' << flush;
 
 return;
 

@@ -25,7 +25,7 @@ enum ConfigObjectType {
    StringType, 
    DictionaryType, 
    ArrayType, 
-   FunctionType, 
+   PwlFunctionType, 
    ThresholdType, 
 
    no_config_object_type

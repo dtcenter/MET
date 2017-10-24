@@ -26,11 +26,14 @@ endif
 libvx_config_a_SOURCES += \
               configobjecttype_to_string.cc configobjecttype_to_string.h \
               grdfiletype_to_string.cc grdfiletype_to_string.h \
+              celltype_to_string.cc celltype_to_string.h \
               dictionary.cc dictionary.h \
               config_file.cc config_file.h \
               config_util.cc config_util.h \
               temp_file.cc temp_file.h \
               threshold.cc threshold.h \
+              builtin.cc builtin.h \
+              icode.cc icode.h \
               data_file_type.h \
               object_types.h \
               scanner_stuff.h \
@@ -49,11 +52,16 @@ if ENABLE_DEVELOPMENT
     grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
 	${ENUM_TO_STRING} -concat_string -reverse data_file_type.h
 
+    celltype_to_string.cc celltype_to_string.h: icode.h
+	${ENUM_TO_STRING} -concat_string -reverse icode.h
+
     clean-local:
 	-rm -r configobjecttype_to_string.cc
 	-rm -r configobjecttype_to_string.h
 	-rm -r grdfiletype_to_string.cc
 	-rm -r grdfiletype_to_string.h
+	-rm -r celltype_to_string.h
+	-rm -r celltype_to_string.cc
 endif
 
 # If we are in development mode, clean up extra local files in a "make clean".
