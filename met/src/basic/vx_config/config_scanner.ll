@@ -468,6 +468,12 @@ int do_id()
 Column += strlen(configtext);
 
    //
+   //  print?
+   //
+
+if ( strcmp(configtext, "print"  ) == 0 )  { return ( PRINT ); }
+
+   //
    //  boolean?
    //
 

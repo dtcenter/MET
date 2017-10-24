@@ -194,7 +194,7 @@ switch ( entry.Type )  {
       set_threshold(entry.Name, *(entry.Thresh));
       break;
 
-   case FunctionType:
+   case PwlFunctionType:
       set_pwl(entry.Name, *(entry.PWL));
       break;
 
@@ -263,7 +263,7 @@ switch ( Type )  {
       break;
 
 
-   case FunctionType:
+   case PwlFunctionType:
       out << prefix << "Function Value = \n";
       PWL->dump(out, depth + 1);
       break;
@@ -358,7 +358,7 @@ switch ( Type )  {
       out << ";\n";
       break;
 
-   case FunctionType:
+   case PwlFunctionType:
       out << "( ";
       for (k=0; k<(PWL->n_points()); ++k)  {
 
@@ -531,7 +531,7 @@ void DictionaryEntry::set_pwl(const char * _name, const PiecewiseLinear & _pwl)
 
 clear();
 
-Type = FunctionType;
+Type = PwlFunctionType;
 
 if ( nonempty(_name) )  set_name(_name);
 
@@ -778,7 +778,7 @@ PiecewiseLinear * DictionaryEntry::pwl_value() const
 
 {
 
-if ( Type != FunctionType )  {
+if ( Type != PwlFunctionType )  {
 
    mlog << Error
         << "\nDictionaryEntry::pwl_value() -> bad type\n\n";
@@ -2022,7 +2022,7 @@ PiecewiseLinear *Dictionary::lookup_pwl(const char * name, bool error_out)
 const DictionaryEntry * Entry = lookup(name);
 bool is_correct_type = false;
 
-if ( Entry )  is_correct_type = (Entry->type() == FunctionType);
+if ( Entry )  is_correct_type = (Entry->type() == PwlFunctionType);
 
 LastLookupStatus = is_correct_type;
 
