@@ -3761,8 +3761,8 @@ void compute_bca_interval(double s, NumArray &si_na,
    //
    for(i=0, num=0, sum=0; i<n; i++) {
       diff = si_bar - si_na[i];
-      num += pow(diff, 3);
-      sum += pow(diff, 2);
+      num += pow(diff, 3.0);
+      sum += pow(diff, 2.0);
    } // end for i
    den = 6.0*pow(sum, 1.5);
 
