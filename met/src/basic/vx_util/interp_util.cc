@@ -333,7 +333,7 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
 
       if(is_bad_data(data)) continue;
 
-      double dist = sqrt(pow((obs_x-x), 2) + pow((obs_y-y), 2));
+      double dist = sqrt(pow((obs_x-x), 2.0) + pow((obs_y-y), 2.0));
 
       //if the distance is tiny, just use the value at this point.
       if(dist <= 0.001){

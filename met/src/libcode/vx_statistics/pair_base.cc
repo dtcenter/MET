@@ -413,7 +413,7 @@ ob_val_t PairBase::compute_dw_mean(string obs_key) {
    out.qc = (*it).qc;
    for(; it != svt.obs.end(); it++) {
      if( svt.ut == (*it).ut) return *it;
-     weight = 1.0 / pow( labs( svt.ut - (*it).ut ),2);
+     weight = 1.0 / pow( labs( svt.ut - (*it).ut ), 2.0);
 
      total_weight += weight;
      total += (*it).val * weight;
