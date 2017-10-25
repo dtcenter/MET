@@ -210,7 +210,7 @@ switch ( entry.Type )  {
       set_variable(entry.Name, *(entry.v));
       break;
 
-   case FunctionType:
+   case UserFunctionType:
       set_function(entry.Name, *(entry.v), *(entry.local_vars));
       break;
 

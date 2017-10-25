@@ -93,7 +93,7 @@ static Dictionary DD;
 
 static SingleThresh STH;
 
-static const char print_prefix [] = "config: ";
+static const char default_print_prefix [] = "config";
 
 static bool is_function_def = false;
 
@@ -229,9 +229,13 @@ statement : assign_stmt   { is_lhs = true; }
           ;
 
 
-print_stmt : PRINT expression                         ';' { do_print($2); }
-           | PRINT QUOTED_STRING opt_comma expression ';' { do_print($2, $4); }
+print_stmt : print_prefix expression                         ';' { do_print($2); }
+           | print_prefix QUOTED_STRING opt_comma expression ';' { do_print($2, $4); }
            ;
+
+
+print_prefix : PRINT   { is_lhs = false; }
+             ;
 
 
 
@@ -262,7 +266,7 @@ id_list : IDENTIFIER             {}
         ;
 
 
-function_prefix : IDENTIFIER '(' id_list ')' '='    { is_function_def = true; }
+function_prefix : IDENTIFIER '(' id_list ')' '='    { is_lhs = false;  is_function_def = true; }
                 ;
 
 
@@ -1115,7 +1119,12 @@ void do_print(const Number & n)
 
 {
 
-cout << print_prefix << n << '\n' << flush;
+if ( bison_input_filename )  cout << bison_input_filename;
+else                         cout << default_print_prefix;
+
+cout << ": ";
+
+cout << n << '\n' << flush;
 
 return;
 
@@ -1129,7 +1138,12 @@ void do_print(const char * s, const Number & n)
 
 {
 
-cout << print_prefix << s << n << '\n' << flush;
+if ( bison_input_filename )  cout << bison_input_filename;
+else                         cout << default_print_prefix;
+
+cout << ": ";
+
+cout << s << n << '\n' << flush;
 
 return;
 

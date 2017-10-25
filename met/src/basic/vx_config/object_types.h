@@ -30,7 +30,7 @@ enum ConfigObjectType {
 
    VariableType, //  poor name?
 
-   FunctionType, 
+   UserFunctionType, 
 
 
 
