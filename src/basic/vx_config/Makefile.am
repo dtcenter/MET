@@ -36,6 +36,7 @@ libvx_config_a_SOURCES += \
               number_stack.cc number_stack.h \
               builtin.cc builtin.h \
               icode.cc icode.h \
+              calculator.cc calculator.h \
               data_file_type.h \
               object_types.h \
               scanner_stuff.h \

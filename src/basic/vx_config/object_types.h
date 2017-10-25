@@ -28,6 +28,13 @@ enum ConfigObjectType {
    PwlFunctionType, 
    ThresholdType, 
 
+   VariableType, //  poor name?
+
+   FunctionType, 
+
+
+
+
    no_config_object_type
 
 };

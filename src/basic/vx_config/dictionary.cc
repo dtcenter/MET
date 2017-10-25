@@ -117,6 +117,10 @@ Thresh = (SingleThresh *) 0;
 
 PWL = (PiecewiseLinear *) 0;
 
+v = (IcodeVector *) 0;
+
+local_vars = (IdentifierArray *) 0;
+
 clear();
 
 return;
@@ -144,6 +148,10 @@ if ( Dict )  { delete Dict;  Dict = (Dictionary *) 0; }
 if ( Thresh )  { delete Thresh;  Thresh = (SingleThresh *) 0; }
 
 if ( PWL )  { delete PWL;  PWL = (PiecewiseLinear *) 0; }
+
+if ( v )  { delete v;  v = (IcodeVector *) 0; }
+
+if ( local_vars )  { delete local_vars;  local_vars = (IdentifierArray *) 0; }
 
    //
    //  done
@@ -196,6 +204,14 @@ switch ( entry.Type )  {
 
    case PwlFunctionType:
       set_pwl(entry.Name, *(entry.PWL));
+      break;
+
+   case VariableType:
+      set_variable(entry.Name, *(entry.v));
+      break;
+
+   case FunctionType:
+      set_function(entry.Name, *(entry.v), *(entry.local_vars));
       break;
 
    default:
@@ -418,6 +434,42 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void DictionaryEntry::set_icodevector (const IcodeVector & icv)
+
+{
+
+if ( v )  { delete v;  v = 0; }
+
+v = new IcodeVector;
+
+(*v) = icv;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryEntry::set_local_vars (const IdentifierArray & ia)
+
+{
+
+if ( local_vars )  { delete local_vars;  local_vars = 0; }
+
+local_vars = new IdentifierArray;
+
+(*local_vars) = ia;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void DictionaryEntry::set_int (const char * _name, int k)
 
 {
@@ -429,6 +481,41 @@ Type = IntegerType;
 if ( nonempty(_name) )   set_name(_name);
 
 Ival = k;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryEntry::set_variable (const char * _name, const IcodeVector & icv)
+
+{
+
+set_name(_name);
+
+set_icodevector(icv);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void DictionaryEntry::set_function (const char * _name, const IcodeVector & icv, const IdentifierArray & ia)
+
+{
+
+set_name(_name);
+
+set_icodevector(icv);
+
+set_local_vars(ia);
 
 
 return;

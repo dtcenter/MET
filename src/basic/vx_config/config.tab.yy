@@ -29,6 +29,8 @@ using namespace std;
 #include "is_number.h"
 #include "concat_string.h"
 #include "pwl.h"
+#include "icode.h"
+#include "idstack.h"
 
 #include "scanner_stuff.h"
 #include "threshold.h"
@@ -94,6 +96,10 @@ static SingleThresh STH;
 static const char print_prefix [] = "config: ";
 
 static bool is_function_def = false;
+
+static  ICVStack         icvs;
+
+static  IdentifierArray  ida;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,6 +174,8 @@ static void do_function_def();
 
    bool bval;
 
+   int index;
+
    ThreshType cval;
 
    ThreshNode * node;
@@ -179,14 +187,17 @@ static void do_function_def();
 %token COMPARISON NA_COMPARISON
 %token LOGICAL_OP_NOT LOGICAL_OP_AND LOGICAL_OP_OR
 %token FORTRAN_THRESHOLD
+%token BUILTIN
 
-%token FUNCTION_NAME
+%token USER_FUNCTION
 %token PRINT
 
 
 %type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix FORTRAN_THRESHOLD
 
 %type <nval> INTEGER FLOAT number expression
+
+%type <index> BUILTIN
 
 %type <bval> BOOLEAN
 
@@ -326,7 +337,8 @@ expression : number                                     { $$ = $1; }
            | expression '^' expression                  { $$ = do_op('^', $1, $3); }
            | '-' expression  %prec UNARY_MINUS          { $$ = do_negate($2); }
            | '(' expression ')'                         { $$ = $2; }
-           | FUNCTION_NAME '(' expression ')'           {  }
+           | BUILTIN       '(' expression ')'           {  }
+           | USER_FUNCTION '(' expression ')'           {  }
            ;
 
 

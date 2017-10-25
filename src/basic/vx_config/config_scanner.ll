@@ -28,6 +28,7 @@ using namespace std;
 #include "config.tab.h"
 
 #include "dictionary.h"
+#include "builtin.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -497,6 +498,14 @@ if ( strcmp(configtext, "ne" ) == 0 )  { configlval.cval = thresh_ne;  return ( 
 if ( strcmp(configtext, "eq" ) == 0 )  { configlval.cval = thresh_eq;  return ( COMPARISON ); }
 
 if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return ( NA_COMPARISON ); }
+
+   //
+   //  builtin?
+   //
+
+int index;
+
+if ( is_builtin(configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
 
    //
    //  number?
