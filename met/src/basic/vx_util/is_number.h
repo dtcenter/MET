@@ -93,12 +93,7 @@ inline double as_double(const Number & n)
 
 {
 
-double x;
-
-if ( n.is_int )  x = (double) (n.i);
-else             x = n.d;
-
-return ( x );
+return ( (n.is_int) ? ((double) (n.i)) : (n.d) );
 
 }
 

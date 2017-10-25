@@ -33,7 +33,7 @@
 
 class NumberStack {
 
-   private:
+   protected:
 
       void init_from_scratch();
 
@@ -48,7 +48,7 @@ class NumberStack {
 
       int AllocInc;
 
-      Number ** e;
+      Number * e;   //  allocated
 
 
    public:
@@ -80,7 +80,12 @@ class NumberStack {
 
       void push(const Number &);
 
+      void push_int    (const int);
+      void push_double (const double);
+
       Number pop();
+
+      void pop2(Number & a, Number & b);
 
       Number peek() const;
 

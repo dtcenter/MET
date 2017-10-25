@@ -33,6 +33,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static int default_alloc_inc = 100;   //  default value
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //   Code for class NumberStack
    //
@@ -99,9 +105,9 @@ void NumberStack::init_from_scratch()
 
 {
 
-e = (Number **) 0;
+e = 0;
 
-AllocInc = 50;   //  default value
+AllocInc = default_alloc_inc;
 
 clear();
 
@@ -117,26 +123,14 @@ void NumberStack::clear()
 
 {
 
-if ( e )  {
-
-   int j;
-
-   for (j=0; j<Nalloc; ++j)  {
-
-      if ( e[j] )  { delete e[j];  e[j] = (Number *) 0; }
-
-   }
-
-   delete [] e;  e = (Number **) 0;
-
-}   //  if e
+if ( e )  { delete [] e;  e = 0; }
 
 
 Nelements = 0;
 
 Nalloc = 0;
 
-// AllocInc = 50;   //  don't reset AllocInc
+// AllocInc = default_alloc_inc;   //  don't reset AllocInc
 
 
 return;
@@ -147,25 +141,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumberStack::assign(const NumberStack & _a)
+void NumberStack::assign(const NumberStack & s)
 
 {
 
 clear();
 
-if ( _a.depth() == 0 )  return;
+if ( s.depth() == 0 )  return;
 
-extend(_a.depth());
+extend(s.depth());
 
 int j;
 
-for (j=0; j<(_a.depth()); ++j)  {
+for (j=0; j<(s.depth()); ++j)  {
 
-   *(e[j]) = *(_a.e[j]);
+   e[j] = s.e[j];
 
 }
 
-Nelements = _a.Nelements;
+Nelements = s.Nelements;
 
 return;
 
@@ -184,7 +178,7 @@ if ( n <= Nalloc )  return;
 n = AllocInc*( (n + AllocInc - 1)/AllocInc );
 
 int j;
-Number ** u = new Number * [n];
+Number * u = new Number [n];
 
 if ( !u )  {
 
@@ -194,19 +188,17 @@ if ( !u )  {
 
 }
 
-memset(u, 0, n*sizeof(Number *));
-
 for(j=0; j<Nelements; ++j)  {
 
    u[j] = e[j];
 
 }
 
-if ( e )  { delete [] e;  e = (Number **) 0; }
+if ( e )  { delete [] e;  e = 0; }
 
 e = u;
 
-u = (Number **) 0;
+u = 0;
 
 Nalloc = n;
 
@@ -234,7 +226,7 @@ for(j=0; j<Nelements; ++j)  {
 
    out << prefix << "Element # " << j << "\n";
 
-   // e[j]->dump(out, _depth_ + 1);
+   // e[j].dump(out, _depth_ + 1);
 
 }
 
@@ -260,7 +252,7 @@ if ( n < 0 )  {
 
 }
 
-if ( n == 0 )  AllocInc = 50;   //  default value
+if ( n == 0 )  AllocInc = default_alloc_inc;   //  default value
 else           AllocInc = n;
 
 return;
@@ -277,17 +269,39 @@ void NumberStack::push(const Number & a)
 
 extend(Nelements + 1);
 
-e[Nelements] = new Number;
+e[Nelements++] = a;
 
-if ( !(e[Nelements]) )  {
-
-   cerr << "NumberStack::add(const Number &) -> memory allocation error\n\n";
-
-   exit ( 1 );
+return;
 
 }
 
-*(e[Nelements++]) = a;
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumberStack::push_int(const int k)
+
+{
+
+extend(Nelements + 1);
+
+set_int(e[Nelements++], k);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumberStack::push_double (const double x)
+
+{
+
+extend(Nelements + 1);
+
+set_double(e[Nelements++], x);
 
 return;
 
@@ -309,11 +323,34 @@ if ( Nelements <= 0 )  {
 
 }
 
-Number _t = *(e[Nelements - 1]);
+return ( e[Nelements--] );
 
---Nelements;
+}
 
-return ( _t );
+
+////////////////////////////////////////////////////////////////////////
+
+
+void NumberStack::pop2(Number & a, Number & b)
+
+{
+
+if ( Nelements < 2 )  {
+
+   cerr << "NumberStack::pop2() -> stack empty!\n\n";
+
+   exit ( 1 );
+
+}
+
+int k = Nelements - 1;
+
+b = e[k--];
+a = e[k--];
+
+Nelements -= 2;
+
+return;
 
 }
 
@@ -333,9 +370,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-Number _t = *(e[Nelements - 1]);
-
-return ( _t );
+return ( e[Nelements - 1] );
 
 }
 

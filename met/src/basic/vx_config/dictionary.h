@@ -28,6 +28,8 @@
 #include "vx_cal.h"
 #include "vx_log.h"
 #include "pwl.h"
+#include "icode.h"
+#include "idstack.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,6 +75,10 @@ class DictionaryEntry {
 
       PiecewiseLinear * PWL;         //  allocated
 
+      IcodeVector * v;               //  allocated
+
+      IdentifierArray * local_vars;  //  allocated
+
    public:
 
       DictionaryEntry();
@@ -99,7 +105,14 @@ class DictionaryEntry {
       void set_threshold    (const char * _name, const SingleThresh &);
       void set_pwl          (const char * _name, const PiecewiseLinear &);
 
+      void set_variable     (const char * _name, const IcodeVector &);
+
+      void set_function     (const char * _name, const IcodeVector &, const IdentifierArray &);
+
       void set_name         (const char *);
+
+      void set_icodevector  (const IcodeVector &);
+      void set_local_vars   (const IdentifierArray &);
 
          //
          //  get stuff
