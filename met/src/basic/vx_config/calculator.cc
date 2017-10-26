@@ -540,7 +540,7 @@ while ( pos < (v.length()) )  {
    switch ( cell.type )  {
 
       case integer:
-         push_int(cell.val);
+         push_int(cell.i);
          break;
 
       case floating_point:
@@ -591,13 +591,13 @@ while ( pos < (v.length()) )  {
 
 
        case builtin_func:
-         do_builtin(cell.val);
+         do_builtin(cell.i);
          break;
 
 
 /*
        case user_func:
-         do_user_func(cell.val);
+         do_user_func(cell.i);
          break;
 */
 

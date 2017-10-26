@@ -31,6 +31,7 @@ using namespace std;
 #include "pwl.h"
 #include "icode.h"
 #include "idstack.h"
+#include "calculator.h"
 
 #include "scanner_stuff.h"
 #include "threshold.h"
@@ -97,9 +98,11 @@ static const char default_print_prefix [] = "config";
 
 static bool is_function_def = false;
 
-static  ICVStack         icvs;
+static ICVStack         icvs;
 
-static  IdentifierArray  ida;
+static IdentifierArray  ida;
+
+static Calculator hp;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -114,6 +117,8 @@ static Number do_op(char op, const Number & a, const Number & b);
 static Number do_integer_op(char op, const Number & a, const Number & b);
 
 static Number do_negate(const Number &);
+
+static Number do_builtin(int which, const Number &);
 
 
 static void do_assign_boolean   (const char * name, bool);
@@ -153,6 +158,8 @@ static ThreshNode * do_fortran_thresh(const char *);
 
 static void set_number_string();
 static void set_number_string(const char *);
+
+static void mark(int);
 
 static void do_print(const Number &);
 static void do_print(const char *, const Number &);
@@ -341,7 +348,7 @@ expression : number                                     { $$ = $1; }
            | expression '^' expression                  { $$ = do_op('^', $1, $3); }
            | '-' expression  %prec UNARY_MINUS          { $$ = do_negate($2); }
            | '(' expression ')'                         { $$ = $2; }
-           | BUILTIN       '(' expression ')'           {  }
+           | BUILTIN       '(' expression ')'           { $$ = do_builtin($1, $3);  }
            | USER_FUNCTION '(' expression ')'           {  }
            ;
 
@@ -1115,6 +1122,31 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void mark(int k)
+
+{
+
+IcodeVector v;
+IcodeCell cell;
+
+
+cell.type = cell_mark;
+
+cell.i = k;
+
+v.add(cell);
+
+icvs.push(v);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void do_print(const Number & n)
 
 {
@@ -1146,6 +1178,31 @@ cout << ": ";
 cout << s << n << '\n' << flush;
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Number do_builtin(int which, const Number & n)
+
+{
+
+Number result;
+
+hp.push(n);
+
+hp.do_builtin(which);
+
+result = hp.pop();
+
+
+   //
+   //  done
+   //
+
+return ( result );
 
 }
 
