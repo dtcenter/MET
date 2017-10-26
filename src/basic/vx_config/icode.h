@@ -123,7 +123,7 @@ class IcodeCell {
       void set_string(const char *);
 
 
-      int val;
+      int i;
 
       double d;
 

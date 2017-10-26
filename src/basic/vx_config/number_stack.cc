@@ -323,7 +323,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-return ( e[Nelements--] );
+return ( e[--Nelements] );
 
 }
 

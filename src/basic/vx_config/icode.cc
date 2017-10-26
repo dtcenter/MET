@@ -109,7 +109,7 @@ void IcodeCell::init_from_scratch()
 
 {
 
-val = 0;
+i = 0;
 
 d = 0.0;
 
@@ -131,7 +131,7 @@ void IcodeCell::clear()
 
 {
 
-val = 0;
+i = 0;
 
 d = 0.0;
 
@@ -157,7 +157,7 @@ void IcodeCell::assign(const IcodeCell & icc)
 
 {
 
-val = icc.val;
+i = icc.i;
 
 d = icc.d;
 
@@ -187,7 +187,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void IcodeCell::set_integer(int i)
+void IcodeCell::set_integer(int k)
 
 {
 
@@ -195,7 +195,7 @@ clear();
 
 type = integer;
 
-val = i;
+i = k;
 
 
 return;
@@ -212,7 +212,7 @@ void IcodeCell::set_boolean(bool tf)
 
 type = boolean;
 
-val = ( tf ? 1 : 0 );
+i = ( tf ? 1 : 0 );
 
 return;
 
@@ -249,7 +249,7 @@ double x;
 
 switch ( type )  {
 
-   case integer:         x = (double) val;  break;
+   case integer:         x = (double) i;  break;
    case floating_point:  x = d;             break;
 
    default:
@@ -276,7 +276,7 @@ int k;
 
 switch ( type )  {
 
-   case integer:         k = val;          break;
+   case integer:         k = i;            break;
    case floating_point:  k = my_nint(d);   break;
 
    default:
@@ -310,11 +310,11 @@ out << prefix << "Type   = " << celltype_to_string(type) << "\n";
 switch ( type )  {
 
    case integer:
-      out << prefix << "value  = " << val << "\n";
+      out << prefix << "value  = " << i << "\n";
       break;
 
    case boolean:
-      out << prefix << "value  = " << (val ? "true" : "false" ) << "\n";
+      out << prefix << "value  = " << (i ? "true" : "false" ) << "\n";
       break;
 
    case floating_point:
@@ -337,8 +337,8 @@ switch ( type )  {
 
 
    case cell_mark:
-      out << prefix << "value  = " << val;
-      if ( (val >= 33) && (val <= 126) )  out << "  " << "'" << ((char) val) << "'";
+      out << prefix << "value  = " << i;
+      if ( (i >= 33) && (i <= 126) )  out << "  " << "'" << ((char) i) << "'";
       out << "\n";
       break;
 
@@ -352,8 +352,8 @@ switch ( type )  {
       break;
 
    case builtin_func:
-      out << prefix << "name   = " << (binfo[val].name)   << "\n";
-      out << prefix << "# args = " << (binfo[val].n_vars) << "\n";
+      out << prefix << "name   = " << (binfo[i].name)   << "\n";
+      out << prefix << "# args = " << (binfo[i].n_vars) << "\n";
       break;
 
    default:
@@ -433,7 +433,7 @@ clear();
 
 type = builtin_func;
 
-val = index;
+i = index;
 
 
 return;

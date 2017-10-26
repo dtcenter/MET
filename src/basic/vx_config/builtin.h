@@ -61,6 +61,9 @@ enum Builtin {
 
    builtin_step,
 
+   builtin_F_to_C, 
+   builtin_C_to_F, 
+
 
       //
       //  built-in functions of two variables
