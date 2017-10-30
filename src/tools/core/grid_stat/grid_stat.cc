@@ -2050,8 +2050,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    bool apply_mask;
 
    // Append nc_pairs_var_str config file entry
-   if(strlen(conf_info.var_str[i]) > 0) {
-      var_str << "_" << conf_info.var_str[i];
+   if(strlen(conf_info.var_str[i_vx]) > 0) {
+      var_str << "_" << conf_info.var_str[i_vx];
    }
 
    // Append smoothing info for all but nearest neighbor
@@ -2300,8 +2300,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    bool apply_mask;
 
    // Append nc_pairs_var_str config file entry
-   if(strlen(conf_info.var_str[i]) > 0) {
-      var_str << "_" << conf_info.var_str[i];
+   if(strlen(conf_info.var_str[i_vx]) > 0) {
+      var_str << "_" << conf_info.var_str[i_vx];
    }
 
    // Determine the number of masking regions
