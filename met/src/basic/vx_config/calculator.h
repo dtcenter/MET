@@ -31,7 +31,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class Calculator : public NumberStack {
+class Machine : public NumberStack {
 
    protected:
 
@@ -42,10 +42,11 @@ class Calculator : public NumberStack {
 
    public:
 
-      Calculator();
-     ~Calculator();
-      Calculator(const Calculator &);
-      Calculator & operator=(const Calculator &);
+      Machine();
+      Machine(int);
+     ~Machine();
+      Machine(const Machine &);
+      Machine & operator=(const Machine &);
 
       //
       //  set stuff
@@ -83,6 +84,8 @@ class Calculator : public NumberStack {
    void do_sign     ();
 
    void do_builtin  (int which);
+
+   void do_builtin  (int which, const Number *);
 
 };
 

@@ -122,6 +122,8 @@ class IcodeCell {
 
       void set_string(const char *);
 
+      void set_mark(int);
+
 
       int i;
 
@@ -132,9 +134,10 @@ class IcodeCell {
 
       CellType type;
 
-      int is_numeric() const;
+      bool is_numeric() const;
 
-      int is_mark() const;
+      bool is_mark()    const;
+      bool is_mark(int) const;
 
       int as_int() const;
 
@@ -148,7 +151,7 @@ class IcodeCell {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int IcodeCell::is_numeric() const { return ( (type == integer) || (type == floating_point) ); }
+inline bool IcodeCell::is_numeric() const { return ( (type == integer) || (type == floating_point) ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -191,7 +194,10 @@ class IcodeVector {
 
       void dump(ostream &, int depth = 0) const;
 
-      int is_mark() const;
+      bool is_mark()    const;
+      bool is_mark(int) const;
+
+      bool is_numeric () const;
 
 };
 
@@ -283,7 +289,12 @@ class ICVStack {
 
       IcodeVector pop();
 
+      void toss();   //  like "pop", only returns nothing
+                     //   no error if stack is empty
+
       IcodeVector * peek();
+
+      bool top_is_mark(int) const;
 
       int depth() const;
 

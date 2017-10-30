@@ -22,13 +22,13 @@ using namespace std;
 #include "util_constants.h"
 #include "is_number.h"
 
+#include "dictionary.h"
+#include "builtin.h"
+
 #include "scanner_stuff.h" //  must be included before config.tab.h
 #include "threshold.h"     //  must be included before config.tab.h
 
 #include "config.tab.h"
-
-#include "dictionary.h"
-#include "builtin.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -505,7 +505,7 @@ if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return 
 
 int index;
 
-if ( is_builtin(configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
+if ( (! is_lhs) && is_builtin(configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
 
    //
    //  number?
@@ -537,8 +537,17 @@ if ( e && (e->is_number()) && (! is_lhs) )  {
 }
 
    //
-   //  something else?
+   //  user function?
    //
+
+if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
+
+   configlval.entry = e;
+
+   return ( USER_FUNCTION ); 
+
+}
+
 
    //
    //  nope

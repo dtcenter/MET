@@ -33,12 +33,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static int default_alloc_inc = 100;   //  default value
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //   Code for class NumberStack
    //
@@ -107,7 +101,7 @@ void NumberStack::init_from_scratch()
 
 e = 0;
 
-AllocInc = default_alloc_inc;
+AllocInc = default_ns_alloc_inc;
 
 clear();
 
@@ -130,8 +124,9 @@ Nelements = 0;
 
 Nalloc = 0;
 
-// AllocInc = default_alloc_inc;   //  don't reset AllocInc
+AllocInc = default_ns_alloc_inc;
 
+extend(default_ns_alloc_inc);
 
 return;
 
@@ -161,6 +156,8 @@ for (j=0; j<(s.depth()); ++j)  {
 
 Nelements = s.Nelements;
 
+AllocInc = s.AllocInc;
+
 return;
 
 }
@@ -174,6 +171,8 @@ void NumberStack::extend(int n)
 {
 
 if ( n <= Nalloc )  return;
+
+if ( AllocInc <= 0 )  AllocInc = default_ns_alloc_inc;
 
 n = AllocInc*( (n + AllocInc - 1)/AllocInc );
 
@@ -252,7 +251,7 @@ if ( n < 0 )  {
 
 }
 
-if ( n == 0 )  AllocInc = default_alloc_inc;   //  default value
+if ( n == 0 )  AllocInc = default_ns_alloc_inc;   //  default value
 else           AllocInc = n;
 
 return;

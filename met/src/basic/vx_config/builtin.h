@@ -23,6 +23,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+static const int max_builtin_args = 2;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 enum Builtin {
 
 
@@ -112,7 +118,7 @@ struct BuiltinInfo {
 
    const char * name;
 
-   int n_vars;   //  1 or 2
+   int n_args;   //  1 or 2
 
    Builtin id;
 
