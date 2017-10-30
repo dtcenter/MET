@@ -643,9 +643,9 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->Process      = gfld->ipdtmpl[2];
          rec->LvlTyp       = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? 8 : gfld->ipdtmpl[9]);
 
-         //  check for special fixed level types (1 through 10) and set the level values to 0
+         //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
          //  Reference: http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_table4-5.shtml
-         if( rec->LvlTyp >= 1 && rec->LvlTyp <= 10 ) {
+         if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
          } else {
