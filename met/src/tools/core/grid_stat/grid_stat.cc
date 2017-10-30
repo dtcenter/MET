@@ -2244,7 +2244,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       write_netcdf_var_times(&nc_var, dp);
       add_att(&nc_var, "_FillValue", bad_data_float);
       add_var_att_local(&nc_var, "desc", conf_info.desc[i_vx]);
-      add_var_att_local(&nc_var, "masking_region", conf_info.mask_name[i]);
+      add_var_att_local(&nc_var, "masking_region", mask_str);
       add_var_att_local(&nc_var, "smoothing_method", interp_mthd);
       add_att(&nc_var, "smoothing_neighborhood", interp_pnts);
 
@@ -2287,11 +2287,16 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                     int i_vx, const SingleThresh &fcst_st,
                     const SingleThresh &obs_st, int wdth) {
-   int i, n, x, y;
+   int i, n, x, y, n_masks;
    int fcst_flag, obs_flag;
    double fval, oval;
-   ConcatString fcst_var_name, obs_var_name;
+   ConcatString fcst_var_name, obs_var_name, mask_str;
    ConcatString att_str, mthd_str, nbrhd_str;
+   bool apply_mask;
+
+   // Determine the number of masking regions
+   apply_mask = conf_info.nc_info.do_apply_mask;
+   n_masks    = (apply_mask ? conf_info.get_n_mask() : 1);
 
    float *fcst_data = (float *) 0;
    float *obs_data  = (float *) 0;
@@ -2311,14 +2316,18 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Process each of the masking regions
-   for(i=0; i<conf_info.get_n_mask(); i++) {
+   for(i=0; i<n_masks; i++) {
+
+      // If apply_mask is true, create fields for each masking region.
+      // Otherwise create only fields for the FULL domain.
+      mask_str = (apply_mask ? conf_info.mask_name[i] : "FULL");
 
       // Build the forecast variable name
       fcst_var_name << cs_erase
                     << "FCST_"
                     << conf_info.fcst_info[i_vx]->name() << "_"
                     << conf_info.fcst_info[i_vx]->level_name() << "_"
-                    << conf_info.mask_name[i] << "_"
+                    << mask_str << "_"
                     << fcst_st.get_abbr_str() << nbrhd_str;
 
       // Build the observation variable name
@@ -2326,7 +2335,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                    << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
                    << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << conf_info.mask_name[i] << "_"
+                   << mask_str << "_"
                    << obs_st.get_abbr_str() << nbrhd_str;
 
       // Figure out which fields should be written
@@ -2356,7 +2365,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
          add_var_att_local(&fcst_var, "units", conf_info.fcst_info[i_vx]->units());
          write_netcdf_var_times(&fcst_var, fcst_dp);
          add_att(&fcst_var, "_FillValue", bad_data_float);
-         add_var_att_local(&fcst_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&fcst_var, "masking_region", mask_str);
          add_var_att_local(&fcst_var, "smoothing_method", mthd_str);
          add_var_att_local(&fcst_var, "threshold", fcst_st.get_abbr_str());
          add_att(&fcst_var, "smoothing_neighborhood", wdth*wdth);
@@ -2382,7 +2391,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
          add_var_att_local(&obs_var, "units", conf_info.obs_info[i_vx]->units());
          write_netcdf_var_times(&obs_var, obs_dp);
          add_att(&obs_var, "_FillValue", bad_data_float);
-         add_var_att_local(&obs_var, "masking_region", conf_info.mask_name[i]);
+         add_var_att_local(&obs_var, "masking_region", mask_str);
          add_var_att_local(&obs_var, "smoothing_method", mthd_str);
          add_var_att_local(&obs_var, "threshold", obs_st.get_abbr_str());
          add_att(&obs_var, "smoothing_neighborhood", wdth*wdth);
@@ -2394,20 +2403,16 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
             n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
-            // Check whether the mask is on or off for this point
-            if(!conf_info.mask_dp[i].s_is_on(x, y)) {
-               fcst_data[n] = bad_data_float;
-               obs_data[n]  = bad_data_float;
-               continue;
+            // Check apply_mask
+            if(!apply_mask ||
+               (apply_mask && conf_info.mask_dp[i].s_is_on(x, y))) {
+               fcst_data[n] = fcst_dp.get(x, y);
+                obs_data[n] =  obs_dp.get(x, y);
             }
-
-            // Retrieve the data values
-            fval = fcst_dp.get(x, y);
-            oval = obs_dp.get(x, y);
-
-            // Store the values
-            fcst_data[n] = (is_bad_data(fval)   ? bad_data_float : fval);
-            obs_data[n]  = (is_bad_data(oval)   ? bad_data_float : oval);
+            else {
+               fcst_data[n] = bad_data_float;
+                obs_data[n] = bad_data_float;
+            }
 
          } // end for y
       } // end for x
