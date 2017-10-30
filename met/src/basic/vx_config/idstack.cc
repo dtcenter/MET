@@ -584,19 +584,22 @@ void IdentifierArray::dump(ostream & out, int indent_depth) const
 {
 
 int j;
-int do_sep;
+Indent prefix(indent_depth);
 
-do_sep = 0;
+
+out << prefix << "Nelements = " << Nelements << "\n";
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( do_sep )   out << ", ";
+   out << "Element # " << j << " ...\n";
 
-   out << (i[j].name);
-
-   do_sep = 1;
+   i[j].dump(out, indent_depth + 1);
 
 }
+
+   //
+   //  done
+   //
 
 out.flush();
 
@@ -608,7 +611,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int IdentifierArray::has(const char * text) const
+bool IdentifierArray::has(const char * text) const
 
 {
 
@@ -616,13 +619,71 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( strcmp(text, i[j].name) == 0 )  return ( 1 );
+   if ( strcmp(text, i[j].name) == 0 )  return ( true );
 
 }
 
 
 
-return ( 0 );
+return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool IdentifierArray::has(const char * text, int & index) const
+
+{
+
+int j;
+
+index = -1;
+
+for (j=0; j<Nelements; ++j)  {
+
+   if ( strcmp(text, i[j].name) == 0 )  { index = j;   return ( true ); }
+
+}
+
+
+
+return ( false );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void IdentifierArray::add(const char * text)
+
+{
+
+   //
+   //  make sure it's not already there
+   //
+
+if ( has(text) )  {
+
+   cerr << "\n\n  IdentifierArray::add(const char *) -> identifier \""
+        << text << "\" is already in the array\n\n";
+
+   exit ( 1 );
+
+}
+
+extend(Nelements + 1);
+
+i[Nelements++].set(text);
+
+
+   //
+   //  done
+   //
+
+return;
 
 }
 

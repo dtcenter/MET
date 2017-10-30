@@ -356,12 +356,16 @@ switch ( type )  {
       out << prefix << "# args = " << (binfo[i].n_args) << "\n";
       break;
 
+   case local_var:
+      out << prefix << "n      = " << i << "\n";
+      break;
+
    default:
       cerr << "\n\n  IcodeCell::dump() -> unrecognized type ... \"" << celltype_to_string(type) << "\"\n\n";
       exit ( 1 );
       break;
 
-}
+}   //  switch
 
 
 
@@ -432,6 +436,24 @@ void IcodeCell::set_mark(int k)
 clear();
 
 type = cell_mark;
+
+i = k;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void IcodeCell::set_local_var(int k)
+
+{
+
+clear();
+
+type = local_var;
 
 i = k;
 
@@ -744,6 +766,33 @@ for (j=0; j<(v.Ncells); ++j)  {
 }
 
 Ncells += v.Ncells;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void IcodeVector::add_front(const IcodeVector & v)
+
+{
+
+if ( Ncells == 0 )  {
+
+   assign(v);
+
+   return;
+
+}
+
+IcodeVector vv = *this;
+
+assign(v);
+
+add(vv);
+
 
 return;
 

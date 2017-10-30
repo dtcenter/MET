@@ -80,6 +80,10 @@ bool              test_mode             = false;
 
 char number_string [max_id_length];
 
+IdentifierArray  ida;
+
+bool is_function_def = false;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -96,15 +100,14 @@ static SingleThresh STH;
 
 static const char default_print_prefix [] = "config";
 
-static bool is_function_def = false;
 
 static ICVStack         icvs;
 
-static IdentifierArray  ida;
 
 static Machine hp;
 
 static const char apm = 'b';   //  assign_prefix mark
+static const char fcm = 'f';   //  function def mark
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -121,7 +124,7 @@ static Number do_integer_op(char op, const Number & a, const Number & b);
 static void do_negate();
 static void do_paren_exp();
 
-static void do_builtin(int which);
+static void do_builtin_call(int which);
 
 
 static void do_assign_boolean   (const char * name, bool);
@@ -153,6 +156,8 @@ static void do_pwl(const char * LHS);
 
 static void do_number(const Number &);
 
+static void do_local_var(int);
+
 
 static ThreshNode * do_and_thresh    (ThreshNode *, ThreshNode *);
 static ThreshNode * do_or_thresh     (ThreshNode *, ThreshNode *);
@@ -168,9 +173,11 @@ static void set_number_string(const char *);
 
 static void mark(int);
 
+static void do_user_function_call();
+
 static void do_print(const char *);
 
-static void do_function_def();
+static void do_user_function_def();
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,6 +210,7 @@ static void do_function_def();
 %token LOGICAL_OP_NOT LOGICAL_OP_AND LOGICAL_OP_OR
 %token FORTRAN_THRESHOLD
 %token BUILTIN
+%token LOCAL_VAR
 
 %token USER_FUNCTION
 %token PRINT
@@ -214,6 +222,7 @@ static void do_function_def();
 %type <nval> INTEGER FLOAT number
 
 %type <index> BUILTIN
+%type <index> LOCAL_VAR
 
 %type <bval> BOOLEAN
 
@@ -271,14 +280,14 @@ assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($
             | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
             | array_prefix                 ']' ';'      { do_assign_dict($1); }
 
-            | function_prefix expression       ';'      { do_function_def();  }
+            | function_prefix expression       ';'      { do_user_function_def(); }
 
             ;
 
 
 
-id_list : IDENTIFIER             {}
-        | id_list ',' IDENTIFIER {}
+id_list : IDENTIFIER             { ida.add($1); }
+        | id_list ',' IDENTIFIER { ida.add($3); }
         ;
 
 
@@ -349,16 +358,17 @@ opt_comma : ','
           ;
 
 
-expression : number                                              { do_number($1); }
-           | expression '+' expression                           { do_op('+'); }
-           | expression '-' expression                           { do_op('-'); }
-           | expression '*' expression                           { do_op('*'); }
-           | expression '/' expression                           { do_op('/'); }
-           | expression '^' expression                           { do_op('^'); }
-           | '-' expression  %prec UNARY_MINUS                   { do_negate(); }
-           | '(' expression ')'                                  { do_paren_exp(); }
-           | BUILTIN       '(' { mark(0); } expression_list ')'  { do_builtin($1);  }
-           | USER_FUNCTION '(' { mark(0); } expression_list ')'  {  }
+expression : number                                                { do_number($1); }
+           | LOCAL_VAR                                             { do_local_var($1); }
+           | expression '+' expression                             { do_op('+'); }
+           | expression '-' expression                             { do_op('-'); }
+           | expression '*' expression                             { do_op('*'); }
+           | expression '/' expression                             { do_op('/'); }
+           | expression '^' expression                             { do_op('^'); }
+           | '-' expression  %prec UNARY_MINUS                     { do_negate(); }
+           | '(' expression ')'                                    { do_paren_exp(); }
+           | BUILTIN       '(' { mark(fcm); } expression_list ')'  { do_builtin_call($1);  }
+           | USER_FUNCTION '(' { mark(fcm); } expression_list ')'  { do_user_function_call(); }
            ;
 
 
@@ -1281,6 +1291,29 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void do_local_var(int n)
+
+{
+
+IcodeVector v;
+IcodeCell cell;
+
+cell.set_local_var(n);
+
+v.add(cell);
+
+icvs.push(v);
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void do_print(const char * s)
 
 {
@@ -1317,16 +1350,50 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_builtin(int which)
+void do_builtin_call(int which)
 
 {
 
 int j;
-const BuiltinInfo & info = binfo[which];
-Number n[max_builtin_args];
-Number result;
 IcodeVector v;
 IcodeCell cell;
+const BuiltinInfo & info = binfo[which];
+
+
+if ( is_function_def )  {
+
+   IcodeVector vv;
+
+      //  pop the args (in reverse order) from the icodevector stack
+
+   for (j=0; j<(info.n_args); ++j)  {
+
+      vv = icvs.pop();
+
+      v.add_front(vv);
+
+   }
+
+   if ( icvs.top_is_mark(fcm) )  icvs.toss();
+
+      //
+
+   cell.set_builtin(which);
+
+   v.add(cell);
+
+      //
+
+   icvs.push(v);
+
+   return;
+
+}   //  if is function def
+
+   ///////////////////////////////////////
+
+Number n[max_builtin_args];
+Number result;
 
    //
    //  pop the args (in reverse order) from the icodevector stack
@@ -1338,7 +1405,7 @@ for (j=0; j<(info.n_args); ++j)  {
 
    if ( v.is_mark() )  {
 
-      cerr << "\n\n  do_builtin(int) -> too few arguments to builtin function \""
+      cerr << "\n\n  do_builtin_call(int) -> too few arguments to builtin function \""
            << info.name << "\"\n\n";
 
       exit ( 1 );
@@ -1359,7 +1426,7 @@ v = icvs.pop();
 
 if ( ! (v.is_mark()) )  {
 
-   cerr << "\n\n  do_builtin(int) -> too many arguments to builtin function \""
+   cerr << "\n\n  do_builtin_call(int) -> too many arguments to builtin function \""
         << info.name << "\"\n\n";
 
    exit ( 1 );
@@ -1396,17 +1463,42 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_function_def()
+void do_user_function_call()
 
 {
 
 
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_user_function_def()
+
+{
+
+cout << "\n\n  in do_user_function_def() ...\n\n";
+
+cout << "   icvs ...\n";
+
+icvs.dump(cout, 1);
+
+cout << "\n\n   ida ...\n";
+
+ida.dump(cout, 1);
+
+cout << "\n\n";
 
    //
    //  done
    //
 
 is_function_def = false;
+
+ida.clear();
 
 return;
 
