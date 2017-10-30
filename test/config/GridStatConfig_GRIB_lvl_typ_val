@@ -78,6 +78,7 @@ fcst = {
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
         desc = tropo;
+        nc_pairs_var_str = "TROPO";
       },
       {
         //max wind
@@ -85,6 +86,7 @@ fcst = {
         GRIB_lvl_typ = 6;
         GRIB_lvl_val1 = 0;
         desc = maxw;
+        nc_pairs_var_str = "MAXWIND";
       },
       {
         // theta 310
@@ -113,6 +115,7 @@ fcst = {
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
         desc = tropo;
+        nc_pairs_var_str = "TROPO";
       },
       {
         // max wind
@@ -120,6 +123,7 @@ fcst = {
         GRIB_lvl_typ = 6;
         GRIB_lvl_val1 = 0;
         desc = maxw;
+        nc_pairs_var_str = "MAXWIND";
       },
       {
         // tropopause
@@ -127,6 +131,7 @@ fcst = {
         GRIB_lvl_typ = 7;
         GRIB_lvl_val1 = 0;
         desc = tropo;
+        nc_pairs_var_str = "TROPO";
       },
       {
         // max wind
@@ -134,6 +139,7 @@ fcst = {
         GRIB_lvl_typ = 76;
         GRIB_lvl_val1 = 0;
         desc = maxw;
+        nc_pairs_var_str = "MAXWIND";
       },
       {
         // freezing level
@@ -141,6 +147,7 @@ fcst = {
         GRIB_lvl_typ = 4;
         GRIB_lvl_val1 = 0;
         desc = fzl;
+        nc_pairs_var_str = "FREEZING";
       }
    ];
 
