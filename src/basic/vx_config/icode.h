@@ -84,6 +84,8 @@ enum CellType {
    user_func, 
    builtin_func, 
 
+   local_var, 
+
    character_string,
 
 
@@ -123,6 +125,8 @@ class IcodeCell {
       void set_string(const char *);
 
       void set_mark(int);
+
+      void set_local_var(int);
 
 
       int i;
@@ -190,7 +194,8 @@ class IcodeVector {
 
       void add(const IcodeCell &);
 
-      void add(const IcodeVector &);
+      void add       (const IcodeVector &);
+      void add_front (const IcodeVector &);
 
       void dump(ostream &, int depth = 0) const;
 

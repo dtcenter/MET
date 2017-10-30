@@ -46,7 +46,11 @@ extern int Column;
 
 extern DictionaryStack * dict_stack;
 
+extern IdentifierArray  ida;
+
 extern bool is_lhs;
+
+extern bool is_function_def;
 
 extern void start_string_scan  (const char *);
 extern void finish_string_scan ();
@@ -500,12 +504,18 @@ if ( strcmp(configtext, "eq" ) == 0 )  { configlval.cval = thresh_eq;  return ( 
 if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return ( NA_COMPARISON ); }
 
    //
-   //  builtin?
+   //  builtin ?
    //
 
 int index;
 
 if ( (! is_lhs) && is_builtin(configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
+
+   //
+   //  local variable ?
+   //
+
+if ( is_function_def && ida.has(configtext, index) )  { configlval.index = index;  return ( LOCAL_VAR ); }
 
    //
    //  number?

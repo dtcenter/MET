@@ -87,6 +87,8 @@ class Machine : public NumberStack {
 
    void do_builtin  (int which, const Number *);
 
+   void do_user_func  (const DictionaryEntry *);
+
 };
 
 

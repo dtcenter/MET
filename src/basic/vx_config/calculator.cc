@@ -545,6 +545,23 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void Machine::do_user_func(const DictionaryEntry * e)
+
+{
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void Machine::run(const IcodeVector & v)
 
 {
@@ -616,11 +633,11 @@ while ( pos < (v.length()) )  {
          break;
 
 
-/*
+
        case user_func:
-         do_user_func(cell.i);
+         do_user_func(0);
          break;
-*/
+
 
 
 

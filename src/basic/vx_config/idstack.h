@@ -136,13 +136,17 @@ class IdentifierArray {
 
       void clear();
 
+      void add(const char *);
+
       const Identifier & operator[](int) const;
 
       void add(const Identifier &);
 
       void dump(ostream &, int depth = 0) const;
 
-      int has(const char *) const;
+      bool has(const char *) const;
+
+      bool has(const char *, int & index) const;
 
 };
 
