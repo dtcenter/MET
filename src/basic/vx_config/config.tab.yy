@@ -102,7 +102,9 @@ static ICVStack         icvs;
 
 static IdentifierArray  ida;
 
-static Calculator hp;
+static Machine hp;
+
+static const char apm = 'b';   //  assign_prefix mark
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -112,17 +114,18 @@ static Calculator hp;
    //  static declarations
    //
 
-static Number do_op(char op, const Number & a, const Number & b);
+static void do_op(char op);
 
 static Number do_integer_op(char op, const Number & a, const Number & b);
 
-static Number do_negate(const Number &);
+static void do_negate();
+static void do_paren_exp();
 
-static Number do_builtin(int which, const Number &);
+static void do_builtin(int which);
 
 
 static void do_assign_boolean   (const char * name, bool);
-static void do_assign_exp       (const char * name, const Number &);
+static void do_assign_exp       (const char * name);
 static void do_assign_string    (const char * name, const char * text);
 static void do_assign_threshold (const char * name);
 
@@ -130,21 +133,25 @@ static void do_assign_id      (const char * LHS, const char * RHS);
 
 static void do_assign_dict    (const char * name);
 
+static void do_assign_exp_array(const char * name);
+
 static void do_dict();
 
 static void do_string(const char *);
 
 static void do_boolean(const bool &);
 
-static void do_number(const Number &);
+static void store_exp();
 
 static void do_thresh(ThreshNode *);
 
 static void do_na_thresh();
 
-static void add_point(const Number &, const Number &);
+static void add_point();
 
 static void do_pwl(const char * LHS);
+
+static void do_number(const Number &);
 
 
 static ThreshNode * do_and_thresh    (ThreshNode *, ThreshNode *);
@@ -161,8 +168,7 @@ static void set_number_string(const char *);
 
 static void mark(int);
 
-static void do_print(const Number &);
-static void do_print(const char *, const Number &);
+static void do_print(const char *);
 
 static void do_function_def();
 
@@ -187,6 +193,8 @@ static void do_function_def();
 
    ThreshNode * node;
 
+   const DictionaryEntry * entry;
+
 }
 
 
@@ -202,7 +210,8 @@ static void do_function_def();
 
 %type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix FORTRAN_THRESHOLD
 
-%type <nval> INTEGER FLOAT number expression
+// %type <nval> INTEGER FLOAT number expression
+%type <nval> INTEGER FLOAT number
 
 %type <index> BUILTIN
 
@@ -236,8 +245,8 @@ statement : assign_stmt   { is_lhs = true; }
           ;
 
 
-print_stmt : print_prefix expression                         ';' { do_print($2); }
-           | print_prefix QUOTED_STRING opt_comma expression ';' { do_print($2, $4); }
+print_stmt : print_prefix expression                         ';' { do_print( 0); }
+           | print_prefix QUOTED_STRING opt_comma expression ';' { do_print($2); }
            ;
 
 
@@ -247,7 +256,7 @@ print_prefix : PRINT   { is_lhs = false; }
 
 
 assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1, $2); }
-            | assign_prefix expression         ';'      { do_assign_exp       ($1, $2); }
+            | assign_prefix expression         ';'      { do_assign_exp       ($1); }
             | assign_prefix IDENTIFIER         ';'      { do_assign_id        ($1, $2); }
             | assign_prefix piecewise_linear   ';'      { do_pwl              ($1); }
 
@@ -256,7 +265,7 @@ assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($
             | assign_prefix dictionary                  { do_assign_dict      ($1); }
 
             | array_prefix boolean_list    ']' ';'      { do_assign_dict($1); }
-            | array_prefix expression_list ']' ';'      { do_assign_dict($1); }
+            | array_prefix expression_list ']' ';'      { do_assign_exp_array($1); }
             | array_prefix string_list     ']' ';'      { do_assign_dict($1); }
             | array_prefix threshold_list  ']' ';'      { do_assign_dict($1); }
             | array_prefix dictionary_list ']' ';'      { do_assign_dict($1); }
@@ -281,7 +290,7 @@ assign_prefix : IDENTIFIER '='     { is_lhs = false;  strcpy($$, $1); }
               ;
 
 
-array_prefix : assign_prefix '['   { is_lhs = false;  strcpy($$, $1); }
+array_prefix : assign_prefix { mark(apm); } '['   { is_lhs = false;  strcpy($$, $1); }
              ;
 
 
@@ -340,22 +349,22 @@ opt_comma : ','
           ;
 
 
-expression : number                                     { $$ = $1; }
-           | expression '+' expression                  { $$ = do_op('+', $1, $3); }
-           | expression '-' expression                  { $$ = do_op('-', $1, $3); }
-           | expression '*' expression                  { $$ = do_op('*', $1, $3); }
-           | expression '/' expression                  { $$ = do_op('/', $1, $3); }
-           | expression '^' expression                  { $$ = do_op('^', $1, $3); }
-           | '-' expression  %prec UNARY_MINUS          { $$ = do_negate($2); }
-           | '(' expression ')'                         { $$ = $2; }
-           | BUILTIN       '(' expression ')'           { $$ = do_builtin($1, $3);  }
-           | USER_FUNCTION '(' expression ')'           {  }
+expression : number                                              { do_number($1); }
+           | expression '+' expression                           { do_op('+'); }
+           | expression '-' expression                           { do_op('-'); }
+           | expression '*' expression                           { do_op('*'); }
+           | expression '/' expression                           { do_op('/'); }
+           | expression '^' expression                           { do_op('^'); }
+           | '-' expression  %prec UNARY_MINUS                   { do_negate(); }
+           | '(' expression ')'                                  { do_paren_exp(); }
+           | BUILTIN       '(' { mark(0); } expression_list ')'  { do_builtin($1);  }
+           | USER_FUNCTION '(' { mark(0); } expression_list ')'  {  }
            ;
 
 
 
-expression_list : expression                     { do_number($1); }
-                | expression_list ',' expression { do_number($3); }
+expression_list : expression                     { store_exp(); }
+                | expression_list ',' expression { store_exp(); }
                 ;
 
 
@@ -368,7 +377,7 @@ point_list : point              { }
            ;
 
 
-point : '(' expression ',' expression ')'   { add_point($2, $4); }
+point : '(' expression ',' expression ')'   { add_point(); }
 
 
 
@@ -466,80 +475,54 @@ return ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-Number do_op(char op, const Number & a, const Number & b)
+void do_op(char op)
 
 {
 
-Number c;
-double A, B, C;
+IcodeCell cell;
+IcodeVector L, R;
 
-   //
-   //  treat ^ as a special case
-   //
 
-if ( op == '^' )  {
+R = icvs.pop();
+L = icvs.pop();
 
-   A = as_double(a);   
-   B = as_double(b);   
-
-   C = pow(A, B);
-
-   set_double(c, C);
-
-   return ( c );
-
-}
-
-   //
-   //  for all other operators, see if we're doing integer arithmetic
-   //
-
-if ( a.is_int && b.is_int )  {
-
-   c = do_integer_op(op, a, b);
-
-   return ( c );
-
-}
-
-   //
-   //  do floating-point arithmetic
-   //
-
-A = as_double(a);   
-B = as_double(b);   
 
 switch ( op )  {
 
-   case '+':  C = A + B;  break;
-   case '-':  C = A - B;  break;
-   case '*':  C = A * B;  break;
-   case '/':
-      if ( is_eq(B, 0.0) )  {
-         mlog << Error
-              << "\ndo_op() -> "
-              << "division by zero!\n\n";
-         exit ( 1 );
-      }
-      C = A / B;
+
+   case '+':  cell.type = op_add;       break;
+   case '-':  cell.type = op_subtract;  break;
+
+
+   case '*':  cell.type = op_multiply;  break;
+   case '/':  cell.type = op_divide;    break;
+
+
+   case '^':
+      if ( (R.length() == 1) && (R[0].type == integer) && (R[0].i == 2) )   cell.type = op_square;
+      else                                                                  cell.type = op_power;
       break;
 
+
    default:
-      mlog << Error
-           << "\ndo_op() -> "
-           << "bad operator ... \"" << op << "\"\n\n";
+      cerr << "\n\n  do_op() -> unrecognized op ... \"" << op << "\"\n\n";
       exit ( 1 );
       break;
 
-}
 
-set_double(c, C);
+}   //  switch
+
+if ( cell.type != op_square )   L.add(R);
+
+L.add(cell);
+
+icvs.push(L);
 
    //
    //  done
    //
 
-return ( c );
+return;
 
 }
 
@@ -595,16 +578,38 @@ return ( c );
 ////////////////////////////////////////////////////////////////////////
 
 
-Number do_negate(const Number & a)
+void do_negate()
 
 {
 
-Number b;
+IcodeVector v;
+IcodeCell cell;
 
-if ( a.is_int )  set_int    (b, -(a.i));
-else             set_double (b, -(a.d));
+cell.type = op_negate;
 
-return ( b );
+v = icvs.pop();
+
+v.add(cell);
+
+icvs.push(v);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_paren_exp()
+
+{
+
+   //
+   //  nothing to do here!
+   //
+
+return;
 
 }
 
@@ -650,14 +655,22 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_assign_exp(const char * name, const Number & n)
+void do_assign_exp(const char * name)
 
 {
 
 DictionaryEntry entry;
+IcodeVector v;
+Number n;
 
-if ( n.is_int )  entry.set_int    (name, n.i);
-else             entry.set_double (name, n.d);
+v = icvs.pop();
+
+hp.run(v);
+
+n = hp.pop();
+
+if ( n.is_int)  entry.set_int    (name, n.i);
+else            entry.set_double (name, n.d);
 
 dict_stack->store(entry);
 
@@ -765,6 +778,69 @@ if ( DD.n_entries() > 0 )  {
 
 }
 
+if ( icvs.top_is_mark(apm) )  icvs.toss();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_assign_exp_array(const char * name)
+
+{
+
+int j, count;
+IcodeVector v;
+Number n;
+NumberStack ns;
+DictionaryEntry e;
+
+
+
+count = 0;
+
+while ( 1 )  {
+
+   v = icvs.pop();
+
+   if ( v.is_mark() )  break;
+
+   hp.run(v);
+
+   n = hp.pop();
+
+   ns.push(n);
+
+   ++count;
+
+}   //  while
+
+
+for (j=0; j<count; ++j)  {
+
+   e.clear();
+
+   n = ns.pop();
+
+   if ( n.is_int )  e.set_int    (0, n.i);
+   else             e.set_double (0, n.d);
+
+   dict_stack->store(e);
+
+}   //  for j
+
+dict_stack->set_top_is_array(true);
+
+dict_stack->pop_dict(name);
+
+
+DD.clear();
+
+if ( icvs.top_is_mark(apm) )  icvs.toss();
+
 return;
 
 }
@@ -811,16 +887,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_number(const Number & number)
+void store_exp()
 
 {
 
-DictionaryEntry e;
 
-if ( number.is_int )  e.set_int    (0, number.i);
-else                  e.set_double (0, number.d);
-
-dict_stack->store(e);
+// DictionaryEntry e;
+// IcodeVector v;
+// Number n;
+// 
+// v = icvs.pop();
+// 
+// hp.run(v);
+// 
+// n = hp.pop();
+// 
+// if ( n.is_int )  e.set_int    (0, n.i);
+// else             e.set_double (0, n.d);
+// 
+// dict_stack->store(e);
 
 
 return;
@@ -893,11 +978,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void add_point(const Number & x, const Number & y)
+void add_point()
 
 {
 
-pwl.add_point(as_double(x), as_double(y));
+double x, y;
+IcodeVector xv, yv;
+Number n;
+
+yv = icvs.pop();
+xv = icvs.pop();
+
+hp.run(xv);
+
+n = hp.pop();
+
+x = as_double(n);
+
+hp.run(yv);
+
+n = hp.pop();
+
+y = as_double(n);
+
+pwl.add_point(x, y);
 
 return;
 
@@ -1147,16 +1251,27 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_print(const Number & n)
+void do_number(const Number & n)
 
 {
 
-if ( bison_input_filename )  cout << bison_input_filename;
-else                         cout << default_print_prefix;
+IcodeVector v;
+IcodeCell cell;
 
-cout << ": ";
+if ( n.is_int )  {
 
-cout << n << '\n' << flush;
+   cell.set_integer(n.i);
+
+} else {
+
+   cell.set_double (n.d);
+
+}
+
+v.add(cell);
+
+icvs.push(v);
+
 
 return;
 
@@ -1166,16 +1281,33 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_print(const char * s, const Number & n)
+void do_print(const char * s)
 
 {
+
+IcodeVector v;
+Number n;
+
 
 if ( bison_input_filename )  cout << bison_input_filename;
 else                         cout << default_print_prefix;
 
 cout << ": ";
 
-cout << s << n << '\n' << flush;
+if ( s )  cout << s;
+
+v = icvs.pop();
+
+hp.run(v);
+
+n = hp.pop();
+
+if ( n.is_int )  cout << (n.i) << "\n";
+else             cout << (n.d) << "\n";
+
+
+
+cout.flush();
 
 return;
 
@@ -1185,24 +1317,78 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Number do_builtin(int which, const Number & n)
+void do_builtin(int which)
 
 {
 
+int j;
+const BuiltinInfo & info = binfo[which];
+Number n[max_builtin_args];
 Number result;
+IcodeVector v;
+IcodeCell cell;
 
-hp.push(n);
+   //
+   //  pop the args (in reverse order) from the icodevector stack
+   //
 
-hp.do_builtin(which);
+for (j=0; j<(info.n_args); ++j)  {
+
+   v = icvs.pop();
+
+   if ( v.is_mark() )  {
+
+      cerr << "\n\n  do_builtin(int) -> too few arguments to builtin function \""
+           << info.name << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   hp.run(v);
+
+   n[info.n_args - 1 - j] = hp.pop();
+
+}
+
+   //
+   //  next one should be a mark
+   //
+
+v = icvs.pop();
+
+if ( ! (v.is_mark()) )  {
+
+   cerr << "\n\n  do_builtin(int) -> too many arguments to builtin function \""
+        << info.name << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  call the function
+   //
+
+hp.do_builtin(which, n);
 
 result = hp.pop();
+
+if ( result.is_int )  cell.set_integer (result.i);
+else                  cell.set_double  (result.d);
+
+v.clear();
+
+v.add(cell);
+
+icvs.push(v);
 
 
    //
    //  done
    //
 
-return ( result );
+return;
 
 }
 

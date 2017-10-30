@@ -353,7 +353,7 @@ switch ( type )  {
 
    case builtin_func:
       out << prefix << "name   = " << (binfo[i].name)   << "\n";
-      out << prefix << "# args = " << (binfo[i].n_vars) << "\n";
+      out << prefix << "# args = " << (binfo[i].n_args) << "\n";
       break;
 
    default:
@@ -425,6 +425,24 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void IcodeCell::set_mark(int k)
+
+{
+
+clear();
+
+type = cell_mark;
+
+i = k;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void IcodeCell::set_builtin(int index)
 
 {
@@ -444,13 +462,23 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int IcodeCell::is_mark() const
+bool IcodeCell::is_mark() const
 
 {
 
-if ( type == cell_mark )  return ( 1 );
+return ( type == cell_mark );
 
-return ( 0 );
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool IcodeCell::is_mark(int k) const
+
+{
+
+return ( (type == cell_mark) && (i == k) );
 
 }
 
@@ -768,15 +796,41 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-int IcodeVector::is_mark() const
+bool IcodeVector::is_mark() const
 
 {
 
-if ( Ncells != 1 )  return ( 0 );
+if ( Ncells != 1 )  return ( false );
 
-if ( Cell[0].is_mark() )  return ( 1 );
+return ( Cell[0].is_mark() );
 
-return ( 0 );
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool IcodeVector::is_mark(int k) const
+
+{
+
+if ( Ncells != 1 )  return ( false );
+
+return ( Cell[0].is_mark(k) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool IcodeVector::is_numeric() const
+
+{
+
+if ( Ncells != 1 )  return ( false );
+
+return ( Cell[0].is_numeric() );
 
 }
 
@@ -1164,6 +1218,8 @@ if ( Depth >= icv_stack_size )  {
 
    cerr << "\n\n  ICVStack::push(const IcodeVector &) -> stack full!\n\n";
 
+   dump(cout);
+
    exit ( 1 );
 
 }
@@ -1221,6 +1277,22 @@ return ( V );
 ////////////////////////////////////////////////////////////////////////
 
 
+void ICVStack::toss()
+
+{
+
+if ( Depth <= 0 )  return;   //  no error if stack is empty
+
+IcodeVector V = pop();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 IcodeVector * ICVStack::peek()
 
 {
@@ -1235,6 +1307,23 @@ if ( Depth <= 0 )  {
 
 
 return ( v[Depth - 1] );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool ICVStack::top_is_mark(int k) const
+
+{
+
+if ( Depth <= 0 )  return ( false );
+
+const IcodeVector & top = *(v[Depth - 1]);
+
+
+return ( top.is_mark(k) );
 
 }
 

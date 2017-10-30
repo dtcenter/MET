@@ -87,13 +87,13 @@ for (j=1; j<argc; ++j)  {   //  j starts at one, here
    //
    //  dump the contents
    //
-/*
+
 cout << "\n\n";
 
 config.dump(cout);
 
 cout << "\n\n";
-
+/*
 config.dump_config_format(cout);
 
 cout << "\n\n";
