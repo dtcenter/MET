@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 extern ConcatString    parse_conf_version(Dictionary *dict);
-extern ConcatString    parse_conf_string(Dictionary *dict, const char *);
+extern ConcatString    parse_conf_string(Dictionary *dict, const char *, bool check_empty = true);
 extern GrdFileType     parse_conf_file_type(Dictionary *dict);
 extern map<STATLineType,STATOutputType>
                        parse_conf_output_flag(Dictionary *dict);

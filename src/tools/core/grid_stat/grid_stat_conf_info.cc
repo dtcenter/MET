@@ -285,6 +285,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
       // Conf: desc
       desc.add(parse_conf_string(&i_odict, conf_key_desc));
 
+      // Conf: nc_pairs_var_str
+      var_str.add(parse_conf_string(&i_odict, conf_key_nc_pairs_var_str, false));
+
       // Conf: eclv_points
       eclv_points[i] = parse_conf_eclv_points(&i_odict);
 

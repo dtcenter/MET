@@ -118,7 +118,8 @@ ConcatString parse_conf_version(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_conf_string(Dictionary *dict, const char *conf_key) {
+ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
+                               bool check_empty) {
    ConcatString s;
 
    if(!dict) {
@@ -130,11 +131,19 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key) {
    s = dict->lookup_string(conf_key);
    if(dict->last_lookup_status()) {
 
-      // Check that it's non-empty and contains no whitespace
-      if(s.empty() || check_reg_exp(ws_reg_exp, s) == true) {
+      // Check for an empty string
+      if(check_empty && s.empty()) {
          mlog << Error << "\nparse_conf_string() -> "
               << "The \"" << conf_key << "\" entry (\"" << s
-              << "\") must be non-empty and contain no embedded whitespace.\n\n";
+              << "\") cannot be empty.\n\n";
+         exit(1);
+      }
+
+      // Check for embedded whitespace in non-empty strings
+      if(!s.empty() && check_reg_exp(ws_reg_exp, s) == true) {
+         mlog << Error << "\nparse_conf_string() -> "
+              << "The \"" << conf_key << "\" entry (\"" << s
+              << "\") cannot contain embedded whitespace.\n\n";
          exit(1);
       }
    }

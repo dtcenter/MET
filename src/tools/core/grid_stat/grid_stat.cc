@@ -2044,10 +2044,15 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
               int i_vx, const ConcatString &interp_mthd,
               int interp_pnts, FieldType field_type) {
    int i, x, y, n, n_masks;
-   ConcatString var_name, interp_str, mask_str;
+   ConcatString var_name, var_str, interp_str, mask_str;
    ConcatString name_att, long_att, level_att, units_att;
    NcVar nc_var;
    bool apply_mask;
+
+   // Append nc_pairs_var_str config file entry
+   if(strlen(conf_info.var_str[i]) > 0) {
+      var_str << "_" << conf_info.var_str[i];
+   }
 
    // Append smoothing info for all but nearest neighbor
    if(interp_pnts > 1) {
@@ -2085,8 +2090,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          var_name  << cs_erase
                    << "FCST_"
                    << conf_info.fcst_info[i_vx]->name() << "_"
-                   << conf_info.fcst_info[i_vx]->level_name() << "_"
-                   << mask_str;
+                   << conf_info.fcst_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str;
          if(field_type == FieldType_Fcst ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2102,8 +2107,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          var_name  << cs_erase
                    << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << mask_str;
+                   << conf_info.obs_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str;
          if(field_type == FieldType_Obs ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2121,8 +2126,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.fcst_info[i_vx]->name() << "_"
                    << conf_info.fcst_info[i_vx]->level_name() << "_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << mask_str << interp_str;
+                   << conf_info.obs_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str << interp_str;
          name_att  << cs_erase
                    << "Forecast " << shc.get_fcst_var()
                    << " minus Observed " << shc.get_obs_var();
@@ -2142,8 +2147,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          var_name  << cs_erase
                    << "CLIMO_MEAN_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << mask_str;
+                   << conf_info.obs_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str;
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology mean for "
@@ -2156,8 +2161,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          var_name  << cs_erase
                    << "CLIMO_STDEV_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << mask_str;
+                   << conf_info.obs_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str;
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology standard deviation for "
@@ -2170,8 +2175,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          var_name  << cs_erase
                    << "CLIMO_CDF_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << mask_str;
+                   << conf_info.obs_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str;
          name_att  = shc.get_obs_var();
          long_att  << cs_erase
                    << "Climatology cumulative distribution function for "
@@ -2184,8 +2189,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.fcst_info[i_vx]->name() << "_"
-                   << conf_info.fcst_info[i_vx]->level_name() << "_"
-                   << mask_str;
+                   << conf_info.fcst_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str;
          if(field_type == FieldType_Fcst ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2202,8 +2207,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << mask_str;
+                   << conf_info.obs_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str;
          if(field_type == FieldType_Obs ||
             field_type == FieldType_Both) {
             var_name << interp_str;
@@ -2290,9 +2295,14 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    int i, n, x, y, n_masks;
    int fcst_flag, obs_flag;
    double fval, oval;
-   ConcatString fcst_var_name, obs_var_name, mask_str;
+   ConcatString fcst_var_name, obs_var_name, var_str, mask_str;
    ConcatString att_str, mthd_str, nbrhd_str;
    bool apply_mask;
+
+   // Append nc_pairs_var_str config file entry
+   if(strlen(conf_info.var_str[i]) > 0) {
+      var_str << "_" << conf_info.var_str[i];
+   }
 
    // Determine the number of masking regions
    apply_mask = conf_info.nc_info.do_apply_mask;
@@ -2326,16 +2336,16 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       fcst_var_name << cs_erase
                     << "FCST_"
                     << conf_info.fcst_info[i_vx]->name() << "_"
-                    << conf_info.fcst_info[i_vx]->level_name() << "_"
-                    << mask_str << "_"
+                    << conf_info.fcst_info[i_vx]->level_name()
+                    << var_str << "_" << mask_str << "_"
                     << fcst_st.get_abbr_str() << nbrhd_str;
 
       // Build the observation variable name
       obs_var_name << cs_erase
                    << "OBS_"
                    << conf_info.obs_info[i_vx]->name() << "_"
-                   << conf_info.obs_info[i_vx]->level_name() << "_"
-                   << mask_str << "_"
+                   << conf_info.obs_info[i_vx]->level_name()
+                   << var_str << "_" << mask_str << "_"
                    << obs_st.get_abbr_str() << nbrhd_str;
 
       // Figure out which fields should be written
