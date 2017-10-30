@@ -1084,7 +1084,7 @@ output_flag = {
 // the output of all the different fields).  A value of false means no
 // netcdf output will be generated.
 //
-nc_pairs_flag   = {
+nc_pairs_flag = {
    latlon     = TRUE;
    raw        = TRUE;
    diff       = TRUE;
@@ -1095,6 +1095,18 @@ nc_pairs_flag   = {
    gradient   = FALSE;
    apply_mask = TRUE;
 }
+
+//
+// The "nc_pairs_var_str" entry specifies a string for each verification task
+// in Grid-Stat.  This string is parsed from each "obs.field" dictionary entry
+// and is used to customize the variable names written to the NetCDF matched
+// pairs output file.  The default is an empty string, meaning that no
+// customization is applied to the output variable names.  When the Grid-Stat
+// config file contains two fields with the same name and level value, this
+// entry is used to make the resulting variable names unique.
+// e.g. nc_pairs_var_str = "MIN";
+//
+nc_pairs_var_str = "";
 
 //
 // The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
