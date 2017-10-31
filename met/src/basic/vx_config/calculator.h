@@ -31,7 +31,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class Machine : public NumberStack {
+static const int max_user_function_args = 3;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+class Calculator : public NumberStack {
 
    protected:
 
@@ -42,11 +48,11 @@ class Machine : public NumberStack {
 
    public:
 
-      Machine();
-      Machine(int);
-     ~Machine();
-      Machine(const Machine &);
-      Machine & operator=(const Machine &);
+      Calculator();
+      Calculator(int);
+     ~Calculator();
+      Calculator(const Calculator &);
+      Calculator & operator=(const Calculator &);
 
       //
       //  set stuff
@@ -62,7 +68,7 @@ class Machine : public NumberStack {
       //  do stuff
       //
 
-   void run(const IcodeVector &);
+   void run(const IcodeVector &, const Number * local_vars = 0);
 
    void store(DictionaryEntry &);
 

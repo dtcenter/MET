@@ -28,7 +28,7 @@ enum ConfigObjectType {
    PwlFunctionType, 
    ThresholdType, 
 
-   VariableType, //  poor name?
+   // VariableType, //  poor name?
 
    UserFunctionType, 
 

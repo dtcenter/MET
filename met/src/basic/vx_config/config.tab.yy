@@ -24,11 +24,11 @@ using namespace std;
 #include "math_constants.h"
 #include "is_bad_data.h"
 #include "scanner_stuff.h"
-#include "dictionary.h"
 #include "threshold.h"
 #include "is_number.h"
 #include "concat_string.h"
 #include "pwl.h"
+#include "dictionary.h"
 #include "icode.h"
 #include "idstack.h"
 #include "calculator.h"
@@ -104,7 +104,9 @@ static const char default_print_prefix [] = "config";
 static ICVStack         icvs;
 
 
-static Machine hp;
+static Calculator hp;
+
+static ConcatString function_name;
 
 static const char apm = 'b';   //  assign_prefix mark
 static const char fcm = 'f';   //  function def mark
@@ -173,7 +175,7 @@ static void set_number_string(const char *);
 
 static void mark(int);
 
-static void do_user_function_call();
+static void do_user_function_call(const DictionaryEntry *);
 
 static void do_print(const char *);
 
@@ -223,6 +225,8 @@ static void do_user_function_def();
 
 %type <index> BUILTIN
 %type <index> LOCAL_VAR
+
+%type <entry> USER_FUNCTION
 
 %type <bval> BOOLEAN
 
@@ -291,7 +295,7 @@ id_list : IDENTIFIER             { ida.add($1); }
         ;
 
 
-function_prefix : IDENTIFIER '(' id_list ')' '='    { is_lhs = false;  is_function_def = true; }
+function_prefix : IDENTIFIER '(' id_list ')' '='    { is_lhs = false;  function_name = $1;  is_function_def = true; }
                 ;
 
 
@@ -368,7 +372,7 @@ expression : number                                                { do_number($
            | '-' expression  %prec UNARY_MINUS                     { do_negate(); }
            | '(' expression ')'                                    { do_paren_exp(); }
            | BUILTIN       '(' { mark(fcm); } expression_list ')'  { do_builtin_call($1);  }
-           | USER_FUNCTION '(' { mark(fcm); } expression_list ')'  { do_user_function_call(); }
+           | USER_FUNCTION '(' { mark(fcm); } expression_list ')'  { do_user_function_call($1); }
            ;
 
 
@@ -1463,10 +1467,106 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_user_function_call()
+void do_user_function_call(const DictionaryEntry * e)
 
 {
 
+int j;
+IcodeVector v;
+IcodeCell cell;
+const int Nargs = e->n_args();
+
+
+if ( is_function_def )  {
+
+   IcodeVector vv;
+
+      //  pop the args (in reverse order) from the icodevector stack
+
+   for (j=0; j<Nargs; ++j)  {
+
+      vv = icvs.pop();
+
+      v.add_front(vv);
+
+   }
+
+   if ( icvs.top_is_mark(fcm) )  icvs.toss();
+
+      //
+
+   cell.set_user_function(e);
+
+   v.add(cell);
+
+      //
+
+   icvs.push(v);
+
+   return;
+
+}   //  if is function def
+
+
+   //////////////////////////////////////
+
+Number n[max_user_function_args];
+Number result;
+
+   //
+   //  pop the args (in reverse order) from the icodevector stack
+   //
+
+for (j=0; j<Nargs; ++j)  {
+
+   v = icvs.pop();
+
+   if ( v.is_mark() )  {
+
+      cerr << "\n\n  do_user_function_call(int) -> too few arguments to user function \""
+           << (e->name()) << "\"\n\n";
+
+      exit ( 1 );
+
+   }
+
+   hp.run(v);
+
+   n[Nargs - 1 - j] = hp.pop();
+
+}
+
+
+if ( icvs.top_is_mark(fcm) )  icvs.toss();
+
+
+   //
+   //  call the function
+   //
+
+hp.run(*(e->icv()), n);
+
+result = hp.pop();
+
+if ( result.is_int )  cell.set_integer (result.i);
+else                  cell.set_double  (result.d);
+
+v.clear();
+
+v.add(cell);
+
+icvs.push(v);
+
+
+
+
+
+
+   //
+   //  done
+   //
+
+// if ( icvs.top_is_mark(fcm) )  icvs.toss();
 
 return;
 
@@ -1480,17 +1580,27 @@ void do_user_function_def()
 
 {
 
-cout << "\n\n  in do_user_function_def() ...\n\n";
+// cout << "\n\n  in do_user_function_def() ...\n\n";
+// cout << "   icvs ...\n";
+// icvs.dump(cout, 1);
+// cout << "\n\n   ida ...\n";
+// ida.dump(cout, 1);
+// cout << "\n\n";
 
-cout << "   icvs ...\n";
+DictionaryEntry e;
 
-icvs.dump(cout, 1);
+if ( ida.n_elements() > max_user_function_args )  {
 
-cout << "\n\n   ida ...\n";
+   cerr << "\n\n  do_user_function_def() -> too many arguments to function \""
+        << function_name << "\" definition\n\n";
 
-ida.dump(cout, 1);
+   exit ( 1 );
 
-cout << "\n\n";
+}
+
+e.set_user_function(function_name, icvs.pop(), ida.n_elements());
+
+dict_stack->store(e);
 
    //
    //  done
@@ -1499,6 +1609,8 @@ cout << "\n\n";
 is_function_def = false;
 
 ida.clear();
+
+function_name.erase();
 
 return;
 

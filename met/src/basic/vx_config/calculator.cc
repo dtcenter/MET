@@ -30,14 +30,14 @@ using namespace std;
 
 
    //
-   //  Code for class Machine
+   //  Code for class Calculator
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-Machine::Machine()
+Calculator::Calculator()
 
 {
 
@@ -51,7 +51,7 @@ AllocInc = 100;
 ////////////////////////////////////////////////////////////////////////
 
 
-Machine::~Machine()
+Calculator::~Calculator()
 
 {
 
@@ -63,7 +63,7 @@ dict_stack = 0;
 ////////////////////////////////////////////////////////////////////////
 
 
-Machine::Machine(const Machine & c)
+Calculator::Calculator(const Calculator & c)
 
 {
 
@@ -79,7 +79,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Machine & Machine::operator=(const Machine & c)
+Calculator & Calculator::operator=(const Calculator & c)
 
 {
 
@@ -98,7 +98,7 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_negate()
+void Calculator::do_negate()
 
 {
 
@@ -115,7 +115,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_add()
+void Calculator::do_add()
 
 {
 
@@ -147,7 +147,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_subtract()
+void Calculator::do_subtract()
 
 {
 
@@ -179,7 +179,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_multiply()
+void Calculator::do_multiply()
 
 {
 
@@ -211,7 +211,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_divide()
+void Calculator::do_divide()
 
 {
 
@@ -225,7 +225,7 @@ if ( a.is_int && b.is_int )  {
 
    if ( b.i == 0 )  {
 
-      cerr << "\n\n  Machine::do_divide() -> integer division by zero!\n\n";
+      cerr << "\n\n  Calculator::do_divide() -> integer division by zero!\n\n";
 
       exit ( 1 );
 
@@ -239,7 +239,7 @@ if ( a.is_int && b.is_int )  {
 
    if ( denom == 0 )  {
 
-      cerr << "\n\n  Machine::do_divide() -> floating-point division by zero!\n\n";
+      cerr << "\n\n  Calculator::do_divide() -> floating-point division by zero!\n\n";
 
       exit ( 1 );
 
@@ -262,7 +262,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_power()
+void Calculator::do_power()
 
 {
 
@@ -286,7 +286,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_square()
+void Calculator::do_square()
 
 {
 
@@ -319,7 +319,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_nint()
+void Calculator::do_nint()
 
 {
 
@@ -338,7 +338,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_sign()
+void Calculator::do_sign()
 
 {
 
@@ -375,7 +375,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_builtin(int which)
+void Calculator::do_builtin(int which)
 
 {
 
@@ -397,7 +397,7 @@ if ( info.id == builtin_sign )  { do_sign();  return; }
 else if ( info.n_args == 2 )  do_builtin_2_arg(info);
 else {
 
-   cerr << "\n\n  Machine::do_builtin(int) -> bad signature for builtin function \""
+   cerr << "\n\n  Calculator::do_builtin(int) -> bad signature for builtin function \""
         << (info.name) << "\"\n\n";
 
    exit ( 1 );
@@ -414,7 +414,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_builtin(int which, const Number * n)
+void Calculator::do_builtin(int which, const Number * n)
 
 {
 
@@ -433,7 +433,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_builtin_1_arg(const BuiltinInfo & info)
+void Calculator::do_builtin_1_arg(const BuiltinInfo & info)
 
 {
 
@@ -487,7 +487,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_builtin_2_arg(const BuiltinInfo & info)
+void Calculator::do_builtin_2_arg(const BuiltinInfo & info)
 
 {
 
@@ -545,9 +545,29 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::do_user_func(const DictionaryEntry * e)
+void Calculator::do_user_func(const DictionaryEntry * e)
 
 {
+
+int j;
+Number locals [max_user_function_args];
+const int n_args = e->n_args();
+
+   //
+   //  local variables should already be loaded onto the stack
+   //
+   //    we just need to pop them off and load them in to the local vars
+   //
+
+for (j=0; j<n_args; ++j)  {
+
+   locals[n_args - 1 - j] = pop();
+
+}
+
+const IcodeVector * V = e->icv();
+
+run(*V, locals);
 
 
    //
@@ -562,7 +582,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Machine::run(const IcodeVector & v)
+void Calculator::run(const IcodeVector & v, const Number * local_vars)
 
 {
 
@@ -620,7 +640,7 @@ while ( pos < (v.length()) )  {
          if ( e )   {
             run ( *e );
          } else {
-            cerr << "\n\n  Machine::run(const IcodeVector &) -> undefined identifier ... \""
+            cerr << "\n\n  Calculator::run(const IcodeVector &) -> undefined identifier ... \""
                  << (cell.name) << "\"\n\n";
             exit ( 1 );
          }
@@ -635,14 +655,19 @@ while ( pos < (v.length()) )  {
 
 
        case user_func:
-         do_user_func(0);
+         do_user_func(cell.e);
+         break;
+
+
+       case local_var:
+         push(local_vars[cell.i]);
          break;
 
 
 
 
       default:
-         cerr << "\n\n  Machine::run(const IcodeVector &) -> bad icode cell type ... \"" 
+         cerr << "\n\n  Calculator::run(const IcodeVector &) -> bad icode cell type ... \"" 
               << celltype_to_string(cell.type)
               << "\"\n\n";
          exit ( 1 );
@@ -666,6 +691,7 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
 
 
 
