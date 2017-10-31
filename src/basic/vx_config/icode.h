@@ -40,17 +40,19 @@ class IcodeVector;   //  forward reference
 
 
 
-#ifndef  __CONFIG_SYMTAB_H__
-
+// #ifndef  __CONFIG_DICTIONARY_H__
+// 
 // #include "symtab.h"
-
-#endif
+// 
+// #endif
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 // class SymbolTableEntry;   //  forward reference
+
+class DictionaryEntry;   //  forward reference
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -128,6 +130,8 @@ class IcodeCell {
 
       void set_local_var(int);
 
+      void set_user_function(const DictionaryEntry *);
+
 
       int i;
 
@@ -135,6 +139,8 @@ class IcodeCell {
 
       char * name;   //  allocated if needed
       char * text;   //  allocated if needed
+
+      const DictionaryEntry * e;   //  not allocated
 
       CellType type;
 

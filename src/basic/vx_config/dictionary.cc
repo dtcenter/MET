@@ -119,7 +119,7 @@ PWL = (PiecewiseLinear *) 0;
 
 v = (IcodeVector *) 0;
 
-local_vars = (IdentifierArray *) 0;
+Nargs = 0;
 
 clear();
 
@@ -151,7 +151,7 @@ if ( PWL )  { delete PWL;  PWL = (PiecewiseLinear *) 0; }
 
 if ( v )  { delete v;  v = (IcodeVector *) 0; }
 
-if ( local_vars )  { delete local_vars;  local_vars = (IdentifierArray *) 0; }
+Nargs = 0;
 
    //
    //  done
@@ -206,12 +206,12 @@ switch ( entry.Type )  {
       set_pwl(entry.Name, *(entry.PWL));
       break;
 
-   case VariableType:
-      set_variable(entry.Name, *(entry.v));
-      break;
+   // case VariableType:
+   //    set_variable(entry.Name, *(entry.v));
+   //    break;
 
    case UserFunctionType:
-      set_function(entry.Name, *(entry.v), *(entry.local_vars));
+      set_user_function(entry.Name, *(entry.v), entry.Nargs);
       break;
 
    default:
@@ -283,6 +283,14 @@ switch ( Type )  {
       out << prefix << "Function Value = \n";
       PWL->dump(out, depth + 1);
       break;
+
+
+   case UserFunctionType:
+      out << prefix << "N args = " << Nargs << "\n";
+      out << prefix << "Code ... \n";
+      v->dump(out, depth + 1);
+      break;
+
 
    default:
       mlog << Error
@@ -452,24 +460,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_local_vars (const IdentifierArray & ia)
-
-{
-
-if ( local_vars )  { delete local_vars;  local_vars = 0; }
-
-local_vars = new IdentifierArray;
-
-(*local_vars) = ia;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void DictionaryEntry::set_int (const char * _name, int k)
 
 {
@@ -507,16 +497,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void DictionaryEntry::set_function (const char * _name, const IcodeVector & icv, const IdentifierArray & ia)
+void DictionaryEntry::set_user_function (const char * _name, const IcodeVector & _icv, int _n_args)
 
 {
 
 set_name(_name);
 
-set_icodevector(icv);
+set_icodevector(_icv);
 
-set_local_vars(ia);
+Nargs = _n_args;
 
+Type = UserFunctionType;
 
 return;
 

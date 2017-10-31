@@ -28,6 +28,7 @@ using namespace std;
 #include "builtin.h"
 #include "indent.h"
 #include "icode.h"
+#include "dictionary.h"
 
 #include "celltype_to_string.h"
 
@@ -119,6 +120,9 @@ name = (char *) 0;
 
 text = (char *) 0;
 
+e = 0;
+
+
 return;
 
 }
@@ -139,6 +143,7 @@ if ( name )  { delete [] name;   name = (char *) 0; }
 
 if ( text )  { delete [] text;   text = (char *) 0; }
 
+e = 0;
 
 
 type = no_cell_type;
@@ -178,6 +183,8 @@ if ( type == character_string )  {
    strcpy(text, icc.text);
 
 }
+
+e = icc.e;
 
 return;
 
@@ -294,6 +301,24 @@ return ( k );
 ////////////////////////////////////////////////////////////////////////
 
 
+void IcodeCell::set_user_function(const DictionaryEntry * _e)
+
+{
+
+clear();
+
+type = user_func;
+
+e = _e;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void IcodeCell::dump(ostream & out, int indent_depth) const
 
 {
@@ -354,6 +379,10 @@ switch ( type )  {
    case builtin_func:
       out << prefix << "name   = " << (binfo[i].name)   << "\n";
       out << prefix << "# args = " << (binfo[i].n_args) << "\n";
+      break;
+
+   case user_func:
+      e->dump(out, indent_depth + 1);
       break;
 
    case local_var:

@@ -77,7 +77,7 @@ class DictionaryEntry {
 
       IcodeVector * v;               //  allocated
 
-      IdentifierArray * local_vars;  //  allocated
+      int Nargs;                     //  only for user functions
 
    public:
 
@@ -107,7 +107,7 @@ class DictionaryEntry {
 
       void set_variable     (const char * _name, const IcodeVector &);
 
-      void set_function     (const char * _name, const IcodeVector &, const IdentifierArray &);
+      void set_user_function (const char * _name, const IcodeVector &, int _n_args);
 
       void set_name         (const char *);
 
@@ -126,6 +126,8 @@ class DictionaryEntry {
       double  d_value() const;
       bool    b_value() const;
 
+      int     n_args () const;
+
       const ConcatString * string_value () const;
 
       Dictionary * dict_value () const;
@@ -135,6 +137,8 @@ class DictionaryEntry {
       SingleThresh * thresh_value() const;
 
       PiecewiseLinear * pwl_value() const;
+
+      const IcodeVector * icv() const;
 
          //
          //  do stuff
@@ -159,6 +163,10 @@ inline bool DictionaryEntry::is_number() const { return ( (Type == IntegerType) 
 inline bool DictionaryEntry::is_dictionary() const { return ( Type == DictionaryType ); }
 
 inline bool DictionaryEntry::is_array() const { return ( Type == ArrayType ); }
+
+inline int DictionaryEntry::n_args() const { return ( Nargs ); }
+
+inline const IcodeVector * DictionaryEntry::icv() const { return ( v ); }
 
 
 ////////////////////////////////////////////////////////////////////////
