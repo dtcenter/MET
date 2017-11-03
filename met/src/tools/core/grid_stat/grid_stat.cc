@@ -1630,6 +1630,13 @@ void process_scores() {
 
    } // end for i
 
+   // Check for no data
+   if(is_first_pass) {
+      mlog << Error << "\nprocess_scores() -> "
+           << "no requested data found!  Exiting...\n\n";
+      exit(1);
+   }
+
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Deallocate memory
