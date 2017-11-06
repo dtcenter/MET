@@ -94,7 +94,41 @@ config.dump(cout);
 
 cout << "\n\n";
 
+   //
+   //
+   //
 
+const DictionaryEntry * e = config.lookup("sq");
+UserFunc_1Arg f;
+double x;
+
+if ( !e )  {
+
+   cout << "\n\n  lookup failed!\n\n";
+
+   exit ( 1 );
+
+}
+
+f.set(e);
+
+for (j=0; j<=10; ++j)  {
+
+   x = (double) j;
+
+   cout << j << "   " << f(x) << '\n';
+
+}
+
+   //
+   //
+   //
+
+e = config.lookup("h");
+
+f.set(e);
+
+cout << "\n\n   " << f(3.0) << "\n\n";
 
 /*
 config.dump_config_format(cout);

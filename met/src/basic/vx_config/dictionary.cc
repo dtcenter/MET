@@ -287,8 +287,10 @@ switch ( Type )  {
 
    case UserFunctionType:
       out << prefix << "N args = " << Nargs << "\n";
-      out << prefix << "Code ... \n";
-      v->dump(out, depth + 1);
+      if ( depth <= 2 )  {
+         out << prefix << "Code ... \n";
+         v->dump(out, depth + 1);
+      }
       break;
 
 
