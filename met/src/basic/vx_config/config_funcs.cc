@@ -188,6 +188,150 @@ return ( as_double(n) );
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Code for class UserFunc_MultiArg
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+UserFunc_MultiArg::UserFunc_MultiArg()
+
+{
+
+init_from_scratch();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+UserFunc_MultiArg::~UserFunc_MultiArg()
+
+{
+
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+UserFunc_MultiArg::UserFunc_MultiArg(const UserFunc_MultiArg & f)
+
+{
+
+init_from_scratch();
+
+assign(f);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+UserFunc_MultiArg & UserFunc_MultiArg::operator=(const UserFunc_MultiArg & f)
+
+{
+
+if ( this == &f )  return ( * this );
+
+assign(f);
+
+return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UserFunc_MultiArg::init_from_scratch()
+
+{
+
+entry = 0;
+
+v = 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UserFunc_MultiArg::assign(const UserFunc_MultiArg & f)
+
+{
+
+// clear();
+
+entry = f.entry;
+
+v = f.v;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UserFunc_MultiArg::set(const DictionaryEntry * e)
+
+{
+
+if ( e->type() != UserFunctionType )  {
+
+   cerr << "\n\n  UserFunc_MultiArg::set(const DictionaryEntry *) -> bad object type: "
+        << configobjecttype_to_string(e->type()) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( e->n_args() != 1 )  {
+
+   cerr << "\n\n  UserFunc_MultiArg::set(const DictionaryEntry *) -> bad number of arguments: "
+        << (e->n_args()) << "\n\n";
+
+   exit ( 1 );
+
+}
+
+entry = e;
+
+v = e->icv();
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Number UserFunc_MultiArg::operator()(const Number * n) const
+
+{
+
+hp.run( *v, n);
+
+return ( hp.pop() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 
 

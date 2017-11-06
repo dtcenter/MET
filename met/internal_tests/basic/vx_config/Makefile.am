@@ -16,6 +16,7 @@ AM_LDFLAGS = -L. ${MET_LDFLAGS}
 # Test programs
 
 noinst_PROGRAMS = test_config \
+              test_user_func \
               test_lookup \
               test_lookup2 \
               test_lookup3 \
@@ -26,6 +27,15 @@ noinst_PROGRAMS = test_config \
 
 test_config_SOURCES = test_config.cc
 test_config_LDADD = -lvx_config \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lm
+
+
+test_user_func_SOURCES = test_user_func.cc
+test_user_func_LDADD = -lvx_config \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
