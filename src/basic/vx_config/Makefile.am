@@ -37,6 +37,7 @@ libvx_config_a_SOURCES += \
               builtin.cc builtin.h \
               icode.cc icode.h \
               calculator.cc calculator.h \
+              config_funcs.cc config_funcs.h \
               data_file_type.h \
               object_types.h \
               scanner_stuff.h \

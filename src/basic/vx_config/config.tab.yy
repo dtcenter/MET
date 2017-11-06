@@ -84,6 +84,8 @@ IdentifierArray  ida;
 
 bool is_function_def = false;
 
+Calculator hp;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +106,6 @@ static const char default_print_prefix [] = "config";
 static ICVStack         icvs;
 
 
-static Calculator hp;
 
 static ConcatString function_name;
 
