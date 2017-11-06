@@ -22,6 +22,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "is_number.h"
 #include "dictionary.h"
 #include "icode.h"
 
@@ -49,9 +50,87 @@ class UserFunc_1Arg {
       UserFunc_1Arg(const UserFunc_1Arg &);
       UserFunc_1Arg & operator=(const UserFunc_1Arg &);
 
+         //
+         //  set stuff
+         //
+
       void set(const DictionaryEntry *);
 
+         //
+         //  get stuff
+         //
+
+      ConcatString name() const;
+
+      int n_args () const;   //  should be 1
+
+      const IcodeVector * program() const;
+
+         //
+         //  do stuff
+         //
+
+
       double operator()(double) const;
+
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline ConcatString UserFunc_1Arg::name() const { return ( entry ? (entry->name()) : ConcatString("(nul)") ); }
+
+inline int UserFunc_1Arg::n_args() const { return ( entry ? (entry->n_args()) : (-1) ); }
+
+inline const IcodeVector * UserFunc_1Arg::program() const { return ( v ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+class UserFunc_MultiArg {
+
+   private:
+
+      void init_from_scratch();
+
+      void assign(const UserFunc_MultiArg &);
+
+
+      const DictionaryEntry * entry;   //  not allocated
+
+      const IcodeVector * v;           //  not allocated
+
+   public:
+
+      UserFunc_MultiArg();
+     ~UserFunc_MultiArg();
+      UserFunc_MultiArg(const UserFunc_MultiArg &);
+      UserFunc_MultiArg & operator=(const UserFunc_MultiArg &);
+
+         //
+         //  set stuff
+         //
+
+      void set(const DictionaryEntry *);
+
+         //
+         //  get stuff
+         //
+
+      ConcatString name() const;
+
+      int n_args () const;
+
+      const IcodeVector * program() const;
+
+         //
+         //  do stuff
+         //
+
+      Number operator()(const Number *) const;
 
 };
 
