@@ -104,6 +104,11 @@ public:
   {
     return _qualityFlag;
   }
+
+  int getGribCode() const
+  {
+    return varCode;
+  }
   
   int getVarCode() const
   {
