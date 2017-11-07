@@ -714,7 +714,8 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    }
 
    // Conf: grib_code
-   info.grib_code = ts_dict->lookup_int_array(conf_key_grib_code);
+   info.grib_code = ts_dict->lookup_int_array(conf_key_grib_code, false);
+   info.obs_var   = ts_dict->lookup_string_array(conf_key_obs_var, false);
 
    // Conf: type
    info.type = ts_dict->lookup_string_array(conf_key_type);

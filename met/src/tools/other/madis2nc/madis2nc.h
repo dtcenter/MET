@@ -42,7 +42,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 //#define BUFFER_SIZE (128*1024)
-#define BUFFER_SIZE (32*1024)
+//#define BUFFER_SIZE (32*1024)
 
 
 // Enumeration of possible MADIS observation types
@@ -132,39 +132,7 @@ static int          rej_sid  = 0;
 // Output NetCDF file
 NcFile *f_out = (NcFile *) 0;
 
-static NcDim strl_dim    ; // Maximum string length
-static NcDim hdr_arr_dim ; // Header array width
-static NcDim obs_arr_dim ; // Observation array width
-static NcDim hdr_dim     ; // Header array length
-static NcDim obs_dim     ; // Observation array length
-
-static NcVar hdr_typ_var ; // Message type
-static NcVar hdr_sid_var ; // Station ID
-static NcVar hdr_vld_var ; // Valid time
-static NcVar hdr_arr_var ; // Header array
-static NcVar obs_qty_var ; // Quality Flag
-static NcVar obs_arr_var ; // Observation array
-
-int    obs_buf_size;
 int    processed_count;
-int    obs_data_idx;
-int    obs_data_offset;
-int    hdr_data_idx;
-int    hdr_data_offset;
-
-char   hdr_typ_buf[BUFFER_SIZE][strl_len];
-char   hdr_sid_buf[BUFFER_SIZE][strl_len];
-char   hdr_vld_buf[BUFFER_SIZE][strl_len];
-float  hdr_arr_buf[BUFFER_SIZE][hdr_arr_len];
-float obs_data_buf[BUFFER_SIZE][obs_arr_len];
-char  qty_data_buf[BUFFER_SIZE][strl_len];
-
-char   hdr_typ_out_buf[BUFFER_SIZE][strl_len];
-char   hdr_sid_out_buf[BUFFER_SIZE][strl_len];
-char   hdr_vld_out_buf[BUFFER_SIZE][strl_len];
-float  hdr_arr_out_buf[BUFFER_SIZE][hdr_arr_len];
-float obs_data_out_buf[BUFFER_SIZE][obs_arr_len];
-char  qty_data_out_buf[BUFFER_SIZE][strl_len];
 
 ////////////////////////////////////////////////////////////////////////
 

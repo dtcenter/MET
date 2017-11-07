@@ -43,6 +43,7 @@ const string GRIB_NAME = "WWSIS";
 WwsisHandler::WwsisHandler(const string &program_name) :
   FileHandler(program_name)
 {
+  use_var_id = true;
 }
 
 
