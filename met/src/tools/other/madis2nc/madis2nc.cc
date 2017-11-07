@@ -2816,7 +2816,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, dim, cur);
       get_nc_data(&in_hdr_lat_var, (float *)hdr_lat_arr, dim, cur);
       get_nc_data(&in_hdr_lon_var, (float *)hdr_lon_arr, dim, cur);
-      get_filtered_nc_data(in_hdr_elv_var, (float *)hdr_elv_arr, buf_size, i_hdr_s);
+      get_filtered_nc_data_2d(in_hdr_elv_var, (float *)hdr_elv_arr, dim, cur);
 
       if (!IS_INVALID_NC(in_temperatureQty_var)) get_nc_data(&in_temperatureQty_var, (char *)&temperatureQty_arr, dim, cur);
       if (!IS_INVALID_NC(in_dewpointQty_var))    get_nc_data(&in_dewpointQty_var, (char *)&dewpointQty_arr, dim, cur);
