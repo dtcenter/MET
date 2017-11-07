@@ -29,6 +29,7 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_solar \
 	     -I${top_builddir}/src/libcode/vx_statistics \
 	     -I${top_builddir}/src/libcode/vx_stat_out \
+	     -I${top_builddir}/src/libcode/vx_summary \
 	     -I${top_builddir}/src/libcode/vx_time_series \
 	     -I${top_builddir}/src/libcode/vx_tc_util
 
@@ -63,6 +64,7 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/libcode/vx_solar \
 	     -L${top_builddir}/src/libcode/vx_statistics \
 	     -L${top_builddir}/src/libcode/vx_stat_out \
+	     -L${top_builddir}/src/libcode/vx_summary \
 	     -L${top_builddir}/src/libcode/vx_time_series \
 	     -L${top_builddir}/src/libcode/vx_tc_util
 
