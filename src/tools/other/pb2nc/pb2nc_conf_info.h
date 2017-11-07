@@ -56,7 +56,8 @@ class PB2NCConfInfo {
       ConcatString tmp_dir;             // Directory for temporary files
       ConcatString version;             // Config file version
       map<ConcatString,ConcatString> obs_bufr_map;
-      map<ConcatString,ConcatString> _messageTypeMap;
+      map<ConcatString,ConcatString> messageTypeMap;
+      TimeSummaryInfo timeSummaryInfo;
   
       bool         anyair_flag;         // Flags for specific message types
       bool         anysfc_flag;
@@ -71,7 +72,9 @@ class PB2NCConfInfo {
       void clear();
 
       map<ConcatString,ConcatString> getObsVarMap() const {  return obs_bufr_map; }
-      map<ConcatString,ConcatString> getMessageTypeMap() const { return _messageTypeMap; }
+      map<ConcatString,ConcatString> getMessageTypeMap() const { return messageTypeMap; }
+      TimeSummaryInfo getSummaryInfo() const { return timeSummaryInfo; };
+
       void read_config(const char *, const char *);
       void process_config();
 };

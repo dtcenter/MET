@@ -29,9 +29,9 @@ using namespace std;
 #include "summary_calc_stdev.h"
 
 
-const long FileHandler::HDR_ARRAY_LEN  = 3;  // Observation header length
-const long FileHandler::OBS_ARRAY_LEN  = 5;  // Observation values length
-const long FileHandler::MAX_STRING_LEN = 40; // Maximum length for strings
+//const long FileHandler::HDR_ARRAY_LEN  = 3;  // Observation header length
+//const long FileHandler::OBS_ARRAY_LEN  = 5;  // Observation values length
+//const long FileHandler::MAX_STRING_LEN = 40; // Maximum length for strings
                                              //   in the netCDF file
 
 const float FileHandler::FILL_VALUE = -9999.f;
@@ -198,7 +198,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 
   // Add variable names
   if (use_var_id) {
-    int max_name_len = _MAX_STRING_LEN;
+    int max_name_len = MAX_STRING_LEN;
     char var_name[max_name_len];
     add_att(_ncFile, nc_att_use_var_id, "true");
     NcDim var_dim     = add_dim(_ncFile, nc_dim_nvar, (long)obs_names.n_elements());

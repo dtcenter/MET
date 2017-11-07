@@ -61,8 +61,20 @@ using namespace netCDF;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+// Defined at write_netcdf.cc
+extern int   obs_data_idx;
+
+extern float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
+extern char  qty_data_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
+
+////////////////////////////////////////////////////////////////////////
+
 static const int FIELD_COUNT =  50;
+static const int BUFFER_SIZE = OBS_BUFFER_SIZE / FIELD_COUNT;
+
 static int nc_buf_size;
+static NetcdfObsVars obsVars;
 
 static void initialize();
 static void process_command_line(int, char **);
@@ -76,17 +88,13 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
                                     const long *cur, bool count_bad=false);
 static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
                                     const long *cur, bool count_bad=false);
-static void reset_header_buffer(int buf_size);
 
 static void check_quality_control_flag(int &value, const char qty, const char *var_name);
 static void check_quality_control_flag(float &value, const char qty, const char *var_name);
 
-static void process_obs(const int gc, const float conversion,
-                        float *obs_arr, char qty, const NcVar &);
+static int process_obs(const int gc, const float conversion,
+                       float *obs_arr, char qty, const NcVar &);
 static void write_qty(char &qty);
-
-static bool write_nc_hdr_data(int buf_size);
-static bool write_nc_obs_data(int buf_size);
 
 static MadisType get_madis_type(NcFile *&f_in);
 static void      convert_wind_wdir_to_u_v(float wind, float wdir,
@@ -337,77 +345,12 @@ void setup_netcdf_out(int nhdr) {
       exit(1);
    }
 
-   //
-   // Define netCDF dimensions
-   //
-   strl_dim    = add_dim(f_out, "mxstr", (long) strl_len);
-   hdr_arr_dim = add_dim(f_out, "hdr_arr_len", (long) hdr_arr_len);
-   obs_arr_dim = add_dim(f_out, "obs_arr_len", (long) obs_arr_len);
-   obs_dim     = add_dim(f_out, "nobs"); // unlimited dimension
-   hdr_dim     = add_dim(f_out, "nhdr");
-
-   //
-   // Define netCDF variables
-   //
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
 
-   vector<NcDim> ncDims_hdr_strl;
-   vector<NcDim> ncDims_obs_strl;
-   vector<NcDim> ncDims_hdr_arr;
-   vector<NcDim> ncDims_obs_arr;
-   ncDims_hdr_strl.push_back(hdr_dim);
-   ncDims_hdr_strl.push_back(strl_dim);
-   ncDims_obs_strl.push_back(obs_dim);
-   ncDims_obs_strl.push_back(strl_dim);
-   ncDims_hdr_arr.push_back(hdr_dim);
-   ncDims_hdr_arr.push_back(hdr_arr_dim);
-   ncDims_obs_arr.push_back(obs_dim);
-   ncDims_obs_arr.push_back(obs_arr_dim);
-   hdr_typ_var = add_var(f_out, "hdr_typ", ncChar,  ncDims_hdr_strl, deflate_level);
-   hdr_sid_var = add_var(f_out, "hdr_sid", ncChar,  ncDims_hdr_strl, deflate_level);
-   hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  ncDims_hdr_strl, deflate_level);
-   hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, ncDims_hdr_arr,  deflate_level);
-   obs_qty_var = add_var(f_out, "obs_qty", ncChar,  ncDims_obs_strl, deflate_level);
-   obs_arr_var = add_var(f_out, "obs_arr", ncFloat, ncDims_obs_arr,  deflate_level);
-   //obs_arr_var->SetCompression(false, true, 2)
-
-   //
-   // Add variable attributes
-   //
-   add_att(&hdr_typ_var, "long_name", "message type");
-   add_att(&hdr_sid_var, "long_name", "station identification");
-   add_att(&hdr_vld_var, "long_name", "valid time");
-   add_att(&hdr_vld_var, "units", "YYYYMMDD_HHMMSS");
-
-   add_att(&hdr_arr_var, "long_name",
-                        "array of observation station header values");
-   add_att(&hdr_arr_var, "missing_value", fill_value);
-   add_att(&hdr_arr_var, in_fillValue_str, fill_value);
-   add_att(&hdr_arr_var, "columns", "lat lon elv");
-   add_att(&hdr_arr_var, "lat_long_name", "latitude");
-   add_att(&hdr_arr_var, "lat_units", "degrees_north");
-   add_att(&hdr_arr_var, "lon_long_name", "longitude");
-   add_att(&hdr_arr_var, "lon_units", "degrees_east");
-   add_att(&hdr_arr_var, "elv_long_name", "elevation");
-   add_att(&hdr_arr_var, "elv_units", "meters above sea level (msl)");
-
-   add_att(&obs_qty_var, "long_name", "quality flag");
-
-   add_att(&obs_arr_var, "long_name", "array of observation values");
-   add_att(&obs_arr_var, "missing_value", fill_value);
-   add_att(&obs_arr_var, in_fillValue_str, fill_value);
-   add_att(&obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
-   add_att(&obs_arr_var, "hdr_id_long_name",
-                        "index of matching header data");
-   add_att(&obs_arr_var, "gc_long_name",
-      "grib code corresponding to the observation type");
-   add_att(&obs_arr_var, "lvl_long_name",
-      "pressure level (hPa) or accumulation interval (sec)");
-   add_att(&obs_arr_var, "hgt_long_name",
-                        "height in meters above sea level (msl)");
-   add_att(&obs_arr_var, "ob_long_name", "observation value");
-
+   create_nc_hdr_vars(obsVars, f_out, -1, deflate_level);
+   create_nc_obs_vars(obsVars, f_out, deflate_level, false);
+   
    //
    // Add global attributes
    //
@@ -417,9 +360,6 @@ void setup_netcdf_out(int nhdr) {
    // Add the command line arguments that were applied.
    //
    add_att(f_out, "RunCommand", (string)argv_str);
-
-   int buf_size = nhdr;
-   reset_header_buffer(BUFFER_SIZE);
 
    return;
 }
@@ -564,13 +504,13 @@ void check_quality_control_flag(float &value, const char qty, const char *var_na
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_obs(const int in_gc, const float conversion,
-                 float *obs_arr, char qty, const NcVar &nc_var) {
-
+int process_obs(const int in_gc, const float conversion,
+                float *obs_arr, char qty, const NcVar &nc_var) {
+   int processed_count = 0;
    //
    // Check that the input variable contains valid data.
    //
-   if(IS_INVALID_NC(nc_var)) return;
+   if(IS_INVALID_NC(nc_var)) return processed_count;
 
    check_quality_control_flag(obs_arr[4], qty, GET_NC_NAME(nc_var).c_str());
 
@@ -584,36 +524,20 @@ void process_obs(const int in_gc, const float conversion,
    //
    if(!is_bad_data(obs_arr[4])) {
       obs_arr[4] *= conversion;
-      for (int idx=0; idx<obs_arr_len; idx++) {
-         obs_data_out_buf[obs_data_idx][idx] = obs_arr[idx];
-      }
-
-      write_qty(qty);
-      obs_data_idx++;
-      if (nc_buf_size <= obs_data_idx) {
-         write_nc_obs_data(nc_buf_size);
-      }
+      
+      ConcatString qty_str;
+      if(qty == '\0') qty_str = na_str;
+      else            qty_str << qty;
+      qty_str.replace(" ", "_", false);
+      
+      add_and_write_nc_observation(obsVars, obs_arr, qty_str);
       i_obs++;
+      processed_count++;
    }
 
-   return;
+   return processed_count;
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-void reset_header_buffer(int buf_size) {
-   for (int i=0; i<buf_size; i++) {
-      for (int j=0; j<strl_len; j++) {
-         hdr_typ_out_buf[i][j] = bad_data_char;
-         hdr_sid_out_buf[i][j] = bad_data_char;
-         hdr_vld_out_buf[i][j] = bad_data_char;
-      }
-      for (int j=0; j<hdr_arr_len; j++) {
-         hdr_arr_out_buf[i][j] = fill_value;
-      }
-   }
-}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -622,68 +546,9 @@ void write_qty(char &qty) {
    if(qty == '\0') qty_str = na_str;
    else            qty_str << qty;
    qty_str.replace(" ", "_", false);
-   strncpy(qty_data_out_buf[obs_data_idx], qty_str, qty_str.length());
-   qty_data_out_buf[obs_data_idx][qty_str.length()] = bad_data_char;
-}
 
-////////////////////////////////////////////////////////////////////////
-
-bool write_nc_hdr_data(int buf_size) {
-   bool status = true;
-
-   long offsets[2] = { hdr_data_offset, 0 };
-   long lengths[2] = { buf_size, strl_len };
-
-
-   if(!put_nc_data(&hdr_typ_var, (char *)hdr_typ_out_buf[0], lengths, offsets)) {
-      mlog << Error << " write_nc_hdr_data() -> "
-           << "error writing the header type to the netCDF file\n\n";
-      status = false;
-   }
-   if(!put_nc_data(&hdr_sid_var, (char *)hdr_sid_out_buf[0], lengths, offsets)) {
-      mlog << Error << " write_nc_hdr_data() -> "
-           << "error writing the station id to the netCDF file\n\n";
-      status = false;
-   }
-   if(!put_nc_data(&hdr_vld_var, (char *)hdr_vld_out_buf[0], lengths, offsets)) {
-      mlog << Error << " write_nc_hdr_data() -> "
-           << "error writing the valid time to the netCDF file\n\n";
-      status = false;
-   }
-
-   lengths[1] = hdr_arr_len;
-   if(!put_nc_data(&hdr_arr_var, (float *)hdr_arr_out_buf[0], lengths, offsets)) {
-      mlog << Error << " write_nc_hdr_data() -> "
-           << "error writing the header array (lat/lon/elv) to the netCDF file\n\n";
-      status = false;
-   }
-   hdr_data_idx = 0;
-   hdr_data_offset += buf_size;
-   return status;
-}
-
-bool write_nc_obs_data(int buf_size) {
-   bool status = true;
-   long offsets[2] = { obs_data_offset, 0 };
-   long lengths[2] = { buf_size, obs_arr_len };
-
-   if(!put_nc_data(&obs_arr_var, (float *)obs_data_out_buf, lengths, offsets)) {
-      mlog << Error << " write_nc_obs_data() -> "
-           << "error writing the obs data to the netCDF file\n\n";
-      status = false;
-   }
-
-   lengths[1] = strl_len;
-   if(!put_nc_data(&obs_qty_var, (char *)qty_data_out_buf, lengths, offsets)) {
-      mlog << Error << " write_nc_obs_data() -> "
-           << "error writing the obs data to the netCDF file\n\n";
-      status = false;
-   }
-
-   obs_data_idx = 0;
-   obs_data_offset += buf_size;
-
-   return status;
+   strncpy(qty_data_buf[obs_data_idx], qty_str, qty_str.length());
+   qty_data_buf[obs_data_idx][qty_str.length()] = bad_data_char;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -851,12 +716,9 @@ void process_madis_metar(NcFile *&f_in) {
 
    long lengths[2] = {BUFFER_SIZE, 1};
 
-   obs_buf_size = 0;
+   int hdr_idx = 0;
    processed_count = 0;
    obs_data_idx = 0;
-   obs_data_offset = 0;
-   hdr_data_idx = 0;
-   hdr_data_offset = 0;
 
    //
    // Loop through each record and get the header data.
@@ -991,15 +853,11 @@ void process_madis_metar(NcFile *&f_in) {
          //
          hdr_typ = hdr_typ_arr[i_idx];
          if(hdr_typ == metar_str || hdr_typ == "SPECI") hdr_typ = "ADPSFC";
-         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
 
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
          //
          // Process the observation time.
@@ -1009,20 +867,14 @@ void process_madis_metar(NcFile *&f_in) {
 
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         //
-         // Write the header array to the output file.
-         //
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
+         hdr_idx = get_nc_header_index();
 
+               
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
          //
-         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);   // Index into header array
+         obs_arr[0] = (float)hdr_idx;  // Index into header array
          obs_arr[2] = bad_data_float;  // Level: accum(sec) or pressure
          obs_arr[3] = bad_data_float;  // Height
 
@@ -1116,22 +968,16 @@ void process_madis_metar(NcFile *&f_in) {
          process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
                      snowCover_var);
 
-         hdr_data_idx++;
-         if (hdr_data_idx >= buf_size) {
-            write_nc_hdr_data(buf_size);
-            reset_header_buffer(buf_size);
-         }
+         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
       }
 
    } // end for i_hdr
 
-   if (hdr_data_idx > 0) {
-      write_nc_hdr_data(hdr_data_idx);
-      reset_header_buffer(hdr_data_idx);
-   }
    if (0 < obs_data_idx) {
-      write_nc_obs_data(obs_data_idx);
+      write_nc_obs_buffer(obsVars, obs_data_idx);
    }
+   write_nc_headers(obsVars);
 
    print_rej_counts();
 
@@ -1265,12 +1111,14 @@ void process_madis_raob(NcFile *&f_in) {
    long *dim = new long [3];
    dim[0] = dim[1] = dim[2] = 1;
 
-   obs_buf_size = 0;
+   int hdr_idx = 0;
    processed_count = 0;
    obs_data_idx = 0;
-   obs_data_offset = 0;
-   hdr_data_idx = 0;
-   hdr_data_offset = 0;
+
+   //
+   // Process the header type.: For RAOB, store as ADPUPA.
+   //
+   hdr_typ = "ADPUPA";
 
    //
    // Loop through each record and get the header data.
@@ -1468,47 +1316,30 @@ void process_madis_raob(NcFile *&f_in) {
          if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
          //
-         // Process the header type.
-         // For RAOB, store as ADPUPA.
+         // Process the observation time.
          //
-         hdr_typ = "ADPUPA";
-         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
+         tmp_dbl = tmp_dbl_arr[i_idx];
+         if(is_bad_data(tmp_dbl)) continue;
+
+         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
+         hdr_vld = tmp_str;
+
+         hdr_idx = get_nc_header_index();
 
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
-         //
-         // Process the observation time.
-         //
-         tmp_dbl = tmp_dbl_arr[i_idx];
-         if(is_bad_data(tmp_dbl)) continue;
-         unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
-         hdr_vld = tmp_str;
-         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
+         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
-         //
-         // Write the header array to the output file.
-         //
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
 
          //
          // Initialize the observation array: hdr_id
          //
-         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
+         obs_arr[0] = (float) (hdr_idx);
 
-         hdr_data_idx++;
-         if (hdr_data_idx >= buf_size) {
-            write_nc_hdr_data(buf_size);
-            reset_header_buffer(buf_size);
-         }
 
          //
          // Loop through the mandatory levels
@@ -1829,13 +1660,10 @@ void process_madis_raob(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   if (0 < hdr_data_idx) {
-      write_nc_hdr_data(hdr_data_idx);
-   }
-
    if (0 < obs_data_idx) {
-      write_nc_obs_data(obs_data_idx);
+      write_nc_obs_buffer(obsVars, obs_data_idx);
    }
+   write_nc_headers(obsVars);
 
    print_rej_counts();
 
@@ -1909,12 +1737,15 @@ void process_madis_profiler(NcFile *&f_in) {
    dim[0] = dim[1] = dim[2] = 1;
 
    //int[] hdr_lat_arr = new int[BUFFER_SIZE];
-   obs_buf_size = 0;
+   int hdr_idx = 0;
    processed_count = 0;
    obs_data_idx = 0;
-   obs_data_offset = 0;
-   hdr_data_idx = 0;
-   hdr_data_offset = 0;
+
+   //
+   // Process the header type.
+   // For PROFILER, store as ADPUPA.
+   //
+   hdr_typ = "ADPUPA";
 
    //
    // Loop through each record and get the header data.
@@ -1993,48 +1824,30 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
-         //
-         // Process the header type.
-         // For PROFILER, store as ADPUPA.
-         //
-         hdr_typ = "ADPUPA";
-         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
+
 
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
          //
          // Process the observation time.
          //
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
+
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         //
-         // Write the header array to the output file.
-         //
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
+         hdr_idx = get_nc_header_index();
+         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
          //
          // Initialize the observation array: hdr_id
          //
-         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
-
-         hdr_data_idx++;
-         if (hdr_data_idx >= buf_size) {
-            write_nc_hdr_data(buf_size);
-            reset_header_buffer(buf_size);
-         }
+         obs_arr[0] = (float)(hdr_idx);
 
          //
          // Get the pressure for the current level
@@ -2080,13 +1893,10 @@ void process_madis_profiler(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   if (hdr_data_idx > 0) {
-      write_nc_hdr_data(hdr_data_idx);
-      reset_header_buffer(hdr_data_idx);
-   }
    if (0 < obs_data_idx) {
-      write_nc_obs_data(obs_data_idx);
+      write_nc_obs_buffer(obsVars, obs_data_idx);
    }
+   write_nc_headers(obsVars);
 
    print_rej_counts();
 
@@ -2177,10 +1987,15 @@ void process_madis_maritime(NcFile *&f_in) {
    long *dim = new long [3];
    dim[0] = dim[1] = dim[2] = 1;
 
+   int hdr_idx = 0;
    obs_data_idx = 0;
-   obs_data_offset = 0;
-   hdr_data_idx = 0;
-   hdr_data_offset = 0;
+
+   //
+   // Process the header type.
+   // For maritime, store as SFCSHP.
+   //
+   hdr_typ = "SFCSHP";
+
    //
    // Loop through each record and get the header data.
    //
@@ -2292,42 +2107,29 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
-         //
-         // Process the header type.
-         // For maritime, store as SFCSHP.
-         //
-         hdr_typ = "SFCSHP";
-         strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-         hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
 
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
          //
          // Process the observation time.
          //
          tmp_dbl = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl)) continue;
+
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         //
-         // Write the header array to the output file.
-         //
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
+         hdr_idx = get_nc_header_index();
+if (hdr_idx > 2290) cout << "  DEBUG HS hdr_idx: "  << hdr_idx<< endl;
+
 
          //
          // Initialize the observation array: hdr_id
          //
-         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
+         obs_arr[0] = (float) (hdr_idx);
 
          //
          // Get the pressure for the current level
@@ -2405,25 +2207,17 @@ void process_madis_maritime(NcFile *&f_in) {
          process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
                      in_precip24Hour_var);
 
-         hdr_data_idx++;
-         if (hdr_data_idx >= buf_size) {
-            write_nc_hdr_data(buf_size);
-            reset_header_buffer(buf_size);
-         }
-
+         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
       }
 
    } // end for i_hdr
 
-   if (hdr_data_idx > 0) {
-      write_nc_hdr_data(hdr_data_idx);
-      reset_header_buffer(hdr_data_idx);
-   }
-
    if (0 < obs_data_idx) {
-      write_nc_obs_data(obs_data_idx);
+      write_nc_obs_buffer(obsVars, obs_data_idx);
    }
-
+   write_nc_headers(obsVars);
+   
    print_rej_counts();
 
    //
@@ -2442,7 +2236,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    int hdr_sid_len;
    double tmp_dbl;
    char tmp_str[max_str_len];
-   ConcatString hdr_sid, hdr_vld;
+   ConcatString hdr_typ, hdr_sid, hdr_vld;
    float hdr_arr[hdr_arr_len], obs_arr[obs_arr_len], conversion;
    float wdir, wind, ugrd, vgrd;
 
@@ -2530,10 +2324,13 @@ void process_madis_mesonet(NcFile *&f_in) {
    long *dim = new long [1];
    dim[0] = 1;
 
+   int hdr_idx = 0;
    obs_data_idx = 0;
-   obs_data_offset = 0;
-   hdr_data_idx = 0;
-   hdr_data_offset = 0;
+
+   //
+   // Encode the header type as ADPSFC for MESONET observations.
+   //
+   hdr_typ = "ADPSFC";
 
    //
    // Loop through each record and get the header data.
@@ -2659,7 +2456,6 @@ void process_madis_mesonet(NcFile *&f_in) {
       dim[0] = 1;
       dim[1] = 1;
 
-      int hdr_typ_len = strlen("ADPSFC");
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
 
          //
@@ -2693,18 +2489,11 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
          if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx])) continue;
 
-         //
-         // Encode the header type as ADPSFC for MESONET observations.
-         //
-         strncpy(hdr_typ_out_buf[hdr_data_idx], "ADPSFC", hdr_typ_len);
-         hdr_typ_out_buf[hdr_data_idx][hdr_typ_len] = bad_data_char;
 
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
-         strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-         hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
 
          //
          // Process the observation time.
@@ -2713,28 +2502,18 @@ void process_madis_mesonet(NcFile *&f_in) {
          if(is_bad_data(tmp_dbl)) continue;
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
-         strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-         hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-         //
-         // Write the header array to the output file.
-         //
-         for (int idx=0; idx<hdr_arr_len; idx++) {
-            hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
-         }
+         hdr_idx = get_nc_header_index();
 
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
          //
-         obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);   // Index into header array
-         obs_arr[2] = bad_data_float;  // Level: accum(sec) or pressure
-         obs_arr[3] = 0;               // Height for surface is 0 meters
+         obs_arr[0] = (float)hdr_idx;   // Index into header array
+         obs_arr[2] = bad_data_float;   // Level: accum(sec) or pressure
+         obs_arr[3] = 0;                // Height for surface is 0 meters
 
-         hdr_data_idx++;
-         if (hdr_data_idx >= buf_size) {
-            write_nc_hdr_data(buf_size);
-            reset_header_buffer(buf_size);
-         }
+         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
          // Temperature
          obs_arr[4] = temperature_arr[i_idx];
@@ -2892,14 +2671,10 @@ void process_madis_mesonet(NcFile *&f_in) {
 
    } // end for i
 
-   if (hdr_data_idx > 0) {
-      write_nc_hdr_data(hdr_data_idx);
-      reset_header_buffer(hdr_data_idx);
-   }
-
    if (0 < obs_data_idx) {
-      write_nc_obs_data(obs_data_idx);
+      write_nc_obs_buffer(obsVars, obs_data_idx);
    }
+   write_nc_headers(obsVars);
 
    print_rej_counts();
 
@@ -3005,10 +2780,8 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    // Initialize
    //
    i_cnt = -1;
+   int hdr_idx = 0;
    obs_data_idx = 0;
-   obs_data_offset = 0;
-   hdr_data_idx = 0;
-   hdr_data_offset = 0;
 
    //
    // Loop through each record and get the header data.
@@ -3109,23 +2882,13 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            //
-            // Write header type
-            //
-            strncpy(hdr_typ_out_buf[hdr_data_idx], hdr_typ, hdr_typ.length());
-            hdr_typ_out_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
-
-            //
-            // Write Airport ID
-            //
-            strncpy(hdr_sid_out_buf[hdr_data_idx], hdr_sid, hdr_sid.length());
-            hdr_sid_out_buf[hdr_data_idx][hdr_sid.length()] = bad_data_char;
+            hdr_idx = get_nc_header_index();
 
             //
             // Use cur to index into the NetCDF variables.
             //
             cur[1] = i_lvl;
-            obs_arr[0] = (float) (hdr_data_idx + hdr_data_offset);
+            obs_arr[0] = (float) (hdr_idx);
 
             //
             // Process the latitude, longitude, and elevation.
@@ -3159,31 +2922,18 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             tmp_dbl2 = obsTimeOfDay_arr[i_idx][i_lvl];
 
             //
+            // Write header type
+            // Write Airport ID
             // Add to Profile Time
             // Observation Time is relative to time of day
             //
             tmp_dbl = tmp_dbl1+tmp_dbl2-fmod(tmp_dbl1, 86400);
             unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
             hdr_vld = tmp_str;
-            strncpy(hdr_vld_out_buf[hdr_data_idx], hdr_vld, hdr_vld.length());
-            hdr_vld_out_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
 
-            //
-            // Write observation time
-            //
+            add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+               hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
-            //
-            // Write header array
-            //
-            for (int idx=0; idx<hdr_arr_len; idx++) {
-               hdr_arr_out_buf[hdr_data_idx][idx] = hdr_arr[idx];
-            }
-
-            hdr_data_idx++;
-            if (hdr_data_idx >= buf_size) {
-               write_nc_hdr_data(buf_size);
-               reset_header_buffer(buf_size);
-            }
 
             //
             // Compute the pressure (hPa) from altitude data
@@ -3233,13 +2983,10 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       }
    } // end for i_hdr
 
-   if (0 < hdr_data_idx) {
-      write_nc_hdr_data(hdr_data_idx);
-   }
-
    if (0 < obs_data_idx) {
-      write_nc_obs_data(obs_data_idx);
+      write_nc_obs_buffer(obsVars, obs_data_idx);
    }
+   write_nc_headers(obsVars);
 
    print_rej_counts();
 

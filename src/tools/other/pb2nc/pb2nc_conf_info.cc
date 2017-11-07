@@ -74,7 +74,7 @@ void PB2NCConfInfo::clear() {
    tmp_dir.clear();
    version.clear();
    obs_bufr_map.clear();
-   _messageTypeMap.clear();
+   messageTypeMap.clear();
 
    return;
 }
@@ -206,9 +206,16 @@ void PB2NCConfInfo::process_config() {
       }
    }
 
-   // Conf: obs_bufr_var
-   sa = conf.lookup_string_array(conf_key_obs_bufr_var, false);
-   for(i=0; i<sa.n_elements(); i++) obs_bufr_var.add(sa[i]);
+   // Conf: time_summary
+   timeSummaryInfo = parse_conf_time_summary(&conf);
+   if (timeSummaryInfo.flag) {
+      for(i=0; i<timeSummaryInfo.obs_var.n_elements(); i++) obs_bufr_var.add(timeSummaryInfo.obs_var);
+   }
+   else {
+      // Conf: obs_bufr_var
+      sa = conf.lookup_string_array(conf_key_obs_bufr_var, false);
+      for(i=0; i<sa.n_elements(); i++) obs_bufr_var.add(sa[i]);
+   }
    
    // Conf: quality_mark_thresh
    quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
@@ -228,7 +235,7 @@ void PB2NCConfInfo::process_config() {
    tmp_dir = parse_conf_tmp_dir(&conf);
 
    obs_bufr_map = parse_conf_obs_bufr_map(&conf);
-   _messageTypeMap = parse_conf_message_type_map(&conf);
+   messageTypeMap = parse_conf_message_type_map(&conf);
 
    return;
 }

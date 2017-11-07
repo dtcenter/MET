@@ -40,6 +40,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lbufr \
 	$(FLIBS)
 

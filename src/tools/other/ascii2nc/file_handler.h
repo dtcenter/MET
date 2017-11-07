@@ -29,17 +29,18 @@ using namespace netCDF;
 #include "vx_grid.h"
 #include "vx_config.h"
 #include "vx_util.h"
+#include "write_netcdf.h"
 
 #include "observation.h"
 #include "summary_calc.h"
 #include "summary_key.h"
 #include "time_summary_interval.h"
 
-#define _HDR_ARRAY_LEN   3   // Observation header length
-#define _OBS_ARRAY_LEN   5   // Observation values length
-#define _MAX_STRING_LEN  40  // Maximum length for strings
+//#define _HDR_ARRAY_LEN   3   // Observation header length
+//#define _OBS_ARRAY_LEN   5   // Observation values length
+#define MAX_STRING_LEN  40  // Maximum length for strings
 
-#define OBS_BUFFER_SIZE  (128 * 1024)
+//#define OBS_BUFFER_SIZE  (128 * 1024)
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -73,9 +74,9 @@ protected:
   // Protected constants //
   /////////////////////////
 
-  static const long HDR_ARRAY_LEN;
-  static const long OBS_ARRAY_LEN;
-  static const long MAX_STRING_LEN;
+  //static const long HDR_ARRAY_LEN;
+  //static const long OBS_ARRAY_LEN;
+  //static const long MAX_STRING_LEN;
 
   static const float FILL_VALUE;
 
@@ -127,12 +128,12 @@ protected:
   bool  use_var_id;
   StringArray obs_names;
 
-  char   hdr_typ_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
-  char   hdr_sid_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
-  char   hdr_vld_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
-  float  hdr_arr_buf[OBS_BUFFER_SIZE][_HDR_ARRAY_LEN];
-  float obs_data_buf[OBS_BUFFER_SIZE][_OBS_ARRAY_LEN];
-  char  qty_data_buf[OBS_BUFFER_SIZE][_MAX_STRING_LEN];
+  char   hdr_typ_buf[OBS_BUFFER_SIZE][MAX_STRING_LEN];
+  char   hdr_sid_buf[OBS_BUFFER_SIZE][MAX_STRING_LEN];
+  char   hdr_vld_buf[OBS_BUFFER_SIZE][MAX_STRING_LEN];
+  float  hdr_arr_buf[OBS_BUFFER_SIZE][HDR_ARRAY_LEN];
+  float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
+  char  qty_data_buf[OBS_BUFFER_SIZE][MAX_STRING_LEN];
 
   int   deflate_level;
 
