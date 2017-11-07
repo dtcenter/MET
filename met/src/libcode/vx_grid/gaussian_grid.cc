@@ -215,10 +215,53 @@ void GaussianGrid::latlon_to_xy(double lat, double lon, double & x, double & y) 
 
 {
 
-mlog << Error 
-     << "\nGaussianGrid::latlon_to_xy() not implemented!\n\n";
+// mlog << Error 
+//      << "\nGaussianGrid::latlon_to_xy() not implemented!\n\n";
+// 
+// exit ( 1 );
 
-exit ( 1 );
+
+
+int j;
+const bool neg = (lat < 0.0);
+const double lat_top = North_Latitudes[N_north_lats - 1];
+
+lat = fabs(lat);
+
+if ( lat > lat_top )  x = Nx - 1;
+else {
+
+   double t;
+
+   for (j=0; j<(N_north_lats - 1); ++j)  {
+
+      if ( (lat >= North_Latitudes[j]) && (lat <= North_Latitudes[j + 1]) )  {
+
+         t = (lat - North_Latitudes[j])/(North_Latitudes[j + 1] - North_Latitudes[j]);
+
+         x = j + t;
+
+         break;
+
+      }
+
+   }
+
+}
+
+if ( neg )  x = Nx - 1 - x;
+
+y = (lon - Lon_Zero)/Delta_Lon;
+
+// y = nint(y);
+
+
+
+
+   //
+   //  done
+   //
+
 
 return;
 
