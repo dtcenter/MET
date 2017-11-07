@@ -16,18 +16,7 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	file_handler.cc file_handler.h \
 	little_r_handler.cc little_r_handler.h \
 	met_handler.cc met_handler.h \
-	observation.cc observation.h \
-	summary_calc.cc summary_calc.h \
-	summary_calc_max.cc summary_calc_max.h \
-	summary_calc_mean.cc summary_calc_mean.h \
-	summary_calc_median.cc summary_calc_median.h \
-	summary_calc_min.cc summary_calc_min.h \
-	summary_calc_percentile.cc summary_calc_percentile.h \
-	summary_calc_range.cc summary_calc_range.h \
-	summary_calc_stdev.cc summary_calc_stdev.h \
-	summary_key.cc summary_key.h \
 	surfrad_handler.cc surfrad_handler.h \
-	time_summary_interval.cc time_summary_interval.h \
 	wwsis_handler.cc wwsis_handler.h \
 	aeronet_handler.cc aeronet_handler.h
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS}
@@ -59,4 +48,5 @@ ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	-lvx_summary \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
