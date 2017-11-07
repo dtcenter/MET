@@ -66,6 +66,11 @@ public:
     return _elevation;
   }
   
+  int getGribCode() const
+  {
+    return _varCode;
+  }
+  
   int getVarCode() const
   {
     return _varCode;
