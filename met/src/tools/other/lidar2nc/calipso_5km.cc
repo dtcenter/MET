@@ -28,6 +28,7 @@ static float ff[2];
 
 
 #include "nint.h"
+#include "write_netcdf.h"
 
 #include "calipso_5km.h"
 
