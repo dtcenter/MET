@@ -618,19 +618,28 @@ printCompReport = function(listTest, verb=0, hist=""){
 #     verb: (optional) verbosity level, 0 for no output
 #   strict: (optional) require strict numerical equality, default no
 #    delta: (optional) the allowed file size difference, ignore the file size checking if negative
-compareNc = function(nc1, nc2, verb, strict=0, delta=-1){
+# comp_var: (optional) Compare the variables, too, default: no
+compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 
 	strNcDump1 = paste(strDirTmp, "/", "ncdump_hdr1_", as.numeric(Sys.time()), ".txt", sep="");
 	strNcDump2 = paste(strDirTmp, "/", "ncdump_hdr2_", as.numeric(Sys.time()), ".txt", sep="");
 	strNcDiff  = paste(strDirTmp, "/", "ncdiff_", as.numeric(Sys.time()), ".nc", sep="");
 
 	# build and run the ncdump command for the first file
-	strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
+    if (0 < comp_var) {
+		strCmd = paste(strNcDumpExec, " \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
+    } else {
+		strCmd = paste(strNcDumpExec, " -h \\\n  ", nc1, " \\\n  > ", strNcDump1, sep="");
+    }
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
 	# build and run the ncdump command for the second file
-	strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
+    if (0 < comp_var) {
+		strCmd = paste(strNcDumpExec, " \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
+    } else {
+		strCmd = paste(strNcDumpExec, " -h \\\n  ", nc2, " \\\n  > ", strNcDump2, sep="");
+    }
 	if( 2 <= verb ){ cat("NCDUMP:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 

@@ -12,11 +12,15 @@ verb = 1;
 strict = F;
 hist = 0;		# default histogram plot production
 file_size_delta = 0;
+compare_nc_var = 0;
 
 usage = function(){
-	cat("usage: Rscript comp_dir.R [-v {lev}] [-hist {0|1}] [-strict] {dir_1} {dir_2}\n",
+	cat("usage: Rscript comp_dir.R [-v {lev}] [-hist {0|1}] [-strict] [-nc_var] {dir_1} {dir_2}\n",
 			"  where -v {lev}    indicates verbosity level (0-3), default 1\n",
 			"        -hist {0|1} 1 to produce histogram error plots for each file, default 0\n",
+            "        -nc_var     compare NetCDF variables, default: no\n",
+            "        -comp_nc_var     compare NetCDF variables, default: no\n",
+            "        -compare_nc_var  compare NetCDF variables, default: no\n",
 			"        -strict     applies strict equality when comparing numerical values, default false\n\n",
 			sep="");
 }
@@ -32,6 +36,9 @@ while( 2 < length(listArgs) ){
 		listArgs = listArgs[3:length(listArgs)];
 	} else if( "-strict" == listArgs[1] ){
 		strict = 1;
+		listArgs = listArgs[2:length(listArgs)];
+	} else if( "-compare_nc_var" == listArgs[1] || "-comp_nc_var" == listArgs[1] || "-nc_var" == listArgs[1] ){
+		compare_nc_var = 1;
 		listArgs = listArgs[2:length(listArgs)];
 	} else {
 		cat("ERROR: unrecognized option:", listArgs[1], "\n\n"); usage(); q(status=1);
@@ -52,6 +59,10 @@ listTest2Files = gsub(paste(strDir2, "/", sep=""), "", listTest2);
 if( 1 <= verb ){ cat("dir1:", strDir1, "contains", length(listTest1Files), "files\n");
                  cat("dir2:", strDir2, "contains", length(listTest2Files), "files\n\n"); }
 
+if( 5 <= verb ){
+    boolRmTmp = FALSE;
+}
+                 
 # report files missing from stat folder 1
 listMiss = listTest2Files[ !(listTest2Files %in% listTest1Files) ];
 if( 0 < length(listMiss) ){
@@ -89,7 +100,7 @@ for(strFile in listTest1Files[ listTest1Files %in% listTest2Files ]){
 	# if the files are NetCDF, compare accordingly
 	if( TRUE == grepl("\\.nc$", strFile1, perl=T) ){
 		if( 1 <= verb ){ cat("file1: ", strFile1, "\nfile2: ", strFile2, "\n", sep=""); }
-		compareNc(strFile1, strFile2, verb, strict, file_size_delta);
+		compareNc(strFile1, strFile2, verb, strict, file_size_delta, compare_nc_var);
 	}
 
 	# if the files are PostScript, PNG, or end in .out, compare accordingly
