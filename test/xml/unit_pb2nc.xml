@@ -149,5 +149,24 @@
    </output>
   </test>
   
+  <test name="pb2nc_NDAS_summary">
+    <exec>&MET_DIR;/bin/pb2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value>MET_BASE/poly/CONUS.poly</value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>2</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/prepbufr/ndas/nam.20120409.t12z.prepbufr.tm00.nr \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.summary.nc \
+      &CONFIG_DIR;/PB2NCConfig_summary \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.summary.nc</point_nc>
+    </output>
+  </test>
+  
 
 </met_test>
