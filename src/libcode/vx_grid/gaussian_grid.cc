@@ -223,15 +223,16 @@ void GaussianGrid::latlon_to_xy(double lat, double lon, double & x, double & y) 
 
 
 int j;
-const bool neg = (lat < 0.0);
 const double lat_top = North_Latitudes[N_north_lats - 1];
 
 lat = fabs(lat);
 
-if ( lat > lat_top )  x = Nx - 1;
+if ( lat >  lat_top )  x = Nx - 1;
+if ( lat < -lat_top )  x = 0;
 else {
 
    double t;
+   const bool neg = (lat < 0.0);
 
    for (j=0; j<(N_north_lats - 1); ++j)  {
 
@@ -239,7 +240,7 @@ else {
 
          t = (lat - North_Latitudes[j])/(North_Latitudes[j + 1] - North_Latitudes[j]);
 
-         x = j + t;
+         x = N_north_lats + j + t;
 
          break;
 
@@ -247,9 +248,10 @@ else {
 
    }
 
-}
+   if ( neg )  x = Nx - 1 - x;
 
-if ( neg )  x = Nx - 1 - x;
+}   //  else
+
 
 y = (lon - Lon_Zero)/Delta_Lon;
 
