@@ -114,6 +114,22 @@ quality_mark_thresh = 2;
 event_stack_flag    = TOP;
 
 ////////////////////////////////////////////////////////////////////////////////
+// Time periods for the summarization
+//
+
+time_summary = {
+  flag = FALSE;
+  beg = "000000";
+  end = "235959";
+  step = 300;
+  width = 600;
+  var_name = [ "TMP", "WDIR", "RH" ];
+  type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
+  vld_freq = 0;
+  vld_thresh = 0.0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir = "/tmp";
 version = "V6.1";
