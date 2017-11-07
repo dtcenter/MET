@@ -58,6 +58,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                GridTemplate.h GridTemplate.cc \
                GridPoint.h GridPoint.cc \
                GridOffset.h GridOffset.cc \
+               observation.h observation.cc \
                RectangularTemplate.h RectangularTemplate.cc
 
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
