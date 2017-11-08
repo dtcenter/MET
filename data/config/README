@@ -42,6 +42,14 @@ The configuration file language supports the following data types:
    - Piecewise-Linear Function (currently used only by MODE):
       - A list of (x, y) points enclosed in parenthesis ().
       - The (x, y) points are *NOT* separated by commas.
+   - User-defined function of a single variable:
+      - Left side is a function name followed by variable name in parenthesis.
+      - Right side is an equation which includes basic math functions (+,-,*,/),
+        built-in functions (listed below), or other user-defined functions.
+      - Built-in functions include:
+        sin, cos, tan, sind, cosd, tand, asin, acos, atan, asind, acosd, atand,
+        atan2, atan2d, arg, argd, log, exp, log10, exp10, sqrt, abs, min, max,
+        mod, floor, ceil, step, nint, sign
 
 The context of a configuration entry matters.  If an entry cannot be found in
 the expected dictionary, the MET tools recursively search for that entry in the
@@ -362,6 +370,15 @@ regrid = {
 //        probability data.  It can also be used to compare two probability
 //        fields directly.  When this flag is set, probability values are
 //        automatically rescaled from the range [0, 100] to [0, 1].
+//
+//      - The "convert" entry is a user-defined function of a single variable for
+//        processing input data values.  Any input values that are not bad data
+//        are replaced by the value of this function.  This function may include
+//        any of the built-in math functions (e.g. sqrt, log10), as described
+//        above.  Examples include:
+//          convert(x) = 2*x;
+//          convert(a) = log10(a);
+//          convert(t) = max(1, sqrt(abs(t)));
 //
 //      - The "censor_thresh" entry is an array of thresholds to be applied
 //        to the raw input data.  The "censor_val" entry is an array of numbers

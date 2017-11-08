@@ -53,6 +53,8 @@ class VarInfo
       ThreshArray  CensorThresh; // Censoring thesholds
       NumArray     CensorVal;    // and replacement values
 
+      const DictionaryEntry *ConvertFx; // Conversion function
+
       void init_from_scratch();
       void assign(const VarInfo &);
 
@@ -98,6 +100,8 @@ class VarInfo
 
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;
+
+      const DictionaryEntry *convert_fx() const;
 
          //
          // set stuff
@@ -176,8 +180,10 @@ inline unixtime     VarInfo::init()           const { return(Init);             
 inline unixtime     VarInfo::valid()          const { return(Valid);            }
 inline int          VarInfo::lead()           const { return(Lead);             }
 
-inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     } 
-inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        } 
+inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     }
+inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        }
+
+inline const DictionaryEntry * VarInfo::convert_fx() const { return(ConvertFx); }
 
 ///////////////////////////////////////////////////////////////////////////////
 

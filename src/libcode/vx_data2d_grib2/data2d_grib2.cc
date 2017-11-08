@@ -190,11 +190,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       plane = plane_array[0];
 
-      // Apply shift to the right
-      if(ShiftRight != 0) plane.shift_right(ShiftRight);
-
-      // Apply censor thresholds
-      plane.censor(vinfo_g2->censor_thresh(), vinfo_g2->censor_val());
+      process_data_plane(vinfo_g2, plane);
 
       return true;
 
@@ -220,14 +216,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    //  check the data plane for wind rotation
    plane = check_uv_rotation(vinfo_g2, listMatch[0], plane);
 
-   if(read_success) {
-
-      // Apply shift to the right
-      if(ShiftRight != 0) plane.shift_right(ShiftRight);
-
-      // Apply censor thresholds
-      plane.censor(vinfo_g2->censor_thresh(), vinfo_g2->censor_val());
-   }
+   if(read_success) process_data_plane(vinfo_g2, plane);
 
    return read_success;
 
@@ -323,11 +312,7 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
          lvl_upper = ( (double)(*it)->LvlVal2 ) / 100.0;
       }
 
-      // Apply shift to the right
-      if(ShiftRight != 0) plane.shift_right(ShiftRight);
-
-      // Apply censor thresholds
-      plane.censor(vinfo_g2->censor_thresh(), vinfo_g2->censor_val());
+      process_data_plane(vinfo_g2, plane);
 
       plane_array.add(plane, lvl_lower, lvl_upper);
 

@@ -105,6 +105,8 @@ void VarInfo::assign(const VarInfo &v) {
    CensorThresh = v.censor_thresh();
    CensorVal    = v.censor_val();
 
+   ConvertFx = v.ConvertFx;
+
    return;
 }
 
@@ -136,6 +138,8 @@ void VarInfo::clear() {
 
    CensorThresh.clear();
    CensorVal.clear();
+
+   ConvertFx = (DictionaryEntry *) 0;
 
    return;
 }
@@ -169,6 +173,11 @@ void VarInfo::dump(ostream &out) const {
        << "  Lead         = " << lead_str << " (" << Lead << ")\n"
        << "  CensorThresh = " << CensorThresh.get_str() << ")\n"
        << "  CensorVal    = " << CensorVal.serialize() << ")\n";
+
+   if(ConvertFx != 0) {
+      out << "  Convert:\n";
+      ConvertFx->dump(out);
+   }
 
    Level.dump(out);
 
@@ -363,6 +372,9 @@ void VarInfo::set_dict(Dictionary &dict) {
    // Parse censor_val, if present
    na = dict.lookup_num_array(conf_key_censor_val, false);
    if(dict.last_lookup_status()) set_censor_val(na);
+
+   // Lookup conversion function, if present
+   ConvertFx = dict.lookup(conf_key_convert);
 
    // Check for equal number of censor thresholds and values
    if(ta.n_elements() != na.n_elements()) {

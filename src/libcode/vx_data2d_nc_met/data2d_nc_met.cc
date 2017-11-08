@@ -64,7 +64,7 @@ MetNcMetDataFile & MetNcMetDataFile::operator=(const MetNcMetDataFile &) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcMetDataFile::nc_met_init_from_scratch() {
-  
+
    MetNc  = (MetNcFile *) 0;
 
    close();
@@ -88,7 +88,7 @@ bool MetNcMetDataFile::open(const char * _filename) {
    close();
 
    MetNc = new MetNcFile;
-   
+
    if(!MetNc->open(_filename)) {
       mlog << Error << "\nMetNcMetDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
@@ -146,7 +146,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
          }
       }
    }
-   
+
    // Read the data
    status = MetNc->data(vinfo_nc->req_name(),
                         vinfo_nc->dimension(),
@@ -183,11 +183,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
          status = false;
       }
 
-      // Apply shift to the right
-      if(ShiftRight != 0) plane.shift_right(ShiftRight);
-
-      // Apply censor thresholds
-      plane.censor(vinfo.censor_thresh(), vinfo.censor_val());
+      process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, level, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
@@ -210,7 +206,7 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
 
    // Initialize
    plane_array.clear();
-   
+
    // Can only read a single 2D data plane from a MET NetCDF file
    status = data_plane(vinfo, plane);
 
