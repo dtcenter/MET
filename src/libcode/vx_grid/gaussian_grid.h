@@ -39,8 +39,6 @@ class GaussianGrid : public GridRep {
      ~GaussianGrid();
       GaussianGrid(const GaussianData &);
 
-      double y_to_lat(int y) const;
-
       int Nx;
       int Ny;
 
@@ -48,9 +46,7 @@ class GaussianGrid : public GridRep {
 
       double Delta_Lon;
 
-      double * North_Latitudes;   //  allocated, increasing order
-
-      int N_north_lats;
+      double * Latitudes;   //  allocated, increasing order (ie, south to north)
 
       ConcatString Name;
 
