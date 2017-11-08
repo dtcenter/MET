@@ -28,6 +28,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+
 static bool is_grid_relative(const GribRecord &);
 
 static int  get_bit_from_octet(unsigned char, int);
@@ -536,12 +537,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
             continue;
          }
          else {
-
-            // Apply shift to the right
-            if(ShiftRight != 0) cur_plane.shift_right(ShiftRight);
-
-            // Apply censor thresholds
-            cur_plane.censor(vinfo_grib->censor_thresh(), vinfo_grib->censor_val());
+            process_data_plane(&vinfo, cur_plane);
          }
 
          // Add current record to the data plane array
@@ -708,15 +704,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
          // Read current record
          status = get_data_plane(r, plane);
 
-
-         if(status) {
-
-            // Apply shift to the right
-            if(ShiftRight != 0) plane.shift_right(ShiftRight);
-
-            // Apply censor thresholds
-            plane.censor(vinfo_grib.censor_thresh(), vinfo_grib.censor_val());
-         }
+         if(status) process_data_plane(&vinfo_grib, plane);
 
          break;
       }

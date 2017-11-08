@@ -15,6 +15,7 @@
 #include "config_constants.h"
 #include "config_file.h"
 #include "config_util.h"
+#include "config_funcs.h"
 #include "dictionary.h"
 #include "data_file_type.h"
 #include "threshold.h"

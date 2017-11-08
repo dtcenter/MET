@@ -451,6 +451,7 @@ static const char conf_key_GRIB_ens[]          = "GRIB_ens";
 static const char conf_key_message_type[]      = "message_type";
 static const char conf_key_sid_exc[]           = "sid_exc";
 static const char conf_key_obs_qty[]           = "obs_quality";
+static const char conf_key_convert[]           = "convert";
 static const char conf_key_censor_thresh[]     = "censor_thresh";
 static const char conf_key_censor_val[]        = "censor_val";
 static const char conf_key_cnt_thresh[]        = "cnt_thresh";

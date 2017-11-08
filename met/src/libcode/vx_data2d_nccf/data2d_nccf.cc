@@ -192,13 +192,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       status = false;
     }
 
-    // Apply shift to the right
-
-    if(ShiftRight != 0) plane.shift_right(ShiftRight);
-
-    // Apply censor thresholds
-
-    plane.censor(vinfo.censor_thresh(), vinfo.censor_val());
+    process_data_plane(&vinfo, plane);
 
     // Set the VarInfo object's name, long_name, level, and units strings
 

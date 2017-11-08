@@ -171,7 +171,7 @@ if ( Dest_Grid )  {
 } else out << "(nul)\n";
 
 out << prefix << "ShiftRight = " << ShiftRight << '\n';
-   
+
    //
    //  done
    //
@@ -269,7 +269,47 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
+
+{
+
+if ( ! vinfo )  return;
+
+   //
+   // Apply shift to the right logic.
+   //
+
+if ( ShiftRight != 0 )  dp.shift_right(ShiftRight);
+
+   //
+   // Apply conversion logic.
+   //
+
+if ( vinfo->convert_fx() )  {
+
+   mlog << Debug(3) << "Applying conversion function.\n";
+
+   UserFunc_1Arg fx;
+   fx.set(vinfo->convert_fx());
+
+   int Nxy = dp.nx()*dp.ny();
+
+   for (int j=0; j<Nxy; ++j)  {
+      if(!is_bad_data(dp.buf()[j])) {
+         dp.buf()[j] = fx(dp.buf()[j]);
+      }
+   }
+}
+
+   //
+   // Apply censor logic.
+   //
+
+dp.censor(vinfo->censor_thresh(), vinfo->censor_val());
+
+return;
+
+}
 
 
-
-
+////////////////////////////////////////////////////////////////////////

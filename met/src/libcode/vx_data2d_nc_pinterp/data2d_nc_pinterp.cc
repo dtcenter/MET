@@ -89,7 +89,7 @@ bool MetNcPinterpDataFile::open(const char * _filename) {
    close();
 
    PinterpNc = new PinterpFile;
-   
+
    if(!PinterpNc->open(_filename)) {
       mlog << Error << "\nMetNcPinterpDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
@@ -162,11 +162,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
          status = false;
       }
 
-      // Apply shift to the right
-      if(ShiftRight != 0) plane.shift_right(ShiftRight);
-
-      // Apply censor thresholds
-      plane.censor(vinfo.censor_thresh(), vinfo.censor_val());
+      process_data_plane(&vinfo, plane);
 
       // Set the VarInfo object's name, long_name, and units strings
       if(info->name_att.length()      > 0) vinfo.set_name(info->name_att);
@@ -222,14 +218,14 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
    lower   = nint(vinfo.level().lower());
    upper   = nint(vinfo.level().upper());
    n_level = upper - lower + 1;
-   
+
    // Loop through each of levels specified in the range
    cur_dim = dim;
    for(i=0; i<n_level; i++) {
 
       // Set the dimension for the current level
       cur_dim[i_dim] = lower + i;
-     
+
       // Read data for the current level
       status = PinterpNc->data(vinfo_nc->req_name(),
                                cur_dim, cur_plane, pressure, info);
@@ -259,11 +255,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
             status = false;
          }
 
-         // Apply shift to the right
-         if(ShiftRight != 0) cur_plane.shift_right(ShiftRight);
-
-         // Apply censor thresholds
-         cur_plane.censor(vinfo.censor_thresh(), vinfo.censor_val());
+         process_data_plane(&vinfo, cur_plane);
 
          // Add current plane to the data plane array
          plane_array.add(cur_plane, pressure, pressure);
@@ -295,7 +287,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
    else                                 level_str << cs_erase << "P" << nint(max_level)
                                                   << "-" << nint(min_level);
    vinfo.set_level_name(level_str);
-   
+
    return(n_level);
 }
 
