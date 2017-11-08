@@ -148,16 +148,24 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       //
       // render the data image
       //
+
+   plot.comment("drawing data image");
+
    render(plot, image, render_info);
 
       //
       // draw the map on top of the image and put a border around it
       //
-    if ( use_flate )  plot.begin_flate();
-    draw_map(grid, grid_bb, plot, map_box, conf);
-    if ( use_flate )  plot.end_flate();
 
-    draw_border(plot, map_box, 2.0);
+   plot.comment("start drawing map");
+
+   if ( use_flate )  plot.begin_flate();
+   draw_map(grid, grid_bb, plot, map_box, conf);
+   if ( use_flate )  plot.end_flate();
+
+   plot.comment("end drawing map");
+
+   draw_border(plot, map_box, 2.0);
    
       //
       // annotate the plot with the filename and the title if set
@@ -197,6 +205,9 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       //
       // now fill in the colorbar and draw a border around it
       //
+
+   plot.comment("drawing colorbar image");
+
    cbar_image.set_size_xy(1, num_cbar_vals);
    fill_colorbar_image(cbar_image, colortable);
    draw_border(plot, cbar_bb, 1.5);

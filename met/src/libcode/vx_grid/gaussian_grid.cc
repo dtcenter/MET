@@ -57,7 +57,7 @@ GaussianGrid::GaussianGrid()
 
 {
 
-North_Latitudes = 0;
+Latitudes = 0;
 
 clear();
 
@@ -93,9 +93,7 @@ Delta_Lon = 0.0;
 
 memset(&Data, 0, sizeof(Data));
 
-if ( North_Latitudes )  { delete [] North_Latitudes;  North_Latitudes = 0; }
-
-N_north_lats = 0;
+if ( Latitudes )  { delete [] Latitudes;  Latitudes = 0; }
 
 return;
 
@@ -109,13 +107,12 @@ GaussianGrid::GaussianGrid(const GaussianData & data)
 
 {
 
-North_Latitudes = 0;
+Latitudes = 0;
 
 clear();
 
 Lon_Zero = data.lon_zero;
 
-Delta_Lon = 360.0/(Nx - 1.0);
 
 Name = data.name;
 
@@ -124,6 +121,8 @@ Data = data;
 Nx = data.nx;
 
 Ny = data.ny;
+
+Delta_Lon = -360.0/(Nx - 1.0);
 
    //
    //  check that Ny is even
@@ -144,66 +143,48 @@ if ( Ny%2 )  {
 
 
 Legendre L;
-int j, k;
+int i, j, k;
 double r, w;
+double latitude;
+const int ny_half = Ny/2;
 
 
-N_north_lats = Ny/2;
+Latitudes = new double [Ny];
 
-North_Latitudes = new double [N_north_lats];
+L.set_max_degree(Ny);
 
-L.set_max_degree(N_north_lats);
+for (j=0; j<Ny; ++j)  Latitudes[j] = 0.0;
 
+for (j=0; j<ny_half; ++j)  {
 
-for (j=0; j<N_north_lats; ++j)  {
-
-   k = j + Ny/2;
+   k = j + ny_half;
 
    k = Ny - 1 - k;
 
    L.lether_root_weight(k, r, w);
    // L.d_and_r_root_weight(k, r, w);
 
-   North_Latitudes[j] = r;
+   latitude = asind(r);
+
+   i = j + ny_half;
+
+   Latitudes[i] = latitude;
+
+   Latitudes[Ny - 1 - i] = -latitude;
 
 }
+
+// cout << "///////////////////////////////////////////////////////////////////\n";
+// 
+// for (j=0; j<Ny; ++j)  {
+// 
+//    cout << "Latitudes[" << j << "] = " << Latitudes[j] << '\n';
+// 
+// }
 
    //
    //  done
    //
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double GaussianGrid::y_to_lat(int y) const
-
-{
-
-int index;
-double lat;
-
-if ( y < N_north_lats )  {
-
-   index = N_north_lats - 1 - y;
-
-   lat = North_Latitudes[index];
-
-   lat = -lat;
-
-} else {
-
-   index = y - N_north_lats;
-
-   lat = North_Latitudes[index];
-
-}
-
-
-
-return ( lat );
 
 }
 
@@ -223,24 +204,22 @@ void GaussianGrid::latlon_to_xy(double lat, double lon, double & x, double & y) 
 
 
 int j;
-const double lat_top = North_Latitudes[N_north_lats - 1];
+const double lat_top = Latitudes[Ny - 1];
 
-lat = fabs(lat);
 
-if ( lat >  lat_top )  x = Nx - 1;
-if ( lat < -lat_top )  x = 0;
+     if ( lat >  lat_top )  y = Ny - 1;
+else if ( lat < -lat_top )  y = 0;
 else {
 
    double t;
-   const bool neg = (lat < 0.0);
 
-   for (j=0; j<(N_north_lats - 1); ++j)  {
+   for (j=0; j<(Ny - 1); ++j)  {
 
-      if ( (lat >= North_Latitudes[j]) && (lat <= North_Latitudes[j + 1]) )  {
+      if ( (lat >= Latitudes[j]) && (lat <= Latitudes[j + 1]) )  {
 
-         t = (lat - North_Latitudes[j])/(North_Latitudes[j + 1] - North_Latitudes[j]);
+         t = (lat - Latitudes[j])/(Latitudes[j + 1] - Latitudes[j]);
 
-         x = N_north_lats + j + t;
+         y = j + t;
 
          break;
 
@@ -248,14 +227,18 @@ else {
 
    }
 
-   if ( neg )  x = Nx - 1 - x;
-
 }   //  else
 
+lon -= Lon_Zero;
 
-y = (lon - Lon_Zero)/Delta_Lon;
+lon -= 360.0*floor((lon + 180.0)/360.0);
 
-// y = nint(y);
+
+x = lon/Delta_Lon;
+
+if ( x < 0.0 )  x += Nx;
+
+// x = nint(x);
 
 
 
@@ -298,7 +281,7 @@ if ( (iy < 0) || (iy >= Ny) )  {
 
 }
 
-lat = y_to_lat(iy);
+lat = Latitudes[iy];
 
 lon = Lon_Zero - ix*Delta_Lon;
 
@@ -318,9 +301,9 @@ double lat_top, lat_bot;
 double area;
 
 if ( y == (Ny - 1) )  lat_top = 90.0;
-else                  lat_top = y_to_lat(y + 1);
+else                  lat_top = Latitudes[y + 1];
 
-lat_bot = y_to_lat(y);
+lat_bot = Latitudes[y];
 
 area = rad_per_deg*fabs(Delta_Lon);   //  Delta_Lon in radians
 
