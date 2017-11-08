@@ -45,6 +45,7 @@ using namespace std;
 #include "nc_utils.h"
 #include "vx_log.h"
 #include "data_plane.h"
+#include "write_netcdf.h"
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d_grib.h"
@@ -205,18 +206,6 @@ int main(int argc, char *argv[]) {
    //
    NcFile *f_in       = (NcFile *) 0;
 
-   NcDim hdr_arr_dim ;
-   NcDim obs_arr_dim ;
-   NcDim nhdr_dim    ;
-   NcDim nobs_dim    ;
-   NcDim strl_dim    ;
-
-   NcVar hdr_arr_var ;
-   NcVar hdr_typ_var ;
-   NcVar hdr_sid_var ;
-   NcVar hdr_vld_var ;
-   NcVar obs_arr_var ;
-
    //
    // Open the netCDF point observation file
    //
@@ -233,46 +222,31 @@ int main(int argc, char *argv[]) {
       exit(1);
    }
 
-   bool use_var_id = false;
-   if (!get_global_att(f_in, nc_att_use_var_id, use_var_id)) {
-      use_var_id = false;
-   }
-   
-   //
-   // Retrieve the dimensions and variable from the netCDF file
-   //
-   hdr_arr_dim = get_nc_dim(f_in, "hdr_arr_len");
-   obs_arr_dim = get_nc_dim(f_in, "obs_arr_len");
+   // Read the dimensions and variables
+   NetcdfObsVars obsVars;
+   read_nc_dims_vars(obsVars, f_in);
+   bool use_var_id = obsVars.use_var_id;
 
-   nhdr_dim = get_nc_dim(f_in, "nhdr");
-   nobs_dim = get_nc_dim(f_in, "nobs");
-
-   strl_dim = get_nc_dim(f_in, "mxstr");
-
-   hdr_arr_var = get_nc_var(f_in, "hdr_arr");
-   hdr_typ_var = get_nc_var(f_in, "hdr_typ");
-   hdr_sid_var = get_nc_var(f_in, "hdr_sid");
-   hdr_vld_var = get_nc_var(f_in, "hdr_vld");
-   obs_arr_var = get_nc_var(f_in, "obs_arr");
-
-   if(IS_INVALID_NC(hdr_arr_dim) ||
-      IS_INVALID_NC(obs_arr_dim) ||
-      IS_INVALID_NC(nhdr_dim)    ||
-      IS_INVALID_NC(nobs_dim)    ||
-      IS_INVALID_NC(strl_dim)    ||
-      IS_INVALID_NC(hdr_arr_var) ||
-      IS_INVALID_NC(hdr_typ_var) ||
-      IS_INVALID_NC(hdr_sid_var) ||
-      IS_INVALID_NC(hdr_vld_var) ||
-      IS_INVALID_NC(obs_arr_var)) {
+   if(IS_INVALID_NC(obsVars.hdr_arr_dim) ||
+      IS_INVALID_NC(obsVars.obs_arr_dim) ||
+      IS_INVALID_NC(obsVars.hdr_dim)    ||
+      IS_INVALID_NC(obsVars.obs_dim)    ||
+      IS_INVALID_NC(obsVars.strl_dim)    ||
+      IS_INVALID_NC(obsVars.hdr_arr_var) ||
+      IS_INVALID_NC(obsVars.hdr_typ_var) ||
+      IS_INVALID_NC(obsVars.hdr_sid_var) ||
+      IS_INVALID_NC(obsVars.hdr_vld_var) ||
+      IS_INVALID_NC(obsVars.obs_arr_var)) {
       mlog << Error << "\nmain() -> "
            << "trouble reading netCDF file " << nc_file << "\n\n";
       exit(1);
    }
 
-   long nhdr_count = get_dim_size(&nhdr_dim);
-   long nobs_count = get_dim_size(&nobs_dim);
-   long strl_count = get_dim_size(&strl_dim);
+   long nhdr_count  = get_dim_size(&obsVars.hdr_dim);
+   long nobs_count  = get_dim_size(&obsVars.obs_dim);
+   long strl_count  = get_dim_size(&obsVars.strl_dim);
+   long strll_count = strl_count;
+   if (!IS_INVALID_NC(obsVars.strll_dim)) strll_count = get_dim_size(&obsVars.strll_dim);
 
    mlog << Debug(2) << "Processing " << (nobs_count) << " observations at "
         << nhdr_count << " locations.\n";
@@ -374,8 +348,8 @@ int main(int argc, char *argv[]) {
    plot.lineto(map_box.x_ll(), map_box.y_ur());
    plot.clip();
 
-   int hdr_arr_len = get_dim_size(&hdr_arr_dim);
-   int obs_arr_len = get_dim_size(&obs_arr_dim);
+   int hdr_arr_len = get_dim_size(&obsVars.hdr_arr_dim);
+   int obs_arr_len = get_dim_size(&obsVars.obs_arr_dim);
 
    int buf_size = ((nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count));
    int hdr_buf_size = nhdr_count;
@@ -383,12 +357,12 @@ int main(int argc, char *argv[]) {
    //
    // Allocate space to store the data
    //
-   char hdr_typ_str[strl_count];
+   char hdr_typ_str[strll_count];
    char hdr_sid_str[strl_count];
    char hdr_vld_str[strl_count];
    float *hdr_arr = (float *) 0, *obs_arr = (float *) 0;
    
-   char hdr_typ_str_full[hdr_buf_size][strl_count];
+   char hdr_typ_str_full[hdr_buf_size][strll_count];
    char hdr_sid_str_full[hdr_buf_size][strl_count];
    char hdr_vld_str_full[hdr_buf_size][strl_count];
 
@@ -413,7 +387,8 @@ int main(int argc, char *argv[]) {
    //
    // Get the corresponding header message type
    //
-   if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
+   lengths[1] = strll_count;
+   if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_typ\n\n";
       exit(1);
@@ -422,7 +397,8 @@ int main(int argc, char *argv[]) {
    //
    // Get the corresponding header station id
    //
-   if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
+   lengths[1] = strl_count;
+   if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_sid\n\n";
       exit(1);
@@ -431,7 +407,7 @@ int main(int argc, char *argv[]) {
    //
    // Get the corresponding header valid time
    //
-   if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
+   if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_vld\n\n";
       exit(1);
@@ -441,7 +417,7 @@ int main(int argc, char *argv[]) {
    // Get the header for this observation
    //
    lengths[1] = hdr_arr_len;
-   if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
+   if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_arr\n\n";
       exit(1);
@@ -473,7 +449,7 @@ int main(int argc, char *argv[]) {
       lengths[1] = obs_arr_len;
 
       // Read the current observation message
-      if(!get_nc_data(&obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
+      if(!get_nc_data(&obsVars.obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
          mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }

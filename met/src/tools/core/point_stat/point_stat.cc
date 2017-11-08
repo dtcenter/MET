@@ -651,37 +651,20 @@ void process_obs_file(int i_nc) {
       return;
    }
 
-   // Define dimensions
-   NcDim strl_dim    ; // Maximum string length
-   NcDim obs_dim     ; // Number of observations
-   NcDim hdr_dim     ; // Number of messages
-
-   // Define variables
-   NcVar obs_qty_var ;
-   NcVar obs_arr_var ;
-   NcVar hdr_typ_var ;
-   NcVar hdr_sid_var ;
-   NcVar hdr_vld_var ;
-   NcVar hdr_arr_var ;
+   // Read the dimensions and variables
+   NetcdfObsVars obsVars;
+   read_nc_dims_vars(obsVars, obs_in);
 
    int var_num = 0;
-   bool use_var_id = false;
-   if (!get_global_att(obs_in, nc_att_use_var_id, use_var_id)) {
-      use_var_id = false;
-   }
-
-   // Read the dimensions
-   strl_dim = get_nc_dim(obs_in, nc_dim_mxstr);
-   obs_dim  = get_nc_dim(obs_in, nc_dim_nobs);
-   hdr_dim  = get_nc_dim(obs_in, nc_dim_nhdr);
+   bool use_var_id = obsVars.use_var_id;
    if (use_var_id) {
-      NcDim var_dim    = get_nc_dim(obs_in,nc_dim_nvar);
+      NcDim var_dim = get_nc_dim(obs_in,nc_dim_nvar);
       var_num       = get_dim_size(&var_dim);
    }
 
-   if(IS_INVALID_NC(strl_dim) ||
-      IS_INVALID_NC(obs_dim)  ||
-      IS_INVALID_NC(hdr_dim)) {
+   if(IS_INVALID_NC(obsVars.strl_dim) ||
+      IS_INVALID_NC(obsVars.obs_dim)  ||
+      IS_INVALID_NC(obsVars.hdr_dim)) {
       mlog << Error << "\nprocess_obs_file() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
            << "dimensions from netCDF file: "
@@ -689,19 +672,11 @@ void process_obs_file(int i_nc) {
       exit(1);
    }
 
-   // Read the variables
-   obs_arr_var = get_nc_var(obs_in, "obs_arr");
-   hdr_typ_var = get_nc_var(obs_in, "hdr_typ");
-   hdr_sid_var = get_nc_var(obs_in, "hdr_sid");
-   hdr_vld_var = get_nc_var(obs_in, "hdr_vld");
-   hdr_arr_var = get_nc_var(obs_in, "hdr_arr");
-   if (has_var(obs_in, "obs_qty")) obs_qty_var = get_nc_var(obs_in, "obs_qty");
-
-   if(IS_INVALID_NC(obs_arr_var) ||
-      IS_INVALID_NC(hdr_typ_var) ||
-      IS_INVALID_NC(hdr_sid_var) ||
-      IS_INVALID_NC(hdr_vld_var) ||
-      IS_INVALID_NC(hdr_arr_var)) {
+   if(IS_INVALID_NC(obsVars.obs_arr_var) ||
+      IS_INVALID_NC(obsVars.hdr_typ_var) ||
+      IS_INVALID_NC(obsVars.hdr_sid_var) ||
+      IS_INVALID_NC(obsVars.hdr_vld_var) ||
+      IS_INVALID_NC(obsVars.hdr_arr_var)) {
       mlog << Error << "\nprocess_obs_file() -> "
            << "can't read \"obs_arr\", \"hdr_typ\", \"hdr_sid\", "
            << "\"hdr_vld\", or \"hdr_arr\" variables from netCDF file: "
@@ -709,12 +684,15 @@ void process_obs_file(int i_nc) {
       exit(1);
    }
 
-   if(IS_INVALID_NC(obs_qty_var))
+   if(IS_INVALID_NC(obsVars.obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file\n";
 
-   int obs_count = get_dim_size(&obs_dim);
-   int hdr_count = get_dim_size(&hdr_dim);
-   int strl_len  = get_dim_size(&strl_dim);
+   int obs_count = get_dim_size(&obsVars.obs_dim);
+   int hdr_count = get_dim_size(&obsVars.hdr_dim);
+   int strl_len  = get_dim_size(&obsVars.strl_dim);
+   int strll_len = strl_len;
+   if (!IS_INVALID_NC(obsVars.strll_dim)) strll_len = get_dim_size(&obsVars.strll_dim);
+   
    mlog << Debug(2)
         << "Searching " << obs_count
         << " observations from " << hdr_count
@@ -753,7 +731,7 @@ void process_obs_file(int i_nc) {
    float obs_arr_block[buf_size][obs_arr_len];
    char  obs_qty_block[buf_size][strl_len];
 
-   char hdr_typ_str_block[hdr_buf_size][strl_len];
+   char hdr_typ_str_block[hdr_buf_size][strll_len];
    char hdr_sid_str_block[hdr_buf_size][strl_len];
    char hdr_vld_str_block[hdr_buf_size][strl_len];
    float    hdr_arr_block[hdr_buf_size][hdr_arr_len];
@@ -768,17 +746,18 @@ void process_obs_file(int i_nc) {
       // Get the corresponding header message type
       //
       lengths[0] = hdr_buf_size;
-      lengths[1] = strl_len;
-      if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
+      lengths[1] = strll_len;
+      if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_typ\n\n";
          exit(1);
       }
 
+      lengths[1] = strl_len;
       //
       // Get the corresponding header station id
       //
-      if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
+      if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_sid\n\n";
          exit(1);
@@ -787,7 +766,7 @@ void process_obs_file(int i_nc) {
       //
       // Get the corresponding header valid time
       //
-      if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
+      if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_vld\n\n";
          exit(1);
@@ -797,7 +776,7 @@ void process_obs_file(int i_nc) {
       // Get the header for this observation
       //
       lengths[1] = hdr_arr_len;
-      if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
+      if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "trouble getting hdr_arr\n\n";
          exit(1);
@@ -818,7 +797,7 @@ void process_obs_file(int i_nc) {
       lengths[1] = obs_arr_len;
 
       // Read the current observation message
-      if(!get_nc_data(&obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
+      if(!get_nc_data(&obsVars.obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the record for observation "
               << "index " << i_block_start_idx << "\n\n";
@@ -828,8 +807,8 @@ void process_obs_file(int i_nc) {
       // Read the current observation quality flag
       lengths[1] = strl_len;
       strcpy(obs_qty_str, "");
-      if(!IS_INVALID_NC(obs_qty_var)
-          && !get_nc_data(&obs_qty_var, (char *)&obs_qty_block[0], lengths, offsets)) {
+      if(!IS_INVALID_NC(obsVars.obs_qty_var)
+          && !get_nc_data(&obsVars.obs_qty_var, (char *)&obs_qty_block[0], lengths, offsets)) {
          mlog << Error << "\nprocess_obs_file() -> "
               << "can't read the quality flag for observation "
               << "index " << i_block_start_idx << "\n\n";
@@ -840,7 +819,7 @@ void process_obs_file(int i_nc) {
          // Read the corresponding header array for this observation
          lengths[1] = hdr_arr_len;
 
-         if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
+         if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
             mlog << Error << "\nprocess_obs_file() -> "
                  << "for observation index " << i_block_start_idx
                  << ", can't read the header array record for header "
@@ -849,8 +828,8 @@ void process_obs_file(int i_nc) {
          }
 
          // Read the corresponding header type for this observation
-         lengths[1] = strl_len;
-         if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
+         lengths[1] = strll_len;
+         if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_str_block[0], lengths, offsets)) {
             mlog << Error << "\nprocess_obs_file() -> "
                  << "for observation index " << i_block_start_idx
                  << ", can't read the message type record for header "
@@ -860,7 +839,7 @@ void process_obs_file(int i_nc) {
 
          // Read the corresponding header Station ID for this observation
          lengths[1] = strl_len;
-         if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
+         if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_str_block[0], lengths, offsets)) {
             mlog << Error << "\nprocess_obs_file() -> "
                  << "for observation index " << i_block_start_idx
                  << ", can't read the station ID record for header "
@@ -869,7 +848,7 @@ void process_obs_file(int i_nc) {
          }
 
          // Read the corresponding valid time for this observation
-         if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
+         if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_str_block[0], lengths, offsets)) {
             mlog << Error << "\nprocess_obs_file() -> "
                  << "for observation index " << i_block_start_idx
                  << ", can't read the valid time for header "
@@ -936,7 +915,7 @@ void process_obs_file(int i_nc) {
             lengths[1] = hdr_arr_len;
 
             if (prev_hdr_offset != headerOffset) {
-               if(!get_nc_data(&hdr_arr_var, hdr_arr, lengths, offsets)) {
+               if(!get_nc_data(&obsVars.hdr_arr_var, hdr_arr, lengths, offsets)) {
                   mlog << Error << "\nprocess_obs_file() -> "
                        << "for observation index " << i_obs
                        << ", can't read the header array record for header "
@@ -945,8 +924,8 @@ void process_obs_file(int i_nc) {
                }
 
                // Read the corresponding header type for this observation
-               lengths[1] = strl_len;
-               if(!get_nc_data(&hdr_typ_var, hdr_typ_str, lengths, offsets)) {
+               lengths[1] = strll_len;
+               if(!get_nc_data(&obsVars.hdr_typ_var, hdr_typ_str, lengths, offsets)) {
                   mlog << Error << "\nprocess_obs_file() -> "
                        << "for observation index " << i_obs
                        << ", can't read the message type record for header "
@@ -956,7 +935,7 @@ void process_obs_file(int i_nc) {
 
                // Read the corresponding header Station ID for this observation
                lengths[1] = strl_len;
-               if(!get_nc_data(&hdr_sid_var, hdr_sid_str, lengths, offsets)) {
+               if(!get_nc_data(&obsVars.hdr_sid_var, hdr_sid_str, lengths, offsets)) {
                   mlog << Error << "\nprocess_obs_file() -> "
                        << "for observation index " << i_obs
                        << ", can't read the station ID record for header "
@@ -965,7 +944,7 @@ void process_obs_file(int i_nc) {
                }
 
                // Read the corresponding valid time for this observation
-               if(!get_nc_data(&hdr_vld_var, hdr_vld_str, lengths, offsets)) {
+               if(!get_nc_data(&obsVars.hdr_vld_var, hdr_vld_str, lengths, offsets)) {
                   mlog << Error << "\nprocess_obs_file() -> "
                        << "for observation index " << i_obs
                        << ", can't read the valid time for header "

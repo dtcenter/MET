@@ -386,10 +386,11 @@ void add_and_write_nc_observation(const NetcdfObsVars &obsVars,
 void create_nc_dimensions(NetcdfObsVars &obsVars, NcFile *f_out) {
    // Define netCDF dimensions
    if (IS_INVALID_NC(obsVars.strl_dim))    obsVars.strl_dim    = add_dim(f_out, nc_dim_mxstr,   (long)HEADER_STR_LEN);
-   //if (IS_INVALID_NC(obsVars.strl_dim_l) && obsVars.str_len > 0) {
-   //   obsVars.strl_dim_l = add_dim(f_out, nc_dim_mxstr,   (long)obsVars.str_len);
-   //}
-   //if (IS_INVALID_NC(obsVars.strl_dim_l))  obsVars.strl_dim_l = add_dim(f_out, nc_dim_mxstrl,   (long)HEADER_STR_LEN_L);
+   if (IS_INVALID_NC(obsVars.strll_dim)) {
+      int hdr_str_len = obsVars.hdr_str_len;
+      if (hdr_str_len <= 0) hdr_str_len = HEADER_STR_LEN_L;
+      obsVars.strll_dim = add_dim(f_out, nc_dim_mxstr2, (long)hdr_str_len);
+   }
    if (IS_INVALID_NC(obsVars.hdr_arr_dim)) obsVars.hdr_arr_dim = add_dim(f_out, nc_dim_hdr_arr, (long)HDR_ARRAY_LEN);
    if (IS_INVALID_NC(obsVars.obs_arr_dim)) obsVars.obs_arr_dim = add_dim(f_out, nc_dim_obs_arr, (long)OBS_ARRAY_LEN);
    if (IS_INVALID_NC(obsVars.hdr_dim) && obsVars.hdr_len > 0) {
@@ -415,10 +416,10 @@ void create_nc_hdr_vars (NetcdfObsVars &obsVars, NcFile *f_out,
    if (IS_INVALID_NC(obsVars.hdr_dim)) obsVars.hdr_dim = hdr_dim;
 
    // Define netCDF header variables
-   obsVars.hdr_typ_var = add_var(f_out, "hdr_typ", ncChar,  hdr_dim, obsVars.strl_dim,    deflate_level);
-   obsVars.hdr_sid_var = add_var(f_out, "hdr_sid", ncChar,  hdr_dim, obsVars.strl_dim,    deflate_level);
-   obsVars.hdr_vld_var = add_var(f_out, "hdr_vld", ncChar,  hdr_dim, obsVars.strl_dim,    deflate_level);
-   obsVars.hdr_arr_var = add_var(f_out, "hdr_arr", ncFloat, hdr_dim, obsVars.hdr_arr_dim, deflate_level);
+   obsVars.hdr_typ_var = add_var(f_out, nc_var_hdr_typ, ncChar,  hdr_dim, obsVars.strll_dim,   deflate_level);
+   obsVars.hdr_sid_var = add_var(f_out, nc_var_hdr_sid, ncChar,  hdr_dim, obsVars.strl_dim,    deflate_level);
+   obsVars.hdr_vld_var = add_var(f_out, nc_var_hdr_vld, ncChar,  hdr_dim, obsVars.strl_dim,    deflate_level);
+   obsVars.hdr_arr_var = add_var(f_out, nc_var_hdr_arr, ncFloat, hdr_dim, obsVars.hdr_arr_dim, deflate_level);
 
    add_att(&obsVars.hdr_typ_var, "long_name", "message type");
    add_att(&obsVars.hdr_sid_var, "long_name", "station identification");
@@ -445,8 +446,8 @@ void create_nc_obs_vars (NetcdfObsVars &obsVars, NcFile *f_out, const int deflat
    create_nc_dimensions(obsVars, f_out);
    
    // Define netCDF variables
-   obsVars.obs_qty_var = add_var(f_out, "obs_qty", ncChar,  obsVars.obs_dim, obsVars.strl_dim,    deflate_level);
-   obsVars.obs_arr_var = add_var(f_out, "obs_arr", ncFloat, obsVars.obs_dim, obsVars.obs_arr_dim, deflate_level);
+   obsVars.obs_qty_var = add_var(f_out, nc_var_obs_qty, ncChar,  obsVars.obs_dim, obsVars.strl_dim,    deflate_level);
+   obsVars.obs_arr_var = add_var(f_out, nc_var_obs_arr, ncFloat, obsVars.obs_dim, obsVars.obs_arr_dim, deflate_level);
 
    add_att(f_out, nc_att_use_var_id, (use_var_id ? "true" : "false"));
 
@@ -506,12 +507,49 @@ void nc_obs_initialize() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void read_nc_dims_vars (NetcdfObsVars &obsVars, NcFile *f_in) {
+   
+   // Define netCDF dimensions
+   obsVars.hdr_len     ; // header array length (fixed dimension if hdr_len > 0)
+   obsVars.hdr_str_len ; // header string length
+   obsVars.strl_dim    = get_nc_dim(f_in, nc_dim_mxstr);    // header string dimension
+   if (has_dim(f_in, nc_dim_mxstr2))
+      obsVars.strll_dim   = get_nc_dim(f_in, nc_dim_mxstr2);// header string dimension (bigger dimension)
+   obsVars.hdr_arr_dim = get_nc_dim(f_in, nc_dim_hdr_arr);  // Header array width
+   obsVars.obs_arr_dim = get_nc_dim(f_in, nc_dim_obs_arr);  // Observation array width
+   obsVars.obs_dim     = get_nc_dim(f_in, nc_dim_nobs);     // Observation array length
+   obsVars.hdr_dim     = get_nc_dim(f_in, nc_dim_nhdr);     // Header array length
+
+   // Get netCDF header variables
+   obsVars.hdr_typ_var = get_var(f_in, nc_var_hdr_typ);     // Message type
+   obsVars.hdr_sid_var = get_var(f_in, nc_var_hdr_sid);     // Station ID
+   obsVars.hdr_vld_var = get_var(f_in, nc_var_hdr_vld);     // Valid time
+   obsVars.hdr_arr_var = get_var(f_in, nc_var_hdr_arr);     // Header array
+
+   // Get netCDF variables
+   obsVars.obs_arr_var = get_var(f_in, nc_var_obs_arr);
+   if (has_var(f_in, nc_var_obs_qty)) {
+      obsVars.obs_qty_var = get_var(f_in, nc_var_obs_qty);
+   }
+
+   bool use_var_id = false;
+   if (!get_global_att(f_in, nc_att_use_var_id, use_var_id)) {
+      use_var_id = false;
+   }
+   obsVars.use_var_id = use_var_id;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void reset_header_buffer(int buf_size) {
    for (int i=0; i<buf_size; i++) {
       for (int j=0; j<HEADER_STR_LEN; j++) {
          hdr_typ_buf[i][j] = bad_data_char;
          hdr_sid_buf[i][j] = bad_data_char;
          hdr_vld_buf[i][j] = bad_data_char;
+      }
+      for (int j=HEADER_STR_LEN; j<HEADER_STR_LEN_L; j++) {
+         hdr_typ_buf[i][j] = bad_data_char;
       }
       for (int j=0; j<HDR_ARRAY_LEN; j++) {
          hdr_arr_buf[i][j] = FILL_VALUE;
@@ -531,7 +569,7 @@ void write_nc_headers(const NetcdfObsVars &obsVars)
       // PrepBufr Message type
       hdr_str_len  = strlen(hdr_arrays.typ_sa[index]);
       hdr_str_len2 = strlen(hdr_typ_buf[hdr_data_idx]);
-      if (hdr_str_len > HEADER_STR_LEN) hdr_str_len = HEADER_STR_LEN;
+      if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
       if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
       strncpy(hdr_typ_buf[hdr_data_idx], hdr_arrays.typ_sa[index], hdr_str_len);
       for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
@@ -581,12 +619,13 @@ void write_nc_header_buffer(const NetcdfObsVars &obsVars, const int buf_size)
    long offsets[2] = { hdr_data_offset, 0 };
    long lengths[2] = { buf_size, HEADER_STR_LEN } ;
    
-   lengths[1] = HEADER_STR_LEN;
+   lengths[1] = HEADER_STR_LEN_L;
    if(!put_nc_data((NcVar *)&obsVars.hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
       mlog << Error << err_msg_message_type;
       exit(1);
    }
    
+   lengths[1] = HEADER_STR_LEN;
    // Station ID
    if(!put_nc_data((NcVar *)&obsVars.hdr_sid_var, (char *)hdr_sid_buf[0], lengths, offsets)) {
       mlog << Error << err_msg_station_id;

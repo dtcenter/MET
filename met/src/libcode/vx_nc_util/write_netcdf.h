@@ -23,8 +23,8 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 #define HDR_ARRAY_LEN    3   // Observation header length
 #define OBS_ARRAY_LEN    5   // Observation values length
-#define HEADER_STR_LEN   40  // Maximum length for header string (was 16)
-#define HEADER_STR_LEN_L 40  // Maximum length for header string (bigger)
+#define HEADER_STR_LEN   16  // Maximum length for header string
+#define HEADER_STR_LEN_L 40  // Maximum length for header string (for time summary)
 
 #define OBS_BUFFER_SIZE  (128 * 1024)
 
@@ -33,19 +33,22 @@ static const float FILL_VALUE = -9999.f;
 ////////////////////////////////////////////////////////////////////////
 
 struct NetcdfObsVars {
-   int   hdr_len     ; // header string length
+   bool  use_var_id  ;
+   int   hdr_len     ; // header array length (fixed dimension if hdr_len > 0)
+   int   hdr_str_len ; // header string length
    NcDim strl_dim    ; // header string dimension
-   NcDim strl_dim_l  ; // header string dimension (longer dimension)
+   NcDim strll_dim   ; // header string dimension (bigger dimension)
    NcDim hdr_arr_dim ; // Header array width
    NcDim obs_arr_dim ; // Observation array width
    NcDim obs_dim     ; // Observation array length
    NcDim hdr_dim     ; // Header array length
+   //NcDim var_dim     ;
    NcVar hdr_typ_var ; // Message type
    NcVar hdr_sid_var ; // Station ID
    NcVar hdr_vld_var ; // Valid time
    NcVar hdr_arr_var ; // Header array
-   NcVar obs_qty_var ; // Quality flag
-   NcVar obs_arr_var ; // Observation array
+   NcVar obs_qty_var ; // Quality flag (unlimited dimension)
+   NcVar obs_arr_var ; // Observation array (unlimited dimension)
 };
 
 struct NcHeaderArrays {
@@ -93,6 +96,8 @@ extern void add_and_write_nc_observation
 
 extern void create_nc_hdr_vars (NetcdfObsVars &obsVars, NcFile *, const int hdr_count, const int deflate_level=0);
 extern void create_nc_obs_vars (NetcdfObsVars &obsVars, NcFile *, const int deflate_level=0, const bool use_var_id=true);
+
+extern void read_nc_dims_vars  (NetcdfObsVars &obsVars, NcFile *);
 
 extern void reset_header_buffer(int buf_size);
 

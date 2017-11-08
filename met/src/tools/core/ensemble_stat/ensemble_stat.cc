@@ -838,37 +838,20 @@ void process_point_obs(int i_nc) {
       return;
    }
 
-   // Define dimensions
-   NcDim strl_dim; // Maximum string length
-   NcDim obs_dim;  // Number of observations
-   NcDim hdr_dim;  // Number of PrepBufr messages
-
-   // Define variables
-   NcVar obs_arr_var;
-   NcVar obs_qty_var;
-   NcVar hdr_typ_var;
-   NcVar hdr_sid_var;
-   NcVar hdr_vld_var;
-   NcVar hdr_arr_var;
+   // Read the dimensions and variables
+   NetcdfObsVars obsVars;
+   read_nc_dims_vars(obsVars, obs_in);
 
    int var_num = 0;
-   bool use_var_id = false;
-   if (!get_global_att(obs_in, nc_att_use_var_id, use_var_id)) {
-      use_var_id = false;
-   }
-
-   // Read the dimensions
-   strl_dim = get_nc_dim(obs_in, nc_dim_mxstr);
-   obs_dim  = get_nc_dim(obs_in, nc_dim_nobs);
-   hdr_dim  = get_nc_dim(obs_in, nc_dim_nhdr);
+   bool use_var_id = obsVars.use_var_id;
    if (use_var_id) {
-      NcDim var_dim    = get_nc_dim(obs_in,nc_dim_nvar);
+      NcDim var_dim = get_nc_dim(obs_in,nc_dim_nvar);
       var_num       = get_dim_size(&var_dim);
    }
 
-   if(IS_INVALID_NC(strl_dim) ||
-      IS_INVALID_NC(obs_dim)  ||
-      IS_INVALID_NC(hdr_dim)) {
+   if(IS_INVALID_NC(obsVars.strl_dim) ||
+      IS_INVALID_NC(obsVars.obs_dim)  ||
+      IS_INVALID_NC(obsVars.hdr_dim)) {
       mlog << Error << "\nprocess_point_obs() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
            << "dimensions from netCDF file: "
@@ -877,18 +860,12 @@ void process_point_obs(int i_nc) {
    }
 
    // Read the variables
-   obs_arr_var = get_nc_var(obs_in, "obs_arr");
-   hdr_typ_var = get_nc_var(obs_in, "hdr_typ");
-   hdr_sid_var = get_nc_var(obs_in, "hdr_sid");
-   hdr_vld_var = get_nc_var(obs_in, "hdr_vld");
-   hdr_arr_var = get_nc_var(obs_in, "hdr_arr");
-   if (has_var(obs_in, "obs_qty")) obs_qty_var = get_nc_var(obs_in, "obs_qty");
 
-   if(IS_INVALID_NC(obs_arr_var) ||
-      IS_INVALID_NC(hdr_typ_var) ||
-      IS_INVALID_NC(hdr_sid_var) ||
-      IS_INVALID_NC(hdr_vld_var) ||
-      IS_INVALID_NC(hdr_arr_var)) {
+   if(IS_INVALID_NC(obsVars.obs_arr_var) ||
+      IS_INVALID_NC(obsVars.hdr_typ_var) ||
+      IS_INVALID_NC(obsVars.hdr_sid_var) ||
+      IS_INVALID_NC(obsVars.hdr_vld_var) ||
+      IS_INVALID_NC(obsVars.hdr_arr_var)) {
       mlog << Error << "\nprocess_point_obs() -> "
            << "can't read \"obs_arr\", \"hdr_typ\", \"hdr_sid\", "
            << "\"hdr_vld\", or \"hdr_arr\" variables from netCDF file: "
@@ -896,16 +873,18 @@ void process_point_obs(int i_nc) {
       exit(1);
    }
 
-   if(IS_INVALID_NC(obs_qty_var))
+   if(IS_INVALID_NC(obsVars.obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file.\n";
 
-   int hdr_buf_size = GET_NC_SIZE(hdr_dim);
-   int obs_count = GET_NC_SIZE(obs_dim);
+   int hdr_buf_size = GET_NC_SIZE(obsVars.hdr_dim);
+   int obs_count    = GET_NC_SIZE(obsVars.obs_dim);
    mlog << Debug(2) << "Searching " << (obs_count)
         << " observations from " << (hdr_buf_size)
         << " header messages.\n";
 
-   int mxstr_len = GET_NC_SIZE(strl_dim);
+   int mxstr_len  = GET_NC_SIZE(obsVars.strl_dim);
+   int mxstr2_len = mxstr_len;
+   if (!IS_INVALID_NC(obsVars.strll_dim)) mxstr2_len = get_dim_size(&obsVars.strll_dim);
    int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
    float obs_arr_block[buf_size][obs_arr_len];
    char obs_qty_str_block[buf_size][mxstr_len];
@@ -917,7 +896,7 @@ void process_point_obs(int i_nc) {
    char obs_qty_str[max_str_len];
 
    float hdr_arr_full   [hdr_buf_size][hdr_arr_len];
-   char hdr_typ_str_full[hdr_buf_size][mxstr_len];
+   char hdr_typ_str_full[hdr_buf_size][mxstr2_len];
    char hdr_sid_str_full[hdr_buf_size][mxstr_len];
    char hdr_vld_str_full[hdr_buf_size][mxstr_len];
 
@@ -950,16 +929,18 @@ void process_point_obs(int i_nc) {
    //
    // Get the corresponding header message type
    //
-   if(!get_nc_data(&hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
+   lengths[1] = mxstr2_len;
+   if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_typ\n\n";
       exit(1);
    }
 
+   lengths[1] = mxstr_len;
    //
    // Get the corresponding header station id
    //
-   if(!get_nc_data(&hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
+   if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_sid\n\n";
       exit(1);
@@ -968,7 +949,7 @@ void process_point_obs(int i_nc) {
    //
    // Get the corresponding header valid time
    //
-   if(!get_nc_data(&hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
+   if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_vld\n\n";
       exit(1);
@@ -978,7 +959,7 @@ void process_point_obs(int i_nc) {
    // Get the header for this observation
    //
    lengths[1] = hdr_arr_len;
-   if(!get_nc_data(&hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
+   if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_arr\n\n";
       exit(1);
@@ -992,13 +973,13 @@ void process_point_obs(int i_nc) {
       lengths[1] = obs_arr_len;
 
       // Read the current observation message
-      if(!get_nc_data(&obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
+      if(!get_nc_data(&obsVars.obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
          mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }
 
       lengths[1] = mxstr_len;
-      if(!get_nc_data(&obs_qty_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
+      if(!get_nc_data(&obsVars.obs_qty_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
          mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
          exit(1);
       }
@@ -1036,7 +1017,7 @@ void process_point_obs(int i_nc) {
 
          // Read the corresponding header type for this observation
          str_length = strlen(hdr_typ_str_full[headerOffset]);
-         if (str_length > mxstr_len) str_length = mxstr_len;
+         if (str_length > mxstr2_len) str_length = mxstr2_len;
          strncpy(hdr_typ_str, hdr_typ_str_full[headerOffset], str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
