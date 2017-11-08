@@ -315,6 +315,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_TRMM_3B42_daily_packed_CONVERT">
+    <exec>&MET_DIR;/bin/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm_nc/3B42_daily.2013.11.30.7.G3_packed.nc \
+      &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_inches.ps \
+      'name="precipitation"; level="(*,*)"; convert(x)=x/25.4; censor_thresh=lt0; censor_val=0;' \
+      -title "TRMM Precipitation (inches)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3_inches.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_CESM_SSMI_microwave">
     <exec>&MET_DIR;/bin/plot_data_plane</exec>
     <param> \
