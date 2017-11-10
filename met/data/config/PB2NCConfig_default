@@ -114,9 +114,10 @@ quality_mark_thresh = 2;
 event_stack_flag    = TOP;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+//
 // Time periods for the summarization
 //
-
 time_summary = {
   flag = FALSE;
   beg = "000000";
