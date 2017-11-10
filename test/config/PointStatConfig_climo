@@ -38,6 +38,9 @@ wind_thresh = [ NA ];
 wind_logic  = UNION;
 eclv_points = 0.05;
 
+// Define conversion function
+K_to_C(x) = x - 273.15;
+
 //
 // Forecast and observation fields to be verified
 //
@@ -50,6 +53,19 @@ fcst = {
       {
         name         = "TMP";
         level        = [ "Z2" ];
+        desc         = "KELVIN";
+      },
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "CELCIUS";
+        convert(x)   = K_to_C(x);
+      },
+      {
+        name         = "TMP";
+        level        = [ "Z2" ];
+        desc         = "FAHRENHEIT";
+        convert(x)   = C_to_F(K_to_C(x));
       },
       {
         name         = "TMP";
