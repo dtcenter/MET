@@ -40,7 +40,14 @@ TESTS := $(shell grep "define ENABLE_" ../config.h | cut -d" " -f2 | cut -b8- | 
 ########################################################################
 
 
-all: ${TESTS}
+all:
+	@ echo
+
+
+########################################################################
+
+
+test: ${TESTS}
 	@ echo
 	@ echo "   *** Finished Testing the Model Evaluation Tools Project ***"
 	@ echo
@@ -77,7 +84,6 @@ include $(MK_DIR)/lidar2nc.mk
 
 
 ########################################################################
-########################################################################
 
 
 which:
@@ -109,7 +115,7 @@ clean:
 
 ########################################################################
 ## This section below was added so the Rscripts subdirectory
-## is installed 
+## is installed
 
 SUBDIRS = \
         Rscripts
@@ -130,7 +136,7 @@ install:
 # Since the scripts directory and scripts/<subdirectories> are distributed
 # via the top-level Makefile.am EXTRA_DIST variable, we don't really
 # need this target to do anything, other than, not fail.
-# This is all a bit of a hack which would go away if this Makefile is ported 
+# This is all a bit of a hack which would go away if this Makefile is ported
 # to the world of autoconf.
 #
 # More info than you probably want to know.
@@ -140,7 +146,7 @@ install:
 #       am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir;
 #       cd Rscripts/include && make  top_distdir=../../../met-6.0 \
 #       distdir=../../../met-6.0/scripts/Rscripts/include \
-#       am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir; 
+#       am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir;
 
 .PHONY: distdir
 distdir:
