@@ -1205,16 +1205,9 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
    obs_lvl = obs_arr[2];
    obs_hgt = obs_arr[3];
-   obs_v   = obs_arr[4];
 
-   // JHG, apply derivation logic!
-
-   // Apply censor thresholds to point observations
-   for(i=0; i<obs_info->censor_thresh().n_elements(); i++) {
-      if(obs_info->censor_thresh()[i].check(obs_v)) {
-         obs_v = obs_info->censor_val()[i];
-      }
-   }
+   // Apply observation processing logic
+   obs_v = pd[0][0][0].process_obs(obs_info, obs_arr[4]);
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) return;

@@ -27,33 +27,31 @@ class VarInfo
 {
    protected:
 
-      ConcatString MagicStr;  // Requested magic string
-      Dictionary   Dict;      // Requested fcst/obs dictionary of fields
+      ConcatString  MagicStr;  // Requested magic string
+      Dictionary    Dict;      // Requested fcst/obs dictionary of fields
 
-      ConcatString ReqName;   // Requested parameter name
-      ConcatString Name;      // Name of parameter
-      ConcatString Units;     // Units for parameter
-      LevelInfo    Level;     // Level information
-      ConcatString LongName;  // Description string
-      ConcatString Ensemble;  // Ensemble information
+      ConcatString  ReqName;   // Requested parameter name
+      ConcatString  Name;      // Name of parameter
+      ConcatString  Units;     // Units for parameter
+      LevelInfo     Level;     // Level information
+      ConcatString  LongName;  // Description string
+      ConcatString  Ensemble;  // Ensemble information
 
-      bool         PFlag;     // Flag for probability
-      ConcatString PName;     // Name for probability
-      ConcatString PUnits;    // Unit for probability
-      SingleThresh PThreshLo; // Lower probability threshold
-      SingleThresh PThreshHi; // Upper probability threshold
-      bool         PAsScalar; // Flag to process probabilities as scalars
+      bool          PFlag;     // Flag for probability
+      ConcatString  PName;     // Name for probability
+      ConcatString  PUnits;    // Unit for probability
+      SingleThresh  PThreshLo; // Lower probability threshold
+      SingleThresh  PThreshHi; // Upper probability threshold
+      bool          PAsScalar; // Flag to process probabilities as scalars
 
-      int          UVIndex;   // Index for u/v vector wind
+      int           UVIndex;   // Index for u/v vector wind
 
-      unixtime     Init;      // Initialization time in unixtime
-      unixtime     Valid;     // Valid time in unixtime
-      int          Lead;      // Lead time in seconds
+      unixtime      Init;      // Initialization time in unixtime
+      unixtime      Valid;     // Valid time in unixtime
+      int           Lead;      // Lead time in seconds
 
-      ThreshArray  CensorThresh; // Censoring thesholds
-      NumArray     CensorVal;    // and replacement values
-
-      const DictionaryEntry *ConvertFx; // Conversion function
+      ThreshArray   CensorThresh; // Censoring thesholds
+      NumArray      CensorVal;    // and replacement values
 
       void init_from_scratch();
       void assign(const VarInfo &);
@@ -64,6 +62,9 @@ class VarInfo
       virtual ~VarInfo();
       VarInfo(const VarInfo &);
       VarInfo & operator=(const VarInfo &);
+
+      // Conversion function
+      UserFunc_1Arg ConvertFx;
 
       void clear();
 
@@ -100,8 +101,6 @@ class VarInfo
 
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;
-
-      const DictionaryEntry *convert_fx() const;
 
          //
          // set stuff
@@ -182,8 +181,6 @@ inline int          VarInfo::lead()           const { return(Lead);             
 
 inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     }
 inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        }
-
-inline const DictionaryEntry * VarInfo::convert_fx() const { return(ConvertFx); }
 
 ///////////////////////////////////////////////////////////////////////////////
 

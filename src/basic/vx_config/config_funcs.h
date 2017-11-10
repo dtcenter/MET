@@ -38,10 +38,9 @@ class UserFunc_1Arg {
 
       void assign(const UserFunc_1Arg &);
 
-
-      const DictionaryEntry * entry;   //  not allocated
-
-      const IcodeVector * v;           //  not allocated
+      ConcatString Name;
+      int          NArgs;
+      IcodeVector  V;
 
    public:
 
@@ -49,6 +48,8 @@ class UserFunc_1Arg {
      ~UserFunc_1Arg();
       UserFunc_1Arg(const UserFunc_1Arg &);
       UserFunc_1Arg & operator=(const UserFunc_1Arg &);
+
+      void clear();
 
          //
          //  set stuff
@@ -64,15 +65,15 @@ class UserFunc_1Arg {
 
       int n_args () const;   //  should be 1
 
+      bool is_set() const;
+
       const IcodeVector * program() const;
 
          //
          //  do stuff
          //
 
-
       double operator()(double) const;
-
 
 };
 
@@ -80,11 +81,13 @@ class UserFunc_1Arg {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString UserFunc_1Arg::name() const { return ( entry ? (entry->name()) : ConcatString("(nul)") ); }
+inline ConcatString UserFunc_1Arg::name() const { return ( Name ); }
 
-inline int UserFunc_1Arg::n_args() const { return ( entry ? (entry->n_args()) : (-1) ); }
+inline int UserFunc_1Arg::n_args() const { return ( NArgs ); }
 
-inline const IcodeVector * UserFunc_1Arg::program() const { return ( v ); }
+inline bool UserFunc_1Arg::is_set() const { return ( NArgs >= 0 ); };
+
+inline const IcodeVector * UserFunc_1Arg::program() const { return ( &V ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -98,10 +101,9 @@ class UserFunc_MultiArg {
 
       void assign(const UserFunc_MultiArg &);
 
-
-      const DictionaryEntry * entry;   //  not allocated
-
-      const IcodeVector * v;           //  not allocated
+      ConcatString Name;
+      int          NArgs;
+      IcodeVector  V;
 
    public:
 
@@ -109,6 +111,8 @@ class UserFunc_MultiArg {
      ~UserFunc_MultiArg();
       UserFunc_MultiArg(const UserFunc_MultiArg &);
       UserFunc_MultiArg & operator=(const UserFunc_MultiArg &);
+
+      void clear();
 
          //
          //  set stuff
