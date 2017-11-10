@@ -285,18 +285,15 @@ if ( ShiftRight != 0 )  dp.shift_right(ShiftRight);
    // Apply conversion logic.
    //
 
-if ( vinfo->convert_fx() )  {
+if ( vinfo->ConvertFx.is_set() )  {
 
    mlog << Debug(3) << "Applying conversion function.\n";
-
-   UserFunc_1Arg fx;
-   fx.set(vinfo->convert_fx());
 
    int Nxy = dp.nx()*dp.ny();
 
    for (int j=0; j<Nxy; ++j)  {
-      if(!is_bad_data(dp.buf()[j])) {
-         dp.buf()[j] = fx(dp.buf()[j]);
+      if ( ! is_bad_data(dp.buf()[j]) )  {
+         dp.buf()[j] = vinfo->ConvertFx(dp.buf()[j]);
       }
    }
 }

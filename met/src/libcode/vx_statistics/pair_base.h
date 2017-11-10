@@ -152,6 +152,8 @@ class PairBase {
       void set_obs(int, double, double, double, double, double,
                    double wgt = default_grid_weight);
 
+      double process_obs(VarInfo *, double);
+
       void print_obs_summary();
 
       void calc_obs_summary();

@@ -59,6 +59,7 @@ UserFunc_1Arg::~UserFunc_1Arg()
 
 {
 
+clear();
 
 }
 
@@ -100,10 +101,6 @@ void UserFunc_1Arg::init_from_scratch()
 
 {
 
-entry = 0;
-
-v = 0;
-
 return;
 
 }
@@ -116,12 +113,29 @@ void UserFunc_1Arg::assign(const UserFunc_1Arg & f)
 
 {
 
-// clear();
+clear();
 
-entry = f.entry;
+Name  = f.Name;
+NArgs = f.NArgs;
+V     = f.V;
 
-v = f.v;
+return;
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UserFunc_1Arg::clear()
+
+{
+
+Name.clear();
+
+NArgs = bad_data_int;
+
+V.clear();
 
 return;
 
@@ -135,9 +149,12 @@ void UserFunc_1Arg::set(const DictionaryEntry * e)
 
 {
 
+if ( ! e )  return;
+
 if ( e->type() != UserFunctionType )  {
 
-   cerr << "\n\n  UserFunc_1Arg::set(const DictionaryEntry *) -> bad object type: "
+   cerr << "\n\n  UserFunc_1Arg::set(const DictionaryEntry *) -> "
+        << "bad object type: "
         << configobjecttype_to_string(e->type()) << "\n\n";
 
    exit ( 1 );
@@ -146,18 +163,19 @@ if ( e->type() != UserFunctionType )  {
 
 if ( e->n_args() != 1 )  {
 
-   cerr << "\n\n  UserFunc_1Arg::set(const DictionaryEntry *) -> bad number of arguments: "
+   cerr << "\n\n  UserFunc_1Arg::set(const DictionaryEntry *) -> "
+        << "bad number of arguments: "
         << (e->n_args()) << "\n\n";
 
    exit ( 1 );
 
 }
 
-entry = e;
+Name = e->name();
 
-v = e->icv();
+NArgs = e->n_args();
 
-
+V = *(e->icv());
 
 return;
 
@@ -176,7 +194,7 @@ Number n;
 n.d = x;
 n.is_int = false;
 
-hp.run( *v, &n);
+hp.run( V, &n);
 
 n = hp.pop();
 
@@ -212,6 +230,7 @@ UserFunc_MultiArg::~UserFunc_MultiArg()
 
 {
 
+clear();
 
 }
 
@@ -253,10 +272,6 @@ void UserFunc_MultiArg::init_from_scratch()
 
 {
 
-entry = 0;
-
-v = 0;
-
 return;
 
 }
@@ -269,12 +284,30 @@ void UserFunc_MultiArg::assign(const UserFunc_MultiArg & f)
 
 {
 
-// clear();
+clear();
 
-entry = f.entry;
+Name  = f.Name;
+NArgs = f.NArgs;
+V     = f.V;
 
-v = f.v;
+return;
 
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UserFunc_MultiArg::clear()
+
+{
+
+Name.clear();
+
+NArgs = bad_data_int;
+
+V.clear();
 
 return;
 
@@ -290,7 +323,8 @@ void UserFunc_MultiArg::set(const DictionaryEntry * e)
 
 if ( e->type() != UserFunctionType )  {
 
-   cerr << "\n\n  UserFunc_MultiArg::set(const DictionaryEntry *) -> bad object type: "
+   cerr << "\n\n  UserFunc_MultiArg::set(const DictionaryEntry *) -> "
+        << "bad object type: "
         << configobjecttype_to_string(e->type()) << "\n\n";
 
    exit ( 1 );
@@ -299,18 +333,19 @@ if ( e->type() != UserFunctionType )  {
 
 if ( e->n_args() != 1 )  {
 
-   cerr << "\n\n  UserFunc_MultiArg::set(const DictionaryEntry *) -> bad number of arguments: "
+   cerr << "\n\n  UserFunc_MultiArg::set(const DictionaryEntry *) -> "
+        << "bad number of arguments: "
         << (e->n_args()) << "\n\n";
 
    exit ( 1 );
 
 }
 
-entry = e;
+Name = e->name();
 
-v = e->icv();
+NArgs = e->n_args();
 
-
+V = *(e->icv());
 
 return;
 
@@ -324,7 +359,7 @@ Number UserFunc_MultiArg::operator()(const Number * n) const
 
 {
 
-hp.run( *v, n);
+hp.run( V, n);
 
 return ( hp.pop() );
 

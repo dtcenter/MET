@@ -302,7 +302,7 @@ bool PairBase::add_obs(const char *sid,
       val.elv = elv;
       val.cmn = cmn;
       val.csd = csd;
-      
+
       val.obs.push_back(ob_val);
       map_key.add(obs_key.c_str());
       map_val.insert( pair<string,station_values_t>(obs_key, val) );
@@ -637,6 +637,29 @@ void PairBase::set_obs(int i_obs, double x, double y,
    csd_na.set(i_obs, csd);
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double PairBase::process_obs(VarInfo *vinfo, double v) {
+
+   if(!vinfo) return(v);
+
+   double new_v = v;
+
+   // Apply conversion logic.
+   if(vinfo->ConvertFx.is_set()) {
+      new_v = vinfo->ConvertFx(new_v);
+   }
+
+   // Apply censor logic.
+   for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+      if(vinfo->censor_thresh()[i].check(new_v)) {
+         new_v = vinfo->censor_val()[i];
+      }
+   }
+
+   return(new_v);
 }
 
 ////////////////////////////////////////////////////////////////////////

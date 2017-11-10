@@ -95,7 +95,7 @@ void VarInfo::assign(const VarInfo &v) {
    PThreshHi = v.p_thresh_hi();
    PAsScalar = v.p_as_scalar();
 
-   UVIndex     = v.uv_index();
+   UVIndex   = v.uv_index();
 
    Init      = v.init();
    Valid     = v.valid();
@@ -139,7 +139,7 @@ void VarInfo::clear() {
    CensorThresh.clear();
    CensorVal.clear();
 
-   ConvertFx = (DictionaryEntry *) 0;
+   ConvertFx.clear();
 
    return;
 }
@@ -171,13 +171,9 @@ void VarInfo::dump(ostream &out) const {
        << "  Valid        = " << valid_str << " (" << Valid << ")\n"
        << "  Ensemble     = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
        << "  Lead         = " << lead_str << " (" << Lead << ")\n"
-       << "  CensorThresh = " << CensorThresh.get_str() << ")\n"
-       << "  CensorVal    = " << CensorVal.serialize() << ")\n";
-
-   if(ConvertFx != 0) {
-      out << "  Convert:\n";
-      ConvertFx->dump(out);
-   }
+       << "  CensorThresh = " << CensorThresh.get_str() << "\n"
+       << "  CensorVal    = " << CensorVal.serialize() << "\n"
+       << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n";
 
    Level.dump(out);
 
@@ -365,6 +361,9 @@ void VarInfo::set_dict(Dictionary &dict) {
    f = dict.lookup_bool(conf_key_prob_as_scalar, false);
    if(dict.last_lookup_status()) set_p_as_scalar(f);
 
+   // Lookup conversion function, if present
+   ConvertFx.set(dict.lookup(conf_key_convert));
+
    // Parse censor_thresh, if present
    ta = dict.lookup_thresh_array(conf_key_censor_thresh, false);
    if(dict.last_lookup_status()) set_censor_thresh(ta);
@@ -372,9 +371,6 @@ void VarInfo::set_dict(Dictionary &dict) {
    // Parse censor_val, if present
    na = dict.lookup_num_array(conf_key_censor_val, false);
    if(dict.last_lookup_status()) set_censor_val(na);
-
-   // Lookup conversion function, if present
-   ConvertFx = dict.lookup(conf_key_convert);
 
    // Check for equal number of censor thresholds and values
    if(ta.n_elements() != na.n_elements()) {
