@@ -1023,6 +1023,8 @@ AC_CHECK_FUNCS([dup2 floor gethostname memset mkdir pow regcomp select setenv sq
 # Create configured files
 
 AC_CONFIG_FILES([Makefile
+                 scripts/Rscripts/Makefile
+                 scripts/Rscripts/include/Makefile
                  data/Makefile
                  data/colortables/Makefile
                  data/colortables/NCL_colortables/Makefile

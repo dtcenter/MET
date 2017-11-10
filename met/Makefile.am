@@ -18,7 +18,7 @@
 
 ACLOCAL_AMFLAGS		= -I m4
 
-SUBDIRS 		= data src
+SUBDIRS 		= scripts data src
 
 if ENABLE_DEVELOPMENT
   SUBDIRS += internal_tests

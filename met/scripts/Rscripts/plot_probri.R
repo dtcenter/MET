@@ -17,9 +17,16 @@
 ##
 ########################################################################
 
+# Check that the MET_INSTALL_DIR environment variable is set
+MET_INSTALL_DIR = Sys.getenv("MET_INSTALL_DIR", unset=NA);
+if(is.na(MET_INSTALL_DIR)) {
+  cat("ERROR: The \"MET_INSTALL_DIR\" environment variable must be set.\n");
+  quit(status=1);
+}
+
 # Make sure that tc_stat can be found
 #tc_stat = Sys.which("tc_stat");
-tc_stat = "/d1/CODE/MET/MET_development/met/bin/tc_stat";
+tc_stat = ${MET_INSTALL_DIR}/bin/tc_stat";
 
 if(nchar(tc_stat) == 0) {
   cat("ERROR: Cannot find the tc_stat tool in your path.\n");
