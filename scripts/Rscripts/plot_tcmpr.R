@@ -98,32 +98,32 @@
 
 library(boot);
 
-# Check that the MET_BUILD_BASE environment variable is set
-MET_BUILD_BASE = Sys.getenv("MET_BUILD_BASE", unset=NA);
-if(is.na(MET_BUILD_BASE)) {
-  cat("ERROR: The \"MET_BUILD_BASE\" environment variable must be set.\n");
+# Check that the MET_INSTALL_DIR environment variable is set
+MET_INSTALL_DIR = Sys.getenv("MET_INSTALL_DIR", unset=NA);
+if(is.na(MET_INSTALL_DIR)) {
+  cat("ERROR: The \"MET_INSTALL_DIR\" environment variable must be set.\n");
   quit(status=1);
 }
 
-# Check that the RSCRIPTS_BASE environment variable is set
-RSCRIPTS_BASE = Sys.getenv("RSCRIPTS_BASE", unset=NA);
-if(is.na(RSCRIPTS_BASE)) {
-  cat("ERROR: The \"RSCRIPTS_BASE\" environment variable must be set.\n");
+MET_BASE = Sys.getenv("MET_BASE", unset=NA);
+if(is.na(MET_BASE)) {
+  cat("ERROR: The \"MET_BASE\" environment variable must be set.\n");
   quit(status=1);
 }
+
 
 # Source utilities
-source(paste(RSCRIPTS_BASE, "/include/plot_tcmpr_util.R", sep=''));
-source(paste(RSCRIPTS_BASE, "/include/plot_tcmpr_config_default.R", sep=''));
-source(paste(MET_BUILD_BASE, "/scripts/Rscripts/include/Compute_STDerr.R", sep=''));
+source(paste(MET_BASE, "/Rscripts/include/plot_tcmpr_util.R", sep=''));
+source(paste(MET_BASE, "/Rscripts/include/plot_tcmpr_config_default.R", sep=''));
+source(paste(MET_BASE, "/Rscripts/include/Compute_STDerr.R", sep=''));
 
 # Read the TCMPR column information from a data file.
 column_info = read.table(
-  paste(MET_BUILD_BASE, "/scripts/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
+  paste(MET_BASE, "/Rscripts/include/plot_tcmpr_hdr.dat", sep=''),
   header=TRUE, row.names=1);
   
 # Read the HFIP baseline information from a data file.
-baseline = read.table(paste(RSCRIPTS_BASE, "/include/hfip_baseline.dat", sep=''), header=TRUE)
+baseline = read.table(paste(MET_BASE, "/Rscripts/include/hfip_baseline.dat", sep=''), header=TRUE)
 
 ########################################################################
 #
@@ -209,7 +209,7 @@ usage = function() {
 ########################################################################
 
 # Path to the tc_stat tool
-tc_stat = "${MET_BUILD_BASE}/bin/tc_stat";
+tc_stat = "${MET_INSTALL_DIR}/bin/tc_stat";
 
 # Strings used to select the plots to be created
 boxplot_str = "BOXPLOT";
