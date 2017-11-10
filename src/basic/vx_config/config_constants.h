@@ -182,7 +182,7 @@ struct TimeSummaryInfo {
   int         step;        // Number of seconds between summaries
   int         width;       // Width of summary time window in seconds
   IntArray    grib_code;   // List of grib codes to do summaries for
-  StringArray obs_var;     // List of obs. variable names to do summaries for
+  StringArray obs_var;     // List of obs variable for time summaries
   StringArray type;        // List of types of summaries to perform
                            //   Valid summaries are "min", "max", "range",
                            //   "mean", "stdev", "median" and "p##".
