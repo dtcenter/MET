@@ -40,14 +40,7 @@ TESTS := $(shell grep "define ENABLE_" ../config.h | cut -d" " -f2 | cut -b8- | 
 ########################################################################
 
 
-all:
-	@ echo
-
-
-########################################################################
-
-
-test: ${TESTS}
+all: ${TESTS}
 	@ echo
 	@ echo "   *** Finished Testing the Model Evaluation Tools Project ***"
 	@ echo
@@ -84,6 +77,7 @@ include $(MK_DIR)/lidar2nc.mk
 
 
 ########################################################################
+########################################################################
 
 
 which:
@@ -114,40 +108,6 @@ clean:
 
 
 ########################################################################
-## This section below was added so the Rscripts subdirectory
-## is installed
-
-SUBDIRS = \
-        Rscripts
-
-# This was added to run 'make install' in each of the defined SUBDIRS
-# The $@ resolves to the value of the target being called, ie. "install"
-
-.PHONY: install
-install:
-	for dir in $(SUBDIRS); do \
-	  $(MAKE) -C $$dir $@; \
-	done
 
 
-# The distdir target was added to do nothing when 'make distdir' is called.
-# This distdir target is called from the top-level when running 'make dist'
-# If this target is not defined than 'make dist' fails.
-# Since the scripts directory and scripts/<subdirectories> are distributed
-# via the top-level Makefile.am EXTRA_DIST variable, we don't really
-# need this target to do anything, other than, not fail.
-# This is all a bit of a hack which would go away if this Makefile is ported
-# to the world of autoconf.
-#
-# More info than you probably want to know.
-# When 'make dist' is called, it is actually wanting to run these two commands
-#       cd Rscripts && make  top_distdir=../../met-6.0 \
-#       distdir=../../met-6.0/scripts/Rscripts \
-#       am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir;
-#       cd Rscripts/include && make  top_distdir=../../../met-6.0 \
-#       distdir=../../../met-6.0/scripts/Rscripts/include \
-#       am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir;
-
-.PHONY: distdir
-distdir:
 
