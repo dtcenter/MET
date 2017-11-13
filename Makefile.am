@@ -18,7 +18,7 @@
 
 ACLOCAL_AMFLAGS		= -I m4
 
-SUBDIRS 		= src data scripts
+SUBDIRS 		= data src scripts/Rscripts
 
 if ENABLE_DEVELOPMENT
   SUBDIRS += internal_tests
@@ -49,7 +49,7 @@ dist-hook:
 # Run the non-standard test suite
 
 test:
-	cd scripts; make test
+	cd scripts; make
 
 .PHONY: test
 
