@@ -426,23 +426,29 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    int n_planes = 0;
    DataPlaneArray plane_array;
    VarInfoGrib *vinfo_grib = (VarInfoGrib *) &vinfo;
-
+   int j;
 
    // Call data_plane_array() to retrieve all matching records
    n_planes = data_plane_array(*vinfo_grib, plane_array);
 
-   // Check for at least one match
+   // Find an exact match
    if(n_planes > 0) {
 
-      // Check if first data_plane is an exact match
-      // or this isn't pressure or vertical levels
-      if( ( is_eq(plane_array.lower(0), vinfo_grib->level ().lower()) &&
-            is_eq(plane_array.upper(0), vinfo_grib->level().upper()) ) ||
-          ( vinfo_grib->level().type() != LevelType_Pres &&
-            vinfo_grib->level().type() != LevelType_Vert )
-        ) {
+      // Search for an exact pressure or vertical level match
+      if ( vinfo_grib->level().type() == LevelType_Pres ||
+           vinfo_grib->level().type() == LevelType_Vert ) {
 
-         // Store the first data_plane
+         for (j=0; j<n_planes; ++j )  {
+            if ( is_eq(plane_array.lower(j), vinfo_grib->level().lower()) &&
+                 is_eq(plane_array.upper(j), vinfo_grib->level().upper()) ) {
+               plane  = plane_array[j];
+               status = true;
+               break;
+            }
+         }
+      }
+      // Otherwise, use the first match found.
+      else {
          plane  = plane_array[0];
          status = true;
 
@@ -472,6 +478,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array) {
    bool status = false;
+   bool exact;
    int i, lower, upper, type_num;
    GribRecord r;
    VarInfoGrib *vinfo_grib = (VarInfoGrib *) &vinfo;
@@ -493,11 +500,12 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
       // Check for a range match
       if(is_range_match(*vinfo_grib, r)) {
 
+         exact = is_exact_match(*vinfo_grib, r);
          mlog << Debug(3) << "MetGrib1DataFile::data_plane_array() -> "
-              << "Found range match for VarInfo \""
-              << vinfo.magic_str() << "\" in GRIB record "
-              << i+1 << " of GRIB file \"" << filename()
-              << "\".\n";
+              << "Found " << ( exact ? "exact" : "range" )
+              << " match for VarInfo \"" << vinfo.magic_str()
+              << "\" in GRIB record " << i+1 << " of GRIB file \""
+              << filename() << "\".\n";
 
          // Get the level information for this record
          read_pds_level(r, lower, upper, type_num);
