@@ -75,53 +75,54 @@ static double  my_C_to_F    (double);
 
 const BuiltinInfo binfo[] = {
 
-   { "sin",    1, builtin_sin,     0, 0, sin, 0 }, 
-   { "cos",    1, builtin_cos,     0, 0, cos, 0 }, 
-   { "tan",    1, builtin_tan,     0, 0, tan, 0 }, 
+   { "sin",    1, builtin_sin,     0, 0, sin, 0 },
+   { "cos",    1, builtin_cos,     0, 0, cos, 0 },
+   { "tan",    1, builtin_tan,     0, 0, tan, 0 },
 
-   { "sind",   1, builtin_sind,    0, 0, sin_deg, 0 }, 
-   { "cosd",   1, builtin_cosd,    0, 0, cos_deg, 0 }, 
-   { "tand",   1, builtin_tand,    0, 0, tan_deg, 0 }, 
+   { "sind",   1, builtin_sind,    0, 0, sin_deg, 0 },
+   { "cosd",   1, builtin_cosd,    0, 0, cos_deg, 0 },
+   { "tand",   1, builtin_tand,    0, 0, tan_deg, 0 },
 
-   { "asin",   1, builtin_asin,    0, 0, asin, 0 }, 
-   { "acos",   1, builtin_acos,    0, 0, acos, 0 }, 
-   { "atan",   1, builtin_atan,    0, 0, atan, 0 }, 
+   { "asin",   1, builtin_asin,    0, 0, asin, 0 },
+   { "acos",   1, builtin_acos,    0, 0, acos, 0 },
+   { "atan",   1, builtin_atan,    0, 0, atan, 0 },
 
-   { "asind",  1, builtin_sind,    0, 0, arc_sin_deg, 0 }, 
-   { "acosd",  1, builtin_cosd,    0, 0, arc_cos_deg, 0 }, 
-   { "atand",  1, builtin_tand,    0, 0, arc_tan_deg, 0 }, 
+   { "asind",  1, builtin_sind,    0, 0, arc_sin_deg, 0 },
+   { "acosd",  1, builtin_cosd,    0, 0, arc_cos_deg, 0 },
+   { "atand",  1, builtin_tand,    0, 0, arc_tan_deg, 0 },
 
-   { "atan2",  2, builtin_atan2,   0, 0, 0, atan2 }, 
-   { "atan2d", 2, builtin_atan2d,  0, 0, 0, atan2_deg }, 
+   { "atan2",  2, builtin_atan2,   0, 0, 0, atan2 },
+   { "atan2d", 2, builtin_atan2d,  0, 0, 0, atan2_deg },
 
-   { "arg",    2, builtin_arg,     0, 0, 0, my_arg     }, 
-   { "argd",   2, builtin_argd,    0, 0, 0, my_arg_deg }, 
+   { "arg",    2, builtin_arg,     0, 0, 0, my_arg     },
+   { "argd",   2, builtin_argd,    0, 0, 0, my_arg_deg },
 
-   { "log",    1, builtin_log,     0, 0, log, 0 }, 
-   { "exp",    1, builtin_exp,     0, 0, exp, 0 }, 
+   { "log",    1, builtin_log,     0, 0, log, 0 },
+   { "exp",    1, builtin_exp,     0, 0, exp, 0 },
 
-   { "log10",  1, builtin_log10,   0, 0, log10,    0 }, 
-   { "exp10",  1, builtin_exp10,   0, 0, my_exp10, 0 }, 
+   { "log10",  1, builtin_log10,   0, 0, log10,    0 },
+   { "exp10",  1, builtin_exp10,   0, 0, my_exp10, 0 },
 
-   { "sqrt",   1, builtin_sqrt,    0, 0, sqrt, 0 }, 
+   { "sqrt",   1, builtin_sqrt,    0, 0, sqrt, 0 },
 
-   { "abs",    1, builtin_abs,     abs, 0, fabs, 0 }, 
+   { "abs",    1, builtin_abs,     abs, 0, fabs, 0 },
 
-   { "min",    2, builtin_min,     0, my_imin, 0, my_dmin }, 
-   { "max",    2, builtin_max,     0, my_imax, 0, my_dmax }, 
+   { "min",    2, builtin_min,     0, my_imin, 0, my_dmin },
+   { "max",    2, builtin_max,     0, my_imax, 0, my_dmax },
 
-   { "mod",    2, builtin_mod,     0, my_imod, 0, my_dmod }, 
+   { "mod",    2, builtin_mod,     0, my_imod, 0, my_dmod },
 
-   { "floor",  1, builtin_floor,   0, 0, floor, 0 }, 
-   { "ceil",   1, builtin_ceil,    0, 0, ceil,  0 }, 
+   { "floor",  1, builtin_floor,   0, 0, floor, 0 },
+   { "ceil",   1, builtin_ceil,    0, 0, ceil,  0 },
 
-   { "step",   1, builtin_step,    my_istep, 0, my_dstep,  0 }, 
+   { "step",   1, builtin_step,    my_istep, 0, my_dstep,  0 },
 
-   { "F_to_C", 1, builtin_F_to_C,  0, 0, my_F_to_C,  0 }, 
-   { "C_to_F", 1, builtin_C_to_F,  0, 0, my_C_to_F,  0 }, 
+   // Functions defined in ConfigConstants
+   // { "F_to_C", 1, builtin_F_to_C,  0, 0, my_F_to_C,  0 },
+   // { "C_to_F", 1, builtin_C_to_F,  0, 0, my_C_to_F,  0 },
 
-   { "nint",   1, builtin_nint,    0, 0, 0,  0 }, 
-   { "sign",   1, builtin_sign,    0, 0, 0,  0 }, 
+   { "nint",   1, builtin_nint,    0, 0, 0,  0 },
+   { "sign",   1, builtin_sign,    0, 0, 0,  0 },
 
 
       //

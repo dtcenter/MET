@@ -233,6 +233,8 @@ void ConcatString::extend(int n)
 
 if ( n < Nalloc )  return;
 
+if ( AllocInc == 0 )  AllocInc = default_cs_alloc_inc;
+
 int k;
 
 k = n/AllocInc;

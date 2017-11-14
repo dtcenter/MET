@@ -72,7 +72,7 @@ class NumberStack {
          //  set stuff
          //
 
-      void set_alloc_inc(int = 0);   //  0 means default value (50)
+      void set_alloc_inc(int = 0);   //  0 means default value (100)
 
          //
          //  get stuff
