@@ -36,27 +36,27 @@ enum Builtin {
       //  built-in functions of one variable
       //
 
-   builtin_sin, 
-   builtin_cos, 
-   builtin_tan, 
+   builtin_sin,
+   builtin_cos,
+   builtin_tan,
 
-   builtin_sind, 
-   builtin_cosd, 
-   builtin_tand, 
+   builtin_sind,
+   builtin_cosd,
+   builtin_tand,
 
-   builtin_asin, 
-   builtin_acos, 
-   builtin_atan, 
+   builtin_asin,
+   builtin_acos,
+   builtin_atan,
 
-   builtin_asind, 
-   builtin_acosd, 
-   builtin_atand, 
+   builtin_asind,
+   builtin_acosd,
+   builtin_atand,
 
-   builtin_log, 
-   builtin_exp, 
+   builtin_log,
+   builtin_exp,
 
-   builtin_log10, 
-   builtin_exp10, 
+   builtin_log10,
+   builtin_exp10,
 
    builtin_sqrt,
    builtin_abs,
@@ -67,24 +67,25 @@ enum Builtin {
 
    builtin_step,
 
-   builtin_F_to_C, 
-   builtin_C_to_F, 
+   // Functions defined in ConfigConstants
+   // builtin_F_to_C,
+   // builtin_C_to_F,
 
 
       //
       //  built-in functions of two variables
       //
 
-   builtin_atan2, 
-   builtin_atan2d, 
+   builtin_atan2,
+   builtin_atan2d,
 
-   builtin_arg, 
-   builtin_argd, 
+   builtin_arg,
+   builtin_argd,
 
-   builtin_min, 
-   builtin_max, 
+   builtin_min,
+   builtin_max,
 
-   builtin_mod, 
+   builtin_mod,
 
       //
       //  built-in functions of three variables

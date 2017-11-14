@@ -374,11 +374,14 @@ regrid = {
 //      - The "convert" entry is a user-defined function of a single variable for
 //        processing input data values.  Any input values that are not bad data
 //        are replaced by the value of this function.  This function may include
-//        any of the built-in math functions (e.g. sqrt, log10), as described
-//        above.  Examples include:
+//        any of the built-in math functions (e.g. sqrt, log10) described above.
+//        Several standard unit conversion functions are already defined in
+//        data/config/ConfigConstants.
+//        Examples of user-defined conversion functions include:
 //          convert(x) = 2*x;
 //          convert(a) = log10(a);
 //          convert(t) = max(1, sqrt(abs(t)));
+//          convert(x) = K_to_C(x); where K_to_C(x) is defined in ConfigConstants
 //
 //      - The "censor_thresh" entry is an array of thresholds to be applied
 //        to the raw input data.  The "censor_val" entry is an array of numbers

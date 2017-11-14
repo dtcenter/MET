@@ -8,15 +8,37 @@
 exit_on_warning = FALSE;
 
 // NetCDF Compression per variable (0 to 9, 0: disable compression)
-// This will be overridden by the environment variable MET_NC_COMPRESS and the command line argument.
+// This will be overridden by the environment variable MET_NC_COMPRESS and the
+// command line argument.
 nc_compression = 0;
 
 // Precision for output statistics written by the MET tools.
 output_precision = 5;
 
-// Temporary directory. This will be overridden by the environment variable MET_TMP_DIR.
-
+// Temporary directory. This will be overridden by the environment variable
+// MET_TMP_DIR.
 tmp_dir = "/tmp";
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Standard unit conversion functions.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+K_to_C(t) = t - 273.15;
+C_to_K(t) = t + 273.15;
+C_to_F(t) = 1.8 * t + 32.0;
+F_to_C(t) = 5.0 / 9.0 * ( t - 32.0 );
+K_to_F(t) = C_to_F(K_to_C(t));
+F_to_K(t) = C_to_K(F_to_C(t));
+
+MM_to_IN(x) = x / 25.4;
+IN_to_MM(x) = x * 25.4;
+
+PA_to_HPA(p) = p / 100.0;
+HPA_to_PA(p) = p * 100.0;
+PA_to_MB(p)  = PA_to_HPA(p);
+MB_to_PA(p)  = HPA_to_PA(p);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
