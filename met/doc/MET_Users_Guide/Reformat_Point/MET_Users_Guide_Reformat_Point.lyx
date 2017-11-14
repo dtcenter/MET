@@ -1027,8 +1027,7 @@ beg
 end
 \series medium
  variables are used to stratify the model level of observations to be retained.
- The range shown above is 1 to 255, which is the current maximum possible
- level.
+ The range shown above is 1 to 255.
  
 \end_layout
 
@@ -1594,10 +1593,10 @@ name "table_reform-point_pb2nc_output_dim"
 
 \series bold
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="8" columns="2">
 <features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="2in">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="1.7in">
+<column alignment="left" valignment="top" width="4.3in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -1669,6 +1668,26 @@ Maximum string length (16)
 \begin_inset Text
 
 \begin_layout Plain Layout
+mxstr2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Another string length (40)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 hdr_arr_len
 \end_layout
 
@@ -1678,7 +1697,7 @@ hdr_arr_len
 \begin_inset Text
 
 \begin_layout Plain Layout
-Number of entries in each PrepBufr message header array (3)
+Number of entries in each PrepBufr header array (3)
 \end_layout
 
 \end_inset
@@ -1792,9 +1811,9 @@ name "table_reform-point_pb2nc_output_vars"
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
 <features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="1in">
-<column alignment="left" valignment="top" width="1in">
-<column alignment="left" valignment="top" width="4in">
+<column alignment="left" valignment="top" width="0.7in">
+<column alignment="left" valignment="top" width="0.9in">
+<column alignment="left" valignment="top" width="4.4in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -1954,7 +1973,7 @@ hdr_typ
 \begin_inset Text
 
 \begin_layout Plain Layout
-nmsg, mxstr
+nmsg, mxstr2
 \end_layout
 
 \end_inset
@@ -2458,7 +2477,7 @@ Elevation in msl of the observing location.
 \begin_inset Text
 
 \begin_layout Plain Layout
-Grib_Code
+Grib_Code or Variable_Name
 \end_layout
 
 \end_inset
@@ -2467,7 +2486,8 @@ Grib_Code
 \begin_inset Text
 
 \begin_layout Plain Layout
-Integer GRIB code value corresponding to this observation type.
+Integer GRIB code value or variable name corresponding to this observation
+ type.
 \end_layout
 
 \end_inset
