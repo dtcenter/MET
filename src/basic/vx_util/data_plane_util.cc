@@ -510,7 +510,7 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
-                     const DataPlane &sd) {
+                         const DataPlane &sd) {
    DataPlane cdf_inv = mn;
    double v;
 
