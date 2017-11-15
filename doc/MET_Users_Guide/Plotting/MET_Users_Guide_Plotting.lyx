@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -114,7 +116,7 @@ ield.
 plot_point_obs usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:plot_point_obs-usage"
+name "subsec:plot_point_obs-usage"
 
 \end_inset
 
@@ -418,7 +420,7 @@ sample_pb.ps
 plot_data_plane usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:plot_data_plane-usage"
+name "subsec:plot_data_plane-usage"
 
 \end_inset
 
@@ -732,7 +734,7 @@ test.ps
 plot_mode_field usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:plot_mode_field-usage"
+name "subsec:plot_mode_field-usage"
 
 \end_inset
 
@@ -1060,7 +1062,7 @@ name "sec:Examples-of-plotting"
 Grid-Stat tool examples
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Grid-Stat-tool-examples"
+name "subsec:Grid-Stat-tool-examples"
 
 \end_inset
 
@@ -1138,7 +1140,7 @@ name "Gilbert_skill_score"
 MODE tool examples
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MODE-tool-examples"
+name "subsec:MODE-tool-examples"
 
 \end_inset
 
@@ -1377,7 +1379,7 @@ name "histogram"
 TC-Stat tool example
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:TC-Stat-tool-example"
+name "subsec:TC-Stat-tool-example"
 
 \end_inset
 
@@ -1387,9 +1389,9 @@ name "sub:TC-Stat-tool-example"
 \begin_layout Standard
 
 \series medium
-There is a basic R script is located in the MET build in 
+There is a basic R script located in the MET installation
 \series default
-scripts/Rscripts/plot_tcmpr.R
+, share/met/Rscripts/plot_tcmpr.R
 \series medium
 .
  The usage statement with a short description of the options for 
@@ -1419,14 +1421,16 @@ plot_tcmpr.R
 \series medium
 In order to run this script, the 
 \series default
-MET_BUILD_DIR
+MET_INSTALL_DIR
 \series medium
- environment variable must be set to the top-level MET build directory.
+ environment variable must be set to the MET installation directory and
+ the MET_BASE environment variable must be set to the MET_INSTALL_DIR/share/met
+ directory.
  In addition, the 
 \emph on
 tc_stat tool
 \emph default
- must be in your path.
+ under MET_INSTALL_DIR/bin must be in your system path.
 \end_layout
 
 \begin_layout Standard
