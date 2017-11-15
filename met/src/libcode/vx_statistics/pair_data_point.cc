@@ -761,7 +761,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // observation height falls within the requested range.
    else if(obs_info->level().type() == LevelType_Vert) {
 
-      if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
+      if(strstr(surface_msg_typ_str, hdr_typ_str) == NULL &&
          (obs_hgt < obs_info->level().lower() ||
           obs_hgt > obs_info->level().upper())) {
          rej_lvl++;
@@ -773,7 +773,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // within the requested range.
    else {
 
-      if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
+      if(strstr(surface_msg_typ_str, hdr_typ_str) == NULL &&
          (obs_hgt < obs_info->level().lower() ||
           obs_hgt > obs_info->level().upper())) {
          rej_lvl++;
@@ -827,7 +827,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // type, set the observation level value to bad data so that it's not
    // used in the duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      strstr(onlysf_msg_typ_str, hdr_typ_str) != NULL) {
+      strstr(surface_msg_typ_str, hdr_typ_str) != NULL) {
       obs_lvl = bad_data_double;
    }
 

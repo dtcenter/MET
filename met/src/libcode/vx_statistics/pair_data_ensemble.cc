@@ -1239,15 +1239,18 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // observation height falls within the requested range.
    else if(obs_info_grib->level().type() == LevelType_Vert) {
 
-      if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL &&
+      if(strstr(surface_msg_typ_str, hdr_typ_str) == NULL &&
          (obs_hgt < obs_info_grib->level().lower() ||
           obs_hgt > obs_info_grib->level().upper())) return;
    }
    // For all other level types (RecNumber, NoLevel), check
-   // if the observation height falls within the requested range.
+   // for a surface message type or if the observation height falls
+   // within the requested range.
    else {
-      if(obs_hgt < obs_info_grib->level().lower() ||
-         obs_hgt > obs_info_grib->level().upper()) return;
+
+      if(strstr(surface_msg_typ_str, hdr_typ_str) == NULL &&
+         (obs_hgt < obs_info->level().lower() ||
+          obs_hgt > obs_info->level().upper())) return;
    }
 
    // For a single climatology mean field
@@ -1282,7 +1285,9 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // set the observation level value to bad data so that it's not used in the
    // duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      strstr(onlysf_msg_typ_str, hdr_typ_str) != NULL) obs_lvl = bad_data_double;
+      strstr(surface_msg_typ_str, hdr_typ_str) != NULL) {
+      obs_lvl = bad_data_double;
+   }
 
    // Set flag for specific humidity
    bool spfh_flag = fcst_info->is_specific_humidity() &&

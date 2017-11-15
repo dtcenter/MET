@@ -587,6 +587,11 @@ fcst = {
 //     observations.  This may be specified once at the top-level "obs"
 //     dictionary or separately for each "field" array element.  In the example
 //     shown above, this is specified in the "fcst" dictionary and copied to "obs".
+//
+//   - Simplified vertical level matching logic is applied for surface message types.
+//     Observations for the following message types are assumed to be at the surface:
+//        ADPSFC, SFCSHP, MSONET
+//
 //   - The "message_type" would be placed in the "field" array element if more
 //     than one "message_type" entry is desired within the config file.
 //     e.g.
@@ -2031,7 +2036,7 @@ shift_right = 0;
 //    MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
 //    SFCSHP SPSSMI SYNDAT VADWND
 //    ANYAIR (= AIRCAR, AIRCFT)
-//    ANYSFC (= ADPSFC, SFCSHP, ADPUPA, PROFLR)
+//    ANYSFC (= ADPSFC, SFCSHP, ADPUPA, PROFLR, MESONET)
 //    ONLYSF (= ADPSFC, SFCSHP)
 //
 //    e.g. message_type[] = [ "ADPUPA", "AIRCAR" ];
