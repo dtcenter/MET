@@ -151,6 +151,7 @@ class GridStatConfInfo {
       NumArray *        eclv_points;        // ECLV points [n_vx]
 
       ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
+      bool              write_cdf_bins;     // Flag for writing output lines for each bin
 
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
@@ -209,6 +210,7 @@ class GridStatConfInfo {
       int get_n_vx_vect()     const;
       int get_n_vx_prob()     const;
       int get_n_mask()        const;
+      int get_n_climo_bins()  const;
 
       int get_n_interp()      const;
       int get_n_nbrhd_wdth()  const;

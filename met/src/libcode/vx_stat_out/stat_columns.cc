@@ -3063,7 +3063,8 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    //    TOTAL,       INDEX,       OBS_SID,
    //    OBS_LAT,     OBS_LON,     OBS_LVL,
    //    OBS_ELV,     FCST,        OBS,
-   //    CLIMO,       OBS_QC
+   //    OBS_QC,      CLIMO_MEAN,  CLIMO_STDEV,
+   //    CLIMO_CDF
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);
@@ -3092,11 +3093,17 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+8,  // Observation Value
       pd_ptr->o_na[i]);
 
-   at.set_entry(r, c+9,  // Climatology Mean Value
+   at.set_entry(r, c+9,  // Observation Quality Control
+      pd_ptr->o_qc_sa[i]);
+
+   at.set_entry(r, c+10, // Climatological Mean Value
       pd_ptr->cmn_na[i]);
 
-   at.set_entry(r, c+10, // Observation Quality Control
-      pd_ptr->o_qc_sa[i]);
+   at.set_entry(r, c+11, // Climatological Standard Deviation Value
+      pd_ptr->csd_na[i]);
+
+   at.set_entry(r, c+12, // Climatological CDF Value
+      pd_ptr->cdf_na[i]);
 
    return;
 }

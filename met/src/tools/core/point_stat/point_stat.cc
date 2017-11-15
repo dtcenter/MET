@@ -80,6 +80,7 @@
 //   033    02/27/17  Halley Gotway  Add HiRA verification.
 //   034    05/15/17  Prestopnik P   Add shape for HiRA, interp and regrid.
 //   035    06/16/17  Halley Gotway  Add ECLV line type.
+//   037    09/08/17  Halley Gotway  Add climatological bins.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1264,6 +1265,8 @@ void process_scores() {
                      }
                   } // end for m
                } // end Compute CNT
+
+// JHG add logic for climo bins here!
 
                // Compute SL1L2 and SAL1L2 scores as long as the
                // vflag is not set

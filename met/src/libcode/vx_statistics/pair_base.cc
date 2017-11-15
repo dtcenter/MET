@@ -22,6 +22,7 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_grid.h"
+#include "vx_gsl_prob.h"
 #include "vx_data2d.h"
 #include "vx_data2d_grib.h"
 #include "vx_math.h"
@@ -78,6 +79,7 @@ void PairBase::clear() {
    o_qc_sa.clear();
    cmn_na.clear();
    csd_na.clear();
+   cdf_na.clear();
 
    n_obs = 0;
 
@@ -110,6 +112,7 @@ void PairBase::extend(int n) {
    o_qc_sa.extend(n);
    cmn_na.extend(n);
    csd_na.extend(n);
+   cdf_na.extend(n);
 
    map_key.extend(n);
 
@@ -171,6 +174,7 @@ void PairBase::set_interp_mthd(InterpMthd m) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
 void PairBase::set_interp_dpth(int n) {
 
    interp_dpth = n;
@@ -178,9 +182,11 @@ void PairBase::set_interp_dpth(int n) {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void PairBase::set_interp_shape(GridTemplateFactory::GridTemplates shape) {
 
-	interp_shape = shape;
+   interp_shape = shape;
 
    return;
 }
@@ -323,6 +329,7 @@ bool PairBase::add_obs(const char *sid,
       o_qc_sa.add(qc);
       cmn_na.add(cmn);
       csd_na.add(csd);
+      cdf_na.add(normal_cdf(o, cmn, csd));
 
       // Increment the number of pairs
       n_obs += 1;
@@ -543,6 +550,7 @@ void PairBase::calc_obs_summary(){
       o_qc_sa.add(ob.qc.c_str());
       cmn_na.add (svt.cmn);
       csd_na.add (svt.csd);
+      cdf_na.add (normal_cdf(ob.val, svt.cmn, svt.csd));
 
       // Increment the number of pairs
       n_obs += 1;
@@ -570,6 +578,7 @@ void PairBase::add_obs(double x, double y, double o,
    o_qc_sa.add(na_str);
    cmn_na.add(cmn);
    csd_na.add(csd);
+   cdf_na.add(normal_cdf(o, cmn, csd));
 
    // Increment the number of observations
    n_obs += 1;
@@ -606,6 +615,7 @@ void PairBase::set_obs(int i_obs, const char *sid,
    o_qc_sa.set(i_obs, qc);
    cmn_na.set(i_obs, cmn);
    csd_na.set(i_obs, csd);
+   cdf_na.set(i_obs, normal_cdf(o, cmn, csd));
 
    return;
 }
@@ -635,6 +645,7 @@ void PairBase::set_obs(int i_obs, double x, double y,
    o_qc_sa.set(i_obs, na_str);
    cmn_na.set(i_obs, cmn);
    csd_na.set(i_obs, csd);
+   cdf_na.set(i_obs, normal_cdf(o, cmn, csd));
 
    return;
 }

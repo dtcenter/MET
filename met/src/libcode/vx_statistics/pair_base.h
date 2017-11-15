@@ -94,6 +94,7 @@ class PairBase {
       // Climatology Information
       NumArray    cmn_na;  // Climatology mean [n_obs]
       NumArray    csd_na;  // Climatology standard deviation [n_obs]
+      NumArray    cdf_na;  // Climatology cumulative distribution function [n_obs]
 
       unixtime    fcst_ut; // Forecast valid time
 
