@@ -1266,8 +1266,6 @@ void process_scores() {
                   } // end for m
                } // end Compute CNT
 
-// JHG add logic for climo bins here!
-
                // Compute SL1L2 and SAL1L2 scores as long as the
                // vflag is not set
                if(!conf_info.vx_pd[i].fcst_info->is_prob() &&
