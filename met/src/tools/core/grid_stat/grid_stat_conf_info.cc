@@ -738,7 +738,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_cnt):
          // Maximum number of CNT lines possible =
          //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
-         //    Max Thresholds * Alphas*  Climo Bins
+         //    Max Thresholds * Alphas
          n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
              max_n_cnt_thresh * get_n_ci_alpha();
          break;
@@ -747,9 +747,9 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_sal1l2):
          // Maximum number of SL1L2 or SAL1L2 lines possible =
          //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
-         //    Max Thresholds * Climo Bins
+         //    Max Thresholds
          n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
-             max_n_cnt_thresh * n_climo_bins;
+             max_n_cnt_thresh;
          break;
 
       case(i_vl1l2):
@@ -758,7 +758,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
          //    Max Thresholds
          n = n_vx_vect * n_mask * (n_interp + get_n_wave_1d()) *
-             max_n_wind_thresh * n_climo_bins;
+             max_n_wind_thresh;
          break;
 
       case(i_nbrctc):
@@ -790,16 +790,18 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_pjc):
       case(i_prc):
          // Maximum number of PCT, PJC, or PRC lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh;
+         //    Fields * Masks * Smoothing Methods * Max Thresholds *
+         //    Climo Bins
+         n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
+             n_climo_bins;
          break;
 
       case(i_pstd):
          // Maximum number of PSTD lines possible =
          //    Fields * Masks * Smoothing Methods * Max Thresholds *
-         //    Alphas
+         //    Alphas * Climo Bins
          n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
-             get_n_ci_alpha();
+             get_n_ci_alpha() * n_climo_bins;
          break;
 
       case(i_eclv):

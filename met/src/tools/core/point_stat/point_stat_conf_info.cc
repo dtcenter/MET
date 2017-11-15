@@ -736,18 +736,18 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_sal1l2):
          // Maximum number of SL1L2 or SAL1L2 lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds * Climo Bins
+         //    Max Thresholds
          n = n_vx_scal * max_n_msg_typ * n_mask * n_interp *
-             max_n_cnt_thresh * n_climo_bins;
+             max_n_cnt_thresh;
          break;
 
       case(i_vl1l2):
       case(i_val1l2):
          // Maximum number of VL1L2 or VAL1L2 lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds * Climo Bins
+         //    Max Thresholds
          n = n_vx_vect * max_n_msg_typ * n_mask * n_interp *
-             max_n_wind_thresh * n_climo_bins;
+             max_n_wind_thresh;
          break;
 
       case(i_pct):
@@ -755,9 +755,9 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_prc):
          // Maximum number of PCT, PJC, or PRC lines possible =
          //    Probability Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Observation Probability Thresholds
+         //    Max Observation Probability Thresholds * Climo Bins
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
-             max_n_oprob_thresh;
+             max_n_oprob_thresh * n_climo_bins;
 
          // Maximum number of HiRA PCT, PJC, or PRC lines possible =
          //    Scalar Fields * Message Types * Masks *
@@ -772,9 +772,9 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_pstd):
          // Maximum number of PSTD lines possible =
          //    Probability Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Observation Probability Thresholds * Alphas
+         //    Max Observation Probability Thresholds * Alphas * Climo Bins
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
-             max_n_oprob_thresh * get_n_ci_alpha();
+             max_n_oprob_thresh * get_n_ci_alpha() * n_climo_bins;
 
          // Maximum number of HiRA PSTD lines possible =
          //    Scalar Fields * Message Types * Masks *
