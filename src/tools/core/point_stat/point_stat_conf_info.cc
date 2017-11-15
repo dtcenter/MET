@@ -95,6 +95,7 @@ void PointStatConfInfo::clear() {
    regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
    climo_cdf_ta.clear();
+   write_cdf_bins = true;
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -242,6 +243,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype, bool use_var_id) {
 
    // Conf: climo_cdf_bins
    climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
+
+   // Conf: write_cdf_bins
+   write_cdf_bins = conf.lookup_bool(conf_key_write_cdf_bins);
 
    // Allocate space based on the number of verification tasks
    vx_pd       = new VxPairDataPoint [n_vx];
@@ -669,8 +673,17 @@ int PointStatConfInfo::get_n_msg_typ(int i) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int PointStatConfInfo::get_n_climo_bins() const {
+   return(write_cdf_bins ? climo_cdf_ta.n_elements() - 1 : 1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int PointStatConfInfo::n_txt_row(int i_txt_row) {
-   int i, n, max_n_msg_typ;
+   int i, n, max_n_msg_typ, n_climo_bins;
+
+   // Determine the number of climatology CDF bins to be written
+   n_climo_bins = get_n_climo_bins();
 
    // Determine the maximum number of message types being used
    for(i=0, max_n_msg_typ=0; i<n_vx; i++)
@@ -723,18 +736,18 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_sal1l2):
          // Maximum number of SL1L2 or SAL1L2 lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
+         //    Max Thresholds * Climo Bins
          n = n_vx_scal * max_n_msg_typ * n_mask * n_interp *
-             max_n_cnt_thresh;
+             max_n_cnt_thresh * n_climo_bins;
          break;
 
       case(i_vl1l2):
       case(i_val1l2):
          // Maximum number of VL1L2 or VAL1L2 lines possible =
          //    Fields * Message Types * Masks * Smoothing Methods *
-         //    Max Thresholds
+         //    Max Thresholds * Climo Bins
          n = n_vx_vect * max_n_msg_typ * n_mask * n_interp *
-             max_n_wind_thresh;
+             max_n_wind_thresh * n_climo_bins;
          break;
 
       case(i_pct):

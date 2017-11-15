@@ -113,10 +113,11 @@ class PointStatConfInfo {
       NumArray *        eclv_points;        // ECLV points [n_vx]
 
       ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
+      bool              write_cdf_bins;     // Flag for writing output lines for each bin
 
       vector<DuplicateType> dup_flgs;
-      vector<ObsSummary> obs_smry;
-      vector<int> obs_percs;
+      vector<ObsSummary>    obs_smry;
+      vector<int>           obs_percs;
 
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
@@ -160,6 +161,7 @@ class PointStatConfInfo {
       int get_n_vx_vect()         const;
       int get_n_vx_prob()         const;
       int get_n_msg_typ(int i)    const;
+      int get_n_climo_bins()      const;
       int get_n_mask()            const;
       int get_n_mask_area()       const;
       int get_n_mask_sid()        const;

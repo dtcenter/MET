@@ -718,16 +718,14 @@ climo_cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
 
 //
 // The "write_climo_bins" entry is a boolean which should be set to TRUE or
-// FALSE.  When climatological mean and standard deviation data are provided
+// FALSE.  When climatological mean and standard deviation data are provided,
 // the matched pairs are subset into climatological bins, as described above.
-// Partial sums are computed for the pairs in each of the bins.  The final
-// partial sum values reported in the MET output files are the mean across those
-// bins.  Setting this option to TRUE indicates that MET should also write out
-// the partial sums separately for each climatological bin.  The bin information
-// is indicated in the MET output by appending "_BIN#" to the VX_MASK column
-// entry, where # indicates the bin number.
+// Probabilistic verification methods are applied to the pairs within each bin.
+// When the number of bins is greater than 1, the bin information is indicated
+// in the MET output by appending "_BIN#" to the VX_MASK column entry, where
+// # indicates the bin number.
 //
-write_cdf_bins = FALSE;
+write_cdf_bins = TRUE;
 
 //
 // The "mask_missing_flag" entry specifies how missing data should be handled

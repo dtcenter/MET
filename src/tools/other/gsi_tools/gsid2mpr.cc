@@ -384,8 +384,10 @@ void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
 
    at.set_entry(row, col++, d.guess);     // FCST
    at.set_entry(row, col++, d.obs);       // OBS
-   at.set_entry(row, col++, na_str);      // CLIMO
    at.set_entry(row, col++, d.obs_qc[0]); // OBS_QC
+   at.set_entry(row, col++, na_str);      // CLIMO_MEAN
+   at.set_entry(row, col++, na_str);      // CLIMO_STDEV
+   at.set_entry(row, col++, na_str);      // CLIMO_CDF
 
    // Write extra columns
    at.set_entry(row, col++, d.prs);       // OBS_PRS
@@ -436,8 +438,10 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
 
    at.set_entry(row, col++, d.guess);       // FCST
    at.set_entry(row, col++, d.obs);         // OBS
-   at.set_entry(row, col++, na_str);        // CLIMO
    at.set_entry(row, col++, d.obs_qc[0]);   // OBS_QC
+   at.set_entry(row, col++, na_str);        // CLIMO_MEAN
+   at.set_entry(row, col++, na_str);        // CLIMO_STDEV
+   at.set_entry(row, col++, na_str);        // CLIMO_CDF
 
    // Write extra columns
    at.set_entry(row, col++, d.use);         // CHAN_USE

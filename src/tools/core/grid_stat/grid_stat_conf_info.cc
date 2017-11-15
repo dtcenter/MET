@@ -91,6 +91,7 @@ void GridStatConfInfo::clear() {
    regrid_info.clear();
    desc.clear();
    climo_cdf_ta.clear();
+   write_cdf_bins = true;
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -250,6 +251,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Conf: climo_cdf_bins
    climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
+
+   // Conf: write_cdf_bins
+   write_cdf_bins = conf.lookup_bool(conf_key_write_cdf_bins);
 
    // Allocate space based on the number of verification tasks
    fcst_info   = new VarInfo *   [n_vx];
@@ -689,8 +693,17 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int GridStatConfInfo::get_n_climo_bins() const {
+   return(write_cdf_bins ? climo_cdf_ta.n_elements() - 1 : 1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int GridStatConfInfo::n_txt_row(int i_txt_row) {
-   int n;
+   int n, n_climo_bins;
+
+   // Determine the number of climatology CDF bins to be written
+   n_climo_bins = get_n_climo_bins();
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -725,7 +738,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_cnt):
          // Maximum number of CNT lines possible =
          //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
-         //    Max Thresholds * Alphas
+         //    Max Thresholds * Alphas*  Climo Bins
          n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
              max_n_cnt_thresh * get_n_ci_alpha();
          break;
@@ -734,9 +747,9 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_sal1l2):
          // Maximum number of SL1L2 or SAL1L2 lines possible =
          //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
-         //    Max Thresholds
+         //    Max Thresholds * Climo Bins
          n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
-             max_n_cnt_thresh;
+             max_n_cnt_thresh * n_climo_bins;
          break;
 
       case(i_vl1l2):
@@ -745,7 +758,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
          //    Max Thresholds
          n = n_vx_vect * n_mask * (n_interp + get_n_wave_1d()) *
-             max_n_wind_thresh;
+             max_n_wind_thresh * n_climo_bins;
          break;
 
       case(i_nbrctc):

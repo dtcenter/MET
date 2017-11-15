@@ -188,7 +188,8 @@ static const char * mpr_columns [] = {
    "TOTAL",       "INDEX",       "OBS_SID",
    "OBS_LAT",     "OBS_LON",     "OBS_LVL",
    "OBS_ELV",     "FCST",        "OBS",
-   "CLIMO",       "OBS_QC"
+   "OBS_QC",      "CLIMO_MEAN",  "CLIMO_STDEV",
+   "CLIMO_CDF"
 };
 
 static const char * nbrctc_columns [] = {
@@ -262,7 +263,8 @@ static const char * orank_columns [] = {
    "OBS_ELV",     "OBS",         "PIT",
    "RANK",        "N_ENS_VLD",   "N_ENS",
    "ENS_",        "OBS_QC",      "ENS_MEAN",
-   "CLIMO",       "ENS_SPREAD"
+   "ENS_SPREAD",  "CLIMO_MEAN",  "CLIMO_STDEV",
+   "CLIMO_CDF"
 };
 
 static const char * ssvar_columns [] = {
