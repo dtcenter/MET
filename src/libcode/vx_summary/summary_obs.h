@@ -39,6 +39,7 @@ public:
    
    bool summarizeObs(const TimeSummaryInfo &summary_info);
    
+   bool addObservationObj(const Observation &obs);
    bool addObservation(const string &header_type, const string &station_id,
                        const time_t valid_time,
                        const double latitude, const double longitude,

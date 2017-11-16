@@ -348,8 +348,10 @@ void setup_netcdf_out(int nhdr) {
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
 
+   bool use_var_id = false;
+   init_nc_dims_vars (obsVars, use_var_id);
    create_nc_hdr_vars(obsVars, f_out, -1, deflate_level);
-   create_nc_obs_vars(obsVars, f_out, deflate_level, false);
+   create_nc_obs_vars(obsVars, f_out, deflate_level, use_var_id);
    
    //
    // Add global attributes

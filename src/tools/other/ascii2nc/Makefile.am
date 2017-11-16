@@ -44,6 +44,7 @@ ascii2nc_LDADD = -lvx_shapedata \
 	-lvx_gsl_prob \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_summary \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

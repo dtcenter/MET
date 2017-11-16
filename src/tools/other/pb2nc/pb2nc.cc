@@ -688,6 +688,8 @@ void open_netcdf() {
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
    // Define netCDF variables
+   init_nc_dims_vars (obsVars);
+   obsVars.attr_pb2nc = true;
    create_nc_obs_vars(obsVars, f_out, deflate_level);
    
    // Add global attributes

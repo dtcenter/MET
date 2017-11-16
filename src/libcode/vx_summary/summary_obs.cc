@@ -59,7 +59,6 @@ long SummaryObs::countHeaders()
    for (vector< Observation >::iterator obs = observations.begin();
         obs != observations.end(); ++obs)
    {
-      obs->setHeaderIndex(nhdr);
       if (obs->getHeaderType() != prev_header_type    ||
           obs->getStationId()  != prev_station_id     ||
           obs->getValidTime()  != prev_valid_time     ||
@@ -76,6 +75,7 @@ long SummaryObs::countHeaders()
         prev_longitude   = obs->getLongitude();
         prev_elevation   = obs->getElevation();
       }
+      obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */
    
    return nhdr;
@@ -444,7 +444,7 @@ bool SummaryObs::isInTimeInterval(const time_t test_time,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool SummaryObs::addObservation(const Observation &obs)
+bool SummaryObs::addObservationObj(const Observation &obs)
 {
    bool result = false;
    if (summaryInfo.grib_code.n_elements() == 0
@@ -473,7 +473,7 @@ bool SummaryObs::addObservation(
       const double height_m, const double value,
       const string &var_name)
 {
-   return addObservation(
+   return addObservationObj(
              Observation(header_type, station_id, valid_time,
                          latitude, longitude, elevation,
                          quality_flag, var_code, pressure_level_hpa,

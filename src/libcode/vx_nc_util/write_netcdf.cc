@@ -346,8 +346,6 @@ ConcatString s;
 void add_nc_header (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
       const float hdr_lat, const float hdr_lon, const float hdr_elv)
 {
-   int hdr_str_len;
-   
    hdr_arrays.typ_sa.add(hdr_typ);  // Message type
    hdr_arrays.sid_sa.add(hdr_sid);  // Station ID
    hdr_arrays.vld_sa.add(hdr_vld);  // Valid time
@@ -356,6 +354,55 @@ void add_nc_header (const char *hdr_typ, const char *hdr_sid, const char *hdr_vl
    hdr_arrays.elv_na.add(hdr_elv);  // Elevation
    
    cur_hdr_idx++;
+}
+      
+///////////////////////////////////////////////////////////////////////////////
+
+void add_nc_header_to_buf (const NetcdfObsVars &obsVars,
+      const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+      const float hdr_lat, const float hdr_lon, const float hdr_elv)
+{
+   int hdr_str_len, hdr_str_len2;
+   
+   // Message type
+   hdr_str_len  = strlen(hdr_typ);
+   hdr_str_len2 = strlen(hdr_typ_buf[hdr_data_idx]);
+   if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
+   if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
+   strncpy(hdr_typ_buf[hdr_data_idx], hdr_typ, hdr_str_len);
+   for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
+      hdr_typ_buf[hdr_data_idx][idx] = bad_data_char;
+   
+   // Station ID
+   hdr_str_len = strlen(hdr_sid);
+   hdr_str_len2 = strlen(hdr_sid_buf[hdr_data_idx]);
+   if (hdr_str_len > HEADER_STR_LEN) hdr_str_len = HEADER_STR_LEN;
+   if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
+   strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_str_len);
+   for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
+      hdr_sid_buf[hdr_data_idx][idx] = bad_data_char;
+   
+   // Valid Time
+   hdr_str_len = strlen(hdr_vld);
+   hdr_str_len2 = strlen(hdr_vld_buf[hdr_data_idx]);
+   if (hdr_str_len > HEADER_STR_LEN) hdr_str_len = HEADER_STR_LEN;
+   if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
+   strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_str_len);
+   for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
+      hdr_vld_buf[hdr_data_idx][idx] = bad_data_char;
+   
+   // Write the header array which consists of the following:
+   //    LAT LON ELV
+   hdr_arr_buf[hdr_data_idx][0] = (float) hdr_lat;
+   hdr_arr_buf[hdr_data_idx][1] = (float) hdr_lon;
+   hdr_arr_buf[hdr_data_idx][2] = (float) hdr_elv;
+   
+   hdr_data_idx++;
+   cur_hdr_idx++;
+   
+   if (hdr_data_idx >= OBS_BUFFER_SIZE) {
+      write_nc_header_buffer(obsVars, OBS_BUFFER_SIZE);
+   }
 }
       
 ///////////////////////////////////////////////////////////////////////////////
@@ -384,17 +431,15 @@ void add_and_write_nc_observation(const NetcdfObsVars &obsVars,
 ///////////////////////////////////////////////////////////////////////////////
 
 void create_nc_dimensions(NetcdfObsVars &obsVars, NcFile *f_out) {
+   const char *method_name = "create_nc_dimensions()";
+   mlog << Debug(7) << "    " << method_name << "  is called" << "\n";
    // Define netCDF dimensions
    if (IS_INVALID_NC(obsVars.strl_dim))    obsVars.strl_dim    = add_dim(f_out, nc_dim_mxstr,   (long)HEADER_STR_LEN);
-   if (IS_INVALID_NC(obsVars.strll_dim)) {
-      int hdr_str_len = obsVars.hdr_str_len;
-      if (hdr_str_len <= 0) hdr_str_len = HEADER_STR_LEN_L;
-      obsVars.strll_dim = add_dim(f_out, nc_dim_mxstr2, (long)hdr_str_len);
-   }
+   if (IS_INVALID_NC(obsVars.strll_dim))   obsVars.strll_dim   = add_dim(f_out, nc_dim_mxstr2,  (long)HEADER_STR_LEN_L);
    if (IS_INVALID_NC(obsVars.hdr_arr_dim)) obsVars.hdr_arr_dim = add_dim(f_out, nc_dim_hdr_arr, (long)HDR_ARRAY_LEN);
    if (IS_INVALID_NC(obsVars.obs_arr_dim)) obsVars.obs_arr_dim = add_dim(f_out, nc_dim_obs_arr, (long)OBS_ARRAY_LEN);
-   if (IS_INVALID_NC(obsVars.hdr_dim) && obsVars.hdr_len > 0) {
-      obsVars.hdr_dim = add_dim(f_out, nc_dim_nhdr, (long)obsVars.hdr_len);
+   if (IS_INVALID_NC(obsVars.hdr_dim) && obsVars.hdr_cnt > 0) {
+      obsVars.hdr_dim = add_dim(f_out, nc_dim_nhdr, (long)obsVars.hdr_cnt);
    }
    if (IS_INVALID_NC(obsVars.obs_dim))     obsVars.obs_dim     = add_dim(f_out, nc_dim_nobs);   // unlimited dimension;
 }
@@ -403,10 +448,14 @@ void create_nc_dimensions(NetcdfObsVars &obsVars, NcFile *f_out) {
 
 void create_nc_hdr_vars (NetcdfObsVars &obsVars, NcFile *f_out,
       const int hdr_count, const int deflate_level) {
+   const char *method_name = "create_nc_hdr_vars()";
+   mlog << Debug(7) << "    " << method_name << "  hdr_count: " << hdr_count << "\n";
    
    // Define netCDF dimensions
+
    create_nc_dimensions(obsVars, f_out);
    
+   obsVars.hdr_cnt = hdr_count;
    NcDim hdr_dim = !IS_INVALID_NC(obsVars.hdr_dim)
          ? obsVars.hdr_dim
          : (hdr_count > 0)
@@ -424,7 +473,7 @@ void create_nc_hdr_vars (NetcdfObsVars &obsVars, NcFile *f_out,
    add_att(&obsVars.hdr_typ_var, "long_name", "message type");
    add_att(&obsVars.hdr_sid_var, "long_name", "station identification");
    add_att(&obsVars.hdr_vld_var, "long_name", "valid time");
-   add_att(&obsVars.hdr_vld_var, "units", "YYYYMMDD_HHMMSS");
+   add_att(&obsVars.hdr_vld_var, "units", "YYYYMMDD_HHMMSS UTC");
 
    add_att(&obsVars.hdr_arr_var, "long_name",
            "array of observation station header values");
@@ -442,6 +491,9 @@ void create_nc_hdr_vars (NetcdfObsVars &obsVars, NcFile *f_out,
 ///////////////////////////////////////////////////////////////////////////////
 
 void create_nc_obs_vars (NetcdfObsVars &obsVars, NcFile *f_out, const int deflate_level, bool use_var_id) {
+   const char *method_name = "create_nc_obs_vars()";
+   //mlog << Debug(7) << "    " << method_name << "  hdr_count: " << hdr_count << "\n";
+
    // Define netCDF dimensions
    create_nc_dimensions(obsVars, f_out);
    
@@ -459,15 +511,67 @@ void create_nc_obs_vars (NetcdfObsVars &obsVars, NcFile *f_out, const int deflat
    add_att(&obsVars.obs_arr_var, "hdr_id_long_name", "index of matching header data");
    if (use_var_id) {
       add_att(&obsVars.obs_arr_var, "columns", "hdr_id var_id lvl hgt ob");
-      add_att(&obsVars.obs_arr_var, "var_id_long_name", "index of BUFR variable corresponding to the observation type");
+      if (obsVars.attr_pb2nc) {
+         add_att(&obsVars.obs_arr_var, "var_id_long_name", "index of BUFR variable corresponding to the observation type");
+      } else {
+         add_att(&obsVars.obs_arr_var, "var_id_long_name", "index of variable corresponding to the observation type");
+      }
    }
    else {
       add_att(&obsVars.obs_arr_var, "columns", "hdr_id gc lvl hgt ob");
       add_att(&obsVars.obs_arr_var, "gc_long_name", "grib code corresponding to the observation type");
    }
    add_att(&obsVars.obs_arr_var, "lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
-   add_att(&obsVars.obs_arr_var, "hgt_long_name", "height in meters above sea level (msl)");
+   if (obsVars.attr_agl) {
+      add_att(&obsVars.obs_arr_var, "hgt_long_name", "height in meters above sea level or ground level (msl or agl)");
+   } else {
+      add_att(&obsVars.obs_arr_var, "hgt_long_name", "height in meters above sea level (msl)");
+   }
    add_att(&obsVars.obs_arr_var, "ob_long_name", "observation value");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+long count_nc_headers(vector< Observation > &observations)
+{
+   long nhdr = 0;
+   
+   string prev_header_type = "";
+   string prev_station_id = "";
+   time_t prev_valid_time = 0;
+   double prev_latitude = bad_data_double;
+   double prev_longitude = bad_data_double;
+   double prev_elevation = bad_data_double;
+   const char *method_name = "count_nc_headers()";
+
+   int count = 0;
+   for (vector< Observation >::iterator obs = observations.begin();
+        obs != observations.end(); ++obs)
+   {
+      if (obs->getHeaderType() != prev_header_type    ||
+          obs->getStationId()  != prev_station_id     ||
+          obs->getValidTime()  != prev_valid_time     ||
+          !is_eq(obs->getLatitude(),  prev_latitude)  ||
+          !is_eq(obs->getLongitude(), prev_longitude) ||
+          !is_eq(obs->getElevation(), prev_elevation))
+      {
+        nhdr++;
+      
+        prev_header_type = obs->getHeaderType();
+        prev_station_id  = obs->getStationId();
+        prev_valid_time  = obs->getValidTime();
+        prev_latitude    = obs->getLatitude();
+        prev_longitude   = obs->getLongitude();
+        prev_elevation   = obs->getElevation();
+      }
+      //else mlog << Debug(7) << "    " << method_name 
+      //     << "  FFF obs->getHeaderIndex(): " << obs->getHeaderIndex()
+      //     << ", nhdr: " << nhdr << " count: " << count
+      //     << "\n";
+      obs->setHeaderIndex(nhdr-1);
+   } /* endfor - obs */
+   
+   return nhdr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -507,11 +611,20 @@ void nc_obs_initialize() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void read_nc_dims_vars (NetcdfObsVars &obsVars, NcFile *f_in) {
+void init_nc_dims_vars(NetcdfObsVars &obsVars, bool use_var_id) {
+   obsVars.attr_agl    = false;
+   obsVars.attr_pb2nc  = false;
+   obsVars.use_var_id  = use_var_id;
+   obsVars.hdr_cnt     = 0;     // header array length (fixed dimension if hdr_cnt > 0)
+   //obsVars.hdr_str_len = 0;     // string length fot header (message) type header
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void read_nc_dims_vars(NetcdfObsVars &obsVars, NcFile *f_in) {
    
    // Define netCDF dimensions
-   obsVars.hdr_len     ; // header array length (fixed dimension if hdr_len > 0)
-   obsVars.hdr_str_len ; // header string length
+   //obsVars.hdr_cnt     ; // header array length (fixed dimension if hdr_cnt > 0)
    obsVars.strl_dim    = get_nc_dim(f_in, nc_dim_mxstr);    // header string dimension
    if (has_dim(f_in, nc_dim_mxstr2))
       obsVars.strll_dim   = get_nc_dim(f_in, nc_dim_mxstr2);// header string dimension (bigger dimension)
@@ -563,6 +676,9 @@ void write_nc_headers(const NetcdfObsVars &obsVars)
 {
    int hdr_str_len, hdr_str_len2;
    int buf_size = (cur_hdr_idx > OBS_BUFFER_SIZE) ? OBS_BUFFER_SIZE : cur_hdr_idx;
+   const char *method_name = "write_nc_headers()";
+   
+   mlog << Debug(7) << "    " << method_name << "  hdr_count: " << cur_hdr_idx << "\n";
 
    hdr_data_idx = 0;
    for (int index=0; index<cur_hdr_idx; index++) {
@@ -618,6 +734,9 @@ void write_nc_header_buffer(const NetcdfObsVars &obsVars, const int buf_size)
 {
    long offsets[2] = { hdr_data_offset, 0 };
    long lengths[2] = { buf_size, HEADER_STR_LEN } ;
+   const char *method_name = "write_nc_header_buffer()";
+
+   mlog << Debug(7) << "    " << method_name << "  buf_size: " << buf_size << "\n";
    
    lengths[1] = HEADER_STR_LEN_L;
    if(!put_nc_data((NcVar *)&obsVars.hdr_typ_var, (char *)hdr_typ_buf[0], lengths, offsets)) {
@@ -661,11 +780,12 @@ void write_nc_header_buffer(const NetcdfObsVars &obsVars, const int buf_size)
 
 void write_nc_obs_buffer(const NetcdfObsVars &obsVars, const int buf_size)
 {
-   const string method_name = "write_nc_obs_buffer()";
-   
    long offsets[2] = { obs_data_offset, 0 };
    long lengths[2] = { buf_size, 1} ;
+   const string method_name = "write_nc_obs_buffer()";
 
+   mlog << Debug(7) << "    " << method_name << "  buf_size: " << buf_size << "\n";
+   
    lengths[1] = HEADER_STR_LEN;
    if(!put_nc_data((NcVar *)&obsVars.obs_qty_var, (char*)qty_data_buf[0], lengths, offsets)) {
       mlog << Error << "\n" << method_name << " -> "
@@ -687,13 +807,22 @@ void write_nc_obs_buffer(const NetcdfObsVars &obsVars, const int buf_size)
       
 ///////////////////////////////////////////////////////////////////////////////
 
-bool write_nc_observations(const NetcdfObsVars &obsVars,
+int write_nc_observations(const NetcdfObsVars &obsVars,
                            const vector< Observation > observations)
 {
    int prev_hdr_idx = -1;
+   string prev_header_type = "";
+   string prev_station_id = "";
+   time_t prev_valid_time = 0;
+   double prev_latitude = bad_data_double;
+   double prev_longitude = bad_data_double;
+   double prev_elevation = bad_data_double;
+
    //float obs_arr[obs_arr_len];
-   
+   const string method_name = "write_nc_observations()";
+
    int obs_buf_size = observations.size();
+   mlog << Debug(7) << "    " << method_name << "  obs_count: " << obs_buf_size << "\n";
    if (obs_buf_size > OBS_BUFFER_SIZE) obs_buf_size = OBS_BUFFER_SIZE;
    
    obs_data_idx = 0;
@@ -708,14 +837,16 @@ bool write_nc_observations(const NetcdfObsVars &obsVars,
    {
       processed_count++;
       
+      //mlog << Debug(7) << "    " << method_name << "  obs->getHeaderIndex(): " << obs->getHeaderIndex() << "\n";
       if (obs->getHeaderIndex() != prev_hdr_idx) {
          prev_hdr_idx = obs->getHeaderIndex();
-         add_nc_header(obs->getHeaderType().c_str(),
-                       obs->getStationId().c_str(),
-                       obs->getValidTimeString().c_str(),
-                       obs->getLatitude(),
-                       obs->getLongitude(),
-                       obs->getElevation());
+         add_nc_header_to_buf(obsVars,
+                              obs->getHeaderType().c_str(),
+                              obs->getStationId().c_str(),
+                              obs->getValidTimeString().c_str(),
+                              obs->getLatitude(),
+                              obs->getLongitude(),
+                              obs->getElevation());
       }
       
       obs_arr[0] = obs->getHeaderIndex();
@@ -735,7 +866,10 @@ bool write_nc_observations(const NetcdfObsVars &obsVars,
       write_nc_obs_buffer(obsVars, obs_data_idx);
    }
 
-   write_nc_headers(obsVars);
-   
-   return true;
+   //write_nc_headers(obsars);
+   if (hdr_data_idx > 0) {
+      write_nc_header_buffer(obsVars, hdr_data_idx);
+   }
+
+   return processed_count;
 }

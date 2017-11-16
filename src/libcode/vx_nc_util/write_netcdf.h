@@ -33,15 +33,18 @@ static const float FILL_VALUE = -9999.f;
 ////////////////////////////////////////////////////////////////////////
 
 struct NetcdfObsVars {
+   bool  attr_agl    ;
+   bool  attr_pb2nc  ;
    bool  use_var_id  ;
-   int   hdr_len     ; // header array length (fixed dimension if hdr_len > 0)
-   int   hdr_str_len ; // header string length
+   int   hdr_cnt     ; // header array count (fixed dimension if hdr_cnt > 0)
+   
    NcDim strl_dim    ; // header string dimension
    NcDim strll_dim   ; // header string dimension (bigger dimension)
    NcDim hdr_arr_dim ; // Header array width
    NcDim obs_arr_dim ; // Observation array width
    NcDim obs_dim     ; // Observation array length
    NcDim hdr_dim     ; // Header array length
+   
    //NcDim var_dim     ;
    NcVar hdr_typ_var ; // Message type
    NcVar hdr_sid_var ; // Station ID
@@ -94,9 +97,12 @@ extern void add_and_write_nc_observation
      (const NetcdfObsVars &obsVars,
       const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
 
+extern long count_nc_headers   (vector< Observation > &observations);
+
 extern void create_nc_hdr_vars (NetcdfObsVars &obsVars, NcFile *, const int hdr_count, const int deflate_level=0);
 extern void create_nc_obs_vars (NetcdfObsVars &obsVars, NcFile *, const int deflate_level=0, const bool use_var_id=true);
 
+extern void init_nc_dims_vars  (NetcdfObsVars &obsVars, bool use_var_id = true);
 extern void read_nc_dims_vars  (NetcdfObsVars &obsVars, NcFile *);
 
 extern void reset_header_buffer(int buf_size);
@@ -104,7 +110,7 @@ extern void reset_header_buffer(int buf_size);
 extern void write_nc_headers        (const NetcdfObsVars &obsVars);
 extern void write_nc_header_buffer  (const NetcdfObsVars &obsVars, const int buf_size);
 extern void write_nc_obs_buffer     (const NetcdfObsVars &obsVars, const int buf_size);
-extern bool write_nc_observations   (const NetcdfObsVars &obsVars, const vector< Observation > observations);
+extern int  write_nc_observations   (const NetcdfObsVars &obsVars, const vector< Observation > observations);
       
 
 #endif   //  __WRITE_NETCDF_H__
