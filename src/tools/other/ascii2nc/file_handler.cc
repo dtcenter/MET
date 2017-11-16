@@ -29,11 +29,6 @@ using namespace std;
 #include "summary_calc_stdev.h"
 
 
-//const long FileHandler::HDR_ARRAY_LEN  = 3;  // Observation header length
-//const long FileHandler::OBS_ARRAY_LEN  = 5;  // Observation values length
-//const long FileHandler::MAX_STRING_LEN = 40; // Maximum length for strings
-                                             //   in the netCDF file
-
 const float FileHandler::FILL_VALUE = -9999.f;
 
 const int DEF_DEFALTE_LEVEL = 2;
@@ -198,7 +193,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 
   // Add variable names
   if (use_var_id) {
-    int max_name_len = MAX_STRING_LEN;
+    int max_name_len = HEADER_STR_LEN;
     char var_name[max_name_len];
     add_att(_ncFile, nc_att_use_var_id, "true");
     NcDim var_dim     = add_dim(_ncFile, nc_dim_nvar, (long)obs_names.n_elements());
@@ -654,62 +649,13 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    }
 
    //
-   // Define the NetCDF dimensions
+   // Define the NetCDF dimensions and variables
    //
-   NcDim strl_dim    = add_dim(_ncFile,  nc_dim_mxstr, MAX_STRING_LEN);
-   NcDim hdr_arr_dim = add_dim(_ncFile,nc_dim_hdr_arr, HDR_ARRAY_LEN);
-   NcDim obs_arr_dim = add_dim(_ncFile,nc_dim_obs_arr, OBS_ARRAY_LEN);
-   NcDim hdr_dim     = add_dim(_ncFile,nc_dim_nhdr, _nhdr);
-   NcDim obs_dim     = add_dim(_ncFile,nc_dim_nobs); // unlimited dimension
+   init_nc_dims_vars (obsVars, use_var_id);
+   obsVars.attr_agl   = true;
 
-   //
-   // Add variables to NetCDF file
-   //
-   //mlog << Debug(4) << "\nFileHandler::_openNetcdf() compression_level: " << deflate_level << "\n";
-   _hdrTypeVar      = add_var(_ncFile, "hdr_typ", ncChar,  hdr_dim, strl_dim,    deflate_level);
-   _hdrStationIdVar = add_var(_ncFile, "hdr_sid", ncChar,  hdr_dim, strl_dim,    deflate_level);
-   _hdrValidTimeVar = add_var(_ncFile, "hdr_vld", ncChar,  hdr_dim, strl_dim,    deflate_level);
-   _hdrArrayVar     = add_var(_ncFile, "hdr_arr", ncFloat, hdr_dim, hdr_arr_dim, deflate_level);
-   _obsQualityVar   = add_var(_ncFile, "obs_qty", ncChar,  obs_dim, strl_dim,    deflate_level);
-   _obsArrayVar     = add_var(_ncFile, "obs_arr", ncFloat, obs_dim, obs_arr_dim, deflate_level);
-
-   //
-   // Add attributes to the NetCDF variables
-   //
-
-   add_att(&_hdrTypeVar,"long_name", "message type");
-   add_att(&_hdrStationIdVar,"long_name", "station identification");
-   add_att(&_hdrValidTimeVar,"long_name", "valid time");
-   add_att(&_hdrValidTimeVar,"units", "YYYYMMDD_HHMMSS UTC");
-
-   add_att(&_hdrArrayVar, "long_name", "array of observation station header values");
-   add_att(&_hdrArrayVar, "missing_value", FILL_VALUE);
-   add_att(&_hdrArrayVar, "_FillValue", FILL_VALUE);
-   add_att(&_hdrArrayVar, "columns", "lat lon elv");
-   add_att(&_hdrArrayVar, "lat_long_name", "latitude");
-   add_att(&_hdrArrayVar, "lat_units", "degrees_north");
-   add_att(&_hdrArrayVar, "lon_long_name", "longitude");
-   add_att(&_hdrArrayVar, "lon_units", "degrees_east");
-   add_att(&_hdrArrayVar, "elv_long_name", "elevation ");
-   add_att(&_hdrArrayVar, "elv_units", "meters above sea level (msl)");
-
-   add_att(&_obsQualityVar, "long_name", "quality flag");
-
-   add_att(&_obsArrayVar, "long_name", "array of observation values");
-   add_att(&_obsArrayVar, "missing_value", FILL_VALUE);
-   add_att(&_obsArrayVar, "_FillValue", FILL_VALUE);
-   add_att(&_obsArrayVar, "hdr_id_long_name", "index of matching header data");
-   if (use_var_id) {
-      add_att(&_obsArrayVar, "columns", "hdr_id var_id lvl hgt ob");
-      add_att(&_obsArrayVar, "var_id_long_name", "index of variable names at var_name");
-   }
-   else {
-      add_att(&_obsArrayVar, "columns", "hdr_id gc lvl hgt ob");
-      add_att(&_obsArrayVar, "gc_long_name", "grib code corresponding to the observation type");
-   }
-   add_att(&_obsArrayVar, "lvl_long_name", "pressure level (hPa) or accumulation interval (sec)");
-   add_att(&_obsArrayVar, "hgt_long_name", "height in meters above sea level or ground level (msl or agl)");
-   add_att(&_obsArrayVar, "ob_long_name", "observation value");
+   create_nc_hdr_vars(obsVars, _ncFile, _nhdr, deflate_level);
+   create_nc_obs_vars(obsVars, _ncFile, deflate_level, use_var_id);
 
    //
    // Add global attributes
@@ -750,11 +696,11 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    hdr_arr_buf[hdr_data_idx][1] = lon;
    hdr_arr_buf[hdr_data_idx][2] = elv;
 
-   if(hdr_sid.length() > MAX_STRING_LEN) {
+   if(hdr_sid.length() > HEADER_STR_LEN) {
       mlog << Warning << "\nFileHandler::_writeHdrInfo() -> "
-           << "only writing the first " << MAX_STRING_LEN
+           << "only writing the first " << HEADER_STR_LEN
            << " of station id: " << hdr_sid << "\n\n";
-      hdr_sid_len = MAX_STRING_LEN;
+      hdr_sid_len = HEADER_STR_LEN;
    }
    else {
       hdr_sid_len = hdr_sid.length();
@@ -772,7 +718,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    hdr_sid_buf[hdr_data_idx][hdr_sid_len] = bad_data_char;
    strncpy(&hdr_vld_buf[hdr_data_idx][0], hdr_vld, hdr_vld.length());
    hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
-   for (int j=hdr_typ.length(); j<MAX_STRING_LEN; j++)
+   for (int j=hdr_typ.length(); j<HEADER_STR_LEN_L; j++)
        hdr_typ_buf[hdr_data_idx][j] = bad_data_char;
 
    hdr_data_idx++;
@@ -785,24 +731,27 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    if (save_nc) {
 
       long offsets[2] = { hdr_data_offset, 0 };
-      long lengths[2] = { hdr_buf_size, MAX_STRING_LEN };
+      long lengths[2] = { hdr_buf_size, HEADER_STR_LEN };
 
       hdr_data_offset += hdr_buf_size;
 
       //
       // Store the message type
       //
-      if(!put_nc_data(&_hdrTypeVar, (char *)&hdr_typ_buf[0], lengths, offsets)) {
+      lengths[1] = HEADER_STR_LEN_L;
+      if(!put_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_buf[0], lengths, offsets)) {
          mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
               << "error writing the message type to the NetCDF file\n\n";
          return false;
       }
 
+      lengths[1] = HEADER_STR_LEN;
+      
       //
       // Store the station id
       //
 
-      if(!put_nc_data(&_hdrStationIdVar, (char *)&hdr_sid_buf[0], lengths, offsets)) {
+      if(!put_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_buf[0], lengths, offsets)) {
          mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
               << "error writing the station id to the NetCDF file\n\n";
          return false;
@@ -812,7 +761,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
       // Store the valid time and check that it's is in the expected
       // time format: YYYYMMDD_HHMMSS
       //
-      if(!put_nc_data(&_hdrValidTimeVar, (char *)&hdr_vld_buf[0], lengths, offsets)) {
+      if(!put_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_buf[0], lengths, offsets)) {
          mlog << Error << "\nFileHandler::_nwriteHdrInfo() -> "
               << "error writing the valid time to the NetCDF file\n\n";
          return false;
@@ -822,7 +771,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
       // Store the header array
       //
       lengths[1] = HDR_ARRAY_LEN;
-      if(!put_nc_data(&_hdrArrayVar, (float *)&hdr_arr_buf[0], lengths, offsets) ) {
+      if(!put_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_buf[0], lengths, offsets) ) {
          mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
               << "error writing the header array to the NetCDF file\n\n";
          return false;
@@ -877,7 +826,7 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
       //
       // Write the observation array
       //
-      if(!put_nc_data(&_obsArrayVar, (float *)obs_data_buf, lengths, offsets) ) {
+      if(!put_nc_data(&obsVars.obs_arr_var, (float *)obs_data_buf, lengths, offsets) ) {
          mlog << Error << "\nFileHandler::_writeObsInfo() -> "
               << "error writing the observation array to the NetCDF file\n\n";
          return false;
@@ -886,8 +835,8 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
       //
       // Write the observation QC flag, resetting an empty string to NA
       //
-      lengths[1] = MAX_STRING_LEN;
-      if(!put_nc_data(&_obsQualityVar, (char *)qty_data_buf, lengths, offsets) ) {
+      lengths[1] = HEADER_STR_LEN;
+      if(!put_nc_data(&obsVars.obs_qty_var, (char *)qty_data_buf, lengths, offsets) ) {
          mlog << Error << "\nFileHandler::_writeObsInfo() -> "
               << "error writing the quality flag to the NetCDF file\n\n";
          return false;
