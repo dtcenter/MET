@@ -514,7 +514,7 @@ void create_nc_obs_vars (NetcdfObsVars &obsVars, NcFile *f_out, const int deflat
       if (obsVars.attr_pb2nc) {
          add_att(&obsVars.obs_arr_var, "var_id_long_name", "index of BUFR variable corresponding to the observation type");
       } else {
-         add_att(&obsVars.obs_arr_var, "var_id_long_name", "index of variable corresponding to the observation type");
+         add_att(&obsVars.obs_arr_var, "var_id_long_name", "index of variable names at var_name");
       }
    }
    else {
