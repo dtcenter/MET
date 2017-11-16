@@ -21,27 +21,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char mxstr_dim_name          [] = "mxstr";
-static const int  mxstr_dim_size             = 40;
-
-static const char hdr_arr_len_dim_name    [] = "hdr_arr_len";
-static const int  hdr_arr_len_dim_size       = 3;
-
-static const char obs_arr_len_dim_name    [] = "obs_arr_len";
-
 static const int  n_obs_types                = 5;  //  layer base, layer top, opacity, cad score, feature classification
 
-static const char nhdr_dim_name           [] = "nhdr";
-static const char nobs_dim_name           [] = "nobs";
-
 static const char hdr_typ_string          [] = "calipso";
-
-static const char hdr_typ_var_name        [] = "hdr_typ";
-static const char hdr_sid_var_name        [] = "hdr_sid";
-static const char hdr_vld_var_name        [] = "hdr_vld";
-static const char hdr_arr_var_name        [] = "hdr_arr";
-static const char obs_qty_var_name        [] = "obs_qty";
-static const char obs_arr_var_name        [] = "obs_arr";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,6 +72,7 @@ static CommandLine cline;
 
 static const int na_len = strlen(na_str);
 
+static NetcdfObsVars obsVars;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,9 +96,9 @@ static void set_outfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
 static void set_compress  (const StringArray &);
 
-static void process_calipso_file (NcFile &, const char * filename);
+static void process_calipso_file (NcFile *, const char * filename);
 
-static void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value = -1);
+static void write_nc_record(NcFile * out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value = -1);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +140,7 @@ if ( output_filename.empty() )  usage();
    //  open the output file
    //
 
-static NcFile ncf(output_filename.text(), NcFile::replace, NcFile::nc4);
+static NcFile *ncf = open_ncfile(output_filename.text(), true);
 
    //
    //  process the lidar file
@@ -309,7 +292,7 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-void process_calipso_file(NcFile & out, const char * filename)
+void process_calipso_file(NcFile * out, const char * filename)
 
 {
 
@@ -357,14 +340,14 @@ const int nhdr_dim_size = n_data;
    //  see how big a buffer we'll need
    //
 
-const int hdr_typ_bytes = nhdr_dim_size*mxstr_dim_size;
-const int hdr_sid_bytes = nhdr_dim_size*mxstr_dim_size;
-const int hdr_vld_bytes = nhdr_dim_size*mxstr_dim_size;
-const int hdr_arr_bytes = nhdr_dim_size*hdr_arr_len_dim_size*sizeof(float);
+const int hdr_typ_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
+const int hdr_sid_bytes = nhdr_dim_size*HEADER_STR_LEN;
+const int hdr_vld_bytes = nhdr_dim_size*HEADER_STR_LEN;
+const int hdr_arr_bytes = nhdr_dim_size*HDR_ARRAY_LEN*sizeof(float);
 
-int buf_size = hdr_typ_bytes;
+int buf_size      = hdr_sid_bytes;
+int buf_size_type = hdr_typ_bytes;
 
-buf_size = max<int>(buf_size, hdr_sid_bytes);
 buf_size = max<int>(buf_size, hdr_vld_bytes);
 buf_size = max<int>(buf_size, hdr_arr_bytes);
 
@@ -376,144 +359,18 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    //  add some dimensions to the netcdf file
    //
 
-NcDim mxstr_dim;
-NcDim hdr_arr_len_dim;
-NcDim obs_arr_len_dim;
-NcDim nhdr_dim;
-NcDim nobs_dim;
-
-
-out.addDim(mxstr_dim_name,       mxstr_dim_size);
-out.addDim(hdr_arr_len_dim_name, hdr_arr_len_dim_size);
-out.addDim(obs_arr_len_dim_name, n_obs_types);
-out.addDim(nhdr_dim_name,        n_data);
-
-out.addDim(nobs_dim_name);                  //  unlimited
-
-mxstr_dim       = out.getDim(mxstr_dim_name);
-hdr_arr_len_dim = out.getDim(hdr_arr_len_dim_name);
-obs_arr_len_dim = out.getDim(obs_arr_len_dim_name);
-nhdr_dim        = out.getDim(nhdr_dim_name);
-nobs_dim        = out.getDim(nobs_dim_name);
+   int deflate_level = compress_level;
+   if (deflate_level < 0) deflate_level = 0;
 
    //
    //  add the variables to the netcdf file
    //
 
-vector<NcDim> dims;
-NcVar hdr_typ_var;
-NcVar hdr_sid_var;
-NcVar hdr_vld_var;
-NcVar hdr_arr_var;
-NcVar obs_qty_var;
-NcVar obs_arr_var;
-
-
-dims.resize(2);
-
-
-    /////////////////////////////////////
-
-       //
-       //  hdr type variable
-       //
-
-dims.at(0) = nhdr_dim;
-dims.at(1) = mxstr_dim;
-
-out.addVar(hdr_typ_var_name, NcType::nc_CHAR, dims);
-
-hdr_typ_var = out.getVar(hdr_typ_var_name);
-
-(void) hdr_typ_var.putAtt(string("long_name"), string("message type"));
-
-    /////////////////////////////////////
-
-       //
-       //  hdr sid variable
-       //
-
-out.addVar(hdr_sid_var_name, NcType::nc_CHAR, dims);
-
-hdr_sid_var = out.getVar(hdr_sid_var_name);
-
-(void) hdr_sid_var.putAtt(string("long_name"), string("station identification"));   //  we pause now for ...
-
-    /////////////////////////////////////
-
-       //
-       //  hdr vld variable
-       //
-
-out.addVar(hdr_vld_var_name, NcType::nc_CHAR, dims);
-
-hdr_vld_var = out.getVar(hdr_vld_var_name);
-
-(void) hdr_vld_var.putAtt(string("long_name"), string("valid time"));
-
-(void) hdr_vld_var.putAtt(string("units"), string("YYYYMMDD_HHMMS UTC"));
-
-    /////////////////////////////////////
-
-       //
-       //  hdr arr variable
-       //
-
-dims.at(0) = nhdr_dim;
-dims.at(1) = hdr_arr_len_dim;
-
-out.addVar(hdr_arr_var_name, NcType::nc_FLOAT, dims);
-
-hdr_arr_var = out.getVar(hdr_arr_var_name);
-
-(void) hdr_arr_var.putAtt(string("long_name"),      string("array of observation station header values"));
-(void) hdr_arr_var.putAtt(string("missing_value"),  NcType::nc_FLOAT, FILL_VALUE);
-(void) hdr_arr_var.putAtt(string("_FillValue"),     NcType::nc_FLOAT, FILL_VALUE);
-(void) hdr_arr_var.putAtt(string("columns"),        string("lat lon elv"));
-(void) hdr_arr_var.putAtt(string("lat_long_name"),  string("latitude"));
-(void) hdr_arr_var.putAtt(string("lat_units"),      string("degrees_north"));
-(void) hdr_arr_var.putAtt(string("lon_long_name"),  string("longitude"));
-(void) hdr_arr_var.putAtt(string("lon_units"),      string("degrees_east"));
-(void) hdr_arr_var.putAtt(string("elev_long_name"), string("elevation"));
-(void) hdr_arr_var.putAtt(string("elev_units"),     string("meters above sea level (msl)"));
-
-    /////////////////////////////////////
-
-       //
-       //  obs qty variable
-       //
-
-dims.at(0) = nobs_dim;
-dims.at(1) = mxstr_dim;
-
-out.addVar(obs_qty_var_name, NcType::nc_CHAR, dims);
-
-obs_qty_var = out.getVar(obs_qty_var_name);
-
-(void) obs_qty_var.putAtt(string("long_name"), string("quality flag"));
-
-    /////////////////////////////////////
-
-       //
-       //  obs arr variable
-       //
-
-dims.at(0) = nobs_dim;
-dims.at(1) = obs_arr_len_dim;
-
-out.addVar(obs_arr_var_name, NcType::nc_FLOAT, dims);
-
-obs_arr_var = out.getVar(obs_arr_var_name);
-
-(void) obs_arr_var.putAtt(string("long_name"),        string("array of observation values"));
-(void) obs_arr_var.putAtt(string("missing_value"),    NcType::nc_FLOAT, FILL_VALUE);
-(void) obs_arr_var.putAtt(string("_FillValue"),       NcType::nc_FLOAT, FILL_VALUE);
-(void) obs_arr_var.putAtt(string("columns"),          string("hdr_id gc lvl hgt ob"));
-(void) obs_arr_var.putAtt(string("hdr_id_long_name"), string("index of matching header data"));
-(void) obs_arr_var.putAtt(string("gc_long_name"),     string("grib code corresponding to the observation type"));
-(void) obs_arr_var.putAtt(string("lvl_long_name"),    string("pressure level (hPa) or accumulation interval (sec)"));
-(void) obs_arr_var.putAtt(string("hgt_long_name"),    string("height in meters above sea level or ground level (msl or agl)"));
-(void) obs_arr_var.putAtt(string("ob_long_name"),     string("observation value"));
+   bool use_var_id = false;
+   init_nc_dims_vars (obsVars, use_var_id);
+   obsVars.attr_agl = true;
+   create_nc_hdr_vars(obsVars, out, n_data, deflate_level);
+   create_nc_obs_vars(obsVars, out, deflate_level, use_var_id);
 
    //
    //  global attributes for netcdf output file
@@ -522,7 +379,7 @@ obs_arr_var = out.getVar(obs_arr_var_name);
 const unixtime now = time(0);
 int month, day, year, hour, minute, second;
 ConcatString s;
-char junk [1 + mxstr_dim_size];
+char junk [1 + HEADER_STR_LEN];
 
 unix_to_mdyhms(now, month, day, year, hour, minute, second);
 
@@ -538,21 +395,21 @@ memset(junk, 0, sizeof(junk));
 if ( gethostname(junk, sizeof(junk) - 1) < 0 )  s << " on unknown host";
 else                                            s << " on host " << junk;
 
-(void) out.putAtt(string("FileOrigins"), string( s.text() ));
-(void) out.putAtt(string("MET_version"), string( met_version ));
-(void) out.putAtt(string("MET_tool"),    string(program_name.text()));
+(void) out->putAtt(string("FileOrigins"), string( s.text() ));
+(void) out->putAtt(string("MET_version"), string( met_version ));
+(void) out->putAtt(string("MET_tool"),    string(program_name.text()));
 
    //
    //  allocate the buffer
    //
 
-unsigned char * buf = 0;
+unsigned char * buf   = 0;
 
-buf = new unsigned char [buf_size];
+buf   = new unsigned char [buf_size];
 
 char  * const cbuf = (char *)  buf;
 float * const fbuf = (float *) buf;
-
+char  * cbuf_l     = new char [buf_size_type];
 
 mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
@@ -561,15 +418,15 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
    //  populate the hdr_typ variable
    //
 
-memset(buf, 0, buf_size);
+memset(cbuf_l, 0, buf_size_type);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*mxstr_dim_size, hdr_typ_string);
+   strcpy(cbuf_l + j*HEADER_STR_LEN_L, hdr_typ_string);
 
 }
 
-hdr_typ_var.putVar(cbuf);
+obsVars.hdr_typ_var.putVar(cbuf_l);
 
    //
    //  populate the hdr_sid variable
@@ -579,11 +436,11 @@ memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*mxstr_dim_size, na_str);
+   strcpy(cbuf + j*HEADER_STR_LEN, na_str);
 
 }
 
-hdr_sid_var.putVar(cbuf);
+obsVars.hdr_sid_var.putVar(cbuf);
 
    //
    //  populate the obs_qty variable
@@ -593,7 +450,7 @@ memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*mxstr_dim_size, na_str);
+   strcpy(cbuf + j*HEADER_STR_LEN, na_str);
 
 }
 
@@ -604,6 +461,7 @@ obs_qty_var.putVar(cbuf);
    //
 
 float ff[2];
+int hdr_offset = 0;
 
 memset(buf, 0, buf_size);
 
@@ -611,15 +469,19 @@ for (j=0; j<n_data; ++j)  {
 
    hdf_5km.get_latlon(j, ff[0], ff[1]);
 
-   fbuf[hdr_arr_len_dim_size*j]     = ff[0];   //  latitude
+   //hdr_offset = HDR_ARRAY_LEN*j;
+   
+   fbuf[hdr_offset]     = ff[0];   //  latitude
 
-   fbuf[hdr_arr_len_dim_size*j + 1] = ff[1];   //  longitude
+   fbuf[hdr_offset + 1] = ff[1];   //  longitude
 
-   fbuf[hdr_arr_len_dim_size*j + 2] = FILL_VALUE;
+   fbuf[hdr_offset + 2] = FILL_VALUE;
+   
+   hdr_offset += HDR_ARRAY_LEN;
 
 }   //  for j
 
-hdr_arr_var.putVar(fbuf);
+obsVars.hdr_arr_var.putVar(fbuf);
 
    //
    //  populate the hdr_vld variable
@@ -653,11 +515,11 @@ for (j=0; j<n_data; ++j)  {
             "%04d%02d%02d_%02d%02d%02d",
              year, month, day, hour, minute, second);
 
-   strcpy(cbuf + j*mxstr_dim_size, junk);
+   strcpy(cbuf + j*HEADER_STR_LEN, junk);
 
 }   //  for j
 
-hdr_vld_var.putVar(cbuf);
+obsVars.hdr_vld_var.putVar(cbuf);
 
    //
    //  populate the obs_arr variable
@@ -669,6 +531,9 @@ memset(buf, 0, buf_size);
 
 float f[5];
 int qc_value;
+
+NcVar obs_arr_var = obsVars.obs_arr_var;
+NcVar obs_qty_var = obsVars.obs_qty_var;
 
 for (j=0; j<n_data; ++j)  {
 
@@ -756,7 +621,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_nc_record(NcFile & out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value)
+void write_nc_record(NcFile * out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value)
 
 {
 
@@ -784,7 +649,7 @@ obs_arr_var.putVar(index, count, f);
    //  write obs_qty record
    //
 
-char junk[mxstr_dim_size];
+char junk[HEADER_STR_LEN];
 
 
 index.at(0) = pos;
