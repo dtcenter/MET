@@ -22,6 +22,7 @@ using namespace std;
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_data2d_grib.h"
+#include "vx_gsl_prob.h"
 #include "vx_util.h"
 #include "vx_grid.h"
 #include "vx_math.h"
@@ -154,9 +155,8 @@ bool PairDataPoint::add_pair(double f, double o, double cmn, double csd,
 
    f_na.add(f);
    o_na.add(o);
-   cmn_na.add(cmn);
-   csd_na.add(csd);
    wgt_na.add(w);
+   add_climo(o, cmn, csd);
    n_obs++;
 
    return(true);
@@ -192,9 +192,11 @@ bool PairDataPoint::add_pair(const NumArray f_in,   const NumArray o_in,
 
    f_na.add(f_in);
    o_na.add(o_in);
-   cmn_na.add(cmn_in);
-   csd_na.add(csd_in);
    wgt_na.add(w_in);
+
+   for(int i=0; i<o_in.n_elements(); i++) {
+      add_climo(o_in[i], cmn_in[i], csd_in[i]);
+   }
 
    // Increment the number of pairs
    n_obs += o_in.n_elements();
@@ -1213,6 +1215,69 @@ bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
       is_bad_data(c_na.max())) return(false);
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
+                           const SingleThresh &othresh) {
+   int i, n_mn, n_sd;
+   double prob;
+   NumArray climo_prob;
+
+   // Number of valid climo mean and standard deviation
+   n_mn = mn_na.n_valid();
+   n_sd = sd_na.n_valid();
+
+   // If both mean and standard deviation were provided, use them to
+   // derive normal climatological probabilities for the current event
+   // threshold
+   if(n_mn > 0 && n_sd > 0) {
+
+      mlog << Debug(2)
+           << "Deriving normal approximation of climatological "
+           << "probabilities for threshold " << othresh.get_str()
+           << ".\n";
+
+      // Compute probability value for each point
+      for(i=0; i<mn_na.n_elements(); i++) {
+
+         prob = normal_cdf(othresh.get_value(), mn_na[i], sd_na[i]);
+
+         // Handle greater-than probabilities
+         if(!is_bad_data(prob) &&
+            othresh.get_type() == thresh_gt ||
+            othresh.get_type() == thresh_ge) {
+            prob = 1.0 - prob;
+         }
+         climo_prob.add(prob);
+      }
+   }
+   // If only climatological mean was provided, it should already
+   // contain probabilities.  Range check the data to be sure.
+   else {
+
+      // Range check climatological probability mean values
+      if(n_mn > 0 && n_sd == 0) {
+         if(mn_na.min() < 0.0 || mn_na.max() > 1.0) {
+            mlog << Error << "\nderive_climo_prob() -> "
+                 << "The range of climatological probability values ["
+                 << mn_na.min() << ", " << mn_na.max() << "] falls "
+                 << "outside the expected range of [0, 1].\n"
+                 << "When verifying a probabilistic forecast using "
+                 << "climatology data, either supply a probabilistic\n"
+                 << "climo_mean field or non-probabilistic climo_mean "
+                 << "and climo_stdev fields from which a normal\n"
+                 << "approximation of the climatological probabilities "
+                 << "should be derived.\n\n";
+            exit(1);
+         }
+      }
+
+      climo_prob = mn_na;
+   }
+
+   return(climo_prob);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -234,6 +234,9 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
 
 extern bool   set_climo_flag(const NumArray &, const NumArray &);
 
+NumArray      derive_climo_prob(const NumArray &, const NumArray &,
+                                const SingleThresh &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   // __PAIR_DATA_POINT_H__
