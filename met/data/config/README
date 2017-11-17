@@ -717,6 +717,22 @@ climo_cdf_bins = 1;
 climo_cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
 
 //
+// The binned climatology logic described above is applied only when verifying
+// probability forecasts.  When specifying climatology data for probability
+// forecasts, either supply a probabilistic climo_mean field or
+// non-probabilistic climo_mean and climo_stdev fields from which a normal
+// approximation of the climatological probabilities should be derived.
+//
+// When climo_mean is set to a probability field with a range of [0, 1] and
+// climo_stdev is unset, the MET tools use the climo_mean probability values
+// directly to compute Brier Skill Score (BSS).
+//
+// When climo_mean and climo_stdev are both set to non-probability fields, the
+// MET tools use the mean, standard deviation, and observation event threshold
+// to derive a normal approximation of the climatological probabilities.  Those
+// derived probability values are used to compute BSS.
+//
+
 // The "mask_missing_flag" entry specifies how missing data should be handled
 // in the Wavelet-Stat and MODE tools:
 //    - "NONE" to perform no masking of missing data
