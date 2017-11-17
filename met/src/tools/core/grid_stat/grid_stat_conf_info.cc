@@ -91,7 +91,6 @@ void GridStatConfInfo::clear() {
    regrid_info.clear();
    desc.clear();
    climo_cdf_ta.clear();
-   write_cdf_bins = true;
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -251,9 +250,6 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
 
    // Conf: climo_cdf_bins
    climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
-
-   // Conf: write_cdf_bins
-   write_cdf_bins = conf.lookup_bool(conf_key_write_cdf_bins);
 
    // Allocate space based on the number of verification tasks
    fcst_info   = new VarInfo *   [n_vx];
@@ -693,17 +689,8 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int GridStatConfInfo::get_n_climo_bins() const {
-   return(write_cdf_bins ? climo_cdf_ta.n_elements() - 1 : 1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 int GridStatConfInfo::n_txt_row(int i_txt_row) {
-   int n, n_climo_bins;
-
-   // Determine the number of climatology CDF bins to be written
-   n_climo_bins = get_n_climo_bins();
+   int n;
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -793,7 +780,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          //    Fields * Masks * Smoothing Methods * Max Thresholds *
          //    Climo Bins
          n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
-             n_climo_bins;
+             get_n_cdf_bin();
          break;
 
       case(i_pstd):
@@ -801,7 +788,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
          //    Fields * Masks * Smoothing Methods * Max Thresholds *
          //    Alphas * Climo Bins
          n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
-             get_n_ci_alpha() * n_climo_bins;
+             get_n_ci_alpha() * get_n_cdf_bin();
          break;
 
       case(i_eclv):
