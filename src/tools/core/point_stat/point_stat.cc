@@ -80,7 +80,7 @@
 //   033    02/27/17  Halley Gotway  Add HiRA verification.
 //   034    05/15/17  Prestopnik P   Add shape for HiRA, interp and regrid.
 //   035    06/16/17  Halley Gotway  Add ECLV line type.
-//   037    09/08/17  Halley Gotway  Add climatological bins.
+//   036    11/01/17  Halley Gotway  Add binned climatologies.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,7 +128,7 @@ static void do_mcts (MCTSInfo   &, int, PairDataPoint *);
 static void do_cnt  (CNTInfo   *&, int, PairDataPoint *);
 static void do_sl1l2(SL1L2Info *&, int, PairDataPoint *);
 static void do_vl1l2(VL1L2Info *&, int, PairDataPoint *, PairDataPoint *);
-static void do_pct  (PCTInfo   *&, int, PairDataPoint *);
+static void do_pct  (PCTInfo   *&, int, PairDataPoint *, int i_bin);
 static void do_hira (              int, PairDataPoint *);
 
 static void finish_txt_files();
@@ -693,7 +693,7 @@ void process_obs_file(int i_nc) {
    int strl_len  = get_dim_size(&obsVars.strl_dim);
    int strll_len = strl_len;
    if (!IS_INVALID_NC(obsVars.strll_dim)) strll_len = get_dim_size(&obsVars.strll_dim);
-   
+
    mlog << Debug(2)
         << "Searching " << obs_count
         << " observations from " << hdr_count
@@ -1025,8 +1025,9 @@ void process_obs_file(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, j, k, l, m;
-   int n_cat, n_cnt, n_wind, n_prob;
+   int i, j, k, l, m, n;
+   int n_cat, n_cnt, n_wind, n_prob, n_cdf_bin;
+   ConcatString cs;
 
    // Initialize pointers
    PairDataPoint *pd_ptr     = (PairDataPoint *) 0;
@@ -1366,55 +1367,72 @@ void process_scores() {
                   // Initialize
                   for(m=0; m<n_prob; m++) pct_info[m].clear();
 
-                  // Compute PCT
-                  do_pct(pct_info, i, pd_ptr);
+                  // Determine the number of climo bins to process
+                  n_cdf_bin = (pd_ptr->cdf_na.n_valid() > 0 ?
+                               conf_info.get_n_cdf_bin() : 1);
 
-                  // Loop through all of the thresholds
-                  for(m=0; m<n_prob; m++) {
+                  // Loop over the climo_cdf_bins
+                  for(m=0; m<n_cdf_bin; m++) {
 
-                     if(pct_info[m].pct.n() == 0) continue;
+                     // Store the verification masking region
+                     cs = conf_info.mask_name[k];
+                     if(n_cdf_bin > 1) cs << "_BIN" << m+1;
+                     shc.set_mask(cs);
 
-                     // Write out PCT
-                     if(conf_info.output_flag[i_pct] != STATOutputType_None) {
-                        write_pct_row(shc, pct_info[m],
-                           conf_info.output_flag[i_pct] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_pct], i_txt_row[i_pct]);
-                     }
+                     // Compute PCT
+                     do_pct(pct_info, i, pd_ptr,
+                            (n_cdf_bin > 1 ? m : bad_data_int));
 
-                     // Write out PSTD
-                     if(conf_info.output_flag[i_pstd] != STATOutputType_None) {
-                        write_pstd_row(shc, pct_info[m],
-                           conf_info.output_flag[i_pstd] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_pstd], i_txt_row[i_pstd]);
-                     }
+                     // Loop through all of the thresholds
+                     for(n=0; n<n_prob; n++) {
 
-                     // Write out PJC
-                     if(conf_info.output_flag[i_pjc] != STATOutputType_None) {
-                        write_pjc_row(shc, pct_info[m],
-                           conf_info.output_flag[i_pjc] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_pjc], i_txt_row[i_pjc]);
-                     }
+                        if(pct_info[n].pct.n() == 0) continue;
 
-                     // Write out PRC
-                     if(conf_info.output_flag[i_prc] != STATOutputType_None) {
-                        write_prc_row(shc, pct_info[m],
-                           conf_info.output_flag[i_prc] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_prc], i_txt_row[i_prc]);
-                     }
+                        // Write out PCT
+                        if(conf_info.output_flag[i_pct] != STATOutputType_None) {
+                           write_pct_row(shc, pct_info[n],
+                              conf_info.output_flag[i_pct] == STATOutputType_Both,
+                              stat_at, i_stat_row,
+                              txt_at[i_pct], i_txt_row[i_pct]);
+                        }
 
-                     // Write out ECLV
-                     if(conf_info.output_flag[i_eclv] != STATOutputType_None) {
-                        write_eclv_row(shc, pct_info[m], conf_info.eclv_points[i],
-                           conf_info.output_flag[i_eclv] == STATOutputType_Both,
-                           stat_at, i_stat_row,
-                           txt_at[i_eclv], i_txt_row[i_eclv]);
-                     }
+                        // Write out PSTD
+                        if(conf_info.output_flag[i_pstd] != STATOutputType_None) {
+                           write_pstd_row(shc, pct_info[n],
+                              conf_info.output_flag[i_pstd] == STATOutputType_Both,
+                              stat_at, i_stat_row,
+                              txt_at[i_pstd], i_txt_row[i_pstd]);
+                        }
+
+                        // Write out PJC
+                        if(conf_info.output_flag[i_pjc] != STATOutputType_None) {
+                           write_pjc_row(shc, pct_info[n],
+                              conf_info.output_flag[i_pjc] == STATOutputType_Both,
+                              stat_at, i_stat_row,
+                              txt_at[i_pjc], i_txt_row[i_pjc]);
+                        }
+
+                        // Write out PRC
+                        if(conf_info.output_flag[i_prc] != STATOutputType_None) {
+                           write_prc_row(shc, pct_info[n],
+                              conf_info.output_flag[i_prc] == STATOutputType_Both,
+                              stat_at, i_stat_row,
+                              txt_at[i_prc], i_txt_row[i_prc]);
+                        }
+
+                        // Write out ECLV
+                        if(conf_info.output_flag[i_eclv] != STATOutputType_None) {
+                           write_eclv_row(shc, pct_info[n], conf_info.eclv_points[i],
+                              conf_info.output_flag[i_eclv] == STATOutputType_Both,
+                              stat_at, i_stat_row,
+                              txt_at[i_eclv], i_txt_row[i_eclv]);
+                        }
+                     } // end for n
                   } // end for m
                } // end Compute PCT
+
+               // Reset the verification masking region
+               shc.set_mask(conf_info.mask_name[k]);
 
             } // end for l
 
@@ -1697,11 +1715,30 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr) {
+void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr,
+            int i_bin) {
    int i, j, n_pct;
+   PairDataPoint pd_bin;
+   NumArray climo_prob;
 
-   mlog << Debug(2)
-        << "Computing Probabilistic Statistics.\n";
+   // No binned climatology
+   if(is_bad_data(i_bin)) {
+      mlog << Debug(2)
+           << "Computing Probabilistic Statistics.\n";
+   }
+   // Binned climatology
+   else {
+      mlog << Debug(2)
+           << "Computing Probabilistic Statistics "
+           << "for climo CDF bin number " << i_bin+1 << " of "
+           << conf_info.get_n_cdf_bin() << " ("
+           << conf_info.climo_cdf_ta[i_bin].get_str() << ").\n";
+
+      // Subset the matched pairs for the current bin
+      pd_bin = subset_climo_cdf_bin(*pd_ptr, conf_info.climo_cdf_ta,
+                                    i_bin);
+      pd_ptr = &pd_bin;
+   }
 
    //
    // If there are no matched pairs to process, return
@@ -1728,10 +1765,17 @@ void do_pct(PCTInfo *&pct_info, int i_vx, PairDataPoint *pd_ptr) {
       }
 
       //
+      // Derive the climo probabilities
+      //
+      climo_prob = derive_climo_prob(pd_ptr->cmn_na, pd_ptr->csd_na,
+                                     conf_info.ocat_ta[i_vx][i]);
+
+      //
       // Compute the probabilistic counts and statistics
       //
-      compute_pctinfo(pd_ptr->f_na, pd_ptr->o_na, pd_ptr->cmn_na,
-            conf_info.output_flag[i_pstd], pct_info[i]);
+      compute_pctinfo(pd_ptr->f_na, pd_ptr->o_na, climo_prob,
+         conf_info.output_flag[i_pstd], pct_info[i]);
+
    } // end for i
 
    return;
