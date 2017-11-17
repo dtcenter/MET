@@ -524,7 +524,7 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
    SingleThresh thr_lo, thr_hi;
    thr_lo.set(thresh_lo, is_bad_data(thresh_lo) ? thresh_na : thresh_gt);
    set_p_thresh_lo(thr_lo);
-   thr_hi.set(thresh_hi, is_bad_data(thresh_hi) ? thresh_na : thresh_gt);
+   thr_hi.set(thresh_hi, is_bad_data(thresh_hi) ? thresh_na : thresh_lt);
    set_p_thresh_hi(thr_hi);
 
    //  if the prob field name is APCP, apply additional formatting
