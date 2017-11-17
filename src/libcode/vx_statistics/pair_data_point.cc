@@ -1151,6 +1151,59 @@ PairDataPoint subset_pairs(const PairDataPoint &pd,
 
 ////////////////////////////////////////////////////////////////////////
 
+PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
+                                   const ThreshArray &ta, int i_bin) {
+
+   // Check for no work to be done
+   if(ta.n_elements() == 0) return(pd);
+
+   int i;
+   PairDataPoint out_pd;
+
+   // Allocate memory for output pairs
+   out_pd.extend(pd.n_obs);
+
+   bool cflag = set_climo_flag(pd.f_na, pd.cmn_na);
+   bool wflag = set_climo_flag(pd.f_na, pd.wgt_na);
+
+   // Loop over the pairs
+   for(i=0; i<pd.n_obs; i++) {
+
+      // Check for bad data
+      if(is_bad_data(pd.f_na[i]) ||
+         is_bad_data(pd.o_na[i]) ||
+         (cflag && is_bad_data(pd.cmn_na[i])) ||
+         (wflag && is_bad_data(pd.wgt_na[i]))) continue;
+
+      // Keep pairs for the current bin.
+      // check_bins() returns a 1-based bin value.
+      if(ta.check_bins(pd.cdf_na[i]) == (i_bin + 1)) {
+
+         // Handle point data
+         if(pd.sid_sa.n_elements() == pd.n_obs) {
+            out_pd.add_pair(pd.sid_sa[i], pd.lat_na[i], pd.lon_na[i],
+                            pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
+                            pd.lvl_na[i], pd.elv_na[i],
+                            pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i],
+                            pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+         }
+         // Handle gridded data
+         else {
+            out_pd.add_pair(pd.f_na[i], pd.o_na[i],
+                            pd.cmn_na[i], pd.wgt_na[i]);
+         }
+      }
+   } // end for
+
+   mlog << Debug(3)
+        << "Using " << out_pd.n_obs << " of " << pd.n_obs
+        << " pairs for climatology bin number " << i+1 << ".\n";
+
+   return(out_pd);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
 
    // The climo values must have non-zero, consistent length and

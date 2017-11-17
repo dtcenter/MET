@@ -228,6 +228,10 @@ PairDataPoint subset_pairs(const PairDataPoint &,
                            const SingleThresh &, const SingleThresh &,
                            const SetLogic);
 
+// Subset pairs for a specific climatology CDF bin
+PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
+                                   const ThreshArray &, int i_bin);
+
 extern bool   set_climo_flag(const NumArray &, const NumArray &);
 
 ////////////////////////////////////////////////////////////////////////
