@@ -1265,11 +1265,11 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
                  << mn_na.min() << ", " << mn_na.max() << "] falls "
                  << "outside the expected range of [0, 1].\n"
                  << "When verifying a probabilistic forecast using "
-                 << "climatology data, either supply a probabilistic\n"
-                 << "climo_mean field or non-probabilistic climo_mean "
-                 << "and climo_stdev fields from which a normal\n"
-                 << "approximation of the climatological probabilities "
-                 << "should be derived.\n\n";
+                 << "climatology data, either supply a probabilistic "
+                 << "climo_mean field or non-probabilistic\n"
+                 << "climo_mean and climo_stdev fields from which a "
+                 << "normal approximation of the climatological "
+                 << "probabilities should be derived.\n\n";
             exit(1);
          }
       }
