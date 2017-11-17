@@ -9,13 +9,13 @@
 //
 // Output model name to be written
 //
-model = "GFS";
+model = "SREF";
 
 //
 // Output description to be written
 // May be set separately in each "obs.field" entry
 //
-desc = "NA";
+desc = "CLIMO_BINS";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -27,6 +27,7 @@ regrid = {
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,55 +43,51 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   sid_exc    = [];
-   cat_thresh = [];
+
+   cat_thresh = ==0.1;
+
+   field = [
+      {
+        name = "PROB"; level = "Z2";
+        prob = { name = "TMP"; thresh_hi = 273.0; };
+      },
+      {
+        name = "PROB"; level = "Z2";
+        prob = { name = "TMP"; thresh_lo = 298.8; };
+      },
+      {
+        name = "PROB"; level = "Z10";
+        prob = { name = "WIND"; thresh_lo = 12.89; };
+      }
+   ];
+}
+
+obs = {
+   sid_exc      = [];
    message_type = [ "ADPSFC" ];
 
    field = [
       {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        desc         = "KELVIN";
+        name = "TMP"; level = "Z2";
+        cat_thresh = <273.0;
       },
       {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        desc         = "CELCIUS";
-        convert(x)   = K_to_C(x);
+        name = "TMP"; level = "Z2";
+        cat_thresh = >298.8;
       },
       {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        desc         = "FAHRENHEIT";
-        convert(x)   = K_to_F(x);
-      },
-      {
-        name         = "TMP";
-        level        = [ "P500" ];
-        message_type = [ "ADPUPA" ];
-      },
-      {
-        name         = "UGRD";
-        level        = [ "Z10" ];
-      },
-      {
-        name         = "VGRD";
-        level        = [ "Z10" ];
-      },
-      {
-        name         = "WIND";
-        level        = [ "Z10" ];
+        name = "WIND"; level = "Z10";
+        cat_thresh = >12.89;
       }
    ];
 }
-obs = fcst;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Climatology mean data
 //
-climo_mean = fcst;
+climo_mean = obs;
 climo_mean = {
 
    file_name = [ "${CLIMO_MEAN_FILE}" ];
@@ -106,12 +103,15 @@ climo_mean = {
    time_step          = 21600;
 }
 
+//
+// Climatology standard deviation data
+//
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [ "${CLIMO_STDEV_FILE}" ];
+  file_name = [ "${CLIMO_STDEV_FILE}" ];
 }
 
-climo_cdf_bins = 1;
+climo_cdf_bins = 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -188,16 +188,16 @@ output_flag = {
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
-   sl1l2  = BOTH;
-   sal1l2 = BOTH;
-   vl1l2  = BOTH;
-   val1l2 = BOTH;
-   pct    = NONE;
-   pstd   = NONE;
-   pjc    = NONE;
-   prc    = NONE;
-   eclv   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   pct    = BOTH;
+   pstd   = BOTH;
+   pjc    = BOTH;
+   prc    = BOTH;
+   eclv   = BOTH;
    mpr    = BOTH;
 }
 

@@ -18,35 +18,13 @@
   <exit_on_fail>true</exit_on_fail>
 
   <!-- Depends on unit_pb2nc.xml -->
-
-  <test name="climatology_POINT_STAT_GFS_1.0DEG">
-    <exec>&MET_DIR;/bin/point_stat</exec>
-    <env>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GFS_CLIMO_1.0DEG</value></pair>
-      <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
-      <pair><name>MATCH_DAY</name>       <value>TRUE</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
-      &CONFIG_DIR;/PointStatConfig_climo \
-      -outdir &OUTPUT_DIR;/climatology -v 4
-    </param>
-    <output>
-      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_sal1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_mpr.txt</stat>
-    </output>
-  </test>
-
   <test name="climatology_POINT_STAT_GFS_2.5DEG">
     <exec>&MET_DIR;/bin/point_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name>   <value>GFS_CLIMO_2.5DEG</value></pair>
-      <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
-      <pair><name>MATCH_DAY</name>       <value>FALSE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_2.5DEG</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590415</value></pair>
+      <pair><name>MATCH_DAY</name>        <value>FALSE</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
@@ -60,6 +38,29 @@
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_2.5DEG_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="climatology_POINT_STAT_GFS_1.0DEG">
+    <exec>&MET_DIR;/bin/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>    <value>GFS_CLIMO_1.0DEG</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
+      <pair><name>MATCH_DAY</name>        <value>TRUE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_climo \
+      -outdir &OUTPUT_DIR;/climatology -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_sal1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_GFS_CLIMO_1.0DEG_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -99,6 +100,56 @@
     <output>
       <stat>&OUTPUT_DIR;/climatology/grid_stat_WMO_CLIMO_1.5DEG_240000L_20120410_000000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/climatology/grid_stat_WMO_CLIMO_1.5DEG_240000L_20120410_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="climatology_POINT_STAT_PROB_GFS_1.0DEG">
+    <exec>&MET_DIR;/bin/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>    <value>PROB_GFS_CLIMO_1.0DEG</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
+      <pair><name>MATCH_DAY</name>        <value>TRUE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      &CONFIG_DIR;/PointStatConfig_climo_prob \
+      -outdir &OUTPUT_DIR;/climatology -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_pjc.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_prc.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_eclv.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/point_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="climatology_GRID_STAT_PROB_GFS_1.0DEG">
+    <exec>&MET_DIR;/bin/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>    <value>PROB_GFS_CLIMO_1.0DEG</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790409</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790409</value></pair>
+      <pair><name>MATCH_DAY</name>        <value>TRUE</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_climo_prob \
+      -outdir &OUTPUT_DIR;/climatology -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology/grid_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/climatology/grid_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_pct.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/grid_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_pstd.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/grid_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_pjc.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/grid_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_prc.txt</stat>
+      <stat>&OUTPUT_DIR;/climatology/grid_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_eclv.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/climatology/grid_stat_PROB_GFS_CLIMO_1.0DEG_150000L_20120409_120000V_pairs.nc</grid_nc>
     </output>
   </test>
 
