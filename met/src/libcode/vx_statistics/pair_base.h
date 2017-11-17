@@ -55,9 +55,6 @@ class PairBase {
 
       void init_from_scratch();
 
-      void add_climo(double, double, double);
-      void set_climo(int, double, double, double);
-
    public:
 
       PairBase();
@@ -155,6 +152,10 @@ class PairBase {
 
       void set_obs(int, double, double, double, double, double,
                    double wgt = default_grid_weight);
+
+      void add_climo(double, double, double);
+      void set_climo(int, double, double, double);
+
 
       double process_obs(VarInfo *, double);
 
