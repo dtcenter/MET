@@ -151,7 +151,6 @@ class GridStatConfInfo {
       NumArray *        eclv_points;        // ECLV points [n_vx]
 
       ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
-      bool              write_cdf_bins;     // Flag for writing output lines for each bin
 
       // Settings for all verification tasks
       StringArray       mask_name;          // Masking region names [n_mask]
@@ -210,7 +209,7 @@ class GridStatConfInfo {
       int get_n_vx_vect()     const;
       int get_n_vx_prob()     const;
       int get_n_mask()        const;
-      int get_n_climo_bins()  const;
+      int get_n_cdf_bin()     const;
 
       int get_n_interp()      const;
       int get_n_nbrhd_wdth()  const;
@@ -239,19 +238,20 @@ class GridStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GridStatConfInfo::get_n_vx()          const { return(n_vx);                      }
-inline int GridStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);                 }
-inline int GridStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                 }
-inline int GridStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                 }
-inline int GridStatConfInfo::get_n_mask()        const { return(n_mask);                    }
-inline int GridStatConfInfo::get_n_interp()      const { return(n_interp);                  }
-inline int GridStatConfInfo::get_n_nbrhd_wdth()  const { return(nbrhd_wdth.n_elements());   }
-inline int GridStatConfInfo::get_n_wave_1d()     const { return(wave_1d_beg.n_elements());  }
-inline int GridStatConfInfo::get_n_cov_thresh()  const { return(nbrhd_cov_ta.n_elements()); }
-inline int GridStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());     }
-inline int GridStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);             }
-inline int GridStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);             }
-inline int GridStatConfInfo::get_compression_level()   { return conf.nc_compression(); }
+inline int GridStatConfInfo::get_n_vx()          const { return(n_vx);                         }
+inline int GridStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);                    }
+inline int GridStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                    }
+inline int GridStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                    }
+inline int GridStatConfInfo::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);}
+inline int GridStatConfInfo::get_n_mask()        const { return(n_mask);                       }
+inline int GridStatConfInfo::get_n_interp()      const { return(n_interp);                     }
+inline int GridStatConfInfo::get_n_nbrhd_wdth()  const { return(nbrhd_wdth.n_elements());      }
+inline int GridStatConfInfo::get_n_wave_1d()     const { return(wave_1d_beg.n_elements());     }
+inline int GridStatConfInfo::get_n_cov_thresh()  const { return(nbrhd_cov_ta.n_elements());    }
+inline int GridStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());        }
+inline int GridStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);                }
+inline int GridStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);                }
+inline int GridStatConfInfo::get_compression_level()   { return(conf.nc_compression());        }
 
 inline int GridStatConfInfo::get_max_n_cat_thresh() const {
    return(max_n_cat_thresh);

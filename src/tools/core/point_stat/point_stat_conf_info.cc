@@ -95,7 +95,6 @@ void PointStatConfInfo::clear() {
    regrid_info.clear();
    beg_ds = end_ds = bad_data_int;
    climo_cdf_ta.clear();
-   write_cdf_bins = true;
    mask_name.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;
@@ -243,9 +242,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype, bool use_var_id) {
 
    // Conf: climo_cdf_bins
    climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
-
-   // Conf: write_cdf_bins
-   write_cdf_bins = conf.lookup_bool(conf_key_write_cdf_bins);
 
    // Allocate space based on the number of verification tasks
    vx_pd       = new VxPairDataPoint [n_vx];
@@ -673,17 +669,8 @@ int PointStatConfInfo::get_n_msg_typ(int i) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int PointStatConfInfo::get_n_climo_bins() const {
-   return(write_cdf_bins ? climo_cdf_ta.n_elements() - 1 : 1);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 int PointStatConfInfo::n_txt_row(int i_txt_row) {
-   int i, n, max_n_msg_typ, n_climo_bins;
-
-   // Determine the number of climatology CDF bins to be written
-   n_climo_bins = get_n_climo_bins();
+   int i, n, max_n_msg_typ;
 
    // Determine the maximum number of message types being used
    for(i=0, max_n_msg_typ=0; i<n_vx; i++)
@@ -757,7 +744,7 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          //    Probability Fields * Message Types * Masks * Smoothing Methods *
          //    Max Observation Probability Thresholds * Climo Bins
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
-             max_n_oprob_thresh * n_climo_bins;
+             max_n_oprob_thresh * get_n_cdf_bin();
 
          // Maximum number of HiRA PCT, PJC, or PRC lines possible =
          //    Scalar Fields * Message Types * Masks *
@@ -774,7 +761,7 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          //    Probability Fields * Message Types * Masks * Smoothing Methods *
          //    Max Observation Probability Thresholds * Alphas * Climo Bins
          n = n_vx_prob * max_n_msg_typ * n_mask * n_interp *
-             max_n_oprob_thresh * get_n_ci_alpha() * n_climo_bins;
+             max_n_oprob_thresh * get_n_ci_alpha() * get_n_cdf_bin();
 
          // Maximum number of HiRA PSTD lines possible =
          //    Scalar Fields * Message Types * Masks *

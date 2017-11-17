@@ -113,7 +113,6 @@ class PointStatConfInfo {
       NumArray *        eclv_points;        // ECLV points [n_vx]
 
       ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
-      bool              write_cdf_bins;     // Flag for writing output lines for each bin
 
       vector<DuplicateType> dup_flgs;
       vector<ObsSummary>    obs_smry;
@@ -161,7 +160,7 @@ class PointStatConfInfo {
       int get_n_vx_vect()         const;
       int get_n_vx_prob()         const;
       int get_n_msg_typ(int i)    const;
-      int get_n_climo_bins()      const;
+      int get_n_cdf_bin()         const;
       int get_n_mask()            const;
       int get_n_mask_area()       const;
       int get_n_mask_sid()        const;
@@ -184,17 +183,18 @@ class PointStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int PointStatConfInfo::get_n_vx()          const { return(n_vx);                      }
-inline int PointStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);                 }
-inline int PointStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                 }
-inline int PointStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                 }
-inline int PointStatConfInfo::get_n_mask()        const { return(n_mask);                    }
-inline int PointStatConfInfo::get_n_mask_area()   const { return(n_mask_area);               }
-inline int PointStatConfInfo::get_n_mask_sid()    const { return(n_mask_sid);                }
-inline int PointStatConfInfo::get_n_interp()      const { return(n_interp);                  }
-inline int PointStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());     }
-inline int PointStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);             }
-inline int PointStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);             }
+inline int PointStatConfInfo::get_n_vx()          const { return(n_vx);                         }
+inline int PointStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);                    }
+inline int PointStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                    }
+inline int PointStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                    }
+inline int PointStatConfInfo::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);}
+inline int PointStatConfInfo::get_n_mask()        const { return(n_mask);                       }
+inline int PointStatConfInfo::get_n_mask_area()   const { return(n_mask_area);                  }
+inline int PointStatConfInfo::get_n_mask_sid()    const { return(n_mask_sid);                   }
+inline int PointStatConfInfo::get_n_interp()      const { return(n_interp);                     }
+inline int PointStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());        }
+inline int PointStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);                }
+inline int PointStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);                }
 
 inline int PointStatConfInfo::get_max_n_cat_thresh() const {
    return(max_n_cat_thresh);
