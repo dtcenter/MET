@@ -255,6 +255,30 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::add_climo(double obs, double cmn, double csd) {
+
+   // Compute and store the climatology information
+   cmn_na.add(cmn);
+   csd_na.add(csd);
+   cdf_na.add(normal_cdf(obs, cmn, csd));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_climo(int i_obs, double obs, double cmn, double csd) {
+
+   // Compute and store the climatology information
+   cmn_na.set(i_obs, cmn);
+   csd_na.set(i_obs, csd);
+   cdf_na.set(i_obs, normal_cdf(obs, cmn, csd));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool PairBase::add_obs(const char *sid,
                        double lat, double lon, double x, double y,
                        unixtime ut, double lvl, double elv,
@@ -327,9 +351,7 @@ bool PairBase::add_obs(const char *sid,
       elv_na.add(elv);
       o_na.add(o);
       o_qc_sa.add(qc);
-      cmn_na.add(cmn);
-      csd_na.add(csd);
-      cdf_na.add(normal_cdf(o, cmn, csd));
+      add_climo(o, cmn, csd);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -548,9 +570,7 @@ void PairBase::calc_obs_summary(){
       elv_na.add (svt.elv);
       o_na.add   (ob.val);
       o_qc_sa.add(ob.qc.c_str());
-      cmn_na.add (svt.cmn);
-      csd_na.add (svt.csd);
-      cdf_na.add (normal_cdf(ob.val, svt.cmn, svt.csd));
+      add_climo(ob.val, svt.cmn, svt.csd);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -576,9 +596,7 @@ void PairBase::add_obs(double x, double y, double o,
    elv_na.add(bad_data_double);
    o_na.add(o);
    o_qc_sa.add(na_str);
-   cmn_na.add(cmn);
-   csd_na.add(csd);
-   cdf_na.add(normal_cdf(o, cmn, csd));
+   add_climo(o, cmn, csd);
 
    // Increment the number of observations
    n_obs += 1;
@@ -613,9 +631,7 @@ void PairBase::set_obs(int i_obs, const char *sid,
    elv_na.set(i_obs, elv);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, qc);
-   cmn_na.set(i_obs, cmn);
-   csd_na.set(i_obs, csd);
-   cdf_na.set(i_obs, normal_cdf(o, cmn, csd));
+   set_climo(i_obs, o, cmn, csd);
 
    return;
 }
@@ -643,9 +659,7 @@ void PairBase::set_obs(int i_obs, double x, double y,
    elv_na.set(i_obs, bad_data_double);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, na_str);
-   cmn_na.set(i_obs, cmn);
-   csd_na.set(i_obs, csd);
-   cdf_na.set(i_obs, normal_cdf(o, cmn, csd));
+   set_climo(i_obs, o, cmn, csd);
 
    return;
 }
