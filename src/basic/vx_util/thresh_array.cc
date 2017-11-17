@@ -381,6 +381,9 @@ void ThreshArray::check_bin_thresh() const {
 int ThreshArray::check_bins(double v) const {
    int i, bin;
 
+   // Check for bad data or no thresholds
+   if(is_bad_data(v) || Nelements == 0) return(bad_data_int);
+
    // For < and <=, check thresholds left to right.
    if(t[0].get_type() == thresh_lt || t[0].get_type() == thresh_le) {
 
@@ -403,6 +406,8 @@ int ThreshArray::check_bins(double v) const {
       }
       if(bin == -1) bin = 0;
    }
+
+   // The bin value returned is 1-based, not 0-based.
 
    return(bin);
 }
