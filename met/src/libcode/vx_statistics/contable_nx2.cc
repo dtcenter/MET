@@ -607,7 +607,8 @@ res = resolution();
 rel = reliability();
 unc = uncertainty();
 
-if (is_bad_data(res) || is_bad_data(rel) || is_bad_data(unc))  {
+if (is_bad_data(res) || is_bad_data(rel) ||
+    is_bad_data(unc) || is_eq(unc, 0.0))  {
    bss = bad_data_double;
 }
 else {
