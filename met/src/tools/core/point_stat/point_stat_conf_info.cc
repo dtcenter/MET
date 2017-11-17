@@ -784,9 +784,9 @@ int PointStatConfInfo::n_txt_row(int i_txt_row) {
          // Maximum number of PCT -> ECLV lines possible =
          //    Probability Fields * Message Types * Masks * Smoothing Methods *
          //    Max Observation Probability Thresholds *
-         //    Max Forecast Probability Thresholds
+         //    Max Forecast Probability Thresholds * Climo Bins
          n += n_vx_prob * max_n_msg_typ * n_mask * n_interp *
-              max_n_oprob_thresh * max_n_fprob_thresh;
+              max_n_oprob_thresh * max_n_fprob_thresh * get_n_cdf_bin();
 
          break;
 
