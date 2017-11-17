@@ -55,6 +55,9 @@ class PairBase {
 
       void init_from_scratch();
 
+      void add_climo(double, double, double);
+      void set_climo(int, double, double, double);
+
    public:
 
       PairBase();
