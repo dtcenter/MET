@@ -46,7 +46,7 @@ int   hdr_data_offset;
 //StringArray obs_names;
 
 char   hdr_typ_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
-char   hdr_sid_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
+char   hdr_sid_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
 char   hdr_vld_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
 float  hdr_arr_buf[OBS_BUFFER_SIZE][HDR_ARRAY_LEN];
 float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
@@ -376,7 +376,7 @@ void add_nc_header_to_buf (const NetcdfObsVars &obsVars,
    // Station ID
    hdr_str_len = strlen(hdr_sid);
    hdr_str_len2 = strlen(hdr_sid_buf[hdr_data_idx]);
-   if (hdr_str_len > HEADER_STR_LEN) hdr_str_len = HEADER_STR_LEN;
+   if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
    if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
    strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_str_len);
    for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
@@ -466,7 +466,7 @@ void create_nc_hdr_vars (NetcdfObsVars &obsVars, NcFile *f_out,
 
    // Define netCDF header variables
    obsVars.hdr_typ_var = add_var(f_out, nc_var_hdr_typ, ncChar,  hdr_dim, obsVars.strll_dim,   deflate_level);
-   obsVars.hdr_sid_var = add_var(f_out, nc_var_hdr_sid, ncChar,  hdr_dim, obsVars.strl_dim,    deflate_level);
+   obsVars.hdr_sid_var = add_var(f_out, nc_var_hdr_sid, ncChar,  hdr_dim, obsVars.strll_dim,   deflate_level);
    obsVars.hdr_vld_var = add_var(f_out, nc_var_hdr_vld, ncChar,  hdr_dim, obsVars.strl_dim,    deflate_level);
    obsVars.hdr_arr_var = add_var(f_out, nc_var_hdr_arr, ncFloat, hdr_dim, obsVars.hdr_arr_dim, deflate_level);
 
@@ -663,6 +663,7 @@ void reset_header_buffer(int buf_size) {
       }
       for (int j=HEADER_STR_LEN; j<HEADER_STR_LEN_L; j++) {
          hdr_typ_buf[i][j] = bad_data_char;
+         hdr_sid_buf[i][j] = bad_data_char;
       }
       for (int j=0; j<HDR_ARRAY_LEN; j++) {
          hdr_arr_buf[i][j] = FILL_VALUE;
@@ -694,7 +695,7 @@ void write_nc_headers(const NetcdfObsVars &obsVars)
       // Station ID
       hdr_str_len = strlen(hdr_arrays.sid_sa[index]);
       hdr_str_len2 = strlen(hdr_sid_buf[hdr_data_idx]);
-      if (hdr_str_len > HEADER_STR_LEN) hdr_str_len = HEADER_STR_LEN;
+      if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
       if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
       strncpy(hdr_sid_buf[hdr_data_idx], hdr_arrays.sid_sa[index], hdr_str_len);
       for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
@@ -744,12 +745,14 @@ void write_nc_header_buffer(const NetcdfObsVars &obsVars, const int buf_size)
       exit(1);
    }
    
-   lengths[1] = HEADER_STR_LEN;
    // Station ID
    if(!put_nc_data((NcVar *)&obsVars.hdr_sid_var, (char *)hdr_sid_buf[0], lengths, offsets)) {
       mlog << Error << err_msg_station_id;
       exit(1);
    }
+   
+   lengths[1] = HEADER_STR_LEN;
+   
    // Valid Time
    if(!put_nc_data((NcVar *)&obsVars.hdr_vld_var, (char *)hdr_vld_buf[0], lengths, offsets)) {
       mlog << Error << err_msg_valid_time;

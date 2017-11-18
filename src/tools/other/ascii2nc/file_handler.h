@@ -120,7 +120,7 @@ protected:
   StringArray obs_names;
 
   char   hdr_typ_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
-  char   hdr_sid_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
+  char   hdr_sid_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
   char   hdr_vld_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
   float  hdr_arr_buf[OBS_BUFFER_SIZE][HDR_ARRAY_LEN];
   float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];

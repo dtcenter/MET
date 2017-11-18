@@ -696,14 +696,12 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    hdr_arr_buf[hdr_data_idx][1] = lon;
    hdr_arr_buf[hdr_data_idx][2] = elv;
 
-   if(hdr_sid.length() > HEADER_STR_LEN) {
+   hdr_sid_len = hdr_sid.length();
+   if(hdr_sid_len > HEADER_STR_LEN_L) {
       mlog << Warning << "\nFileHandler::_writeHdrInfo() -> "
-           << "only writing the first " << HEADER_STR_LEN
+           << "only writing the first " << HEADER_STR_LEN_L
            << " of station id: " << hdr_sid << "\n\n";
-      hdr_sid_len = HEADER_STR_LEN;
-   }
-   else {
-      hdr_sid_len = hdr_sid.length();
+      hdr_sid_len = HEADER_STR_LEN_L;
    }
 
    if(check_reg_exp(yyyymmdd_hhmmss_reg_exp, hdr_vld) != true) {
@@ -745,8 +743,6 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
          return false;
       }
 
-      lengths[1] = HEADER_STR_LEN;
-      
       //
       // Store the station id
       //
@@ -756,6 +752,8 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
               << "error writing the station id to the NetCDF file\n\n";
          return false;
       }
+
+      lengths[1] = HEADER_STR_LEN;
 
       //
       // Store the valid time and check that it's is in the expected

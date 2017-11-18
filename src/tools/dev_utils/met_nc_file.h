@@ -67,6 +67,7 @@ protected:
   NcDim nhdrDim;
   NcDim nobsDim;
   NcDim strlDim;
+  NcDim strllDim;
 
   NcVar *_hdrArrVar;
   NcVar *_hdrTypeVar;
