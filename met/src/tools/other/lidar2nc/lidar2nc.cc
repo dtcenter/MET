@@ -341,12 +341,11 @@ const int nhdr_dim_size = n_data;
    //
 
 const int hdr_typ_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
-const int hdr_sid_bytes = nhdr_dim_size*HEADER_STR_LEN;
-const int hdr_vld_bytes = nhdr_dim_size*HEADER_STR_LEN;
+const int hdr_sid_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
+const int hdr_vld_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
 const int hdr_arr_bytes = nhdr_dim_size*HDR_ARRAY_LEN*sizeof(float);
 
-int buf_size      = hdr_sid_bytes;
-int buf_size_type = hdr_typ_bytes;
+int buf_size      = hdr_typ_bytes;
 
 buf_size = max<int>(buf_size, hdr_vld_bytes);
 buf_size = max<int>(buf_size, hdr_arr_bytes);
@@ -372,6 +371,22 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    create_nc_hdr_vars(obsVars, out, n_data, deflate_level);
    create_nc_obs_vars(obsVars, out, deflate_level, use_var_id);
 
+   int strl_len = get_dim_size(&obsVars.strl_dim);
+   int typ_len = strl_len;
+   int sid_len = strl_len;
+   int vld_len = strl_len;
+   if (!IS_INVALID_NC(obsVars.strll_dim)) {
+      NcDim str_dim;
+      string dim_name = GET_NC_NAME(obsVars.strll_dim);
+      int strll_len = get_dim_size(&obsVars.strll_dim);
+      str_dim = get_nc_dim(&obsVars.hdr_typ_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) typ_len = strll_len;
+      str_dim = get_nc_dim(&obsVars.hdr_sid_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) sid_len = strll_len;
+      str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) vld_len = strll_len;
+   }
+   
    //
    //  global attributes for netcdf output file
    //
@@ -409,7 +424,6 @@ buf   = new unsigned char [buf_size];
 
 char  * const cbuf = (char *)  buf;
 float * const fbuf = (float *) buf;
-char  * cbuf_l     = new char [buf_size_type];
 
 mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
@@ -418,15 +432,15 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
    //  populate the hdr_typ variable
    //
 
-memset(cbuf_l, 0, buf_size_type);
+memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf_l + j*HEADER_STR_LEN_L, hdr_typ_string);
+   strcpy(cbuf + j*typ_len, hdr_typ_string);
 
 }
 
-obsVars.hdr_typ_var.putVar(cbuf_l);
+obsVars.hdr_typ_var.putVar(cbuf);
 
    //
    //  populate the hdr_sid variable
@@ -436,7 +450,7 @@ memset(buf, 0, buf_size);
 
 for (j=0; j<n_data; ++j)  {
 
-   strcpy(cbuf + j*HEADER_STR_LEN, na_str);
+   strcpy(cbuf + j*sid_len, na_str);
 
 }
 
@@ -515,7 +529,7 @@ for (j=0; j<n_data; ++j)  {
             "%04d%02d%02d_%02d%02d%02d",
              year, month, day, hour, minute, second);
 
-   strcpy(cbuf + j*HEADER_STR_LEN, junk);
+   strcpy(cbuf + j*vld_len, junk);
 
 }   //  for j
 

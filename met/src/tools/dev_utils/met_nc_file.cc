@@ -93,7 +93,8 @@ bool MetNcFile::readFile(const int desired_grib_code,
   nhdrDim = get_nc_dim(_ncFile, "nhdr");
   nobsDim = get_nc_dim(_ncFile, "nobs");
 
-  strlDim = get_nc_dim(_ncFile, "mxstr");
+  strlDim  = get_nc_dim(_ncFile, "mxstr");
+  strllDim = get_nc_dim(_ncFile, "mxstr2");
 
   _hdrArrDim = &hdrArrDim;
   _obsArrDim = &obsArrDim;
@@ -135,6 +136,21 @@ bool MetNcFile::readFile(const int desired_grib_code,
   long obs_arr_len = get_dim_size(&obsArrDim);
   long hdr_arr_len = get_dim_size(&hdrArrDim);
   long  strl_count = get_dim_size(&strlDim);
+  long strll_count = strl_count;
+  if (!IS_INVALID_NC(strllDim)) strll_count = get_dim_size(&strllDim);
+  int typ_len = strl_count;
+  int sid_len = strl_count;
+  int vld_len = strl_count;
+  if (!IS_INVALID_NC(strllDim)) {
+    NcDim str_dim;
+    string dim_name = GET_NC_NAME(strllDim);
+    str_dim = get_nc_dim(&hdrTypeVar, dim_name);
+    if (!IS_INVALID_NC(str_dim)) typ_len = strll_count;
+    str_dim = get_nc_dim(&hdrSidVar, dim_name);
+    if (!IS_INVALID_NC(str_dim)) sid_len = strll_count;
+    str_dim = get_nc_dim(&hdrVldVar, dim_name);
+    if (!IS_INVALID_NC(str_dim)) vld_len = strll_count;
+  }
 
   float *obs_arr = new float[obs_arr_len];
   float *hdr_arr = new float[hdr_arr_len];
@@ -155,9 +171,9 @@ bool MetNcFile::readFile(const int desired_grib_code,
   // Allocate space to store the data
   //
   
-  char hdr_typ_str_full[hdr_buf_size][strl_count];
-  char hdr_sid_str_full[hdr_buf_size][strl_count];
-  char hdr_vld_str_full[hdr_buf_size][strl_count];
+  char hdr_typ_str_full[hdr_buf_size][typ_len];
+  char hdr_sid_str_full[hdr_buf_size][sid_len];
+  char hdr_vld_str_full[hdr_buf_size][vld_len];
   //float **hdr_arr_full = (float **) 0, **obs_arr_block = (float **) 0;
 
   float hdr_arr_full[hdr_buf_size][hdr_arr_len];
@@ -173,6 +189,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   //
   // Get the corresponding header message type
   //
+  lengths[1] = typ_len;
   if(!get_nc_data(&hdrTypeVar, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> "
          << "trouble getting hdr_typ\n\n";
@@ -182,6 +199,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   //
   // Get the corresponding header station id
   //
+  lengths[1] = sid_len;
   if(!get_nc_data(&hdrSidVar, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> "
          << "trouble getting hdr_sid\n\n";
@@ -191,6 +209,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   //
   // Get the corresponding header valid time
   //
+  lengths[1] = vld_len;
   if(!get_nc_data(&hdrVldVar, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> "
          << "trouble getting hdr_vld\n\n";
@@ -261,19 +280,19 @@ bool MetNcFile::readFile(const int desired_grib_code,
     char hdr_vld_buffer[max_str_len];
     // Read the corresponding header type for this observation
     str_length = strlen(hdr_typ_str_full[hdr_index]);
-    if (str_length > strl_count) str_length = strl_count;
+    if (str_length > typ_len) str_length = typ_len;
     strncpy(message_type_buffer, hdr_typ_str_full[hdr_index], str_length);
     message_type_buffer[str_length] = bad_data_char;
 
     // Read the corresponding header Station ID for this observation
     str_length = strlen(hdr_sid_str_full[hdr_index]);
-    if (str_length > strl_count) str_length = strl_count;
+    if (str_length > sid_len) str_length = sid_len;
     strncpy(station_id_buffer, hdr_sid_str_full[hdr_index], str_length);
     station_id_buffer[str_length] = bad_data_char;
 
     // Read the corresponding valid time for this observation
     str_length = strlen(hdr_vld_str_full[hdr_index]);
-    if (str_length > strl_count) str_length = strl_count;
+    if (str_length > vld_len) str_length = vld_len;
     strncpy(hdr_vld_buffer, hdr_vld_str_full[hdr_index], str_length);
     hdr_vld_buffer[str_length] = bad_data_char;
     

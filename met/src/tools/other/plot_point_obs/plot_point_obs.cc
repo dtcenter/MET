@@ -247,6 +247,19 @@ int main(int argc, char *argv[]) {
    long strl_count  = get_dim_size(&obsVars.strl_dim);
    long strll_count = strl_count;
    if (!IS_INVALID_NC(obsVars.strll_dim)) strll_count = get_dim_size(&obsVars.strll_dim);
+   int typ_len = strl_count;
+   int sid_len = strl_count;
+   int vld_len = strl_count;
+   if (!IS_INVALID_NC(obsVars.strll_dim)) {
+      NcDim str_dim;
+      string dim_name = GET_NC_NAME(obsVars.strll_dim);
+      str_dim = get_nc_dim(&obsVars.hdr_typ_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) typ_len = strll_count;
+      str_dim = get_nc_dim(&obsVars.hdr_sid_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) sid_len = strll_count;
+      str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) vld_len = strll_count;
+   }
 
    mlog << Debug(2) << "Processing " << (nobs_count) << " observations at "
         << nhdr_count << " locations.\n";
@@ -357,14 +370,14 @@ int main(int argc, char *argv[]) {
    //
    // Allocate space to store the data
    //
-   char hdr_typ_str[strll_count];
-   char hdr_sid_str[strl_count];
-   char hdr_vld_str[strl_count];
+   char hdr_typ_str[typ_len];
+   char hdr_sid_str[sid_len];
+   char hdr_vld_str[vld_len];
    float *hdr_arr = (float *) 0, *obs_arr = (float *) 0;
    
-   char hdr_typ_str_full[hdr_buf_size][strll_count];
-   char hdr_sid_str_full[hdr_buf_size][strl_count];
-   char hdr_vld_str_full[hdr_buf_size][strl_count];
+   char hdr_typ_str_full[hdr_buf_size][typ_len];
+   char hdr_sid_str_full[hdr_buf_size][sid_len];
+   char hdr_vld_str_full[hdr_buf_size][vld_len];
 
    hdr_arr = new float[hdr_arr_len];
    obs_arr = new float[obs_arr_len];
@@ -387,7 +400,7 @@ int main(int argc, char *argv[]) {
    //
    // Get the corresponding header message type
    //
-   lengths[1] = strll_count;
+   lengths[1] = typ_len;
    if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_typ\n\n";
@@ -397,7 +410,7 @@ int main(int argc, char *argv[]) {
    //
    // Get the corresponding header station id
    //
-   lengths[1] = strl_count;
+   lengths[1] = sid_len;
    if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_sid\n\n";
@@ -407,6 +420,7 @@ int main(int argc, char *argv[]) {
    //
    // Get the corresponding header valid time
    //
+   lengths[1] = vld_len;
    if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
       mlog << Error << "\nmain() -> "
            << "trouble getting hdr_vld\n\n";
@@ -473,17 +487,17 @@ int main(int argc, char *argv[]) {
             hdr_arr[j] = hdr_arr_full[h][j];
         
          str_length = strlen(hdr_typ_str_full[h]);
-         if (str_length > strl_count) str_length = strl_count;
+         if (str_length > typ_len) str_length = typ_len;
          strncpy(hdr_typ_str, hdr_typ_str_full[h], str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
          str_length = strlen(hdr_sid_str_full[h]);
-         if (str_length > strl_count) str_length = strl_count;
+         if (str_length > sid_len) str_length = sid_len;
          strncpy(hdr_sid_str, hdr_sid_str_full[h], str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
          str_length = strlen(hdr_vld_str_full[h]);
-         if (str_length > strl_count) str_length = strl_count;
+         if (str_length > vld_len) str_length = vld_len;
          strncpy(hdr_vld_str, hdr_vld_str_full[h], str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
