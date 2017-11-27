@@ -505,7 +505,7 @@ void PairDataEnsemble::compute_phist() {
       if(skip_ba[i] || is_bad_data(pit_na[i])) continue;
 
       if(pit_na[i] < 0.0 || pit_na[i] > 1.0) {
-         mlog << Warning << "PairDataEnsemble::compute_phist() -> "
+         mlog << Warning << "\nPairDataEnsemble::compute_phist() -> "
               << "probability integral transform value ("
               << pit_na[i] << ") is outside of valid range [0, 1].\n\n";
          continue;
@@ -571,13 +571,22 @@ void PairDataEnsemble::compute_ssvar() {
 
       // Determine the bin for the current point and add it to the list
       // Bins are defined starting at 0 and are left-closed, right-open
-      j=0;
-      while(var > (j+1)*ssvar_bin_size || is_eq(var, (j+1)*ssvar_bin_size)) j++;
+      j = floor(var/ssvar_bin_size);
       string ssvar_min = str_format("%.5e", j*ssvar_bin_size).contents();
       if( !bins.count(ssvar_min) ){
          ssvar_pt_list pts;
          pts.push_back(pt);
          bins[ssvar_min] = pts;
+
+         // Print warning for too many bins
+         if(bins.size() == n_warn_ssvar_bins) {
+            mlog << Warning << "\nPairDataEnsemble::compute_ssvar() -> "
+                 << "writing at least " << n_warn_ssvar_bins
+                 << " SSVAR output lines. Increase the ssvar_bin_size "
+                 << "config file setting for this variable to reduce "
+                 << "the number of variance bins.\n\n";
+         }
+
       } else {
          bins[ssvar_min].push_back(pt);
       }
