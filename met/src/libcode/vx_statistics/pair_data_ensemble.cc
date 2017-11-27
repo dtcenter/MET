@@ -336,9 +336,9 @@ void PairDataEnsemble::compute_pair_vals() {
    NumArray cur;
 
    // Initialize
-   crps_na.clear();
-   ign_na.clear();
-   pit_na.clear();
+   crps_na.erase();
+   ign_na.erase();
+   pit_na.erase();
 
    // Loop through the pairs and compute CRPS for each
    for(i=0; i<n_obs; i++) {
