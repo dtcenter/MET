@@ -145,7 +145,6 @@ static VarInfo*     var_info = (VarInfo *) 0;
 
 // Variables for the add and subtract commands
 static ConcatString *in_file = (ConcatString *) 0;
-static int          *accum = (int *) 0;
 static StringArray   accum_mag;
 static int           n_files;
 static int           compress_level = -1;
@@ -404,7 +403,6 @@ void process_add_sub_args(const CommandLine & cline)
    // Allocate memory for file names and accumulations
    //
    in_file = new ConcatString [n_files];
-   accum   = new int [n_files];
 
    //
    // Store the input files and accumulations

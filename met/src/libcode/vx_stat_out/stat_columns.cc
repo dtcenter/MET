@@ -1314,7 +1314,6 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
                     bool txt_flag,
                     AsciiTable &stat_at, int &stat_row,
                     AsciiTable &txt_at, int &txt_row) {
-   int i;
 
    // GRAD line type
    shc.set_line_type(stat_grad_str);

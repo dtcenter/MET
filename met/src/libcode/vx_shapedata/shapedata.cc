@@ -535,7 +535,7 @@ Polyline ShapeData::convex_hull_new() const
 
 {
 
-int j, k, x, y;
+int j, k, y;
 int n_in, n_out;
 Polyline hull_poly;
 const int N = nint(area());

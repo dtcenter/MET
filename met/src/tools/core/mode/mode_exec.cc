@@ -215,7 +215,6 @@ void ModeExecutive::setup_fcst_obs_data()
 
 {
 
-   int i;
    // ShapeData fcst_sd, obs_sd;
    double fmin, omin, fmax, omax;
 

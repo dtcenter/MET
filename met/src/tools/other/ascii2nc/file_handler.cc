@@ -903,7 +903,6 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  int grib_code;
   string prev_header_type = "";
   string prev_station_id = "";
   time_t prev_valid_time = 0;

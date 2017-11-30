@@ -544,7 +544,6 @@ long count_nc_headers(vector< Observation > &observations)
    double prev_elevation = bad_data_double;
    const char *method_name = "count_nc_headers()";
 
-   int count = 0;
    for (vector< Observation >::iterator obs = observations.begin();
         obs != observations.end(); ++obs)
    {
@@ -816,10 +815,6 @@ int write_nc_observations(const NetcdfObsVars &obsVars,
    int prev_hdr_idx = -1;
    string prev_header_type = "";
    string prev_station_id = "";
-   time_t prev_valid_time = 0;
-   double prev_latitude = bad_data_double;
-   double prev_longitude = bad_data_double;
-   double prev_elevation = bad_data_double;
 
    //float obs_arr[obs_arr_len];
    const string method_name = "write_nc_observations()";

@@ -844,7 +844,7 @@ void apply_solar_mask(DataPlane &dp) {
 
 void apply_lat_lon_mask(DataPlane &dp) {
    int x, y, n_in;
-   double lat, lon, alt, azi, v;
+   double lat, lon, v;
    bool check;
 
    // Check for no threshold

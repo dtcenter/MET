@@ -307,8 +307,6 @@ double interp_uw_mean_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doub
 
 double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
                       double obs_x, double obs_y, int i_pow, double t) {
-   int i;
-   double dw_mean_v;
 
    // Search the neighborhood for valid data points
    double count = 0;
@@ -455,7 +453,6 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
 double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
                     double t, const SingleThresh *st) {
    int count, count_thr;
-   double nbrhd_cov;
 
    // Compute the ratio of events within the neighborhood
    count = count_thr = 0;
@@ -599,7 +596,7 @@ double interp_best(const DataPlane &dp, const GridTemplate &gt,
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != NULL; gp = gt.getNextInGrid()) {
 
-      double v = dp.get(gp->x,gp->y);
+      v = dp.get(gp->x,gp->y);
       if (is_bad_data(v)) continue;
 
       if(is_bad_data(min_d) || fabs(v - obs_v) < min_d) {

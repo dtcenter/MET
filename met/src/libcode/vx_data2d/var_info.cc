@@ -343,7 +343,6 @@ void VarInfo::set_dict(Dictionary &dict) {
    NumArray na;
    ConcatString s;
    bool f;
-   int i;
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
