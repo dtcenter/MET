@@ -1357,7 +1357,6 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &j,
    AggrGRADInfo aggr;
    GRADInfo cur;
    ConcatString key;
-   int i;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //

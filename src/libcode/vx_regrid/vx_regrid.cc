@@ -118,7 +118,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
       }
 
-      to_data.put(value, xt, yt);   int          width;      // Regridding width
+      to_data.put(value, xt, yt);
 
    }   //  for yt
 

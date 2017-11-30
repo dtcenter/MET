@@ -566,7 +566,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, j, k, l, m, n;
+   int i, j, k, m, n;
    int n_cat, n_cnt, n_wind, n_prob, n_cov, n_cdf_bin;
    ConcatString cs;
 
@@ -2347,7 +2347,6 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                     const SingleThresh &obs_st, int wdth) {
    int i, n, x, y, n_masks;
    int fcst_flag, obs_flag;
-   double fval, oval;
    ConcatString fcst_var_name, obs_var_name, var_str, mask_str;
    ConcatString att_str, mthd_str, nbrhd_str;
    bool apply_mask;

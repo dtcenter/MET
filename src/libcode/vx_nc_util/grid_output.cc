@@ -488,7 +488,6 @@ void gaussian_grid_output(const GridInfo & info, NcFile * ncfile)
 {
 
 char junk[256];
-double t;
 const GaussianData & data = *(info.g);
 
 

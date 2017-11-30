@@ -94,7 +94,7 @@ void rescale_probability(DataPlane &dp) {
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width, const GridTemplateFactory::GridTemplates shape, double t) {
    double v;
-   int x, y, x_ll, y_ll;
+   int x, y;
 
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
