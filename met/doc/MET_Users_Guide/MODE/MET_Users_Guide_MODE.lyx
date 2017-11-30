@@ -1722,7 +1722,7 @@ obtype         = "ANALYS";
 
 \series bold
 regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
- = 1; }
+ = 1; shape = SQUARE; }
 \end_layout
 
 \begin_layout LyX-Code
