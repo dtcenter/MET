@@ -80,7 +80,6 @@ level_category = [];
 // BUFR variable names to retain or derive.
 // If emtpy, process all available variables.
 //
-//obs_bufr_var = [ "POB", "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,8 +90,10 @@ obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 //
 obs_bufr_map = [];
 
+//
 // This map is for PREPBUFR. It will be added into obs_bufr_map.
 // Please do not override this map.
+//
 obs_prefbufr_map = [
    { key = "POB";     val = "PRES";  },
    { key = "QOB";     val = "SPFH";  },
