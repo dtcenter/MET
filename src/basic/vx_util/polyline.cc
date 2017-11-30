@@ -59,6 +59,8 @@ Polyline::~Polyline() {
 
 Polyline::Polyline(const Polyline &c) {
 
+   name = (char *) 0;
+
    u = v = (double *) 0;
 
    assign(c);
