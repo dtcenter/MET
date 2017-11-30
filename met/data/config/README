@@ -296,7 +296,6 @@ obtype = "ANALYS";
 //    - The "shape" entry defines the shape of the neighborhood.
 //      Valid values are "SQUARE" or "CIRCLE"
 //
-//
 regrid = {
    to_grid    = NONE;
    method     = NEAREST;

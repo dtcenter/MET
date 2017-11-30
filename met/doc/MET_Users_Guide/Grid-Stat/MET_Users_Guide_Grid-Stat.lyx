@@ -1086,7 +1086,7 @@ obtype         = "ANALYS";
 
 \series bold
 regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
- = 1; }
+ = 1; shape = SQUARE; }
 \end_layout
 
 \begin_layout LyX-Code
@@ -1122,7 +1122,7 @@ boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
 \begin_layout LyX-Code
 
 \series bold
-interp         = { field = BOTH; vld_thresh = 1.0; shape = CIRCLE;
+interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
 \end_layout
 
 \begin_layout LyX-Code

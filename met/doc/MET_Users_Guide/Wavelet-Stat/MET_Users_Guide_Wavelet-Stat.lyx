@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -187,7 +189,7 @@ name "sec:WS_Scientific-and-statistical"
 The method
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:WS_The-method"
+name "subsec:WS_The-method"
 
 \end_inset
 
@@ -768,7 +770,7 @@ name "contingency_table_counts"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -1542,7 +1544,7 @@ name "energy_squared_NIMROD"
 The spatial domain constraints
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:WS_The-spatial-domain"
+name "subsec:WS_The-spatial-domain"
 
 \end_inset
 
@@ -1752,7 +1754,7 @@ n
 Aggregation of statistics on multiple cases
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:WS_Aggregation-of-statistics"
+name "subsec:WS_Aggregation-of-statistics"
 
 \end_inset
 
@@ -1832,7 +1834,7 @@ The following sections describe the usage statement, required arguments
 wavelet_stat usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Wavelet_stat-usage"
+name "subsec:Wavelet_stat-usage"
 
 \end_inset
 
@@ -2133,7 +2135,7 @@ WaveletStatConfig
 wavelet_stat configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:wavelet_stat-configuration-file"
+name "subsec:wavelet_stat-configuration-file"
 
 \end_inset
 
@@ -2166,7 +2168,7 @@ We recommend that users make a copy of the default (or other) configuration
  files, as described in the Section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-configuration-file"
+reference "subsec:pb2nc-configuration-file"
 
 \end_inset
 
@@ -2219,7 +2221,7 @@ obs               = {}
 
 \series bold
 regrid            = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST;
- width = 1; }
+ width = 1; shape = SQUARE; }
 \end_layout
 
 \begin_layout LyX-Code
@@ -2287,7 +2289,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2603,7 +2605,7 @@ nc_pairs_flag = {
 The nc_pairs_flag is described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:grid_stat-configuration-file"
+reference "subsec:grid_stat-configuration-file"
 
 \end_inset
 
@@ -2614,7 +2616,7 @@ reference "sub:grid_stat-configuration-file"
 wavelet_stat output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:wavelet_stat-output"
+name "subsec:wavelet_stat-output"
 
 \end_inset
 
@@ -2691,7 +2693,7 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar
  Please refer to the tables in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:point_stat-output"
+reference "subsec:point_stat-output"
 
 \end_inset
 
@@ -2741,7 +2743,7 @@ name "table_WS_header_info_ws_outputs"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -3491,7 +3493,7 @@ name "table_WS_format_info_ISC"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="15" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.25in">
@@ -4009,7 +4011,7 @@ name "table_NetCDF_dim_Wave_output"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="4.5in">
 <row>
@@ -4226,7 +4228,7 @@ name "_table_variables_wave_NetCDF_output"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2.2in">
 <column alignment="left" valignment="top" width="1.3in">
 <column alignment="left" valignment="top" width="2.5in">

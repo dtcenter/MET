@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -160,7 +162,7 @@ reference "chap:Re-Formatting-of-Point"
 ensemble_stat usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:ensemble_stat-usage"
+name "subsec:ensemble_stat-usage"
 
 \end_inset
 
@@ -601,7 +603,7 @@ In this example, the Ensemble-Stat tool will process six forecast files
 ensemble_stat configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:ensemble_stat-configuration-file"
+name "subsec:ensemble_stat-configuration-file"
 
 \end_inset
 
@@ -636,7 +638,7 @@ Note that environment variables may be used when editing configuration files,
  as described in the Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pb2nc-configuration-file"
+reference "subsec:pb2nc-configuration-file"
 
 \end_inset
 
@@ -677,7 +679,7 @@ obtype         = "ANALYS";
 
 \series bold
 regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
- = 1; }
+ = 1; shape = SQUARE; }
 \end_layout
 
 \begin_layout LyX-Code
@@ -707,13 +709,13 @@ ci_alpha       = [ 0.05 ];
 \begin_layout LyX-Code
 
 \series bold
-interp         = { field = BOTH; vld_thresh = 1.0;
+interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-                   type = [ { method = NEAREST; width  = 1; } ]; }
+                   type = [ { method = NEAREST; width = 1; } ]; }
 \end_layout
 
 \begin_layout LyX-Code
@@ -747,7 +749,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -1014,7 +1016,7 @@ obs
  dictionaries of the configuration file is described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -1483,7 +1485,7 @@ boot
  entry in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -1494,7 +1496,7 @@ reference "sub:IO_General-MET-Config-Options"
 ensemble_stat output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:ensemble_stat-output"
+name "subsec:ensemble_stat-output"
 
 \end_inset
 
@@ -1635,7 +1637,7 @@ name "table_ES_header_info_es_out"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="24" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -2400,7 +2402,7 @@ name "table_ES_header_info_es_out_RHIST"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -2745,7 +2747,7 @@ name "table_ES_header_info_es_out_PHIST"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -3002,7 +3004,7 @@ name "table_ES_header_info_es_out_RELP"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -3232,7 +3234,7 @@ name "table_ES_header_info_es_out_ORANK"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="20" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
@@ -3870,7 +3872,7 @@ name "table_ES_header_info_es_out_SSVAR"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="38" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
 <column alignment="left" valignment="top" width="3.75in">
