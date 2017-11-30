@@ -1128,7 +1128,7 @@ interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
 \begin_layout LyX-Code
 
 \series bold
-                   type = [ { method = NEAREST; width  = 1; } ]; }
+                   type = [ { method = NEAREST; width = 1; } ]; }
 \end_layout
 
 \begin_layout LyX-Code

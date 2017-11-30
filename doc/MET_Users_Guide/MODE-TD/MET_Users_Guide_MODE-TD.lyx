@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -99,7 +101,7 @@ name "sec:MTD_Introduction"
 Motivation
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_Motivation"
+name "subsec:MTD_Motivation"
 
 \end_inset
 
@@ -253,7 +255,7 @@ name "sec:MTD_Scientific-and-statistical"
 Attributes
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:_MTD_Attributes"
+name "subsec:_MTD_Attributes"
 
 \end_inset
 
@@ -316,7 +318,7 @@ on is straightforward.
 Convolution
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_Convolution"
+name "subsec:MTD_Convolution"
 
 \end_inset
 
@@ -336,7 +338,7 @@ As in MODE, MTD applies a convolution filter to the raw data as a preliminary
 \begin_layout Standard
 
 \series medium
-First, MTD typically reads in several planes of data for each data field---one
+First, MTD typically reads in several planes of data for each data field—one
  plane for each time step, and there is really no limit to the number of
  time steps.
  So MTD is convolving much more data than it would be if it were simply
@@ -468,7 +470,7 @@ n region.
 3D Single Attributes
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_3D-Single-Attributes"
+name "subsec:MTD_3D-Single-Attributes"
 
 \end_inset
 
@@ -948,7 +950,7 @@ bf intensity percentiles}
 3D Pair Attributes
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_3D-Pair-Attributes"
+name "subsec:MTD_3D-Pair-Attributes"
 
 \end_inset
 
@@ -958,8 +960,8 @@ name "sub:MTD_3D-Pair-Attributes"
 \begin_layout Standard
 
 \series medium
-The next category of spatial attributes is for pairs of objects --- one
- of the pair coming from the collection of forecast objects, the other coming
+The next category of spatial attributes is for pairs of objects — one of
+ the pair coming from the collection of forecast objects, the other coming
  from the observation objects.
 \end_layout
 
@@ -1364,7 +1366,7 @@ name "MTD_axis_diff"
 2D Constant-Time Attributes
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_2D-Constant-Time-Attributes"
+name "subsec:MTD_2D-Constant-Time-Attributes"
 
 \end_inset
 
@@ -1463,7 +1465,7 @@ $(x, y)$
 Matching and Merging
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_Matching-&-Merging"
+name "subsec:MTD_Matching-&-Merging"
 
 \end_inset
 
@@ -1845,7 +1847,7 @@ name "sec:Using-MTD"
 MTD input
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_Data-Files"
+name "subsec:MTD_Data-Files"
 
 \end_inset
 
@@ -1865,7 +1867,7 @@ The formats for two-dimensional data files used as input to MTD are the
 As shown in the next section, filenames for each time used must be given.
  Thus, for example, if MTD is being used for verification over a period
  of 24 hours, and the data file valid times are separated by one hour, then
- a total of 48 filenames must be specified on the MTD command line --- 24
+ a total of 48 filenames must be specified on the MTD command line — 24
  filenames for the forecast files, and 24 for the observation files.
  Further, the filenames must be given in order of increasing valid time.
  Many users will prefer to write scripts to automate this, rather than type
@@ -1876,7 +1878,7 @@ As shown in the next section, filenames for each time used must be given.
 MTD usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_usage"
+name "subsec:MTD_usage"
 
 \end_inset
 
@@ -2260,7 +2262,7 @@ on GRIB files in the obs_files director.
 MTD configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_The-Config-File"
+name "subsec:MTD_The-Config-File"
 
 \end_inset
 
@@ -2316,7 +2318,7 @@ obtype         = "ANALYS";
 
 \series bold
 regrid         = { to_grid = NONE; vld_thresh = 0.5; method = NEAREST; width
- = 1; }
+ = 1; shape = SQUARE; }
 \end_layout
 
 \begin_layout LyX-Code
@@ -2344,7 +2346,7 @@ The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
@@ -2440,7 +2442,7 @@ The configuration options listed above are common to many MODE and are described
  in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MODE-configuration-file"
+reference "subsec:MODE-configuration-file"
 
 \end_inset
 
@@ -2583,7 +2585,7 @@ The configuration options listed above are common to many MODE and are described
  in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MODE-configuration-file"
+reference "subsec:MODE-configuration-file"
 
 \end_inset
 
@@ -2995,7 +2997,7 @@ _3d}
 mtd output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MTD_Output-Files"
+name "subsec:MTD_Output-Files"
 
 \end_inset
 
@@ -3177,7 +3179,7 @@ name "table_mtd-header-columns"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="18" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -3752,7 +3754,7 @@ name "table_mtd-2D-Attributes"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -4132,7 +4134,7 @@ name "table_mtd-3D-single-attributes"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="21" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="10cm">
@@ -4883,7 +4885,7 @@ name "table_mtd-3D-Pair-Attribute"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="15" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="9cm">
