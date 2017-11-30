@@ -164,21 +164,22 @@ bool PairDataPoint::add_pair(double f, double o, double cmn, double csd,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataPoint::add_pair(const NumArray f_in,   const NumArray o_in,
-                             const NumArray cmn_in, const NumArray w_in) {
+bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
+                             const NumArray &cmn_in, const NumArray &w_in) {
    NumArray csd_in;
+   int i;
 
    csd_in.extend(cmn_in.n_elements());
-   for(int i; i<cmn_in.n_elements(); i++) csd_in.add(bad_data_double);
+   for(i=0; i<cmn_in.n_elements(); i++) csd_in.add(bad_data_double);
 
    return(add_pair(f_in, o_in, cmn_in, csd_in, w_in));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataPoint::add_pair(const NumArray f_in,   const NumArray o_in,
-                             const NumArray cmn_in, const NumArray csd_in,
-                             const NumArray w_in) {
+bool PairDataPoint::add_pair(const NumArray &f_in,   const NumArray &o_in,
+                             const NumArray &cmn_in, const NumArray &csd_in,
+                             const NumArray &w_in) {
 
    // Check for constant length
    if(o_in.n_elements() != f_in.n_elements()   ||
