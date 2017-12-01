@@ -1,4 +1,4 @@
-Model Evaluation Tools METv6.1 (November 30, 2017)
+Model Evaluation Tools METv6.1 (December 4, 2017)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -297,6 +297,95 @@ Release Notes
 
 Version 6.1 Release Notes:
 -------------------------
+
+- What's New:
+   - Major Enhancements: generalized point observations, unit conversion, data
+     censoring, economic cost/loss value, gradients, fourier decomposition,
+     relative position, and binned climatologies
+
+- Enhancements to Existing Tools:
+   - Distribute the latest set of bugfixes, details not listed here.
+   - Update "-version" command line option to include patch level info.
+   - Grid library code
+      - Add support for Gaussian grids.
+      - Add support for Polar Stereographic CF-Compliant NetCDF files.
+      - Re-orient NetCDF lat/lon grid.
+      - Support northern and southern hemisphere Lambert Conformal grids.
+   - Regridding
+      - Add "shape" config option to the "regrid" and "interp" dictionaries to
+        define a "square" (legacy) or "circle" area.
+      - Automatically regrid masking regions to verification domain on the fly
+        using nearest-neighbor interpolation.
+   - Config file options
+      - Add "GRIB2_stat_type" config file filtering option.
+      - Fix "GRIB_lvl_typ" config file filtering option for GRIB2 data.
+      - Add "convert(x)" config file option to define unit conversion functions.
+         - For example, convert(x) = C_to_F(x);
+      - Add "censor_thresh" and "censor_val" config file options to apply a
+        filtering thresholds and replacement values.
+         - For example, censor_thresh = [ <0 ]; censor_val = [ 0 ];
+   - MODE
+      - Remove "zero_border_size" config file option.
+      - Remove "raw_thresh" config file option which is replaced by censoring.
+      - Remove "AREA_FILTER" column from MODE output _obj.txt files.
+      - Remove "FILTER" line from MODE output _cts.txt files.
+      - Add output columns for "N_VALID", "GRID_RES", and "OBTYPE".
+      - Speed up convex hull detection algorithm.
+   - Gen-Vx-Mask
+      - Add "lat" and "lon" masking types to threshold grid latitude and/or
+        longitude values.
+        - For example, -type lat -thresh >-10&&<=30
+   - PB2NC
+      - Add support for reading BUFR files directly, rather than just PREPBUFR.
+      - Replace "obs_grib_code" config file option with "obs_bufr_var".
+      - Add "obs_bufr_map", "obs_prepbufr_map", "message_type_map", and
+        "time_summary" config file options.
+      - Add "-index" command line option to list all available observations.
+   - ASCII2NC
+      - Enable input column 7 to contain an integer GRIB code (legacy) or
+        string variable name.
+   - Point-Stat and Ensemble-Stat
+      - Generalize the specification of point observations using the variable
+        name rather than mapping to a GRIB code.
+   - Plot-Point-Obs
+      - Add "-obs_var" command line option.
+   - Grid-Stat and Point-Stat
+      - Add Root-Mean Squared Forecast (RMSFA) and Observation (RMSOA) Anomalies
+        to the CNT line type.
+      - Add new Economic Cost-Loss Value (ECLV) STAT line type derived from
+        CTC or PCT lines.
+      - Add "eclv_points" config file option.
+      - Add initial support for binned climatologies by adding "climo_stdev" and
+        "climo_cdf_bins" config file options.
+      - When computing BSS, use the "climo_mean" and "climo_stdev" fields to
+        derive the climatological probability values to be verified.
+   - Grid-Stat
+      - Add new Gradient (GRAD) STAT line type for statistics derived from
+        gradients, including the S1 score.
+      - Add option to compute 1-dimensional Fourier Decompositions when
+        generating CNT, SL1L2, SAL1L2, VL1L2, and VAL1L2 output lines.
+      - Add "fourier" config file dictionary to specify wave numbers.
+      - Append fourier wave number information to the "INTERP_MTHD" column.
+      - Enhance "nc_pairs_flag" config file option to write derived "fourier"
+        and "gradient" fields.
+   - Ensemble-Stat
+      - Add "skip_const" config file option to exclude points where all ensemble
+        members and the observation value are identical.
+      - Add "obs_thresh" config file option to only include points where the
+        observation value meets the filtering threshold.
+      - Add "BSS_SMPL" statistic to the PSTD line type.
+      - Add new Relative Position (RELP) STAT line type.
+   - Stat-Analysis
+      - Enhance "-column_thresh" job command option to compute column difference
+        with or without absolute values.
+      - Add "RANGE" and "IQR" (Interquartile Range) columns for the summary job.
+      - Allow for NA values when filtering data.
+         - For example, -column_thresh CLIMO != NA
+      - Add support for specifying derived columns, "INIT_HOUR" and "VALID_HOUR".
+         - For example, -by INIT_HOUR
+      - Add support for aggregating new ECLV, GRAD, and RELP line types.
+      - Add support for reading CTC or PCT and deriving ECLV.
+      - Add support for reading ORANK and deriving RELP.
 
 Version 6.0 Release Notes:
 -------------------------

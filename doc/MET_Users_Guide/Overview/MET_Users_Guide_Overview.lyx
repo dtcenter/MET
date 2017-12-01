@@ -785,16 +785,6 @@ Additional methods for verification of climate and seasonal forecasts
 \end_layout
 
 \begin_layout Standard
-Support for other input formats
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Support for NetCDF 4.
-\end_layout
-
-\begin_layout Standard
 Additional analysis capabilities and plotting routines
 \end_layout
 
@@ -866,18 +856,6 @@ Performance diagrams
 \end_layout
 
 \end_deeper
-\begin_layout Standard
-
-\series bold
-Other capabilities
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Database and display system for the statistical output of MET
-\end_layout
-
 \begin_layout Section
 Code support
 \begin_inset CommandInset label

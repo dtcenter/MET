@@ -209,8 +209,8 @@ name "sec:Install_Required-compilers-and"
 
 \series medium
 The MET package was developed and tested using the GNU g++/gfortran compilers,
- the Portland Group (PGI) pgCC/pgf90 compilers, and the Intel icc/ifort
- compilers.
+ the Portland Group (PGI) pgCC or pgc++ and pgf90 compilers, and the Intel
+ icc/ifort compilers.
  As additional compilers are successfully tested, they will be added to
  the list of supported platforms/compilers.
 \end_layout
