@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -101,7 +103,7 @@ This user's guide is provided as an aid to users of the Model Evaluation
 \series medium
 It is important to note here that MET is an evolving software package.
  Previous releases of MET have occurred each year since 2008.
- This documentation describes the 5.1 release from 2015.
+ This documentation describes the 6.1 release from December 2017.
  Intermediate releases may include bug fixes.
  MET is also be able to accept new modules contributed by the community.
  If you have code you would like to contribute, we will gladly consider
@@ -131,7 +133,7 @@ This User's Guide was prepared by the developers of the MET, including Tressa
 \end_layout
 
 \begin_layout Section*
-New for MET v6.0
+New for MET v6.1
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:New-for-MET"
@@ -144,60 +146,9 @@ name "sec:New-for-MET"
 \begin_layout Standard
 
 \series medium
-METv6.0 includes several enhancements to existing tools, including t
-\series default
-he NetCDF4 enhanced model.
-\end_layout
-
-\begin_layout Standard
-NetCDF4 supports the compression for variables.
- The default compresison level is defined in the ConfigConstants file.
- The valid range is between 0 and 9.
- The compression level 0 disables the compression.
- Lower numbers are faster and higher numbers provide better compression.
- Some tools can override this by using the tool specific configuration file.
- Individual users have an option to override the compression level with
- the environment variable 
-\series bold
-MET_NC_COMPRESS
-\series default
- or with the command line argument 
-\series bold
-
-\begin_inset Quotes eld
-\end_inset
-
--compress level
-\series default
-
-\begin_inset Quotes erd
-\end_inset
-
-.
- The command line argument takes precedence over the environment variable
- 
-\series bold
-MET_NC_COMPRESS
-\series default
-.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-METv6.0 includes one new tool (lidar2nc), and several enhancements to existing
- tools, including NetCDF4 support, MET-TC E-Decks, High Resolution Assessment
- (HiRA) verification framework, and description header column.
- Additional details on these changes are listed below.
-\end_layout
-
-\begin_layout Subsection*
-New Tools:
-\end_layout
-
-\begin_layout Standard
-The lidar2nc tool reformats HDF4 CALIPSO data files into a NetCDF point
- observation format for use by Point-Stat and Ensemble-Stat.
+METv6.1 includes several major enhancements, including generalized point
+ observations, unit conversion, data censoring, economic cost/loss value,
+ gradients, fourier decomposition, relative position, and binned climatologies.
 \end_layout
 
 \begin_layout Subsection*
@@ -211,122 +162,321 @@ Distribute the latest set of bugfixes, details not listed here.
 \end_layout
 
 \begin_layout Itemize
-Enhance MET to handle southern polar stereographic grids.
+
+\series medium
+Update 
+\begin_inset Quotes eld
+\end_inset
+
+-version
+\begin_inset Quotes erd
+\end_inset
+
+ command line option to include patch level info.
 \end_layout
 
 \begin_layout Itemize
-NetCDF
+
+\series medium
+Grid library code
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Enhance MET tools to read/write NetCDF4 files and support a configurable
- compression level ("nc_compression" configuration option, ${MET_NC_COMPRESS}
- environment variable, and "-compress" command line option, listed in order
- of precedence).
+Add support for Gaussian grids.
 \end_layout
 
 \begin_layout Itemize
-Support "add_offset" and "scale_factor" attributes to read NetCDF variables
- of type short, int, float, and double.
- 
+
+\series medium
+Add support for Polar Stereographic CF-Compliant NetCDF files.
 \end_layout
 
 \begin_layout Itemize
-Add logic to reorient latitudes to be south to north, if needed.
+
+\series medium
+Re-orient NetCDF lat/lon grid.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Support northern and southern hemisphere Lambert Conformal grids.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-GRIB1 and GRIB2 files
+Regridding
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Enhance GRIB1/2 table support by updating GRIB table definitions and enhancing
- logic when reading GRIB files.
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+shape
+\begin_inset Quotes erd
+\end_inset
+
+ config option to the 
+\begin_inset Quotes eld
+\end_inset
+
+regrid
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+interp
+\begin_inset Quotes erd
+\end_inset
+
+ dictionaries to define a 
+\begin_inset Quotes eld
+\end_inset
+
+square
+\begin_inset Quotes erd
+\end_inset
+
+ (legacy) or 
+\begin_inset Quotes eld
+\end_inset
+
+circle
+\begin_inset Quotes erd
+\end_inset
+
+ area.
 \end_layout
 
 \begin_layout Itemize
-Refine logic for defining custom GRIB tables using the ${MET_GRIB_TABLES}
- environment variable (previously named ${USER_GRIB_TABLES}).
- 
-\end_layout
 
-\begin_layout Itemize
-Support filtering GRIB2 data by product definition template, generating
- process, ensemble type, or derived product type using "GRIB2_pdt", "GRIB2_proce
-ss", "GRIB2_ens_type", and "GRIB2_der_type" configuration options, respectively.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Probabilities 
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Support shorthand convention for reading/writing probabilistic thresholds
- where "==n" is interpreted as equally spaced thresholds (e.g.
- "==0.25" means ">=0.00,>=0.25,>=0.50,>=0.75,>=1.00").
- 
-\end_layout
-
-\begin_layout Itemize
-Add new "prob_as_scalar" configuration option to disable the application
- of probabilistic verification methods.
- 
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Additional configuration options 
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Add new description ("DESC") header column to MET ASCII output files.
- The description string may be set separately for each verification task
- defined in the configuration file.
- 
-\end_layout
-
-\begin_layout Itemize
-Add ${MET_TMP_DIR} environment variable to specify where temporary files
- should be written and override the "tmp_dir" configuration option.
- 
-\end_layout
-
-\begin_layout Itemize
-Remove restriction that UGRD must be immediately followed by VGRD at the
- same level to compute VL1L2 and VAL1L2 output.
+\series medium
+Automatically regrid masking regions to verification domain on the fly using
+ nearest-neighbor interpolation.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-ASCII2NC and MADIS2NC
+Config file options
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add "-mask_sid" command line option to define a group of station ID's.
- 
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB2_stat_type
+\begin_inset Quotes erd
+\end_inset
+
+ config file filtering option.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Reduce runtime by reading blocks of observations.
+Fix 
+\begin_inset Quotes eld
+\end_inset
+
+GRIB_lvl_typ
+\begin_inset Quotes erd
+\end_inset
+
+ config file filtering option for GRIB2 data.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+convert(x)
+\begin_inset Quotes erd
+\end_inset
+
+ config file option to define unit conversion functions.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+For example, convert(x) = C_to_F(x);
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+censor_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+censor_val
+\begin_inset Quotes erd
+\end_inset
+
+ config file options to apply a filtering thresholds and replacement values.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+For example, censor_thresh = [ <0 ]; censor_val = [ 0 ];
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+MODE
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Remove 
+\begin_inset Quotes eld
+\end_inset
+
+zero_border_size
+\begin_inset Quotes erd
+\end_inset
+
+ config file option.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Remove 
+\begin_inset Quotes eld
+\end_inset
+
+raw_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ config file option which is replaced by censoring.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Remove 
+\begin_inset Quotes eld
+\end_inset
+
+AREA_FILTER
+\begin_inset Quotes erd
+\end_inset
+
+ column from MODE output _obj.txt files.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Remove 
+\begin_inset Quotes eld
+\end_inset
+
+FILTER
+\begin_inset Quotes erd
+\end_inset
+
+ line from MODE output _cts.txt files.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add output columns for 
+\begin_inset Quotes eld
+\end_inset
+
+N_VALID
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+GRID_RES
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+OBTYPE
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Speed up convex hull detection algorithm.
 \end_layout
 
 \end_deeper
@@ -334,87 +484,291 @@ Reduce runtime by reading blocks of observations.
 
 \series medium
 Gen-Vx-Mask
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add support for masking by the position of the sun using the solar altitude
- ("solar_alt") option azimuth ("solar_azi") "-type" options.
-\end_layout
+Add 
+\begin_inset Quotes eld
+\end_inset
 
-\end_deeper
-\begin_layout Itemize
-PB2NC 
-\end_layout
+lat
+\begin_inset Quotes erd
+\end_inset
 
-\begin_deeper
-\begin_layout Itemize
-Enable "grid" configuration option in "mask" to be set to a named grid or
- gridded data file.
-\end_layout
+ and 
+\begin_inset Quotes eld
+\end_inset
 
-\end_deeper
-\begin_layout Itemize
-PCP-Combine 
-\end_layout
+lon
+\begin_inset Quotes erd
+\end_inset
 
-\begin_deeper
-\begin_layout Itemize
-Switch error for subtracting data with different initialization times to
- a warning.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Regrid-Data-Plane 
+ masking types to threshold grid latitude and/or longitude values.
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Change the "-name" command line option to a comma-separated list of output
- variable names for each field specified.
+For example, -type lat -thresh >-10&&<=30
 \end_layout
 
 \end_deeper
+\end_deeper
 \begin_layout Itemize
-Point-Stat 
+
+\series medium
+PB2NC
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Add "hira" configuration options to support High Resolution Assessment (HiRA)
- verification, a neighborhood verification method for point observations.
+
+\series medium
+Add support for reading BUFR files directly, rather than just PREPBUFR.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Replace 
+\begin_inset Quotes eld
+\end_inset
+
+obs_grib_code
+\begin_inset Quotes erd
+\end_inset
+
+ config file option with 
+\begin_inset Quotes eld
+\end_inset
+
+obs_bufr_var
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+obs_bufr_map
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+obs_prepbufr_map
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+message_type_map
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+time_summary
+\begin_inset Quotes erd
+\end_inset
+
+ config file options.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+-index
+\begin_inset Quotes erd
+\end_inset
+
+ command line option to list all available observations.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Point-Stat and Ensemble-Stat 
+
+\series medium
+ASCII2NC
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Refine logic for the "duplicate_flag" configuration option to check for
- duplicate observations at the same station.
- 
+
+\series medium
+Enable input column 7 to contain an integer GRIB code (legacy) or string
+ variable name.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Point-Stat and Ensemble-Stat
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Generalize the specification of point observations using the variable name
+ rather than mapping to a GRIB code.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Plot-Point-Obs
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+-obs_var
+\begin_inset Quotes erd
+\end_inset
+
+ command line option.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series medium
+Grid-Stat and Point-Stat
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series medium
+Add Root-Mean Squared Forecast (RMSFA) and Observation (RMSOA) Anomalies
+ to the CNT line type.
 \end_layout
 
 \begin_layout Itemize
-Add "obs_summary" and "obs_perc_value" configuration options to derive summary
- metrics for multiple observations at the same station within the time window:
- "NONE", "MIN", "MAX", "UW_MEAN", "DW_MEAN", "MEDIAN", or "PERC" to use
- all observations, the minimum, maximum, average, time-weighted average,
- median, or a particular percentile, respectively.
- 
+
+\series medium
+Add new Economic Cost-Loss Value (ECLV) STAT line type derived from CTC
+ or PCT lines.
 \end_layout
 
 \begin_layout Itemize
-Add five new "method" options in the "interp" section: "UPPER_LEFT", "UPPER_RIGH
-T", "LOWER_RIGHT", and "LOWER_LEFT" to select the forecast value at a particular
- grid box corner and "BEST" to select the forecast value which most closely
- matches the observation value.
- 
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+eclv_points
+\begin_inset Quotes erd
+\end_inset
+
+ config file option.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add initial support for binned climatologies by adding 
+\begin_inset Quotes eld
+\end_inset
+
+climo_stdev
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+climo_cdf_bins
+\begin_inset Quotes erd
+\end_inset
+
+ config file options.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+When computing BSS, use the 
+\begin_inset Quotes eld
+\end_inset
+
+climo_mean
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+climo_stdev
+\begin_inset Quotes erd
+\end_inset
+
+ fields to derive the climatological probability values to be verified.
 \end_layout
 
 \end_deeper
@@ -422,37 +776,85 @@ T", "LOWER_RIGHT", and "LOWER_LEFT" to select the forecast value at a particular
 
 \series medium
 Grid-Stat
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add "shape" configuration option (SQUARE or CIRCLE) to the "interp" dictionary.
- Will be applied to other MET tools in future releases.
- 
+Add new Gradient (GRAD) STAT line type for statistics derived from gradients,
+ including the S1 score.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add "apply_mask" configuration option to "nc_pairs_flag" to indicate whether
- matched pairs should be written for each masking region.
- 
+Add option to compute 1-dimensional Fourier Decompositions when generating
+ CNT, SL1L2, SAL1L2, VL1L2, and VAL1L2 output lines.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Allow Grid-Stat to run with only matched pairs output requested ("nc_pairs_flag"
-) but no statistics computed ("output_flag").
- 
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+fourier
+\begin_inset Quotes erd
+\end_inset
+
+ config file dictionary to specify wave numbers.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Dramatically reduce runtime with more efficient memory management.
+Append fourier wave number information to the 
+\begin_inset Quotes eld
+\end_inset
+
+INTERP_MTHD
+\begin_inset Quotes erd
+\end_inset
+
+ column.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Enhance 
+\begin_inset Quotes eld
+\end_inset
+
+nc_pairs_flag
+\begin_inset Quotes erd
+\end_inset
+
+ config file option to write derived 
+\begin_inset Quotes eld
+\end_inset
+
+fourier
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+gradient
+\begin_inset Quotes erd
+\end_inset
+
+ fields.
 \end_layout
 
 \end_deeper
@@ -460,195 +862,176 @@ Dramatically reduce runtime with more efficient memory management.
 
 \series medium
 Ensemble-Stat
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add ensemble spread to the output: "SPREAD" column in RHIST line type and
- "ENS_SPREAD" in the ORANK line type.
- 
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+skip_const
+\begin_inset Quotes erd
+\end_inset
+
+ config file option to exclude points where all ensemble members and the
+ observation value are identical.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Dramatically reduce runtime with more efficient memory management and data
- access methods.
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+obs_thresh
+\begin_inset Quotes erd
+\end_inset
+
+ config file option to only include points where the observation value meets
+ the filtering threshold.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+BSS_SMPL
+\begin_inset Quotes erd
+\end_inset
+
+ statistic to the PSTD line type.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add new Relative Position (RELP) STAT line type.
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-STAT-Analysis
+Stat-Analysis
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add "-mask_sid" job command option to define a group of station ID's.
-\end_layout
+Enhance 
+\begin_inset Quotes eld
+\end_inset
 
-\end_deeper
-\begin_layout Itemize
-STAT-Analysis, MODE-Analysis, and TC-Stat 
-\end_layout
+-column_thresh
+\begin_inset Quotes erd
+\end_inset
 
-\begin_deeper
-\begin_layout Itemize
-Enhance logic to process output from all previous versions of MET by reading
- version-specific column offset files rather than hard-coding those values.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-
-\series medium
-MODE
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Add support for arrays in the "merge_thresh" configuration option.
- - MODE-Analysis 
+ job command option to compute column difference with or without absolute
+ values.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Allow "-lookin" option to be set to a directory or filename.
- 
+Add 
+\begin_inset Quotes eld
+\end_inset
+
+RANGE
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+IQR
+\begin_inset Quotes erd
+\end_inset
+
+ (Interquartile Range) columns for the summary job.
 \end_layout
 
-\end_deeper
-\begin_layout Itemize
-MODE-Analysis 
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Allow "-lookin" option to be set to a directory or filename.
-\end_layout
-
-\end_deeper
 \begin_layout Itemize
 
 \series medium
-MTD 
+Allow for NA values when filtering data.
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Add cluster object centroid coordinates to the 2D attributes file.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add "DURATION_DIFF" column to the 3D pair attributes file.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add "CDIST_TRAVELLED" column to the 3D simple attributes file to indicate
- the total distance travelled for 2D object slices.
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-GSID2MPR
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Reduce runtime by refining the logic of checking for duplicates.
- 
+For example, -column_thresh CLIMO != NA
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-MET-TC 
+Add support for specifying derived columns, 
+\begin_inset Quotes eld
+\end_inset
+
+INIT_HOUR
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+VALID_HOUR
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
 
 \series medium
-Enhance TC-Pairs to read E-Deck files using the "-edeck" command line option
- and write the new PROBRIRW line type containing probabilities of rapid
- intensity changes.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Enhance TC-Stat to parse and filter PROBRIRW lines.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add new "probrirw" job type to TC-Stat to apply probabilistic methods to
- PROBRIRW lines and write PCT, PSTD, PRC, and PJC lines.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Add "lead_req" configuration option to TC-Pairs and TC-Stat to specify required
- lead times that must be present for a track to be retained.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Modify TC-Pairs to derive interp12, consensus, lag, and baseline tracks
- before applying track filtering logic.
- 
-\end_layout
-
-\begin_layout Itemize
-
-\series medium
-Distribute enhancements to the plot_tcmpr.R Rscript plotting utility.
+For example, -by INIT_HOUR
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
 
 \series medium
-WWMCA-Regrid
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-
-\series medium
-Generalize to handle a wider variety of input naming conventions.
- 
+Add support for aggregating new ECLV, GRAD, and RELP line types.
 \end_layout
 
 \begin_layout Itemize
 
 \series medium
-Add "write_pixel_age" and "swap_endian" configuration options to process
- pixel age data rather than cloud data.
+Add support for reading CTC or PCT and deriving ECLV.
+\end_layout
+
+\begin_layout Itemize
+
+\series medium
+Add support for reading ORANK and deriving RELP.
 \end_layout
 
 \end_deeper
@@ -858,7 +1241,7 @@ on for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with
 \series bold
 \begin_inset Tabular
 <lyxtabular version="3" rows="1" columns="1">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="6in">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
