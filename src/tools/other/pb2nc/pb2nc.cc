@@ -226,7 +226,6 @@ static const char *bufr_avail_sid_names = "SID SAID RPID";
 static const char *bufr_avail_latlon_names = "XOB CLON CLONH YOB CLAT CLATH";
 
 static double bufr_obs[mxr8lv][mxr8pm];
-static double bufr_obs_evt[mxr8vn][mxr8lv][mxr8pm];
 static double bufr_pres_lv[mxr8lv]; // Retain the pressure in hPa
 static double bufr_msl_lv[mxr8lv];  // Convert from geopotential height to MSL
 
@@ -324,7 +323,6 @@ static void   set_valid_beg_time(const StringArray &);
 static void   set_valid_end_time(const StringArray &);
 static void   set_nmsg(const StringArray &);
 static void   set_dump_path(const StringArray &);
-static void   set_do_all_variables(const StringArray & a);
 static void   set_collect_metadata(const StringArray &);
 static void   set_target_variables(const StringArray & a);
 static void   set_logfile(const StringArray &);
@@ -826,12 +824,8 @@ void process_pbfile(int i_pb) {
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_pb_rpt = rej_in_rpt = rej_itp  = rej_nobs = 0;
 
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { OBS_BUFFER_SIZE, 1} ;
-
    //processed_count = 0;
    int buf_nlev;
-   int valid_data_count = 0;
    bool is_prepbufr = is_prepbufr_file(&event_names);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
@@ -1361,7 +1355,6 @@ void process_pbfile(int i_pb) {
             isDegC = false;
             isMgKg = false;
             isMilliBar = false;
-            char unit_str[BUFR_UNIT_LEN];
             if (var_names.has(var_name, var_index)) {
                //mlog << Debug(7) <<  "  var name  " << var_name << ", unit str=" << var_units[var_index] << "\n";
                if (0 == strcmp("DEG C", var_units[var_index])) {
@@ -1553,18 +1546,14 @@ void process_pbfile(int i_pb) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_pbfile_metadata(int i_pb) {
-   int npbmsg, unit, yr, mon, day, hr, min, sec;
-   int i, i_msg, i_read, i_ret, i_date, n_hdr_obs;
-   int lv, ev, ev_temp, kk, len1, len2, var_index;
+   int npbmsg, unit;
+   int i, i_msg, i_read, i_ret, i_date;
+   int lv, var_index;
    int debug_threshold = 10;
-
-   double   x, y;
 
    bool tmp_use_small_buffer = false;
    bool check_all = do_all_vars || collect_metadata;
-   unixtime file_ut = (unixtime) 0;
-   char     time_str[max_str_len];
-   char     hdr_typ[max_str_len];
+   char hdr_typ[max_str_len];
    StringArray tmp_bufr_obs_name_arr;
    ConcatString file_name, blk_prefix, blk_file;
    static const char *method_name = "process_pbfile_metadata()";
@@ -1625,10 +1614,8 @@ void process_pbfile_metadata(int i_pb) {
    // Initialize counts
    i_ret   =  i_msg     = 0;
 
-   int valid_data_count = 0;
    bool is_prepbufr = is_prepbufr_file(&event_names);
 
-   //
    StringArray headers;
    StringArray tmp_hdr_array;
    headers.add(prepbufr_hdrs);
@@ -1659,7 +1646,6 @@ void process_pbfile_metadata(int i_pb) {
 
    int index;
    int length;
-   int var_idx;
    bool is_prepbufr_hdr = false;
    use_small_buffer = true;
    // Loop through the PrepBufr messages from the input file
@@ -1866,9 +1852,6 @@ void process_pbfile_metadata(int i_pb) {
             if (bufr_obs[lv][0] < r8bfms) {
                if (!tmp_bufr_obs_name_arr.has(var_name) && !bufr_hdr_name_arr.has(var_name)) {
                   tmp_bufr_obs_name_arr.add(var_name);
-                  //if (prepbufr_vars.has(var_name, var_idx)) {
-                  //   bufr_var_code[var_idx] = vIdx;
-                  //}
                }
                if (do_all_vars) {
                   int count = (0 == variableCountMap.count(var_name)) ? variableCountMap[var_name] : 0;
@@ -1940,7 +1923,6 @@ void process_pbfile_metadata(int i_pb) {
 void write_netcdf_hdr_data() {
    int i, buf_len;
    long dim_count;
-   float hdr_arr[hdr_arr_len];
    bool is_prepbufr = is_prepbufr_file(&event_names);
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
@@ -1956,7 +1938,6 @@ void write_netcdf_hdr_data() {
          mlog << Error << method_name << " -> "
               << "can't remove output NetCDF file \"" << ncfile
               << "\"\n\n";
-         //exit(1);
       }
       exit(1);
    }
@@ -2066,7 +2047,6 @@ void write_netcdf_hdr_data() {
       }
          
       // Variable description
-      int buf_len = 0;
       lengths[1] = BUFR_DESCRIPTION_LEN;
       if(!put_nc_data(&bufr_desc_var, (char *)desc_str, lengths, offsets)) {
          mlog << Error << "\nwrite_netcdf_hdr_data() -> "
