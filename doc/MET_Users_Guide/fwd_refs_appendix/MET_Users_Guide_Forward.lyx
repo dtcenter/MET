@@ -149,6 +149,9 @@ name "sec:New-for-MET"
 METv6.1 includes several major enhancements, including generalized point
  observations, unit conversion, data censoring, economic cost/loss value,
  gradients, fourier decomposition, relative position, and binned climatologies.
+ The documentation also has some enhancements, including a Statistics Name
+ Equivalency Table.
+ This is located in the Appendices.
 \end_layout
 
 \begin_layout Subsection*
@@ -1226,7 +1229,7 @@ Notices and Additional Terms
 The source of this material is the Research Applications Laboratory at the
  National Center for Atmospheric Research, a program of the University Corporati
 on for Atmospheric Research (UCAR) pursuant to a Cooperative Agreement with
- the National Science Foundation; ©2007-2015 University Corporation for
+ the National Science Foundation; ©2007-2017 University Corporation for
  Atmospheric Research.
  All Rights Reserved." 
 \begin_inset Newline newline
@@ -1282,20 +1285,20 @@ By using or downloading the Software, you agree to be bound by the terms
 \end_layout
 
 \begin_layout Standard
-The citation for tEhis User's Guide should be:
+The citation for tEis User's Guide should be:
 \end_layout
 
 \begin_layout Standard
-Brown, B., R.
+R.
  Bullock, T.
  Fowler, J.
  Halley Gotway, K.
- Newman and T.
- Jensen, 2017: The Model Evaluation Tools v6.0 (METv6.0) User’s Guide.
+ Newman,Brown, B., and T.
+ Jensen, 2017: The Model Evaluation Tools v6.1 (METv6.1) User’s Guide.
  Developmental Testbed Center.
  Available at: http://www.dtcenter.org/met/users/docs/users_guide/MET_Users_Guide_
-v6.0.pdf.
- 329 pp.
+v6.1.pdf.
+ 355 pp.
 \end_layout
 
 \begin_layout Chapter*
@@ -1314,27 +1317,33 @@ name "chap:Acknowledgments"
 \begin_layout Standard
 
 \series medium
-We thank the the National Science Foundation (NSF), the National Oceanic
- and Atmospheric Administration (NOAA), the United States Air Force (USAF),
- and the United States Department of Energy (DOE) for their support of this
- work.
+We thank the the National Science Foundation (NSF) along with three organization
+s within the National Oceanic and Atmospheric Administration (NOAA): 1)
+ Office of Atmospheric Research (OAR); 2) Next Generation Global Predition
+ System project (NGGPS); and 3) United State Weather Research Program (USWRP),
+ the United States Air Force (USAF), and the United States Department of
+ Energy (DOE) for their support of this work.
  Funding for the development of MET-TC is from the NOAA's Hurricane Forecast
  Improvement Project (HFIP) through the Developmental Testbed Center (DTC).
  Funding for the expansion of capability to address many methods pertinent
  to global and climate simulations was provided by NOAA's Next Generation
  Global Prediction System (NGGPS) and NSF Earth System Model 2 (EaSM2) projects.
- The National Center for Atmospheric Research (NCAR) is sponsored by NSF.
  We would like to thank James Franklin at the National Hurricane Center
  (NHC) for his insight into the original development of the existing NHC
  verification software.
  Thanks also go to the staff at the Developmental Testbed Center for their
  help, advice, and many types of support.
- We are grateful to the individuals who participated in MET planning workshops
- in February 2007, April 2008, August 2009, and November 2010; the ideas
- generated at those workshops will help MET grow in future years.
- Finally, we would like to specifically thank the verification advisory
+ We released METv1.0 in January 2008 and would not have made a decade of
+ cutting-edge verification support without those who participated in the
+ original MET planning workshopsand the now dis-banded verification advisory
  group (Mike Baldwin, Matthew Sittel, Elizabeth Ebert, Geoff DiMego, Chris
- Davis, and Jason Knievel) for their guidance and other contributions.
+ Davis, and Jason Knievel).
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The National Center for Atmospheric Research (NCAR) is sponsored by NSF.
  The DTC is sponsored by the National Oceanic and Atmospheric Administration
  (NOAA), the United States Air Force, and the National Science Foundation
  (NSF).
