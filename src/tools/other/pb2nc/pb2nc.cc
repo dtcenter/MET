@@ -557,7 +557,7 @@ void get_variable_info(const char* tbl_filename) {
    ConcatString input_data;
    if (fp != NULL) {
       char var_name[BUFR_NAME_LEN+1];
-      char var_desc[BUFR_DESCRIPTION_LEN+1];
+      char var_desc[max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
       char var_unit_str[BUFR_UNIT_LEN+1];
       bool find_mnemonic = false;
       
@@ -728,8 +728,8 @@ void process_pbfile(int i_pb) {
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
    
    const int debug_level_for_performance = 3;
-   int start_t, end_t = clock();
-   int method_end, method_start = clock();
+   int start_t, end_t, method_start, method_end;
+   start_t = end_t = method_start = method_end = clock();
 
    StringArray variables_big_nlevels;
    static const char *method_name = "process_pbfile()";
