@@ -372,7 +372,7 @@ return;
 template <typename T>
 void CRC_Array<T>::set(unsigned int ix, const T & elem)
 {
-	if ( (ix < 0) || (ix >= Nelements) )  {
+	if ( (ix >= Nelements) )  {
 		mlog << Error << "\nCRC_Array::set(unsigned int, T) const -> range check error\n\n";
 		exit ( 1 );
 	}
