@@ -829,6 +829,16 @@ map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void BootInfo::clear() {
+   interval = BootIntervalType_None;
+   rep_prop = bad_data_double;
+   n_rep    = 0;
+   rng.clear();
+   seed.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
 BootInfo parse_conf_boot(Dictionary *dict) {
    BootInfo info;
    int v;
@@ -939,7 +949,18 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void InterpInfo::validate(){
+void InterpInfo::clear() {
+   field = FieldType_None;
+   vld_thresh = bad_data_double;
+   n_interp = 0;
+   method.clear();
+   width.clear();
+   shape = GridTemplateFactory::GridTemplate_None;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void InterpInfo::validate() {
 
    for(unsigned int i=0; i<n_interp; i++) {
 
@@ -1113,6 +1134,15 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    info.validate();
 
    return(info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void NbrhdInfo::clear() {
+   vld_thresh = bad_data_double;
+   width.clear();
+   cov_ta.clear();
+   shape = GridTemplateFactory::GridTemplate_None;
 }
 
 ////////////////////////////////////////////////////////////////////////
