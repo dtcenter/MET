@@ -213,6 +213,8 @@ struct BootInfo {
    int              n_rep;    // Number of replicates
    ConcatString     rng;      // GSL random number generator
    ConcatString     seed;     // RNG seed value
+
+   void             clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -228,6 +230,8 @@ struct InterpInfo {
    StringArray method;     // Interpolation methods
    IntArray    width;      // Interpolation widths
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
+
+   void        clear();
    void        validate(); // Ensure that width and method are accordant
 };
 
@@ -265,6 +269,8 @@ struct NbrhdInfo {
    IntArray    width;      // Neighborhood widths
    ThreshArray cov_ta;     // Fractional coverage thresholds
    GridTemplateFactory::GridTemplates shape; // Neighborhood shape
+
+   void        clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
