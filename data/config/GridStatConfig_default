@@ -26,6 +26,7 @@ obtype = "ANALYS";
 
 //
 // Verification grid
+// May be set separately in each "obs.field" entry
 //
 regrid = {
    to_grid    = NONE;
@@ -49,6 +50,7 @@ wind_thresh      = [ NA ];
 wind_logic       = UNION;
 eclv_points      = 0.05;
 nc_pairs_var_str = "";
+rank_corr_flag   = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -99,6 +101,7 @@ climo_cdf_bins = 1;
 
 //
 // Verification masking regions
+// May be set separately in each "obs.field" entry
 //
 mask = {
    grid = [ "FULL" ];
@@ -109,6 +112,7 @@ mask = {
 
 //
 // Confidence interval settings
+// May be set separately in each "obs.field" entry
 //
 ci_alpha  = [ 0.05 ];
 
@@ -124,6 +128,7 @@ boot = {
 
 //
 // Data smoothing methods
+// May be set separately in each "obs.field" entry
 //
 interp = {
    field      = BOTH;
@@ -142,6 +147,7 @@ interp = {
 
 //
 // Neighborhood methods
+// May be set separately in each "obs.field" entry
 //
 nbrhd = {
    width      = [ 1 ];
@@ -154,6 +160,7 @@ nbrhd = {
 
 //
 // Fourier decomposition
+// May be set separately in each "obs.field" entry
 //
 fourier = {
    wave_1d_beg = [];
@@ -164,6 +171,7 @@ fourier = {
 
 //
 // Statistical output types
+// May be set separately in each "obs.field" entry
 //
 output_flag = {
    fho    = BOTH;
@@ -189,6 +197,7 @@ output_flag = {
 
 //
 // NetCDF matched pairs output file
+// May be set separately in each "obs.field" entry
 //
 nc_pairs_flag   = {
    latlon     = TRUE;
@@ -205,7 +214,6 @@ nc_pairs_flag   = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "";
 version          = "V6.1";

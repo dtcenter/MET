@@ -47,20 +47,7 @@ GridStatConfInfo::~GridStatConfInfo() {
 void GridStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info   = (VarInfo **)     0;
-   obs_info    = (VarInfo **)     0;
-   fcat_ta     = (ThreshArray *)  0;
-   ocat_ta     = (ThreshArray *)  0;
-   cnt_logic   = (SetLogic *)     0;
-   fcnt_ta     = (ThreshArray *)  0;
-   ocnt_ta     = (ThreshArray *)  0;
-   fwind_ta    = (ThreshArray *)  0;
-   owind_ta    = (ThreshArray *)  0;
-   wind_logic  = (SetLogic *)     0;
-   eclv_points = (NumArray *)     0;
-   mask_dp     = (DataPlane *)    0;
-   interp_mthd = (InterpMthd *)   0;
-   ascii_output_flag = true;
+   vx_opt = (GridStatVxOpt *) 0;
 
    clear();
 
@@ -70,79 +57,23 @@ void GridStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::clear() {
-   int i;
-
-   // Set counts to zero
-   n_vx_scal = 0;
-   n_vx_vect = 0;
-   n_vx_prob = 0;
-   n_mask    = 0;
-   n_interp  = 0;
-
-   max_n_cat_thresh   = 0;
-   max_n_cnt_thresh   = 0;
-   max_n_wind_thresh  = 0;
-   max_n_fprob_thresh = 0;
-   max_n_oprob_thresh = 0;
 
    // Initialize values
    model.clear();
    obtype.clear();
-   regrid_info.clear();
-   desc.clear();
-   climo_cdf_ta.clear();
-   mask_name.clear();
-   ci_alpha.clear();
-   boot_interval = BootIntervalType_None;
-   boot_rep_prop = bad_data_double;
-   n_boot_rep = bad_data_int;
-   boot_rng.clear();
-   boot_seed.clear();
-   interp_field = FieldType_None;
-   interp_thresh = bad_data_double;
-   interp_wdth.clear();
-   nc_info.set_all_true();
+   mask_map.clear();
    grid_weight_flag = GridWeightType_None;
-   rank_corr_flag = false;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
-   ascii_output_flag = true;
-
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   nc_info.clear();
+   output_ascii_flag = false;
+   output_nc_flag = false;
 
    // Deallocate memory
-   if(fcat_ta)     { delete [] fcat_ta;     fcat_ta     = (ThreshArray *) 0; }
-   if(ocat_ta)     { delete [] ocat_ta;     ocat_ta     = (ThreshArray *) 0; }
+   if(vx_opt) { delete [] vx_opt; vx_opt = (GridStatVxOpt *) 0; }
 
-   if(fcnt_ta)     { delete [] fcnt_ta;     fcnt_ta     = (ThreshArray *) 0; }
-   if(ocnt_ta)     { delete [] ocnt_ta;     ocnt_ta     = (ThreshArray *) 0; }
-   if(cnt_logic)   { delete [] cnt_logic;   cnt_logic   = (SetLogic *)    0; }
-
-   if(fwind_ta)    { delete [] fwind_ta;    fwind_ta    = (ThreshArray *) 0; }
-   if(owind_ta)    { delete [] owind_ta;    owind_ta    = (ThreshArray *) 0; }
-   if(wind_logic)  { delete [] wind_logic;  wind_logic  = (SetLogic *)    0; }
-
-   if(eclv_points) { delete [] eclv_points; eclv_points = (NumArray *)    0; }
-
-   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)   0; }
-   if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)  0; }
-
-   // Clear fcst_info
-   if(fcst_info) {
-      for(i=0; i<n_vx; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      delete fcst_info; fcst_info = (VarInfo **) 0;
-   }
-
-   // Clear obs_info
-   if(obs_info) {
-      for(i=0; i<n_vx; i++)
-         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
-      delete obs_info; obs_info = (VarInfo **) 0;
-   }
-
-   // Reset count
+   // Reset counts
    n_vx = 0;
 
    return;
@@ -167,18 +98,12 @@ void GridStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
-   int i, n;
-   ConcatString s;
-   StringArray sa;
-   VarInfoFactory info_factory;
-   map<STATLineType,STATOutputType>output_map;
+void GridStatConfInfo::process_config(GrdFileType ftype,
+                                      GrdFileType otype) {
+   int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
    Dictionary i_fdict, i_odict;
-   BootInfo boot_info;
-   InterpInfo interp_info;
-   NbrhdInfo nbrhd_info;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -195,15 +120,469 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    // Conf: obtype
    obtype = parse_conf_string(&conf, conf_key_obtype);
 
+   // Conf: grid_weight_flag
+   grid_weight_flag = parse_conf_grid_weight_flag(&conf);
+
+   // Conf: tmp_dir
+   tmp_dir = parse_conf_tmp_dir(&conf);
+
+   // Conf: output_prefix
+   output_prefix = conf.lookup_string(conf_key_output_prefix);
+
+   // Conf: fcst.field and obs.field
+   fdict = conf.lookup_array(conf_key_fcst_field);
+   odict = conf.lookup_array(conf_key_obs_field);
+
+   // Determine the number of fields (name/level) to be verified
+   n_fvx = parse_conf_n_vx(fdict);
+   n_ovx = parse_conf_n_vx(odict);
+
+   // Check for a valid number of verification tasks
+   if(n_fvx != n_ovx) {
+      mlog << Error << "\nGridStatConfInfo::process_config() -> "
+           << "The number of verification tasks in \""
+           << conf_key_obs_field << "\" (" << n_ovx
+           << ") must be non-zero and match the number in \""
+           << conf_key_fcst_field << "\" (" << n_fvx << ").\n\n";
+      exit(1);
+   }
+
+   // Allocate memory for the verification task options
+   n_vx   = n_fvx;
+   vx_opt = new GridStatVxOpt [n_vx];
+
+   // Check for consistent number of climatology fields
+   check_climo_n_vx(&conf, n_vx);
+
+   for(i=0; i<n_vx; i++) {
+
+      // Get the current dictionaries
+      i_fdict = parse_conf_i_vx_dict(fdict, i);
+      i_odict = parse_conf_i_vx_dict(odict, i);
+
+      // Process the options for this verification task
+      vx_opt[i].process_config(ftype, i_fdict, otype, i_odict);
+   }
+
+   // Summarize output flags across all verification tasks
+   process_flags();
+
+   // If VL1L2 or VAL1L2 is requested, set the uv_index
+   if(output_flag[i_vl1l2]  != STATOutputType_None ||
+      output_flag[i_val1l2] != STATOutputType_None) {
+
+      for(i=0; i<n_vx; i++) {
+
+         // Process u-wind
+         if(vx_opt[i].fcst_info->is_u_wind() &&
+            vx_opt[i].obs_info->is_u_wind()) {
+
+            // Search for corresponding v-wind
+            for(j=0; j<n_vx; j++) {
+               if(vx_opt[j].fcst_info->is_v_wind()      &&
+                  vx_opt[j].obs_info->is_v_wind()       &&
+                  vx_opt[i].fcst_info->req_level_name() ==
+                  vx_opt[j].fcst_info->req_level_name() &&
+                  vx_opt[i].obs_info->req_level_name()  ==
+                  vx_opt[j].obs_info->req_level_name()) {
+
+                  vx_opt[i].fcst_info->set_uv_index(j);
+                  vx_opt[i].obs_info->set_uv_index(j);
+               }
+            }
+         }
+         // Process v-wind
+         else if(vx_opt[i].fcst_info->is_v_wind() &&
+                 vx_opt[i].obs_info->is_v_wind()) {
+
+            // Search for corresponding u-wind
+            for(j=0; j<n_vx; j++) {
+               if(vx_opt[j].fcst_info->is_u_wind()      &&
+                  vx_opt[j].obs_info->is_u_wind()       &&
+                  vx_opt[i].fcst_info->req_level_name() ==
+                  vx_opt[j].fcst_info->req_level_name() &&
+                  vx_opt[i].obs_info->req_level_name()  ==
+                  vx_opt[j].obs_info->req_level_name()) {
+
+                  vx_opt[i].fcst_info->set_uv_index(j);
+                  vx_opt[i].obs_info->set_uv_index(j);
+               }
+            }
+         }
+      } // end for i
+   } // end if
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridStatConfInfo::process_flags() {
+   int i, j;
+
+   // Initialize
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   nc_info.set_all_false();
+   output_ascii_flag = false;
+
+   // Loop over the verification tasks
+   for(i=0; i<n_vx; i++) {
+
+      // Summary of output_flag settings
+      for(j=0; j<n_txt; j++) {
+         if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
+            output_flag[j] = STATOutputType_Both;
+            output_ascii_flag = true;
+         }
+         else if(vx_opt[i].output_flag[j] == STATOutputType_Stat &&
+                           output_flag[j] == STATOutputType_None) {
+            output_flag[j] = STATOutputType_Stat;
+            output_ascii_flag = true;
+         }
+      }
+
+      // Summary of nc_info flag settings
+      if(vx_opt[i].nc_info.do_latlon)     nc_info.do_latlon     = true;
+      if(vx_opt[i].nc_info.do_raw)        nc_info.do_raw        = true;
+      if(vx_opt[i].nc_info.do_diff)       nc_info.do_diff       = true;
+      if(vx_opt[i].nc_info.do_climo)      nc_info.do_climo      = true;
+      if(vx_opt[i].nc_info.do_weight)     nc_info.do_weight     = true;
+      if(vx_opt[i].nc_info.do_nbrhd)      nc_info.do_nbrhd      = true;
+      if(vx_opt[i].nc_info.do_fourier)    nc_info.do_fourier    = true;
+      if(vx_opt[i].nc_info.do_gradient)   nc_info.do_gradient   = true;
+      if(vx_opt[i].nc_info.do_apply_mask) nc_info.do_apply_mask = true;
+   }
+
+   // Check output_ascii_flag
+   if(!output_ascii_flag) {
+       mlog << Debug(3)
+            <<"\nNo STAT output types requested, "
+            << "proceeding with ASCII output flag set to false.\n";
+   }
+
+   // Set output_nc_flag
+   output_nc_flag = !nc_info.all_false();
+
+   // Check for at least one output data type
+   if(!output_ascii_flag && !output_nc_flag) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "At least one output STAT or NetCDF type must be "
+           << " requested in \"" << conf_key_output_flag << "\" or \""
+           << conf_key_nc_pairs_flag << "\".\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridStatConfInfo::process_masks(const Grid &grid) {
+   int i, j;
+   DataPlane dp;
+   ConcatString name;
+
+   mlog << Debug(2)
+        << "Processing masking regions.\n";
+
+   // Mapping of grid definition strings to mask names
+   map<ConcatString,ConcatString> grid_map;
+   map<ConcatString,ConcatString> poly_map;
+
+   // Initiailize
+   mask_map.clear();
+
+   // Process the masks for each vx task
+   for(i=0; i<n_vx; i++) {
+
+      // Initialize
+      vx_opt[i].mask_name.clear();
+
+      // Parse the masking grids
+      for(j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
+
+         // Process new grid masks
+         if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
+            mlog << Debug(3)
+                 << "Processing grid mask: "
+                 << vx_opt[i].mask_grid[j] << "\n";
+            parse_grid_mask(vx_opt[i].mask_grid[j], grid, dp, name);
+            grid_map[vx_opt[i].mask_grid[j]] = name;
+            mask_map[name] = dp;
+         }
+
+         // Store the name for the current grid mask
+         vx_opt[i].mask_name.add(grid_map[vx_opt[i].mask_grid[j]]);
+
+      } // end for j
+
+      // Parse the masking polylines
+      for(j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+
+         // Process new poly mask
+         if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
+            mlog << Debug(3)
+                 << "Processing poly mask: "
+                 << vx_opt[i].mask_poly[j] << "\n";
+            parse_poly_mask(vx_opt[i].mask_poly[j], grid, dp, name);
+            poly_map[vx_opt[i].mask_poly[j]] = name;
+            mask_map[name] = dp;
+         }
+
+         // Store the name for the current poly mask
+         vx_opt[i].mask_name.add(poly_map[vx_opt[i].mask_poly[j]]);
+
+      } // end for j
+
+      // Check that at least one verification masking region is provided
+      if(vx_opt[i].mask_name.n_elements() == 0) {
+         mlog << Error << "\nGridStatConfInfo::process_masks() -> "
+              << "At least one grid or polyline verification masking "
+              << "region must be provided for verification task number "
+              << i+1 << ".\n\n";
+         exit(1);
+      }
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::n_txt_row(int i_txt_row) const {
+   int i, n;
+
+   // Loop over the tasks and sum the line counts for this line type
+   for(i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::n_stat_row() const {
+   int i, n;
+
+   // Loop over the line types and sum the line counts
+   for(i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::get_max_n_cat_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::get_max_n_cnt_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::get_max_n_wind_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::get_max_n_fprob_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::get_max_n_oprob_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::get_max_n_eclv_points() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int GridStatConfInfo::get_max_n_cov_thresh() const {
+   int i, n;
+
+   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class GridStatVxOpt
+//
+////////////////////////////////////////////////////////////////////////
+
+GridStatVxOpt::GridStatVxOpt() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GridStatVxOpt::~GridStatVxOpt() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridStatVxOpt::init_from_scratch() {
+
+   // Initialize pointers
+   fcst_info   = (VarInfo *)    0;
+   obs_info    = (VarInfo *)    0;
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridStatVxOpt::clear() {
+   int i;
+
+   // Initialize values
+   regrid_info.clear();
+
+   desc.clear();
+   var_str.clear();
+
+   fcat_ta.clear();
+   ocat_ta.clear();
+
+   fcnt_ta.clear();
+   ocnt_ta.clear();
+   cnt_logic = SetLogic_None;
+
+   fwind_ta.clear();
+   owind_ta.clear();
+   wind_logic = SetLogic_None;
+
+   mask_grid.clear();
+   mask_poly.clear();
+   mask_name.clear();
+
+   eclv_points.clear();
+
+   climo_cdf_ta.clear();
+
+   ci_alpha.clear();
+
+   boot_info.clear();
+   interp_info.clear();
+   nbrhd_info.clear();
+
+   wave_1d_beg.clear();
+   wave_1d_end.clear();
+
+   rank_corr_flag = false;
+
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+
+   nc_info.set_all_true();
+
+   // Deallocate memory
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridStatVxOpt::process_config(
+        GrdFileType ftype, Dictionary &fdict,
+        GrdFileType otype, Dictionary &odict) {
+   int i, n;
+   VarInfoFactory info_factory;
+   map<STATLineType,STATOutputType>output_map;
+   InterpMthd mthd;
+
+   // Initialize
+   clear();
+
+   // Allocate new VarInfo objects
+   fcst_info = info_factory.new_var_info(ftype);
+   obs_info  = info_factory.new_var_info(otype);
+
+   // Set the VarInfo objects
+   fcst_info->set_dict(fdict);
+   obs_info->set_dict(odict);
+
+   // Dump the contents of the current VarInfo
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << "Parsed forecast field:\n";
+      fcst_info->dump(cout);
+      mlog << Debug(5)
+           << "Parsed observation field:\n";
+      obs_info->dump(cout);
+   }
+
+   // No support for wind direction
+   if(fcst_info->is_wind_direction() || obs_info->is_wind_direction()) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "wind direction may not be verified using grid_stat.\n\n";
+      exit(1);
+   }
+
+   // Check that the observation field does not contain probabilities
+   if(obs_info->is_prob()) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "the observation field cannot contain probabilities.\n\n";
+      exit(1);
+   }
+
    // Conf: regrid
-   regrid_info = parse_conf_regrid(&conf);
+   regrid_info = parse_conf_regrid(&odict);
+
+   // Conf: desc
+   desc = parse_conf_string(&odict, conf_key_desc);
+
+   // Conf: nc_pairs_var_str
+   var_str = parse_conf_string(&odict, conf_key_nc_pairs_var_str, false);
 
    // Conf: output_flag
-   output_map = parse_conf_output_flag(&conf);
+   output_map = parse_conf_output_flag(&odict);
 
    // Make sure the output_flag is the expected size
    if((signed int) output_map.size() != n_txt) {
-      mlog << Error << "\nGridStatConfInfo::process_config() -> "
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
            << "Unexpected number of entries found in \""
            << conf_key_output_flag << "\" ("
            << (signed int) output_map.size()
@@ -212,607 +591,347 @@ void GridStatConfInfo::process_config(GrdFileType ftype, GrdFileType otype) {
    }
 
    // Populate the output_flag array with map values
-   for(i=0,n=0; i<n_txt; i++) {
-      output_flag[i] = output_map[txt_file_type[i]];
-      if(output_flag[i] != STATOutputType_None) n++;
+   for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
+
+   // Conf: cat_thresh
+   fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
+   ocat_ta = odict.lookup_thresh_array(conf_key_cat_thresh);
+
+   // Conf: cnt_thresh
+   fcnt_ta = fdict.lookup_thresh_array(conf_key_cnt_thresh);
+   ocnt_ta = odict.lookup_thresh_array(conf_key_cnt_thresh);
+
+   // Conf: cnt_logic
+   cnt_logic = check_setlogic(
+      int_to_setlogic(fdict.lookup_int(conf_key_cnt_logic)),
+      int_to_setlogic(odict.lookup_int(conf_key_cnt_logic)));
+
+   // Conf: wind_thresh
+   fwind_ta = fdict.lookup_thresh_array(conf_key_wind_thresh);
+   owind_ta = odict.lookup_thresh_array(conf_key_wind_thresh);
+
+   // Conf: wind_logic
+   wind_logic = check_setlogic(
+      int_to_setlogic(fdict.lookup_int(conf_key_wind_logic)),
+      int_to_setlogic(odict.lookup_int(conf_key_wind_logic)));
+
+   // Dump the contents of the current thresholds
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << "Parsed thresholds:\n"
+           << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
+           << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
+           << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
+           << "Observed continuous thresholds:  " << ocnt_ta.get_str() << "\n"
+           << "Continuous threshold logic:      " << setlogic_to_string(cnt_logic) << "\n"
+           << "Forecast wind speed thresholds:  " << fwind_ta.get_str() << "\n"
+           << "Observed wind speed thresholds:  " << owind_ta.get_str() << "\n"
+           << "Wind speed threshold logic:      " << setlogic_to_string(wind_logic) << "\n";
    }
 
-   // Check for at least one output line type
-   if(n == 0) {
-       // MET-620  Do NOT error out when no STAT type is requested.
-       // Instead, generate the requested output file and do NOT
-       // generate any ASCII output text files. Set the ascii_output_flat
-       // to false, it is set to true by default.
-       mlog <<Debug(3)
-            <<"\nNo STAT type requested, proceeding with ASCII output flag to false.\n";
-       set_ascii_output_flag(false);
+   // Verifying a probability field
+   if(fcst_info->is_prob()) {
+      fcat_ta = string_to_prob_thresh(fcat_ta.get_str());
    }
 
-   // Conf: fcst.field and obs.field
-   fdict = conf.lookup_array(conf_key_fcst_field);
-   odict = conf.lookup_array(conf_key_obs_field);
+   // Check for equal threshold length for non-probability fields
+   if(!fcst_info->is_prob() &&
+      fcat_ta.n_elements() != ocat_ta.n_elements()) {
 
-   // Determine the number of fields (name/level) to be verified
-   n_vx = parse_conf_n_vx(fdict);
-
-   // Check for a valid number of verification tasks
-   if(n_vx == 0 || parse_conf_n_vx(odict) != n_vx) {
-      mlog << Error << "\nGridStatConfInfo::process_config() -> "
-           << "The number of verification tasks in \""
-           << conf_key_obs_field
-           << "\" must be non-zero and match the number in \""
-           << conf_key_fcst_field << "\".\n\n";
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The number of thresholds for each field in \"fcst."
+           << conf_key_cat_thresh
+           << "\" must match the number of thresholds for each "
+           << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
       exit(1);
    }
 
-   // Check climatology fields
-   check_climo_n_vx(&conf, n_vx);
+   // Add default continuous thresholds until the counts match
+   n = max(fcnt_ta.n_elements(), ocnt_ta.n_elements());
+   while(fcnt_ta.n_elements() < n) fcnt_ta.add(na_str);
+   while(ocnt_ta.n_elements() < n) ocnt_ta.add(na_str);
 
-   // Conf: climo_cdf_bins
-   climo_cdf_ta = parse_conf_climo_cdf_bins(&conf);
+   // Add default wind speed thresholds until the counts match
+   n = max(fwind_ta.n_elements(), owind_ta.n_elements());
+   while(fwind_ta.n_elements() < n) fwind_ta.add(na_str);
+   while(owind_ta.n_elements() < n) owind_ta.add(na_str);
 
-   // Allocate space based on the number of verification tasks
-   fcst_info   = new VarInfo *   [n_vx];
-   obs_info    = new VarInfo *   [n_vx];
-   fcat_ta     = new ThreshArray [n_vx];
-   ocat_ta     = new ThreshArray [n_vx];
-   fcnt_ta     = new ThreshArray [n_vx];
-   ocnt_ta     = new ThreshArray [n_vx];
-   cnt_logic   = new SetLogic    [n_vx];
-   fwind_ta    = new ThreshArray [n_vx];
-   owind_ta    = new ThreshArray [n_vx];
-   wind_logic  = new SetLogic    [n_vx];
-   eclv_points = new NumArray    [n_vx];
-
-   // Initialize pointers
-   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
-
-   // Parse the fcst and obs field information
-   for(i=0; i<n_vx; i++) {
-
-      // Allocate new VarInfo objects
-      fcst_info[i] = info_factory.new_var_info(ftype);
-      obs_info[i]  = info_factory.new_var_info(otype);
-
-      // Get the current dictionaries
-      i_fdict = parse_conf_i_vx_dict(fdict, i);
-      i_odict = parse_conf_i_vx_dict(odict, i);
-
-      // Set the current dictionaries
-      fcst_info[i]->set_dict(i_fdict);
-      obs_info[i]->set_dict(i_odict);
-
-      // Conf: desc
-      desc.add(parse_conf_string(&i_odict, conf_key_desc));
-
-      // Conf: nc_pairs_var_str
-      var_str.add(parse_conf_string(&i_odict, conf_key_nc_pairs_var_str, false));
-
-      // Conf: eclv_points
-      eclv_points[i] = parse_conf_eclv_points(&i_odict);
-
-      // Dump the contents of the current VarInfo
-      if(mlog.verbosity_level() >= 5) {
-         mlog << Debug(5)
-              << "Parsed forecast field number " << i+1 << ":\n";
-         fcst_info[i]->dump(cout);
-         mlog << Debug(5)
-              << "Parsed observation field number " << i+1 << ":\n";
-         obs_info[i]->dump(cout);
-      }
-
-      // No support for wind direction
-      if(fcst_info[i]->is_wind_direction() ||
-         obs_info[i]->is_wind_direction()) {
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
-              << "the wind direction field may not be verified "
-              << "using grid_stat.\n\n";
-         exit(1);
-      }
-
-      // Check that the observation field does not contain probabilities
-      if(obs_info[i]->is_prob()) {
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
-              << "The observation field cannot contain probabilities.\n\n";
-         exit(1);
-      }
-   } // end for i
-
-   // If VL1L2 or VAL1L2 is requested, check the specified fields and turn
-   // on the vflag when UGRD is followed by VGRD at the same level
-   if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None) {
-
-      for(i=0, n_vx_vect = 0; i<n_vx; i++) {
-
-         if(fcst_info[i]->is_u_wind() && obs_info[i]->is_u_wind()) {
-
-            // Search for corresponding v wind
-            for(int j=0; j<n_vx; j++) {
-               if(fcst_info[j]->is_v_wind() && obs_info[j]->is_v_wind() &&
-                  fcst_info[i]->req_level_name() ==
-                  fcst_info[j]->req_level_name() &&
-                  obs_info[i]->req_level_name()  ==
-                  obs_info[j]->req_level_name()) {
-
-                  fcst_info[i]->set_uv_index(j);
-                  obs_info[i]->set_uv_index(j);
-
-                  // Increment the number of vector fields to be verified
-                  n_vx_vect++;
-               }
-            }
-         }
-         else if(fcst_info[i]->is_v_wind() && obs_info[i]->is_v_wind()) {
-
-            // Search for corresponding u wind
-            for(int j=0; j<n_vx; j++) {
-               if(fcst_info[j]->is_u_wind() && obs_info[j]->is_u_wind() &&
-                  fcst_info[i]->req_level_name() ==
-                  fcst_info[j]->req_level_name() &&
-                  obs_info[i]->req_level_name()  ==
-                  obs_info[j]->req_level_name()) {
-
-                  fcst_info[i]->set_uv_index(j);
-                  obs_info[i]->set_uv_index(j);
-               }
-            }
-         }
-      } // end for
-   } // end if
-
-   // Compute the number of scalar and probability fields to be verified.
-   for(i=0, n_vx_prob=0, n_vx_scal=0; i<n_vx; i++) {
-      if(fcst_info[i]->is_prob()) n_vx_prob++;
-      else                        n_vx_scal++;
+   // Verifying with multi-category contingency tables
+   if(!fcst_info->is_prob() &&
+      (output_flag[i_mctc] != STATOutputType_None ||
+       output_flag[i_mcts] != STATOutputType_None)) {
+      check_mctc_thresh(fcat_ta);
+      check_mctc_thresh(ocat_ta);
    }
 
-   // Initialize maximum threshold counts
-   max_n_cat_thresh   = 0;
-   max_n_cnt_thresh   = 0;
-   max_n_wind_thresh  = 0;
-   max_n_fprob_thresh = 0;
-   max_n_oprob_thresh = 0;
+   // Conf: mask_grid
+   mask_grid = odict.lookup_string_array(conf_key_mask_grid);
 
-   // Parse and sanity check thresholds
-   for(i=0; i<n_vx; i++) {
+   // Conf: mask_poly
+   mask_poly = odict.lookup_string_array(conf_key_mask_poly);
 
-      // Get the current dictionaries
-      i_fdict = parse_conf_i_vx_dict(fdict, i);
-      i_odict = parse_conf_i_vx_dict(odict, i);
+   // Conf: eclv_points
+   eclv_points = parse_conf_eclv_points(&odict);
 
-      // Conf: cat_thresh
-      fcat_ta[i] = i_fdict.lookup_thresh_array(conf_key_cat_thresh);
-      ocat_ta[i] = i_odict.lookup_thresh_array(conf_key_cat_thresh);
-
-      // Conf: cnt_thresh
-      fcnt_ta[i] = i_fdict.lookup_thresh_array(conf_key_cnt_thresh);
-      ocnt_ta[i] = i_odict.lookup_thresh_array(conf_key_cnt_thresh);
-
-      // Conf: cnt_logic
-      cnt_logic[i] = check_setlogic(
-         int_to_setlogic(i_fdict.lookup_int(conf_key_cnt_logic)),
-         int_to_setlogic(i_odict.lookup_int(conf_key_cnt_logic)));
-
-      // Conf: wind_thresh
-      fwind_ta[i] = i_fdict.lookup_thresh_array(conf_key_wind_thresh);
-      owind_ta[i] = i_odict.lookup_thresh_array(conf_key_wind_thresh);
-
-      // Conf: wind_logic
-      wind_logic[i] = check_setlogic(
-         int_to_setlogic(i_fdict.lookup_int(conf_key_wind_logic)),
-         int_to_setlogic(i_odict.lookup_int(conf_key_wind_logic)));
-
-      // Dump the contents of the current thresholds
-      if(mlog.verbosity_level() >= 5) {
-         mlog << Debug(5)
-              << "Parsed thresholds for field number " << i+1 << "...\n"
-              << "Forecast categorical thresholds: "     << fcat_ta[i].get_str() << "\n"
-              << "Observed categorical thresholds: "     << ocat_ta[i].get_str() << "\n"
-              << "Forecast continuous thresholds: "      << fcnt_ta[i].get_str() << "\n"
-              << "Observed continuous thresholds: "      << ocnt_ta[i].get_str() << "\n"
-              << "Continuous threshold logic: "          << setlogic_to_string(cnt_logic[i]) << "\n"
-              << "Forecast wind speed thresholds: "      << fwind_ta[i].get_str() << "\n"
-              << "Observed wind speed thresholds: "      << owind_ta[i].get_str() << "\n"
-              << "Wind speed threshold logic: "          << setlogic_to_string(wind_logic[i]) << "\n";
-      }
-
-      // Verifying a probability field
-      if(fcst_info[i]->is_prob()) {
-         fcat_ta[i] = string_to_prob_thresh(fcat_ta[i].get_str());
-      }
-
-      // Check for equal threshold length for non-probability fields
-      if(!fcst_info[i]->is_prob() &&
-         fcat_ta[i].n_elements() != ocat_ta[i].n_elements()) {
-
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
-              << "The number of thresholds for each field in \"fcst."
-              << conf_key_cat_thresh
-              << "\" must match the number of thresholds for each "
-              << "field in \"obs." << conf_key_cat_thresh << "\".\n\n";
-         exit(1);
-      }
-
-      // Add default continuous thresholds until the counts match
-      n = max(fcnt_ta[i].n_elements(), ocnt_ta[i].n_elements());
-      while(fcnt_ta[i].n_elements() < n) fcnt_ta[i].add(na_str);
-      while(ocnt_ta[i].n_elements() < n) ocnt_ta[i].add(na_str);
-
-      // Add default wind speed thresholds until the counts match
-      n = max(fwind_ta[i].n_elements(), owind_ta[i].n_elements());
-      while(fwind_ta[i].n_elements() < n) fwind_ta[i].add(na_str);
-      while(owind_ta[i].n_elements() < n) owind_ta[i].add(na_str);
-
-      // Verifying with multi-category contingency tables
-      if(!fcst_info[i]->is_prob() &&
-         (output_flag[i_mctc] != STATOutputType_None ||
-          output_flag[i_mcts] != STATOutputType_None)) {
-         check_mctc_thresh(fcat_ta[i]);
-         check_mctc_thresh(ocat_ta[i]);
-      }
-
-      // Look for the maximum number of thresholds
-      if(!fcst_info[i]->is_prob()) {
-
-         if(fcat_ta[i].n_elements() > max_n_cat_thresh)
-            max_n_cat_thresh = fcat_ta[i].n_elements();
-         if(fcnt_ta[i].n_elements() > max_n_cnt_thresh)
-            max_n_cnt_thresh = fcnt_ta[i].n_elements();
-         if(fwind_ta[i].n_elements() > max_n_wind_thresh)
-            max_n_wind_thresh = fwind_ta[i].n_elements();
-      }
-      // Look for the maximum number of thresholds for prob fields
-      else {
-
-         if(fcat_ta[i].n_elements() > max_n_fprob_thresh)
-            max_n_fprob_thresh = fcat_ta[i].n_elements();
-         if(ocat_ta[i].n_elements() > max_n_oprob_thresh)
-            max_n_oprob_thresh = ocat_ta[i].n_elements();
-      }
-   } // end for i
+   // Conf: climo_cdf_bins
+   climo_cdf_ta = parse_conf_climo_cdf_bins(&odict);
 
    // Conf: ci_alpha
-   ci_alpha = parse_conf_ci_alpha(&conf);
+   ci_alpha = parse_conf_ci_alpha(&odict);
 
    // Conf: boot
-   boot_info     = parse_conf_boot(&conf);
-   boot_interval = boot_info.interval;
-   boot_rep_prop = boot_info.rep_prop;
-   n_boot_rep    = boot_info.n_rep;
-   boot_rng      = boot_info.rng;
-   boot_seed     = boot_info.seed;
+   boot_info = parse_conf_boot(&odict);
 
    // Conf: interp
-   interp_info   = parse_conf_interp(&conf);
-   interp_field  = interp_info.field;
-   interp_thresh = interp_info.vld_thresh;
-   n_interp      = interp_info.n_interp;
-   interp_wdth   = interp_info.width;
-   interp_shape  = interp_info.shape;
+   interp_info = parse_conf_interp(&odict);
 
-   // Allocate memory to store the interpolation methods
-   interp_mthd = new InterpMthd [n_interp];
-   for(i=0; i<n_interp; i++) {
+   // Loop through interpolation options
+   for(i=0; i<interp_info.n_interp; i++) {
 
-      interp_mthd[i] = string_to_interpmthd(interp_info.method[i]);
+      mthd = string_to_interpmthd(interp_info.method[i]);
 
-      // Check for DW_MEAN, LS_FIT, BILIN and others
-      if(interp_mthd[i] == InterpMthd_DW_Mean ||
-         interp_mthd[i] == InterpMthd_LS_Fit  ||
-         interp_mthd[i] == InterpMthd_Bilin) {
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
+      // Check for unsupported interpolation methods
+      if(mthd == InterpMthd_DW_Mean ||
+         mthd == InterpMthd_LS_Fit  ||
+         mthd == InterpMthd_Bilin) {
+         mlog << Error << "\nGridStatVxOpt::process_config() -> "
               << "Interpolation methods DW_MEAN, LS_FIT, and BILIN are "
               << "not supported in Grid-Stat.\n\n";
          exit(1);
       }
 
       // Check for valid interpolation width
-      if(interp_wdth[i] < 1 || interp_wdth[i]%2 == 0) {
-         mlog << Error << "\nGridStatConfInfo::process_config() -> "
+      if(interp_info.width[i] < 1 || interp_info.width[i]%2 == 0) {
+         mlog << Error << "\nGridStatVxOpt::process_config() -> "
               << "The interpolation width must be set to odd values "
               << "greater than or equal to 1 ("
-              << interp_wdth[i] << ").\n\n";
+              << interp_info.width[i] << ").\n\n";
          exit(1);
       }
    } // end for i
 
    // Conf: nbrhd
-   nbrhd_info   = parse_conf_nbrhd(&conf);
-   nbrhd_thresh = nbrhd_info.vld_thresh;
-   nbrhd_wdth   = nbrhd_info.width;
-   nbrhd_cov_ta = nbrhd_info.cov_ta;
-   nbrhd_shape  = nbrhd_info.shape;
+   nbrhd_info = parse_conf_nbrhd(&odict);
 
    // Conf: fourier
-   Dictionary * d = conf.lookup_dictionary(conf_key_fourier);
+   Dictionary * d = odict.lookup_dictionary(conf_key_fourier);
    wave_1d_beg = d->lookup_int_array(conf_key_wave_1d_beg);
    wave_1d_end = d->lookup_int_array(conf_key_wave_1d_end);
 
    // Check for the same length
    if(wave_1d_beg.n_elements() != wave_1d_end.n_elements()) {
-      mlog << Error << "\nGridStatConfInfo::process_config() -> "
-           << "The fourier wave_1d_beg and wave_1d_end arrays must have the "
-           << "same length (" << wave_1d_beg.n_elements() << " != "
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The fourier wave_1d_beg and wave_1d_end arrays must have "
+           << "the same length (" << wave_1d_beg.n_elements() << " != "
            << wave_1d_end.n_elements() << ").\n\n";
       exit(1);
    }
 
-   // Conf: nc_pairs_flag
-   parse_nc_info();
-
-   // Check for at least one output data type
-   if(!get_ascii_output_flag() && nc_info.all_false()) {
-      mlog<<Error<<"\nGridStatConfInfo::process_config() -> "
-          <<"At least one output STAT or NetCDF type must be requested.\n\n";
-      exit(1);
-   }
-
-   // Conf: grid_weight_flag
-   grid_weight_flag = parse_conf_grid_weight_flag(&conf);
-
    // Conf: rank_corr_flag
-   rank_corr_flag = conf.lookup_bool(conf_key_rank_corr_flag);
+   rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
-   // Conf: tmp_dir
-   tmp_dir = parse_conf_tmp_dir(&conf);
-
-   // Conf: output_prefix
-   output_prefix = conf.lookup_string(conf_key_output_prefix);
+   // Conf: nc_pairs_flag
+   parse_nc_info(odict);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
-void GridStatConfInfo::parse_nc_info()
+   e = odict.lookup(conf_key_nc_pairs_flag);
 
-{
-
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
-
-e = conf.lookup(conf_key_nc_pairs_flag);
-
-if ( !e )  {
-
-   mlog << Error
-        << "\nGridStatConfInfo::parse_nc_info() -> lookup failed for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-const ConfigObjectType type = e->type();
-
-if ( type == BooleanType )  {
-
-   bool value = e->b_value();
-
-   if ( ! value )  nc_info.set_all_false();
-
-   return;
-
-}
-
-   //
-   //  it should be a dictionary
-   //
-
-if ( type != DictionaryType )  {
-
-   mlog << Error
-        << "\nGridStatConfInfo::parse_nc_info() -> bad type ("
-        << configobjecttype_to_string(type)
-        << ") for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  parse the various entries
-   //
-
-Dictionary * d = e->dict_value();
-
-nc_info.do_latlon      = d->lookup_bool(conf_key_latlon_flag);
-nc_info.do_raw         = d->lookup_bool(conf_key_raw_flag);
-nc_info.do_diff        = d->lookup_bool(conf_key_diff_flag);
-nc_info.do_climo       = d->lookup_bool(conf_key_climo_flag);
-nc_info.do_weight      = d->lookup_bool(conf_key_weight);
-nc_info.do_nbrhd       = d->lookup_bool(conf_key_nbrhd);
-nc_info.do_fourier     = d->lookup_bool(conf_key_fourier);
-nc_info.do_gradient    = d->lookup_bool(conf_key_gradient);
-nc_info.do_apply_mask  = d->lookup_bool(conf_key_apply_mask_flag);
-
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-void GridStatConfInfo::process_masks(const Grid &grid) {
-   int i;
-   StringArray mask_grid, mask_poly;
-   ConcatString name;
-
-   mlog << Debug(2)
-        << "Processing masking regions.\n";
-
-   // Retrieve the mask names
-   mask_grid = conf.lookup_string_array(conf_key_mask_grid);
-   mask_poly = conf.lookup_string_array(conf_key_mask_poly);
-
-   // Get the number of masks
-   n_mask = mask_grid.n_elements() + mask_poly.n_elements();
-
-   // Check that at least one verification masking region is provided
-   if(n_mask == 0) {
-
-      mlog << Error << "\nGridStatConfInfo::process_masks() -> "
-           << "At least one grid or polyline verification masking "
-           << "region must be provided.\n\n";
+   if(!e) {
+      mlog << Error
+           << "\nGridStatVxOpt::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_pairs_flag
+           << "\"\n\n";
       exit(1);
    }
 
-   // Allocate space to store the masking information
-   mask_dp = new DataPlane [n_mask];
+   const ConfigObjectType type = e->type();
 
-   // Parse out the masking grids
-   for(i=0; i<mask_grid.n_elements(); i++) {
-      mlog << Debug(3)
-           << "Processing grid mask: " << mask_grid[i] << "\n";
-      parse_grid_mask(mask_grid[i], grid, mask_dp[i], name);
-      mask_name.add(name);
+   if(type == BooleanType) {
+      bool value = e->b_value();
+
+      if(! value) nc_info.set_all_false();
+
+      return;
    }
 
-   // Parse out the masking polylines
-   for(i=0; i<mask_poly.n_elements(); i++) {
-      mlog << Debug(3)
-           << "Processing poly mask: " << mask_poly[i] << "\n";
-      parse_poly_mask(mask_poly[i], grid,
-                      mask_dp[i+mask_grid.n_elements()], name);
-      mask_name.add(name);
+   // It should be a dictionary
+   if(type != DictionaryType) {
+      mlog << Error
+           << "\nGridStatVxOpt::parse_nc_info() -> "
+           << "bad type (" << configobjecttype_to_string(type)
+           << ") for key \"" << conf_key_nc_pairs_flag << "\"\n\n";
+      exit(1);
    }
+
+   // Parse the various entries
+   Dictionary * d = e->dict_value();
+
+   nc_info.do_latlon      = d->lookup_bool(conf_key_latlon_flag);
+   nc_info.do_raw         = d->lookup_bool(conf_key_raw_flag);
+   nc_info.do_diff        = d->lookup_bool(conf_key_diff_flag);
+   nc_info.do_climo       = d->lookup_bool(conf_key_climo_flag);
+   nc_info.do_weight      = d->lookup_bool(conf_key_weight);
+   nc_info.do_nbrhd       = d->lookup_bool(conf_key_nbrhd);
+   nc_info.do_fourier     = d->lookup_bool(conf_key_fourier);
+   nc_info.do_gradient    = d->lookup_bool(conf_key_gradient);
+   nc_info.do_apply_mask  = d->lookup_bool(conf_key_apply_mask_flag);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int GridStatConfInfo::n_txt_row(int i_txt_row) {
+int GridStatVxOpt::n_txt_row(int i_txt_row) const {
    int n;
+
+   // Range check
+   if(i_txt_row < 0 || i_txt_row >= n_txt) {
+      mlog << Error << "\nGridStatVxOpt::n_txt_row(int) -> "
+           << "range check error for " << i_txt_row << "\n\n";
+      exit(1);
+   }
+
+   // Check if this output line type is requested
+   if(output_flag[i_txt_row] == STATOutputType_None) return(0);
+
+   bool prob_flag = fcst_info->is_prob();
+   bool vect_flag = (fcst_info->is_u_wind() && obs_info->is_u_wind());
 
    // Switch on the index of the line type
    switch(i_txt_row) {
 
       case(i_fho):
       case(i_ctc):
-         // Maximum number of FHO or CTC lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_scal * n_mask * n_interp * max_n_cat_thresh;
+         // Number of FHO or CTC lines =
+         //    Masks * Smoothing Methods * Thresholds
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_interp() * get_n_cat_thresh());
          break;
 
       case(i_cts):
-         // Maximum number of CTS lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds *
-         //    Alphas
-         n = n_vx_scal * n_mask * n_interp * max_n_cat_thresh *
-             get_n_ci_alpha();
+         // Number of CTS lines =
+         //    Masks * Smoothing Methods * Thresholds * Alphas
+         n = (prob_flag ? 0:
+              get_n_mask() * get_n_interp() * get_n_cat_thresh() *
+              get_n_ci_alpha());
          break;
 
       case(i_mctc):
-         // Maximum number of CTC lines possible =
-         //    Fields * Masks * Smoothing Methods
-         n = n_vx_scal * n_mask * n_interp;
+         // Number of MCTC lines =
+         //    Masks * Smoothing Methods
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_interp());
          break;
 
       case(i_mcts):
-         // Maximum number of CTS lines possible =
-         //    Fields * Masks * Smoothing Methods * Alphas
-         n = n_vx_scal * n_mask * n_interp * get_n_ci_alpha();
+         // Number of MCTS lines =
+         //    Masks * Smoothing Methods * Alphas
+         n = (prob_flag ? 0:
+              get_n_mask() * get_n_interp() * get_n_ci_alpha());
          break;
 
       case(i_cnt):
-         // Maximum number of CNT lines possible =
-         //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
-         //    Max Thresholds * Alphas
-         n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
-             max_n_cnt_thresh * get_n_ci_alpha();
+         // Number of CNT lines =
+         //    Masks * (Smoothing Methods + Fourier Waves) *
+         //    Thresholds * Alphas
+         n = (prob_flag ? 0 :
+              get_n_mask() * (get_n_interp() + get_n_wave_1d()) *
+              get_n_cnt_thresh() * get_n_ci_alpha());
          break;
 
       case(i_sl1l2):
       case(i_sal1l2):
-         // Maximum number of SL1L2 or SAL1L2 lines possible =
-         //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
-         //    Max Thresholds
-         n = n_vx_scal * n_mask * (n_interp + get_n_wave_1d()) *
-             max_n_cnt_thresh;
+         // Number of SL1L2 or SAL1L2 lines =
+         //    Masks * (Smoothing Methods + Fourier Waves) * Thresholds
+         n = (prob_flag ? 0 :
+              get_n_mask() * (get_n_interp() + get_n_wave_1d()) *
+              get_n_cnt_thresh());
          break;
 
       case(i_vl1l2):
       case(i_val1l2):
-         // Maximum number of VL1L2 or VAL1L2 lines possible =
-         //    Fields * Masks * (Smoothing Methods + Fourier Waves) *
-         //    Max Thresholds
-         n = n_vx_vect * n_mask * (n_interp + get_n_wave_1d()) *
-             max_n_wind_thresh;
+         // Number of VL1L2 or VAL1L2 lines =
+         //    Masks * (Smoothing Methods + Fourier Waves) * Thresholds
+         n = (!vect_flag ? 0 :
+              get_n_mask() * (get_n_interp() + get_n_wave_1d()) *
+              get_n_wind_thresh());
          break;
 
       case(i_nbrctc):
-         // Maximum number of NBRCTC lines possible =
-         //    Fields * Masks * Max Thresholds *
-         //    Neighborhoods * Frac Thresholds
-         n = n_vx_scal * n_mask * max_n_cat_thresh *
-             get_n_nbrhd_wdth() * get_n_cov_thresh();
+         // Number of NBRCTC lines =
+         //    Masks * Thresholds * Neighborhoods * Frac Thresholds
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_cat_thresh() * get_n_nbrhd_wdth() *
+              get_n_cov_thresh());
          break;
 
       case(i_nbrcts):
-         // Maximum number of NBRCTS lines possible =
-         //    Fields * Masks * Max Thresholds *
-         //    Neighborhoods * Frac Thresholds * Alphas
-         n = n_vx_scal * n_mask * max_n_cat_thresh *
-             get_n_nbrhd_wdth() * get_n_cov_thresh() *
-             get_n_ci_alpha();
+         // Number of NBRCTS lines =
+         //    Masks * Thresholds * Neighborhoods * Frac Thresholds *
+         //    Alphas
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_cat_thresh() * get_n_nbrhd_wdth() *
+              get_n_cov_thresh() * get_n_ci_alpha());
          break;
 
       case(i_nbrcnt):
-         // Maximum number of NBRCNT lines possible =
-         //    Fields * Masks * Max Thresholds *
-         //    Neighborhoods * Alphas
-         n = n_vx_scal * n_mask * max_n_cat_thresh *
-             get_n_nbrhd_wdth() * get_n_ci_alpha();
+         // Number of NBRCNT lines =
+         //    Masks * Thresholds * Neighborhoods * Alphas
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_cat_thresh() * get_n_nbrhd_wdth() *
+              get_n_ci_alpha());
          break;
 
       case(i_pct):
       case(i_pjc):
       case(i_prc):
-         // Maximum number of PCT, PJC, or PRC lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds *
-         //    Climo Bins
-         n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
-             get_n_cdf_bin();
+         // Number of PCT, PJC, or PRC lines =
+         //    Masks * Smoothing Methods * Thresholds * Climo Bins
+         n = (!prob_flag ? 0 :
+              get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
+              get_n_cdf_bin());
          break;
 
       case(i_pstd):
-         // Maximum number of PSTD lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds *
-         //    Alphas * Climo Bins
-         n = n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
-             get_n_ci_alpha() * get_n_cdf_bin();
+         // Number of PSTD lines =
+         //    Masks * Smoothing Methods * Thresholds * Alphas *
+         //    Climo Bins
+         n = (!prob_flag ? 0 :
+              get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
+              get_n_ci_alpha() * get_n_cdf_bin());
          break;
 
       case(i_eclv):
-         // Maximum number of CTC -> ECLV lines possible =
-         //    Fields * Masks * Smoothing Methods * Max Thresholds
-         n = n_vx_scal * n_mask * n_interp * max_n_cat_thresh;
+         // Number of CTC -> ECLV lines =
+         //    Masks * Smoothing Methods * Thresholds
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_interp() * get_n_cat_thresh());
 
-         // Maximum number of PCT -> ECLV lines possible =
+         // Number of PCT -> ECLV lines =
          //    Probability Fields * Masks * Smoothing Methods *
          //    Max Observation Probability Thresholds *
          //    Max Forecast Probability Thresholds * Climo Bins
-         n += n_vx_prob * n_mask * n_interp * max_n_oprob_thresh *
-              max_n_fprob_thresh * get_n_cdf_bin();
+         n += (!prob_flag ? 0 :
+               get_n_mask() * get_n_interp() * get_n_oprob_thresh() *
+               get_n_fprob_thresh() * get_n_cdf_bin());
          break;
 
       case(i_grad):
-         // Maximum number of GRAD lines possible =
-         //    Fields * Masks * Smoothing Methods
-         n = n_vx_scal * n_mask * n_interp;
-
+         // Number of GRAD lines =
+         //    Masks * Smoothing Methods
+         n = (prob_flag ? 0 :
+              get_n_mask() * get_n_interp());
          break;
 
       default:
-         mlog << Error << "\nGridStatConfInfo::n_txt_row(int) -> "
+         mlog << Error << "\nGridStatVxOpt::n_txt_row(int) -> "
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
@@ -824,123 +943,79 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int GridStatConfInfo::n_stat_row() {
-   int i, n;
-
-   // Set the maximum number of STAT output lines by summing the counts
-   // for the optional text files that have been requested
-   for(i=0, n=0; i<n_txt; i++) {
-      if(output_flag[i] != STATOutputType_None) n += n_txt_row(i);
-   }
-
-   return(n);
+int GridStatVxOpt::get_n_fprob_thresh() const {
+   return((!fcst_info || !fcst_info->is_prob()) ?
+          0 : fcat_ta.n_elements());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatConfInfo::set_ascii_output_flag(bool val)
-{
-    ascii_output_flag = val;
+int GridStatVxOpt::get_n_oprob_thresh() const {
+   return((!fcst_info || !fcst_info->is_prob()) ?
+          0 : ocat_ta.n_elements());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for struct GridStatNcOutInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+GridStatNcOutInfo::GridStatNcOutInfo() {
+   clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool GridStatConfInfo::get_ascii_output_flag()
-{
-    return ascii_output_flag;
-}
+void GridStatNcOutInfo::clear() {
 
+   set_all_true();
 
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for struct GridStatNcOutInfo
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-GridStatNcOutInfo::GridStatNcOutInfo()
-
-{
-
-clear();
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void GridStatNcOutInfo::clear()
-
-{
-
-set_all_true();
-
-return;
-
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+bool GridStatNcOutInfo::all_false() const {
 
-bool GridStatNcOutInfo::all_false() const
+   bool status = do_latlon || do_raw   || do_diff    || do_climo ||
+                 do_weight || do_nbrhd || do_fourier || do_apply_mask;
 
-{
-
-bool status = do_latlon || do_raw   || do_diff    || do_climo ||
-              do_weight || do_nbrhd || do_fourier || do_apply_mask;
-
-return ( !status );
-
+   return(!status);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void GridStatNcOutInfo::set_all_false() {
 
-void GridStatNcOutInfo::set_all_false()
+   do_latlon     = false;
+   do_raw        = false;
+   do_diff       = false;
+   do_climo      = false;
+   do_weight     = false;
+   do_nbrhd      = false;
+   do_fourier    = false;
+   do_gradient   = false;
+   do_apply_mask = false;
 
-{
-
-do_latlon     = false;
-do_raw        = false;
-do_diff       = false;
-do_climo      = false;
-do_weight     = false;
-do_nbrhd      = false;
-do_fourier    = false;
-do_gradient   = false;
-do_apply_mask = false;
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void GridStatNcOutInfo::set_all_true() {
 
-void GridStatNcOutInfo::set_all_true()
+   do_latlon     = true;
+   do_raw        = true;
+   do_diff       = true;
+   do_climo      = true;
+   do_weight     = true;
+   do_nbrhd      = true;
+   do_fourier    = true;
+   do_gradient   = true;
+   do_apply_mask = true;
 
-{
-
-do_latlon     = true;
-do_raw        = true;
-do_diff       = true;
-do_climo      = true;
-do_weight     = true;
-do_nbrhd      = true;
-do_fourier    = true;
-do_gradient   = true;
-do_apply_mask = true;
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
