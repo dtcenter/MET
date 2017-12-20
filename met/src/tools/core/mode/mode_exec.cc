@@ -898,15 +898,47 @@ if ( info.all_false() )  return;
    int deflate_level = info.compress_level;
 
    // Define Variables
-   if ( info.do_raw )         fcst_raw_var     = add_var(f_out, "fcst_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
-   if ( info.do_object_raw )  fcst_obj_raw_var = add_var(f_out, "fcst_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
-   if ( info.do_object_id )   fcst_obj_var     = add_var(f_out, "fcst_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
-   if ( info.do_cluster_id )  fcst_clus_var    = add_var(f_out, "fcst_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
+   if ( info.do_raw ) {
+      fcst_raw_var     = add_var(f_out, "fcst_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
+      add_att(&fcst_raw_var, "long_name", "Forecast Raw Values");
+      add_att(&fcst_raw_var, "_FillValue", bad_data_float);
+   }
+   if ( info.do_object_raw ) {
+      fcst_obj_raw_var = add_var(f_out, "fcst_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
+      add_att(&fcst_obj_raw_var, "long_name", "Forecast Object Raw Values");
+      add_att(&fcst_obj_raw_var, "_FillValue", bad_data_float);
+   }
+   if ( info.do_object_id ) {
+      fcst_obj_var     = add_var(f_out, "fcst_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
+      add_att(&fcst_obj_var, "long_name", "Forecast Object ID");
+      add_att(&fcst_obj_var, "_FillValue", bad_data_int);
+   }
+   if ( info.do_cluster_id ) {
+      fcst_clus_var    = add_var(f_out, "fcst_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
+      add_att(&fcst_clus_var, "long_name", "Forecast Cluster Object ID");
+      add_att(&fcst_clus_var, "_FillValue", bad_data_int);
+   }
 
-   if ( info.do_raw )         obs_raw_var      = add_var(f_out, "obs_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
-   if ( info.do_object_raw )  obs_obj_raw_var  = add_var(f_out, "obs_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
-   if ( info.do_object_id )   obs_obj_var      = add_var(f_out, "obs_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
-   if ( info.do_cluster_id )  obs_clus_var     = add_var(f_out, "obs_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
+   if ( info.do_raw ) {
+      obs_raw_var      = add_var(f_out, "obs_raw",     ncFloat, lat_dim, lon_dim, deflate_level);
+      add_att(&obs_raw_var, "long_name", "Observation Raw Values");
+      add_att(&obs_raw_var, "_FillValue", bad_data_float);
+   }
+   if ( info.do_object_raw ) {
+      obs_obj_raw_var  = add_var(f_out, "obs_obj_raw", ncFloat, lat_dim, lon_dim, deflate_level);
+      add_att(&obs_obj_raw_var, "long_name", "Observation Object Raw Values");
+      add_att(&obs_obj_raw_var, "_FillValue", bad_data_float);
+   }
+   if ( info.do_object_id ) {
+      obs_obj_var      = add_var(f_out, "obs_obj_id",  ncInt,   lat_dim, lon_dim, deflate_level);
+      add_att(&obs_obj_var, "long_name", "Observation Object ID");
+      add_att(&obs_obj_var, "_FillValue", bad_data_int);
+   }
+   if ( info.do_cluster_id ) {
+      obs_clus_var     = add_var(f_out, "obs_clus_id", ncInt,   lat_dim, lon_dim, deflate_level);
+      add_att(&obs_clus_var, "long_name", "Observation Cluster Object ID");
+      add_att(&obs_clus_var, "_FillValue", bad_data_int);
+   }
 
    fcst_radius_var = add_var(f_out, (string)"fcst_conv_radius", ncInt, deflate_level);
     obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt, deflate_level);
@@ -958,69 +990,37 @@ if ( info.all_false() )  return;
    // Add forecast variable attributes
 
    if ( info.do_raw )  {
-
-      add_att(&fcst_raw_var, "long_name", "Forecast Raw Values");
       write_netcdf_var_times(&fcst_raw_var, engine.fcst_raw->data);
-      add_att(&fcst_raw_var, "_FillValue", bad_data_float);
-
    }
 
    if ( info.do_object_raw )  {
-
-      add_att(&fcst_obj_raw_var, "long_name", "Forecast Object Raw Values");
       write_netcdf_var_times(&fcst_obj_raw_var, engine.fcst_raw->data);
-      add_att(&fcst_obj_raw_var, "_FillValue", bad_data_float);
-
    }
 
    if ( info.do_object_id )  {
-
-      add_att(&fcst_obj_var, "long_name", "Forecast Object ID");
       write_netcdf_var_times(&fcst_obj_var, engine.fcst_raw->data);
-      add_att(&fcst_obj_var, "_FillValue", bad_data_int);
-
    }
 
    if ( info.do_cluster_id )  {
-
-      add_att(&fcst_clus_var, "long_name", "Forecast Cluster Object ID");
       write_netcdf_var_times(&fcst_clus_var, engine.fcst_raw->data);
-      add_att(&fcst_clus_var, "_FillValue", bad_data_int);
-
    }
 
    // Add observation variable attributes
 
    if ( info.do_raw )  {
-
-      add_att(&obs_raw_var, "long_name", "Observation Raw Values");
       write_netcdf_var_times(&obs_raw_var, engine.obs_raw->data);
-      add_att(&obs_raw_var, "_FillValue", bad_data_float);
-
    }
 
    if ( info.do_object_raw )  {
-
-      add_att(&obs_obj_raw_var, "long_name", "Observation Object Raw Values");
       write_netcdf_var_times(&obs_obj_raw_var, engine.obs_raw->data);
-      add_att(&obs_obj_raw_var, "_FillValue", bad_data_float);
-
    }
 
    if ( info.do_object_id )  {
-
-      add_att(&obs_obj_var, "long_name", "Observation Object ID");
       write_netcdf_var_times(&obs_obj_var, engine.obs_raw->data);
-      add_att(&obs_obj_var, "_FillValue", bad_data_int);
-
    }
 
    if ( info.do_cluster_id )  {
-
-      add_att(&obs_clus_var, "long_name", "Observation Cluster Object ID");
       write_netcdf_var_times(&obs_clus_var, engine.obs_raw->data);
-      add_att(&obs_clus_var, "_FillValue", bad_data_int);
-
    }
 
    //
