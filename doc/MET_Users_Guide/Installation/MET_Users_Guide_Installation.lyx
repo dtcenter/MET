@@ -552,7 +552,7 @@ Compiling the BUFRLIB using the Intel icc and ifort compilers consists of
 \begin_layout LyX-Code
 
 \series medium
-* ifort -c DUNDERSCORE *.f *.F
+* ifort -c -DUNDERSCORE *.f *.F
 \end_layout
 
 \begin_layout LyX-Code
