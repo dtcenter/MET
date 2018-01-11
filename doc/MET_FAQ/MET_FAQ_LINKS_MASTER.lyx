@@ -162,6 +162,30 @@ target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_unix_time
 
 \end_layout
 
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset CommandInset href
+LatexCommand href
+name "no fixed width output format"
+target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_fixed_width_output_format.xhtml"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+\begin_inset CommandInset href
+LatexCommand href
+name "use of scientific notation"
+target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_scientific_notation.xhtml"
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section*
 gen_vx_mask
 \end_layout
