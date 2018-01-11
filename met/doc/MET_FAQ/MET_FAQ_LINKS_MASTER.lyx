@@ -166,8 +166,8 @@ target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_unix_time
 \labelwidthstring 00.00.0000
 \begin_inset CommandInset href
 LatexCommand href
-name "no fixed width output format"
-target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_fixed_width_output_format.xhtml"
+name "no_fixed_width_output_format"
+target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_no_fixed_width_output_format.xhtml"
 
 \end_inset
 
@@ -178,7 +178,7 @@ target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_fixed_wid
 \labelwidthstring 00.00.0000
 \begin_inset CommandInset href
 LatexCommand href
-name "use of scientific notation"
+name "use_of_scientific_notation"
 target "http://www.dtcenter.org/met/users/support/faqs/file_io/file_io_scientific_notation.xhtml"
 
 \end_inset
