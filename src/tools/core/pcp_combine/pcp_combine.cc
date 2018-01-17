@@ -1267,7 +1267,7 @@ void usage()
         << verbosity << ") (optional).\n"
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
-        << config.nc_compression() << ") (optional).\n"
+        << config.nc_compression() << ") (optional).\n\n"
 
         << "\t\tNote: Specifying \"-sum\" is not required since it is "
         << "the default behavior.\n"
