@@ -410,7 +410,7 @@ void usage() {
         << "\t-field string\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
-	      << "\t[-shape SHAPE]\n"
+        << "\t[-shape type]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-name list]\n"
         << "\t[-log file]\n"
@@ -437,7 +437,7 @@ void usage() {
         << "\t\t\"-width n\" overrides the default regridding "
         << "width (" << RGInfo.width << ") (optional).\n"
 
-        << "\t\t\"-shape\" overrides the default interpolation shape ("
+        << "\t\t\"-shape type\" overrides the default interpolation shape ("
         << gtf.enum2String(RGInfo.shape) << ") "
         <<  "(optional).\n"
 
