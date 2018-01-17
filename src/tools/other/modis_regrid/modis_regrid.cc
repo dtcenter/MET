@@ -237,7 +237,7 @@ cout << "\n"
      << tab << "-fill value\n"
      << tab << "[-units text]\n"
      << tab << "[-compress level]\n"
-     << tab << "      modis_file\n\n"
+     << tab << "modis_file\n\n"
 
      << "  where  \"-data_file path\" specifies the data files used to get the grid information.\n"
      << "         \"-field name\" specifies the name of the field to use in the modis data file.\n"
