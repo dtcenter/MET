@@ -247,7 +247,7 @@ cout << "\n"
      << "         \"-fill value\" specifies the bad data value in the modis data.\n"
      << "         \"-units text\" specifies the units string in the global attributes section of the output file (optional).\n"
      << "         \"-compress level\" specifies the compression level of output NetCDF variable (optional).\n"
-     << "         \"modis file\" is the name of the modis input file.\n"
+     << "         \"modis_file\" is the name of the modis input file.\n"
 
      << "\n";
 
