@@ -898,7 +898,7 @@ void process_point_obs(int i_nc) {
       str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
       if (!IS_INVALID_NC(str_dim)) vld_len = mxstr2_len;
    }
-   
+
    int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
    float obs_arr_block[buf_size][obs_arr_len];
    char obs_qty_str_block[buf_size][mxstr_len];
@@ -1110,6 +1110,8 @@ int process_point_ens(int i_ens, int &n_miss) {
          ens_mn_name << conf_info.vx_pd[i].fcst_info->name() << "_"
                      << conf_info.vx_pd[i].fcst_info->level_name() << "_"
                      << "ENS_MEAN";
+         ens_mn_name.replace(",", "_",   false);
+         ens_mn_name.replace("*", "all", false);
          mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
          info = new VarInfoNcMet();
          info->set_magic(ens_mn_name, "(*,*)");
@@ -1460,6 +1462,8 @@ void process_grid_vx() {
             ens_mn_name << conf_info.ens_info[i]->name() << "_"
                         << conf_info.ens_info[i]->level_name() << "_"
                         << "ENS_MEAN";
+            ens_mn_name.replace(",", "_",   false);
+            ens_mn_name.replace("*", "all", false);
             mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
             info = new VarInfoNcMet();
             info->set_magic(ens_mn_name, "(*,*)");
@@ -1707,13 +1711,12 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
          // Add the observation point
          pd.add_obs(x, y, obs_dp.get(x, y),
                     cmn, bad_data_double, wgt_dp(x, y));
+
+         // Add the ensemble mean value for this point
+         pd.mn_na.add(emn_dp.get(x, y));
+
       } // end for y
    } // end for x
-
-   // Loop through the mean field, adding all the points
-   for(x=0; x<emn_dp.nx(); x++)
-      for(y=0; y<emn_dp.ny(); y++)
-         pd.mn_na.add(emn_dp.get(x, y));
 
    // Loop through the observation points
    for(i=0; i<pd.n_obs; i++) {

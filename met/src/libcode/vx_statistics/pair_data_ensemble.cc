@@ -534,9 +534,30 @@ struct ssvar_bin_comp {
 };
 
 void PairDataEnsemble::compute_ssvar() {
-   int i, j, n_vld;
-   double var, dev;
+   int i, j;
+   double mn, stdev, var;
    ssvar_bin_map bins;
+   NumArray cur;
+
+   // Check number of points
+   if(o_na.n_elements() != mn_na.n_elements()) {
+      mlog << Error << "\nPairDataEnsemble::compute_ssvar() -> "
+           << "the number of ensemble mean points ("
+           << mn_na.n_elements()
+           << ") should match the number of observation points ("
+           << o_na.n_elements() << ")!\n\n";
+      exit(1);
+   }
+   for(j=0; j<n_ens; j++) {
+      if(o_na.n_elements() != e_na[j].n_elements()) {
+         mlog << Error << "\nPairDataEnsemble::compute_ssvar() -> "
+              << "the number of ensemble member " << j+1 << " points ("
+              << e_na[j].n_elements()
+              << ") should match the number of observation points ("
+              << o_na.n_elements() << ")!\n\n";
+         exit(1);
+      }
+   }
 
    // Compute the variance of ensemble member values at each point
    for(i=0; i<o_na.n_elements(); i++) {
@@ -544,23 +565,15 @@ void PairDataEnsemble::compute_ssvar() {
       // Check if point should be skipped
       if(skip_ba[i]) continue;
 
-      // Add the deviation of each ensemble member
-      for(j=0, n_vld=0, var=0; j<n_ens; j++) {
+      // Store ensemble values for the current observation
+      for(j=0, cur.erase(); j<n_ens; j++) cur.add(e_na[j][i]);
 
-         // Skip bad data
-         if(is_bad_data(e_na[j][i]) || is_bad_data(mn_na[i])) continue;
-         n_vld++;
+      // Compute standard deviation
+      cur.compute_mean_stdev(mn, stdev);
 
-         // Add the squared deviation
-         dev = (e_na[j][i] - mn_na[i]);
-         var += dev*dev;
-
-      } // end for j
-
-      if( !n_vld ) continue;
-
-      //  Calculate the variance
-      var = (1.0 / ((double)n_vld - 1.0)) * var;
+      // Skip bad data points
+      if(is_bad_data(stdev)) continue;
+      else                   var = stdev*stdev;
 
       // Build a variance point
       ens_ssvar_pt pt;
