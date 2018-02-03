@@ -236,6 +236,13 @@ units     = tok[5];  // may be empty
 if (units == "\n" || units == "\n\n") units.clear();
 
    //
+   // if empty, set to the NA string to avoid a runtime error writing
+   // units attribute to NetCDF output files
+   //
+
+if (units.empty()) units = na_str;
+
+   //
    //  done
    //
 
@@ -445,6 +452,13 @@ full_name = tok[3];
 units     = tok[5];  // may be empty
 
 if (units == "\n" || units == "\n\n") units.clear();
+
+   //
+   // if empty, set to the NA string to avoid a runtime error writing
+   // units attribute to NetCDF output files
+   //
+
+if (units.empty()) units = na_str;
 
    //
    //  done
