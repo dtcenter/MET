@@ -21,8 +21,10 @@ using namespace std;
 #include "met_handler.h"
 
 
-static const int   n_met_col     = 10;
-static const int   n_met_col_qty = 11;
+static const int n_met_col     = 10;
+static const int n_met_col_qty = 11;
+static double    parse_num(const char *);
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -98,13 +100,13 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Check for the first line of the file or the header changing
 
-    if (data_line.line_number()  == 1       ||
-	hdr_typ           != data_line[0]   ||
-	hdr_sid           != data_line[1]   ||
-	hdr_vld_str       != data_line[2]   ||
-	!is_eq(hdr_lat, atof(data_line[3])) ||
-	!is_eq(hdr_lon, atof(data_line[4])) ||
-	!is_eq(hdr_elv, atof(data_line[5])))
+    if (data_line.line_number() == 1            ||
+	hdr_typ           != data_line[0]        ||
+	hdr_sid           != data_line[1]        ||
+	hdr_vld_str       != data_line[2]        ||
+	!is_eq(hdr_lat, parse_num(data_line[3])) ||
+	!is_eq(hdr_lon, parse_num(data_line[4])) ||
+	!is_eq(hdr_elv, parse_num(data_line[5])))
     {
       // Store the column format
 
@@ -119,12 +121,12 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
       // Store the header info
 
-      hdr_typ =      data_line[0];
-      hdr_sid =      data_line[1];
-      hdr_vld_str =  data_line[2];
-      hdr_lat = atof(data_line[3]);
-      hdr_lon = atof(data_line[4]);
-      hdr_elv = atof(data_line[5]);
+      hdr_typ =           data_line[0];
+      hdr_sid =           data_line[1];
+      hdr_vld_str =       data_line[2];
+      hdr_lat = parse_num(data_line[3]);
+      hdr_lon = parse_num(data_line[4]);
+      hdr_elv = parse_num(data_line[5]);
 
       hdr_vld = _getValidTime(hdr_vld_str.text());
 
@@ -133,11 +135,11 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
     // Pressure level (hPa) or precip accumulation interval (sec)
 
     double obs_prs = ((is_precip_grib_name(data_line[6]) || is_precip_grib_code(atoi(data_line[6]))) ?
-		      timestring_to_sec(data_line[7]) : atof(data_line[7]));
+		      timestring_to_sec(data_line[7]) : parse_num(data_line[7]));
 
     // Observation height (meters above sea level)
 
-    double obs_hgt = atof(data_line[8]);
+    double obs_hgt = parse_num(data_line[8]);
 
     // Observation quality
 
@@ -146,7 +148,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
     // Observation value
 
     int obs_idx = (_nFileColumns == n_met_col ? 9 : 10);
-    double obs_val = atof(data_line[obs_idx]);
+    double obs_val = parse_num(data_line[obs_idx]);
 
     // Save the observation info
 
@@ -177,4 +179,16 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
   return true;
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double parse_num(const char *s) {
+   if(!s) return(bad_data_double);
+   return( (strcasecmp(s, na_str) == 0 ? bad_data_double : atof(s)) );
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
