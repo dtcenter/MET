@@ -451,7 +451,8 @@ void usage() {
         << "\" ASCII format consists of 11 columns:\n"
         << "\t\tMessage_Type Station_ID Valid_Time(YYYYMMDD_HHMMSS)\n"
         << "\t\tLat(Deg North) Lon(Deg East) Elevation(msl)\n"
-        << "\t\tVariable_Name(or GRIB_code) Level Height(msl or agl) QC_String Observation_Value\n\n"
+        << "\t\tVar_Name(or GRIB_Code) Level Height(msl or agl)\n"
+        << "\t\tQC_String Observation_Value\n\n"
 
         << "\t\twhere\t\"Level\" is the pressure level (hPa) or "
         << "accumulation interval (HH[MMSS]).\n"
