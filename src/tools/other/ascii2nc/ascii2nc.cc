@@ -460,7 +460,7 @@ void usage() {
         << "observation (msl or agl).\n\n"
 
         << "\t\t\tUse a value of \"" << bad_data_int
-        << "\" to indicate missing data.\n\n"
+        << "\" or \"" << na_str << "\" to indicate missing data.\n\n"
 
         << flush;
 
