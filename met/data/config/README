@@ -372,7 +372,8 @@ regrid = {
 //
 //      - The "convert" entry is a user-defined function of a single variable for
 //        processing input data values.  Any input values that are not bad data
-//        are replaced by the value of this function.  This function may include
+//        are replaced by the value of this function.  The convert function is 
+//	  applied prior to regridding or thresholding. This function may include
 //        any of the built-in math functions (e.g. sqrt, log10) described above.
 //        Several standard unit conversion functions are already defined in
 //        data/config/ConfigConstants.
@@ -383,17 +384,23 @@ regrid = {
 //          convert(x) = K_to_C(x); where K_to_C(x) is defined in ConfigConstants
 //
 //      - The "censor_thresh" entry is an array of thresholds to be applied
-//        to the raw input data.  The "censor_val" entry is an array of numbers
-//        and must be the same length as "censor_thresh".  For each censor
-//        threshold, any input values meeting the threshold criteria will be
+//        to the input data.  The "censor_val" entry is an array of numbers
+//        and must be the same length as "censor_thresh".  These arguments must 
+//        appear together in the correct format (threshold and number). For each 
+//        censor threshold, any input values meeting the threshold criteria will be
 //        reset to the corresponding censor value.  An empty list indicates that
 //        no censoring should be performed.  The censoring logic is applied
-//        prior to any regridding, and all statistics are computed on the
-//        censored data. These entries may be used to apply quality control
-//        logic by resetting data outside of an expected range to the bad data
-//        value of -9999. These entries are not indicated in the metadata of any
-//        output files, but the user can set the "desc" entry accordingly.
-//
+//        prior to any regridding but after the convert function. All statistics 
+// 	  are computed on the censored data. These entries may be used to apply 
+//	  quality control logic by resetting data outside of an expected range to 
+//        the bad data value of -9999. These entries are not indicated in the 
+//        metadata of any output files, but the user can set the "desc" entry 
+//	  accordingly.
+// 
+// 	Examples of user-defined conversion functions include:
+//          censor_thresh = [ >12000 ];
+//	    censor_val      = [ 12000 ];   
+// 
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
 //
