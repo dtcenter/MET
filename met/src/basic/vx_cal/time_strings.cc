@@ -471,9 +471,23 @@ unixtime t;
 
 t = (unixtime) 0;
 
-     if ( !text                           )  t = (unixtime) 0;
-else if ( strlen(text) == 0               ||
-          strcmp(text, bad_data_str) == 0 ||
+if ( !text ) {
+
+   mlog << Error << "\ntimestring_to_unix(const char *) -> "
+        << "null pointer!\n\n";
+
+   exit ( 1 );
+
+}
+else if ( strlen(text) == 0 ) {
+
+   mlog << Error << "\ntimestring_to_unix(const char *) -> "
+        << "empty time string!\n\n";
+
+   exit ( 1 );
+
+}
+else if ( strcmp(text, bad_data_str) == 0 ||
           strcmp(text, na_str      ) == 0 )  t = (unixtime) 0;
 else if ( is_yyyymmdd_hhmmss (text)       )  t = yyyymmdd_hhmmss_to_unix (text);
 else if ( is_yyyymmdd_hh     (text)       )  t = yyyymmdd_hh_to_unix     (text);
@@ -483,7 +497,8 @@ else if ( is_yyyymmddhh      (text)       )  t = yyyymmddhh_to_unix      (text);
 else if ( is_yyyymmdd        (text)       )  t = yyyymmdd_to_unix        (text);
 else {
 
-   mlog << Error << "\ntimestring_to_unix(const char *) -> can't parse date/time string \"" << text << "\"\n\n";
+   mlog << Error << "\ntimestring_to_unix(const char *) -> "
+        << "can't parse date/time string \"" << text << "\"\n\n";
 
    exit ( 1 );
 
@@ -595,8 +610,22 @@ int t;
 
 t = 0;
 
-     if ( !text             )  t = bad_data_int;
-else if ( strlen(text) == 0 )  t = bad_data_int;
+if ( !text ) {
+
+   mlog << Error << "\ntimestring_to_sec(const char *) -> "
+        << "null pointer!\n\n";
+
+   exit ( 1 );
+
+}
+else if ( strlen(text) == 0 ) {
+
+   mlog << Error << "\ntimestring_to_sec(const char *) -> "
+        << "empty time string!\n\n";
+
+   exit ( 1 );
+
+}
 else if ( strcmp(text,       na_str) == 0 ||
           strcmp(text, bad_data_str) == 0 )
                                t = bad_data_int;
