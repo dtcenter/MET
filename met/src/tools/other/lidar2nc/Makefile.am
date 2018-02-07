@@ -20,6 +20,7 @@ lidar2nc_CPPFLAGS = ${MET_CPPFLAGS} \
      -I../../../libcode/vx_data2d_factory
 lidar2nc_LDFLAGS = ${MET_LDFLAGS}
 lidar2nc_LDADD = -lvx_shapedata \
+	-lvx_config  \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
