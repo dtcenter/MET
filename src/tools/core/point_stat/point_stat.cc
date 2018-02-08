@@ -1342,8 +1342,27 @@ void process_scores() {
                   // Initialize
                   for(m=0; m<n_wind; m++) vl1l2_info[m].clear();
 
-                  // Compute VL1L2 and VAL1L2
+                  // Get the index of the matching u-component
                   int ui = conf_info.vx_opt[i].vx_pd.fcst_info->uv_index();
+
+                  // Check to make sure message types, masking regions,
+                  // and interpolation methods match
+                  if(conf_info.vx_opt[i].get_n_msg_typ()  !=
+                     conf_info.vx_opt[ui].get_n_msg_typ() ||
+                     conf_info.vx_opt[i].get_n_mask()     !=
+                     conf_info.vx_opt[ui].get_n_mask()    ||
+                     conf_info.vx_opt[i].get_n_interp()   !=
+                     conf_info.vx_opt[ui].get_n_interp()) {
+                     mlog << Warning << "\nprocess_scores() -> "
+                          << "when computing VL1L2 and/or VAL1L2 vector "
+                          << "partial sums, the U and V components must "
+                          << "be processed using the same set of message "
+                          << "types, masking regions, and interpolation "
+                          << "methods. Failing to do so will cause "
+                          << "unexpected results!\n\n";
+                  }
+
+                  // Compute VL1L2 and VAL1L2
                   do_vl1l2(vl1l2_info, i,
                            &conf_info.vx_opt[ui].vx_pd.pd[j][k][l],
                            &conf_info.vx_opt[i].vx_pd.pd[j][k][l]);
