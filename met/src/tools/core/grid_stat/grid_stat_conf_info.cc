@@ -154,6 +154,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    // Check for consistent number of climatology fields
    check_climo_n_vx(&conf, n_vx);
 
+   // Parse settings for each verification task
    for(i=0; i<n_vx; i++) {
 
       // Get the current dictionaries
