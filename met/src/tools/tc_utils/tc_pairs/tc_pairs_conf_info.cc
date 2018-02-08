@@ -140,8 +140,8 @@ void TCPairsConfInfo::process_config() {
    StormName = Conf.lookup_string_array(conf_key_storm_name);
 
    // Conf: InitBeg, InitEnd
-   InitBeg = timestring_to_unix(Conf.lookup_string(conf_key_init_beg));
-   InitEnd = timestring_to_unix(Conf.lookup_string(conf_key_init_end));
+   InitBeg = Conf.lookup_unixtime(conf_key_init_beg);
+   InitEnd = Conf.lookup_unixtime(conf_key_init_end);
 
    // Conf: InitInc
    sa = Conf.lookup_string_array(conf_key_init_inc);
@@ -159,8 +159,8 @@ void TCPairsConfInfo::process_config() {
       InitHour.add(timestring_to_sec(sa[i]));
 
    // Conf: ValidBeg, ValidEnd
-   ValidBeg = timestring_to_unix(Conf.lookup_string(conf_key_valid_beg));
-   ValidEnd = timestring_to_unix(Conf.lookup_string(conf_key_valid_end));
+   ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
+   ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
 
    // Conf: LeadReq
    sa = Conf.lookup_string_array(conf_key_lead_req);
