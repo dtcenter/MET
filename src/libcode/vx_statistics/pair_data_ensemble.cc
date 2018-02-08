@@ -1470,7 +1470,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int VxPairDataEnsemble::get_n_pair() {
+int VxPairDataEnsemble::get_n_pair() const {
    int n, i, j, k;
 
    for(i=0, n=0; i<n_msg_typ; i++) {

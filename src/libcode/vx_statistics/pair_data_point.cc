@@ -968,7 +968,7 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
 ////////////////////////////////////////////////////////////////////////
 
-int VxPairDataPoint::get_n_pair() {
+int VxPairDataPoint::get_n_pair() const {
    int n, i, j, k;
 
    for(i=0, n=0; i<n_msg_typ; i++) {
