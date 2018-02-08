@@ -114,8 +114,8 @@ void TCStatConfInfo::process_config() {
    Filter.StormName = Conf.lookup_string_array(conf_key_storm_name);
 
    // Conf: TCStatJob::InitBeg, TCStatJob::InitEnd
-   Filter.InitBeg = timestring_to_unix(Conf.lookup_string(conf_key_init_beg));
-   Filter.InitEnd = timestring_to_unix(Conf.lookup_string(conf_key_init_end));
+   Filter.InitBeg = Conf.lookup_unixtime(conf_key_init_beg);
+   Filter.InitEnd = Conf.lookup_unixtime(conf_key_init_end);
 
    // Conf: TCStatJob::InitInc
    sa = Conf.lookup_string_array(conf_key_init_inc);
@@ -128,8 +128,8 @@ void TCStatConfInfo::process_config() {
       Filter.InitExc.add(timestring_to_unix(sa[i]));
 
    // Conf: TCStatJob::ValidBeg, TCStatJob::ValidEnd
-   Filter.ValidBeg = timestring_to_unix(Conf.lookup_string(conf_key_valid_beg));
-   Filter.ValidEnd = timestring_to_unix(Conf.lookup_string(conf_key_valid_end));
+   Filter.ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
+   Filter.ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
 
    // Conf: TCStatJob::ValidInc
    sa = Conf.lookup_string_array(conf_key_valid_inc);
