@@ -236,7 +236,7 @@ class VxPairDataEnsemble {
 
       void add_ens(int, bool mn);
 
-      int  get_n_pair();
+      int  get_n_pair() const;
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
 

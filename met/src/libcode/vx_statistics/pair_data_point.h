@@ -199,7 +199,7 @@ class VxPairDataPoint {
                    const char *, float *, Grid &, const char * = 0,
                    const DataPlane * = 0);
 
-      int  get_n_pair();
+      int  get_n_pair() const;
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
 
