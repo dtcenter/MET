@@ -721,11 +721,14 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
 
    hdr_data_idx++;
 
-
    hdr_buf_size = _nhdr;
    if (hdr_buf_size > OBS_BUFFER_SIZE) hdr_buf_size = OBS_BUFFER_SIZE;
 
    bool save_nc = (hdr_buf_size <= hdr_data_idx);
+   if (! save_nc && (processed_count >= _observations.size()) ) {
+      save_nc = true;
+      hdr_buf_size = _nhdr % OBS_BUFFER_SIZE;
+   }
    if (save_nc) {
 
       long offsets[2] = { hdr_data_offset, 0 };
@@ -918,7 +921,7 @@ bool FileHandler::_writeObservations()
   hdr_data_idx = 0;
   hdr_data_offset = 0;
 
-  processed_count =0;
+  processed_count = 0;
   for (vector< Observation >::const_iterator obs = _observations.begin();
        obs != _observations.end(); ++obs)
   {
@@ -947,14 +950,14 @@ bool FileHandler::_writeObservations()
       prev_longitude   = obs->getLongitude();
       prev_elevation   = obs->getElevation();
     }
-
+    
     if (!_writeObsInfo(obs->getGribCode(),
                        obs->getPressureLevel(),
                        obs->getHeight(),
                        obs->getValue(),
                        obs->getQualityFlag().c_str()))
       return false;
-
+    
     obs_data_idx++;
     if (obs_data_idx >= obs_buf_size) obs_data_idx = 0;
 
