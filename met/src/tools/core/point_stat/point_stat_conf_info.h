@@ -58,159 +58,173 @@ static const STATLineType txt_file_type[n_txt] = {
 
 ////////////////////////////////////////////////////////////////////////
 
+class PointStatConfInfo; // forward reference
+
+////////////////////////////////////////////////////////////////////////
+
+class PointStatVxOpt {
+
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      PointStatVxOpt();
+     ~PointStatVxOpt();
+
+      //////////////////////////////////////////////////////////////////
+
+      VxPairDataPoint   vx_pd;              // Matched pair data [n_msg_typ][n_mask][n_interp]
+
+      RegridInfo        regrid_info;        // Regridding information
+
+      int               beg_ds;             // Begin observation time window offset
+      int               end_ds;             // End observation time window offset
+
+      ThreshArray       fcat_ta;            // Array for fcst categorical thresholds
+      ThreshArray       ocat_ta;            // Array for obs categorical thresholds
+
+      ThreshArray       fcnt_ta;            // Array for fcst continuous thresholds
+      ThreshArray       ocnt_ta;            // Array for obs continuous thresholds
+      SetLogic          cnt_logic;          // Array of continuous threshold field logic
+
+      ThreshArray       fwind_ta;           // Array for fcst wind speed thresholds
+      ThreshArray       owind_ta;           // Array for obs wind speed thresholds
+      SetLogic          wind_logic;         // Array of wind speed field logic
+
+      StringArray       mask_grid;          // Masking grid strings
+      StringArray       mask_poly;          // Masking polyline strings
+      StringArray       mask_sid;           // Masking station ID's
+
+      StringArray       mask_name;          // Masking names
+
+      NumArray          eclv_points;        // ECLV points
+
+      ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
+
+      NumArray          ci_alpha;           // Alpha value for confidence intervals
+
+      BootInfo          boot_info;          // Bootstrapping information
+      InterpInfo        interp_info;        // Interpolation information
+      HiRAInfo          hira_info;          // HiRA verification logic
+
+      bool              rank_corr_flag;     // Flag for computing rank correlations
+
+      StringArray       msg_typ;            // Array of message types
+
+      // Output file options
+      STATOutputType    output_flag[n_txt]; // Flag for each output line type
+
+      //////////////////////////////////////////////////////////////////
+
+      void clear();
+
+      void process_config(GrdFileType, Dictionary &, Dictionary &, bool);
+      void set_vx_pd(PointStatConfInfo *);
+
+      // Compute the number of output lines for this task
+      int n_txt_row(int i)     const;
+
+      int get_n_msg_typ()      const;
+      int get_n_mask()         const;
+      int get_n_interp()       const;
+
+      int get_n_cnt_thresh()   const;
+      int get_n_cat_thresh()   const;
+      int get_n_wind_thresh()  const;
+
+      int get_n_fprob_thresh() const;
+      int get_n_oprob_thresh() const;
+
+      int get_n_eclv_points()  const;
+      int get_n_cdf_bin()      const;
+      int get_n_ci_alpha()     const;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+inline int PointStatVxOpt::get_n_msg_typ()     const { return(msg_typ.n_elements());         }
+inline int PointStatVxOpt::get_n_mask()        const { return(mask_name.n_elements());       }
+inline int PointStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);         }
+
+inline int PointStatVxOpt::get_n_cnt_thresh()  const { return(fcnt_ta.n_elements());         }
+inline int PointStatVxOpt::get_n_cat_thresh()  const { return(fcat_ta.n_elements());         }
+inline int PointStatVxOpt::get_n_wind_thresh() const { return(fwind_ta.n_elements());        }
+
+inline int PointStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());     }
+inline int PointStatVxOpt::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);}
+inline int PointStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n_elements());        }
+
+////////////////////////////////////////////////////////////////////////
+
 class PointStatConfInfo {
 
    private:
 
       void init_from_scratch();
 
-      // Counts based on the contents of the config file
-      int n_vx;          // Number of fields to be verified
-      int n_vx_scal;     // Number of scalar fields to be verified
-      int n_vx_vect;     // Number of vector fields to be verified
-      int n_vx_prob;     // Number of probability fields to be verified
-
-      int n_mask;        // Total number of masking regions
-      int n_mask_area;   // Number of masking areas
-      int n_mask_sid;    // Number of masking station ID lists
-      int n_interp;      // Number of interpolation methods
-
-      int max_n_cnt_thresh;       // Maximum number of continuous thresholds
-      int max_n_cat_thresh;       // Maximum number of categorical thresholds
-      int max_n_wind_thresh;      // Maximum number of wind speed thresholds
-      int max_n_fprob_thresh;     // Maximum fcst prob thresholds
-      int max_n_oprob_thresh;     // Maximum obs prob thresholds
+      // Number of verification tasks
+      int n_vx;
 
    public:
+
+      PointStatConfInfo();
+     ~PointStatConfInfo();
+
+      //////////////////////////////////////////////////////////////////
 
       // Point-Stat configuration object
       MetConfig conf;
 
       // Store data parsed from the Point-Stat configuration object
-      ConcatString      model;              // Model name
-      RegridInfo        regrid_info;        // Regridding information
-      int               beg_ds;             // Begin observation time window offset
-      int               end_ds;             // End observation time window offset
+      ConcatString model;                   // Model name
 
-      // Setting for each verification task
-      VxPairDataPoint * vx_pd;              // Array pair data [n_vx]
+      PointStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
 
-      ThreshArray *     fcat_ta;            // Array for fcst categorical thresholds [n_vx]
-      ThreshArray *     ocat_ta;            // Array for obs categorical thresholds [n_vx]
+      map<ConcatString,DataPlane>   mask_dp_map;  // Mapping of mask names to DataPlanes
+      map<ConcatString,StringArray> mask_sid_map; // Mapping of mask names to Station ID lists
 
-      ThreshArray *     fcnt_ta;            // Array for fcst continuous thresholds [n_vx]
-      ThreshArray *     ocnt_ta;            // Array for obs continuous thresholds [n_vx]
-      SetLogic *        cnt_logic;          // Array of continuous threshold field logic [n_vx]
+      ConcatString tmp_dir;                 // Directory for temporary files
+      ConcatString output_prefix;           // String to customize output file name
+      ConcatString version;                 // Config file version
 
-      ThreshArray *     fwind_ta;           // Array for fcst wind speed thresholds [n_vx]
-      ThreshArray *     owind_ta;           // Array for obs wind speed thresholds [n_vx]
-      SetLogic *        wind_logic;         // Array of wind speed field logic [n_vx]
+      // Summary of output file options across all verification tasks
+      STATOutputType output_flag[n_txt];    // Flag for each output line type
 
-      StringArray *     msg_typ;            // Array of message types [n_vx]
-      StringArray *     sid_exc;            // Array of station ID's to exclude [n_vx]
-      StringArray *     obs_qty;            // Array for quality flags [n_vx]
-
-      NumArray *        eclv_points;        // ECLV points [n_vx]
-
-      ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
-
-      vector<DuplicateType> dup_flgs;
-      vector<ObsSummary>    obs_smry;
-      vector<int>           obs_percs;
-
-      // Settings for all verification tasks
-      StringArray       mask_name;          // Masking region names [n_mask]
-      DataPlane *       mask_dp;            // Array for masking regions [n_mask_area]
-      StringArray *     mask_sid;           // Masking station id's [n_mask_sid]
-
-      NumArray          ci_alpha;           // Alpha value for confidence intervals
-      BootIntervalType  boot_interval;      // Bootstrap CI type
-      double            boot_rep_prop;      // Bootstrap replicate proportion
-      int               n_boot_rep;         // Number of bootstrap replicates
-      ConcatString      boot_rng;           // GSL random number generator
-      ConcatString      boot_seed;          // GSL RNG seed value
-
-      double            interp_thresh;      // Proportion of valid data values
-      InterpMthd *      interp_mthd;        // Array for interpolation methods [n_interp]
-      IntArray          interp_wdth;        // Array for interpolation widths [n_interp]
-      GridTemplateFactory::GridTemplates interp_shape;  //Shape for interpolation
-      HiRAInfo          hira_info;          // HiRA verification logic
-
-      STATOutputType    output_flag[n_txt]; // Flag for each output line type
-
-      bool              rank_corr_flag;     // Flag for computing rank correlations
-
-      ConcatString      tmp_dir;            // Directory for temporary files
-      ConcatString      output_prefix;      // String to customize output file names
-      ConcatString      version;            // Config file version
-
-      PointStatConfInfo();
-     ~PointStatConfInfo();
+      //////////////////////////////////////////////////////////////////
 
       void clear();
 
-      void read_config   (const char *, const char *);
+      void read_config(const char *, const char *);
       void process_config(GrdFileType, bool);
-      void process_masks (const Grid &);
-      void set_vx_pd     ();
+      void process_flags();
+      void process_masks(const Grid &);
+      void set_vx_pd();
 
       // Dump out the counts
-      int get_n_vx()              const;
-      int get_n_vx_scal()         const;
-      int get_n_vx_vect()         const;
-      int get_n_vx_prob()         const;
-      int get_n_msg_typ(int i)    const;
-      int get_n_cdf_bin()         const;
-      int get_n_mask()            const;
-      int get_n_mask_area()       const;
-      int get_n_mask_sid()        const;
-      int get_n_interp()          const;
-      int get_n_ci_alpha()        const;
-      int get_vflag()             const;
-      int get_pflag()             const;
+      int get_n_vx() const;
 
+      // Compute the maximum number of output lines possible based
+      // on the contents of the configuration file
+      int n_txt_row(int i) const;
+      int n_stat_row()     const;
+
+      // Maximum across all verification tasks
       int get_max_n_cat_thresh()   const;
       int get_max_n_cnt_thresh()   const;
       int get_max_n_wind_thresh()  const;
       int get_max_n_fprob_thresh() const;
       int get_max_n_oprob_thresh() const;
+      int get_max_n_eclv_points()  const;
 
-      // Compute the maximum number of output lines possible based
-      // on the contents of the configuration file
-      int n_txt_row (int i);
-      int n_stat_row();
+      // Check for any verification of vectors
+      bool get_vflag() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int PointStatConfInfo::get_n_vx()          const { return(n_vx);                         }
-inline int PointStatConfInfo::get_n_vx_scal()     const { return(n_vx_scal);                    }
-inline int PointStatConfInfo::get_n_vx_vect()     const { return(n_vx_vect);                    }
-inline int PointStatConfInfo::get_n_vx_prob()     const { return(n_vx_prob);                    }
-inline int PointStatConfInfo::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);}
-inline int PointStatConfInfo::get_n_mask()        const { return(n_mask);                       }
-inline int PointStatConfInfo::get_n_mask_area()   const { return(n_mask_area);                  }
-inline int PointStatConfInfo::get_n_mask_sid()    const { return(n_mask_sid);                   }
-inline int PointStatConfInfo::get_n_interp()      const { return(n_interp);                     }
-inline int PointStatConfInfo::get_n_ci_alpha()    const { return(ci_alpha.n_elements());        }
-inline int PointStatConfInfo::get_vflag()         const { return(n_vx_vect > 0);                }
-inline int PointStatConfInfo::get_pflag()         const { return(n_vx_prob > 0);                }
-
-inline int PointStatConfInfo::get_max_n_cat_thresh() const {
-   return(max_n_cat_thresh);
-}
-inline int PointStatConfInfo::get_max_n_cnt_thresh() const {
-   return(max_n_cnt_thresh);
-}
-inline int PointStatConfInfo::get_max_n_wind_thresh() const {
-   return(max_n_wind_thresh);
-}
-inline int PointStatConfInfo::get_max_n_fprob_thresh() const {
-   return(max_n_fprob_thresh);
-}
-inline int PointStatConfInfo::get_max_n_oprob_thresh() const {
-   return(max_n_oprob_thresh);
-}
+inline int PointStatConfInfo::get_n_vx() const { return(n_vx); }
 
 ////////////////////////////////////////////////////////////////////////
 
