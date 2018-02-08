@@ -378,7 +378,7 @@ void setup_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
-      if(conf_info.vx_opt[i].output_flag[i] == STATOutputType_Both) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Initialize file stream
          txt_out[i] = (ofstream *) 0;
@@ -1981,7 +1981,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.vx_opt[i].output_flag[i] == STATOutputType_Both) {
+      if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {
