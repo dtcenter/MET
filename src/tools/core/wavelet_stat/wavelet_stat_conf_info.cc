@@ -164,17 +164,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    regrid_info = parse_conf_regrid(&conf);
 
    // Conf: output_flag
-   output_map = parse_conf_output_flag(&conf);
-
-   // Make sure the output_flag is the expected size
-   if((signed int) output_map.size() != n_txt) {
-      mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-           << "Unexpected number of entries found in \""
-           << conf_key_output_flag << "\" ("
-           << (signed int) output_map.size()
-           << " != " << n_txt << ").\n\n";
-      exit(1);
-   }
+   output_map = parse_conf_output_flag(&conf, txt_file_type, n_txt);
 
    // Populate the output_flag array with map values
    for(i=0,n=0; i<n_txt; i++) {
