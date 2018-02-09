@@ -579,17 +579,7 @@ void GridStatVxOpt::process_config(
    var_str = parse_conf_string(&odict, conf_key_nc_pairs_var_str, false);
 
    // Conf: output_flag
-   output_map = parse_conf_output_flag(&odict);
-
-   // Make sure the output_flag is the expected size
-   if((signed int) output_map.size() != n_txt) {
-      mlog << Error << "\nGridStatVxOpt::process_config() -> "
-           << "Unexpected number of entries found in \""
-           << conf_key_output_flag << "\" ("
-           << (signed int) output_map.size()
-           << " != " << n_txt << ").\n\n";
-      exit(1);
-   }
+   output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
 
    // Populate the output_flag array with map values
    for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];

@@ -186,11 +186,11 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
-   Dictionary *out_dict = (Dictionary *) 0;
+map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
+                                 const STATLineType *line_type, int n_lty) {
    map<STATLineType,STATOutputType> output_map;
-   STATLineType line_type;
-   STATOutputType output_type;
+   STATOutputType t;
+   ConcatString cs;
    int i, v;
 
    if(!dict) {
@@ -199,32 +199,40 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict) {
       exit(1);
    }
 
-   // Get the output flag dictionary
-   out_dict = dict->lookup_dictionary(conf_key_output_flag);
+   // Loop over the requested line types
+   for(i=0; i<n_lty; i++) {
 
-   // Loop over the output flag dictionary entries
-   for(i=0; i<out_dict->n_entries(); i++) {
-
-      // Get the line type for the current entry
-      line_type = string_to_statlinetype((*out_dict)[i]->name());
+      // Build the string
+      cs << cs_erase << conf_key_output_flag << "."
+         << statlinetype_to_string(line_type[i]);
+      cs.set_lower();
 
       // Get the integer flag value for the current entry
-      v = out_dict->lookup_int((*out_dict)[i]->name());
+      v = dict->lookup_int(cs);
 
       // Convert integer to enumerated STATOutputType
-           if(v == conf_const.lookup_int(conf_val_none)) output_type = STATOutputType_None;
-      else if(v == conf_const.lookup_int(conf_val_stat)) output_type = STATOutputType_Stat;
-      else if(v == conf_const.lookup_int(conf_val_both)) output_type = STATOutputType_Both;
+           if(v == conf_const.lookup_int(conf_val_none)) t = STATOutputType_None;
+      else if(v == conf_const.lookup_int(conf_val_stat)) t = STATOutputType_Stat;
+      else if(v == conf_const.lookup_int(conf_val_both)) t = STATOutputType_Both;
       else {
          mlog << Error << "\nparse_conf_output_flag() -> "
               << "Unexpected config file value of " << v << " for \""
-              << conf_key_output_flag << "." << (*out_dict)[i]->name()
-              << "\".\n\n";
+              << cs << "\".\n\n";
          exit(1);
       }
 
       // Store entry line type and corresponding output type
-      output_map[line_type] = output_type;
+      output_map[line_type[i]] = t;
+   }
+
+   // Make sure the map is the expected size
+   if((signed int) output_map.size() != n_lty) {
+      mlog << Error << "\nparse_conf_output_flag() -> "
+           << "Unexpected number of entries found in \""
+           << conf_key_output_flag << "\" ("
+           << (signed int) output_map.size()
+           << " != " << n_lty << ").\n\n";
+      exit(1);
    }
 
    return(output_map);
