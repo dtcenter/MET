@@ -814,7 +814,7 @@ void ConcatString::set_lower()
 
 {
 
-for (int i=0; i<Length; ++i)  s[i] = toupper(s[i]);
+for (int i=0; i<Length; ++i)  s[i] = tolower(s[i]);
 
 return;
 
