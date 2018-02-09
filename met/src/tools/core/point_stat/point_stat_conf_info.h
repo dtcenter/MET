@@ -113,6 +113,10 @@ class PointStatVxOpt {
 
       StringArray       msg_typ;            // Array of message types
 
+      DuplicateType     duplicate_flag;     // Duplicate observations
+      ObsSummary        obs_summary;        // Summarize observations
+      int               obs_perc;           // Summary percentile value
+
       // Output file options
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
 

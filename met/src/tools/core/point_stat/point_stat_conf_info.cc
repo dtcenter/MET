@@ -521,6 +521,10 @@ void PointStatVxOpt::clear() {
 
    msg_typ.clear();
 
+   duplicate_flag = DuplicateType_None;
+   obs_summary = ObsSummary_None;
+   obs_perc = bad_data_int;
+
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    return;
@@ -723,6 +727,15 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: message_type
    msg_typ = parse_conf_message_type(&odict);
 
+   // Conf: duplicate_flag
+   duplicate_flag = parse_conf_duplicate_flag(&odict);
+
+   // Conf: obs_summary
+   obs_summary = parse_conf_obs_summary(&odict);
+
+   // Conf: obs_perc_value
+   obs_perc = parse_conf_percentile(&odict);
+
    // Conf: desc
    vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc));
 
@@ -731,15 +744,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Conf: obs_qty
    vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
-
-   // Conf: duplicate_flag
-   vx_pd.set_duplicate_flag(parse_conf_duplicate_flag(&odict));
-
-   // Conf: obs_summary
-   vx_pd.set_obs_summary(parse_conf_obs_summary(&odict));
-
-   // Conf: obs_perc_value
-   vx_pd.set_obs_perc_value(parse_conf_percentile(&odict));
 
    return;
 }
@@ -817,6 +821,11 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
       vx_pd.set_interp(i, interp_info.method[i], interp_info.width[i],
                        interp_info.shape);
    }
+
+   // After sizing VxPairDataPoint, add settings for each array element
+   vx_pd.set_duplicate_flag(duplicate_flag);
+   vx_pd.set_obs_summary(obs_summary);
+   vx_pd.set_obs_perc_value(obs_perc);
 
    return;
 }
