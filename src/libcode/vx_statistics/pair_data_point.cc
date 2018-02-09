@@ -971,6 +971,11 @@ void VxPairDataPoint::add_obs(float *hdr_arr, const char *hdr_typ_str,
 int VxPairDataPoint::get_n_pair() const {
    int n, i, j, k;
 
+   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
+      mlog << Warning << "\nVxPairDataPoint::get_n_pair() -> "
+           << "set_pd_size() has not been called yet!\n\n";
+   }
+
    for(i=0, n=0; i<n_msg_typ; i++) {
       for(j=0; j<n_mask; j++) {
          for(k=0; k<n_interp; k++) {
@@ -986,6 +991,11 @@ int VxPairDataPoint::get_n_pair() const {
 
 void VxPairDataPoint::set_duplicate_flag(DuplicateType duplicate_flag) {
 
+   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
+      mlog << Warning << "\nVxPairDataPoint::set_duplicate_flag() -> "
+           << "set_pd_size() has not been called yet!\n\n";
+   }
+
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
@@ -999,6 +1009,11 @@ void VxPairDataPoint::set_duplicate_flag(DuplicateType duplicate_flag) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::set_obs_summary(ObsSummary s) {
+
+   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
+      mlog << Warning << "\nVxPairDataPoint::set_obs_summary() -> "
+           << "set_pd_size() has not been called yet!\n\n";
+   }
 
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
@@ -1015,6 +1030,11 @@ void VxPairDataPoint::set_obs_summary(ObsSummary s) {
 
 void VxPairDataPoint::set_obs_perc_value(int percentile) {
 
+   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
+      mlog << Warning << "\nVxPairDataPoint::set_obs_perc_value() -> "
+           << "set_pd_size() has not been called yet!\n\n";
+   }
+
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
@@ -1030,6 +1050,11 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
 
 void VxPairDataPoint::print_obs_summary() {
 
+   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
+      mlog << Warning << "\nVxPairDataPoint::print_obs_summary() -> "
+           << "set_pd_size() has not been called yet!\n\n";
+   }
+
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
@@ -1044,6 +1069,11 @@ void VxPairDataPoint::print_obs_summary() {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::calc_obs_summary() {
+
+   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
+      mlog << Warning << "\nVxPairDataPoint::calc_obs_summary() -> "
+           << "set_pd_size() has not been called yet!\n\n";
+   }
 
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
