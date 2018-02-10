@@ -1152,7 +1152,7 @@ void process_scores() {
                     << "Number of matched pairs  = " << pd_ptr->n_obs << "\n"
                     << "Observations processed   = " << conf_info.vx_opt[i].vx_pd.n_try << "\n"
                     << "Rejected: SID exclusion  = " << conf_info.vx_opt[i].vx_pd.rej_sid_exc << "\n"
-                    << "Rejected: GRIB code      = " << conf_info.vx_opt[i].vx_pd.rej_gc << "\n"
+                    << "Rejected: obs type       = " << conf_info.vx_opt[i].vx_pd.rej_gc << "\n"
                     << "Rejected: valid time     = " << conf_info.vx_opt[i].vx_pd.rej_vld << "\n"
                     << "Rejected: bad obs value  = " << conf_info.vx_opt[i].vx_pd.rej_obs << "\n"
                     << "Rejected: off the grid   = " << conf_info.vx_opt[i].vx_pd.rej_grd << "\n"
