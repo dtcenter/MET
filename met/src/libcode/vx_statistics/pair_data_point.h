@@ -98,15 +98,17 @@ class VxPairDataPoint {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo     *fcst_info;  // Forecast field, allocated by VarInfoFactory
-      VarInfo     *climo_info; // Climatology field, allocated by VarInfoFactory
-      VarInfoGrib *obs_info;   // Observation field, allocated by VarInfoFactory
+      VarInfo     *fcst_info;    // Forecast field, allocated by VarInfoFactory
+      VarInfo     *climo_info;   // Climatology field, allocated by VarInfoFactory
+      VarInfoGrib *obs_info;     // Observation field, allocated by VarInfoFactory
 
-      ConcatString desc;       // User description from config file
+      ConcatString desc;         // User description from config file
 
-      double interp_thresh;    // Threshold between 0 and 1 used when
-                               // interpolating the forecasts to the
-                               // observation location.
+      double interp_thresh;      // Threshold between 0 and 1 used when
+                                 // interpolating the forecasts to the
+                                 // observation location.
+
+      StringArray  msg_typ_sfc;  // List of surface message types
 
       //////////////////////////////////////////////////////////////////
       //
@@ -171,6 +173,7 @@ class VxPairDataPoint {
       void set_desc(const char *);
 
       void set_interp_thresh(double);
+      void set_msg_typ_sfc(const StringArray &);
 
       void set_fcst_dpa(const DataPlaneArray &);
       void set_climo_mn_dpa(const DataPlaneArray &);
@@ -187,6 +190,7 @@ class VxPairDataPoint {
       void set_pd_size(int, int, int);
 
       void set_msg_typ(int, const char *);
+      void set_msg_typ_vals(int, const StringArray &);
       void set_mask_dp(int, const char *, DataPlane *);
       void set_mask_sid(int, const char *, StringArray *);
 

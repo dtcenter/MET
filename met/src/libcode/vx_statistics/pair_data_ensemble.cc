@@ -151,6 +151,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    set_mask_name(pd.mask_name);
    set_mask_dp_ptr(pd.mask_dp_ptr);
    set_msg_typ(pd.msg_typ);
+   set_msg_typ_vals(pd.msg_typ_vals);
 
    set_interp_mthd(pd.interp_mthd);
    set_interp_dpth(pd.interp_dpth);
@@ -807,6 +808,7 @@ void VxPairDataEnsemble::clear() {
    desc.clear();
 
    interp_thresh = 0;
+   msg_typ_sfc.clear();
 
    fcst_dpa.clear();
    climo_mn_dpa.clear();
@@ -854,6 +856,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    obs_qty_filt = vx_pd.obs_qty_filt;
 
    interp_thresh = vx_pd.interp_thresh;
+   msg_typ_sfc   = vx_pd.msg_typ_sfc;
 
    fcst_dpa     = vx_pd.fcst_dpa;
    climo_mn_dpa = vx_pd.climo_mn_dpa;
@@ -931,6 +934,15 @@ void VxPairDataEnsemble::set_desc(const char *s) {
 void VxPairDataEnsemble::set_interp_thresh(double t) {
 
    interp_thresh = t;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_msg_typ_sfc(const StringArray &sa) {
+
+   msg_typ_sfc = sa;
 
    return;
 }
@@ -1048,6 +1060,20 @@ void VxPairDataEnsemble::set_msg_typ(int i_msg_typ, const char *name) {
    for(i=0; i<n_mask; i++) {
       for(j=0; j<n_interp; j++) {
          pd[i_msg_typ][i][j].set_msg_typ(name);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_msg_typ_vals(int i_msg_typ, const StringArray &sa) {
+   int i, j;
+
+   for(i=0; i<n_mask; i++) {
+      for(j=0; j<n_interp; j++) {
+         pd[i_msg_typ][i][j].set_msg_typ_vals(sa);
       }
    }
 
@@ -1257,22 +1283,16 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
       if(obs_lvl < obs_info_grib->level().lower() ||
          obs_lvl > obs_info_grib->level().upper()) return;
    }
-   // For vertical levels, check for a surface message type or if the
-   // observation height falls within the requested range.
-   else if(obs_info_grib->level().type() == LevelType_Vert) {
-
-      if(strstr(surface_msg_typ_str, hdr_typ_str) == NULL &&
-         (obs_hgt < obs_info_grib->level().lower() ||
-          obs_hgt > obs_info_grib->level().upper())) return;
-   }
-   // For all other level types (RecNumber, NoLevel), check
-   // for a surface message type or if the observation height falls
-   // within the requested range.
+   // For all other level types (VertLevel, RecNumber, NoLevel),
+   // check for a surface message type or if the observation height
+   // falls within the requested range.
    else {
 
-      if(strstr(surface_msg_typ_str, hdr_typ_str) == NULL &&
-         (obs_hgt < obs_info->level().lower() ||
-          obs_hgt > obs_info->level().upper())) return;
+      if(!msg_typ_sfc.has(hdr_typ_str) &&
+         (obs_hgt < obs_info_grib->level().lower() ||
+          obs_hgt > obs_info_grib->level().upper())) {
+         return;
+      }
    }
 
    // For a single climatology mean field
@@ -1307,7 +1327,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // set the observation level value to bad data so that it's not used in the
    // duplicate logic.
    if(obs_info->level().type() == LevelType_Vert &&
-      strstr(surface_msg_typ_str, hdr_typ_str) != NULL) {
+      msg_typ_sfc.has(hdr_typ_str)) {
       obs_lvl = bad_data_double;
    }
 
@@ -1321,28 +1341,9 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check the message types
    for(i=0; i<n_msg_typ; i++) {
 
-      //
       // Check for a matching PrepBufr message type
-      //
-
-      // Handle ANYAIR
-      if(strcmp(anyair_str, pd[i][0][0].msg_typ) == 0) {
-         if(strstr(anyair_msg_typ_str, hdr_typ_str) == NULL ) continue;
-      }
-
-      // Handle ANYSFC
-      else if(strcmp(anysfc_str, pd[i][0][0].msg_typ) == 0) {
-         if(strstr(anysfc_msg_typ_str, hdr_typ_str) == NULL) continue;
-      }
-
-      // Handle ONLYSF
-      else if(strcmp(onlysf_str, pd[i][0][0].msg_typ) == 0) {
-         if(strstr(onlysf_msg_typ_str, hdr_typ_str) == NULL) continue;
-      }
-
-      // Handle all other message types
-      else {
-         if(strcmp(hdr_typ_str, pd[i][0][0].msg_typ) != 0) continue;
+      if(!pd[i][0][0].msg_typ_vals.has(hdr_typ_str)) {
+         continue;
       }
 
       // Check the masking areas and points

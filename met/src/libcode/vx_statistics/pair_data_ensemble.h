@@ -149,6 +149,8 @@ class VxPairDataEnsemble {
                                  // interpolating the forecasts to the
                                  // observation location.
 
+      StringArray  msg_typ_sfc;  // List of surface message types
+
       //////////////////////////////////////////////////////////////////
       //
       // Forecast and climotology fields falling between the requested
@@ -201,6 +203,7 @@ class VxPairDataEnsemble {
       void set_desc(const char *);
 
       void set_interp_thresh(double);
+      void set_msg_typ_sfc(const StringArray &);
 
       void set_fcst_dpa(const DataPlaneArray &);
       void set_climo_mn_dpa(const DataPlaneArray &);
@@ -217,6 +220,7 @@ class VxPairDataEnsemble {
       void set_pd_size(int, int, int);
 
       void set_msg_typ(int, const char *);
+      void set_msg_typ_vals(int, const StringArray &);
       void set_mask_dp(int, const char *, DataPlane *);
       void set_mask_sid(int, const char *, StringArray *);
       void set_interp(int i_interp, const char *interp_mthd_str, int width,

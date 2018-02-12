@@ -57,11 +57,12 @@ void PairBase::init_from_scratch() {
 
 void PairBase::clear() {
 
-   msg_typ.clear();
    mask_name.clear();
-
    mask_dp_ptr  = (DataPlane *)   0;  // Not allocated
    mask_sid_ptr = (StringArray *) 0;  // Not allocated
+
+   msg_typ.clear();
+   msg_typ_vals.clear();
 
    interp_mthd = InterpMthd_None;
    interp_shape = GridTemplateFactory::GridTemplate_None;
@@ -151,6 +152,15 @@ void PairBase::set_mask_sid_ptr(StringArray *sid_ptr) {
 void PairBase::set_msg_typ(const char *c) {
 
    msg_typ = c;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_msg_typ_vals(const StringArray &sa) {
+
+   msg_typ_vals = sa;
 
    return;
 }
