@@ -1350,31 +1350,85 @@ void VL1L2Info::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
+
 void VL1L2Info::zero_out() {
 
+   //
    // VL1L2 Quantities
-   uf_bar    = vf_bar    = uo_bar    = vo_bar   = 0.0;
-   uvfo_bar  = uvff_bar  = uvoo_bar  = 0.0;
+   //
 
-   f_bar = o_bar = 0.0;
+f_speed_bar = 0.0;
+o_speed_bar = 0.0;
 
-   me = 0.0;
+uf_bar      = 0.0;
+vf_bar      = 0.0;
+uo_bar      = 0.0;
+vo_bar      = 0.0;
+uvfo_bar    = 0.0;
+uvff_bar    = 0.0;
+uvoo_bar    = 0.0;
 
-   mse = 0.0;
+f_bar       = 0.0;
+o_bar       = 0.0;
+me          = 0.0;
+mse         = 0.0;
+rmse        = 0.0;
+speed_bias  = 0.0;
 
-   rmse = 0.0;
 
-   speed_bias = 0.0;
+FBAR        = 0.0;
+OBAR        = 0.0;
 
-   vcount   = 0;
+FS_RMS      = 0.0;
+OS_RMS      = 0.0;
 
+ MSVE       = 0.0;
+RMSVE       = 0.0;
+
+FSTDEV      = 0.0;
+OSTDEV      = 0.0;
+
+// COV         = 0.0;
+
+FDIR        = 0.0;
+ODIR        = 0.0;
+
+F_BAR_SPEED = 0.0;
+O_BAR_SPEED = 0.0;
+
+VDIFF_SPD   = 0.0;
+VDIFF_DIR   = 0.0;
+
+SPD_ERR     = 0.0;
+SPD_ABSERR  = 0.0;
+
+DIR_ERR     = 0.0;
+DIR_ABSERR  = 0.0;
+
+vcount      = 0;
+
+   //
    // VAL1L2 Quantities
-   ufa_bar   = vfa_bar   = uoa_bar   = voa_bar  = 0.0;
-   uvfoa_bar = uvffa_bar = uvooa_bar = 0.0;
-   vacount  = 0;
+   //
 
-   return;
+ufa_bar     = 0.0;
+vfa_bar     = 0.0;
+uoa_bar     = 0.0;
+voa_bar     = 0.0;
+uvfoa_bar   = 0.0;
+uvffa_bar   = 0.0;
+uvooa_bar   = 0.0;
+
+vacount     = 0;
+
+   //
+   //  done
+   //
+
+return;
+
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1551,6 +1605,14 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
 
       speed_bias += w*(sqrt(uf*uf + vf*vf) - sqrt(uo*uo + vo*vo));
 
+         //
+         //  new stuff from vector stats whitepaper
+         //
+
+      f_speed_bar      += w*sqrt(uf*uf + vf*vf);
+      o_speed_bar      += w*sqrt(uo*uo + vo*vo);
+
+      MSVE += w*(u_diff*u_diff + v_diff*v_diff);
 
 
       // VAL1L2 sums
@@ -1579,21 +1641,93 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
 
        //////////////////////////////////////////////////////
 
+
+if ( vcount > 0 )  {
+
+   u_diff = uf_bar - uo_bar;
+   v_diff = vf_bar - vo_bar;
+
+      //
+
+   FBAR        = f_speed_bar;
+   OBAR        = o_speed_bar;
+
+   FS_RMS      = sqrt(uvff_bar);
+   OS_RMS      = sqrt(uvoo_bar);
+
+   RMSVE       = sqrt(MSVE);
+
+   FSTDEV      = uvff_bar - f_speed_bar*f_speed_bar;
+   OSTDEV      = uvoo_bar - o_speed_bar*o_speed_bar;
+
+   FDIR        = convert_u_v_to_wdir(-uf_bar, -vf_bar);
+   ODIR        = convert_u_v_to_wdir(-uo_bar, -vo_bar);
+
+   F_BAR_SPEED = convert_u_v_to_wind(uf_bar, vf_bar);
+   O_BAR_SPEED = convert_u_v_to_wind(uo_bar, vo_bar);
+   
+   VDIFF_SPD   = convert_u_v_to_wind(u_diff, v_diff);
+
+   VDIFF_DIR   = convert_u_v_to_wdir(-u_diff, -v_diff);
+
+   SPD_ERR     = F_BAR_SPEED - O_BAR_SPEED;
+
+   SPD_ABSERR  = fabs(SPD_ERR);
+
+   DIR_ERR     = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
+
+   DIR_ABSERR  = fabs(DIR_ERR);
+
+
+}   //  if vcount > 0
+
+
+       //////////////////////////////////////////////////////
+
    // Check for 0 points
    if(vcount == 0) {
 
-      uf_bar     = bad_data_double;
-      vf_bar     = bad_data_double;
-      uo_bar     = bad_data_double;
-      vo_bar     = bad_data_double;
-      uvfo_bar   = bad_data_double;
-      uvff_bar   = bad_data_double;
-      uvoo_bar   = bad_data_double;
+      uf_bar      = bad_data_double;
+      vf_bar      = bad_data_double;
+      uo_bar      = bad_data_double;
+      vo_bar      = bad_data_double;
+      uvfo_bar    = bad_data_double;
+      uvff_bar    = bad_data_double;
+      uvoo_bar    = bad_data_double;
 
-      me         = bad_data_double;
-      mse        = bad_data_double;
-      rmse       = bad_data_double;
-      speed_bias = bad_data_double;
+      me          = bad_data_double;
+      mse         = bad_data_double;
+      rmse        = bad_data_double;
+      speed_bias  = bad_data_double;
+
+      FBAR        = bad_data_double;
+      OBAR        = bad_data_double;
+
+      FS_RMS      = bad_data_double;
+      OS_RMS      = bad_data_double;
+
+       MSVE       = bad_data_double;
+      RMSVE       = bad_data_double;
+
+      FSTDEV      = bad_data_double;
+      OSTDEV      = bad_data_double;
+
+      // COV         = bad_data_double;
+
+      FDIR        = bad_data_double;
+      ODIR        = bad_data_double;
+
+      F_BAR_SPEED = bad_data_double;
+      O_BAR_SPEED = bad_data_double;
+
+      VDIFF_SPD   = bad_data_double;
+      VDIFF_DIR   = bad_data_double;
+
+      SPD_ERR     = bad_data_double;
+      SPD_ABSERR  = bad_data_double;
+
+      DIR_ERR     = bad_data_double;
+      DIR_ABSERR  = bad_data_double;
 
    } else {
 
@@ -1612,6 +1746,11 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
       uvooa_bar = bad_data_double;
 
    }
+
+
+      //
+      //  done
+      //
 
    return;
 
