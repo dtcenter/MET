@@ -69,8 +69,8 @@ class PairBase {
       StringArray   *mask_sid_ptr; // Pointer to masking station ID list
                                    // which is not allocated
 
-      // The verifying message type
-      ConcatString msg_typ;
+      ConcatString msg_typ;        // Name of the verifying message type
+      StringArray  msg_typ_vals;   // Message type values to be included
 
       // Interpolation method and shape used
       InterpMthd interp_mthd;
@@ -114,7 +114,9 @@ class PairBase {
       void set_mask_name(const char *);
       void set_mask_dp_ptr(DataPlane *);
       void set_mask_sid_ptr(StringArray *);
+
       void set_msg_typ(const char *);
+      void set_msg_typ_vals(const StringArray &);
 
       void set_interp_mthd(const char *);
       void set_interp_mthd(InterpMthd);
