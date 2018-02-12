@@ -494,7 +494,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename /d1/johnhg/MET/MET_development/svn-met-dev.cgd.ucar.edu/trunk/met/doc/MET_Users_Guide/Flowchart/MET_flowchart_v6.1.png
+	filename MET_flowchart_v6.1.png
 	scale 60
 
 \end_inset
