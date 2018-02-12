@@ -478,7 +478,8 @@ static const char conf_key_flag[]              = "flag";
 static const char conf_key_step[]              = "step";
 static const char conf_key_grib_code[]         = "grib_code";
 static const char conf_key_vld_freq[]          = "vld_freq";
-static const char conf_key_message_type_map[]  = "message_type_map";
+static const char conf_key_message_type_map[]       = "message_type_map";
+static const char conf_key_message_type_group_map[] = "message_type_group_map";
 static const char conf_key_obs_bufr_map[]      = "obs_bufr_map";
 static const char conf_key_obs_bufr_var[]      = "obs_bufr_var";
 static const char conf_key_obs_prefbufr_map[]  = "obs_prefbufr_map";
@@ -520,7 +521,6 @@ static const char conf_key_file_name[]         = "file_name";
 static const char conf_key_line_color[]        = "line_color";
 static const char conf_key_line_width[]        = "line_width";
 static const char conf_key_line_dash[]         = "line_dash";
-
 static const char conf_key_latlon_flag[]       = "latlon";
 static const char conf_key_raw_flag[]          = "raw";
 static const char conf_key_diff_flag[]         = "diff";
@@ -530,13 +530,10 @@ static const char conf_key_object_raw_flag[]   = "object_raw";
 static const char conf_key_object_id_flag[]    = "object_id";
 static const char conf_key_cluster_id_flag[]   = "cluster_id";
 static const char conf_key_polylines_flag[]    = "polylines";
-
-static const char conf_key_do_2d_att_flag   [] = "attributes_2d";
-static const char conf_key_do_3d_att_flag   [] = "attributes_3d";
-
-static const char conf_key_grib_ens_hi_res_ctl [] = "hi_res_ctl";
+static const char conf_key_do_2d_att_flag[]    = "attributes_2d";
+static const char conf_key_do_3d_att_flag[]    = "attributes_3d";
+static const char conf_key_grib_ens_hi_res_ctl[]  = "hi_res_ctl";
 static const char conf_key_grib_ens_low_res_ctl[] = "low_res_ctl";
-
 static const char conf_key_shape[]             = "shape";
 static const char conf_key_eclv_points[]       = "eclv_points";
 

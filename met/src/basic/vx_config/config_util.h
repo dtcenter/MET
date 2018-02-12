@@ -42,6 +42,8 @@ extern ThreshArray     parse_conf_climo_cdf_bins(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
+extern map<ConcatString,StringArray>
+                       parse_conf_message_type_group_map(Dictionary *dict);
 extern map<ConcatString,ConcatString>
                        parse_conf_obs_bufr_map(Dictionary *dict);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
