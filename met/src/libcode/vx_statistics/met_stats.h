@@ -255,12 +255,20 @@ class VL1L2Info {
       VL1L2Info & operator=(const VL1L2Info &);
       VL1L2Info & operator+=(const VL1L2Info &);
 
-      // Filtering thresholds
+         // Filtering thresholds
+
       SingleThresh fthresh;
       SingleThresh othresh;
       SetLogic     logic;
 
-      // VL1L2 Quantities
+
+         // New VL1L2 Quantities added from vector stats whitepaper
+
+      double f_speed_bar;
+      double o_speed_bar;
+
+         // VL1L2 Quantities
+
       double uf_bar;
       double vf_bar;
       double uo_bar;
@@ -269,6 +277,38 @@ class VL1L2Info {
       double uvfo_bar;
       double uvff_bar;
       double uvoo_bar;
+
+         // New VL1L2 Quantities added from vector stats whitepaper
+
+      double FBAR;
+      double OBAR;
+
+      double FS_RMS;
+      double OS_RMS;
+
+      double  MSVE;
+      double RMSVE;
+
+      double FSTDEV;
+      double OSTDEV;
+
+      // double COV;
+
+      double FDIR;
+      double ODIR;
+
+      double F_BAR_SPEED;
+      double O_BAR_SPEED;
+
+      double VDIFF_SPD;
+      double VDIFF_DIR;
+
+      double SPD_ERR;
+      double SPD_ABSERR;
+
+      double DIR_ERR;
+      double DIR_ABSERR;
+
 
          //
          //  extra VL1L2 quantities for NCEP
