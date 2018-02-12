@@ -194,6 +194,23 @@ output_precision = 5;
 tmp_dir = "/tmp";
 
 //
+// The "message_type_group_map" entry is an array of dictionaries, each
+// containing a "key" string and "val" string.  This defines a mapping of message
+// type group names to a comma-separated list of values.  This map is defined in
+// the config files for PB2NC, Point-Stat, or Ensemble-Stat.  Modify this map to
+// define sets of message types that should be processed together as a group.
+// The "SURFACE" entry must be present to define message types for which surface
+// verification logic should be applied.
+//
+
+mesage_type_group_map = [
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+];
+
+//
 // The "message_type_map" entry is an array of dictionaries, each containing
 // a "key" string and "val" string.  This defines a mapping of input strings
 // to output message types.  This mapping is applied in ASCII2NC when
@@ -372,7 +389,7 @@ regrid = {
 //
 //      - The "convert" entry is a user-defined function of a single variable for
 //        processing input data values.  Any input values that are not bad data
-//        are replaced by the value of this function.  The convert function is 
+//        are replaced by the value of this function.  The convert function is
 //	  applied prior to regridding or thresholding. This function may include
 //        any of the built-in math functions (e.g. sqrt, log10) described above.
 //        Several standard unit conversion functions are already defined in
@@ -385,22 +402,22 @@ regrid = {
 //
 //      - The "censor_thresh" entry is an array of thresholds to be applied
 //        to the input data.  The "censor_val" entry is an array of numbers
-//        and must be the same length as "censor_thresh".  These arguments must 
-//        appear together in the correct format (threshold and number). For each 
+//        and must be the same length as "censor_thresh".  These arguments must
+//        appear together in the correct format (threshold and number). For each
 //        censor threshold, any input values meeting the threshold criteria will be
 //        reset to the corresponding censor value.  An empty list indicates that
 //        no censoring should be performed.  The censoring logic is applied
-//        prior to any regridding but after the convert function. All statistics 
-// 	  are computed on the censored data. These entries may be used to apply 
-//	  quality control logic by resetting data outside of an expected range to 
-//        the bad data value of -9999. These entries are not indicated in the 
-//        metadata of any output files, but the user can set the "desc" entry 
+//        prior to any regridding but after the convert function. All statistics
+// 	  are computed on the censored data. These entries may be used to apply
+//	  quality control logic by resetting data outside of an expected range to
+//        the bad data value of -9999. These entries are not indicated in the
+//        metadata of any output files, but the user can set the "desc" entry
 //	  accordingly.
-// 
+//
 // 	Examples of user-defined conversion functions include:
 //          censor_thresh = [ >12000 ];
-//	    censor_val      = [ 12000 ];   
-// 
+//	    censor_val      = [ 12000 ]; �
+//
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
 //
