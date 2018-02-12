@@ -829,6 +829,25 @@ map<ConcatString,ConcatString> parse_conf_message_type_map(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict) {
+   map<ConcatString,ConcatString> cs_map;
+   map<ConcatString,ConcatString>::const_iterator it;
+   map<ConcatString,StringArray> sa_map;
+   StringArray sa;
+
+   cs_map = parse_conf_key_value_map(dict, conf_key_message_type_group_map);
+
+   // Convert input comma-separated strings to StringArray
+   for(it=cs_map.begin(); it!= cs_map.end(); it++) {
+      sa.parse_css(it->second);
+      sa_map[it->first] = sa;
+   }
+
+   return sa_map;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
    map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, conf_key_obs_prefbufr_map);
    parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
