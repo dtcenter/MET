@@ -66,16 +66,8 @@ static const char *vld_msg_typ_list[] = {
 static const int n_vld_msg_typ =
    sizeof(vld_msg_typ_list)/sizeof(*vld_msg_typ_list);
 
-// Special PrepBufr message types
-static const char anyair_str[]         = "ANYAIR";
-static const char anyair_msg_typ_str[] = "AIRCAR AIRCFT";
-static const char anysfc_str[]         = "ANYSFC";
-static const char anysfc_msg_typ_str[] = "ADPSFC SFCSHP ADPUPA PROFLR MSONET";
-static const char onlysf_str[]         = "ONLYSF";
-static const char onlysf_msg_typ_str[] = "ADPSFC SFCSHP";
-
 // PrepBufr surface message types
-static const char surface_msg_typ_str[] = "ADPSFC SFCSHP MSONET";
+static const char surface_msg_typ_group_str[] = "SURFACE";
 
 // String containing all interpolation methods
 static const char all_interp_mthd_str[] =
