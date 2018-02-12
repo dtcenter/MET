@@ -39,7 +39,7 @@ class PB2NCConfInfo {
       StringArray  message_type;        // Obseration message type
       StringArray  station_id;          // Observation location station id
       int          beg_ds;              // Time range of observations to be retained,
-      int          end_ds;              // defined relative to the PrepBufr center time (seconds)      
+      int          end_ds;              // defined relative to the PrepBufr center time (seconds)
       Grid         grid_mask;           // Grid masking region
       MaskPoly     poly_mask;           // Lat/Lon polyline masking region
       double       beg_elev;            // Range of observing location elevations to be retained
@@ -55,13 +55,11 @@ class PB2NCConfInfo {
       bool         event_stack_flag;    // True for top, false for bottom
       ConcatString tmp_dir;             // Directory for temporary files
       ConcatString version;             // Config file version
+
       map<ConcatString,ConcatString> obs_bufr_map;
-      map<ConcatString,ConcatString> messageTypeMap;
-      TimeSummaryInfo timeSummaryInfo;
-  
-      bool         anyair_flag;         // Flags for specific message types
-      bool         anysfc_flag;
-      bool         onlysf_flag;
+      map<ConcatString,ConcatString> message_type_map;
+      StringArray                    surface_message_types;
+      TimeSummaryInfo                timeSummaryInfo;
 
       // More information on the PrepBufr file format:
       // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc
@@ -72,7 +70,7 @@ class PB2NCConfInfo {
       void clear();
 
       map<ConcatString,ConcatString> getObsVarMap() const {  return obs_bufr_map; }
-      map<ConcatString,ConcatString> getMessageTypeMap() const { return messageTypeMap; }
+      map<ConcatString,ConcatString> getMessageTypeMap() const { return message_type_map; }
       TimeSummaryInfo getSummaryInfo() const { return timeSummaryInfo; };
 
       void read_config(const char *, const char *);

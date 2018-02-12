@@ -74,7 +74,7 @@ void PB2NCConfInfo::clear() {
    tmp_dir.clear();
    version.clear();
    obs_bufr_map.clear();
-   messageTypeMap.clear();
+   message_type_map.clear();
 
    return;
 }
@@ -100,12 +100,10 @@ void PB2NCConfInfo::read_config(const char *default_file_name,
 
 void PB2NCConfInfo::process_config() {
    int i;
-
    ConcatString s, mask_name;
    StringArray sa, *sid_list;
    Dictionary *dict = (Dictionary *) 0;
 
-   
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
@@ -114,17 +112,33 @@ void PB2NCConfInfo::process_config() {
 
    // Conf: version
    version = parse_conf_version(&conf);
-   
+
    // Conf: message_type
    message_type = conf.lookup_string_array(conf_key_message_type);
 
-   // Check specific message types
+   // Conf: message_type_group_map
+   map<ConcatString,StringArray> group_map;
+   group_map = parse_conf_message_type_group_map(&conf);
+
+   // Expand the values for any message type group names
    for(i=0; i<message_type.n_elements(); i++) {
-           if(strcmp(message_type[i], anyair_str) == 0) anyair_flag = true;
-      else if(strcmp(message_type[i], anysfc_str) == 0) anysfc_flag = true;
-      else if(strcmp(message_type[i], onlysf_str) == 0) onlysf_flag = true;
+      if(group_map.count(message_type[i]) > 0) {
+         message_type.add(group_map[message_type[i]]);
+      }
    }
-   
+
+   // Parse surface_message_types from message_type_group_map
+   if(group_map.count(surface_msg_typ_group_str) == 0) {
+      mlog << Error << "\nPB2NCConfInfo::process_config() -> "
+           << "\"" << conf_key_message_type_group_map
+           << "\" must contain an entry for \""
+           << surface_msg_typ_group_str << "\".\n\n";
+      exit(1);
+   }
+   else {
+      surface_message_types = group_map[surface_msg_typ_group_str];
+   }
+
    // Conf: station_id
    sa = conf.lookup_string_array(conf_key_station_id);
    sid_list = new StringArray [sa.n_elements()];
@@ -147,14 +161,14 @@ void PB2NCConfInfo::process_config() {
          Met2dDataFile * datafile = (Met2dDataFile *) 0;
          // If that doesn't work, try to open a data file.
          datafile = factory.new_met_2d_data_file(replace_path(s));
-         
+
          if(!datafile) {
             mlog << Error << "\nPB2NCConfInfo::process_config() -> "
                  << "the \"" << conf_key_mask_grid << "\" requested ("
                  << s << ") as named grid or data file is not defined.\n\n";
             exit(1);
          }
-         
+
          // Store the data file's grid
          grid_mask = datafile->grid();
       }
@@ -182,17 +196,17 @@ void PB2NCConfInfo::process_config() {
               << ") should be set between 100 and 600.\n\n";
       }
    }
-   
+
    // Conf: in_report_type
    in_report_type = conf.lookup_num_array(conf_key_in_report_type);
 
    // Conf: instrument_type
    instrument_type = conf.lookup_num_array(conf_key_instrument_type);
-   
+
    // Conf: beg_level and end_level
    dict = conf.lookup_dictionary(conf_key_level_range);
    parse_conf_range_double(dict, beg_level, end_level);
-   
+
    // Conf: level_category
    level_category = conf.lookup_num_array(conf_key_level_category);
 
@@ -216,7 +230,7 @@ void PB2NCConfInfo::process_config() {
       sa = conf.lookup_string_array(conf_key_obs_bufr_var, false);
       for(i=0; i<sa.n_elements(); i++) obs_bufr_var.add(sa[i]);
    }
-   
+
    // Conf: quality_mark_thresh
    quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
 
@@ -235,7 +249,7 @@ void PB2NCConfInfo::process_config() {
    tmp_dir = parse_conf_tmp_dir(&conf);
 
    obs_bufr_map = parse_conf_obs_bufr_map(&conf);
-   messageTypeMap = parse_conf_message_type_map(&conf);
+   message_type_map = parse_conf_message_type_map(&conf);
 
    return;
 }

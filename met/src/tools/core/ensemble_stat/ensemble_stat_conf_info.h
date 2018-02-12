@@ -104,6 +104,10 @@ class EnsembleStatConfInfo {
       IntArray             interp_wdth;         // Array for interpolation widths [n_interp]
       GridTemplateFactory::GridTemplates interp_shape;  //Shape for interpolation
 
+      // Message type groups that should be processed toegher
+      map<ConcatString,StringArray> msg_typ_group_map;
+      StringArray                   msg_typ_sfc;
+
       STATOutputType       output_flag[n_txt];  // Flag for each output line type
       bool                 ensemble_flag[n_nc]; // Boolean for each ensemble field type
       ConcatString         rng_type;            // GSL random number generator

@@ -62,6 +62,8 @@ void PointStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   msg_typ_group_map.clear();
+   msg_typ_sfc.clear();
    mask_dp_map.clear();
    mask_sid_map.clear();
    tmp_dir.clear();
@@ -120,6 +122,21 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
+
+   // Conf: message_type_group_map
+   msg_typ_group_map = parse_conf_message_type_group_map(&conf);
+
+   // Conf: message_type_group_map(SURFACE)
+   if(msg_typ_group_map.count(surface_msg_typ_group_str) == 0) {
+      mlog << Error << "\nPointStatConfInfo::process_config() -> "
+           << "\"" << conf_key_message_type_group_map
+           << "\" must contain an entry for \""
+           << surface_msg_typ_group_str << "\".\n\n";
+      exit(1);
+   }
+   else {
+      msg_typ_sfc = msg_typ_group_map[surface_msg_typ_group_str];
+   }
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -745,6 +762,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    int n_msg_typ = msg_typ.n_elements();
    int n_mask    = mask_name.n_elements();
    int n_interp  = interp_info.n_interp;
+   StringArray sa;
 
    // Setup the VxPairDataPoint object with these dimensions:
    // [n_msg_typ][n_mask][n_interp]
@@ -778,9 +796,15 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    // Define the dimensions
    vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
 
-   // Define the verifying message types
+   // Store the list of surface message types
+   vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);
+
+   // Define the verifying message type name and values
    for(i=0; i<n_msg_typ; i++) {
       vx_pd.set_msg_typ(i, msg_typ[i]);
+      sa = conf_info->msg_typ_group_map[msg_typ[i]];
+      if(sa.n_elements() == 0) sa.add(msg_typ[i]);
+      vx_pd.set_msg_typ_vals(i, sa);
    }
 
    // Define the masking information: grid, poly, sid

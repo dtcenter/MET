@@ -100,6 +100,9 @@ void EnsembleStatConfInfo::clear() {
 
    phist_bin_size.clear();
 
+   msg_typ_group_map.clear();
+   msg_typ_sfc.clear();
+
    for(i=0; i<n_txt; i++) output_flag[i]   = STATOutputType_None;
    for(i=0; i<n_nc;  i++) ensemble_flag[i] = false;
 
@@ -413,6 +416,21 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
+   // Conf: message_type_group_map
+   msg_typ_group_map = parse_conf_message_type_group_map(&conf);
+
+   // Conf: message_type_group_map(SURFACE)
+   if(msg_typ_group_map.count(surface_msg_typ_group_str) == 0) {
+      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+           << "\"" << conf_key_message_type_group_map
+           << "\" must contain an entry for \""
+           << surface_msg_typ_group_str << "\".\n\n";
+      exit(1);
+   }
+   else {
+      msg_typ_sfc = msg_typ_group_map[surface_msg_typ_group_str];
+   }
+
    return;
 }
 
@@ -485,6 +503,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
    int i, j, n_msg_typ;
    Dictionary i_odict;
+   StringArray sa;
 
    // Parse configuration settings specific to each verification task
    Dictionary *obs_dict = conf.lookup_array(conf_key_obs_field);
@@ -506,9 +525,16 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
       vx_pd[i].ens_ssvar_flag = ens_ssvar_flag;
       vx_pd[i].ens_ssvar_mean = ens_ssvar_mean;
 
-      // Add the verifying message type to the vx_pd objects
-      for(j=0; j<n_msg_typ; j++)
+      // Store the list of surface message types
+      vx_pd[i].set_msg_typ_sfc(msg_typ_sfc);
+
+      // Define the verifying message type name and values
+      for(j=0; j<n_msg_typ; j++) {
          vx_pd[i].set_msg_typ(j, msg_typ[i][j]);
+         sa = msg_typ_group_map[msg_typ[i][j]];
+         if(sa.n_elements() == 0) sa.add(msg_typ[i][j]);
+         vx_pd[i].set_msg_typ_vals(j, sa);
+      }
 
       // Add the masking information to the vx_pd objects
       for(j=0; j<n_mask; j++) {

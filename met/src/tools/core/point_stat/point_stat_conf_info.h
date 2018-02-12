@@ -186,8 +186,15 @@ class PointStatConfInfo {
 
       PointStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
 
-      map<ConcatString,DataPlane>   mask_dp_map;  // Mapping of mask names to DataPlanes
-      map<ConcatString,StringArray> mask_sid_map; // Mapping of mask names to Station ID lists
+      // Message type groups that should be processed toegher
+      map<ConcatString,StringArray> msg_typ_group_map;
+      StringArray                   msg_typ_sfc;
+
+      // Mapping of mask names to DataPlanes
+      map<ConcatString,DataPlane>   mask_dp_map;
+
+      // Mapping of mask names to Station ID lists
+      map<ConcatString,StringArray> mask_sid_map;
 
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name
