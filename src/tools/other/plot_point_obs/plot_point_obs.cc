@@ -52,6 +52,7 @@ using namespace std;
 #include "vx_data2d_nc_met.h"
 #include "vx_data2d_nc_pinterp.h"
 #include "vx_util.h"
+#include "write_netcdf.h"
 #include "vx_cal.h"
 #include "vx_grid.h"
 #include "vx_math.h"
@@ -75,6 +76,8 @@ static const double default_dotsize = 1.0;
 static const double margin_size = 36.0;
 
 static const bool use_flate = true;
+
+static const int BUFFER_SIZE = DEF_NC_BUFFER_SIZE/2;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -364,8 +367,8 @@ int main(int argc, char *argv[]) {
    int hdr_arr_len = get_dim_size(&obsVars.hdr_arr_dim);
    int obs_arr_len = get_dim_size(&obsVars.obs_arr_dim);
 
-   int buf_size = ((nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count));
-   int hdr_buf_size = nhdr_count;
+   int buf_size = ((nobs_count > BUFFER_SIZE) ? BUFFER_SIZE : (nobs_count));
+   int hdr_buf_size = ((nhdr_count > BUFFER_SIZE) ? BUFFER_SIZE : (nhdr_count));
    
    //
    // Allocate space to store the data
@@ -373,15 +376,14 @@ int main(int argc, char *argv[]) {
    char hdr_typ_str[typ_len];
    char hdr_sid_str[sid_len];
    char hdr_vld_str[vld_len];
-   float *hdr_arr = (float *) 0, *obs_arr = (float *) 0;
    
-   char hdr_typ_str_full[hdr_buf_size][typ_len];
-   char hdr_sid_str_full[hdr_buf_size][sid_len];
-   char hdr_vld_str_full[hdr_buf_size][vld_len];
+   char hdr_typ_block[hdr_buf_size][typ_len];
+   char hdr_sid_block[hdr_buf_size][sid_len];
+   char hdr_vld_block[hdr_buf_size][vld_len];
 
-   hdr_arr = new float[hdr_arr_len];
-   obs_arr = new float[obs_arr_len];
-   float hdr_arr_full[hdr_buf_size][hdr_arr_len];
+   float hdr_arr[hdr_arr_len];
+   float obs_arr[obs_arr_len];
+   float hdr_arr_block[hdr_buf_size][hdr_arr_len];
    float obs_arr_block[    buf_size][obs_arr_len];
 
    //
@@ -394,47 +396,69 @@ int main(int argc, char *argv[]) {
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
    
-   lengths[0] = hdr_buf_size;
-   lengths[1] = strl_count;
+   NcHeaderArrays header_data;
+   header_data.typ_sa.extend(nhdr_count);
+   header_data.sid_sa.extend(nhdr_count);
+   header_data.vld_sa.extend(nhdr_count);
+   header_data.lat_na.extend(nhdr_count);
+   header_data.lon_na.extend(nhdr_count);
+   header_data.elv_na.extend(nhdr_count);
    
-   //
-   // Get the corresponding header message type
-   //
-   lengths[1] = typ_len;
-   if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_typ\n\n";
-      exit(1);
-   }
+   for(int i_start=0; i_start<nhdr_count; i_start+=hdr_buf_size) {
+      hdr_buf_size = ((nhdr_count-i_start) > BUFFER_SIZE) ? BUFFER_SIZE : (nhdr_count-i_start);
+      
+      offsets[0] = i_start;
+      lengths[0] = hdr_buf_size;
+      lengths[1] = strl_count;
 
-   //
-   // Get the corresponding header station id
-   //
-   lengths[1] = sid_len;
-   if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_sid\n\n";
-      exit(1);
-   }
+   
+      //
+      // Get the corresponding header message type
+      //
+      lengths[1] = typ_len;
+      if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_typ\n\n";
+         exit(1);
+      }
+      
+      //
+      // Get the corresponding header station id
+      //
+      lengths[1] = sid_len;
+      if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_sid\n\n";
+         exit(1);
+      }
+      
+      //
+      // Get the corresponding header valid time
+      //
+      lengths[1] = vld_len;
+      if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_vld\n\n";
+         exit(1);
+      }
 
-   //
-   // Get the corresponding header valid time
-   //
-   lengths[1] = vld_len;
-   if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_vld\n\n";
-      exit(1);
-   }
-
-   //
-   // Get the header for this observation
-   //
-   lengths[1] = hdr_arr_len;
-   if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_arr\n\n";
-      exit(1);
+      //
+      // Get the header for this observation
+      //
+      lengths[1] = hdr_arr_len;
+      if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
+         mlog << Error << "\nmain() -> "
+              << "trouble getting hdr_arr\n\n";
+         exit(1);
+      }
+      for (int hIndex = 0; hIndex < hdr_buf_size; hIndex++) {
+         header_data.typ_sa.add(hdr_typ_block[hIndex]);
+         header_data.sid_sa.add(hdr_sid_block[hIndex]);
+         header_data.vld_sa.add(hdr_vld_block[hIndex]);
+         header_data.lat_na.add(hdr_arr_block[hIndex][0]);
+         header_data.lon_na.add(hdr_arr_block[hIndex][1]);
+         header_data.elv_na.add(hdr_arr_block[hIndex][2]);
+      }
    }
 
    if (use_var_id) {
@@ -456,7 +480,7 @@ int main(int argc, char *argv[]) {
    }
    
    for(int i_start=0; i_start<nobs_count; i_start+=buf_size) {
-      buf_size = ((nobs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (nobs_count-i_start);
+      buf_size = ((nobs_count-i_start) > BUFFER_SIZE) ? BUFFER_SIZE : (nobs_count-i_start);
       
       offsets[0] = i_start;
       lengths[0] = buf_size;
@@ -483,22 +507,23 @@ int main(int argc, char *argv[]) {
          h = nint(obs_arr[0]);
          v = nint(obs_arr[1]);
 
-         for (int j=0; j < obs_arr_len; j++)
-            hdr_arr[j] = hdr_arr_full[h][j];
+         hdr_arr[0] = header_data.lat_na[h];
+         hdr_arr[1] = header_data.lon_na[h];
+         hdr_arr[2] = header_data.elv_na[h];
         
-         str_length = strlen(hdr_typ_str_full[h]);
+         str_length = strlen(header_data.typ_sa[h]);
          if (str_length > typ_len) str_length = typ_len;
-         strncpy(hdr_typ_str, hdr_typ_str_full[h], str_length);
+         strncpy(hdr_typ_str, header_data.typ_sa[h], str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
-         str_length = strlen(hdr_sid_str_full[h]);
+         str_length = strlen(header_data.sid_sa[h]);
          if (str_length > sid_len) str_length = sid_len;
-         strncpy(hdr_sid_str, hdr_sid_str_full[h], str_length);
+         strncpy(hdr_sid_str, header_data.sid_sa[h], str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
-         str_length = strlen(hdr_vld_str_full[h]);
+         str_length = strlen(header_data.vld_sa[h]);
          if (str_length > vld_len) str_length = vld_len;
-         strncpy(hdr_vld_str, hdr_vld_str_full[h], str_length);
+         strncpy(hdr_vld_str, header_data.vld_sa[h], str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
          //
@@ -588,8 +613,12 @@ int main(int argc, char *argv[]) {
    if(f_in)    {
       delete f_in; f_in = (NcFile *) 0; 
    }
-   if(hdr_arr) { delete hdr_arr; hdr_arr = (float *) 0; }
-   if(obs_arr) { delete obs_arr; obs_arr = (float *) 0; }
+   header_data.typ_sa.clear();
+   header_data.sid_sa.clear();
+   header_data.vld_sa.clear();
+   header_data.lat_na.clear();
+   header_data.lon_na.clear();
+   header_data.elv_na.clear();
 
    return(0);
 }
