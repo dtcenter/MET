@@ -29,6 +29,7 @@ using namespace netCDF;
 #include "vx_grid.h"
 #include "vx_config.h"
 #include "vx_util.h"
+#include "nc_utils.h"
 #include "write_netcdf.h"
 
 #include "observation.h"
