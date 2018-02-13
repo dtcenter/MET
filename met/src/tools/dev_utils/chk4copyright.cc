@@ -38,7 +38,7 @@ using namespace std;
 #include <unistd.h>
 #include <cstdlib>
 #include <fcntl.h>
-#include <syscall.h>
+#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/file.h>
 #include <dirent.h>
