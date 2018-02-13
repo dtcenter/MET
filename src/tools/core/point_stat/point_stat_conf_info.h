@@ -186,7 +186,7 @@ class PointStatConfInfo {
 
       PointStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
 
-      // Message type groups that should be processed toegher
+      // Message type groups that should be processed together
       map<ConcatString,StringArray> msg_typ_group_map;
       StringArray                   msg_typ_sfc;
 
