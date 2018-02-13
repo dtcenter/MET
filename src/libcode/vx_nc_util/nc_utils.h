@@ -58,6 +58,9 @@ typedef signed char ncbyte; // from ncvalues.h
 #define GET_NC_ATT_OBJ_BY_P(nc_or_var, att_name)    nc_or_var->getAtt(att_name)
 
 #define DEF_NC_BUFFER_SIZE          (64*1024)
+#define NC_BUFFER_SIZE_32K          (32*1024)
+
+
 
 static const char nc_dim_nhdr[]         = "nhdr";
 static const char nc_dim_nobs[]         = "nobs";
@@ -79,6 +82,42 @@ static const char nc_var_obs_var[]      = "obs_var";
 static const char nc_var_unit[]         = "obs_unit";
 static const char nc_att_use_var_id[]   = "use_var_id";
 
+struct NetcdfObsVars {
+   bool  attr_agl    ;
+   bool  attr_pb2nc  ;
+   bool  use_var_id  ;
+   int   hdr_cnt     ; // header array count (fixed dimension if hdr_cnt > 0)
+   
+   NcDim strl_dim    ; // header string dimension
+   NcDim strll_dim   ; // header string dimension (bigger dimension)
+   NcDim hdr_arr_dim ; // Header array width
+   NcDim obs_arr_dim ; // Observation array width
+   NcDim obs_dim     ; // Observation array length
+   NcDim hdr_dim     ; // Header array length
+   
+   //NcDim var_dim     ;
+   NcVar hdr_typ_var ; // Message type
+   NcVar hdr_sid_var ; // Station ID
+   NcVar hdr_vld_var ; // Valid time
+   NcVar hdr_arr_var ; // Header array
+   NcVar obs_qty_var ; // Quality flag (unlimited dimension)
+   NcVar obs_arr_var ; // Observation array (unlimited dimension)
+};
+
+struct NcHeaderData {
+   int typ_len;
+   int sid_len;
+   int vld_len;
+   int strl_len;  
+   int strll_len;
+   
+   StringArray typ_array;
+   StringArray sid_array;
+   StringArray vld_array;
+   NumArray    lat_array;
+   NumArray    lon_array;
+   NumArray    elv_array;
+};
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -278,6 +317,7 @@ extern bool   get_dim_names(const NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 //extern multimap<string,NcDim> get_global_dims(const NcFile *nc, int *dim_count);
 
+extern NcHeaderData get_nc_hdr_data(NetcdfObsVars obsVars);
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
