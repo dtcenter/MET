@@ -876,28 +876,19 @@ void process_point_obs(int i_nc) {
    if(IS_INVALID_NC(obsVars.obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file.\n";
 
-   int hdr_buf_size = GET_NC_SIZE(obsVars.hdr_dim);
-   int obs_count    = GET_NC_SIZE(obsVars.obs_dim);
+   int hdr_count = GET_NC_SIZE(obsVars.hdr_dim);
+   int obs_count = GET_NC_SIZE(obsVars.obs_dim);
    mlog << Debug(2) << "Searching " << (obs_count)
-        << " observations from " << (hdr_buf_size)
+        << " observations from " << (hdr_count)
         << " header messages.\n";
 
    int mxstr_len  = GET_NC_SIZE(obsVars.strl_dim);
    int mxstr2_len = mxstr_len;
    if (!IS_INVALID_NC(obsVars.strll_dim)) mxstr2_len = get_dim_size(&obsVars.strll_dim);
-   int typ_len = mxstr_len;
-   int sid_len = mxstr_len;
-   int vld_len = mxstr_len;
-   if (!IS_INVALID_NC(obsVars.strll_dim)) {
-      NcDim str_dim;
-      string dim_name = GET_NC_NAME(obsVars.strll_dim);
-      str_dim = get_nc_dim(&obsVars.hdr_typ_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) typ_len = mxstr2_len;
-      str_dim = get_nc_dim(&obsVars.hdr_sid_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) sid_len = mxstr2_len;
-      str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) vld_len = mxstr2_len;
-   }
+   NcHeaderData header_data = get_nc_hdr_data(obsVars);
+   int typ_len = header_data.typ_len;
+   int sid_len = header_data.sid_len;
+   int vld_len = header_data.vld_len;
 
    int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
    float obs_arr_block[buf_size][obs_arr_len];
@@ -908,11 +899,6 @@ void process_point_obs(int i_nc) {
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
    char obs_qty_str[max_str_len];
-
-   float hdr_arr_full   [hdr_buf_size][hdr_arr_len];
-   char hdr_typ_str_full[hdr_buf_size][typ_len];
-   char hdr_sid_str_full[hdr_buf_size][sid_len];
-   char hdr_vld_str_full[hdr_buf_size][vld_len];
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
@@ -937,48 +923,6 @@ void process_point_obs(int i_nc) {
 
    offsets[0] = 0;
    offsets[1] = 0;
-   lengths[0] = hdr_buf_size;
-   lengths[1] = mxstr_len;
-
-   //
-   // Get the corresponding header message type
-   //
-   lengths[1] = typ_len;
-   if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_typ\n\n";
-      exit(1);
-   }
-
-   //
-   // Get the corresponding header station id
-   //
-   lengths[1] = sid_len;
-   if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_sid\n\n";
-      exit(1);
-   }
-
-   //
-   // Get the corresponding header valid time
-   //
-   lengths[1] = vld_len;
-   if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_vld\n\n";
-      exit(1);
-   }
-
-   //
-   // Get the header for this observation
-   //
-   lengths[1] = hdr_arr_len;
-   if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_full[0], lengths, offsets)) {
-      mlog << Error << "\nmain() -> "
-           << "trouble getting hdr_arr\n\n";
-      exit(1);
-   }
 
    for(int i_start=0; i_start<obs_count; i_start+=buf_size) {
       buf_size = ((obs_count-i_start) > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count-i_start);
@@ -1017,7 +961,7 @@ void process_point_obs(int i_nc) {
          int headerOffset  = obs_arr[0];
 
          // Range check the header offset
-         if(headerOffset < 0 || headerOffset >= hdr_buf_size) {
+         if(headerOffset < 0 || headerOffset >= hdr_count) {
             mlog << Warning << "\nprocess_point_obs() -> "
                  << "range check error for header index " << headerOffset
                  << " from observation number " << i_obs
@@ -1027,26 +971,28 @@ void process_point_obs(int i_nc) {
          }
 
          // Read the corresponding header array for this observation
-         for (int k=0; k < hdr_arr_len; k++)
-            hdr_arr[k] = hdr_arr_full[headerOffset][k];
-
+         hdr_arr[0] = header_data.lat_array[headerOffset];
+         hdr_arr[1] = header_data.lon_array[headerOffset];
+         hdr_arr[2] = header_data.elv_array[headerOffset];
+        
          // Read the corresponding header type for this observation
-         str_length = strlen(hdr_typ_str_full[headerOffset]);
+         str_length = strlen(header_data.typ_array[headerOffset]);
          if (str_length > typ_len) str_length = typ_len;
-         strncpy(hdr_typ_str, hdr_typ_str_full[headerOffset], str_length);
+         strncpy(hdr_typ_str, header_data.typ_array[headerOffset], str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
          // Read the corresponding header Station ID for this observation
-         str_length = strlen(hdr_sid_str_full[headerOffset]);
+         str_length = strlen(header_data.sid_array[headerOffset]);
          if (str_length > sid_len) str_length = sid_len;
-         strncpy(hdr_sid_str, hdr_sid_str_full[headerOffset], str_length);
+         strncpy(hdr_sid_str, header_data.sid_array[headerOffset], str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
          // Read the corresponding valid time for this observation
-         str_length = strlen(hdr_vld_str_full[headerOffset]);
+         str_length = strlen(header_data.vld_array[headerOffset]);
          if (str_length > vld_len) str_length = vld_len;
-         strncpy(hdr_vld_str, hdr_vld_str_full[headerOffset], str_length);
+         strncpy(hdr_vld_str, header_data.vld_array[headerOffset], str_length);
          hdr_vld_str[str_length] = bad_data_char;
+
 
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
@@ -1075,6 +1021,12 @@ void process_point_obs(int i_nc) {
       delete obs_in;
       obs_in = (NcFile *) 0;
    }
+   header_data.typ_array.clear();
+   header_data.sid_array.clear();
+   header_data.vld_array.clear();
+   header_data.lat_array.clear();
+   header_data.lon_array.clear();
+   header_data.elv_array.clear();
 
    return;
 }
