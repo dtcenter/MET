@@ -18,6 +18,7 @@ using namespace netCDF;
 
 #include "vx_grid.h"
 #include "vx_config.h"
+#include "nc_utils.h"
 #include "observation.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,47 +32,6 @@ using namespace netCDF;
 static const float FILL_VALUE = -9999.f;
 
 ////////////////////////////////////////////////////////////////////////
-
-struct NetcdfObsVars {
-   bool  attr_agl    ;
-   bool  attr_pb2nc  ;
-   bool  use_var_id  ;
-   int   hdr_cnt     ; // header array count (fixed dimension if hdr_cnt > 0)
-   
-   NcDim strl_dim    ; // header string dimension
-   NcDim strll_dim   ; // header string dimension (bigger dimension)
-   NcDim hdr_arr_dim ; // Header array width
-   NcDim obs_arr_dim ; // Observation array width
-   NcDim obs_dim     ; // Observation array length
-   NcDim hdr_dim     ; // Header array length
-   
-   //NcDim var_dim     ;
-   NcVar hdr_typ_var ; // Message type
-   NcVar hdr_sid_var ; // Station ID
-   NcVar hdr_vld_var ; // Valid time
-   NcVar hdr_arr_var ; // Header array
-   NcVar obs_qty_var ; // Quality flag (unlimited dimension)
-   NcVar obs_arr_var ; // Observation array (unlimited dimension)
-};
-
-struct NcHeaderArrays {
-   StringArray typ_sa;  // Message type
-   StringArray sid_sa;  // Station ID
-   StringArray vld_sa;  // Valid time
-   NumArray    lat_na;  // Latitude
-   NumArray    lon_na;  // Longitude
-   NumArray    elv_na;  // Elevation
-};
-
-////////////////////////////////////////////////////////////////////////
-
-//extern int   cur_hdr_idx;
-//extern int   hdr_data_idx;
-//extern int   hdr_data_offset;
-//extern int   obs_data_idx;
-//extern int   obs_data_offset;
-//extern float  hdr_arr_buf[OBS_BUFFER_SIZE][HDR_ARRAY_LEN];
-//extern float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
 
 extern void write_netcdf_global     (NcFile *, const char *, const char *,
                                      const char *model_name = (const char *) 0,
