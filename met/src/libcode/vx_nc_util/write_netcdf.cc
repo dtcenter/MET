@@ -22,7 +22,6 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_cal.h"
-#include "nc_utils.h"
 #include "vx_util.h"
 #include "write_netcdf.h"
 #include "grid_output.h"
@@ -34,7 +33,6 @@ long obsNum;
 
 int   obs_buf_size;
 int   hdr_buf_size;
-//int   processed_count;
 int   cur_hdr_idx = 0;
 int   cur_obs_idx = 0;
 
@@ -42,8 +40,6 @@ int   obs_data_idx;
 int   obs_data_offset;
 int   hdr_data_idx;
 int   hdr_data_offset;
-//bool  use_var_id;
-//StringArray obs_names;
 
 char   hdr_typ_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
 char   hdr_sid_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
@@ -52,7 +48,7 @@ float  hdr_arr_buf[OBS_BUFFER_SIZE][HDR_ARRAY_LEN];
 float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
 char  qty_data_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
 
-static struct NcHeaderArrays hdr_arrays;
+static struct NcHeaderData hdr_data;
 
 static const string err_msg_message_type =
       "error writing the message type string to the netCDF file\n\n";
@@ -346,12 +342,12 @@ ConcatString s;
 void add_nc_header (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
       const float hdr_lat, const float hdr_lon, const float hdr_elv)
 {
-   hdr_arrays.typ_sa.add(hdr_typ);  // Message type
-   hdr_arrays.sid_sa.add(hdr_sid);  // Station ID
-   hdr_arrays.vld_sa.add(hdr_vld);  // Valid time
-   hdr_arrays.lat_na.add(hdr_lat);  // Latitude
-   hdr_arrays.lon_na.add(hdr_lon);  // Longitude
-   hdr_arrays.elv_na.add(hdr_elv);  // Elevation
+   hdr_data.typ_array.add(hdr_typ);  // Message type
+   hdr_data.sid_array.add(hdr_sid);  // Station ID
+   hdr_data.vld_array.add(hdr_vld);  // Valid time
+   hdr_data.lat_array.add(hdr_lat);  // Latitude
+   hdr_data.lon_array.add(hdr_lon);  // Longitude
+   hdr_data.elv_array.add(hdr_elv);  // Elevation
    
    cur_hdr_idx++;
 }
@@ -368,28 +364,31 @@ void add_nc_header_to_buf (const NetcdfObsVars &obsVars,
    hdr_str_len  = strlen(hdr_typ);
    hdr_str_len2 = strlen(hdr_typ_buf[hdr_data_idx]);
    if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
-   if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
    strncpy(hdr_typ_buf[hdr_data_idx], hdr_typ, hdr_str_len);
-   for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
-      hdr_typ_buf[hdr_data_idx][idx] = bad_data_char;
+   if (hdr_str_len2 > hdr_str_len) {
+      for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
+         hdr_typ_buf[hdr_data_idx][idx] = bad_data_char;
+   }
    
    // Station ID
-   hdr_str_len = strlen(hdr_sid);
+   hdr_str_len  = strlen(hdr_sid);
    hdr_str_len2 = strlen(hdr_sid_buf[hdr_data_idx]);
    if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
-   if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
    strncpy(hdr_sid_buf[hdr_data_idx], hdr_sid, hdr_str_len);
-   for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
-      hdr_sid_buf[hdr_data_idx][idx] = bad_data_char;
+   if (hdr_str_len2 > hdr_str_len) {
+      for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
+         hdr_sid_buf[hdr_data_idx][idx] = bad_data_char;
+   }
    
    // Valid Time
-   hdr_str_len = strlen(hdr_vld);
+   hdr_str_len  = strlen(hdr_vld);
    hdr_str_len2 = strlen(hdr_vld_buf[hdr_data_idx]);
    if (hdr_str_len > HEADER_STR_LEN) hdr_str_len = HEADER_STR_LEN;
-   if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
    strncpy(hdr_vld_buf[hdr_data_idx], hdr_vld, hdr_str_len);
-   for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
-      hdr_vld_buf[hdr_data_idx][idx] = bad_data_char;
+   if (hdr_str_len2 > hdr_str_len) {
+      for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
+         hdr_vld_buf[hdr_data_idx][idx] = bad_data_char;
+   }
    
    // Write the header array which consists of the following:
    //    LAT LON ELV
@@ -599,12 +598,12 @@ void nc_obs_initialize() {
    hdr_data_idx    = 0;
    hdr_data_offset = 0;
    
-   hdr_arrays.typ_sa.clear();
-   hdr_arrays.sid_sa.clear();
-   hdr_arrays.vld_sa.clear();
-   hdr_arrays.lat_na.clear();
-   hdr_arrays.lon_na.clear();
-   hdr_arrays.elv_na.clear();
+   hdr_data.typ_array.clear();
+   hdr_data.sid_array.clear();
+   hdr_data.vld_array.clear();
+   hdr_data.lat_array.clear();
+   hdr_data.lon_array.clear();
+   hdr_data.elv_array.clear();
 
 }
 
@@ -683,37 +682,37 @@ void write_nc_headers(const NetcdfObsVars &obsVars)
    hdr_data_idx = 0;
    for (int index=0; index<cur_hdr_idx; index++) {
       // PrepBufr Message type
-      hdr_str_len  = strlen(hdr_arrays.typ_sa[index]);
+      hdr_str_len  = strlen(hdr_data.typ_array[index]);
       hdr_str_len2 = strlen(hdr_typ_buf[hdr_data_idx]);
       if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
       if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
-      strncpy(hdr_typ_buf[hdr_data_idx], hdr_arrays.typ_sa[index], hdr_str_len);
+      strncpy(hdr_typ_buf[hdr_data_idx], hdr_data.typ_array[index], hdr_str_len);
       for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
          hdr_typ_buf[hdr_data_idx][idx] = bad_data_char;
       
       // Station ID
-      hdr_str_len = strlen(hdr_arrays.sid_sa[index]);
+      hdr_str_len = strlen(hdr_data.sid_array[index]);
       hdr_str_len2 = strlen(hdr_sid_buf[hdr_data_idx]);
       if (hdr_str_len > HEADER_STR_LEN_L) hdr_str_len = HEADER_STR_LEN_L;
       if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
-      strncpy(hdr_sid_buf[hdr_data_idx], hdr_arrays.sid_sa[index], hdr_str_len);
+      strncpy(hdr_sid_buf[hdr_data_idx], hdr_data.sid_array[index], hdr_str_len);
       for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
          hdr_sid_buf[hdr_data_idx][idx] = bad_data_char;
       
       // Valid Time
-      hdr_str_len = strlen(hdr_arrays.vld_sa[index]);
+      hdr_str_len = strlen(hdr_data.vld_array[index]);
       hdr_str_len2 = strlen(hdr_vld_buf[hdr_data_idx]);
       if (hdr_str_len > HEADER_STR_LEN) hdr_str_len = HEADER_STR_LEN;
       if (hdr_str_len2 < hdr_str_len) hdr_str_len2 = hdr_str_len;
-      strncpy(hdr_vld_buf[hdr_data_idx], hdr_arrays.vld_sa[index], hdr_str_len);
+      strncpy(hdr_vld_buf[hdr_data_idx], hdr_data.vld_array[index], hdr_str_len);
       for (int idx=hdr_str_len; idx<hdr_str_len2; idx++)
          hdr_vld_buf[hdr_data_idx][idx] = bad_data_char;
       
       // Write the header array which consists of the following:
       //    LAT LON ELV
-      hdr_arr_buf[hdr_data_idx][0] = (float) hdr_arrays.lat_na[index];
-      hdr_arr_buf[hdr_data_idx][1] = (float) hdr_arrays.lon_na[index];
-      hdr_arr_buf[hdr_data_idx][2] = (float) hdr_arrays.elv_na[index];
+      hdr_arr_buf[hdr_data_idx][0] = (float) hdr_data.lat_array[index];
+      hdr_arr_buf[hdr_data_idx][1] = (float) hdr_data.lon_array[index];
+      hdr_arr_buf[hdr_data_idx][2] = (float) hdr_data.elv_array[index];
       
       hdr_data_idx++;
       
