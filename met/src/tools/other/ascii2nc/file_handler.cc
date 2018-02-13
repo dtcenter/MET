@@ -67,7 +67,7 @@ FileHandler::FileHandler(const string &program_name) :
 
 FileHandler::~FileHandler()
 {
-  delete _ncFile;
+  if (_ncFile != 0) delete _ncFile;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -678,7 +678,6 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
                                 const ConcatString &hdr_sid,
                                 const ConcatString &hdr_vld,
                                 double lat, double lon, double elv) {
-  float hdr_arr[HDR_ARRAY_LEN];
   int hdr_sid_len;
 
    //
@@ -689,9 +688,6 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    //
    // Build the header array
    //
-   hdr_arr[0] = lat;
-   hdr_arr[1] = lon;
-   hdr_arr[2] = elv;
    hdr_arr_buf[hdr_data_idx][0] = lat;
    hdr_arr_buf[hdr_data_idx][1] = lon;
    hdr_arr_buf[hdr_data_idx][2] = elv;
@@ -720,15 +716,11 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
        hdr_typ_buf[hdr_data_idx][j] = bad_data_char;
 
    hdr_data_idx++;
-
-   hdr_buf_size = _nhdr;
-   if (hdr_buf_size > OBS_BUFFER_SIZE) hdr_buf_size = OBS_BUFFER_SIZE;
-
-   bool save_nc = (hdr_buf_size <= hdr_data_idx);
-   if (! save_nc && (processed_count >= _observations.size()) ) {
-      save_nc = true;
+   hdr_buf_size = (_nhdr > OBS_BUFFER_SIZE) ? OBS_BUFFER_SIZE : _nhdr;
+   if (processed_count >= (int)_observations.size()) {
       hdr_buf_size = _nhdr % OBS_BUFFER_SIZE;
    }
+   bool save_nc = (hdr_buf_size <= hdr_data_idx);
    if (save_nc) {
 
       long offsets[2] = { hdr_data_offset, 0 };
@@ -811,14 +803,10 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
    obs_qty = (qty.length() == 0 ? na_str : qty.text());
    strncpy(qty_data_buf[obs_data_idx], obs_qty, obs_qty.length());
 
-   if ( _observations.size() == _obsNum && OBS_BUFFER_SIZE == obs_buf_size) {
+   if (processed_count >= (int)_observations.size()) {
       obs_buf_size = _observations.size() % OBS_BUFFER_SIZE;
    }
    bool save_nc = (obs_buf_size <= (obs_data_idx+1));
-   if (! save_nc && processed_count == _observations.size() ) {
-      save_nc = true;
-      obs_buf_size = _observations.size() % OBS_BUFFER_SIZE;
-   }
    if (save_nc) {
       long offsets[2] = { obs_data_offset, 0 };
       long lengths[2] = { obs_buf_size, OBS_ARRAY_LEN };
