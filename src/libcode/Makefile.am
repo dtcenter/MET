@@ -32,6 +32,7 @@ SUBDIRS += vx_data2d_factory \
 	vx_gsl_prob \
 	vx_gnomon \
 	vx_geodesy \
+	vx_gis \
 	vx_nav \
 	vx_pb_util \
 	vx_afm \

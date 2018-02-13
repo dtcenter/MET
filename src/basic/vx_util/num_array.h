@@ -100,6 +100,7 @@ class NumArray {
       ConcatString serialize() const;
 
       int n_elements() const;
+      int n() const;         //  same as n_elements()
       int n_valid() const;
 
       NumArray subset(int, int) const;
@@ -115,6 +116,7 @@ class NumArray {
 
 
 inline int            NumArray::n_elements()         const { return ( Nelements ); }
+inline int            NumArray::n         ()         const { return ( Nelements ); }
 inline const double * NumArray::vals()               const { return ( e );         }
 inline       double * NumArray::buf()                const { return ( e );         }
 inline void           NumArray::inc(int i, int v)          { e[i] += v; return;    }
