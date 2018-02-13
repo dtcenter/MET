@@ -205,6 +205,7 @@ int main(int argc, char *argv[]) {
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = config_info.get_compression_level();
+   if (deflate_level > 9) deflate_level = config_info.get_compression_level();
    file_handler->setCompressionLevel(deflate_level);
 
    //
