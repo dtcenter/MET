@@ -24,10 +24,10 @@ using namespace std;
 #include "wwsis_handler.h"
 
 
-const string WwsisHandler::HEADER_TYPE = "WWSIS";
+const string WwsisHandler::HEADER_TYPE = (string)"WWSIS";
 
 const int WwsisHandler::GRIB_CODE = 0;
-const string GRIB_NAME = "WWSIS";
+const string GRIB_NAME = (string)"WWSIS";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -200,7 +200,7 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
 
     // Add the observation
 
-    _addObservations(Observation(HEADER_TYPE, "WWSIS",
+    _addObservations(Observation(HEADER_TYPE, (string)"WWSIS",
                                  valid_time,
                                  _stationLat, _stationLon,
                                  0,
