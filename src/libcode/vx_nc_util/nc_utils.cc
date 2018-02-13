@@ -1592,6 +1592,120 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long *dim, const long *cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
+NcHeaderData get_nc_hdr_data(NetcdfObsVars obsVars) {
+   NcHeaderData header_data;
+   long nhdr_count  = get_dim_size(&obsVars.hdr_dim);
+   int  hdr_arr_len = get_dim_size(&obsVars.hdr_arr_dim);
+   int  strl_len    = get_dim_size(&obsVars.strl_dim);
+   int  strll_len   = strl_len;
+   int  typ_len = strl_len;
+   int  sid_len = strl_len;
+   int  vld_len = strl_len;
+   if (!IS_INVALID_NC(obsVars.strll_dim)) {
+      strll_len = get_dim_size(&obsVars.strll_dim);
+      NcDim str_dim;
+      string dim_name = GET_NC_NAME(obsVars.strll_dim);
+      str_dim = get_nc_dim(&obsVars.hdr_typ_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) typ_len = strll_len;
+      str_dim = get_nc_dim(&obsVars.hdr_sid_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) sid_len = strll_len;
+      str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) vld_len = strll_len;
+   }
+   
+   header_data.typ_len   = typ_len;
+   header_data.sid_len   = sid_len;
+   header_data.vld_len   = vld_len;
+   header_data.strl_len  = strl_len;
+   header_data.strll_len = strll_len;
+   header_data.typ_array.extend(nhdr_count);
+   header_data.sid_array.extend(nhdr_count);
+   header_data.vld_array.extend(nhdr_count);
+   header_data.lat_array.extend(nhdr_count);
+   header_data.lon_array.extend(nhdr_count);
+   header_data.elv_array.extend(nhdr_count);
+   
+   int buf_size = ((nhdr_count > NC_BUFFER_SIZE_32K)
+        ? NC_BUFFER_SIZE_32K : (nhdr_count));
+   
+   //
+   // Allocate space to store the data
+   //
+   char hdr_typ_str[typ_len];
+   char hdr_sid_str[sid_len];
+   char hdr_vld_str[vld_len];
+   
+   char  hdr_typ_block[buf_size][typ_len];
+   char  hdr_sid_block[buf_size][sid_len];
+   char  hdr_vld_block[buf_size][vld_len];
+   float hdr_arr_block[buf_size][hdr_arr_len];
+
+   long offsets[2] = { 0, 0 };
+   long lengths[2] = { 1, 1 };
+   
+   lengths[0] = buf_size;
+   lengths[1] = strl_len;
+
+   for(int i_start=0; i_start<nhdr_count; i_start+=buf_size) {
+      buf_size = ((nhdr_count-i_start) > NC_BUFFER_SIZE_32K)
+            ? NC_BUFFER_SIZE_32K : (nhdr_count-i_start);
+      
+      offsets[0] = i_start;
+      lengths[0] = buf_size;
+   
+      //
+      // Get the corresponding header message type
+      //
+      lengths[1] = typ_len;
+      if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_block[0], lengths, offsets)) {
+         mlog << Error << "\nget_nc_header() -> "
+              << "trouble getting hdr_typ\n\n";
+         exit(1);
+      }
+      
+      //
+      // Get the corresponding header station id
+      //
+      lengths[1] = sid_len;
+      if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_block[0], lengths, offsets)) {
+         mlog << Error << "\nget_nc_header() -> "
+              << "trouble getting hdr_sid\n\n";
+         exit(1);
+      }
+      
+      //
+      // Get the corresponding header valid time
+      //
+      lengths[1] = vld_len;
+      if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_block[0], lengths, offsets)) {
+         mlog << Error << "\nget_nc_header() -> "
+              << "trouble getting hdr_vld\n\n";
+         exit(1);
+      }
+
+      //
+      // Get the header for this observation
+      //
+      lengths[1] = hdr_arr_len;
+      if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
+         mlog << Error << "\nget_nc_header() -> "
+              << "trouble getting hdr_arr\n\n";
+         exit(1);
+      }
+      for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+         header_data.typ_array.add(hdr_typ_block[hIndex]);
+         header_data.sid_array.add(hdr_sid_block[hIndex]);
+         header_data.vld_array.add(hdr_vld_block[hIndex]);
+         header_data.lat_array.add(hdr_arr_block[hIndex][0]);
+         header_data.lon_array.add(hdr_arr_block[hIndex][1]);
+         header_data.elv_array.add(hdr_arr_block[hIndex][2]);
+      }
+   }
+   return header_data;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool put_nc_data(NcVar *var, const int data,    long offset0, long offset1, long offset2) {
    vector<size_t> offsets;
    offsets.push_back((size_t)offset0);
