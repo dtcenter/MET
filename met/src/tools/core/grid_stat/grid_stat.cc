@@ -90,6 +90,8 @@
 //   041    11/01/17  Halley Gotway  Add binned climatologies.
 //   042    12/15/17  Halley Gotway  Restructure config logic to make
 //                    all options settable for each verification task.
+//   043    02/14/17  Halley Gotway  Add nbrhd.field option to skip the
+//                    computation of fractional coverage fields.
 //
 ////////////////////////////////////////////////////////////////////////
 
