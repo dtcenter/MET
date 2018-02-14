@@ -21,6 +21,7 @@ desc = "NA";
 
 //
 // Verification grid
+// May be set separately in each "obs.field" entry
 //
 regrid = {
    to_grid    = NONE;
@@ -35,14 +36,15 @@ regrid = {
 //
 // May be set separately in each "field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-cat_thresh    = [ NA ];
-cnt_thresh    = [ NA ];
-cnt_logic     = UNION;
-wind_thresh   = [ NA ];
-wind_logic    = UNION;
-eclv_points   = 0.05;
+censor_thresh  = [];
+censor_val     = [];
+cat_thresh     = [ NA ];
+cnt_thresh     = [ NA ];
+cnt_logic      = UNION;
+wind_thresh    = [ NA ];
+wind_logic     = UNION;
+eclv_points    = 0.05;
+rank_corr_flag = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -139,6 +141,7 @@ climo_cdf_bins = 1;
 
 //
 // Point observation time window
+// May be set separately in each "obs.field" entry
 //
 obs_window = {
    beg = -5400;
@@ -149,6 +152,7 @@ obs_window = {
 
 //
 // Verification masking regions
+// May be set separately in each "obs.field" entry
 //
 mask = {
    grid    = [ "FULL" ];
@@ -160,6 +164,7 @@ mask = {
 
 //
 // Confidence interval settings
+// May be set separately in each "obs.field" entry
 //
 ci_alpha  = [ 0.05 ];
 
@@ -175,6 +180,7 @@ boot = {
 
 //
 // Interpolation methods
+// May be set separately in each "obs.field" entry
 //
 interp = {
    vld_thresh = 1.0;
@@ -192,6 +198,7 @@ interp = {
 
 //
 // HiRA verification method
+// May be set separately in each "obs.field" entry
 //
 hira = {
    flag       = FALSE;
@@ -205,6 +212,7 @@ hira = {
 
 //
 // Statistical output types
+// May be set separately in each "obs.field" entry
 //
 output_flag = {
    fho    = BOTH;
@@ -227,7 +235,6 @@ output_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
 version        = "V6.1";
