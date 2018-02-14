@@ -1166,6 +1166,7 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
 ////////////////////////////////////////////////////////////////////////
 
 void NbrhdInfo::clear() {
+   field = FieldType_None;
    vld_thresh = bad_data_double;
    width.clear();
    cov_ta.clear();
@@ -1187,6 +1188,13 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict) {
 
    // Conf: nbrhd
    nbrhd_dict = dict->lookup_dictionary(conf_key_nbrhd);
+
+   // Conf: field - may be missing
+   v = nbrhd_dict->lookup_int(conf_key_field, false);
+
+   // If found, interpret value.  Otherwise, default to BOTH
+   if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
+   else                                 info.field = FieldType_Both;
 
    // Conf: vld_thresh
    info.vld_thresh = nbrhd_dict->lookup_double(conf_key_vld_thresh);

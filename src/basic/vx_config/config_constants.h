@@ -265,6 +265,7 @@ struct RegridInfo {
 //
 
 struct NbrhdInfo {
+   FieldType   field;      // Forecast grid, observation grid, or none
    double      vld_thresh; // Valid data neighborhood threshold
    IntArray    width;      // Neighborhood widths
    ThreshArray cov_ta;     // Fractional coverage thresholds

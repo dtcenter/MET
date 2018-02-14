@@ -150,10 +150,11 @@ interp = {
 // May be set separately in each "obs.field" entry
 //
 nbrhd = {
-   width      = [ 1 ];
-   cov_thresh = [ >=0.5 ];
+   field      = BOTH;
    vld_thresh = 1.0;
    shape      = SQUARE;
+   width      = [ 1 ];
+   cov_thresh = [ >=0.5 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
