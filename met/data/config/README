@@ -1001,7 +1001,24 @@ interp = {
 // entry.  It specifies information for computing neighborhood statistics in
 // Grid-Stat.  This dictionary may include the following entries:
 //
+//    - The "field" entry specifies to which field(s) the computation of
+//      fractional coverage should be applied. Grid-Stat processes each
+//      combination of categorical threshold and neighborhood width to
+//      derive the fractional coverage fields from which neighborhood
+//      statistics are calculated.  Users who have computed fractional
+//      coverage fields outside of MET can use this option to disable
+//      these computations.  Instead, the raw input values will be
+//      used directly to compute neighborhood statistics:
+//       - "BOTH" to compute fractional coverage for both the forecast
+//                and the observation fields (default).
+//       - "FCST" to only process the forecast field.
+//       - "OBS"  to only process the observation field.
+//       - "NONE" to process neither field.
+//
 //    - The "vld_thresh" entry is described above.
+//
+//    - The "shape" entry defines the shape of the neighborhood.
+//      Valid values are "SQUARE" or "CIRCLE"
 //
 //    - The "width" entry is as described above, and must be odd.
 //
@@ -1009,14 +1026,12 @@ interp = {
 //      computing categorical statistics for the neighborhood fractional
 //      coverage field.
 //
-//    - The "shape" entry defines the shape of the neighborhood.
-//      Valid values are "SQUARE" or "CIRCLE"
-//
 nbrhd = {
-   width      = [ 1 ];
-   cov_thresh = [ >=0.5 ];
+   field      = BOTH;
    vld_thresh = 1.0;
    shape      = SQUARE;
+   width      = [ 1 ];
+   cov_thresh = [ >=0.5 ];
 }
 
 //

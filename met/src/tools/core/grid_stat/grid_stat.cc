@@ -569,6 +569,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 void process_scores() {
    int i, j, k, m, n;
    int n_cat, n_cnt, n_wind, n_prob, n_cov, n_cdf_bin;
+   double dmin, dmax;
    ConcatString cs;
 
    // Forecast and observation fields
@@ -1257,38 +1258,86 @@ void process_scores() {
           conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType_None ||
           conf_info.vx_opt[i].output_flag[i_nbrcnt] != STATOutputType_None)) {
 
+         // Pointer to current interpolation object
+         NbrhdInfo * nbrhd = &conf_info.vx_opt[i].nbrhd_info;
+
          // Initialize
          for(j=0; j<n_cov; j++) nbrcts_info[j].clear();
 
          // Loop through and apply each of the neighborhood widths
-         for(j=0; j<conf_info.vx_opt[i].get_n_nbrhd_wdth(); j++) {
+         for(j=0; j<nbrhd->width.n_elements(); j++) {
 
-            shc.set_interp_mthd(InterpMthd_Nbrhd,
-                                conf_info.vx_opt[i].nbrhd_info.shape);
-            shc.set_interp_wdth(conf_info.vx_opt[i].nbrhd_info.width[j]);
+            shc.set_interp_mthd(InterpMthd_Nbrhd, nbrhd->shape);
+            shc.set_interp_wdth(nbrhd->width[j]);
 
             // Loop through and apply each of the raw threshold values
             for(k=0; k<conf_info.vx_opt[i].fcat_ta.n_elements(); k++) {
 
-               // Compute the binary thresholded fields
-               fcst_dp_thresh = fcst_dp;
-               fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
+               // Process the forecast data
+               if(nbrhd->field == FieldType_Fcst ||
+                  nbrhd->field == FieldType_Both) {
 
-               obs_dp_thresh = obs_dp;
-               obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
+                  // Compute fractional coverage
+                  fractional_coverage(fcst_dp, fcst_dp_smooth,
+                                      nbrhd->width[j], nbrhd->shape,
+                                      conf_info.vx_opt[i].fcat_ta[k],
+                                      nbrhd->vld_thresh);
 
-               // Compute the thresholded fractional coverage field
-               fractional_coverage(fcst_dp, fcst_dp_smooth,
-                                   conf_info.vx_opt[i].nbrhd_info.width[j],
-                                   conf_info.vx_opt[i].nbrhd_info.shape,
-                                   conf_info.vx_opt[i].fcat_ta[k],
-                                   conf_info.vx_opt[i].nbrhd_info.vld_thresh);
+                  // Compute the binary threshold field
+                  fcst_dp_thresh = fcst_dp;
+                  fcst_dp_thresh.threshold(conf_info.vx_opt[i].fcat_ta[k]);
+               }
+               // Do not compute fractional coverage
+               else {
+                  mlog << Debug(3) << "Skipping forecast fractional "
+                       << "coverage computations since \"nbrhd.field\" = "
+                       << fieldtype_to_string(nbrhd->field) << "\n";
+                  fcst_dp_smooth = fcst_dp;
+                  fcst_dp_thresh = fcst_dp;
+                  fcst_dp_thresh.set_constant(bad_data_double);
 
-               fractional_coverage(obs_dp, obs_dp_smooth,
-                                   conf_info.vx_opt[i].nbrhd_info.width[j],
-                                   conf_info.vx_opt[i].nbrhd_info.shape,
-                                   conf_info.vx_opt[i].ocat_ta[k],
-                                   conf_info.vx_opt[i].nbrhd_info.vld_thresh);
+                  // Check range of forecast values
+                  fcst_dp_smooth.data_range(dmin, dmax);
+                  if(dmin < 0.0 || dmax > 1.0) {
+                     mlog << Warning << "\nThe range of forecast "
+                          << "fractional coverage values [" << dmin
+                          << ", " << dmax << "] falls outside the "
+                          << "expected [0, 1] range.\n\n";
+                  }
+               }
+
+               // Process the observation data
+               if(nbrhd->field == FieldType_Obs ||
+                  nbrhd->field == FieldType_Both) {
+
+                  // Compute fractional coverage
+                  fractional_coverage(obs_dp, obs_dp_smooth,
+                                      nbrhd->width[j], nbrhd->shape,
+                                      conf_info.vx_opt[i].ocat_ta[k],
+                                      nbrhd->vld_thresh);
+
+                  // Compute the binary threshold field
+                  obs_dp_thresh = obs_dp;
+                  obs_dp_thresh.threshold(conf_info.vx_opt[i].ocat_ta[k]);
+               }
+               // Do not compute fractional coverage
+               else {
+                  mlog << Debug(3) << "Skipping observation fractional "
+                       << "coverage computations since \"nbrhd.field\" = "
+                       << fieldtype_to_string(nbrhd->field) << "\n";
+                  obs_dp_smooth = obs_dp;
+                  obs_dp_thresh = obs_dp;
+                  obs_dp_thresh.set_constant(bad_data_double);
+
+                  // Check range of observation values
+                  obs_dp_smooth.data_range(dmin, dmax);
+                  if(dmin < 0.0 || dmax > 1.0) {
+                     mlog << Warning << "\nThe range of observation "
+                          << "fractional coverage values [" << dmin
+                          << ", " << dmax << "] falls outside the "
+                          << "expected [0, 1] range.\n\n";
+                  }
+               }
 
                // Loop through the masks to be applied
                for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
@@ -1298,9 +1347,17 @@ void process_scores() {
 
                   // Turn off the mask for bad forecast or observation values
                   mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
-                  mask_bad_data(mask_dp, fcst_dp_thresh, 0.0);
                   mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
-                  mask_bad_data(mask_dp, obs_dp_thresh,  0.0);
+
+                  if(nbrhd->field == FieldType_Fcst ||
+                     nbrhd->field == FieldType_Both) {
+                     mask_bad_data(mask_dp, fcst_dp_thresh, 0.0);
+                  }
+
+                  if(nbrhd->field == FieldType_Obs ||
+                     nbrhd->field == FieldType_Both) {
+                     mask_bad_data(mask_dp, obs_dp_thresh,  0.0);
+                  }
 
                   // Apply the current mask to the fractional coverage
                   // and thresholded fields
@@ -1398,7 +1455,14 @@ void process_scores() {
                      conf_info.vx_opt[i].nbrhd_info.width[j]);
                }
 
+               // If not computing fractional coverage, all finished with thresholds
+               if(nbrhd->field == FieldType_None) break;
+
             } // end for k
+
+            // If not computing fractional coverage, all finished with neighborhood widths
+            if(nbrhd->field == FieldType_None) break;
+
          } // end for j
       } // end if
 
@@ -1990,6 +2054,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
                int i_vx, int i_wdth, int i_thresh,
                const NumArray &f_na, const NumArray &o_na) {
    int i, j, n_nbrcts;
+   FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
    //
    // Set up the NBRCTSInfo thresholds and alpha values
@@ -1997,10 +2062,21 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    n_nbrcts = conf_info.vx_opt[i_vx].get_n_cov_thresh();
    for(i=0; i<n_nbrcts; i++) {
 
-      nbrcts_info[i].fthresh =
-         conf_info.vx_opt[i_vx].fcat_ta[i_thresh];
-      nbrcts_info[i].othresh =
-         conf_info.vx_opt[i_vx].ocat_ta[i_thresh];
+      if(field == FieldType_Fcst || field == FieldType_Both) {
+         nbrcts_info[i].fthresh =
+            conf_info.vx_opt[i_vx].fcat_ta[i_thresh];
+      }
+      else {
+         nbrcts_info[i].fthresh.set_na();
+      }
+
+      if(field == FieldType_Obs || field == FieldType_Both) {
+         nbrcts_info[i].othresh =
+            conf_info.vx_opt[i_vx].ocat_ta[i_thresh];
+      }
+      else {
+         nbrcts_info[i].othresh.set_na();
+      }
       nbrcts_info[i].cthresh =
          conf_info.vx_opt[i_vx].nbrhd_info.cov_ta[i];
 
@@ -2055,14 +2131,24 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
                const NumArray &fthr_na, const NumArray &othr_na,
                const NumArray &w_na) {
    int i;
+   FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
    //
    // Set up the NBRCNTInfo threshold and alpha values
    //
-   nbrcnt_info.fthresh =
-      conf_info.vx_opt[i_vx].fcat_ta[i_thresh];
-   nbrcnt_info.othresh =
-      conf_info.vx_opt[i_vx].ocat_ta[i_thresh];
+   if(field == FieldType_Fcst || field == FieldType_Both) {
+      nbrcnt_info.fthresh = conf_info.vx_opt[i_vx].fcat_ta[i_thresh];
+   }
+   else {
+      nbrcnt_info.fthresh.set_na();
+   }
+
+   if(field == FieldType_Obs || field == FieldType_Both) {
+      nbrcnt_info.othresh = conf_info.vx_opt[i_vx].ocat_ta[i_thresh];
+   }
+   else {
+      nbrcnt_info.othresh.set_na();
+   }
 
    nbrcnt_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
    for(i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
