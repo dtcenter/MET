@@ -467,6 +467,7 @@ int main(int argc, char *argv[]) {
       char obs_var_str[var_count][strl_count];
       NcVar obs_var_var = get_nc_var(f_in, nc_var_obs_var);
       
+      offsets[0] = 0;
       lengths[0] = var_count;
       lengths[1] = strl_count;
       if(!get_nc_data(&obs_var_var, (char *)&obs_var_str[0], lengths, offsets)) {
