@@ -122,7 +122,7 @@ _regrid}
 \end_layout
 
 \begin_layout Standard
-The WWNCA tools get valid time and hemisphere (north or south) information
+The WWMCA tools get valid time and hemisphere (north or south) information
  from the file names, so it's important for both of the WWMCA tools that
  these file names not be changed.
 \end_layout
