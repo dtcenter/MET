@@ -2026,16 +2026,11 @@ void NBRCNTInfo::allocate_n_alpha(int i) {
 
 void NBRCNTInfo::compute_stats() {
    double num, den;
-   int n;
 
    //
    // Compute FBS
    //
-   n   = sl1l2_info.scount;
-   num = sl1l2_info.ffbar*n + sl1l2_info.oobar*n - 2.0*sl1l2_info.fobar*n;
-
-   if(n == 0) fbs.v = bad_data_double;
-   else       fbs.v = (double) num/n;
+   fbs.v = sl1l2_info.ffbar + sl1l2_info.oobar - 2.0*sl1l2_info.fobar;
 
    //
    // Compute FSS
