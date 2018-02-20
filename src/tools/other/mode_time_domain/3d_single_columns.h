@@ -21,9 +21,9 @@
 static const char * att_3d_single_cols [] = {
 
 
-   "OBJ_ID", 
+   "OBJECT_ID", 
 
-   "CLUSTER_ID", 
+   "OBJECT_CAT", 
 
    "CENTROID_X", 
    "CENTROID_Y", 
