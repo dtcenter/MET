@@ -353,11 +353,11 @@ add_att(&f, "hemisphere", junk);
    //  scale latitude
    //
 
-sprintf(j2, "%.5f", data.scale_lat);
+snprintf(j2, sizeof(j2), "%.5f", data.scale_lat);
 
 fix_float(j2);
 
-sprintf(junk, "%s degrees_north", j2);
+snprintf(junk, sizeof(junk), "%s degrees_north", j2);
 
 add_att(&f, "scale_lat", junk);
 
@@ -365,14 +365,14 @@ add_att(&f, "scale_lat", junk);
    //  lat/lon pin point
    //
 
-sprintf(junk, "%.5f", data.lat_pin);
+snprintf(junk, sizeof(junk), "%.5f", data.lat_pin);
 
 fix_float(junk);
 
 add_att(&f, "lat_pin", junk);
 
 
-sprintf(junk, "%.5f", -(data.lon_pin));
+snprintf(junk, sizeof(junk), "%.5f", -(data.lon_pin));
 
 fix_float(junk);
 
@@ -382,14 +382,14 @@ add_att(&f, "lon_pin", junk);
    //  x/y pin point
    //
 
-sprintf(junk, "%.5f", data.x_pin);
+snprintf(junk, sizeof(junk), "%.5f", data.x_pin);
 
 fix_float(junk);
 
 add_att(&f, "x_pin", junk);
 
 
-sprintf(junk, "%.5f", data.y_pin);
+snprintf(junk, sizeof(junk), "%.5f", data.y_pin);
 
 fix_float(junk);
 
@@ -399,7 +399,7 @@ add_att(&f, "y_pin", junk);
    //  orientation longitude
    //
 
-sprintf(junk, "%.5f", -(data.lon_orient));
+snprintf(junk, sizeof(junk), "%.5f", -(data.lon_orient));
 
 fix_float(junk);
 
@@ -409,20 +409,20 @@ add_att(&f, "lon_orient", junk);
    //  D and R
    //
 
-sprintf(j2, "%.5f", data.d_km);
+snprintf(j2, sizeof(j2), "%.5f", data.d_km);
 
 fix_float(j2);
 
-sprintf(junk, "%s km", j2);
+snprintf(junk, sizeof(junk), "%s km", j2);
 
 add_att(&f, "d_km", junk);
 
 
-sprintf(j2, "%.5f", data.r_km);
+snprintf(j2, sizeof(j2), "%.5f", data.r_km);
 
 fix_float(j2);
 
-sprintf(junk, "%s km", j2);
+snprintf(junk, sizeof(junk), "%s km", j2);
 
 add_att(&f, "r_km", junk);
 
@@ -430,12 +430,12 @@ add_att(&f, "r_km", junk);
    //  nx and ny
    //
 
-sprintf(junk, "%d", data.nx);
+snprintf(junk, sizeof(junk), "%d", data.nx);
 
 add_att(&f, "nx", junk);
 
 
-sprintf(junk, "%d", data.ny);
+snprintf(junk, sizeof(junk), "%d", data.ny);
 
 add_att(&f, "ny", junk);
 
@@ -469,14 +469,14 @@ add_att(&f, "Projection", "Lambert Conformal");
    //  scale latitudes
    //
 
-sprintf(junk, "%.5f", data.scale_lat_1);
+snprintf(junk, sizeof(junk), "%.5f", data.scale_lat_1);
 
 fix_float(junk);
 
 add_att(&f, "scale_lat_1", junk);
 
 
-sprintf(junk, "%.5f", data.scale_lat_2);
+snprintf(junk, sizeof(junk), "%.5f", data.scale_lat_2);
 
 fix_float(junk);
 
@@ -486,14 +486,14 @@ add_att(&f, "scale_lat_2", junk);
    //  lat/lon pin point
    //
 
-sprintf(junk, "%.5f", data.lat_pin);
+snprintf(junk, sizeof(junk), "%.5f", data.lat_pin);
 
 fix_float(junk);
 
 add_att(&f, "lat_pin", junk);
 
 
-sprintf(junk, "%.5f", -(data.lon_pin));
+snprintf(junk, sizeof(junk), "%.5f", -(data.lon_pin));
 
 fix_float(junk);
 
@@ -503,14 +503,14 @@ add_att(&f, "lon_pin", junk);
    //  x/y pin point
    //
 
-sprintf(junk, "%.5f", data.x_pin);
+snprintf(junk, sizeof(junk), "%.5f", data.x_pin);
 
 fix_float(junk);
 
 add_att(&f, "x_pin", junk);
 
 
-sprintf(junk, "%.5f", data.y_pin);
+snprintf(junk, sizeof(junk), "%.5f", data.y_pin);
 
 fix_float(junk);
 
@@ -520,7 +520,7 @@ add_att(&f, "y_pin", junk);
    //  orientation longitude
    //
 
-sprintf(junk, "%.5f", -(data.lon_orient));
+snprintf(junk, sizeof(junk), "%.5f", -(data.lon_orient));
 
 fix_float(junk);
 
@@ -530,20 +530,20 @@ add_att(&f, "lon_orient", junk);
    //  D and R
    //
 
-sprintf(j2, "%.5f", data.d_km);
+snprintf(j2, sizeof(j2), "%.5f", data.d_km);
 
 fix_float(j2);
 
-sprintf(junk, "%s km", j2);
+snprintf(junk, sizeof(junk), "%s km", j2);
 
 add_att(&f, "d_km", junk);
 
 
-sprintf(j2, "%.5f", data.r_km);
+snprintf(j2, sizeof(j2), "%.5f", data.r_km);
 
 fix_float(j2);
 
-sprintf(junk, "%s km", j2);
+snprintf(junk, sizeof(junk), "%s km", j2);
 
 add_att(&f, "r_km", junk);
 
@@ -551,12 +551,12 @@ add_att(&f, "r_km", junk);
    //  nx and ny
    //
 
-sprintf(junk, "%d", data.nx);
+snprintf(junk, sizeof(junk), "%d", data.nx);
 
 add_att(&f, "nx", junk);
 
 
-sprintf(junk, "%d", data.ny);
+snprintf(junk, sizeof(junk), "%d", data.ny);
 
 add_att(&f, "ny", junk);
 
@@ -590,14 +590,14 @@ add_att(&f, "Projection", "LatLon");
    //  lower left point
    //
 
-sprintf(junk, "%.5f", data.lat_ll);
+snprintf(junk, sizeof(junk), "%.5f", data.lat_ll);
 
 fix_float(junk);
 
 add_att(&f, "lat_ll", junk);
 
 
-sprintf(junk, "%.5f", -(data.lon_ll));
+snprintf(junk, sizeof(junk), "%.5f", -(data.lon_ll));
 
 fix_float(junk);
 
@@ -607,14 +607,14 @@ add_att(&f, "lon_ll", junk);
    //  lat/lon deltas
    //
 
-sprintf(junk, "%.5f", data.delta_lat);
+snprintf(junk, sizeof(junk), "%.5f", data.delta_lat);
 
 fix_float(junk);
 
 add_att(&f, "delta_lat", junk);
 
 
-sprintf(junk, "%.5f", data.delta_lon);
+snprintf(junk, sizeof(junk), "%.5f", data.delta_lon);
 
 fix_float(junk);
 
@@ -624,14 +624,14 @@ add_att(&f, "delta_lon", junk);
    //  grid size
    //
 
-sprintf(junk, "%d", data.Nlat);
+snprintf(junk, sizeof(junk), "%d", data.Nlat);
 
 fix_float(junk);
 
 add_att(&f, "Nlat", junk);
 
 
-sprintf(junk, "%d", data.Nlon);
+snprintf(junk, sizeof(junk), "%d", data.Nlon);
 
 fix_float(junk);
 

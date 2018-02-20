@@ -164,7 +164,7 @@ char junk[256];
 
 unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
-sprintf(junk, "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
+snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
 
 return ( ConcatString(junk) );
 

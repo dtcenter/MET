@@ -511,7 +511,7 @@ const double * data_in_p      = 0;
 
 // mlog << Debug(5) << "in calc_sum_plane\n";
 
-// sprintf(junk, "raw_%02d", t_count);
+// snprintf(junk, sizeof(junk), "raw_%02d", t_count);
 
 // data_pgm(data_plane, nx, ny, junk);
 
@@ -607,11 +607,11 @@ for (y=0; y<ny; ++y)  {
 
 if ( do_ppms )  {
 
-   sprintf(junk, "sum_a_%02d.ppm", t_count);
+   snprintf(junk, sizeof(junk), "sum_a_%02d.ppm", t_count);
 
    data_handle_ppm(data_out_p, nx, ny, junk);
 
-   sprintf(junk, "ok_a_%02d.ppm", t_count);
+   snprintf(junk, sizeof(junk), "ok_a_%02d.ppm", t_count);
 
    ok_handle_ppm(ok_out_p, nx, ny, junk);
 
@@ -695,11 +695,11 @@ for (x=0; x<nx; ++x)  {
 
 if ( do_ppms )  {
 
-   sprintf(junk, "sum_b_%02d.ppm", t_count);
+   snprintf(junk, sizeof(junk), "sum_b_%02d.ppm", t_count);
 
    data_handle_ppm(data_out_p, nx, ny, junk);
 
-   sprintf(junk, "ok_b_%02d.ppm", t_count);
+   snprintf(junk, sizeof(junk), "ok_b_%02d.ppm", t_count);
 
    ok_handle_ppm(ok_out_p, nx, ny, junk);
 

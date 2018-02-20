@@ -2632,7 +2632,7 @@ for(i=0; i<n_mode_hdr_columns; i++) {
    // Over-ride the name of the INTENSITY_USER column
    //
    c = METHdrTable.header(met_version, "MODE", "OBJ")->col_offset("INTENSITY_USER");
-   sprintf(tmp_str, "INTENSITY_%d",
+   snprintf(tmp_str, sizeof(tmp_str), "INTENSITY_%d",
            nint(eng.conf_info.inten_perc_value));
    at.set_entry(row, c, tmp_str);
 
@@ -2751,12 +2751,12 @@ void write_fcst_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   sprintf(tmp_str, "F%03d", (n+1));
+   snprintf(tmp_str, sizeof(tmp_str), "F%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
    i = eng.collection.fcst_set_number(n + 1);
-   sprintf(tmp_str, "CF%03d", (i + 1));
+   snprintf(tmp_str, sizeof(tmp_str), "CF%03d", (i + 1));
    at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
@@ -2868,12 +2868,12 @@ void write_obs_single(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   sprintf(tmp_str, "O%03d", (n+1));
+   snprintf(tmp_str, sizeof(tmp_str), "O%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
    i = eng.collection.obs_set_number(n + 1);
-   sprintf(tmp_str, "CO%03d", (i + 1));
+   snprintf(tmp_str, sizeof(tmp_str), "CO%03d", (i + 1));
    at.set_entry(row, c++, tmp_str);
 
    // Convert x,y to lat,lon
@@ -2994,13 +2994,13 @@ void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const in
    c = n_mode_hdr_columns;
 
    // Object ID
-   sprintf(tmp_str, "F%03d_O%03d", (n_f+1), (n_o+1));
+   snprintf(tmp_str, sizeof(tmp_str), "F%03d_O%03d", (n_f+1), (n_o+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
    fcst_i = eng.collection.fcst_set_number(n_f+1);
    obs_i  = eng.collection.obs_set_number(n_o+1);
-   sprintf(tmp_str, "CF%03d_CO%03d", (fcst_i+1), (obs_i+1));
+   snprintf(tmp_str, sizeof(tmp_str), "CF%03d_CO%03d", (fcst_i+1), (obs_i+1));
    at.set_entry(row, c++, tmp_str);
 
    //
@@ -3076,7 +3076,7 @@ void write_fcst_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   sprintf(tmp_str, "CF%03d", (n+1));
+   snprintf(tmp_str, sizeof(tmp_str), "CF%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
@@ -3184,7 +3184,7 @@ void write_obs_cluster(ModeFuzzyEngine &eng, const int n, const Grid &grid,
    c = n_mode_hdr_columns;
 
    // Object ID
-   sprintf(tmp_str, "CO%03d", (n+1));
+   snprintf(tmp_str, sizeof(tmp_str), "CO%03d", (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category
@@ -3291,7 +3291,7 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
    c = n_mode_hdr_columns;
 
    // Object ID
-   sprintf(tmp_str, "CF%03d_CO%03d", (n+1), (n+1));
+   snprintf(tmp_str, sizeof(tmp_str), "CF%03d_CO%03d", (n+1), (n+1));
    at.set_entry(row, c++, tmp_str);
 
    // Object category

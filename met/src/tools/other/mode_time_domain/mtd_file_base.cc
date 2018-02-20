@@ -157,7 +157,7 @@ else                        out << "(nul)\n";
 
 unix_to_mdyhms(StartTime, month, day, year, hour, minute, second);
 
-sprintf(junk, "%s %d, %d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+snprintf(junk, sizeof(junk), "%s %d, %d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
 
 out << prefix << "StartTime         = " << StartTime << " ... (" << junk << ")\n";
@@ -436,7 +436,7 @@ s = start_time_string(StartTime);
 add_att(&f, start_time_att_name, s.text());
 
 
-sprintf(junk, "%d", DeltaT);
+snprintf(junk, sizeof(junk), "%d", DeltaT);
 
 add_att(&f, delta_t_att_name, junk);
 

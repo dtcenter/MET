@@ -676,11 +676,11 @@ nt_dim = get_nc_dim(&f, nt_dim_name);
 
    //  DataMin, DataMax
 
-sprintf(junk, format, DataMin);
+snprintf(junk, sizeof(junk), format, DataMin);
 
 add_att(&f, min_value_att_name, junk);
 
-sprintf(junk, format, DataMax);
+snprintf(junk, sizeof(junk), format, DataMax);
 
 add_att(&f, max_value_att_name, junk);
 
