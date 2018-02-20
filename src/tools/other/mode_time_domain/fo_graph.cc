@@ -437,7 +437,7 @@ k = 0;
 
 for (c=fcst_start; c<=fcst_stop; ++c)  {
 
-   sprintf(junk, "F%d", k++);
+   snprintf(junk, sizeof(junk), "F%d", k++);
 
    table.set_entry(r, c, junk);
    table.set_entry(c, r, junk);
@@ -448,7 +448,7 @@ k = 0;
 
 for (c=obs_start; c<=obs_stop; ++c)  {
 
-   sprintf(junk, "O%d", k++);
+   snprintf(junk, sizeof(junk), "O%d", k++);
 
    table.set_entry(r, c, junk);
    table.set_entry(c, r, junk);

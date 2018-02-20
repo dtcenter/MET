@@ -772,7 +772,7 @@ void ModeExecutive::write_obj_stats()
       engine.conf_info.obs_merge_flag == MergeType_Engine) {
 
       //
-      // Create output stats file for obseravation merging
+      // Create output stats file for observation merging
       //
       build_outfile_name("_obs_merge.txt", stat_file);
       out.open(stat_file);

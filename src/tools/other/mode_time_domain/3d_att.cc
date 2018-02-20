@@ -33,6 +33,7 @@ using namespace std;
 
 
 static const char format_int        [] = "%d";
+static const char format_int_0      [] = "%03d";
 
 static const char format_2_decimals [] = "%.2f";
 static const char format_3_decimals [] = "%.3f";
@@ -529,7 +530,7 @@ if ( is_cluster() )  s << 'C';
 if ( is_fcst() )  s << 'F';
 else              s << 'O';
 
-sprintf(junk, format_int, ObjectNumber);
+snprintf(junk, sizeof(junk), format_int_0, ObjectNumber);
 
 s << '_' << junk;
 
@@ -548,7 +549,7 @@ else              s << 'O';
 
 if ( ClusterNumber >= 1 )  {
 
-   sprintf(junk, format_int, ClusterNumber);
+   snprintf(junk, sizeof(junk), format_int_0, ClusterNumber);
 
    s << '_' << junk;
 
@@ -1081,8 +1082,8 @@ int c = n_header_3d_cols;
 
    //  object number
 
-if ( is_simple() )  sprintf(junk, "F_%d_O_%d",   FcstObjectNumber, ObsObjectNumber);
-else                sprintf(junk, "CF_%d_CO_%d", FcstObjectNumber, ObsObjectNumber);
+if ( is_simple() )  snprintf(junk, sizeof(junk), "F_%03d_O_%03d",   FcstObjectNumber, ObsObjectNumber);
+else                snprintf(junk, sizeof(junk), "CF_%03d_CO_%03d", FcstObjectNumber, ObsObjectNumber);
 
 table.set_entry(row, c++, junk);
 
@@ -1090,43 +1091,43 @@ table.set_entry(row, c++, junk);
    //  cluster number
    //
 
-sprintf(junk, "CF_%d_CO_%d", FcstClusterNumber, ObsClusterNumber);
+snprintf(junk, sizeof(junk), "CF_%03d_CO_%03d", FcstClusterNumber, ObsClusterNumber);
 
 table.set_entry(row, c++, junk);
 
    //  space centroid distance
 
-sprintf(junk, format_2_decimals, SpaceCentroidDist);
+snprintf(junk, sizeof(junk), format_2_decimals, SpaceCentroidDist);
 
 table.set_entry(row, c++, junk);
 
    //  time centroid delta
 
-sprintf(junk, format_2_decimals, TimeCentroidDelta);
+snprintf(junk, sizeof(junk), format_2_decimals, TimeCentroidDelta);
 
 table.set_entry(row, c++, junk);
 
    //  axis diff
 
-sprintf(junk, format_3_decimals, AxisDiff);
+snprintf(junk, sizeof(junk), format_3_decimals, AxisDiff);
 
 table.set_entry(row, c++, junk);
 
    //  speed delta
 
-sprintf(junk, format_2_decimals, SpeedDelta);
+snprintf(junk, sizeof(junk), format_2_decimals, SpeedDelta);
 
 table.set_entry(row, c++, junk);
 
    //  direction diff
 
-sprintf(junk, format_2_decimals, DirectionDifference);
+snprintf(junk, sizeof(junk), format_2_decimals, DirectionDifference);
 
 table.set_entry(row, c++, junk);
 
    //  volume ratio
 
-sprintf(junk, format_2_decimals, VolumeRatio);
+snprintf(junk, sizeof(junk), format_2_decimals, VolumeRatio);
 
 table.set_entry(row, c++, junk);
 
@@ -1134,7 +1135,7 @@ table.set_entry(row, c++, junk);
 
 k = nint(StartTimeDelta);
 
-sprintf(junk, format_int, k);
+snprintf(junk, sizeof(junk), format_int, k);
 
 table.set_entry(row, c++, junk);
 
@@ -1142,25 +1143,25 @@ table.set_entry(row, c++, junk);
 
 k = nint(EndTimeDelta);
 
-sprintf(junk, format_int, k);
+snprintf(junk, sizeof(junk), format_int, k);
 
 table.set_entry(row, c++, junk);
 
    //  intersection volume
 
-sprintf(junk, format_int, IntersectionVol);
+snprintf(junk, sizeof(junk), format_int, IntersectionVol);
 
 table.set_entry(row, c++, junk);
 
    //  duration difference
 
-sprintf(junk, format_int, DurationDifference);
+snprintf(junk, sizeof(junk), format_int, DurationDifference);
 
 table.set_entry(row, c++, junk);
 
    //  total interest
 
-sprintf(junk, format_3_decimals, TotalInterest);
+snprintf(junk, sizeof(junk), format_3_decimals, TotalInterest);
 
 table.set_entry(row, c++, junk);
 

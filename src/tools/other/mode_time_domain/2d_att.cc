@@ -34,7 +34,7 @@ using namespace std;
 
 static const char format_2_decimals [] = "%.2f";
 
-static const char format_int        [] = "%d";
+static const char format_int        [] = "%03d";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -420,7 +420,9 @@ if ( ObjectNumber > 0 )  {
    if ( IsFcst )  s << 'F';
    else           s << 'O';
 
-   s << '_' << ObjectNumber;
+   snprintf(junk, sizeof(junk), format_int, ObjectNumber);
+
+   s << '_' << junk;
 
 } else s = na_str;
 
@@ -439,7 +441,7 @@ if ( ClusterNumber > 0 )  {
    if ( is_fcst() )  s << 'F';
    else              s << 'O';
 
-   sprintf(junk, format_int, ClusterNumber);
+   snprintf(junk, sizeof(junk), format_int, ClusterNumber);
 
    s << '_' << junk;
 
