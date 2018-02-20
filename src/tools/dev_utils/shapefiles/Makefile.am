@@ -15,67 +15,48 @@ bin_PROGRAMS	= dump_shp \
 	dump_dbf \
 	make_mapfiles
 
-dump_shp_SOURCES = dump_shp.cc \
-	shapetype_to_string.cc shapetype_to_string.h \
-	shp_file.cc shp_file.h
+dump_shp_SOURCES = dump_shp.cc
 
 dump_shp_CPPFLAGS = ${MET_CPPFLAGS}
 dump_shp_LDFLAGS = ${MET_LDFLAGS}
 dump_shp_LDADD = -lvx_config \
+	-lvx_gis \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_log \
 	-lm
 
-dump_shx_SOURCES = dump_shx.cc \
-	shapetype_to_string.cc shapetype_to_string.h \
-	shp_file.cc shp_file.h \
-	shx_file.cc shx_file.h
+dump_shx_SOURCES = dump_shx.cc 
 
 dump_shx_CPPFLAGS = ${MET_CPPFLAGS}
 dump_shx_LDFLAGS = ${MET_LDFLAGS}
 dump_shx_LDADD = -lvx_config \
+	-lvx_gis \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_log \
 	-lm
 
-dump_dbf_SOURCES = dump_dbf.cc \
-	dbf_file.cc dbf_file.h
+dump_dbf_SOURCES = dump_dbf.cc
 
 dump_dbf_CPPFLAGS = ${MET_CPPFLAGS}
 dump_dbf_LDFLAGS = ${MET_LDFLAGS}
 dump_dbf_LDADD = -lvx_config \
+	-lvx_gis \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_log \
 	-lm
 
-make_mapfiles_SOURCES = make_mapfiles.cc \
-	shapetype_to_string.cc shapetype_to_string.h \
-	shp_file.cc shp_file.h \
-	shx_file.cc shx_file.h \
-	dbf_file.cc dbf_file.h
+make_mapfiles_SOURCES = make_mapfiles.cc
 
 make_mapfiles_CPPFLAGS = ${MET_CPPFLAGS}
 make_mapfiles_LDFLAGS = ${MET_LDFLAGS}
 make_mapfiles_LDADD = -lvx_config \
+	-lvx_gis \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
 	-lm
-
-# If we are in development mode, generate the "to_string" files and
-# clean them up in a "make clean".  We don't want to do either of these
-# in a distribution because the enum_to_string utility isn't available.
-
-if ENABLE_DEVELOPMENT
-    shapetype_to_string.h shapetype_to_string.cc: shp_file.h
-	${ENUM_TO_STRING} -concat_string shp_file.h
-
-   clean-local:
-	-rm -f shapetype_to_string.cc
-	-rm -f shapetype_to_string.h
-endif
 
