@@ -25,11 +25,17 @@ static const char default_config_path          [] = "MET_BASE/config/MTDConfig_d
 
 static const char txt_2d_suffix                [] = "2d.txt";
 
-static const char txt_3d_single_simple_suffix  [] = "3d_ss.txt";
-static const char txt_3d_pair_simple_suffix    [] = "3d_ps.txt";
+// static const char txt_3d_single_simple_suffix  [] = "3d_ss.txt";
+// static const char txt_3d_pair_simple_suffix    [] = "3d_ps.txt";
+// 
+// static const char txt_3d_single_cluster_suffix [] = "3d_sc.txt";
+// static const char txt_3d_pair_cluster_suffix   [] = "3d_pc.txt";
 
-static const char txt_3d_single_cluster_suffix [] = "3d_sc.txt";
-static const char txt_3d_pair_cluster_suffix   [] = "3d_pc.txt";
+static const char txt_3d_single_simple_suffix  [] = "3d_single_simple.txt";
+static const char txt_3d_pair_simple_suffix    [] = "3d_pair_simple.txt";
+ 
+static const char txt_3d_single_cluster_suffix [] = "3d_single_cluster.txt";
+static const char txt_3d_pair_cluster_suffix   [] = "3d_pair_cluster.txt";
 
 static const char nc_suffix                    [] = "obj.nc";
 
