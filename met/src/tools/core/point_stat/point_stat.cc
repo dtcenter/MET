@@ -296,7 +296,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
    is_first_pass = false;
 
    // Determine the verification grid
-   grid = parse_vx_grid(conf_info.vx_opt[0].regrid_info,
+   grid = parse_vx_grid(conf_info.vx_opt[0].vx_pd.fcst_info->regrid(),
                         &(data_grid), &(data_grid));
 
    // Process the masks
@@ -562,7 +562,7 @@ void process_fcst_climo_files() {
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {
             fcst_dpa[j] = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
-                                     conf_info.vx_opt[i].regrid_info);
+                                     conf_info.vx_opt[i].vx_pd.fcst_info->regrid());
          }
       }
 
@@ -733,7 +733,7 @@ void process_obs_file(int i_nc) {
    int typ_len = header_data.typ_len;
    int sid_len = header_data.sid_len;
    int vld_len = header_data.vld_len;
-   
+
    float obs_arr_block[buf_size][obs_arr_len];
    char  obs_qty_block[buf_size][strl_len];
 
@@ -797,7 +797,7 @@ void process_obs_file(int i_nc) {
          hdr_arr[0] = header_data.lat_array[headerOffset];
          hdr_arr[1] = header_data.lon_array[headerOffset];
          hdr_arr[2] = header_data.elv_array[headerOffset];
-        
+
          // Read the corresponding header type for this observation
          str_length = strlen(header_data.typ_array[headerOffset]);
          if (str_length > typ_len) str_length = typ_len;

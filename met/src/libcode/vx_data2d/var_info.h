@@ -53,6 +53,8 @@ class VarInfo
       ThreshArray   CensorThresh; // Censoring thesholds
       NumArray      CensorVal;    // and replacement values
 
+      RegridInfo    Regrid;    // Regridding logic
+
       void init_from_scratch();
       void assign(const VarInfo &);
 
@@ -102,6 +104,8 @@ class VarInfo
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;
 
+      RegridInfo   regrid()         const;
+
          //
          // set stuff
          //
@@ -134,6 +138,8 @@ class VarInfo
 
       void set_censor_thresh(const ThreshArray &);
       void set_censor_val(const NumArray &);
+
+      void set_regrid(const RegridInfo &);
 
       void set_level_info_grib(Dictionary & dict);
       void set_prob_info_grib(ConcatString prob_name,
@@ -181,6 +187,8 @@ inline int          VarInfo::lead()           const { return(Lead);             
 
 inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     }
 inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        }
+
+inline RegridInfo   VarInfo::regrid()         const { return(Regrid);           }
 
 ///////////////////////////////////////////////////////////////////////////////
 

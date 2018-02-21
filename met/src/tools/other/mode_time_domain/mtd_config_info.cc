@@ -87,8 +87,6 @@ void MtdConfigInfo::clear()
    do_2d_att_ascii = true;
    do_3d_att_ascii = true;
 
-   regrid_info.clear();
-
    mask_missing_flag = FieldType_None;
 
    fcst_conv_radius = bad_data_int;
@@ -283,10 +281,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       // Conf: obtype
 
    obtype = parse_conf_string(&conf, conf_key_obtype);
-
-      // Conf: regrid
-
-   regrid_info = parse_conf_regrid(&conf);
 
       // Conf: fcst and obs
 

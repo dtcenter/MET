@@ -253,10 +253,11 @@ config.delta_t_seconds = fcst_raw.delta_t();
 
 mlog << Debug(2) << "regridding, if needed ...\n";
 
-const Grid to_grid = parse_vx_grid(config.regrid_info, fcst_raw.grid_p(), obs_raw.grid_p());
+const Grid to_grid = parse_vx_grid(config.fcst_info->regrid(),
+                                   fcst_raw.grid_p(), obs_raw.grid_p());
 
-fcst_raw.regrid(to_grid, config.regrid_info);
- obs_raw.regrid(to_grid, config.regrid_info);
+fcst_raw.regrid(to_grid, config.fcst_info->regrid());
+ obs_raw.regrid(to_grid, config.obs_info->regrid());
 
    //
    //  make the output file prefix
@@ -1121,9 +1122,10 @@ config.delta_t_seconds = raw.delta_t();
 
 mlog << Debug(2) << "regridding, if needed ...\n";
 
-const Grid to_grid = parse_vx_grid(config.regrid_info, raw.grid_p(), raw.grid_p());
+const Grid to_grid = parse_vx_grid(config.fcst_info->regrid(),
+                                   raw.grid_p(), raw.grid_p());
 
-raw.regrid(to_grid, config.regrid_info);
+raw.regrid(to_grid, config.fcst_info->regrid());
 
    //
    //  make the output file prefix

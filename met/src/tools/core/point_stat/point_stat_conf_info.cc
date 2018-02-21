@@ -503,8 +503,6 @@ void PointStatVxOpt::clear() {
    // Initialize values
    vx_pd.clear();
 
-   regrid_info.clear();
-
    beg_ds = end_ds = bad_data_int;
 
    fcat_ta.clear();
@@ -616,9 +614,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
            << "the observation field cannot contain probabilities.\n\n";
       exit(1);
    }
-
-   // Conf: regrid
-   regrid_info = parse_conf_regrid(&odict);
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);

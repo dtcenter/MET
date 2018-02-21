@@ -924,7 +924,7 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-RegridInfo parse_conf_regrid(Dictionary *dict) {
+RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    Dictionary *regrid_dict = (Dictionary *) 0;
    RegridInfo info;
    int v;
@@ -936,7 +936,19 @@ RegridInfo parse_conf_regrid(Dictionary *dict) {
    }
 
    // Conf: regrid
-   regrid_dict = dict->lookup_dictionary(conf_key_regrid);
+   regrid_dict = dict->lookup_dictionary(conf_key_regrid, false);
+
+   // Check that the regrid dictionary is present
+   if(!regrid_dict) {
+      if(error_out) {
+         mlog << Error << "\nparse_conf_regrid() -> "
+              << "can't find the \"regrid\" dictionary!\n\n";
+         exit(1);
+      }
+      else {
+         return(info);
+      }
+   }
 
    // Parse to_grid as an integer
    v = regrid_dict->lookup_int(conf_key_to_grid, false);

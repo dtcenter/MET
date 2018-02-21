@@ -102,10 +102,12 @@ void VarInfo::assign(const VarInfo &v) {
    Lead      = v.lead();
    Ensemble  = v.ens ();
 
+   ConvertFx = v.ConvertFx;
+
    CensorThresh = v.censor_thresh();
    CensorVal    = v.censor_val();
 
-   ConvertFx = v.ConvertFx;
+   Regrid    = v.Regrid;
 
    return;
 }
@@ -136,10 +138,12 @@ void VarInfo::clear() {
    Lead  = bad_data_int;
    Ensemble.clear ();
 
+   ConvertFx.clear();
+
    CensorThresh.clear();
    CensorVal.clear();
 
-   ConvertFx.clear();
+   Regrid.clear();
 
    return;
 }
@@ -171,9 +175,10 @@ void VarInfo::dump(ostream &out) const {
        << "  Valid        = " << valid_str << " (" << Valid << ")\n"
        << "  Ensemble     = " << (Ensemble ? Ensemble.text() : "(nul)") << "\n"
        << "  Lead         = " << lead_str << " (" << Lead << ")\n"
+       << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
        << "  CensorThresh = " << CensorThresh.get_str() << "\n"
        << "  CensorVal    = " << CensorVal.serialize() << "\n"
-       << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n";
+       << "  Regrid       = " << interpmthd_to_string(Regrid.method) << "\n";
 
    Level.dump(out);
 
@@ -322,6 +327,13 @@ void VarInfo::set_censor_val(const NumArray &a) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_regrid(const RegridInfo &ri) {
+   Regrid = ri;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
    // Check for embedded whitespace
@@ -380,6 +392,9 @@ void VarInfo::set_dict(Dictionary &dict) {
            << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
       exit(1);
    }
+
+   // Parse regrid, if present
+   Regrid = parse_conf_regrid(&dict, false);
 
    return;
 }

@@ -81,7 +81,6 @@ class EnsembleStatConfInfo {
       ConcatString         model;               // Model name
       ConcatString         desc;                // Description
       ConcatString         obtype;              // Observation type
-      RegridInfo           regrid_info;         // Regridding information
       int                  beg_ds;              // Begin observation time window offset
       int                  end_ds;              // End observation time window offset
       VarInfo **           ens_info;            // Array of pointers for ensemble [n_ens_var]

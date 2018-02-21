@@ -75,50 +75,47 @@ class PointStatVxOpt {
 
       //////////////////////////////////////////////////////////////////
 
-      VxPairDataPoint   vx_pd;              // Matched pair data [n_msg_typ][n_mask][n_interp]
+      VxPairDataPoint vx_pd;              // Matched pair data [n_msg_typ][n_mask][n_interp]
 
-      RegridInfo        regrid_info;        // Regridding information
+      int             beg_ds;             // Begin observation time window offset
+      int             end_ds;             // End observation time window offset
 
-      int               beg_ds;             // Begin observation time window offset
-      int               end_ds;             // End observation time window offset
+      ThreshArray     fcat_ta;            // Array for fcst categorical thresholds
+      ThreshArray     ocat_ta;            // Array for obs categorical thresholds
 
-      ThreshArray       fcat_ta;            // Array for fcst categorical thresholds
-      ThreshArray       ocat_ta;            // Array for obs categorical thresholds
+      ThreshArray     fcnt_ta;            // Array for fcst continuous thresholds
+      ThreshArray     ocnt_ta;            // Array for obs continuous thresholds
+      SetLogic        cnt_logic;          // Array of continuous threshold field logic
 
-      ThreshArray       fcnt_ta;            // Array for fcst continuous thresholds
-      ThreshArray       ocnt_ta;            // Array for obs continuous thresholds
-      SetLogic          cnt_logic;          // Array of continuous threshold field logic
+      ThreshArray     fwind_ta;           // Array for fcst wind speed thresholds
+      ThreshArray     owind_ta;           // Array for obs wind speed thresholds
+      SetLogic        wind_logic;         // Array of wind speed field logic
 
-      ThreshArray       fwind_ta;           // Array for fcst wind speed thresholds
-      ThreshArray       owind_ta;           // Array for obs wind speed thresholds
-      SetLogic          wind_logic;         // Array of wind speed field logic
+      StringArray     mask_grid;          // Masking grid strings
+      StringArray     mask_poly;          // Masking polyline strings
+      StringArray     mask_sid;           // Masking station ID's
 
-      StringArray       mask_grid;          // Masking grid strings
-      StringArray       mask_poly;          // Masking polyline strings
-      StringArray       mask_sid;           // Masking station ID's
+      StringArray     mask_name;          // Masking names
 
-      StringArray       mask_name;          // Masking names
+      NumArray        eclv_points;        // ECLV points
+      ThreshArray     climo_cdf_ta;       // Climo CDF thresh array
 
-      NumArray          eclv_points;        // ECLV points
+      NumArray        ci_alpha;           // Alpha value for confidence intervals
 
-      ThreshArray       climo_cdf_ta;       // Climo CDF thresh array
+      BootInfo        boot_info;          // Bootstrapping information
+      InterpInfo      interp_info;        // Interpolation information
+      HiRAInfo        hira_info;          // HiRA verification logic
 
-      NumArray          ci_alpha;           // Alpha value for confidence intervals
+      bool            rank_corr_flag;     // Flag for computing rank correlations
 
-      BootInfo          boot_info;          // Bootstrapping information
-      InterpInfo        interp_info;        // Interpolation information
-      HiRAInfo          hira_info;          // HiRA verification logic
+      StringArray     msg_typ;            // Array of message types
 
-      bool              rank_corr_flag;     // Flag for computing rank correlations
-
-      StringArray       msg_typ;            // Array of message types
-
-      DuplicateType     duplicate_flag;     // Duplicate observations
-      ObsSummary        obs_summary;        // Summarize observations
-      int               obs_perc;           // Summary percentile value
+      DuplicateType   duplicate_flag;     // Duplicate observations
+      ObsSummary      obs_summary;        // Summarize observations
+      int             obs_perc;           // Summary percentile value
 
       // Output file options
-      STATOutputType    output_flag[n_txt]; // Flag for each output line type
+      STATOutputType  output_flag[n_txt]; // Flag for each output line type
 
       //////////////////////////////////////////////////////////////////
 

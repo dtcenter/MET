@@ -102,8 +102,6 @@ class ModeConfInfo {
       ConcatString     desc;                   // Description
       ConcatString     obtype;                 // Observation type
 
-      RegridInfo       regrid_info;            // Regridding information
-
       double           grid_res;
 
       VarInfo *        fcst_info;              // allocated

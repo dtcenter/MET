@@ -478,7 +478,6 @@ void GridStatVxOpt::clear() {
    int i;
 
    // Initialize values
-   regrid_info.clear();
 
    desc.clear();
    var_str.clear();
@@ -568,9 +567,6 @@ void GridStatVxOpt::process_config(
            << "the observation field cannot contain probabilities.\n\n";
       exit(1);
    }
-
-   // Conf: regrid
-   regrid_info = parse_conf_regrid(&odict);
 
    // Conf: desc
    desc = parse_conf_string(&odict, conf_key_desc);
