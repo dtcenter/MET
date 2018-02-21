@@ -29,10 +29,10 @@
 
     <output>
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_2d.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pc.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_ps.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_sc.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_ss.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_single_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pair_simple.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_single_cluster.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_3d_pair_cluster.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_BASIC_20100517_010000V_obj.nc</exist>
     </output>
   </test>
@@ -50,7 +50,7 @@
 
     <output>
       <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_2d.txt</exist>
-      <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_3d_ss.txt</exist>
+      <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_3d_single_simple.txt</exist>
       <exist>&OUTPUT_DIR;/mtd/mtd_SINGLE_20100517_010000V_obj.nc</exist>
     </output>
   </test>
