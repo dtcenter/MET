@@ -265,7 +265,7 @@ void compute_hk_ci(double hk, double alpha, double vif,
 // Compute the categorical statistics for the pairs provided.
 // Compute bootstrap confidence intervals using the BCa method with
 // the random number generator and number of replicates specified.
-// Arugments:
+// Arguments:
 //    gsl_rng is a pointer to the random number generator to be used.
 //    f_na and o_na are the arrays to be bootstrapped.
 //    b is the number of replicates to be used when bootstrapping.
@@ -707,7 +707,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
 // Compute the multi-category statistics for the pairs provided.
 // Compute bootstrap confidence intervals using the BCa method with
 // the random number generator and number of replicates specified.
-// Arugments:
+// Arguments:
 //    gsl_rng is a pointer to the random number generator to be used.
 //    f_na and o_na are the arrays to be bootstrapped.
 //    b is the number of replicates to be used when bootstrapping.
@@ -913,7 +913,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
 // Compute the continuous statistics for the pairs provided.
 // Compute bootstrap confidence intervals using the BCa method with
 // the random number generator and number of replicates specified.
-// Arugments:
+// Arguments:
 //    gsl_rng is a pointer to the random number generator to be used.
 //    f_na and o_na are the arrays to be bootstrapped.
 //    precip_flag specifies if precip is being compared.
