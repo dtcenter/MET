@@ -405,6 +405,7 @@ void SingleAtt2D::write_txt(AsciiTable & table, const int row) const
 {
 
 int c = n_header_3d_cols;
+int k;
 const char * format = 0;
 char junk[512];
 ConcatString s;
@@ -415,16 +416,14 @@ ConcatString s;
 
 s.erase();
 
-if ( ObjectNumber > 0 )  {
+k = max<int>(ObjectNumber, 0);
 
-   if ( IsFcst )  s << 'F';
-   else           s << 'O';
+if ( IsFcst )  s << 'F';
+else           s << 'O';
 
-   snprintf(junk, sizeof(junk), format_int, ObjectNumber);
+snprintf(junk, sizeof(junk), format_int, k);
 
-   s << '_' << junk;
-
-} else s = na_str;
+s << junk;
 
 table.set_entry(row, c++, s.text());
 
@@ -434,18 +433,16 @@ table.set_entry(row, c++, s.text());
 
 s.erase();
 
-if ( ClusterNumber > 0 )  {
+k = max<int>(ClusterNumber, 0);
 
-   s << 'C';
+s << 'C';
 
-   if ( is_fcst() )  s << 'F';
-   else              s << 'O';
+if ( is_fcst() )  s << 'F';
+else              s << 'O';
 
-   snprintf(junk, sizeof(junk), format_int, ClusterNumber);
+snprintf(junk, sizeof(junk), format_int, k);
 
-   s << '_' << junk;
-
-} else s = na_str;
+s << junk;
 
 table.set_entry(row, c++, s.text());
 

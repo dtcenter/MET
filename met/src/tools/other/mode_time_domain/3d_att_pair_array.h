@@ -76,6 +76,9 @@ class PairAtt3DArray {
       int fcst_obj_number(int index) const;  //  one-based
       int  obs_obj_number(int index) const;  //  one-based
 
+      int fcst_cluster_number(int index) const;  //  one-based
+      int  obs_cluster_number(int index) const;  //  one-based
+
       double total_interest(int index) const;
 
          //

@@ -1,7 +1,7 @@
+// ** National Center for Atmospheric Research (NCAR)
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2017
 // ** University Corporation for Atmospheric Research (UCAR)
-// ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
@@ -234,6 +234,7 @@ return;
 
 void do_3d_pair_txt_output(const PairAtt3DArray & pa,
                            const MtdConfigInfo & config,
+                           const bool is_cluster, 
                            const char * output_filename)
 
 {
@@ -243,7 +244,34 @@ if ( !(config.do_3d_att_ascii) )  return;
 int j, r, c;
 ofstream out;
 AsciiTable table;
+PairAtt3DArray pa_new;
+const PairAtt3DArray * a = 0;
 
+   //
+   //  if we're doing clusters, make a new array where all the object numbers match
+   //
+
+if ( is_cluster )  {
+
+   for (j=0; j<(pa.n()); ++j)  {
+
+      if ( pa.fcst_cluster_number(j) != pa.obs_cluster_number(j) )  continue;
+
+      if ( pa.fcst_cluster_number(j) <= 0 )  continue;
+
+      pa_new.add(pa[j]);
+
+   }
+
+   a = &pa_new;
+
+} else {
+
+   a = &pa;
+
+}
+
+const PairAtt3DArray & array = *a;
 
 out.open(output_filename);
 
@@ -256,7 +284,7 @@ if ( ! out )  {
 
 }
 
-table.set_size(1 + pa.n(), n_header_3d_cols + n_att_3d_pair_cols);
+table.set_size(1 + array.n(), n_header_3d_cols + n_att_3d_pair_cols);
 
 table.set_ics(2);
 
@@ -287,7 +315,7 @@ for (j=0; j<n_att_3d_pair_cols; ++j)  {
    //  leading columns
    //
 
-for (j=0; j<(pa.n()); ++j)  {
+for (j=0; j<(array.n()); ++j)  {
 
    r = j + 1;
 
@@ -301,9 +329,9 @@ for (j=0; j<(pa.n()); ++j)  {
 
 r = 1;
 
-for (j=0; j<(pa.n()); ++j)  {
+for (j=0; j<(array.n()); ++j)  {
 
-   pa[j].write_txt(table, r++);
+   array[j].write_txt(table, r++);
 
 }
 

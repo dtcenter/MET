@@ -340,6 +340,46 @@ return ( e[k].obs_obj_number() );
 ////////////////////////////////////////////////////////////////////////
 
 
+int PairAtt3DArray::fcst_cluster_number(int k) const
+
+{
+
+if ( (k < 0) || (k >= Nelements) )  {
+
+   mlog << Error << "\n\n  PairAtt3DArray::fcst_cluster_number(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( e[k].fcst_cluster_number() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int PairAtt3DArray::obs_cluster_number(int k) const
+
+{
+
+if ( (k < 0) || (k >= Nelements) )  {
+
+   mlog << Error << "\n\n  PairAtt3DArray::obs_cluster_number(int) -> range check error\n\n";
+
+   exit ( 1 );
+
+}
+
+return ( e[k].obs_cluster_number() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double PairAtt3DArray::total_interest(int k) const
 
 {

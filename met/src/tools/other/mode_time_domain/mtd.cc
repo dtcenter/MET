@@ -796,7 +796,7 @@ if ( have_pairs )  {
         << "Creating 3D pair simple attributes file: \""
         << path << "\"\n";
 
-   do_3d_pair_txt_output(pa_simple, config, path);
+   do_3d_pair_txt_output(pa_simple, config, false, path);
 
 }
 
@@ -832,7 +832,7 @@ if ( have_pairs )  {
         << "Creating 3D cluster pair attributes file: \""
         << path << "\"\n";
 
-   do_3d_pair_txt_output(pa_cluster, config, path);
+   do_3d_pair_txt_output(pa_cluster, config, true, path);
 
 }
 
