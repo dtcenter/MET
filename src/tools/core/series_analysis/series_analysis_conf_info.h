@@ -46,7 +46,6 @@ class SeriesAnalysisConfInfo {
       ConcatString     model;              // Model name
       ConcatString     desc;               // Description
       ConcatString     obtype;             // Observation type
-      RegridInfo       regrid_info;        // Regridding information
 
       VarInfo **       fcst_info;          // Array of pointers for fcst VarInfo [n_fcst]
       VarInfo **       obs_info;           // Array of pointers for obs VarInfo [n_obs]

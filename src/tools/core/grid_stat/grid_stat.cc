@@ -175,8 +175,7 @@ static void set_outdir(const StringArray &);
 static void set_logfile(const StringArray &);
 static void set_verbosity(const StringArray &);
 static void set_compress(const StringArray &);
-static bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
-                            DataPlane& dp, Met2dDataFile* mtddf,
+static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
                             const ConcatString &filename);
 
 ////////////////////////////////////////////////////////////////////////
@@ -272,7 +271,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // Determine the verification grid
-   grid = parse_vx_grid(conf_info.vx_opt[0].regrid_info,
+   grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
    // Compute weight for each grid point
@@ -643,7 +642,6 @@ void process_scores() {
 
       // Read the gridded data from the input forecast file
       if(!read_data_plane(conf_info.vx_opt[i].fcst_info,
-                          conf_info.vx_opt[i].regrid_info,
                           fcst_dp, fcst_mtddf, fcst_file)) continue;
 
       // Set the forecast lead time
@@ -659,7 +657,6 @@ void process_scores() {
 
       // Read the gridded data from the input observation file
       if(!read_data_plane(conf_info.vx_opt[i].obs_info,
-                          conf_info.vx_opt[i].regrid_info,
                           obs_dp, obs_mtddf, obs_file)) continue;
 
       // Set the observation lead time
@@ -985,12 +982,10 @@ void process_scores() {
 
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   conf_info.vx_opt[i].regrid_info,
                                    fu_dp, fcst_mtddf, fcst_file)) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   conf_info.vx_opt[i].regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
 
                // Read climatology data for UGRD
@@ -1619,12 +1614,10 @@ void process_scores() {
 
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   conf_info.vx_opt[i].regrid_info,
                                    fu_dp, fcst_mtddf, fcst_file)) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   conf_info.vx_opt[i].regrid_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
 
                // Read climatology data for UGRD
@@ -2751,8 +2744,7 @@ void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
-                     DataPlane& dp, Met2dDataFile* mtddf,
+bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
                      const ConcatString &filename) {
 
    bool status = mtddf->data_plane(*info, dp);
@@ -2771,7 +2763,7 @@ bool read_data_plane(VarInfo* info, RegridInfo regrid_info,
            << "Regridding field "
            << info->magic_str()
            << " to the verification grid.\n";
-      dp = met_regrid(dp, mtddf->grid(), grid, regrid_info);
+      dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
    }
 
    // Rescale probabilities from [0, 100] to [0, 1]

@@ -221,7 +221,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // Determine the verification grid
-   grid = parse_vx_grid(conf_info.regrid_info,
+   grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
    // Process masking regions
@@ -521,7 +521,7 @@ void get_series_entry(int i_series, VarInfo *info,
       if(!(cur_grid == grid)) {
 
          // Check if regridding is disabled
-         if(!conf_info.regrid_info.enable) {
+         if(!info->regrid().enable) {
             mlog << Error << "\nget_series_entry() -> "
                  << "The grid of the current series entry does not "
                  << "match the verification grid and regridding is "
@@ -536,7 +536,7 @@ void get_series_entry(int i_series, VarInfo *info,
               << "Regridding field " << info->magic_str()
               << " to the verification grid.\n";
          dp = met_regrid(dp, cur_grid, grid,
-                         conf_info.regrid_info);
+                         info->regrid());
       }
    }
    // No match here results in a warning.

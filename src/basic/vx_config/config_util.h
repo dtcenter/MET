@@ -47,7 +47,7 @@ extern map<ConcatString,StringArray>
 extern map<ConcatString,ConcatString>
                        parse_conf_obs_bufr_map(Dictionary *dict);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
-extern RegridInfo      parse_conf_regrid(Dictionary *dict);
+extern RegridInfo      parse_conf_regrid(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern InterpInfo      parse_conf_interp(Dictionary *dict);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict);
 extern HiRAInfo        parse_conf_hira(Dictionary *dict);

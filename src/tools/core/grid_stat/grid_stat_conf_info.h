@@ -104,8 +104,6 @@ class GridStatVxOpt {
       VarInfo *        fcst_info;        // fcst VarInfo pointer (allocated)
       VarInfo *        obs_info;         // obs VarInfo pointer (allocated)
 
-      RegridInfo       regrid_info;      // Regridding information
-
       ConcatString     desc;             // Description string
       ConcatString     var_str;          // nc_pairs_var_str string
 

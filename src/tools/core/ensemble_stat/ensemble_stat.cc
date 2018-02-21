@@ -77,9 +77,9 @@ static void process_n_vld         ();
 static void process_ensemble      ();
 static void process_vx            ();
 static bool get_data_plane        (const char *, GrdFileType, VarInfo *,
-                                   DataPlane &, bool regrid);
+                                   DataPlane &, bool do_regrid);
 static bool get_data_plane_array  (const char *, GrdFileType, VarInfo *,
-                                   DataPlaneArray &, bool regrid);
+                                   DataPlaneArray &, bool do_regrid);
 
 static void process_point_vx      ();
 static void process_point_climo   ();
@@ -327,7 +327,8 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(etype, otype, point_obs_flag, use_var_id);
 
    // Determine the verification grid
-   grid = parse_vx_grid(conf_info.regrid_info, &(ens_mtddf->grid()),
+   grid = parse_vx_grid(conf_info.ens_info[0]->regrid(),
+                        &(ens_mtddf->grid()),
                         (obs_mtddf ? &(obs_mtddf->grid()) : &(ens_mtddf->grid())));
 
    // Compute weight for each grid point
@@ -544,7 +545,7 @@ void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane(const char *infile, GrdFileType ftype,
-                    VarInfo *info, DataPlane &dp, bool regrid) {
+                    VarInfo *info, DataPlane &dp, bool do_regrid) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -559,11 +560,11 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    if(found = mtddf->data_plane(*info, dp)) {
 
       // Regrid, if requested and necessary
-      if(regrid && !(mtddf->grid() == grid)) {
+      if(do_regrid && !(mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding field \"" << info->magic_str()
               << "\" to the verification grid.\n";
-         dp = met_regrid(dp, mtddf->grid(), grid, conf_info.regrid_info);
+         dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 
       // Store the valid time, if not already set
@@ -590,7 +591,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane_array(const char *infile, GrdFileType ftype,
-                          VarInfo *info, DataPlaneArray &dpa, bool regrid) {
+                          VarInfo *info, DataPlaneArray &dpa, bool do_regrid) {
    int n, i;
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
@@ -609,7 +610,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
    if(found = (n > 0)) {
 
       // Regrid, if requested and necessary
-      if(regrid && !(mtddf->grid() == grid)) {
+      if(do_regrid && !(mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding " << dpa.n_planes()
               << " field(s) \"" << info->magic_str()
@@ -617,8 +618,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
          // Loop through the forecast fields
          for(i=0; i<dpa.n_planes(); i++) {
-            dpa[i] = met_regrid(dpa[i], mtddf->grid(), grid,
-                                conf_info.regrid_info);
+            dpa[i] = met_regrid(dpa[i], mtddf->grid(), grid, info->regrid());
          }
       }
 
@@ -974,7 +974,7 @@ void process_point_obs(int i_nc) {
          hdr_arr[0] = header_data.lat_array[headerOffset];
          hdr_arr[1] = header_data.lon_array[headerOffset];
          hdr_arr[2] = header_data.elv_array[headerOffset];
-        
+
          // Read the corresponding header type for this observation
          str_length = strlen(header_data.typ_array[headerOffset]);
          if (str_length > typ_len) str_length = typ_len;

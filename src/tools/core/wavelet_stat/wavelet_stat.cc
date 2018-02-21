@@ -224,7 +224,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.process_config(ftype, otype);
 
    // Determine the verification grid
-   grid = parse_vx_grid(conf_info.regrid_info,
+   grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
    // Set the model name
@@ -274,7 +274,7 @@ void process_scores() {
               << "Regridding forecast " << conf_info.fcst_info[i]->magic_str()
               << " to the verification grid.\n";
          fcst_dp = met_regrid(fcst_dp, fcst_mtddf->grid(), grid,
-                              conf_info.regrid_info);
+                              conf_info.fcst_info[i]->regrid());
       }
 
       // Set the forecast lead time
@@ -300,7 +300,7 @@ void process_scores() {
               << "Regridding observation " << conf_info.obs_info[i]->magic_str()
               << " to the verification grid.\n";
          obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
-                             conf_info.regrid_info);
+                             conf_info.obs_info[i]->regrid());
       }
 
       // Set the observation lead time

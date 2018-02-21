@@ -72,7 +72,6 @@ void WaveletStatConfInfo::clear() {
    model.clear();
    desc.clear();
    obtype.clear();
-   regrid_info.clear();
    mask_missing_flag = FieldType_None;
    grid_decomp_flag = GridDecompType_None;
    tile_dim = 0;
@@ -159,9 +158,6 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: obtype
    obtype = parse_conf_string(&conf, conf_key_obtype);
-
-   // Conf: regrid
-   regrid_info = parse_conf_regrid(&conf);
 
    // Conf: output_flag
    output_map = parse_conf_output_flag(&conf, txt_file_type, n_txt);

@@ -82,7 +82,6 @@ class WaveletStatConfInfo {
 //       // Store data parsed from the Wavelet-Stat configuration object
       ConcatString            model;              // Model name
       ConcatString            obtype;             // Observation type
-      RegridInfo              regrid_info;        // Regridding information
 
       StringArray             desc;               // Description
       VarInfo **              fcst_info;          // Array of pointers for fcst VarInfo [n_vx]

@@ -28,6 +28,7 @@ obtype = "ANALYS";
 
    //
    //  Verification grid
+   //  May be set separately in each "field" entry
    //
 
 regrid = {

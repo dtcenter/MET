@@ -223,7 +223,7 @@ void ModeExecutive::setup_fcst_obs_data()
 
       // Determine the verification grid
 
-   grid = parse_vx_grid(engine.conf_info.regrid_info,
+   grid = parse_vx_grid(engine.conf_info.fcst_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
       // Read the gridded data from the input forecast file
@@ -242,7 +242,7 @@ void ModeExecutive::setup_fcst_obs_data()
            << "Regridding forecast " << engine.conf_info.fcst_info->magic_str()
            << " to the verification grid.\n";
       Fcst_sd.data = met_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
-                                engine.conf_info.regrid_info);
+                                engine.conf_info.fcst_info->regrid());
    }
 
       // Rescale probabilites from [0, 100] to [0, 1]
@@ -265,7 +265,7 @@ void ModeExecutive::setup_fcst_obs_data()
            << "Regridding observation " << engine.conf_info.obs_info->magic_str()
            << " to the verification grid.\n";
       Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
-                               engine.conf_info.regrid_info);
+                               engine.conf_info.obs_info->regrid());
    }
 
       // Rescale probabilites from [0, 100] to [0, 1]
