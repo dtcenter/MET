@@ -517,6 +517,7 @@ void SingleAtt3D::write_txt(AsciiTable & table, const int row) const
 
 char junk[512];
 int c = n_header_3d_cols;
+int k;
 const char * format = 0;
 ConcatString s;
 
@@ -532,7 +533,7 @@ else              s << 'O';
 
 snprintf(junk, sizeof(junk), format_int_0, ObjectNumber);
 
-s << '_' << junk;
+s << junk;
 
 table.set_entry(row, c++, s.text());
 
@@ -547,13 +548,11 @@ s << 'C';
 if ( is_fcst() )  s << 'F';
 else              s << 'O';
 
-if ( ClusterNumber >= 1 )  {
+k = max<int>(ClusterNumber, 0);
 
-   snprintf(junk, sizeof(junk), format_int_0, ClusterNumber);
+snprintf(junk, sizeof(junk), format_int_0, k);
 
-   s << junk;
-
-}
+s << junk;
 
 table.set_entry(row, c++, s.text());
 
@@ -1091,9 +1090,14 @@ table.set_entry(row, c++, junk);
    //  cluster number
    //
 
-snprintf(junk, sizeof(junk), "CF%03d_CO%03d", FcstClusterNumber, ObsClusterNumber);
+if ( FcstClusterNumber == ObsClusterNumber )  k = ObsClusterNumber;
+else                                          k = 0;
+
+snprintf(junk, sizeof(junk), "CF%03d_CO%03d", k, k);
 
 table.set_entry(row, c++, junk);
+
+   ////////////////////////////
 
    //  space centroid distance
 
