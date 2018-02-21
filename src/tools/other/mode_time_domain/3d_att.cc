@@ -551,7 +551,7 @@ if ( ClusterNumber >= 1 )  {
 
    snprintf(junk, sizeof(junk), format_int_0, ClusterNumber);
 
-   s << '_' << junk;
+   s << junk;
 
 }
 
@@ -1082,8 +1082,8 @@ int c = n_header_3d_cols;
 
    //  object number
 
-if ( is_simple() )  snprintf(junk, sizeof(junk), "F_%03d_O_%03d",   FcstObjectNumber, ObsObjectNumber);
-else                snprintf(junk, sizeof(junk), "CF_%03d_CO_%03d", FcstObjectNumber, ObsObjectNumber);
+if ( is_simple() )  snprintf(junk, sizeof(junk), "F%03d_O%03d",   FcstObjectNumber, ObsObjectNumber);
+else                snprintf(junk, sizeof(junk), "CF%03d_CO%03d", FcstObjectNumber, ObsObjectNumber);
 
 table.set_entry(row, c++, junk);
 
@@ -1091,7 +1091,7 @@ table.set_entry(row, c++, junk);
    //  cluster number
    //
 
-snprintf(junk, sizeof(junk), "CF_%03d_CO_%03d", FcstClusterNumber, ObsClusterNumber);
+snprintf(junk, sizeof(junk), "CF%03d_CO%03d", FcstClusterNumber, ObsClusterNumber);
 
 table.set_entry(row, c++, junk);
 
