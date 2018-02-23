@@ -1317,7 +1317,7 @@ bf total interest}
 
   gives the result of the fuzzy-logic matching and merging calculation for
  this pair of objects.
- Note that this is provided only for simple objects, not for composites.
+ Note that this is provided only for simple objects, not for clusters.
 \end_layout
 
 \begin_layout Standard
@@ -2805,26 +2805,38 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 nc_output = {
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
    latlon = true;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
    raw = true;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
    object_id = true;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
    cluster_id = true;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }; 
 \end_layout
 
@@ -2926,18 +2938,26 @@ height "1pt"
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 txt_output = {
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
    attributes_2d   = true;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
    attributes_3d   = true;
 \end_layout
 
 \begin_layout LyX-Code
+
+\series bold
 }; 
 \end_layout
 
@@ -3055,7 +3075,7 @@ Single attributes for 3D simple objects
 \end_layout
 
 \begin_layout Itemize
-Single attributes for 3D composite objects
+Single attributes for 3D cluster objects
 \end_layout
 
 \begin_layout Itemize
@@ -3063,7 +3083,7 @@ Pair attributes for 3D simple objects
 \end_layout
 
 \begin_layout Itemize
-Pair attributes for 3D composite objects
+Pair attributes for 3D cluster objects
 \end_layout
 
 \begin_layout Itemize
@@ -3115,37 +3135,64 @@ reference "table_mtd-3D-Pair-Attribute"
 \end_layout
 
 \begin_layout Standard
-One thing that is slightly different in the ASCII output files from the
- way MODE does things is the way in which object numbers (both simple and
- composite) are indicated.
- For example, in the ASCII attribute files that MODE produces, forecast
- simple object number #1 is indicated as 
+The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects
+ using the same logic as the MODE tool.
+ In these columns, the F and O prefixes are used to indicate simple forecast
+ and observation objects, respectively.
+ Similarly, the CF and CO prefixes indicate cluster forecast and observation
+ objects, respectively.
+ Each prefix is followed by a 3-digit number, using leading zeros, to indicate
+ the object number (as in 
 \family typewriter
 F001
 \family default
-, while in MTD is indicated as 
+,
 \family typewriter
-F_1
+ O001
 \family default
-.
- Similarly, for cluster forecast object #1 is indicated in MODE as 
+,
 \family typewriter
-CF001
+ CF001
 \family default
-, while in MTD it is indicated by 
+, or
 \family typewriter
-CF_1
+ CO000
 \family default
-.
- MODE indicates that a simple object is not part of a cluster by giving
- it a cluster number of zero, as in 
+).
+ Pairs of objects are indicated by listing the forecast object information
+ followed by the observation object information, separated by an underscore
+ (as in 
+\family typewriter
+F001_O001
+\family default
+ or
+\family typewriter
+ CF001_CO001
+\family default
+).
+ The OBJECT_ID column indicates the single object or pair of objects being
+ described in that line.
+ The OBJECT_CAT column indicates the cluster or pair of clusters to which
+ these object(s) belong.
+ A simple object that is not part of a cluster is assigned a cluster number
+ of zero (as in 
 \family typewriter
 CF000
 \family default
-.
- In MTD, the corresponding notation is simply 
+ or
 \family typewriter
-CF
+ CO000
+\family default
+).
+ When pairs of objects belong to the same matching cluster, the OBJECT_CAT
+ column indicates the matching cluster number (as in 
+\family typewriter
+CF001_CO001
+\family default
+).
+ When they do not, the OBJECT_CAT column is set to 
+\family typewriter
+CF000_CO000
 \family default
 .
 \end_layout
@@ -3838,7 +3885,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-OBJ_ID
+OBJECT_ID
 \end_layout
 
 \end_inset
@@ -3867,7 +3914,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-CLUSTER_ID
+OBJECT_CAT
 \end_layout
 
 \end_inset
@@ -3876,7 +3923,7 @@ CLUSTER_ID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Cluster number
+Object category
 \end_layout
 
 \end_inset
@@ -4218,7 +4265,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-OBJ_ID
+OBJECT_ID
 \end_layout
 
 \end_inset
@@ -4247,7 +4294,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-CLUSTER_ID
+OBJECT_CAT
 \end_layout
 
 \end_inset
@@ -4256,7 +4303,7 @@ CLUSTER_ID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Cluster number
+Object category
 \end_layout
 
 \end_inset
@@ -4969,7 +5016,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-OBJ_ID
+OBJECT_ID
 \end_layout
 
 \end_inset
@@ -4998,7 +5045,7 @@ Object number
 \begin_inset Text
 
 \begin_layout Plain Layout
-CLUSTER_ID
+OBJECT_CAT
 \end_layout
 
 \end_inset
@@ -5007,7 +5054,7 @@ CLUSTER_ID
 \begin_inset Text
 
 \begin_layout Plain Layout
-Cluster number
+Object category
 \end_layout
 
 \end_inset
