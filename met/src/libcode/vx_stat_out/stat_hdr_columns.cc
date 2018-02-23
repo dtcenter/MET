@@ -207,6 +207,7 @@ void StatHdrColumns::set_interp_mthd(const char *s,
                                      GridTemplateFactory::GridTemplates shape) {
    ConcatString mthd = s;
    if(shape != GridTemplateFactory::GridTemplate_None &&
+      mthd  != interpmthd_none_str &&
       mthd  != interpmthd_nearest_str &&
       mthd  != interpmthd_force_str  &&
       mthd  != interpmthd_upper_left_str  &&
