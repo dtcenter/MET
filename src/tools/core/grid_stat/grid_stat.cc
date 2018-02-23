@@ -798,7 +798,7 @@ void process_scores() {
             mlog << Debug(2)
                  << "Processing " << conf_info.vx_opt[i].fcst_info->magic_str()
                  << " versus " << conf_info.vx_opt[i].obs_info->magic_str()
-                 << ", for interpolation method "
+                 << ", for smoothing method "
                  << shc.get_interp_mthd() << "("
                  << shc.get_interp_pnts_str()
                  << "), over region " << shc.get_mask()
@@ -1368,7 +1368,7 @@ void process_scores() {
                        << conf_info.vx_opt[i].fcst_info->magic_str()
                        << " versus "
                        << conf_info.vx_opt[i].obs_info->magic_str()
-                       << ", for interpolation method "
+                       << ", for smoothing method "
                        << shc.get_interp_mthd() << "("
                        << shc.get_interp_pnts_str()
                        << "), raw thresholds of "
@@ -1490,7 +1490,7 @@ void process_scores() {
             cs << "-" << conf_info.vx_opt[i].wave_1d_end[j];
          }
 
-         shc.set_interp_mthd(cs);
+         shc.set_interp_mthd(cs, GridTemplateFactory::GridTemplate_None);
          shc.set_interp_pnts(bad_data_int);
 
          // Loop through the masks to be applied
