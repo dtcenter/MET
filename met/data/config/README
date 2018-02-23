@@ -215,7 +215,7 @@ mesage_type_group_map = [
 // a "key" string and "val" string.  This defines a mapping of input strings
 // to output message types.  This mapping is applied in ASCII2NC when
 // converting input little_r report types to output message types. This mapping
-// is also supported in PBN2NC as a way of renaming input PrepBufr message types.
+// is also supported in PBN2NC as a way of renaming input PREPBUFR message types.
 //
 message_type_map = [
    { key = "FM-12 SYNOP";  val = "ADPSFC"; },
@@ -770,7 +770,7 @@ mask_missing_flag = BOTH;
 // entry) and ending ("end" entry) time offset values in seconds.  It defines
 // the time window over which observations are retained for scoring. These time
 // offsets are defined relative to a reference time t, as [t+beg, t+end].
-// In PB2NC, the reference time is the PrepBufr files center time.  In
+// In PB2NC, the reference time is the PREPBUFR files center time.  In
 // Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 //
 obs_window = {
@@ -2029,9 +2029,9 @@ shift_right = 0;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// The PB2NC tool filters out observations from PrepBufr files using the
+// The PB2NC tool filters out observations from PREPBUFR or BUFR files using the
 // following criteria:
-//  (1) by message type: supply a list of PrepBufr message types to retain
+//  (1) by message type: supply a list of PREPBUFR message types to retain
 //  (2) by station id: supply a list of observation stations to retain
 //  (3) by valid time: supply the beginning and ending time offset values
 //      in the obs_window entry described above.
@@ -2039,14 +2039,14 @@ shift_right = 0;
 //      an NCEP masking grid, a masking lat/lon polygon or a file to a
 //      mask lat/lon polygon
 //  (5) by elevation: supply min/max elevation values
-//  (6) by report type: supply a list of report types to retain by using
+//  (6) by report type: supply a list of report types to retain using
 //      pb_report_type and in_report_type entries described below
 //  (7) by instrument type: supply a list of instrument type to
 //      retain
-//  (8) by vertical level: supply beg/end vertical levels by using the
+//  (8) by vertical level: supply beg/end vertical levels using the
 //      level_range entry described below
 //  (9) by variable type: supply a list of observation variable types to
-//      retain by using the obs_grib_code entry described below
+//      retain using the obs_bufr_var entry described below
 // (11) by quality mark: supply a quality mark threshold
 // (12) Flag to retain values for all quality marks, or just the first
 //      quality mark (highest): use the event_stack_flag described below
@@ -2076,15 +2076,24 @@ shift_right = 0;
 //    ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
 //    MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
 //    SFCSHP SPSSMI SYNDAT VADWND
-//    ANYAIR (= AIRCAR, AIRCFT)
-//    ANYSFC (= ADPSFC, SFCSHP, ADPUPA, PROFLR, MESONET)
-//    ONLYSF (= ADPSFC, SFCSHP)
 //
 //    e.g. message_type[] = [ "ADPUPA", "AIRCAR" ];
 //
 // http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 //
 message_type = [];
+
+//
+// Mapping of message type group name to comma-separated list of values.
+// The default setting defines ANYAIR, ANYSFC, and ONLYSF as groups.
+// Derive PRMSL only for SURFACE message types.
+//
+message_type_group_map = [
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+];
 
 //
 // The "station_id" entry is an array of station ids to be retained or
@@ -2107,7 +2116,7 @@ elevation_range = {
 }
 
 //
-// The "pb_report_type" entry is an array of PrepBufr report types to be
+// The "pb_report_type" entry is an array of PREPBUFR report types to be
 // retained.  The numeric "pb_report_type" entry allows for further stratification
 // within message types.  An empty list indicates that all should be retained.
 //
@@ -2172,27 +2181,50 @@ level_range = {
 level_category = [];
 
 //
-// The "obs_grib_code" entry is an array of  strings containing grib codes or
-// corresponding grib code abbreviations to be retained or derived from the
-// available observations.
+// The "obs_bufr_var" entry is an array of strings containing BUFR variable
+// names to be retained or derived.  This replaces the "obs_grib_code" setting
+// from earlier versions of MET.  Run PB2NC on your data with the "-index"
+// command line option to see the list of available observation variables.
 //
-// GRIB Codes to be RETAINED:
-//    SPFH or 51 for Specific Humidity in kg/kg
-//    TMP  or 11 for Temperature in K
-//    HGT  or 7  for Height in meters
-//    UGRD or 33 for the East-West component of the wind in m/s
-//    VGRD or 34 for the North-South component of the wind in m/s
+// Observation variables that can be derived begin with "D_":
+//    D_DPT   for Dew point Temperature in K
+//    D_WDIR  for Wind Direction
+//    D_WIND  for Wind Speed in m/s
+//    D_RH    for Relative Humidity in %
+//    D_MIXR  for Humidity Mixing Ratio in kg/kg
+//    D_PRMSL for Pressure Reduced to Mean Sea Level in Pa
 //
-// GRIB Codes to be DERIVED:
-//    DPT   or 17 for Dew point Temperature in K
-//    WIND  or 32 for Wind Speed in m/s
-//    RH    or 52 for Relative Humidity in %
-//    MIXR  or 53 for Humidity Mixing Ratio in kg/kg
-//    PRMSL or  2 for Pressure Reduced to Mean Sea Level in Pa
+obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
+
 //
-// http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+// Mapping of input BUFR variable names to output variables names.
+// The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
+// Users may choose to rename BUFR variables to match the naming convention
+// of the forecast the observation is used to verify.
 //
-obs_grib_code = [ "SPFH", "TMP", "HGT", "UGRD", "VGRD" ];
+obs_bufr_map = [];
+
+//
+// Default mapping for PREPBUFR.  Replace input BUFR variable names with GRIB
+// abbreviations in the output.  This default map is appended to obs_bufr_map.
+// This should not typically be overridden.  This default mapping provides
+// backward-compatibility for earlier versions of MET which wrote GRIB
+// abbreviations to the output.
+//
+obs_prefbufr_map = [
+   { key = "POB";     val = "PRES";  },
+   { key = "QOB";     val = "SPFH";  },
+   { key = "TOB";     val = "TMP";   },
+   { key = "ZOB";     val = "HGT";   },
+   { key = "UOB";     val = "UGRD";  },
+   { key = "VOB";     val = "VGRD";  },
+   { key = "D_DPT";   val = "DPT";   },
+   { key = "D_WDIR";  val = "WDIR";  },
+   { key = "D_WIND";  val = "WIND";  },
+   { key = "D_RH";    val = "RH";    },
+   { key = "D_MIXR";  val = "MIXR";  },
+   { key = "D_PRMSL"; val = "PRMSL"; }
+];
 
 //
 // The "quality_mark_thresh" entry specifies the maximum quality mark value

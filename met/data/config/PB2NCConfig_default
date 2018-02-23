@@ -85,25 +85,27 @@ level_range = {
 
 level_category = [];
 
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 //
 // BUFR variable names to retain or derive.
-// If emtpy, process all available variables.
+// Use obs_bufr_map to rename variables in the output.
+// If empty, process all available variables.
 //
 obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Mapping of BUFR variable name to GRIB name. The default map is defined at
-// obs_prepbufr_map. This replaces/expends the default map.
+// Mapping of input BUFR variable names to output variables names.
+// The default PREPBUFR map, obs_prepbufr_map, is appended to this map.
 //
 obs_bufr_map = [];
 
 //
-// This map is for PREPBUFR. It will be added into obs_bufr_map.
-// Please do not override this map.
+// Default mapping for PREPBUFR.  Replace input BUFR variable names with GRIB
+// abbreviations in the output.  This default map is appended to obs_bufr_map.
+// This should not typically be overridden.
 //
 obs_prefbufr_map = [
    { key = "POB";     val = "PRES";  },
