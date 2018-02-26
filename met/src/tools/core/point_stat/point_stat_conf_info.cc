@@ -344,15 +344,6 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
       } // end for j
 
-      // Check that at least one verification masking region is provided
-      if(vx_opt[i].mask_name.n_elements() == 0) {
-         mlog << Error << "\nPointStatConfInfo::process_masks() -> "
-              << "At least one grid, polyline or station ID masking "
-              << "region must be provided for verification task number "
-              << i+1 << ".\n\n";
-         exit(1);
-      }
-
    } // end for i
 
    return;
