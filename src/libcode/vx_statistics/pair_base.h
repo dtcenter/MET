@@ -74,7 +74,7 @@ class PairBase {
 
       // Interpolation method and shape used
       InterpMthd interp_mthd;
-      int        interp_dpth;
+      int        interp_wdth;
       GridTemplateFactory::GridTemplates interp_shape;
 
       // Observation Information
@@ -120,7 +120,7 @@ class PairBase {
 
       void set_interp_mthd(const char *);
       void set_interp_mthd(InterpMthd);
-      void set_interp_dpth(int);
+      void set_interp_wdth(int);
       void set_interp_shape(GridTemplateFactory::GridTemplates);
 
       void set_fcst_ut(unixtime ut);
