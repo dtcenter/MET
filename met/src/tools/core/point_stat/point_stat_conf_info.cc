@@ -344,6 +344,15 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
       } // end for j
 
+      // Check that at least one verification masking region is provided
+      if(vx_opt[i].mask_name.n_elements() == 0) {
+         mlog << Error << "\nPointStatConfInfo::process_masks() -> "
+              << "At least one grid, polyline or station ID masking "
+              << "region must be provided for verification task number "
+              << i+1 << ".\n\n";
+         exit(1);
+      }
+
    } // end for i
 
    return;
@@ -566,10 +575,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    vx_pd.fcst_info->set_dict(fdict);
    vx_pd.obs_info->set_dict(odict);
 
-   if(!use_var_id) {
-      // Set the GRIB code for point observations
-      vx_pd.obs_info->add_grib_code(odict);
-   }
+   // Set the GRIB code for point observations
+   if(!use_var_id) vx_pd.obs_info->add_grib_code(odict);
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {
