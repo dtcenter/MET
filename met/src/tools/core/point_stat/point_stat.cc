@@ -974,7 +974,8 @@ void process_scores() {
             for(l=0; l<conf_info.vx_opt[i].get_n_interp(); l++) {
 
                // Store the interpolation method and width being applied
-               shc.set_interp_mthd(conf_info.vx_opt[i].interp_info.method[l]);
+               shc.set_interp_mthd(conf_info.vx_opt[i].interp_info.method[l],
+                                   conf_info.vx_opt[i].interp_info.shape);
                shc.set_interp_wdth(conf_info.vx_opt[i].interp_info.width[l]);
 
                pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][l];
@@ -1679,7 +1680,8 @@ void do_hira(int i_vx, PairDataPoint *pd_ptr) {
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
                     conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
 
-   shc.set_interp_mthd(InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.shape);
+   shc.set_interp_mthd(InterpMthd_Nbrhd,
+                       conf_info.vx_opt[i_vx].hira_info.shape);
 
    // Loop over categorical thresholds and HiRA widths
    for(i=0; i<conf_info.vx_opt[i_vx].fcat_ta.n_elements(); i++) {
