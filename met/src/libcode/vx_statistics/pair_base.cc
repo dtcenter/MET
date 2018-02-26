@@ -185,9 +185,9 @@ void PairBase::set_interp_mthd(InterpMthd m) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_interp_dpth(int n) {
+void PairBase::set_interp_wdth(int n) {
 
-   interp_dpth = n;
+   interp_wdth = n;
 
    return;
 }
