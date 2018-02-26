@@ -57,6 +57,7 @@ void GridStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::clear() {
+   int i;
 
    // Initialize values
    model.clear();
@@ -66,7 +67,11 @@ void GridStatConfInfo::clear() {
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
+
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+
    nc_info.clear();
+
    output_ascii_flag = false;
    output_nc_flag = false;
 
@@ -514,7 +519,7 @@ void GridStatVxOpt::clear() {
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
-   nc_info.set_all_true();
+   nc_info.clear();
 
    // Deallocate memory
    if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
@@ -743,7 +748,7 @@ void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
    if(type == BooleanType) {
       bool value = e->b_value();
 
-      if(! value) nc_info.set_all_false();
+      if(!value) nc_info.set_all_false();
 
       return;
    }
