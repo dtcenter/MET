@@ -200,7 +200,7 @@ output_flag = {
 // NetCDF matched pairs output file
 // May be set separately in each "obs.field" entry
 //
-nc_pairs_flag   = {
+nc_pairs_flag = {
    latlon     = TRUE;
    raw        = TRUE;
    diff       = TRUE;
