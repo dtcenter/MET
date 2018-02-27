@@ -42,6 +42,18 @@ MB_to_PA(p)  = HPA_to_PA(p);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+// Grouping of statistics by the logic that should be applied when computing
+// their mean value.  These settings are used by the STAT-Analysis wmo_mean job.
+// Each entry is a line type followed by the statistic name.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+wmo_sqrt_stats   = [ "CNT:FSTDEV", "CNT:OSTDEV", "CNT:ESTDEV",
+                     "CNT:RMSE",   "CNT:RMSFA",  "CNT:RMSOA" ];
+wmo_fisher_stats = [ "CNT:ANOM_CORR" ];
+
+////////////////////////////////////////////////////////////////////////////////
+//
 // Defintion of constants used throughout MET configuration files.
 //
 // THE FOLLOWING SHOULD NOT BE MODIFIED.  DOING SO WILL MAKE THE MET
