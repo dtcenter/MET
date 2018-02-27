@@ -961,4 +961,43 @@ return(wmn);
 }
 
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::wmean_sqrt(const NumArray &wgt) const
+
+{
+
+int j;
+NumArray squares;
+
+// square the current values
+squares.extend(Nelements);
+for(j=0; j<Nelements; j++) squares.add(e[j]*e[j]);
+
+return(sqrt(squares.wmean(wgt)));
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::wmean_fisher(const NumArray &wgt) const
+
+{
+
+int j;
+NumArray xform;
+
+// apply fisher transform
+xform.extend(Nelements);
+for(j=0; j<Nelements; j++) xform.add(atanh(e[j]));
+
+return(tanh(xform.wmean(wgt)));
+
+}
+
+
 ////////////////////////////////////////////////////////////////////////
