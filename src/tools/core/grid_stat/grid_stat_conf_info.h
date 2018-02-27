@@ -28,36 +28,67 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Indices for the output flag types in the configuration file
+
 static const int i_fho    = 0;
 static const int i_ctc    = 1;
 static const int i_cts    = 2;
+
 static const int i_mctc   = 3;
 static const int i_mcts   = 4;
 static const int i_cnt    = 5;
+
 static const int i_sl1l2  = 6;
 static const int i_sal1l2 = 7;
 static const int i_vl1l2  = 8;
+
 static const int i_val1l2 = 9;
 static const int i_pct    = 10;
 static const int i_pstd   = 11;
+
 static const int i_pjc    = 12;
 static const int i_prc    = 13;
 static const int i_eclv   = 14;
+
 static const int i_nbrctc = 15;
 static const int i_nbrcts = 16;
 static const int i_nbrcnt = 17;
+
 static const int i_grad   = 18;
-static const int n_txt    = 19;
+
+static const int i_vcnt   = 19;
+
+static const int n_txt    = 20;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_fho,    stat_ctc,    stat_cts,
-   stat_mctc,   stat_mcts,   stat_cnt,
-   stat_sl1l2,  stat_sal1l2, stat_vl1l2,
-   stat_val1l2, stat_pct,    stat_pstd,
-   stat_pjc,    stat_prc,    stat_eclv,
-   stat_nbrctc, stat_nbrcts, stat_nbrcnt,
-   stat_grad
+
+   stat_fho,        //  0
+   stat_ctc,        //  1
+   stat_cts,        //  2
+
+   stat_mctc,       //  3
+   stat_mcts,       //  4
+   stat_cnt,        //  5
+
+   stat_sl1l2,      //  6
+   stat_sal1l2,     //  7
+   stat_vl1l2,      //  8
+
+   stat_val1l2,     //  9
+   stat_pct,        //  10
+   stat_pstd,       //  11
+
+   stat_pjc,        //  12
+   stat_prc,        //  13
+   stat_eclv,       //  14
+
+   stat_nbrctc,     //  15
+   stat_nbrcts,     //  16
+   stat_nbrcnt,     //  17
+
+   stat_grad,       //  18
+   stat_vcnt,       //  19
+
 };
 
 ////////////////////////////////////////////////////////////////////////

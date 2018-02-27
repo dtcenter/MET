@@ -1313,6 +1313,10 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    v_info.vcount  = vcount + c.vcount;
 
    if(v_info.vcount > 0) {
+
+      v_info.f_speed_bar   = (f_speed_bar*vcount   + c.f_speed_bar*c.vcount)  /v_info.vcount;
+      v_info.o_speed_bar   = (o_speed_bar*vcount   + c.o_speed_bar*c.vcount)  /v_info.vcount;
+
       v_info.uf_bar   = (uf_bar*vcount   + c.uf_bar*c.vcount)  /v_info.vcount;
       v_info.vf_bar   = (vf_bar*vcount   + c.vf_bar*c.vcount)  /v_info.vcount;
       v_info.uo_bar   = (uo_bar*vcount   + c.uo_bar*c.vcount)  /v_info.vcount;
@@ -1333,6 +1337,8 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
       v_info.uvffa_bar = (uvffa_bar*vacount + c.uvffa_bar*c.vacount)/v_info.vacount;
       v_info.uvooa_bar = (uvooa_bar*vacount + c.uvooa_bar*c.vacount)/v_info.vacount;
    }
+
+   v_info.calc_ncep_stats();
 
    assign(v_info);
 
@@ -1393,14 +1399,14 @@ OSTDEV      = 0.0;
 FDIR        = 0.0;
 ODIR        = 0.0;
 
-F_BAR_SPEED = 0.0;
-O_BAR_SPEED = 0.0;
+FBAR_SPEED  = 0.0;
+OBAR_SPEED  = 0.0;
 
-VDIFF_SPD   = 0.0;
+VDIFF_SPEED = 0.0;
 VDIFF_DIR   = 0.0;
 
-SPD_ERR     = 0.0;
-SPD_ABSERR  = 0.0;
+SPEED_ERR   = 0.0;
+SPEED_ABSERR = 0.0;
 
 DIR_ERR     = 0.0;
 DIR_ABSERR  = 0.0;
@@ -1483,8 +1489,98 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    uvooa_bar = c.uvooa_bar;
    vacount   = c.vacount;
 
-   return;
+      //
+      //  NCEP stats
+      //
+
+FBAR = c.FBAR;
+OBAR = c.OBAR;
+
+FS_RMS = c.FS_RMS;
+OS_RMS = c.OS_RMS;
+
+ MSVE = c.MSVE;
+RMSVE = c.RMSVE;
+
+FSTDEV = c.FSTDEV;
+OSTDEV = c.OSTDEV;
+
+FDIR = c.FDIR;
+ODIR = c.ODIR;
+
+FBAR_SPEED = c.FBAR_SPEED;
+OBAR_SPEED = c.OBAR_SPEED;
+
+VDIFF_SPEED = c.VDIFF_SPEED;
+VDIFF_DIR = c.VDIFF_DIR;
+
+SPEED_ERR = c.SPEED_ERR;
+SPEED_ABSERR = c.SPEED_ABSERR;
+
+DIR_ERR = c.DIR_ERR;
+DIR_ABSERR = c.DIR_ABSERR;
+
+   //
+   //  done
+   //
+
+
+return;
+
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void VL1L2Info::calc_ncep_stats()
+
+{
+
+double u_diff, v_diff;
+
+u_diff = uf_bar - uo_bar;
+v_diff = vf_bar - vo_bar;
+
+      //
+
+   FBAR         = f_speed_bar;
+   OBAR         = o_speed_bar;
+
+   FS_RMS       = sqrt(uvff_bar);
+   OS_RMS       = sqrt(uvoo_bar);
+
+   RMSVE        = sqrt(MSVE);
+
+   FSTDEV       = uvff_bar - f_speed_bar*f_speed_bar;
+   OSTDEV       = uvoo_bar - o_speed_bar*o_speed_bar;
+
+   FDIR         = convert_u_v_to_wdir(-uf_bar, -vf_bar);
+   ODIR         = convert_u_v_to_wdir(-uo_bar, -vo_bar);
+
+   FBAR_SPEED   = convert_u_v_to_wind(uf_bar, vf_bar);
+   OBAR_SPEED   = convert_u_v_to_wind(uo_bar, vo_bar);
+   
+   VDIFF_SPEED  = convert_u_v_to_wind(u_diff, v_diff);
+
+   VDIFF_DIR    = convert_u_v_to_wdir(-u_diff, -v_diff);
+
+   SPEED_ERR    = FBAR_SPEED - OBAR_SPEED;
+
+   SPEED_ABSERR = fabs(SPEED_ERR);
+
+   DIR_ERR      = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
+
+   DIR_ABSERR   = fabs(DIR_ERR);
+
+
+   //
+   //
+   //
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1644,42 +1740,9 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
 
 if ( vcount > 0 )  {
 
-   u_diff = uf_bar - uo_bar;
-   v_diff = vf_bar - vo_bar;
+   calc_ncep_stats();
 
-      //
-
-   FBAR        = f_speed_bar;
-   OBAR        = o_speed_bar;
-
-   FS_RMS      = sqrt(uvff_bar);
-   OS_RMS      = sqrt(uvoo_bar);
-
-   RMSVE       = sqrt(MSVE);
-
-   FSTDEV      = uvff_bar - f_speed_bar*f_speed_bar;
-   OSTDEV      = uvoo_bar - o_speed_bar*o_speed_bar;
-
-   FDIR        = convert_u_v_to_wdir(-uf_bar, -vf_bar);
-   ODIR        = convert_u_v_to_wdir(-uo_bar, -vo_bar);
-
-   F_BAR_SPEED = convert_u_v_to_wind(uf_bar, vf_bar);
-   O_BAR_SPEED = convert_u_v_to_wind(uo_bar, vo_bar);
-   
-   VDIFF_SPD   = convert_u_v_to_wind(u_diff, v_diff);
-
-   VDIFF_DIR   = convert_u_v_to_wdir(-u_diff, -v_diff);
-
-   SPD_ERR     = F_BAR_SPEED - O_BAR_SPEED;
-
-   SPD_ABSERR  = fabs(SPD_ERR);
-
-   DIR_ERR     = atan2d(vf_bar*uo_bar - uf_bar*vo_bar, uf_bar*uo_bar + vf_bar*vo_bar);
-
-   DIR_ABSERR  = fabs(DIR_ERR);
-
-
-}   //  if vcount > 0
+}
 
 
        //////////////////////////////////////////////////////
@@ -1687,47 +1750,47 @@ if ( vcount > 0 )  {
    // Check for 0 points
    if(vcount == 0) {
 
-      uf_bar      = bad_data_double;
-      vf_bar      = bad_data_double;
-      uo_bar      = bad_data_double;
-      vo_bar      = bad_data_double;
-      uvfo_bar    = bad_data_double;
-      uvff_bar    = bad_data_double;
-      uvoo_bar    = bad_data_double;
+      uf_bar        = bad_data_double;
+      vf_bar        = bad_data_double;
+      uo_bar        = bad_data_double;
+      vo_bar        = bad_data_double;
+      uvfo_bar      = bad_data_double;
+      uvff_bar      = bad_data_double;
+      uvoo_bar      = bad_data_double;
 
-      me          = bad_data_double;
-      mse         = bad_data_double;
-      rmse        = bad_data_double;
-      speed_bias  = bad_data_double;
+      me            = bad_data_double;
+      mse           = bad_data_double;
+      rmse          = bad_data_double;
+      speed_bias    = bad_data_double;
 
-      FBAR        = bad_data_double;
-      OBAR        = bad_data_double;
+      FBAR          = bad_data_double;
+      OBAR          = bad_data_double;
 
-      FS_RMS      = bad_data_double;
-      OS_RMS      = bad_data_double;
+      FS_RMS        = bad_data_double;
+      OS_RMS        = bad_data_double;
 
-       MSVE       = bad_data_double;
-      RMSVE       = bad_data_double;
+       MSVE         = bad_data_double;
+      RMSVE         = bad_data_double;
 
-      FSTDEV      = bad_data_double;
-      OSTDEV      = bad_data_double;
+      FSTDEV        = bad_data_double;
+      OSTDEV        = bad_data_double;
 
       // COV         = bad_data_double;
 
-      FDIR        = bad_data_double;
-      ODIR        = bad_data_double;
+      FDIR          = bad_data_double;
+      ODIR          = bad_data_double;
 
-      F_BAR_SPEED = bad_data_double;
-      O_BAR_SPEED = bad_data_double;
+      FBAR_SPEED    = bad_data_double;
+      OBAR_SPEED    = bad_data_double;
 
-      VDIFF_SPD   = bad_data_double;
-      VDIFF_DIR   = bad_data_double;
+      VDIFF_SPEED   = bad_data_double;
+      VDIFF_DIR     = bad_data_double;
 
-      SPD_ERR     = bad_data_double;
-      SPD_ABSERR  = bad_data_double;
+      SPEED_ERR     = bad_data_double;
+      SPEED_ABSERR  = bad_data_double;
 
-      DIR_ERR     = bad_data_double;
-      DIR_ABSERR  = bad_data_double;
+      DIR_ERR       = bad_data_double;
+      DIR_ABSERR    = bad_data_double;
 
    } else {
 

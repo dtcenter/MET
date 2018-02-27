@@ -324,7 +324,10 @@ void setup_first_pass(const DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(unixtime valid_ut, int lead_sec) {
+void setup_txt_files(unixtime valid_ut, int lead_sec)
+
+{
+
    int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
    ConcatString base_name;
 
@@ -1051,6 +1054,18 @@ void process_scores() {
                         stat_at, i_stat_row,
                         txt_at[i_val1l2], i_txt_row[i_val1l2]);
                   }
+
+
+                  // Write out VCNT
+                  if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
+                     vl1l2_info[m].vcount > 0) {
+
+                     write_vcnt_row(shc, vl1l2_info[m],
+                        conf_info.vx_opt[i].output_flag[i_vcnt] == STATOutputType_Both,
+                        stat_at, i_stat_row,
+                        txt_at[i_vcnt], i_txt_row[i_vcnt]);
+                  }
+
                } // end for m
 
                // Reset the forecast variable name
