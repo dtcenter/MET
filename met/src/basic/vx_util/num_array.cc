@@ -971,12 +971,17 @@ double NumArray::wmean_sqrt(const NumArray &wgt) const
 
 int j;
 NumArray squares;
+double v;
 
 // square the current values
 squares.extend(Nelements);
 for(j=0; j<Nelements; j++) squares.add(e[j]*e[j]);
 
-return(sqrt(squares.wmean(wgt)));
+v = squares.wmean(wgt);
+
+if(!is_bad_data(v)) v = sqrt(v);
+
+return(v);
 
 }
 
@@ -990,12 +995,17 @@ double NumArray::wmean_fisher(const NumArray &wgt) const
 
 int j;
 NumArray xform;
+double v;
 
 // apply fisher transform
 xform.extend(Nelements);
 for(j=0; j<Nelements; j++) xform.add(atanh(e[j]));
 
-return(tanh(xform.wmean(wgt)));
+v = xform.wmean(wgt);
+
+if(!is_bad_data(v)) v = tanh(v);
+
+return(v);
 
 }
 
