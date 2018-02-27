@@ -206,13 +206,17 @@ void StatHdrColumns::set_mask(const char *s) {
 void StatHdrColumns::set_interp_mthd(const char *s,
                                      GridTemplateFactory::GridTemplates shape) {
    ConcatString mthd = s;
+
+   // Only append the interpolation shape when applicable
    if(shape != GridTemplateFactory::GridTemplate_None &&
-      mthd  != interpmthd_none_str &&
-      mthd  != interpmthd_nearest_str &&
-      mthd  != interpmthd_force_str  &&
+      mthd  != interpmthd_none_str        &&
+      mthd  != interpmthd_bilin_str       &&
+      mthd  != interpmthd_nearest_str     &&
+      mthd  != interpmthd_budget_str      &&
+      mthd  != interpmthd_force_str       &&
       mthd  != interpmthd_upper_left_str  &&
-      mthd  != interpmthd_upper_right_str  &&
-      mthd  != interpmthd_lower_right_str  &&
+      mthd  != interpmthd_upper_right_str &&
+      mthd  != interpmthd_lower_right_str &&
       mthd  != interpmthd_lower_left_str ) {
       GridTemplateFactory gtf;
       mthd << '_' << gtf.enum2String(shape).c_str();
