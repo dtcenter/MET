@@ -193,6 +193,6 @@ grid_weight_flag = NONE;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "POP_12";
-version          = "V6.1";
+version          = "V7.0";
 
 ////////////////////////////////////////////////////////////////////////////////
