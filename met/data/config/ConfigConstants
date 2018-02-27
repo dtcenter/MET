@@ -28,7 +28,7 @@ tmp_dir = "/tmp";
 K_to_C(t) = t - 273.15;
 C_to_K(t) = t + 273.15;
 C_to_F(t) = 1.8 * t + 32.0;
-F_to_C(t) = 5.0 / 9.0 * ( t - 32.0 );
+F_to_C(t) = (5.0 / 9.0) * ( t - 32.0 );
 K_to_F(t) = C_to_F(K_to_C(t));
 F_to_K(t) = C_to_K(F_to_C(t));
 

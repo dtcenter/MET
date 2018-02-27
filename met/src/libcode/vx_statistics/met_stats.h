@@ -255,6 +255,8 @@ class VL1L2Info {
       VL1L2Info & operator=(const VL1L2Info &);
       VL1L2Info & operator+=(const VL1L2Info &);
 
+      void calc_ncep_stats();
+
          // Filtering thresholds
 
       SingleThresh fthresh;
@@ -297,14 +299,14 @@ class VL1L2Info {
       double FDIR;
       double ODIR;
 
-      double F_BAR_SPEED;
-      double O_BAR_SPEED;
+      double FBAR_SPEED;
+      double OBAR_SPEED;
 
-      double VDIFF_SPD;
+      double VDIFF_SPEED;
       double VDIFF_DIR;
 
-      double SPD_ERR;
-      double SPD_ABSERR;
+      double SPEED_ERR;
+      double SPEED_ABSERR;
 
       double DIR_ERR;
       double DIR_ABSERR;

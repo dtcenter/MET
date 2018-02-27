@@ -241,6 +241,7 @@ void PointStatConfInfo::process_flags() {
 
       // Summary of output_flag settings
       for(j=0; j<n_txt; j++) {
+
          if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
             output_flag[j] = STATOutputType_Both;
             output_ascii_flag = true;
@@ -250,8 +251,10 @@ void PointStatConfInfo::process_flags() {
             output_flag[j] = STATOutputType_Stat;
             output_ascii_flag = true;
          }
-      }
-   }
+
+      }   //  for j
+
+   }   //  for i
 
    // Check for at least one output line type
    if(!output_ascii_flag) {
@@ -911,6 +914,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_vl1l2):
       case(i_val1l2):
+      case(i_vcnt):
          // Number of VL1L2 or VAL1L2 lines =
          //    Message Types * Masks * Interpolations *
          //    Thresholds

@@ -1810,6 +1810,9 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_sal1l2):       s = stat_sal1l2_str;  break;
       case(stat_vl1l2):        s = stat_vl1l2_str;   break;
       case(stat_val1l2):       s = stat_val1l2_str;  break;
+
+      case(stat_vcnt):         s = stat_vcnt_str;    break;
+
       case(stat_fho):          s = stat_fho_str;     break;
       case(stat_ctc):          s = stat_ctc_str;     break;
       case(stat_cts):          s = stat_cts_str;     break;
@@ -1859,6 +1862,9 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_sal1l2_str) == 0) t = stat_sal1l2;
    else if(strcasecmp(s, stat_vl1l2_str)  == 0) t = stat_vl1l2;
    else if(strcasecmp(s, stat_val1l2_str) == 0) t = stat_val1l2;
+
+   else if(strcasecmp(s, stat_vcnt_str)   == 0) t = stat_vcnt;
+
    else if(strcasecmp(s, stat_fho_str)    == 0) t = stat_fho;
    else if(strcasecmp(s, stat_ctc_str)    == 0) t = stat_ctc;
    else if(strcasecmp(s, stat_cts_str)    == 0) t = stat_cts;

@@ -145,13 +145,40 @@ static const char * sal1l2_columns [] = {
 static const char * vl1l2_columns [] = {
    "TOTAL",       "UFBAR",       "VFBAR",
    "UOBAR",       "VOBAR",       "UVFOBAR",
-   "UVFFBAR",     "UVOOBAR"
+   "UVFFBAR",     "UVOOBAR",     "F_SPEED_BAR", 
+   "O_SPEED_BAR", 
 };
 
 static const char * val1l2_columns [] = {
    "TOTAL",       "UFABAR",      "VFABAR",
    "UOABAR",      "VOABAR",      "UVFOABAR",
    "UVFFABAR",    "UVOOABAR"
+};
+
+
+static const char * vcnt_columns [] = {
+
+   "TOTAL",       
+
+   "FBAR",         "FBAR_BCL",        "FBAR_BCU",
+   "OBAR",         "OBAR_BCL",        "OBAR_BCU",
+   "FS_RMS",       "FS_RMS_BCL",      "FS_RMS_BCU",
+   "OS_RMS",       "OS_RMS_BCL",      "OS_RMS_BCU",
+   "MSVE",         "MSVE_BCL",        "MSVE_BCU",
+   "RMSVE",        "RMSVE_BCL",       "RMSVE_BCU",
+   "FSTDEV",       "FSTDEV_BCL",      "FSTDEV_BCU",
+   "OSTDEV",       "OSTDEV_BCL",      "OSTDEV_BCU",
+   "FDIR",         "FDIR_BCL",        "FDIR_BCU",
+   "ODIR",         "ODIR_BCL",        "ODIR_BCU",
+   "FBAR_SPEED",   "FBAR_SPEED_BCL",  "FBAR_SPEED_BCU",
+   "OBAR_SPEED",   "OBAR_SPEED_BCL",  "OBAR_SPEED_BCU",
+   "VDIFF_SPEED",  "VDIFF_SPEED_BCL", "VDIFF_SPEED_BCU",
+   "VDIFF_DIR",    "VDIFF_DIR_BCL",   "VDIFF_DIR_BCU",
+   "SPD_ERR",      "SPD_ERR_BCL",     "SPD_ERR_BCU",
+   "SPD_ABSERR",   "SPD_ABSERR_BCL",  "SPD_ABSERR_BCU",
+   "DIR_ERR",      "DIR_ERR_BCL",     "DIR_ERR_BCU",
+   "DIR_ABSERR",   "DIR_ABSERR_BCL",  "DIR_ABSERR_BCU",
+
 };
 
 static const char * pct_columns [] = {
@@ -344,6 +371,7 @@ static const int n_sl1l2_columns        = sizeof(sl1l2_columns)/sizeof(*sl1l2_co
 static const int n_sal1l2_columns       = sizeof(sal1l2_columns)/sizeof(*sal1l2_columns);
 static const int n_vl1l2_columns        = sizeof(vl1l2_columns)/sizeof(*vl1l2_columns);
 static const int n_val1l2_columns       = sizeof(val1l2_columns)/sizeof(*val1l2_columns);
+static const int n_vcnt_columns         = sizeof(vcnt_columns)/sizeof(*vcnt_columns);
 
 static const int n_pct_columns          = sizeof(pct_columns)/sizeof(*pct_columns);
 static const int n_pstd_columns         = sizeof(pstd_columns)/sizeof(*pstd_columns);
@@ -427,10 +455,16 @@ extern void write_sl1l2_row (StatHdrColumns &, const SL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_sal1l2_row(StatHdrColumns &, const SL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+
 extern void write_vl1l2_row (StatHdrColumns &, const VL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+
 extern void write_val1l2_row(StatHdrColumns &, const VL1L2Info &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+
+extern void write_vcnt_row  (StatHdrColumns &, const VL1L2Info &, bool,
+                             AsciiTable &, int &, AsciiTable &, int &);
+
 extern void write_pct_row   (StatHdrColumns &, const PCTInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &,
                              bool update_thresh = true);
@@ -487,6 +521,7 @@ extern void write_sl1l2_cols (const SL1L2Info &,        AsciiTable &, int, int);
 extern void write_sal1l2_cols(const SL1L2Info &,        AsciiTable &, int, int);
 extern void write_vl1l2_cols (const VL1L2Info &,        AsciiTable &, int, int);
 extern void write_val1l2_cols(const VL1L2Info &,        AsciiTable &, int, int);
+extern void write_vcnt_cols  (const VL1L2Info &,        AsciiTable &, int, int);
 extern void write_pct_cols   (const PCTInfo &,          AsciiTable &, int, int);
 extern void write_pstd_cols  (const PCTInfo &,     int, AsciiTable &, int, int);
 extern void write_pjc_cols   (const PCTInfo &,          AsciiTable &, int, int);

@@ -98,10 +98,14 @@ enum Interp12Type {
 //
 
 enum STATLineType {
+
    stat_sl1l2,
    stat_sal1l2,
    stat_vl1l2,
    stat_val1l2,
+
+   stat_vcnt, 
+
    stat_fho,
    stat_ctc,
    stat_cts,
@@ -126,7 +130,9 @@ enum STATLineType {
    stat_eclv,
    stat_grad,
    stat_header,
+
    no_stat_line_type
+
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,6 +145,7 @@ static const char stat_sl1l2_str[]  = "SL1L2";
 static const char stat_sal1l2_str[] = "SAL1L2";
 static const char stat_vl1l2_str[]  = "VL1L2";
 static const char stat_val1l2_str[] = "VAL1L2";
+static const char stat_vcnt_str[]   = "VCNT";
 static const char stat_fho_str[]    = "FHO";
 static const char stat_ctc_str[]    = "CTC";
 static const char stat_cts_str[]    = "CTS";
