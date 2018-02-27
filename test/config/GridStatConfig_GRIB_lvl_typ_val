@@ -267,6 +267,6 @@ grid_weight_flag = NONE;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "GRIB_lvl_typ_val";
-version          = "V6.0";
+version          = "V7.0";
 
 ////////////////////////////////////////////////////////////////////////////////
