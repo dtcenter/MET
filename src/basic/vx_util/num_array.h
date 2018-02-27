@@ -108,6 +108,8 @@ class NumArray {
       NumArray subset(const NumArray &) const;
 
       double wmean(const NumArray &) const;
+      double wmean_sqrt(const NumArray &) const;
+      double wmean_fisher(const NumArray &) const;
 
 };
 
