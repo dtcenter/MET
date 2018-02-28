@@ -1365,6 +1365,12 @@ version = "V6.0";
 // observations be present and valid for a summary value to be written.  The
 // default "vld_thresh = 0.0" setting will skip over this logic.
 //
+// The variable names are saved to NetCDF file if they are given instead of
+// grib_codes which are not available for non GRIB input. The "obs_var" option
+// was added and works like "grib_code" option (string value VS. int value).
+// They are inclusive (union) and all variables are included if both options
+//  are empty. For example, grib_code 11 is equivalent to obs_var "TMP".
+//
 time_summary = {
   flag = FALSE;
   beg = "000000";
@@ -1372,6 +1378,7 @@ time_summary = {
   step = 300;
   width = 600;
   grib_code = [ 11, 204, 211 ];
+  obs_var   = [];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
   vld_freq = 0;
   vld_thresh = 0.0;
