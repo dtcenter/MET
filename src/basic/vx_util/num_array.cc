@@ -975,7 +975,10 @@ double v;
 
 // square the current values
 squares.extend(Nelements);
-for(j=0; j<Nelements; j++) squares.add(e[j]*e[j]);
+for(j=0; j<Nelements; j++) {
+   v = (is_bad_data(e[j]) ? bad_data_double : e[j]*e[j]);
+   squares.add(v);
+}
 
 v = squares.wmean(wgt);
 
@@ -999,7 +1002,10 @@ double v;
 
 // apply fisher transform
 xform.extend(Nelements);
-for(j=0; j<Nelements; j++) xform.add(atanh(e[j]));
+for(j=0; j<Nelements; j++) {
+   v = (is_bad_data(e[j]) ? bad_data_double : atanh(e[j]));
+   xform.add(v);
+}
 
 v = xform.wmean(wgt);
 
