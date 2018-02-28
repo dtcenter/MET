@@ -131,6 +131,8 @@ event_stack_flag    = TOP;
 
 //
 // Time periods for the summarization
+// obs_var (string array) is added and works like grib_code (int array)
+// when use_var_id is enabled and variable names are saved.
 //
 time_summary = {
   flag = FALSE;
@@ -138,7 +140,8 @@ time_summary = {
   end = "235959";
   step = 300;
   width = 600;
-  var_name = [ "TMP", "WDIR", "RH" ];
+  grib_code = [];
+  obs_var   = [ "TMP", "WDIR", "RH" ];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
   vld_freq = 0;
   vld_thresh = 0.0;
