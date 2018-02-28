@@ -681,30 +681,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double NumArray::mean() const
-
-{
-
-int j, count;
-double s, mn;
-
-for(j=0, count=0, s=0.0; j<Nelements; j++) {
-   if(is_bad_data(e[j])) continue;
-   s += e[j];
-   count++;
-}
-
-if(count == 0) mn = bad_data_double;
-else           mn = s/count;
-
-return(mn);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 double NumArray::sum() const
 
 {
@@ -933,6 +909,68 @@ return ( subset );
 ////////////////////////////////////////////////////////////////////////
 
 
+double NumArray::mean() const
+
+{
+
+int j, count;
+double s, mn;
+
+for(j=0, count=0, s=0.0; j<Nelements; j++) {
+   if(is_bad_data(e[j])) continue;
+   s += e[j];
+   count++;
+}
+
+if(count == 0) mn = bad_data_double;
+else           mn = s/count;
+
+return(mn);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::mean_sqrt() const
+
+{
+
+int j;
+NumArray wgt;
+
+// for simple mean, call weighted mean with constant weight
+wgt.extend(Nelements);
+for(j=0; j<Nelements; j++) wgt.add(1);
+
+return(wmean_sqrt(wgt));
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double NumArray::mean_fisher() const
+
+{
+
+int j;
+NumArray wgt;
+
+// for simple mean, call weighted mean with constant weight
+wgt.extend(Nelements);
+for(j=0; j<Nelements; j++) wgt.add(1);
+
+return(wmean_fisher(wgt));
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double NumArray::wmean(const NumArray &wgt) const
 
 {
@@ -959,7 +997,6 @@ else           wmn = s/w;
 return(wmn);
 
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////
