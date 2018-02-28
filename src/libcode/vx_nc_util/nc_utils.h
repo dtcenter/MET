@@ -57,10 +57,15 @@ typedef signed char ncbyte; // from ncvalues.h
 #define GET_NC_ATT_OBJ(nc_or_var, att_name)         nc_or_var.getAtt(att_name)
 #define GET_NC_ATT_OBJ_BY_P(nc_or_var, att_name)    nc_or_var->getAtt(att_name)
 
-#define DEF_NC_BUFFER_SIZE          (64*1024)
-#define NC_BUFFER_SIZE_32K          (32*1024)
+#define DEF_NC_BUFFER_SIZE              (64*1024)
+#define NC_BUFFER_SIZE_32K              (32*1024)
 
+#define HDR_ARRAY_LEN    3   // Observation header length
+#define OBS_ARRAY_LEN    5   // Observation values length
+#define HEADER_STR_LEN   16  // Maximum length for header string
+#define HEADER_STR_LEN_L 40  // Maximum length for header string (for time summary)
 
+#define OBS_BUFFER_SIZE  (128 * 1024)
 
 static const char nc_dim_nhdr[]         = "nhdr";
 static const char nc_dim_nobs[]         = "nobs";
@@ -95,7 +100,6 @@ struct NetcdfObsVars {
    NcDim obs_dim     ; // Observation array length
    NcDim hdr_dim     ; // Header array length
    
-   //NcDim var_dim     ;
    NcVar hdr_typ_var ; // Message type
    NcVar hdr_sid_var ; // Station ID
    NcVar hdr_vld_var ; // Valid time

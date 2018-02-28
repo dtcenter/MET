@@ -28,6 +28,7 @@ using namespace std;
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
 
+extern struct NcDataBuffer nc_data_buffer;
 
 const float FileHandler::FILL_VALUE = -9999.f;
 
@@ -74,6 +75,8 @@ FileHandler::~FileHandler()
 
 bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
 {
+  nc_obs_initialize();
+  
   // Loop through the ASCII files, reading in the observations.  At the end of
   // this loop, all of the observations will be in the _observations vector.
 
@@ -230,199 +233,28 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 
 ////////////////////////////////////////////////////////////////////////
 
-bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
-{
-  // Save the summary information
-  const char *var_name = 0;
-
-  _dataSummarized = true;
-  _summaryInfo = summary_info;
-
-  // Initialize the list of summary observations
-
-  StringArray summary_vnames;
-  vector< Observation > summary_obs;
-
-  // Sort the observations.  This will put them in chronological order, with
-  // secondary sorts of things like the station id
-
-  sort(_observations.begin(), _observations.end());
-
-  // Check for zero observations
-
-  if (_observations.size() == 0) return true;
-
-  // Extract the desired time intervals from the summary information.
-  // The vector will be in chronological order by start time, but could
-  // overlap in time.
-
-  vector< TimeSummaryInterval > time_intervals =
-    _getTimeIntervals(_observations[0].getValidTime(),
-                      _observations[_observations.size()-1].getValidTime(),
-                      summary_info);
-
-  // Get the summary calculators from the summary information.
-
-  vector< SummaryCalc* > calculators = _getSummaryCalculators(summary_info);
-
-  // Get a pointer into the observations
-
-  vector< Observation >::const_iterator curr_obs = _observations.begin();
-
-  // Loop through the time periods, processing the appropriate observations
-
-  vector< TimeSummaryInterval >::const_iterator time_interval;
-
-  for (time_interval = time_intervals.begin();
-       time_interval != time_intervals.end(); ++time_interval)
-  {
-    // Initialize the map used to sort observations in this time period
-    // into their correct summary groups
-
-    map< SummaryKey, NumArray* > summary_values;
-
-    // Loop backwards through the observations to find the first observation
-    // in the interval.  We need to do this because the user can define
-    // overlapping intervals.
-
-    while (curr_obs != _observations.begin() &&
-           curr_obs->getValidTime() > time_interval->getStartTime())
-      --curr_obs;
-
-    // At this point, we are either at the beginning of the observations list
-    // or we are at the observation right before our current interval.  Process
-    // observations until we get to the end of the interval.
-
-    while (curr_obs != _observations.end() &&
-           curr_obs->getValidTime() < time_interval->getEndTime())
-    {
-      // We need to double-check that this observation is indeed within the
-      // current time interval.  This takes care of the cases where there is
-      // space between the time intervals and when we are first starting out.
-      // It also allows us to go back one observation too far when looking for
-      // the first observation in this time interval.
-
-      if (time_interval->isInInterval(curr_obs->getValidTime()) &&
-          summary_info.grib_code.has(curr_obs->getGribCode()))
-      {
-      // The summary key defines which observations should be grouped
-      // together.  Any differences in key values indicates a different
-      // summary.
-
-        SummaryKey summary_key(curr_obs->getHeaderType(),
-                               curr_obs->getStationId(),
-                               curr_obs->getLatitude(),
-                               curr_obs->getLongitude(),
-                               curr_obs->getElevation(),
-                               curr_obs->getGribCode(),
-                               curr_obs->getHeight(),
-                               curr_obs->getPressureLevel(),
-                               curr_obs->getVarName());
-
-        // Collect variable names
-        var_name = curr_obs->getVarName().c_str();
-        if (0 < strlen(var_name) && !summary_vnames.has(var_name)) {
-          summary_vnames.add(var_name);
-        }
-      // If this is a new key, create a new NumArray
-
-        if (summary_values.find(summary_key) == summary_values.end())
-          summary_values[summary_key] = new NumArray;
-
-      // Add the observation to the correct summary
-
-        summary_values[summary_key]->add(curr_obs->getValue());
-      }
-
-      // Move to the next obs
-
-      ++curr_obs;
-    }
-
-    // Calculate the summaries and add them to the summary observations list
-
-    map< SummaryKey, NumArray* >::const_iterator curr_values;
-    for (curr_values = summary_values.begin();
-         curr_values != summary_values.end(); ++curr_values)
-    {
-      // Loop through the calculators, saving a summary for each one
-
-      vector< SummaryCalc* >::const_iterator calc_iter;
-
-      for (calc_iter = calculators.begin();
-           calc_iter != calculators.end(); ++calc_iter)
-      {
-        SummaryCalc *calc = *calc_iter;
-
-        // Compute the expected number of observations and check valid data ratio
-
-        if (summary_info.vld_freq > 0 && summary_info.vld_thresh > 0)
-        {
-          int n_expect = max(1, nint(summary_info.width / summary_info.vld_freq));
-          int n_valid  = (*curr_values->second).n_valid();
-
-          if (((double) n_valid / n_expect) < summary_info.vld_thresh)
-          {
-
-            mlog << Debug(4)
-                 << "Skipping time summary since the ratio of valid data "
-                 << n_valid << "/" << n_expect << " < " << summary_info.vld_thresh
-                 << " for " << curr_values->first.getHeaderType() << ", "
-                 << calc->getType() << ", "
-                 << summary_info.width << " seconds, "
-                 << curr_values->first.getStationId() << ", "
-                 << unix_to_yyyymmdd_hhmmss(time_interval->getBaseTime()) << ", "
-                 << curr_values->first.getLatitude() << ", "
-                 << curr_values->first.getLongitude() << ", "
-                 << curr_values->first.getElevation() << ", "
-                 << curr_values->first.getVarName() << ", "
-                 << curr_values->first.getGribCode() << "\n";
-            continue;
-          }
-        }
-
-        summary_obs.push_back(Observation(_getSummaryHeaderType(curr_values->first.getHeaderType(),
-                                                                calc->getType(),
-                                                                summary_info.width),
-                                          curr_values->first.getStationId(),
-                                          time_interval->getBaseTime(),
-                                          curr_values->first.getLatitude(),
-                                          curr_values->first.getLongitude(),
-                                          curr_values->first.getElevation(),
-                                          "",
-                                          curr_values->first.getGribCode(),
-                                          curr_values->first.getPressureLevel(),
-                                          curr_values->first.getHeight(),
-                                          calc->calcSummary(*curr_values->second),
-                                          curr_values->first.getVarName()));
-
-      } /* endfor - calc */
-
-    } /* endfor - curr_values */
-
-    // Reclaim space for the summary arrays
-
-    for (curr_values = summary_values.begin();
-         curr_values != summary_values.end(); ++curr_values)
-      delete curr_values->second;
-
-  } /* endfor - time_interval */
-
-  // Replace the observations vector with the summary observations
-
-  _observations = summary_obs;
-  for (int idx=0; idx<summary_vnames.n_elements(); idx++) {
-    if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
-  }
-
-  // Reclaim memory
-
-  for (size_t i = 0; i < calculators.size(); ++i)
-    delete calculators[i];
-
-  return true;
+void FileHandler::setSummaryInfo(const TimeSummaryInfo &summary_info) {
+   do_summary = summary_info.flag; 
+   _summaryInfo = summary_info;
+   summary_obs.setSummaryInfo(summary_info);
 }
 
+////////////////////////////////////////////////////////////////////////
+
+bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
+{
+   bool result = summary_obs.summarizeObs(summary_info);
+   
+   //_observations = summary_obs.getSummaries();
+   
+   _dataSummarized = true;
+   _summaryInfo = summary_info;
+   StringArray summary_vnames = summary_obs.getObsNames();
+   for (int idx=0; idx<summary_vnames.n_elements(); idx++) {
+      if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
+   }
+   return result;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // Protected/Private Methods
@@ -439,192 +271,15 @@ void FileHandler::_closeNetcdf()
 
 void FileHandler::_countHeaders()
 {
-  _nhdr = 0;
-
-  string prev_header_type = "";
-  string prev_station_id = "";
-  time_t prev_valid_time = 0;
-  double prev_latitude = bad_data_double;
-  double prev_longitude = bad_data_double;
-  double prev_elevation = bad_data_double;
-
-  for (vector< Observation >::const_iterator obs = _observations.begin();
-       obs != _observations.end(); ++obs)
-  {
-    if (obs->getHeaderType() != prev_header_type    ||
-        obs->getStationId()  != prev_station_id     ||
-        obs->getValidTime()  != prev_valid_time     ||
-        !is_eq(obs->getLatitude(),  prev_latitude)  ||
-        !is_eq(obs->getLongitude(), prev_longitude) ||
-        !is_eq(obs->getElevation(), prev_elevation))
-    {
-      _nhdr++;
-
-      prev_header_type = obs->getHeaderType();
-      prev_station_id  = obs->getStationId();
-      prev_valid_time  = obs->getValidTime();
-      prev_latitude    = obs->getLatitude();
-      prev_longitude   = obs->getLongitude();
-      prev_elevation   = obs->getElevation();
-    }
-
-  } /* endfor - obs */
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-vector< SummaryCalc* > FileHandler::_getSummaryCalculators(const TimeSummaryInfo &info) const
-{
-  // Initialize the list of calculators
-
-  vector< SummaryCalc * > calculators;
-
-  // Loop through the summary types, creating the calculators
-
-  for (int i = 0; i < info.type.n_elements(); ++i)
-  {
-    // Convert the current type to a string for easier processing
-
-    string type = info.type[i];
-
-    // Create the calculator specified
-
-    if (type == "mean")
-    {
-      calculators.push_back(new SummaryCalcMean);
-    }
-    else if (type == "stdev")
-    {
-      calculators.push_back(new SummaryCalcStdev);
-    }
-    else if (type == "min")
-    {
-      calculators.push_back(new SummaryCalcMin);
-    }
-    else if (type == "max")
-    {
-      calculators.push_back(new SummaryCalcMax);
-    }
-    else if (type == "range")
-    {
-      calculators.push_back(new SummaryCalcRange);
-    }
-    else if (type == "median")
-    {
-      calculators.push_back(new SummaryCalcMedian);
-    }
-    else if (type[0] == 'p')
-    {
-      calculators.push_back(new SummaryCalcPercentile(type));
-    }
-  }
-
-  return calculators;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-string FileHandler::_getSummaryHeaderType(const string &header_type,
-					  const string &summary_type,
-					  const int summary_width_secs) const
-{
-  // Extract the time values from the width
-
-  char header_type_string[1024];
-
-  sprintf(header_type_string, "%s_%s_%s",
-	  header_type.c_str(), summary_type.c_str(),
-	  _secsToTimeString(summary_width_secs).c_str());
-
-  return string(header_type_string);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-vector< TimeSummaryInterval > FileHandler::_getTimeIntervals(const time_t first_data_time,
-                                                             const time_t last_data_time,
-                                                             const TimeSummaryInfo &info) const
-{
-  // Add the time intervals based on the relationship between the begin and
-  // end times.
-
-  vector< TimeSummaryInterval > time_intervals;
-
-  time_t interval_time = _getIntervalTime(first_data_time, info.beg, info.end,
-                                          info.step, info.width);
-
-  while (interval_time < last_data_time)
-  {
-    // We need to process each day separately so that we can always start
-    // at the indicated start time on each day.
-
-    time_t day_end_time = _getEndOfDay(interval_time);
-
-    while (interval_time < day_end_time &&
-           interval_time < last_data_time)
-    {
-      // See if the current time is within the defined time intervals
-
-      if (_isInTimeInterval(interval_time, info.beg, info.end))
-        time_intervals.push_back(TimeSummaryInterval(interval_time,
-                                 info.width));
-
-      // Increment the current time
-
-      interval_time += info.step;
-    }
-
-  }
-
-  return time_intervals;
+   _nhdr = (do_summary ? summary_obs.countSummaryHeaders()
+                       : summary_obs.countHeaders());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 time_t FileHandler::_getValidTime(const string &time_string) const
 {
-  struct tm time_struct;
-  memset(&time_struct, 0, sizeof(time_struct));
-
-  time_struct.tm_year = atoi(time_string.substr(0, 4).c_str()) - 1900;
-  time_struct.tm_mon = atoi(time_string.substr(4, 2).c_str()) - 1;
-  time_struct.tm_mday = atoi(time_string.substr(6, 2).c_str());
-  time_struct.tm_hour = atoi(time_string.substr(9, 2).c_str());
-  time_struct.tm_min = atoi(time_string.substr(11, 2).c_str());
-  time_struct.tm_sec = atoi(time_string.substr(13, 2).c_str());
-
-  return timegm(&time_struct);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool FileHandler::_isInTimeInterval(const time_t test_time,
-                                    const int begin_secs, const int end_secs) const
-{
-  // If the begin and end times are the same, assume the user wants all times
-
-  if (begin_secs == end_secs)
-    return true;
-
-  // Extract the seconds from the test time
-
-  int test_secs = _unixtimeToSecs(test_time);
-
-  // Test for an interval that doesn't span midnight
-
-  if (begin_secs < end_secs)
-    return test_secs >= begin_secs && test_secs <= end_secs;
-
-  // If we get here, the time interval spans midnight
-
-  if (test_secs >= 0 && test_secs <= end_secs)
-    return true;
-
-  if (test_secs >= begin_secs && test_secs <= sec_per_day)
-    return true;
-
-  return false;
+   return summary_obs.getValidTime(time_string);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -678,100 +333,11 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
                                 const ConcatString &hdr_sid,
                                 const ConcatString &hdr_vld,
                                 double lat, double lon, double elv) {
-  int hdr_sid_len;
-
    //
    // Increment header count before writing
    //
    _hdrNum++;
-
-   //
-   // Build the header array
-   //
-   hdr_arr_buf[hdr_data_idx][0] = lat;
-   hdr_arr_buf[hdr_data_idx][1] = lon;
-   hdr_arr_buf[hdr_data_idx][2] = elv;
-
-   hdr_sid_len = hdr_sid.length();
-   if(hdr_sid_len > HEADER_STR_LEN_L) {
-      mlog << Warning << "\nFileHandler::_writeHdrInfo() -> "
-           << "only writing the first " << HEADER_STR_LEN_L
-           << " of station id: " << hdr_sid << "\n\n";
-      hdr_sid_len = HEADER_STR_LEN_L;
-   }
-
-   if(check_reg_exp(yyyymmdd_hhmmss_reg_exp, hdr_vld) != true) {
-      mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
-           << "valid time is not in the expected YYYYMMDD_HHMMSS format: "
-           << hdr_vld << "\n\n";
-      return false;
-   }
-   strncpy(&hdr_typ_buf[hdr_data_idx][0], hdr_typ, hdr_typ.length());
-   hdr_typ_buf[hdr_data_idx][hdr_typ.length()] = bad_data_char;
-   strncpy(&hdr_sid_buf[hdr_data_idx][0], hdr_sid, hdr_sid_len);
-   hdr_sid_buf[hdr_data_idx][hdr_sid_len] = bad_data_char;
-   strncpy(&hdr_vld_buf[hdr_data_idx][0], hdr_vld, hdr_vld.length());
-   hdr_vld_buf[hdr_data_idx][hdr_vld.length()] = bad_data_char;
-   for (int j=hdr_typ.length(); j<HEADER_STR_LEN_L; j++)
-       hdr_typ_buf[hdr_data_idx][j] = bad_data_char;
-
-   hdr_data_idx++;
-   hdr_buf_size = (_nhdr > OBS_BUFFER_SIZE) ? OBS_BUFFER_SIZE : _nhdr;
-   if (processed_count >= (int)_observations.size()) {
-      hdr_buf_size = _nhdr % OBS_BUFFER_SIZE;
-   }
-   bool save_nc = (hdr_buf_size <= hdr_data_idx);
-   if (save_nc) {
-
-      long offsets[2] = { hdr_data_offset, 0 };
-      long lengths[2] = { hdr_buf_size, HEADER_STR_LEN };
-
-      hdr_data_offset += hdr_buf_size;
-
-      //
-      // Store the message type
-      //
-      lengths[1] = HEADER_STR_LEN_L;
-      if(!put_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_buf[0], lengths, offsets)) {
-         mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
-              << "error writing the message type to the NetCDF file\n\n";
-         return false;
-      }
-
-      //
-      // Store the station id
-      //
-
-      if(!put_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_buf[0], lengths, offsets)) {
-         mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
-              << "error writing the station id to the NetCDF file\n\n";
-         return false;
-      }
-
-      lengths[1] = HEADER_STR_LEN;
-
-      //
-      // Store the valid time and check that it's is in the expected
-      // time format: YYYYMMDD_HHMMSS
-      //
-      if(!put_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_buf[0], lengths, offsets)) {
-         mlog << Error << "\nFileHandler::_nwriteHdrInfo() -> "
-              << "error writing the valid time to the NetCDF file\n\n";
-         return false;
-      }
-
-      //
-      // Store the header array
-      //
-      lengths[1] = HDR_ARRAY_LEN;
-      if(!put_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_buf[0], lengths, offsets) ) {
-         mlog << Error << "\nFileHandler::_writeHdrInfo() -> "
-              << "error writing the header array to the NetCDF file\n\n";
-         return false;
-      }
-
-      hdr_data_idx = 0;
-   }
+   write_nc_header(obsVars, hdr_typ, hdr_sid, hdr_vld, lat, lon, elv);
 
    return true;
 }
@@ -796,42 +362,10 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
    obs_arr[2] = prs;   // Pressure level (hPa) or accumulation interval (sec)
    obs_arr[3] = hgt;   // Height in meters above sea level or ground level (msl or agl)
    obs_arr[4] = obs;   // Observation value
-   for (int idx=0; idx<OBS_ARRAY_LEN; idx++) {
-      obs_data_buf[obs_data_idx][idx] = obs_arr[idx];
-   }
-
+   
    obs_qty = (qty.length() == 0 ? na_str : qty.text());
-   strncpy(qty_data_buf[obs_data_idx], obs_qty, obs_qty.length());
-
-   if (processed_count >= (int)_observations.size()) {
-      obs_buf_size = _observations.size() % OBS_BUFFER_SIZE;
-   }
-   bool save_nc = (obs_buf_size <= (obs_data_idx+1));
-   if (save_nc) {
-      long offsets[2] = { obs_data_offset, 0 };
-      long lengths[2] = { obs_buf_size, OBS_ARRAY_LEN };
-      obs_data_offset += obs_buf_size;
-
-      //
-      // Write the observation array
-      //
-      if(!put_nc_data(&obsVars.obs_arr_var, (float *)obs_data_buf, lengths, offsets) ) {
-         mlog << Error << "\nFileHandler::_writeObsInfo() -> "
-              << "error writing the observation array to the NetCDF file\n\n";
-         return false;
-      }
-
-      //
-      // Write the observation QC flag, resetting an empty string to NA
-      //
-      lengths[1] = HEADER_STR_LEN;
-      if(!put_nc_data(&obsVars.obs_qty_var, (char *)qty_data_buf, lengths, offsets) ) {
-         mlog << Error << "\nFileHandler::_writeObsInfo() -> "
-              << "error writing the quality flag to the NetCDF file\n\n";
-         return false;
-      }
-   }
-
+   write_nc_observation(obsVars, nc_data_buffer, obs_arr, obs_qty.text());
+   
    return true;
 }
 
@@ -880,11 +414,14 @@ bool FileHandler::_addObservations(const Observation &obs)
      }
    }
 
-   _observations.push_back(obs);
+   summary_obs.addObservationObj(obs);
+   //   _observations.push_back(obs);
    
-   const char *var_name = obs.getVarName().c_str();
-   if (0 < strlen(var_name) && !obs_names.has(var_name)) {
-      obs_names.add(var_name);
+   if (!do_summary) {
+      const char *var_name = obs.getVarName().c_str();
+      if (0 < strlen(var_name) && !obs_names.has(var_name)) {
+         obs_names.add(var_name);
+      }
    }
 
    return true;
@@ -901,55 +438,51 @@ bool FileHandler::_writeObservations()
   double prev_longitude = bad_data_double;
   double prev_elevation = bad_data_double;
 
-  obs_buf_size = _observations.size();
-  if (obs_buf_size > OBS_BUFFER_SIZE) obs_buf_size = OBS_BUFFER_SIZE;
-
-  obs_data_idx = 0;
-  obs_data_offset = 0;
-  hdr_data_idx = 0;
-  hdr_data_offset = 0;
-
-  processed_count = 0;
-  for (vector< Observation >::const_iterator obs = _observations.begin();
-       obs != _observations.end(); ++obs)
-  {
-
-    processed_count++;
-
-    if (obs->getHeaderType() != prev_header_type    ||
-        obs->getStationId()  != prev_station_id     ||
-        obs->getValidTime()  != prev_valid_time     ||
-        !is_eq(obs->getLatitude(),  prev_latitude)  ||
-        !is_eq(obs->getLongitude(), prev_longitude) ||
-        !is_eq(obs->getElevation(), prev_elevation))
+  if (do_summary) {
+     write_nc_observations(obsVars, summary_obs.getSummaries());
+  }
+  else {
+    _observations = summary_obs.getObservations();
+    
+    for (vector< Observation >::const_iterator obs = _observations.begin();
+         obs != _observations.end(); ++obs)
     {
-      if (!_writeHdrInfo(obs->getHeaderType().c_str(),
-                         obs->getStationId().c_str(),
-                         obs->getValidTimeString().c_str(),
-                         obs->getLatitude(),
-                         obs->getLongitude(),
-                         obs->getElevation()))
+    
+      if (obs->getHeaderType() != prev_header_type    ||
+          obs->getStationId()  != prev_station_id     ||
+          obs->getValidTime()  != prev_valid_time     ||
+          !is_eq(obs->getLatitude(),  prev_latitude)  ||
+          !is_eq(obs->getLongitude(), prev_longitude) ||
+          !is_eq(obs->getElevation(), prev_elevation))
+      {
+        if (!_writeHdrInfo(obs->getHeaderType().c_str(),
+                           obs->getStationId().c_str(),
+                           obs->getValidTimeString().c_str(),
+                           obs->getLatitude(),
+                           obs->getLongitude(),
+                           obs->getElevation()))
+          return false;
+    
+        prev_header_type = obs->getHeaderType();
+        prev_station_id  = obs->getStationId();
+        prev_valid_time  = obs->getValidTime();
+        prev_latitude    = obs->getLatitude();
+        prev_longitude   = obs->getLongitude();
+        prev_elevation   = obs->getElevation();
+      }
+      
+      if (!_writeObsInfo(obs->getGribCode(),
+                         obs->getPressureLevel(),
+                         obs->getHeight(),
+                         obs->getValue(),
+                         obs->getQualityFlag().c_str()))
         return false;
-
-      prev_header_type = obs->getHeaderType();
-      prev_station_id  = obs->getStationId();
-      prev_valid_time  = obs->getValidTime();
-      prev_latitude    = obs->getLatitude();
-      prev_longitude   = obs->getLongitude();
-      prev_elevation   = obs->getElevation();
-    }
+      
+    } /* endfor - obs */
     
-    if (!_writeObsInfo(obs->getGribCode(),
-                       obs->getPressureLevel(),
-                       obs->getHeight(),
-                       obs->getValue(),
-                       obs->getQualityFlag().c_str()))
-      return false;
-    
-    obs_data_idx++;
-    if (obs_data_idx >= obs_buf_size) obs_data_idx = 0;
-
-  } /* endfor - obs */
+    write_nc_observation(obsVars, nc_data_buffer);
+    write_nc_header(obsVars);
+  }
 
   return true;
 }

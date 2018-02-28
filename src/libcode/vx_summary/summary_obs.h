@@ -19,7 +19,6 @@
 #include <iostream>
 
 #include "config_constants.h"
-//#include "vx_config.h"
 #include "observation.h"
 #include "summary_calc.h"
 #include "time_summary_interval.h"
@@ -52,7 +51,9 @@ public:
    vector< Observation > getSummaries();
    long countHeaders();
    long countSummaryHeaders();
-   void setFiltered(bool filtered);
+   time_t getValidTime(const string &time_string) const;
+   void setSummaryInfo(const TimeSummaryInfo &summary_info);
+   StringArray getObsNames();
 
    
 protected:
@@ -67,15 +68,10 @@ protected:
   bool dataSummarized;
   TimeSummaryInfo summaryInfo;
 
-  //long nhdr;
-  //int  hdrNum;
-  //int  obsNum;
-  
   // List of observations read
   vector< Observation > observations;
   vector< Observation > summaries;
   StringArray obs_names;
-  bool filtered;
 
   ///////////////////////
   // Protected methods //
@@ -84,8 +80,6 @@ protected:
   // Count the number of headers needed for the netCDF file.  All of the
   // observations must be loaded into the observations vector before calling
   // this method.
-
-  time_t getValidTime(const string &time_string) const;
 
   bool addObservation(const Observation &obs);
   
@@ -100,6 +94,10 @@ protected:
   vector< TimeSummaryInterval > getTimeIntervals(const time_t first_data_time,
                     const time_t last_data_time,
                     const TimeSummaryInfo &info) const;
+
+  // Check to see if the observation is in the list.
+  bool isInObsList(const TimeSummaryInfo &summary_info,
+                   const Observation &obs) const;
 
   // Check to see if the given time is within the defined time interval
 
@@ -256,7 +254,8 @@ public:
 
 inline vector< Observation > SummaryObs::getObservations() { return observations; }
 inline vector< Observation > SummaryObs::getSummaries()    { return summaries;    }
-inline void SummaryObs::setFiltered(bool new_filtered)     { filtered = new_filtered;    }
+inline StringArray           SummaryObs::getObsNames()     { return obs_names;    }
+inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info) { summaryInfo = summary_info;};
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -22,14 +22,31 @@ using namespace netCDF;
 #include "observation.h"
 
 ////////////////////////////////////////////////////////////////////////
-#define HDR_ARRAY_LEN    3   // Observation header length
-#define OBS_ARRAY_LEN    5   // Observation values length
-#define HEADER_STR_LEN   16  // Maximum length for header string
-#define HEADER_STR_LEN_L 40  // Maximum length for header string (for time summary)
-
-#define OBS_BUFFER_SIZE  (128 * 1024)
-
 static const float FILL_VALUE = -9999.f;
+
+////////////////////////////////////////////////////////////////////////
+
+struct NcDataBuffer {
+   NetcdfObsVars obsVars;
+   int   processed_count;
+   int   obs_count;
+   int   obs_buf_size;
+   int   cur_obs_idx;
+   int   obs_data_idx;
+   int   obs_data_offset;
+   int   hdr_count;
+   int   hdr_buf_size;
+   int   cur_hdr_idx;
+   int   hdr_data_idx;
+   int   hdr_data_offset;
+   
+   char   hdr_typ_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
+   char   hdr_sid_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
+   char   hdr_vld_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
+   float  hdr_arr_buf[OBS_BUFFER_SIZE][HDR_ARRAY_LEN];
+   float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
+   char  qty_data_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
+};
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -43,19 +60,11 @@ extern void write_netcdf_grid_weight(NcFile *, NcDim *, NcDim *, const GridWeigh
 extern void write_netcdf_var_times  (NcVar *, const DataPlane &);
 extern void write_netcdf_var_times  (NcVar *, const unixtime, const unixtime, const int);
 
-// Observations to NetCDF
-extern int get_nc_header_index      ();
-extern int get_nc_hdr_buf_count     ();
-extern int get_nc_obs_buf_count     ();
-
 extern void nc_obs_initialize       ();
 
-extern void add_nc_header
+extern void add_nc_header_full
      (const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
       const float hdr_lat, const float hdr_lon, const float hdr_elv);
-extern void add_and_write_nc_observation
-     (const NetcdfObsVars &obsVars,
-      const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
 
 extern long count_nc_headers   (vector< Observation > &observations);
 
@@ -68,9 +77,17 @@ extern void read_nc_dims_vars  (NetcdfObsVars &obsVars, NcFile *);
 extern void reset_header_buffer(int buf_size);
 
 extern void write_nc_headers        (const NetcdfObsVars &obsVars);
-extern void write_nc_header_buffer  (const NetcdfObsVars &obsVars, const int buf_size);
-extern void write_nc_obs_buffer     (const NetcdfObsVars &obsVars, const int buf_size);
+//extern void write_nc_header         (const NetcdfObsVars &obsVars, NcDataBuffer data_buf);
+extern void write_nc_header         (const NetcdfObsVars &obsVars);
+extern void write_nc_header         (const NetcdfObsVars &obsVars,
+                const char *hdr_typ, const char *hdr_sid, const char *hdr_vld,
+                const float hdr_lat, const float hdr_lon, const float hdr_elv);
+extern void write_header_to_nc      (const NetcdfObsVars &obsVars, NcDataBuffer &data_buf, const int buf_size);
+extern void write_nc_obs_buffer     (NcDataBuffer &data_buf, const int buf_size);
 extern int  write_nc_observations   (const NetcdfObsVars &obsVars, const vector< Observation > observations);
+extern void write_nc_observation    (const NetcdfObsVars &obsVars, NcDataBuffer &data_buf,
+                const float obs_arr[OBS_ARRAY_LEN], const char *obs_qty);
+extern void write_nc_observation    (const NetcdfObsVars &obsVars, NcDataBuffer &data_buf);
       
 
 #endif   //  __WRITE_NETCDF_H__
