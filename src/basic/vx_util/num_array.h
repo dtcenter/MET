@@ -90,7 +90,6 @@ class NumArray {
       double percentile_array(double);
       double iqr();
       void   compute_mean_stdev(double &, double &) const;
-      double mean() const;
       double sum() const;
       double mode() const;
       double min() const;
@@ -106,6 +105,10 @@ class NumArray {
       NumArray subset(int, int) const;
 
       NumArray subset(const NumArray &) const;
+
+      double mean() const;
+      double mean_sqrt() const;
+      double mean_fisher() const;
 
       double wmean(const NumArray &) const;
       double wmean_sqrt(const NumArray &) const;
