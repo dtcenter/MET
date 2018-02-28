@@ -10,6 +10,8 @@
 
 //
 // Time periods for the summarization
+// obs_var (string array) is added and works like grib_code (int array)
+// when the obs name is given instead of grib_code
 //
 
 time_summary = {
@@ -19,6 +21,7 @@ time_summary = {
   step = 300;
   width = 600;
   grib_code = [ 11, 204, 211 ];
+  obs_var   = [];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
   vld_freq = 0;
   vld_thresh = 0.0;
