@@ -145,8 +145,8 @@ static const char * sal1l2_columns [] = {
 static const char * vl1l2_columns [] = {
    "TOTAL",       "UFBAR",       "VFBAR",
    "UOBAR",       "VOBAR",       "UVFOBAR",
-   "UVFFBAR",     "UVOOBAR",     "F_SPEED_BAR", 
-   "O_SPEED_BAR", 
+   "UVFFBAR",     "UVOOBAR",     "F_SPEED_BAR",
+   "O_SPEED_BAR",
 };
 
 static const char * val1l2_columns [] = {
@@ -158,26 +158,26 @@ static const char * val1l2_columns [] = {
 
 static const char * vcnt_columns [] = {
 
-   "TOTAL",       
+   "TOTAL",
 
-   "FBAR",         "FBAR_BCL",        "FBAR_BCU",
-   "OBAR",         "OBAR_BCL",        "OBAR_BCU",
-   "FS_RMS",       "FS_RMS_BCL",      "FS_RMS_BCU",
-   "OS_RMS",       "OS_RMS_BCL",      "OS_RMS_BCU",
-   "MSVE",         "MSVE_BCL",        "MSVE_BCU",
-   "RMSVE",        "RMSVE_BCL",       "RMSVE_BCU",
-   "FSTDEV",       "FSTDEV_BCL",      "FSTDEV_BCU",
-   "OSTDEV",       "OSTDEV_BCL",      "OSTDEV_BCU",
-   "FDIR",         "FDIR_BCL",        "FDIR_BCU",
-   "ODIR",         "ODIR_BCL",        "ODIR_BCU",
-   "FBAR_SPEED",   "FBAR_SPEED_BCL",  "FBAR_SPEED_BCU",
-   "OBAR_SPEED",   "OBAR_SPEED_BCL",  "OBAR_SPEED_BCU",
-   "VDIFF_SPEED",  "VDIFF_SPEED_BCL", "VDIFF_SPEED_BCU",
-   "VDIFF_DIR",    "VDIFF_DIR_BCL",   "VDIFF_DIR_BCU",
-   "SPD_ERR",      "SPD_ERR_BCL",     "SPD_ERR_BCU",
-   "SPD_ABSERR",   "SPD_ABSERR_BCL",  "SPD_ABSERR_BCU",
-   "DIR_ERR",      "DIR_ERR_BCL",     "DIR_ERR_BCU",
-   "DIR_ABSERR",   "DIR_ABSERR_BCL",  "DIR_ABSERR_BCU",
+   "FBAR",         "FBAR_BCL",         "FBAR_BCU",
+   "OBAR",         "OBAR_BCL",         "OBAR_BCU",
+   "FS_RMS",       "FS_RMS_BCL",       "FS_RMS_BCU",
+   "OS_RMS",       "OS_RMS_BCL",       "OS_RMS_BCU",
+   "MSVE",         "MSVE_BCL",         "MSVE_BCU",
+   "RMSVE",        "RMSVE_BCL",        "RMSVE_BCU",
+   "FSTDEV",       "FSTDEV_BCL",       "FSTDEV_BCU",
+   "OSTDEV",       "OSTDEV_BCL",       "OSTDEV_BCU",
+   "FDIR",         "FDIR_BCL",         "FDIR_BCU",
+   "ODIR",         "ODIR_BCL",         "ODIR_BCU",
+   "FBAR_SPEED",   "FBAR_SPEED_BCL",   "FBAR_SPEED_BCU",
+   "OBAR_SPEED",   "OBAR_SPEED_BCL",   "OBAR_SPEED_BCU",
+   "VDIFF_SPEED",  "VDIFF_SPEED_BCL",  "VDIFF_SPEED_BCU",
+   "VDIFF_DIR",    "VDIFF_DIR_BCL",    "VDIFF_DIR_BCU",
+   "SPEED_ERR",    "SPEED_ERR_BCL",    "SPEED_ERR_BCU",
+   "SPEED_ABSERR", "SPEED_ABSERR_BCL", "SPEED_ABSERR_BCU",
+   "DIR_ERR",      "DIR_ERR_BCL",      "DIR_ERR_BCU",
+   "DIR_ABSERR",   "DIR_ABSERR_BCL",   "DIR_ABSERR_BCU",
 
 };
 
