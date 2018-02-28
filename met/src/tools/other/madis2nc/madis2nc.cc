@@ -63,10 +63,7 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 // Defined at write_netcdf.cc
-extern int   obs_data_idx;
-
-extern float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
-extern char  qty_data_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
+extern struct NcDataBuffer nc_data_buffer;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -532,7 +529,7 @@ int process_obs(const int in_gc, const float conversion,
       else            qty_str << qty;
       qty_str.replace(" ", "_", false);
       
-      add_and_write_nc_observation(obsVars, obs_arr, qty_str);
+      write_nc_observation(obsVars, nc_data_buffer, obs_arr, qty_str);
       i_obs++;
       processed_count++;
    }
@@ -540,18 +537,6 @@ int process_obs(const int in_gc, const float conversion,
    return processed_count;
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-void write_qty(char &qty) {
-   ConcatString qty_str;
-   if(qty == '\0') qty_str = na_str;
-   else            qty_str << qty;
-   qty_str.replace(" ", "_", false);
-
-   strncpy(qty_data_buf[obs_data_idx], qty_str, qty_str.length());
-   qty_data_buf[obs_data_idx][qty_str.length()] = bad_data_char;
-}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -720,7 +705,7 @@ void process_madis_metar(NcFile *&f_in) {
 
    int hdr_idx = 0;
    processed_count = 0;
-   obs_data_idx = 0;
+   nc_obs_initialize();
 
    //
    // Loop through each record and get the header data.
@@ -870,7 +855,7 @@ void process_madis_metar(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
 
-         hdr_idx = get_nc_header_index();
+         hdr_idx = nc_data_buffer.cur_hdr_idx;
 
                
          //
@@ -970,16 +955,14 @@ void process_madis_metar(NcFile *&f_in) {
          process_obs(66, conversion, obs_arr, snowCoverQty[i_idx],
                      snowCover_var);
 
-         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+         write_nc_header (obsVars, hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);
       }
 
    } // end for i_hdr
 
-   if (0 < obs_data_idx) {
-      write_nc_obs_buffer(obsVars, obs_data_idx);
-   }
-   write_nc_headers(obsVars);
+   write_nc_observation(obsVars, nc_data_buffer);
+   write_nc_header (obsVars);
 
    print_rej_counts();
 
@@ -1115,7 +1098,7 @@ void process_madis_raob(NcFile *&f_in) {
 
    int hdr_idx = 0;
    processed_count = 0;
-   obs_data_idx = 0;
+   nc_obs_initialize();
 
    //
    // Process the header type.: For RAOB, store as ADPUPA.
@@ -1326,14 +1309,14 @@ void process_madis_raob(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
 
-         hdr_idx = get_nc_header_index();
+         hdr_idx = nc_data_buffer.cur_hdr_idx;
 
          //
          // Process the station name.
          //
          hdr_sid = hdr_sid_arr[i_idx];
 
-         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+         write_nc_header (obsVars, hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
 
@@ -1662,10 +1645,8 @@ void process_madis_raob(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   if (0 < obs_data_idx) {
-      write_nc_obs_buffer(obsVars, obs_data_idx);
-   }
-   write_nc_headers(obsVars);
+   write_nc_observation(obsVars, nc_data_buffer);
+   write_nc_header (obsVars);
 
    print_rej_counts();
 
@@ -1741,7 +1722,7 @@ void process_madis_profiler(NcFile *&f_in) {
    //int[] hdr_lat_arr = new int[BUFFER_SIZE];
    int hdr_idx = 0;
    processed_count = 0;
-   obs_data_idx = 0;
+   nc_obs_initialize();
 
    //
    // Process the header type.
@@ -1842,8 +1823,8 @@ void process_madis_profiler(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
 
-         hdr_idx = get_nc_header_index();
-         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+         hdr_idx = nc_data_buffer.cur_hdr_idx;
+         write_nc_header (obsVars, hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
          //
@@ -1895,10 +1876,8 @@ void process_madis_profiler(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   if (0 < obs_data_idx) {
-      write_nc_obs_buffer(obsVars, obs_data_idx);
-   }
-   write_nc_headers(obsVars);
+   write_nc_observation(obsVars, nc_data_buffer);
+   write_nc_header (obsVars);
 
    print_rej_counts();
 
@@ -1990,7 +1969,7 @@ void process_madis_maritime(NcFile *&f_in) {
    dim[0] = dim[1] = dim[2] = 1;
 
    int hdr_idx = 0;
-   obs_data_idx = 0;
+   nc_obs_initialize();
 
    //
    // Process the header type.
@@ -2124,7 +2103,7 @@ void process_madis_maritime(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
 
-         hdr_idx = get_nc_header_index();
+         hdr_idx = nc_data_buffer.cur_hdr_idx;
 if (hdr_idx > 2290) cout << "  DEBUG HS hdr_idx: "  << hdr_idx<< endl;
 
 
@@ -2209,16 +2188,14 @@ if (hdr_idx > 2290) cout << "  DEBUG HS hdr_idx: "  << hdr_idx<< endl;
          process_obs(61, conversion, obs_arr, precip24HourQty_arr[i_idx],
                      in_precip24Hour_var);
 
-         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+         write_nc_header (obsVars, hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);
       }
 
    } // end for i_hdr
 
-   if (0 < obs_data_idx) {
-      write_nc_obs_buffer(obsVars, obs_data_idx);
-   }
-   write_nc_headers(obsVars);
+   write_nc_observation(obsVars, nc_data_buffer);
+   write_nc_header (obsVars);
    
    print_rej_counts();
 
@@ -2327,7 +2304,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    dim[0] = 1;
 
    int hdr_idx = 0;
-   obs_data_idx = 0;
+   nc_obs_initialize();
 
    //
    // Encode the header type as ADPSFC for MESONET observations.
@@ -2505,7 +2482,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
          hdr_vld = tmp_str;
 
-         hdr_idx = get_nc_header_index();
+         hdr_idx = nc_data_buffer.cur_hdr_idx;
 
          //
          // Initialize the observation array: hdr_id, gc, lvl, hgt, ob
@@ -2514,7 +2491,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          obs_arr[2] = bad_data_float;   // Level: accum(sec) or pressure
          obs_arr[3] = 0;                // Height for surface is 0 meters
 
-         add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+         write_nc_header (obsVars, hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
          // Temperature
@@ -2673,10 +2650,8 @@ void process_madis_mesonet(NcFile *&f_in) {
 
    } // end for i
 
-   if (0 < obs_data_idx) {
-      write_nc_obs_buffer(obsVars, obs_data_idx);
-   }
-   write_nc_headers(obsVars);
+   write_nc_observation(obsVars, nc_data_buffer);
+   write_nc_header (obsVars);
 
    print_rej_counts();
 
@@ -2783,7 +2758,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    i_cnt = -1;
    int hdr_idx = 0;
-   obs_data_idx = 0;
+   nc_obs_initialize();
 
    //
    // Loop through each record and get the header data.
@@ -2884,7 +2859,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            hdr_idx = get_nc_header_index();
+            hdr_idx = nc_data_buffer.cur_hdr_idx;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -2933,7 +2908,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             unix_to_yyyymmdd_hhmmss((unixtime) tmp_dbl, tmp_str);
             hdr_vld = tmp_str;
 
-            add_nc_header (hdr_typ, hdr_sid, hdr_vld,
+            write_nc_header (obsVars, hdr_typ, hdr_sid, hdr_vld,
                hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
 
@@ -2985,10 +2960,8 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       }
    } // end for i_hdr
 
-   if (0 < obs_data_idx) {
-      write_nc_obs_buffer(obsVars, obs_data_idx);
-   }
-   write_nc_headers(obsVars);
+   write_nc_observation(obsVars, nc_data_buffer);
+   write_nc_header (obsVars);
 
    print_rej_counts();
 

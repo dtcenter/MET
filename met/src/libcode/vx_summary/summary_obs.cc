@@ -31,8 +31,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 SummaryObs::SummaryObs():
-  dataSummarized(false),
-  filtered(false)
+  dataSummarized(false)
 {
 }
 
@@ -123,7 +122,6 @@ long SummaryObs::countSummaryHeaders()
 
 bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
 {
-   bool includeObs;
    int summaryCount = 0;
    int summaryKeyCount = 0;
    // Save the summary information
@@ -185,11 +183,12 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
         // It also allows us to go back one observation too far when looking for
         // the first observation in this time interval.
       
-        includeObs = (filtered ?
-                true :
-                (summary_info.grib_code.has(curr_obs->getVarCode()) ||
-                 summary_info.obs_var.has(curr_obs->getVarName().c_str())));
-        if (time_interval->isInInterval(curr_obs->getValidTime()) && includeObs)
+        if (!isInObsList(summaryInfo, *curr_obs)) {
+           mlog << Debug(10)
+                << "SummaryObs::summarizeObs()  Filtered variable ["
+                << curr_obs->getVarName() << "] (id: " << curr_obs->getVarCode() << ")\n";
+        }
+        else if (time_interval->isInInterval(curr_obs->getValidTime()))
         {
         // The summary key defines which observations should be grouped
         // together.  Any differences in key values indicates a different
@@ -418,6 +417,15 @@ time_t SummaryObs::getValidTime(const string &time_string) const
 
 ////////////////////////////////////////////////////////////////////////
 
+bool SummaryObs::isInObsList(const TimeSummaryInfo &summary_info,
+                 const Observation &obs) const {
+   return (0 == (summary_info.grib_code.n_elements()+summary_info.obs_var.n_elements())
+       || summary_info.grib_code.has(obs.getVarCode())
+       || summary_info.obs_var.has(obs.getVarName().c_str()));
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool SummaryObs::isInTimeInterval(const time_t test_time,
       const int begin_secs, const int end_secs) const
 {
@@ -447,17 +455,15 @@ bool SummaryObs::isInTimeInterval(const time_t test_time,
 bool SummaryObs::addObservationObj(const Observation &obs)
 {
    bool result = false;
-   if (summaryInfo.grib_code.n_elements() == 0
-       || summaryInfo.grib_code.has(obs.getVarCode())) {
-      observations.push_back(obs);
-      
-      const char *var_name = obs.getVarName().c_str();
-      if (0 < strlen(var_name) && !obs_names.has(var_name)) {
-         obs_names.add(var_name);
-      }
-      result = true;
+   
+   // Do not filter by grib_code or obs_var here
+   observations.push_back(obs);
+   
+   const char *var_name = obs.getVarName().c_str();
+   if (0 < strlen(var_name) && !obs_names.has(var_name)) {
+      obs_names.add(var_name);
    }
-
+   result = true;
    return result;
 }
 

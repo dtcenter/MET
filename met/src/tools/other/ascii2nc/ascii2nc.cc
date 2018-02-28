@@ -207,6 +207,7 @@ int main(int argc, char *argv[]) {
    if (deflate_level < 0) deflate_level = config_info.get_compression_level();
    if (deflate_level > 9) deflate_level = config_info.get_compression_level();
    file_handler->setCompressionLevel(deflate_level);
+   file_handler->setSummaryInfo(config_info.getSummaryInfo());
 
    //
    // Set the masking grid and polyline, if specified.
