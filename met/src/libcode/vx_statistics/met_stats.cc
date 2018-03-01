@@ -1394,17 +1394,15 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    v_info.vcount  = vcount + c.vcount;
 
    if(v_info.vcount > 0) {
-
-      v_info.f_speed_bar   = (f_speed_bar*vcount   + c.f_speed_bar*c.vcount)  /v_info.vcount;
-      v_info.o_speed_bar   = (o_speed_bar*vcount   + c.o_speed_bar*c.vcount)  /v_info.vcount;
-
-      v_info.uf_bar   = (uf_bar*vcount   + c.uf_bar*c.vcount)  /v_info.vcount;
-      v_info.vf_bar   = (vf_bar*vcount   + c.vf_bar*c.vcount)  /v_info.vcount;
-      v_info.uo_bar   = (uo_bar*vcount   + c.uo_bar*c.vcount)  /v_info.vcount;
-      v_info.vo_bar   = (vo_bar*vcount   + c.vo_bar*c.vcount)  /v_info.vcount;
-      v_info.uvfo_bar = (uvfo_bar*vcount + c.uvfo_bar*c.vcount)/v_info.vcount;
-      v_info.uvff_bar = (uvff_bar*vcount + c.uvff_bar*c.vcount)/v_info.vcount;
-      v_info.uvoo_bar = (uvoo_bar*vcount + c.uvoo_bar*c.vcount)/v_info.vcount;
+      v_info.uf_bar      = (uf_bar*vcount      + c.uf_bar*c.vcount)     /v_info.vcount;
+      v_info.vf_bar      = (vf_bar*vcount      + c.vf_bar*c.vcount)     /v_info.vcount;
+      v_info.uo_bar      = (uo_bar*vcount      + c.uo_bar*c.vcount)     /v_info.vcount;
+      v_info.vo_bar      = (vo_bar*vcount      + c.vo_bar*c.vcount)     /v_info.vcount;
+      v_info.uvfo_bar    = (uvfo_bar*vcount    + c.uvfo_bar*c.vcount)   /v_info.vcount;
+      v_info.uvff_bar    = (uvff_bar*vcount    + c.uvff_bar*c.vcount)   /v_info.vcount;
+      v_info.uvoo_bar    = (uvoo_bar*vcount    + c.uvoo_bar*c.vcount)   /v_info.vcount;
+      v_info.f_speed_bar = (f_speed_bar*vcount + c.f_speed_bar*c.vcount)/v_info.vcount;
+      v_info.o_speed_bar = (o_speed_bar*vcount + c.o_speed_bar*c.vcount)/v_info.vcount;
    }
 
    v_info.vacount  = vacount + c.vacount;
@@ -1444,9 +1442,6 @@ void VL1L2Info::zero_out() {
    // VL1L2 Quantities
    //
 
-f_speed_bar = 0.0;
-o_speed_bar = 0.0;
-
 uf_bar      = 0.0;
 vf_bar      = 0.0;
 uo_bar      = 0.0;
@@ -1454,6 +1449,8 @@ vo_bar      = 0.0;
 uvfo_bar    = 0.0;
 uvff_bar    = 0.0;
 uvoo_bar    = 0.0;
+f_speed_bar = 0.0;
+o_speed_bar = 0.0;
 
 f_bar       = 0.0;
 o_bar       = 0.0;
@@ -1461,7 +1458,6 @@ me          = 0.0;
 mse         = 0.0;
 rmse        = 0.0;
 speed_bias  = 0.0;
-
 
 FBAR        = 0.0;
 OBAR        = 0.0;
@@ -1541,13 +1537,15 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    logic   = c.logic;
 
    // VL1L2 Quantities
-   uf_bar    = c.uf_bar;
-   vf_bar    = c.vf_bar;
-   uo_bar    = c.uo_bar;
-   vo_bar    = c.vo_bar;
-   uvfo_bar  = c.uvfo_bar;
-   uvff_bar  = c.uvff_bar;
-   uvoo_bar  = c.uvoo_bar;
+   uf_bar      = c.uf_bar;
+   vf_bar      = c.vf_bar;
+   uo_bar      = c.uo_bar;
+   vo_bar      = c.vo_bar;
+   uvfo_bar    = c.uvfo_bar;
+   uvff_bar    = c.uvff_bar;
+   uvoo_bar    = c.uvoo_bar;
+   f_speed_bar = c.f_speed_bar;
+   o_speed_bar = c.o_speed_bar;
 
    f_bar     = c.f_bar;
    o_bar     = c.o_bar;
@@ -1786,8 +1784,8 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
          //  new stuff from vector stats whitepaper
          //
 
-      f_speed_bar      += w*sqrt(uf*uf + vf*vf);
-      o_speed_bar      += w*sqrt(uo*uo + vo*vo);
+      f_speed_bar   += w*sqrt(uf*uf + vf*vf);
+      o_speed_bar   += w*sqrt(uo*uo + vo*vo);
 
       MSVE += w*(u_diff*u_diff + v_diff*v_diff);
 

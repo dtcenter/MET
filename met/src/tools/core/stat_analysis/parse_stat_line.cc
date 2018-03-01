@@ -214,14 +214,16 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
 
    v_info.clear();
 
-   v_info.vcount   = atoi(l.get_item("TOTAL"));
-   v_info.uf_bar   = atof(l.get_item("UFBAR"));
-   v_info.vf_bar   = atof(l.get_item("VFBAR"));
-   v_info.uo_bar   = atof(l.get_item("UOBAR"));
-   v_info.vo_bar   = atof(l.get_item("VOBAR"));
-   v_info.uvfo_bar = atof(l.get_item("UVFOBAR"));
-   v_info.uvff_bar = atof(l.get_item("UVFFBAR"));
-   v_info.uvoo_bar = atof(l.get_item("UVOOBAR"));
+   v_info.vcount      = atoi(l.get_item("TOTAL"));
+   v_info.uf_bar      = atof(l.get_item("UFBAR"));
+   v_info.vf_bar      = atof(l.get_item("VFBAR"));
+   v_info.uo_bar      = atof(l.get_item("UOBAR"));
+   v_info.vo_bar      = atof(l.get_item("VOBAR"));
+   v_info.uvfo_bar    = atof(l.get_item("UVFOBAR"));
+   v_info.uvff_bar    = atof(l.get_item("UVFFBAR"));
+   v_info.uvoo_bar    = atof(l.get_item("UVOOBAR"));
+   v_info.f_speed_bar = atof(l.get_item("F_SPEED_BAR"));
+   v_info.o_speed_bar = atof(l.get_item("O_SPEED_BAR"));
 
    return;
 }
