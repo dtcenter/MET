@@ -1551,8 +1551,8 @@ v_diff = vf_bar - vo_bar;
 
    RMSVE        = sqrt(MSVE);
 
-   FSTDEV       = uvff_bar - f_speed_bar*f_speed_bar;
-   OSTDEV       = uvoo_bar - o_speed_bar*o_speed_bar;
+   FSTDEV       = sqrt(uvff_bar - f_speed_bar*f_speed_bar);
+   OSTDEV       = sqrt(uvoo_bar - o_speed_bar*o_speed_bar);
 
    FDIR         = convert_u_v_to_wdir(-uf_bar, -vf_bar);
    ODIR         = convert_u_v_to_wdir(-uo_bar, -vo_bar);
