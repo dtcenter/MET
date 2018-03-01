@@ -44,6 +44,7 @@ regrid = {
 censor_thresh = [];
 censor_val    = [];
 cat_thresh    = [];
+nc_var_str    = "";
 
 //
 // Ensemble product fields to be processed
@@ -195,6 +196,7 @@ output_flag = {
 // Ensemble product output types
 //
 ensemble_flag = {
+   latlon    = TRUE;
    mean      = TRUE;
    stdev     = TRUE;
    minus     = TRUE;

@@ -44,6 +44,8 @@
 //   017    08/09/16  Halley Gotway  Fixed n_ens_vld vs n_vx_vld bug.
 //   018    05/15/17  Prestonik P    Add shape for regrid and interp.
 //   019    05/15/17  Halley Gotway  Add RELP line type and skip_const.
+//   020    02/21/18  Halley Gotway  Restructure config logic to make
+//                    all options settable for each verification task.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,7 +116,7 @@ static void write_orank_var_int(int, int, int, int *, DataPlane &,
                                 const char *, const char *);
 
 static void add_var_att_local(VarInfo *, NcVar *, bool is_int, DataPlane &,
-                        const char *, const char *);
+                              const char *, const char *);
 
 static void finish_txt_files();
 static void clean_up();
@@ -394,7 +396,7 @@ void process_command_line(int argc, char **argv) {
    else                                                        vx_flag = 0;
 
    // Check the spread/skill configuration information
-   conf_info.ens_ssvar_flag = 0;
+   conf_info.ens_ssvar_flag = false;
    bool ssvar_out = (conf_info.output_flag[i_ssvar] != STATOutputType_None);
    if(ens_ssvar_mean && strcmp(ens_ssvar_mean, "")) {
 
@@ -415,7 +417,7 @@ void process_command_line(int argc, char **argv) {
               << "no verification has been requested\n\n";
       }
       else {
-         conf_info.ens_ssvar_flag = 1;
+         conf_info.ens_ssvar_flag = true;
       }
 
    }
@@ -429,11 +431,11 @@ void process_command_line(int argc, char **argv) {
       else {
          conf_info.ens_ssvar_flag = 1;
 
-         if(!conf_info.ensemble_flag[i_nc_mean]) {
+         if(!conf_info.nc_info.do_mean) {
             mlog << Warning << "\nprocess_command_line() -> "
                  << "enabling ensemble mean to facilitate calculation "
                  << "of ensemble spread/skill\n\n";
-            conf_info.ensemble_flag[i_nc_mean] = true;
+            conf_info.nc_info.do_mean;
          }
       }
    }
@@ -508,10 +510,11 @@ void process_n_vld() {
          // Check for valid data fields.
          // Call data_plane_array to handle multiple levels.
          if(!get_data_plane_array(ens_file_list[j], etype,
-                                  conf_info.vx_pd[i].fcst_info, dpa, false)) {
+                                  conf_info.vx_opt[i].vx_pd.fcst_info,
+                                  dpa, false)) {
             mlog << Warning << "\nprocess_n_vld() -> "
                  << "no data found for forecast field \""
-                 << conf_info.vx_pd[i].fcst_info->magic_str()
+                 << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
                  << "\" in file \"" << ens_file_list[j]
                  << "\"\n\n";
          }
@@ -734,22 +737,27 @@ void process_vx() {
 
 void process_point_vx() {
    int i, n_miss;
+   unixtime beg_ut, end_ut;
 
-   // Set the matching time window.  If obs_valid_beg_ut and
-   // obs_valid_end_ut were not set on the command line,
-   // use beg_ds and end_ds.
-   if(obs_valid_beg_ut == (unixtime) 0) {
-      obs_valid_beg_ut = ens_valid_ut + conf_info.beg_ds;
-   }
-   if(obs_valid_end_ut == (unixtime) 0) {
-      obs_valid_end_ut = ens_valid_ut + conf_info.end_ds;
-   }
-
-   // Store the valid time window
+   // Set observation time window for each verification task
    for(i=0; i<conf_info.get_n_vx(); i++) {
-      conf_info.vx_pd[i].set_fcst_ut(ens_valid_ut);
-      conf_info.vx_pd[i].set_beg_ut(obs_valid_beg_ut);
-      conf_info.vx_pd[i].set_end_ut(obs_valid_end_ut);
+
+      // If obs_valid_beg_ut and obs_valid_end_ut were set on the command
+      // line, use them.  If not, use beg_ds and end_ds.
+      if(obs_valid_beg_ut != (unixtime) 0 ||
+         obs_valid_end_ut != (unixtime) 0) {
+         beg_ut = obs_valid_beg_ut;
+         end_ut = obs_valid_end_ut;
+      }
+      else {
+         beg_ut = ens_valid_ut + conf_info.vx_opt[i].beg_ds;
+         end_ut = ens_valid_ut + conf_info.vx_opt[i].end_ds;
+      }
+
+      // Store the timing info
+      conf_info.vx_opt[i].vx_pd.set_fcst_ut(ens_valid_ut);
+      conf_info.vx_opt[i].vx_pd.set_beg_ut(beg_ut);
+      conf_info.vx_opt[i].vx_pd.set_end_ut(end_ut);
    }
 
    // Process the climatology fields
@@ -762,8 +770,8 @@ void process_point_vx() {
 
    // Calculate and print observation summaries
    for(i=0; i<conf_info.get_n_vx(); i++) {
-      conf_info.vx_pd[i].calc_obs_summary();
-      conf_info.vx_pd[i].print_obs_summary();
+      conf_info.vx_opt[i].vx_pd.calc_obs_summary();
+      conf_info.vx_opt[i].vx_pd.print_obs_summary();
    }
 
    // Process each ensemble file
@@ -808,7 +816,7 @@ void process_point_climo() {
                    i, ens_valid_ut, grid);
 
       // Store climatology information
-      conf_info.vx_pd[i].set_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_climo_mn_dpa(cmn_dpa);
    } // end for i
 
    return;
@@ -1008,10 +1016,10 @@ void process_point_obs(int i_nc) {
          // should be added
          for(j=0; j<conf_info.get_n_vx(); j++) {
 
-            // Attempt to add the observation to the conf_info.vx_pd object
-            conf_info.vx_pd[j].add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                       hdr_ut, obs_qty_str, obs_arr, grid,
-                                       var_name);
+            // Attempt to add the observation to the vx_pd object
+            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty_str, obs_arr, grid,
+                                              var_name);
          }
       }
    } // end for i_start
@@ -1059,9 +1067,10 @@ int process_point_ens(int i_ens, int &n_miss) {
       if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) {
          fcst_dpa.clear();
          ConcatString ens_mn_name;
-         ens_mn_name << conf_info.vx_pd[i].fcst_info->name() << "_"
-                     << conf_info.vx_pd[i].fcst_info->level_name() << "_"
-                     << "ENS_MEAN";
+         ens_mn_name << conf_info.vx_opt[i].vx_pd.fcst_info->name()
+                     << "_"
+                     << conf_info.vx_opt[i].vx_pd.fcst_info->level_name()
+                     << "_ENS_MEAN";
          ens_mn_name.replace(",", "_",   false);
          ens_mn_name.replace("*", "all", false);
          mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
@@ -1069,7 +1078,7 @@ int process_point_ens(int i_ens, int &n_miss) {
          info->set_magic(ens_mn_name, "(*,*)");
       }
       else {
-         info = conf_info.vx_pd[i].fcst_info;
+         info = conf_info.vx_opt[i].vx_pd.fcst_info;
       }
 
       // Read the gridded data from the input forecast file
@@ -1086,10 +1095,10 @@ int process_point_ens(int i_ens, int &n_miss) {
       if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) delete info;
 
       // Store information for the raw forecast fields
-      conf_info.vx_pd[i].set_fcst_dpa(fcst_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
 
       // Compute forecast values for this ensemble member
-      conf_info.vx_pd[i].add_ens(i_ens-n_miss, ens_mn);
+      conf_info.vx_opt[i].vx_pd.add_ens(i_ens-n_miss, ens_mn);
 
    } // end for i
 
@@ -1120,54 +1129,54 @@ void process_point_scores() {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Set the description
-      shc.set_desc(conf_info.vx_pd[i].desc);
+      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc);
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_pd[i].fcst_info->name().text());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name().text());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_pd[i].fcst_info->level_name().text());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.vx_pd[i].obs_info->name().text());
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name().text());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_pd[i].obs_info->level_name().text());
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(0);
 
       // Set the observation valid time
-      shc.set_obs_valid_beg(conf_info.vx_pd[i].beg_ut);
-      shc.set_obs_valid_end(conf_info.vx_pd[i].end_ut);
+      shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
+      shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
 
       // Loop through the message types
-      for(j=0; j<conf_info.get_n_msg_typ(i); j++) {
+      for(j=0; j<conf_info.vx_opt[i].get_n_msg_typ(); j++) {
 
          // Store the message type in the obtype column
-         shc.set_obtype(conf_info.msg_typ[i][j]);
+         shc.set_obtype(conf_info.vx_opt[i].msg_typ[j]);
 
          // Loop through the verification masking regions
-         for(k=0; k<conf_info.get_n_mask(); k++) {
+         for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
             // Store the verification masking region
-            shc.set_mask(conf_info.mask_name[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
 
             // Loop through the interpolation methods
-            for(l=0; l<conf_info.get_n_interp(); l++) {
+            for(l=0; l<conf_info.vx_opt[i].get_n_interp(); l++) {
 
                // Store the interpolation method and width being applied
-               shc.set_interp_mthd(conf_info.interp_mthd[l],
-                                   conf_info.interp_shape);
-               shc.set_interp_wdth(conf_info.interp_wdth[l]);
+               shc.set_interp_mthd(conf_info.vx_opt[i].interp_info.method[l],
+                                   conf_info.vx_opt[i].interp_info.shape);
+               shc.set_interp_wdth(conf_info.vx_opt[i].interp_info.width[l]);
 
-               pd_ptr = &conf_info.vx_pd[i].pd[j][k][l];
+               pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][l];
 
                mlog << Debug(2)
                     << "Processing point verification "
-                    << conf_info.vx_pd[i].fcst_info->magic_str()
+                    << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
                     << " versus "
-                    << conf_info.vx_pd[i].obs_info->magic_str()
+                    << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
                     << ", for observation type " << pd_ptr->msg_typ
                     << ", over region " << pd_ptr->mask_name
                     << ", for interpolation method "
@@ -1183,13 +1192,13 @@ void process_point_scores() {
                pd_ptr->compute_pair_vals();
 
                // Process each filtering threshold
-               for(m=0; m<conf_info.othr_ta[i].n_elements(); m++) {
+               for(m=0; m<conf_info.vx_opt[i].othr_ta.n_elements(); m++) {
 
                   // Set the header column
-                  shc.set_obs_thresh(conf_info.othr_ta[i][m]);
+                  shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[m]);
 
                   // Subset pairs using the current obs_thresh
-                  pd = pd_ptr->subset_pairs(conf_info.othr_ta[i][m]);
+                  pd = pd_ptr->subset_pairs(conf_info.vx_opt[i].othr_ta[m]);
 
                   // Compute ensemble statistics
                   pd.compute_stats();
@@ -1243,16 +1252,16 @@ void process_point_scores() {
 
                         // Add rows to the output AsciiTables for SSVAR
                         stat_at.add_rows(pd.ssvar_bins[0].n_bin *
-                                         conf_info.ci_alpha.n_elements());
+                                         conf_info.vx_opt[i].ci_alpha.n_elements());
 
                         if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
                            txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
-                                                    conf_info.ci_alpha.n_elements());
+                                                    conf_info.vx_opt[i].ci_alpha.n_elements());
                         }
 
                         // Write the SSVAR data for each alpha value
-                        for(n=0; n<conf_info.ci_alpha.n_elements(); n++) {
-                           write_ssvar_row(shc, &pd, conf_info.ci_alpha[n],
+                        for(n=0; n<conf_info.vx_opt[i].ci_alpha.n_elements(); n++) {
+                           write_ssvar_row(shc, &pd, conf_info.vx_opt[i].ci_alpha[n],
                               conf_info.output_flag[i_ssvar],
                               stat_at, i_stat_row,
                               txt_at[i_ssvar], i_txt_row[i_ssvar]);
@@ -1274,8 +1283,8 @@ void process_point_scores() {
                      txt_at[i_orank], i_txt_row[i_orank]);
 
                   // Reset the observation valid time
-                  shc.set_obs_valid_beg(conf_info.vx_pd[i].beg_ut);
-                  shc.set_obs_valid_end(conf_info.vx_pd[i].end_ut);
+                  shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
+                  shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
                }
 
             } // end for l
@@ -1291,6 +1300,7 @@ void process_point_scores() {
 void process_grid_vx() {
    int i, j, k, l, m, n_miss;
    bool found;
+   DataPlane  mask_dp;
    DataPlane *fcst_dp = (DataPlane *) 0;
    DataPlane *fcst_dp_smooth = (DataPlane *) 0;
    DataPlane  obs_dp, obs_dp_smooth;
@@ -1318,19 +1328,19 @@ void process_grid_vx() {
       shc.set_fcst_valid_end(ens_valid_ut);
 
       // Set the description
-      shc.set_desc(conf_info.vx_pd[i].desc);
+      shc.set_desc(conf_info.vx_opt[i].vx_pd.desc);
 
       // Set the forecast variable name
-      shc.set_fcst_var(conf_info.vx_pd[i].fcst_info->name().text());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name().text());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_pd[i].fcst_info->level_name().text());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_name().text());
 
       // Set the observation variable name
-      shc.set_obs_var(conf_info.vx_pd[i].obs_info->name().text());
+      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name().text());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_pd[i].obs_info->level_name().text());
+      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
       // Loop through each of the input ensemble files
       for(j=0, n_miss=0; j<ens_file_list.n_elements(); j++) {
@@ -1341,7 +1351,7 @@ void process_grid_vx() {
          // If the current ensemble file is valid, read the field
          if(ens_file_vld[j]) {
             found = get_data_plane(ens_file_list[j], etype,
-                                   conf_info.vx_pd[i].fcst_info,
+                                   conf_info.vx_opt[i].vx_pd.fcst_info,
                                    fcst_dp[j], true);
          }
          else {
@@ -1363,11 +1373,11 @@ void process_grid_vx() {
       mlog << Debug(3)
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
            << " climatology mean field(s) for forecast "
-           << conf_info.vx_pd[i].fcst_info->magic_str() << ".\n";
+           << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ".\n";
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
-      if(conf_info.ensemble_flag[i_nc_orank] &&
+      if(conf_info.nc_info.do_orank &&
          nc_out == (NcFile *) 0)
          setup_nc_file(fcst_dp[j].valid(), fcst_dp[j].lead(),
                        "_orank.nc");
@@ -1376,7 +1386,7 @@ void process_grid_vx() {
       for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
 
          found = get_data_plane(grid_obs_file_list[j], otype,
-                                conf_info.vx_pd[i].obs_info, obs_dp, true);
+                                conf_info.vx_opt[i].vx_pd.obs_info, obs_dp, true);
 
          // If found, break out of the loop
          if(!found) n_miss++;
@@ -1386,7 +1396,7 @@ void process_grid_vx() {
       // Check if the observation field was found
       if(n_miss == grid_obs_file_list.n_elements()) {
          mlog << Warning << "\nprocess_grid_vx() -> "
-              << conf_info.vx_pd[i].obs_info->magic_str()
+              << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
               << " not found in observation files.\n";
          continue;
       }
@@ -1421,7 +1431,7 @@ void process_grid_vx() {
             info->set_magic(ens_mn_name, "(*,*)");
          }
          else {
-            info = conf_info.vx_pd[i].fcst_info;
+            info = conf_info.vx_opt[i].vx_pd.fcst_info;
          }
 
          // Read the gridded data from the mean file
@@ -1437,40 +1447,39 @@ void process_grid_vx() {
       }
 
       // Loop through and apply each of the smoothing operations
-      for(j=0; j<conf_info.get_n_interp(); j++) {
+      for(j=0; j<conf_info.vx_opt[i].get_n_interp(); j++) {
+
+         // Store current settings
+         ConcatString mthd_str   = conf_info.vx_opt[i].interp_info.method[j];
+         InterpMthd   mthd       = string_to_interpmthd(mthd_str);
+         int          wdth       = conf_info.vx_opt[i].interp_info.width[j];
+         double       vld_thresh = conf_info.vx_opt[i].interp_info.vld_thresh;
+         GridTemplateFactory::GridTemplates shape = conf_info.vx_opt[i].interp_info.shape;
+         FieldType    field      = conf_info.vx_opt[i].interp_info.field;
 
          // Check for allowable smoothing operation
-         if(conf_info.interp_mthd[j] == InterpMthd_DW_Mean ||
-            conf_info.interp_mthd[j] == InterpMthd_LS_Fit  ||
-            conf_info.interp_mthd[j] == InterpMthd_Bilin   ||
-            conf_info.interp_mthd[j] == InterpMthd_Nbrhd) {
+         if(mthd == InterpMthd_DW_Mean || mthd == InterpMthd_LS_Fit  ||
+            mthd == InterpMthd_Bilin   || mthd == InterpMthd_Nbrhd) {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
-                 << interpmthd_to_string(conf_info.interp_mthd[j])
-                 << " smoothing option not supported for gridded observations.\n";
+                 << mthd_str << " smoothing option not supported for "
+                 << "gridded observations.\n";
             continue;
          }
 
          // Set the interpolation method and width
-         shc.set_interp_mthd(conf_info.interp_mthd[j], conf_info.interp_shape);
-         shc.set_interp_wdth(conf_info.interp_wdth[j]);
+         shc.set_interp_mthd(mthd, shape);
+         shc.set_interp_wdth(wdth);
 
          // If requested in the config file, smooth the forecast field
          for(k=0; k<ens_file_list.n_elements(); k++) {
 
-            if(conf_info.interp_field == FieldType_Fcst ||
-               conf_info.interp_field == FieldType_Both) {
+            if(field == FieldType_Fcst || field == FieldType_Both) {
                smooth_field(fcst_dp[k], fcst_dp_smooth[k],
-                            conf_info.interp_mthd[j],
-                            conf_info.interp_wdth[j],
-                            conf_info.interp_shape,
-                            conf_info.interp_thresh);
+                            mthd, wdth, shape, vld_thresh);
                if(conf_info.ens_ssvar_flag) {
                   smooth_field(emn_dp, emn_dp_smooth,
-                               conf_info.interp_mthd[j],
-                               conf_info.interp_wdth[j],
-                               conf_info.interp_shape,
-                               conf_info.interp_thresh);
+                               mthd, wdth, shape, vld_thresh);
                }
             }
             // Do not smooth the forecast field
@@ -1481,13 +1490,9 @@ void process_grid_vx() {
          } // end for k
 
          // If requested in the config file, smooth the observation field
-         if(conf_info.interp_field == FieldType_Obs ||
-            conf_info.interp_field == FieldType_Both) {
+         if(field == FieldType_Obs || field == FieldType_Both) {
             smooth_field(obs_dp, obs_dp_smooth,
-                         conf_info.interp_mthd[j],
-                         conf_info.interp_wdth[j],
-                         conf_info.interp_shape,
-                         conf_info.interp_thresh);
+                         mthd, wdth, shape, vld_thresh);
          }
          // Do not smooth the observation field
          else {
@@ -1495,26 +1500,28 @@ void process_grid_vx() {
          }
 
          // Loop through the masks to be applied
-         for(k=0; k<conf_info.get_n_mask_area(); k++) {
+         for(k=0; k<conf_info.vx_opt[i].get_n_mask_area(); k++) {
 
             // Set the mask name
-            shc.set_mask(conf_info.mask_name[k]);
+            shc.set_mask(conf_info.vx_opt[i].mask_name_area[k]);
+
+            // Store the current mask
+            mask_dp = conf_info.mask_dp_map[conf_info.vx_opt[i].mask_name_area[k]];
 
             // Initialize
             pd_all.clear();
             pd_all.set_ens_size(n_vx_vld[i]);
-            pd_all.skip_const = conf_info.vx_pd[i].pd[0][0][0].skip_const;
+            pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0][0][0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
-                                emn_dp_smooth, cmn_dp,
-                                conf_info.mask_dp[k], pd_all);
+                                emn_dp_smooth, cmn_dp, mask_dp, pd_all);
 
             mlog << Debug(2)
                  << "Processing gridded verification "
-                 << conf_info.vx_pd[i].fcst_info->magic_str()
+                 << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
                  << " versus "
-                 << conf_info.vx_pd[i].obs_info->magic_str()
+                 << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
                  << ", for observation type " << shc.get_obtype()
                  << ", over region " << shc.get_mask()
                  << ", for interpolation method "
@@ -1530,18 +1537,18 @@ void process_grid_vx() {
             pd_all.compute_pair_vals();
 
             // Write out the unfiltered observation rank field.
-            if(conf_info.ensemble_flag[i_nc_orank]) {
+            if(conf_info.nc_info.do_orank) {
                write_orank_nc(pd_all, obs_dp_smooth, i, j, k);
             }
 
             // Process each filtering threshold
-            for(l=0; l<conf_info.othr_ta[i].n_elements(); l++) {
+            for(l=0; l<conf_info.vx_opt[i].othr_ta.n_elements(); l++) {
 
                // Set the header column
-               shc.set_obs_thresh(conf_info.othr_ta[i][l]);
+               shc.set_obs_thresh(conf_info.vx_opt[i].othr_ta[l]);
 
                // Subset pairs using the current obs_thresh
-               pd = pd_all.subset_pairs(conf_info.othr_ta[i][l]);
+               pd = pd_all.subset_pairs(conf_info.vx_opt[i].othr_ta[l]);
 
                // Compute ensemble statistics
                pd.compute_stats();
@@ -1564,7 +1571,7 @@ void process_grid_vx() {
                // Write PHIST counts if greater than 0
                if(conf_info.output_flag[i_phist] != STATOutputType_None) {
 
-                  pd.phist_bin_size = conf_info.vx_pd[i].pd[0][0][0].phist_bin_size;
+                  pd.phist_bin_size = conf_info.vx_opt[i].vx_pd.pd[0][0][0].phist_bin_size;
                   pd.compute_phist();
 
                   if(pd.phist_na.sum() > 0) {
@@ -1591,7 +1598,7 @@ void process_grid_vx() {
                // Write SSVAR scores
                if(conf_info.output_flag[i_ssvar] != STATOutputType_None) {
 
-                  pd.ssvar_bin_size = conf_info.vx_pd[i].pd[0][0][0].ssvar_bin_size;
+                  pd.ssvar_bin_size = conf_info.vx_opt[i].vx_pd.pd[0][0][0].ssvar_bin_size;
                   pd.compute_ssvar();
 
                   // Make sure there are bins to process
@@ -1599,16 +1606,16 @@ void process_grid_vx() {
 
                      // Add rows to the output AsciiTables for SSVAR
                      stat_at.add_rows(pd.ssvar_bins[0].n_bin *
-                                      conf_info.ci_alpha.n_elements());
+                                      conf_info.vx_opt[i].ci_alpha.n_elements());
 
                      if(conf_info.output_flag[i_ssvar] == STATOutputType_Both) {
                         txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
-                                                 conf_info.ci_alpha.n_elements());
+                                                 conf_info.vx_opt[i].ci_alpha.n_elements());
                      }
 
                      // Write the SSVAR data for each alpha value
-                     for(m=0; m<conf_info.ci_alpha.n_elements(); m++) {
-                        write_ssvar_row(shc, &pd, conf_info.ci_alpha[m],
+                     for(m=0; m<conf_info.vx_opt[i].ci_alpha.n_elements(); m++) {
+                        write_ssvar_row(shc, &pd, conf_info.vx_opt[i].ci_alpha[m],
                            conf_info.output_flag[i_ssvar],
                            stat_at, i_stat_row,
                            txt_at[i_ssvar], i_txt_row[i_ssvar]);
@@ -1811,7 +1818,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_nc_file.text(), program_name,
-                       conf_info.model, conf_info.obtype, conf_info.desc);
+                       conf_info.model, conf_info.obtype);
 
    // Add the projection information
    write_netcdf_proj(nc_out, grid);
@@ -1821,10 +1828,12 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
    lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
 
    // Add the lat/lon variables
-   write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   if(conf_info.nc_info.do_latlon) {
+      write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
+   }
 
    // Add grid weight variable
-   if(conf_info.ensemble_flag[i_nc_weight]) {
+   if(conf_info.nc_info.do_weight) {
       write_netcdf_grid_weight(nc_out, &lat_dim, &lon_dim,
                                conf_info.grid_weight_flag, wgt_dp);
    }
@@ -1838,7 +1847,7 @@ void setup_nc_file(unixtime valid_ut, int lead_sec, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int  i, n_phist_bin, n_vld, max_col;
+   int  i, n, n_phist_bin, n_vld, max_col;
    ConcatString tmp_str;
 
    // Check to see if the text files have already been set up
@@ -1854,7 +1863,10 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Compute the number of PHIST bins
-   n_phist_bin = ceil(1.0 / conf_info.phist_bin_size.min());
+   for(i=n_phist_bin=0; i<conf_info.get_n_vx(); i++) {
+      n = ceil(1.0 / conf_info.vx_opt[i].vx_pd.pd[0][0][0].phist_bin_size);
+      n_phist_bin = (n > n_phist_bin ? n : n_phist_bin);
+   }
 
    // Store the maximum number of valid verification fields
    n_vld    = n_vx_vld.max();
@@ -2088,63 +2100,63 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
    } // end for i
 
    // Add the ensemble mean if requested
-   if(conf_info.ensemble_flag[i_nc_mean]) {
+   if(conf_info.nc_info.do_mean) {
       write_ens_var_float(i_ens, ens_mean, dp,
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation if requested
-   if(conf_info.ensemble_flag[i_nc_stdev]) {
+   if(conf_info.nc_info.do_stdev) {
       write_ens_var_float(i_ens, ens_stdev, dp,
                           "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation if requested
-   if(conf_info.ensemble_flag[i_nc_minus]) {
+   if(conf_info.nc_info.do_minus) {
       write_ens_var_float(i_ens, ens_minus, dp,
                           "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation if requested
-   if(conf_info.ensemble_flag[i_nc_plus]) {
+   if(conf_info.nc_info.do_plus) {
       write_ens_var_float(i_ens, ens_plus, dp,
                           "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value if requested
-   if(conf_info.ensemble_flag[i_nc_min]) {
+   if(conf_info.nc_info.do_min) {
       write_ens_var_float(i_ens, ens_min, dp,
                           "ENS_MIN",
                           "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value if requested
-   if(conf_info.ensemble_flag[i_nc_max]) {
+   if(conf_info.nc_info.do_max) {
       write_ens_var_float(i_ens, ens_max, dp,
                           "ENS_MAX",
                           "Ensemble Maximum");
    }
 
    // Add the ensemble range if requested
-   if(conf_info.ensemble_flag[i_nc_range]) {
+   if(conf_info.nc_info.do_range) {
       write_ens_var_float(i_ens, ens_range, dp,
                           "ENS_RANGE",
                           "Ensemble Range");
    }
 
    // Add the ensemble valid data count if requested
-   if(conf_info.ensemble_flag[i_nc_vld]) {
+   if(conf_info.nc_info.do_vld) {
       write_ens_var_int(i_ens, ens_vld, dp,
                         "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
 
    // Add the ensemble relative frequencies if requested
-   if(conf_info.ensemble_flag[i_nc_freq]) {
+   if(conf_info.nc_info.do_freq) {
 
       // Loop through each threshold
       for(i=0; i<conf_info.ens_ta[i_ens].n_elements(); i++) {
@@ -2191,15 +2203,18 @@ void write_ens_nc(int i_ens, DataPlane &dp) {
 void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
-   //NcVar *ens_var = (NcVar *) 0;
    NcVar ens_var;
-   ConcatString ens_var_name, name_str;
+   ConcatString ens_var_name, var_str, name_str, cs;
+
+   // Append nc_pairs_var_str config file entry
+   cs = conf_info.ens_var_str[i_ens];
+   if(cs.length() > 0) var_str << "_" << cs;
 
    // Construct the variable name
    ens_var_name << cs_erase
                 << conf_info.ens_info[i_ens]->name() << "_"
-                << conf_info.ens_info[i_ens]->level_name() << "_"
-                << type_str;
+                << conf_info.ens_info[i_ens]->level_name()
+                << var_str << "_" << type_str;
    ens_var = add_var(nc_out, (string)ens_var_name, ncFloat, lat_dim, lon_dim);
 
    //
@@ -2219,7 +2234,7 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
 
    // Add the variable attributes
    add_var_att_local(conf_info.ens_info[i_ens], &ens_var, false, dp,
-               name_str, long_name_str);
+                     name_str, long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
@@ -2237,15 +2252,18 @@ void write_ens_var_float(int i_ens, float *ens_data, DataPlane &dp,
 void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
-   //NcVar *ens_var = (NcVar *) 0;
    NcVar ens_var;
-   ConcatString ens_var_name, name_str;
+   ConcatString ens_var_name, var_str, name_str, cs;
+
+   // Append nc_pairs_var_str config file entry
+   cs = conf_info.ens_var_str[i_ens];
+   if(cs.length() > 0) var_str << "_" << cs;
 
    // Construct the variable name
    ens_var_name << cs_erase
                 << conf_info.ens_info[i_ens]->name() << "_"
-                << conf_info.ens_info[i_ens]->level_name() << "_"
-                << type_str;
+                << conf_info.ens_info[i_ens]->level_name()
+                << var_str << "_" << type_str;
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
@@ -2258,7 +2276,7 @@ void write_ens_var_int(int i_ens, int *ens_data, DataPlane &dp,
 
    // Add the variable attributes
    add_var_att_local(conf_info.ens_info[i_ens], &ens_var, true, dp,
-               name_str, long_name_str);
+                     name_str, long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
@@ -2348,29 +2366,34 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
                            const char *long_name_str) {
    NcVar nc_var;
    int wdth;
-   ConcatString mthd_str, var_name, name_str;
+   ConcatString mthd_str, var_name, var_str, name_str;
+
+   // Append nc_var_str config file entry
+   if(conf_info.vx_opt[i_vx].var_str.length() > 0) {
+      var_str << "_" << conf_info.vx_opt[i_vx].var_str;
+   }
 
    // Get the interpolation method string and width
-   mthd_str = interpmthd_to_string(conf_info.interp_mthd[i_interp]);
-   wdth     = conf_info.interp_wdth[i_interp];
+   mthd_str = conf_info.vx_opt[i_vx].interp_info.method[i_interp];
+   wdth     = conf_info.vx_opt[i_vx].interp_info.width[i_interp];
 
    // Build the orank variable name
    var_name << cs_erase
-            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
-            << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
-            << type_str << "_"
-            << conf_info.mask_name[i_mask];
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->level_name()
+            << var_str << "_" << type_str << "_"
+            << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
             << type_str << "_"
-            << conf_info.mask_name[i_mask];
+            << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Append smoothing information
    if((wdth > 1) &&
-      (conf_info.interp_field == FieldType_Obs ||
-       conf_info.interp_field == FieldType_Both)) {
+      (conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
+       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
@@ -2379,8 +2402,8 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_pd[i_vx].fcst_info, &nc_var, false, dp,
-               name_str, long_name_str);
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, false, dp,
+                     name_str, long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
@@ -2401,29 +2424,34 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
                          const char *long_name_str) {
    NcVar nc_var;
    int wdth;
-   ConcatString mthd_str, var_name, name_str;
+   ConcatString mthd_str, var_name, var_str, name_str;
+
+   // Append nc_var_str config file entry
+   if(conf_info.vx_opt[i_vx].var_str.length() > 0) {
+      var_str << "_" << conf_info.vx_opt[i_vx].var_str;
+   }
 
    // Get the interpolation method string and width
-   mthd_str = interpmthd_to_string(conf_info.interp_mthd[i_interp]);
-   wdth     = conf_info.interp_wdth[i_interp];
+   mthd_str = conf_info.vx_opt[i_vx].interp_info.method[i_interp];
+   wdth     = conf_info.vx_opt[i_vx].interp_info.width[i_interp];
 
    // Build the orank variable name
    var_name << cs_erase
-            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
-            << conf_info.vx_pd[i_vx].obs_info->level_name() << "_"
-            << type_str << "_"
-            << conf_info.mask_name[i_mask];
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->level_name()
+            << var_str << "_" << type_str << "_"
+            << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Construct the variable name attribute
    name_str << cs_erase
-            << conf_info.vx_pd[i_vx].obs_info->name() << "_"
+            << conf_info.vx_opt[i_vx].vx_pd.obs_info->name() << "_"
             << type_str << "_"
-            << conf_info.mask_name[i_mask];
+            << conf_info.vx_opt[i_vx].mask_name_area[i_mask];
 
    // Append smoothing information
    if((wdth > 1) &&
-      (conf_info.interp_field == FieldType_Obs ||
-       conf_info.interp_field == FieldType_Both)) {
+      (conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
+       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
@@ -2432,8 +2460,8 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_pd[i_vx].fcst_info, &nc_var, true, dp,
-               name_str, long_name_str);
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, true, dp,
+                     name_str, long_name_str);
 
    // Write the data
    if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
@@ -2449,7 +2477,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 ////////////////////////////////////////////////////////////////////////
 
 void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int, DataPlane &dp,
-                 const char *name_str, const char *long_name_str) {
+                       const char *name_str, const char *long_name_str) {
    ConcatString att_str;
 
    // Construct the long name
