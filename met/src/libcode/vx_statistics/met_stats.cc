@@ -1554,15 +1554,15 @@ v_diff = vf_bar - vo_bar;
    FSTDEV       = sqrt(uvff_bar - f_speed_bar*f_speed_bar);
    OSTDEV       = sqrt(uvoo_bar - o_speed_bar*o_speed_bar);
 
-   FDIR         = convert_u_v_to_wdir(-uf_bar, -vf_bar);
-   ODIR         = convert_u_v_to_wdir(-uo_bar, -vo_bar);
+   FDIR         = convert_u_v_to_wdir(uf_bar, vf_bar);
+   ODIR         = convert_u_v_to_wdir(uo_bar, vo_bar);
 
    FBAR_SPEED   = convert_u_v_to_wind(uf_bar, vf_bar);
    OBAR_SPEED   = convert_u_v_to_wind(uo_bar, vo_bar);
    
    VDIFF_SPEED  = convert_u_v_to_wind(u_diff, v_diff);
 
-   VDIFF_DIR    = convert_u_v_to_wdir(-u_diff, -v_diff);
+   VDIFF_DIR    = convert_u_v_to_wdir(u_diff, v_diff);
 
    SPEED_ERR    = FBAR_SPEED - OBAR_SPEED;
 
