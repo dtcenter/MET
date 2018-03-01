@@ -100,50 +100,41 @@ int main(int argc, char * argv []) {
    parse_command_line(argc, argv);
 
    //
-   // If a config file was specified, set up the default job using the
-   // config file.
+   // Read config file constants and the default config file.
+   //
+   default_config_file = replace_path(default_config_filename);
+   mlog << Debug(1)
+        << "Default Config File: " << default_config_file << "\n";
+   conf.read(replace_path(config_const_filename));
+   conf.read(default_config_file);
+
+   //
+   // Read the user config file
    //
    if(config_file.length() > 0) {
-
-      //
-      // Create the default config file name
-      //
-      default_config_file = replace_path(default_config_filename);
-
-      //
-      // List the config files
-      //
       mlog << Debug(1)
-           << "Default Config File: " << default_config_file << "\n"
-           << "User Config File: "    << config_file << "\n";
-
-      //
-      // Read config file constants, the default config file,
-      // and then the user config file.
-      //
-      conf.read(replace_path(config_const_filename));
-      conf.read(default_config_file);
+           << "User Config File: " << config_file << "\n";
       conf.read(config_file);
-
-      //
-      // Sanity check the command line and config file options
-      //
-      sanity_check();
-
-      //
-      // Setup the default job using the config file options
-      //
-      default_job.clear();
-      set_job_from_config(conf, default_job);
-      default_job.set_precision(conf.output_precision());
-
-      //
-      // Write out the default job
-      //
-      mlog << Debug(4)
-           << "Default Job from the config file: \""
-           << default_job.get_jobstring() << "\"\n";
    }
+
+   //
+   // Sanity check the command line and config file options
+   //
+   sanity_check();
+
+   //
+   // Setup the default job using the config file options
+   //
+   default_job.clear();
+   set_job_from_config(conf, default_job);
+   default_job.set_precision(conf.output_precision());
+
+   //
+   // Write out the default job
+   //
+   mlog << Debug(4)
+        << "Default Job from the config file: \""
+        << default_job.get_jobstring() << "\"\n";
 
    //
    // Enclose within a try block to catch any run time errors, and
@@ -167,7 +158,7 @@ int main(int argc, char * argv []) {
       //
       // If a config file was specified, process the jobs.
       //
-      if(config_file.length() != 0) {
+      if(config_file.length() > 0) {
 
          jobs_sa = conf.lookup_string_array(conf_key_jobs);
 
