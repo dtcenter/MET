@@ -2317,9 +2317,23 @@ output_stats = {
 //          Required Args: -dump_row
 //
 //       "summary"
-//          To compute the mean, standard deviation, and percentiles
-//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
-//          specified using the "-line_type" and "-column" arguments.
+//          To compute summary information for a set of statistics.
+//          The summary output includes the mean, standard deviation, percentiles
+//          (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range, and inter-quartile
+//          range.  Also included are columns summarizing the computation of WMO
+//          mean values.  Both unweighted and weighted mean values are reported,
+//          and they are computed using three types of logic:
+//             - simple arithmetic mean (default)
+//             - square root of the mean of the statistic squared
+//               (applied to columns listed in "wmo_sqrt_stats")
+//             - apply fisher transform
+//              (applied to columns listed in "wmo_fisher_stats")
+//          The columns of data to be summarized are specified in one of two ways:
+//             - Specify one -line_type option and one or more -column names.
+//             - Format the -column option as LINE_TYPE:COLUMN.
+//          Use the -derive job command option to automatically derive statistics
+//          on the fly from input contingency tables and partial sums.
+//
 //          For TCStat, the "-column" argument may be set to:
 //             "TRACK" for track, along-track, and cross-track errors.
 //             "WIND" for all wind radius errors.
@@ -2329,9 +2343,11 @@ output_stats = {
 //             "col" for a specific column name.
 //             "col1-col2" for a difference of two columns.
 //             "ABS(col or col1-col2)" for the absolute value.
+//
 //          Required Args: -line_type, -column
-//          Optional Args (TCStat): -by column_name to specify case information
-//                                  -out_alpha to override default alpha value of 0.05
+//          Optional Args: -by column_name to specify case information
+//                         -out_alpha to override default alpha value of 0.05
+//                         -derive to derive statistics on the fly
 //
 //       "aggregate"
 //          To aggregate the STAT data for the STAT line type specified using
@@ -2568,6 +2584,15 @@ jobs = [
    "-job aggregate      -line_type SSVAR -obtype MC_PCP -vx_mask HUC4_1605 -vx_mask HUC4_1803 -dump_row job_aggregate_SSVAR_in.stat",
    "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC -vx_mask HUC4_1605 -vx_mask HUC4_1803 -dump_row job_aggregate_stat_ORANK_RHIST_in.stat"
 ];
+
+//
+// List of statistics by the logic that should be applied when computing their
+// WMO mean value in the summary job.  Each entry is a line type followed by the
+// statistic name.  Statistics using the default arithemtic mean method do not
+// need to be listed.
+//
+wmo_sqrt_stats   = [];
+wmo_fisher_stats = [];
 
 //
 // The "vif_flag" entry is a boolean to indicate whether a variance inflation
