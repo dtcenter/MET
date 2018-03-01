@@ -1269,6 +1269,14 @@ ensemble_flag = {
 \begin_layout LyX-Code
 
 \series bold
+   latlon    = TRUE;
+\series default
+   
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    mean      = TRUE;
 \end_layout
 
@@ -1352,6 +1360,10 @@ ensemble_flag
 \end_layout
 
 \begin_layout Enumerate
+Grid Latitude and Longitude Fields
+\end_layout
+
+\begin_layout Enumerate
 Ensemble Mean Field
 \end_layout
 
@@ -1400,6 +1412,49 @@ Observation Ranks for input gridded observations are written to a separate
 \begin_layout Enumerate
 The grid area weights applied are written to the Observation Rank output
  file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+nc_var_str = "";
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The
+\series bold
+ nc_var_str
+\series medium
+ entry specifies a string for each ensemble field and verification task.
+ This string is parsed from each 
+\series bold
+ens.field
+\series medium
+ and 
+\series bold
+obs.field
+\series medium
+ dictionary entry and is used to customize the variable names written to
+ theNetCDF output file.
+ The default is an empty string, meaning that no customization is applied
+ to the output variable names.
+ When the Ensemble-Stat config file contains two fields with the same name
+ and level value, this entry is used to make the resulting variable names
+ unique.
 \end_layout
 
 \begin_layout Standard
