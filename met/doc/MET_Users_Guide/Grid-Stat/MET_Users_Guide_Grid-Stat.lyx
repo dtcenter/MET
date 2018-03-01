@@ -1863,9 +1863,12 @@ The
  nc_pairs_var_str
 \series medium
  entry specifies a string for each verification task.
- This string is parsed from each obs.field dictionary entry and is used to
- customize the variable names written to the NetCDF matched pairs output
- file.
+ This string is parsed from each 
+\series bold
+obs.field
+\series medium
+ dictionary entry and is used to customize the variable names written to
+ the NetCDF matched pairs output file.
  The default is an empty string, meaning that no customization is applied
  to the output variable names.
  When the Grid-Stat config file contains two fields with the same name and
