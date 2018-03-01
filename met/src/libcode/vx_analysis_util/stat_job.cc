@@ -98,7 +98,7 @@ void STATAnalysisJob::init_from_scratch() {
    line_type.set_ignore_case(1);
    column.set_ignore_case(1);
    column_case.set_ignore_case(1);
-//    hdr_name.set_ignore_case(1);
+   hdr_name.set_ignore_case(1);
 
    clear();
 
@@ -155,6 +155,10 @@ void STATAnalysisJob::clear() {
    line_type.clear();
    column.clear();
    weight.clear();
+
+   do_derive = false;
+   wmo_sqrt_stats.clear();
+   wmo_fisher_stats.clear();
 
    column_thresh_map.clear();
    column_str_map.clear();
@@ -272,6 +276,10 @@ void STATAnalysisJob::assign(const STATAnalysisJob & aj) {
    line_type            = aj.line_type;
    column               = aj.column;
    weight               = aj.weight;
+
+   do_derive            = aj.do_derive;
+   wmo_sqrt_stats       = aj.wmo_sqrt_stats;
+   wmo_fisher_stats     = aj.wmo_fisher_stats;
 
    column_thresh_map    = aj.column_thresh_map;
    column_str_map       = aj.column_str_map;
@@ -426,6 +434,9 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
 
    out << prefix << "weight ...\n";
    weight.dump(out, depth + 1);
+
+   out << prefix << "do_derive = "
+       << bool_to_string(do_derive) << "\n";
 
    out << prefix << "column_thresh_map ...\n";
    for(map<ConcatString,ThreshArray>::const_iterator thr_it = column_thresh_map.begin();
@@ -1142,6 +1153,9 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(strcmp(jc_array[i], "-weight") == 0) {
          weight.add_css(jc_array[i+1]);
          i++;
+      }
+      else if(strcmp(jc_array[i], "-derive") == 0) {
+         do_derive = true;
       }
       else if(strcmp(jc_array[i], "-column_min") == 0) {
          thresh_cs << cs_erase << ">=" << jc_array[i+2];
@@ -2095,6 +2109,11 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       for(i=0; i<weight.n_elements(); i++) {
          js << "-weight " << weight[i] << " ";
       }
+   }
+
+   // derive
+   if(do_derive != default_do_derive) {
+      js << "-derive ";
    }
 
    // column_thresh
