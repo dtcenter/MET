@@ -215,14 +215,15 @@ name "subsec:StA_Summary-statistics-for"
 \begin_layout Standard
 
 \series medium
-The Stat-Analysis tool can be used to produce summary information for a
- single column of data.
- After the user specifies the line type, column of interest, and any other
- relevant search criteria, summary information is produced from values in
- that column of data.
+The Stat-Analysis tool can be used to produce summary information for columns
+ of data.
+ After the user specifies the column(s) of interest and any other relevant
+ search criteria, summary information is produced from values in those column(s)
+ of data.
  The summary statistics produced are: mean, standard deviation, minimum,
  maximum, the 10th, 25th, 50th, 75th, and 90th percentiles, the interquartile
- range, and the range.
+ range, the range, and both weighted and unweighted means using the logic
+ prescribed by the World Meteorological Organization (WMO).
 \end_layout
 
 \begin_layout Standard
@@ -237,6 +238,118 @@ Confidence intervals are computed for the mean and standard deviation of
  In this application of the bootstrap method, the values in the column of
  data being summarized are resampled, and for each replicated sample, the
  mean and standard deviation are computed.
+\end_layout
+
+\begin_layout Standard
+The columns to be summarized can be specified in one of two ways.
+ Use the 
+\series bold
+-line_type
+\series default
+ option exactly once to specify a single input line type and use the 
+\series bold
+-column
+\series default
+ option one or more times to select the columns of data to be summarized.
+ Alternatively, use the 
+\series bold
+-column
+\series default
+ option one or more times formatting the entries as 
+\series bold
+LINE_TYPE:COLUMN
+\series default
+.
+ For example, the RMSE column from the CNT line type can be selected using
+\series bold
+ -line_type CNT -column RMSE 
+\series default
+or using 
+\series bold
+-column CNT:RMSE
+\series default
+.
+ With the second option, columns from multiple input line types may be selected.
+ For example, 
+\series bold
+-column CNT:RMSE,CNT:MAE,CTS:CSI
+\series default
+ select two CNT columns one CTS column.
+\end_layout
+
+\begin_layout Standard
+The WMO mean values are computed in one of three ways, as determined by
+ the configuration file settings for 
+\series bold
+wmo_sqrt_stats
+\series default
+ and 
+\series bold
+wmo_fisher_stats
+\series default
+.
+ The statistics listed in the first option are square roots.
+ When computing WMO means, the input values are first squared, then averaged,
+ and the square root of the average value is reported.
+ The statistics listed in the second option are correlations to which the
+ Fisher transformation is applied.
+ For any statistic not listed, the WMO mean is computed as a simple arithmetic
+ mean.
+ The 
+\series bold
+WMO_TYPE
+\series default
+ output column indicates the method applied (
+\series bold
+SQRT
+\series default
+, 
+\series bold
+FISHER
+\series default
+, or 
+\series bold
+MEAN
+\series default
+).
+ The 
+\series bold
+WMO_MEAN
+\series default
+ and 
+\series bold
+WMO_WEIGHTED_MEAN
+\series default
+ columns contain the unweighted and weighted means, respectively.
+ The value listed in the 
+\series bold
+TOTAL
+\series default
+ column of each input line is used as the weight.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+-derive
+\series default
+ job command option can be used to perform the derivation of statistics
+ on the fly from input partial sums and contingency table counts.
+ When enabled, SL1L2 and SAL1L2 input lines are converted to CNT statistics,
+ VL1L2 input lines are converted to VCNT statistics, and CTC lines are converted
+ to CTS statistics.
+ Users should take care with this option.
+ If the data passed to this job contains both partial sums and derived statistic
+s, using the 
+\series bold
+-derive
+\series default
+ option will effectively cause the statistics to be double counted.
+ Use the 
+\series bold
+-line_type
+\series default
+ job command option to filter the data passed to Stat-Analysis jobs.
 \end_layout
 
 \begin_layout Subsection
@@ -291,13 +404,13 @@ The Stat-Analysis tool can be used to aggregate multiple STAT lines of the
  MCTS, or NBRCTS) line type will be written out.
  If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, a continuous
  statistics (CNT) line type will be written out.
+ If a vector partial sums line type (VL1L2) has been aggregated, the vector
+ continuous statistics (VCNT) line type will be written out.
  For ensembles, the ORANK line type can be accumulated into RHIST, PHIST,
  RELP, or SSVAR output.
  If the matched pair line type (MPR) has been aggregated, the user may choose
- the line type to be output (FHO, CTC, CTS, CNT, MCTC, MCTS, WDIR, SL1L2,
- SAL1L2, PCT, PSTD, PJC, or PRC).
- Only wind vector statistics are produced from the vector partial sums line
- types (VL1L2 or VAL1L2).
+ the line type to be output (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2,
+ VL1L2, VCNT, WDIR, PCT, PSTD, PJC, or PRC).
 \end_layout
 
 \begin_layout Standard
@@ -2626,7 +2739,8 @@ summary
 
 \begin_layout Plain Layout
 Computes the mean, standard deviation, percentiles (min, 10th, 25th, 50th,
- 75th, 90th, and max), interquartile range, and range
+ 75th, 90th, and max), interquartile range, range, wmo_mean, and wmo_weighted_me
+an
 \end_layout
 
 \end_inset
@@ -2855,6 +2969,47 @@ reference "subsec:IO_General-MET-Config-Options"
 
 \series default
 .
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+wmo_sqrt_stats = [ "CNT:FSTDEV", "CNT:OSTDEV", "CNT:ESTDEV", "CNT:RMSE",
+ "CNT:RMSFA", "CNT:RMSOA",
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                   "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE", "VCNT:FSTDEV",
+ "VCNT:OSTDEV" ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR", "CNT:KT_CORR", "CNT:ANOM_CORR
+" ];
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+These entries specify lists of statistics in the form LINE_TYPE:COLUMN to
+ which the various WMO mean logic types should be applied for the summary
+ job type.
 \end_layout
 
 \begin_layout Standard
@@ -3377,7 +3532,7 @@ SUMMARY
 ", followed by a colon, then the total, mean with confidence intervals,
  standard deviation with confidence intervals, minimum value, percentiles
  (10th, 25th, 50th, 75th, and 90th), the maximum value, the interquartile
- range, and the range.
+ range, the range, and WMO mean information.
  The output columns are shown in Table 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -3420,7 +3575,7 @@ name "Columnar_output"
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="14" columns="2">
+<lyxtabular version="3" rows="17" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="5.25in">
@@ -3691,7 +3846,7 @@ Interquartile range (75th - 25th percentile)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3700,11 +3855,71 @@ Interquartile range (75th - 25th percentile)
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 Range (Maximum - Minimum)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+WMO Mean type
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+WMO Unweighted Mean value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+WMO Weighted Mean value
 \end_layout
 
 \end_inset
