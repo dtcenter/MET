@@ -588,24 +588,27 @@ static const char conf_key_wvlt_plot[]         = "wvlt_plot";
 // Ensemble-Stat specific parameter key names
 //
 
-static const char conf_key_ens[]                     = "ens";
-static const char conf_key_ens_field[]               = "ens.field";
-static const char conf_key_ens_ens_thresh[]          = "ens.ens_thresh";
-static const char conf_key_ens_vld_thresh[]          = "ens.vld_thresh";
-static const char conf_key_skip_const[]              = "skip_const";
-static const char conf_key_rng_type[]                = "rng.type";
-static const char conf_key_rng_seed[]                = "rng.seed";
-static const char conf_key_ensemble_flag[]           = "ensemble_flag";
-static const char conf_key_ssvar_bin[]               = "ens_ssvar_bin_size";
-static const char conf_key_phist_bin[]               = "ens_phist_bin_size";
-static const char * conf_key_ensemble_flag_entries[] = {
-   "mean", "stdev", "minus",     "plus",      "min",
-   "max",  "range", "vld_count", "frequency", "rank",
-   "weight"
-};
-static const int n_conf_key_ensemble_flag_entries =
-                    sizeof(conf_key_ensemble_flag_entries)/
-                    sizeof(*conf_key_ensemble_flag_entries);
+static const char conf_key_ens[]            = "ens";
+static const char conf_key_ens_field[]      = "ens.field";
+static const char conf_key_ens_ens_thresh[] = "ens.ens_thresh";
+static const char conf_key_ens_vld_thresh[] = "ens.vld_thresh";
+static const char conf_key_nc_var_str[]     = "nc_var_str";
+static const char conf_key_skip_const[]     = "skip_const";
+static const char conf_key_rng_type[]       = "rng.type";
+static const char conf_key_rng_seed[]       = "rng.seed";
+static const char conf_key_ensemble_flag[]  = "ensemble_flag";
+static const char conf_key_mean_flag[]      = "mean";
+static const char conf_key_stdev_flag[]     = "stdev";
+static const char conf_key_minus_flag[]     = "minus";
+static const char conf_key_plus_flag[]      = "plus";
+static const char conf_key_min_flag[]       = "min";
+static const char conf_key_max_flag[]       = "max";
+static const char conf_key_range_flag[]     = "range";
+static const char conf_key_vld_count_flag[] = "vld_count";
+static const char conf_key_frequency_flag[] = "frequency";
+static const char conf_key_rank_flag[]      = "rank";
+static const char conf_key_ssvar_bin[]      = "ens_ssvar_bin_size";
+static const char conf_key_phist_bin[]      = "ens_phist_bin_size";
 
 //
 // STAT-Analysis specific parameter key names
