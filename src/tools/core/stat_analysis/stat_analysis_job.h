@@ -22,6 +22,7 @@
 //   004    03/07/13  Halley Gotway   Add aggregate SSVAR lines.
 //   005    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //   006    10/09/17  Halley Gotway   Add aggregate GRAD lines.
+//   007    03/01/18  Halley Gotway   Update summary job type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -79,6 +80,10 @@ extern void do_job_ramp(const ConcatString &, LineDataFile &,
 
 extern void write_job_aggr_hdr(STATAnalysisJob &,
                int, int, AsciiTable &);
+
+extern void write_job_summary(STATAnalysisJob &,
+               map<ConcatString, AggrSummaryInfo> &, AsciiTable &,
+               gsl_rng *);
 
 extern void write_job_aggr_ctc(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrCTCInfo> &, AsciiTable &);
