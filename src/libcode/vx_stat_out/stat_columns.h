@@ -314,13 +314,14 @@ static const char * relp_columns [] = {
    "TOTAL",       "N_ENS",       "RELP_"
 };
 
-static const char * job_sum_columns [] = {
+static const char * job_summary_columns [] = {
    "TOTAL",
    "MEAN",        "MEAN_NCL",    "MEAN_NCU",     "MEAN_BCL",    "MEAN_BCU",
    "STDEV",       "STDEV_BCL",   "STDEV_BCU",
    "MIN",
    "P10",         "P25",         "P50",          "P75",         "P90",
-   "MAX",         "IQR",         "RANGE"
+   "MAX",         "IQR",         "RANGE",
+   "WMO_TYPE",    "WMO_MEAN",    "WMO_WEIGHTED_MEAN"
 };
 
 static const char * job_go_columns [] = {
@@ -387,7 +388,7 @@ static const int n_grad_columns         = sizeof(grad_columns)/sizeof(*grad_colu
 
 static const int n_isc_columns          = sizeof(isc_columns)/sizeof(*isc_columns);
 
-static const int n_job_sum_columns      = sizeof(job_sum_columns)/sizeof(*job_sum_columns);
+static const int n_job_summary_columns  = sizeof(job_summary_columns)/sizeof(*job_summary_columns);
 static const int n_job_go_columns       = sizeof(job_go_columns)/sizeof(*job_go_columns);
 static const int n_job_ss_columns       = sizeof(job_ss_columns)/sizeof(*job_ss_columns);
 static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_wdir_columns);
