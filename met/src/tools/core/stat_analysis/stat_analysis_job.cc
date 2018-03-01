@@ -678,17 +678,24 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //    MPR -> WDIR
    //
    else if(in_lt  == stat_mpr &&
-           out_lt == stat_wdir) {
+           (out_lt == stat_wdir ||
+            out_lt == stat_vl1l2 ||
+            out_lt == stat_vcnt)) {
 
       mlog << Debug(4) << "do_job_aggr_stat() -> "
-           << "For MPR to WDIR conversion, searching for UGRD and VGRD MPR lines.\n";
+           << "For MPR wind aggregation, searching for UGRD and VGRD MPR lines.\n";
 
       j.fcst_var.clear();
       j.fcst_var.add(ugrd_abbr_str);
       j.fcst_var.add(vgrd_abbr_str);
 
       aggr_mpr_wind_lines(f, j, wind_map, n_in, n_out);
-      write_job_aggr_wind(j, in_lt, wind_map, out_at);
+      if(out_lt == stat_wdir) {
+         write_job_aggr_wind(j, in_lt, wind_map, out_at);
+      }
+      else {
+         write_job_aggr_mpr_wind(j, out_lt, wind_map, out_at);
+      }
    }
 
    //
@@ -2687,6 +2694,81 @@ void write_job_aggr_mpr(STATAnalysisJob &j, STATLineType lt,
          write_case_cols(it->first, at, r, c);
          write_prc_cols(pct_info, at, r, c);
          if(j.stat_out) write_prc_cols(pct_info, j.stat_at, r, n_header_columns);
+      }
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_mpr_wind(STATAnalysisJob &j, STATLineType lt,
+                             map<ConcatString, AggrWindInfo> &m,
+                             AsciiTable &at) {
+   map<ConcatString, AggrWindInfo>::iterator it;
+   int n_row, n_col, r, c;
+   StatHdrColumns shc;
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + j.column_case.n_elements();
+        if(lt == stat_vl1l2) n_col += n_vl1l2_columns;
+   else if(lt == stat_vcnt)  n_col += n_vcnt_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+        if(lt == stat_vl1l2) write_header_row(vl1l2_columns, n_vl1l2_columns, 0, at, 0, c);
+   else if(lt == stat_vcnt)  write_header_row(vcnt_columns,  n_vcnt_columns,  0, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   j.setup_stat_file(n_row, 0);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      if(j.stat_out) {
+         if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(j.out_alpha);
+         write_header_cols(shc, j.stat_at, r);
+      }
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // VL1L2 output line
+      //
+      if(lt == stat_vl1l2) {
+         at.set_entry(r, c++, "VL1L2:");
+         write_case_cols(it->first, at, r, c);
+         write_vl1l2_cols(it->second.vl1l2_info, at, r, c);
+         if(j.stat_out) write_vl1l2_cols(it->second.vl1l2_info, j.stat_at, r, n_header_columns);
+      }
+      //
+      // VCNT output line
+      //
+      else if(lt == stat_vcnt) {
+         at.set_entry(r, c++, "VCNT:");
+         write_case_cols(it->first, at, r, c);
+         write_vcnt_cols(it->second.vl1l2_info, at, r, c);
+         if(j.stat_out) write_vcnt_cols(it->second.vl1l2_info, j.stat_at, r, n_header_columns);
       }
    } // end for it
 

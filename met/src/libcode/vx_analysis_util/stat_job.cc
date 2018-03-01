@@ -1143,7 +1143,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(strcmp(jc_array[i], "-line_type") == 0) {
-         line_type.add_css(jc_array[i+1]);
+         line_type.add_css(to_upper(jc_array[i+1]));
          i++;
       }
       else if(strcmp(jc_array[i], "-column") == 0) {
@@ -1639,6 +1639,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_mctc:   c = get_n_mctc_columns(n);  break;
          case stat_mcts:   c = n_mcts_columns;         break;
          case stat_cnt:    c = n_cnt_columns;          break;
+         case stat_vcnt:   c = n_vcnt_columns;         break;
          case stat_pct:    c = get_n_pct_columns(n);   break;
          case stat_pstd:   c = get_n_pstd_columns(n);  break;
          case stat_pjc:    c = get_n_pjc_columns(n);   break;
@@ -1695,6 +1696,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       case stat_mctc:   write_mctc_header_row  (1, n,                                    stat_at, 0, 0); break;
       case stat_mcts:   write_header_row       (mcts_columns, n_mcts_columns, 1,         stat_at, 0, 0); break;
       case stat_cnt:    write_header_row       (cnt_columns, n_cnt_columns, 1,           stat_at, 0, 0); break;
+      case stat_vcnt:   write_header_row       (vcnt_columns, n_vcnt_columns, 1,         stat_at, 0, 0); break;
       case stat_pct:    write_pct_header_row   (1, n,                                    stat_at, 0, 0); break;
       case stat_pstd:   write_pstd_header_row  (1, n,                                    stat_at, 0, 0); break;
       case stat_pjc:    write_pjc_header_row   (1, n,                                    stat_at, 0, 0); break;

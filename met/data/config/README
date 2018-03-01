@@ -2389,6 +2389,7 @@ output_stats = {
 //          -line_type MPR,           -out_line_type FHO, CTC, CTS,
 //                                                   MCTC, MCTS, CNT,
 //                                                   SL1L2, SAL1L2,
+//                                                   VL1L2, VCNT,
 //                                                   PCT, PSTD, PJC, PRC, ECLV,
 //                                                   WDIR (wind direction)
 //          Required Args:
