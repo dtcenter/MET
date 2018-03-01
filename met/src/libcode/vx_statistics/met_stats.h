@@ -95,6 +95,8 @@ class CTSInfo {
       void add(double, double);
       void compute_stats();
       void compute_ci();
+
+      double get_stat(const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -185,6 +187,8 @@ class CNTInfo {
       void clear();
       void allocate_n_alpha(int);
       void compute_ci();
+
+      double get_stat(const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -348,6 +352,8 @@ class VL1L2Info {
 
       void zero_out();
       void clear();
+
+      double get_stat(const char *);
 };
 
 ////////////////////////////////////////////////////////////////////////

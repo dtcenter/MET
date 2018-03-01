@@ -420,6 +420,42 @@ void CTSInfo::compute_ci() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+double CTSInfo::get_stat(const char *stat_name) {
+   double v;
+
+        if(strcmp(stat_name, "TOTAL") == 0) v = cts.n();
+   else if(strcmp(stat_name, "BASER") == 0) v = cts.baser();
+   else if(strcmp(stat_name, "FMEAN") == 0) v = cts.fmean();
+   else if(strcmp(stat_name, "ACC"  ) == 0) v = cts.accuracy();
+   else if(strcmp(stat_name, "FBIAS") == 0) v = cts.fbias();
+   else if(strcmp(stat_name, "PODY" ) == 0) v = cts.pod_yes();
+   else if(strcmp(stat_name, "PODN" ) == 0) v = cts.pod_no();
+   else if(strcmp(stat_name, "POFD" ) == 0) v = cts.pofd();
+   else if(strcmp(stat_name, "FAR"  ) == 0) v = cts.far();
+   else if(strcmp(stat_name, "CSI"  ) == 0) v = cts.csi();
+   else if(strcmp(stat_name, "GSS"  ) == 0) v = cts.gss();
+   else if(strcmp(stat_name, "HK"   ) == 0) v = cts.hk();
+   else if(strcmp(stat_name, "HSS"  ) == 0) v = cts.hss();
+   else if(strcmp(stat_name, "ODDS" ) == 0) v = cts.odds();
+   else if(strcmp(stat_name, "LODDS") == 0) v = cts.lodds();
+   else if(strcmp(stat_name, "ORSS" ) == 0) v = cts.orss();
+   else if(strcmp(stat_name, "EDS"  ) == 0) v = cts.eds();
+   else if(strcmp(stat_name, "SEDS" ) == 0) v = cts.seds();
+   else if(strcmp(stat_name, "EDI"  ) == 0) v = cts.edi();
+   else if(strcmp(stat_name, "SEDI" ) == 0) v = cts.sedi();
+   else if(strcmp(stat_name, "BAGSS") == 0) v = cts.bagss();
+   else {
+      mlog << Error << "\nCTSInfo::get_stat() -> "
+           << "unknown categorical statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class MCTSInfo
 //
@@ -934,6 +970,51 @@ void CNTInfo::compute_ci() {
    } // end for i
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double CNTInfo::get_stat(const char *stat_name) {
+   double v;
+
+        if(strcmp(stat_name, "TOTAL"     ) == 0) v = n;
+   else if(strcmp(stat_name, "FBAR"      ) == 0) v = fbar.v;
+   else if(strcmp(stat_name, "FSTDEV"    ) == 0) v = fstdev.v;
+   else if(strcmp(stat_name, "OBAR"      ) == 0) v = obar.v;
+   else if(strcmp(stat_name, "OSTDEV"    ) == 0) v = ostdev.v;
+   else if(strcmp(stat_name, "PR_CORR"   ) == 0) v = pr_corr.v;
+   else if(strcmp(stat_name, "SP_CORR"   ) == 0) v = sp_corr.v;
+   else if(strcmp(stat_name, "KT_CORR"   ) == 0) v = kt_corr.v;
+   else if(strcmp(stat_name, "RANKS"     ) == 0) v = n_ranks;
+   else if(strcmp(stat_name, "FRANK_TIES") == 0) v = frank_ties;
+   else if(strcmp(stat_name, "ORANK_TIES") == 0) v = orank_ties;
+   else if(strcmp(stat_name, "ME"        ) == 0) v = me.v;
+   else if(strcmp(stat_name, "ESTDEV"    ) == 0) v = estdev.v;
+   else if(strcmp(stat_name, "MBIAS"     ) == 0) v = mbias.v;
+   else if(strcmp(stat_name, "MAE"       ) == 0) v = mae.v;
+   else if(strcmp(stat_name, "MSE"       ) == 0) v = mse.v;
+   else if(strcmp(stat_name, "BCMSE"     ) == 0) v = bcmse.v;
+   else if(strcmp(stat_name, "RMSE"      ) == 0) v = rmse.v;
+   else if(strcmp(stat_name, "E10"       ) == 0) v = e10.v;
+   else if(strcmp(stat_name, "E25"       ) == 0) v = e25.v;
+   else if(strcmp(stat_name, "E50"       ) == 0) v = e50.v;
+   else if(strcmp(stat_name, "E75"       ) == 0) v = e75.v;
+   else if(strcmp(stat_name, "E90"       ) == 0) v = e90.v;
+   else if(strcmp(stat_name, "EIQR"      ) == 0) v = eiqr.v;
+   else if(strcmp(stat_name, "MAD  "     ) == 0) v = mad.v;
+   else if(strcmp(stat_name, "ANOM_CORR" ) == 0) v = anom_corr.v;
+   else if(strcmp(stat_name, "ME2"       ) == 0) v = me2.v;
+   else if(strcmp(stat_name, "MSESS"     ) == 0) v = msess.v;
+   else if(strcmp(stat_name, "RMSFA"     ) == 0) v = rmsfa.v;
+   else if(strcmp(stat_name, "RMSOA"     ) == 0) v = rmsoa.v;
+   else {
+      mlog << Error << "\nCNTInfo::get_stat() -> "
+           << "unknown continuous statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1559,7 +1640,7 @@ v_diff = vf_bar - vo_bar;
 
    FBAR_SPEED   = convert_u_v_to_wind(uf_bar, vf_bar);
    OBAR_SPEED   = convert_u_v_to_wind(uo_bar, vo_bar);
-   
+
    VDIFF_SPEED  = convert_u_v_to_wind(u_diff, v_diff);
 
    VDIFF_DIR    = convert_u_v_to_wdir(u_diff, v_diff);
@@ -1817,6 +1898,40 @@ if ( vcount > 0 )  {
 
    return;
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double VL1L2Info::get_stat(const char *stat_name) {
+   double v;
+
+        if(strcmp(stat_name, "TOTAL"       ) == 0) v = vcount;
+   else if(strcmp(stat_name, "FBAR"        ) == 0) v = FBAR;
+   else if(strcmp(stat_name, "OBAR"        ) == 0) v = OBAR;
+   else if(strcmp(stat_name, "FS_RMS"      ) == 0) v = FS_RMS;
+   else if(strcmp(stat_name, "OS_RMS"      ) == 0) v = OS_RMS;
+   else if(strcmp(stat_name, "MSVE"        ) == 0) v = MSVE;
+   else if(strcmp(stat_name, "RMSVE"       ) == 0) v = RMSVE;
+   else if(strcmp(stat_name, "FSTDEV"      ) == 0) v = FSTDEV;
+   else if(strcmp(stat_name, "OSTDEV"      ) == 0) v = OSTDEV;
+   else if(strcmp(stat_name, "FDIR"        ) == 0) v = FDIR;
+   else if(strcmp(stat_name, "ODIR"        ) == 0) v = ODIR;
+   else if(strcmp(stat_name, "FBAR_SPEED"  ) == 0) v = FBAR_SPEED;
+   else if(strcmp(stat_name, "OBAR_SPEED"  ) == 0) v = OBAR_SPEED;
+   else if(strcmp(stat_name, "VDIFF_SPEED" ) == 0) v = VDIFF_SPEED;
+   else if(strcmp(stat_name, "VDIFF_DIR"   ) == 0) v = VDIFF_DIR;
+   else if(strcmp(stat_name, "SPEED_ERR"   ) == 0) v = SPEED_ERR;
+   else if(strcmp(stat_name, "SPEED_ABSERR") == 0) v = SPEED_ABSERR;
+   else if(strcmp(stat_name, "DIR_ERR"     ) == 0) v = DIR_ERR;
+   else if(strcmp(stat_name, "DIR_ABSERR"  ) == 0) v = DIR_ABSERR;
+   else {
+      mlog << Error << "\nVL1L2Info::get_stat() -> "
+           << "unknown continuous statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
