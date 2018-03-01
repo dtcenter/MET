@@ -558,13 +558,13 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    AsciiTable out_at;
    int i, n;
 
-   map<ConcatString, AggrCTCInfo>   ctc_map;
-   map<ConcatString, AggrMCTCInfo>  mctc_map;
-   map<ConcatString, AggrPCTInfo>   pct_map;
-   map<ConcatString, AggrPSumInfo>  psum_map;
-   map<ConcatString, AggrWindInfo>  wind_map;
-   map<ConcatString, AggrENSInfo>   orank_map;
-   map<ConcatString, AggrMPRInfo>   mpr_map;
+   map<ConcatString, AggrCTCInfo>  ctc_map;
+   map<ConcatString, AggrMCTCInfo> mctc_map;
+   map<ConcatString, AggrPCTInfo>  pct_map;
+   map<ConcatString, AggrPSumInfo> psum_map;
+   map<ConcatString, AggrWindInfo> wind_map;
+   map<ConcatString, AggrENSInfo>  orank_map;
+   map<ConcatString, AggrMPRInfo>  mpr_map;
 
    //
    // Check that the -line_type and -out_line_type options have been
@@ -590,6 +590,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //    -line_type FHO,   CTC,    -out_line_type CTS, ECLV
    //    -line_type MCTC,          -out_line_type MCTS
    //    -line_type SL1L2, SAL1L2, -out_line_type CNT
+   //    -line_type VL1L2          -out_line_type VCNT
    //    -line_type VL1L2, VAL1L2, -out_line_type WDIR (wind direction)
    //    -line_type PCT,           -out_line_type PSTD, PJC, PRC, ECLV
    //    -line_type NBRCTC,        -out_line_type NBRCTS
@@ -647,6 +648,16 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    else if((in_lt  == stat_sl1l2 ||
             in_lt  == stat_sal1l2) &&
             out_lt == stat_cnt) {
+      aggr_psum_lines(f, j, psum_map, n_in, n_out);
+      write_job_aggr_psum(j, out_lt, psum_map, out_at);
+   }
+
+   //
+   // Sum the vector partial sum line types:
+   //    VL1L2 -> VCNT
+   //
+   else if(in_lt  == stat_vl1l2 &&
+           out_lt == stat_vcnt) {
       aggr_psum_lines(f, j, psum_map, n_in, n_out);
       write_job_aggr_psum(j, out_lt, psum_map, out_at);
    }
@@ -1486,6 +1497,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_vl1l2)  n_col += n_vl1l2_columns;
    else if(lt == stat_val1l2) n_col += n_val1l2_columns;
    else if(lt == stat_cnt)    n_col += n_cnt_columns;
+   else if(lt == stat_vcnt)   n_col += n_vcnt_columns;
    else if(lt == stat_nbrcnt) n_col += n_nbrcnt_columns;
    write_job_aggr_hdr(j, n_row, n_col, at);
 
@@ -1498,6 +1510,7 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
    else if(lt == stat_vl1l2)  write_header_row(vl1l2_columns,  n_vl1l2_columns,  0, at, 0, c);
    else if(lt == stat_val1l2) write_header_row(val1l2_columns, n_val1l2_columns, 0, at, 0, c);
    else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
+   else if(lt == stat_vcnt)   write_header_row(vcnt_columns,   n_vcnt_columns,   0, at, 0, c);
    else if(lt == stat_nbrcnt) write_header_row(nbrcnt_columns, n_nbrcnt_columns, 0, at, 0, c);
 
    //
@@ -1588,6 +1601,15 @@ void write_job_aggr_psum(STATAnalysisJob &j, STATLineType lt,
          write_case_cols(it->first, at, r, c);
          write_cnt_cols(it->second.cnt_info, 0, at, r, c);
          if(j.stat_out) write_cnt_cols(it->second.cnt_info, 0, j.stat_at, r, n_header_columns);
+      }
+      //
+      // VCNT output line
+      //
+      else if(lt == stat_vcnt) {
+         at.set_entry(r, c++, "VCNT:");
+         write_case_cols(it->first, at, r, c);
+         write_vcnt_cols(it->second.vl1l2_info, at, r, c);
+         if(j.stat_out) write_vcnt_cols(it->second.vl1l2_info, j.stat_at, r, n_header_columns);
       }
       //
       // NBRCNT output line

@@ -267,12 +267,6 @@ class VL1L2Info {
       SingleThresh othresh;
       SetLogic     logic;
 
-
-         // New VL1L2 Quantities added from vector stats whitepaper
-
-      double f_speed_bar;
-      double o_speed_bar;
-
          // VL1L2 Quantities
 
       double uf_bar;
@@ -283,6 +277,11 @@ class VL1L2Info {
       double uvfo_bar;
       double uvff_bar;
       double uvoo_bar;
+
+         // New VL1L2 Quantities added from vector stats whitepaper
+
+      double f_speed_bar;
+      double o_speed_bar;
 
          // New VL1L2 Quantities added from vector stats whitepaper
 
@@ -314,7 +313,6 @@ class VL1L2Info {
 
       double DIR_ERR;
       double DIR_ABSERR;
-
 
          //
          //  extra VL1L2 quantities for NCEP
