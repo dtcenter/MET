@@ -125,6 +125,9 @@ extern void write_job_aggr_mpr(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrMPRInfo> &, AsciiTable &,
                const char *, gsl_rng *);
 
+extern void write_job_aggr_mpr_wind(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrWindInfo> &, AsciiTable &);
+
 extern void write_job_ramp(STATAnalysisJob &,
                map<ConcatString, AggrTimeSeriesInfo> &,
                AsciiTable &, AsciiTable &, AsciiTable &);

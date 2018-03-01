@@ -1872,8 +1872,8 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
-                     map<ConcatString, AggrWindInfo> &m,
-                     int &n_in, int &n_out) {
+                         map<ConcatString, AggrWindInfo> &m,
+                         int &n_in, int &n_out) {
    STATLine line;
    AggrWindInfo aggr;
    VL1L2Info v_info;
@@ -2029,8 +2029,9 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
    for(it = m.begin(); it != m.end(); it++) {
 
       //
-      // Clear contents
+      // Initialize
       //
+      aggr.hdr = it->second.hdr;
       aggr.vl1l2_info.clear();
       aggr.hdr_sa.clear();
       aggr.uf_na.clear();
@@ -2097,17 +2098,21 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Keep running partial sums of matches
          //
-         v_info.vcount   = 1;
-         v_info.uf_bar   = it->second.uf_na[i];
-         v_info.vf_bar   = it->second.vf_na[i];
-         v_info.uo_bar   = it->second.uo_na[i];
-         v_info.vo_bar   = it->second.vo_na[i];
-         v_info.uvfo_bar = it->second.uf_na[i]*it->second.uo_na[i] +
-                           it->second.vf_na[i]*it->second.vo_na[i];
-         v_info.uvff_bar = it->second.uf_na[i]*it->second.uf_na[i] +
-                           it->second.vf_na[i]*it->second.vf_na[i];
-         v_info.uvoo_bar = it->second.uo_na[i]*it->second.uo_na[i] +
-                           it->second.vo_na[i]*it->second.vo_na[i];
+         v_info.vcount      = 1;
+         v_info.uf_bar      = it->second.uf_na[i];
+         v_info.vf_bar      = it->second.vf_na[i];
+         v_info.uo_bar      = it->second.uo_na[i];
+         v_info.vo_bar      = it->second.vo_na[i];
+         v_info.uvfo_bar    = it->second.uf_na[i]*it->second.uo_na[i] +
+                              it->second.vf_na[i]*it->second.vo_na[i];
+         v_info.uvff_bar    = it->second.uf_na[i]*it->second.uf_na[i] +
+                              it->second.vf_na[i]*it->second.vf_na[i];
+         v_info.uvoo_bar    = it->second.uo_na[i]*it->second.uo_na[i] +
+                              it->second.vo_na[i]*it->second.vo_na[i];
+         v_info.f_speed_bar = sqrt(it->second.uf_na[i]*it->second.uf_na[i] +
+                                   it->second.vf_na[i]*it->second.vf_na[i]);
+         v_info.o_speed_bar = sqrt(it->second.uo_na[i]*it->second.uo_na[i] +
+                                   it->second.vo_na[i]*it->second.vo_na[i]);
          aggr.vl1l2_info += v_info;
 
          //
