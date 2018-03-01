@@ -639,6 +639,8 @@ static const char conf_key_line_type[]         = "line_type";
 static const char conf_key_column[]            = "column";
 static const char conf_key_out_alpha[]         = "out_alpha";
 static const char conf_key_vif_flag[]          = "vif_flag";
+static const char conf_key_wmo_sqrt_stats[]    = "wmo_sqrt_stats";
+static const char conf_key_wmo_fisher_stats[]  = "wmo_fisher_stats";
 static const char conf_key_jobs[]              = "jobs";
 
 //
