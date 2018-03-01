@@ -29,6 +29,7 @@
 //   009    03/30/15  Halley Gotway   Add ramp job type.
 //   010    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //   011    06/09/17  Halley Gotway   Add aggregate GRAD lines.
+//   012    03/01/18  Halley Gotway   Update summary job type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -139,6 +140,162 @@ void StatHdrInfo::add(const STATLine &line) {
       cov_thresh.add(line.get_item("COV_THRESH", false));
    if(!alpha.has(line.alpha()))
       alpha.add(line.alpha());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check for and print debug and warning messages about multiple header
+// column values found.
+//
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrInfo::check_shc(const ConcatString &cur_case) {
+
+   // MODEL
+   if(model.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << model.n_elements()
+           << " unique MODEL values: "
+           << write_css(model) << "\n";
+   }
+
+   // DESC
+   if(desc.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << desc.n_elements()
+           << " unique DESC values: "
+           << write_css(desc) << "\n";
+   }
+
+   // FCST_LEAD
+   if(fcst_lead.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << fcst_lead.n_elements()
+           << " unique FCST_LEAD values: "
+           << write_css_hhmmss(fcst_lead) << "\n";
+   }
+
+   // OBS_LEAD
+   if(obs_lead.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << obs_lead.n_elements()
+           << " unique OBS_LEAD values: "
+           << write_css_hhmmss(obs_lead) << "\n";
+   }
+
+   // FCST_VAR
+   if(fcst_var.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << fcst_var.n_elements()
+           << " unique FCST_VAR values: "
+           << write_css(fcst_var) << "\n";
+   }
+
+   // FCST_LEV
+   if(fcst_lev.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << fcst_lev.n_elements()
+           << " unique FCST_LEV values: "
+           << write_css(fcst_lev) << "\n";
+   }
+
+   // OBS_VAR
+   if(obs_var.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << obs_var.n_elements()
+           << " unique OBS_VAR values: "
+           << write_css(obs_var) << "\n";
+   }
+
+   // OBS_LEV
+   if(obs_lev.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << obs_lev.n_elements()
+           << " unique OBS_LEV values: "
+           << write_css(obs_lev) << "\n";
+   }
+
+   // OBTYPE
+   if(obtype.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << obtype.n_elements()
+           << " unique OBTYPE values: "
+           << write_css(obtype) << "\n";
+   }
+
+   // VX_MASK
+   if(vx_mask.n_elements() > 1) {
+      mlog << Debug(2)
+           << "For case \"" << cur_case << "\", found "
+           << vx_mask.n_elements()
+           << " unique VX_MASK values: "
+           << write_css(vx_mask) << "\n";
+   }
+
+   // INTERP_MTHD
+   if(interp_mthd.n_elements() > 1) {
+      mlog << Warning
+           << "For case \"" << cur_case << "\", found "
+           << interp_mthd.n_elements()
+           << " unique INTERP_MTHD values: "
+           << write_css(interp_mthd) << ".\n";
+   }
+
+   // INTERP_PNTS
+   if(interp_pnts.n_elements() > 1) {
+      mlog << Warning
+           << "For case \"" << cur_case << "\", found "
+           << interp_pnts.n_elements()
+           << " unique INTERP_PNTS values: "
+           << write_css(interp_pnts) << ".\n";
+   }
+
+   // FCST_THRESH
+   if(fcst_thresh.n_elements() > 1) {
+      mlog << Warning
+           << "For case \"" << cur_case << "\", found "
+           << fcst_thresh.n_elements()
+           << " unique FCST_THRESH values: "
+           << write_css(fcst_thresh) << "\n";
+   }
+
+   // OBS_THRESH
+   if(obs_thresh.n_elements() > 1) {
+      mlog << Warning
+           << "For case \"" << cur_case << "\", found "
+           << obs_thresh.n_elements()
+           << " unique OBS_THRESH values: "
+           << write_css(obs_thresh) << "\n";
+   }
+
+   // COV_THRESH
+   if(cov_thresh.n_elements() > 1) {
+      mlog << Warning
+           << "For case \"" << cur_case << "\", found "
+           << cov_thresh.n_elements()
+           << " unique COV_THRESH values: "
+           << write_css(cov_thresh) << ".\n";
+   }
+
+   // ALPHA
+   if(alpha.n_elements() > 1) {
+      mlog << Warning
+           << "For case \"" << cur_case << "\", found "
+           << alpha.n_elements()
+           << " unique ALPHA values: "
+           << write_css(alpha) << ".\n";
+   }
 
    return;
 }
@@ -572,6 +729,198 @@ ConcatString write_css_hhmmss(const NumArray &na) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
+                        map<ConcatString, AggrSummaryInfo> &m,
+                        int &n_in, int &n_out) {
+   STATLine line;
+   AggrSummaryInfo aggr;
+   ConcatString key, cs;
+   StringArray sa, req_stat, req_lty, req_col;
+   STATLineType lty;
+   NumArray empty_na;
+   int i, n_add, wgt;
+   double v, w;
+
+   //
+   // Objects for derived statistics
+   //
+   CTSInfo   cts_info;
+   SL1L2Info sl1l2_info;
+   CNTInfo   cnt_info;
+   VL1L2Info vl1l2_info;
+
+   //
+   // Build list of requested line types and column names
+   //
+   for(i=0; i<j.column.n_elements(); i++) {
+
+      // Split -column entry on colon
+      sa = ConcatString(j.column[i]).split(":");
+
+      // Option 1: Use -line_type once with no colons in -column option
+      if(sa.n_elements() == 1 && j.line_type.n_elements() == 1) {
+         cs << j.line_type[0] << ":" << sa[0];
+         req_stat.add(cs);
+         req_lty.add(j.line_type[0]);
+         req_col.add(sa[0]);
+      }
+      // Option 2: Use colons in -column option
+      else if(sa.n_elements() == 2) {
+         req_stat.add(j.column[i]);
+         req_lty.add(sa[0]);
+         req_col.add(sa[1]);
+      }
+      else {
+         mlog << Error << "\naggr_summary_lines() -> "
+              << "trouble parsing \"-column " << j.column[i]
+              << "\" option.  Either use \"-line_type\" exactly once "
+              << "or use format \"-column LINE_TYPE:COLUMN\".\n\n";
+         throw(1);
+      }
+   }
+
+   //
+   // Check for derived types:
+   //   FHO, CTC      -> CTS
+   //   SL1L2, SAL1L2 -> CNT
+   //   VL1L2         -> VCNT
+   //
+   bool do_cts  = j.do_derive && req_lty.has(stat_cts_str);
+   if(do_cts) mlog << Debug(3)
+                   << "Deriving CTS statistics from input FHO/CTC lines.\n";
+   bool do_cnt  = j.do_derive && req_lty.has(stat_cnt_str);
+   if(do_cnt) mlog << Debug(3)
+                   << "Deriving CNT statistics from input SL1L2/SAL1L2 lines.\n";
+   bool do_vcnt = j.do_derive && req_lty.has(stat_vcnt_str);
+   if(do_cnt) mlog << Debug(3)
+                   << "Deriving VCNT statistics from input VL1L2 lines.\n";
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.val.clear();
+            aggr.wgt.clear();
+            for(i=0; i<req_stat.n_elements(); i++) {
+               aggr.val[req_stat[i]] = empty_na;
+               aggr.wgt[req_stat[i]] = empty_na;
+            }
+            m[key] = aggr;
+         }
+
+         //
+         // Derive categorical statistics
+         //
+         if(do_cts && line.type() == stat_fho) {
+            parse_fho_ctable(line, cts_info.cts);
+         }
+         else if(do_cts && line.type() == stat_ctc) {
+            parse_ctc_ctable(line, cts_info.cts);
+         }
+
+         //
+         // Derive continuous statistics
+         //
+         else if(do_cnt && (line.type() == stat_sl1l2 ||
+                            line.type() == stat_sal1l2)) {
+            parse_sl1l2_line(line, sl1l2_info);
+            compute_cntinfo(sl1l2_info, 0, cnt_info);
+         }
+
+         //
+         // Derive vector continuous statistics
+         //
+         else if(do_vcnt && line.type() == stat_vl1l2) {
+            parse_vl1l2_line(line, vl1l2_info);
+            vl1l2_info.calc_ncep_stats();
+         }
+
+         //
+         // Update the map entries for each requested statistic
+         //
+         for(i=0,n_add=0; i<req_stat.n_elements(); i++) {
+
+            //
+            // Store the current requested line type
+            //
+            lty = string_to_statlinetype(req_lty[i]);
+
+            //
+            // Retrieve the column value, checking dervied stats
+            //
+            if((line.type() == stat_fho ||
+                line.type() == stat_ctc) && lty == stat_cts) {
+               v = cts_info.get_stat(req_col[i]);
+               w = cts_info.cts.n();
+            }
+            else if(line.type() == stat_sl1l2 && lty == stat_cnt) {
+               v = cnt_info.get_stat(req_col[i]);
+               w = cnt_info.n;
+            }
+            else if(line.type() == stat_sal1l2 && lty == stat_cnt) {
+               v = cnt_info.get_stat(req_col[i]);
+               w = cnt_info.n;
+            }
+            else if(line.type() == stat_vl1l2 && lty == stat_vcnt) {
+               v = vl1l2_info.get_stat(req_col[i]);
+               w = vl1l2_info.vcount;
+            }
+            else if(line.type() != lty) {
+               continue;
+            }
+            else {
+               v = atof(line.get_item(req_col[i]));
+               w = atoi(line.get_item("TOTAL"));
+            }
+
+            //
+            // Check for bad data
+            //
+            if(is_bad_data(v)) continue;
+
+            //
+            // Add the current column value and weight
+            //
+            m[key].val[req_stat[i]].add(v);
+            m[key].wgt[req_stat[i]].add(w);
+
+            // Keep track of the unique header column entries
+            m[key].hdr.add(line);
+
+            n_add++;
+         }
+
+         //
+         // Dump only the lines that were actually used
+         //
+         if(n_add > 0) {
+            j.dump_stat_line(line);
+            n_out++;
+         }
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // The aggr_ctc_lines routine should only be called when the
 // -line_type option has been used exactly once.
@@ -603,7 +952,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &j,
          j.dump_stat_line(line);
 
          //
-         // Zero out the contingecy table object
+         // Zero out the contingency table object
          //
          cur.cts.zero_out();
 

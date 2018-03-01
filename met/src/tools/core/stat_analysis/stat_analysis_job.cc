@@ -35,6 +35,7 @@
 //   015    06/28/17  Halley Gotway   Add aggregate_stat for CTC, PCT,
 //                    or MPR to ECLV lines.
 //   016    10/09/17  Halley Gotway   Add aggregate GRAD lines.
+//   017    03/01/18  Halley Gotway   Update summary job type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -109,6 +110,9 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &j) {
    j.rank_corr_flag  = (int) c.lookup_bool(conf_key_rank_corr_flag);
    j.vif_flag        = (int) c.lookup_bool(conf_key_vif_flag);
 
+   j.wmo_sqrt_stats   = c.lookup_string_array(conf_key_wmo_sqrt_stats, false);
+   j.wmo_fisher_stats = c.lookup_string_array(conf_key_wmo_fisher_stats, false);
+
    //
    // No settings in the default job for column_min_name/value,
    // column_max_name/value, column_str_name/value, and
@@ -167,9 +171,9 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
    //
    // Print warning for column_case option
    //
-   if(j.column_case.n_elements() > 0 &&
-      j.job_type != stat_job_summary &&
-      j.job_type != stat_job_aggr &&
+   if(j.column_case.n_elements() > 0   &&
+      j.job_type != stat_job_summary   &&
+      j.job_type != stat_job_aggr      &&
       j.job_type != stat_job_aggr_stat &&
       j.job_type != stat_job_ramp) {
       mlog << Warning << "\nThe -by option is ignored for the \""
@@ -220,8 +224,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &j,
 
       default:
          mlog << Error << "\ndo_job() -> "
-              << "jobtype value of " << j.job_type
-              << " not currently supported!\n\n";
+              << "Invalid -job type requested!\n\n";
          throw(1);
    }
 
@@ -307,208 +310,58 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// The do_job_summary() routine should only be called when the
-// -line_type option has been used exactly once and the -column option
-// has been used to specify the column of data to summarize.
+// For do_job_summary() the -line_type and and -column options specify
+// the data to be summarized in one of two ways:
+// (1) Use -line_type once and -column one or more times.
+// (2) Format -column options as LINE_TYPE:COLUMN.
 //
 ////////////////////////////////////////////////////////////////////////
 
 void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
                     STATAnalysisJob &j, int &n_in, int &n_out,
                     ofstream *sa_out, gsl_rng *rng_ptr) {
-   STATLine line;
-   int i, k, r, c;
-   double val, min, v10, v25, v50, v75, v90, max, iqr, range;
-   CIInfo mean_ci, stdev_ci;
+   map<ConcatString, AggrSummaryInfo> summary_map;
    AsciiTable out_at;
-   ConcatString key;
-   NumArray val_na;
-   StringArray sa;
-   map<ConcatString, NumArray> summary_map;
-   map<ConcatString, NumArray>::iterator it;
-
-   //
-   // Check that the -line_type option has been supplied only once
-   //
-   if(j.line_type.n_elements() != 1) {
-      mlog << Error << "\ndo_job_summary() -> "
-           << "this function may only be called when the "
-           << "\"-line_type\" option has been used exactly once to "
-           << "specify a single line type from which to select a "
-           << "statistic to summarize: " << jobstring << "\n\n";
-      throw(1);
-   }
 
    //
    // Check that the -column option has been supplied
    //
-   if(j.column.n_elements() == 0) {
+   if(j.column.n() == 0) {
       mlog << Error << "\ndo_job_summary() -> "
-           << "this function may only be called when the "
-           << "\"-column\" option has been used at least once to "
-           << "specify the column(s) to summarize: " << jobstring
-           << "\n\n";
+           << "the \"-column\" option must be used at least once: "
+           << jobstring << "\n\n";
       throw(1);
    }
 
    //
-   // Process the STAT lines
+   // Parse the input stat lines
    //
-   while(f >> line) {
-
-      if(line.is_header()) continue;
-
-      n_in++;
-
-      if(j.is_keeper(line)) {
-
-         j.dump_stat_line(line);
-
-         //
-         // Loop through the columns to be summarized
-         //
-         for(i=0; i<j.column.n_elements(); i++) {
-
-            //
-            // Build the key and get the current column value
-            //
-            key = j.column[i];
-            key << ":" << j.get_case_info(line);
-            val = j.get_column_double(line, j.column[i]);
-
-            //
-            // Add value to existing map entry or add a new one
-            //
-            if(!is_bad_data(val)) {
-               if(summary_map.count(key) > 0) {
-                  summary_map[key].add(val);
-               }
-               else {
-                  val_na.erase();
-                  val_na.add(val);
-                  summary_map[key] = val_na;
-               }
-            }
-         } // end for i
-
-         n_out++;
-
-      } // end if
-   } // end while
+   aggr_summary_lines(f, j, summary_map, n_in, n_out);
 
    //
    // Check for no matching STAT lines
    //
-   if(summary_map.size() == 0) {
+   if(n_out == 0) {
       mlog << Warning << "\ndo_job_summary() -> "
-           << "no valid data found in the STAT lines for job: "
-           << jobstring << "\n\n";
+           << "no matching STAT lines found for job: " << jobstring
+           << "\n\n";
       return;
    }
 
    //
-   // Setup the output object
+   // Check for no matching STAT lines
    //
-   r = c = 0;
-   out_at.set_size(summary_map.size() + 1,
-                   2 + j.column_case.n_elements() + n_job_sum_columns);
-   setup_table(out_at, 2 + j.column_case.n_elements(), j.get_precision());
-
-   //
-   // Write header line
-   //
-   out_at.set_entry(r, c++, "COL_NAME:");
-   out_at.set_entry(r, c++, "COLUMN");
-   for(k=0; k<j.column_case.n_elements(); k++)
-     out_at.set_entry(0, c++, j.column_case[k]);
-   write_header_row(job_sum_columns, n_job_sum_columns,
-                    0, out_at, r, c);
+   if(n_out == 0) {
+      mlog << Warning << "\ndo_job_aggr() -> "
+           << "no matching STAT lines found for job: " << jobstring
+           << "\n\n";
+      return;
+   }
 
    //
-   // Set up CIInfo objects
+   // Write the ASCII Table and the job command line
    //
-   mean_ci.allocate_n_alpha(1);
-   stdev_ci.allocate_n_alpha(1);
-
-   mlog << Debug(2) << "Computing output for "
-        << (int) summary_map.size() << " case(s).\n";
-
-   //
-   // Loop over the summary table
-   //
-   for(it  = summary_map.begin(), r=1;
-       it != summary_map.end();
-       it++, r++) {
-
-      //
-      // Compute the summary information for this collection of values:
-      // min, max, v10, v25, v50, 75, v90, iqr, range
-      //
-      min = it->second.percentile_array(0.00);
-      v10 = it->second.percentile_array(0.10);
-      v25 = it->second.percentile_array(0.25);
-      v50 = it->second.percentile_array(0.50);
-      v75 = it->second.percentile_array(0.75);
-      v90 = it->second.percentile_array(0.90);
-      max = it->second.percentile_array(1.00);
-
-      iqr   = (is_bad_data(v75) || is_bad_data(v25) ? bad_data_double : v75 - v25);
-      range = (is_bad_data(max) || is_bad_data(min) ? bad_data_double : max - min);
-
-      //
-      // Compute a bootstrap confidence interval for the mean of this
-      // array of values.
-      //
-      if(j.boot_interval == boot_bca_flag) {
-         compute_mean_stdev_ci_bca(rng_ptr, it->second,
-                                   j.n_boot_rep,
-                                   j.out_alpha, mean_ci, stdev_ci);
-      }
-      else {
-         compute_mean_stdev_ci_perc(rng_ptr, it->second,
-                                    j.n_boot_rep, j.boot_rep_prop,
-                                    j.out_alpha, mean_ci, stdev_ci);
-      }
-
-      //
-      // Write the data row
-      //
-      c = 0;
-
-      // Split the current map key
-      sa = it->first.split(":");
-
-      out_at.set_entry(r, c++, "SUMMARY:");
-      out_at.set_entry(r, c++, sa[0]);
-
-      // Write case column values
-      for(i=1; i<sa.n_elements(); i++)
-         out_at.set_entry(r, c++, sa[i]);
-
-      out_at.set_entry(r, c++, it->second.n_elements());
-      out_at.set_entry(r, c++, mean_ci.v);
-      out_at.set_entry(r, c++, mean_ci.v_ncl[0]);
-      out_at.set_entry(r, c++, mean_ci.v_ncu[0]);
-      out_at.set_entry(r, c++, mean_ci.v_bcl[0]);
-      out_at.set_entry(r, c++, mean_ci.v_bcu[0]);
-      out_at.set_entry(r, c++, stdev_ci.v);
-      out_at.set_entry(r, c++, stdev_ci.v_bcl[0]);
-      out_at.set_entry(r, c++, stdev_ci.v_bcu[0]);
-      out_at.set_entry(r, c++, min);
-      out_at.set_entry(r, c++, v10);
-      out_at.set_entry(r, c++, v25);
-      out_at.set_entry(r, c++, v50);
-      out_at.set_entry(r, c++, v75);
-      out_at.set_entry(r, c++, v90);
-      out_at.set_entry(r, c++, max);
-      out_at.set_entry(r, c++, iqr);
-      out_at.set_entry(r, c++, range);
-
-   } // end for it
-
-   //
-   // Write the Ascii Table and the job command line
-   //
+   write_job_summary(j, summary_map, out_at, rng_ptr);
    write_jobstring(jobstring, sa_out);
    write_table(out_at, sa_out);
 
@@ -1003,6 +856,180 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //
    write_jobstring(jobstring, sa_out);
    write_table(out_at, sa_out);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_summary(STATAnalysisJob &j,
+                       map<ConcatString, AggrSummaryInfo> &m,
+                       AsciiTable &at, gsl_rng *rng_ptr) {
+   map<ConcatString, AggrSummaryInfo>::iterator it;
+   map<ConcatString, NumArray>::iterator val_it, wgt_it;
+   int i, r, c;
+   double min, v10, v25, v50, v75, v90, max, iqr, range;
+   double wmo_mean, wmo_wmean;
+   ConcatString wmo_method;
+   StringArray sa;
+   CIInfo mean_ci, stdev_ci;
+
+   //
+   // Setup the output table
+   //
+   for(it = m.begin(), r = 0; it != m.end(); it++) {
+      r += (int) it->second.val.size();
+   }
+   at.set_size(r + 1,
+               3 + j.column_case.n() + n_job_summary_columns);
+   setup_table(at, 3 + j.column_case.n(), j.get_precision());
+
+   //
+   // Initialize
+   //
+   r = c = 0;
+
+   //
+   // Write header line
+   //
+   at.set_entry(r, c++, "COL_NAME:");
+   at.set_entry(0, c++, "LINE_TYPE");
+   at.set_entry(0, c++, "COLUMN");
+   for(i=0; i<j.column_case.n(); i++) {
+      at.set_entry(0, c++, j.column_case[i]);
+   }
+   write_header_row(job_summary_columns, n_job_summary_columns,
+                    0, at, r, c);
+
+   //
+   // Set up CIInfo objects
+   //
+   mean_ci.allocate_n_alpha(1);
+   stdev_ci.allocate_n_alpha(1);
+
+   mlog << Debug(2) << "Computing output for " << (int) m.size()
+        << " case(s).\n";
+
+   //
+   // Loop over the summary table
+   //
+   for(it = m.begin(), r = 1; it != m.end(); it++) {
+
+      //
+      // Print info about multiple header entries
+      //
+      it->second.hdr.check_shc(it->first);
+
+      //
+      // Loop over the statistics for current case
+      //
+      for(val_it  = it->second.val.begin(), wgt_it  = it->second.wgt.begin();
+          val_it != it->second.val.end(),   wgt_it != it->second.wgt.end();
+          val_it++, wgt_it++) {
+
+         //
+         // Skip empty rows
+         //
+         if(val_it->second.n() == 0) continue;
+
+         //
+         // Compute the summary information for these values:
+         // min, max, v10, v25, v50, 75, v90, iqr, range
+         //
+         min = val_it->second.percentile_array(0.00);
+         v10 = val_it->second.percentile_array(0.10);
+         v25 = val_it->second.percentile_array(0.25);
+         v50 = val_it->second.percentile_array(0.50);
+         v75 = val_it->second.percentile_array(0.75);
+         v90 = val_it->second.percentile_array(0.90);
+         max = val_it->second.percentile_array(1.00);
+
+         iqr   = (is_bad_data(v75) || is_bad_data(v25) ? bad_data_double : v75 - v25);
+         range = (is_bad_data(max) || is_bad_data(min) ? bad_data_double : max - min);
+
+         //
+         // Compute a bootstrap confidence interval for the mean.
+         //
+         if(j.boot_interval == boot_bca_flag) {
+            compute_mean_stdev_ci_bca(rng_ptr, val_it->second,
+                                      j.n_boot_rep,
+                                      j.out_alpha, mean_ci, stdev_ci);
+         }
+         else {
+            compute_mean_stdev_ci_perc(rng_ptr, val_it->second,
+                                       j.n_boot_rep, j.boot_rep_prop,
+                                       j.out_alpha, mean_ci, stdev_ci);
+         }
+
+         //
+         // Compute WMO means
+         //
+         if(j.wmo_fisher_stats.has(val_it->first)) {
+            wmo_method = "FISHER";
+            wmo_mean   = val_it->second.mean_fisher();
+            wmo_wmean  = val_it->second.wmean_fisher(wgt_it->second);
+         }
+         else if(j.wmo_sqrt_stats.has(val_it->first)) {
+            wmo_method = "SQRT";
+            wmo_mean   = val_it->second.mean_sqrt();
+            wmo_wmean  = val_it->second.wmean_sqrt(wgt_it->second);
+         }
+         else {
+            wmo_method = "MEAN";
+            wmo_mean   = val_it->second.mean();
+            wmo_wmean  = val_it->second.wmean(wgt_it->second);
+         }
+
+         //
+         // Write the data row
+         //
+         c = 0;
+         at.set_entry(r, c++, "SUMMARY:");
+
+         //
+         // Line type and column name
+         //
+         sa = val_it->first.split(":");
+         for(i=0; i<sa.n(); i++) at.set_entry(r, c++, sa[i]);
+
+         //
+         // Case columns
+         //
+         sa = it->first.split(":");
+         for(i=0; i<sa.n(); i++) at.set_entry(r, c++, sa[i]);
+
+         //
+         // Data columns
+         //
+         at.set_entry(r, c++, val_it->second.n_elements());
+         at.set_entry(r, c++, mean_ci.v);
+         at.set_entry(r, c++, mean_ci.v_ncl[0]);
+         at.set_entry(r, c++, mean_ci.v_ncu[0]);
+         at.set_entry(r, c++, mean_ci.v_bcl[0]);
+         at.set_entry(r, c++, mean_ci.v_bcu[0]);
+         at.set_entry(r, c++, stdev_ci.v);
+         at.set_entry(r, c++, stdev_ci.v_bcl[0]);
+         at.set_entry(r, c++, stdev_ci.v_bcu[0]);
+         at.set_entry(r, c++, min);
+         at.set_entry(r, c++, v10);
+         at.set_entry(r, c++, v25);
+         at.set_entry(r, c++, v50);
+         at.set_entry(r, c++, v75);
+         at.set_entry(r, c++, v90);
+         at.set_entry(r, c++, max);
+         at.set_entry(r, c++, iqr);
+         at.set_entry(r, c++, range);
+         at.set_entry(r, c++, wmo_method);
+         at.set_entry(r, c++, wmo_mean);
+         at.set_entry(r, c++, wmo_wmean);
+
+         //
+         // Increment the row counter
+         //
+         r++;
+
+      } // end for val_it, wgt_it
+   } // end for it
 
    return;
 }

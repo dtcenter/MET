@@ -25,6 +25,7 @@
 //   006    03/30/15  Halley Gotway   Add ramp job type.
 //   007    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //   008    06/09/17  Halley Gotway   Add aggregate GRAD lines.
+//   009    03/01/18  Halley Gotway   Update summary job type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -67,10 +68,17 @@ struct StatHdrInfo {
 
    void clear();
    void add(const STATLine &line);
+   void check_shc(const ConcatString &cur_case);
    StatHdrColumns get_shc(const ConcatString &cur_case,
                           const StringArray &hdr_name,
                           const StringArray &hdr_value,
                           const STATLineType lt);
+};
+
+struct AggrSummaryInfo {
+   StatHdrInfo hdr;
+   map<ConcatString, NumArray> val;
+   map<ConcatString, NumArray> wgt;
 };
 
 struct AggrCTCInfo {
@@ -167,6 +175,11 @@ struct AggrTimeSeriesInfo {
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+extern void aggr_summary_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrSummaryInfo> &,
+               int &, int &);
 
 extern void aggr_ctc_lines(
                LineDataFile &, STATAnalysisJob &,
