@@ -41,6 +41,7 @@ static const char   default_boot_rng[]     = "mt19937";
 static const char   default_boot_seed[]    = "";
 static const int    default_rank_corr_flag = 1;
 static const int    default_vif_flag       = 0;
+static const bool   default_do_derive      = false;
 
 //
 // Ramp job type defaults
@@ -254,6 +255,14 @@ class STATAnalysisJob {
       double       out_alpha;            // output alpha value
       double       out_bin_size;         // output PHIST bin size
       NumArray     out_eclv_points;      // output ECLV points
+
+      //
+      // Variables used for the stat_job_summary job type
+      //
+
+      bool         do_derive;
+      StringArray  wmo_sqrt_stats;
+      StringArray  wmo_fisher_stats;
 
       //
       // Variables used for the stat_job_aggr_mpr job type
