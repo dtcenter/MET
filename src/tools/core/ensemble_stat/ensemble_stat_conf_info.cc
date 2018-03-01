@@ -19,6 +19,7 @@ using namespace std;
 #include <cmath>
 
 #include "ensemble_stat_conf_info.h"
+#include "configobjecttype_to_string.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -49,14 +50,9 @@ EnsembleStatConfInfo::~EnsembleStatConfInfo() {
 void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   ens_info    = (VarInfo **)           0;
-   ens_ta      = (ThreshArray *)        0;
-   vx_pd       = (VxPairDataEnsemble *) 0;
-   msg_typ     = (StringArray *)        0;
-   sid_exc     = (StringArray *)        0;
-   obs_qty     = (StringArray *)        0;
-   mask_dp     = (DataPlane *)          0;
-   interp_mthd = (InterpMthd *)         0;
+   ens_info = (VarInfo **)          0;
+   ens_ta   = (ThreshArray *)       0;
+   vx_opt   = (EnsembleStatVxOpt *) 0;
 
    clear();
 
@@ -68,64 +64,44 @@ void EnsembleStatConfInfo::init_from_scratch() {
 void EnsembleStatConfInfo::clear() {
    int i;
 
-   // Set counts to zero
-   max_n_thresh = 0;
-   n_vx         = 0;
-   n_interp     = 0;
-   n_mask       = 0;
-   n_mask_area  = 0;
-   n_mask_sid   = 0;
-
    // Initialize values
+   ens_var_str.clear();
    model.clear();
-   desc.clear();
    obtype.clear();
-   beg_ds = end_ds = bad_data_int;
-   vld_ens_thresh = vld_data_thresh = bad_data_double;
-   mask_name.clear();
-   ci_alpha.clear();
-   interp_field = FieldType_None;
-   interp_thresh = bad_data_double;
-   interp_wdth.clear();
-   interp_shape = GridTemplateFactory::GridTemplate_None;
+   vld_ens_thresh = bad_data_double;
+   vld_data_thresh = bad_data_double;
+   ens_ssvar_file.clear();
+   ens_ssvar_mean.clear();
+   ens_ssvar_flag = false;
+   msg_typ_group_map.clear();
+   msg_typ_sfc.clear();
+   mask_dp_map.clear();
+   mask_sid_map.clear();
    rng_type.clear();
    rng_seed.clear();
    grid_weight_flag = GridWeightType_None;
+   tmp_dir.clear();
    output_prefix.clear();
    version.clear();
 
-   ens_ssvar_flag = false;
-   ens_ssvar_mean.clear();
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
-   phist_bin_size.clear();
-
-   msg_typ_group_map.clear();
-   msg_typ_sfc.clear();
-
-   for(i=0; i<n_txt; i++) output_flag[i]   = STATOutputType_None;
-   for(i=0; i<n_nc;  i++) ensemble_flag[i] = false;
+   nc_info.clear();
 
    // Deallocate memory
-   if(ens_info)    { delete [] ens_info;    ens_info    = (VarInfo **)           0; }
-   if(ens_ta)      { delete [] ens_ta;      ens_ta      = (ThreshArray *)        0; }
-   if(vx_pd)       { delete [] vx_pd;       vx_pd       = (VxPairDataEnsemble *) 0; }
-   if(msg_typ)     { delete [] msg_typ;     msg_typ     = (StringArray *)        0; }
-   if(sid_exc)     { delete [] sid_exc;     sid_exc     = (StringArray *)        0; }
-   if(obs_qty)     { delete [] obs_qty;     obs_qty     = (StringArray *)        0; }
-   if(othr_ta)     { delete [] othr_ta;     othr_ta     = (ThreshArray *)        0; }
-   if(mask_dp)     { delete [] mask_dp;     mask_dp     = (DataPlane *)          0; }
-   if(mask_sid)    { delete [] mask_sid;    mask_sid    = (StringArray *)        0; }
-   if(interp_mthd) { delete [] interp_mthd; interp_mthd = (InterpMthd *)         0; }
+   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) 0; }
 
-   // Clear ens_info
    if(ens_info) {
-      for(i=0; i<n_vx; i++)
+      for(i=0; i<n_ens_var; i++) {
          if(ens_info[i]) { delete ens_info[i]; ens_info[i] = (VarInfo *) 0; }
+      }
       delete ens_info; ens_info = (VarInfo **) 0;
    }
 
-   // Reset count
-   n_ens_var = 0;
+   // Reset counts
+   n_ens_var    = 0;
+   max_n_thresh = 0;
+   n_vx         = 0;
 
    return;
 }
@@ -155,9 +131,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    int i;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   Dictionary *ens_dict  = (Dictionary *) 0;
-   Dictionary *fcst_dict = (Dictionary *) 0;
-   Dictionary *obs_dict  = (Dictionary *) 0;
+   Dictionary *edict  = (Dictionary *) 0;
+   Dictionary *fdict = (Dictionary *) 0;
+   Dictionary *odict  = (Dictionary *) 0;
    Dictionary i_edict, i_fdict, i_odict;
    InterpInfo interp_info;
 
@@ -173,35 +149,42 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
 
-   // Conf: desc
-   desc = parse_conf_string(&conf, conf_key_desc);
-
    // Conf: obtype
    obtype = parse_conf_string(&conf, conf_key_obtype);
 
-   // Conf: beg_ds and end_ds
-   ens_dict = conf.lookup_dictionary(conf_key_obs_window);
-   parse_conf_range_int(ens_dict, beg_ds, end_ds);
+   // Conf: rng_type and rng_seed
+   rng_type = conf.lookup_string(conf_key_rng_type);
+   rng_seed = conf.lookup_string(conf_key_rng_seed);
 
-   // Conf: output_flag
-   output_map = parse_conf_output_flag(&conf, txt_file_type, n_txt);
+   // Conf: grid_weight_flag
+   grid_weight_flag = parse_conf_grid_weight_flag(&conf);
 
-   // Populate the output_flag array with map values
-   for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
+   // Conf: output_prefix
+   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
-   // Conf: ensemble_flag
-   ens_dict = conf.lookup_dictionary(conf_key_ensemble_flag);
+   // Conf: message_type_group_map
+   msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
-   // Populate the ensemble_flag array
-   for(i=0; i<n_nc; i++) {
-      ensemble_flag[i] = ens_dict->lookup_bool(conf_key_ensemble_flag_entries[i]);
+   // Conf: message_type_group_map(SURFACE)
+   if(msg_typ_group_map.count(surface_msg_typ_group_str) == 0) {
+      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+           << "\"" << conf_key_message_type_group_map
+           << "\" must contain an entry for \""
+           << surface_msg_typ_group_str << "\".\n\n";
+      exit(1);
+   }
+   else {
+      msg_typ_sfc = msg_typ_group_map[surface_msg_typ_group_str];
    }
 
-   // Conf: ens.field
-   ens_dict = conf.lookup_array(conf_key_ens_field);
+   // Conf: ensemble_flag
+   parse_nc_info();
 
-   // Determine the number of ensemble fields (name/level) to be processed
-   n_ens_var = parse_conf_n_vx(ens_dict);
+   // Conf: ens.field
+   edict = conf.lookup_array(conf_key_ens_field);
+
+   // Determine the number of ensemble fields to be processed
+   n_ens_var = parse_conf_n_vx(edict);
 
    // Allocate space based on the number of ensemble fields
    if(n_ens_var > 0) {
@@ -219,7 +202,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       ens_info[i] = info_factory.new_var_info(etype);
 
       // Get the current dictionary
-      i_edict = parse_conf_i_vx_dict(ens_dict, i);
+      i_edict = parse_conf_i_vx_dict(edict, i);
 
       // Set the current dictionary
       ens_info[i]->set_dict(i_edict);
@@ -231,8 +214,12 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          ens_info[i]->dump(cout);
       }
 
+      // Conf: ens_nc_var_str
+      ens_var_str.add(parse_conf_string(&i_edict, conf_key_nc_var_str, false));
+
+      // Conf: ens_nc_pairs
       // Only parse thresholds if relative frequencies are requested
-      if(ensemble_flag[i_nc_freq]) {
+      if(nc_info.do_freq) {
 
          // Conf: cat_thresh
          ens_ta[i] = i_edict.lookup_thresh_array(conf_key_cat_thresh);
@@ -274,14 +261,14 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    }
 
    // Conf: fcst.field and obs.field
-   fcst_dict = conf.lookup_array(conf_key_fcst_field);
-   obs_dict  = conf.lookup_array(conf_key_obs_field);
+   fdict = conf.lookup_array(conf_key_fcst_field);
+   odict = conf.lookup_array(conf_key_obs_field);
 
-   // Determine the number of fields (name/level) to be verified
-   n_vx = parse_conf_n_vx(fcst_dict);
+   // Determine the number of fields to be verified
+   n_vx = parse_conf_n_vx(fdict);
 
    // Check for a valid number of verification tasks
-   if(parse_conf_n_vx(obs_dict) != n_vx) {
+   if(parse_conf_n_vx(odict) != n_vx) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
            << "The number of verification tasks in \""
            << conf_key_obs_field
@@ -291,6 +278,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    }
 
    if(n_vx > 0) {
+
+      // Allocate memory for the verification task options
+      vx_opt = new EnsembleStatVxOpt [n_vx];
 
       // Check climatology fields
       check_climo_n_vx(&conf, n_vx);
@@ -304,127 +294,109 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
          exit(1);
       }
 
-      // Allocate space based on the number of verification tasks
-      vx_pd   = new VxPairDataEnsemble [n_vx];
-      msg_typ = new StringArray        [n_vx];
-      sid_exc = new StringArray        [n_vx];
-      obs_qty = new StringArray        [n_vx];
-      othr_ta = new ThreshArray        [n_vx];
-
-      // Parse the fcst field information
+      // Parse settings for each verification task
       for(i=0; i<n_vx; i++) {
 
-         // Allocate new VarInfo objects
-         vx_pd[i].fcst_info = info_factory.new_var_info(etype);
-
-         // Point observations are specified following GRIB conventions
-         if(point_vx) vx_pd[i].obs_info = new VarInfoGrib;
-         else         vx_pd[i].obs_info = info_factory.new_var_info(otype);
-
          // Get the current dictionaries
-         i_fdict = parse_conf_i_vx_dict(fcst_dict, i);
-         i_odict = parse_conf_i_vx_dict(obs_dict,  i);
+         i_fdict = parse_conf_i_vx_dict(fdict, i);
+         i_odict = parse_conf_i_vx_dict(odict, i);
 
-         // Conf: desc
-         vx_pd[i].set_desc(parse_conf_string(&i_odict, conf_key_desc));
+         // Process the options for this verification task
+         vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
+                                  point_vx, use_var_id);
+      }
 
-         // Conf: message_type
-         msg_typ[i] = parse_conf_message_type(&i_odict, point_vx);
+      // Summarize output flags across all verification tasks
+      process_flags();
+   }
 
-         // If no message type specified, store the obtype value.
-         if(msg_typ[i].n_elements() == 0) msg_typ[i].add(obtype);
+   return;
+}
 
-         // Conf: sid_exc
-         sid_exc[i] = parse_conf_sid_exc(&i_odict);
-         vx_pd[i].set_sid_exc_filt(sid_exc[i]);
+////////////////////////////////////////////////////////////////////////
 
-         // Conf: obs_qty
-         obs_qty[i] = parse_conf_obs_qty(&i_odict);
-         vx_pd[i].set_obs_qty_filt(obs_qty[i]);
+void EnsembleStatConfInfo::parse_nc_info() {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
-         // Conf: phist_bin_size
-         phist_bin_size.add(i_odict.lookup_double(conf_key_phist_bin));
+   e = conf.lookup(conf_key_ensemble_flag);
 
-         // Conf: obs_thresh
-         othr_ta[i] = i_odict.lookup_thresh_array(conf_key_obs_thresh);
-
-         // Set the current dictionaries
-         vx_pd[i].fcst_info->set_dict(i_fdict);
-         vx_pd[i].obs_info->set_dict(i_odict);
-
-         // Set the GRIB code for point observations
-         if(point_vx && !use_var_id) vx_pd[i].obs_info->add_grib_code(i_odict);
-
-         // Dump the contents of the current VarInfo
-         if(mlog.verbosity_level() >= 5) {
-            mlog << Debug(5)
-                 << "Parsed forecast field number " << i+1 << ":\n";
-            vx_pd[i].fcst_info->dump(cout);
-            mlog << Debug(5)
-                 << "Parsed observation field number " << i+1 << ":\n";
-            vx_pd[i].obs_info->dump(cout);
-         }
-
-         // Check the levels for the forecast and observation fields.  If the
-         // forecast field is a range of pressure levels, check to see if the
-         // range of observation field pressure levels is wholly contained in the
-         // fcst levels.  If not, print a warning message.
-         if(vx_pd[i].fcst_info->level().type() == LevelType_Pres &&
-            !is_eq(vx_pd[i].fcst_info->level().lower(), vx_pd[i].fcst_info->level().upper()) &&
-            (vx_pd[i].obs_info->level().lower() < vx_pd[i].fcst_info->level().lower() ||
-             vx_pd[i].obs_info->level().upper() > vx_pd[i].fcst_info->level().upper())) {
-
-            mlog << Warning
-                 << "\nEnsembleStatConfInfo::process_config() -> "
-                 << "The range of requested observation pressure levels "
-                 << "is not contained within the range of requested "
-                 << "forecast pressure levels.  No vertical interpolation "
-                 << "will be performed for observations falling outside "
-                 << "the range of forecast levels.  Instead, they will be "
-                 << "matched to the single nearest forecast level.\n\n";
-         }
-      } // end for i
-   } // end if n_vx > 0
-
-   // Conf: ci_alpha
-   ci_alpha = parse_conf_ci_alpha(&conf);
-
-   // Conf: interp
-   interp_info   = parse_conf_interp(&conf);
-   interp_field  = interp_info.field;
-   interp_thresh = interp_info.vld_thresh;
-   n_interp      = interp_info.n_interp;
-   interp_wdth   = interp_info.width;
-   interp_shape  = interp_info.shape;
-
-   // Allocate memory to store the interpolation methods
-   interp_mthd = new InterpMthd [n_interp];
-   for(i=0; i<n_interp; i++)
-      interp_mthd[i] = string_to_interpmthd(interp_info.method[i]);
-
-   // Conf: rng_type and rng_seed
-   rng_type = conf.lookup_string(conf_key_rng_type);
-   rng_seed = conf.lookup_string(conf_key_rng_seed);
-
-   // Conf: grid_weight_flag
-   grid_weight_flag = parse_conf_grid_weight_flag(&conf);
-
-   // Conf: output_prefix
-   output_prefix = conf.lookup_string(conf_key_output_prefix);
-
-   // Conf: message_type_group_map
-   msg_typ_group_map = parse_conf_message_type_group_map(&conf);
-
-   // Conf: message_type_group_map(SURFACE)
-   if(msg_typ_group_map.count(surface_msg_typ_group_str) == 0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \""
-           << surface_msg_typ_group_str << "\".\n\n";
+   if(!e) {
+      mlog << Error
+           << "\nEnsembleStatConfInfo::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_ensemble_flag
+           << "\"\n\n";
       exit(1);
    }
-   else {
-      msg_typ_sfc = msg_typ_group_map[surface_msg_typ_group_str];
+
+   const ConfigObjectType type = e->type();
+
+   if(type == BooleanType) {
+      bool value = e->b_value();
+
+      if(!value) nc_info.set_all_false();
+
+      return;
+   }
+
+   // It should be a dictionary
+   if(type != DictionaryType) {
+      mlog << Error
+           << "\nEnsembleStatConfInfo::parse_nc_info() -> "
+           << "bad type (" << configobjecttype_to_string(type)
+           << ") for key \"" << conf_key_ensemble_flag << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the various entries
+   Dictionary * d = e->dict_value();
+
+   nc_info.do_latlon = d->lookup_bool(conf_key_latlon_flag);
+   nc_info.do_mean   = d->lookup_bool(conf_key_mean_flag);
+   nc_info.do_stdev  = d->lookup_bool(conf_key_stdev_flag);
+   nc_info.do_minus  = d->lookup_bool(conf_key_minus_flag);
+   nc_info.do_plus   = d->lookup_bool(conf_key_plus_flag);
+   nc_info.do_min    = d->lookup_bool(conf_key_min_flag);
+   nc_info.do_max    = d->lookup_bool(conf_key_max_flag);
+   nc_info.do_range  = d->lookup_bool(conf_key_range_flag);
+   nc_info.do_vld    = d->lookup_bool(conf_key_vld_count_flag);
+   nc_info.do_freq   = d->lookup_bool(conf_key_frequency_flag);
+   nc_info.do_orank  = d->lookup_bool(conf_key_rank_flag);
+   nc_info.do_weight = d->lookup_bool(conf_key_weight);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatConfInfo::process_flags() {
+   int i, j;
+   bool output_ascii_flag = false;
+
+   // Initialize
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+
+   // Loop over the verification tasks
+   for(i=0; i<n_vx; i++) {
+
+      // Summary of output_flag settings
+      for(j=0; j<n_txt; j++) {
+         if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
+            output_flag[j] = STATOutputType_Both;
+            output_ascii_flag = true;
+         }
+         else if(vx_opt[i].output_flag[j] == STATOutputType_Stat &&
+                           output_flag[j] == STATOutputType_None) {
+            output_flag[j] = STATOutputType_Stat;
+            output_ascii_flag = true;
+         }
+      }
+   }
+
+   // Check output_ascii_flag
+   if(!output_ascii_flag) {
+       mlog << Debug(3)
+            <<"\nNo STAT output types requested, "
+            << "proceeding with ASCII output flag set to false.\n";
    }
 
    return;
@@ -434,141 +406,93 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
-   StringArray mask_grid, mask_poly, sid_list;
-   ConcatString s;
+   DataPlane dp;
+   StringArray sid;
+   ConcatString name;
 
    mlog << Debug(2)
         << "Processing masking regions.\n";
 
-   // Retrieve the area masks
-   mask_grid = conf.lookup_string_array(conf_key_mask_grid);
-   mask_poly = conf.lookup_string_array(conf_key_mask_poly);
-   n_mask_area = mask_grid.n_elements() + mask_poly.n_elements();
+   // Mapping of grid definition strings to mask names
+   map<ConcatString,ConcatString> grid_map;
+   map<ConcatString,ConcatString> poly_map;
+   map<ConcatString,ConcatString>  sid_map;
 
-   // Retrieve the station masks
-   sid_list = conf.lookup_string_array(conf_key_mask_sid);
-   n_mask_sid = sid_list.n_elements();
+   // Initialize
+   mask_dp_map.clear();
+   mask_sid_map.clear();
 
-   // Save the total number masks as a sum of the masking areas and
-   // masking points
-   n_mask = n_mask_area + n_mask_sid;
-
-   // Check that at least one verification masking region is provided
-   if(n_mask == 0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_masks() -> "
-           << "At least one grid, polyline, or station ID "
-           << "masking region must be provided.\n\n";
-      exit(1);
-   }
-
-   // Allocate space to store the masking information
-   mask_dp = new DataPlane [n_mask_area];
-
-   // Parse out the masking grid areas
-   for(i=0; i<mask_grid.n_elements(); i++) {
-      mlog << Debug(3)
-           << "Processing grid mask: " << mask_grid[i] << "\n";
-      parse_grid_mask(mask_grid[i], grid, mask_dp[i], s);
-      mask_name.add(s);
-   }
-
-   // Parse out the masking poly areas
-   for(i=0,j=mask_grid.n_elements(); i<mask_poly.n_elements(); i++,j++) {
-      mlog << Debug(3)
-           << "Processing poly mask: " << mask_poly[i] << "\n";
-      parse_poly_mask(mask_poly[i], grid, mask_dp[j], s);
-      mask_name.add(s);
-   }
-
-   // Allocate space to store the station ID masks
-   mask_sid = new StringArray [n_mask_sid];
-
-   // Parse out the station ID masks
-   for(i=0; i<sid_list.n_elements(); i++) {
-      mlog << Debug(3)
-           << "Processing station ID mask: " << sid_list[i] << "\n";
-      parse_sid_mask(sid_list[i], mask_sid[i], s);
-      mask_name.add(s);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
-   int i, j, n_msg_typ;
-   Dictionary i_odict;
-   StringArray sa;
-
-   // Parse configuration settings specific to each verification task
-   Dictionary *obs_dict = conf.lookup_array(conf_key_obs_field);
-
-   // EnsPairData is stored in the vx_pd objects in the following order:
-   // [n_msg_typ][n_mask][n_interp]
+   // Process the masks for each vx task
    for(i=0; i<n_vx; i++) {
 
-      // Get the message types for the current verification task
-      n_msg_typ = get_n_msg_typ(i);
+      // Initialize
+      vx_opt[i].mask_name.clear();
+      vx_opt[i].mask_name_area.clear();
 
-      // Set up the dimensions for the vx_pd object
-      vx_pd[i].set_pd_size(n_msg_typ, n_mask, n_interp);
+      // Parse the masking grids
+      for(j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
 
-      // Set up the ensemble size
-      vx_pd[i].set_ens_size(ens_size[i]);
-
-      // Set the ensemble spread/skill information
-      vx_pd[i].ens_ssvar_flag = ens_ssvar_flag;
-      vx_pd[i].ens_ssvar_mean = ens_ssvar_mean;
-
-      // Store the list of surface message types
-      vx_pd[i].set_msg_typ_sfc(msg_typ_sfc);
-
-      // Define the verifying message type name and values
-      for(j=0; j<n_msg_typ; j++) {
-         vx_pd[i].set_msg_typ(j, msg_typ[i][j]);
-         sa = msg_typ_group_map[msg_typ[i][j]];
-         if(sa.n_elements() == 0) sa.add(msg_typ[i][j]);
-         vx_pd[i].set_msg_typ_vals(j, sa);
-      }
-
-      // Add the masking information to the vx_pd objects
-      for(j=0; j<n_mask; j++) {
-
-         // If this is a masking area
-         if(j<n_mask_area) {
-            vx_pd[i].set_mask_dp(j, mask_name[j], &mask_dp[j]);
+         // Process new grid masks
+         if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
+            mlog << Debug(3)
+                 << "Processing grid mask: "
+                 << vx_opt[i].mask_grid[j] << "\n";
+            parse_grid_mask(vx_opt[i].mask_grid[j], grid, dp, name);
+            grid_map[vx_opt[i].mask_grid[j]] = name;
+            mask_dp_map[name] = dp;
          }
-         // Otherwise this is a masking StationID
-         else {
-            vx_pd[i].set_mask_sid(j, mask_name[j], &mask_sid[j-n_mask_area]);
+
+         // Store the name for gridded and point verification
+         vx_opt[i].mask_name.add(grid_map[vx_opt[i].mask_grid[j]]);
+         vx_opt[i].mask_name_area.add(grid_map[vx_opt[i].mask_grid[j]]);
+
+      } // end for j
+
+      // Parse the masking polylines
+      for(j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+
+         // Process new poly mask
+         if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
+            mlog << Debug(3)
+                 << "Processing poly mask: "
+                 << vx_opt[i].mask_poly[j] << "\n";
+            parse_poly_mask(vx_opt[i].mask_poly[j], grid, dp, name);
+            poly_map[vx_opt[i].mask_poly[j]] = name;
+            mask_dp_map[name] = dp;
          }
+
+         // Store the name for gridded and point verification
+         vx_opt[i].mask_name.add(poly_map[vx_opt[i].mask_poly[j]]);
+         vx_opt[i].mask_name_area.add(poly_map[vx_opt[i].mask_poly[j]]);
+
+      } // end for j
+
+      // Parse the masking station ID's
+      for(j=0; j<vx_opt[i].mask_sid.n_elements(); j++) {
+
+         // Process new station ID mask
+         if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
+            mlog << Debug(3)
+                 << "Processing station ID mask: "
+                 << vx_opt[i].mask_sid[j] << "\n";
+            parse_sid_mask(vx_opt[i].mask_sid[j], sid, name);
+            sid_map[vx_opt[i].mask_sid[j]] = name;
+            mask_sid_map[name] = sid;
+         }
+
+         // Store the name only for point verification
+         vx_opt[i].mask_name.add(sid_map[vx_opt[i].mask_sid[j]]);
+
+      } // end for j
+
+      // Check that at least one verification masking region is provided
+      if(vx_opt[i].mask_name.n_elements() == 0) {
+         mlog << Error << "\nEnsembleStatConfInfo::process_masks() -> "
+              << "At least one grid, polyline or station ID masking "
+              << "region must be provided for verification task number "
+              << i+1 << ".\n\n";
+         exit(1);
       }
-
-      // Add the interpolation methods to the vx_pd objects
-      for(j=0; j<n_interp; j++)
-         vx_pd[i].set_interp(j, interp_mthd[j], interp_wdth[j], interp_shape);
-
-      // Get the current observation dictionary
-      i_odict = parse_conf_i_vx_dict(obs_dict, i);
-
-      // Conf: ssvar_bin_size
-      vx_pd[i].set_ssvar_bin_size(i_odict.lookup_double(conf_key_ssvar_bin));
-
-      // Conf: phist_bin_size
-      vx_pd[i].set_phist_bin_size(i_odict.lookup_double(conf_key_phist_bin));
-
-      // Conf: duplicate_flag
-      vx_pd[i].set_duplicate_flag(parse_conf_duplicate_flag(&i_odict));
-
-      // Conf: obs_summary
-      vx_pd[i].set_obs_summary(parse_conf_obs_summary(&i_odict));
-
-      // Conf: obs_perc_value
-      vx_pd[i].set_obs_perc_value(parse_conf_percentile(&i_odict));
-
-      // Conf: skip_const
-      vx_pd[i].set_skip_const(i_odict.lookup_bool(conf_key_skip_const));
 
    } // end for i
 
@@ -577,41 +501,345 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::get_n_msg_typ(int i) const {
+int EnsembleStatConfInfo::n_txt_row(int i_txt_row) const {
+   int i, n;
 
-   if(i < 0 || i >= n_vx) {
-      mlog << Error << "\nEnsembleStatConfInfo::get_n_msg_typ(int i) -> "
-           << "range check error for i = " << i << "\n\n";
-      exit(1);
-   }
+   // Loop over the tasks and sum the line counts for this line type
+   for(i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
-   return(msg_typ[i].n_elements());
+   return(n);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::get_n_othr(int i) const {
+int EnsembleStatConfInfo::n_stat_row() const {
+   int i, n;
 
-   if(i < 0 || i >= n_vx) {
-      mlog << Error << "\nEnsembleStatConfInfo::get_n_othr(int i) -> "
-           << "range check error for i = " << i << "\n\n";
-      exit(1);
-   }
+   // Loop over the line types and sum the line counts
+   for(i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
 
-   return(othr_ta[i].n_elements());
+   return(n);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
-   int i, n, max_n_msg_typ, max_n_othr;
+void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
 
-   // Determine the maximum number of message types and observation
-   // thresholds being used
-   for(i=0, max_n_msg_typ=0, max_n_othr=0; i<n_vx; i++) {
-      if(get_n_msg_typ(i) > max_n_msg_typ) max_n_msg_typ = get_n_msg_typ(i);
-      if(get_n_othr(i)    > max_n_othr)    max_n_othr    = get_n_othr(i);
+   // This should be called after process_masks()
+   for(int i=0; i<n_vx; i++) {
+
+      vx_opt[i].set_vx_pd(this);
+
+      // Set up the ensemble size
+      vx_opt[i].vx_pd.set_ens_size(ens_size[i]);
+
+      // Set the ensemble spread/skill information
+      vx_opt[i].vx_pd.ens_ssvar_flag = ens_ssvar_flag;
+      vx_opt[i].vx_pd.ens_ssvar_mean = ens_ssvar_mean;
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class EnsembleStatVxOpt
+//
+////////////////////////////////////////////////////////////////////////
+
+EnsembleStatVxOpt::EnsembleStatVxOpt() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+EnsembleStatVxOpt::~EnsembleStatVxOpt() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatVxOpt::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatVxOpt::clear() {
+   int i;
+
+   // Initialize values
+   vx_pd.clear();
+   var_str.clear();
+   beg_ds = end_ds = bad_data_int;
+   mask_grid.clear();
+   mask_poly.clear();
+   mask_sid.clear();
+   mask_name.clear();
+   mask_name_area.clear();
+   msg_typ.clear();
+   othr_ta.clear();
+   ci_alpha.clear();
+   interp_info.clear();
+
+   ssvar_bin_size = bad_data_double;
+   phist_bin_size = bad_data_double;
+   duplicate_flag = DuplicateType_None;
+   obs_summary = ObsSummary_None;
+   obs_perc = bad_data_int;
+   skip_const = false;
+
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
+                                       GrdFileType otype, Dictionary &odict,
+                                       bool point_vx, bool use_var_id) {
+   int i, n;
+   VarInfoFactory info_factory;
+   map<STATLineType,STATOutputType>output_map;
+   InterpMthd mthd;
+   Dictionary *dict;
+
+   // Initialize
+   clear();
+
+   // Allocate new VarInfo objects
+   vx_pd.fcst_info = info_factory.new_var_info(ftype);
+   vx_pd.obs_info  = info_factory.new_var_info(otype);
+
+   // Set the VarInfo objects
+   vx_pd.fcst_info->set_dict(fdict);
+   vx_pd.obs_info->set_dict(odict);
+
+   // Set the GRIB code for point observations
+   if(!use_var_id) vx_pd.obs_info->add_grib_code(odict);
+
+   // Dump the contents of the current VarInfo
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << "Parsed forecast field:\n";
+      vx_pd.fcst_info->dump(cout);
+      mlog << Debug(5)
+           << "Parsed observation field:\n";
+      vx_pd.obs_info->dump(cout);
+   }
+
+   // Check the levels for the forecast and observation fields.  If the
+   // forecast field is a range of pressure levels, check to see if the
+   // range of observation field pressure levels is wholly contained in the
+   // fcst levels.  If not, print a warning message.
+   if(vx_pd.fcst_info->level().type() == LevelType_Pres &&
+      !is_eq(vx_pd.fcst_info->level().lower(), vx_pd.fcst_info->level().upper()) &&
+      (vx_pd.obs_info->level().lower() < vx_pd.fcst_info->level().lower() ||
+       vx_pd.obs_info->level().upper() > vx_pd.fcst_info->level().upper())) {
+
+      mlog << Warning
+           << "\nEnsembleStatVxOpt::process_config() -> "
+           << "The range of requested observation pressure levels "
+           << "is not contained within the range of requested "
+           << "forecast pressure levels.  No vertical interpolation "
+           << "will be performed for observations falling outside "
+           << "the range of forecast levels.  Instead, they will be "
+           << "matched to the single nearest forecast level.\n\n";
+   }
+
+   // No support for wind direction
+   if(vx_pd.fcst_info->is_wind_direction() ||
+      vx_pd.obs_info->is_wind_direction()) {
+      mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
+           << "wind direction may not be verified using grid_stat.\n\n";
+      exit(1);
+   }
+
+   // Check that the observation field does not contain probabilities
+   if(vx_pd.obs_info->is_prob()) {
+      mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
+           << "the observation field cannot contain probabilities.\n\n";
+      exit(1);
+   }
+
+   // Conf: nc_var_str
+   var_str = parse_conf_string(&odict, conf_key_nc_var_str, false);
+
+   // Conf: beg_ds and end_ds
+   dict = odict.lookup_dictionary(conf_key_obs_window);
+   parse_conf_range_int(dict, beg_ds, end_ds);
+
+   // Conf: mask_grid
+   mask_grid = odict.lookup_string_array(conf_key_mask_grid);
+
+   // Conf: mask_poly
+   mask_poly = odict.lookup_string_array(conf_key_mask_poly);
+
+   // Conf: mask_sid
+   mask_sid = odict.lookup_string_array(conf_key_mask_sid);
+
+   // Conf: message_type
+   msg_typ = parse_conf_message_type(&odict);
+
+   // Conf: othr_thresh
+   othr_ta = odict.lookup_thresh_array(conf_key_obs_thresh);
+
+   // Conf: ci_alpha
+   ci_alpha = parse_conf_ci_alpha(&odict);
+
+   // Conf: interp
+   interp_info = parse_conf_interp(&odict);
+
+   // Conf: output_flag
+   output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
+
+   // Populate the output_flag array with map values
+   for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
+
+   // Conf: ssvar_bin_size
+   ssvar_bin_size = odict.lookup_double(conf_key_ssvar_bin);
+
+   // Conf: phist_bin_size
+   phist_bin_size = odict.lookup_double(conf_key_phist_bin);
+
+   // Conf: duplicate_flag
+   duplicate_flag = parse_conf_duplicate_flag(&odict);
+
+   // Conf: obs_summary
+   obs_summary = parse_conf_obs_summary(&odict);
+
+   // Conf: obs_perc_value
+   obs_perc = parse_conf_percentile(&odict);
+
+   // Conf: skip_const
+   skip_const = odict.lookup_bool(conf_key_skip_const);
+
+   // Conf: desc
+   vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc));
+
+   // Conf: sid_exc
+   vx_pd.set_sid_exc_filt(parse_conf_sid_exc(&odict));
+
+   // Conf: obs_qty
+   vx_pd.set_obs_qty_filt(parse_conf_obs_qty(&odict));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info) {
+   int i, n;
+   int n_msg_typ = msg_typ.n_elements();
+   int n_mask    = mask_name.n_elements();
+   int n_interp  = interp_info.n_interp;
+   StringArray sa;
+
+   // Setup the VxPairDataEnsemble object with these dimensions:
+   // [n_msg_typ][n_mask][n_interp]
+
+   // Check for at least one message type
+   if(n_msg_typ == 0) {
+      mlog << Error << "\nEnsembleStatVxOpt::set_vx_pd() -> "
+           << "At least one output message type must be requested in \""
+           << conf_key_message_type << "\".\n\n";
+      exit(1);
+   }
+
+   // Check for at least one masking region
+   if(n_mask == 0) {
+      mlog << Error << "\nEnsembleStatVxOpt::set_vx_pd() -> "
+           << "At least one output masking region must be requested in \""
+           << conf_key_mask_grid << "\", \""
+           << conf_key_mask_poly << "\", or \""
+           << conf_key_mask_sid << "\".\n\n";
+      exit(1);
+   }
+
+   // Check for at least one interpolation method
+   if(n_interp == 0) {
+      mlog << Error << "\nEnsembleStatVxOpt::set_vx_pd() -> "
+           << "At least one interpolation method must be requested in \""
+           << conf_key_interp << "\".\n\n";
+      exit(1);
+   }
+
+   // Define the dimensions
+   vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+
+   // Store the list of surface message types
+   vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);
+
+   // Define the verifying message type name and values
+   for(i=0; i<n_msg_typ; i++) {
+      vx_pd.set_msg_typ(i, msg_typ[i]);
+      sa = conf_info->msg_typ_group_map[msg_typ[i]];
+      if(sa.n_elements() == 0) sa.add(msg_typ[i]);
+      vx_pd.set_msg_typ_vals(i, sa);
+   }
+
+   // Define the masking information: grid, poly, sid
+
+   // Define the grid masks
+   for(i=0; i<mask_grid.n_elements(); i++) {
+      n = i;
+      vx_pd.set_mask_dp(n, mask_name[n],
+                        &(conf_info->mask_dp_map[mask_name[n]]));
+   }
+
+   // Define the poly masks
+   for(i=0; i<mask_poly.n_elements(); i++) {
+      n = i + mask_grid.n_elements();
+      vx_pd.set_mask_dp(n, mask_name[n],
+                        &(conf_info->mask_dp_map[mask_name[n]]));
+   }
+
+   // Define the station ID masks
+   for(i=0; i<mask_sid.n_elements(); i++) {
+      n = i + mask_grid.n_elements() + mask_poly.n_elements();
+      vx_pd.set_mask_sid(n, mask_name[n],
+                         &(conf_info->mask_sid_map[mask_name[n]]));
+   }
+
+   // Define the interpolation methods
+   for(i=0; i<n_interp; i++) {
+      vx_pd.set_interp(i, interp_info.method[i], interp_info.width[i],
+                       interp_info.shape);
+   }
+
+   // After sizing VxPairDataEnsemble, add settings for each array element
+   vx_pd.set_ssvar_bin_size(ssvar_bin_size);
+   vx_pd.set_phist_bin_size(phist_bin_size);
+   vx_pd.set_duplicate_flag(duplicate_flag);
+   vx_pd.set_obs_summary(obs_summary);
+   vx_pd.set_obs_perc_value(obs_perc);
+   vx_pd.set_skip_const(skip_const);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
+   int n;
+
+   // Range check
+   if(i_txt_row < 0 || i_txt_row >= n_txt) {
+      mlog << Error << "\nEnsembleStatVxOpt::n_txt_row(int) -> "
+           << "range check error for " << i_txt_row << "\n\n";
+      exit(1);
+   }
+
+   // Check if this output line type is requested
+   if(output_flag[i_txt_row] == STATOutputType_None) return(0);
+
+   int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -620,22 +848,17 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
       case(i_phist):
       case(i_relp):
          // Maximum number of RHIST, PHIST, and RELP lines possible =
-         //    Point Vx: Fields * Masks * Interpolations * Obs Thresholds * Message Types
-         //     Grid Vx: Fields * Masks * Interpolations * Obs Thresholds
-         n =   n_vx * n_mask * n_interp * max_n_othr * max_n_msg_typ
-             + n_vx * n_mask * n_interp * max_n_othr;
+         //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds
+         //     Grid Vx:                 Masks * Interpolations * Obs Thresholds
+         n =   get_n_msg_typ() * get_n_mask() * get_n_interp() * get_n_o_thresh()
+             +                   get_n_mask() * get_n_interp() * get_n_o_thresh();
          break;
 
       case(i_orank):
 
          // Compute the maximum number of matched pairs to be written
          // out by summing the number for each VxPairDataEnsemble object
-         for(i=0, n=0; i<n_vx; i++) {
-            n += vx_pd[i].get_n_pair();
-         }
-
-         // Multiply by the number of observation thresholds
-         n *= max_n_othr;
+         n = vx_pd.get_n_pair() * get_n_o_thresh();
          break;
 
       case(i_ssvar):
@@ -646,7 +869,7 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
          break;
 
       default:
-         mlog << Error << "\nEnsembleStatConfInfo::n_txt_row(int) -> "
+         mlog << Error << "\nEnsembleStatVxOpt::n_txt_row(int) -> "
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
@@ -657,18 +880,75 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+//  Code for struct EnsembleStatNcOutInfo
+//
+////////////////////////////////////////////////////////////////////////
 
-int EnsembleStatConfInfo::n_stat_row() {
-   int i, n;
-
-   // Set the maximum number of STAT output lines by summing the counts
-   // for the optional text files that have been requested
-   for(i=0, n=0; i<n_txt; i++) {
-
-      if(output_flag[i] != STATOutputType_None) n += n_txt_row(i);
-   }
-
-   return(n);
+EnsembleStatNcOutInfo::EnsembleStatNcOutInfo() {
+   clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatNcOutInfo::clear() {
+
+   set_all_true();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool EnsembleStatNcOutInfo::all_false() const {
+
+   bool status = do_latlon || do_mean || do_stdev || do_minus ||
+                 do_plus   || do_min  || do_max   || do_range ||
+                 do_vld    || do_freq || do_orank || do_weight;
+
+   return(!status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatNcOutInfo::set_all_false() {
+
+   do_latlon = false;
+   do_mean   = false;
+   do_stdev  = false;
+   do_minus  = false;
+   do_plus   = false;
+   do_min    = false;
+   do_max    = false;
+   do_range  = false;
+   do_vld    = false;
+   do_freq   = false;
+   do_orank  = false;
+   do_weight = false;
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void EnsembleStatNcOutInfo::set_all_true() {
+
+   do_latlon = true;
+   do_mean   = true;
+   do_stdev  = true;
+   do_minus  = true;
+   do_plus   = true;
+   do_min    = true;
+   do_max    = true;
+   do_range  = true;
+   do_vld    = true;
+   do_freq   = true;
+   do_orank  = true;
+   do_weight = true;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+

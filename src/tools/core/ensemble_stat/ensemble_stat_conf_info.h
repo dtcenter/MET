@@ -39,19 +39,114 @@ static const STATLineType txt_file_type[n_txt] = {
    stat_rhist, stat_phist, stat_orank, stat_ssvar, stat_relp
 };
 
-// Indices for the ensemble flag types in the configuration file
-static const int i_nc_mean   = 0;
-static const int i_nc_stdev  = 1;
-static const int i_nc_minus  = 2;
-static const int i_nc_plus   = 3;
-static const int i_nc_min    = 4;
-static const int i_nc_max    = 5;
-static const int i_nc_range  = 6;
-static const int i_nc_vld    = 7;
-static const int i_nc_freq   = 8;
-static const int i_nc_orank  = 9;
-static const int i_nc_weight = 10;
-static const int n_nc        = 11;
+////////////////////////////////////////////////////////////////////////
+
+struct EnsembleStatNcOutInfo {
+
+   bool do_latlon;
+   bool do_mean;
+   bool do_stdev;
+   bool do_minus;
+   bool do_plus;
+   bool do_min;
+   bool do_max;
+   bool do_range;
+   bool do_vld;
+   bool do_freq;
+   bool do_orank;
+   bool do_weight;
+
+      //////////////////////////////////////////////////////////////////
+
+   EnsembleStatNcOutInfo();
+
+   void clear();   //  sets everything to true
+
+   bool all_false() const;
+
+   void set_all_false();
+   void set_all_true();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+class EnsembleStatConfInfo; // forward reference
+
+////////////////////////////////////////////////////////////////////////
+
+class EnsembleStatVxOpt {
+
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      EnsembleStatVxOpt();
+     ~EnsembleStatVxOpt();
+
+      //////////////////////////////////////////////////////////////////
+
+      VxPairDataEnsemble vx_pd;          // Ensemble pair data
+
+      ConcatString   var_str;            // nc_pairs_var_str string
+
+      int            beg_ds;             // Begin observation time window offset
+      int            end_ds;             // End observation time window offset
+
+      StringArray    mask_grid;          // Masking grid strings
+      StringArray    mask_poly;          // Masking polyline strings
+      StringArray    mask_sid;           // Masking station ID's
+
+      StringArray    mask_name;          // Masking region names
+      StringArray    mask_name_area;     // Masking area (grid + poly) region names
+
+      StringArray    msg_typ;            // Verifying message types
+
+      ThreshArray    othr_ta;            // Observation filetering thresholds
+
+      NumArray       ci_alpha;           // Alpha value for confidence intervals
+
+      InterpInfo     interp_info;        // Interpolation (smoothing) information
+
+      double         ssvar_bin_size;     // SSVAR bin size
+      double         phist_bin_size;     // PHIST bin size
+      DuplicateType  duplicate_flag;     // Duplicate observations
+      ObsSummary     obs_summary;        // Summarize observations
+      int            obs_perc;           // Summary percentile value
+      bool           skip_const;         // Skip points with constant data values
+
+      // Output file options
+      STATOutputType output_flag[n_txt]; // Flag for each output line type
+
+      //////////////////////////////////////////////////////////////////
+
+      void clear();
+
+      void process_config(GrdFileType, Dictionary &,
+                          GrdFileType, Dictionary &, bool, bool);
+      void set_vx_pd(EnsembleStatConfInfo *);
+
+      // Compute the number of output lines for this task
+      int n_txt_row(int i) const;
+
+      int get_n_msg_typ()   const;
+      int get_n_interp()    const;
+      int get_n_mask()      const;
+      int get_n_mask_area() const;
+
+      int get_n_o_thresh()   const;
+      int get_n_ci_alpha()   const;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+inline int EnsembleStatVxOpt::get_n_msg_typ()   const { return(msg_typ.n_elements());        }
+inline int EnsembleStatVxOpt::get_n_interp()    const { return(interp_info.n_interp);        }
+inline int EnsembleStatVxOpt::get_n_mask()      const { return(mask_name.n_elements());      }
+inline int EnsembleStatVxOpt::get_n_mask_area() const { return(mask_name_area.n_elements()); }
+inline int EnsembleStatVxOpt::get_n_o_thresh()  const { return(othr_ta.n_elements());        }
+inline int EnsembleStatVxOpt::get_n_ci_alpha()  const { return(ci_alpha.n_elements());       }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -67,97 +162,85 @@ class EnsembleStatConfInfo {
 
       // Ensemble verification
       int n_vx;         // Number of ensemble fields to be verified
-      int n_interp;     // Number of interpolation methods
-      int n_mask;       // Number of masking regions
-      int n_mask_area;  // Number of masking areas
-      int n_mask_sid;   // Number of masking station ID lists
 
    public:
+
+      EnsembleStatConfInfo();
+     ~EnsembleStatConfInfo();
+
+      //////////////////////////////////////////////////////////////////
 
       // Ensemble-Stat configuration object
       MetConfig conf;
 
       // Store data parsed from the Ensemble-Stat configuration object
-      ConcatString         model;               // Model name
-      ConcatString         desc;                // Description
-      ConcatString         obtype;              // Observation type
-      int                  beg_ds;              // Begin observation time window offset
-      int                  end_ds;              // End observation time window offset
-      VarInfo **           ens_info;            // Array of pointers for ensemble [n_ens_var]
-      ThreshArray *        ens_ta;              // Array for ensemble thresholds [n_ens_var]
-      double               vld_ens_thresh;      // Minimum valid input file ratio
-      double               vld_data_thresh;     // Minimum valid data ratio for each point
-      VxPairDataEnsemble * vx_pd;               // Array for ensemble pair data [n_vx]
-      StringArray *        msg_typ;             // Array of message types [n_vx]
-      StringArray *        sid_exc;             // Array of station ID's to exclude [n_vx]
-      StringArray *        obs_qty;             // Observation quality flags for filtering [n_vx]
-      ThreshArray *        othr_ta;             // Arrays of observation filetering thresholds [n_vx]
-      StringArray          mask_name;           // Masking region names [n_mask]
-      ConcatString         ens_ssvar_file;      // Ensemble mean file name
-      DataPlane *          mask_dp;             // Array for masking regions [n_mask_area]
-      StringArray *        mask_sid;            // Masking station id's [n_mask_sid]
-      NumArray             ci_alpha;            // Alpha value for confidence intervals
-      FieldType            interp_field;        // How to apply interpolation options
-      double               interp_thresh;       // Proportion of valid data values
-      InterpMthd *         interp_mthd;         // Array for interpolation methods [n_interp]
-      IntArray             interp_wdth;         // Array for interpolation widths [n_interp]
-      GridTemplateFactory::GridTemplates interp_shape;  //Shape for interpolation
+      ConcatString        model;            // Model name
+      ConcatString        obtype;           // Observation type
 
-      // Message type groups that should be processed toegher
+      VarInfo **          ens_info;         // Array of pointers for ensemble [n_ens_var] (allocated)
+      ThreshArray *       ens_ta;           // Array for ensemble thresholds [n_ens_var] (allocated)
+      StringArray         ens_var_str;      // Array for ensemble variable name strings [n_ens_var]
+
+      EnsembleStatVxOpt * vx_opt;           // Array of vx task options [n_vx] (allocated)
+
+      double              vld_ens_thresh;   // Required ratio of valid input files
+      double              vld_data_thresh;  // Required ratio of valid data for each point
+
+      ConcatString        ens_ssvar_file;   // Ensemble mean file name
+      ConcatString        ens_ssvar_mean;   // Ensemble mean for spread/skill calculations
+      bool                ens_ssvar_flag;   // Flag to turn SSVAR on/off
+
+      // Message type groups that should be processed together
       map<ConcatString,StringArray> msg_typ_group_map;
       StringArray                   msg_typ_sfc;
 
-      STATOutputType       output_flag[n_txt];  // Flag for each output line type
-      bool                 ensemble_flag[n_nc]; // Boolean for each ensemble field type
-      ConcatString         rng_type;            // GSL random number generator
-      ConcatString         rng_seed;            // GSL RNG seed value
-      GridWeightType       grid_weight_flag;    // Grid weighting flag
-      ConcatString         output_prefix;       // String to customize output file names
-      ConcatString         version;             // Config file version
+      // Mapping of mask names to DataPlanes
+      map<ConcatString,DataPlane>   mask_dp_map;
 
-      bool                 ens_ssvar_flag;      // Indicator for calculation of ensemble spread/skill
-      ConcatString         ens_ssvar_mean;      // Ensemble mean for spread/skill calculations
+      // Mapping of mask names to Station ID lists
+      map<ConcatString,StringArray> mask_sid_map;
 
-      NumArray             phist_bin_size;      // PHIST bin sizes
+      ConcatString   rng_type;              // GSL random number generator
+      ConcatString   rng_seed;              // GSL RNG seed value
 
-      EnsembleStatConfInfo();
-     ~EnsembleStatConfInfo();
+      GridWeightType grid_weight_flag;      // Grid weighting flag
+      ConcatString   tmp_dir;               // Directory for temporary files
+      ConcatString   output_prefix;         // String to customize output file name
+      ConcatString   version;               // Config file version
+
+      STATOutputType output_flag[n_txt];    // Summary of output_flag options
+
+      EnsembleStatNcOutInfo nc_info;        // Output NetCDF file contents
+
+      //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void read_config   (const char *, const char *);
       void process_config(GrdFileType, GrdFileType, bool, bool);
+      void process_flags ();
+      void parse_nc_info ();
       void process_masks (const Grid &);
       void set_vx_pd     (const IntArray &);
 
       // Dump out the counts
-      int get_n_ens_var()      const;
-      int get_max_n_thresh()   const;
-      int get_n_vx()           const;
-      int get_n_msg_typ(int i) const;
-      int get_n_othr(int i)    const;
-      int get_n_interp()       const;
-      int get_n_mask()         const;
-      int get_n_mask_area()    const;
-      int get_n_mask_sid()     const;
+      int get_n_ens_var()    const;
+      int get_max_n_thresh() const;
+      int get_n_vx()         const;
 
       // Compute the maximum number of output lines possible based
       // on the contents of the configuration file
-      int n_txt_row(int i);
-      int n_stat_row();
+      int n_txt_row(int i) const;
+      int n_stat_row()     const;
       int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_ens_var()      const { return(n_ens_var);    }
-inline int EnsembleStatConfInfo::get_max_n_thresh()   const { return(max_n_thresh); }
-inline int EnsembleStatConfInfo::get_n_vx()           const { return(n_vx);         }
-inline int EnsembleStatConfInfo::get_n_interp()       const { return(n_interp);     }
-inline int EnsembleStatConfInfo::get_n_mask()         const { return(n_mask);       }
-inline int EnsembleStatConfInfo::get_n_mask_area()    const { return(n_mask_area);  }
-inline int EnsembleStatConfInfo::get_n_mask_sid()     const { return(n_mask_sid);   }
-inline int EnsembleStatConfInfo::get_compression_level()    { return conf.nc_compression(); }
+inline int EnsembleStatConfInfo::get_n_ens_var()    const { return(n_ens_var);             }
+inline int EnsembleStatConfInfo::get_max_n_thresh() const { return(max_n_thresh);          }
+inline int EnsembleStatConfInfo::get_n_vx()         const { return(n_vx);                  }
+inline int EnsembleStatConfInfo::get_compression_level()  { return(conf.nc_compression()); }
 
 ////////////////////////////////////////////////////////////////////////
 
