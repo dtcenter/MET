@@ -92,11 +92,13 @@ long SummaryObs::countSummaryHeaders()
    double prev_latitude = bad_data_double;
    double prev_longitude = bad_data_double;
    double prev_elevation = bad_data_double;
+   const string method_name = "SummaryObs::countSummaryHeaders()";
    
+   int obs_count = 0;
    for (vector< Observation >::iterator obs = summaries.begin();
         obs != summaries.end(); ++obs)
    {
-      obs->setHeaderIndex(nhdr);
+      obs_count++;
       if (obs->getHeaderType() != prev_header_type    ||
           obs->getStationId()  != prev_station_id     ||
           obs->getValidTime()  != prev_valid_time     ||
@@ -105,6 +107,9 @@ long SummaryObs::countSummaryHeaders()
           !is_eq(obs->getElevation(), prev_elevation))
       {
         nhdr++;
+        mlog << Debug(9) << "    " << method_name << "  hdrIndex: "
+             << nhdr << " at obs " << obs_count << "\n";
+        
       
         prev_header_type = obs->getHeaderType();
         prev_station_id  = obs->getStationId();
@@ -113,6 +118,7 @@ long SummaryObs::countSummaryHeaders()
         prev_longitude   = obs->getLongitude();
         prev_elevation   = obs->getElevation();
       }
+      obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */
    
    return nhdr;
