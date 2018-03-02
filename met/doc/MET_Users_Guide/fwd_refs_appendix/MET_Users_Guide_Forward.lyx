@@ -103,7 +103,7 @@ This user's guide is provided as an aid to users of the Model Evaluation
 \series medium
 It is important to note here that MET is an evolving software package.
  Previous releases of MET have occurred each year since 2008.
- This documentation describes the 6.1 release from December 2017.
+ This documentation describes the 7.0 release from March 2018.
  Intermediate releases may include bug fixes.
  MET is also be able to accept new modules contributed by the community.
  If you have code you would like to contribute, we will gladly consider
@@ -133,7 +133,7 @@ This User's Guide was prepared by the developers of the MET, including Tressa
 \end_layout
 
 \begin_layout Section*
-New for MET v6.1
+New for MET v7.0
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:New-for-MET"
@@ -146,7 +146,7 @@ name "sec:New-for-MET"
 \begin_layout Standard
 
 \series medium
-METv6.1 includes several major enhancements, including generalized point
+METv7.0 includes several major enhancements, including generalized point
  observations, unit conversion, data censoring, economic cost/loss value,
  gradients, fourier decomposition, relative position, and binned climatologies.
  The documentation also has some enhancements, including a Statistics Name
@@ -1285,7 +1285,7 @@ By using or downloading the Software, you agree to be bound by the terms
 \end_layout
 
 \begin_layout Standard
-The citation for tEis User's Guide should be:
+The citation for this User's Guide should be:
 \end_layout
 
 \begin_layout Standard
@@ -1297,7 +1297,7 @@ R.
  Jensen, 2017: The Model Evaluation Tools v6.1 (METv6.1) User’s Guide.
  Developmental Testbed Center.
  Available at: http://www.dtcenter.org/met/users/docs/users_guide/MET_Users_Guide_
-v6.1.pdf.
+v7.0.pdf.
  355 pp.
 \end_layout
 
