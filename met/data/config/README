@@ -416,7 +416,7 @@ regrid = {
 //
 // 	Examples of user-defined conversion functions include:
 //          censor_thresh = [ >12000 ];
-//	    censor_val      = [ 12000 ]; �
+//	    censor_val  � = [ 12000 ];
 //
 //      - The "cat_thresh" entry is an array of thresholds to be used when
 //        computing categorical statistics.
