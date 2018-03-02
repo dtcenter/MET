@@ -1432,6 +1432,12 @@ output_flag = {
 \end_layout
 
 \begin_layout LyX-Code
+   
+\series bold
+vcnt   = BOTH;
+\end_layout
+
+\begin_layout LyX-Code
 
 \series bold
    pct    = BOTH;
@@ -1597,6 +1603,14 @@ VL1L2
 VAL1L2
 \series medium
  for Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+VCNT
+\series default
+ for Vector Contingency Table Statistics
 \end_layout
 
 \begin_layout Enumerate
@@ -1941,8 +1955,8 @@ TYPE
 \series medium
  is one of 
 \series default
-fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, pct, pstd, pjc, prc, eclv,
- nbrctc, nbrcts
+fho, ctc, cts, mctc, mcts, cnt, sl1l2, vl1l2, vcnt, pct, pstd, pjc, prc,
+ eclv, nbrctc, nbrcts
 \series medium
 , 
 \series default
