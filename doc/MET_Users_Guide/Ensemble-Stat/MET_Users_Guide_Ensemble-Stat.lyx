@@ -726,8 +726,44 @@ duplicate_flag = NONE;
 
 \begin_layout LyX-Code
 
+\end_layout
+
+\begin_layout LyX-Code
+
 \series bold
 obs_quality    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+duplicate_flag = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_summary    = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_perc_value = 50;
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+message_type_group_map = [...];
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \begin_layout LyX-Code
@@ -987,12 +1023,6 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-sid_exc            = [];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
 ens_ssvar_bin_size = 1.0;
 \end_layout
 
@@ -1077,30 +1107,6 @@ fcst
 obs
 \series medium
  sections separately.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
-sid_exc
-\series medium
- entr
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-y, defined in the 
-\series bold
-obs
-\series medium
- dictionary, contains a comma-separated list of the station id's to be excluded
- from verification.
- This option is typically used when an observation file contains some stations
- known to have bad or unreliable data.
- 
 \end_layout
 
 \begin_layout Standard

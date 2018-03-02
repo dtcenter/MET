@@ -864,6 +864,76 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+message_type_group_map = [ { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";
+               },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                           { key = "ANYAIR";  val = "AIRCAR,AIRCFT";   
+                   },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                           { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR
+,MSONET"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+                           { key = "ONLYSF";  val = "ADPSFC,SFCSHP";   
+                   } ];
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\series medium
+The 
+\series bold
+message_type_group_map
+\series medium
+ entry is an array of dictionaries, each containing a 
+\series bold
+key
+\series medium
+ string and 
+\series bold
+val
+\series medium
+ string.
+ This defines a mapping of message type group names to a comma-separated
+ list of values.
+ This map is defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat.
+ Modify this map to define sets of message types that should be processed
+ together as a group.
+ The 
+\series bold
+SURFACE
+\series medium
+ entry must be present to define message types for which surface verification
+ logic should be applied.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 station_id = [];
 \end_layout
 
@@ -1525,6 +1595,248 @@ event_stack_flag
 BOTTOM
 \series medium
  option uses the data closest to raw values.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+time_summary = {
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   flag       = FALSE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   beg        = "000000";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   end        = "235959";
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   step       = 300;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   width      = 600;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   grib_code  = [ 11, 204, 211 ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   obs_var    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   type       = [ "min", "max", "range", "mean", "stdev", "median", "p80"
+ ];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_freq   = 0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   vld_thresh = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+}
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+time_summary
+\series medium
+ dictionary enables additional processing for observations with high temporal
+ resolution.
+ The 
+\series bold
+flag
+\series medium
+ entry toggles the 
+\series bold
+time_summary
+\series medium
+ on (
+\series bold
+TRUE
+\series medium
+) and off (
+\series bold
+FALSE
+\series medium
+).
+ Observations may be summarized across the user specified time period defined
+ by the 
+\series bold
+beg
+\series medium
+ and 
+\series bold
+end
+\series medium
+ entries in HHMMSS format.
+ The 
+\series bold
+step
+\series medium
+ entry defines the time between intervals in seconds.
+ The 
+\series bold
+width
+\series medium
+ entry specifies the width of the summary interval in seconds.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+This example listed above does a 10-minute time summary (width = 600;) every
+ 5 minutes (step = 300;) throughout the day (beg = 
+\begin_inset Quotes eld
+\end_inset
+
+000000
+\begin_inset Quotes erd
+\end_inset
+
+; end = 235959
+\begin_inset Quotes erd
+\end_inset
+
+;).
+ The first interval will be from 23:55:00 the previous day through 00:04:59
+ of the current day.
+ The second interval will be from 0:00:00 through 00:09:59.
+ And so on.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The summaries will only be calculated for the observations specified in
+ the 
+\series bold
+grib_code
+\series medium
+ or 
+\series bold
+obs_var
+\series medium
+ entries.
+ The 
+\series bold
+grib_code
+\series medium
+ entry is an array of itegers while the 
+\series bold
+obs_var
+\series medium
+ entries is an array of strings.
+ The supported summaries are 
+\series bold
+min
+\series medium
+ (minimum),
+\series bold
+ max
+\series medium
+ (maximum), 
+\series bold
+range
+\series medium
+, 
+\series bold
+mean
+\series medium
+, 
+\series bold
+stdev
+\series medium
+ (standard deviation), 
+\series bold
+median
+\series medium
+ and 
+\series bold
+p##
+\series medium
+ (percentile, with the desired percentile value specified in place of ##).
+ If multiple summaries are selected in a single run, a string indicating
+ the summary method applied will be appended to the output message type.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+vld_freq
+\series default
+ and 
+\series bold
+vld_thresh
+\series default
+ entries specify the required ratio of valid data for an output time summary
+ value to be computed.
+ This option is only applied when these entries are set to non-zero values.
+ The 
+\series bold
+vld_freq
+\series default
+ entry specifies the expected frequency of obesrvations in seconds.
+ The width of the time window is divided by this frequency to compute the
+ expected number of observations for the time window.
+ The actual number of valid observations is divided by the expected number
+ to compute the ratio of valid data.
+ An output time summary value will only be written if that ratio is greater
+ than or equal to the 
+\series bold
+vld_thresh
+\series default
+ entry.
+ Detailed information about which observations are excluded is provided
+ at debug level 4.
 \end_layout
 
 \begin_layout Subsection
@@ -3168,6 +3480,12 @@ time_summary = {
 \begin_layout LyX-Code
 
 \series bold
+   obs_var    = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    type       = [ "min", "max", "range", "mean", "stdev", "median", "p80"
  ];
 \end_layout
@@ -3193,95 +3511,20 @@ time_summary = {
 \begin_layout Standard
 
 \series medium
-The time summary feature was implemented to allow additional processing
- of observations with high temporal resolution, such as SURFRAD data every
- 5 minutes.
- The "flag" entry toggles the "time_summary" on (TRUE) and off (FALSE).
- Observations may be summarized across the user specified time period defined
- by the "beg" and "end" entries in HHMMSS format.
- The "step" entry defines the time between intervals in seconds.
- The "width" entry specifies the width of the summary interval in seconds.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-This example listed above does a 10-minute time summary (width = 600;) every
- 5 minutes (step = 300;) throughout the day (beg = 
-\begin_inset Quotes eld
-\end_inset
-
-000000
-\begin_inset Quotes erd
-\end_inset
-
-; end = 235959
-\begin_inset Quotes erd
-\end_inset
-
-;).
- The first interval will be from 23:55:00 the previous day through 00:04:59
- of the current day.
- The second interval will be from 0:00:00 through 00:09:59.
- And so on.
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The summaries will only be calculated for the specified GRIB codes.
- The supported summaries are "min" (minimum), "max" (maximum), "range",
- "mean", "stdev" (standard deviation), "median" and "p##" (percentile, with
- the desired percentile value specified in place of ##).
- If multiple summaries are selected in a single run, a string indicating
- the summary method applied will be appended to the output message type.
-\end_layout
-
-\begin_layout Standard
 The 
-\begin_inset Quotes eld
+\series bold
+time_summary
+\series medium
+ feature was implemented to allow additional processing of observations
+ with high temporal resolution, such as SURFRAD data every 5 minutes.
+ This option is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pb2nc-configuration-file"
+
 \end_inset
 
-vld_freq
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-vld_thresh
-\begin_inset Quotes erd
-\end_inset
-
- entries specify the required ratio of valid data for an output time summary
- value to be computed.
- This option is only applied when these entries are set to non-zero values.
- The 
-\begin_inset Quotes eld
-\end_inset
-
-vld_freq
-\begin_inset Quotes erd
-\end_inset
-
- entry specifies the expected frequency of obesrvations in seconds.
- The width of the time window is divided by this frequency to compute the
- expected number of observations for the time window.
- The actual number of valid observations is divided by the expected number
- to compute the ratio of valid data.
- An output time summary value will only be written if that ratio is greater
- than or equal to the 
-\begin_inset Quotes eld
-\end_inset
-
-vld_thresh
-\begin_inset Quotes erd
-\end_inset
-
- entry.
- Detailed information about which observations are excluded is provided
- at debug level 4.
+.
 \end_layout
 
 \begin_layout Standard
@@ -3363,9 +3606,15 @@ message_type_map = [
 \end_layout
 
 \begin_layout Standard
-This entry is an array of dictionaries, each containing a "key" string and
- "val" string which define a mapping of input strings to output message
- types.
+This entry is an array of dictionaries, each containing a 
+\series bold
+key
+\series default
+ string and 
+\series bold
+val
+\series default
+ string which define a mapping of input strings to output message types.
  This mapping is currently only applied when converting input little_r report
  types to output message types.
 \end_layout

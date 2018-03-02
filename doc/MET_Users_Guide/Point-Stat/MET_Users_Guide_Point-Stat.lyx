@@ -1977,6 +1977,18 @@ duplicate_flag = NONE;
 \begin_layout LyX-Code
 
 \series bold
+obs_summary    = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_perc_value = 50;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 tmp_dir        = "/tmp";
 \end_layout
 
@@ -2129,6 +2141,21 @@ http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 \series bold
 obs = fcst;
 \series medium
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+message_group_map
+\series medium
+ entry is described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pb2nc-configuration-file"
+
+\end_inset
+
 .
 \end_layout
 
