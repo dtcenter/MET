@@ -1,5 +1,5 @@
 C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-C*      ** Copyright UCAR (c) 1992 - 2013
+C*      ** Copyright UCAR (c) 1992 - 2018
 C*      ** University Corporation for AtmospheriC*Research (UCAR)
 C*      ** National Center for AtmospheriC*Research (NCAR)
 C*      ** Research Applications Lab (RAL)
