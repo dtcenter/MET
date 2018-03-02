@@ -720,24 +720,24 @@ interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
 
 \begin_layout LyX-Code
 
-\series bold
-duplicate_flag = NONE;
 \end_layout
 
 \begin_layout LyX-Code
 
+\series bold
+sid_exc        = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+duplicate_flag = NONE;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
 obs_quality    = [];
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-duplicate_flag = NONE;
 \end_layout
 
 \begin_layout LyX-Code

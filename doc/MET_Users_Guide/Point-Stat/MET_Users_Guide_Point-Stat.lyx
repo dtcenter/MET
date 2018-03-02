@@ -1958,20 +1958,24 @@ interp         = { vld_thresh = 1.0; shape = SQUARE;
 
 \begin_layout LyX-Code
 
-\series bold
-obs_quality    = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-rank_corr_flag = TRUE;
+sid_exc        = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
 duplicate_flag = NONE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+obs_quality    = [];
 \end_layout
 
 \begin_layout LyX-Code
@@ -1984,6 +1988,26 @@ obs_summary    = NONE;
 
 \series bold
 obs_perc_value = 50;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+rank_corr_flag = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+message_type_group_map = [...];
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \begin_layout LyX-Code
@@ -2007,13 +2031,7 @@ version        = "VN.N";
 \begin_layout Standard
 
 \series medium
-The 
-\series bold
-duplicate_flag
-\series medium
- option has expanded logic as of METv6.0 for how to handle multiple observations
- at the same station within the time window.
- The configuration options listed above are common to many MET tools and
+The configuration options listed above are common to many MET tools and
  are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2095,24 +2113,6 @@ obs
 \series medium
 The 
 \series bold
-sid_exc
-\series medium
- entry, defined in the 
-\series bold
-obs
-\series medium
- dictionary, contains a comma-separated list of the station id's to be excluded
- from verification.
- This option is typically used when an observation file contains some stations
- known to have bad or unreliable data.
- 
-\end_layout
-
-\begin_layout Standard
-
-\series medium
-The 
-\series bold
 message_type
 \series medium
  entry, defined in the 
@@ -2141,21 +2141,6 @@ http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm
 \series bold
 obs = fcst;
 \series medium
-.
-\end_layout
-
-\begin_layout Standard
-The 
-\series bold
-message_group_map
-\series medium
- entry is described in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:pb2nc-configuration-file"
-
-\end_inset
-
 .
 \end_layout
 
