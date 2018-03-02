@@ -2395,7 +2395,8 @@ VL1L2
 \series bold
 VCNT
 \series medium
- for Vector Continuous Statistics
+ for Vector Continuous Statistics (Note that bootstrap confidence intervals
+ are not currently calculated for this line type.)
 \end_layout
 
 \begin_layout Description
@@ -10446,6 +10447,10 @@ status open
 \begin_layout Plain Layout
 Format information for VAL1L2 (Vector Anomaly Partial Sums) output line
  type.
+ Note that each statistic (except TOTAL) is followed by two columns giving
+ bootstrap confidence intervals.
+ These confidence intervals are not currently calculated for this release
+ of MET, but will be in future releases.
 \end_layout
 
 \end_inset
@@ -10465,7 +10470,7 @@ name "table_PS_format_info_VCNT"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="21" columns="3">
-<features tabularvalignment="middle">
+<features islongtable="true" longtabularalignment="center">
 <column alignment="center" valignment="top" width="2.5cm">
 <column alignment="center" valignment="top" width="4.5cm">
 <column alignment="center" valignment="middle" width="9cm">
@@ -10507,7 +10512,7 @@ VCNT OUTPUT FORMAT
 \begin_layout Plain Layout
 
 \series bold
-Column Number
+Column Numbers
 \end_layout
 
 \end_inset
@@ -10581,14 +10586,6 @@ Total number of data points
 FBAR
 \end_layout
 
-\begin_layout Plain Layout
-FBAR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-FBAR_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -10616,14 +10613,6 @@ Mean value of forecast wind speed
 
 \begin_layout Plain Layout
 OBAR
-\end_layout
-
-\begin_layout Plain Layout
-OBAR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-OBAR_BCU
 \end_layout
 
 \end_inset
@@ -10655,14 +10644,6 @@ Mean value of observed wind speed
 FS_RMS
 \end_layout
 
-\begin_layout Plain Layout
-FS_RMS_BCL
-\end_layout
-
-\begin_layout Plain Layout
-FS_RMS_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -10692,14 +10673,6 @@ Root mean square forcast wind speed
 OS_RMS
 \end_layout
 
-\begin_layout Plain Layout
-OS_RMS_BCL
-\end_layout
-
-\begin_layout Plain Layout
-OS_RMS_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -10727,14 +10700,6 @@ Root mean square observed wind speed
 
 \begin_layout Plain Layout
 MSVE
-\end_layout
-
-\begin_layout Plain Layout
-MSVE_BCL
-\end_layout
-
-\begin_layout Plain Layout
-MSV_BCU
 \end_layout
 
 \end_inset
@@ -10767,14 +10732,6 @@ Mean squared length of the vector difference between the forecast and observed
 RMSVE
 \end_layout
 
-\begin_layout Plain Layout
-RMSVE_BCL
-\end_layout
-
-\begin_layout Plain Layout
-RMSVE_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -10802,14 +10759,6 @@ Square root of MSVE
 
 \begin_layout Plain Layout
 FSTDEV
-\end_layout
-
-\begin_layout Plain Layout
-FSTDEV_BCL
-\end_layout
-
-\begin_layout Plain Layout
-FSTDEV_BCU
 \end_layout
 
 \end_inset
@@ -10841,14 +10790,6 @@ Standard deviation of the forecast wind speed
 OSTDEV
 \end_layout
 
-\begin_layout Plain Layout
-OSTDEV_BCL
-\end_layout
-
-\begin_layout Plain Layout
-OSTDEV_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -10876,14 +10817,6 @@ Standard deviation of the observed wind field
 
 \begin_layout Plain Layout
 FDIR
-\end_layout
-
-\begin_layout Plain Layout
-FDIR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-FDIR_BCU
 \end_layout
 
 \end_inset
@@ -10915,14 +10848,6 @@ Direction of the average forecast wind vector
 ODIR
 \end_layout
 
-\begin_layout Plain Layout
-ODIR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-ODIR_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -10950,14 +10875,6 @@ Direction of the average observed wind vector
 
 \begin_layout Plain Layout
 FBAR_SPEED
-\end_layout
-
-\begin_layout Plain Layout
-FBAR_SPEED_BCL
-\end_layout
-
-\begin_layout Plain Layout
-FBAR_SPEED_BCU
 \end_layout
 
 \end_inset
@@ -10989,14 +10906,6 @@ Length (speed) of the average forecast wind vector
 OBAR_SPEED
 \end_layout
 
-\begin_layout Plain Layout
-OBAR_SPEED_BCL
-\end_layout
-
-\begin_layout Plain Layout
-OBAR_SPEED_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -11024,14 +10933,6 @@ Length (speed) of the average observed wind vector
 
 \begin_layout Plain Layout
 VDIFF_SPEED
-\end_layout
-
-\begin_layout Plain Layout
-VDIFF_SPEED_BCL
-\end_layout
-
-\begin_layout Plain Layout
-VDIFF_SPEED_BCU
 \end_layout
 
 \end_inset
@@ -11064,14 +10965,6 @@ Length (speed) of the vector difference between the average forecast and
 VDIFF_DIR
 \end_layout
 
-\begin_layout Plain Layout
-VDIFF_DIR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-VDIFF_DIR_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -11085,7 +10978,7 @@ Direction of the vector difference between the average forecast and average
 \end_inset
 </cell>
 </row>
-<row>
+<row newpage="true">
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -11100,14 +10993,6 @@ Direction of the vector difference between the average forecast and average
 
 \begin_layout Plain Layout
 SPEED_ERR
-\end_layout
-
-\begin_layout Plain Layout
-SPEED_ERR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-SPEED_ERR_BCU
 \end_layout
 
 \end_inset
@@ -11140,14 +11025,6 @@ Difference between the length of the average forecast wind vector and the
 SPEED_ABSERR
 \end_layout
 
-\begin_layout Plain Layout
-SPEED_ABSERR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-SPEED_ABSERR_BCU
-\end_layout
-
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
@@ -11175,14 +11052,6 @@ Absolute value of SPEED_ERR
 
 \begin_layout Plain Layout
 DIR_ERR
-\end_layout
-
-\begin_layout Plain Layout
-DIR_ERR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-DIR_ERR_BCU
 \end_layout
 
 \end_inset
@@ -11215,14 +11084,6 @@ Signed angle between the directions of the average forecast and observed
 
 \begin_layout Plain Layout
 DIR_ABSERR
-\end_layout
-
-\begin_layout Plain Layout
-DIR_ABSERR_BCL
-\end_layout
-
-\begin_layout Plain Layout
-DIR_ABSERR_BCU
 \end_layout
 
 \end_inset
