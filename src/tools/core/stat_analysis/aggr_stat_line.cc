@@ -760,7 +760,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
 
       // Option 1: Use -line_type once with no colons in -column option
       if(sa.n_elements() == 1 && j.line_type.n_elements() == 1) {
-         cs << j.line_type[0] << ":" << sa[0];
+         cs << cs_erase << j.line_type[0] << ":" << sa[0];
          req_stat.add(cs);
          req_lty.add(j.line_type[0]);
          req_col.add(sa[0]);
@@ -886,7 +886,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
                continue;
             }
             else {
-               v = atof(line.get_item(req_col[i]));
+               v = j.get_column_double(line, req_col[i]);
                w = atoi(line.get_item("TOTAL"));
             }
 
