@@ -1,4 +1,4 @@
-Model Evaluation Tools METv6.1 (December 4, 2017)
+Model Evaluation Tools METv7.0 (March 5, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -294,6 +294,75 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 7.0 Release Notes:
+-------------------------
+
+- What's New:
+   - Major Enhancements: add vector statistics for winds, finer control of
+     configuration options, message type groups, and WMO mean summary statistics
+
+- Enhancements to Existing Tools:
+   - Distribute the latest set of bugfixes, details not listed here.
+   - Vector statistics for winds
+      - Add vector wind speeds to the existing VL1L2 line type (F_SPEED_BAR and
+        O_SPEED_BAR).
+      - Add a new VCNT line type containing statistics for wind vectors.
+      - Enhance STAT-Analysis to parse the updated VL1L2 line type, parse the
+        new VCNT line type, and derive VCNT statistics from input VL1L2 lines.
+      - Enhance STAT-Analysis to read U/V matched pair (MPR) lines and derive
+        VL1L2 or VCNT output lines.
+   - Config file options
+      - Refactor config file logic for Point-Stat, Grid-Stat, and Ensemble-Stat.
+      - Whenever possible, parse config file options separately for each
+        verification task rather than parsing from the top level.
+      - See default config files for the list of options which may be specified
+        separately for each "obs.field" entry.
+      - Parse the "regrid" option separately for each field so that regridding
+        logic can be customized for each field (e.g. use BUDGET for
+        precipitation and BILIN for temperature).
+      - Add "message_type_group" config file option to define message types that
+        should be processed together as a group.  Enhance PB2NC, Point-Stat,
+        and Ensemble-Stat to parse and process groups of message types.
+   - PB2NC
+      - Add specialized processing for AIRNOW message types to use the TPHR
+        value as the accumulation interval and the QCIND value as the quality
+        control value.
+   - STAT-Analysis
+      - Enhance the existing summary job type.
+        - Print debug messages and warnings when summary includes multiple
+          values for each header column.
+        - Add three new output columns for WMO-approved means of daily scores
+          (WMO_TYPE, WMO_MEAN, and WMO_WEIGHTED_MEAN).
+        - Process columns of data from multiple input line types when the
+          following format is used "-column LINE_TYPE:COLUMN".
+        - Add -derive job command option to automatically compute statistics
+          on the fly from input partial sums (SL1L2/SAL1L2 -> CNT, VL1L2 ->
+          VCNT, and CTC -> CTS).
+   - Point-Stat
+      - Append the shape to the INTERP_MTHD column but omit it for NEAREST,
+        BILIN, and BUDGET methods.
+   - Grid-Stat
+      - Add "nbrhd.field" config file option to control the computation of
+        fractional coverage fields.
+   - Ensemble-Stat
+      - Add "nc_var_str" config file option to customize NetCDF variable names.
+      - Add "ensemble_flag.latlon" config file option.
+   - MTD
+      - Rename output files using a more explicit naming convention:
+         - Rename *_3d_ss.txt to *_3d_simple_single.txt.
+         - Rename *_3d_sc.txt to *_3d_simple_cluster.txt.
+         - Rename *_3d_ps.txt to *_3d_pair_single.txt.
+         - Rename *_3d_pc.txt to *_3d_pair_cluser.txt.
+      - Update output file conventions to match the logic of MODE:
+         - Rename the "OBJ_ID" column to "OBJECT_ID".
+         - Rename the "CLUSTER_ID" column to "OBJECT_CAT".
+         - Change object naming conventions for "OBJECT_ID" and "OBJECT_CAT":
+           - FROM: F_#,  O_#,  F_#_O_#,   CF_#,  CO_#,  and CF_#_CF_#
+           - TO:   F###, O###, F###_O###, CF###, CO###, and CF###_CO###
+           - Where ### is a 3-digit object number with leading 0's.
+           - Indicate unmatched objects with a 3-digit "000" object number.
+         - Only write pair information to *_pair_cluster.txt for matches.
 
 Version 6.1 Release Notes:
 -------------------------

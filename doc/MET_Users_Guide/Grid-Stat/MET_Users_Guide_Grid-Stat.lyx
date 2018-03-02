@@ -1216,7 +1216,21 @@ nbrhd = {
 \begin_layout LyX-Code
 
 \series bold
+   field      = BOTH;
+\series default
+   
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    vld_thresh = 1.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   shape      = SQUARE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1246,12 +1260,57 @@ nbrhd
 \series medium
  dictionary contains a list of values to be used in defining the neighborhood
  to be used when computing neighborhood verification statistics.
- The neighborhood is simply a square centered on the current point and the
- 
+ The neighborhood 
+\series bold
+shape
+\series medium
+ is a 
+\series bold
+SQUARE
+\series medium
+ or 
+\series bold
+CIRCLE
+\series medium
+ centered on the current point, and the 
 \series bold
 width
 \series medium
- value specifies the width of that square as an odd integer.
+ value specifies the width of the square or diameter of the circle as an
+ odd integer.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The 
+\series bold
+field
+\series medium
+ entry is set to 
+\series bold
+BOTH
+\series medium
+, 
+\series bold
+FCST
+\series medium
+, 
+\series bold
+OBS
+\series medium
+, or 
+\series bold
+NONE
+\series medium
+ to indicate the fields to which the fractional coverage derivation logic
+ should be applied.
+ This should always to be set to 
+\series bold
+BOTH
+\series medium
+ unless you have already computed the fractional coverage field(s) with
+ numbers between 0 and 1 outside of MET.
 \end_layout
 
 \begin_layout Standard
