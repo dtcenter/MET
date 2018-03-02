@@ -1963,6 +1963,34 @@ interp         = { vld_thresh = 1.0; shape = SQUARE;
 \begin_layout LyX-Code
 
 \series bold
+censor_thresh  = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+censor_val     = [];
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+eclv_points    = 0.05;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+rank_corr_flag = TRUE;
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 sid_exc        = [];
 \end_layout
 
@@ -1988,12 +2016,6 @@ obs_summary    = NONE;
 
 \series bold
 obs_perc_value = 50;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-rank_corr_flag = TRUE;
 \end_layout
 
 \begin_layout LyX-Code
