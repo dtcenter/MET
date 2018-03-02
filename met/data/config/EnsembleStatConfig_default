@@ -224,8 +224,6 @@ rng = {
 
 grid_weight_flag = NONE;
 output_prefix    = "";
-obs_quality      = [];
-output_prefix    = "";
 version          = "V7.0";
 
 ////////////////////////////////////////////////////////////////////////////////
