@@ -9993,7 +9993,7 @@ O_SPEED_BAR
 \begin_inset Text
 
 \begin_layout Plain Layout
-Mean observed wind speed
+mean observed wind speed
 \end_layout
 
 \end_inset
@@ -10452,10 +10452,10 @@ name "table_PS_format_info_VCNT"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="11" columns="3">
+<lyxtabular version="3" rows="21" columns="3">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="2.5cm">
-<column alignment="center" valignment="top" width="4cm">
+<column alignment="center" valignment="top" width="4.5cm">
 <column alignment="center" valignment="middle" width="9cm">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -10583,7 +10583,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Mean value of forecast wind speed
 \end_layout
 
 \end_inset
@@ -10603,7 +10603,15 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+OBAR
+\end_layout
 
+\begin_layout Plain Layout
+OBAR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+OBAR_BCU
 \end_layout
 
 \end_inset
@@ -10612,7 +10620,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Mean value of observed wind speed
 \end_layout
 
 \end_inset
@@ -10632,7 +10640,15 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+FS_RMS
+\end_layout
 
+\begin_layout Plain Layout
+FS_RMS_BCL
+\end_layout
+
+\begin_layout Plain Layout
+FS_RMS_BCU
 \end_layout
 
 \end_inset
@@ -10641,7 +10657,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Root mean square forcast wind speed
 \end_layout
 
 \end_inset
@@ -10652,7 +10668,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-33-35
+33–35
 \end_layout
 
 \end_inset
@@ -10661,7 +10677,15 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+OS_RMS
+\end_layout
 
+\begin_layout Plain Layout
+OS_RMS_BCL
+\end_layout
+
+\begin_layout Plain Layout
+OS_RMS_BCU
 \end_layout
 
 \end_inset
@@ -10670,7 +10694,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Root mean square observed wind speed
 \end_layout
 
 \end_inset
@@ -10681,7 +10705,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+36–38
 \end_layout
 
 \end_inset
@@ -10690,7 +10714,15 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+MSVE
+\end_layout
 
+\begin_layout Plain Layout
+MSVE_BCL
+\end_layout
+
+\begin_layout Plain Layout
+MSV_BCU
 \end_layout
 
 \end_inset
@@ -10699,7 +10731,8 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Mean squared length of the vector difference between the forecast and observed
+ winds
 \end_layout
 
 \end_inset
@@ -10710,7 +10743,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+39–41
 \end_layout
 
 \end_inset
@@ -10719,7 +10752,15 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+RMSVE
+\end_layout
 
+\begin_layout Plain Layout
+RMSVE_BCL
+\end_layout
+
+\begin_layout Plain Layout
+RMSVE_BCU
 \end_layout
 
 \end_inset
@@ -10728,7 +10769,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Square root of MSVE
 \end_layout
 
 \end_inset
@@ -10739,7 +10780,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+42–44
 \end_layout
 
 \end_inset
@@ -10748,7 +10789,15 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+FSTDEV
+\end_layout
 
+\begin_layout Plain Layout
+FSTDEV_BCL
+\end_layout
+
+\begin_layout Plain Layout
+FSTDEV_BCU
 \end_layout
 
 \end_inset
@@ -10757,7 +10806,383 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+Standard deviation of the forecast wind speed
+\end_layout
 
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+45–47
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OSTDEV
+\end_layout
+
+\begin_layout Plain Layout
+OSTDEV_BCL
+\end_layout
+
+\begin_layout Plain Layout
+OSTDEV_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Standard deviation of the observed wind field
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+48–50
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FDIR
+\end_layout
+
+\begin_layout Plain Layout
+FDIR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+FDIR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Direction of the average forecast wind vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+51–53
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ODIR
+\end_layout
+
+\begin_layout Plain Layout
+ODIR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+ODIR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Direction of the average observed wind vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+54–56
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+FBAR_SPEED
+\end_layout
+
+\begin_layout Plain Layout
+FBAR_SPEED_BCL
+\end_layout
+
+\begin_layout Plain Layout
+FBAR_SPEED_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Length (speed) of the average forecast wind vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+57–59
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBAR_SPEED
+\end_layout
+
+\begin_layout Plain Layout
+OBAR_SPEED_BCL
+\end_layout
+
+\begin_layout Plain Layout
+OBAR_SPEED_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Length (speed) of the average observed wind vector
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+60–62
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VDIFF_SPEED
+\end_layout
+
+\begin_layout Plain Layout
+VDIFF_SPEED_BCL
+\end_layout
+
+\begin_layout Plain Layout
+VDIFF_SPEED_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Length (speed) of the vector difference between the average forecast and
+ average observed wind vectors
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+63–65
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VDIFF_DIR
+\end_layout
+
+\begin_layout Plain Layout
+VDIFF_DIR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+VDIFF_DIR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Direction of the vector difference between the average forecast and average
+ wind vectors
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+66–68
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SPEED_ERR
+\end_layout
+
+\begin_layout Plain Layout
+SPEED_ERR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+SPEED_ERR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Difference between the length of the average forecast wind vector and the
+ average observed wind vector (in the sense F - O)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+69–71
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SPEED_ABSERR
+\end_layout
+
+\begin_layout Plain Layout
+SPEED_ABSERR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+SPEED_ABSERR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Absolute value of SPEED_ERR
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+72–74
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DIR_ERR
+\end_layout
+
+\begin_layout Plain Layout
+DIR_ERR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+DIR_ERR_BCU
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Signed angle between the directions of the average forecast and observed
+ wing vectors.
+ Positive if the forecast wind vector is counterclockwise from the observed
+ wind vector
 \end_layout
 
 \end_inset
@@ -10768,7 +11193,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+75–77
 \end_layout
 
 \end_inset
@@ -10777,7 +11202,15 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
+DIR_ABSERR
+\end_layout
 
+\begin_layout Plain Layout
+DIR_ABSERR_BCL
+\end_layout
+
+\begin_layout Plain Layout
+DIR_ABSERR_BCU
 \end_layout
 
 \end_inset
@@ -10786,7 +11219,7 @@ FBAR_BCU
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Absolute value of DIR_ABSERR
 \end_layout
 
 \end_inset
