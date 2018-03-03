@@ -155,6 +155,7 @@ output_flag = {
    sal1l2 = NONE;
    vl1l2  = STAT;
    val1l2 = NONE;
+   vcnt   = STAT;
    pct    = NONE;
    pstd   = NONE;
    pjc    = NONE;
