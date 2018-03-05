@@ -187,6 +187,13 @@ void STATAnalysisJob::clear() {
    out_obs_wind_thresh.clear();
    out_wind_logic = SetLogic_Union;
 
+   out_alpha      = bad_data_double;
+   boot_interval  = bad_data_int;
+   boot_rep_prop  = bad_data_double;
+   n_boot_rep     = bad_data_int;
+   rank_corr_flag = false;
+   vif_flag       = false;
+
    // Initialize ramp job settings
    ramp_type       = default_ramp_type;
    ramp_time_fcst  = default_ramp_time;
@@ -200,16 +207,7 @@ void STATAnalysisJob::clear() {
    swing_width     = bad_data_double;
 
    // Set to default values
-   out_alpha       = default_alpha;
-   out_bin_size    = default_bin_size;
-   boot_interval   = default_boot_interval;
-   boot_rep_prop   = default_boot_rep_prop;
-   n_boot_rep      = default_n_boot_rep;
-   set_boot_rng (default_boot_rng);
-   set_boot_seed(default_boot_seed);
-   rank_corr_flag  = default_rank_corr_flag;
-   vif_flag        = default_vif_flag;
-
+   out_bin_size = default_bin_size;
    for(int i=1; i*default_eclv_points < 1.0; i++) {
       out_eclv_points.add(i*default_eclv_points);
    }
