@@ -31,17 +31,9 @@
 //
 // Defaults to be used if not specified by the user
 //
-static const double default_alpha          = 0.05;
-static const double default_bin_size       = 0.05;
-static const double default_eclv_points    = 0.05;
-static const int    default_boot_interval  = 1;
-static const double default_boot_rep_prop  = 1.0;
-static const int    default_n_boot_rep     = 1000;
-static const char   default_boot_rng[]     = "mt19937";
-static const char   default_boot_seed[]    = "";
-static const int    default_rank_corr_flag = 1;
-static const int    default_vif_flag       = 0;
-static const bool   default_do_derive      = false;
+static const double default_bin_size    = 0.05;
+static const double default_eclv_points = 0.05;
+static const bool   default_do_derive   = false;
 
 //
 // Ramp job type defaults
