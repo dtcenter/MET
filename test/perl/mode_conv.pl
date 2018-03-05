@@ -196,21 +196,21 @@ while(<$fh_mode_in>){
   # write a cts line
   my $fmt_val;
   if( $type eq "c" ){
-    push @outs, (" MODE_CTS ", @vals[2,3,19 .. 37]);
+    push @outs, (" MODE_CTS ", @vals[2,3,20 .. 38]);
     $fmt_val = $fmt_cts;
   }
 
-  # write a pair object attribute line
-  elsif( $vals[17] !~ /_/ ){
+  # write a single object attribute line
+  elsif( $vals[20] !~ /_/ ){
     next if( $type eq "p");
-    push @outs, (" MODE_SOA ", @vals[2,3,19 .. 43]);
+    push @outs, (" MODE_SOA ", @vals[2,3,20 .. 41]);
     $fmt_val = $fmt_sing;
   }
 
-  # write a single object attribute line
+  # write a pair object attribute line
   else {
     next if ($type eq "s");
-    push @outs, (" MODE_POA ", @vals[2,3,19,20,42 .. 53]);
+    push @outs, (" MODE_POA ", @vals[2,3,20,21,42 .. 53]);
     $fmt_val = $fmt_pair;
   }
 
@@ -220,81 +220,80 @@ while(<$fh_mode_in>){
 
 close($fh_mode_in);
 
-
 #  0 - VERSION
 #  1 - MODEL
 #  2 - N_VALID
-#  3  - GRID_RES
-...
-#  2 - DESC
-#  3 - FCST_LEAD
-#  4 - FCST_VALID
-#  5 - FCST_ACCUM
-#  6 - OBS_LEAD
-#  7 - OBS_VALID
-#  8 - OBS_ACCUM
-#  9 - FCST_RAD
-# 10 - FCST_THR
-# 11 - OBS_RAD
-# 12 - OBS_THR
-# 13 - FCST_VAR
-# 14 - FCST_LEV
-# 15 - OBS_VAR
-# 16 - OBS_LEV
+#  3 - GRID_RES
+#  4 - DESC
+#  5 - FCST_LEAD
+#  6 - FCST_VALID
+#  7 - FCST_ACCUM
+#  8 - OBS_LEAD
+#  9 - OBS_VALID
+# 10 - OBS_ACCUM
+# 11 - FCST_RAD
+# 12 - FCST_THR
+# 13 - OBS_RAD
+# 14 - OBS_THR
+# 15 - FCST_VAR
+# 16 - FCST_LEV
+# 17 - OBS_VAR
+# 18 - OBS_LEV
+# 19 - OBTYPE
 
-# 17 - OBJECT_ID
-# 18 - OBJECT_CAT
-# 19 - CENTROID_X
-# 20 - CENTROID_Y
-# 21 - CENTROID_LAT
-# 22 - CENTROID_LON
-# 23 - AXIS_ANG
-# 24 - LENGTH
-# 25 - WIDTH
-# 26 - AREA
-# 27 - AREA_THRESH
-# 28 - CURVATURE
-# 29 - CURVATURE_X
-# 30 - CURVATURE_Y
-# 31 - COMPLEXITY
-# 32 - INTENSITY_10
-# 33 - INTENSITY_25
-# 34 - INTENSITY_50
-# 35 - INTENSITY_75
-# 36 - INTENSITY_90
+# 20 - OBJECT_ID
+# 21 - OBJECT_CAT
+
+# 22 - CENTROID_X
+# 23 - CENTROID_Y
+# 24 - CENTROID_LAT
+# 25 - CENTROID_LON
+# 26 - AXIS_ANG
+# 27 - LENGTH
+# 28 - WIDTH
+# 29 - AREA
+# 30 - AREA_THRESH
+# 31 - CURVATURE
+# 32 - CURVATURE_X
+# 33 - CURVATURE_Y
+# 34 - COMPLEXITY
+# 35 - INTENSITY_10
+# 36 - INTENSITY_25
 # 37 - INTENSITY_50
-# 38 - INTENSITY_SUM
-# 39 - CENTROID_DIST
-# 40 - BOUNDARY_DIST
-# 41 - CONVEX_HULL_DIST
-# 42 - ANGLE_DIFF
-# 43 - AREA_RATIO
-# 44 - INTERSECTION_AREA
-# 45 - UNION_AREA
-# 46 - SYMMETRIC_DIFF
-# 47 - INTERSECTION_OVER_AREA
-# 48 - COMPLEXITY_RATIO
-# 49 - PERCENTILE_INTENSITY_RATIO
-# 50 - INTEREST
+# 38 - INTENSITY_75
+# 39 - INTENSITY_90
+# 40 - INTENSITY_50
+# 41 - INTENSITY_SUM
 
-# 17 - FIELD
-# 18 - TOTAL
-# 19 - FY_OY
-# 20 - FY_ON
-# 21 - FN_OY
-# 22 - FN_ON
-# 23 - BASER
-# 24 - FMEAN
-# 25 - ACC
-# 26 - FBIAS
-# 27 - PODY
-# 28 - PODN
-# 29 - POFD
-# 30 - FAR
-# 31 - CSI
-# 32 - GSS
-# 33 - HK
-# 34 - HSS
-# 35 - ODDS
+# 42 - CENTROID_DIST
+# 43 - BOUNDARY_DIST
+# 44 - CONVEX_HULL_DIST
+# 45 - ANGLE_DIFF
+# 46 - AREA_RATIO
+# 47 - INTERSECTION_AREA
+# 48 - UNION_AREA
+# 49 - SYMMETRIC_DIFF
+# 50 - INTERSECTION_OVER_AREA
+# 51 - COMPLEXITY_RATIO
+# 52 - PERCENTILE_INTENSITY_RATIO
+# 53 - INTEREST
 
-
+# 20 - FIELD
+# 21 - TOTAL
+# 22 - FY_OY
+# 23 - FY_ON
+# 24 - FN_OY
+# 25 - FN_ON
+# 26 - BASER
+# 27 - FMEAN
+# 28 - ACC
+# 29 - FBIAS
+# 30 - PODY
+# 31 - PODN
+# 32 - POFD
+# 33 - FAR
+# 34 - CSI
+# 35 - GSS
+# 36 - HK
+# 37 - HSS
+# 38 - ODDS
