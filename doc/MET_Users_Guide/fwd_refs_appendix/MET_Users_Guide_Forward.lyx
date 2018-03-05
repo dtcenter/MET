@@ -706,12 +706,12 @@ The citation for this User's Guide should be:
 \end_layout
 
 \begin_layout Standard
-R.
- Bullock, T.
+T.
  Fowler, J.
  Halley Gotway, K.
- Newman,Brown, B., and T.
- Jensen, 2017:
+ Newman, T.
+ Jensen, Brown, B., and R.
+ Bullock, 2017:
 \begin_inset Newline newline
 \end_inset
 
@@ -722,7 +722,7 @@ The Model Evaluation Tools v7.0 (METv7.0) User’s Guide.
 
 Available at: http://www.dtcenter.org/met/users/docs/users_guide/MET_Users_Guide_v
 7.0.pdf.
- 406 pp.
+ 407 pp.
 \end_layout
 
 \begin_layout Chapter*
