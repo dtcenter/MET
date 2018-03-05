@@ -864,29 +864,37 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-message_type_group_map = [ { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";
-               },
+message_type_group_map = [
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-                           { key = "ANYAIR";  val = "AIRCAR,AIRCFT";   
-                   },
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-                           { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR
-,MSONET"; },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-                           { key = "ONLYSF";  val = "ADPSFC,SFCSHP";   
-                   } ];
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+];
 \end_layout
 
 \begin_layout Standard

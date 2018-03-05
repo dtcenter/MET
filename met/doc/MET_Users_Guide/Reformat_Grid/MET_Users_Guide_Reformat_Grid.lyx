@@ -3726,15 +3726,8 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
-regrid = { to_grid = 
-\begin_inset Quotes eld
-\end_inset
-
-G212
-\begin_inset Quotes erd
-\end_inset
-
-; vld_thresh = 0.5; method = UW_MEAN; width = 5; shape = SQUARE; }
+regrid = { ...
+ }
 \end_layout
 
 \begin_layout Standard

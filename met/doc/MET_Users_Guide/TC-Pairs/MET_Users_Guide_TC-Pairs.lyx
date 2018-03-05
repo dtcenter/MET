@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -152,7 +154,7 @@ tc_pairs
 tc_pairs usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:tc_pairs-usage"
+name "subsec:tc_pairs-usage"
 
 \end_inset
 
@@ -548,7 +550,7 @@ For each edeck/bdeck pair, write paired edeck probabilities and matching
 tc_pairs configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:TC_Pairs-configuration-file"
+name "subsec:TC_Pairs-configuration-file"
 
 \end_inset
 
@@ -691,19 +693,11 @@ version      = "VN.N";
 \begin_layout Standard
 
 \series medium
-The configuration options listed above are common to many MET to
-\begin_inset CommandInset line
-LatexCommand rule
-offset "0.5ex"
-width "100col%"
-height "1pt"
-
-\end_inset
-
-ols and are described in Section 
+The configuration options listed above are common to multiple MET tools
+ and are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_MET-TC-Config-Options"
+reference "subsec:IO_MET-TC-Config-Options"
 
 \end_inset
 
@@ -1429,7 +1423,7 @@ met_help@ucar.edu
 tc_pairs output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:TC_Pairs-output"
+name "subsec:TC_Pairs-output"
 
 \end_inset
 
@@ -1486,7 +1480,7 @@ name "TCST Header"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="15" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -1976,7 +1970,7 @@ name "TCMPR Line Type"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="46" columns="3">
-<features rotate="0" tabularvalignment="top">
+<features tabularvalignment="top">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
@@ -3365,7 +3359,7 @@ name "PROBRI Line Type"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="26" columns="3">
-<features rotate="0" tabularvalignment="top">
+<features tabularvalignment="top">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">

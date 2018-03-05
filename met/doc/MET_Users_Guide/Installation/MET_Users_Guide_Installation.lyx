@@ -1279,8 +1279,15 @@ To configure MET to install all of the available tools in the "bin" subdirectory
 
 \series medium
 1.
- ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-mode_graphics
- --enable-lidar2nc
+ ./configure --prefix=`pwd` --enable-grib2 --enable-modis 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series medium
+               --enable-mode_graphics --enable-lidar2nc
 \end_layout
 
 \begin_layout LyX-Code

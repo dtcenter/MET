@@ -2093,8 +2093,16 @@ h ge20
 \noindent
 
 \series bold
-      -job probrirw -line_type PROBRIRW -column_thresh RI_WINDOW ==24 -probri_th
-resh 30 -probri_prob_thresh ==0.25
+      -job probrirw -line_type PROBRIRW -column_thresh RI_WINDOW ==24 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+\noindent
+
+\series bold
+                    -probri_thresh 30 -probri_prob_thresh ==0.25
 \end_layout
 
 \begin_layout Standard
