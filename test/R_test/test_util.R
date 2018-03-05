@@ -674,7 +674,7 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
             sizeDiff = abs((ncFileSize1 - ncFileSize2) - (ncHeaderSize1 - ncHeaderSize2));
             if (sizeDiff > delta) {
                 if( 1 <= verb ){
-                    cat("ERROR: NetCDF file size is different more than header differnce\n");
+                    cat("ERROR: NetCDF file size is different more than header difference\n");
                     cat("       header size difference: ", abs(ncHeaderSize1 - ncHeaderSize2), ", file size difference: ", abs(ncFileSize1 - ncFileSize2), "\n");
                     cat("       ", nc1, " : ", ncFileSize1, "\n");
                     cat("       ", nc2, " : ", ncFileSize2, "\n");
