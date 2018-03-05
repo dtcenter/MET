@@ -28,16 +28,16 @@ my @fld_hdrs  = qw(VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG FCST_VALID_END OB
                    OBS_VALID_END FCST_VAR FCST_LEV OBS_VAR OBS_LEV OBTYPE VX_MASK INTERP_MTHD
                    INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE);
 
-my @fld_sings = qw(OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y CENTROID_LAT CENTROID_LON
+my @fld_sings = qw(N_VALID GRID_RES OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y CENTROID_LAT CENTROID_LON
                    AXIS_ANG LENGTH WIDTH AREA AREA_THRESH CURVATURE CURVATURE_X
                    CURVATURE_Y COMPLEXITY INTENSITY_10 INTENSITY_25 INTENSITY_50 INTENSITY_75
                    INTENSITY_90 INTENSITY_50 INTENSITY_SUM);
 
-my @fld_pairs = qw(OBJECT_ID OBJECT_CAT CENTROID_DIST BOUNDARY_DIST CONVEX_HULL_DIST ANGLE_DIFF
+my @fld_pairs = qw(N_VALID GRID_RES OBJECT_ID OBJECT_CAT CENTROID_DIST BOUNDARY_DIST CONVEX_HULL_DIST ANGLE_DIFF
                    AREA_RATIO INTERSECTION_AREA UNION_AREA SYMMETRIC_DIFF INTERSECTION_OVER_AREA
                    COMPLEXITY_RATIO PERCENTILE_INTENSITY_RATIO INTEREST);
 
-my @fld_ctss  = qw(FIELD TOTAL FY_OY FY_ON FN_OY FN_ON BASER FMEAN ACC FBIAS PODY PODN POFD FAR
+my @fld_ctss  = qw(N_VALID GRID_RES FIELD TOTAL FY_OY FY_ON FN_OY FN_ON BASER FMEAN ACC FBIAS PODY PODN POFD FAR
                    CSI GSS HK HSS ODDS);
 
 my $fmt_hdr =
@@ -65,6 +65,8 @@ my $fmt_hdr =
       "%-10s";  # LINE_TYPE
 
 my $fmt_sing =
+      "%-12s" . # N_VALID
+      "%-12s" . # GRID_RES
       "%-12s" . # OBJECT_ID
       "%-12s" . # OBJECT_CAT
       "%11s"  . # CENTROID_X
@@ -89,6 +91,8 @@ my $fmt_sing =
       "%14s";   # INTENSITY_SUM
 
 my $fmt_pair =
+      "%-12s" . # N_VALID
+      "%-12s" . # GRID_RES
       "%-12s" . # OBJECT_ID
       "%-12s" . # OBJECT_CAT
       "%14s"  . # CENTROID_DIST
@@ -105,6 +109,8 @@ my $fmt_pair =
       "%12s";   # INTEREST
 
 my $fmt_cts =
+      "%-12s" . # N_VALID
+      "%-12s" . # GRID_RES
       "%7s"   . # FIELD
       "%8s"   . # TOTAL
       "%8s"   . # FY_OY
@@ -163,35 +169,48 @@ while(<$fh_mode_in>){
 
   # parse the data line, and build the header
   my @vals = split /\s+/;
-  my @outs = (@vals[0,1,2,3,4,4,6,7,7,13,14,15,16],
-    "ANALYS",      # OBTYPE
-    "FULL",        # VX_MASK
-    "UW_MEAN",     # INTERP_MTHD
-    "0",           # INTERP_PNTS
-    $vals[9],      # FCST_THRESH
-    $vals[11],     # OBS_THRESH
-    $vals[8],      # COV_THRESH (FCST_RAD)
-    $vals[10]      # ALPHA (OBS_RAD)
+  my @outs = (
+    $vals[0],  # VERSION
+    $vals[1],  # MODEL
+    $vals[4],  # DESC
+    $vals[5],  # FCST_LEAD
+    $vals[6],  # FCST_VALID_BEG
+    $vals[6],  # FCST_VALID_END
+    $vals[8],  # OBS_LEAD
+    $vals[9],  # OBS_VALID_END
+    $vals[9],  # OBS_VALID_END
+    $vals[15], # FCST_VAR
+    $vals[16], # FCST_LEV
+    $vals[17], # OBS_VAR
+    $vals[18], # OBS_LEV
+    $vals[19], # OBTYPE
+    "FULL",    # VX_MASK
+    "UW_MEAN", # INTERP_MTHD
+    "0",       # INTERP_PNTS
+    $vals[12], # FCST_THRESH
+    $vals[14], # OBS_THRESH
+    $vals[11], # COV_THRESH (FCST_RAD)
+    $vals[13]  # ALPHA (OBS_RAD)
   );
 
   # write a cts line
   my $fmt_val;
   if( $type eq "c" ){
-    push @outs, (" MODE_CTS ", @vals[17 .. 35]);
+    push @outs, (" MODE_CTS ", @vals[2,3,19 .. 37]);
     $fmt_val = $fmt_cts;
   }
 
   # write a pair object attribute line
   elsif( $vals[17] !~ /_/ ){
     next if( $type eq "p");
-    push @outs, (" MODE_SOA ", @vals[17 .. 41]);
+    push @outs, (" MODE_SOA ", @vals[2,3,19 .. 43]);
     $fmt_val = $fmt_sing;
   }
 
   # write a single object attribute line
   else {
     next if ($type eq "s");
-    push @outs, (" MODE_POA ", @vals[17,18,40 .. 51]);
+    push @outs, (" MODE_POA ", @vals[2,3,19,20,42 .. 53]);
     $fmt_val = $fmt_pair;
   }
 
@@ -204,6 +223,9 @@ close($fh_mode_in);
 
 #  0 - VERSION
 #  1 - MODEL
+#  2 - N_VALID
+#  3  - GRID_RES
+...
 #  2 - DESC
 #  3 - FCST_LEAD
 #  4 - FCST_VALID
