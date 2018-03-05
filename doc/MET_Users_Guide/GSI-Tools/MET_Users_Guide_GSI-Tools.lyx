@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -164,7 +166,7 @@ This section describes how to run the tool gsid2mpr tool.
 gsid2mpr usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:gsid2mpr-usage"
+name "subsec:gsid2mpr-usage"
 
 \end_inset
 
@@ -515,7 +517,7 @@ out
 gsid2mpr output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:gsid2mpr-output"
+name "subsec:gsid2mpr-output"
 
 \end_inset
 
@@ -574,7 +576,7 @@ Format information for GSI Diagnotic Conventional MPR (Matched Pair) output
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -948,7 +950,7 @@ Format information for GSI Diagnotic Radiance MPR (Matched Pair) output
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="35" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.1cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -2122,7 +2124,7 @@ This section describes how to run the tool gsidens2orank tool.
 gsidens2orank usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:gsidens2orank-usage"
+name "subsec:gsidens2orank-usage"
 
 \end_inset
 
@@ -2492,7 +2494,7 @@ diag_conv_ges.ensmean
 gsidens2orank output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:gsidens2orank-output"
+name "subsec:gsidens2orank-output"
 
 \end_inset
 
@@ -2556,7 +2558,7 @@ Format information for GSI Diagnotic Conventional ORANK (Observation Rank)
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -2785,7 +2787,7 @@ Format information for GSI Diagnotic Radiance ORANK (Observation Rank) output
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="28" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3.1cm">
 <column alignment="left" valignment="top" width="9cm">
@@ -3689,10 +3691,7 @@ stat_analysis -lookin diag_conv_ges_ens_mean_orank.txt
 \begin_layout Standard
 
 \series medium
-In this example, the Stat-Analysis tool will read ORANK lines from the input
- file named
-\series default
- 
+In this example, the Stat-Analysis tool will read ORANK lines from 
 \series bold
 diag_conv_ges_ens_mean_orank.txt
 \series default

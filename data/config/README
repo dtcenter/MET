@@ -1121,7 +1121,8 @@ output_flag = {
    vl1l2  = BOTH;  // Vector L1L2 Partial Sums
    val1l2 = BOTH;  // Vector Anomaly L1L2 Partial Sums when climatological data is supplied
    pct    = BOTH;  // Contingency Table Counts for Probabilistic Forecasts
-   pstd   = BOTH;  // Contingency Table Statistics for Probabilistic Forecasts with Dichotomous outcomes
+   pstd   = BOTH;  // Contingency Table Statistics for Probabilistic Forecasts with
+                   // Dichotomous outcomes
    pjc    = BOTH;  // Joint and Conditional Factorization for Probabilistic Forecasts
    prc    = BOTH;  // Receiver Operating Characteristic for Probabilistic Forecasts
    eclv   = BOTH;  // Economic Cost/Loss Value derived from CTC and PCT lines
@@ -2584,20 +2585,38 @@ output_stats = {
 //
 jobs = [
    "-job filter         -line_type SL1L2 -vx_mask DTC165 -dump_row job_filter_SL1L2.stat",
-   "-job summary        -line_type CNT   -alpha 0.050 -fcst_var TMP -dump_row job_summary_ME.stat -column ME",
-   "-job aggregate      -line_type SL1L2 -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_SL1L2_dump.stat -out_stat job_aggregate_SL1L2_out.stat -set_hdr VX_MASK CONUS",
-   "-job aggregate_stat -line_type SL1L2 -out_line_type CNT -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_stat_SL1L2_CNT_in.stat",
-   "-job aggregate_stat -line_type MPR   -out_line_type CNT -vx_mask DTC165 -vx_mask DTC166 -fcat_var TMP -dump_row job_aggregate_stat_MPR_CNT_in.stat",
-   "-job aggregate      -line_type CTC   -fcst_thresh <300.000 -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_CTC_in.stat",
-   "-job aggregate_stat -line_type CTC   -out_line_type CTS -fcst_thresh <300.000 -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_stat_CTC_CTS_in.stat",
-   "-job aggregate      -line_type MCTC  -column_eq N_CAT 4 -vx_mask DTC165 -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_MCTC_in.stat",
-   "-job aggregate_stat -line_type MCTC  -out_line_type MCTS -column_eq N_CAT 4 -vx_mask DTC165 -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_stat_MCTC_MCTS_in.stat",
-   "-job aggregate      -line_type PCT   -vx_mask DTC165 -vx_mask DTC166 -dump_row job_aggregate_PCT_in.stat",
-   "-job aggregate_stat -line_type PCT   -out_line_type PSTD -vx_mask DTC165 -vx_mask DTC166 -dump_row job_aggregate_stat_PCT_PSTD_in.stat",
-   "-job aggregate      -line_type ISC   -fcst_thresh >0.000 -vx_mask TILE_TOT -fcst_var APCP_12 -dump_row job_aggregate_ISC_in.stat",
-   "-job aggregate      -line_type RHIST -obtype MC_PCP -vx_mask HUC4_1605 -vx_mask HUC4_1803 -dump_row job_aggregate_RHIST_in.stat",
-   "-job aggregate      -line_type SSVAR -obtype MC_PCP -vx_mask HUC4_1605 -vx_mask HUC4_1803 -dump_row job_aggregate_SSVAR_in.stat",
-   "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC -vx_mask HUC4_1605 -vx_mask HUC4_1803 -dump_row job_aggregate_stat_ORANK_RHIST_in.stat"
+   "-job summary        -line_type CNT   -alpha 0.050 -fcst_var TMP \
+    -dump_row job_summary_ME.stat -column ME",
+   "-job aggregate      -line_type SL1L2 -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP \
+    -dump_row job_aggregate_SL1L2_dump.stat  -out_stat job_aggregate_SL1L2_out.stat \
+    -set_hdr VX_MASK CONUS",
+   "-job aggregate_stat -line_type SL1L2 -out_line_type CNT -vx_mask DTC165  \
+    -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_stat_SL1L2_CNT_in.stat",
+   "-job aggregate_stat -line_type MPR   -out_line_type CNT -vx_mask DTC165 \
+    -vx_mask DTC166 -fcat_var TMP -dump_row job_aggregate_stat_MPR_CNT_in.stat",
+   "-job aggregate      -line_type CTC   -fcst_thresh <300.000 -vx_mask DTC165 \
+    -vx_mask DTC166 -fcst_var TMP -dump_row job_aggregate_CTC_in.stat",
+   "-job aggregate_stat -line_type CTC   -out_line_type CTS -fcst_thresh <300.000 \
+    -vx_mask DTC165 -vx_mask DTC166 -fcst_var TMP \
+    -dump_row job_aggregate_stat_CTC_CTS_in.stat",
+   "-job aggregate      -line_type MCTC  -column_eq N_CAT 4 -vx_mask DTC165 \
+    -vx_mask DTC166 -fcst_var APCP_24 -dump_row job_aggregate_MCTC_in.stat",
+   "-job aggregate_stat -line_type MCTC  -out_line_type MCTS -column_eq N_CAT 4 \
+    -vx_mask DTC165 -vx_mask DTC166 -fcst_var APCP_24 \
+    -dump_row job_aggregate_stat_MCTC_MCTS_in.stat",
+   "-job aggregate      -line_type PCT   -vx_mask DTC165 -vx_mask DTC166 \
+    -dump_row job_aggregate_PCT_in.stat",
+   "-job aggregate_stat -line_type PCT   -out_line_type PSTD -vx_mask DTC165 \
+    -vx_mask DTC166 -dump_row job_aggregate_stat_PCT_PSTD_in.stat",
+   "-job aggregate      -line_type ISC   -fcst_thresh >0.000 -vx_mask TILE_TOT \
+    -fcst_var APCP_12 -dump_row job_aggregate_ISC_in.stat",
+   "-job aggregate      -line_type RHIST -obtype MC_PCP -vx_mask HUC4_1605 \
+    -vx_mask HUC4_1803 -dump_row job_aggregate_RHIST_in.stat",
+   "-job aggregate      -line_type SSVAR -obtype MC_PCP -vx_mask HUC4_1605 \
+    -vx_mask HUC4_1803 -dump_row job_aggregate_SSVAR_in.stat",
+   "-job aggregate_stat -line_type ORANK -out_line_type RHIST -obtype ADPSFC \
+    -vx_mask HUC4_1605 -vx_mask HUC4_1803 \
+    -dump_row job_aggregate_stat_ORANK_RHIST_in.stat"
 ];
 
 //

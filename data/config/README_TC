@@ -536,12 +536,13 @@ out_valid_mask = "";
 //             -rirw_thresh or -rirw_thresh_adeck and -rirw_thresh_bdeck to override defaults
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
-//             -out_line_type to specify which output types (CTC, CTS, and MPR) should be written
+//             -out_line_type to specify output line types (CTC, CTS, and MPR)
 //
 //          Note that the "-dump_row path" option results in 4 files being created:
 //             path_FY_OY.tcst, path_FY_ON.tcst, path_FN_OY.tcst, and path_FN_ON.tcst
-//             containing the TCST lines that were hits, false alarms, misses, and correct negatives,
-//             respectively.  These files may be used as input for additional TC-Stat analysis.
+//             containing the TCST lines that were hits, false alarms, misses, and correct
+//             negatives,  respectively.  These files may be used as input for additional
+//             TC-Stat analysis.
 //
 //       "probrirw"
 //          To define an Nx2 probabilistic contingency table by reading the PROBRIRW line type,
@@ -561,10 +562,11 @@ out_valid_mask = "";
 //                (e.g. -probrirw_prob_thresh ==0.1)
 //             -by column_name to specify case information
 //             -out_alpha to override default alpha value
-//             -out_line_type to specify which output types (PCT, PSTD, PRC, and PJC) should be written
+//             -out_line_type to specify output line types (PCT, PSTD, PRC, and PJC)
 //
-//       For the PROBRIRW line type, PROBRIRW_PROB is a derived column name.  For example, the following
-//       options select 30 kt probabilities and match probability values greater than 0:
+//       For the PROBRIRW line type, PROBRIRW_PROB is a derived column name.  For example,
+//       the following options select 30 kt probabilities and match probability values
+//       greater than 0:
 //         -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0
 //
 //       e.g.
