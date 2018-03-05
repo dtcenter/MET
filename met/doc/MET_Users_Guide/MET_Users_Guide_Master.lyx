@@ -116,11 +116,23 @@ Boulder, Colorado
 
 
 \shape italic
-Randy Bullock, Tressa Fowler, John Halley Gotway,
+Tressa Fowler, John Halley Gotway, Kathryn Newman,
+\shape default
+
 \begin_inset Newline newline
 \end_inset
 
-Kathryn Newman, Barbara Brown, and Tara Jensen
+
+\shape italic
+Tara Jensen
+\shape default
+, 
+\shape italic
+Barbara Brown, 
+\shape default
+and 
+\shape italic
+Randy Bullock
 \shape default
 
 \begin_inset Newline newline
@@ -139,7 +151,7 @@ with contributions from Julie Prestopnik, Eric Gilleland, Howard Soh,
 
 \series default
 \shape italic
-Minna Win-Gildenmeister and Barbara Casati
+Minna Win-Gildenmeister and James Frimel
 \shape default
 
 \begin_inset VSpace 1in
