@@ -64,7 +64,6 @@ using namespace std;
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
-#include <climits>
 #include <limits>
 #include <math.h>
 #include <string.h>
@@ -844,8 +843,13 @@ void process_pbfile(int i_pb) {
    }
 
    if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
+   
    int grib_code, bufr_var_index;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
+   
+   int bufr_hdr_length = bufr_hdrs.length();
+   char bufr_hdr_names[(bufr_hdr_length+1)*2];
+   strcpy(bufr_hdr_names, bufr_hdrs.text());
 
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
@@ -934,15 +938,17 @@ void process_pbfile(int i_pb) {
          //Read header (station id, lat, lon, ele, time)
          length = bufr_hdrs.length();
          strcpy(tmp_str, bufr_hdrs.text());
-         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &use_small_buffer );
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, bufr_hdr_names,
+                    &bufr_hdr_length, &use_small_buffer );
 
-         // Copy sid, lat, and lon
-         for (index=0; index<3; index++) {
+         // Copy sid, lat, lon, and dhr
+         for (index=0; index<4; index++) {
             hdr[index] = bufr_obs[0][index];
          }
+         
          // Update hdr[3] and file_ut for obs_time
-         hdr[3] = 0;
          if (bufr_obs[0][3] > r8bfms) {
+            hdr[3] = 0;
             yr  = nint(bufr_obs[0][4]);
             mon = nint(bufr_obs[0][5]);
             day = nint(bufr_obs[0][6]);
@@ -2164,7 +2170,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
    // Write the quality flag to the netCDF file
    ConcatString obs_qty;
    int quality_code = nint(quality_mark);
-   if (quality_code == bad_data_int || quality_code <= (INT_MIN+1)) {
+   if (quality_code == bad_data_int || quality_mark > r8bfms) {
       obs_qty.add("NA");
    }
    else {
@@ -2296,8 +2302,6 @@ void dbl2str(double *d, char *str) {
 
    sprintf(str, fmt_str, d);
    if (0 == strlen(str)) {
-      //const char *fmt_str_d = "%d";
-      //sprintf(str, fmt_str_d, nint(*d));
       strcpy(str, "NA");
    }
 
