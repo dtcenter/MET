@@ -1,5 +1,4 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -104,7 +103,7 @@ enum STATLineType {
    stat_vl1l2,
    stat_val1l2,
 
-   stat_vcnt, 
+   stat_vcnt,
 
    stat_fho,
    stat_ctc,
@@ -240,6 +239,7 @@ struct InterpInfo {
 
    void        clear();
    void        validate(); // Ensure that width and method are accordant
+   bool        operator==(const InterpInfo &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
