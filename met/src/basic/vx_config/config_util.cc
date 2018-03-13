@@ -1051,6 +1051,23 @@ void InterpInfo::validate() {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool InterpInfo::operator==(const InterpInfo &v) const {
+   bool match = true;
+
+   if(!(field      == v.field     ) ||
+      !(vld_thresh == v.vld_thresh) ||
+      !(n_interp   == v.n_interp  ) ||
+      !(method     == v.method    ) ||
+      !(width      == v.width     ) ||
+      !(shape      == v.shape     )) {
+      match = false;
+   }
+
+   return(match);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 InterpInfo parse_conf_interp(Dictionary *dict) {
    Dictionary *interp_dict = (Dictionary *) 0;
    Dictionary *type_dict = (Dictionary *) 0;
