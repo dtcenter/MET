@@ -196,7 +196,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
                   vx_opt[i].vx_pd.fcst_info->req_level_name() ==
                   vx_opt[j].vx_pd.fcst_info->req_level_name() &&
                   vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()) {
+                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+                  vx_opt[i].uv_match(vx_opt[j])) {
 
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
                   vx_opt[i].vx_pd.obs_info->set_uv_index(j);
@@ -214,7 +215,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
                   vx_opt[i].vx_pd.fcst_info->req_level_name() ==
                   vx_opt[j].vx_pd.fcst_info->req_level_name() &&
                   vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()) {
+                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+                  vx_opt[i].uv_match(vx_opt[j])) {
 
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
                   vx_opt[i].vx_pd.obs_info->set_uv_index(j);
@@ -546,6 +548,43 @@ void PointStatVxOpt::clear() {
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check the setting that would impact the number of matched pairs when
+// searching for U/V matches.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool PointStatVxOpt::uv_match(const PointStatVxOpt &v) const {
+   bool match = true;
+
+   //
+   // The following do not impact matched pairs:
+   //    fcat_ta, ocat_ta,
+   //    fcnt_ta, ocnt_ta, cnt_logic,
+   //    fwind_ta, owind_ta, wind_logic,
+   //    eclv_points, climo_cdf_ta, ci_alpha
+   //    boot_info, hira_info, rank_corr_flag,
+   //    output_flag
+   //
+
+   if(!(beg_ds         == v.beg_ds        ) ||
+      !(end_ds         == v.end_ds        ) ||
+      !(mask_grid      == v.mask_grid     ) ||
+      !(mask_poly      == v.mask_poly     ) ||
+      !(mask_sid       == v.mask_sid      ) ||
+      !(mask_name      == v.mask_name     ) ||
+      !(interp_info    == v.interp_info   ) ||
+      !(msg_typ        == v.msg_typ       ) ||
+      !(duplicate_flag == v.duplicate_flag) ||
+      !(obs_summary    == v.obs_summary   ) ||
+      !(obs_perc       == v.obs_perc      )) {
+      match = false;
+   }
+
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////
