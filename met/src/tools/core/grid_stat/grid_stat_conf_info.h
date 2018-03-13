@@ -181,6 +181,7 @@ class GridStatVxOpt {
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &);
       void parse_nc_info(Dictionary &);
+      bool is_uv_match(const GridStatVxOpt &) const;
 
       // Compute the number of output lines for this task
       int n_txt_row(int i)     const;
