@@ -150,7 +150,7 @@ class PointStatVxOpt {
 
       void process_config(GrdFileType, Dictionary &, Dictionary &, bool);
       void set_vx_pd(PointStatConfInfo *);
-      bool uv_match(const PointStatVxOpt &) const;
+      bool is_uv_match(const PointStatVxOpt &) const;
 
       // Compute the number of output lines for this task
       int n_txt_row(int i)     const;
