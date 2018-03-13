@@ -95,6 +95,8 @@ class CRC_Array {
 
       CRC_Array <T> & operator=(const NumArray &);
 
+      bool operator==(const CRC_Array <T> &) const;
+
       void clear();
 
       void extend(int);
@@ -169,6 +171,26 @@ clear();
 for(int j=0; j<a.n_elements(); ++j) add(nint(a[j]));
 
 return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+bool CRC_Array<T>::operator==(const CRC_Array<T> & a) const
+
+{
+
+if ( Nelements != a.Nelements )  return ( false );
+
+for(int j=0; j<Nelements; ++j)  {
+   if(e[j] != a.e[j])  return ( false );
+}
+
+return ( true );
 
 }
 
