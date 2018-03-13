@@ -51,6 +51,7 @@ class StringArray {
      ~StringArray();
       StringArray(const StringArray &);
       StringArray & operator=(const StringArray &);
+      bool operator==(const StringArray &) const;
 
       void clear();
 
