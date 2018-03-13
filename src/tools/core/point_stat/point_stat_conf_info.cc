@@ -197,7 +197,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
                   vx_opt[j].vx_pd.fcst_info->req_level_name() &&
                   vx_opt[i].vx_pd.obs_info->req_level_name()  ==
                   vx_opt[j].vx_pd.obs_info->req_level_name()  &&
-                  vx_opt[i].uv_match(vx_opt[j])) {
+                  vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
                   vx_opt[i].vx_pd.obs_info->set_uv_index(j);
@@ -216,7 +216,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
                   vx_opt[j].vx_pd.fcst_info->req_level_name() &&
                   vx_opt[i].vx_pd.obs_info->req_level_name()  ==
                   vx_opt[j].vx_pd.obs_info->req_level_name()  &&
-                  vx_opt[i].uv_match(vx_opt[j])) {
+                  vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
                   vx_opt[i].vx_pd.obs_info->set_uv_index(j);
@@ -552,12 +552,12 @@ void PointStatVxOpt::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Check the setting that would impact the number of matched pairs when
-// searching for U/V matches.
+// Check the settings that would impact the number of matched pairs
+// when searching for U/V matches.
 //
 ////////////////////////////////////////////////////////////////////////
 
-bool PointStatVxOpt::uv_match(const PointStatVxOpt &v) const {
+bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    bool match = true;
 
    //
