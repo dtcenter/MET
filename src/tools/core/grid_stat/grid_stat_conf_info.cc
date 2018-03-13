@@ -190,7 +190,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
                   vx_opt[i].fcst_info->req_level_name() ==
                   vx_opt[j].fcst_info->req_level_name() &&
                   vx_opt[i].obs_info->req_level_name()  ==
-                  vx_opt[j].obs_info->req_level_name()) {
+                  vx_opt[j].obs_info->req_level_name()  &&
+                  vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].fcst_info->set_uv_index(j);
                   vx_opt[i].obs_info->set_uv_index(j);
@@ -208,7 +209,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
                   vx_opt[i].fcst_info->req_level_name() ==
                   vx_opt[j].fcst_info->req_level_name() &&
                   vx_opt[i].obs_info->req_level_name()  ==
-                  vx_opt[j].obs_info->req_level_name()) {
+                  vx_opt[j].obs_info->req_level_name()  &&
+                  vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].fcst_info->set_uv_index(j);
                   vx_opt[i].obs_info->set_uv_index(j);
@@ -776,6 +778,38 @@ void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
    nc_info.do_apply_mask  = d->lookup_bool(conf_key_apply_mask_flag);
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Check the settings that would impact the number of matched pairs
+// when searching for U/V matches.
+//
+////////////////////////////////////////////////////////////////////////
+
+bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
+   bool match = true;
+
+   //
+   // The following do not impact matched pairs:
+   //    desc, var_str,
+   //    fcat_ta, ocat_ta,
+   //    fcnt_ta, ocnt_ta, cnt_logic,
+   //    fwind_ta, owind_ta, wind_logic,
+   //    eclv_points, climo_cdf_ta, ci_alpha
+   //    boot_info, nbrhd_info,
+   //    wave_1d_beg, wave_1d_end,
+   //    rank_corr_flag, output_flag, nc_info
+   //
+
+   if(!(mask_grid   == v.mask_grid  ) ||
+      !(mask_poly   == v.mask_poly  ) ||
+      !(mask_name   == v.mask_name  ) ||
+      !(interp_info == v.interp_info)) {
+      match = false;
+   }
+
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////
