@@ -103,6 +103,28 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool StringArray::operator==(const StringArray & a) const
+
+{
+
+if ( Nelements != a.Nelements )  return ( false );
+
+int j;
+
+for (j=0; j<Nelements; ++j)  {
+
+   if ( strcmp(s[j], a.s[j]) != 0 )  return ( false );
+
+}
+
+return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void StringArray::init_from_scratch()
 
 {
