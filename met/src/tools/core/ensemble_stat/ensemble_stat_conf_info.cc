@@ -242,7 +242,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    vld_ens_thresh = conf.lookup_double(conf_key_ens_ens_thresh);
 
    // Check that the valid ensemble threshold is between 0 and 1.
-   if(vld_ens_thresh <= 0.0 || vld_ens_thresh > 1.0) {
+   if(vld_ens_thresh < 0.0 || vld_ens_thresh > 1.0) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
            << "The \"" << conf_key_ens_ens_thresh << "\" parameter ("
            << vld_ens_thresh << ") must be set between 0 and 1.\n\n";
@@ -253,7 +253,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    vld_data_thresh = conf.lookup_double(conf_key_ens_vld_thresh);
 
    // Check that the valid data threshold is between 0 and 1.
-   if(vld_data_thresh <= 0.0 || vld_data_thresh > 1.0) {
+   if(vld_data_thresh < 0.0 || vld_data_thresh > 1.0) {
       mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
            << "The \"" << conf_key_ens_vld_thresh << "\" parameter ("
            << vld_data_thresh << ") must be set between 0 and 1.\n\n";
