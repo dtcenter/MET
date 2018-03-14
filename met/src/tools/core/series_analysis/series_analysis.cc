@@ -2071,6 +2071,8 @@ void put_nc_val(int n, const ConcatString &var_name, float v) {
 
 void set_range(const unixtime &t, unixtime &beg, unixtime &end) {
 
+   if(t == (unixtime) 0) return;
+
    beg = (beg == (unixtime) 0 || t < beg ? t : beg);
    end = (end == (unixtime) 0 || t > end ? t : end);
 
@@ -2080,6 +2082,8 @@ void set_range(const unixtime &t, unixtime &beg, unixtime &end) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_range(const int &t, int &beg, int &end) {
+
+   if(is_bad_data(t)) return;
 
    beg = (is_bad_data(beg) || t < beg ? t : beg);
    end = (is_bad_data(end) || t > end ? t : end);
