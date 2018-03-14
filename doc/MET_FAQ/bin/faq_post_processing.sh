@@ -29,9 +29,6 @@ if [ $# -gt 0 ]; then
       DEBUG=1
     elif [ $my_arg == "upload" -o $my_arg == "-upload" ]; then
       DO_UPLOAD=1
-    elif [ $my_arg == "upload-only" -o $my_arg == "-upload-only" ]; then
-      DO_UPLOAD=1
-      DO_CONVERT=0
     elif [ $my_arg == "timestamp" ]; then
       KEEP_TIMESTAMP=0
     elif [ $my_arg == "help" -o $my_arg == "-help"  -o $my_arg == "--help" ]; then
@@ -60,7 +57,6 @@ fi
 if [ $SHOW_HELP -eq 1 ]; then
   echo "   Usage: $0 <source_xhtml_dir> <upload> <timestamp> <out_dir=Output_directory> <upload_only>"
   echo "                      upload: Upload the HTML and image files to mandan after converting(Optional)"
-  echo "                 upload_only: Upload the HTML and image files to mandan without converting(Optional)"
   echo "                   timestamp: Do not keep the timestamp from the raw XHTML (Optional)"
   echo "          <source_xhtml_dir>: The directory where the XHTML and image files are"
   echo "  <out_dir=Output_directory>: Override output directory $OUTPUT_DIR"
