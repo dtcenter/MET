@@ -282,7 +282,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    // Conf: vld_thresh
    vld_data_thresh = conf.lookup_double(conf_key_vld_thresh);
 
-   if(vld_data_thresh <= 0.0 || vld_data_thresh > 1.0) {
+   if(vld_data_thresh < 0.0 || vld_data_thresh > 1.0) {
       mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
            << "The \"" << conf_key_vld_thresh << "\" parameter ("
            << vld_data_thresh << ") must be set between 0 and 1.\n\n";
