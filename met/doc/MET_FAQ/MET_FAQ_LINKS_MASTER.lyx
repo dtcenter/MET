@@ -538,8 +538,8 @@ target "http://www.dtcenter.org/met/users/support/faqs/regrid_data_plane/regrid_
 \labelwidthstring 00.00.0000
 \begin_inset CommandInset href
 LatexCommand href
-name "wgrib2"
-target "http://www.dtcenter.org/met/users/support/faqs/regrid_data_plane/regrid_with_wgrib2.xhtml"
+name "with_wgrib2"
+target "http://www.dtcenter.org/met/users/support/faqs/regrid_data_plane/regrid_data_plane_with_wgrib2.xhtml"
 
 \end_inset
 
@@ -711,7 +711,7 @@ target "http://www.dtcenter.org/met/users/support/faqs/troubleshooting/troublesh
 \begin_inset CommandInset href
 LatexCommand href
 name "stat_analysis_slow"
-target "http://www.dtcenter.org/met/users/support/faqs/troubleshooting/trouble_shooting_stat_analysis_slow.xhtml"
+target "http://www.dtcenter.org/met/users/support/faqs/troubleshooting/troubleshooting_stat_analysis_slow.xhtml"
 
 \end_inset
 
