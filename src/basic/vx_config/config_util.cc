@@ -1090,8 +1090,9 @@ InterpInfo parse_conf_interp(Dictionary *dict) {
    // Conf: field - may be missing
    v = interp_dict->lookup_int(conf_key_field, false);
 
-   // If found, interpret value
+   // If found, interpret value.  Otherwise, set to a default value.
    if(interp_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
+   else                                  info.field = FieldType_None;
 
    // Conf: vld_thresh
    info.vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
