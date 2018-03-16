@@ -179,6 +179,6 @@ grid_weight_flag = NONE;
 rank_corr_flag   = FALSE;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V7.0";
+version          = "V7.1";
 
 ////////////////////////////////////////////////////////////////////////////////

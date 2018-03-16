@@ -202,6 +202,6 @@ output_flag = {
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V7.0";
+version        = "V7.1";
 
 ////////////////////////////////////////////////////////////////////////////////
