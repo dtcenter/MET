@@ -598,9 +598,9 @@ void process_scores() {
    csd_na.extend(grid.nx()*grid.ny());
    w_na.extend(grid.nx()*grid.ny());
 
-   if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None ||
-      conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType_None ||
-      conf_info.vx_opt[i].output_flag[i_nbrcnt] != STATOutputType_None) {
+   if(conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
+      conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
+      conf_info.output_flag[i_nbrcnt] != STATOutputType_None) {
       fthr_na.extend(grid.nx()*grid.ny());
       othr_na.extend(grid.nx()*grid.ny());
    }
