@@ -207,6 +207,42 @@ void ran_sample(const gsl_rng *r, NumArray &src_na,
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Return a random draw from the specified distribution.
+//
+////////////////////////////////////////////////////////////////////////
+
+double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
+   double v;
+
+   // Switch on the distribution type
+   switch(t) {
+      case(DistType_Normal):
+         v = gsl_ran_gaussian(r, p1);
+         break;
+
+      case(DistType_Exponential):
+         v = gsl_ran_exponential(r, p1);
+         break;
+
+      case(DistType_ChiSquared):
+         v = gsl_ran_chisq(r, p1);
+         break;
+
+      case(DistType_Gamma):
+         v = gsl_ran_gamma(r, p1, p2);
+         break;
+
+      case(DistType_None):
+      default:
+         v = 0.0;
+         break;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
 
 int get_seed() {
    int curr_time;
