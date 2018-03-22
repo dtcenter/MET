@@ -12,6 +12,8 @@
 
 #include "vx_util.h"
 #include "GridTemplate.h"
+#include "int_array.h"
+#include "gsl_randist.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -406,6 +408,26 @@ enum MatchType {
    MatchType_NoMerge    // Match with no additional merging
 };
 
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store observation error information
+//
+
+struct ObsErrorInfo {
+   FieldType field;
+   DistType  dist_type;
+   NumArray  dist_parm;
+   double    inst_bias_scale;
+   double    inst_bias_offset;
+
+   gsl_rng * rng_ptr; // not allocated
+
+   void      clear();
+   void      validate();
+};
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Constants used in configuartion files
@@ -588,27 +610,38 @@ static const char conf_key_wvlt_plot[]         = "wvlt_plot";
 // Ensemble-Stat specific parameter key names
 //
 
-static const char conf_key_ens[]            = "ens";
-static const char conf_key_ens_field[]      = "ens.field";
-static const char conf_key_ens_ens_thresh[] = "ens.ens_thresh";
-static const char conf_key_ens_vld_thresh[] = "ens.vld_thresh";
-static const char conf_key_nc_var_str[]     = "nc_var_str";
-static const char conf_key_skip_const[]     = "skip_const";
-static const char conf_key_rng_type[]       = "rng.type";
-static const char conf_key_rng_seed[]       = "rng.seed";
-static const char conf_key_ensemble_flag[]  = "ensemble_flag";
-static const char conf_key_mean_flag[]      = "mean";
-static const char conf_key_stdev_flag[]     = "stdev";
-static const char conf_key_minus_flag[]     = "minus";
-static const char conf_key_plus_flag[]      = "plus";
-static const char conf_key_min_flag[]       = "min";
-static const char conf_key_max_flag[]       = "max";
-static const char conf_key_range_flag[]     = "range";
-static const char conf_key_vld_count_flag[] = "vld_count";
-static const char conf_key_frequency_flag[] = "frequency";
-static const char conf_key_rank_flag[]      = "rank";
-static const char conf_key_ssvar_bin[]      = "ens_ssvar_bin_size";
-static const char conf_key_phist_bin[]      = "ens_phist_bin_size";
+static const char conf_key_ens[]              = "ens";
+static const char conf_key_ens_field[]        = "ens.field";
+static const char conf_key_ens_ens_thresh[]   = "ens.ens_thresh";
+static const char conf_key_ens_vld_thresh[]   = "ens.vld_thresh";
+static const char conf_key_nc_var_str[]       = "nc_var_str";
+static const char conf_key_skip_const[]       = "skip_const";
+static const char conf_key_rng_type[]         = "rng.type";
+static const char conf_key_rng_seed[]         = "rng.seed";
+static const char conf_key_ensemble_flag[]    = "ensemble_flag";
+static const char conf_key_mean_flag[]        = "mean";
+static const char conf_key_stdev_flag[]       = "stdev";
+static const char conf_key_minus_flag[]       = "minus";
+static const char conf_key_plus_flag[]        = "plus";
+static const char conf_key_min_flag[]         = "min";
+static const char conf_key_max_flag[]         = "max";
+static const char conf_key_range_flag[]       = "range";
+static const char conf_key_vld_count_flag[]   = "vld_count";
+static const char conf_key_frequency_flag[]   = "frequency";
+static const char conf_key_rank_flag[]        = "rank";
+static const char conf_key_ssvar_bin[]        = "ens_ssvar_bin_size";
+static const char conf_key_phist_bin[]        = "ens_phist_bin_size";
+static const char conf_key_obs_error[]        = "obs_error";
+static const char conf_key_dist_type[]        = "dist_type";
+static const char conf_key_dist_parm[]        = "dist_parm";
+static const char conf_key_inst_bias_scale[]  = "inst_bias_scale";
+static const char conf_key_inst_bias_offset[] = "inst_bias_offset";
+
+// Distribution options
+static const char conf_val_normal[]      = "NORMAL";
+static const char conf_val_exponential[] = "EXPONENTIAL";
+static const char conf_val_chisquared[]  = "CHISQUARED";
+static const char conf_val_gamma[]       = "GAMMA";
 
 //
 // STAT-Analysis specific parameter key names
