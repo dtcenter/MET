@@ -20,6 +20,7 @@ using namespace std;
 #include <limits>
 
 #include "pair_data_ensemble.h"
+#include "obs_error.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -817,6 +818,8 @@ void VxPairDataEnsemble::clear() {
    sid_exc_filt.clear();
    obs_qty_filt.clear();
 
+   obs_error_ptr = (ObsErrorInfo *) 0;
+
    fcst_ut = (unixtime) 0;
    beg_ut  = (unixtime) 0;
    end_ut  = (unixtime) 0;
@@ -847,20 +850,21 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    set_climo_info(vx_pd.climo_info);
    set_obs_info(vx_pd.obs_info);
 
-   desc         = vx_pd.desc;
+   desc          = vx_pd.desc;
 
-   fcst_ut      = vx_pd.fcst_ut;
-   beg_ut       = vx_pd.beg_ut;
-   end_ut       = vx_pd.end_ut;
-   sid_exc_filt = vx_pd.sid_exc_filt;
-   obs_qty_filt = vx_pd.obs_qty_filt;
+   fcst_ut       = vx_pd.fcst_ut;
+   beg_ut        = vx_pd.beg_ut;
+   end_ut        = vx_pd.end_ut;
+   sid_exc_filt  = vx_pd.sid_exc_filt;
+   obs_qty_filt  = vx_pd.obs_qty_filt;
+   obs_error_ptr = vx_pd.obs_error_ptr;
 
    interp_thresh = vx_pd.interp_thresh;
    msg_typ_sfc   = vx_pd.msg_typ_sfc;
 
-   fcst_dpa     = vx_pd.fcst_dpa;
-   climo_mn_dpa = vx_pd.climo_mn_dpa;
-   climo_sd_dpa = vx_pd.climo_sd_dpa;
+   fcst_dpa      = vx_pd.fcst_dpa;
+   climo_mn_dpa  = vx_pd.climo_mn_dpa;
+   climo_sd_dpa  = vx_pd.climo_sd_dpa;
 
    set_pd_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
@@ -1335,6 +1339,17 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    bool spfh_flag = fcst_info->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
+   // Apply observation error logic
+   if(obs_error_ptr->field == FieldType_Obs ||
+      obs_error_ptr->field == FieldType_Both) {
+
+      double obs_new = add_obs_error(obs_v, FieldType_Obs, *obs_error_ptr);
+      mlog << Debug(4)
+           << "Observation error update from observation value "
+           << obs_v << " to " << obs_new << "\n";
+      obs_v = obs_new;
+   }
+
    // Look through all of the PairData objects to see if the observation
    // should be added.
 
@@ -1457,6 +1472,19 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                            interp_thresh, spfh_flag,
                            fcst_info->level().type(),
                            to_lvl, f_lvl_blw, f_lvl_abv);
+
+               // Apply observation error logic
+               if(obs_error_ptr->field == FieldType_Fcst ||
+                  obs_error_ptr->field == FieldType_Both) {
+
+                  double fcst_new = add_obs_error(fcst_v,
+                                       FieldType_Fcst, *obs_error_ptr);
+                  mlog << Debug(4)
+                       << "Observation error update from ensemble "
+                       << "member value " << fcst_v << " to "
+                       << fcst_new << "\n";
+                  fcst_v = fcst_new;
+               }
 
                // Add the ensemble value, even if it's bad data
                if(!mn) pd[i][j][k].add_ens(member, fcst_v);

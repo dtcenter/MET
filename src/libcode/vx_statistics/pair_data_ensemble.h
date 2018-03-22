@@ -175,6 +175,11 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
+      ObsErrorInfo *obs_error_ptr; // Pointer for observation error
+                                   // Not allocated
+
+      //////////////////////////////////////////////////////////////////
+
       ConcatString ens_ssvar_mean; // Name of ensemble spread/skill mean file
       bool         ens_ssvar_flag; // Flag to trigger spread/skill calculations
 
