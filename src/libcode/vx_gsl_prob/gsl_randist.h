@@ -18,6 +18,20 @@
 #include "gsl/gsl_randist.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration for distribution types
+//
+
+enum DistType {
+   DistType_None,        // No distribution
+   DistType_Normal,      // Normal distribution
+   DistType_Exponential, // Exponential distribution
+   DistType_ChiSquared,  // Chi-Squared distribution
+   DistType_Gamma        // Gamma distribution
+};
+
+////////////////////////////////////////////////////////////////////////
 //
 // Setup and free a random number generator
 //
@@ -40,6 +54,9 @@ extern void ran_choose(const gsl_rng *r, NumArray &, NumArray &, int);
 
 extern void ran_sample(const gsl_rng *r, double *, int, double *, int);
 extern void ran_sample(const gsl_rng *r, NumArray &, NumArray &, int);
+
+extern double ran_draw(const gsl_rng *r, DistType,
+                       double p1, double p2 = bad_data_int);
 
 ////////////////////////////////////////////////////////////////////////
 
