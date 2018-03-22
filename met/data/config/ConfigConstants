@@ -149,6 +149,13 @@ MERGE_BOTH     = 2;
 MERGE_FCST     = 3;
 NO_MERGE       = 4;
 
+// Distribution types
+NONE           = 1;
+NORMAL         = 2;
+EXPONENTIAL    = 3;
+CHISQUARED     = 4;
+GAMMA          = 4;
+
 // PB2NC event stack
 TOP            = TRUE;
 BOTTOM         = FALSE;
