@@ -46,6 +46,7 @@
 //   019    05/15/17  Halley Gotway  Add RELP line type and skip_const.
 //   020    02/21/18  Halley Gotway  Restructure config logic to make
 //                    all options settable for each verification task.
+//   021    03/21/18  Halley Gotway  Add obs_error perturbation.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -342,10 +343,6 @@ void process_command_line(int argc, char **argv) {
    // Allocate arrays to store threshold counts
    thresh_count_na = new NumArray [conf_info.get_max_n_thresh()];
 
-   // Set the random number generator and seed value to be used when
-   // computing bootstrap confidence intervals
-   rng_set(rng_ptr, conf_info.rng_type, conf_info.rng_seed);
-
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
         << ens_file_list.n_elements() << "]:\n";
@@ -548,7 +545,8 @@ void process_n_vld() {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane(const char *infile, GrdFileType ftype,
-                    VarInfo *info, DataPlane &dp, bool do_regrid) {
+                    VarInfo *info, DataPlane &dp,
+                    bool do_regrid) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
@@ -594,7 +592,8 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_data_plane_array(const char *infile, GrdFileType ftype,
-                          VarInfo *info, DataPlaneArray &dpa, bool do_regrid) {
+                          VarInfo *info, DataPlaneArray &dpa,
+                          bool do_regrid) {
    int n, i;
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
@@ -621,7 +620,8 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
          // Loop through the forecast fields
          for(i=0; i<dpa.n_planes(); i++) {
-            dpa[i] = met_regrid(dpa[i], mtddf->grid(), grid, info->regrid());
+            dpa[i] = met_regrid(dpa[i], mtddf->grid(), grid,
+                                info->regrid());
          }
       }
 
@@ -1001,7 +1001,6 @@ void process_point_obs(int i_nc) {
          strncpy(hdr_vld_str, header_data.vld_array[headerOffset], str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
-
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
 
@@ -1082,7 +1081,8 @@ int process_point_ens(int i_ens, int &n_miss) {
       }
 
       // Read the gridded data from the input forecast file
-      if(!get_data_plane_array(ens_file, info->file_type(), info, fcst_dpa, true)) {
+      if(!get_data_plane_array(ens_file, info->file_type(), info,
+                               fcst_dpa, true)) {
          n_miss++;
          continue;
       }
@@ -1188,7 +1188,7 @@ void process_point_scores() {
                if(pd_ptr->n_obs == 0) continue;
 
                // Compute observation ranks and pair values
-               pd_ptr->compute_rank(rng_ptr);
+               pd_ptr->compute_rank(conf_info.rng_ptr);
                pd_ptr->compute_pair_vals();
 
                // Process each filtering threshold
@@ -1353,6 +1353,16 @@ void process_grid_vx() {
             found = get_data_plane(ens_file_list[j], etype,
                                    conf_info.vx_opt[i].vx_pd.fcst_info,
                                    fcst_dp[j], true);
+
+            // Apply observation error logic
+            if(conf_info.vx_opt[i].obs_error.field == FieldType_Fcst ||
+               conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
+               mlog << Debug(4)
+                    << "Applying observation error perturbation to "
+                    << "ensemble member " << j+1 << ".\n";
+               fcst_dp[j] = add_obs_error(fcst_dp[j], FieldType_Fcst,
+                               conf_info.vx_opt[i].obs_error);
+            }
          }
          else {
             found = false;
@@ -1386,7 +1396,18 @@ void process_grid_vx() {
       for(j=0, n_miss=0; j<grid_obs_file_list.n_elements(); j++) {
 
          found = get_data_plane(grid_obs_file_list[j], otype,
-                                conf_info.vx_opt[i].vx_pd.obs_info, obs_dp, true);
+                                conf_info.vx_opt[i].vx_pd.obs_info,
+                                obs_dp, true);
+
+         // Apply observation error logic
+         if(conf_info.vx_opt[i].obs_error.field == FieldType_Obs ||
+            conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
+            mlog << Debug(4)
+                 << "Applying observation error perturbation to "
+                 << "gridded observation data.\n";
+            obs_dp = add_obs_error(obs_dp, FieldType_Obs,
+                        conf_info.vx_opt[i].obs_error);
+         }
 
          // If found, break out of the loop
          if(!found) n_miss++;
@@ -1421,9 +1442,10 @@ void process_grid_vx() {
          // For spread/skill, use the calculated mean file if none was specified
          if(!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) {
             ConcatString ens_mn_name;
-            ens_mn_name << conf_info.ens_info[i]->name() << "_"
-                        << conf_info.ens_info[i]->level_name() << "_"
-                        << "ENS_MEAN";
+            ens_mn_name << conf_info.vx_opt[i].vx_pd.fcst_info->name()
+                        << "_"
+                        << conf_info.vx_opt[i].vx_pd.fcst_info->level_name()
+                        << "_ENS_MEAN";
             ens_mn_name.replace(",", "_",   false);
             ens_mn_name.replace("*", "all", false);
             mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
@@ -1533,7 +1555,7 @@ void process_grid_vx() {
             if(pd_all.n_obs == 0) continue;
 
             // Compute observation ranks and pair values
-            pd_all.compute_rank(rng_ptr);
+            pd_all.compute_rank(conf_info.rng_ptr);
             pd_all.compute_pair_vals();
 
             // Write out the unfiltered observation rank field.
@@ -1662,7 +1684,8 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 
          // Skip any grid points containing bad data values or where the
          // verification masking region is turned off
-         if(is_bad_data(obs_dp.get(x, y)) || !mask_dp.s_is_on(x, y)) continue;
+         if(is_bad_data(obs_dp.get(x, y)) ||
+            !mask_dp.s_is_on(x, y)) continue;
 
          // Get current climatology value
          cmn = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
@@ -2553,9 +2576,6 @@ void clean_up() {
       }
       delete [] thresh_count_na; thresh_count_na = (NumArray *) 0;
    }
-
-   // Deallocate memory for the random number generator
-   rng_free(rng_ptr);
 
    return;
 }
