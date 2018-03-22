@@ -53,6 +53,7 @@ void EnsembleStatConfInfo::init_from_scratch() {
    ens_info = (VarInfo **)          0;
    ens_ta   = (ThreshArray *)       0;
    vx_opt   = (EnsembleStatVxOpt *) 0;
+   rng_ptr  = (gsl_rng *)           0;
 
    clear();
 
@@ -77,12 +78,13 @@ void EnsembleStatConfInfo::clear() {
    msg_typ_sfc.clear();
    mask_dp_map.clear();
    mask_sid_map.clear();
-   rng_type.clear();
-   rng_seed.clear();
    grid_weight_flag = GridWeightType_None;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
+
+   // Deallocate memory for the random number generator
+   if(rng_ptr) rng_free(rng_ptr);
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
@@ -153,8 +155,12 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    obtype = parse_conf_string(&conf, conf_key_obtype);
 
    // Conf: rng_type and rng_seed
+   ConcatString rng_type, rng_seed;
    rng_type = conf.lookup_string(conf_key_rng_type);
    rng_seed = conf.lookup_string(conf_key_rng_seed);
+
+   // Set the random number generator and seed value
+   rng_set(rng_ptr, rng_type, rng_seed);
 
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
@@ -303,7 +309,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
          // Process the options for this verification task
          vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
-                                  point_vx, use_var_id);
+                                  rng_ptr, point_vx, use_var_id);
       }
 
       // Summarize output flags across all verification tasks
@@ -593,6 +599,7 @@ void EnsembleStatVxOpt::clear() {
    obs_summary = ObsSummary_None;
    obs_perc = bad_data_int;
    skip_const = false;
+   obs_error.clear();
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
@@ -603,7 +610,8 @@ void EnsembleStatVxOpt::clear() {
 
 void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        GrdFileType otype, Dictionary &odict,
-                                       bool point_vx, bool use_var_id) {
+                                       gsl_rng *rng_ptr, bool point_vx,
+                                       bool use_var_id) {
    int i, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -719,6 +727,10 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
    // Conf: skip_const
    skip_const = odict.lookup_bool(conf_key_skip_const);
+
+   // Conf: obs_error
+   obs_error = parse_conf_obs_error(&odict, rng_ptr);
+   vx_pd.obs_error_ptr = &obs_error;
 
    // Conf: desc
    vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc));

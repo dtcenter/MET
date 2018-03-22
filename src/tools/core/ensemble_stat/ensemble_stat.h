@@ -173,9 +173,6 @@ static DataPlane wgt_dp;
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
 
-// Pointer to the random number generator to be used
-static gsl_rng *rng_ptr = (gsl_rng *) 0;
-
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;
 

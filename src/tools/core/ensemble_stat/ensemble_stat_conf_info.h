@@ -115,6 +115,7 @@ class EnsembleStatVxOpt {
       ObsSummary     obs_summary;        // Summarize observations
       int            obs_perc;           // Summary percentile value
       bool           skip_const;         // Skip points with constant data values
+      ObsErrorInfo   obs_error;          // Observation error handling
 
       // Output file options
       STATOutputType output_flag[n_txt]; // Flag for each output line type
@@ -124,7 +125,8 @@ class EnsembleStatVxOpt {
       void clear();
 
       void process_config(GrdFileType, Dictionary &,
-                          GrdFileType, Dictionary &, bool, bool);
+                          GrdFileType, Dictionary &,
+                          gsl_rng *, bool, bool);
       void set_vx_pd(EnsembleStatConfInfo *);
 
       // Compute the number of output lines for this task
@@ -200,8 +202,7 @@ class EnsembleStatConfInfo {
       // Mapping of mask names to Station ID lists
       map<ConcatString,StringArray> mask_sid_map;
 
-      ConcatString   rng_type;              // GSL random number generator
-      ConcatString   rng_seed;              // GSL RNG seed value
+      gsl_rng *rng_ptr;                     // GSL random number generator (allocated)
 
       GridWeightType grid_weight_flag;      // Grid weighting flag
       ConcatString   tmp_dir;               // Directory for temporary files
