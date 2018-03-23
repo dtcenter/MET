@@ -1482,7 +1482,7 @@ void process_pbfile(int i_pb) {
             unix_to_mdyhms(hdr_vld_ut, mon, day, yr, hr, min, sec);
             sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
                     yr, mon, day, hr, min, sec);
-            if (IS_INVALID_NC(obsVars.hdr_arr_var)) {
+            if (!IS_INVALID_NC(obsVars.hdr_arr_var)) {
                write_nc_header(obsVars, modified_hdr_typ, hdr_sid, time_str,
                                hdr_lat, hdr_lon, hdr_elv);
             }
