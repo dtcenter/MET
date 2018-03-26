@@ -396,7 +396,9 @@ regrid = {
 //        data/config/ConfigConstants.
 //        Examples of user-defined conversion functions include:
 //          convert(x) = 2*x;
+//          convert(x) = x^2;
 //          convert(a) = log10(a);
+//          convert(a) = a^10;
 //          convert(t) = max(1, sqrt(abs(t)));
 //          convert(x) = K_to_C(x); where K_to_C(x) is defined in ConfigConstants
 //
