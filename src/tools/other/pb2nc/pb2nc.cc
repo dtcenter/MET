@@ -180,6 +180,7 @@ static int nmsg = -1;
 static bool dump_flag = false;
 static ConcatString dump_dir = ".";
 
+static bool header_to_vector = false;
 static bool do_all_vars      = false;
 static bool use_small_buffer = false;
 static bool override_vars    = false;
@@ -851,6 +852,7 @@ void process_pbfile(int i_pb) {
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
    strcpy(bufr_hdr_names, bufr_hdrs.text());
 
+   header_to_vector = IS_INVALID_NC(obsVars.hdr_arr_var);
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
@@ -1488,12 +1490,12 @@ void process_pbfile(int i_pb) {
             unix_to_mdyhms(hdr_vld_ut, mon, day, yr, hr, min, sec);
             sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
                     yr, mon, day, hr, min, sec);
-            if (!IS_INVALID_NC(obsVars.hdr_arr_var)) {
-               write_nc_header(obsVars, modified_hdr_typ, hdr_sid, time_str,
+            if (header_to_vector) {
+               add_nc_header_full(modified_hdr_typ, hdr_sid, time_str,
                                hdr_lat, hdr_lon, hdr_elv);
             }
             else {
-               add_nc_header_full(modified_hdr_typ, hdr_sid, time_str,
+               write_nc_header(obsVars, modified_hdr_typ, hdr_sid, time_str,
                                hdr_lat, hdr_lon, hdr_elv);
             }
          }
@@ -2026,11 +2028,11 @@ void write_netcdf_hdr_data() {
    }
    else {
       // Write out the header data
-      if (nc_data_buffer.cur_hdr_idx > 0) {
-         write_nc_header(obsVars);
-      }
-      else {
+      if (header_to_vector) {
          write_nc_headers(obsVars);
+      }
+      else if (nc_data_buffer.hdr_data_idx > 0) {
+         write_nc_header(obsVars);
       }
    }
 
