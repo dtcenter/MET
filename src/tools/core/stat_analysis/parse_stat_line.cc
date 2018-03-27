@@ -225,6 +225,8 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.f_speed_bar = atof(l.get_item("F_SPEED_BAR"));
    v_info.o_speed_bar = atof(l.get_item("O_SPEED_BAR"));
 
+   v_info.calc_ncep_stats();
+
    return;
 }
 

@@ -849,7 +849,6 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          else if(do_vcnt && line.type() == stat_vl1l2) {
             parse_vl1l2_line(line, vl1l2_info);
-            vl1l2_info.calc_ncep_stats();
          }
 
          //
