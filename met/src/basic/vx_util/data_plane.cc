@@ -321,23 +321,6 @@ void DataPlane::replace(const SingleThresh &st, const double new_v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void DataPlane::transform(double scale, double offset) {
-   int j;
-
-   //
-   // Apply scale and offset and update with the replacement value.
-   //
-
-   for(j=0; j<Nxy; ++j) {
-      if( !is_bad_data(scale)  ) Data[j] *= scale;
-      if( !is_bad_data(offset) ) Data[j] += offset;
-   }
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 int DataPlane::two_to_one(int x, int y) const {
    int n;
 
