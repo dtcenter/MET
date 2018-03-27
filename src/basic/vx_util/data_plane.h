@@ -93,7 +93,6 @@ class DataPlane {
       void threshold(const SingleThresh &);
       void censor   (const ThreshArray &, const NumArray &);
       void replace  (const SingleThresh &, const double);
-      void transform(double scale, double offset);
 
       int  two_to_one(int x, int y) const;
       void one_to_two(int n, int &x, int &y) const;
@@ -103,7 +102,7 @@ class DataPlane {
 
       void data_range(double & data_min, double & data_max) const;
 
-      void shift_right(int n);
+      void shift_right  (int n);
 
       void put(const double, const int __x__, const int __y__);
 
