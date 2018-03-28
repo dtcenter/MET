@@ -1,4 +1,4 @@
-Model Evaluation Tools METv7.1 BETA 1 (March 16, 2018)
+Model Evaluation Tools METv7.1 BETA 2 (March 28, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -294,6 +294,13 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 7.1 BETA 2 Release Notes:
+--------------------------------
+
+- Add special handling for ANOWPM message types to PB2NC.
+- Fix bug in STAT-Analysis for VL1L2 to VCNT conversion.
+- Initial development for observation error handling in Ensemble-Stat.
 
 Version 7.1 BETA 1 Release Notes:
 --------------------------------
