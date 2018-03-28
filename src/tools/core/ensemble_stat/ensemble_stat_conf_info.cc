@@ -730,7 +730,12 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 
    // Conf: obs_error
    obs_error = parse_conf_obs_error(&odict, rng_ptr);
-   vx_pd.obs_error_ptr = &obs_error;
+   vx_pd.obs_error_info = &obs_error;
+
+   // Initialize the global instance of obs_error_table
+   if(obs_error.field != FieldType_None && !obs_error_table.is_set()) {
+      obs_error_table.initialize();
+   }
 
    // Conf: desc
    vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc));
