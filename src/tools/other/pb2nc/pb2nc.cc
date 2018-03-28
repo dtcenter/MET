@@ -52,6 +52,7 @@
 //          06/07/17  Howard Soh     Added more options: -vars, -all, and -index.
 //          09/15/17  Howard Soh     Removed options: -all, and -use_var_id.
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
+//   016    03/28/18  Howard Soh     Add special AIRNOW/ANOWPM handling.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -844,10 +845,10 @@ void process_pbfile(int i_pb) {
    }
 
    if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
-   
+
    int grib_code, bufr_var_index;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
-   
+
    int bufr_hdr_length = bufr_hdrs.length();
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
    strcpy(bufr_hdr_names, bufr_hdrs.text());
@@ -947,7 +948,7 @@ void process_pbfile(int i_pb) {
          for (index=0; index<4; index++) {
             hdr[index] = bufr_obs[0][index];
          }
-         
+
          // Update hdr[3] and file_ut for obs_time
          if (bufr_obs[0][3] > r8bfms) {
             hdr[3] = 0;
@@ -1107,8 +1108,9 @@ void process_pbfile(int i_pb) {
          continue;
       }
 
-      // Special handling for "AIRNOW"
-      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ));
+      // Special handling for AIRNOW and ANOWPM message types
+      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ) ||
+                        0 == strcmp("ANOWPM", hdr_typ));
 
       if (0 < message_type_map.count(hdr_typ)) {
          ConcatString mappedMessageType = message_type_map[hdr_typ];
@@ -1404,7 +1406,7 @@ void process_pbfile(int i_pb) {
 
             readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &use_small_buffer);
             if (0 >= nlev2) continue;
-            
+
             buf_nlev = nlev2;
             if (nlev2 > mxr8lv) {
                buf_nlev = mxr8lv;
@@ -1618,7 +1620,7 @@ void process_pbfile_metadata(int i_pb) {
    // Build the temporary block file name
    blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
    blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
-   
+
    blk_file = make_temp_file_name(blk_prefix2, '\0');
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
@@ -1641,15 +1643,15 @@ void process_pbfile_metadata(int i_pb) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
    }
-   
+
    // Open the blocked temp PrepBufr file for reading
    openpb_(blk_file, &unit);
-   
+
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_(&unit, &npbmsg);
    mlog << Debug(1) << method_name << " -> "
         << "the number of records: " << npbmsg << "\n";
-   
+
    // Use the number of records requested by the user if there
    // are enough present.
    if(nmsg >= 0 && nmsg <= npbmsg) npbmsg = nmsg;
@@ -2506,6 +2508,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
       }
       mlog << Debug(1) << line_buf;
    }
+   mlog << Debug(1) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
