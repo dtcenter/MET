@@ -88,6 +88,8 @@ void PairDataEnsemble::clear() {
 
    PairBase::clear();
 
+   obs_error_entry.clear();
+
    for(i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
    n_ens = 0;
@@ -203,6 +205,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    for(i=0; i<n_ens; i++) e_na[i] = pd.e_na[i];
 
+   obs_error_entry = pd.obs_error_entry;
+
    return;
 }
 
@@ -222,6 +226,15 @@ void PairDataEnsemble::set_ens_size(int n) {
    // Allocate a NumArray to store ensemble values for each member
    n_ens = n;
    e_na  = new NumArray [n_ens];
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
+
+   obs_error_entry.add(e);
 
    return;
 }
@@ -818,7 +831,7 @@ void VxPairDataEnsemble::clear() {
    sid_exc_filt.clear();
    obs_qty_filt.clear();
 
-   obs_error_ptr = (ObsErrorInfo *) 0;
+   obs_error_info = (ObsErrorInfo *) 0;
 
    fcst_ut = (unixtime) 0;
    beg_ut  = (unixtime) 0;
@@ -832,9 +845,9 @@ void VxPairDataEnsemble::clear() {
       }
    }
 
-   n_msg_typ     = 0;
-   n_mask        = 0;
-   n_interp      = 0;
+   n_msg_typ = 0;
+   n_mask    = 0;
+   n_interp  = 0;
 
    return;
 }
@@ -857,7 +870,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    end_ut        = vx_pd.end_ut;
    sid_exc_filt  = vx_pd.sid_exc_filt;
    obs_qty_filt  = vx_pd.obs_qty_filt;
-   obs_error_ptr = vx_pd.obs_error_ptr;
+   obs_error_info = vx_pd.obs_error_info;
 
    interp_thresh = vx_pd.interp_thresh;
    msg_typ_sfc   = vx_pd.msg_typ_sfc;
@@ -1213,6 +1226,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    double cmn_v, csd_v, obs_v, wgt_v;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
+   ObsErrorEntry *obs_error_ptr = (ObsErrorEntry *) 0;
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {
@@ -1339,11 +1353,29 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    bool spfh_flag = fcst_info->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
-   // Apply observation error logic
-   if(obs_error_ptr->field == FieldType_Obs ||
-      obs_error_ptr->field == FieldType_Both) {
+   // Store pointer to ObsErrorEntry
+   if(obs_error_info->field != FieldType_None) {
 
-      double obs_new = add_obs_error(obs_v, FieldType_Obs, *obs_error_ptr);
+      // Use config file setting, if specified
+      if(obs_error_info->entry.dist_type != DistType_None) {
+         obs_error_ptr = &(obs_error_info->entry);
+      }
+      // Otherwise, do a table lookup
+      else {
+         obs_error_ptr = obs_error_table.lookup(
+            obs_info->name(), hdr_typ_str, hdr_sid_str,
+            bad_data_int, bad_data_int, bad_data_int,
+            obs_lvl, obs_hgt, obs_v);
+      }
+   }
+
+   // Apply observation error perturbation
+   if(obs_error_info->field == FieldType_Obs ||
+      obs_error_info->field == FieldType_Both) {
+
+      double obs_new = add_obs_error(obs_error_info->rng_ptr,
+                          FieldType_Obs, obs_error_ptr, obs_v);
+
       mlog << Debug(4)
            << "Observation error update from observation value "
            << obs_v << " to " << obs_new << "\n";
@@ -1412,8 +1444,8 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                         to_lvl, csd_lvl_blw, csd_lvl_abv);
 
             // Compute weight for current point
-            wgt_v = ( wgt_dp == (DataPlane *) 0 ?
-                      default_grid_weight : wgt_dp->get(x, y) );
+            wgt_v = (wgt_dp == (DataPlane *) 0 ?
+                     default_grid_weight : wgt_dp->get(x, y));
 
             // Add the observation value
             // Weight is from the nearest grid point
@@ -1421,6 +1453,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                                 obs_x, obs_y, hdr_ut,
                                 obs_lvl, obs_hgt, obs_v, obs_qty,
                                 cmn_v, csd_v, wgt_v);
+            pd[i][j][k].add_obs_error_entry(obs_error_ptr);
          } // end for k
       } // end for j
    } // end for i
@@ -1467,18 +1500,23 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                            pd[i][j][k].x_na[l],
                            pd[i][j][k].y_na[l],
                            pd[i][j][k].o_na[l],
-                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                           pd[0][0][k].interp_mthd,
+                           pd[0][0][k].interp_wdth,
                            pd[0][0][k].interp_shape,
                            interp_thresh, spfh_flag,
                            fcst_info->level().type(),
                            to_lvl, f_lvl_blw, f_lvl_abv);
 
                // Apply observation error logic
-               if(obs_error_ptr->field == FieldType_Fcst ||
-                  obs_error_ptr->field == FieldType_Both) {
+               if(obs_error_info->field == FieldType_Fcst ||
+                  obs_error_info->field == FieldType_Both) {
 
-                  double fcst_new = add_obs_error(fcst_v,
-                                       FieldType_Fcst, *obs_error_ptr);
+                  double fcst_new = add_obs_error(
+                                       obs_error_info->rng_ptr,
+                                       FieldType_Fcst,
+                                       pd[i][j][k].obs_error_entry[l],
+                                       fcst_v);
+
                   mlog << Debug(4)
                        << "Observation error update from ensemble "
                        << "member value " << fcst_v << " to "

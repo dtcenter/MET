@@ -1486,104 +1486,6 @@ ObsSummary parse_conf_obs_summary(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void ObsErrorInfo::clear() {
-   field = FieldType_None;
-   dist_type = DistType_None;
-   dist_parm.clear();
-   inst_bias_scale = bad_data_double;
-   inst_bias_offset = bad_data_double;
-   rng_ptr = (gsl_rng *) 0;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void ObsErrorInfo::validate() {
-
-   // If set to NONE, no work to do
-   if(field == FieldType_None) return;
-
-   int n_parm;
-
-   // Number of distribution parameters
-        if(dist_type == DistType_None)  n_parm = 0;
-   else if(dist_type == DistType_Gamma) n_parm = 2;
-   else                                 n_parm = 1;
-
-   // Make sure we have the expected number
-   if(dist_parm.n() != n_parm) {
-      mlog << Error << "\nObsErrorInfo::validate() -> "
-           << "the number of distribution parameters in \""
-           << conf_key_dist_parm << "\" (" << dist_parm.n()
-           << ") must be " << n_parm << " when \"" << conf_key_dist_type
-           << "\" is set to \""
-           << disttype_to_string(dist_type) << "\".\n\n";
-      exit(1);
-   }
-
-   // Make sure the rng_ptr is set
-   if(rng_ptr == (gsl_rng *) 0) {
-      mlog << Error << "\nObsErrorInfo::validate() -> "
-           << "random number generator pointer is not set!\n\n";
-      exit(1);
-   }
-
-   // Pad with bad data out to length 2 to simplify later logic
-   while(dist_parm.n() < 2) dist_parm.add(bad_data_double);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
-   Dictionary *err_dict = (Dictionary *) 0;
-   ObsErrorInfo info;
-   int i;
-   double d;
-
-   if(!dict) {
-      mlog << Error << "\nparse_conf_obs_error() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   // Initialize
-   info.clear();
-
-   // Conf: obs_error
-   err_dict = dict->lookup_dictionary(conf_key_obs_error);
-
-   // Conf: field
-   info.field = int_to_fieldtype(err_dict->lookup_int(conf_key_field));
-
-   // If set to NONE, no work to do
-   if(info.field == FieldType_None) return(info);
-
-   // Conf: dist_type - optional
-   i = err_dict->lookup_int(conf_key_dist_type, false);
-   if(err_dict->last_lookup_status()) {
-      info.dist_type = int_to_disttype(i);
-   }
-
-   // Conf: dist_parm - optional
-   info.dist_parm = err_dict->lookup_num_array(conf_key_dist_parm, false);
-
-   // Conf: inst_bias_scale - optional
-   info.inst_bias_scale = err_dict->lookup_double(conf_key_inst_bias_scale, false);
-
-   // Conf: inst_bias_offset - optional
-   info.inst_bias_offset = err_dict->lookup_double(conf_key_inst_bias_offset, false);
-
-   // Store the RNG pointer
-   info.rng_ptr = rng_ptr;
-
-   info.validate();
-
-   return(info);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 int parse_conf_percentile(Dictionary *dict) {
    int i = bad_data_int;
 
@@ -2432,9 +2334,33 @@ DistType int_to_disttype(int v) {
    else if(v == conf_const.lookup_int(conf_val_exponential)) t = DistType_Exponential;
    else if(v == conf_const.lookup_int(conf_val_chisquared))  t = DistType_ChiSquared;
    else if(v == conf_const.lookup_int(conf_val_gamma))       t = DistType_Gamma;
+   else if(v == conf_const.lookup_int(conf_val_uniform))     t = DistType_Uniform;
+   else if(v == conf_const.lookup_int(conf_val_beta))        t = DistType_Beta;
    else {
       mlog << Error << "\nint_to_disttype() -> "
            << "Unexpected value of " << v << ".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DistType string_to_disttype(const char *s) {
+   DistType t;
+
+   // Convert string to enumerated DistType
+        if(strcasecmp(s, conf_val_none)        == 0) t = DistType_None;
+   else if(strcasecmp(s, conf_val_normal)      == 0) t = DistType_Normal;
+   else if(strcasecmp(s, conf_val_exponential) == 0) t = DistType_Exponential;
+   else if(strcasecmp(s, conf_val_chisquared)  == 0) t = DistType_ChiSquared;
+   else if(strcasecmp(s, conf_val_gamma)       == 0) t = DistType_Gamma;
+   else if(strcasecmp(s, conf_val_uniform)     == 0) t = DistType_Uniform;
+   else if(strcasecmp(s, conf_val_beta)        == 0) t = DistType_Beta;
+   else {
+      mlog << Error << "\nstring_to_disttype() -> "
+           << "Unexpected DistType string \"" << s << "\".\n\n";
       exit(1);
    }
 
@@ -2453,6 +2379,8 @@ ConcatString disttype_to_string(DistType type) {
       case(DistType_Exponential): s = conf_val_exponential; break;
       case(DistType_ChiSquared):  s = conf_val_chisquared;  break;
       case(DistType_Gamma):       s = conf_val_gamma;       break;
+      case(DistType_Uniform):     s = conf_val_uniform;     break;
+      case(DistType_Beta):        s = conf_val_beta;       break;
       default:
          mlog << Error << "\ndisttype_to_string() -> "
               << "Unexpected DistType value of " << type << ".\n\n";

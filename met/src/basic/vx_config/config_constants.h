@@ -408,26 +408,6 @@ enum MatchType {
    MatchType_NoMerge    // Match with no additional merging
 };
 
-
-////////////////////////////////////////////////////////////////////////
-
-//
-// Struct to store observation error information
-//
-
-struct ObsErrorInfo {
-   FieldType field;
-   DistType  dist_type;
-   NumArray  dist_parm;
-   double    inst_bias_scale;
-   double    inst_bias_offset;
-
-   gsl_rng * rng_ptr; // not allocated
-
-   void      clear();
-   void      validate();
-};
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Constants used in configuartion files
@@ -642,6 +622,8 @@ static const char conf_val_normal[]      = "NORMAL";
 static const char conf_val_exponential[] = "EXPONENTIAL";
 static const char conf_val_chisquared[]  = "CHISQUARED";
 static const char conf_val_gamma[]       = "GAMMA";
+static const char conf_val_uniform[]     = "UNIFORM";
+static const char conf_val_beta[]        = "BETA";
 
 //
 // STAT-Analysis specific parameter key names

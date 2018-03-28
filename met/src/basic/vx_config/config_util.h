@@ -54,7 +54,6 @@ extern HiRAInfo        parse_conf_hira(Dictionary *dict);
 extern GridWeightType  parse_conf_grid_weight_flag(Dictionary *dict);
 extern DuplicateType   parse_conf_duplicate_flag(Dictionary *dict);
 extern ObsSummary      parse_conf_obs_summary(Dictionary *dict);
-extern ObsErrorInfo    parse_conf_obs_error(Dictionary *dict, gsl_rng *);
 extern ConcatString    parse_conf_tmp_dir(Dictionary *dict);
 extern GridDecompType  parse_conf_grid_decomp_flag(Dictionary *dict);
 extern WaveletType     parse_conf_wavelet_type(Dictionary *dict);
@@ -105,6 +104,7 @@ extern MatchType    int_to_matchtype(int);
 extern ConcatString matchtype_to_string(MatchType);
 
 extern DistType     int_to_disttype(int);
+extern DistType     string_to_disttype(const char *);
 extern ConcatString disttype_to_string(DistType);
 
 extern ConcatString griddecomptype_to_string(GridDecompType);
