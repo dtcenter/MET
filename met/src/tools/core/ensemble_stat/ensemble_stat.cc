@@ -98,6 +98,8 @@ static void process_grid_scores   (DataPlane *&, DataPlane &,
 static void clear_counts(const DataPlane &, int);
 static void track_counts(const DataPlane &, int);
 
+static ConcatString get_ens_mn_var_name(int);
+
 static void setup_nc_file   (unixtime, int, const char *);
 static void setup_txt_files ();
 static void setup_table     (AsciiTable &);
@@ -1045,6 +1047,7 @@ int process_point_ens(int i_ens, int &n_miss) {
    DataPlaneArray fcst_dpa;
    NumArray fcst_lvl_na;
    VarInfo *info = (VarInfo *) 0;
+   bool info_alloc = false;
 
    ConcatString ens_file;
    bool ens_mn = (-1 == i_ens);
@@ -1065,16 +1068,9 @@ int process_point_ens(int i_ens, int &n_miss) {
       // For spread/skill, use the calculated mean file if none was specified
       if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) {
          fcst_dpa.clear();
-         ConcatString ens_mn_name;
-         ens_mn_name << conf_info.vx_opt[i].vx_pd.fcst_info->name()
-                     << "_"
-                     << conf_info.vx_opt[i].vx_pd.fcst_info->level_name()
-                     << "_ENS_MEAN";
-         ens_mn_name.replace(",", "_",   false);
-         ens_mn_name.replace("*", "all", false);
-         mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
          info = new VarInfoNcMet();
-         info->set_magic(ens_mn_name, "(*,*)");
+         info->set_magic(get_ens_mn_var_name(i), "(*,*)");
+         info_alloc = true;
       }
       else {
          info = conf_info.vx_opt[i].vx_pd.fcst_info;
@@ -1092,7 +1088,7 @@ int process_point_ens(int i_ens, int &n_miss) {
            << " found " << fcst_dpa.n_planes() << " forecast levels.\n";
 
       // Clean up the allocated VarInfo object, if necessary
-      if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) delete info;
+      if(info_alloc) { delete info; info = (VarInfo *) 0; }
 
       // Store information for the raw forecast fields
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
@@ -1307,6 +1303,7 @@ void process_grid_vx() {
    DataPlane  emn_dp, emn_dp_smooth;
    DataPlane  cmn_dp;
    PairDataEnsemble pd_all, pd;
+   ObsErrorEntry *entry_ptr = (ObsErrorEntry *) 0;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1342,6 +1339,29 @@ void process_grid_vx() {
       // Set the observation level name
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
+      // Set the ObsErrorEntry pointer
+      if(conf_info.vx_opt[i].obs_error.field != FieldType_None) {
+
+         // Use config file setting, if specified
+         if(conf_info.vx_opt[i].obs_error.entry.dist_type != DistType_None) {
+            entry_ptr = &(conf_info.vx_opt[i].obs_error.entry);
+         }
+         // Otherwise, do a table lookup
+         else {
+            entry_ptr = obs_error_table.lookup(
+               conf_info.vx_opt[i].vx_pd.obs_info->name(),
+               conf_info.obtype);
+
+            // If match was found and includes a value range setting,
+            // reset to NULL and lookup separately for grid point
+            if(entry_ptr) {
+               if(entry_ptr->val_range.n() > 0) {
+                  entry_ptr = (ObsErrorEntry *) 0;
+               }
+            }
+         }
+      }
+
       // Loop through each of the input ensemble files
       for(j=0, n_miss=0; j<ens_file_list.n_elements(); j++) {
 
@@ -1360,8 +1380,10 @@ void process_grid_vx() {
                mlog << Debug(4)
                     << "Applying observation error perturbation to "
                     << "ensemble member " << j+1 << ".\n";
-               fcst_dp[j] = add_obs_error(fcst_dp[j], FieldType_Fcst,
-                               conf_info.vx_opt[i].obs_error);
+               fcst_dp[j] = add_obs_error(conf_info.rng_ptr,
+                               FieldType_Fcst, entry_ptr, fcst_dp[j],
+                               conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                               conf_info.obtype);
             }
          }
          else {
@@ -1405,8 +1427,10 @@ void process_grid_vx() {
             mlog << Debug(4)
                  << "Applying observation error perturbation to "
                  << "gridded observation data.\n";
-            obs_dp = add_obs_error(obs_dp, FieldType_Obs,
-                        conf_info.vx_opt[i].obs_error);
+            obs_dp = add_obs_error(conf_info.rng_ptr,
+                        FieldType_Obs, entry_ptr, obs_dp,
+                        conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                        conf_info.obtype);
          }
 
          // If found, break out of the loop
@@ -1433,6 +1457,7 @@ void process_grid_vx() {
       if(conf_info.ens_ssvar_flag) {
 
          VarInfo *info = (VarInfo *) 0;
+         bool info_alloc = false;
          ConcatString mn_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
                                  ens_ssvar_mean : conf_info.ens_ssvar_file;
 
@@ -1441,16 +1466,9 @@ void process_grid_vx() {
 
          // For spread/skill, use the calculated mean file if none was specified
          if(!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) {
-            ConcatString ens_mn_name;
-            ens_mn_name << conf_info.vx_opt[i].vx_pd.fcst_info->name()
-                        << "_"
-                        << conf_info.vx_opt[i].vx_pd.fcst_info->level_name()
-                        << "_ENS_MEAN";
-            ens_mn_name.replace(",", "_",   false);
-            ens_mn_name.replace("*", "all", false);
-            mlog << Debug(4) << "Generated mean field: " << ens_mn_name << "\n";
             info = new VarInfoNcMet();
-            info->set_magic(ens_mn_name, "(*,*)");
+            info->set_magic(get_ens_mn_var_name(i), "(*,*)");
+            info_alloc = true;
          }
          else {
             info = conf_info.vx_opt[i].vx_pd.fcst_info;
@@ -1466,6 +1484,9 @@ void process_grid_vx() {
                  << " from file " << mn_file << "\n\n";
             exit(1);
          }
+
+         // Clean up the allocated VarInfo object, if necessary
+         if(info_alloc) { delete info; info = (VarInfo *) 0; }
       }
 
       // Loop through and apply each of the smoothing operations
@@ -1819,6 +1840,21 @@ void track_counts(const DataPlane &dp, int i_vx) {
    } // end for i
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString get_ens_mn_var_name(int i_vx) {
+   ConcatString cs;
+
+   cs << conf_info.vx_opt[i_vx].vx_pd.fcst_info->name() << "_"
+      << conf_info.vx_opt[i_vx].vx_pd.fcst_info->level_name()
+      << "_ENS_MEAN";
+      cs.replace(",", "_",   false);
+      cs.replace("*", "all", false);
+   mlog << Debug(4) << "Generated mean field: " << cs << "\n";
+
+   return(cs);
 }
 
 ////////////////////////////////////////////////////////////////////////
