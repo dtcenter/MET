@@ -94,12 +94,13 @@ skip_const     = FALSE;
 
 //
 // Observation error options
+// Set dist_type to NONE to use the observation error table instead
 // May be set separately in each "obs.field" entry
 //
 obs_error = {
    field            = NONE;    // FCST, OBS, BOTH, or NONE
-   dist_type        = NONE;    // NORMAL(stdev), EXPONENTIAL(lambda),
-   dist_parm        = [];      // CHISQUARED(degf), GAMMA(shape, scale)
+   dist_type        = NONE;    // Distribution type
+   dist_parm        = [];      // Distribution parameters
    inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
    inst_bias_offset = 0.0;     // Instrument bias offset adjustment
 }

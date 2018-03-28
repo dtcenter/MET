@@ -28,7 +28,9 @@ enum DistType {
    DistType_Normal,      // Normal distribution
    DistType_Exponential, // Exponential distribution
    DistType_ChiSquared,  // Chi-Squared distribution
-   DistType_Gamma        // Gamma distribution
+   DistType_Gamma,       // Gamma distribution
+   DistType_Uniform,     // Uniform distribution
+   DistType_Beta         // Beta distribution
 };
 
 ////////////////////////////////////////////////////////////////////////

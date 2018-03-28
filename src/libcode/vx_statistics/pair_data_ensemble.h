@@ -16,13 +16,14 @@
 #include <map>
 
 #include "pair_base.h"
+#include "obs_error.h"
+#include "met_stats.h"
 
 #include "vx_util.h"
 #include "vx_grid.h"
 #include "vx_data2d.h"
 #include "vx_data2d_grib.h"
 #include "vx_gsl_prob.h"
-#include "vx_statistics.h"
 
 using namespace std;
 
@@ -34,9 +35,10 @@ struct ens_ssvar_pt {
    double w;
 };
 
-typedef deque<ens_ssvar_pt>       ssvar_pt_list;
-typedef map<string,ssvar_pt_list> ssvar_bin_map;  // Indexed by bin min
-typedef CRC_Array<bool>           BoolArray;
+typedef deque<ens_ssvar_pt>        ssvar_pt_list;
+typedef map<string,ssvar_pt_list>  ssvar_bin_map;  // Indexed by bin min
+typedef CRC_Array<bool>            BoolArray;
+typedef CRC_Array<ObsErrorEntry *> ObsErrorEntryPtrArray;
 
 // Number of SSVAR bins to produce a warning
 static const int n_warn_ssvar_bins = 1000;
@@ -62,6 +64,9 @@ class PairDataEnsemble : public PairBase {
       PairDataEnsemble & operator=(const PairDataEnsemble &);
 
       //////////////////////////////////////////////////////////////////
+
+      // ObsErrorEntry points [n_obs]
+      ObsErrorEntryPtrArray obs_error_entry;
 
       // Ensemble, valid count, and rank values
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
@@ -99,6 +104,8 @@ class PairDataEnsemble : public PairBase {
 
       void add_ens(int, double);
       void set_ens_size(int);
+
+      void add_obs_error_entry(ObsErrorEntry *);
 
       void compute_rank(const gsl_rng *);
       void compute_pair_vals();
@@ -175,8 +182,8 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
-      ObsErrorInfo *obs_error_ptr; // Pointer for observation error
-                                   // Not allocated
+      ObsErrorInfo *obs_error_info; // Pointer for observation error
+                                    // Not allocated
 
       //////////////////////////////////////////////////////////////////
 

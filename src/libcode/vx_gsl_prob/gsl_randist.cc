@@ -233,6 +233,14 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
          v = gsl_ran_gamma(r, p1, p2);
          break;
 
+      case(DistType_Uniform):
+         v = gsl_ran_flat(r, p1, p2);
+         break;
+
+      case(DistType_Beta):
+         v = gsl_ran_beta(r, p1, p2);
+         break;
+
       case(DistType_None):
       default:
          v = 0.0;

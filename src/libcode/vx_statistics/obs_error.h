@@ -12,16 +12,175 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "config_constants.h"
-
+#include "vx_config.h"
 #include "vx_util.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-extern double    add_obs_error(double,
-                               FieldType, const ObsErrorInfo &);
-extern DataPlane add_obs_error(const DataPlane &,
-                               FieldType, const ObsErrorInfo &);
+class ObsErrorEntry {
+
+   private:
+
+      void init_from_scratch();
+
+      void assign(const ObsErrorEntry &);
+
+   public:
+
+      ObsErrorEntry();
+     ~ObsErrorEntry();
+      ObsErrorEntry(const ObsErrorEntry &);
+      ObsErrorEntry & operator=(const ObsErrorEntry &);
+
+      void clear();
+
+      void dump(ostream &, int = 0) const;
+
+      // Line number of the table
+      int         line_number;
+
+      // Observation matching criteria
+      StringArray var_name;
+      StringArray msg_type;
+      StringArray sid;
+      NumArray    pb_rpt_type;
+      NumArray    in_rpt_type;
+      NumArray    inst_type;
+      NumArray    hgt_range;
+      NumArray    prs_range;
+      NumArray    val_range;
+
+      // Observation error settings
+      double      bias_scale;
+      double      bias_offset;
+      DistType    dist_type;
+      NumArray    dist_parm;
+
+         //
+         //  set stuff
+         //
+
+         //
+         //  get stuff
+         //
+
+         //
+         //  do stuff
+         //
+
+      bool parse_line(const DataLine &);
+
+      bool is_header(const DataLine &);
+
+      bool is_match(const char *, const char *, const char *,
+                    int, int, int, double, double, double);
+
+      void validate();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+class ObsErrorTable {
+
+   private:
+
+      void init_from_scratch();
+
+      void assign(const ObsErrorTable &);
+
+      void extend(int);
+
+      ObsErrorEntry * e;   //  elements ... allocated
+
+      int N_elements;
+
+      int N_alloc;
+
+      bool IsSet;
+
+   public:
+
+      ObsErrorTable();
+     ~ObsErrorTable();
+      ObsErrorTable(const ObsErrorTable &);
+      ObsErrorTable & operator=(const ObsErrorTable &);
+
+      void clear();
+
+      void dump(ostream &, int = 0) const;
+
+         //
+         // set stuff
+         //
+
+         //
+         // get stuff
+         //
+
+      int n() const;
+
+      bool is_set() const;
+
+         //
+         // do stuff
+         //
+
+      void initialize();
+
+      bool read(const char * filename);
+
+      // for point observations
+      ObsErrorEntry * lookup(const char *, const char *, const char *,
+                             int, int, int, double, double, double);
+
+      // for gridded analyses
+      ObsErrorEntry * lookup(const char *, const char *,
+                             double cur_val = bad_data_double);
+};
+
+////////////////////////////////////////////////////////////////////////
+
+inline int  ObsErrorTable::n()      const { return(N_elements); }
+inline bool ObsErrorTable::is_set() const { return(IsSet);      }
+
+////////////////////////////////////////////////////////////////////////
+
+//
+//  Global instance of ObsErrorTable
+//
+
+extern ObsErrorTable obs_error_table;
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store observation error information from config files
+//
+
+struct ObsErrorInfo {
+   FieldType     field; // Apply to FCST, OBS, BOTH, or NONE
+   ObsErrorEntry entry; // Defines perturbation
+
+   gsl_rng * rng_ptr;   // not allocated
+
+   void clear();
+   void validate();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// External utility functions
+//
+
+extern ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *);
+
+extern double       add_obs_error(const gsl_rng *, FieldType,
+                                  const ObsErrorEntry *, double);
+extern DataPlane    add_obs_error(const gsl_rng *, FieldType,
+                                  const ObsErrorEntry *,
+                                  const DataPlane &,
+                                  const char *, const char *);
 
 ////////////////////////////////////////////////////////////////////////
 
