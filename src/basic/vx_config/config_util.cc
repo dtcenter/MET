@@ -2331,6 +2331,7 @@ DistType int_to_disttype(int v) {
    // Convert integer to enumerated DistType
         if(v == conf_const.lookup_int(conf_val_none))        t = DistType_None;
    else if(v == conf_const.lookup_int(conf_val_normal))      t = DistType_Normal;
+   else if(v == conf_const.lookup_int(conf_val_lognormal))   t = DistType_LogNormal;
    else if(v == conf_const.lookup_int(conf_val_exponential)) t = DistType_Exponential;
    else if(v == conf_const.lookup_int(conf_val_chisquared))  t = DistType_ChiSquared;
    else if(v == conf_const.lookup_int(conf_val_gamma))       t = DistType_Gamma;
@@ -2353,6 +2354,7 @@ DistType string_to_disttype(const char *s) {
    // Convert string to enumerated DistType
         if(strcasecmp(s, conf_val_none)        == 0) t = DistType_None;
    else if(strcasecmp(s, conf_val_normal)      == 0) t = DistType_Normal;
+   else if(strcasecmp(s, conf_val_lognormal)   == 0) t = DistType_LogNormal;
    else if(strcasecmp(s, conf_val_exponential) == 0) t = DistType_Exponential;
    else if(strcasecmp(s, conf_val_chisquared)  == 0) t = DistType_ChiSquared;
    else if(strcasecmp(s, conf_val_gamma)       == 0) t = DistType_Gamma;
@@ -2376,11 +2378,12 @@ ConcatString disttype_to_string(DistType type) {
    switch(type) {
       case(DistType_None):        s = conf_val_none;        break;
       case(DistType_Normal):      s = conf_val_normal;      break;
+      case(DistType_LogNormal):   s = conf_val_lognormal;   break;
       case(DistType_Exponential): s = conf_val_exponential; break;
       case(DistType_ChiSquared):  s = conf_val_chisquared;  break;
       case(DistType_Gamma):       s = conf_val_gamma;       break;
       case(DistType_Uniform):     s = conf_val_uniform;     break;
-      case(DistType_Beta):        s = conf_val_beta;       break;
+      case(DistType_Beta):        s = conf_val_beta;        break;
       default:
          mlog << Error << "\ndisttype_to_string() -> "
               << "Unexpected DistType value of " << type << ".\n\n";

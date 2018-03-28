@@ -269,13 +269,16 @@ bool ObsErrorEntry::is_match(const char *cur_var_name,
 
    // Check ranges
    if(!is_bad_data(cur_hgt) && hgt_range.n() == 2) {
-       if(cur_hgt < hgt_range[0] || cur_hgt > hgt_range[1]) return(false);
+       if((cur_hgt < hgt_range[0] && !is_eq(cur_hgt, hgt_range[0])) ||
+          (cur_hgt > hgt_range[1] && !is_eq(cur_hgt, hgt_range[1]))) return(false);
    }
    if(!is_bad_data(cur_prs) && prs_range.n() == 2) {
-       if(cur_prs < prs_range[0] || cur_prs > prs_range[1]) return(false);
+       if((cur_prs < prs_range[0] && !is_eq(cur_prs, prs_range[0])) ||
+          (cur_prs > prs_range[1] && !is_eq(cur_prs, prs_range[1]))) return(false);
    }
    if(!is_bad_data(cur_val) && val_range.n() == 2) {
-       if(cur_val < val_range[0] || cur_val > val_range[1]) return(false);
+       if((cur_val < val_range[0] && !is_eq(cur_val, val_range[0])) ||
+          (cur_val > val_range[1] && !is_eq(cur_val, val_range[1]))) return(false);
    }
 
    return(true);
@@ -661,8 +664,17 @@ double add_obs_error(const gsl_rng *r, FieldType t,
       if(!is_bad_data(e->bias_offset)) v_new += e->bias_offset;
    }
 
+   // Handle DistType_LogNormal transform
+   if(e->dist_type == DistType_LogNormal) {
+      if(v > 0.0) {
+         v_new  = log(v);
+         v_new += ran_draw(r, e->dist_type,
+                           e->dist_parm[0], e->dist_parm[1]);
+         v_new  = exp(v_new);
+      }
+   }
    // Apply random perturbation
-   if(e->dist_type != DistType_None) {
+   else if(e->dist_type != DistType_None) {
       v_new += ran_draw(r, e->dist_type,
                         e->dist_parm[0], e->dist_parm[1]);
    }
