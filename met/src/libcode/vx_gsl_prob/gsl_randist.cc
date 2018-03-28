@@ -218,6 +218,7 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
    // Switch on the distribution type
    switch(t) {
       case(DistType_Normal):
+      case(DistType_LogNormal):
          v = gsl_ran_gaussian(r, p1);
          break;
 

@@ -26,6 +26,7 @@
 enum DistType {
    DistType_None,        // No distribution
    DistType_Normal,      // Normal distribution
+   DistType_LogNormal,   // Log transform with normal distribution
    DistType_Exponential, // Exponential distribution
    DistType_ChiSquared,  // Chi-Squared distribution
    DistType_Gamma,       // Gamma distribution
