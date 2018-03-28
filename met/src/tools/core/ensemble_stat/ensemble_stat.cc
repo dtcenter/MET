@@ -1344,6 +1344,9 @@ void process_grid_vx() {
 
          // Use config file setting, if specified
          if(conf_info.vx_opt[i].obs_error.entry.dist_type != DistType_None) {
+            mlog << Debug(3)
+                 << "Observation error for gridded verification is "
+                 << "defined in the configuration file.\n";
             entry_ptr = &(conf_info.vx_opt[i].obs_error.entry);
          }
          // Otherwise, do a table lookup
@@ -1355,7 +1358,15 @@ void process_grid_vx() {
             // If match was found and includes a value range setting,
             // reset to NULL and lookup separately for grid point
             if(entry_ptr) {
-               if(entry_ptr->val_range.n() > 0) {
+               if(entry_ptr->val_range.n() == 0) {
+                  mlog << Debug(3)
+                       << "Observation error for gridded verification is "
+                       << "defined by a single table entry.\n";
+               }
+               else {
+                  mlog << Debug(3)
+                       << "Observation error for gridded verification is "
+                       << "defined by a table lookup for each point.\n";
                   entry_ptr = (ObsErrorEntry *) 0;
                }
             }
@@ -1377,7 +1388,7 @@ void process_grid_vx() {
             // Apply observation error logic
             if(conf_info.vx_opt[i].obs_error.field == FieldType_Fcst ||
                conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
-               mlog << Debug(4)
+               mlog << Debug(3)
                     << "Applying observation error perturbation to "
                     << "ensemble member " << j+1 << ".\n";
                fcst_dp[j] = add_obs_error(conf_info.rng_ptr,
@@ -1424,7 +1435,7 @@ void process_grid_vx() {
          // Apply observation error logic
          if(conf_info.vx_opt[i].obs_error.field == FieldType_Obs ||
             conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
-            mlog << Debug(4)
+            mlog << Debug(3)
                  << "Applying observation error perturbation to "
                  << "gridded observation data.\n";
             obs_dp = add_obs_error(conf_info.rng_ptr,

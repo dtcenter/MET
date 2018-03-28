@@ -737,6 +737,18 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       obs_error_table.initialize();
    }
 
+   // Print debug information
+   if(obs_error.entry.dist_type != DistType_None) {
+      mlog << Debug(3)
+           << "Observation error for point verification is "
+           << "defined in the configuration file.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "Observation error for point verification is "
+           << "defined by a table lookup for each observation.\n";
+   }
+
    // Conf: desc
    vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc));
 
