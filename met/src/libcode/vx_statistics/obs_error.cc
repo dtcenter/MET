@@ -210,7 +210,7 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
    if(strcasecmp(dl[7],  wildcard_str) != 0)   prs_range.add_css(dl[7]);
    if(strcasecmp(dl[8],  wildcard_str) != 0)   val_range.add_css(dl[8]);
 
-   // Observation error adjustments 
+   // Observation error adjustments
    bias_scale = atof(dl[9]);
    bias_offset = atof(dl[10]);
    dist_type = string_to_disttype(dl[11]);
@@ -650,11 +650,11 @@ double add_obs_error(const gsl_rng *r, FieldType t,
                      const ObsErrorEntry *e, double v) {
    double v_new = v;
 
-   // Check for null pointer
-   if(!e) return(v_new);
+   // Check for null pointer or bad input value
+   if(!e || is_bad_data(v)) return(v);
 
    // Instrument bias correction for observations
-   if(t == FieldType_Obs && !is_bad_data(v_new)) {
+   if(t == FieldType_Obs) {
       if(!is_bad_data(e->bias_scale))  v_new *= e->bias_scale;
       if(!is_bad_data(e->bias_offset)) v_new += e->bias_offset;
    }
@@ -663,6 +663,22 @@ double add_obs_error(const gsl_rng *r, FieldType t,
    if(e->dist_type != DistType_None) {
       v_new += ran_draw(r, e->dist_type,
                         e->dist_parm[0], e->dist_parm[1]);
+   }
+
+   // Detailed debug information
+   if(mlog.verbosity_level() >= 5) {
+      ConcatString cs;
+      cs << "Update " << fieldtype_to_string(t) << " value from "
+         << v << " to " << v_new << " for observation error ";
+      if(t == FieldType_Obs && !is_bad_data(e->bias_scale)) {
+         cs << "bias scale (" << e->bias_scale << "), ";
+      }
+      if(t == FieldType_Obs && !is_bad_data(e->bias_offset)) {
+         cs << "bias offset (" << e->bias_offset << "), ";
+      }
+      cs << dist_to_string(e->dist_type, e->dist_parm)
+         << " perturbation.\n";
+      mlog << Debug(5) << cs;
    }
 
    return(v_new);

@@ -106,6 +106,7 @@ extern ConcatString matchtype_to_string(MatchType);
 extern DistType     int_to_disttype(int);
 extern DistType     string_to_disttype(const char *);
 extern ConcatString disttype_to_string(DistType);
+extern ConcatString dist_to_string(DistType, const NumArray &);
 
 extern ConcatString griddecomptype_to_string(GridDecompType);
 extern ConcatString wavelettype_to_string(WaveletType);

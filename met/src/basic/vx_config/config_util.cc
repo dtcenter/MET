@@ -2393,6 +2393,27 @@ ConcatString disttype_to_string(DistType type) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString dist_to_string(DistType type, const NumArray &parm) {
+   ConcatString s;
+
+   s = disttype_to_string(type);
+
+   // Append distribution parameters
+   if(type != DistType_None && parm.n() == 2) {
+      s << "(" << parm[0];
+      if(type == DistType_Gamma   ||
+         type == DistType_Uniform ||
+         type == DistType_Beta) {
+         s << ", " << parm[1];
+      }
+      s << ")";
+   }
+
+   return(s);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString griddecomptype_to_string(GridDecompType type) {
    ConcatString s;
 

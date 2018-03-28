@@ -1372,14 +1372,8 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Apply observation error perturbation
    if(obs_error_info->field == FieldType_Obs ||
       obs_error_info->field == FieldType_Both) {
-
-      double obs_new = add_obs_error(obs_error_info->rng_ptr,
-                          FieldType_Obs, obs_error_ptr, obs_v);
-
-      mlog << Debug(4)
-           << "Observation error update from observation value "
-           << obs_v << " to " << obs_new << "\n";
-      obs_v = obs_new;
+      obs_v = add_obs_error(obs_error_info->rng_ptr, FieldType_Obs,
+                            obs_error_ptr, obs_v);
    }
 
    // Look through all of the PairData objects to see if the observation
@@ -1510,18 +1504,9 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                // Apply observation error logic
                if(obs_error_info->field == FieldType_Fcst ||
                   obs_error_info->field == FieldType_Both) {
-
-                  double fcst_new = add_obs_error(
-                                       obs_error_info->rng_ptr,
-                                       FieldType_Fcst,
-                                       pd[i][j][k].obs_error_entry[l],
-                                       fcst_v);
-
-                  mlog << Debug(4)
-                       << "Observation error update from ensemble "
-                       << "member value " << fcst_v << " to "
-                       << fcst_new << "\n";
-                  fcst_v = fcst_new;
+                  fcst_v = add_obs_error(
+                              obs_error_info->rng_ptr, FieldType_Fcst,
+                              pd[i][j][k].obs_error_entry[l], fcst_v);
                }
 
                // Add the ensemble value, even if it's bad data
