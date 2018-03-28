@@ -211,10 +211,12 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
    if(strcasecmp(dl[8],  wildcard_str) != 0)   val_range.add_css(dl[8]);
 
    // Observation error adjustments
-   bias_scale = atof(dl[9]);
-   bias_offset = atof(dl[10]);
+   bias_scale = (strcmp(dl[9], na_str) == 0 ?
+                 bad_data_double : atof(dl[9]));
+   bias_offset = (strcmp(dl[10], na_str) == 0 ?
+                  bad_data_double : atof(dl[10]));
    dist_type = string_to_disttype(dl[11]);
-   dist_parm.add_css(dl[12]);
+   if(dist_type != DistType_None) dist_parm.add_css(dl[12]);
 
    // Range check
    if((hgt_range.n() != 0 && hgt_range.n() != 2) ||
@@ -666,19 +668,31 @@ double add_obs_error(const gsl_rng *r, FieldType t,
    }
 
    // Detailed debug information
-   if(mlog.verbosity_level() >= 5) {
+   if(mlog.verbosity_level() >= 4) {
       ConcatString cs;
-      cs << "Update " << fieldtype_to_string(t) << " value from "
-         << v << " to " << v_new << " for observation error ";
-      if(t == FieldType_Obs && !is_bad_data(e->bias_scale)) {
-         cs << "bias scale (" << e->bias_scale << "), ";
+
+      // Check for no updates
+      if(is_bad_data(e->bias_scale) &&
+         is_bad_data(e->bias_offset) &&
+         e->dist_type == DistType_None) {
+         cs << "Applying no observation error update for "
+            << fieldtype_to_string(t) << " value " <<  v << ".\n";
       }
-      if(t == FieldType_Obs && !is_bad_data(e->bias_offset)) {
-         cs << "bias offset (" << e->bias_offset << "), ";
+      // List update information
+      else {
+         cs << "Applying observation error update from "
+            << fieldtype_to_string(t) << " value " << v << " to "
+            << v_new << " for ";
+         if(t == FieldType_Obs && !is_bad_data(e->bias_scale)) {
+            cs << "bias scale (" << e->bias_scale << "), ";
+         }
+         if(t == FieldType_Obs && !is_bad_data(e->bias_offset)) {
+            cs << "bias offset (" << e->bias_offset << "), ";
+         }
+         cs << dist_to_string(e->dist_type, e->dist_parm)
+            << " perturbation.\n";
       }
-      cs << dist_to_string(e->dist_type, e->dist_parm)
-         << " perturbation.\n";
-      mlog << Debug(5) << cs;
+      mlog << Debug(4) << cs;
    }
 
    return(v_new);
