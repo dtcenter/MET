@@ -214,7 +214,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
    } // end if
 
    // Read next line
-   while(status = (CurLDF >> line)) {
+   while((status = (CurLDF >> line))) {
 
       // Skip header and non-PROBRIRW lines
       if(line.is_header() || line.type() != TCStatLineType_ProbRIRW) continue;
@@ -263,7 +263,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
    } // end if
 
    // Read next line
-   while(status = (CurLDF >> line)) {
+   while((status = (CurLDF >> line))) {
 
       // Skip header and invalid line types
       if(line.is_header() || line.type() == NoTCStatLineType) continue;

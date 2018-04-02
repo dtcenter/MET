@@ -942,7 +942,7 @@ void write_job_summary(STATAnalysisJob &j,
       // Loop over the statistics for current case
       //
       for(val_it  = it->second.val.begin(), wgt_it  = it->second.wgt.begin();
-          val_it != it->second.val.end(),   wgt_it != it->second.wgt.end();
+          val_it != it->second.val.end() && wgt_it != it->second.wgt.end();
           val_it++, wgt_it++) {
 
          //

@@ -763,7 +763,7 @@ void process_pbfile(int i_pb) {
 
    // Build the temporary block file name
    blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
-   blk_file = make_temp_file_name(blk_prefix, '\0');
+   blk_file = make_temp_file_name(blk_prefix, NULL);
 
    mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file
         << "\n";
@@ -1621,7 +1621,7 @@ void process_pbfile_metadata(int i_pb) {
    blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
    blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
 
-   blk_file = make_temp_file_name(blk_prefix2, '\0');
+   blk_file = make_temp_file_name(blk_prefix2, NULL);
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
 
@@ -1637,7 +1637,7 @@ void process_pbfile_metadata(int i_pb) {
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
    unit = dump_unit + i_pb;
-   blk_file = make_temp_file_name(blk_prefix, '\0');
+   blk_file = make_temp_file_name(blk_prefix, NULL);
    pblock(file_name, blk_file, block);
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "
