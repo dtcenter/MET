@@ -82,12 +82,11 @@ void ProbInfoArray::clear() {
 
 void ProbInfoArray::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    out << prefix << "ProbInfoArray:\n"
        << prefix << "NProbRIRW = "   << n_prob_rirw() << "\n";
 
-   for(i=0; i<ProbRIRW.size(); i++) {
+   for(unsigned int i=0; i<ProbRIRW.size(); i++) {
       out << prefix << "ProbRIRW[" << i+1 << "]:\n";
       ProbRIRW[i].dump(out, indent_depth+1);
    }
@@ -116,7 +115,7 @@ ConcatString ProbInfoArray::serialize_r(int indent_depth) const {
 
    s << prefix << serialize() << ", ProbRIRW:\n";
 
-   for(int i=0; i<ProbRIRW.size(); i++) {
+   for(unsigned int i=0; i<ProbRIRW.size(); i++) {
       s << ProbRIRW[i].serialize_r(i+1, indent_depth+1);
    }
 
@@ -130,7 +129,7 @@ void ProbInfoArray::assign(const ProbInfoArray &p) {
    clear();
 
    // Allocate space and copy each element
-   for(int i=0; i<p.ProbRIRW.size(); i++) {
+   for(unsigned int i=0; i<p.ProbRIRW.size(); i++) {
       ProbRIRW.push_back(p.ProbRIRW[i]);
    }
 

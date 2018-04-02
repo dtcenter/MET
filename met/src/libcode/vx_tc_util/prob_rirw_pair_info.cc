@@ -359,12 +359,11 @@ void ProbRIRWPairInfoArray::clear() {
 
 void ProbRIRWPairInfoArray::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    out << prefix << "ProbRIRWPairInfoArray:\n"
        << prefix << "NPairs = " << n_pairs() << "\n";
 
-   for(i=0; i<Pairs.size(); i++) {
+   for(unsigned int i=0; i<Pairs.size(); i++) {
       out << prefix << "Pair[" << i+1 << "]:\n";
       Pairs[i].dump(out, indent_depth+1);
    }
@@ -393,7 +392,7 @@ ConcatString ProbRIRWPairInfoArray::serialize_r(int indent_depth) const {
 
    s << prefix << serialize() << ", Pairs:\n";
 
-   for(int i=0; i<Pairs.size(); i++) {
+   for(unsigned int i=0; i<Pairs.size(); i++) {
       s << Pairs[i].serialize_r(i+1, indent_depth+1);
    }
 
@@ -407,7 +406,7 @@ void ProbRIRWPairInfoArray::assign(const ProbRIRWPairInfoArray &p) {
    clear();
 
    // Allocate space and copy each element
-   for(int i=0; i<p.Pairs.size(); i++) {
+   for(unsigned int i=0; i<p.Pairs.size(); i++) {
       add(p.Pairs[i]);
    }
 

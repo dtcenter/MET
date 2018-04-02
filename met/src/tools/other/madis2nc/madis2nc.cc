@@ -701,8 +701,6 @@ void process_madis_metar(NcFile *&f_in) {
    long *dim = new long [1];
    dim[0] = 1;
 
-   long lengths[2] = {BUFFER_SIZE, 1};
-
    int hdr_idx = 0;
    processed_count = 0;
    nc_obs_initialize();
@@ -715,8 +713,6 @@ void process_madis_metar(NcFile *&f_in) {
       int buf_size = ((rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (rec_end - i_hdr_s);
       dim[0] = buf_size;
       cur[0] = i_hdr_s;
-
-      lengths[0] = buf_size;
 
       float hdr_lat_arr[buf_size];
       float hdr_lon_arr[buf_size];

@@ -111,7 +111,7 @@ void get_att_value_doubles(const NcAtt *att, NumArray &value) {
    value.erase();
    double *values = new double[att->getAttLength()];
    att->getValues(values);
-   for(int i=0; i<=att->getAttLength(); i++) value.add(values[i]);
+   for(unsigned int i=0; i<=att->getAttLength(); i++) value.add(values[i]);
    if(values) { delete [] values; values = 0; }
    return;
 }
@@ -1631,10 +1631,6 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obsVars) {
    //
    // Allocate space to store the data
    //
-   char hdr_typ_str[typ_len];
-   char hdr_sid_str[sid_len];
-   char hdr_vld_str[vld_len];
-   
    char  hdr_typ_block[buf_size][typ_len];
    char  hdr_sid_block[buf_size][sid_len];
    char  hdr_vld_block[buf_size][vld_len];

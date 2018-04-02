@@ -350,7 +350,6 @@ void ObsErrorTable::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void ObsErrorTable::clear() {
-   int i;
 
    if(e) { delete [] e; e = (ObsErrorEntry *) 0; }
 
@@ -603,7 +602,6 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
    Dictionary *err_dict = (Dictionary *) 0;
    ObsErrorInfo info;
    int i;
-   double d;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_obs_error() -> "

@@ -573,7 +573,6 @@ int i;
 short s;
 float f;
 double d;
-long counts[dim_count];
 float add_offset   = 0.f;
 float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
@@ -584,8 +583,6 @@ if (!IS_INVALID_NC(att_add_offset) && !IS_INVALID_NC(att_scale_factor)) {
    add_offset = get_att_value_float(&att_add_offset);
    scale_factor = get_att_value_float(&att_scale_factor);
 }
-
-for (j=0; j<(a.n_elements()); ++j) counts[j] = 1;
 
 switch ( GET_NC_TYPE_ID_P(var) )  {
 

@@ -547,7 +547,6 @@ bool is_prepbufr_file(StringArray *events) {
 
 void get_variable_info(const char* tbl_filename) {
    static const int maximumLineLength = 128;
-   char *lineBuffer = (char *)malloc(sizeof(char) * maximumLineLength);
    static const char *method_name = "get_variable_info()";
 
    FILE * fp;
@@ -935,11 +934,9 @@ void process_pbfile(int i_pb) {
 
       if (!is_prepbufr) {
          int index;
-         int length;
          char tmp_str[mxr8lv*mxr8pm];
 
          //Read header (station id, lat, lon, ele, time)
-         length = bufr_hdrs.length();
          strcpy(tmp_str, bufr_hdrs.text());
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, bufr_hdr_names,
                     &bufr_hdr_length, &use_small_buffer );
@@ -1673,8 +1670,6 @@ void process_pbfile_metadata(int i_pb) {
    // Initialize counts
    i_ret   =  i_msg     = 0;
 
-   bool is_prepbufr = is_prepbufr_file(&event_names);
-
    StringArray headers;
    StringArray tmp_hdr_array;
    headers.add(prepbufr_hdrs);
@@ -1987,7 +1982,6 @@ void process_pbfile_metadata(int i_pb) {
 void write_netcdf_hdr_data() {
    int i, buf_len;
    long dim_count;
-   bool is_prepbufr = is_prepbufr_file(&event_names);
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
    dim_count = (doSummarize ? summaryObs->countSummaryHeaders()
