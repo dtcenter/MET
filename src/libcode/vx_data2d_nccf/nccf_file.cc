@@ -739,11 +739,6 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
     exit(1);
   }
 
-  long counts[dim_count];
-
-  for (int j = 0; j < (dim_count); ++j)
-    counts[j] = 1;
-
   bool status;
   double d;
   float add_offset = 0.f;

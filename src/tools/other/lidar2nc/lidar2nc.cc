@@ -299,12 +299,12 @@ void process_calipso_file(NcFile * out, const char * filename)
 int j;
 int hdf_sd_id;
 int n_data;
-int hdf_start[MAX_VAR_DIMS], hdf_stride[MAX_VAR_DIMS], hdf_edge[MAX_VAR_DIMS];
+int hdf_stride[MAX_VAR_DIMS], hdf_edge[MAX_VAR_DIMS];
 NcDim nc_dim;
 NcVar nc_lat_var, nc_lon_var, nc_data_var, nc_time_var;
 
 
-for (j=0; j<MAX_VAR_DIMS; ++j)  hdf_start[j] = hdf_stride[j] = hdf_edge[j] = 0;
+for (j=0; j<MAX_VAR_DIMS; ++j)  hdf_stride[j] = hdf_edge[j] = 0;
 
    //
    //  open hdf file
@@ -341,7 +341,6 @@ const int nhdr_dim_size = n_data;
    //
 
 const int hdr_typ_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
-const int hdr_sid_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
 const int hdr_vld_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
 const int hdr_arr_bytes = nhdr_dim_size*HDR_ARRAY_LEN*sizeof(float);
 

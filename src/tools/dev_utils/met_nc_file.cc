@@ -245,7 +245,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   //   exit(1);
   //}
       
-  for (int i = 0; i < GET_NC_SIZE_P(_nobsDim); ++i)
+  for (unsigned int i = 0; i < GET_NC_SIZE_P(_nobsDim); ++i)
   {
       
     // Copy the current observation message

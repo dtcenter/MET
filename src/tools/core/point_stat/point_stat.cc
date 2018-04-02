@@ -698,8 +698,6 @@ void process_obs_file(int i_nc) {
    int obs_count = get_dim_size(&obsVars.obs_dim);
    int hdr_count = get_dim_size(&obsVars.hdr_dim);
    int strl_len  = get_dim_size(&obsVars.strl_dim);
-   int strll_len = strl_len;
-   if (!IS_INVALID_NC(obsVars.strll_dim)) strll_len = get_dim_size(&obsVars.strll_dim);
 
    mlog << Debug(2)
         << "Searching " << obs_count
@@ -743,7 +741,6 @@ void process_obs_file(int i_nc) {
    lengths[1] = strl_len;
 
    int str_length;
-   int prev_hdr_offset = -1;
    // Process each observation in the file
    for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=BUFFER_SIZE) {
       int block_size = (obs_count - i_block_start_idx);

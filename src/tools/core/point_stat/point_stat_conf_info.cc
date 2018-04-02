@@ -58,7 +58,6 @@ void PointStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::clear() {
-   int i;
 
    // Initialize values
    model.clear();
@@ -594,7 +593,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    int i, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   InterpMthd mthd;
    Dictionary *dict;
 
    // Initialize

@@ -892,9 +892,7 @@ void process_point_obs(int i_nc) {
         << " observations from " << (hdr_count)
         << " header messages.\n";
 
-   int mxstr_len  = GET_NC_SIZE(obsVars.strl_dim);
-   int mxstr2_len = mxstr_len;
-   if (!IS_INVALID_NC(obsVars.strll_dim)) mxstr2_len = get_dim_size(&obsVars.strll_dim);
+   int mxstr_len = GET_NC_SIZE(obsVars.strl_dim);
    NcHeaderData header_data = get_nc_hdr_data(obsVars);
    int typ_len = header_data.typ_len;
    int sid_len = header_data.sid_len;

@@ -612,10 +612,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        GrdFileType otype, Dictionary &odict,
                                        gsl_rng *rng_ptr, bool point_vx,
                                        bool use_var_id) {
-   int i, n;
+   int i;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   InterpMthd mthd;
    Dictionary *dict;
 
    // Initialize
@@ -867,8 +866,6 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
 
    // Check if this output line type is requested
    if(output_flag[i_txt_row] == STATOutputType_None) return(0);
-
-   int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
 
    // Switch on the index of the line type
    switch(i_txt_row) {

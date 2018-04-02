@@ -739,7 +739,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &j,
    StringArray sa, req_stat, req_lty, req_col;
    STATLineType lty;
    NumArray empty_na;
-   int i, n_add, wgt;
+   int i, n_add;
    double v, w;
 
    //

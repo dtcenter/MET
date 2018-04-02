@@ -175,7 +175,7 @@ ConcatString get_rad_key(const RadData &d) {
 
 int key_to_integer(const char * key) {
    int int_key = 0;
-   for (int idx=0; idx<strlen(key); idx++) {
+   for (unsigned int idx=0; idx<strlen(key); idx++) {
       int_key += ((int)key[idx]) << (idx%3)*8;
       //int_key += (int)key[idx];
    }
