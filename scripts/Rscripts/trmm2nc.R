@@ -168,7 +168,7 @@ nlat = length(lat)
 nlon = length(lon)
 
 # Slice the 1D array into a 2D array
-pcp = array(trmm$precipitation, dim=c(nlon, nlat), dimnames=c("lon", "lat"))
+pcp = array(trmm$precipitation, dim=c(nlon, nlat))
 pcp[pcp < missing] = missing
 
 ########################################################################
