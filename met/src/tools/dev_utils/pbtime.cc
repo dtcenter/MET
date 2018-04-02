@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
    pb_file << argv[1];
 
    // Build the temporary block file name
-   blk_file = make_temp_file_name("/tmp/tmp_pbtime_blk", '\0');
+   blk_file = make_temp_file_name("/tmp/tmp_pbtime_blk", NULL);
 
    // Block the PrepBufr file and open it for reading.
    pblock(pb_file, blk_file, block);

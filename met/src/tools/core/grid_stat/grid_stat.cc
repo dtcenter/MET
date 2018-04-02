@@ -1645,7 +1645,7 @@ void process_scores() {
                ou_dp_smooth = ou_dp;
 
                if(!fu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
-                                          conf_info.vx_opt[i].wave_1d_end[j]),
+                                          conf_info.vx_opt[i].wave_1d_end[j]) ||
                   !ou_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
                                           conf_info.vx_opt[i].wave_1d_end[j])) {
                   mlog << Debug(2)

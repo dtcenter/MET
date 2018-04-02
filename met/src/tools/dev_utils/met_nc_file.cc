@@ -320,7 +320,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
   // Cleanup
 
-  if (obs_arr) { delete obs_arr; obs_arr = (float *) 0; }
+  if (obs_arr) { delete [] obs_arr; obs_arr = (float *) 0; }
 
   return true;
 }

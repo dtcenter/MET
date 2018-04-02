@@ -1265,8 +1265,8 @@ NumArray derive_climo_prob(const NumArray &mn_na, const NumArray &sd_na,
 
          // Handle greater-than probabilities
          if(!is_bad_data(prob) &&
-            othresh.get_type() == thresh_gt ||
-            othresh.get_type() == thresh_ge) {
+            (othresh.get_type() == thresh_gt ||
+             othresh.get_type() == thresh_ge)) {
             prob = 1.0 - prob;
          }
          climo_prob.add(prob);

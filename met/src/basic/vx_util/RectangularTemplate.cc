@@ -118,8 +118,8 @@ void RectangularTemplate::printOffsetList(FILE *stream)
 {
   fprintf(stream, "\n\n");
   fprintf(stream, "Rectangular template:");
-  fprintf(stream, "    height = %f\n", _height);
-  fprintf(stream, "    width = %f\n", _width);
+  fprintf(stream, "    height = %d\n", _height);
+  fprintf(stream, "    width = %d\n", _width);
   
   fprintf(stream, " grid points:\n");
 

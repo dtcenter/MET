@@ -434,7 +434,7 @@ void process_command_line(int argc, char **argv) {
             mlog << Warning << "\nprocess_command_line() -> "
                  << "enabling ensemble mean to facilitate calculation "
                  << "of ensemble spread/skill\n\n";
-            conf_info.nc_info.do_mean;
+            conf_info.nc_info.do_mean = true;
          }
       }
    }
@@ -560,7 +560,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    }
 
    // Read the gridded data field
-   if(found = mtddf->data_plane(*info, dp)) {
+   if((found = mtddf->data_plane(*info, dp))) {
 
       // Regrid, if requested and necessary
       if(do_regrid && !(mtddf->grid() == grid)) {
@@ -611,7 +611,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
    n = mtddf->data_plane_array(*info, dpa);
 
    // Check for at least one field
-   if(found = (n > 0)) {
+   if((found = (n > 0))) {
 
       // Regrid, if requested and necessary
       if(do_regrid && !(mtddf->grid() == grid)) {

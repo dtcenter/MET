@@ -465,7 +465,7 @@ void process_search_dirs() {
    // Build the temp file name
    //
    tmp_file << tmp_dir << "/" << "tmp_stat_analysis";
-   tmp_path = make_temp_file_name(tmp_file, '\0');
+   tmp_path = make_temp_file_name(tmp_file, NULL);
 
    //
    // Open the temp file
