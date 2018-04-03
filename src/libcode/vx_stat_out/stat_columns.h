@@ -263,8 +263,7 @@ static const char * orank_columns [] = {
    "OBS_ELV",     "OBS",         "PIT",
    "RANK",        "N_ENS_VLD",   "N_ENS",
    "ENS_",        "OBS_QC",      "ENS_MEAN",
-   "ENS_SPREAD",  "CLIMO_MEAN",  "CLIMO_STDEV",
-   "CLIMO_CDF"
+   "CLIMO",       "ENS_SPREAD"
 };
 
 static const char * ssvar_columns [] = {
