@@ -1789,11 +1789,6 @@ void VL1L2Info::set(const NumArray &uf_in_na, const NumArray &vf_in_na,
       f_speed_bar   += w*sqrt(uf*uf + vf*vf);
       o_speed_bar   += w*sqrt(uo*uo + vo*vo);
 
-      // MSVE += w*(u_diff*u_diff + v_diff*v_diff);
-
-      // MSVE = uvff_bar - 2.0*uvfo_bar + uvoo_bar;
-
-
       // VAL1L2 sums
       if(!is_bad_data(uc) && !is_bad_data(vc)) {
          vacount   += 1;
