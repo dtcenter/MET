@@ -187,11 +187,6 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
-      ConcatString ens_ssvar_mean; // Name of ensemble spread/skill mean file
-      bool         ens_ssvar_flag; // Flag to trigger spread/skill calculations
-
-      //////////////////////////////////////////////////////////////////
-
       int      n_msg_typ;        // Number of verifying message types
 
       int      n_mask;           // Total number of masking regions
