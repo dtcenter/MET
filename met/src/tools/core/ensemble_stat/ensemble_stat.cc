@@ -47,6 +47,7 @@
 //   020    02/21/18  Halley Gotway  Restructure config logic to make
 //                    all options settable for each verification task.
 //   021    03/21/18  Halley Gotway  Add obs_error perturbation.
+//   022    04/05/18  Halley Gotway  Replace -ssvar_mean with -ens_mean.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -399,51 +400,49 @@ void process_command_line(int argc, char **argv) {
        conf_info.output_flag[i_relp]  != STATOutputType_None)) vx_flag = 1;
    else                                                        vx_flag = 0;
 
-   // Check the spread/skill configuration information
-   conf_info.ens_ssvar_flag = false;
-   bool ssvar_out = (conf_info.output_flag[i_ssvar] != STATOutputType_None);
-   if(ens_mean_user && strcmp(ens_mean_user, "")) {
+   // Process ensemble mean information
+   conf_info.ens_mean_flag = false;
+   bool need_ens_mean = (
+      conf_info.output_flag[i_orank] != STATOutputType_None ||
+      conf_info.output_flag[i_ssvar] != STATOutputType_None);
 
-      if(!ssvar_out) {
+   // User-specified ensemble mean file
+   if(ens_mean_user.nonempty()) {
+
+      if(!need_ens_mean) {
          mlog << Warning << "\nprocess_command_line() -> "
-              << "ignoring input -ssvar_mean file because "
-              << "SSVAR line type is set to NONE\n\n";
+              << "ignoring input -ens_mean file because no ensemble "
+              << "mean is needed.\n\n";
       }
       else if(stat(ens_mean_user, &results)) {
          mlog << Warning << "\nprocess_command_line() -> "
-              << "can't open input spread/skill mean file: "
+              << "can't open input ensemble mean file: "
               << ens_mean_user << "\n\n";
          ens_mean_user = "";
       }
       else if(!vx_flag) {
          mlog << Warning << "\nprocess_command_line() -> "
-              << "ignoring input -ssvar_mean file because "
-              << "no verification has been requested\n\n";
+              << "ignoring input -ens_mean file because no verification "
+              << "has been requested\n\n";
       }
       else {
-         conf_info.ens_ssvar_flag = true;
+         conf_info.ens_mean_flag = true;
       }
-
    }
-   else if(ssvar_out) {
+   else if(need_ens_mean) {
 
-      if(!vx_flag) {
+      conf_info.ens_mean_flag = true;
+
+      if(!conf_info.nc_info.do_mean) {
          mlog << Warning << "\nprocess_command_line() -> "
-              << "disabling ensemble spread/skill calculation "
-              << "because no verification has been requested\n\n";
-      }
-      else {
-         conf_info.ens_ssvar_flag = 1;
-
-         if(!conf_info.nc_info.do_mean) {
-            mlog << Warning << "\nprocess_command_line() -> "
-                 << "enabling ensemble mean to facilitate calculation "
-                 << "of ensemble spread/skill\n\n";
-            conf_info.nc_info.do_mean = true;
-         }
+              << "enabling NetCDF ensemble mean computation to be used "
+              << "in verificaiton.\n\n";
+         conf_info.nc_info.do_mean = true;
       }
    }
-   conf_info.ens_ssvar_mean = ens_mean_user;
+
+   // Store the user-specified ensemble mean file (may be empty)
+   conf_info.ens_mean_user = ens_mean_user;
 
    // Deallocate memory for data files
    if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
@@ -695,8 +694,9 @@ void process_ensemble() {
       // Write out the ensemble information to a NetCDF file
       write_ens_nc(i, ens_dp);
 
-      // Store the ensemble output file for spread/skill analysis
-      conf_info.ens_ssvar_file = out_nc_file_list[out_nc_file_list.n_elements() - 1];
+      // Store the ensemble mean output file
+      conf_info.ens_mean_file =
+         out_nc_file_list[out_nc_file_list.n_elements() - 1];
 
    } // end for i
 
@@ -795,11 +795,8 @@ void process_point_vx() {
 
    } // end for i
 
-   // Process the ensemble mean for SSVAR or ORANK
-   if(conf_info.ens_ssvar_flag ||
-      conf_info.output_flag[i_orank] != STATOutputType_None) {
-      process_point_ens(-1, n_miss);
-   }
+   // Process the ensemble mean, if necessary
+   if(conf_info.ens_mean_flag) process_point_ens(-1, n_miss);
 
    // Compute the scores and write them out
    process_point_scores();
@@ -1058,8 +1055,9 @@ int process_point_ens(int i_ens, int &n_miss) {
 
    // Determine the correct file to process
    if(!ens_mn) ens_file = ConcatString(ens_file_list[i_ens]);
-   else        ens_file = (ens_mean_user && strcmp(ens_mean_user,"")) ?
-                           ens_mean_user : conf_info.ens_ssvar_file;
+   else        ens_file = (conf_info.ens_mean_user.empty() ?
+                           conf_info.ens_mean_file :
+                           conf_info.ens_mean_user);
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing " << file_type << " file: " << ens_file << "\n";
@@ -1068,8 +1066,8 @@ int process_point_ens(int i_ens, int &n_miss) {
    // the forecast fields for verification
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      // For spread/skill, use the calculated mean file if none was specified
-      if(ens_mn && (!ens_mean_user || !strcmp(ens_mean_user, ""))) {
+      // Use the calculated mean file, in necessary
+      if(ens_mn && conf_info.ens_mean_user.empty()) {
          fcst_dpa.clear();
          info = new VarInfoNcMet();
          info->set_magic(get_ens_mn_var_name(i), "(*,*)");
@@ -1467,19 +1465,20 @@ void process_grid_vx() {
       shc.set_obs_valid_beg(obs_dp.valid());
       shc.set_obs_valid_end(obs_dp.valid());
 
-      // If spread/skill is activated, read the ensemble mean file
-      if(conf_info.ens_ssvar_flag) {
+      // Process the ensemble mean, if necessary
+      if(conf_info.ens_mean_flag) {
 
          VarInfo *info = (VarInfo *) 0;
          bool info_alloc = false;
-         ConcatString mn_file = (ens_mean_user && strcmp(ens_mean_user,"")) ?
-                                 ens_mean_user : conf_info.ens_ssvar_file;
+         ConcatString mn_file = (conf_info.ens_mean_user.empty() ?
+                                 conf_info.ens_mean_file :
+                                 conf_info.ens_mean_user);
 
          mlog << Debug(2) << "\n" << sep_str << "\n\n"
               << "Processing ensemble mean file: " << mn_file << "\n";
 
-         // For spread/skill, use the calculated mean file if none was specified
-         if(!ens_mean_user || !strcmp(ens_mean_user, "")) {
+         // Use the calculated mean file, in necessary
+         if(conf_info.ens_mean_user.empty()) {
             info = new VarInfoNcMet();
             info->set_magic(get_ens_mn_var_name(i), "(*,*)");
             info_alloc = true;
@@ -1534,7 +1533,7 @@ void process_grid_vx() {
             if(field == FieldType_Fcst || field == FieldType_Both) {
                smooth_field(fcst_dp[k], fcst_dp_smooth[k],
                             mthd, wdth, shape, vld_thresh);
-               if(conf_info.ens_ssvar_flag) {
+               if(conf_info.ens_mean_flag) {
                   smooth_field(emn_dp, emn_dp_smooth,
                                mthd, wdth, shape, vld_thresh);
                }
@@ -1542,7 +1541,7 @@ void process_grid_vx() {
             // Do not smooth the forecast field
             else {
                fcst_dp_smooth[k] = fcst_dp[k];
-               if(conf_info.ens_ssvar_flag) emn_dp_smooth = emn_dp;
+               if(conf_info.ens_mean_flag) emn_dp_smooth = emn_dp;
             }
          } // end for k
 
