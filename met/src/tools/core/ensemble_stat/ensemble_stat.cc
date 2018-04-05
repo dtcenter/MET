@@ -2636,7 +2636,7 @@ void usage() {
         << "\tconfig_file\n"
         << "\t[-grid_obs file]\n"
         << "\t[-point_obs file]\n"
-        << "\t[-ssvar_mean file]\n"
+        << "\t[-ens_mean file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
         << "\t[-outdir path]\n"
@@ -2660,8 +2660,8 @@ void usage() {
         << "\t\t\"-point_obs file\" specifies a NetCDF point observation file. "
         << "May be used multiple times (optional).\n"
 
-        << "\t\t\"-ssvar_mean file\" specifies an ensemble mean model data file. "
-        << "Used in conjunction with the SSVAR output line type.\n"
+        << "\t\t\"-ens_mean file\" specifies an ensemble mean model data file "
+        << "(optional).\n"
 
         << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
         << "beginning of the matching time window (optional).\n"
