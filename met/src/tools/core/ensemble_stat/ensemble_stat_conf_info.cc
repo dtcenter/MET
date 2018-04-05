@@ -71,9 +71,6 @@ void EnsembleStatConfInfo::clear() {
    obtype.clear();
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
-   ens_mean_file.clear();
-   ens_mean_user.clear();
-   ens_mean_flag = false;
    msg_typ_group_map.clear();
    msg_typ_sfc.clear();
    mask_dp_map.clear();

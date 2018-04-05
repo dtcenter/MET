@@ -401,7 +401,7 @@ void process_command_line(int argc, char **argv) {
    else                                                        vx_flag = 0;
 
    // Process ensemble mean information
-   conf_info.ens_mean_flag = false;
+   ens_mean_flag = false;
    bool need_ens_mean = (
       conf_info.output_flag[i_orank] != STATOutputType_None ||
       conf_info.output_flag[i_ssvar] != STATOutputType_None);
@@ -426,12 +426,12 @@ void process_command_line(int argc, char **argv) {
               << "has been requested\n\n";
       }
       else {
-         conf_info.ens_mean_flag = true;
+         ens_mean_flag = true;
       }
    }
    else if(need_ens_mean) {
 
-      conf_info.ens_mean_flag = true;
+      ens_mean_flag = true;
 
       if(!conf_info.nc_info.do_mean) {
          mlog << Warning << "\nprocess_command_line() -> "
@@ -440,9 +440,6 @@ void process_command_line(int argc, char **argv) {
          conf_info.nc_info.do_mean = true;
       }
    }
-
-   // Store the user-specified ensemble mean file (may be empty)
-   conf_info.ens_mean_user = ens_mean_user;
 
    // Deallocate memory for data files
    if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
@@ -695,7 +692,7 @@ void process_ensemble() {
       write_ens_nc(i, ens_dp);
 
       // Store the ensemble mean output file
-      conf_info.ens_mean_file =
+      ens_mean_file =
          out_nc_file_list[out_nc_file_list.n_elements() - 1];
 
    } // end for i
@@ -796,7 +793,7 @@ void process_point_vx() {
    } // end for i
 
    // Process the ensemble mean, if necessary
-   if(conf_info.ens_mean_flag) process_point_ens(-1, n_miss);
+   if(ens_mean_flag) process_point_ens(-1, n_miss);
 
    // Compute the scores and write them out
    process_point_scores();
@@ -1050,14 +1047,13 @@ int process_point_ens(int i_ens, int &n_miss) {
    bool info_alloc = false;
 
    ConcatString ens_file;
-   bool ens_mn = (-1 == i_ens);
-   const char *file_type = ens_mn ? "mean" : "ensemble";
+   bool is_ens_mean = (-1 == i_ens);
+   const char *file_type = (is_ens_mean ? "mean" : "ensemble");
 
    // Determine the correct file to process
-   if(!ens_mn) ens_file = ConcatString(ens_file_list[i_ens]);
-   else        ens_file = (conf_info.ens_mean_user.empty() ?
-                           conf_info.ens_mean_file :
-                           conf_info.ens_mean_user);
+   if(!is_ens_mean) ens_file = ConcatString(ens_file_list[i_ens]);
+   else             ens_file = (ens_mean_user.empty() ?
+                                ens_mean_file : ens_mean_user);
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing " << file_type << " file: " << ens_file << "\n";
@@ -1067,7 +1063,7 @@ int process_point_ens(int i_ens, int &n_miss) {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // Use the calculated mean file, in necessary
-      if(ens_mn && conf_info.ens_mean_user.empty()) {
+      if(is_ens_mean && ens_mean_user.empty()) {
          fcst_dpa.clear();
          info = new VarInfoNcMet();
          info->set_magic(get_ens_mn_var_name(i), "(*,*)");
@@ -1095,7 +1091,7 @@ int process_point_ens(int i_ens, int &n_miss) {
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
 
       // Compute forecast values for this ensemble member
-      conf_info.vx_opt[i].vx_pd.add_ens(i_ens-n_miss, ens_mn);
+      conf_info.vx_opt[i].vx_pd.add_ens(i_ens-n_miss, is_ens_mean);
 
    } // end for i
 
@@ -1466,19 +1462,18 @@ void process_grid_vx() {
       shc.set_obs_valid_end(obs_dp.valid());
 
       // Process the ensemble mean, if necessary
-      if(conf_info.ens_mean_flag) {
+      if(ens_mean_flag) {
 
          VarInfo *info = (VarInfo *) 0;
          bool info_alloc = false;
-         ConcatString mn_file = (conf_info.ens_mean_user.empty() ?
-                                 conf_info.ens_mean_file :
-                                 conf_info.ens_mean_user);
+         ConcatString mn_file = (ens_mean_user.empty() ?
+                                 ens_mean_file : ens_mean_user);
 
          mlog << Debug(2) << "\n" << sep_str << "\n\n"
               << "Processing ensemble mean file: " << mn_file << "\n";
 
          // Use the calculated mean file, in necessary
-         if(conf_info.ens_mean_user.empty()) {
+         if(ens_mean_user.empty()) {
             info = new VarInfoNcMet();
             info->set_magic(get_ens_mn_var_name(i), "(*,*)");
             info_alloc = true;
@@ -1533,7 +1528,7 @@ void process_grid_vx() {
             if(field == FieldType_Fcst || field == FieldType_Both) {
                smooth_field(fcst_dp[k], fcst_dp_smooth[k],
                             mthd, wdth, shape, vld_thresh);
-               if(conf_info.ens_mean_flag) {
+               if(ens_mean_flag) {
                   smooth_field(emn_dp, emn_dp_smooth,
                                mthd, wdth, shape, vld_thresh);
                }
@@ -1541,7 +1536,7 @@ void process_grid_vx() {
             // Do not smooth the forecast field
             else {
                fcst_dp_smooth[k] = fcst_dp[k];
-               if(conf_info.ens_mean_flag) emn_dp_smooth = emn_dp;
+               if(ens_mean_flag) emn_dp_smooth = emn_dp;
             }
          } // end for k
 
