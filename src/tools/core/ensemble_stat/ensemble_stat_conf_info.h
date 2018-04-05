@@ -188,9 +188,9 @@ class EnsembleStatConfInfo {
       double              vld_ens_thresh;   // Required ratio of valid input files
       double              vld_data_thresh;  // Required ratio of valid data for each point
 
-      ConcatString        ens_ssvar_file;   // Ensemble mean file name
-      ConcatString        ens_ssvar_mean;   // Ensemble mean for spread/skill calculations
-      bool                ens_ssvar_flag;   // Flag to turn SSVAR on/off
+      ConcatString        ens_mean_file;    // Ensemble mean file name
+      ConcatString        ens_mean_user;    // User-Specified ensemble mean file name
+      bool                ens_mean_flag;    // Flag to turn ensemble mean processing On/Off
 
       // Message type groups that should be processed together
       map<ConcatString,StringArray> msg_typ_group_map;
