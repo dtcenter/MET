@@ -106,7 +106,9 @@ static StringArray  ens_file_list;
 static IntArray     ens_file_vld;
 static GrdFileType  etype = FileType_None;
 
-static ConcatString ens_mean_user; // User-specified Ensemble Mean data file
+static bool         ens_mean_flag; // Flag for ensemble mean processing
+static ConcatString ens_mean_user; // User-specified ensemble mean data file
+static ConcatString ens_mean_file; // Computed ensemble mean output file
 
 // Input Observation files
 static StringArray  grid_obs_file_list;
