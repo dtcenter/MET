@@ -261,7 +261,7 @@ hskip 0.5in}
 
 \end_inset
 
-[-ssvar_mean file]
+[-ens_mean file]
 \end_layout
 
 \begin_layout LyX-Code
@@ -447,12 +447,17 @@ Optional arguments for ensemble_stat
 
 \begin_layout Description
 6.
- Used in conjunction with the SSVAR output line type, the 
+ To override the simple ensemble mean value of the input ensemble members
+ for the ECNT, SSVAR, and ORANK line types, the 
+\series bold
+-ens_mean file
+\series default
+ specifies an ensemble mean model data file.
+ This option replaces the 
 \series bold
 -ssvar_mean file
 \series default
- specifies an ensemble mean model data file.
- If not provided, the mean value of the input ensemble members will be used.
+ from earlier versions of MET.
 \end_layout
 
 \begin_layout Description
