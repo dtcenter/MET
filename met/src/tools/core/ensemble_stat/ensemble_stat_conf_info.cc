@@ -539,9 +539,6 @@ void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size) {
       // Set up the ensemble size
       vx_opt[i].vx_pd.set_ens_size(ens_size[i]);
 
-      // Set the ensemble spread/skill information
-      vx_opt[i].vx_pd.ens_ssvar_flag = ens_ssvar_flag;
-      vx_opt[i].vx_pd.ens_ssvar_mean = ens_ssvar_mean;
    }
 
    return;
