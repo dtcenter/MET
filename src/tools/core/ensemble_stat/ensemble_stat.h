@@ -106,7 +106,7 @@ static StringArray  ens_file_list;
 static IntArray     ens_file_vld;
 static GrdFileType  etype = FileType_None;
 
-static ConcatString ens_ssvar_mean;  // Mean data file to use for spread/skill analysis
+static ConcatString ens_mean_user; // User-specified Ensemble Mean data file
 
 // Input Observation files
 static StringArray  grid_obs_file_list;

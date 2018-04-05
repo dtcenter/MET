@@ -128,7 +128,7 @@ static void usage();
 
 static void set_grid_obs(const StringArray &);
 static void set_point_obs(const StringArray &);
-static void set_ssvar_mean(const StringArray & a);
+static void set_ens_mean(const StringArray & a);
 static void set_obs_valid_beg(const StringArray &);
 static void set_obs_valid_end(const StringArray &);
 static void set_outdir(const StringArray &);
@@ -194,13 +194,18 @@ void process_command_line(int argc, char **argv) {
    //
    cline.add(set_grid_obs, "-grid_obs", 1);
    cline.add(set_point_obs, "-point_obs", 1);
-   cline.add(set_ssvar_mean, "-ssvar_mean", 1);
+   cline.add(set_ens_mean, "-ens_mean", 1);
    cline.add(set_obs_valid_beg, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end, "-obs_valid_end", 1);
    cline.add(set_outdir, "-outdir", 1);
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_compress,  "-compress",  1);
+
+   //
+   // quietly support deprecated -ssvar_mean option
+   //
+   cline.add(set_ens_mean, "-ssvar_mean", 1);
 
    //
    // parse the command line
@@ -397,18 +402,18 @@ void process_command_line(int argc, char **argv) {
    // Check the spread/skill configuration information
    conf_info.ens_ssvar_flag = false;
    bool ssvar_out = (conf_info.output_flag[i_ssvar] != STATOutputType_None);
-   if(ens_ssvar_mean && strcmp(ens_ssvar_mean, "")) {
+   if(ens_mean_user && strcmp(ens_mean_user, "")) {
 
       if(!ssvar_out) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "ignoring input -ssvar_mean file because "
               << "SSVAR line type is set to NONE\n\n";
       }
-      else if(stat(ens_ssvar_mean, &results)) {
+      else if(stat(ens_mean_user, &results)) {
          mlog << Warning << "\nprocess_command_line() -> "
               << "can't open input spread/skill mean file: "
-              << ens_ssvar_mean << "\n\n";
-         ens_ssvar_mean = "";
+              << ens_mean_user << "\n\n";
+         ens_mean_user = "";
       }
       else if(!vx_flag) {
          mlog << Warning << "\nprocess_command_line() -> "
@@ -438,7 +443,7 @@ void process_command_line(int argc, char **argv) {
          }
       }
    }
-   conf_info.ens_ssvar_mean = ens_ssvar_mean;
+   conf_info.ens_ssvar_mean = ens_mean_user;
 
    // Deallocate memory for data files
    if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
@@ -1053,8 +1058,8 @@ int process_point_ens(int i_ens, int &n_miss) {
 
    // Determine the correct file to process
    if(!ens_mn) ens_file = ConcatString(ens_file_list[i_ens]);
-   else        ens_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
-                           ens_ssvar_mean : conf_info.ens_ssvar_file;
+   else        ens_file = (ens_mean_user && strcmp(ens_mean_user,"")) ?
+                           ens_mean_user : conf_info.ens_ssvar_file;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing " << file_type << " file: " << ens_file << "\n";
@@ -1064,7 +1069,7 @@ int process_point_ens(int i_ens, int &n_miss) {
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
       // For spread/skill, use the calculated mean file if none was specified
-      if(ens_mn && (!ens_ssvar_mean || !strcmp(ens_ssvar_mean, ""))) {
+      if(ens_mn && (!ens_mean_user || !strcmp(ens_mean_user, ""))) {
          fcst_dpa.clear();
          info = new VarInfoNcMet();
          info->set_magic(get_ens_mn_var_name(i), "(*,*)");
@@ -1467,14 +1472,14 @@ void process_grid_vx() {
 
          VarInfo *info = (VarInfo *) 0;
          bool info_alloc = false;
-         ConcatString mn_file = (ens_ssvar_mean && strcmp(ens_ssvar_mean,"")) ?
-                                 ens_ssvar_mean : conf_info.ens_ssvar_file;
+         ConcatString mn_file = (ens_mean_user && strcmp(ens_mean_user,"")) ?
+                                 ens_mean_user : conf_info.ens_ssvar_file;
 
          mlog << Debug(2) << "\n" << sep_str << "\n\n"
               << "Processing ensemble mean file: " << mn_file << "\n";
 
          // For spread/skill, use the calculated mean file if none was specified
-         if(!ens_ssvar_mean || !strcmp(ens_ssvar_mean, "")) {
+         if(!ens_mean_user || !strcmp(ens_mean_user, "")) {
             info = new VarInfoNcMet();
             info->set_magic(get_ens_mn_var_name(i), "(*,*)");
             info_alloc = true;
@@ -2703,9 +2708,9 @@ void set_point_obs(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_ssvar_mean(const StringArray & a)
+void set_ens_mean(const StringArray & a)
 {
-   ens_ssvar_mean = a[0];
+   ens_mean_user = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
