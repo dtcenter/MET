@@ -60,6 +60,8 @@ extern void ran_sample(const gsl_rng *r, NumArray &, NumArray &, int);
 
 extern double ran_draw(const gsl_rng *r, DistType,
                        double p1, double p2 = bad_data_int);
+extern double dist_var(DistType,
+                       double p1, double p2 = bad_data_int);
 
 ////////////////////////////////////////////////////////////////////////
 

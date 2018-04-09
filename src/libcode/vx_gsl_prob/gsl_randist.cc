@@ -217,6 +217,7 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
 
    // Switch on the distribution type
    switch(t) {
+
       case(DistType_Normal):
       case(DistType_LogNormal):
          v = gsl_ran_gaussian(r, p1);
@@ -240,6 +241,59 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
 
       case(DistType_Beta):
          v = gsl_ran_beta(r, p1, p2);
+         break;
+
+      case(DistType_None):
+      default:
+         v = 0.0;
+         break;
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the variance for each distribution type.
+// Reference:
+//    Introduction to the Theory of Statistics, 3rd Ed.
+//       by Mood, Graybill, and Boes
+//       Pages 540-542
+//
+////////////////////////////////////////////////////////////////////////
+
+double dist_var(DistType t, double p1, double p2) {
+   double v;
+
+   // Switch on the distribution type
+   switch(t) {
+
+      case(DistType_Normal):
+         v = p1*p1;
+         break;
+
+      case(DistType_LogNormal):
+         v = exp(2.0*p1*p1) - exp(p1*p1);
+         break;
+
+      case(DistType_Exponential):
+         v = 1.0 / (p1*p1);
+         break;
+
+      case(DistType_ChiSquared):
+         v = 2*p1;
+         break;
+
+      case(DistType_Gamma):
+         v = p1 / (p2*p2);
+         break;
+
+      case(DistType_Uniform):
+         v = ((p2-p1)*(p2-p1)) / 12.0;
+         break;
+
+      case(DistType_Beta):
+         v = (p1*p2) / ((p1+p2)*(p1+p2)*(p1+p2+1.0));
          break;
 
       case(DistType_None):
