@@ -42,17 +42,23 @@ static const char *program_name = "gen_vx_mask";
 ////////////////////////////////////////////////////////////////////////
 
 enum MaskType {
+
    MaskType_Poly,      // Polyline masking region
    MaskType_Box,       // Box masking type
    MaskType_Circle,    // Circle masking region
+
    MaskType_Track,     // Track masking region
    MaskType_Grid,      // Grid masking type
    MaskType_Data,      // Data masking type
+
    MaskType_Solar_Alt, // Solar altitude masking type
    MaskType_Solar_Azi, // Solar azimuth masking type
+
    MaskType_Lat,       // Latitude masking type
    MaskType_Lon,       // Longitude masking type
+
    MaskType_None
+
 };
 
 extern bool is_solar_masktype(MaskType);

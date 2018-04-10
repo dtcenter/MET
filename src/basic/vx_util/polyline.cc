@@ -420,7 +420,10 @@ double Polyline::uv_signed_area() const {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-int Polyline::is_inside(double u_test, double v_test) const {
+int Polyline::is_inside(double u_test, double v_test) const
+
+{
+
    int i, j;
    double Angle, Angle0, a, b, c, d;
 
@@ -556,6 +559,188 @@ void Polyline::sum_second_moments(double x_bar, double y_bar,
 
    return;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for class GridClosedPoly
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+GridClosedPoly::GridClosedPoly()
+
+{
+
+gcp_init_from_scratch();
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+GridClosedPoly::~GridClosedPoly()
+
+{
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+GridClosedPoly::GridClosedPoly(const GridClosedPoly & g)
+
+{
+
+gcp_init_from_scratch();
+
+gcp_assign(g);
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+GridClosedPoly & GridClosedPoly::operator=(const GridClosedPoly & g)
+
+{
+
+if ( this == &g )  return ( * this );
+
+gcp_assign(g);
+
+
+return ( * this );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void GridClosedPoly::gcp_init_from_scratch()
+
+{
+
+u_min = u_max = v_min = v_max = 0.0;
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void GridClosedPoly::gcp_assign(const GridClosedPoly & g)
+
+{
+
+Polyline::assign(g);
+
+u_min = g.u_min;
+u_max = g.u_max;
+
+v_min = g.v_min;
+v_max = g.v_max;
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+void GridClosedPoly::add_point(double uu, double vv)
+
+{
+
+if ( n_points == 0 )  { 
+
+   u_min = u_max = uu;  v_min = v_max = vv;
+
+} else {
+
+   if ( uu < u_min )  u_min = uu;
+   if ( uu > u_max )  u_max = uu;
+
+   if ( vv < v_min )  v_min = vv;
+   if ( vv > v_max )  v_max = vv;
+
+}
+
+Polyline::add_point(uu, vv);
+
+
+return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+int GridClosedPoly::is_inside(double u_test, double v_test) const
+
+{
+
+   //
+   //  test bounding box
+   //
+
+if ( u_test < u_min )  return ( 0 );
+if ( u_test > u_max )  return ( 0 );
+
+if ( v_test < v_min )  return ( 0 );
+if ( v_test > v_max )  return ( 0 );
+
+   //
+   //  test polyline
+   //
+
+const int status = Polyline::is_inside(u_test, v_test);
+
+return ( status );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for class GridClosedPolyArray
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+bool GridClosedPolyArray::is_inside(double u_test, double v_test) const
+
+{
+
+if ( Nelements == 0 )  return ( false );
+
+int j, status;
+
+   //
+   //  if the test point is inside **ANY** of the element polylines, return true
+   //
+
+for (j=0; j<Nelements; ++j)  {
+
+   status = e[j]->is_inside(u_test, v_test);
+
+   if ( status != 0 )  return ( true );
+
+}
+
+
+return ( false );
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -1062,3 +1247,6 @@ void parse_xy_poly_file(const char *poly_file, Polyline &poly) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+

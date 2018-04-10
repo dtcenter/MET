@@ -40,7 +40,7 @@ template <typename T>
 
 class NCRR_Array {
 
-   private:
+   protected:
 
       void init_from_scratch();
 
