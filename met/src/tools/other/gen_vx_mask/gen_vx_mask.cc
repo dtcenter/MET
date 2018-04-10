@@ -186,9 +186,14 @@ void process_input_file(DataPlane &dp) {
    return;
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
-void process_mask_file(DataPlane &dp) {
+
+void process_mask_file(DataPlane &dp)
+
+{
+
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
@@ -209,6 +214,7 @@ void process_mask_file(DataPlane &dp) {
            << "Parsed Lat/Lon Mask File:\t" << poly_mask.name()
            << " containing " << poly_mask.n_points() << " points\n";
    }
+
    // For solar masking, check for a date/time string
    else if(is_solar_masktype(mask_type) &&
            is_datestring(mask_filename)) {
@@ -219,10 +225,12 @@ void process_mask_file(DataPlane &dp) {
            << "Solar Time String:\t"
            << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
    }
+
    // Nothing to do for Lat/Lon masking types
    else if(mask_type == MaskType_Lat ||
            mask_type == MaskType_Lon) {
    }
+
    // Otherwise, process the mask file as a gridded data file
    else {
 
@@ -414,29 +422,35 @@ bool get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr, DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_poly_mask(DataPlane &dp) {
+void apply_poly_mask(DataPlane & dp)
+
+{
+
    int x, y, n_in;
    bool inside;
    double lat, lon;
 
+   n_in = 0;
+
    // Check each grid point being inside the polyline
-   for(x=0,n_in=0; x<grid.nx(); x++) {
+   for(x=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
 
          // Check current grid point inside polyline
-         inside = poly_mask.latlon_is_inside(lat, lon);
+         inside = poly_mask.latlon_is_inside(lat, lon);   //  returns bool
 
          // Check the complement
          if(complement) inside = !inside;
 
          // Increment count
-         n_in += inside;
+         if ( inside )  ++n_in;
 
          // Store the current mask value
-         dp.set(inside, x, y);
+         dp.set( (inside ? 1.0 : 0.0), x, y);
+
       } // end for y
    } // end for x
 

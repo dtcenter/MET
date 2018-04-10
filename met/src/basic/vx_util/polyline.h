@@ -28,6 +28,7 @@
 
 #include "vx_util.h"
 #include "vx_math.h"
+#include "ncrr_array.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -37,14 +38,14 @@ static const int polyline_alloc_jump = 100;
 
 class Polyline {
 
-   private:
+   protected:
 
       void assign(const Polyline &);
 
    public:
 
       Polyline();
-     ~Polyline();
+      virtual ~Polyline();
       Polyline(const Polyline &);
       Polyline & operator=(const Polyline &);
 
@@ -52,27 +53,27 @@ class Polyline {
 
       void dump(ostream &, int = 0) const;
 
-      /////////////////////////////////////////////////////////////////////////
+         /////////////////////////////////////////////////////////////////////////
 
-      char *name;
+      char * name;   //  allocated
       
-      double *u;
-      double *v;
+      double * u;    //  allocated
+      double * v;    //  allocated
 
       int n_points;
       int n_alloc;
 
       void set_name(const char *);
       
-      void add_point(double, double);
+      virtual void add_point(double, double);
 
       void extend_points(int);
 
-      /////////////////////////////////////////////////////////////////////////
-      //
-      // Single polyline functions
-      //
-      /////////////////////////////////////////////////////////////////////////
+         /////////////////////////////////////////////////////////////////////////
+         //
+         // Single polyline functions
+         //
+         /////////////////////////////////////////////////////////////////////////
 
       int is_closed() const;
 
@@ -88,7 +89,7 @@ class Polyline {
 
       double uv_signed_area() const;
 
-      int is_inside(double u_test, double v_test) const;
+      virtual int is_inside(double u_test, double v_test) const;
 
       int is_polyline_point(double u_test, double v_test) const;
 
@@ -97,6 +98,7 @@ class Polyline {
       void sum_first_moments(double &, double &) const;
 
       void sum_second_moments(double, double, double &, double &, double &) const;
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,13 +118,64 @@ extern double min_dist_linesegment(double px, double py,
                                    double qx, double qy,
                                    double x_test, double y_test);
 
-extern void parse_latlon_poly_str(const char *, Polyline &);
-extern void parse_latlon_poly_file(const char *, Polyline &);
-extern void parse_xy_poly_str(const char *, Polyline &);
-extern void parse_xy_poly_file(const char *, Polyline &);
+extern void parse_latlon_poly_str  (const char *, Polyline &);
+extern void parse_latlon_poly_file (const char *, Polyline &);
+extern void parse_xy_poly_str      (const char *, Polyline &);
+extern void parse_xy_poly_file     (const char *, Polyline &);
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+class GridClosedPoly : public Polyline
+
+{
+
+   protected:
+
+      void gcp_init_from_scratch();
+
+      void gcp_assign(const GridClosedPoly &);
+
+         //  bounding box info
+
+      double u_min, u_max;
+      double v_min, v_max;
+
+   public:
+
+      GridClosedPoly();
+     ~GridClosedPoly();
+      GridClosedPoly(const GridClosedPoly &);
+      GridClosedPoly & operator=(const GridClosedPoly &);
+
+
+      int is_inside(double u_test, double v_test) const;   //  test bounding box first
+
+      void add_point(double, double);   //  updates bounding box
+
+
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+class GridClosedPolyArray : public NCRR_Array<GridClosedPoly>
+
+{
+
+   public:
+
+      bool is_inside(double u_test, double v_test) const;
+
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
 #endif   //  __DATA2D_UTIL_POLYLINE_H__
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+

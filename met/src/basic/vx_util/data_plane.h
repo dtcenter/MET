@@ -61,7 +61,9 @@ class DataPlane {
          //
 
       void set_size(int Nx, int Ny);
+
       void set(double, int, int);
+
       void set_constant(double);
 
       void set_init(unixtime);
