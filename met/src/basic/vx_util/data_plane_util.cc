@@ -84,6 +84,7 @@ void rescale_probability(DataPlane &dp) {
    return;
 
 }
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Smooth the DataPlane values using the interpolation method and
@@ -92,7 +93,9 @@ void rescale_probability(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
-                  InterpMthd mthd, int width, const GridTemplateFactory::GridTemplates shape, double t) {
+                  InterpMthd mthd, int width,
+                  const GridTemplateFactory::GridTemplates shape,
+                  double t) {
    double v;
    int x, y;
 
@@ -154,6 +157,24 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    } // end for x
    delete gt;
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Smooth the DataPlane values using the interpolation method and
+// Grid Template specified.
+//
+////////////////////////////////////////////////////////////////////////
+
+DataPlane smooth_field(const DataPlane &dp,
+                       InterpMthd mthd, int width,
+                       const GridTemplateFactory::GridTemplates shape,
+                       double t) {
+   DataPlane smooth_dp;
+
+   smooth_field(dp, smooth_dp, mthd, width, shape, t);
+
+   return(smooth_dp);
 }
 
 ////////////////////////////////////////////////////////////////////////

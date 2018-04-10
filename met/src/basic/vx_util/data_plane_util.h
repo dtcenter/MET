@@ -43,6 +43,10 @@ extern void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                InterpMthd mthd, int width,
                const GridTemplateFactory::GridTemplates shape, double t);
 
+extern DataPlane smooth_field(const DataPlane &dp,
+                    InterpMthd mthd, int width,
+                    const GridTemplateFactory::GridTemplates shape, double t);
+
 extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                int width, const GridTemplateFactory::GridTemplates shape,
                SingleThresh t, double vld_t);
