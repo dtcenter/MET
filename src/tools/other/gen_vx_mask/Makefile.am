@@ -12,7 +12,8 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = gen_vx_mask
 
-gen_vx_mask_SOURCES = gen_vx_mask.cc
+gen_vx_mask_SOURCES = gen_vx_mask.cc  \
+                      grid_closed_poly.cc
 gen_vx_mask_CPPFLAGS = ${MET_CPPFLAGS}
 gen_vx_mask_LDFLAGS = ${MET_LDFLAGS}
 gen_vx_mask_LDADD = -lvx_shapedata \
@@ -22,6 +23,7 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
+     -lvx_gis  \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_render \
