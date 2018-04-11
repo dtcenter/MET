@@ -3299,7 +3299,7 @@ name "table_ES_header_info_es_out_ORANK"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="20" columns="3">
+<lyxtabular version="3" rows="23" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -3781,7 +3781,7 @@ Value of the ith ensemble member (repeated)
 \begin_inset Text
 
 \begin_layout Plain Layout
-Last-3
+Last-6
 \end_layout
 
 \end_inset
@@ -3810,7 +3810,7 @@ Quality control string for the observation
 \begin_inset Text
 
 \begin_layout Plain Layout
-Last-2
+Last-5
 \end_layout
 
 \end_inset
@@ -3839,7 +3839,7 @@ The ensemble mean value
 \begin_inset Text
 
 \begin_layout Plain Layout
-Last-1
+Last-4
 \end_layout
 
 \end_inset
@@ -3864,6 +3864,96 @@ The value of the inluded climatology
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Last-3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SPREAD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The spread (standard deviation) of the ensemble member values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Last-2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ENS_MEAN _OERR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The PERTURBED Ensemble Mean (e.g.
+ with Observation Error).
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Last-1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SPREAD_OERR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The spread (standard deviation) of the PERTURBED ensemble member values
+ (e.g.
+ with Observation Error).
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -3877,7 +3967,7 @@ Last
 \begin_inset Text
 
 \begin_layout Plain Layout
-ENS_SPREAD
+SPREAD_PLUS_OERR
 \end_layout
 
 \end_inset
@@ -3886,7 +3976,9 @@ ENS_SPREAD
 \begin_inset Text
 
 \begin_layout Plain Layout
-The spread (standard deviation) of the ensemble member values
+The square root of the sum of ensemble variance and the observation error
+ variance.
+ 
 \end_layout
 
 \end_inset
@@ -4290,7 +4382,7 @@ RMSE_OERR
 
 \begin_layout Plain Layout
 The Root Mean Square Error of the PERTURBED Ensemble Mean (e.g.
- with Observation Error)
+ with Observation Error).
 \end_layout
 
 \end_inset
@@ -4321,7 +4413,7 @@ SPREAD_OERR
 \begin_layout Plain Layout
 The spread (standard deviation) of the PERTURBED ensemble member values
  (e.g.
- with Observation Error)
+ with Observation Error).
 \end_layout
 
 \end_inset
