@@ -478,6 +478,28 @@ else
     AC_MSG_NOTICE([gen_vx_mask will not be compiled])
 fi
 
+
+# gis_utils
+
+AC_ARG_ENABLE(gis_utils,
+       [AS_HELP_STRING([--disable-gis_utils], [Disable compilation of gis_utils])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_GIS_UTILS="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-gis_utils) ;;
+   esac],
+  [ENABLE_GIS_UTILS="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_GIS_UTILS], [test "x$ENABLE_GIS_UTILS" = "xyes"])
+
+if test "x$ENABLE_GIS_UTILS" = "xyes"; then
+    AC_DEFINE([ENABLE_GIS_UTILS], [], ["build gis_utils"])
+    AC_MSG_NOTICE([gis_utils will be compiled])
+else
+    AC_MSG_NOTICE([gis_utils will not be compiled])
+fi
+
+
 # grid_stat
 
 AC_ARG_ENABLE(grid_stat,
@@ -1091,6 +1113,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/ascii2nc/Makefile
                  src/tools/other/lidar2nc/Makefile
                  src/tools/other/gen_vx_mask/Makefile
+                 src/tools/other/gis_utils/Makefile
                  src/tools/other/madis2nc/Makefile
                  src/tools/other/mode_graphics/Makefile
                  src/tools/other/modis_regrid/Makefile
