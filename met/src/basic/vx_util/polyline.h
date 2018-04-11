@@ -28,7 +28,7 @@
 
 #include "vx_util.h"
 #include "vx_math.h"
-#include "ncrr_array.h"
+#include "vx_grid.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -126,54 +126,8 @@ extern void parse_xy_poly_file     (const char *, Polyline &);
 ///////////////////////////////////////////////////////////////////////////////
 
 
-class GridClosedPoly : public Polyline
-
-{
-
-   protected:
-
-      void gcp_init_from_scratch();
-
-      void gcp_assign(const GridClosedPoly &);
-
-         //  bounding box info
-
-      double u_min, u_max;
-      double v_min, v_max;
-
-   public:
-
-      GridClosedPoly();
-     ~GridClosedPoly();
-      GridClosedPoly(const GridClosedPoly &);
-      GridClosedPoly & operator=(const GridClosedPoly &);
-
-
-      int is_inside(double u_test, double v_test) const;   //  test bounding box first
-
-      void add_point(double, double);   //  updates bounding box
-
-
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-class GridClosedPolyArray : public NCRR_Array<GridClosedPoly>
-
-{
-
-   public:
-
-      bool is_inside(double u_test, double v_test) const;
-
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 #endif   //  __DATA2D_UTIL_POLYLINE_H__
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
