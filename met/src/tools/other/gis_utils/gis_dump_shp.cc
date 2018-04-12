@@ -32,7 +32,7 @@ using namespace std;
 
 static ConcatString program_name;
 
-static const int buf_size = 600000;
+static const int buf_size = (1 << 21);
 
 static unsigned char buf[buf_size];
 

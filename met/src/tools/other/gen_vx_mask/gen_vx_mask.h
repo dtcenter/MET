@@ -57,6 +57,8 @@ enum MaskType {
    MaskType_Lat,       // Latitude masking type
    MaskType_Lon,       // Longitude masking type
 
+   MaskType_Shape,     // Shapefile
+
    MaskType_None
 
 };
@@ -94,6 +96,8 @@ static int width = bad_data_double;
 static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
+
+static int shape_number = 0;
 
 // Masking polyline
 static MaskPoly poly_mask;
@@ -140,6 +144,7 @@ static void      set_name(const StringArray &);
 static void      set_logfile(const StringArray &);
 static void      set_verbosity(const StringArray &);
 static void      set_compress(const StringArray &);
+static void      set_shapeno(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
