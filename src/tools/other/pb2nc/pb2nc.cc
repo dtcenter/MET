@@ -52,7 +52,6 @@
 //          06/07/17  Howard Soh     Added more options: -vars, -all, and -index.
 //          09/15/17  Howard Soh     Removed options: -all, and -use_var_id.
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
-//   016    03/28/18  Howard Soh     Add special AIRNOW/ANOWPM handling.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +86,8 @@ using namespace std;
 
 #include "vx_summary.h"
 
-extern struct NcDataBuffer nc_data_buffer;
+extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
+extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -256,8 +256,8 @@ static map<ConcatString, int> variableCountMap;
 static map<ConcatString, StringArray> variableTypeMap;
 
 static SummaryObs *summaryObs;
-static bool doSummarize;
-static NetcdfObsVars obsVars;
+static bool doSummary;
+static NetcdfObsVars obs_vars;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -506,7 +506,7 @@ void process_command_line(int argc, char **argv) {
       do_all_vars = (0 == conf_info.obs_bufr_var.n_elements());
    }
 
-   doSummarize = conf_info.getSummaryInfo().flag;
+   doSummary = conf_info.getSummaryInfo().flag;
 
    return;
 }
@@ -547,6 +547,7 @@ bool is_prepbufr_file(StringArray *events) {
 
 void get_variable_info(const char* tbl_filename) {
    static const int maximumLineLength = 128;
+   char *lineBuffer = (char *)malloc(sizeof(char) * maximumLineLength);
    static const char *method_name = "get_variable_info()";
 
    FILE * fp;
@@ -695,9 +696,9 @@ void open_netcdf() {
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
    // Define netCDF variables
-   init_nc_dims_vars (obsVars);
-   obsVars.attr_pb2nc = true;
-   create_nc_obs_vars(obsVars, f_out, deflate_level);
+   init_nc_dims_vars (obs_vars);
+   obs_vars.attr_pb2nc = true;
+   create_nc_obs_vars(obs_vars, f_out, deflate_level);
 
    // Add global attributes
    write_netcdf_global(f_out, ncfile.text(), program_name);
@@ -762,7 +763,7 @@ void process_pbfile(int i_pb) {
 
    // Build the temporary block file name
    blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
-   blk_file = make_temp_file_name(blk_prefix, NULL);
+   blk_file = make_temp_file_name(blk_prefix, '\0');
 
    mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file
         << "\n";
@@ -844,15 +845,15 @@ void process_pbfile(int i_pb) {
    }
 
    if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
-
+   
    int grib_code, bufr_var_index;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
-
+   
    int bufr_hdr_length = bufr_hdrs.length();
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
    strcpy(bufr_hdr_names, bufr_hdrs.text());
 
-   header_to_vector = IS_INVALID_NC(obsVars.hdr_arr_var);
+   header_to_vector = IS_INVALID_NC(obs_vars.hdr_arr_var) || IS_INVALID_NC(obs_vars.hdr_lat_var);
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
@@ -934,9 +935,11 @@ void process_pbfile(int i_pb) {
 
       if (!is_prepbufr) {
          int index;
+         int length;
          char tmp_str[mxr8lv*mxr8pm];
 
          //Read header (station id, lat, lon, ele, time)
+         length = bufr_hdrs.length();
          strcpy(tmp_str, bufr_hdrs.text());
          readpbint_(&unit, &i_ret, &nlev, bufr_obs, bufr_hdr_names,
                     &bufr_hdr_length, &use_small_buffer );
@@ -945,7 +948,7 @@ void process_pbfile(int i_pb) {
          for (index=0; index<4; index++) {
             hdr[index] = bufr_obs[0][index];
          }
-
+         
          // Update hdr[3] and file_ut for obs_time
          if (bufr_obs[0][3] > r8bfms) {
             hdr[3] = 0;
@@ -1105,9 +1108,8 @@ void process_pbfile(int i_pb) {
          continue;
       }
 
-      // Special handling for AIRNOW and ANOWPM message types
-      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ) ||
-                        0 == strcmp("ANOWPM", hdr_typ));
+      // Special handling for "AIRNOW"
+      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ));
 
       if (0 < message_type_map.count(hdr_typ)) {
          ConcatString mappedMessageType = message_type_map[hdr_typ];
@@ -1403,7 +1405,7 @@ void process_pbfile(int i_pb) {
 
             readpbint_(&unit, &i_ret, &nlev2, bufr_obs, var_name, &var_name_len, &use_small_buffer);
             if (0 >= nlev2) continue;
-
+            
             buf_nlev = nlev2;
             if (nlev2 > mxr8lv) {
                buf_nlev = mxr8lv;
@@ -1485,20 +1487,22 @@ void process_pbfile(int i_pb) {
       // store the header data and increment the PrepBufr record
       // counter
       if(n_hdr_obs > 0) {
-         if (!doSummarize) {
-            unix_to_mdyhms(hdr_vld_ut, mon, day, yr, hr, min, sec);
-            sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-                    yr, mon, day, hr, min, sec);
-            if (header_to_vector) {
-               add_nc_header_full(modified_hdr_typ, hdr_sid, time_str,
-                               hdr_lat, hdr_lon, hdr_elv);
-            }
-            else {
-               write_nc_header(obsVars, modified_hdr_typ, hdr_sid, time_str,
-                               hdr_lat, hdr_lon, hdr_elv);
-            }
+         unix_to_mdyhms(hdr_vld_ut, mon, day, yr, hr, min, sec);
+         sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
+                 yr, mon, day, hr, min, sec);
+         if (header_to_vector) {
+            add_nc_header_all(modified_hdr_typ, hdr_sid, time_str,
+                              hdr_lat, hdr_lon, hdr_elv);
+                              
          }
-
+         else {
+            write_nc_header(obs_vars, modified_hdr_typ, hdr_sid, time_str,
+                            hdr_lat, hdr_lon, hdr_elv);
+         }
+         if (is_prepbufr) {
+            add_nc_header_prepbufr(pb_report_type, in_report_type, instrument_type);
+         }
+         
          i_msg++;
       }
       else {
@@ -1507,13 +1511,12 @@ void process_pbfile(int i_pb) {
    } // end for i_read
    if(showed_progress && mlog.verbosity_level() > 0) cout << "\n";
 
-   if (doSummarize) {
+   if (nc_data_buffer.obs_data_idx > 0) {
+      write_nc_observation(obs_vars, nc_data_buffer);
+   }   
+   if (doSummary) {
       TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
       summaryObs->summarizeObs(summaryInfo);
-   }
-   else if (nc_data_buffer.obs_data_idx > 0) {
-      //write_nc_obs_buffer(obsVars, obs_data_idx);
-      write_nc_observation(obsVars, nc_data_buffer);
    }
 
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
@@ -1617,8 +1620,8 @@ void process_pbfile_metadata(int i_pb) {
    // Build the temporary block file name
    blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
    blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
-
-   blk_file = make_temp_file_name(blk_prefix2, NULL);
+   
+   blk_file = make_temp_file_name(blk_prefix2, '\0');
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
 
@@ -1634,21 +1637,21 @@ void process_pbfile_metadata(int i_pb) {
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
    unit = dump_unit + i_pb;
-   blk_file = make_temp_file_name(blk_prefix, NULL);
+   blk_file = make_temp_file_name(blk_prefix, '\0');
    pblock(file_name, blk_file, block);
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
    }
-
+   
    // Open the blocked temp PrepBufr file for reading
    openpb_(blk_file, &unit);
-
+   
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_(&unit, &npbmsg);
    mlog << Debug(1) << method_name << " -> "
         << "the number of records: " << npbmsg << "\n";
-
+   
    // Use the number of records requested by the user if there
    // are enough present.
    if(nmsg >= 0 && nmsg <= npbmsg) npbmsg = nmsg;
@@ -1669,6 +1672,8 @@ void process_pbfile_metadata(int i_pb) {
 
    // Initialize counts
    i_ret   =  i_msg     = 0;
+
+   bool is_prepbufr = is_prepbufr_file(&event_names);
 
    StringArray headers;
    StringArray tmp_hdr_array;
@@ -1980,12 +1985,13 @@ void process_pbfile_metadata(int i_pb) {
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf_hdr_data() {
-   int i, buf_len;
-   long dim_count;
+   long dim_count, pb_hdr_count;
+   bool is_prepbufr = is_prepbufr_file(&event_names);
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
-   dim_count = (doSummarize ? summaryObs->countSummaryHeaders()
-                            : (long) nc_data_buffer.cur_hdr_idx);
+   dim_count = (long) nc_data_buffer.cur_hdr_idx;
+   pb_hdr_count = dim_count;
+   if (doSummary) dim_count += summaryObs->countSummaryHeaders();
 
    // Check for no messages retained
    if(dim_count <= 0) {
@@ -2001,126 +2007,74 @@ void write_netcdf_hdr_data() {
       exit(1);
    }
 
+   // MAke sure all obs data is processed before handling header
+   if (doSummary) {
+      // Write out the header data and summary data
+      write_nc_observations(obs_vars, summaryObs->getSummaries(), false);
+   }
+   
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-   create_nc_hdr_vars(obsVars, f_out, dim_count, deflate_level);
+   create_nc_hdr_vars(obs_vars, f_out, dim_count, deflate_level);
+   if (is_prepbufr) create_nc_pb_hdrs(obs_vars, f_out, pb_hdr_count, deflate_level);
 
    dim_count = bufr_obs_name_arr.n_elements();
-   NcDim bufr_var_dim  = add_dim(f_out, nc_dim_nvar, dim_count);
-   NcDim bufr_unit_dim = add_dim(f_out, nc_dim_unit, (long)BUFR_UNIT_LEN);
-   NcDim bufr_desc_dim = add_dim(f_out, nc_dim_desc, (long)BUFR_DESCRIPTION_LEN);
+   create_nc_other_vars (obs_vars, f_out, nc_data_buffer, hdr_data,
+         dim_count, dim_count, deflate_level);
 
-   NcVar bufr_obs_var  = add_var(f_out, nc_var_obs_var, ncChar, bufr_var_dim, obsVars.strl_dim, deflate_level);
-   NcVar bufr_unit_var = add_var(f_out,    nc_var_unit, ncChar, bufr_var_dim, bufr_unit_dim, deflate_level);
-   NcVar bufr_desc_var = add_var(f_out,    nc_var_desc, ncChar, bufr_var_dim, bufr_desc_dim, deflate_level);
-
-   add_att(&bufr_obs_var,  "long_name", "BUFR variable names from Table B");
-   add_att(&bufr_unit_var, "long_name", "BUFR variable units");
-   add_att(&bufr_desc_var, "long_name", "BUFR variable descriptions");
-
-   if (doSummarize) {
-      // Write out the header data and summary data
-      write_nc_observations(obsVars, summaryObs->getSummaries());
+   // Write out the header data
+   if (header_to_vector) {
+      write_nc_headers(obs_vars);
    }
-   else {
-      // Write out the header data
-      if (header_to_vector) {
-         write_nc_headers(obsVars);
-      }
-      else if (nc_data_buffer.hdr_data_idx > 0) {
-         write_nc_header(obsVars);
-      }
+   if (nc_data_buffer.hdr_data_idx > 0) {
+      write_nc_header(obs_vars);
    }
 
    int hdr_str_len;
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, strl_len } ;
-   StringArray nc_obs_arr;
-   nc_obs_arr.add(bufr_obs_name_arr);
+   StringArray nc_var_name_arr;
+   StringArray nc_var_unit_arr;
+   StringArray nc_var_desc_arr;
    map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
-   for(i=0; i<nc_obs_arr.n_elements(); i++) {
+   for(int i=0; i<bufr_obs_name_arr.n_elements(); i++) {
       int var_index;
-      char var_name[BUFR_NAME_LEN+1];
-      char unit_str[BUFR_UNIT_LEN+1];
-      char desc_str[BUFR_DESCRIPTION_LEN+1];
+      const char *var_name;
+      const char *unit_str;
+      const char *desc_str;
 
-      for(int tIdx=0; tIdx<BUFR_NAME_LEN; tIdx++) {
-         var_name[tIdx] = bad_data_char;
-      }
-      for(int tIdx=0; tIdx<BUFR_UNIT_LEN; tIdx++) {
-         unit_str[tIdx] = bad_data_char;
-      }
-
-      hdr_str_len = strlen(nc_obs_arr[i]);
-      if (hdr_str_len > BUFR_NAME_LEN) hdr_str_len = BUFR_NAME_LEN;
-      strncpy(var_name, nc_obs_arr[i], hdr_str_len);
-      var_name[hdr_str_len] = bad_data_char;
-
+      unit_str = "";
+      var_name = bufr_obs_name_arr[i];
       if (var_names.has(var_name, var_index)) {
-         if (0 == strcmp("DEG C", var_units[var_index])) {
-            strcpy(unit_str, "KELVIN");
+         unit_str = var_units[var_index];
+         if (0 == strcmp("DEG C", unit_str)) {
+            unit_str = "KELVIN";
          }
-         else if (0 == strcmp("MB", var_units[var_index])) {
-            strcpy(unit_str, "PASCALS");
+         else if (0 == strcmp("MB", unit_str)) {
+            unit_str = "PASCALS";
          }
-         else if (0 == strcmp("MG/KG", var_units[var_index])) {
-            strcpy(unit_str, "KG/KG");
-         }
-         else {
-            hdr_str_len = strlen(var_units[var_index]);
-            if (hdr_str_len > BUFR_UNIT_LEN) hdr_str_len = BUFR_UNIT_LEN;
-            strncpy(unit_str, var_units[var_index], hdr_str_len);
-            unit_str[hdr_str_len] = bad_data_char;
+         else if (0 == strcmp("MG/KG", unit_str)) {
+            unit_str = "KG/KG";
          }
       }
+      nc_var_unit_arr.add(unit_str);
 
-      buf_len = 0;
-      if (tableB_vars.has(var_name, var_index)) {
-         strcpy(desc_str, tableB_descs[var_index]);
-         buf_len = strlen(desc_str);
+      desc_str = (tableB_vars.has(var_name, var_index))
+            ? tableB_descs[var_index]
+            : "";
+      nc_var_desc_arr.add(desc_str);
+      
+      ConcatString grib_name = obs_var_map[var_name];
+      if (0 < grib_name.length()) {
+         var_name = grib_name.text();
       }
-      for(int tIdx=buf_len; tIdx<BUFR_DESCRIPTION_LEN; tIdx++) {
-         desc_str[tIdx] = bad_data_char;
-      }
-
-      // Variable name
-      lengths[1] = BUFR_NAME_LEN;
-      if (0 < obs_var_map.count(var_name)) {
-         ConcatString grib_name = obs_var_map[var_name];
-         if (0 < grib_name.length()) {
-            int name_len = strlen(var_name);
-            strcpy(var_name, grib_name);
-            for (int idx=grib_name.length(); idx<name_len; idx++)
-               var_name[idx] = bad_data_char;
-         }
-      }
-      if(!put_nc_data(&bufr_obs_var, (char *)var_name, lengths, offsets)) {
-         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-              << "error writing the BUFR variable name to "
-              << "the netCDF file\n\n";
-         exit(1);
-      }
-
-      // Variable unit
-      lengths[1] = BUFR_UNIT_LEN;
-      if(!put_nc_data(&bufr_unit_var, (char *)unit_str, lengths, offsets)) {
-         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-              << "error writing the variable unit to the "
-              << "netCDF file\n\n";
-         exit(1);
-      }
-
-      // Variable description
-      lengths[1] = BUFR_DESCRIPTION_LEN;
-      if(!put_nc_data(&bufr_desc_var, (char *)desc_str, lengths, offsets)) {
-         mlog << Error << "\nwrite_netcdf_hdr_data() -> "
-              << "error writing the variable description to the "
-              << "netCDF file\n\n";
-         exit(1);
-      }
-
-      offsets[0] += 1;
+      nc_var_name_arr.add(var_name);
    } // end for i
+   write_nc_string_array (&obs_vars.obs_var,  nc_var_name_arr, HEADER_STR_LEN);
+   write_nc_string_array (&obs_vars.unit_var, nc_var_unit_arr, HEADER_STR_LEN2);
+   write_nc_string_array (&obs_vars.desc_var, nc_var_desc_arr, HEADER_STR_LEN3);
+
+   write_nc_other_vars(obs_vars);
 
    TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
    if (summaryInfo.flag) {
@@ -2155,6 +2109,7 @@ void write_netcdf_hdr_data() {
       }
       add_att(f_out, "time_summary_type", type_string.c_str());
    }
+   
    return;
 }
 
@@ -2175,7 +2130,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
       obs_qty.format("%d", quality_code);
    }
 
-   if (doSummarize) {
+   if (doSummary) {
       int var_index = obs_arr[1];
       string var_name = bufr_obs_name_arr[var_index];
       TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
@@ -2189,7 +2144,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
             var_name);
    }
    else {
-      write_nc_observation(obsVars, nc_data_buffer, obs_arr, obs_qty.text());
+      write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
    }
    return;
 }
@@ -2502,7 +2457,6 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
       }
       mlog << Debug(1) << line_buf;
    }
-   mlog << Debug(1) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

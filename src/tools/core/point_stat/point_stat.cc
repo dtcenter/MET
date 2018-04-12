@@ -660,19 +660,18 @@ void process_obs_file(int i_nc) {
    }
 
    // Read the dimensions and variables
-   NetcdfObsVars obsVars;
-   read_nc_dims_vars(obsVars, obs_in);
+   NetcdfObsVars obs_vars;
+   read_nc_dims_vars(obs_vars, obs_in);
 
    int var_num = 0;
-   bool use_var_id = obsVars.use_var_id;
+   bool use_var_id = obs_vars.use_var_id;
    if (use_var_id) {
       NcDim var_dim = get_nc_dim(obs_in,nc_dim_nvar);
       var_num       = get_dim_size(&var_dim);
    }
 
-   if(IS_INVALID_NC(obsVars.strl_dim) ||
-      IS_INVALID_NC(obsVars.obs_dim)  ||
-      IS_INVALID_NC(obsVars.hdr_dim)) {
+   int exit_code = check_nc_dims_vars(obs_vars);
+   if(exit_code == exit_code_no_dim) {
       mlog << Error << "\nprocess_obs_file() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
            << "dimensions from netCDF file: "
@@ -680,24 +679,35 @@ void process_obs_file(int i_nc) {
       exit(1);
    }
 
-   if(IS_INVALID_NC(obsVars.obs_arr_var) ||
-      IS_INVALID_NC(obsVars.hdr_typ_var) ||
-      IS_INVALID_NC(obsVars.hdr_sid_var) ||
-      IS_INVALID_NC(obsVars.hdr_vld_var) ||
-      IS_INVALID_NC(obsVars.hdr_arr_var)) {
+   if(exit_code == exit_code_no_hdr_vars) {
       mlog << Error << "\nprocess_obs_file() -> "
-           << "can't read \"obs_arr\", \"hdr_typ\", \"hdr_sid\", "
-           << "\"hdr_vld\", or \"hdr_arr\" variables from netCDF file: "
+           << "can't read \"hdr_typ\", \"hdr_sid\", "
+           << "or \"hdr_vld\" variables from netCDF file: "
            << obs_file[i_nc] << "\n\n";
       exit(1);
    }
 
-   if(IS_INVALID_NC(obsVars.obs_qty_var))
+   if(exit_code == exit_code_no_loc_vars) {
+      mlog << Error << "\nprocess_obs_file() -> "
+           << "can't read \"hdr_arr\" or \"hdr_lat\" "
+           << "variables from netCDF file: "
+           << obs_file[i_nc] << "\n\n";
+      exit(1);
+   }
+   if(exit_code == exit_code_no_obs_vars) {
+      mlog << Error << "\nprocess_obs_file() -> "
+           << "can't read \"obs_arr\" or \"obs_val\" "
+           << "variables from netCDF file: "
+           << obs_file[i_nc] << "\n\n";
+      exit(1);
+   }
+
+   if(IS_INVALID_NC(obs_vars.obs_qty_var))
       mlog << Debug(3) << "Quality marker information not found input file\n";
 
-   int obs_count = get_dim_size(&obsVars.obs_dim);
-   int hdr_count = get_dim_size(&obsVars.hdr_dim);
-   int strl_len  = get_dim_size(&obsVars.strl_dim);
+   int obs_count = get_dim_size(&obs_vars.obs_dim);
+   int hdr_count = get_dim_size(&obs_vars.hdr_dim);
+   int strl_len  = get_dim_size(&obs_vars.strl_dim);
 
    mlog << Debug(2)
         << "Searching " << obs_count
@@ -706,6 +716,8 @@ void process_obs_file(int i_nc) {
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
+   long offsets_1D[1] = { 0 };
+   long lengths_1D[1] = { 1 };
 
    StringArray var_names;
    char var_name[strl_len+1];
@@ -727,13 +739,44 @@ void process_obs_file(int i_nc) {
    }
 
    int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
-   NcHeaderData header_data = get_nc_hdr_data(obsVars);
+   NcHeaderData header_data = get_nc_hdr_data(obs_vars);
    int typ_len = header_data.typ_len;
    int sid_len = header_data.sid_len;
    int vld_len = header_data.vld_len;
 
+   int   obs_qty_idx_block[buf_size];
+   int   obs_hid_block[buf_size];
+   int   obs_vid_block[buf_size];
+   float obs_lvl_block[buf_size];
+   float obs_hgt_block[buf_size];
+   float obs_val_block[buf_size];
    float obs_arr_block[buf_size][obs_arr_len];
    char  obs_qty_block[buf_size][strl_len];
+   StringArray obs_qty_array;
+   
+   bool use_arr_vars = !IS_INVALID_NC(obs_vars.obs_arr_var);
+
+   offsets[0] = 0;
+   lengths[0] = 1;
+   char obs_qty[strl_len+1];
+   if (!IS_INVALID_NC(obs_vars.obs_qty_tbl_var)) {
+      NcDim qty_dim = get_nc_dim(&obs_vars.obs_qty_tbl_var, nc_dim_nqty);
+      if (!IS_INVALID_NC(qty_dim)) {
+         int qty_count = get_dim_size(&qty_dim);
+         lengths[1] = strl_len;
+         for (int idx=0; idx<qty_count; idx++) {
+            if(!get_nc_data(&obs_vars.obs_qty_tbl_var, obs_qty_str, lengths, offsets)) {
+               mlog << Error << "\nprocess_obs_file() -> "
+                    << "trouble getting obs_qty\n\n";
+               exit(1);
+            }
+            else {
+               obs_qty_array.add(obs_qty_str);
+            }
+            offsets[0]++;
+         }
+      }
+   }
 
    offsets[0] = 0;
    offsets[1] = 0;
@@ -741,42 +784,103 @@ void process_obs_file(int i_nc) {
    lengths[1] = strl_len;
 
    int str_length;
+   int prev_hdr_offset = -1;
+   int block_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
    // Process each observation in the file
-   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=BUFFER_SIZE) {
-      int block_size = (obs_count - i_block_start_idx);
+   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=block_size) {
+      block_size = (obs_count - i_block_start_idx);
       if (block_size > BUFFER_SIZE) block_size = BUFFER_SIZE;
 
       offsets[0] = i_block_start_idx;
       offsets[1] = 0;
       lengths[0] = block_size;
       lengths[1] = obs_arr_len;
+      offsets_1D[0] = i_block_start_idx;
+      lengths_1D[0] = block_size;
 
       // Read the current observation message
-      if(!get_nc_data(&obsVars.obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
-         mlog << Error << "\nprocess_obs_file() -> "
-              << "can't read the record for observation "
-              << "index " << i_block_start_idx << "\n\n";
-         exit(1);
+      if (IS_INVALID_NC(obs_vars.obs_val_var)) {
+         if(!get_nc_data(&obs_vars.obs_arr_var, (float *)&obs_arr_block[0], lengths, offsets)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "can't read the record for observation "
+                 << "index " << i_block_start_idx << "\n\n";
+            exit(1);
+         }
+      }
+      else {
+         if(!get_nc_data(&obs_vars.obs_hid_var, obs_hid_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "can't read the record for observation "
+                 << "index " << i_block_start_idx << "\n\n";
+            exit(1);
+         }
+         if(!get_nc_data((IS_INVALID_NC(obs_vars.obs_gc_var) ? &obs_vars.obs_vid_var : &obs_vars.obs_gc_var),
+               obs_vid_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "can't read the record (vid or gc) for observation "
+                 << "index " << i_block_start_idx << "\n\n";
+            exit(1);
+         }
+         if(!get_nc_data(&obs_vars.obs_lvl_var, obs_lvl_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "can't read the record (lvl) for observation "
+                 << "index " << i_block_start_idx << "\n\n";
+            exit(1);
+         }
+         if(!get_nc_data(&obs_vars.obs_hgt_var, obs_hgt_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "can't read the record (hgt) for observation "
+                 << "index " << i_block_start_idx << "\n\n";
+            exit(1);
+         }
+         if(!get_nc_data(&obs_vars.obs_val_var, obs_val_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nprocess_obs_file() -> "
+                 << "can't read the record (val) for observation "
+                 << "index " << i_block_start_idx << "\n\n";
+            exit(1);
+         }
       }
 
       // Read the current observation quality flag
       lengths[1] = strl_len;
       strcpy(obs_qty_str, "");
-      if(!IS_INVALID_NC(obsVars.obs_qty_var)
-          && !get_nc_data(&obsVars.obs_qty_var, (char *)&obs_qty_block[0], lengths, offsets)) {
-         mlog << Error << "\nprocess_obs_file() -> "
-              << "can't read the quality flag for observation "
-              << "index " << i_block_start_idx << "\n\n";
-         exit(1);
+      if(!IS_INVALID_NC(obs_vars.obs_qty_var)) {
+          if (IS_INVALID_NC(obs_vars.obs_qty_tbl_var)) {
+             if (!get_nc_data(&obs_vars.obs_qty_var, (char *)&obs_qty_block[0], lengths, offsets)) {
+                mlog << Error << "\nprocess_obs_file() -> "
+                     << "can't read the quality flag for observation "
+                     << "index " << i_block_start_idx << "\n\n";
+                exit(1);
+             }
+          }
+          else {
+             if (!get_nc_data(&obs_vars.obs_qty_var, obs_qty_idx_block, lengths_1D, offsets_1D)) {
+                mlog << Error << "\nprocess_obs_file() -> "
+                     << "can't read the quality flag for observation "
+                     << "index " << i_block_start_idx << "\n\n";
+                exit(1);
+             }
+          }
       }
 
+      int hdr_idx;
       for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
          i_obs = i_block_start_idx + i_block_idx;
 
-         for (j=0; j<obs_arr_len; j++) {
-             obs_arr[j] = obs_arr_block[i_block_idx][j];
+         if (use_arr_vars) {
+            for (j=0; j<obs_arr_len; j++) {
+                obs_arr[j] = obs_arr_block[i_block_idx][j];
+            }
+            strcpy(obs_qty_str, obs_qty_block[i_block_idx]);
          }
-         strcpy(obs_qty_str, obs_qty_block[i_block_idx]);
+         else {
+            obs_arr[0] = (float)obs_hid_block[i_block_idx];
+            obs_arr[1] = (float)obs_vid_block[i_block_idx];
+            obs_arr[2] = obs_lvl_block[i_block_idx];
+            obs_arr[3] = obs_hgt_block[i_block_idx];
+            obs_arr[4] = obs_val_block[i_block_idx];
+            strcpy(obs_qty_str, obs_qty_array[obs_qty_idx_block[i_block_idx]]);
+         }
 
          int headerOffset = obs_arr[0];
 
@@ -796,21 +900,24 @@ void process_obs_file(int i_nc) {
          hdr_arr[2] = header_data.elv_array[headerOffset];
 
          // Read the corresponding header type for this observation
-         str_length = strlen(header_data.typ_array[headerOffset]);
+         hdr_idx = use_arr_vars ? headerOffset : header_data.typ_idx_array[headerOffset];
+         str_length = strlen(header_data.typ_array[hdr_idx]);
          if (str_length > typ_len) str_length = typ_len;
-         strncpy(hdr_typ_str, header_data.typ_array[headerOffset], str_length);
+         strncpy(hdr_typ_str, header_data.typ_array[hdr_idx], str_length);
          hdr_typ_str[str_length] = bad_data_char;
 
          // Read the corresponding header Station ID for this observation
-         str_length = strlen(header_data.sid_array[headerOffset]);
+         hdr_idx = use_arr_vars ? headerOffset : header_data.sid_idx_array[headerOffset];
+         str_length = strlen(header_data.sid_array[hdr_idx]);
          if (str_length > sid_len) str_length = sid_len;
-         strncpy(hdr_sid_str, header_data.sid_array[headerOffset], str_length);
+         strncpy(hdr_sid_str, header_data.sid_array[hdr_idx], str_length);
          hdr_sid_str[str_length] = bad_data_char;
 
          // Read the corresponding valid time for this observation
-         str_length = strlen(header_data.vld_array[headerOffset]);
+         hdr_idx = use_arr_vars ? headerOffset : header_data.vld_idx_array[headerOffset];
+         str_length = strlen(header_data.vld_array[hdr_idx]);
          if (str_length > vld_len) str_length = vld_len;
-         strncpy(hdr_vld_str, header_data.vld_array[headerOffset], str_length);
+         strncpy(hdr_vld_str, header_data.vld_array[hdr_idx], str_length);
          hdr_vld_str[str_length] = bad_data_char;
 
 
@@ -875,12 +982,7 @@ void process_obs_file(int i_nc) {
       delete obs_in;
       obs_in = (NcFile *) 0;
    }
-   header_data.typ_array.clear();
-   header_data.sid_array.clear();
-   header_data.vld_array.clear();
-   header_data.lat_array.clear();
-   header_data.lon_array.clear();
-   header_data.elv_array.clear();
+   clear_header_data(&header_data);
 
    return;
 }
