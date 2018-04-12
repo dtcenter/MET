@@ -98,7 +98,7 @@ cout << "\n";
 
 pos = lseek(fd, 0, SEEK_CUR);
 
-cout << "\n  File position = " << comma_string(pos) << "\n\n";
+// cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
    //
    //  subrecords
@@ -112,7 +112,7 @@ cout << "\n";
 
 pos = lseek(fd, 0, SEEK_CUR);
 
-cout << "\n  File position = " << comma_string(pos) << "\n\n";
+// cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
    //
    //  records
@@ -128,7 +128,7 @@ if ( lseek(fd, h.pos_first_record, SEEK_SET) < 0 )  {
 
 pos = lseek(fd, 0, SEEK_CUR);
 
-cout << "\n  File position = " << comma_string(pos) << "\n\n";
+// cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
 
 for (j=0; j<(h.n_records); ++j)  {
@@ -149,7 +149,9 @@ for (j=0; j<(h.n_records); ++j)  {
 
    cout << "Record " << j << " ...\n";
 
-   cout << ((char *) buf) << "\n";
+   // cout << ((char *) buf) << "\n";
+
+   dump_record(cout, 1, buf, h);
 
 }   //  for j
 
