@@ -37,6 +37,7 @@ using namespace std;
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include "gen_vx_mask.h"
@@ -49,10 +50,21 @@ using namespace std;
 #include "vx_nc_util.h"
 #include "data2d_nc_met.h"
 #include "solar.h"
+#include "shp_file.h"
+
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+
+static void get_shapefile_outline(ShpPolygonRecord & shape);
+
+
+////////////////////////////////////////////////////////////////////////
+
+int main(int argc, char *argv[])
+
+{
+
    static DataPlane dp_data, dp_mask, dp_out;
 
    // Set handler to be called for memory allocation error
@@ -117,7 +129,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_name,         "-name",         1);
    cline.add(set_logfile,      "-log",          1);
    cline.add(set_verbosity,    "-v",            1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_compress,     "-compress",     1);
+   cline.add(set_shapeno,      "-shapeno",      1);
 
    cline.allow_numbers();
 
@@ -197,11 +210,14 @@ void process_mask_file(DataPlane &dp)
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
+   ShpPolygonRecord shape;
 
-   // Initialize
+      // Initialize
+
    solar_ut = (unixtime) 0;
 
-   // Process the mask file as a lat/lon polyline file
+      // Process the mask file as a lat/lon polyline file
+
    if(mask_type == MaskType_Poly   ||
       mask_type == MaskType_Box    ||
       mask_type == MaskType_Circle ||
@@ -213,6 +229,21 @@ void process_mask_file(DataPlane &dp)
       mlog << Debug(2)
            << "Parsed Lat/Lon Mask File:\t" << poly_mask.name()
            << " containing " << poly_mask.n_points() << " points\n";
+   }
+
+      //
+      //  process the mask from a shapefile
+      //
+
+   else if ( mask_type == MaskType_Shape )  {
+
+      mlog << Error
+           << program_name << ": -> shapefile masking not yet implemented\n\n";
+
+      exit ( 1 );
+
+      get_shapefile_outline(shape);
+
    }
 
    // For solar masking, check for a date/time string
@@ -263,9 +294,13 @@ void process_mask_file(DataPlane &dp)
               << "Mask Grid -> " << grid_mask.serialize() << "\n\n";
          exit(1);
       }
-   }
+
+   }  //  else
+
+
 
    // For solar masking, parse the valid time from gridded data
+
    if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
 
       if(mask_field_str.length() == 0) {
@@ -282,9 +317,11 @@ void process_mask_file(DataPlane &dp)
       mlog << Debug(2)
            << "Solar File Time:\t"
            << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
-   }
+
+   }   //  if
 
    // Read mask_field for data masking
+
    if(mask_type == MaskType_Data) {
 
       if(mask_field_str.length() == 0) {
@@ -294,10 +331,11 @@ void process_mask_file(DataPlane &dp)
          exit(1);
       }
       get_data_plane(mtddf_ptr, mask_field_str, dp);
-   }
-   // Otherwise, initialize the masking data
-   else {
+
+   } else { // Otherwise, initialize the masking data
+
       dp.set_size(grid.nx(), grid.ny());
+
    }
 
    // Construct the mask
@@ -1127,6 +1165,7 @@ MaskType string_to_masktype(const char *s) {
    else if(strcasecmp(s, "solar_azi") == 0) t = MaskType_Solar_Azi;
    else if(strcasecmp(s, "lat")       == 0) t = MaskType_Lat;
    else if(strcasecmp(s, "lon")       == 0) t = MaskType_Lon;
+   else if(strcasecmp(s, "shape")     == 0) t = MaskType_Shape;
    else {
       mlog << Error << "\nstring_to_masktype() -> "
            << "unsupported masking type \"" << s << "\"\n\n";
@@ -1192,12 +1231,13 @@ void usage() {
         << "\t\t   For \"grid\" and \"data\" masking, specify a gridded data file.\n"
         << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, specify a gridded data file or a timestring in YYYYMMDD[_HH[MMSS]] format.\n"
         << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" needed, simply repeat the path for \"input_file\".\n"
+        << "\t\t   For \"shape\" masking, specify a shapefile (suffix \".shp\").\n"
 
         << "\t\t\"out_file\" is the output NetCDF mask file to be written (required).\n"
 
         << "\t\t\"-type string\" overrides the default masking type ("
         << masktype_to_string(default_mask_type) << ") (optional):\n"
-        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"lat\", or \"lon\"\n"
+        << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" or \"shape\"\n"
 
         << "\t\t\"-input_field string\" reads existing mask data from \"input_file\" (optional).\n"
 
@@ -1331,5 +1371,95 @@ void set_verbosity(const StringArray & a) {
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0]);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void set_shapeno(const StringArray & a)
+
+{
+
+shape_number = atoi(a[0]);
+
+if ( shape_number < 0 )  {
+
+   mlog << Error
+        << program_name << ": bad shapeno ... " << shape_number << "\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void get_shapefile_outline(ShpPolygonRecord & shape)
+
+{
+
+
+int fd = -1;
+int bytes, n_read;
+int recnum;
+const char * const shape_filename = mask_filename;
+unsigned char buf [shp_header_bytes + 10];   //  call me paranoid ...
+ShpFileHeader h;
+
+
+   //
+   //  open shapefile
+   //
+
+if ( (fd = ::open(shape_filename, O_RDONLY)) < 0 )  {
+
+   mlog << Error
+        << program_name << ": unable to open shape file \""
+        << shape_filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  read header
+   //
+
+bytes = shp_header_bytes;
+
+if ( (n_read = read(fd, buf, bytes)) != bytes )  {
+
+   mlog << Error
+        << program_name << ": trouble reading header from shape file \""
+        << shape_filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+h.set(buf);
+
+   //
+   //  loop through the records
+   //
+
+recnum = 0;
+
+// while ( (n_read = read(fd, 
+
+
+   //
+   //  done
+   //
+
+::close(fd);  fd = -1;
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
