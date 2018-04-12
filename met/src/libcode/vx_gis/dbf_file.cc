@@ -1,3 +1,4 @@
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -5,7 +6,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -178,40 +178,57 @@ void DbfHeader::dump(ostream & out, int depth) const
 
 {
 
-Indent prefix(depth);
+Indent p0(depth);
+Indent p1(depth + 1);
 int j, pos;
 int m, d, y;
 
+   //
+   //  header
+   //
+
+out << p0 << "Header ...\n";
+
+out << p1 << "type             = " << type             << '\n';
 
 mjd_to_date(last_update_mjd, m, d, y);
 
-out << prefix << "last_update_mjd  = " << last_update_mjd << "   ("
-              << short_month_name[m] << ' ' << d << ", " << y << ")\n";
+out << p1 << "last_update_mjd  = " << last_update_mjd << "   ("
+          << short_month_name[m] << ' ' << d << ", " << y << ")\n";
 
-out << prefix << "n_records        = " << n_records      << '\n';
-out << prefix << "pos_first_record = " << pos_first_record << '\n';
-out << prefix << "record_length    = " << record_length  << '\n';
-out << prefix << "table_flag       = " << table_flag     << '\n';
-out << prefix << "code_page_mark   = " << code_page_mark << '\n';
-out << prefix << "n_subrecs        = " << n_subrecs      << "   (inferred)\n";
+out << p1 << "n_records        = " << n_records        << '\n';
+out << p1 << "pos_first_record = " << pos_first_record << '\n';
+out << p1 << "record_length    = " << record_length    << '\n';
+out << p1 << "table_flag       = " << table_flag       << '\n';
+out << p1 << "code_page_mark   = " << code_page_mark   << '\n';
+out << p1 << "n_subrecs        = " << n_subrecs        << "   (inferred)\n";
 
 pos = 0;
 
+   //
+   //  subrecords (if any)
+   //
+
 if ( subrec )  {
 
-   out << prefix << "Records ... \n";
+   out << p0 << "\n";
+   out << p0 << "SubRecords ... \n";
 
    for (j=0; j<n_subrecs; ++j)  {
 
       // out << "cumulative length = " << pos << '\n';
 
-      out << prefix << "Record " << j << "\n";
+      out << p1 << "SubRecord " << j << "\n";
 
-      subrec[j].dump(out, depth + 1);
+      subrec[j].dump(out, p1.depth + 1);
 
       pos += subrec[j].field_length;
 
    }
+
+} else {
+
+   out << p0 << "No SubRecords\n";
 
 }
 
@@ -575,6 +592,67 @@ autoinc_step_value = (int) (buf[23]);
 
 
 
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void dump_record(ostream & out, const int depth, const unsigned char * buf, const DbfHeader & h)
+
+{
+
+int j, k;
+int pos, len;
+int max_name_len;
+Indent p0 (depth);
+const char * line = (const char *) buf;
+const DbfSubRecord * s = h.subrec;
+
+max_name_len = 0;
+
+for (j=0; j<(h.n_subrecs); ++j)  {
+
+   len = strlen(s[j].field_name);
+
+   if ( len > max_name_len )  max_name_len = len;
+
+}
+
+pos = 1;   //  skip first byte
+
+for (j=0; j<(h.n_subrecs); ++j)  {
+
+   len = s[j].field_length;
+
+   out << p0 << s[j].field_name;
+
+   for (k=strlen(s[j].field_name); k<max_name_len; ++k)  out << ' ';
+
+   out << " = \"";
+
+   for (k=0; k<len; ++k)  out << line[pos + k];
+
+   out << "\"\n" << flush;
+
+   pos += len;
+
+}   //  for j
 
    //
    //  done
