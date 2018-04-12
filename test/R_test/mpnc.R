@@ -29,6 +29,7 @@ ncfile = nc_open(listArgs[1]);
 # check each variable in the file
 intNumHdrVar = 0;
 intNumArrVar = 0;
+intNum1dVar = 0;
 for(strVarName in names(ncfile$var)){
 	
 	# get the variable values
@@ -61,6 +62,30 @@ for(strVarName in names(ncfile$var)){
 		} else if( verb ){ cat("OK\n"); }
 		intNumArrVar = intNumArrVar + 1;
 	}	
+	else if( strVarName == "hdr_lat" | strVarName == "hdr_lon" |
+             strVarName == "obs_hid" | strVarName == "obs_val"){
+		size = nrow(var);
+		if( size <= sum( 0 == var[!is.na(var)] ) ){
+			if( verb ){ cat("all zeroes\n"); }
+			q(status=1);
+		} else if( size <= sum( is.na(var) ) ){
+			if( verb ){ cat("all NAs\n"); }
+			q(status=1);
+		} else if( verb ){ cat("OK\n"); }
+		intNum1dVar = intNum1dVar + 1;
+	}
+	else if( strVarName == "hdr_elv" |
+             strVarName == "obs_vid" | strVarName == "obs_gc" |
+             strVarName == "obs_lvl" | strVarName == "obs_hgt"){
+		size = nrow(var);
+		if( size <= sum( 0 == var[!is.na(var)] ) ){
+			if( verb ){ cat("all zeroes\n"); }
+		} else if( size <= sum( is.na(var) ) ){
+			if( verb ){ cat("all NAs\n"); }
+		} else if( verb ){ cat("OK\n"); }
+		intNum1dVar = intNum1dVar + 1;
+	}
+    else if( verb ){ cat("ignored\n"); }
 
 }
 
@@ -69,8 +94,8 @@ if( 3 != intNumHdrVar & 4 != intNumHdrVar ){
 	if( verb ){ cat("Unexpected number of header variables (", intNumHdrVar, ")\n"); }
 	q(status=1);
 }
-if( 2 != intNumArrVar ){
-	if( verb ){ cat("Unexpected number of array variables (", intNumArrVar, ")\n"); }
+if( 2 != intNumArrVar & 8 != intNum1dVar){
+	if( verb ){ cat("Unexpected number of array variables (", intNumArrVar, ") or 1D variables (", intNum1dVar, ")\n"); }
 	q(status=1);
 }
 
