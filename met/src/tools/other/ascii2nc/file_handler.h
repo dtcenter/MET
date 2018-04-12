@@ -82,7 +82,7 @@ protected:
   // Variables for writing output NetCDF file
 
   NcFile *_ncFile;
-  NetcdfObsVars obsVars;
+  NetcdfObsVars obs_vars;
 
   long _nhdr;
 
@@ -109,14 +109,6 @@ protected:
   vector< Observation > _observations;
   bool  use_var_id;
   StringArray obs_names;
-
-  char   hdr_typ_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
-  char   hdr_sid_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN_L];
-  char   hdr_vld_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
-  float  hdr_arr_buf[OBS_BUFFER_SIZE][HDR_ARRAY_LEN];
-  float obs_data_buf[OBS_BUFFER_SIZE][OBS_ARRAY_LEN];
-  char  qty_data_buf[OBS_BUFFER_SIZE][HEADER_STR_LEN];
-
   int   deflate_level;
 
   ///////////////////////

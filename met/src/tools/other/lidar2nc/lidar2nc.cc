@@ -340,8 +340,9 @@ const int nhdr_dim_size = n_data;
    //  see how big a buffer we'll need
    //
 
-const int hdr_typ_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
-const int hdr_vld_bytes = nhdr_dim_size*HEADER_STR_LEN_L;
+const int hdr_typ_bytes = nhdr_dim_size*HEADER_STR_LEN2;
+const int hdr_sid_bytes = nhdr_dim_size*HEADER_STR_LEN2;
+const int hdr_vld_bytes = nhdr_dim_size*HEADER_STR_LEN2;
 const int hdr_arr_bytes = nhdr_dim_size*HDR_ARRAY_LEN*sizeof(float);
 
 int buf_size      = hdr_typ_bytes;
@@ -374,16 +375,16 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    int typ_len = strl_len;
    int sid_len = strl_len;
    int vld_len = strl_len;
-   if (!IS_INVALID_NC(obsVars.strll_dim)) {
+   if (!IS_INVALID_NC(obsVars.strl2_dim)) {
       NcDim str_dim;
-      string dim_name = GET_NC_NAME(obsVars.strll_dim);
-      int strll_len = get_dim_size(&obsVars.strll_dim);
+      string dim_name = GET_NC_NAME(obsVars.strl2_dim);
+      int strl2_len = get_dim_size(&obsVars.strl2_dim);
       str_dim = get_nc_dim(&obsVars.hdr_typ_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) typ_len = strll_len;
+      if (!IS_INVALID_NC(str_dim)) typ_len = strl2_len;
       str_dim = get_nc_dim(&obsVars.hdr_sid_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) sid_len = strll_len;
+      if (!IS_INVALID_NC(str_dim)) sid_len = strl2_len;
       str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) vld_len = strll_len;
+      if (!IS_INVALID_NC(str_dim)) vld_len = strl2_len;
    }
    
    //

@@ -28,7 +28,8 @@ using namespace std;
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
 
-extern struct NcDataBuffer nc_data_buffer;
+extern struct NcDataBuffer nc_data_buffer;  // at write_netcdf.cc
+extern struct NcHeaderData hdr_data;        // at write_netcdf.cc
 
 const float FileHandler::FILL_VALUE = -9999.f;
 
@@ -306,11 +307,11 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    //
    // Define the NetCDF dimensions and variables
    //
-   init_nc_dims_vars (obsVars, use_var_id);
-   obsVars.attr_agl   = true;
+   init_nc_dims_vars (obs_vars, use_var_id);
+   obs_vars.attr_agl   = true;
 
-   create_nc_hdr_vars(obsVars, _ncFile, _nhdr, deflate_level);
-   create_nc_obs_vars(obsVars, _ncFile, deflate_level, use_var_id);
+   create_nc_hdr_vars(obs_vars, _ncFile, _nhdr, deflate_level);
+   create_nc_obs_vars(obs_vars, _ncFile, deflate_level, use_var_id);
 
    //
    // Add global attributes
@@ -337,7 +338,7 @@ bool FileHandler::_writeHdrInfo(const ConcatString &hdr_typ,
    // Increment header count before writing
    //
    _hdrNum++;
-   write_nc_header(obsVars, hdr_typ, hdr_sid, hdr_vld, lat, lon, elv);
+   write_nc_header(obs_vars, hdr_typ, hdr_sid, hdr_vld, lat, lon, elv);
 
    return true;
 }
@@ -364,7 +365,7 @@ bool FileHandler::_writeObsInfo(int gc, float prs, float hgt, float obs,
    obs_arr[4] = obs;   // Observation value
    
    obs_qty = (qty.length() == 0 ? na_str : qty.text());
-   write_nc_observation(obsVars, nc_data_buffer, obs_arr, obs_qty.text());
+   write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
    
    return true;
 }
@@ -439,7 +440,14 @@ bool FileHandler::_writeObservations()
   double prev_elevation = bad_data_double;
 
   if (do_summary) {
-     write_nc_observations(obsVars, summary_obs.getSummaries());
+    write_nc_observations(obs_vars, summary_obs.getSummaries());
+    if (IS_INVALID_NC(obs_vars.hdr_arr_var) || IS_INVALID_NC(obs_vars.hdr_lat_var)) {
+      create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data);
+      write_nc_headers(obs_vars);
+    }
+    else {
+      write_nc_header(obs_vars);
+    }
   }
   else {
     _observations = summary_obs.getObservations();
@@ -480,10 +488,13 @@ bool FileHandler::_writeObservations()
       
     } /* endfor - obs */
     
-    write_nc_observation(obsVars, nc_data_buffer);
-    write_nc_header(obsVars);
-  }
+    write_nc_observation(obs_vars, nc_data_buffer);
 
+    int var_count = 0;
+    int unit_count = 0;
+    create_nc_other_vars (obs_vars, _ncFile, nc_data_buffer, hdr_data, var_count, unit_count, deflate_level);
+    write_nc_header(obs_vars);
+  }
   return true;
 }
 

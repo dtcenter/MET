@@ -30,6 +30,16 @@ static const char  units_att_name         [] = "units";
 static const char  missing_value_att_name [] = "missing_value";
 static const char  fill_value_att_name    [] = "_FillValue";
 
+
+int  hdr_typ_idx_block[NC_BUFFER_SIZE_32K];
+int  hdr_sid_idx_block[NC_BUFFER_SIZE_32K];
+int  hdr_vld_idx_block[NC_BUFFER_SIZE_32K];
+float hdr_lat_block[NC_BUFFER_SIZE_32K];
+float hdr_lon_block[NC_BUFFER_SIZE_32K];
+float hdr_elv_block[NC_BUFFER_SIZE_32K];
+
+float hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
+
 ////////////////////////////////////////////////////////////////////////
 
 void replace_comma_to_underscore(string *var_name) {
@@ -44,6 +54,47 @@ void replace_comma_to_underscore(string *var_name) {
       var_name->replace(offset, 1, "all");
       offset = var_name->find('*', offset);
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int check_nc_dims_vars(const NetcdfObsVars obs_vars) {
+   int exit_code = exit_code_no_error;
+   if(IS_INVALID_NC(obs_vars.strl_dim) ||
+      IS_INVALID_NC(obs_vars.obs_dim)  ||
+      IS_INVALID_NC(obs_vars.hdr_dim)) {
+      exit_code = exit_code_no_dim;
+   }
+   else if(IS_INVALID_NC(obs_vars.hdr_typ_var) ||
+      IS_INVALID_NC(obs_vars.hdr_sid_var) ||
+      IS_INVALID_NC(obs_vars.hdr_vld_var)) {
+      exit_code = exit_code_no_hdr_vars;
+   }
+   else if((IS_INVALID_NC(obs_vars.obs_arr_var) && IS_INVALID_NC(obs_vars.obs_val_var))) {
+      exit_code = exit_code_no_obs_vars;
+   }
+   else if((IS_INVALID_NC(obs_vars.hdr_arr_var) && IS_INVALID_NC(obs_vars.hdr_lat_var))) {
+      exit_code = exit_code_no_loc_vars;
+   }
+
+   return exit_code;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void clear_header_data(NcHeaderData *header_data) {
+   header_data->typ_array.clear();
+   header_data->sid_array.clear();
+   header_data->vld_array.clear();
+   header_data->typ_idx_array.clear();
+   header_data->sid_idx_array.clear();
+   header_data->vld_idx_array.clear();
+   header_data->lat_array.clear();
+   header_data->lon_array.clear();
+   header_data->elv_array.clear();
+   header_data->prpt_typ_array.clear();
+   header_data->irpt_typ_array.clear();
+   header_data->inst_typ_array.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -517,7 +568,6 @@ bool get_global_att(const char *nc_name, const ConcatString &att_name,
 bool get_global_att(const char *nc_name, const ConcatString &att_name,
                     bool &att_val) {
    bool status = false;
-   ConcatString att_value;
 
    // Initialize
    NcFile *nc = open_ncfile(nc_name);
@@ -692,6 +742,27 @@ bool get_global_att_double(const NcFile *nc, const ConcatString &att_name,
    }
 
    return(status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_version_no(const NcFile *nc) {
+   int version_no = 0;
+   float att_version_no;
+   bool status = get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
+   version_no = (int)(att_version_no * 100);
+   //cout << "    att_version_no: " << att_version_no << "  version_no: " << version_no << endl;
+   return version_no;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_version_less_than_1_02(const NcFile *nc) {
+   int version_no = get_version_no(nc);
+   float att_version_no;
+   bool status = get_global_att(nc, (const char *)nc_att_obs_version, att_version_no);
+   version_no = (int)(att_version_no * 100);
+   return (version_no < 102);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1106,24 +1177,17 @@ bool get_nc_data(NcVar *var, int *data, const long *dim, const long *cur) {
       std::vector<size_t> start;
       std::vector<size_t> count;
 
+      int data_size = 1;
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
          start.push_back((size_t)cur[idx]);
          count.push_back((size_t)dim[idx]);
+         data_size *= dim[idx];
       }
 
-      int x_dim_index = (dimC < 2) ? 0 : dimC-2;
-      for (int idx1=0; idx1<dim[x_dim_index]; idx1++) {
-         if (dimC >= 2) {
-           for (int idx2=0; idx2<dim[dimC-1]; idx2++) {
-              data[(idx1*dim[dimC-1])+idx2] = bad_data_float;
-           }
-         }
-         else{
-            data[idx1] = bad_data_int;
-         }
+      for (int idx1=0; idx1<data_size; idx1++) {
+         data[idx1] = bad_data_char;
       }
-
 
       //
       // Retrieve the float value from the NetCDF variable.
@@ -1170,22 +1234,16 @@ bool get_nc_data(NcVar *var, short *data, const long *dim, const long *cur) {
       std::vector<size_t> start;
       std::vector<size_t> count;
 
+      int data_size = 1;
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
          start.push_back((size_t)cur[idx]);
          count.push_back((size_t)dim[idx]);
+         data_size *= dim[idx];
       }
 
-      int x_dim_index = (dimC < 2) ? 0 : dimC-2;
-      for (int idx1=0; idx1<dim[x_dim_index]; idx1++) {
-         if (dimC >= 2) {
-            for (int idx2=0; idx2<dim[dimC-1]; idx2++) {
-               data[(idx1*dim[dimC-1])+idx2] = bad_data_int;
-            }
-         }
-         else{
-            data[idx1] = bad_data_int;
-         }
+      for (int idx1=0; idx1<data_size; idx1++) {
+         data[idx1] = bad_data_char;
       }
 
       //
@@ -1261,22 +1319,16 @@ bool get_nc_data(NcVar *var, float *data, const long *dim, const long *cur) {
       std::vector<size_t> start;
       std::vector<size_t> count;
 
+      int data_size = 1;
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
          start.push_back((size_t)cur[idx]);
          count.push_back((size_t)dim[idx]);
+         data_size *= dim[idx];
       }
 
-      int x_dim_index = (dimC < 2) ? 0 : dimC-2;
-      for (int idx1=0; idx1<dim[x_dim_index]; idx1++) {
-         if (dimC >= 2) {
-           for (int idx2=0; idx2<dim[dimC-1]; idx2++) {
-              data[(idx1*dim[dimC-1])+idx2] = bad_data_float;
-           }
-         }
-         else{
-            data[idx1] = bad_data_double;
-         }
+      for (int idx1=0; idx1<data_size; idx1++) {
+         data[idx1] = bad_data_char;
       }
 
       //
@@ -1402,22 +1454,16 @@ bool get_nc_data(NcVar *var, double *data, const long *dim, const long *cur) {
       std::vector<size_t> start;
       std::vector<size_t> count;
 
+      int data_size = 1;
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
          start.push_back((size_t)cur[idx]);
          count.push_back((size_t)dim[idx]);
+         data_size *= dim[idx];
       }
 
-      int x_dim_index = (dimC < 2) ? 0 : dimC-2;
-      for (int idx1=0; idx1<dim[x_dim_index]; idx1++) {
-         if (cur[1] > 0) {
-           for (int idx2=0; idx2<dim[dimC-1]; idx2++) {
-              data[(idx1*dim[dimC-1])+idx2] = bad_data_double;
-           }
-         }
-         else{
-            data[idx1] = bad_data_double;
-         }
+      for (int idx1=0; idx1<data_size; idx1++) {
+         data[idx1] = bad_data_char;
       }
 
       //
@@ -1491,22 +1537,16 @@ bool get_nc_data(NcVar *var, char *data, const long *dim, const long *cur) {
       std::vector<size_t> start;
       std::vector<size_t> count;
 
+      int data_size = 1;
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
          start.push_back((size_t)cur[idx]);
          count.push_back((size_t)dim[idx]);
+         data_size *= dim[idx];
       }
 
-      int x_dim_index = (dimC < 2) ? 0 : dimC-2;
-      for (int idx1=0; idx1<dim[x_dim_index]; idx1++) {
-         if (dimC >= 2) {
-           for (int idx2=0; idx2<dim[dimC-1]; idx2++) {
-              data[(idx1*dim[dimC-1])+idx2] = bad_data_char;
-           }
-         }
-         else{
-            data[idx1] = bad_data_char;
-         }
+      for (int idx1=0; idx1<data_size; idx1++) {
+         data[idx1] = bad_data_char;
       }
 
       //
@@ -1563,22 +1603,16 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long *dim, const long *cur) {
       std::vector<size_t> start;
       std::vector<size_t> count;
 
+      int data_size = 1;
       const int dimC = get_dim_count(var);
       for (int idx = 0 ; idx < dimC; idx++) {
          start.push_back((size_t)cur[idx]);
          count.push_back((size_t)dim[idx]);
+         data_size *= dim[idx];
       }
 
-      int x_dim_index = (dimC < 2) ? 0 : dimC-2;
-      for (int idx1=0; idx1<dim[x_dim_index]; idx1++) {
-         if (dimC >= 2) {
-           for (int idx2=0; idx2<dim[dimC-1]; idx2++) {
-              data[(idx1*dim[dimC-1])+idx2] = bad_data_char;
-           }
-         }
-         else{
-            data[idx1] = bad_data_char;
-         }
+      for (int idx1=0; idx1<data_size; idx1++) {
+         data[idx1] = bad_data_char;
       }
 
       //
@@ -1592,35 +1626,64 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long *dim, const long *cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcHeaderData get_nc_hdr_data(NetcdfObsVars obsVars) {
+NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    NcHeaderData header_data;
-   long nhdr_count  = get_dim_size(&obsVars.hdr_dim);
-   int  hdr_arr_len = get_dim_size(&obsVars.hdr_arr_dim);
-   int  strl_len    = get_dim_size(&obsVars.strl_dim);
-   int  strll_len   = strl_len;
+   long nhdr_count  = get_dim_size(&obs_vars.hdr_dim);
+   int  strl_len    = get_dim_size(&obs_vars.strl_dim);
+   int  strl2_len   = strl_len;
    int  typ_len = strl_len;
    int  sid_len = strl_len;
    int  vld_len = strl_len;
-   if (!IS_INVALID_NC(obsVars.strll_dim)) {
-      strll_len = get_dim_size(&obsVars.strll_dim);
+   int  hdr_arr_len = !IS_INVALID_NC(obs_vars.hdr_arr_dim)
+         ? get_dim_size(&obs_vars.hdr_arr_dim) : -1;
+   bool use_hdr_arr = !IS_INVALID_NC(obs_vars.hdr_arr_dim);
+   if (!IS_INVALID_NC(obs_vars.strl2_dim)) {
       NcDim str_dim;
-      string dim_name = GET_NC_NAME(obsVars.strll_dim);
-      str_dim = get_nc_dim(&obsVars.hdr_typ_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) typ_len = strll_len;
-      str_dim = get_nc_dim(&obsVars.hdr_sid_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) sid_len = strll_len;
-      str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) vld_len = strll_len;
+      strl2_len = get_dim_size(&obs_vars.strl2_dim);
+      string dim_name = GET_NC_NAME(obs_vars.strl2_dim);
+      if (!IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
+         str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)
+               ? &obs_vars.hdr_typ_var : &obs_vars.hdr_typ_tbl_var), dim_name);
+         if (!IS_INVALID_NC(str_dim)) typ_len = strl2_len;
+      }
+      if (!IS_INVALID_NC(obs_vars.hdr_sid_tbl_var)) {
+         str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)
+               ? &obs_vars.hdr_sid_var : &obs_vars.hdr_sid_tbl_var), dim_name);
+         if (!IS_INVALID_NC(str_dim)) sid_len = strl2_len;
+      }
+      if (!IS_INVALID_NC(obs_vars.hdr_vld_tbl_var)) {
+         str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_vld_tbl_var)
+               ? &obs_vars.hdr_vld_var : &obs_vars.hdr_vld_tbl_var), dim_name);
+         if (!IS_INVALID_NC(str_dim)) vld_len = strl2_len;
+      }
    }
    
    header_data.typ_len   = typ_len;
    header_data.sid_len   = sid_len;
    header_data.vld_len   = vld_len;
    header_data.strl_len  = strl_len;
-   header_data.strll_len = strll_len;
-   header_data.typ_array.extend(nhdr_count);
-   header_data.sid_array.extend(nhdr_count);
-   header_data.vld_array.extend(nhdr_count);
+   header_data.strll_len = strl2_len;
+   if (IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
+      header_data.typ_array.extend(nhdr_count);
+      header_data.sid_array.extend(nhdr_count);
+      header_data.vld_array.extend(nhdr_count);
+   }
+   else {
+      header_data.typ_idx_array.extend(nhdr_count);
+      header_data.sid_idx_array.extend(nhdr_count);
+      header_data.vld_idx_array.extend(nhdr_count);
+
+      int tmp_dim_size;
+      tmp_dim_size = get_dim_size(&obs_vars.hdr_typ_dim);
+      header_data.typ_array.extend(tmp_dim_size);
+      tmp_dim_size = get_dim_size(&obs_vars.hdr_sid_dim);
+      header_data.sid_array.extend(tmp_dim_size);
+      tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
+      header_data.vld_array.extend(tmp_dim_size);
+      mlog << Debug(7) << "    tbl dims: messge_type" << get_dim_size(&obs_vars.hdr_typ_dim)
+           << "  station id: " << get_dim_size(&obs_vars.hdr_sid_dim)
+           << "  valid_time: " << get_dim_size(&obs_vars.hdr_vld_dim) << "\n";
+   }
    header_data.lat_array.extend(nhdr_count);
    header_data.lon_array.extend(nhdr_count);
    header_data.elv_array.extend(nhdr_count);
@@ -1631,72 +1694,219 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obsVars) {
    //
    // Allocate space to store the data
    //
-   char  hdr_typ_block[buf_size][typ_len];
-   char  hdr_sid_block[buf_size][sid_len];
-   char  hdr_vld_block[buf_size][vld_len];
-   float hdr_arr_block[buf_size][hdr_arr_len];
+   char hdr_typ_str[typ_len+1];
+   char hdr_sid_str[sid_len+1];
+   char hdr_vld_str[vld_len+1];
+   
+   char hdr_typ_block[buf_size][typ_len];
+   char hdr_sid_block[buf_size][sid_len];
+   char hdr_vld_block[buf_size][vld_len];
+   //float hdr_arr_block[buf_size][hdr_arr_len];
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
+   long offsets_1D[1] = { 0 };
+   long lengths_1D[1] = { 1 };
    
-   lengths[0] = buf_size;
-   lengths[1] = strl_len;
-
+   //lengths[0] = buf_size;
+   //lengths[1] = strl_len;
    for(int i_start=0; i_start<nhdr_count; i_start+=buf_size) {
       buf_size = ((nhdr_count-i_start) > NC_BUFFER_SIZE_32K)
             ? NC_BUFFER_SIZE_32K : (nhdr_count-i_start);
       
       offsets[0] = i_start;
       lengths[0] = buf_size;
+      offsets_1D[0] = i_start;
+      lengths_1D[0] = buf_size;
    
       //
       // Get the corresponding header message type
       //
-      lengths[1] = typ_len;
-      if(!get_nc_data(&obsVars.hdr_typ_var, (char *)&hdr_typ_block[0], lengths, offsets)) {
-         mlog << Error << "\nget_nc_header() -> "
-              << "trouble getting hdr_typ\n\n";
-         exit(1);
-      }
+      if (IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
+         lengths[1] = typ_len;
+         if(!get_nc_data(&obs_vars.hdr_typ_var,
+               (char *)&hdr_typ_block[0], lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_typ\n\n";
+            exit(1);
+         }
       
-      //
-      // Get the corresponding header station id
-      //
-      lengths[1] = sid_len;
-      if(!get_nc_data(&obsVars.hdr_sid_var, (char *)&hdr_sid_block[0], lengths, offsets)) {
-         mlog << Error << "\nget_nc_header() -> "
-              << "trouble getting hdr_sid\n\n";
-         exit(1);
+         //
+         // Get the corresponding header station id
+         //
+         lengths[1] = sid_len;
+         if(!get_nc_data(&obs_vars.hdr_sid_var,
+               (char *)&hdr_sid_block[0], lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_sid\n\n";
+            exit(1);
+         }
+         
+         //
+         // Get the corresponding header valid time
+         //
+         lengths[1] = vld_len;
+         if(!get_nc_data(&obs_vars.hdr_vld_var,
+               (char *)&hdr_vld_block[0], lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_vld\n\n";
+            exit(1);
+         }
+         
+         //
+         // Get the header for this observation
+         //
+         lengths[1] = hdr_arr_len;
+         if(!get_nc_data(&obs_vars.hdr_arr_var,
+               (float *)&hdr_arr_block[0], lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_arr\n\n";
+            exit(1);
+         }
+         for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+            header_data.typ_array.add(hdr_typ_block[hIndex]);
+            header_data.sid_array.add(hdr_sid_block[hIndex]);
+            header_data.vld_array.add(hdr_vld_block[hIndex]);
+            header_data.lat_array.add(hdr_arr_block[hIndex][0]);
+            header_data.lon_array.add(hdr_arr_block[hIndex][1]);
+            header_data.elv_array.add(hdr_arr_block[hIndex][2]);
+         }
       }
+      else {
+         if(!get_nc_data(&obs_vars.hdr_typ_var,
+               hdr_typ_idx_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_typ\n\n";
+            exit(1);
+         }
       
-      //
-      // Get the corresponding header valid time
-      //
-      lengths[1] = vld_len;
-      if(!get_nc_data(&obsVars.hdr_vld_var, (char *)&hdr_vld_block[0], lengths, offsets)) {
-         mlog << Error << "\nget_nc_header() -> "
-              << "trouble getting hdr_vld\n\n";
-         exit(1);
-      }
-
-      //
-      // Get the header for this observation
-      //
-      lengths[1] = hdr_arr_len;
-      if(!get_nc_data(&obsVars.hdr_arr_var, (float *)&hdr_arr_block[0], lengths, offsets)) {
-         mlog << Error << "\nget_nc_header() -> "
-              << "trouble getting hdr_arr\n\n";
-         exit(1);
-      }
-      for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-         header_data.typ_array.add(hdr_typ_block[hIndex]);
-         header_data.sid_array.add(hdr_sid_block[hIndex]);
-         header_data.vld_array.add(hdr_vld_block[hIndex]);
-         header_data.lat_array.add(hdr_arr_block[hIndex][0]);
-         header_data.lon_array.add(hdr_arr_block[hIndex][1]);
-         header_data.elv_array.add(hdr_arr_block[hIndex][2]);
+         //
+         // Get the corresponding header station id
+         //
+         if(!get_nc_data(&obs_vars.hdr_sid_var,
+               hdr_sid_idx_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_sid\n\n";
+            exit(1);
+         }
+         
+         //
+         // Get the corresponding header valid time
+         //
+         if(!get_nc_data(&obs_vars.hdr_vld_var,
+               hdr_vld_idx_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_vld\n\n";
+            exit(1);
+         }
+         
+         //
+         // Get the header for this observation
+         //
+         if(!get_nc_data(&obs_vars.hdr_lat_var,
+               hdr_lat_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_lat\n\n";
+            exit(1);
+         }
+         if(!get_nc_data(&obs_vars.hdr_lon_var,
+               hdr_lon_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_lon\n\n";
+            exit(1);
+         }
+         if(!get_nc_data(&obs_vars.hdr_elv_var,
+               hdr_elv_block, lengths_1D, offsets_1D)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_elv\n\n";
+            exit(1);
+         }
+         for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+            header_data.typ_idx_array.add(hdr_typ_idx_block[hIndex]);
+            header_data.sid_idx_array.add(hdr_sid_idx_block[hIndex]);
+            header_data.vld_idx_array.add(hdr_vld_idx_block[hIndex]);
+            header_data.lat_array.add(hdr_lat_block[hIndex]);
+            header_data.lon_array.add(hdr_lon_block[hIndex]);
+            header_data.elv_array.add(hdr_elv_block[hIndex]);
+         }
       }
    }
+   
+   if (!IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
+      int tmp_dim_size;
+      tmp_dim_size = get_dim_size(&obs_vars.hdr_typ_dim);
+      buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
+           ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
+      for(int i_start=0; i_start<tmp_dim_size; i_start+=buf_size) {
+         buf_size = ((tmp_dim_size-i_start) > NC_BUFFER_SIZE_32K)
+               ? NC_BUFFER_SIZE_32K : (tmp_dim_size-i_start);
+         offsets[0] = i_start;
+         lengths[0] = buf_size;
+      
+         //
+         // Get the corresponding header message type
+         //
+         lengths[1] = typ_len;
+         if(!get_nc_data(&obs_vars.hdr_typ_tbl_var,
+               (char *)&hdr_typ_block[0], lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_typ\n\n";
+            exit(1);
+         }
+         for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+            header_data.typ_array.add(hdr_typ_block[hIndex]);
+         }
+      }
+      
+      tmp_dim_size = get_dim_size(&obs_vars.hdr_sid_dim);
+      buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
+           ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
+      for(int i_start=0; i_start<tmp_dim_size; i_start+=buf_size) {
+         buf_size = ((tmp_dim_size-i_start) > NC_BUFFER_SIZE_32K)
+               ? NC_BUFFER_SIZE_32K : (tmp_dim_size-i_start);
+         offsets[0] = i_start;
+         lengths[0] = buf_size;
+      
+         //
+         // Get the corresponding header message type
+         //
+         lengths[1] = sid_len;
+         if(!get_nc_data(&obs_vars.hdr_sid_tbl_var,
+               (char *)&hdr_sid_block[0], lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_typ\n\n";
+            exit(1);
+         }
+         for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+            header_data.sid_array.add(hdr_sid_block[hIndex]);
+         }
+      }
+
+      tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
+      int buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
+           ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
+      for(int i_start=0; i_start<tmp_dim_size; i_start+=buf_size) {
+         buf_size = ((tmp_dim_size-i_start) > NC_BUFFER_SIZE_32K)
+               ? NC_BUFFER_SIZE_32K : (tmp_dim_size-i_start);
+         offsets[0] = i_start;
+         lengths[0] = buf_size;
+      
+         //
+         // Get the corresponding header message type
+         //
+         lengths[1] = vld_len;
+         if(!get_nc_data(&obs_vars.hdr_vld_tbl_var,
+               (char *)&hdr_vld_block[0], lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_typ\n\n";
+            exit(1);
+         }
+         for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+            header_data.vld_array.add(hdr_vld_block[hIndex]);
+         }
+      }
+   }
+   
    return header_data;
 }
 
