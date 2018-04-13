@@ -30,17 +30,6 @@ static const char  units_att_name         [] = "units";
 static const char  missing_value_att_name [] = "missing_value";
 static const char  fill_value_att_name    [] = "_FillValue";
 
-
-int  hdr_typ_idx_block[NC_BUFFER_SIZE_32K];
-int  hdr_sid_idx_block[NC_BUFFER_SIZE_32K];
-int  hdr_vld_idx_block[NC_BUFFER_SIZE_32K];
-float hdr_lat_block[NC_BUFFER_SIZE_32K];
-float hdr_lon_block[NC_BUFFER_SIZE_32K];
-float hdr_elv_block[NC_BUFFER_SIZE_32K];
-int   hdr_prpt_typ_block[NC_BUFFER_SIZE_32K];
-int   hdr_irpt_typ_block[NC_BUFFER_SIZE_32K];
-int   hdr_inst_typ_block[NC_BUFFER_SIZE_32K];
-
 float hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
 
 ////////////////////////////////////////////////////////////////////////
@@ -1701,6 +1690,12 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    char hdr_typ_block[buf_size][typ_len];
    char hdr_sid_block[buf_size][sid_len];
    char hdr_vld_block[buf_size][vld_len];
+   int  *hdr_typ_idx_block = new int[buf_size];
+   int  *hdr_sid_idx_block = new int[buf_size];
+   int  *hdr_vld_idx_block = new int[buf_size];
+   float *hdr_lat_block    = new float[buf_size];
+   float *hdr_lon_block    = new float[buf_size];
+   float *hdr_elv_block    = new float[buf_size];
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
@@ -1925,6 +1920,9 @@ void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data) {
    // Read PB report type
    int buf_size = ((pb_hdr_count > NC_BUFFER_SIZE_32K)
          ? NC_BUFFER_SIZE_32K : (pb_hdr_count));
+   int *hdr_prpt_typ_block = new int[buf_size];
+   int *hdr_irpt_typ_block = new int[buf_size];
+   int *hdr_inst_typ_block = new int[buf_size];
    for(int i_start=0; i_start<pb_hdr_count; i_start+=buf_size) {
       buf_size = pb_hdr_count - i_start;
       if (buf_size > NC_BUFFER_SIZE_32K) buf_size = NC_BUFFER_SIZE_32K;
