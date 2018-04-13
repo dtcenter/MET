@@ -670,7 +670,10 @@ void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int defla
    // Define netCDF variables
    obs_vars.obs_qty_var = add_var(f_out, nc_var_obs_qty,   ncInt, obs_vars.obs_dim, deflate_level);
    obs_vars.obs_hid_var = add_var(f_out, nc_var_obs_hid,   ncInt, obs_vars.obs_dim, deflate_level);
-   obs_vars.obs_vid_var = add_var(f_out, nc_var_obs_vid,   ncInt, obs_vars.obs_dim, deflate_level);
+   if (use_var_id)
+      obs_vars.obs_vid_var = add_var(f_out, nc_var_obs_vid,   ncInt, obs_vars.obs_dim, deflate_level);
+   else
+      obs_vars.obs_gc_var = add_var(f_out, nc_var_obs_lvl, ncFloat, obs_vars.obs_dim, deflate_level);
    obs_vars.obs_lvl_var = add_var(f_out, nc_var_obs_lvl, ncFloat, obs_vars.obs_dim, deflate_level);
    obs_vars.obs_hgt_var = add_var(f_out, nc_var_obs_hgt, ncFloat, obs_vars.obs_dim, deflate_level);
    obs_vars.obs_val_var = add_var(f_out, nc_var_obs_val, ncFloat, obs_vars.obs_dim, deflate_level);
@@ -1075,10 +1078,15 @@ void write_nc_obs_buffer(NcDataBuffer &data_buf, const int buf_size)
            << "netCDF file\n\n";
       exit(1);
    }
-   if(!put_nc_data((NcVar *)&obs_vars.obs_vid_var, (int*)data_buf.obs_vid_buf, lengths, offsets)) {
+   bool use_var_id = !IS_INVALID_NC(obs_vars.obs_vid_var);
+   bool result = use_var_id
+         ? put_nc_data((NcVar *)&obs_vars.obs_vid_var, (int*)data_buf.obs_vid_buf, lengths, offsets)
+         : put_nc_data((NcVar *)&obs_vars.obs_gc_var,  (int*)data_buf.obs_vid_buf, lengths, offsets);
+   if(!result) {
       mlog << Error << "\n" << method_name << " -> "
-           << "error writing the observation variable_index/grib_code array to the "
-           << "netCDF file\n\n";
+           << "error writing the observation "
+           << (use_var_id ? "variable_index" : "grib_code")
+           << " array to the netCDF file\n\n";
       exit(1);
    }
    if(!put_nc_data((NcVar *)&obs_vars.obs_lvl_var, (float*)data_buf.obs_lvl_buf, lengths, offsets)) {
