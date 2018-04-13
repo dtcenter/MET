@@ -257,8 +257,8 @@ extern void add_att(NcVar  *, const string, const double);
 
 extern int    get_var_names(NcFile *, StringArray *varNames);
 
-extern bool     get_var_att_float (const NcVar *, const ConcatString &, float  &);
-extern bool     get_var_att_double(const NcVar *, const ConcatString &, double &);
+extern bool   get_var_att_float (const NcVar *, const ConcatString &, float  &);
+extern bool   get_var_att_double(const NcVar *, const ConcatString &, double &);
 
 extern bool   get_var_units(const NcVar *, ConcatString &);
 
@@ -361,7 +361,6 @@ extern NcVar  get_var(NcFile *, const char * var_name);
 
 extern NcVar get_nc_var(NcFile *, const char * var_name);
 
-//extern NcVar has_var(NcFile *, const char * var_name);
 extern bool has_var(NcFile *, const char * var_name);
 //extern int get_var_count(NcFile *);
 
@@ -384,8 +383,6 @@ extern int    get_dim_value(const NcFile *, const string, bool error_out = false
 extern NcDim  get_nc_dim(const NcFile *, string dim_name);
 extern NcDim  get_nc_dim(const NcVar *, string dim_name);
 extern NcDim  get_nc_dim(const NcVar *, int dim_offset);
-//extern bool   get_global_dims(const NcFile *, int *dim_count, NcDim * dimArray[], StringArray *dimNames);
-//extern bool   get_dims(const NcVar *, int *dim_count, NcDim * dimArray[], StringArray *dimNames);
 extern bool   get_dim_names(const NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 //extern multimap<string,NcDim> get_global_dims(const NcFile *nc, int *dim_count);
@@ -393,6 +390,7 @@ extern bool   get_dim_names(const NcFile *nc, StringArray *dimNames);
 extern int check_nc_dims_vars(const NetcdfObsVars obs_vars);
 extern void clear_header_data(NcHeaderData *);
 extern NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars);
+extern void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data);
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);

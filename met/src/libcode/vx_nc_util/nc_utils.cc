@@ -37,6 +37,9 @@ int  hdr_vld_idx_block[NC_BUFFER_SIZE_32K];
 float hdr_lat_block[NC_BUFFER_SIZE_32K];
 float hdr_lon_block[NC_BUFFER_SIZE_32K];
 float hdr_elv_block[NC_BUFFER_SIZE_32K];
+int   hdr_prpt_typ_block[NC_BUFFER_SIZE_32K];
+int   hdr_irpt_typ_block[NC_BUFFER_SIZE_32K];
+int   hdr_inst_typ_block[NC_BUFFER_SIZE_32K];
 
 float hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
 
@@ -1634,28 +1637,25 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    int  typ_len = strl_len;
    int  sid_len = strl_len;
    int  vld_len = strl_len;
-   int  hdr_arr_len = !IS_INVALID_NC(obs_vars.hdr_arr_dim)
-         ? get_dim_size(&obs_vars.hdr_arr_dim) : -1;
-   bool use_hdr_arr = !IS_INVALID_NC(obs_vars.hdr_arr_dim);
+   int  hdr_arr_len = IS_INVALID_NC(obs_vars.hdr_arr_dim)
+         ? 0 : get_dim_size(&obs_vars.hdr_arr_dim);
+   bool has_array_vars = IS_INVALID_NC(obs_vars.hdr_typ_tbl_var);
+
    if (!IS_INVALID_NC(obs_vars.strl2_dim)) {
       NcDim str_dim;
       strl2_len = get_dim_size(&obs_vars.strl2_dim);
       string dim_name = GET_NC_NAME(obs_vars.strl2_dim);
-      if (!IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
-         str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)
-               ? &obs_vars.hdr_typ_var : &obs_vars.hdr_typ_tbl_var), dim_name);
-         if (!IS_INVALID_NC(str_dim)) typ_len = strl2_len;
-      }
-      if (!IS_INVALID_NC(obs_vars.hdr_sid_tbl_var)) {
-         str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)
-               ? &obs_vars.hdr_sid_var : &obs_vars.hdr_sid_tbl_var), dim_name);
-         if (!IS_INVALID_NC(str_dim)) sid_len = strl2_len;
-      }
-      if (!IS_INVALID_NC(obs_vars.hdr_vld_tbl_var)) {
-         str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_vld_tbl_var)
-               ? &obs_vars.hdr_vld_var : &obs_vars.hdr_vld_tbl_var), dim_name);
-         if (!IS_INVALID_NC(str_dim)) vld_len = strl2_len;
-      }
+      str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)
+            ? &obs_vars.hdr_typ_var : &obs_vars.hdr_typ_tbl_var), dim_name);
+      if (!IS_INVALID_NC(str_dim)) typ_len = strl2_len;
+      
+      str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_sid_tbl_var)
+            ? &obs_vars.hdr_sid_var : &obs_vars.hdr_sid_tbl_var), dim_name);
+      if (!IS_INVALID_NC(str_dim)) sid_len = strl2_len;
+      
+      str_dim = get_nc_dim((IS_INVALID_NC(obs_vars.hdr_vld_tbl_var)
+            ? &obs_vars.hdr_vld_var : &obs_vars.hdr_vld_tbl_var), dim_name);
+      if (!IS_INVALID_NC(str_dim)) vld_len = strl2_len;
    }
    
    header_data.typ_len   = typ_len;
@@ -1663,7 +1663,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    header_data.vld_len   = vld_len;
    header_data.strl_len  = strl_len;
    header_data.strll_len = strl2_len;
-   if (IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
+   if (has_array_vars) {
       header_data.typ_array.extend(nhdr_count);
       header_data.sid_array.extend(nhdr_count);
       header_data.vld_array.extend(nhdr_count);
@@ -1680,7 +1680,8 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
       header_data.sid_array.extend(tmp_dim_size);
       tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
       header_data.vld_array.extend(tmp_dim_size);
-      mlog << Debug(7) << "    tbl dims: messge_type" << get_dim_size(&obs_vars.hdr_typ_dim)
+      mlog << Debug(7)
+           << "    tbl dims: messge_type: " << get_dim_size(&obs_vars.hdr_typ_dim)
            << "  station id: " << get_dim_size(&obs_vars.hdr_sid_dim)
            << "  valid_time: " << get_dim_size(&obs_vars.hdr_vld_dim) << "\n";
    }
@@ -1697,11 +1698,9 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
    char hdr_typ_str[typ_len+1];
    char hdr_sid_str[sid_len+1];
    char hdr_vld_str[vld_len+1];
-   
    char hdr_typ_block[buf_size][typ_len];
    char hdr_sid_block[buf_size][sid_len];
    char hdr_vld_block[buf_size][vld_len];
-   //float hdr_arr_block[buf_size][hdr_arr_len];
 
    long offsets[2] = { 0, 0 };
    long lengths[2] = { 1, 1 };
@@ -1722,7 +1721,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
       //
       // Get the corresponding header message type
       //
-      if (IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
+      if (has_array_vars) {
          lengths[1] = typ_len;
          if(!get_nc_data(&obs_vars.hdr_typ_var,
                (char *)&hdr_typ_block[0], lengths, offsets)) {
@@ -1773,6 +1772,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          }
       }
       else {
+         // Get the corresponding header message type (index, not string)
          if(!get_nc_data(&obs_vars.hdr_typ_var,
                hdr_typ_idx_block, lengths_1D, offsets_1D)) {
             mlog << Error << "\nget_nc_header() -> "
@@ -1780,9 +1780,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
             exit(1);
          }
       
-         //
-         // Get the corresponding header station id
-         //
+         // Get the corresponding header station id (index, not string)
          if(!get_nc_data(&obs_vars.hdr_sid_var,
                hdr_sid_idx_block, lengths_1D, offsets_1D)) {
             mlog << Error << "\nget_nc_header() -> "
@@ -1790,9 +1788,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
             exit(1);
          }
          
-         //
-         // Get the corresponding header valid time
-         //
+         // Get the corresponding header valid time (index, not string)
          if(!get_nc_data(&obs_vars.hdr_vld_var,
                hdr_vld_idx_block, lengths_1D, offsets_1D)) {
             mlog << Error << "\nget_nc_header() -> "
@@ -1832,8 +1828,10 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
       }
    }
    
-   if (!IS_INVALID_NC(obs_vars.hdr_typ_tbl_var)) {
+   if (!has_array_vars) {
       int tmp_dim_size;
+      
+      lengths[1] = typ_len;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_typ_dim);
       buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
            ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
@@ -1843,10 +1841,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          offsets[0] = i_start;
          lengths[0] = buf_size;
       
-         //
-         // Get the corresponding header message type
-         //
-         lengths[1] = typ_len;
+         // Get the corresponding header message type (string)
          if(!get_nc_data(&obs_vars.hdr_typ_tbl_var,
                (char *)&hdr_typ_block[0], lengths, offsets)) {
             mlog << Error << "\nget_nc_header() -> "
@@ -1858,6 +1853,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          }
       }
       
+      lengths[1] = sid_len;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_sid_dim);
       buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
            ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
@@ -1867,10 +1863,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          offsets[0] = i_start;
          lengths[0] = buf_size;
       
-         //
-         // Get the corresponding header message type
-         //
-         lengths[1] = sid_len;
+         // Get the corresponding header station id (string)
          if(!get_nc_data(&obs_vars.hdr_sid_tbl_var,
                (char *)&hdr_sid_block[0], lengths, offsets)) {
             mlog << Error << "\nget_nc_header() -> "
@@ -1882,6 +1875,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          }
       }
 
+      lengths[1] = vld_len;
       tmp_dim_size = get_dim_size(&obs_vars.hdr_vld_dim);
       int buf_size = ((tmp_dim_size > NC_BUFFER_SIZE_32K)
            ? NC_BUFFER_SIZE_32K : (tmp_dim_size));
@@ -1891,10 +1885,7 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          offsets[0] = i_start;
          lengths[0] = buf_size;
       
-         //
-         // Get the corresponding header message type
-         //
-         lengths[1] = vld_len;
+         // Get the corresponding header valid time (string)
          if(!get_nc_data(&obs_vars.hdr_vld_tbl_var,
                (char *)&hdr_vld_block[0], lengths, offsets)) {
             mlog << Error << "\nget_nc_header() -> "
@@ -1906,8 +1897,76 @@ NcHeaderData get_nc_hdr_data(NetcdfObsVars obs_vars) {
          }
       }
    }
-   
+   if (!IS_INVALID_NC(obs_vars.pb_hdr_dim)) {
+      get_nc_pb_hdr_data(obs_vars, &header_data);
+      int last_prpt_typ = header_data.prpt_typ_array.n_elements() - 1;
+      int last_irpt_typ = header_data.irpt_typ_array.n_elements() - 1; 
+      int last_inst_typ = header_data.inst_typ_array.n_elements() - 1; 
+      mlog << Debug(10)
+           << "    prpt_typ[0,-1] " << header_data.prpt_typ_array[0]
+           << "," << header_data.prpt_typ_array[last_prpt_typ]
+           << "    irpt_typ[0,-1] " << header_data.irpt_typ_array[0]
+           << "," << header_data.irpt_typ_array[last_irpt_typ]
+           << "    inst_typ[0,-1] " << header_data.inst_typ_array[0]
+           << "," << header_data.inst_typ_array[last_inst_typ] << "\n";
+   }
    return header_data;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data) {
+
+   long offsets[1] = { 0 };
+   long lengths[1] = { 1 };
+   int pb_hdr_count = get_dim_size(&obs_vars.pb_hdr_dim);
+   
+   // Read PB report type
+   int buf_size = ((pb_hdr_count > NC_BUFFER_SIZE_32K)
+         ? NC_BUFFER_SIZE_32K : (pb_hdr_count));
+   for(int i_start=0; i_start<pb_hdr_count; i_start+=buf_size) {
+      buf_size = pb_hdr_count - i_start;
+      if (buf_size > NC_BUFFER_SIZE_32K) buf_size = NC_BUFFER_SIZE_32K;
+      offsets[0] = i_start;
+      lengths[0] = buf_size;
+      
+      if (!IS_INVALID_NC(obs_vars.hdr_prpt_typ_var)) {
+         // Get the corresponding header PB message type (string)
+         if(!get_nc_data(&obs_vars.hdr_prpt_typ_var,
+               hdr_prpt_typ_block, lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_prpt_typ\n\n";
+            exit(1);
+         }
+      }
+         
+      if (!IS_INVALID_NC(obs_vars.hdr_irpt_typ_var)) {
+         // Get the corresponding header In message type (string)
+         if(!get_nc_data(&obs_vars.hdr_irpt_typ_var,
+               hdr_irpt_typ_block, lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_irpt_typ\n\n";
+            exit(1);
+         }
+      }
+         
+      if (!IS_INVALID_NC(obs_vars.hdr_inst_typ_var)) {
+         // Get the corresponding header instrument type (string)
+         if(!get_nc_data(&obs_vars.hdr_inst_typ_var,
+               hdr_inst_typ_block, lengths, offsets)) {
+            mlog << Error << "\nget_nc_header() -> "
+                 << "trouble getting hdr_inst_typ\n\n";
+            exit(1);
+         }
+      }
+         
+      for (int hIndex = 0; hIndex < buf_size; hIndex++) {
+         header_data->prpt_typ_array.add(hdr_prpt_typ_block[hIndex]);
+         header_data->irpt_typ_array.add(hdr_irpt_typ_block[hIndex]);
+         header_data->inst_typ_array.add(hdr_inst_typ_block[hIndex]);
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
