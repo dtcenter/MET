@@ -817,24 +817,29 @@ void init_nc_dims_vars(NetcdfObsVars &obs_vars, bool use_var_id) {
 
 void read_nc_dims_vars(NetcdfObsVars &obs_vars, NcFile *f_in) {
    
+   NcVar ncVar;
    bool version_less_than_1_02 = is_version_less_than_1_02(f_in);
    // Define netCDF dimensions
    //obs_vars.hdr_cnt     ; // header array length (fixed dimension if hdr_cnt > 0)
-   obs_vars.strl_dim    = get_nc_dim(f_in, nc_dim_mxstr);    // header string dimension
+   obs_vars.strl_dim    = get_nc_dim(f_in, nc_dim_mxstr);       // header string dimension
    if (has_dim(f_in, nc_dim_mxstr2))
-      obs_vars.strl2_dim   = get_nc_dim(f_in, nc_dim_mxstr2);// header string dimension (bigger dimension)
+      obs_vars.strl2_dim   = get_nc_dim(f_in, nc_dim_mxstr2);   // header string dimension (bigger dimension)
    if (has_dim(f_in, nc_dim_mxstr3))
-      obs_vars.strl3_dim   = get_nc_dim(f_in, nc_dim_mxstr3);// header string dimension (bigger dimension)
-   if (has_dim(f_in, nc_dim_nhdr_typ))
-      obs_vars.hdr_typ_dim   = get_nc_dim(f_in, nc_dim_nhdr_typ);// header dimension for message type
-   if (has_dim(f_in, nc_dim_nhdr_sid))
-      obs_vars.hdr_sid_dim   = get_nc_dim(f_in, nc_dim_nhdr_sid);// header dimension for message type
-   if (has_dim(f_in, nc_dim_nhdr_vld))
-      obs_vars.hdr_vld_dim   = get_nc_dim(f_in, nc_dim_nhdr_vld);// header dimension for message type
+      obs_vars.strl3_dim   = get_nc_dim(f_in, nc_dim_mxstr3);   // header string dimension (bigger dimension)
 
-   if (version_less_than_1_02) {
+   if (has_dim(f_in, nc_dim_hdr_arr)) {
       obs_vars.hdr_arr_dim = get_nc_dim(f_in, nc_dim_hdr_arr);  // Header array width
       obs_vars.obs_arr_dim = get_nc_dim(f_in, nc_dim_obs_arr);  // Observation array width
+   }
+   else {
+      if (has_dim(f_in, nc_dim_nhdr_typ))
+         obs_vars.hdr_typ_dim = get_nc_dim(f_in, nc_dim_nhdr_typ); // header dimension for message type
+      if (has_dim(f_in, nc_dim_nhdr_sid))
+         obs_vars.hdr_sid_dim = get_nc_dim(f_in, nc_dim_nhdr_sid); // header dimension for station id
+      if (has_dim(f_in, nc_dim_nhdr_vld))
+         obs_vars.hdr_vld_dim = get_nc_dim(f_in, nc_dim_nhdr_vld); // header dimension for valid time
+      if (has_dim(f_in, nc_dim_npbhdr))
+         obs_vars.pb_hdr_dim  = get_nc_dim(f_in, nc_dim_npbhdr);   // header dimension for PB headers
    }
    obs_vars.obs_dim     = get_nc_dim(f_in, nc_dim_nobs);     // Observation array length
    obs_vars.hdr_dim     = get_nc_dim(f_in, nc_dim_nhdr);     // Header array length
@@ -843,10 +848,12 @@ void read_nc_dims_vars(NetcdfObsVars &obs_vars, NcFile *f_in) {
    obs_vars.hdr_typ_var = get_var(f_in, nc_var_hdr_typ);     // Message type (String or int)
    obs_vars.hdr_sid_var = get_var(f_in, nc_var_hdr_sid);     // Station ID (String or int)
    obs_vars.hdr_vld_var = get_var(f_in, nc_var_hdr_vld);     // Valid time (String or int)
-   if (version_less_than_1_02) {
+   
+   ncVar = get_var(f_in, nc_var_hdr_lat);
+   if (IS_INVALID_NC(ncVar)) {
       obs_vars.hdr_arr_var = get_var(f_in, nc_var_hdr_arr);     // Header array
    } else {
-      obs_vars.hdr_lat_var = get_var(f_in, nc_var_hdr_lat);          // Header array 
+      obs_vars.hdr_lat_var = ncVar;                                  // Header array 
       obs_vars.hdr_lon_var = get_var(f_in, nc_var_hdr_lon);          // Header array 
       obs_vars.hdr_elv_var = get_var(f_in, nc_var_hdr_elv);          // Header array 
       obs_vars.hdr_typ_tbl_var = get_var(f_in, nc_var_hdr_typ_tbl);  // Message type (String)
@@ -855,31 +862,35 @@ void read_nc_dims_vars(NetcdfObsVars &obs_vars, NcFile *f_in) {
    }
 
    // Get netCDF variables
-   if (version_less_than_1_02) {
+   ncVar = get_var(f_in, nc_var_obs_val);
+   if (IS_INVALID_NC(ncVar)) {
       obs_vars.obs_arr_var = get_var(f_in, nc_var_obs_arr);
    } else {
       obs_vars.obs_hid_var = get_var(f_in, nc_var_obs_hid);     // Obs. array 
-      if (has_var(f_in, nc_var_obs_gc)) {
-         obs_vars.obs_gc_var  = get_var(f_in, nc_var_obs_gc);      // Obs. array 
-      }
-      if (has_var(f_in, nc_var_obs_vid)) {
-         obs_vars.obs_vid_var = get_var(f_in, nc_var_obs_vid);     // Obs. array 
-      }
+      ncVar = get_var(f_in, nc_var_obs_gc);
+      if (!IS_INVALID_NC(ncVar)) obs_vars.obs_gc_var  = ncVar;  // Obs. array 
+      ncVar = get_var(f_in, nc_var_obs_vid);
+      if (!IS_INVALID_NC(ncVar)) obs_vars.obs_vid_var = ncVar;  // Obs. array 
       obs_vars.obs_lvl_var = get_var(f_in, nc_var_obs_lvl);     // Obs. array 
       obs_vars.obs_hgt_var = get_var(f_in, nc_var_obs_hgt);     // Obs. array 
-      obs_vars.obs_val_var = get_var(f_in, nc_var_obs_val);     // Obs. array 
+      obs_vars.obs_val_var = ncVar;     // Obs. array 
    }
-   if (has_var(f_in, nc_var_obs_qty)) {
-      obs_vars.obs_qty_var = get_var(f_in, nc_var_obs_qty);
-   }
-   if (has_var(f_in, nc_var_obs_qty_tbl)) {
-      obs_vars.obs_qty_tbl_var = get_var(f_in, nc_var_obs_qty_tbl);
-   }
+   ncVar = get_var(f_in, nc_var_obs_qty);
+   if (!IS_INVALID_NC(ncVar)) obs_vars.obs_qty_var = ncVar;
+   ncVar = get_var(f_in, nc_var_obs_qty_tbl);
+   if (!IS_INVALID_NC(ncVar)) obs_vars.obs_qty_tbl_var = ncVar;
 
+   // PrepBufr only headers
+   ncVar = get_var(f_in, nc_var_hdr_prpt_typ);
+   if (!IS_INVALID_NC(ncVar)) obs_vars.hdr_prpt_typ_var = ncVar;
+   ncVar = get_var(f_in, nc_var_hdr_irpt_typ);
+   if (!IS_INVALID_NC(ncVar)) obs_vars.hdr_irpt_typ_var = ncVar;
+   ncVar = get_var(f_in, nc_var_hdr_inst_typ);
+   if (!IS_INVALID_NC(ncVar)) obs_vars.hdr_inst_typ_var = ncVar;
+   
    bool use_var_id = false;
-   if (!get_global_att(f_in, nc_att_use_var_id, use_var_id)) {
-      use_var_id = false;
-   }
+   if (!get_global_att(f_in, nc_att_use_var_id, use_var_id)) use_var_id = false;
+
    obs_vars.use_var_id = use_var_id;
    nc_data_buffer.obs_vars = obs_vars;
 }
