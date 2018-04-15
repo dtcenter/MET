@@ -21,9 +21,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int  n_obs_types                = 5;  //  layer base, layer top, opacity, cad score, feature classification
+static const int  n_obs_types      = 5; // layer base, layer top, opacity, cad score, feature classification
 
-static const char hdr_typ_string          [] = "calipso";
+static const char hdr_typ_string[] = "calipso";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,6 +65,8 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+extern struct NcHeaderData hdr_data;
+extern struct NcDataBuffer nc_data_buffer;
 
 static ConcatString program_name;
 
@@ -72,7 +74,8 @@ static CommandLine cline;
 
 static const int na_len = strlen(na_str);
 
-static NetcdfObsVars obsVars;
+static NetcdfObsVars obs_vars;
+static IntArray    valid_times;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -98,7 +101,7 @@ static void set_compress  (const StringArray &);
 
 static void process_calipso_file (NcFile *, const char * filename);
 
-static void write_nc_record(NcFile * out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value = -1);
+static void write_nc_record(NetcdfObsVars a_obs_vars, const float * f, int qc_value = -1);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -366,25 +369,25 @@ mlog << Debug(1) << "Writing MET File:\t" << output_filename << "\n";
    //
 
    bool use_var_id = false;
-   init_nc_dims_vars (obsVars, use_var_id);
-   obsVars.attr_agl = true;
-   create_nc_hdr_vars(obsVars, out, n_data, deflate_level);
-   create_nc_obs_vars(obsVars, out, deflate_level, use_var_id);
+   init_nc_dims_vars (obs_vars, use_var_id);
+   obs_vars.attr_agl = true;
+   create_nc_hdr_vars(obs_vars, out, n_data, deflate_level);
+   create_nc_obs_vars(obs_vars, out, deflate_level, use_var_id);
 
-   int strl_len = get_dim_size(&obsVars.strl_dim);
+   int strl_len = get_dim_size(&obs_vars.strl_dim);
    int typ_len = strl_len;
    int sid_len = strl_len;
    int vld_len = strl_len;
-   if (!IS_INVALID_NC(obsVars.strl2_dim)) {
+   if (!IS_INVALID_NC(obs_vars.strl2_dim)) {
       NcDim str_dim;
-      string dim_name = GET_NC_NAME(obsVars.strl2_dim);
-      int strl2_len = get_dim_size(&obsVars.strl2_dim);
-      str_dim = get_nc_dim(&obsVars.hdr_typ_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) typ_len = strl2_len;
-      str_dim = get_nc_dim(&obsVars.hdr_sid_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) sid_len = strl2_len;
-      str_dim = get_nc_dim(&obsVars.hdr_vld_var, dim_name);
-      if (!IS_INVALID_NC(str_dim)) vld_len = strl2_len;
+      string dim_name = GET_NC_NAME(obs_vars.strl2_dim);
+      int strl2_len = get_dim_size(&obs_vars.strl2_dim);
+      str_dim = get_nc_dim(&obs_vars.hdr_typ_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) typ_len = get_dim_size(&str_dim);
+      str_dim = get_nc_dim(&obs_vars.hdr_sid_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) sid_len = get_dim_size(&str_dim);
+      str_dim = get_nc_dim(&obs_vars.hdr_vld_var, dim_name);
+      if (!IS_INVALID_NC(str_dim)) vld_len = get_dim_size(&str_dim);
    }
    
    //
@@ -422,8 +425,9 @@ unsigned char * buf   = 0;
 
 buf   = new unsigned char [buf_size];
 
-char  * const cbuf = (char *)  buf;
 float * const fbuf = (float *) buf;
+
+int   * const ibuf = new int [n_data];
 
 mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
@@ -432,29 +436,19 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
    //  populate the hdr_typ variable
    //
 
-memset(buf, 0, buf_size);
+memset(ibuf, 0, n_data*sizeof(int));
 
-for (j=0; j<n_data; ++j)  {
-
-   strcpy(cbuf + j*typ_len, hdr_typ_string);
-
-}
-
-obsVars.hdr_typ_var.putVar(cbuf);
+hdr_data.typ_array.add(hdr_typ_string);
+obs_vars.hdr_typ_var.putVar(ibuf);
 
    //
    //  populate the hdr_sid variable
    //
 
-memset(buf, 0, buf_size);
+memset(ibuf, 0, n_data*sizeof(int));
 
-for (j=0; j<n_data; ++j)  {
-
-   strcpy(cbuf + j*sid_len, na_str);
-
-}
-
-obsVars.hdr_sid_var.putVar(cbuf);
+hdr_data.sid_array.add(na_str);
+obs_vars.hdr_sid_var.putVar(ibuf);
 
    //
    //  populate the obs_qty variable
@@ -477,25 +471,28 @@ obs_qty_var.putVar(cbuf);
 float ff[2];
 int hdr_offset = 0;
 
-memset(buf, 0, buf_size);
+float *fhdr_lat_buf = new float[n_data];
+float *fhdr_lon_buf = new float[n_data];
+float *fhdr_elv_buf = new float[n_data];
+
+memset(fhdr_lat_buf, 0, n_data * sizeof(float));
+memset(fhdr_lon_buf, 0, n_data * sizeof(float));
+memset(fhdr_elv_buf, 0, n_data * sizeof(float));
 
 for (j=0; j<n_data; ++j)  {
 
    hdf_5km.get_latlon(j, ff[0], ff[1]);
 
-   //hdr_offset = HDR_ARRAY_LEN*j;
+   fhdr_lat_buf[j] = ff[0];   //  latitude
+   fhdr_lon_buf[j] = ff[1];   //  longitude
+   fhdr_elv_buf[j] = FILL_VALUE;
    
-   fbuf[hdr_offset]     = ff[0];   //  latitude
-
-   fbuf[hdr_offset + 1] = ff[1];   //  longitude
-
-   fbuf[hdr_offset + 2] = FILL_VALUE;
-   
-   hdr_offset += HDR_ARRAY_LEN;
-
 }   //  for j
 
-obsVars.hdr_arr_var.putVar(fbuf);
+//obs_vars.hdr_arr_var.putVar(fbuf);
+obs_vars.hdr_lat_var.putVar(fhdr_lat_buf);
+obs_vars.hdr_lon_var.putVar(fhdr_lon_buf);
+obs_vars.hdr_elv_var.putVar(fhdr_elv_buf);
 
    //
    //  populate the hdr_vld variable
@@ -517,23 +514,30 @@ hdf_stride[1] = 1;
 hdf_edge[0] = 1;
 hdf_edge[1] = 1;
 
-memset(buf, 0, buf_size);
+memset(ibuf, 0, n_data*sizeof(int));
 
 for (j=0; j<n_data; ++j)  {
+   int v_idx;
 
    t = hdf_5km.get_time(j);
 
-   unix_to_mdyhms(t, month, day, year, hour, minute, second);
+   if (!valid_times.has(t, v_idx)) {
+      unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk),
-            "%04d%02d%02d_%02d%02d%02d",
-             year, month, day, hour, minute, second);
-
-   strcpy(cbuf + j*vld_len, junk);
+      snprintf(junk, sizeof(junk),
+               "%04d%02d%02d_%02d%02d%02d",
+                year, month, day, hour, minute, second);
+                
+      v_idx = valid_times.n_elements();
+      valid_times.add(t);
+      hdr_data.vld_array.add(junk);
+   }
+   ibuf[j] = v_idx;
 
 }   //  for j
 
-obsVars.hdr_vld_var.putVar(cbuf);
+
+obs_vars.hdr_vld_var.putVar(ibuf);
 
    //
    //  populate the obs_arr variable
@@ -546,9 +550,6 @@ memset(buf, 0, buf_size);
 float f[5];
 int qc_value;
 
-NcVar obs_arr_var = obsVars.obs_arr_var;
-NcVar obs_qty_var = obsVars.obs_qty_var;
-
 for (j=0; j<n_data; ++j)  {
 
    hdf_5km.get_obs(j, obs);
@@ -558,57 +559,62 @@ for (j=0; j<n_data; ++j)  {
    //
 
    obs.get_n_layers_record              (j, f);
-      write_nc_record                   (out, obs_qty_var, obs_arr_var, f);
+      write_nc_record                   (obs_vars, f);
 
    if ( obs.n_layers == 0 )  continue;
 
    for (layer=0; layer<(obs.n_layers); ++layer)  {
 
       obs.get_layer_base_record         (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
       obs.get_layer_top_record          (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
       obs.get_opacity_record            (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
       obs.get_cad_score_record          (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
       obs.get_ice_water_record          (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
       obs.get_subtype_record            (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
       obs.get_cloud_aerosol_qa_record   (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
       obs.get_h_average_record          (j, layer, f);
-         write_nc_record                (out, obs_qty_var, obs_arr_var, f);
+         write_nc_record                (obs_vars, f);
 
            /////////////////////////////////
 
 
                  obs.get_feature_type_record   (j, layer, f);
       qc_value = obs.get_feature_type_qa_value (layer);
-         write_nc_record                       (out, obs_qty_var, obs_arr_var, f, qc_value);
+         write_nc_record                       (obs_vars, f, qc_value);
 
                  obs.get_ice_water_record      (j, layer, f);
       qc_value = obs.get_ice_water_qa_value    (layer);
-         write_nc_record                       (out, obs_qty_var, obs_arr_var, f, qc_value);
+         write_nc_record                       (obs_vars, f, qc_value);
 
    }   //  for layer
 
    obs.get_base_base_record  (j, f);
-      write_nc_record        (out, obs_qty_var, obs_arr_var, f);
+      write_nc_record        (obs_vars, f);
 
    obs.get_top_top_record    (j, f);
-      write_nc_record        (out, obs_qty_var, obs_arr_var, f);
+      write_nc_record        (obs_vars, f);
 
 }   //  for j
 
+   write_nc_observation(obs_vars, nc_data_buffer);
+   
+   create_nc_other_vars(obs_vars, out, nc_data_buffer, hdr_data);
+   
+   write_nc_other_vars(obs_vars);
 
    //
    //  close hdf file
@@ -635,62 +641,25 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_nc_record(NcFile * out, NcVar & obs_qty_var, NcVar & obs_arr_var, const float * f, int qc_value)
+void write_nc_record(NetcdfObsVars a_obs_vars, const float * f, int qc_value)
 
 {
-
-static int pos = 0;
-vector<size_t> index;
-vector<size_t> count;
-
-index.resize(2);
-count.resize(2);
 
    //
    //  write obs_arr record
    //
 
-index.at(0) = pos;
-index.at(1) = 0;
-
-count.at(0) = 1;
-count.at(1) = n_obs_types;
-
-obs_arr_var.putVar(index, count, f);
-
-
    //
    //  write obs_qty record
    //
 
-char junk[HEADER_STR_LEN];
-
-
-index.at(0) = pos;
-index.at(1) = 0;
-
-count.at(0) = 1;
-
 if ( qc_value < 0 )  {
-
-   count.at(1) = na_len;
-
-   obs_qty_var.putVar(index, count, na_str);
-
+   write_nc_observation(obs_vars, nc_data_buffer, f, na_str);
 } else {
-
+   char junk[HEADER_STR_LEN];
    snprintf(junk, sizeof(junk), "%d", qc_value);
-
-   count.at(1) = strlen(junk);
-
-   obs_qty_var.putVar(index, count, junk);
+   write_nc_observation(obs_vars, nc_data_buffer, f, junk);
 }
-
-   //
-   //  done
-   //
-
-++pos;
 
 return;
 
