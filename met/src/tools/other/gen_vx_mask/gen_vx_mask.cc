@@ -1018,6 +1018,8 @@ for (j=0; j<(shape.n_parts); ++j)  {
       lat = shape.lat(start + k);
       lon = shape.lon(start + k);
 
+      lon = -lon;   //  west is positive for us
+
       grid.latlon_to_xy(lat, lon, dx, dy);
 
       x = nint(dx);
