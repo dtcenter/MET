@@ -26,6 +26,8 @@ static const int max_shp_points = (1 << 17);
 
 static const int shp_header_bytes = 100;
 
+static const int shp_record_header_bytes = 8;
+
 
 ////////////////////////////////////////////////////////////////////////
 
