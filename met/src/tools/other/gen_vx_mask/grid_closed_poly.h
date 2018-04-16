@@ -63,7 +63,6 @@ class GridClosedPoly : public Polyline
 
       void add_point(double, double);   //  updates bounding box
 
-
 };
 
 

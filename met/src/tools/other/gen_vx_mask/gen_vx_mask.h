@@ -34,6 +34,7 @@ using namespace std;
 #include "data_plane.h"
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
+#include "shp_file.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,6 +98,8 @@ static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
 
+static ShpPolygonRecord shape;
+
 static int shape_number = 0;
 
 // Masking polyline
@@ -119,6 +122,7 @@ static void      get_data_plane(Met2dDataFile *mtddf_ptr,
 static bool      get_gen_vx_mask_data(Met2dDataFile *mtddf_ptr,
                                       DataPlane &dp);
 static void      apply_poly_mask(DataPlane &dp);
+static void      apply_shape_mask(DataPlane &dp);
 static void      apply_box_mask(DataPlane &dp);
 static void      apply_circle_mask(DataPlane &dp);
 static void      apply_track_mask(DataPlane &dp);

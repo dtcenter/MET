@@ -51,6 +51,7 @@ using namespace std;
 #include "data2d_nc_met.h"
 #include "solar.h"
 #include "shp_file.h"
+#include "grid_closed_poly.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,9 +89,10 @@ int main(int argc, char *argv[])
    process_mask_file(dp_mask);
 
    // Apply combination logic if the current mask is binary
-   if(mask_type == MaskType_Poly ||
-      mask_type == MaskType_Box  ||
-      mask_type == MaskType_Grid ||
+   if(mask_type == MaskType_Poly   ||
+      mask_type == MaskType_Shape  ||
+      mask_type == MaskType_Box    ||
+      mask_type == MaskType_Grid   ||
       thresh.get_type() != thresh_na) {
       dp_out = combine(dp_data, dp_mask, set_logic);
    }
@@ -218,7 +220,6 @@ void process_mask_file(DataPlane &dp)
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
    GrdFileType ftype = FileType_None;
-   ShpPolygonRecord shape;
 
       // Initialize
 
@@ -348,32 +349,45 @@ void process_mask_file(DataPlane &dp)
 
    // Construct the mask
    switch(mask_type) {
+
       case MaskType_Poly:
          apply_poly_mask(dp);
          break;
+
       case MaskType_Box:
          apply_box_mask(dp);
          break;
+
       case MaskType_Circle:
          apply_circle_mask(dp);
          break;
+
       case MaskType_Track:
          apply_track_mask(dp);
          break;
+
       case MaskType_Grid:
          apply_grid_mask(dp);
          break;
+
       case MaskType_Data:
          apply_data_mask(dp);
          break;
+
       case MaskType_Solar_Alt:
       case MaskType_Solar_Azi:
          apply_solar_mask(dp);
          break;
+
       case MaskType_Lat:
       case MaskType_Lon:
          apply_lat_lon_mask(dp);
          break;
+
+      case MaskType_Shape:
+         apply_shape_mask(dp);
+         break;
+
       default:
          mlog << Error << "\nprocess_mask_file() -> "
               << "Unxpected MaskType value (" << mask_type << ")\n\n";
@@ -968,7 +982,81 @@ void apply_lat_lon_mask(DataPlane &dp) {
    }
 
    return;
+
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void apply_shape_mask(DataPlane & dp)
+
+{
+
+int x, y;
+int j, k, n;
+int start, stop;
+double dx, dy, lat, lon;
+bool status = false;
+GridClosedPoly p;
+GridClosedPolyArray a;
+
+   //
+   //  load up array
+   //
+
+for (j=0; j<(shape.n_parts); ++j)  {
+
+   p.clear();
+
+   start = shape.start_index(j);
+   stop  = shape.stop_index(j);
+
+   n = stop - start + 1;
+
+   for (k=0; k<n; ++k)  {
+
+      lat = shape.lat(start + k);
+      lon = shape.lon(start + k);
+
+      grid.latlon_to_xy(lat, lon, dx, dy);
+
+      x = nint(dx);
+      y = nint(dy);
+
+      p.add_point(x, y);
+
+   }   //  for k
+
+   a.add(p);
+
+}   //  for j
+
+
+
+   //
+   //  check grid points
+   //
+
+for (x=0; x<(grid.nx()); ++x)  {
+
+   for (y=0; y<(grid.ny()); ++y)  {
+
+      status = a.is_inside(x, y);
+
+      dp.set( (status ? 1.0 : 0.0 ), x, y);
+
+   }   //  for y
+
+}   //  for x
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1230,6 +1318,7 @@ void usage() {
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
+        << "\t[-shapeno n]\n\n"
 
         << "\twhere\t\"input_file\" is a gridded data file which specifies the grid definition (required).\n"
         << "\t\t   If output from " << program_name << ", automatically read mask data as the \"input_field\".\n"
@@ -1280,6 +1369,8 @@ void usage() {
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << config.nc_compression() << ") (optional).\n\n"
+
+        << "\t\t\"-shapeno n\" only for use with shapefiles ... specifies which record in the shapefile to use (0-based)\n\n"
 
         << flush;
 
