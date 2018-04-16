@@ -56,6 +56,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const int buf_size = (1 << 21);
+
+static unsigned char buf [buf_size];
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 static void get_shapefile_outline(ShpPolygonRecord & shape);
 
 
@@ -1403,11 +1411,14 @@ void get_shapefile_outline(ShpPolygonRecord & shape)
 
 
 int fd = -1;
+int j;
 int bytes, n_read;
 int recnum;
 const char * const shape_filename = mask_filename;
-unsigned char buf [shp_header_bytes + 10];   //  call me paranoid ...
+bool hit_eof = false;
 ShpFileHeader h;
+ShpRecordHeader rh;
+ShpPolygonRecord pr;
 
 
    //
@@ -1448,7 +1459,107 @@ h.set(buf);
 
 recnum = 0;
 
-// while ( (n_read = read(fd, 
+hit_eof = false;
+
+for (j=0; j<=shape_number; ++j)  {
+
+      //
+      //  get record header
+      //
+
+   bytes = shp_header_bytes;
+
+   n_read = read(fd, buf, bytes);
+
+   if ( n_read == 0 )  { hit_eof = true;  break; }
+
+   if ( n_read < 0 )  {
+
+      mlog << Error
+           << program_name << ": get_shapefile_outline() -> trouble reading record header for record "
+           << j << "\n\n";
+
+      exit ( 1 );
+
+   }
+
+   rh.set(buf);
+
+      //
+      //  check buffer size
+      //
+
+   if ( j == shape_number )  {
+
+      if ( rh.content_length_bytes > buf_size )  {
+
+         mlog << Error
+              << program_name << ": get_shapefile_outline() -> record too large ... increase buffer size to at least "
+              << (rh.content_length_bytes) << "\n\n";
+
+         exit ( 1 );
+
+      }
+
+   }
+
+      //
+      //  get record data
+      //
+
+   bytes = rh.content_length_bytes;
+
+   if ( j < shape_number )  {
+
+      if ( lseek(fd, bytes, SEEK_CUR) < 0 )  {
+
+         mlog << Error
+              << program_name << ": get_shapefile_outline() -> lseek error on record number " << j << "\n\n";
+
+         exit ( 1 );
+
+      }
+
+   } else {
+
+      n_read = read(fd, buf, bytes);
+
+      if ( n_read != bytes )  {
+
+         mlog << Error
+              << program_name << ": get_shapefile_outline() -> read error on record number " << j << "\n\n";
+
+         exit ( 1 );
+
+      }
+
+   }
+
+   pr.set(buf);
+
+}   //  for j
+
+if ( hit_eof )  {
+
+   mlog << Error
+        << program_name << ": get_shapefile_outline() -> hit eof before reading specified record\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  make sure it's a polygon record, as opposed to some other type
+   //
+
+if ( pr.shape_type != shape_type_polygon )  {
+
+   mlog << Error
+        << program_name << ": get_shapefile_outline() -> bad type for specified record ... should be polygon, but is not.\n\n";
+
+   exit ( 1 );
+
+}
 
 
    //
@@ -1463,3 +1574,6 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+
