@@ -673,7 +673,7 @@ void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int defla
    if (use_var_id)
       obs_vars.obs_vid_var = add_var(f_out, nc_var_obs_vid,   ncInt, obs_vars.obs_dim, deflate_level);
    else
-      obs_vars.obs_gc_var = add_var(f_out, nc_var_obs_lvl, ncFloat, obs_vars.obs_dim, deflate_level);
+      obs_vars.obs_gc_var  = add_var(f_out, nc_var_obs_gc,    ncInt, obs_vars.obs_dim, deflate_level);
    obs_vars.obs_lvl_var = add_var(f_out, nc_var_obs_lvl, ncFloat, obs_vars.obs_dim, deflate_level);
    obs_vars.obs_hgt_var = add_var(f_out, nc_var_obs_hgt, ncFloat, obs_vars.obs_dim, deflate_level);
    obs_vars.obs_val_var = add_var(f_out, nc_var_obs_val, ncFloat, obs_vars.obs_dim, deflate_level);
@@ -687,13 +687,18 @@ void create_nc_obs_vars (NetcdfObsVars &obs_vars, NcFile *f_out, const int defla
    add_att(&obs_vars.obs_hid_var, "_FillValue", (int)FILL_VALUE);
    add_att(&obs_vars.obs_val_var,  "long_name", "observation value");
    add_att(&obs_vars.obs_val_var, "_FillValue", FILL_VALUE);
-   long_name_str = (use_var_id)
-         ? (obs_vars.attr_pb2nc
-               ? "index of BUFR variable corresponding to the observation type"
-               : "index of variable names at var_name")
-         : "grib code corresponding to the observation type";
-   add_att(&obs_vars.obs_vid_var,  "long_name", long_name_str);
-   add_att(&obs_vars.obs_vid_var, "_FillValue", (int)FILL_VALUE);
+   if (use_var_id) {
+      long_name_str = (obs_vars.attr_pb2nc
+            ? "index of BUFR variable corresponding to the observation type"
+            : "index of variable names at var_name");
+      add_att(&obs_vars.obs_vid_var,  "long_name", long_name_str);
+      add_att(&obs_vars.obs_vid_var, "_FillValue", (int)FILL_VALUE);
+   }
+   else {
+      add_att(&obs_vars.obs_gc_var,  "long_name", "grib code corresponding to the observation type");
+      add_att(&obs_vars.obs_gc_var, "_FillValue", (int)FILL_VALUE);
+   }
+
    add_att(&obs_vars.obs_lvl_var,  "long_name", "pressure level (hPa) or accumulation interval (sec)");
    add_att(&obs_vars.obs_lvl_var, "_FillValue", FILL_VALUE);
    long_name_str = (obs_vars.attr_agl)
