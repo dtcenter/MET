@@ -870,18 +870,18 @@ void read_nc_dims_vars(NetcdfObsVars &obs_vars, NcFile *f_in) {
    }
 
    // Get netCDF variables
-   ncVar = get_var(f_in, nc_var_obs_val);
+   ncVar = get_var(f_in, nc_var_obs_hid);
    if (IS_INVALID_NC(ncVar)) {
       obs_vars.obs_arr_var = get_var(f_in, nc_var_obs_arr);
    } else {
-      obs_vars.obs_hid_var = get_var(f_in, nc_var_obs_hid);     // Obs. array 
+      obs_vars.obs_hid_var = ncVar;                             // Obs. header id array 
       ncVar = get_var(f_in, nc_var_obs_gc);
-      if (!IS_INVALID_NC(ncVar)) obs_vars.obs_gc_var  = ncVar;  // Obs. array 
+      if (!IS_INVALID_NC(ncVar)) obs_vars.obs_gc_var  = ncVar;  // Obs. grib code array 
       ncVar = get_var(f_in, nc_var_obs_vid);
-      if (!IS_INVALID_NC(ncVar)) obs_vars.obs_vid_var = ncVar;  // Obs. array 
-      obs_vars.obs_lvl_var = get_var(f_in, nc_var_obs_lvl);     // Obs. array 
-      obs_vars.obs_hgt_var = get_var(f_in, nc_var_obs_hgt);     // Obs. array 
-      obs_vars.obs_val_var = ncVar;     // Obs. array 
+      if (!IS_INVALID_NC(ncVar)) obs_vars.obs_vid_var = ncVar;  // Obs. variable id array 
+      obs_vars.obs_lvl_var = get_var(f_in, nc_var_obs_lvl);     // Obs. pressure level array 
+      obs_vars.obs_hgt_var = get_var(f_in, nc_var_obs_hgt);     // Obs. highth array 
+      obs_vars.obs_val_var = get_var(f_in, nc_var_obs_val);     // Obs. value array 
    }
    ncVar = get_var(f_in, nc_var_obs_qty);
    if (!IS_INVALID_NC(ncVar)) obs_vars.obs_qty_var = ncVar;
