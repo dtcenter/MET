@@ -246,10 +246,10 @@ void process_mask_file(DataPlane &dp)
 
    else if ( mask_type == MaskType_Shape )  {
 
-      mlog << Error
-           << program_name << ": -> shapefile masking not yet implemented\n\n";
-
-      exit ( 1 );
+      // mlog << Error
+      //      << program_name << ": -> shapefile masking not yet implemented\n\n";
+      // 
+      // exit ( 1 );
 
       get_shapefile_outline(shape);
 
@@ -1511,7 +1511,7 @@ const char * const shape_filename = mask_filename;
 bool hit_eof = false;
 ShpFileHeader h;
 ShpRecordHeader rh;
-ShpPolygonRecord pr;
+ShpPolygonRecord & pr = shape;
 
 
    //
@@ -1560,7 +1560,7 @@ for (j=0; j<=shape_number; ++j)  {
       //  get record header
       //
 
-   bytes = shp_header_bytes;
+   bytes = shp_record_header_bytes;
 
    n_read = read(fd, buf, bytes);
 
