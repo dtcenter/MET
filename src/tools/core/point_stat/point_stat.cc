@@ -950,9 +950,9 @@ void process_obs_file(int i_nc) {
          // Convert string to a unixtime
          hdr_ut = timestring_to_unix(hdr_vld_str);
 
-         int grid_code = obs_arr[1];
-         if (use_var_id && grid_code < var_names.n_elements()) {
-            strcpy(var_name, var_names[grid_code]);
+         int grib_code = obs_arr[1];
+         if (use_var_id && grib_code < var_names.n_elements()) {
+            strcpy(var_name, var_names[grib_code]);
             obs_arr[1] = bad_data_int;
          }
          else {
@@ -972,7 +972,7 @@ void process_obs_file(int i_nc) {
                                               var_name);
          }
 
-         obs_arr[1] = grid_code;
+         obs_arr[1] = grib_code;
       }
 
    } // end for i_block_start_idx
