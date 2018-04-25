@@ -248,7 +248,7 @@ void process_mask_file(DataPlane &dp)
 
       // mlog << Error
       //      << program_name << ": -> shapefile masking not yet implemented\n\n";
-      // 
+      //
       // exit ( 1 );
 
       get_shapefile_outline(shape);
@@ -992,7 +992,7 @@ void apply_shape_mask(DataPlane & dp)
 
 {
 
-int x, y;
+int x, y, n_in;
 int j, k, n;
 int start, stop;
 double dx, dy, lat, lon;
@@ -1039,11 +1039,13 @@ for (j=0; j<(shape.n_parts); ++j)  {
    //  check grid points
    //
 
-for (x=0; x<(grid.nx()); ++x)  {
+for (x=0, n_in=0; x<(grid.nx()); ++x)  {
 
    for (y=0; y<(grid.ny()); ++y)  {
 
       status = a.is_inside(x, y);
+
+      if(status)  n_in++;
 
       dp.set( (status ? 1.0 : 0.0 ), x, y);
 
@@ -1054,6 +1056,11 @@ for (x=0; x<(grid.nx()); ++x)  {
    //
    //  done
    //
+
+   // List number of points inside the mask
+   mlog << Debug(3)
+        << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
+        << " points inside\n";
 
 return;
 
@@ -1289,6 +1296,7 @@ const char * masktype_to_string(const MaskType t) {
       case MaskType_Solar_Azi: s = "solar_azi";      break;
       case MaskType_Lat:       s = "lat";            break;
       case MaskType_Lon:       s = "lon";            break;
+      case MaskType_Shape:     s = "shape";          break;
       case MaskType_None:      s = na_str;           break;
       default:                 s = (const char *) 0; break;
    }
@@ -1315,12 +1323,12 @@ void usage() {
         << "\t[-thresh string]\n"
         << "\t[-height n]\n"
         << "\t[-width n]\n"
+        << "\t[-shapeno n]\n"
         << "\t[-value n]\n"
         << "\t[-name string]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
-        << "\t[-shapeno n]\n\n"
 
         << "\twhere\t\"input_file\" is a gridded data file which specifies the grid definition (required).\n"
         << "\t\t   If output from " << program_name << ", automatically read mask data as the \"input_field\".\n"
@@ -1357,6 +1365,9 @@ void usage() {
         << "\t\t\"-height n\" and \"-width n\" (optional)\n"
         << "\t\t   For \"box\" masking, specify these dimensions in grid units.\n"
 
+        << "\t\t\"-shapeno n\" (optional)\n"
+        << "\t\t   For \"shape\" masking, specify the shape number (0-based) to be used.\n"
+
         << "\t\t\"-value n\" overrides the default output mask data value ("
         << default_mask_val << ") (optional).\n"
 
@@ -1371,8 +1382,6 @@ void usage() {
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << config.nc_compression() << ") (optional).\n\n"
-
-        << "\t\t\"-shapeno n\" is only for use with shapefiles ... specifies which record in the shapefile to use (0-based)\n\n"
 
         << flush;
 
