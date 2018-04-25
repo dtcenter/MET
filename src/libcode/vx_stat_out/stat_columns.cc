@@ -462,6 +462,8 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+14+n_ens, orank_columns[15]);
    at.set_entry(r, c+15+n_ens, orank_columns[16]);
    at.set_entry(r, c+16+n_ens, orank_columns[17]);
+   at.set_entry(r, c+17+n_ens, orank_columns[18]);
+   at.set_entry(r, c+18+n_ens, orank_columns[19]);
 
    return;
 }
@@ -3434,10 +3436,10 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
       pd_ptr->rmse_oerr);
 
    at.set_entry(r, c+12,  // Mean of perturbed ensemble spread
-      pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
+      pd_ptr->spread_oerr_na.wmean(pd_ptr->wgt_na));
 
    at.set_entry(r, c+13,  // Mean of unperturbed spread plus observation error
-      pd_ptr->spread_oerr_na.wmean(pd_ptr->wgt_na));
+      pd_ptr->spread_plus_oerr_na.wmean(pd_ptr->wgt_na));
 
    return;
 }

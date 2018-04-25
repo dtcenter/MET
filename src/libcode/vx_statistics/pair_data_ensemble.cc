@@ -333,7 +333,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       spread_na.add(sqrt(variance));
 
       // Process the observation error information.
-      ObsErrorEntry * e = obs_error_entry[i];
+      ObsErrorEntry * e = (obs_error_entry.n() == o_na.n() ?
+                           obs_error_entry[i] : 0);
       if(e) {
 
          // Compute the spread of the perturbed ensemble members
