@@ -377,15 +377,11 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
    // Write the columns names specific to the RHIST line type
    at.set_entry(r, c+0, rhist_columns[0]);
    at.set_entry(r, c+1, rhist_columns[1]);
-   at.set_entry(r, c+2, rhist_columns[2]);
-   at.set_entry(r, c+3, rhist_columns[3]);
-   at.set_entry(r, c+4, rhist_columns[4]);
-   at.set_entry(r, c+5, rhist_columns[5]);
 
    // Write RANK_i for each rank
-   for(i=0, col=c+6; i<n_rank; i++) {
+   for(i=0, col=c+2; i<n_rank; i++) {
 
-      sprintf(tmp_str, "%s%i", rhist_columns[6], i+1);
+      sprintf(tmp_str, "%s%i", rhist_columns[2], i+1);
       at.set_entry(r, col, tmp_str); // Counts for each rank
       col++;
    }
@@ -465,6 +461,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+13+n_ens, orank_columns[14]);
    at.set_entry(r, c+14+n_ens, orank_columns[15]);
    at.set_entry(r, c+15+n_ens, orank_columns[16]);
+   at.set_entry(r, c+16+n_ens, orank_columns[17]);
 
    return;
 }
@@ -1476,6 +1473,46 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
       // Increment the STAT row counter
       stat_row++;
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_ecnt_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
+                    bool txt_flag,
+                    AsciiTable &stat_at, int &stat_row,
+                    AsciiTable &txt_at, int &txt_row) {
+
+   // Check for data to write.  Running Ensemble-Stat with skip_const
+   // set to true may result in no data.
+   if(pd_ptr->n_obs == 0) return;
+
+   // ECNT line type
+   shc.set_line_type(stat_ecnt_str);
+
+   // Not Applicable
+   shc.set_fcst_thresh(na_str);
+   shc.set_thresh_logic(SetLogic_None);
+   shc.set_cov_thresh(na_str);
+   shc.set_alpha(bad_data_double);
+
+   // Write the header columns
+   write_header_cols(shc, stat_at, stat_row);
+
+   // Write the data columns
+   write_ecnt_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+
+   // If requested, copy row to the text file
+   if(txt_flag) {
+      copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
+
+      // Increment the text row counter
+      txt_row++;
+   }
+
+   // Increment the STAT row counter
+   stat_row++;
 
    return;
 }
@@ -2604,8 +2641,8 @@ void write_vl1l2_cols(const VL1L2Info &vl1l2_info, AsciiTable &at, int r, int c)
    // Dump out the VL1L2 line:
    //    TOTAL,       UFBAR,       VFBAR,
    //    UOBAR,       VOBAR,       UVFOBAR,
-   //    UVFFBAR,     UVOOBAR      F_SPEED_BAR, 
-   //    O_SPEED_BAR, 
+   //    UVFFBAR,     UVOOBAR      F_SPEED_BAR,
+   //    O_SPEED_BAR,
    //
 
    at.set_entry(r, c+0,  // Total Count
@@ -2688,7 +2725,7 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, AsciiTable &at, int r, int c)
 
 {
 
-   // 
+   //
    // VCNT Line Type
    //
 
@@ -3346,6 +3383,67 @@ void write_isc_cols(const ISCInfo &isc_info, int i,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
+                     AsciiTable &at, int r, int c) {
+
+   //
+   // Ensemble Continuous Statistics
+   // Dump out the ECNT line:
+   //    TOTAL,        N_ENS,
+   //    RPS,          RPSS,
+   //    CRPS,         CRPSS,        IGN,
+   //    ME,           RMSE,         SPREAD,
+   //    ME_OERR,      RMSE_OERR,    SPREAD_OERR,
+   //    SPREAD_PLUS_OERR
+   //
+
+   at.set_entry(r, c+0,  // Total Number of Ranked Observations
+      pd_ptr->n_obs);
+
+   at.set_entry(r, c+1,  // Number of ensemble members
+      pd_ptr->n_ens);
+
+   at.set_entry(r, c+2,  // Ranked Probability Score
+      pd_ptr->rps);
+
+   at.set_entry(r, c+3,  // Ranked Probability Skill Score
+      pd_ptr->rpss);
+
+   at.set_entry(r, c+4,  // Continuous Ranked Probability Score
+      pd_ptr->crps_na.wmean(pd_ptr->wgt_na));
+
+   at.set_entry(r, c+5,  // Continuous Ranked Probability Skill Score
+      pd_ptr->crpss);
+
+   at.set_entry(r, c+6,  // Ignorance Score
+      pd_ptr->ign_na.wmean(pd_ptr->wgt_na));
+
+   at.set_entry(r, c+7,  // ME for unperturbed ensemble mean
+      pd_ptr->me);
+
+   at.set_entry(r, c+8,  // RMSE for unperturbed ensemble mean
+      pd_ptr->rmse);
+
+   at.set_entry(r, c+9,  // Mean of unperturbed ensemble spread
+      pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
+
+   at.set_entry(r, c+10, // ME for mean of perturbed members
+      pd_ptr->me_oerr);
+
+   at.set_entry(r, c+11, // RMSE for mean of perturbed members
+      pd_ptr->rmse_oerr);
+
+   at.set_entry(r, c+12,  // Mean of perturbed ensemble spread
+      pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
+
+   at.set_entry(r, c+13,  // Mean of unperturbed spread plus observation error
+      pd_ptr->spread_oerr_na.wmean(pd_ptr->wgt_na));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_rhist_cols(const PairDataEnsemble *pd_ptr,
                       AsciiTable &at, int r, int c) {
    int i, col;
@@ -3353,32 +3451,19 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    //
    // Ensemble Ranked Histogram
    // Dump out the RHIST line:
-   //    TOTAL,   CRPS,   IGN,
-   //    N_RANKS, CRPSS,  SPREAD,
+   //    TOTAL,   N_RANK,
    //    [RANK_] (for each bin)
    //
    at.set_entry(r, c+0,  // Total Number of Ranked Observations
       nint(pd_ptr->rhist_na.sum()));
 
-   at.set_entry(r, c+1,  // Continuous Ranked Probability Score
-      pd_ptr->crps_na.wmean(pd_ptr->wgt_na));
-
-   at.set_entry(r, c+2,  // Ignorance Score
-      pd_ptr->ign_na.wmean(pd_ptr->wgt_na));
-
-   at.set_entry(r, c+3,  // Total Number of Ranks
+   at.set_entry(r, c+1,  // Total Number of Ranks
       pd_ptr->rhist_na.n_elements());
-
-   at.set_entry(r, c+4,  // Continuous Ranked Probability Skill Score
-      pd_ptr->crpss);
-
-   at.set_entry(r, c+5,  // Average ensemble spread
-      pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
 
    //
    // Write RANK_i count for each bin
    //
-   for(i=0, col=c+6; i<pd_ptr->rhist_na.n_elements(); i++) {
+   for(i=0, col=c+2; i<pd_ptr->rhist_na.n_elements(); i++) {
 
       at.set_entry(r, col, // RANK_i
          nint(pd_ptr->rhist_na[i]));
@@ -3430,13 +3515,14 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //
    // Ensemble Observation Rank Matched Pairs
    // Dump out the ORANK line:
-   //    TOTAL,       INDEX,       OBS_SID,
-   //    OBS_LAT,     OBS_LON,     OBS_LVL,
-   //    OBS_ELV,     OBS,         PIT,
-   //    RANK,        N_ENS_VLD,   N_ENS,
+   //    TOTAL,       INDEX,         OBS_SID,
+   //    OBS_LAT,     OBS_LON,       OBS_LVL,
+   //    OBS_ELV,     OBS,           PIT,
+   //    RANK,        N_ENS_VLD,     N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,      ENS_MEAN,    CLIMO,
-   //    ENS_SPREAD
+   //    OBS_QC,      ENS_MEAN,      CLIMO,
+   //    SPREAD,      ENS_MEAN_OERR, SPREAD_OERR,
+   //    SPREAD_PLUS_OERR
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);    // Use n_obs instead of n_pair to include missing data
@@ -3488,17 +3574,29 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+12+pd_ptr->n_ens,
       pd_ptr->o_qc_sa[i]);
 
-   // Ensemble mean values
+   // Unperturbed ensemble mean values
    at.set_entry(r, c+13+pd_ptr->n_ens,
       pd_ptr->mn_na[i]);
 
-   // Climatology value
+   // Climatology values
    at.set_entry(r, c+14+pd_ptr->n_ens,
       pd_ptr->cmn_na[i]);
 
-   // Ensemble spread values
+   // Unperturbed ensemble spread values
    at.set_entry(r, c+15+pd_ptr->n_ens,
       pd_ptr->spread_na[i]);
+
+   // Perturbed ensemble mean values
+   at.set_entry(r, c+16+pd_ptr->n_ens,
+      pd_ptr->spread_na[i]);
+
+   // Perturbed ensemble spread values
+   at.set_entry(r, c+17+pd_ptr->n_ens,
+      pd_ptr->spread_na[i]);
+
+   // Unperturbed ensemble spread values plus observation error
+   at.set_entry(r, c+18+pd_ptr->n_ens,
+      pd_ptr->spread_oerr_na[i]);
 
    return;
 }

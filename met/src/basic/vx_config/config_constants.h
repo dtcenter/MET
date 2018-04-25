@@ -123,6 +123,7 @@ enum STATLineType {
    stat_nbrcnt,
    stat_isc,
    stat_wdir,
+   stat_ecnt,
    stat_rhist,
    stat_phist,
    stat_orank,
@@ -165,6 +166,7 @@ static const char stat_nbrcnt_str[] = "NBRCNT";
 static const char stat_grad_str[]   = "GRAD";
 static const char stat_isc_str[]    = "ISC";
 static const char stat_wdir_str[]   = "WDIR";
+static const char stat_ecnt_str[]   = "ECNT";
 static const char stat_rhist_str[]  = "RHIST";
 static const char stat_phist_str[]  = "PHIST";
 static const char stat_orank_str[]  = "ORANK";

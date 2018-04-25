@@ -706,7 +706,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
            (out_lt == stat_rhist || out_lt == stat_phist ||
             out_lt == stat_relp  || out_lt == stat_ssvar)) {
       aggr_orank_lines(f, j, orank_map, n_in, n_out);
-      write_job_aggr_orank(j, out_lt, orank_map, out_at);
+      write_job_aggr_orank(j, out_lt, orank_map, out_at, rng_ptr);
    }
 
    //
@@ -2243,7 +2243,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &j, STATLineType lt,
 
 void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
                           map<ConcatString, AggrENSInfo> &m,
-                          AsciiTable &at) {
+                          AsciiTable &at, gsl_rng *rng_ptr) {
    map<ConcatString, AggrENSInfo>::iterator it;
    int i, n, n_row, n_col, r, c;
    StatHdrColumns shc;
@@ -2331,7 +2331,7 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       // RHIST output line
       //
       if(lt == stat_rhist) {
-         it->second.ens_pd.compute_pair_vals();
+         it->second.ens_pd.compute_pair_vals(rng_ptr);
          it->second.ens_pd.compute_stats();
          at.set_entry(r, c++, "RHIST:");
          write_case_cols(it->first, at, r, c);

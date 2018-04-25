@@ -88,13 +88,26 @@ class PairDataEnsemble : public PairBase {
       double     phist_bin_size;  // Ensemble PIT histogram bin width
       NumArray   phist_na;        // PIT Histogram [n_phist_bin]
 
-      NumArray   spread_na;       // Ensemble spread (standard deviation) value [n_obs]
+      NumArray   spread_na;       // Spread of unperturbed members [n_obs]
+      NumArray   spread_oerr_na;  // Spread of perturbed members [n_obs]
+      NumArray   spread_plus_oerr_na; // Unperturbed ensemble spread plus observation error [n_obs]
+
+      NumArray   esum_na;         // Sum of unperturbed ensemble values [n_obs]
+      NumArray   esumsq_na;       // Sum of unperturbed ensemble squared values [n_obs]
+
       NumArray   mn_na;           // Ensemble mean value [n_obs]
 
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
 
+      double     rps;             // Ranked probability score
       double     crpss;           // Continuous ranked probability skill score
+      double     rpss;            // Ranked probability skill score
+
+      double     me;              // ME for unperturbed ensemble mean
+      double     rmse;            // RMSE for unperturbed ensemble mean
+      double     me_oerr;         // ME for mean of perturbed members
+      double     rmse_oerr;       // RMSE for mean of perturbed members
 
       //////////////////////////////////////////////////////////////////
 
@@ -103,12 +116,12 @@ class PairDataEnsemble : public PairBase {
       void extend(int);
 
       void add_ens(int, double);
+      void add_ens_var_sums(int, double);
       void set_ens_size(int);
 
       void add_obs_error_entry(ObsErrorEntry *);
 
-      void compute_rank(const gsl_rng *);
-      void compute_pair_vals();
+      void compute_pair_vals(const gsl_rng *);
 
       void compute_stats();
       void compute_rhist();

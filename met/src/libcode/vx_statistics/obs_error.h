@@ -179,7 +179,8 @@ extern double       add_obs_error(const gsl_rng *, FieldType,
                                   const ObsErrorEntry *, double);
 extern DataPlane    add_obs_error(const gsl_rng *, FieldType,
                                   const ObsErrorEntry *,
-                                  const DataPlane &,
+                                  const DataPlane &in_dp,
+                                  const DataPlane &obs_dp,
                                   const char *, const char *);
 
 ////////////////////////////////////////////////////////////////////////

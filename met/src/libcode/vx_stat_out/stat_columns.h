@@ -273,10 +273,16 @@ static const char * isc_columns [] = {
    "BASER",       "FBIAS"
 };
 
+static const char * ecnt_columns [] = {
+   "TOTAL",       "N_ENS",       "RPS",
+   "RPSS",        "CRPS",        "CRPSS",
+   "IGN",         "ME",          "RMSE",
+   "SPREAD",      "ME_OERR",     "RMSE_OERR",
+   "SPREAD_OERR", "SPREAD_PLUS_OERR"
+};
+
 static const char * rhist_columns [] = {
-   "TOTAL",       "CRPS",        "IGN",
-   "N_RANK",      "CRPSS",       "SPREAD",
-   "RANK_"
+   "TOTAL",       "N_RANK",      "RANK_"
 };
 
 static const char * phist_columns [] = {
@@ -290,7 +296,8 @@ static const char * orank_columns [] = {
    "OBS_ELV",     "OBS",         "PIT",
    "RANK",        "N_ENS_VLD",   "N_ENS",
    "ENS_",        "OBS_QC",      "ENS_MEAN",
-   "CLIMO",       "ENS_SPREAD"
+   "CLIMO",       "SPREAD",      "ENS_MEAN_OERR",
+   "SPREAD_OERR", "SPREAD_PLUS_OERR"
 };
 
 static const char * ssvar_columns [] = {
@@ -394,6 +401,7 @@ static const int n_job_wdir_columns     = sizeof(job_wdir_columns)/sizeof(*job_w
 static const int n_job_ramp_columns     = sizeof(job_ramp_columns)/sizeof(*job_ramp_columns);
 static const int n_job_ramp_mpr_columns = sizeof(job_ramp_mpr_columns)/sizeof(*job_ramp_mpr_columns);
 
+static const int n_ecnt_columns         = sizeof(ecnt_columns)/sizeof(*ecnt_columns);
 static const int n_rhist_columns        = sizeof(rhist_columns)/sizeof(*rhist_columns);
 static const int n_phist_columns        = sizeof(phist_columns)/sizeof(*phist_columns);
 static const int n_orank_columns        = sizeof(orank_columns)/sizeof(*orank_columns);
@@ -408,10 +416,10 @@ inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); }
 inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); }
 inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); }
 inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = N_PNT
-inline int get_n_rhist_columns (int n) { return(6  + n);               } // n = N_RANK
+inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
 inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS
 inline int get_n_relp_columns  (int n) { return(2  + n);               } // n = N_ENS
-inline int get_n_orank_columns (int n) { return(16 + n);               } // n = N_ENS
+inline int get_n_orank_columns (int n) { return(19 + n);               } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -494,6 +502,8 @@ extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, bool,
                              bool update_thresh = true);
 extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
+extern void write_ecnt_row  (StatHdrColumns &, const PairDataEnsemble *, bool,
+                             AsciiTable &, int &, AsciiTable &, int &);
 extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, bool,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_phist_row (StatHdrColumns &, const PairDataEnsemble *, bool,
@@ -534,6 +544,7 @@ extern void write_nbrcnt_cols(const NBRCNTInfo &,  int, AsciiTable &, int, int);
 extern void write_grad_cols  (const GRADInfo &,         AsciiTable &, int, int);
 extern void write_mpr_cols   (const PairDataPoint *,    int, AsciiTable &, int, int);
 extern void write_isc_cols   (const ISCInfo &,     int, AsciiTable &, int, int);
+extern void write_ecnt_cols  (const PairDataEnsemble *,      AsciiTable &, int, int);
 extern void write_rhist_cols (const PairDataEnsemble *,      AsciiTable &, int, int);
 extern void write_phist_cols (const PairDataEnsemble *,      AsciiTable &, int, int);
 extern void write_orank_cols (const PairDataEnsemble *, int, AsciiTable &, int, int);

@@ -92,9 +92,12 @@ static int  process_point_ens     (int, int &);
 static void process_point_scores  ();
 
 static void process_grid_vx       ();
-static void process_grid_scores   (DataPlane *&, DataPlane &,
-                                   DataPlane &,  DataPlane &,
-                                   DataPlane &,  PairDataEnsemble &);
+static void process_grid_scores   (int,
+               const DataPlane *, const DataPlane *,
+               const DataPlane &, const DataPlane &,
+               const DataPlane &, const DataPlane &,
+               const DataPlane &, ObsErrorEntry *,
+               PairDataEnsemble &);
 
 static void clear_counts(const DataPlane &, int);
 static void track_counts(const DataPlane &, int);
@@ -393,11 +396,12 @@ void process_command_line(int argc, char **argv) {
    // Set flag to indicate whether verification is to be performed
    if((point_obs_flag || grid_obs_flag) &&
       (conf_info.get_n_vx() > 0) &&
-      (conf_info.output_flag[i_orank] != STATOutputType_None ||
+      (conf_info.output_flag[i_ecnt]  != STATOutputType_None ||
        conf_info.output_flag[i_rhist] != STATOutputType_None ||
        conf_info.output_flag[i_phist] != STATOutputType_None ||
        conf_info.output_flag[i_ssvar] != STATOutputType_None ||
-       conf_info.output_flag[i_relp]  != STATOutputType_None)) vx_flag = 1;
+       conf_info.output_flag[i_relp]  != STATOutputType_None ||
+       conf_info.output_flag[i_orank] != STATOutputType_None)) vx_flag = 1;
    else                                                        vx_flag = 0;
 
    // Process ensemble mean information
@@ -1272,8 +1276,7 @@ void process_point_scores() {
                if(pd_ptr->n_obs == 0) continue;
 
                // Compute observation ranks and pair values
-               pd_ptr->compute_rank(conf_info.rng_ptr);
-               pd_ptr->compute_pair_vals();
+               pd_ptr->compute_pair_vals(conf_info.rng_ptr);
 
                // Process each filtering threshold
                for(m=0; m<conf_info.vx_opt[i].othr_ta.n_elements(); m++) {
@@ -1286,6 +1289,17 @@ void process_point_scores() {
 
                   // Compute ensemble statistics
                   pd.compute_stats();
+
+                  // Write ECNT stats
+                  if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
+
+                     if(pd.n_obs > 0) {
+                        write_ecnt_row(shc, &pd,
+                           conf_info.output_flag[i_ecnt],
+                           stat_at, i_stat_row,
+                           txt_at[i_ecnt], i_txt_row[i_ecnt]);
+                     }
+                  }
 
                   // Write RHIST counts
                   if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
@@ -1386,12 +1400,11 @@ void process_grid_vx() {
    bool found;
    DataPlane  mask_dp;
    DataPlane *fcst_dp = (DataPlane *) 0;
-   DataPlane *fcst_dp_smooth = (DataPlane *) 0;
-   DataPlane  obs_dp, obs_dp_smooth;
-   DataPlane  emn_dp, emn_dp_smooth;
-   DataPlane  cmn_dp;
+   DataPlane *fraw_dp = (DataPlane *) 0;
+   DataPlane  obs_dp, oraw_dp;
+   DataPlane emn_dp, cmn_dp;
    PairDataEnsemble pd_all, pd;
-   ObsErrorEntry *entry_ptr = (ObsErrorEntry *) 0;
+   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1399,8 +1412,8 @@ void process_grid_vx() {
    shc.set_obtype(conf_info.obtype);
 
    // Allocate space to store the forecast fields
-   fcst_dp        = new DataPlane [n_ens];
-   fcst_dp_smooth = new DataPlane [n_ens];
+   fcst_dp = new DataPlane [n_ens];
+   fraw_dp = new DataPlane [n_ens];
 
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
@@ -1435,18 +1448,18 @@ void process_grid_vx() {
             mlog << Debug(3)
                  << "Observation error for gridded verification is "
                  << "defined in the configuration file.\n";
-            entry_ptr = &(conf_info.vx_opt[i].obs_error.entry);
+            oerr_ptr = &(conf_info.vx_opt[i].obs_error.entry);
          }
          // Otherwise, do a table lookup
          else {
-            entry_ptr = obs_error_table.lookup(
+            oerr_ptr = obs_error_table.lookup(
                conf_info.vx_opt[i].vx_pd.obs_info->name(),
                conf_info.obtype);
 
             // If match was found and includes a value range setting,
             // reset to NULL and lookup separately for grid point
-            if(entry_ptr) {
-               if(entry_ptr->val_range.n() == 0) {
+            if(oerr_ptr) {
+               if(oerr_ptr->val_range.n() == 0) {
                   mlog << Debug(3)
                        << "Observation error for gridded verification is "
                        << "defined by a single table entry.\n";
@@ -1455,7 +1468,7 @@ void process_grid_vx() {
                   mlog << Debug(3)
                        << "Observation error for gridded verification is "
                        << "defined by a table lookup for each point.\n";
-                  entry_ptr = (ObsErrorEntry *) 0;
+                  oerr_ptr = (ObsErrorEntry *) 0;
                }
             }
          }
@@ -1472,18 +1485,6 @@ void process_grid_vx() {
             found = get_data_plane(ens_file_list[j], etype,
                                    conf_info.vx_opt[i].vx_pd.fcst_info,
                                    fcst_dp[j], true);
-
-            // Apply observation error logic
-            if(conf_info.vx_opt[i].obs_error.field == FieldType_Fcst ||
-               conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
-               mlog << Debug(3)
-                    << "Applying observation error perturbation to "
-                    << "ensemble member " << j+1 << ".\n";
-               fcst_dp[j] = add_obs_error(conf_info.rng_ptr,
-                               FieldType_Fcst, entry_ptr, fcst_dp[j],
-                               conf_info.vx_opt[i].vx_pd.obs_info->name(),
-                               conf_info.obtype);
-            }
          }
          else {
             found = false;
@@ -1519,18 +1520,6 @@ void process_grid_vx() {
          found = get_data_plane(grid_obs_file_list[j], otype,
                                 conf_info.vx_opt[i].vx_pd.obs_info,
                                 obs_dp, true);
-
-         // Apply observation error logic
-         if(conf_info.vx_opt[i].obs_error.field == FieldType_Obs ||
-            conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
-            mlog << Debug(3)
-                 << "Applying observation error perturbation to "
-                 << "gridded observation data.\n";
-            obs_dp = add_obs_error(conf_info.rng_ptr,
-                        FieldType_Obs, entry_ptr, obs_dp,
-                        conf_info.vx_opt[i].vx_pd.obs_info->name(),
-                        conf_info.obtype);
-         }
 
          // If found, break out of the loop
          if(!found) n_miss++;
@@ -1600,8 +1589,10 @@ void process_grid_vx() {
          FieldType    field      = conf_info.vx_opt[i].interp_info.field;
 
          // Check for allowable smoothing operation
-         if(mthd == InterpMthd_DW_Mean || mthd == InterpMthd_LS_Fit  ||
-            mthd == InterpMthd_Bilin   || mthd == InterpMthd_Nbrhd) {
+         if(mthd == InterpMthd_DW_Mean ||
+            mthd == InterpMthd_LS_Fit  ||
+            mthd == InterpMthd_Bilin   ||
+            mthd == InterpMthd_Nbrhd) {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
                  << mthd_str << " smoothing option not supported for "
@@ -1613,33 +1604,60 @@ void process_grid_vx() {
          shc.set_interp_mthd(mthd, shape);
          shc.set_interp_wdth(wdth);
 
-         // If requested in the config file, smooth the forecast field
+         // Smooth the ensemble mean field, if requested
+         if(ens_mean_flag &&
+            (field == FieldType_Fcst || field == FieldType_Both)) {
+            emn_dp = smooth_field(emn_dp, mthd, wdth, shape,
+                                  vld_thresh);
+         }
+
+         // Smooth the observation field, if requested
+         if(field == FieldType_Obs || field == FieldType_Both) {
+            obs_dp = smooth_field(obs_dp, mthd, wdth, shape,
+                                  vld_thresh);
+         }
+
+         // Store a copy of the unperturbed observation field
+         oraw_dp = obs_dp;
+
+         // Apply observation error perturbation, if requested
+         if(conf_info.vx_opt[i].obs_error.field == FieldType_Obs ||
+            conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
+            mlog << Debug(3)
+                 << "Applying observation error perturbation to "
+                 << "gridded observation data.\n";
+            obs_dp = add_obs_error(conf_info.rng_ptr,
+                               FieldType_Obs, oerr_ptr,
+                               oraw_dp, oraw_dp,
+                               conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                               conf_info.obtype);
+         }
+
+         // Looop through the ensenmble members
          for(k=0; k<ens_file_list.n_elements(); k++) {
 
+            // Smooth the forecast field, if requested
             if(field == FieldType_Fcst || field == FieldType_Both) {
-               smooth_field(fcst_dp[k], fcst_dp_smooth[k],
-                            mthd, wdth, shape, vld_thresh);
-               if(ens_mean_flag) {
-                  smooth_field(emn_dp, emn_dp_smooth,
-                               mthd, wdth, shape, vld_thresh);
-               }
+               fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth,
+                                         shape, vld_thresh);
             }
-            // Do not smooth the forecast field
-            else {
-               fcst_dp_smooth[k] = fcst_dp[k];
-               if(ens_mean_flag) emn_dp_smooth = emn_dp;
+
+            // Store a copy of the unperturbed ensemble field
+            fraw_dp[k] = fcst_dp[k];
+
+            // Apply observation error perturbation, if requested
+            if(conf_info.vx_opt[i].obs_error.field == FieldType_Fcst ||
+               conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
+               mlog << Debug(3)
+                    << "Applying observation error perturbation to "
+                    << "ensemble member " << k+1 << ".\n";
+               fcst_dp[k] = add_obs_error(conf_info.rng_ptr,
+                               FieldType_Fcst, oerr_ptr,
+                               fraw_dp[k], oraw_dp,
+                               conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                               conf_info.obtype);
             }
          } // end for k
-
-         // If requested in the config file, smooth the observation field
-         if(field == FieldType_Obs || field == FieldType_Both) {
-            smooth_field(obs_dp, obs_dp_smooth,
-                         mthd, wdth, shape, vld_thresh);
-         }
-         // Do not smooth the observation field
-         else {
-            obs_dp_smooth = obs_dp;
-         }
 
          // Loop through the masks to be applied
          for(k=0; k<conf_info.vx_opt[i].get_n_mask_area(); k++) {
@@ -1656,8 +1674,12 @@ void process_grid_vx() {
             pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0][0][0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
-            process_grid_scores(fcst_dp_smooth, obs_dp_smooth,
-                                emn_dp_smooth, cmn_dp, mask_dp, pd_all);
+            process_grid_scores(i,
+                                fcst_dp, fraw_dp,
+                                obs_dp, oraw_dp,
+                                emn_dp, cmn_dp,
+                                mask_dp, oerr_ptr,
+                                pd_all);
 
             mlog << Debug(2)
                  << "Processing gridded verification "
@@ -1675,12 +1697,11 @@ void process_grid_vx() {
             if(pd_all.n_obs == 0) continue;
 
             // Compute observation ranks and pair values
-            pd_all.compute_rank(conf_info.rng_ptr);
-            pd_all.compute_pair_vals();
+            pd_all.compute_pair_vals(conf_info.rng_ptr);
 
             // Write out the unfiltered observation rank field.
             if(conf_info.nc_info.do_orank) {
-               write_orank_nc(pd_all, obs_dp_smooth, i, j, k);
+               write_orank_nc(pd_all, obs_dp, i, j, k);
             }
 
             // Process each filtering threshold
@@ -1696,6 +1717,17 @@ void process_grid_vx() {
                pd.compute_stats();
 
                if(i == 0) setup_txt_files();
+
+               // Write ECNT stats
+               if(conf_info.output_flag[i_ecnt] != STATOutputType_None) {
+
+                  if(pd.n_obs > 0) {
+                     write_ecnt_row(shc, &pd,
+                        conf_info.output_flag[i_ecnt],
+                        stat_at, i_stat_row,
+                        txt_at[i_ecnt], i_txt_row[i_ecnt]);
+                  }
+               }
 
                // Write RHIST counts
                if(conf_info.output_flag[i_rhist] != STATOutputType_None) {
@@ -1772,8 +1804,8 @@ void process_grid_vx() {
    } // end for i
 
    // Delete allocated DataPlane objects
-   if(fcst_dp)        { delete [] fcst_dp;        fcst_dp        = (DataPlane *) 0; }
-   if(fcst_dp_smooth) { delete [] fcst_dp_smooth; fcst_dp_smooth = (DataPlane *) 0; }
+   if(fcst_dp) { delete [] fcst_dp; fcst_dp = (DataPlane *) 0; }
+   if(fraw_dp) { delete [] fraw_dp; fraw_dp = (DataPlane *) 0; }
 
    // Close the output NetCDF file
    if(nc_out) {
@@ -1785,18 +1817,22 @@ void process_grid_vx() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
-        DataPlane &emn_dp, DataPlane &cmn_dp,
-        DataPlane &mask_dp, PairDataEnsemble &pd) {
+void process_grid_scores(int i_vx,
+        const DataPlane *fcst_dp, const DataPlane *fraw_dp,
+        const DataPlane &obs_dp,  const DataPlane &oraw_dp,
+        const DataPlane &emn_dp,  const DataPlane &cmn_dp,
+        const DataPlane &mask_dp, ObsErrorEntry *oerr_ptr,
+        PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
-   double v, cmn;
+   double cmn;
+   ObsErrorEntry *e = (ObsErrorEntry *) 0;
 
    // Allocate memory in one big chunk based on grid size
    pd.extend(grid.nx()*grid.ny());
 
    // Climatology flags
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
-                    cmn_dp.ny() == obs_dp.ny());
+                    cmn_dp.ny() == obs_dp.ny());;
 
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
@@ -1804,18 +1840,34 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
 
          // Skip any grid points containing bad data values or where the
          // verification masking region is turned off
-         if(is_bad_data(obs_dp.get(x, y)) ||
+         if(is_bad_data(obs_dp(x, y)) ||
             !mask_dp.s_is_on(x, y)) continue;
 
          // Get current climatology value
-         cmn = (cmn_flag ? cmn_dp.get(x, y) : bad_data_double);
+         cmn = (cmn_flag ? cmn_dp(x, y) : bad_data_double);
 
          // Add the observation point
-         pd.add_obs(x, y, obs_dp.get(x, y),
+         pd.add_obs(x, y, obs_dp(x, y),
                     cmn, bad_data_double, wgt_dp(x, y));
 
+         // Get the observation error entry pointer
+         if(oerr_ptr) {
+            e = oerr_ptr;
+         }
+         else if(conf_info.vx_opt[i_vx].obs_error.field != FieldType_None) {
+            e = obs_error_table.lookup(
+                   conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                   conf_info.obtype, oraw_dp(x,y));
+         }
+         else {
+            e = (ObsErrorEntry *) 0;
+         }
+
+         // Store the observation error entry pointer
+         pd.add_obs_error_entry(e);
+
          // Add the ensemble mean value for this point
-         pd.mn_na.add(emn_dp.get(x, y));
+         pd.mn_na.add(emn_dp(x, y));
 
       } // end for y
    } // end for x
@@ -1834,13 +1886,13 @@ void process_grid_scores(DataPlane *&fcst_dp, DataPlane &obs_dp,
             n_miss++;
             continue;
          }
-         // Get the ensemble value
          else {
-            v = fcst_dp[j].get(x, y);
-         }
+            // Store the ensemble value
+            pd.add_ens(j-n_miss, fcst_dp[j](x, y));
 
-         // Store the ensemble value
-         pd.add_ens(j-n_miss, v);
+            // Store the unperturbed ensemble value
+            pd.add_ens_var_sums(i, fraw_dp[j](x, y));
+         }
       } // end for j
    } // end for i
 
@@ -2033,6 +2085,7 @@ void setup_txt_files() {
    max_col  = max(get_n_orank_columns(n_vld+1),
                   get_n_rhist_columns(n_vld));
    max_col  = max(max_col, get_n_phist_columns(n_phist_bin));
+   max_col  = max(max_col, n_ecnt_columns);
    max_col  = max(max_col, n_ssvar_columns);
    max_col  = max(max_col, get_n_relp_columns(n_vld));
    max_col += n_header_columns;
