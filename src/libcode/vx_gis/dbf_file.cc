@@ -319,7 +319,8 @@ pos = 32;
 
 if ( lseek(fd, pos, SEEK_SET) < 0 )  {
 
-   cerr << "\n\n   DbfHeader::set_subrecords(int) -> lseek error ... "
+   mlog << Error
+        << "\n\n   DbfHeader::set_subrecords(int) -> lseek error ... "
         << strerror(errno) << "\n\n";
 
    exit ( 1 );
@@ -340,7 +341,8 @@ for (j=0; j<n_subrecs; ++j)  {
 
    if ( n_read != bytes )  {
 
-      cerr << "\n\n  DbfHeader::set_subrecords(int) -> read error ... n_read = " << n_read << "\n\n";
+      mlog << Error
+            << "\n\n  DbfHeader::set_subrecords(int) -> read error ... n_read = " << n_read << "\n\n";
 
       exit ( 1 );
 
@@ -374,7 +376,8 @@ DbfSubRecord * DbfHeader::lookup_subrec(const char * text) const
 
 if ( empty(text) )  {
 
-   cerr << "\n\n  DbfHeader::set_subrecords(const char *) -> empty string!\n\n";
+   mlog << Error
+        << "\n\n  DbfHeader::set_subrecords(const char *) -> empty string!\n\n";
 
    exit ( 1 );
 

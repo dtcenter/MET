@@ -107,7 +107,7 @@ while ( (n_read = read(fd, buf, 8)) == 8 )  {
 
    rh.set(buf);
 
-   cout << "File position = " << pos << "\n";
+   // cout << "File position = " << pos << "\n";
 
    cout << "Record Header ... \n";
 
@@ -138,11 +138,7 @@ while ( (n_read = read(fd, buf, 8)) == 8 )  {
 
    cout << "Record Data ... \n";
 
-   if ( rh.record_number_0 == 1363 )  {
-
-      gr.dump(cout, 1);
-
-   }
+   gr.dump(cout, 1);
 
    cout << "\n";
 

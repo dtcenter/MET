@@ -171,6 +171,14 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Code for struct ShpPolylineRecord
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ShpPolylineRecord::set(unsigned char * buf)
 
 {
@@ -184,7 +192,8 @@ shape_type = i[0];
 
 if ( shape_type != shape_type_polyline )  {
 
-   cerr << "\n\n  ShpPolylineRecord::set(unsigned char *) -> bad shape type ... "
+   mlog << Error
+        << "\n\n  ShpPolylineRecord::set(unsigned char *) -> bad shape type ... "
         << shapetype_to_string((ShapeType) shape_type) << "\n\n";
 
    exit ( 1 );
@@ -215,7 +224,8 @@ n_points = i[1];
 
 if ( n_parts > max_shp_parts )  {
 
-   cerr << "\n\n  ShpPolylineRecord::set(unsigned char *) -> too many parts ... "
+   mlog << Error
+        << "\n\n  ShpPolylineRecord::set(unsigned char *) -> too many parts ... "
         << " increase parameter \"max_shp_parts\" to at least "
         << n_parts << "\n\n";
 
@@ -225,7 +235,8 @@ if ( n_parts > max_shp_parts )  {
 
 if ( n_points > max_shp_points )  {
 
-   cerr << "\n\n  ShpPolylineRecord::set(unsigned char *) -> too many points ... "
+   mlog << Error
+        << "\n\n  ShpPolylineRecord::set(unsigned char *) -> too many points ... "
         << " increase parameter \"max_shp_points\" to at least "
         << n_points << "\n\n";
 
@@ -314,6 +325,36 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ShpPolylineRecord::toggle_longitudes()
+
+{
+
+int j;
+
+for (j=0; j<n_points; ++j)  {
+
+   points[j].x = -(points[j].x);
+
+}   //  for j
+
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for struct ShpPolygonRecord
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ShpPolygonRecord::set(unsigned char * buf)
 
 {
@@ -327,7 +368,8 @@ shape_type = i[0];
 
 if ( shape_type != shape_type_polygon )  {
 
-   cerr << "\n\n  ShpPolygonRecord::set(unsigned char *) -> bad shape type ... "
+   mlog << Error
+        << "\n\n  ShpPolygonRecord::set(unsigned char *) -> bad shape type ... "
         << shapetype_to_string((ShapeType) shape_type) << "\n\n";
 
    exit ( 1 );
@@ -358,7 +400,8 @@ n_points = i[1];
 
 if ( n_parts > max_shp_parts )  {
 
-   cerr << "\n\n  ShpPolygonRecord::set(unsigned char *) -> too many parts ... "
+   mlog << Error
+        << "\n\n  ShpPolygonRecord::set(unsigned char *) -> too many parts ... "
         << " increase parameter \"max_shp_parts\" to at least "
         << n_parts << "\n\n";
 
@@ -368,7 +411,8 @@ if ( n_parts > max_shp_parts )  {
 
 if ( n_points > max_shp_points )  {
 
-   cerr << "\n\n  ShpPolygonRecord::set(unsigned char *) -> too many points ... "
+   mlog << Error
+        << "\n\n  ShpPolygonRecord::set(unsigned char *) -> too many points ... "
         << " increase parameter \"max_shp_points\" to at least "
         << n_points << "\n\n";
 
@@ -475,7 +519,8 @@ double ShpPolygonRecord::lat(int k) const
 
 if ( (k < 0) || (k >= n_points) )  {
 
-   cerr << "\n\n  ShpPolygonRecord::lat(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  ShpPolygonRecord::lat(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -495,7 +540,8 @@ double ShpPolygonRecord::lon(int k) const
 
 if ( (k < 0) || (k >= n_points) )  {
 
-   cerr << "\n\n  ShpPolygonRecord::lon(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  ShpPolygonRecord::lon(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -517,7 +563,8 @@ int ShpPolygonRecord::start_index(int partno) const
 
 if ( (partno < 0) || (partno >= n_parts) )  {
 
-   cerr << "\n\n  ShpPolygonRecord::start_index(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  ShpPolygonRecord::start_index(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -538,7 +585,8 @@ int ShpPolygonRecord::stop_index(int partno) const
 
 if ( (partno < 0) || (partno >= n_parts) )  {
 
-   cerr << "\n\n  ShpPolygonRecord::stop_index(int) const -> range check error\n\n";
+   mlog << Error
+        << "\n\n  ShpPolygonRecord::stop_index(int) const -> range check error\n\n";
 
    exit ( 1 );
 
@@ -548,6 +596,28 @@ if ( (partno < 0) || (partno >= n_parts) )  {
 if ( partno == (n_parts - 1) )  return ( n_points - 1 );
 
 return ( parts[partno + 1] - 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ShpPolygonRecord::toggle_longitudes()
+
+{
+
+int j;
+
+for (j=0; j<n_points; ++j)  {
+
+   points[j].x = -(points[j].x);
+
+}   //  for j
+
+
+
+return;
 
 }
 

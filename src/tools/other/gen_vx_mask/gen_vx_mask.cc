@@ -1372,7 +1372,7 @@ void usage() {
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << config.nc_compression() << ") (optional).\n\n"
 
-        << "\t\t\"-shapeno n\" only for use with shapefiles ... specifies which record in the shapefile to use (0-based)\n\n"
+        << "\t\t\"-shapeno n\" is only for use with shapefiles ... specifies which record in the shapefile to use (0-based)\n\n"
 
         << flush;
 
@@ -1529,7 +1529,7 @@ if ( (fd = ::open(shape_filename, O_RDONLY)) < 0 )  {
 }
 
    //
-   //  read header
+   //  read file header
    //
 
 bytes = shp_header_bytes;
@@ -1547,14 +1547,14 @@ if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 h.set(buf);
 
    //
-   //  loop through the records
+   //  skip through un-needed records
    //
 
 recnum = 0;
 
 hit_eof = false;
 
-for (j=0; j<=shape_number; ++j)  {
+for (j=0; j<shape_number; ++j)  {
 
       //
       //  get record header
@@ -1579,58 +1579,22 @@ for (j=0; j<=shape_number; ++j)  {
    rh.set(buf);
 
       //
-      //  check buffer size
-      //
-
-   if ( j == shape_number )  {
-
-      if ( rh.content_length_bytes > buf_size )  {
-
-         mlog << Error
-              << program_name << ": get_shapefile_outline() -> record too large ... increase buffer size to at least "
-              << (rh.content_length_bytes) << "\n\n";
-
-         exit ( 1 );
-
-      }
-
-   }
-
-      //
-      //  get record data
+      //  skip record
       //
 
    bytes = rh.content_length_bytes;
 
-   if ( j < shape_number )  {
+   if ( lseek(fd, bytes, SEEK_CUR) < 0 )  {
 
-      if ( lseek(fd, bytes, SEEK_CUR) < 0 )  {
+      mlog << Error
+           << program_name << ": get_shapefile_outline() -> lseek error on record number " << j << "\n\n";
 
-         mlog << Error
-              << program_name << ": get_shapefile_outline() -> lseek error on record number " << j << "\n\n";
-
-         exit ( 1 );
-
-      }
-
-   } else {
-
-      n_read = read(fd, buf, bytes);
-
-      if ( n_read != bytes )  {
-
-         mlog << Error
-              << program_name << ": get_shapefile_outline() -> read error on record number " << j << "\n\n";
-
-         exit ( 1 );
-
-      }
+      exit ( 1 );
 
    }
 
-   pr.set(buf);
-
 }   //  for j
+
 
 if ( hit_eof )  {
 
@@ -1640,6 +1604,72 @@ if ( hit_eof )  {
    exit ( 1 );
 
 }
+
+
+   //
+   //  get the terget record
+   //
+
+
+      //
+      //  get record header
+      //
+
+bytes = shp_record_header_bytes;
+
+n_read = read(fd, buf, bytes);
+
+if ( n_read <= 0 )  {
+
+   mlog << Error
+        << program_name << ": get_shapefile_outline() -> trouble reading record header for record "
+        << j << "\n\n";
+
+   exit ( 1 );
+
+}
+
+rh.set(buf);
+
+      //
+      //  check buffer size
+      //
+
+if ( j == shape_number )  {
+
+   if ( rh.content_length_bytes > buf_size )  {
+
+      mlog << Error
+           << program_name << ": get_shapefile_outline() -> record too large ... increase buffer size to at least "
+           << (rh.content_length_bytes) << "\n\n";
+
+      exit ( 1 );
+
+   }
+
+}
+
+      //
+      //  get record data
+      //
+
+bytes = rh.content_length_bytes;
+
+n_read = read(fd, buf, bytes);
+
+if ( n_read != bytes )  {
+
+   mlog << Error
+        << program_name << ": get_shapefile_outline() -> read error on record number " << j << "\n\n";
+
+   exit ( 1 );
+
+}
+
+pr.set(buf);
+
+pr.toggle_longitudes();
+
 
    //
    //  make sure it's a polygon record, as opposed to some other type
