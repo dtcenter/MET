@@ -26,6 +26,7 @@
 //   007    06/09/17  Halley Gotway   Add aggregate RELP lines.
 //   008    06/09/17  Halley Gotway   Add aggregate GRAD lines.
 //   009    03/01/18  Halley Gotway   Update summary job type.
+//   010    04/25/18  Halley Gotway   Add ECNT line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -136,7 +137,7 @@ struct AggrISCInfo {
 struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
-   NumArray crps_climo_na;
+   NumArray crps_climo_na, rps_climo_na;
 };
 
 // Define struct used to perform comparisons for SSVAR bins
@@ -226,9 +227,14 @@ extern void aggr_isc_lines(
                map<ConcatString, AggrISCInfo> &,
                int &, int &);
 
+extern void aggr_ecnt_lines(
+               LineDataFile &, STATAnalysisJob &,
+               map<ConcatString, AggrENSInfo> &,
+               int &, int &);
+
 extern void aggr_rhist_lines(
                LineDataFile &, STATAnalysisJob &,
-                  map<ConcatString, AggrENSInfo> &,
+               map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_phist_lines(
@@ -277,7 +283,6 @@ extern void mpr_to_mcts(
 extern void mpr_to_cnt(
                STATAnalysisJob &, const AggrMPRInfo &,
                CNTInfo &, const char *, gsl_rng *);
-
 
 extern void mpr_to_psum(STATAnalysisJob &, const AggrMPRInfo &,
                SL1L2Info &);

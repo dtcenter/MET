@@ -27,6 +27,7 @@
 //                    independent column names.
 //   008    06/09/17  Halley Gotway   Add RELP line type.
 //   009    10/09/17  Halley Gotway   Add GRAD line type.
+//   010    04/25/18  Halley Gotway   Add ECNT line type.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -326,16 +327,38 @@ void parse_isc_line(STATLine &l, ISCInfo &i_info, int &iscale) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
+
+   e_data.total  = atoi(l.get_item("TOTAL"));
+   e_data.n_ens  = atof(l.get_item("N_ENS"));
+
+   e_data.rps    = atof(l.get_item("RPS"));
+   e_data.rpss   = atof(l.get_item("RPSS"));
+   e_data.crps   = atof(l.get_item("CRPS"));
+   e_data.crpss  = atof(l.get_item("CRPSS"));
+   e_data.ign    = atof(l.get_item("IGN"));
+
+   e_data.me     = atof(l.get_item("ME"));
+   e_data.rmse   = atof(l.get_item("RMSE"));
+   e_data.spread = atof(l.get_item("SPREAD"));
+
+   e_data.me_oerr     = atof(l.get_item("ME_OERR"));
+   e_data.rmse_oerr   = atof(l.get_item("RMSE_OERR"));
+   e_data.spread_oerr = atof(l.get_item("SPREAD_OERR"));
+
+   e_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    int i;
    char col_str[max_str_len];
 
    r_data.total  = atoi(l.get_item("TOTAL"));
-   r_data.crps   = atof(l.get_item("CRPS"));
-   r_data.ign    = atof(l.get_item("IGN"));
    r_data.n_rank = atoi(l.get_item("N_RANK"));
-   r_data.crpss  = atof(l.get_item("CRPSS"));
-   r_data.spread = atof(l.get_item("SPREAD"));
 
    r_data.rhist_na.clear();
 
@@ -397,13 +420,13 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
 
    o_data.total     = atoi(l.get_item("TOTAL"));
    o_data.index     = atoi(l.get_item("INDEX"));
-   o_data.obs_sid   = l.get_item("OBS_SID", false);
+   o_data.obs_sid   =      l.get_item("OBS_SID", false);
    o_data.obs_lat   = atof(l.get_item("OBS_LAT"));
    o_data.obs_lon   = atof(l.get_item("OBS_LON"));
    o_data.obs_lvl   = atof(l.get_item("OBS_LVL"));
    o_data.obs_elv   = atof(l.get_item("OBS_ELV"));
-   o_data.obs       = atof(l.get_item("OBS"));
 
+   o_data.obs       = atof(l.get_item("OBS"));
    o_data.pit       = atof(l.get_item("PIT"));
 
    o_data.rank      = atoi(l.get_item("RANK"));
@@ -417,10 +440,13 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
       o_data.ens_na.add(atof(l.get_item(col_str)));
    }
 
-   o_data.obs_qc     = l.get_item("OBS_QC", false);
-   o_data.ens_mean   = atof(l.get_item("ENS_MEAN"));
-   o_data.climo      = atof(l.get_item("CLIMO"));
-   o_data.ens_spread = atof(l.get_item("ENS_SPREAD"));
+   o_data.obs_qc           =      l.get_item("OBS_QC", false);
+   o_data.ens_mean         = atof(l.get_item("ENS_MEAN"));
+   o_data.climo            = atof(l.get_item("CLIMO"));
+   o_data.spread           = atof(l.get_item("SPREAD"));
+   o_data.ens_mean_oerr    = atof(l.get_item("ENS_MEAN_OERR"));
+   o_data.spread_oerr      = atof(l.get_item("SPREAD_OERR"));
+   o_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
 
    return;
 }

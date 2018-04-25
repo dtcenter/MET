@@ -700,11 +700,12 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the observation rank line types:
-   //    ORANK -> RHIST, PHIST, RELP, SSVAR
+   //    ORANK -> ECNT, RHIST, PHIST, RELP, SSVAR
    //
    else if(in_lt == stat_orank &&
-           (out_lt == stat_rhist || out_lt == stat_phist ||
-            out_lt == stat_relp  || out_lt == stat_ssvar)) {
+           (out_lt == stat_ecnt  || out_lt == stat_rhist ||
+            out_lt == stat_phist || out_lt == stat_relp  ||
+            out_lt == stat_ssvar)) {
       aggr_orank_lines(f, j, orank_map, n_in, n_out);
       write_job_aggr_orank(j, out_lt, orank_map, out_at, rng_ptr);
    }
@@ -2269,7 +2270,11 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    // Setup the output table
    //
    n_col = 1 + j.column_case.n_elements();
-   if(lt == stat_rhist) {
+   if(lt == stat_ecnt) {
+      n_row  = 1 + m.size();
+      n_col += n_ecnt_columns;
+   }
+   else if(lt == stat_rhist) {
       n_row  = 1 + m.size();
       n_col += get_n_rhist_columns(n);
    }
@@ -2291,7 +2296,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    // Write the rest of the header row
    //
    c = 1 + j.column_case.n_elements();
-        if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
+        if(lt == stat_ecnt)  write_header_row(ecnt_columns, n_ecnt_columns, 0, at, 0, c);
+   else if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
    else if(lt == stat_phist) write_phist_header_row(0, n, at, 0, c);
    else if(lt == stat_relp)  write_relp_header_row (0, n, at, 0, c);
    else if(lt == stat_ssvar) write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
@@ -2299,7 +2305,8 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
    //
    // Setup the output STAT file
    //
-        if(lt == stat_rhist) j.setup_stat_file(n_row, n);
+        if(lt == stat_ecnt)  j.setup_stat_file(n_row, 0);
+   else if(lt == stat_rhist) j.setup_stat_file(n_row, n);
    else if(lt == stat_phist) j.setup_stat_file(n_row, n);
    else if(lt == stat_relp)  j.setup_stat_file(n_row, n);
    else if(lt == stat_ssvar) j.setup_stat_file(n_row, 0);
@@ -2328,11 +2335,26 @@ void write_job_aggr_orank(STATAnalysisJob &j, STATLineType lt,
       c = 0;
 
       //
+      // ECNT output line
+      //
+      if(lt == stat_ecnt) {
+         it->second.ens_pd.compute_stats();
+         at.set_entry(r, c++, "ECNT:");
+         write_case_cols(it->first, at, r, c);
+         write_ecnt_cols(&(it->second.ens_pd), at, r, c);
+         if(j.stat_out) {
+            write_header_cols(shc, j.stat_at, r);
+            write_ecnt_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
+         }
+         // Increment row counter
+         r++;
+      }
+
+      //
       // RHIST output line
       //
-      if(lt == stat_rhist) {
-         it->second.ens_pd.compute_pair_vals(rng_ptr);
-         it->second.ens_pd.compute_stats();
+      else if(lt == stat_rhist) {
+         it->second.ens_pd.compute_rhist();
          at.set_entry(r, c++, "RHIST:");
          write_case_cols(it->first, at, r, c);
          write_rhist_cols(&(it->second.ens_pd), at, r, c);
