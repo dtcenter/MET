@@ -711,32 +711,42 @@ double add_obs_error(const gsl_rng *r, FieldType t,
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane add_obs_error(const gsl_rng *r, FieldType t,
-                        const ObsErrorEntry *e, const DataPlane &dp,
+                        const ObsErrorEntry *in_e,
+                        const DataPlane &in_dp,
+                        const DataPlane &obs_dp,
                         const char *var_name, const char *obtype) {
    int x, y;
-   double v, v_new;
-   DataPlane dp_new = dp;
-   const ObsErrorEntry *e_new = e;
+   double v;
+   DataPlane out_dp = in_dp;
+   const ObsErrorEntry *e = (ObsErrorEntry *) 0;
+
+   // Check for matching dimensions
+   if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
+      mlog << Error << "\nadd_obs_obs() -> "
+           << "the data dimensions must match (" << in_dp.nx()
+           << ", " << in_dp.ny() << ") != (" << obs_dp.nx()
+           << ", " << obs_dp.ny() << ")!\n\n";
+      exit(1);
+   }
 
    // Apply random perturbation to each grid point
-   for(x=0; x<dp_new.nx(); x++) {
-      for(y=0; y<dp_new.ny(); y++) {
+   for(x=0; x<out_dp.nx(); x++) {
+      for(y=0; y<out_dp.ny(); y++) {
 
-         // Get current value
-         v = dp.get(x, y);
+         // For a NULL pointer, do a table lookup
+         e = (in_e ? in_e :
+              obs_error_table.lookup(var_name, obtype,
+                                     obs_dp.get(x,y)));
 
-         // Check for a null pointer and do a table lookup
-         if(!e) e_new = obs_error_table.lookup(var_name, obtype, v);
-
-         // Apply perturbation
-         v_new = add_obs_error(r, t, e_new, v);
+         // Get current data value
+         v = in_dp.get(x, y);
 
          // Store perturbed value
-         dp_new.set(v_new, x, y);
+         out_dp.set(add_obs_error(r, t, e, v), x, y);
       }
    }
 
-   return(dp_new);
+   return(out_dp);
 }
 
 ////////////////////////////////////////////////////////////////////////

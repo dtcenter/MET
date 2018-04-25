@@ -541,8 +541,7 @@ void write_orank() {
    }
 
    // Compute statistics
-   ens_pd.compute_rank(rng_ptr);
-   ens_pd.compute_pair_vals();
+   ens_pd.compute_pair_vals(rng_ptr);
    ens_pd.compute_stats();
 
    // Compute ensemble mean, if necessary

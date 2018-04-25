@@ -116,7 +116,8 @@ extern void write_job_aggr_ssvar(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrSSVARInfo> &, AsciiTable &);
 
 extern void write_job_aggr_orank(STATAnalysisJob &, STATLineType,
-               map<ConcatString, AggrENSInfo> &, AsciiTable &);
+               map<ConcatString, AggrENSInfo> &, AsciiTable &,
+               gsl_rng *);
 
 extern void write_job_aggr_isc(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrISCInfo> &, AsciiTable &);

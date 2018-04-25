@@ -1835,25 +1835,35 @@ const char * statlinetype_to_string(const STATLineType t) {
       case(stat_cts):          s = stat_cts_str;     break;
       case(stat_mctc):         s = stat_mctc_str;    break;
       case(stat_mcts):         s = stat_mcts_str;    break;
+
       case(stat_cnt):          s = stat_cnt_str;     break;
+
       case(stat_pct):          s = stat_pct_str;     break;
       case(stat_pstd):         s = stat_pstd_str;    break;
       case(stat_pjc):          s = stat_pjc_str;     break;
       case(stat_prc):          s = stat_prc_str;     break;
+
       case(stat_eclv):         s = stat_eclv_str;    break;
+
       case(stat_mpr):          s = stat_mpr_str;     break;
+
       case(stat_nbrctc):       s = stat_nbrctc_str;  break;
       case(stat_nbrcts):       s = stat_nbrcts_str;  break;
       case(stat_nbrcnt):       s = stat_nbrcnt_str;  break;
+
       case(stat_grad):         s = stat_grad_str;    break;
       case(stat_isc):          s = stat_isc_str;     break;
       case(stat_wdir):         s = stat_wdir_str;    break;
+
+      case(stat_ecnt):         s = stat_ecnt_str;    break;
       case(stat_rhist):        s = stat_rhist_str;   break;
       case(stat_phist):        s = stat_phist_str;   break;
       case(stat_orank):        s = stat_orank_str;   break;
       case(stat_ssvar):        s = stat_ssvar_str;   break;
       case(stat_relp):         s = stat_relp_str;    break;
+
       case(stat_header):       s = stat_header_str;  break;
+
       case(no_stat_line_type): s = stat_na_str;      break;
       default:                 s = (const char *) 0; break;
    }
@@ -1887,25 +1897,35 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_cts_str)    == 0) t = stat_cts;
    else if(strcasecmp(s, stat_mctc_str)   == 0) t = stat_mctc;
    else if(strcasecmp(s, stat_mcts_str)   == 0) t = stat_mcts;
+
    else if(strcasecmp(s, stat_cnt_str)    == 0) t = stat_cnt;
+
    else if(strcasecmp(s, stat_pct_str)    == 0) t = stat_pct;
    else if(strcasecmp(s, stat_pstd_str)   == 0) t = stat_pstd;
    else if(strcasecmp(s, stat_pjc_str)    == 0) t = stat_pjc;
    else if(strcasecmp(s, stat_prc_str)    == 0) t = stat_prc;
+
    else if(strcasecmp(s, stat_eclv_str)   == 0) t = stat_eclv;
+
    else if(strcasecmp(s, stat_mpr_str)    == 0) t = stat_mpr;
+
    else if(strcasecmp(s, stat_nbrctc_str) == 0) t = stat_nbrctc;
    else if(strcasecmp(s, stat_nbrcts_str) == 0) t = stat_nbrcts;
    else if(strcasecmp(s, stat_nbrcnt_str) == 0) t = stat_nbrcnt;
+
    else if(strcasecmp(s, stat_grad_str)   == 0) t = stat_grad;
    else if(strcasecmp(s, stat_isc_str)    == 0) t = stat_isc;
    else if(strcasecmp(s, stat_wdir_str)   == 0) t = stat_wdir;
+
+   else if(strcasecmp(s, stat_ecnt_str)   == 0) t = stat_ecnt;
    else if(strcasecmp(s, stat_rhist_str)  == 0) t = stat_rhist;
    else if(strcasecmp(s, stat_phist_str)  == 0) t = stat_phist;
    else if(strcasecmp(s, stat_orank_str)  == 0) t = stat_orank;
    else if(strcasecmp(s, stat_ssvar_str)  == 0) t = stat_ssvar;
    else if(strcasecmp(s, stat_relp_str)   == 0) t = stat_relp;
+
    else if(strcasecmp(s, stat_header_str) == 0) t = stat_header;
+
    else                                         t = no_stat_line_type;
 
    return(t);

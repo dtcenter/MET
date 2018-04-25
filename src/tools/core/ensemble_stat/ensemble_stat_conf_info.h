@@ -27,16 +27,17 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Indices for the output flag types in the configuration file
-static const int i_rhist    = 0;
-static const int i_phist    = 1;
-static const int i_orank    = 2;
-static const int i_ssvar    = 3;
-static const int i_relp     = 4;
-static const int n_txt      = 5;
+static const int i_ecnt     = 0;
+static const int i_rhist    = 1;
+static const int i_phist    = 2;
+static const int i_orank    = 3;
+static const int i_ssvar    = 4;
+static const int i_relp     = 5;
+static const int n_txt      = 6;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_rhist, stat_phist, stat_orank, stat_ssvar, stat_relp
+   stat_ecnt, stat_rhist, stat_phist, stat_orank, stat_ssvar, stat_relp
 };
 
 ////////////////////////////////////////////////////////////////////////

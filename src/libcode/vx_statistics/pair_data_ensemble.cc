@@ -94,27 +94,40 @@ void PairDataEnsemble::clear() {
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
    n_ens = 0;
 
-   n_pair = 0;
-   skip_const = false;
-   skip_ba.clear();
-
    v_na.clear();
    r_na.clear();
    crps_na.clear();
    ign_na.clear();
    pit_na.clear();
-   spread_na.clear();
-   mn_na.clear();
+
+   n_pair = 0;
+   skip_const = false;
+   skip_ba.clear();
 
    rhist_na.clear();
    relp_na.clear();
    phist_na.clear();
 
+   spread_na.clear();
+   spread_oerr_na.clear();
+   spread_plus_oerr_na.clear();
+   esum_na.clear();
+   esumsq_na.clear();
+
+   mn_na.clear();
+
    if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
+   rps            = bad_data_double;
+   rpss           = bad_data_double;
    crpss          = bad_data_double;
+
+   me             = bad_data_double;
+   rmse           = bad_data_double;
+   me_oerr        = bad_data_double;
+   rmse_oerr      = bad_data_double;
 
    return;
 }
@@ -139,6 +152,10 @@ void PairDataEnsemble::extend(int n) {
    pit_na.extend(n);
    skip_ba.extend(n);
    spread_na.extend(n);
+   spread_oerr_na.extend(n);
+   spread_plus_oerr_na.extend(n);
+   esum_na.extend(n);
+   esumsq_na.extend(n);
    mn_na.extend(n);
 
    return;
@@ -161,34 +178,38 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    set_interp_shape(pd.interp_shape);
 
    // PairBase
-   n_obs        = pd.n_obs;
-   sid_sa       = pd.sid_sa;
-   lat_na       = pd.lat_na;
-   lon_na       = pd.lon_na;
-   x_na         = pd.x_na;
-   y_na         = pd.y_na;
-   wgt_na       = pd.wgt_na;
-   vld_ta       = pd.vld_ta;
-   lvl_na       = pd.lvl_na;
-   elv_na       = pd.elv_na;
-   o_na         = pd.o_na;
-   o_qc_sa      = pd.o_qc_sa;
+   n_obs          = pd.n_obs;
+   sid_sa         = pd.sid_sa;
+   lat_na         = pd.lat_na;
+   lon_na         = pd.lon_na;
+   x_na           = pd.x_na;
+   y_na           = pd.y_na;
+   wgt_na         = pd.wgt_na;
+   vld_ta         = pd.vld_ta;
+   lvl_na         = pd.lvl_na;
+   elv_na         = pd.elv_na;
+   o_na           = pd.o_na;
+   o_qc_sa        = pd.o_qc_sa;
 
    // PairDataEnsemble
-   v_na         = pd.v_na;
-   r_na         = pd.r_na;
-   crps_na      = pd.crps_na;
-   ign_na       = pd.ign_na;
-   pit_na       = pd.pit_na;
-   n_pair       = pd.n_pair;
-   skip_const   = pd.skip_const;
-   skip_ba      = pd.skip_ba;
-   spread_na    = pd.spread_na;
-   mn_na        = pd.mn_na;
+   v_na           = pd.v_na;
+   r_na           = pd.r_na;
+   crps_na        = pd.crps_na;
+   ign_na         = pd.ign_na;
+   pit_na         = pd.pit_na;
+   n_pair         = pd.n_pair;
+   skip_const     = pd.skip_const;
+   skip_ba        = pd.skip_ba;
+   spread_na      = pd.spread_na;
+   spread_oerr_na = pd.spread_oerr_na;
+   spread_plus_oerr_na = pd.spread_plus_oerr_na;
+   esum_na        = pd.esum_na;
+   esumsq_na      = pd.esumsq_na;
+   mn_na          = pd.mn_na;
 
-   rhist_na     = pd.rhist_na;
-   relp_na      = pd.relp_na;
-   phist_na     = pd.phist_na;
+   rhist_na       = pd.rhist_na;
+   relp_na        = pd.relp_na;
+   phist_na       = pd.phist_na;
 
    if(pd.ssvar_bins){
       ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
@@ -199,7 +220,15 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
+
+   rps            = pd.rps;
+   rpss           = pd.rpss;
    crpss          = pd.crpss;
+
+   me             = pd.me;
+   rmse           = pd.rmse;
+   me_oerr        = pd.me_oerr;
+   rmse_oerr      = pd.rmse_oerr;
 
    set_ens_size(pd.n_ens);
 
@@ -215,6 +244,25 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 void PairDataEnsemble::add_ens(int member, double v) {
 
    e_na[member].add(v);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataEnsemble::add_ens_var_sums(int i_obs, double v) {
+
+   // Initialize new sums to 0
+   if(i_obs >= esum_na.n_elements()) {
+      esum_na.add(0.0);
+      esumsq_na.add(0.0);
+   }
+
+   // Track sums of the raw ensemble member values
+   if(!is_bad_data(v)) {
+      esum_na.inc(i_obs, v);
+      esumsq_na.inc(i_obs, v*v);
+   }
 
    return;
 }
@@ -241,17 +289,19 @@ void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
+void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    int i, j, k, n_vld, n_bel, n_tie;
    int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens;
-   double mean, spread;
+   double variance, mean, spread;
+   double crps, ign, pit;
 
    // Check if the ranks have already been computed
    if(r_na.n_elements() == o_na.n_elements()) return;
 
    // Compute the rank for each observation
-   for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n_elements(); i++) {
+   for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0;
+       i<o_na.n_elements(); i++) {
 
       // Initialize
       cur_ens.erase();
@@ -275,14 +325,32 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
 
       } // end for j
 
-      // Compute ensemble mean and spread for current point
-      cur_ens.compute_mean_stdev(mean, spread);
-
-      // Store the spread but the mean is set by PairDataEnsemble::add_ens()
-      spread_na.add(spread);
-
       // Store the number of valid ensemble values
       v_na.add(n_vld);
+
+      // Compute the spread of the unperturbed ensemble members
+      variance = (esumsq_na[i]/v_na[i]) - pow(esum_na[i]/v_na[i], 2.0);
+      spread_na.add(sqrt(variance));
+
+      // Process the observation error information.
+      ObsErrorEntry * e = obs_error_entry[i];
+      if(e) {
+
+         // Compute the spread of the perturbed ensemble members
+         cur_ens.compute_mean_stdev(mean, spread);
+         spread_oerr_na.add(spread);
+
+         // Compute the spread plus observation error variance.
+         spread_plus_oerr_na.add(sqrt(variance +
+                                      dist_var(e->dist_type,
+                                               e->dist_parm[0],
+                                               e->dist_parm[1])));
+      }
+      // If no observation error specified, store bad data values.
+      else {
+         spread_oerr_na.add(bad_data_double);
+         spread_plus_oerr_na.add(bad_data_double);
+      }
 
       // Skip points missing ensemble data
       if(n_vld != n_ens) {
@@ -300,9 +368,12 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
          skip_ba.add(false);
       }
 
-      // Compute the rank
+      // Store bad data values for current point
       if(skip_ba[i]) {
          r_na.add(bad_data_int);
+         crps_na.add(bad_data_double);
+         ign_na.add(bad_data_double);
+         pit_na.add(bad_data_double);
       }
       else {
 
@@ -325,6 +396,12 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
             // Store the rank
             r_na.add(nint(dest_na[0]));
          }
+
+         // Store ensemble stats for the current point
+         compute_crps_ign_pit(o_na[i], cur_ens, crps, ign, pit);
+         crps_na.add(crps);
+         ign_na.add(ign);
+         pit_na.add(pit);
       }
    } // end for i
 
@@ -344,84 +421,81 @@ void PairDataEnsemble::compute_rank(const gsl_rng *rng_ptr) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-void PairDataEnsemble::compute_pair_vals() {
-   int i, j;
-   double crps, ign, pit;
-   NumArray cur;
-
-   // Initialize
-   crps_na.erase();
-   ign_na.erase();
-   pit_na.erase();
-
-   // Loop through the pairs and compute CRPS for each
-   for(i=0; i<n_obs; i++) {
-
-      // Skip constant points, if requested, and missing ensemble data
-      if(skip_ba[i]) {
-         crps_na.add(bad_data_double);
-         ign_na.add(bad_data_double);
-         pit_na.add(bad_data_double);
-         continue;
-      }
-
-      // Store ensemble values for the current observation
-      for(j=0, cur.erase(); j<n_ens; j++) cur.add(e_na[j][i]);
-
-      // Compute the stats
-      compute_crps_ign_pit(o_na[i], cur, crps, ign, pit);
-
-      // Store the stats and weight for the current point
-      crps_na.add(crps);
-      ign_na.add(ign);
-      pit_na.add(pit);
-
-   } // end for i
-
-   return;
-}
-
+//
+// The compute_pair_vals() routine should have already been called.
+//
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_stats() {
-   int i;
+   int i, j;
    double w, w_sum;
-   double crps, crps_climo, ccbar, oobar, cobar;
+   double crps, crps_climo;
+   double fbar, obar, ffbar, oobar, fobar;
+   double mn_oerr, fbar_oerr, ffbar_oerr, fobar_oerr;
    NumArray cur;
 
-   // The compute_pair_vals() routine should have already been called.
-   // Compute CRPS Skill Score.
+   // JHG, compute rps and rpss
+   rps = bad_data_double;
 
    // Get the average ensemble CRPS value
    crps = crps_na.wmean(wgt_na);
+
+   // Get the sum of the weights
+   w_sum = wgt_na.sum();
 
    // Check for bad data
    if(is_bad_data(crps) ||
       cmn_na.n_elements() != o_na.n_elements() ||
       cmn_na.n_elements() == 0 ||
       cmn_na.has(bad_data_double)) {
+      rpss  = bad_data_double;
       crpss = bad_data_double;
    }
    else {
 
-      // Get the sum of the weights
-      w_sum = wgt_na.sum();
-
       // Compute the climatological CRPS
-      ccbar = oobar = cobar = 0.0;
+      ffbar = oobar = fobar = 0.0;
       for(i=0; i<n_obs; i++) {
          w      = wgt_na[i]/w_sum;
-         ccbar += w * cmn_na[i] * cmn_na[i];
+         ffbar += w * cmn_na[i] * cmn_na[i];
          oobar += w * o_na[i]   * o_na[i];
-         cobar += w * cmn_na[i] * o_na[i];
+         fobar += w * cmn_na[i] * o_na[i];
       }
-      crps_climo = ccbar + oobar - 2.0*cobar;
+      crps_climo = ffbar + oobar - 2.0*fobar;
 
       // Compute skill score
       crpss = (is_eq(crps_climo, 0.0) ?
                bad_data_double : (crps_climo - crps)/crps_climo);
    }
+
+   // Compute ME and RMSE values
+   ffbar = oobar = fobar = 0.0;
+   ffbar_oerr = fobar_oerr = 0.0;
+   for(i=0; i<n_obs; i++) {
+
+      // Compute the mean of the perturbed ensemble members
+      for(j=0, mn_oerr=0.0; j<n_ens; j++) {
+         if(!is_bad_data(e_na[j][i])) mn_oerr += e_na[j][i];
+      }
+      if(v_na[i] > 0) mn_oerr /= v_na[i];
+
+      // Track running sums
+      w           = wgt_na[i]/w_sum;
+      obar       += w *  o_na[i];
+      oobar      += w *  o_na[i] *  o_na[i];
+      fbar       += w * mn_na[i];
+      ffbar      += w * mn_na[i] * mn_na[i];
+      fobar      += w * mn_na[i] *  o_na[i];
+      fbar_oerr  += w * mn_oerr;
+      ffbar_oerr += w * mn_oerr  * mn_oerr;
+      fobar_oerr += w * mn_oerr  * o_na[i];
+   }
+
+   // Derive ME and RMSE from partial sums
+   me        = fbar - obar;
+   me_oerr   = fbar_oerr - obar;
+   rmse      = sqrt(ffbar      + oobar - 2.0*fobar);
+   rmse_oerr = sqrt(ffbar_oerr + oobar - 2.0*fobar_oerr);
 
    return;
 }
@@ -437,7 +511,7 @@ void PairDataEnsemble::compute_rhist() {
    // Initialize the histogram counts to 0
    for(i=0; i<=n_ens; i++) rhist_na.add(0);
 
-   // The compute_rank() routine should have already been called.
+   // The compute_pair_vals() routine should have already been called.
    // Loop through the ranks and populate the histogram.
    for(i=0; i<r_na.n_elements(); i++) {
 
@@ -693,9 +767,9 @@ void PairDataEnsemble::compute_ssvar() {
 ////////////////////////////////////////////////////////////////////////
 //
 // Apply conditional observation threshold and return a subset of pairs.
-// The compute_rank() and compute_pair_vals() functions should have
-// already been called.  After retrieving the subset, the compute
-// statistics functions should be called again.
+// The compute_pair_vals() functions should have already been called.
+// After retrieving the subset, the compute statistics functions should
+// be called again.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -723,21 +797,23 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       // required for ensemble output line types.
       //
       // Include in subset:
-      //   wgt_na, o_na, r_na, crps_na, ign_na, pit_na, spread_na,
-      //   mn_na, e_na
+      //   wgt_na, o_na, v_na, r_na, crps_na, ign_na, pit_na,
+      //   spread_na, spread_oerr_na, mn_na, e_na
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
-      //   o_qc_sa, v_na
+      //   o_qc_sa, esum_na, esumsq_na
 
       pd.wgt_na.add(wgt_na[i]);
       pd.o_na.add(o_na[i]);
-      pd.skip_ba.add(false);
+      pd.v_na.add(v_na[i]);
       pd.r_na.add(r_na[i]);
       pd.crps_na.add(crps_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
+      pd.skip_ba.add(false);
       pd.spread_na.add(spread_na[i]);
+      pd.spread_oerr_na.add(spread_oerr_na[i]);
       pd.mn_na.add(mn_na[i]);
 
       for(j=0; j<n_ens; j++) pd.e_na[j].add(e_na[j][i]);
@@ -1226,7 +1302,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    double cmn_v, csd_v, obs_v, wgt_v;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
-   ObsErrorEntry *obs_error_ptr = (ObsErrorEntry *) 0;
+   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {
@@ -1358,11 +1434,11 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
 
       // Use config file setting, if specified
       if(obs_error_info->entry.dist_type != DistType_None) {
-         obs_error_ptr = &(obs_error_info->entry);
+         oerr_ptr = &(obs_error_info->entry);
       }
       // Otherwise, do a table lookup
       else {
-         obs_error_ptr = obs_error_table.lookup(
+         oerr_ptr = obs_error_table.lookup(
             obs_info->name(), hdr_typ_str, hdr_sid_str,
             bad_data_int, bad_data_int, bad_data_int,
             obs_lvl, obs_hgt, obs_v);
@@ -1373,7 +1449,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    if(obs_error_info->field == FieldType_Obs ||
       obs_error_info->field == FieldType_Both) {
       obs_v = add_obs_error(obs_error_info->rng_ptr, FieldType_Obs,
-                            obs_error_ptr, obs_v);
+                            oerr_ptr, obs_v);
    }
 
    // Look through all of the PairData objects to see if the observation
@@ -1447,7 +1523,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                                 obs_x, obs_y, hdr_ut,
                                 obs_lvl, obs_hgt, obs_v, obs_qty,
                                 cmn_v, csd_v, wgt_v);
-            pd[i][j][k].add_obs_error_entry(obs_error_ptr);
+            pd[i][j][k].add_obs_error_entry(oerr_ptr);
          } // end for k
       } // end for j
    } // end for i
@@ -1501,17 +1577,27 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                            fcst_info->level().type(),
                            to_lvl, f_lvl_blw, f_lvl_abv);
 
-               // Apply observation error logic
-               if(obs_error_info->field == FieldType_Fcst ||
-                  obs_error_info->field == FieldType_Both) {
-                  fcst_v = add_obs_error(
-                              obs_error_info->rng_ptr, FieldType_Fcst,
-                              pd[i][j][k].obs_error_entry[l], fcst_v);
+               // Store the ensemble mean
+               if(mn) {
+                  pd[i][j][k].mn_na.add(fcst_v);
                }
+               // Store the ensemble member values
+               else {
 
-               // Add the ensemble value, even if it's bad data
-               if(!mn) pd[i][j][k].add_ens(member, fcst_v);
-               else    pd[i][j][k].mn_na.add(fcst_v);
+                  // Track unperturbed ensemble variance sums
+                  pd[i][j][k].add_ens_var_sums(l, fcst_v);
+
+                  // Apply observation error logic to ensemble members
+                  if(obs_error_info->field == FieldType_Fcst ||
+                     obs_error_info->field == FieldType_Both) {
+                     fcst_v = add_obs_error(
+                                 obs_error_info->rng_ptr, FieldType_Fcst,
+                                 pd[i][j][k].obs_error_entry[l], fcst_v);
+                  }
+
+                  // Store perturbed ensemble member value
+                  pd[i][j][k].add_ens(member, fcst_v);
+               }
             }
          } // end for k - n_interp
       } // end for j - n_mask

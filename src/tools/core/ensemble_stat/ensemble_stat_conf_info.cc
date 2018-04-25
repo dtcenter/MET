@@ -864,6 +864,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    // Switch on the index of the line type
    switch(i_txt_row) {
 
+      case(i_ecnt):
       case(i_rhist):
       case(i_phist):
       case(i_relp):

@@ -196,6 +196,7 @@ interp = {
 // Statistical output types
 //
 output_flag = {
+   ecnt  = BOTH;
    rhist = BOTH;
    phist = BOTH;
    orank = BOTH;
