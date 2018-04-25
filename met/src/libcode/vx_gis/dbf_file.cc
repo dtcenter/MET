@@ -621,7 +621,7 @@ void dump_record(ostream & out, const int depth, const unsigned char * buf, cons
 {
 
 int j, k;
-int pos, len;
+int pos, len, k_max;
 int max_name_len;
 Indent p0 (depth);
 const char * line = (const char *) buf;
@@ -649,7 +649,14 @@ for (j=0; j<(h.n_subrecs); ++j)  {
 
    out << " = \"";
 
-   for (k=0; k<len; ++k)  out << line[pos + k];
+   for (k_max=(pos + len - 1); k_max>=pos; --k_max)  {
+
+      if ( line[k_max] != ' ' )  break;  
+
+   }
+
+   // for (k=0; k<len; ++k)  out << line[pos + k];
+   for (k=pos; k<=k_max; ++k)  out << line[k];
 
    out << "\"\n" << flush;
 
