@@ -151,6 +151,8 @@ struct ShpPolylineRecord {   //  this should really be a class, not a struct
 
    void dump(ostream &, int depth = 0) const;
 
+   void toggle_longitudes();   //  toggle the sign on all the longitudes
+
 };
 
 
@@ -198,6 +200,8 @@ struct ShpPolygonRecord {   //  this should really be a class, not a struct
 
    int start_index(int partno) const;
    int  stop_index(int partno) const;
+
+   void toggle_longitudes();   //  toggle the sign on all the longitudes
 
 };
 
