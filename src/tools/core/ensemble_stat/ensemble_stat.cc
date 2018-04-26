@@ -863,7 +863,7 @@ void process_point_obs(int i_nc) {
    }
 
    int exit_code = check_nc_dims_vars(obs_vars);
-   
+
    if(exit_code == exit_code_no_dim) {
       mlog << Error << "\nprocess_point_obs() -> "
            << "can't read \"mxstr\", \"nobs\" or \"nmsg\" "
@@ -948,7 +948,7 @@ void process_point_obs(int i_nc) {
          offsets[0]++;
       }
    }
-   
+
    offsets[0] = 0;
    lengths[0] = 1;
    char obs_qty[mxstr_len+1];
@@ -1026,7 +1026,7 @@ void process_point_obs(int i_nc) {
                  << "index " << i_start << "\n\n";
             exit(1);
          }
-         
+
          if (!get_nc_data(&obs_vars.obs_qty_var, obs_qty_idx_block, lengths, offsets)) {
             mlog << Error << "\nprocess_point_obs() -> "
                  << "can't read the quality flag for observation "
@@ -1847,7 +1847,7 @@ void process_grid_scores(int i_vx,
          cmn = (cmn_flag ? cmn_dp(x, y) : bad_data_double);
 
          // Add the observation point
-         pd.add_obs(x, y, obs_dp(x, y),
+         pd.add_obs(x, y, oraw_dp(x, y),
                     cmn, bad_data_double, wgt_dp(x, y));
 
          // Get the observation error entry pointer
@@ -1865,6 +1865,9 @@ void process_grid_scores(int i_vx,
 
          // Store the observation error entry pointer
          pd.add_obs_error_entry(e);
+
+         // Store the perturbed observation value
+         pd.o_oerr_na.add(obs_dp(x, y));
 
          // Add the ensemble mean value for this point
          pd.mn_na.add(emn_dp(x, y));

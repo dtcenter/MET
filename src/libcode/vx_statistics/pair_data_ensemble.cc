@@ -89,6 +89,7 @@ void PairDataEnsemble::clear() {
    PairBase::clear();
 
    obs_error_entry.clear();
+   obs_error_flag = false;
 
    for(i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
@@ -111,10 +112,13 @@ void PairDataEnsemble::clear() {
    spread_na.clear();
    spread_oerr_na.clear();
    spread_plus_oerr_na.clear();
+
    esum_na.clear();
    esumsq_na.clear();
 
    mn_na.clear();
+   mn_oerr_na.clear();
+   o_oerr_na.clear();
 
    if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
 
@@ -157,6 +161,8 @@ void PairDataEnsemble::extend(int n) {
    esum_na.extend(n);
    esumsq_na.extend(n);
    mn_na.extend(n);
+   mn_oerr_na.extend(n);
+   o_oerr_na.extend(n);
 
    return;
 }
@@ -200,12 +206,17 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    n_pair         = pd.n_pair;
    skip_const     = pd.skip_const;
    skip_ba        = pd.skip_ba;
+
    spread_na      = pd.spread_na;
    spread_oerr_na = pd.spread_oerr_na;
    spread_plus_oerr_na = pd.spread_plus_oerr_na;
+
    esum_na        = pd.esum_na;
    esumsq_na      = pd.esumsq_na;
+
    mn_na          = pd.mn_na;
+   mn_oerr_na     = pd.mn_oerr_na;
+   o_oerr_na      = pd.o_oerr_na;
 
    rhist_na       = pd.rhist_na;
    relp_na        = pd.relp_na;
@@ -235,8 +246,15 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    for(i=0; i<n_ens; i++) e_na[i] = pd.e_na[i];
 
    obs_error_entry = pd.obs_error_entry;
+   obs_error_flag  = pd.obs_error_flag;
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairDataEnsemble::has_obs_error() const {
+   return(obs_error_flag);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -283,6 +301,8 @@ void PairDataEnsemble::set_ens_size(int n) {
 void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 
    obs_error_entry.add(e);
+
+   if(e != 0) obs_error_flag = true;
 
    return;
 }
@@ -333,12 +353,12 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       spread_na.add(sqrt(variance));
 
       // Process the observation error information.
-      ObsErrorEntry * e = (obs_error_entry.n() == o_na.n() ?
-                           obs_error_entry[i] : 0);
+      ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
       if(e) {
 
-         // Compute the spread of the perturbed ensemble members
+         // Compute perturbed ensemble mean and spread
          cur_ens.compute_mean_stdev(mean, spread);
+         mn_oerr_na.add(mean);
          spread_oerr_na.add(spread);
 
          // Compute the spread plus observation error variance.
@@ -349,6 +369,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       }
       // If no observation error specified, store bad data values.
       else {
+         mn_oerr_na.add(bad_data_double);
          spread_oerr_na.add(bad_data_double);
          spread_plus_oerr_na.add(bad_data_double);
       }
@@ -432,7 +453,6 @@ void PairDataEnsemble::compute_stats() {
    double w, w_sum;
    double crps, crps_climo;
    double fbar, obar, ffbar, oobar, fobar;
-   double mn_oerr, fbar_oerr, ffbar_oerr, fobar_oerr;
    NumArray cur;
 
    // JHG, compute rps and rpss
@@ -470,33 +490,45 @@ void PairDataEnsemble::compute_stats() {
    }
 
    // Compute ME and RMSE values
-   ffbar = oobar = fobar = 0.0;
-   ffbar_oerr = fobar_oerr = 0.0;
+   fbar = obar = ffbar = oobar = fobar = 0.0;
    for(i=0; i<n_obs; i++) {
 
-      // Compute the mean of the perturbed ensemble members
-      for(j=0, mn_oerr=0.0; j<n_ens; j++) {
-         if(!is_bad_data(e_na[j][i])) mn_oerr += e_na[j][i];
-      }
-      if(v_na[i] > 0) mn_oerr /= v_na[i];
-
       // Track running sums
-      w           = wgt_na[i]/w_sum;
-      obar       += w *  o_na[i];
-      oobar      += w *  o_na[i] *  o_na[i];
-      fbar       += w * mn_na[i];
-      ffbar      += w * mn_na[i] * mn_na[i];
-      fobar      += w * mn_na[i] *  o_na[i];
-      fbar_oerr  += w * mn_oerr;
-      ffbar_oerr += w * mn_oerr  * mn_oerr;
-      fobar_oerr += w * mn_oerr  * o_na[i];
+      w      = wgt_na[i]/w_sum;
+      obar  += w *  o_na[i];
+      oobar += w *  o_na[i] *  o_na[i];
+      fbar  += w * mn_na[i];
+      ffbar += w * mn_na[i] * mn_na[i];
+      fobar += w * mn_na[i] *  o_na[i];
    }
 
    // Derive ME and RMSE from partial sums
-   me        = fbar - obar;
-   me_oerr   = fbar_oerr - obar;
-   rmse      = sqrt(ffbar      + oobar - 2.0*fobar);
-   rmse_oerr = sqrt(ffbar_oerr + oobar - 2.0*fobar_oerr);
+   me   = fbar - obar;
+   rmse = sqrt(ffbar + oobar - 2.0*fobar);
+
+   // If observation error was specified, compute ME_OERR and RMSE_OERR
+   if(has_obs_error()) {
+
+      fbar = obar = ffbar = oobar = fobar = 0.0;
+      for(i=0; i<n_obs; i++) {
+
+         // Track running sums
+         w      = wgt_na[i]/w_sum;
+         obar  += w *  o_oerr_na[i];
+         oobar += w *  o_oerr_na[i] *  o_oerr_na[i];
+         fbar  += w * mn_oerr_na[i];
+         ffbar += w * mn_oerr_na[i] * mn_oerr_na[i];
+         fobar += w * mn_oerr_na[i] *  o_oerr_na[i];
+      }
+
+      // Derive ME_OERR and RMSE_OERR from partial sums
+      me_oerr   = fbar - obar;
+      rmse_oerr = sqrt(ffbar + oobar - 2.0*fobar);
+   }
+   else {
+      me_oerr   = bad_data_double;
+      rmse_oerr = bad_data_double;
+   }
 
    return;
 }
@@ -799,7 +831,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       //
       // Include in subset:
       //   wgt_na, o_na, v_na, r_na, crps_na, ign_na, pit_na,
-      //   spread_na, spread_oerr_na, mn_na, e_na
+      //   spread_na, spread_oerr_na, spread_plus_oerr_na,
+      //   mn_na, mn_oerr_na, o_oerr_na, e_na
       //
       // Exclude from subset:
       //   sid_sa, lat_na, lon_na, x_na, y_na, vld_ta, lvl_ta, elv_ta,
@@ -815,7 +848,10 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       pd.skip_ba.add(false);
       pd.spread_na.add(spread_na[i]);
       pd.spread_oerr_na.add(spread_oerr_na[i]);
+      pd.spread_plus_oerr_na.add(spread_plus_oerr_na[i]);
       pd.mn_na.add(mn_na[i]);
+      pd.mn_oerr_na.add(mn_oerr_na[i]);
+      pd.o_oerr_na.add(o_oerr_na[i]);
 
       for(j=0; j<n_ens; j++) pd.e_na[j].add(e_na[j][i]);
 
@@ -1300,7 +1336,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    int i, j, k, x, y;
    double hdr_lat, hdr_lon;
    double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
-   double cmn_v, csd_v, obs_v, wgt_v;
+   double cmn_v, csd_v, obs_v, obs_v_oerr, wgt_v;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
    ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
@@ -1449,8 +1485,11 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
    // Apply observation error perturbation
    if(obs_error_info->field == FieldType_Obs ||
       obs_error_info->field == FieldType_Both) {
-      obs_v = add_obs_error(obs_error_info->rng_ptr, FieldType_Obs,
-                            oerr_ptr, obs_v);
+      obs_v_oerr = add_obs_error(obs_error_info->rng_ptr, FieldType_Obs,
+                                 oerr_ptr, obs_v);
+   }
+   else {
+      obs_v_oerr = obs_v;
    }
 
    // Look through all of the PairData objects to see if the observation
@@ -1525,6 +1564,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
                                 obs_lvl, obs_hgt, obs_v, obs_qty,
                                 cmn_v, csd_v, wgt_v);
             pd[i][j][k].add_obs_error_entry(oerr_ptr);
+            pd[i][j][k].o_oerr_na.add(obs_v_oerr);
          } // end for k
       } // end for j
    } // end for i
