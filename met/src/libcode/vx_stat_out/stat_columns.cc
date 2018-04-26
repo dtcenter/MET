@@ -3398,7 +3398,6 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
    //    ME_OERR,      RMSE_OERR,    SPREAD_OERR,
    //    SPREAD_PLUS_OERR
    //
-
    at.set_entry(r, c+0,  // Total Number of Ranked Observations
       pd_ptr->n_obs);
 
@@ -3590,15 +3589,15 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
 
    // Perturbed ensemble mean values
    at.set_entry(r, c+16+pd_ptr->n_ens,
-      pd_ptr->spread_na[i]);
+      pd_ptr->mn_oerr_na[i]);
 
    // Perturbed ensemble spread values
    at.set_entry(r, c+17+pd_ptr->n_ens,
-      pd_ptr->spread_na[i]);
+      pd_ptr->spread_oerr_na[i]);
 
    // Unperturbed ensemble spread values plus observation error
    at.set_entry(r, c+18+pd_ptr->n_ens,
-      pd_ptr->spread_oerr_na[i]);
+      pd_ptr->spread_plus_oerr_na[i]);
 
    return;
 }

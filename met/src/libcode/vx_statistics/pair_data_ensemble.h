@@ -67,6 +67,7 @@ class PairDataEnsemble : public PairBase {
 
       // ObsErrorEntry points [n_obs]
       ObsErrorEntryPtrArray obs_error_entry;
+      bool                  obs_error_flag;
 
       // Ensemble, valid count, and rank values
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
@@ -88,14 +89,16 @@ class PairDataEnsemble : public PairBase {
       double     phist_bin_size;  // Ensemble PIT histogram bin width
       NumArray   phist_na;        // PIT Histogram [n_phist_bin]
 
-      NumArray   spread_na;       // Spread of unperturbed members [n_obs]
-      NumArray   spread_oerr_na;  // Spread of perturbed members [n_obs]
+      NumArray   spread_na;           // Spread of unperturbed members [n_obs]
+      NumArray   spread_oerr_na;      // Spread of perturbed members [n_obs]
       NumArray   spread_plus_oerr_na; // Unperturbed ensemble spread plus observation error [n_obs]
 
       NumArray   esum_na;         // Sum of unperturbed ensemble values [n_obs]
       NumArray   esumsq_na;       // Sum of unperturbed ensemble squared values [n_obs]
 
       NumArray   mn_na;           // Ensemble mean value [n_obs]
+      NumArray   mn_oerr_na;      // Mean of perturbed members [n_obs]
+      NumArray   o_oerr_na;       // Perturbed observations [n_obs]
 
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
@@ -104,8 +107,8 @@ class PairDataEnsemble : public PairBase {
       double     crpss;           // Continuous ranked probability skill score
       double     rpss;            // Ranked probability skill score
 
-      double     me;              // ME for unperturbed ensemble mean
-      double     rmse;            // RMSE for unperturbed ensemble mean
+      double     me;              // ME for ensemble mean
+      double     rmse;            // RMSE for ensemble mean
       double     me_oerr;         // ME for mean of perturbed members
       double     rmse_oerr;       // RMSE for mean of perturbed members
 
@@ -114,6 +117,8 @@ class PairDataEnsemble : public PairBase {
       void clear();
 
       void extend(int);
+
+      bool has_obs_error() const;
 
       void add_ens(int, double);
       void add_ens_var_sums(int, double);
