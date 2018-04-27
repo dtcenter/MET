@@ -103,6 +103,9 @@ extern void write_job_aggr_grad(STATAnalysisJob &, STATLineType,
 extern void write_job_aggr_wind(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrWindInfo> &, AsciiTable &);
 
+extern void write_job_aggr_ecnt(STATAnalysisJob &, STATLineType,
+               map<ConcatString, AggrENSInfo> &, AsciiTable &);
+
 extern void write_job_aggr_rhist(STATAnalysisJob &, STATLineType,
                map<ConcatString, AggrENSInfo> &, AsciiTable &);
 

@@ -73,6 +73,7 @@ class PairDataEnsemble : public PairBase {
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
       NumArray   r_na;            // Observation ranks [n_obs]
+      NumArray   rps_na;          // Ranked Probability Score [n_obs]
       NumArray   crps_na;         // Continuous Ranked Probability Score [n_obs]
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]

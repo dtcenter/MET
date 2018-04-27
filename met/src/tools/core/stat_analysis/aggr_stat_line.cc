@@ -2538,121 +2538,156 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
                      map<ConcatString, AggrENSInfo> &m,
                      int &n_in, int &n_out) {
 
-   // JHG, work on me
-   //    STATLine line;
-//    AggrENSInfo aggr;
-//    RHISTData cur;
-//    ConcatString key;
-//    int i;
-//    double crps_fcst, crps_climo;
-//    map<ConcatString, AggrENSInfo>::iterator it;
-//
-//    //
-//    // Process the STAT lines
-//    //
-//    while(f >> line) {
-//
-//       if(line.is_header()) continue;
-//
-//       n_in++;
-//
-//       if(j.is_keeper(line)) {
-//
-//          j.dump_stat_line(line);
-//
-//          if(line.type() != stat_rhist) {
-//             mlog << Error << "\naggr_rhist_lines() -> "
-//                  << "should only encounter ranked histogram "
-//                  << "(RHIST) line types.\n"
-//                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-//             throw(1);
-//          }
-//
-//          //
-//          // Parse the current RHIST line
-//          //
-//          parse_rhist_line(line, cur);
-//
-//          //
-//          // Build the map key for the current line
-//          //
-//          key = j.get_case_info(line);
-//
-//          //
-//          // Add a new map entry, if necessary
-//          //
-//          if(m.count(key) == 0) {
-//             aggr.ens_pd.clear();
-//             aggr.crps_climo_na.clear();
-//             aggr.hdr.clear();
-//             for(i=0; i<cur.n_rank; i++) aggr.ens_pd.rhist_na.add(0);
-//             m[key] = aggr;
-//          }
-//
-//          //
-//          // Check for N_RANK remaining constant
-//          //
-//          if(m[key].ens_pd.rhist_na.n_elements() != cur.n_rank) {
-//             mlog << Error << "\naggr_rhist_lines() -> "
-//                  << "the \"N_RANK\" column must remain constant ("
-//                  << m[key].ens_pd.rhist_na.n_elements() << " != " << cur.n_rank
-//                  << ").  Try setting \"-column_eq N_RANK n\".\n\n";
-//             throw(1);
-//          }
-//
-//          //
-//          // Store the current statistics and weight (TOTAL column)
-//          //
-//          m[key].ens_pd.crps_na.add(cur.crps);
-//          m[key].ens_pd.ign_na.add(cur.ign);
-//          m[key].ens_pd.spread_na.add(cur.spread);
-//          m[key].ens_pd.wgt_na.add(cur.total);
-//
-//          //
-//          // Compute and store climatological CRPS
-//          //
-//          if(!is_bad_data(cur.crps) && !is_bad_data(cur.crpss) &&
-//             !is_eq(cur.crpss, 1.0)) {
-//             crps_climo = cur.crps / (1.0 - cur.crpss);
-//             m[key].crps_climo_na.add(crps_climo);
-//          }
-//          else {
-//             m[key].crps_climo_na.add(bad_data_double);
-//          }
-//
-//          //
-//          // Aggregate the ranked histogram counts
-//          //
-//          for(i=0; i<m[key].ens_pd.rhist_na.n_elements(); i++) {
-//             m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rhist_na[i]);
-//          }
-//
-//          //
-//          // Keep track of the unique header column entries
-//          //
-//          m[key].hdr.add(line);
-//
-//          n_out++;
-//       }
-//    } // end while
-//
-//    //
-//    // Loop over the map entries and compute CRPSS
-//    //
-//    for(it = m.begin(); it != m.end(); it++) {
-//
-//       crps_fcst  = it->second.ens_pd.crps_na.wmean(it->second.ens_pd.wgt_na);
-//       crps_climo = it->second.crps_climo_na.wmean(it->second.ens_pd.wgt_na);
-//
-//       if(!is_bad_data(crps_fcst) && !is_bad_data(crps_climo) &&
-//          !is_eq(crps_climo, 0.0)) {
-//          it->second.ens_pd.crpss = (crps_climo - crps_fcst)/crps_climo;
-//       }
-//       else {
-//          it->second.ens_pd.crpss = bad_data_double;
-//       }
-//
-//    } // end for it
+   STATLine line;
+   AggrENSInfo aggr;
+   ECNTData cur;
+   ConcatString key;
+   int i;
+   double rps_fcst, rps_climo, crps_fcst, crps_climo;
+   map<ConcatString, AggrENSInfo>::iterator it;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(j.is_keeper(line)) {
+
+         j.dump_stat_line(line);
+
+         if(line.type() != stat_ecnt) {
+            mlog << Error << "\naggr_ecnt_lines() -> "
+                 << "should only encounter ranked histogram "
+                 << "(ECNT) line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current RHIST line
+         //
+         parse_ecnt_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = j.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.ens_pd.clear();
+            aggr.rps_climo_na.clear();
+            aggr.crps_climo_na.clear();
+            aggr.hdr.clear();
+            m[key] = aggr;
+         }
+
+         //
+         // Check for N_ENS remaining constant
+         //
+         if(m[key].ens_pd.n_ens == 0) m[key].ens_pd.set_ens_size(cur.n_ens);
+         else if(m[key].ens_pd.n_ens != cur.n_ens) {
+            mlog << Warning << "\naggr_ecnt_lines() -> "
+                 << "the \"N_ENS\" column changed from " << m[key].ens_pd.n_ens
+                 << " to " << cur.n_ens << ".\n\n";
+         }
+
+         //
+         // Store the current statistics and weight (TOTAL column)
+         //
+         m[key].ens_pd.rps_na.add(cur.rps);
+         m[key].ens_pd.crps_na.add(cur.crps);
+         m[key].ens_pd.ign_na.add(cur.ign);
+         m[key].ens_pd.spread_na.add(cur.spread);
+         m[key].ens_pd.spread_oerr_na.add(cur.spread_oerr);
+         m[key].ens_pd.spread_plus_oerr_na.add(cur.spread_plus_oerr);
+         m[key].ens_pd.wgt_na.add(cur.total);
+
+         //
+         // Store the summary statistics
+         //
+         m[key].me_na.add(cur.me);
+         m[key].mse_na.add(cur.rmse * cur.rmse);
+         m[key].me_oerr_na.add(cur.me_oerr);
+         m[key].mse_oerr_na.add(cur.me_oerr * cur.me_oerr);
+
+         //
+         // Compute and store climatological RPS
+         //
+         if(!is_bad_data(cur.rps) && !is_bad_data(cur.rpss) &&
+            !is_eq(cur.rpss, 1.0)) {
+            rps_climo = cur.rps / (1.0 - cur.rpss);
+            m[key].rps_climo_na.add(rps_climo);
+         }
+         else {
+            m[key].rps_climo_na.add(bad_data_double);
+         }
+
+         //
+         // Compute and store climatological CRPS
+         //
+         if(!is_bad_data(cur.crps) && !is_bad_data(cur.crpss) &&
+            !is_eq(cur.crpss, 1.0)) {
+            crps_climo = cur.crps / (1.0 - cur.crpss);
+            m[key].crps_climo_na.add(crps_climo);
+         }
+         else {
+            m[key].crps_climo_na.add(bad_data_double);
+         }
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
+
+   //
+   // Loop over the map entries and compute summary stats
+   //
+   for(it = m.begin(); it != m.end(); it++) {
+
+      // Set n_obs as the sum of the TOTAL column
+      it->second.ens_pd.n_obs     = it->second.ens_pd.wgt_na.sum();
+
+      // Compute ME and RMSE as weighted averages
+      it->second.ens_pd.me        =      it->second.me_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse      = sqrt(it->second.mse_na.wmean(it->second.ens_pd.wgt_na));
+      it->second.ens_pd.me_oerr   =      it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse_oerr = sqrt(it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na));
+
+      rps_fcst   = it->second.ens_pd.rps_na.wmean(it->second.ens_pd.wgt_na);
+      rps_climo  = it->second.rps_climo_na.wmean(it->second.ens_pd.wgt_na);
+      crps_fcst  = it->second.ens_pd.crps_na.wmean(it->second.ens_pd.wgt_na);
+      crps_climo = it->second.crps_climo_na.wmean(it->second.ens_pd.wgt_na);
+
+      // Compute aggregated RPSS
+      if(!is_bad_data(rps_fcst) && !is_bad_data(rps_climo) &&
+         !is_eq(rps_climo, 0.0)) {
+         it->second.ens_pd.rpss = (rps_climo - rps_fcst)/rps_climo;
+      }
+      else {
+         it->second.ens_pd.rpss = bad_data_double;
+      }
+
+      // Compute aggregated CRPSS
+      if(!is_bad_data(crps_fcst) && !is_bad_data(crps_climo) &&
+         !is_eq(crps_climo, 0.0)) {
+         it->second.ens_pd.crpss = (crps_climo - crps_fcst)/crps_climo;
+      }
+      else {
+         it->second.ens_pd.crpss = bad_data_double;
+      }
+
+   } // end for it
 
    return;
 }
@@ -2667,7 +2702,6 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &j,
    RHISTData cur;
    ConcatString key;
    int i;
-   double crps_fcst, crps_climo;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -3008,6 +3042,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].ens_pd.spread_oerr_na.add(cur.spread_oerr);
          m[key].ens_pd.spread_plus_oerr_na.add(cur.spread_plus_oerr);
          m[key].ens_pd.mn_na.add(cur.ens_mean);
+         m[key].ens_pd.mn_oerr_na.add(cur.ens_mean_oerr);
 
          for(i=0, n_valid=0, esum=0.0, esumsq=0.0;
              i<m[key].ens_pd.n_ens; i++) {
@@ -3027,6 +3062,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].ens_pd.crps_na.add(crps);
          m[key].ens_pd.ign_na.add(ign);
          m[key].ens_pd.pit_na.add(pit);
+
+         // JHG, need to compute RPS
+         m[key].ens_pd.rps_na.add(bad_data_double);
 
          //
          // Increment the RHIST counts

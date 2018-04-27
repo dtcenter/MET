@@ -137,7 +137,8 @@ struct AggrISCInfo {
 struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
-   NumArray crps_climo_na, rps_climo_na;
+   NumArray rps_climo_na, crps_climo_na;
+   NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
 };
 
 // Define struct used to perform comparisons for SSVAR bins
