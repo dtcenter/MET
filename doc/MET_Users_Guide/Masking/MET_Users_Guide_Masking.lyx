@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -143,7 +145,7 @@ This section contains a description of running the Gen-Vx-Mask tool.
 gen_vx_mask usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:gen_vx_mask-usage"
+name "subsec:gen_vx_mask-usage"
 
 \end_inset
 
@@ -353,6 +355,22 @@ hskip 0.5in}
 
 \end_inset
 
+[-shapeno n]
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{
+\backslash
+hskip 0.5in}
+\end_layout
+
+\end_inset
+
 [-value n]
 \end_layout
 
@@ -459,6 +477,12 @@ input_field
 mask_file
 \series medium
  argument defines the masking information, see below.
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -709,6 +733,12 @@ mask_file
 -thresh string
 \series medium
  option can be used to define the threshold to be applied.
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -831,6 +861,18 @@ masking.
 11.
  The 
 \series bold
+-shapeno n
+\series medium
+ option is only used for shapefile masking.
+ (See description of shapefile masking below).
+\end_layout
+
+\begin_layout Description
+
+\series medium
+12.
+ The 
+\series bold
 -value n
 \series medium
  option can be used to override the default output mask data value (1).
@@ -839,7 +881,7 @@ masking.
 \begin_layout Description
 
 \series medium
-12.
+13.
  The 
 \series bold
 -name string
@@ -850,7 +892,7 @@ masking.
 \begin_layout Description
 
 \series medium
-13.
+14.
  The 
 \series bold
 -log file
@@ -870,7 +912,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-14.
+15.
  The 
 \series bold
 -v level
@@ -884,7 +926,7 @@ standard out and error
 \begin_layout Description
 
 \series medium
-15.
+16.
 
 \series default
  The 
@@ -1131,6 +1173,90 @@ mask_file
  to compute statistics.
 \end_layout
 
+\begin_layout Description
+
+\series medium
+9.
+ Shapefile (
+\series bold
+shape
+\series medium
+) masking uses a closed polygon taken from an ESRI shapefile to define the
+ masking region.
+ Currently, only the main (
+\series default
+\emph on
+i.e.
+\series medium
+\emph default
+, file suffix 
+\begin_inset Quotes eld
+\end_inset
+
+.shp
+\begin_inset Quotes erd
+\end_inset
+
+) shapefiles are supported as inputs to gen_vx_mask.
+ Support for other types of shapefile (index file, suffix 
+\begin_inset Quotes eld
+\end_inset
+
+.shx
+\begin_inset Quotes erd
+\end_inset
+
+, and dBASE file, suffix 
+\begin_inset Quotes eld
+\end_inset
+
+.dbf
+\begin_inset Quotes erd
+\end_inset
+
+) will be available in the next general release of MET.
+ The shapefile must consist of closed polygons rather than polylines, points,
+ or any of the other data types that shapefiles support.
+ Shapefiles usually contain more than one polygon, and the 
+\series bold
+-shape n
+\series medium
+ command line option enables the user to select one polygon from the shapefile.
+ The integer 
+\series bold
+n
+\series medium
+ tells which shape number to use from the shapefile.
+ Note that this value is zero-based, so that the first polygon in the shapefile
+ is polygon number 0, the second polygon in the shapefile is polygon number
+ 1, 
+\series default
+\emph on
+etc.
+ 
+\emph default
+For the user's convenience, some utilities that perform human-readable screen
+ dumps of shapefile contents are provided.
+ The 
+\series bold
+gis_dump_shp
+\series default
+, 
+\series bold
+gis_dump_shx
+\series default
+ and 
+\series bold
+gis_dump_dbf
+\series default
+ tools enable the user to examine the contents of her shapefiles.
+ As an example, if the user knows the name of the particular polygon he
+ wishes to use but not the number of the polygon in the shapefile, he can
+ use the gis_dump_dbf utility to examine the names of the polygons in the
+ shapefile, and the information written to the screen will tell him what
+ the corresponding polygon number is.
+\end_layout
+
 \begin_layout Standard
 The polyline, box, circle, and track masking methods all read an ASCII file
  containing Lat/Lon locations.
@@ -1149,6 +1275,10 @@ Determine the
 input_field
 \series default
  and grid definition.
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1200,6 +1330,10 @@ Determine the
 mask_field
 \series default
 .
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1251,6 +1385,10 @@ mask_field
 out_file
 \series default
 .
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1331,6 +1469,10 @@ Run the Gen-Vx-Mask tool to apply data masking by thresholding a field of
 Rerun the Gen-Vx-Mask tool passing in the output of the first call and applying
  polyline masking to define the geographic area of interest.
  
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1414,7 +1556,7 @@ FORCE
  interpolation method in the regrid configuration option (see 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:IO_General-MET-Config-Options"
+reference "subsec:IO_General-MET-Config-Options"
 
 \end_inset
 
