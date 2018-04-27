@@ -305,6 +305,9 @@ void process_conv_data(ConvData &d, int i_mem) {
       // Store the ensemble member value
       ens_pd.e_na[i_mem].set(i_obs, d.guess);
 
+      // Track the ensemble partial sums
+      ens_pd.add_ens_var_sums(i_obs, d.guess);
+
       // Keep track of ensemble members using this observation
       if(d.anly_use == 1) conv_data[i_obs].n_use++;
    }
@@ -484,6 +487,9 @@ void process_rad_data(RadData &d, int i_mem) {
       // Store the ensemble member value
       ens_pd.e_na[i_mem].set(i_obs, d.guess);
 
+      // Track the ensemble partial sums
+      ens_pd.add_ens_var_sums(i_obs, d.guess);
+
       // Keep track of ensemble members using this observation
       if(d.obs_qc[0] == 0) rad_data[i_obs].n_use++;
    }
@@ -629,6 +635,10 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, bad_data_double);          // CLIMO
    at.set_entry(row, col++, ens_pd.spread_na[i_obs]);  // ENS_SPREAD
 
+   at.set_entry(row, col++, bad_data_double);          // ENS_MEAN_OERR
+   at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
+   at.set_entry(row, col++, bad_data_double);          // SPREAD_PLUS_OERR
+
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
    at.set_entry(row, col++, d->prep_use);              // PREP_USE
@@ -689,6 +699,10 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, ens_pd.mn_na[i_obs]);      // ENS_MEAN
    at.set_entry(row, col++, bad_data_double);          // CLIMO
    at.set_entry(row, col++, ens_pd.spread_na[i_obs]);  // ENS_SPREAD
+
+   at.set_entry(row, col++, bad_data_double);          // ENS_MEAN_OERR
+   at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
+   at.set_entry(row, col++, bad_data_double);          // SPREAD_PLUS_OERR
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
