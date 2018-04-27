@@ -1261,7 +1261,7 @@ void process_scores() {
          // Loop through and apply each of the neighborhood widths
          for(j=0; j<conf_info.get_n_nbrhd_wdth(); j++) {
 
-            shc.set_interp_mthd(InterpMthd_Nbrhd, conf_info.interp_shape);
+            shc.set_interp_mthd(InterpMthd_Nbrhd, conf_info.nbrhd_shape);
             shc.set_interp_wdth(conf_info.nbrhd_wdth[j]);
 
             // Loop through and apply each of the raw threshold values
@@ -1277,13 +1277,13 @@ void process_scores() {
                // Compute the thresholded fractional coverage field
                fractional_coverage(fcst_dp, fcst_dp_smooth,
                                    conf_info.nbrhd_wdth[j],
-                                   conf_info.interp_shape,
+                                   conf_info.nbrhd_shape,
                                    conf_info.fcat_ta[i][k],
                                    conf_info.nbrhd_thresh);
 
                fractional_coverage(obs_dp, obs_dp_smooth,
                                    conf_info.nbrhd_wdth[j],
-                                   conf_info.interp_shape,
+                                   conf_info.nbrhd_shape,
                                    conf_info.ocat_ta[i][k],
                                    conf_info.nbrhd_thresh);
 
