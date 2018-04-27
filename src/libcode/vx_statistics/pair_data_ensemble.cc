@@ -97,6 +97,7 @@ void PairDataEnsemble::clear() {
 
    v_na.clear();
    r_na.clear();
+   rps_na.clear();
    crps_na.clear();
    ign_na.clear();
    pit_na.clear();
@@ -151,6 +152,7 @@ void PairDataEnsemble::extend(int n) {
 
    v_na.extend(n);
    r_na.extend(n);
+   rps_na.extend(n);
    crps_na.extend(n);
    ign_na.extend(n);
    pit_na.extend(n);
@@ -200,6 +202,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    // PairDataEnsemble
    v_na           = pd.v_na;
    r_na           = pd.r_na;
+   rps_na         = pd.rps_na;
    crps_na        = pd.crps_na;
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
@@ -393,6 +396,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       // Store bad data values for current point
       if(skip_ba[i]) {
          r_na.add(bad_data_int);
+         rps_na.add(bad_data_double);
          crps_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
@@ -418,6 +422,9 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Store the rank
             r_na.add(nint(dest_na[0]));
          }
+
+         // JHG, need to actually compute RPS here
+         rps_na.add(bad_data_double);
 
          // Store ensemble stats for the current point
          compute_crps_ign_pit(o_na[i], cur_ens, crps, ign, pit);
@@ -455,10 +462,8 @@ void PairDataEnsemble::compute_stats() {
    double fbar, obar, ffbar, oobar, fobar;
    NumArray cur;
 
-   // JHG, compute rps and rpss
-   rps = bad_data_double;
-
-   // Get the average ensemble CRPS value
+   // Get the average ensemble RPS and CRPS values
+   rps  = rps_na.wmean(wgt_na);
    crps = crps_na.wmean(wgt_na);
 
    // Get the sum of the weights
@@ -488,6 +493,9 @@ void PairDataEnsemble::compute_stats() {
       crpss = (is_eq(crps_climo, 0.0) ?
                bad_data_double : (crps_climo - crps)/crps_climo);
    }
+
+   // JHG, need to compute RPSS here
+   rpss = bad_data_double;
 
    // Compute ME and RMSE values
    fbar = obar = ffbar = oobar = fobar = 0.0;
@@ -830,7 +838,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       // required for ensemble output line types.
       //
       // Include in subset:
-      //   wgt_na, o_na, v_na, r_na, crps_na, ign_na, pit_na,
+      //   wgt_na, o_na, v_na, r_na, rps_na, crps_na, ign_na, pit_na,
       //   spread_na, spread_oerr_na, spread_plus_oerr_na,
       //   mn_na, mn_oerr_na, o_oerr_na, e_na
       //
@@ -842,6 +850,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs(const SingleThresh &ot) const {
       pd.o_na.add(o_na[i]);
       pd.v_na.add(v_na[i]);
       pd.r_na.add(r_na[i]);
+      pd.rps_na.add(rps_na[i]);
       pd.crps_na.add(crps_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);

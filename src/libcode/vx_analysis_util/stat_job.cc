@@ -1833,6 +1833,10 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
                write_header_row(grad_columns, n_grad_columns, 1, dump_at, 0, 0);
                break;
 
+            case(stat_ecnt):
+               write_header_row(ecnt_columns, n_ecnt_columns, 1, dump_at, 0, 0);
+               break;
+
             case(stat_isc):
                write_header_row(isc_columns, n_isc_columns, 1, dump_at, 0, 0);
                break;

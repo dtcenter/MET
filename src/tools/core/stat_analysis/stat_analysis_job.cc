@@ -415,15 +415,16 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_sal1l2 && lt != stat_vl1l2  &&
       lt != stat_val1l2 && lt != stat_pct    &&
       lt != stat_nbrctc && lt != stat_nbrcnt &&
-      lt != stat_grad   && lt != stat_rhist  &&
-      lt != stat_phist  && lt != stat_relp   &&
-      lt != stat_ssvar  && lt != stat_isc) {
+      lt != stat_grad   && lt != stat_ecnt   &&
+      lt != stat_rhist  && lt != stat_phist  &&
+      lt != stat_relp   && lt != stat_ssvar  &&
+      lt != stat_isc) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, NBRCNT, GRAD, ISC,\n"
-           << "\tRHIST, PHIST, RELP, SSVAR\n\n";
+           << "\tECNT, RHIST, PHIST, RELP, SSVAR\n\n";
       throw(1);
    }
 
@@ -489,6 +490,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    else if(lt == stat_isc) {
       aggr_isc_lines(f, j, isc_map, n_in, n_out);
       write_job_aggr_isc(j, lt, isc_map, out_at);
+   }
+
+   //
+   // Sum the ECNT line types
+   //
+   else if(lt == stat_ecnt) {
+      aggr_ecnt_lines(f, j, ens_map, n_in, n_out);
+      write_job_aggr_ecnt(j, lt, ens_map, out_at);
    }
 
    //
@@ -1480,7 +1489,6 @@ void write_job_aggr_pct(STATAnalysisJob &j, STATLineType lt,
             }
          }
       }
-
    } // end for it
 
    return;
@@ -1693,7 +1701,6 @@ void write_job_aggr_grad(STATAnalysisJob &j, STATLineType lt,
       write_case_cols(it->first, at, r, c);
       write_grad_cols(it->second.grad_info, at, r, c);
       if(j.stat_out) write_grad_cols(it->second.grad_info, j.stat_at, r, n_header_columns);
-
    } // end for it
 
    return;
@@ -1862,7 +1869,65 @@ void write_job_aggr_wind(STATAnalysisJob &j, STATLineType lt,
       at.set_entry(r, c++, obar);
       at.set_entry(r, c++, me);
       at.set_entry(r, c++, mae);
+   } // end for it
 
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_ecnt(STATAnalysisJob &j, STATLineType lt,
+                          map<ConcatString, AggrENSInfo> &m,
+                          AsciiTable &at) {
+   map<ConcatString, AggrENSInfo>::iterator it;
+   int n_row, n_col, r, c;
+   StatHdrColumns shc;
+
+   //
+   // Setup the output table
+   //
+   n_row  = 1 + m.size();
+   n_col  = 1 + j.column_case.n_elements();
+   n_col += n_ecnt_columns;
+   write_job_aggr_hdr(j, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + j.column_case.n_elements();
+   write_header_row(ecnt_columns,  n_ecnt_columns,  0, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   j.setup_stat_file(n_row, 0);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++, r++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, j.hdr_name, j.hdr_value, lt);
+      if(j.stat_out) write_header_cols(shc, j.stat_at, r);
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // ECNT output line
+      //
+      at.set_entry(r, c++, "GRAD:");
+      write_case_cols(it->first, at, r, c);
+      write_ecnt_cols(&(it->second.ens_pd), at, r, c);
+      if(j.stat_out) write_ecnt_cols(&(it->second.ens_pd), j.stat_at, r, n_header_columns);
    } // end for it
 
    return;
@@ -3254,7 +3319,6 @@ void write_job_ramp(STATAnalysisJob &j,
          write_cts_cols(cts_info, 0, cts_at, r_cts, c);
          r_cts++;
       }
-
    } // end for it
 
    return;
