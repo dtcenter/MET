@@ -332,8 +332,6 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.total  = atoi(l.get_item("TOTAL"));
    e_data.n_ens  = atof(l.get_item("N_ENS"));
 
-   e_data.rps    = atof(l.get_item("RPS"));
-   e_data.rpss   = atof(l.get_item("RPSS"));
    e_data.crps   = atof(l.get_item("CRPS"));
    e_data.crpss  = atof(l.get_item("CRPSS"));
    e_data.ign    = atof(l.get_item("IGN"));

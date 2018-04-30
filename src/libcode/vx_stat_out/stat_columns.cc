@@ -3392,7 +3392,6 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
    // Ensemble Continuous Statistics
    // Dump out the ECNT line:
    //    TOTAL,        N_ENS,
-   //    RPS,          RPSS,
    //    CRPS,         CRPSS,        IGN,
    //    ME,           RMSE,         SPREAD,
    //    ME_OERR,      RMSE_OERR,    SPREAD_OERR,
@@ -3404,40 +3403,34 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
    at.set_entry(r, c+1,  // Number of ensemble members
       pd_ptr->n_ens);
 
-   at.set_entry(r, c+2,  // Ranked Probability Score
-      pd_ptr->rps);
-
-   at.set_entry(r, c+3,  // Ranked Probability Skill Score
-      pd_ptr->rpss);
-
-   at.set_entry(r, c+4,  // Continuous Ranked Probability Score
+   at.set_entry(r, c+2,  // Continuous Ranked Probability Score
       pd_ptr->crps_na.wmean(pd_ptr->wgt_na));
 
-   at.set_entry(r, c+5,  // Continuous Ranked Probability Skill Score
+   at.set_entry(r, c+3,  // Continuous Ranked Probability Skill Score
       pd_ptr->crpss);
 
-   at.set_entry(r, c+6,  // Ignorance Score
+   at.set_entry(r, c+4,  // Ignorance Score
       pd_ptr->ign_na.wmean(pd_ptr->wgt_na));
 
-   at.set_entry(r, c+7,  // ME for unperturbed ensemble mean
+   at.set_entry(r, c+5,  // ME for unperturbed ensemble mean
       pd_ptr->me);
 
-   at.set_entry(r, c+8,  // RMSE for unperturbed ensemble mean
+   at.set_entry(r, c+6,  // RMSE for unperturbed ensemble mean
       pd_ptr->rmse);
 
-   at.set_entry(r, c+9,  // Mean of unperturbed ensemble spread
+   at.set_entry(r, c+7,  // Mean of unperturbed ensemble spread
       pd_ptr->spread_na.wmean(pd_ptr->wgt_na));
 
-   at.set_entry(r, c+10, // ME for mean of perturbed members
+   at.set_entry(r, c+8,  // ME for mean of perturbed members
       pd_ptr->me_oerr);
 
-   at.set_entry(r, c+11, // RMSE for mean of perturbed members
+   at.set_entry(r, c+9,  // RMSE for mean of perturbed members
       pd_ptr->rmse_oerr);
 
-   at.set_entry(r, c+12,  // Mean of perturbed ensemble spread
+   at.set_entry(r, c+10,  // Mean of perturbed ensemble spread
       pd_ptr->spread_oerr_na.wmean(pd_ptr->wgt_na));
 
-   at.set_entry(r, c+13,  // Mean of unperturbed spread plus observation error
+   at.set_entry(r, c+11,  // Mean of unperturbed spread plus observation error
       pd_ptr->spread_plus_oerr_na.wmean(pd_ptr->wgt_na));
 
    return;

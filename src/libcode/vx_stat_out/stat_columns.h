@@ -274,11 +274,10 @@ static const char * isc_columns [] = {
 };
 
 static const char * ecnt_columns [] = {
-   "TOTAL",       "N_ENS",       "RPS",
-   "RPSS",        "CRPS",        "CRPSS",
-   "IGN",         "ME",          "RMSE",
-   "SPREAD",      "ME_OERR",     "RMSE_OERR",
-   "SPREAD_OERR", "SPREAD_PLUS_OERR"
+   "TOTAL",       "N_ENS",       "CRPS",
+   "CRPSS",       "IGN",         "ME",
+   "RMSE",        "SPREAD",      "ME_OERR",
+   "RMSE_OERR",   "SPREAD_OERR", "SPREAD_PLUS_OERR"
 };
 
 static const char * rhist_columns [] = {
