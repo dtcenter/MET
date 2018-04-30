@@ -923,6 +923,7 @@ void process_point_obs(int i_nc) {
    StringArray obs_qty_array;
 
    float obs_arr[obs_arr_len], hdr_arr[hdr_arr_len];
+   int  hdr_typ_arr[hdr_typ_arr_len];
    char hdr_typ_str[max_str_len];
    char hdr_sid_str[max_str_len];
    char hdr_vld_str[max_str_len];
@@ -1061,7 +1062,6 @@ void process_point_obs(int i_nc) {
             strcpy(obs_qty_str, obs_qty_array[obs_qty_idx_block[i_offset]]);
          }
 
-
          int headerOffset  = obs_arr[0];
 
          // Range check the header offset
@@ -1078,6 +1078,14 @@ void process_point_obs(int i_nc) {
          hdr_arr[0] = header_data.lat_array[headerOffset];
          hdr_arr[1] = header_data.lon_array[headerOffset];
          hdr_arr[2] = header_data.elv_array[headerOffset];
+
+         // Read the header integer types
+         hdr_typ_arr[0] = (header_data.prpt_typ_array.n() > headerOffset ?
+                           header_data.prpt_typ_array[headerOffset] : bad_data_int);
+         hdr_typ_arr[1] = (header_data.irpt_typ_array.n() > headerOffset ?
+                           header_data.irpt_typ_array[headerOffset] : bad_data_int);
+         hdr_typ_arr[2] = (header_data.inst_typ_array.n() > headerOffset ?
+                           header_data.inst_typ_array[headerOffset] : bad_data_int);
 
          // Read the corresponding header type for this observation
          hdr_idx = use_arr_vars ? headerOffset : header_data.typ_idx_array[headerOffset];
@@ -1115,9 +1123,9 @@ void process_point_obs(int i_nc) {
          for(j=0; j<conf_info.get_n_vx(); j++) {
 
             // Attempt to add the observation to the vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty_str, obs_arr, grid,
-                                              var_name);
+            conf_info.vx_opt[j].vx_pd.add_obs(hdr_arr, hdr_typ_arr, hdr_typ_str,
+                                              hdr_sid_str, hdr_ut, obs_qty_str,
+                                              obs_arr, grid, var_name);
          }
       }
    } // end for i_start

@@ -1319,8 +1319,10 @@ void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
-                                 const char *hdr_sid_str, unixtime hdr_ut,
+void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
+                                 const char *hdr_typ_str,
+                                 const char *hdr_sid_str,
+                                 unixtime hdr_ut,
                                  const char *obs_qty, float *obs_arr,
                                  Grid &gr, const char *var_name,
                                  const DataPlane *wgt_dp) {
@@ -1468,7 +1470,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, const char *hdr_typ_str,
       else {
          oerr_ptr = obs_error_table.lookup(
             obs_info->name(), hdr_typ_str, hdr_sid_str,
-            bad_data_int, bad_data_int, bad_data_int,
+            hdr_typ_arr[0], hdr_typ_arr[1], hdr_typ_arr[2],
             obs_lvl, obs_hgt, obs_v);
       }
    }
