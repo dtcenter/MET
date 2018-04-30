@@ -2543,7 +2543,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
    ECNTData cur;
    ConcatString key;
    int i;
-   double rps_fcst, rps_climo, crps_fcst, crps_climo;
+   double crps_fcst, crps_climo;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2582,7 +2582,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          if(m.count(key) == 0) {
             aggr.ens_pd.clear();
-            aggr.rps_climo_na.clear();
             aggr.crps_climo_na.clear();
             aggr.hdr.clear();
             m[key] = aggr;
@@ -2601,7 +2600,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
          //
          // Store the current statistics and weight (TOTAL column)
          //
-         m[key].ens_pd.rps_na.add(cur.rps);
          m[key].ens_pd.crps_na.add(cur.crps);
          m[key].ens_pd.ign_na.add(cur.ign);
          m[key].ens_pd.spread_na.add(cur.spread);
@@ -2616,18 +2614,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].mse_na.add(cur.rmse * cur.rmse);
          m[key].me_oerr_na.add(cur.me_oerr);
          m[key].mse_oerr_na.add(cur.me_oerr * cur.me_oerr);
-
-         //
-         // Compute and store climatological RPS
-         //
-         if(!is_bad_data(cur.rps) && !is_bad_data(cur.rpss) &&
-            !is_eq(cur.rpss, 1.0)) {
-            rps_climo = cur.rps / (1.0 - cur.rpss);
-            m[key].rps_climo_na.add(rps_climo);
-         }
-         else {
-            m[key].rps_climo_na.add(bad_data_double);
-         }
 
          //
          // Compute and store climatological CRPS
@@ -2664,19 +2650,8 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &j,
       it->second.ens_pd.me_oerr   =      it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
       it->second.ens_pd.rmse_oerr = sqrt(it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na));
 
-      rps_fcst   = it->second.ens_pd.rps_na.wmean(it->second.ens_pd.wgt_na);
-      rps_climo  = it->second.rps_climo_na.wmean(it->second.ens_pd.wgt_na);
       crps_fcst  = it->second.ens_pd.crps_na.wmean(it->second.ens_pd.wgt_na);
       crps_climo = it->second.crps_climo_na.wmean(it->second.ens_pd.wgt_na);
-
-      // Compute aggregated RPSS
-      if(!is_bad_data(rps_fcst) && !is_bad_data(rps_climo) &&
-         !is_eq(rps_climo, 0.0)) {
-         it->second.ens_pd.rpss = (rps_climo - rps_fcst)/rps_climo;
-      }
-      else {
-         it->second.ens_pd.rpss = bad_data_double;
-      }
 
       // Compute aggregated CRPSS
       if(!is_bad_data(crps_fcst) && !is_bad_data(crps_climo) &&
@@ -3062,9 +3037,6 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &j,
          m[key].ens_pd.crps_na.add(crps);
          m[key].ens_pd.ign_na.add(ign);
          m[key].ens_pd.pit_na.add(pit);
-
-         // JHG, need to compute RPS
-         m[key].ens_pd.rps_na.add(bad_data_double);
 
          //
          // Increment the RHIST counts

@@ -73,7 +73,6 @@ class PairDataEnsemble : public PairBase {
       NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
       NumArray   v_na;            // Number of valid ensemble values [n_obs]
       NumArray   r_na;            // Observation ranks [n_obs]
-      NumArray   rps_na;          // Ranked Probability Score [n_obs]
       NumArray   crps_na;         // Continuous Ranked Probability Score [n_obs]
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
@@ -104,10 +103,7 @@ class PairDataEnsemble : public PairBase {
       double     ssvar_bin_size;  // Variance bin size for spread/skill
       SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
 
-      double     rps;             // Ranked probability score
       double     crpss;           // Continuous ranked probability skill score
-      double     rpss;            // Ranked probability skill score
-
       double     me;              // ME for ensemble mean
       double     rmse;            // RMSE for ensemble mean
       double     me_oerr;         // ME for mean of perturbed members

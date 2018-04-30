@@ -63,7 +63,7 @@ struct MPRData {
 // Ensemble continuous statistics (ECNT) data structure
 struct ECNTData {
    int total, n_ens;
-   double rps, rpss, crps, crpss, ign;
+   double crps, crpss, ign;
    double me, rmse, spread;
    double me_oerr, rmse_oerr, spread_oerr;
    double spread_plus_oerr;
