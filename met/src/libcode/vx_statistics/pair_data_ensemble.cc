@@ -308,7 +308,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    int i, j, k, n_vld, n_bel, n_tie;
    int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens;
-   double variance, mean, spread;
+   double mean, variance, spread;
    double crps, ign, pit;
 
    // Check if the ranks have already been computed
@@ -344,8 +344,9 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       v_na.add(n_vld);
 
       // Compute the spread of the unperturbed ensemble members
-      variance = (esumsq_na[i]/v_na[i]) - pow(esum_na[i]/v_na[i], 2.0);
-      spread_na.add(sqrt(variance));
+      spread = compute_stdev(esum_na[i], esumsq_na[i], v_na[i]);
+      spread_na.add(spread);
+      variance = spread * spread;
 
       // Process the observation error information.
       ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
