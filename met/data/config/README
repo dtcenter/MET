@@ -1493,6 +1493,53 @@ obs_thresh = [ NA ];
 skip_const = FALSE;
 
 //
+// Observation error options
+// Set dist_type to NONE to use the observation error table instead.
+// May be set separately in each "obs.field" entry.
+// The obs_error dictionary controls how observation error information should be
+// handled.  Observation error information can either be specified directly in
+// the configuration file or by parsing information from an external table file.
+// By default, the MET_BASE/data/table_files/obs_error_table.txt file is read
+// but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment
+// variable at runtime.
+//
+// The field entry may be set to FCST, OBS, BOTH, or NONE. Setting this entry to
+// NONE, the default value, disables the observation error logic. FCST indicates
+// that a random perturbation should be applied to the ensemble member values;
+// OBS applies the random perturbation to the observation values; and BOTH
+// applies the random perturbation to the ensemble members and the observations.
+//
+// The dist_type entry may be set to NONE, NORMAL, LOGNORMAL, EXPONENTIAL,
+// CHISQUARED, GAMMA, UNIFORM, or BETA. The default value of NONE indicates that
+// the observation error table file should be used rather than the configuration
+// file settings.
+//
+// The dist_parm entry is an array of length 1 or 2 specifying the parameters
+// for the distribution selected in dist_type.
+//
+// The inst_bias_scale and inst_bias_offset entries specify bias scale and
+// offset values that should be applied to observation values prior to
+// perturbing them. These entries enable bias-correction on the fly.
+//
+// Defining the observation error information in the configuration file is
+// convenient but limited. The random perturbations for all points in the
+// current verification task are drawn from the same distribution. Specifying an
+// observation error table file instead (by setting dist_type = NONE;) provides
+// much finer control, enabling the user to define observation error
+// distribution information and bias-correction logic separately for each
+// observation variable name, message type, PREPBUFR report type, input report
+// type, instrument type, station ID, range of heights, range of pressure
+// levels, and range of values.
+//
+obs_error = {
+   field            = NONE;    // FCST, OBS, BOTH, or NONE
+   dist_type        = NONE;    // Distribution type
+   dist_parm        = [];      // Distribution parameters
+   inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
+   inst_bias_offset = 0.0;     // Instrument bias offset adjustment
+}
+
+//
 // The "ensemble_flag" entry is a dictionary of boolean value indicating
 // which ensemble products should be generated:
 //    - "mean" for the simple ensemble mean

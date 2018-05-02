@@ -73,6 +73,19 @@ obs_perc_value = 50;
 skip_const     = FALSE;
 
 //
+// Observation error options
+// Set dist_type to NONE to use the observation error table instead
+// May be set separately in each "obs.field" entry
+//
+obs_error = {
+   field            = NONE;
+   dist_type        = NONE;
+   dist_parm        = [];
+   inst_bias_scale  = 1.0;
+   inst_bias_offset = 0.0;
+}
+
+//
 // Ensemble bin sizes
 // May be set separately in each "obs.field" entry
 //
@@ -151,6 +164,7 @@ interp = {
 // Statistical output types
 //
 output_flag = {
+   ecnt  = STAT;
    rhist = STAT;
    phist = STAT;
    orank = NONE;

@@ -90,10 +90,8 @@ fcst = {
 
    field = [
       {
-         name               = "APCP";
-         level              = [ "A24" ];
-         ens_ssvar_bin_size = 0.1;
-         ens_phist_bin_size = 0.05;
+         name  = "APCP";
+         level = [ "A24" ];
       }
    ];
 }
@@ -112,6 +110,26 @@ duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_perc_value = 50;
 skip_const     = FALSE;
+
+//
+// Observation error options
+// Set dist_type to NONE to use the observation error table instead
+// May be set separately in each "obs.field" entry
+//
+obs_error = {
+   field            = NONE;
+   dist_type        = NONE;
+   dist_parm        = [];
+   inst_bias_scale  = 1.0;
+   inst_bias_offset = 0.0;
+}
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -189,6 +207,7 @@ interp = {
 // Statistical output types
 //
 output_flag = {
+   ecnt  = BOTH;
    rhist = BOTH;
    phist = BOTH;
    orank = BOTH;
