@@ -103,6 +103,16 @@ files when specifying paths and the appropriate path will be substituted in.
 If MET_BASE is defined as an environment variable, its value will be used
 instead of the one defined at compilation time.
 
+The MET_OBS_ERROR_TABLE environment variable can be set to specify the location
+of an ASCII file defining observation error information.  The default table
+can be found in the installed share/met/table_files/obs_error_table.txt.  This
+observation error logic is applied in Ensemble-Stat to perturb ensemble member
+values and/or observation values.  When processing each point observation,
+Ensemble-Stat searches the table to find the entry defining the observation
+error perturbation information.  The table file consists of 13 columns and
+includes a header row defining each column.  The special string "ALL" is
+interpreted as a wildcard in these files.
+
 The MET_GRIB_TABLES environment variable can be set to specify the location of
 custom GRIB tables.  It can either be set to a specific file name or to a
 directory containing custom GRIB tables files.  These file names must begin with
