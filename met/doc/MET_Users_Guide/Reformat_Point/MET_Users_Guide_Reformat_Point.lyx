@@ -1968,7 +1968,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-mxstr
+mxstr, mxstr2, mxstr3
 \end_layout
 
 \end_inset
@@ -1977,67 +1977,7 @@ mxstr
 \begin_inset Text
 
 \begin_layout Plain Layout
-Maximum string length (16)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-mxstr2
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Another string length (40)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hdr_arr_len
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Number of entries in each PrepBufr header array (3)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-obs_arr_len
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Number of entries in each PrepBufr observation array (5)
+Maximum string lengths (16, 40, and 80)
 \end_layout
 
 \end_inset
@@ -2064,11 +2004,72 @@ Number of PrepBufr observations in the file (UNLIMITED)
 </cell>
 </row>
 <row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nhdr, npbhdr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of PrepBufr messages in the file (variable) 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nhdr_typ, nhdr_sid, nhdr_vld
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of unique header message type, station ID, and valid time strings
+ (variable)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nobs_qty
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Number of unique quality control strings (variable)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-nhdr
+obs_var_num
 \end_layout
 
 \end_inset
@@ -2077,7 +2078,7 @@ nhdr
 \begin_inset Text
 
 \begin_layout Plain Layout
-Number of PrepBufr messages in the file (variable) 
+Number of unique observation variable types (variable)
 \end_layout
 
 \end_inset
@@ -2097,10 +2098,6 @@ Number of PrepBufr messages in the file (variable)
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 
@@ -2129,10 +2126,10 @@ name "table_reform-point_pb2nc_output_vars"
 
 \series bold
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="3">
+<lyxtabular version="3" rows="23" columns="3">
 <features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0.7in">
-<column alignment="left" valignment="top" width="0.9in">
+<column alignment="left" valignment="top" width="1.1in">
+<column alignment="left" valignment="top" width="1.1in">
 <column alignment="left" valignment="top" width="4.4in">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
@@ -2205,7 +2202,7 @@ Description
 \begin_inset Text
 
 \begin_layout Plain Layout
-obs_arr
+obs_qty
 \end_layout
 
 \end_inset
@@ -2214,37 +2211,17 @@ obs_arr
 \begin_inset Text
 
 \begin_layout Plain Layout
-nobs, obs_arr_len
+nobs
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Array of floats containing values for each observation including:
-\end_layout
-
-\begin_layout Plain Layout
-* Reference to the entry in the hdr_arr with which this observation is associate
-d
-\end_layout
-
-\begin_layout Plain Layout
-* GRIB code corresponding to this observation type
-\end_layout
-
-\begin_layout Plain Layout
-* Pressure level in hPa or accumulation interval
-\end_layout
-
-\begin_layout Plain Layout
-* Height in meters above sea level
-\end_layout
-
-\begin_layout Plain Layout
-* Observation value
+Integer value of the n_obs_qty dimension for the observation quality control
+ string.
 \end_layout
 
 \end_inset
@@ -2255,7 +2232,7 @@ d
 \begin_inset Text
 
 \begin_layout Plain Layout
-obs_qty
+obs_hid
 \end_layout
 
 \end_inset
@@ -2264,16 +2241,134 @@ obs_qty
 \begin_inset Text
 
 \begin_layout Plain Layout
-nobs, mxstr
+nobs
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Text string containing quality control value for each observation.
+Integer value of the nhdr dimension for the header arrays with which this
+ observation is associated.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_vid
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nobs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Integer value of the obs_var_num dimension for the observation variable
+ name, units, and description.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_lvl
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nobs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Floating point pressure level in hPa or accumulation interval.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_hgt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nobs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Floating point height in meters above sea level.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_val
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nobs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Floating point observation value.
 \end_layout
 
 \end_inset
@@ -2293,7 +2388,7 @@ hdr_typ
 \begin_inset Text
 
 \begin_layout Plain Layout
-nmsg, mxstr2
+nhdr
 \end_layout
 
 \end_inset
@@ -2302,7 +2397,7 @@ nmsg, mxstr2
 \begin_inset Text
 
 \begin_layout Plain Layout
-Text string containing the message type for each PrepBufr message
+Integer value of the nhdr_typ dimension for the message type string.
 \end_layout
 
 \end_inset
@@ -2322,7 +2417,7 @@ hdr_sid
 \begin_inset Text
 
 \begin_layout Plain Layout
-nmsg, mxstr
+nhdr
 \end_layout
 
 \end_inset
@@ -2331,7 +2426,7 @@ nmsg, mxstr
 \begin_inset Text
 
 \begin_layout Plain Layout
-Text string containing the station id for each PrepBufr message
+Integer value of the nhdr_sid dimension for the station ID string.
 \end_layout
 
 \end_inset
@@ -2351,7 +2446,7 @@ hdr_vld
 \begin_inset Text
 
 \begin_layout Plain Layout
-nmsg, mxstr
+nhdr
 \end_layout
 
 \end_inset
@@ -2360,8 +2455,328 @@ nmsg, mxstr
 \begin_inset Text
 
 \begin_layout Plain Layout
-Text string containing the observation valid time for each PrepBufr message
- in YYYYMMDD_HHMMSS format
+Integer value of the nhdr_vld dimension for the valid time string.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_lat, hdr_lon
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nhdr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Floating point latitude in degrees north and longitude in degrees east.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_elv
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nhdr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Floating point elevation of observing station in meters above sea level.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_prpt_typ
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+npbhdr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Integer PREPBUFR report type value.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_irpt_typ
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+npbhdr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Integer input report type value.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_inst_typ
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+npbhdr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Integer instrument type value.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_typ_table
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nhdr_typ, mxstr2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lookup table containing unique message type strings.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_sid_table
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nhdr_sid, mxstr2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lookup table containing unique station ID strings.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hdr_vld_table
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nhdr_vld, mxstr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lookup table containing unique valid time strings in YYYYMMDD_HHMMSS UTC
+ format.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_qty_table
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nobs_qty, mxstr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lookup table containing unique quality control strings.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_var
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_var_num, mxstr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lookup table containing unique observation variable names.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_unit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+obs_var_num, mxstr2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lookup table containing a units string for the unique observation variable
+ names in obs_var.
 \end_layout
 
 \end_inset
@@ -2372,7 +2787,7 @@ Text string containing the observation valid time for each PrepBufr message
 \begin_inset Text
 
 \begin_layout Plain Layout
-hdr_arr
+obs_desc
 \end_layout
 
 \end_inset
@@ -2381,28 +2796,17 @@ hdr_arr
 \begin_inset Text
 
 \begin_layout Plain Layout
-nhdr, hdr_arr_len
+obs_var_num, mxstr3
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Array of floats containing values for each PrepBufr message including:
-\end_layout
-
-\begin_layout Plain Layout
-* Latitude in degrees north
-\end_layout
-
-\begin_layout Plain Layout
-* Longitude in degrees east
-\end_layout
-
-\begin_layout Plain Layout
-* Elevation in meters above sea level 
+Lookup table containing a description string for the unique observation
+ variable names in obs_var.
 \end_layout
 
 \end_inset
