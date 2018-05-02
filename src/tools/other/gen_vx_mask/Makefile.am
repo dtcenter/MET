@@ -48,4 +48,4 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = gen_vx_mask.h \
-	grid_close_poly.h
+	grid_closed_poly.h
