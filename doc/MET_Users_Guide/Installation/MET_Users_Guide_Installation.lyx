@@ -1584,6 +1584,18 @@ Disable compilation of gen_vx_mask
 \begin_layout Standard
 
 \series bold
+–disable-gis_utils
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Disable compilation of gis_dump_dbf, gis_dump_shp, and gis_dump_shx
+\end_layout
+
+\begin_layout Standard
+
+\series bold
 –disable-grid_stat
 \end_layout
 

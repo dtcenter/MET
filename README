@@ -1,4 +1,4 @@
-Model Evaluation Tools METv7.1 BETA 2 (March 28, 2018)
+Model Evaluation Tools METv7.1 BETA 3 (May 2, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -245,11 +245,14 @@ sub-directory, or the MET Online Tutorial:
 
 - If all tools are enabled and the build is successful, the "<prefix>/bin"
   directory (where <prefix> is the prefix you specified on your configure
-  command line) will contain 28 executables:
+  command line) will contain 31 executables:
    - ascii2nc
    - ensemble_stat
    - gen_vx_mask
    - grid_stat
+   - gis_dump_dbf
+   - gis_dump_shp
+   - gis_dump_shx
    - gsid2mpr
    - gsidens2orank
    - lidar2nc
@@ -295,6 +298,31 @@ sub-directory, or the MET Online Tutorial:
 Release Notes
 ================================================================================
 
+Version 7.1 BETA 3 Release Notes:
+--------------------------------
+
+- In Point-Stat, Grid-Stat, Ensemble-Stat, and Wavelet-Stat, change default
+  config file output_flag settings from BOTH to NONE.
+- In Ensemble-Stat, rename -ssvar_mean command line option as -ens_mean, but
+  still quietly support -ssvar_mean.
+- In Ensemble-Stat, split the RHIST line type out into RHIST and ECNT, for
+  continuous ensemble statistics.
+- Continue observation error development in Ensemble-Stat.  Finalize updated
+  contents of the ORANK, ECNT, and RHIST line types.  Support the definition of
+  multiple observation error distribution types.
+- Enhance STAT-Analysis to aggregate the ECNT line type and derive it from
+  input ORANK lines.
+- Enhance gen_vx_mask to define masking regions using shapefiles (-type shape).
+- Add three utilities to dump shapefile information:
+     gis_dump_dbf, gis_dump_shp, and gis_dump_shx
+- Major change to the NetCDF point observation format written by PB2NC,
+  ASCII2NC, MADIS2NC, and LIDAR2NC.  Split data out into multiple 1D arrays.
+- Enhance PB2NC to dump the PrepBufr report type, input report type, and
+  instrument for use in the observation error table lookup.
+- Update computation of MSVE statistic in the VCNT line type to be done using
+  partial sums rather than matched pair values.  This enables it to be
+  computed from VL1L2 lines in STAT-Analysis.
+
 Version 7.1 BETA 2 Release Notes:
 --------------------------------
 
@@ -307,7 +335,7 @@ Version 7.1 BETA 1 Release Notes:
 
 - Make logic for finding matching UGRD/VGRD verification tasks more robust in
   Point-Stat and Grid-Stat.
-- Fix PB2NC's computation of valid time for AIRNOW observations. 
+- Fix PB2NC's computation of valid time for AIRNOW observations.
 - Minor bugfix for Series-Analysis when computing min/max timing info for
   series with some missing input files.
 - Enable vld_thresh = 0 in Ensemble-Stat and Series-Analysis.

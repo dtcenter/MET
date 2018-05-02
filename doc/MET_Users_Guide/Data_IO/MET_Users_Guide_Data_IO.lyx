@@ -1605,6 +1605,43 @@ Output
 \end_layout
 
 \end_deeper
+\begin_layout Description
+
+\series medium
+26.
+ 
+\series bold
+GIS-Util Tools
+\series default
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Input
+\series medium
+: ESRI shapefiles ending in .dbf, .shp, or .shx
+\end_layout
+
+\begin_layout Description
+
+\series medium
+* 
+\series bold
+Output
+\series medium
+: Ascii description of the contents printed to the screen.
+\end_layout
+
+\end_deeper
 \begin_layout Section
 Configuration File Details
 \begin_inset CommandInset label

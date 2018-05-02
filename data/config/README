@@ -1112,32 +1112,32 @@ hira = {
 //      "_type.txt" file, a more readable ASCII file sorted by line type.
 //
 output_flag = {
-   fho    = BOTH;  // Forecast, Hit, Observation Rates
-   ctc    = BOTH;  // Contingency Table Counts
-   cts    = BOTH;  // Contingency Table Statistics
-   mctc   = BOTH;  // Multi-category Contingency Table Counts
-   mcts   = BOTH;  // Multi-category Contingency Table Statistics
-   cnt    = BOTH;  // Continuous Statistics
-   sl1l2  = BOTH;  // Scalar L1L2 Partial Sums
-   sal1l2 = BOTH;  // Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
-   vl1l2  = BOTH;  // Vector L1L2 Partial Sums
-   val1l2 = BOTH;  // Vector Anomaly L1L2 Partial Sums when climatological data is supplied
-   pct    = BOTH;  // Contingency Table Counts for Probabilistic Forecasts
-   pstd   = BOTH;  // Contingency Table Statistics for Probabilistic Forecasts with
+   fho    = NONE;  // Forecast, Hit, Observation Rates
+   ctc    = NONE;  // Contingency Table Counts
+   cts    = NONE;  // Contingency Table Statistics
+   mctc   = NONE;  // Multi-category Contingency Table Counts
+   mcts   = NONE;  // Multi-category Contingency Table Statistics
+   cnt    = NONE;  // Continuous Statistics
+   sl1l2  = NONE;  // Scalar L1L2 Partial Sums
+   sal1l2 = NONE;  // Scalar Anomaly L1L2 Partial Sums when climatological data is supplied
+   vl1l2  = NONE;  // Vector L1L2 Partial Sums
+   val1l2 = NONE;  // Vector Anomaly L1L2 Partial Sums when climatological data is supplied
+   pct    = NONE;  // Contingency Table Counts for Probabilistic Forecasts
+   pstd   = NONE;  // Contingency Table Statistics for Probabilistic Forecasts with
                    // Dichotomous outcomes
-   pjc    = BOTH;  // Joint and Conditional Factorization for Probabilistic Forecasts
-   prc    = BOTH;  // Receiver Operating Characteristic for Probabilistic Forecasts
-   eclv   = BOTH;  // Economic Cost/Loss Value derived from CTC and PCT lines
-   mpr    = BOTH;  // Matched Pair Data
-   nbrctc = BOTH;  // Neighborhood Contingency Table Counts
-   nbrcts = BOTH;  // Neighborhood Contingency Table Statistics
-   nbrcnt = BOTH;  // Neighborhood Continuous Statistics
-   isc    = BOTH;  // Intensity-Scale
-   rhist  = BOTH;  // Rank Histogram
-   phist  = BOTH;  // Probability Integral Transform Histogram
-   orank  = BOTH;  // Observation Rank
-   ssvar  = BOTH;  // Spread Skill Variance
-   grad   = BOTH;  // Gradient statistics (S1 score)
+   pjc    = NONE;  // Joint and Conditional Factorization for Probabilistic Forecasts
+   prc    = NONE;  // Receiver Operating Characteristic for Probabilistic Forecasts
+   eclv   = NONE;  // Economic Cost/Loss Value derived from CTC and PCT lines
+   mpr    = NONE;  // Matched Pair Data
+   nbrctc = NONE;  // Neighborhood Contingency Table Counts
+   nbrcts = NONE;  // Neighborhood Contingency Table Statistics
+   nbrcnt = NONE;  // Neighborhood Continuous Statistics
+   isc    = NONE;  // Intensity-Scale
+   rhist  = NONE;  // Rank Histogram
+   phist  = NONE;  // Probability Integral Transform Histogram
+   orank  = NONE;  // Observation Rank
+   ssvar  = NONE;  // Spread Skill Variance
+   grad   = NONE;  // Gradient statistics (S1 score)
 }
 
 //
