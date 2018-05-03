@@ -37,35 +37,83 @@ strPntNc = listArgs[ length(listArgs) ];
 ncPnt = nc_open(c(strPntNc), write=F);
 
 # build the header data frame
-dfHdr = data.frame(
-	typ    = ncvar_get(ncPnt, ncPnt$var[["hdr_typ"]]),
-	sid    = ncvar_get(ncPnt, ncPnt$var[["hdr_sid"]]),
-	vld    = ncvar_get(ncPnt, ncPnt$var[["hdr_vld"]]),
-	lat    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[1,],
-	lon    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[2,],
-	elv    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[3,]
-);
+use_index = F;
+if( 0 < length(ncPnt$var[["hdr_lat"]]) ) {
+    use_index = T;
+    dfHdr = data.frame(
+        typ    = ncvar_get(ncPnt, ncPnt$var[["hdr_typ"]]),
+        sid    = ncvar_get(ncPnt, ncPnt$var[["hdr_sid"]]),
+        vld    = ncvar_get(ncPnt, ncPnt$var[["hdr_vld"]]),
+        lat    = ncvar_get(ncPnt, ncPnt$var[["hdr_lat"]]),
+        lon    = ncvar_get(ncPnt, ncPnt$var[["hdr_lon"]]),
+        elv    = ncvar_get(ncPnt, ncPnt$var[["hdr_elv"]])
+    );
+    if( strSid != "" ) {
+        sid_list = ncPnt$var[["hdr_sid_table"]];
+        if( 0 < length(sid_list)){
+            strSid = which(sid_list == strSid);
+        }
+        #cat(strSid,"  int  \n")
+    };
+    if( strMsg != "") {
+        msg_list = ncvar_get(ncPnt, ncPnt$var[["hdr_typ_table"]]);
+        if (0 < length(msg_list)){
+            strMsg = which(msg_list == strMsg);
+        }
+    };
+} else {
+    dfHdr = data.frame(
+        typ    = ncvar_get(ncPnt, ncPnt$var[["hdr_typ"]]),
+        sid    = ncvar_get(ncPnt, ncPnt$var[["hdr_sid"]]),
+        vld    = ncvar_get(ncPnt, ncPnt$var[["hdr_vld"]]),
+        lat    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[1,],
+        lon    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[2,],
+        elv    = ncvar_get(ncPnt, ncPnt$var[["hdr_arr"]])[3,]
+    );
+}
 dfHdr$hdr_id = seq(0,nrow(dfHdr)-1);
 
 # replace empty SID strings with NA
-dfHdr$sid[dfHdr$sid == ""] = NA;
+if( ! use_index ) {
+    dfHdr$sid[dfHdr$sid == ""] = NA;
+}
 
 # check for the obs_qty variable
 if( 0 < length(ncPnt$var[["obs_qty"]]) ) {
 	ObsQty = ncvar_get(ncPnt, ncPnt$var[["obs_qty"]]);
+    if( 0 < length(ncPnt$var[["obs_qty_table"]]) ) {
+        ObsQtyList = ncvar_get(ncPnt, ncPnt$var[["obs_qty_table"]]);
+        ObsQty = ObsQtyList[ObsQty+1];
+    }
 } else {
 	ObsQty = rep(-9999, ncPnt$dim[["nobs"]]$len);
 }
 
 # build the observation data frame
-dfObs = data.frame(
-	hdr_id = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[1,],
-	var    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[2,],
-	lvl    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[3,],
-	hgt    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[4,],
-	qty    = ObsQty,
-	ob     = signif(ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[5,], 5)
-);
+if( 0 < length(ncPnt$var[["obs_val"]]) ) {
+    if( 0 < length(ncPnt$var[["obs_vid"]]) ) {
+        vid_or_gc = ncvar_get(ncPnt, ncPnt$var[["obs_vid"]])
+    } else {
+        vid_or_gc = ncvar_get(ncPnt, ncPnt$var[["obs_gc"]])
+    }
+    dfObs = data.frame(
+        hdr_id = ncvar_get(ncPnt, ncPnt$var[["obs_hid"]]),
+        var    = vid_or_gc,
+        lvl    = ncvar_get(ncPnt, ncPnt$var[["obs_lvl"]]),
+        hgt    = ncvar_get(ncPnt, ncPnt$var[["obs_hgt"]]),
+        qty    = ObsQty,
+        ob     = signif(ncvar_get(ncPnt, ncPnt$var[["obs_val"]]), 5)
+    );
+} else {
+    dfObs = data.frame(
+        hdr_id = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[1,],
+        var    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[2,],
+        lvl    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[3,],
+        hgt    = ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[4,],
+        qty    = ObsQty,
+        ob     = signif(ncvar_get(ncPnt, ncPnt$var[["obs_arr"]])[5,], 5)
+    );
+}
 
 # check for the obs_var variable and update dfObs$var
 if( 0 < length(ncPnt$var[["obs_var"]]) ) {
@@ -77,6 +125,22 @@ if( 0 < length(ncPnt$var[["obs_var"]]) ) {
 if( strSid != "" ){ dfHdr = dfHdr[dfHdr$sid == strSid,]; }
 if( strMsg != "" ){ dfHdr = dfHdr[dfHdr$typ == strMsg,]; }
 if( strObs != "" ){ dfObs = dfObs[dfObs$var == strObs,]; }
+
+if( use_index ) {
+    if( 0 < length(ncPnt$var[["hdr_typ_table"]]) ) {
+        HdrTypList = ncvar_get(ncPnt, ncPnt$var[["hdr_typ_table"]]);
+        dfHdr$typ = HdrTypList[dfHdr$typ+1];
+    }
+    if( 0 < length(ncPnt$var[["hdr_sid_table"]]) ) {
+        HdrSidList = ncvar_get(ncPnt, ncPnt$var[["hdr_sid_table"]]);
+        dfHdr$sid = HdrSidList[dfHdr$sid+1];
+    }
+    if( 0 < length(ncPnt$var[["hdr_vld_table"]]) ) {
+        HdrVldList = ncvar_get(ncPnt, ncPnt$var[["hdr_vld_table"]]);
+        dfHdr$vld = HdrVldList[dfHdr$vld+1];
+    }
+}
+
 dfSid = merge(dfHdr, dfObs);
 
 # format level column to HHMMSS for accumulation intervals
