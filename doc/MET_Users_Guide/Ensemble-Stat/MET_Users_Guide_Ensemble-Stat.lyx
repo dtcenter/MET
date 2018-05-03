@@ -110,6 +110,8 @@ This chapter contains a description of the Ensemble-Stat tool.
 s ranked probability score are produced.
  A climatology file may also be provided, and will be used as a reference
  forecast in several of the output statistics.
+ Finally, observation error perturbations can be included prior to calculation
+ of statistics.
  Details about and equations for the statistics produced for ensembles are
  given in Appendix C 
 \begin_inset CommandInset ref
@@ -119,6 +121,105 @@ reference "sec:App_C-ensemble"
 \end_inset
 
 .
+ 
+\end_layout
+
+\begin_layout Section
+Scientific and statistical aspects
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:ES_Scientific-and-statistical"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Ensemble Relative Frequency
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:ES_Rel_Freq"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Ensemble Statistics 
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:ES_Statistical-measures"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Ensemble Observation Error
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:ES_Obs_Err"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In an attempt to ameliorate the effect of observation errors on the verification
+ of forecasts, a random perturbation approach has been implemented.
+ A great deal of user flexibility has been built in, but the methods detailed
+ in Candile and Talagrand (2008) can be replicated using the appropriate
+ options.
+ The user selects a distribution for the observation error, along with parameter
+s for that distrubtion.
+ Rescaling and bias correction can also be specified prior to the perturbation.
+ Random draws from the distribution can then be added to either, or both,
+ of the forecast and observed fields, including ensemble members.
+ Details about the effects of the choices on verification statstics should
+ be considered, with many details provided in the literature (e.g.
+ Candille and Talagrand, 2008; Saetra et al., 2004; Santos and Ghelli, 2012).
+ Generally, perturbation make verification statistics better when applied
+ to ensemble members, and worse when applied to the observations themselves.
+ 
+\end_layout
+
+\begin_layout Standard
+Normal and uniform are common choices for the observation error distribution.
+ The uniform distribution provides the benefit of being bounded on both
+ sides, thus preventing the pertubation from taking on extreme values.
+ Normal is the most common choice for observation error.
+ However, the user should realize that with the very large samples typical
+ in NWP, some large outliers will almost certainly be introduced with the
+ perturbation.
+ For variables that are bounded below by 0, and that may have inconsistent
+ observation errors (e.g.
+ larger errors with larger measurements), a lognormal distribution may be
+ selected.
+ Wind speeds and precipitaiton measurements are the most common of this
+ type of NWP variable.
+ The lognormal error perturbation prevents measurements of 0 from being
+ perturbed, and applies larger perturbations when measurements are larger.
+ This is often the desired behavior in these cases, but this distribution
+ can also lead to some outliers being introduced in the perturbation step.
+ 
+\end_layout
+
+\begin_layout Standard
+Observation errors differ according to instrument, temporal and spatial
+ representation, and variable type.
+ Unfortunately, many observation errors have not been examined or documented
+ in the literature.
+ Those that have usually lack information regarding their distributions
+ and approximate parameters.
+ Instead, a range or typical value of observation error is often reported
+ and these are often used as an estimate of the standard deviation of some
+ distribution.
+ Where possible, it is recommended to use the appropriate type and size
+ of perturbation for the observation to prevent spurious results.
  
 \end_layout
 
