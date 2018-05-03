@@ -172,8 +172,9 @@ http://ams.confex.com/ams/pdfpapers/124856.pdf.
 \series medium
 Bullock, 
 \series default
-R., Fowler, T.
- and Brown, B, 2016: Method for Object-Based Diagnostic Evaluation.
+R., T.
+ Fowler, and B.
+ Brown, 2016: Method for Object-Based Diagnostic Evaluation.
  NCAR Tech.
  Note NCAR/TN-532+STR, 66 pp.
 \end_layout
@@ -181,9 +182,30 @@ R., Fowler, T.
 \begin_layout Description
 
 \series medium
-Casati, B., Ross, G., and Stephenson, D.
- 2004: A new intensity-scale approach for the verification of spatial precipitat
-ion forecasts.
+Candille
+\series default
+, G., and O.
+ Talagrand, 2008: Impact of observational error on the validation of ensemble
+ prediction systems.
+ 
+\emph on
+Q.
+ J.
+ R.
+ Meteorol.
+ Soc
+\emph default
+.
+ 134: 959–971.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+Casati, B., G.
+ Ross, and D.
+ Stephenson, 2004: A new intensity-scale approach for the verification of
+ spatial precipitation forecasts.
  
 \emph on
 Meteorol.
@@ -236,8 +258,7 @@ Monthly Weather Review
 \begin_layout Description
 
 \series medium
-Dawid, A.
- P., 1984: Statistical theory: The prequential approach.
+Dawid, A.P., 1984: Statistical theory: The prequential approach.
  
 \emph on
 J.
@@ -272,8 +293,9 @@ Meteorological Applications
 
 \series medium
 Eckel, F.
- Anthony, Mark S.
- Allen, Matthew C.
+ A., M.S.
+ Allen, M.
+ C.
  Sittel, 2012: Estimation of Ambiguity in Ensemble Forecasts.
  
 \emph on
@@ -302,7 +324,7 @@ http://dx.doi.org/10.1175/WAF-D-11-00015.1
 \begin_layout Description
 
 \series medium
-Efron B.
+Efron, B.
  2007: Correlation and large-scale significance testing.
  
 \emph on
@@ -330,8 +352,10 @@ NCAR Technical Note
 \begin_layout Description
 
 \series medium
-Gneiting, T., Westveld, A., Raferty, A.
- and Goldman, T, 2004: 
+Gneiting, T., A.
+ Westveld, A.
+ Raferty, and T.
+ Goldman, 2004: 
 \emph on
 Calibrated Probabilistic Forecasting Using Ensemble Model Output Statistics
  and Minimum CRPS Estimation
@@ -518,6 +542,45 @@ Monthly Weather Review
 \begin_layout Description
 
 \series medium
+Saetra O., H.
+ Hersbach, J-R Bidlot, D.
+ Richardson, 2004: Effects of observation errors on the statistics for ensemble
+ spread and reliability.
+
+\series default
+\emph on
+ Mon.
+ Weather Rev
+\series medium
+\emph default
+.
+ 132: 1487–1501.
+\end_layout
+
+\begin_layout Description
+
+\series medium
+Santos C.
+ and A.
+ Ghelli, 2012: Observational probability method to assess ensemble precipitation
+ forecasts.
+
+\series default
+\emph on
+ Q.
+ J.
+ R.
+ Meteorol.
+ Soc.
+
+\series medium
+\emph default
+ 138: 209–221.
+\end_layout
+
+\begin_layout Description
+
+\series medium
 Stephenson, D.B., 2000: Use of the 
 \begin_inset Quotes eld
 \end_inset
@@ -564,8 +627,9 @@ Meteor.
 \series medium
 Weniger
 \series default
-, M., Kapp, F., and Friederichs, P.: Spatial Verification Using Wavelet Transforms:
- A Review.
+, M., F.
+ Kapp, and P.
+ Friederichs, 2016: Spatial Verification Using Wavelet Transforms: A Review.
  
 \shape italic
 Quarterly Journal of the Royal Meteorological Society
