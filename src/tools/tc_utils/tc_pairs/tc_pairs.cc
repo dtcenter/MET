@@ -1020,8 +1020,7 @@ void derive_interp12(TrackInfoArray &tracks) {
 
       // Swap the '2' or '3' for an 'I' in the AMODEL
       amodel = tracks[i].technique();
-      amodel.chomp('2');
-      amodel.chomp('3');
+      amodel.chomp(c);
       amodel << 'I';
 
       // Create a copy the '2' or '3' track and rename it to 'I'.
