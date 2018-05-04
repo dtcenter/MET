@@ -92,6 +92,8 @@ fcst = {
       {
          name  = "APCP";
          level = [ "A24" ];
+         ens_ssvar_bin_size = 0.1;
+         ens_phist_bin_size = 0.05;
       }
    ];
 }
