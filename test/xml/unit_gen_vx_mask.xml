@@ -400,4 +400,21 @@
     </output>
   </test>
 
+  <!--                                                                  -->
+  <!-- SHAPE: shapefile masking                                         -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_SHAPE">
+    <exec>&MET_DIR;/bin/gen_vx_mask</exec>
+    <param> \
+      &INPUT_DIR;/shapefile/wrfprs_ruc13_12.tm00_G212 \
+      &INPUT_DIR;/shapefile/test_mask.shp \
+      &OUTPUT_DIR;/gen_vx_mask/SHAPE_mask.nc \
+      -type shape -shapeno 1 -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SHAPE_mask.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
