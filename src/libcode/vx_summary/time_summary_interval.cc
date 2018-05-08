@@ -27,12 +27,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 TimeSummaryInterval::TimeSummaryInterval(const time_t base_time,
-					 const int width_secs) :
+                                         const int width_beg_sec,
+                                         const int width_end_sec) :
   _baseTime(base_time),
-  _width(width_secs)
+  _width_beg(width_beg_sec),
+  _width_end(width_end_sec)
 {
-  _startTime = _baseTime - (_width / 2);
-  _endTime = _startTime + _width - 1;
+  _startTime = _baseTime + _width_beg;
+  _endTime   = _baseTime + _width_end;
 }
 
 ////////////////////////////////////////////////////////////////////////

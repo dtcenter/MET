@@ -190,7 +190,11 @@ struct TimeSummaryInfo {
   int         end;         // Time (specified as "HHMMSS" in config file) to
                            //   end summaries for each day of data.
   int         step;        // Number of seconds between summaries
-  int         width;       // Width of summary time window in seconds
+  int         width_beg;   // Offset to the beginning of the summary
+                           //   time window in seconds
+  int         width_end;   // Offset to the end of the summary
+                           //   time_window in seconds
+  int         width;       // width_end minus width_beg
   IntArray    grib_code;   // List of grib codes to do summaries for
   StringArray obs_var;     // List of obs variable for time summaries
   StringArray type;        // List of types of summaries to perform

@@ -27,8 +27,9 @@ class TimeSummaryInterval
 
 public:
 
-  TimeSummaryInterval(const time_t base_time, const int width_secs);
-  
+  TimeSummaryInterval(const time_t base_time,
+                      const int width_beg_sec, const int width_end_sec);
+
   virtual ~TimeSummaryInterval();
 
 
@@ -40,25 +41,25 @@ public:
   {
     return _baseTime;
   }
-  
+
   time_t getStartTime() const
   {
     return _startTime;
   }
-  
+
   time_t getEndTime() const
   {
     return _endTime;
   }
-  
+
   bool isInInterval(const time_t test_time) const
   {
     if (test_time >= _startTime && test_time <= _endTime)
       return true;
-    
+
     return false;
   }
-  
+
   ///////////////
   // Operators //
   ///////////////
@@ -69,7 +70,7 @@ public:
 
     return _baseTime < other._baseTime;
   }
-  
+
 protected:
 
   ///////////////////////
@@ -77,11 +78,12 @@ protected:
   ///////////////////////
 
   time_t _baseTime;
-  int _width;
-  
+  int _width_beg;
+  int _width_end;
+
   time_t _startTime;
   time_t _endTime;
-  
+
 };
 
 

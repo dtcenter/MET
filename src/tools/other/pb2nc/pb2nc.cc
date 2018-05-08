@@ -2087,8 +2087,11 @@ void write_netcdf_hdr_data() {
       sprintf(att_string, "%d", summaryInfo.step);
       add_att(f_out, "time_summary_step", att_string);
 
-      sprintf(att_string, "%d", summaryInfo.width);
-      add_att(f_out, "time_summary_width", att_string);
+      sprintf(att_string, "%d", summaryInfo.width_beg);
+      add_att(f_out, "time_summary_width_beg", att_string);
+
+      sprintf(att_string, "%d", summaryInfo.width_end);
+      add_att(f_out, "time_summary_width_end", att_string);
 
       string grib_code_string;
       for (int i = 0; i < summaryInfo.grib_code.n_elements(); ++i) {
