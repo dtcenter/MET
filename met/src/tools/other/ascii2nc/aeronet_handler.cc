@@ -308,7 +308,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (data_line.n_items() != NUM_HDR_COLS)
   {
     mlog << Error << "\nAeronetHandler::_readHeaderInfo() -> "
-	 << "SURFRAD file has incorrect number of columns ("
+	 << "AERONET file has incorrect number of columns ("
 	 << data_line.n_items() << ") in header line\n\n";
     return false;
   }
