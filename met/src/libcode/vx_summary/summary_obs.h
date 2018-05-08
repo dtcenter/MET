@@ -6,13 +6,10 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #ifndef  __SUMMARYOBS_H__
 #define  __SUMMARYOBS_H__
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -25,9 +22,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-//bool summarizeObs(const TimeSummaryInfo &summary_info);
-
-
 class SummaryObs
 {
 
@@ -35,9 +29,9 @@ public:
 
    SummaryObs();
    virtual ~SummaryObs();
-   
+
    bool summarizeObs(const TimeSummaryInfo &summary_info);
-   
+
    bool addObservationObj(const Observation &obs);
    bool addObservation(const string &header_type, const string &station_id,
                        const time_t valid_time,
@@ -55,7 +49,7 @@ public:
    void setSummaryInfo(const TimeSummaryInfo &summary_info);
    StringArray getObsNames();
 
-   
+
 protected:
 
   static const float FILL_VALUE;
@@ -82,7 +76,7 @@ protected:
   // this method.
 
   bool addObservation(const Observation &obs);
-  
+
   // Use the configuration information to generate the list of summary
   // calculators needed.
 
@@ -189,8 +183,8 @@ public:
   // time.
 
   static time_t getIntervalTime(const time_t test_time,
-      const int begin_secs, const int end_secs,
-      const int step, const int width)
+      const int begin_secs, const int end_secs, const int step,
+      const int width_beg, const int width_end)
   {
     // Get the first interval time for the day
 
@@ -198,11 +192,12 @@ public:
                     begin_secs, end_secs,
                     step);
 
-    // Loop through the day until we find the first interval the includes the
+    // Loop through the day until we find the first interval that includes the
     // given time or is later than the given time (because the user could define
     // the intervals so that there are unprocessed times between them).
 
-    while (test_time > test_interval + ((width / 2) + 1))
+    while (test_time < (test_interval + width_beg) ||
+           test_time > (test_interval + width_end))
     {
       test_interval += step;
     }
@@ -259,10 +254,6 @@ inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &s
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #endif   /*  __SUMMARYOBS_H__  */
 
-
 ////////////////////////////////////////////////////////////////////////
-
-

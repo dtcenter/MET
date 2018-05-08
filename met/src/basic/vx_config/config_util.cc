@@ -683,6 +683,7 @@ ThreshArray parse_conf_climo_cdf_bins(Dictionary *dict) {
 TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    Dictionary *ts_dict = (Dictionary *) 0;
    TimeSummaryInfo info;
+   bool is_correct_type = false;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_time_summary() -> "
@@ -712,12 +713,34 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
    }
 
    // Conf: width
-   info.width = ts_dict->lookup_int(conf_key_width);
-   if(info.width <= 0) {
-     mlog << Error << "\nparse_conf_time_summary() -> "
-          << "The \"" << conf_key_width << "\" parameter (" << info.width
-          << ") must be greater than 0!\n\n";
-     exit(1);
+   const DictionaryEntry * entry = ts_dict->lookup(conf_key_width);
+
+   // Check that width is specified correctly
+   if(entry) is_correct_type = (entry->type() == IntegerType ||
+                                entry->type() == DictionaryType);
+
+   if(!entry || !is_correct_type) {
+      mlog << Error << "\nparse_conf_time_summary() -> "
+           << "Lookup failed for name \"" << conf_key_width << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse width as an integer centered on the current timestamp
+   if(entry->type() == IntegerType) {
+      if(entry->i_value() <= 0) {
+         mlog << Error << "\nparse_conf_time_summary() -> "
+              << "The \"" << conf_key_width << "\" parameter ("
+              << entry->i_value() << ") must be greater than 0!\n\n";
+         exit(1);
+      }
+      info.width     = entry->i_value();
+      info.width_beg = -1.0*nint(info.width/2.0);
+      info.width_end = nint(info.width/2.0);
+   }
+   // Parse width as a dictionary
+   else {
+      parse_conf_range_int(entry->dict_value(), info.width_beg, info.width_end);
+      info.width = info.width_end - info.width_beg;
    }
 
    // Conf: grib_code

@@ -165,8 +165,11 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
     sprintf(att_string, "%d", _summaryInfo.step);
     add_att(_ncFile, "time_summary_step", att_string);
 
-    sprintf(att_string, "%d", _summaryInfo.width);
-    add_att(_ncFile, "time_summary_width", att_string);
+    sprintf(att_string, "%d", _summaryInfo.width_beg);
+    add_att(_ncFile, "time_summary_width_beg", att_string);
+
+    sprintf(att_string, "%d", _summaryInfo.width_end);
+    add_att(_ncFile, "time_summary_width_end", att_string);
 
     string grib_code_string;
     for (int i = 0; i < _summaryInfo.grib_code.n_elements(); ++i)

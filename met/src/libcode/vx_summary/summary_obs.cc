@@ -47,14 +47,14 @@ SummaryObs::~SummaryObs()
 long SummaryObs::countHeaders()
 {
    long nhdr = 0;
-   
+
    string prev_header_type = "";
    string prev_station_id = "";
    time_t prev_valid_time = 0;
    double prev_latitude = bad_data_double;
    double prev_longitude = bad_data_double;
    double prev_elevation = bad_data_double;
-   
+
    for (vector< Observation >::iterator obs = observations.begin();
         obs != observations.end(); ++obs)
    {
@@ -66,7 +66,7 @@ long SummaryObs::countHeaders()
           !is_eq(obs->getElevation(), prev_elevation))
       {
         nhdr++;
-      
+
         prev_header_type = obs->getHeaderType();
         prev_station_id  = obs->getStationId();
         prev_valid_time  = obs->getValidTime();
@@ -76,7 +76,7 @@ long SummaryObs::countHeaders()
       }
       obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */
-   
+
    return nhdr;
 }
 
@@ -85,7 +85,7 @@ long SummaryObs::countHeaders()
 long SummaryObs::countSummaryHeaders()
 {
    long nhdr = 0;
-   
+
    string prev_header_type = "";
    string prev_station_id = "";
    time_t prev_valid_time = 0;
@@ -93,7 +93,7 @@ long SummaryObs::countSummaryHeaders()
    double prev_longitude = bad_data_double;
    double prev_elevation = bad_data_double;
    const string method_name = "SummaryObs::countSummaryHeaders()";
-   
+
    int obs_count = 0;
    for (vector< Observation >::iterator obs = summaries.begin();
         obs != summaries.end(); ++obs)
@@ -109,8 +109,8 @@ long SummaryObs::countSummaryHeaders()
         nhdr++;
         mlog << Debug(9) << "    " << method_name << "  hdrIndex: "
              << nhdr << " at obs " << obs_count << "\n";
-        
-      
+
+
         prev_header_type = obs->getHeaderType();
         prev_station_id  = obs->getStationId();
         prev_valid_time  = obs->getValidTime();
@@ -120,7 +120,7 @@ long SummaryObs::countSummaryHeaders()
       }
       obs->setHeaderIndex(nhdr-1);
    } /* endfor - obs */
-   
+
    return nhdr;
 }
 
@@ -132,21 +132,21 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    int summaryKeyCount = 0;
    // Save the summary information
    const char *var_name = 0;
-   
+
    //_dataSummarized = true;
    TimeSummaryInfo summaryInfo = summary_info;
-   
+
    // Initialize the list of summary observations
    StringArray summary_vnames;
    //vector< Observation > summary_obs;
-   
+
    // Sort the observations.  This will put them in chronological order, with
    // secondary sorts of things like the station id
    sort(observations.begin(), observations.end());
-   
+
    // Check for zero observations
    if (observations.size() == 0) return true;
-   
+
    // Extract the desired time intervals from the summary information.
    // The vector will be in chronological order by start time, but could
    // overlap in time.
@@ -154,13 +154,13 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
          getTimeIntervals(observations[0].getValidTime(),
                           observations[observations.size()-1].getValidTime(),
                           summary_info);
-   
+
    // Get the summary calculators from the summary information.
    vector< SummaryCalc* > calculators = getSummaryCalculators(summary_info);
-   
+
    // Get a pointer into the observations
    vector< Observation >::const_iterator curr_obs = observations.begin();
-   
+
    // Loop through the time periods, processing the appropriate observations
    vector< TimeSummaryInterval >::const_iterator time_interval;
    for (time_interval = time_intervals.begin();
@@ -169,14 +169,14 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
       // Initialize the map used to sort observations in this time period
       // into their correct summary groups
       map< SummaryKey, NumArray* > summary_values;
-      
+
       // Loop backwards through the observations to find the first observation
       // in the interval.  We need to do this because the user can define
       // overlapping intervals.
       while (curr_obs != observations.begin() &&
              curr_obs->getValidTime() > time_interval->getStartTime())
          --curr_obs;
-      
+
       // At this point, we are either at the beginning of the observations list
       // or we are at the observation right before our current interval.  Process
       // observations until we get to the end of the interval.
@@ -188,7 +188,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
         // space between the time intervals and when we are first starting out.
         // It also allows us to go back one observation too far when looking for
         // the first observation in this time interval.
-      
+
         if (!isInObsList(summaryInfo, *curr_obs)) {
            mlog << Debug(10)
                 << "SummaryObs::summarizeObs()  Filtered variable ["
@@ -199,7 +199,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
         // The summary key defines which observations should be grouped
         // together.  Any differences in key values indicates a different
         // summary.
-      
+
            SummaryKey summary_key(curr_obs->getHeaderType(),
                                   curr_obs->getStationId(),
                                   curr_obs->getLatitude(),
@@ -209,7 +209,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                                   curr_obs->getHeight(),
                                   curr_obs->getPressureLevel(),
                                   curr_obs->getVarName());
-         
+
            // Collect variable names
            var_name = curr_obs->getVarName().c_str();
            if (0 < strlen(var_name) && !summary_vnames.has(var_name)) {
@@ -220,17 +220,17 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
               summary_values[summary_key] = new NumArray;
               summaryKeyCount++;
            }
-         
+
            // Add the observation to the correct summary
            summary_values[summary_key]->add(curr_obs->getValue());
          }
-         
+
          // Move to the next obs
          ++curr_obs;
       }
-      
+
       // Calculate the summaries and add them to the summary observations list
-      
+
       map< SummaryKey, NumArray* >::const_iterator curr_values;
       for (curr_values = summary_values.begin();
            curr_values != summary_values.end(); ++curr_values)
@@ -241,12 +241,12 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
              calc_iter != calculators.end(); ++calc_iter)
         {
            SummaryCalc *calc = *calc_iter;
-           
+
            // Compute the expected number of observations and check valid data ratio
            if (summary_info.vld_freq > 0 && summary_info.vld_thresh > 0) {
               int n_expect = max(1, nint(summary_info.width / summary_info.vld_freq));
               int n_valid  = (*curr_values->second).n_valid();
-              
+
               if (((double) n_valid / n_expect) < summary_info.vld_thresh) {
                  mlog << Debug(4)
                       << "Skipping time summary since the ratio of valid data "
@@ -264,7 +264,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                  continue;
               }
            }
-           
+
            summaries.push_back(
                  Observation(
                        getSummaryHeaderType(curr_values->first.getHeaderType(),
@@ -283,29 +283,29 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                        curr_values->first.getVarName()));
            summaryCount++;
         } /* endfor - calc */
-      
+
       } /* endfor - curr_values */
-      
+
       // Reclaim space for the summary arrays
-      
+
       for (curr_values = summary_values.begin();
            curr_values != summary_values.end(); ++curr_values)
          delete curr_values->second;
-   
+
    } /* endfor - time_interval */
-   
+
    // Replace the observations vector with the summary observations
-   
+
    //observations = summary_obs;
    for (int idx=0; idx<summary_vnames.n_elements(); idx++) {
       if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
    }
-   
+
    // Reclaim memory
-   
+
    for (size_t i = 0; i < calculators.size(); ++i)
       delete calculators[i];
-   
+
    mlog << Debug(3)
         << "SummaryObs::summarizeObs() summary key count: " << summaryKeyCount
         << "\tsummaryCount: " << summaryCount << "\n";
@@ -319,15 +319,15 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
 {
    // Initialize the list of calculators
    vector< SummaryCalc * > calculators;
-   
+
    // Loop through the summary types, creating the calculators
    for (int i = 0; i < info.type.n_elements(); ++i) {
       // Convert the current type to a string for easier processing
-      
+
       string type = info.type[i];
-      
+
       // Create the calculator specified
-      
+
       if (type == "mean") {
         calculators.push_back(new SummaryCalcMean);
       }
@@ -350,7 +350,7 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
         calculators.push_back(new SummaryCalcPercentile(type));
       }
    }
-   
+
    return calculators;
 }
 
@@ -361,13 +361,13 @@ string SummaryObs::getSummaryHeaderType(const string &header_type,
       const int summary_width_secs) const
 {
    // Extract the time values from the width
-   
+
    char header_type_string[1024];
-   
+
    sprintf(header_type_string, "%s_%s_%s",
            header_type.c_str(), summary_type.c_str(),
            secsToTimeString(summary_width_secs).c_str());
-   
+
    return string(header_type_string);
 }
 
@@ -380,10 +380,10 @@ vector< TimeSummaryInterval > SummaryObs::getTimeIntervals(
 {
    // Add the time intervals based on the relationship between the begin and
    // end times.
-   
+
    vector< TimeSummaryInterval > time_intervals;
    time_t interval_time = getIntervalTime(first_data_time, info.beg, info.end,
-                                           info.step, info.width);
+                                          info.step, info.width_beg, info.width_end);
    while (interval_time < last_data_time) {
       // We need to process each day separately so that we can always start
       // at the indicated start time on each day.
@@ -393,14 +393,14 @@ vector< TimeSummaryInterval > SummaryObs::getTimeIntervals(
       {
          // See if the current time is within the defined time intervals
          if (isInTimeInterval(interval_time, info.beg, info.end)) {
-           time_intervals.push_back(TimeSummaryInterval(interval_time, info.width));
+           time_intervals.push_back(TimeSummaryInterval(interval_time, info.width_beg, info.width_end));
          }
-         
+
          // Increment the current time
          interval_time += info.step;
       }
    }
-   
+
    return time_intervals;
 }
 
@@ -410,14 +410,14 @@ time_t SummaryObs::getValidTime(const string &time_string) const
 {
    struct tm time_struct;
    memset(&time_struct, 0, sizeof(time_struct));
-   
+
    time_struct.tm_year = atoi(time_string.substr(0, 4).c_str()) - 1900;
    time_struct.tm_mon = atoi(time_string.substr(4, 2).c_str()) - 1;
    time_struct.tm_mday = atoi(time_string.substr(6, 2).c_str());
    time_struct.tm_hour = atoi(time_string.substr(9, 2).c_str());
    time_struct.tm_min = atoi(time_string.substr(11, 2).c_str());
    time_struct.tm_sec = atoi(time_string.substr(13, 2).c_str());
-   
+
    return timegm(&time_struct);
 }
 
@@ -438,21 +438,21 @@ bool SummaryObs::isInTimeInterval(const time_t test_time,
    // If the begin and end times are the same, assume the user wants all times
    if (begin_secs == end_secs)
       return true;
-   
+
    // Extract the seconds from the test time
    int test_secs = unixtimeToSecs(test_time);
-   
+
    // Test for an interval that doesn't span midnight
    if (begin_secs < end_secs)
       return test_secs >= begin_secs && test_secs <= end_secs;
-   
+
    // If we get here, the time interval spans midnight
    if (test_secs >= 0 && test_secs <= end_secs)
       return true;
-   
+
    if (test_secs >= begin_secs && test_secs <= sec_per_day)
       return true;
-   
+
    return false;
 }
 
@@ -461,10 +461,10 @@ bool SummaryObs::isInTimeInterval(const time_t test_time,
 bool SummaryObs::addObservationObj(const Observation &obs)
 {
    bool result = false;
-   
+
    // Do not filter by grib_code or obs_var here
    observations.push_back(obs);
-   
+
    const char *var_name = obs.getVarName().c_str();
    if (0 < strlen(var_name) && !obs_names.has(var_name)) {
       obs_names.add(var_name);
