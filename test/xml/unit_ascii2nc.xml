@@ -15,26 +15,26 @@
 
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
-  
+
   <test name="ascii2nc_TRMM_3hr">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc</point_nc>
     </output>
   </test>
-  
+
   <test name="ascii2nc_TRMM_12hr">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
       &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.22:30Z07Aug2012-10:30Z08Aug2012.G3.output.mtxt \
       &OUTPUT_DIR;/ascii2nc/trmm_2008080812_12hr.nc \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2008080812_12hr.nc</point_nc>
     </output>
@@ -46,7 +46,7 @@
       &DATA_DIR_OBS;/gauge/2012041012.precip24_qty.ascii \
       &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc>
     </output>
@@ -58,7 +58,7 @@
       &DATA_DIR_OBS;/ascii/dup_test_qty.txt \
       &OUTPUT_DIR;/ascii2nc/dup_test.nc \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/dup_test.nc</point_nc>
     </output>
@@ -107,10 +107,10 @@
   <test name="ascii2nc_SURFRAD_summary1">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <env>
-      <pair><name>BEG_TS</name>         <value>000000</value></pair>
-      <pair><name>END_TS</name>         <value>235959</value></pair>
-      <pair><name>STEP_TS</name>         <value>300</value></pair>
-      <pair><name>WIDTH_TS</name>         <value>300</value></pair>
+      <pair><name>BEG_TS</name>   <value>000000</value></pair>
+      <pair><name>END_TS</name>   <value>235959</value></pair>
+      <pair><name>STEP_TS</name>  <value>300</value></pair>
+      <pair><name>WIDTH_TS</name> <value>300</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/surfrad/tbl12001.dat \
@@ -121,17 +121,17 @@
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary1.nc </point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary1.nc</point_nc>
     </output>
   </test>
 
   <test name="ascii2nc_SURFRAD_summary2">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <env>
-      <pair><name>BEG_TS</name>         <value>03</value></pair>
-      <pair><name>END_TS</name>         <value>20</value></pair>
-      <pair><name>STEP_TS</name>         <value>300</value></pair>
-      <pair><name>WIDTH_TS</name>         <value>600</value></pair>
+      <pair><name>BEG_TS</name>   <value>03</value></pair>
+      <pair><name>END_TS</name>   <value>20</value></pair>
+      <pair><name>STEP_TS</name>  <value>300</value></pair>
+      <pair><name>WIDTH_TS</name> <value>600</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/surfrad/tbl12001.dat \
@@ -142,17 +142,17 @@
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary2.nc </point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary2.nc</point_nc>
     </output>
   </test>
 
   <test name="ascii2nc_SURFRAD_summary3">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <env>
-      <pair><name>BEG_TS</name>         <value>17</value></pair>
-      <pair><name>END_TS</name>         <value>03</value></pair>
-      <pair><name>STEP_TS</name>         <value>420</value></pair>
-      <pair><name>WIDTH_TS</name>         <value>420</value></pair>
+      <pair><name>BEG_TS</name>   <value>17</value></pair>
+      <pair><name>END_TS</name>   <value>03</value></pair>
+      <pair><name>STEP_TS</name>  <value>420</value></pair>
+      <pair><name>WIDTH_TS</name> <value>420</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/surfrad/tbl12001.dat \
@@ -163,7 +163,30 @@
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary3.nc </point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary3.nc</point_nc>
+    </output>
+  </test>
+
+  <!-- Test uncentered time interval -->
+
+  <test name="ascii2nc_SURFRAD_summary4">
+    <exec>&MET_DIR;/bin/ascii2nc</exec>
+    <env>
+      <pair><name>BEG_TS</name>   <value>17</value></pair>
+      <pair><name>END_TS</name>   <value>03</value></pair>
+      <pair><name>STEP_TS</name>  <value>420</value></pair>
+      <pair><name>WIDTH_TS</name> <value>{beg=-420;end=0;}</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/surfrad/tbl12001.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12002.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12003.dat \
+      -config &CONFIG_DIR;/Ascii2NcConfig.surfrad \
+      &OUTPUT_DIR;/ascii2nc/surfrad_summary4.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad_summary4.nc</point_nc>
     </output>
   </test>
 
@@ -182,7 +205,7 @@
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.nc </point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.nc</point_nc>
     </output>
   </test>
 
@@ -202,7 +225,7 @@
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_sid.nc </point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_sid.nc</point_nc>
     </output>
   </test>
 
@@ -222,10 +245,10 @@
       -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_grid_data.nc </point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_grid_data.nc</point_nc>
     </output>
   </test>
- 
+
   <test name="ascii2nc_insitu_turb_mask_named_grid">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
@@ -241,10 +264,10 @@
       -mask_grid G212 -v 1
     </param>
     <output>
-      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_named_grid.nc </point_nc>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.mask_named_grid.nc</point_nc>
     </output>
   </test>
- 
+
   <test name="ascii2nc_MASK_GRID">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
@@ -252,7 +275,7 @@
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_grid_dtc165.nc \
       -mask_grid DTC165 \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_grid_dtc165.nc</point_nc>
     </output>
@@ -265,12 +288,12 @@
       &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_poly_lmv.nc \
       -mask_poly &MET_BASE;/poly/LMV.poly \
       -v 1
-    </param>   
+    </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr_mask_poly_lmv.nc</point_nc>
     </output>
   </test>
-  
+
   <test name="ascii2nc_WWSIS_clear_pvwatts_one_min">
     <exec>&MET_DIR;/bin/ascii2nc</exec>
     <param> \
@@ -378,5 +401,5 @@
       <point_nc>&OUTPUT_DIR;/ascii2nc/gdas1.20120409.t12z.prepbufr.ascii_name.nc</point_nc>
     </output>
   </test>
-  
+
 </met_test>
