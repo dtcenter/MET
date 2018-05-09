@@ -1656,6 +1656,12 @@ time_summary = {
 \begin_layout LyX-Code
 
 \series bold
+   // width   = { beg = -300; end = 300; }
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    grib_code  = [ 11, 204, 211 ];
 \end_layout
 
@@ -1735,7 +1741,9 @@ step
 \series bold
 width
 \series medium
- entry specifies the width of the summary interval in seconds.
+ entry specifies the summary interval in seconds.
+ It may either be set as an integer number of seconds for a centered time
+ interval or a dictionary with beginning and ending time offsets in seconds.
 \end_layout
 
 \begin_layout Standard
@@ -1759,6 +1767,31 @@ This example listed above does a 10-minute time summary (width = 600;) every
  of the current day.
  The second interval will be from 0:00:00 through 00:09:59.
  And so on.
+\end_layout
+
+\begin_layout Standard
+The two 
+\series bold
+width
+\series default
+ settings listed above are equivalent.
+ Both define a centered 10-minute time interval.
+ Use the 
+\series bold
+beg
+\series default
+ and 
+\series bold
+end
+\series default
+ entries to define uncentered time intervals.
+ The following example requests observations for one hour prior:
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+width = { beg = -3600; end = 0; }
 \end_layout
 
 \begin_layout Standard

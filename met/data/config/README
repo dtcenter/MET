@@ -1330,39 +1330,31 @@ output_prefix  = "";
 //
 version = "V6.0";
 
-////////////////////////////////////////////////////////////////////////////////
-//
-// Settings specific to individual tools
-//
-////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
-//
-// Ascii2NcConfig_default
-//
-// A configuration file may be passed to the ascii2nc tool with the "-config"
-// command line argument.  If not specified, the default configuration file
-// will be used.
-//
-////////////////////////////////////////////////////////////////////////////////
-
 //
 // This feature was implemented to allow additional processing of observations
 // with high temporal resolution. The "flag" entry toggles the "time_summary"
 // on (TRUE) and off (FALSE).  Obs may be summarized across the user specified
 // time period defined by the "beg" and "end" entries.  The "step" entry defines
-// the time between intervals in seconds.  The "width" entry specifies the width
-// of the summary interval in seconds.
+// the time between intervals in seconds.  The "width" entry specifies the summary
+// interval in seconds.  It may either be set as an integer number of seconds for
+// a centered time interval or a dictionary with beginning and ending time offsets
+// in seconds.
 //
 // e.g. beg = "00";
 //      end = "235959";
 //      step = 300;
 //      width = 600;
+//      width = { beg = -300; end = 300; }
 //
 // This example does a 10-minute time summary every 5 minutes throughout the
 // day.  The first interval will be from 23:55:00 the previous day through
 // 00:04:59 of the current day.  The second interval will be from 0:00:00
 // through 00:09:59. And so on.
+//
+// The two "width" settings listed above are equivalent.  Both define a centered
+// 10-minute time interval.  Use the "beg" and "end" entries to define uncentered
+// time intervals.  The following example requests observations for one hour prior:
+//      width = { beg = -3600; end = 0; }
 //
 // The summaries will only be calculated for the specified GRIB codes.
 // The supported summaries are "min" (minimum), "max" (maximum), "range",
@@ -1389,13 +1381,20 @@ time_summary = {
   beg = "000000";
   end = "235959";
   step = 300;
-  width = 600;
+  width = 600;'
+  // width = { beg = -300; end = 300; }
   grib_code = [ 11, 204, 211 ];
   obs_var   = [];
   type = [ "min", "max", "range", "mean", "stdev", "median", "p80" ];
   vld_freq = 0;
   vld_thresh = 0.0;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Settings specific to individual tools
+//
+////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 //
