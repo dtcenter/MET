@@ -196,8 +196,7 @@ public:
     // given time or is later than the given time (because the user could define
     // the intervals so that there are unprocessed times between them).
 
-    while (test_time < (test_interval + width_beg) ||
-           test_time > (test_interval + width_end))
+    while (test_time > (test_interval + width_end))
     {
       test_interval += step;
     }
