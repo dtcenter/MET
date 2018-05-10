@@ -53,6 +53,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                mask_poly.h mask_poly.cc \
                read_fortran_binary.h read_fortran_binary.cc \
                met_buffer.h met_buffer.cc \
+               smart_buffer.h smart_buffer.cc  \
                vx_util.h \
                CircularTemplate.h CircularTemplate.cc \
                GridTemplate.h GridTemplate.cc \

@@ -1,3 +1,8 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -17,43 +22,21 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int max_shp_parts  =  1000;
-static const int max_shp_points = (1 << 17);
+#include <sys/types.h>
+#include <unistd.h>
+
+#include "smart_buffer.h"
+#include "check_endian.h"
+
+#include "shp_types.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int shp_header_bytes = 100;
+static const int shp_file_header_bytes   = 100;
 
 static const int shp_record_header_bytes = 8;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-enum ShapeType {
-
-   shape_type_null_shape   =  0,
-
-   shape_type_point        =  1,
-   shape_type_polyline     =  3,
-   shape_type_polygon      =  5,
-   shape_type_multipoint   =  8,
-
-   shape_type_point_z      = 11,
-   shape_type_polyline_z   = 13,
-   shape_type_polygon_z    = 15,
-   shape_type_multipoint_z = 18,
-
-   shape_type_point_m      = 21,
-   shape_type_polyline_m   = 23,
-   shape_type_polygon_m    = 25,
-   shape_type_multipoint_m = 28,
-
-   shape_type_multipatch   = 31
-
-};
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,7 +52,7 @@ struct ShpFileHeader {
 
    int version;
 
-   int shape_type;
+   int shape_type;          //  one of the above enum ShapeType
 
 
    double x_min, x_max; 
@@ -114,94 +97,66 @@ struct ShpRecordHeader {
 ////////////////////////////////////////////////////////////////////////
 
 
-struct ShpPoint {
+class ShpFile {
 
-   double x;
-   double y;
+   private:
 
-};
+      ShpFile(const ShpFile &);
+      ShpFile & operator=(const ShpFile &);
 
+   protected:
 
-////////////////////////////////////////////////////////////////////////
-
-
-struct ShpPolylineRecord {   //  this should really be a class, not a struct
-
-   int shape_type;
-
-   double bbox[4];   //  order: x_min, y_min, x_max, y_max
-
-   int n_parts;
-
-   int n_points;
-
-   int parts[max_shp_parts];
-
-   ShpPoint points[max_shp_points];
-
-      //
-
-   double x_min() const;
-   double x_max() const;
-
-   double y_min() const;
-   double y_max() const;
-
-   void set(unsigned char * buf);
-
-   void dump(ostream &, int depth = 0) const;
-
-   void toggle_longitudes();   //  toggle the sign on all the longitudes
-
-};
+      void init_from_scratch();
 
 
-////////////////////////////////////////////////////////////////////////
+      int fd;
+
+      bool At_Eof;
+
+      ShpFileHeader Header;
+
+      ConcatString Filename;
 
 
-inline double ShpPolylineRecord::x_min() const { return ( bbox[0] ); }
-inline double ShpPolylineRecord::x_max() const { return ( bbox[2] ); }
+   public:
 
-inline double ShpPolylineRecord::y_min() const { return ( bbox[1] ); }
-inline double ShpPolylineRecord::y_max() const { return ( bbox[3] ); }
-
-
-////////////////////////////////////////////////////////////////////////
+      ShpFile();
+     ~ShpFile();
 
 
-struct ShpPolygonRecord {   //  this should really be a class, not a struct
+      bool open(const char * path);
 
-   int shape_type;
+      void close();
 
-   double bbox[4];   //  order: x_min, y_min, x_max, y_max
+         //
+         //  set stuff
+         //
 
-   int n_parts;
+         //
+         //  get stuff
+         //
 
-   int n_points;
+      const ShpFileHeader * header() const;
 
-   int parts[max_shp_parts];
+      const char * filename() const;
 
-   ShpPoint points[max_shp_points];
+      int shape_type() const;
 
-      //
+      bool at_eof() const;
 
-   double x_min() const;
-   double x_max() const;
+      int position() const;   //  offset in bytes from beginning of file
 
-   double y_min() const;
-   double y_max() const;
+      bool is_open() const;
 
-   double lat(int) const;
-   double lon(int) const;
+         //
+         //  do stuff
+         //
 
-   void set(unsigned char * buf);
+      void lseek(int offset, int whence = SEEK_SET);   //  just like lseek(2)
 
-   void dump(ostream &, int depth = 0) const;
+      bool read(unsigned char * buf, int nbytes);
 
-   int start_index(int partno) const;
-   int  stop_index(int partno) const;
-
-   void toggle_longitudes();   //  toggle the sign on all the longitudes
+      bool read_sb(SmartBuffer &, int nbytes);
 
 };
 
@@ -209,11 +164,13 @@ struct ShpPolygonRecord {   //  this should really be a class, not a struct
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double ShpPolygonRecord::x_min() const { return ( bbox[0] ); }
-inline double ShpPolygonRecord::x_max() const { return ( bbox[2] ); }
+inline const ShpFileHeader * ShpFile::header() const { return ( &Header ); }
 
-inline double ShpPolygonRecord::y_min() const { return ( bbox[1] ); }
-inline double ShpPolygonRecord::y_max() const { return ( bbox[3] ); }
+inline int   ShpFile::shape_type() const { return ( Header.shape_type ); }
+
+inline bool  ShpFile::at_eof() const { return ( At_Eof ); }
+
+inline bool  ShpFile::is_open() const { return ( fd >= 0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////

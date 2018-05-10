@@ -1,3 +1,8 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -23,6 +28,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util.h"
+#include "vx_log.h"
 
 #include "dbf_file.h"
 
@@ -55,7 +61,8 @@ program_name = get_short_name(argv[0]);
 if ( argc != 2 )  usage();
 
 int fd = -1;
-int j, pos;
+int j;
+// int pos;
 int n_read, bytes;
 ConcatString input_filename = argv[1];
 DbfHeader h;
@@ -64,7 +71,8 @@ DbfSubRecord sr;
 
 if ( (fd = open(input_filename.contents(), O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": unable to open input file \""
+   mlog << Error
+        << "\n\n  " << program_name << ": unable to open input file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
@@ -81,7 +89,8 @@ bytes = 32;
 
 if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
-   cerr << "\n\n  " << program_name << ": trouble reading main file header from input file \""
+   mlog << Error
+        << "\n\n  " << program_name << ": trouble reading main file header from input file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
@@ -90,13 +99,13 @@ if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
 h.set_header(buf);
 
-cout << "DbfHeader ...\n";
-
-h.dump(cout, 1);
+// cout << "DbfHeader ...\n";
+// 
+// h.dump(cout, 1);
 
 cout << "\n";
 
-pos = lseek(fd, 0, SEEK_CUR);
+// pos = lseek(fd, 0, SEEK_CUR);
 
 // cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
@@ -110,7 +119,7 @@ h.dump(cout);
 
 cout << "\n";
 
-pos = lseek(fd, 0, SEEK_CUR);
+// pos = lseek(fd, 0, SEEK_CUR);
 
 // cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
@@ -120,16 +129,18 @@ pos = lseek(fd, 0, SEEK_CUR);
 
 if ( lseek(fd, h.pos_first_record, SEEK_SET) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": lseek error\n\n";
+   mlog << Error
+        << "\n\n  " << program_name << ": lseek error\n\n";
 
    exit ( 1 );
 
 }
 
-pos = lseek(fd, 0, SEEK_CUR);
+// pos = lseek(fd, 0, SEEK_CUR);
 
 // cout << "\n  File position = " << comma_string(pos) << "\n\n";
 
+// cout << "Records ...\n";
 
 for (j=0; j<(h.n_records); ++j)  {
 
@@ -139,7 +150,8 @@ for (j=0; j<(h.n_records); ++j)  {
 
    if ( n_read != bytes )  {
 
-      cerr << "\n\n  " << program_name << ": read error ... n_read = " << n_read << "\n\n";
+      mlog << Error
+           << "\n\n  " << program_name << ": read error ... n_read = " << n_read << "\n\n";
 
       exit ( 1 );
 
@@ -149,7 +161,7 @@ for (j=0; j<(h.n_records); ++j)  {
 
    cout << "Record " << j << " ...\n";
 
-   // cout << ((char *) buf) << "\n";
+   // cout << "   \"" << ((char *) buf) << "\"\n";
 
    dump_record(cout, 1, buf, h);
 
@@ -174,7 +186,8 @@ void usage()
 
 {
 
-cerr << "\n\n  usage:  " << program_name << " dbf_filename\n\n";
+mlog << Error
+     << "\n\n  usage:  " << program_name << " dbf_filename\n\n";
 
 exit ( 1 );
 

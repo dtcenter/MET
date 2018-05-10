@@ -30,6 +30,7 @@
 #include "polyline.h"
 #include "ncrr_array.h"
 #include "shp_file.h"
+#include "shp_poly_record.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,7 +78,7 @@ class GridClosedPolyArray : public NCRR_Array<GridClosedPoly>
 
       bool is_inside(double u_test, double v_test) const;
 
-      void set (const ShpPolygonRecord &, const Grid &);
+      void set (const ShpPolyRecord &, const Grid &);
 
 };
 

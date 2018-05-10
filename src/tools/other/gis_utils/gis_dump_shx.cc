@@ -1,3 +1,8 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -23,6 +28,7 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util.h"
+#include "vx_log.h"
 
 #include "shx_file.h"
 
@@ -64,7 +70,8 @@ ShxRecord r;
 
 if ( (fd = open(input_filename.contents(), O_RDONLY)) < 0 )  {
 
-   cerr << "\n\n  " << program_name << ": unable to open input file \""
+   mlog << Error
+        << "\n\n  " << program_name << ": unable to open input file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
@@ -81,7 +88,8 @@ bytes = 100;
 
 if ( (n_read = read(fd, buf, bytes)) != bytes )  {
 
-   cerr << "\n\n  " << program_name << ": trouble reading main file header from input file \""
+   mlog << Error
+        << "\n\n  " << program_name << ": trouble reading main file header from input file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
@@ -134,7 +142,8 @@ void usage()
 
 {
 
-cerr << "\n\n  usage:  " << program_name << " shp_filename\n\n";
+mlog << Error
+     << "\n\n  usage:  " << program_name << " shp_filename\n\n";
 
 exit ( 1 );
 
