@@ -1,3 +1,8 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -23,8 +28,30 @@ using namespace std;
 #include <cmath>
 
 #include "vx_util.h"
+#include "vx_log.h"
 
 #include "shp_file.h"
+#include "shp_poly_record.h"
+#include "shp_point_record.h"
+#include "shapetype_to_string.h"
+
+
+
+#include "shp_file.h"
+#include "shp_poly_record.h"
+#include "shp_point_record.h"
+#include "shapetype_to_string.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Default values for command-line switches
+   //
+
+
+static bool header_only = false;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,15 +59,19 @@ using namespace std;
 
 static ConcatString program_name;
 
-static const int buf_size = (1 << 21);
-
-static unsigned char buf[buf_size];
+static CommandLine cline;
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static void usage();
+
+static void set_header_only(const StringArray &);
+
+static void do_poly_dump  (ShpFile &);
+
+static void do_point_dump (ShpFile &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -52,108 +83,77 @@ int main(int argc, char * argv [])
 
 program_name = get_short_name(argv[0]);
 
-if ( argc != 2 )  usage();
+cline.set(argc, argv);
 
-int fd = -1;
-int n_read, bytes;
-int pos;
-ConcatString input_filename = argv[1];
-ShpFileHeader h;
-ShpRecordHeader rh;
-ShpPolygonRecord gr;
+cline.set_usage(usage);
+
+cline.add(set_header_only, "-h", 0);
+
+cline.parse();
+
+if ( cline.n() != 1 )  usage();
 
 
-if ( (fd = open(input_filename.contents(), O_RDONLY)) < 0 )  {
+ConcatString input_filename = cline[0];
+ShpFile f;
 
-   cerr << "\n\n  " << program_name << ": unable to open input file \""
+
+cout << "file = \"" << get_short_name(input_filename) << "\"\n\n";
+
+if ( ! f.open(input_filename) )  {
+
+   mlog << Error
+        << "\n\n  " << program_name << ": unable to open input file \""
         << input_filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-cout << get_short_name(input_filename) << '\n';
-
    //
-   //  main header
+   //  header
    //
 
-bytes = 100;
+cout << "File Header ... \n";
 
-if ( (n_read = read(fd, buf, bytes)) != bytes )  {
+f.header()->dump(cout, 1);
 
-   cerr << "\n\n  " << program_name << ": trouble reading main file header from input file \""
-        << input_filename << "\"\n\n";
+cout << '\n' << flush;
 
-   exit ( 1 );
-
-}
-
-h.set(buf);
-
-cout << "ShpFileHeader ...\n";
-
-h.dump(cout, 1);
-
-cout << "\n";
+if ( header_only )   return ( 0 );
 
    //
    //  records
    //
 
-pos = (int) lseek(fd, 0, SEEK_CUR);
+const ShapeType shape_type = (ShapeType) (f.header()->shape_type);
 
-while ( (n_read = read(fd, buf, 8)) == 8 )  {
+switch ( shape_type )  {
 
-   rh.set(buf);
+   case shape_type_polygon:   //  fall through
+   case shape_type_polyline:  //  fall through
+      do_poly_dump(f);
+      break;
 
-   // cout << "File position = " << pos << "\n";
+   case shape_type_point:
+      do_point_dump(f);
+      break;
 
-   cout << "Record Header ... \n";
-
-   rh.dump(cout, 1);
-
-   cout << "\n";
-
-   bytes = rh.content_length_bytes;
-
-   if ( bytes >= buf_size )  {
-
-      cerr << "\n\n  " << program_name << ": buffer too small ... increase to at least "
-           << bytes << "\n\n";
-
+   default:
+      mlog << Error
+           << "\n\n  " << program_name << ": shape file type \""
+           << shapetype_to_string(shape_type) << "\" is not supported\n\n";
       exit ( 1 );
+      break;
 
-   }
-
-   if ( (n_read = read(fd, buf, bytes)) != bytes )  {
-
-      cerr << "\n\n  " << program_name << ": trouble reading record data ... n_read = " << n_read << "\n\n";
-
-      exit ( 1 );
-
-   }
-
-   gr.set(buf);
-
-   cout << "Record Data ... \n";
-
-   gr.dump(cout, 1);
-
-   cout << "\n";
-
-   pos = (int) lseek(fd, 0, SEEK_CUR);
-
-}   //  while
-
-cout << "\n\n  n_read = " << n_read << "\n\n";
+}   //  switch
 
 
    //
    //  done
    //
 
-close(fd);  fd = -1;
+f.close();
 
 return ( 0 );
 
@@ -167,9 +167,105 @@ void usage()
 
 {
 
-cerr << "\n\n  usage:  " << program_name << " shp_filename\n\n";
+mlog << Error 
+     << "\n\n  usage:  " << program_name << " [ -h ] shp_filename\n\n";
 
 exit ( 1 );
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void set_header_only(const StringArray &)
+
+{
+
+header_only = true;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_poly_dump(ShpFile & f)
+
+{
+
+ShpPolyRecord r;
+
+
+
+while ( f >> r )  {
+
+   cout << "Record Header ... \n";
+
+   r.rh.dump(cout, 1);
+
+   cout << "\n";
+
+   cout << "Record Data ... \n";
+
+   r.dump(cout, 1);
+
+   cout << "\n";
+
+}   //  while
+
+
+cout << "\n\n";
+
+
+
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void do_point_dump (ShpFile & f)
+
+{
+
+ShpPointRecord r;
+
+
+while ( f >> r )  {
+
+   cout << "Record Header ... \n";
+
+   r.rh.dump(cout, 1);
+
+   cout << "\n";
+
+   cout << "Record Data ... \n";
+
+   r.dump(cout, 1);
+
+   cout << "\n";
+
+}   //  while
+
+
+cout << "\n\n";
+
+
+   //
+   //  done
+   //
 
 return;
 

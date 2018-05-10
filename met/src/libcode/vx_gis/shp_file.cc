@@ -1,3 +1,8 @@
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2018
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -15,10 +20,16 @@ using namespace std;
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <cmath>
 
 #include "vx_util.h"
+#include "vx_log.h"
+#include "check_endian.h"
 
 #include "shp_file.h"
 #include "shapetype_to_string.h"
@@ -43,10 +54,10 @@ int    * i = (int *) buf;
 double * d = (double *) (buf + 36);
 
 
-shuffle_4(buf);
-shuffle_4(buf + 24);
-// shuffle_4(buf + 28);
-// shuffle_4(buf + 32);
+handle_big_4    (buf);
+handle_big_4    (buf + 24);
+handle_little_4 (buf + 28);
+handle_little_4 (buf + 32);
 
 file_code      = i[0];
 
@@ -55,6 +66,14 @@ version        = i[7];
 shape_type     = i[8];
 
 file_length_bytes = 2*file_length_16;
+
+if ( is_big_endian() )  {
+
+   int j;
+
+   for (j=0; j<8; ++j)  shuffle_8(d + j);
+
+}
 
 x_min = d[0];
 y_min = d[1];
@@ -86,10 +105,10 @@ void ShpFileHeader::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "file_code   = " << file_code         << "\n";
-out << prefix << "file_length = " << file_length_bytes << "\n";
-out << prefix << "version     = " << version           << "\n";
-out << prefix << "shape_type  = " << shapetype_to_string((ShapeType) shape_type) << "\n";
+out << prefix << "file_code      = " << file_code         << "\n";
+out << prefix << "file_length    = " << file_length_bytes << "\n";
+out << prefix << "version        = " << version           << "\n";
+out << prefix << "shape_type     = " << shapetype_to_string((ShapeType) shape_type) << "\n";
 
 out << prefix << "\n";
 
@@ -126,8 +145,8 @@ void ShpRecordHeader::set(unsigned char * buf)
 
 int * i = (int *) buf;
 
-shuffle_4(buf);
-shuffle_4(buf + 4);
+handle_big_4(buf);
+handle_big_4(buf + 4);
 
 record_number_1   = i[0];
 content_length_16 = i[1];
@@ -154,9 +173,6 @@ Indent prefix(depth);
 out << prefix << "record_number  = " << record_number_0      << " (0-based)\n";
 out << prefix << "content_length = " << content_length_bytes << "\n";
 
-
-
-
    //
    //  done
    //
@@ -172,101 +188,166 @@ return;
 
 
    //
-   //  Code for struct ShpPolylineRecord
+   //  Code for class ShpFile
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void ShpPolylineRecord::set(unsigned char * buf)
+ShpFile::ShpFile()
 
 {
 
-// int j;
-int * i = (int *) buf;
-int bytes, offset;
-
-
-shape_type = i[0];
-
-if ( shape_type != shape_type_polyline )  {
-
-   mlog << Error
-        << "\n\n  ShpPolylineRecord::set(unsigned char *) -> bad shape type ... "
-        << shapetype_to_string((ShapeType) shape_type) << "\n\n";
-
-   exit ( 1 );
+init_from_scratch();
 
 }
 
-   //
-   //  since the double "bbox" is at offset 4 bytes into the buffer, 
-   //
-   //    alignment considerations prevent us from doing a simple cast 
-   //
-   //    like "(double *) (buf + 4)"
-   //
 
-memcpy(bbox, buf + 4, 4*sizeof(double));
+////////////////////////////////////////////////////////////////////////
 
-// for (j=0; j<4; ++j)  {
-// 
-//    shuffle_8( bbox + j );
-// 
-// }
 
-i = (int *) (buf + 36);
+ShpFile::~ShpFile()
 
-n_parts = i[0];
+{
 
-n_points = i[1];
-
-if ( n_parts > max_shp_parts )  {
-
-   mlog << Error
-        << "\n\n  ShpPolylineRecord::set(unsigned char *) -> too many parts ... "
-        << " increase parameter \"max_shp_parts\" to at least "
-        << n_parts << "\n\n";
-
-   exit ( 1 );
+close();
 
 }
 
-if ( n_points > max_shp_points )  {
 
-   mlog << Error
-        << "\n\n  ShpPolylineRecord::set(unsigned char *) -> too many points ... "
-        << " increase parameter \"max_shp_points\" to at least "
-        << n_points << "\n\n";
+////////////////////////////////////////////////////////////////////////
 
-   exit ( 1 );
+
+ShpFile::ShpFile(const ShpFile &)
+
+{
+
+mlog << Error
+     << "\n\n  ShpFile::ShpFile(const ShpFile &) -> should never be called!\n\n";
+
+exit ( 1 );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+ShpFile & ShpFile::operator=(const ShpFile &)
+
+{
+
+mlog << Error
+     << "\n\n  ShpFile::operator=(const ShpFile &) -> should never be called!\n\n";
+
+exit ( 1 );
+
+return ( * this );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ShpFile::init_from_scratch()
+
+{
+
+fd = -1;
+
+close();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ShpFile::close()
+
+{
+
+if ( fd >= 0 )  ::close(fd);
+
+fd = -1;
+
+memset(&Header, 0, sizeof(Header));
+
+Filename.clear();
+
+At_Eof = false;
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const char * ShpFile::filename() const
+
+{
+
+if ( Filename.empty() )  return ( (const char *) 0 );
+
+return ( Filename.text() );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool ShpFile::open(const char * path)
+
+{
+
+close();
+
+if ( (fd = ::open(path, O_RDONLY)) < 0 )  {
+
+   fd = -1;
+
+   return ( false );
+
+}
+
+Filename = path;
+
    //
-   //  read parts array
+   //  read the file header
    //
 
-bytes = n_parts*sizeof(int);
+int n_read;
+unsigned char buf[shp_file_header_bytes];
 
-memcpy(parts, buf + 44, bytes);
+if ( (n_read = ::read(fd, buf, shp_file_header_bytes)) != shp_file_header_bytes )  {
 
-   //
-   //  read points array
-   //
+   mlog << Error
+        << "\n\n  ShpFile::open(const char * path) -> trouble reading file header from shp file \""
+        << path << "\"\n\n";
 
-offset = 44 + bytes;
+   // exit ( 1 );
 
-bytes = n_points*2*sizeof(double);
+   close();
 
-memcpy(points, buf + offset, bytes);
+   return ( false );
+
+}
+
+Header.set(buf);
 
    //
    //  done
    //
 
-return;
+return ( true );
 
 }
 
@@ -274,173 +355,71 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ShpPolylineRecord::dump(ostream & out, int depth) const
+int ShpFile::position() const
 
 {
 
-int j;
-Indent prefix(depth);
-
-
-out << prefix << "shape_type = " << shapetype_to_string((ShapeType) shape_type) << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "x_min      = " << x_min() << "\n";
-out << prefix << "x_max      = " << x_max() << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "y_min      = " << y_min() << "\n";
-out << prefix << "y_max      = " << y_max() << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "n_parts    = " << n_parts  << "\n";
-out << prefix << "n_points   = " << n_points << "\n";
-
-out << prefix << "\n";
-
-out << prefix << " parts = [ ";
-
-for (j=0; j<n_parts; ++j)  {
-
-   out << parts[j] << ' ';
-
-}
-
-out << "]\n";
-
-   //
-   //  done
-   //
-
-out.flush();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ShpPolylineRecord::toggle_longitudes()
-
-{
-
-int j;
-
-for (j=0; j<n_points; ++j)  {
-
-   points[j].x = -(points[j].x);
-
-}   //  for j
-
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for struct ShpPolygonRecord
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ShpPolygonRecord::set(unsigned char * buf)
-
-{
-
-// int j;
-int * i = (int *) buf;
-int bytes, offset;
-
-
-shape_type = i[0];
-
-if ( shape_type != shape_type_polygon )  {
+if ( ! is_open() )  {
 
    mlog << Error
-        << "\n\n  ShpPolygonRecord::set(unsigned char *) -> bad shape type ... "
-        << shapetype_to_string((ShapeType) shape_type) << "\n\n";
+        << "\n\n  ShpFile::position() -> no file open!\n\n";
+
+   exit ( 1 );
+
+   // return ( false );
+
+}
+
+
+// if ( ! is_open() )  return ( -1 );
+
+const int pos = ::lseek(fd, 0, SEEK_CUR);
+
+if ( pos < 0 )  {
+
+   mlog << Error
+        << "\n\n  ShpFile::position() const -> lseek error ... "
+        << strerror(errno) << "\n\n";
 
    exit ( 1 );
 
 }
 
-   //
-   //  since the double "bbox" is at offset 4 bytes into the buffer, 
-   //
-   //    alignment considerations prevent us from doing a simple cast 
-   //
-   //    like "(double *) (buf + 4)"
-   //
 
-memcpy(bbox, buf + 4, 4*sizeof(double));
+return ( pos );
 
-// for (j=0; j<4; ++j)  {
-// 
-//    shuffle_8( bbox + j );
-// 
-// }
+}
 
-i = (int *) (buf + 36);
 
-n_parts = i[0];
+////////////////////////////////////////////////////////////////////////
 
-n_points = i[1];
 
-if ( n_parts > max_shp_parts )  {
+void ShpFile::lseek(int offset, int whence)
+
+{
+
+
+if ( ! is_open() )  {
 
    mlog << Error
-        << "\n\n  ShpPolygonRecord::set(unsigned char *) -> too many parts ... "
-        << " increase parameter \"max_shp_parts\" to at least "
-        << n_parts << "\n\n";
+        << "\n\n  ShpFile::lseek() -> no file open!\n\n";
+
+   exit ( 1 );
+
+   // return ( false );
+
+}
+
+
+if ( ::lseek(fd, offset, whence) < 0 )  {
+
+   mlog << Error
+        << "\n\n  ShpFile::lseek() -> lseek(2) failed! ... "
+        << strerror(errno) << "\n\n";
 
    exit ( 1 );
 
 }
-
-if ( n_points > max_shp_points )  {
-
-   mlog << Error
-        << "\n\n  ShpPolygonRecord::set(unsigned char *) -> too many points ... "
-        << " increase parameter \"max_shp_points\" to at least "
-        << n_points << "\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  read parts array
-   //
-
-bytes = n_parts*sizeof(int);
-
-memcpy(parts, buf + 44, bytes);
-
-   //
-   //  read points array
-   //
-
-offset = 44 + bytes;
-
-bytes = n_points*2*sizeof(double);
-
-memcpy(points, buf + offset, bytes);
-
-   //
-   //  done
-   //
 
 return;
 
@@ -450,83 +429,49 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ShpPolygonRecord::dump(ostream & out, int depth) const
+bool ShpFile::read(unsigned char * buf, int n_bytes)
 
 {
 
-int j;
-Indent prefix(depth);
-Indent p2(depth + 1);
+if ( ! is_open() )  {
 
+   mlog << Error
+        << "\n\n  ShpFile::read() -> no file open!\n\n";
 
-out << prefix << "shape_type = " << shapetype_to_string((ShapeType) shape_type) << "\n";
+   exit ( 1 );
 
-out << prefix << "\n";
-
-out << prefix << "x_min      = " << x_min() << "\n";
-out << prefix << "x_max      = " << x_max() << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "y_min      = " << y_min() << "\n";
-out << prefix << "y_max      = " << y_max() << "\n";
-
-out << prefix << "\n";
-
-out << prefix << "n_parts    = " << n_parts  << "\n";
-out << prefix << "n_points   = " << n_points << "\n";
-
-out << prefix << "\n";
-
-out << prefix << " parts = [ ";
-
-for (j=0; j<n_parts; ++j)  {
-
-   out << parts[j] << ' ';
+   // return ( false );
 
 }
 
-out << "]\n";
+int n_read;
 
-out << prefix << " points = [ \n";
+n_read = ::read(fd, buf, n_bytes);
 
-for (j=0; j<n_points; ++j)  {
-
-   out << p2 << '(' << points[j].x << ", " << points[j].y << ")\n";
-
-}
-
-out << "]\n";
-
+if ( n_read == n_bytes )  return ( true );
 
    //
-   //  done
-   //
 
-out.flush();
+if ( n_read == 0 )  {
 
-return;
+   At_Eof = true;
+
+   return ( false );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-double ShpPolygonRecord::lat(int k) const
-
-{
-
-if ( (k < 0) || (k >= n_points) )  {
+if ( n_read < 0 )  {   //  some kind of error
 
    mlog << Error
-        << "\n\n  ShpPolygonRecord::lat(int) const -> range check error\n\n";
+        << "\n\n  ShpFile::read() -> read error on shp file \""
+        << Filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-return ( points[k].y );
+
+return ( false );   //  gotta return something
 
 }
 
@@ -534,95 +479,42 @@ return ( points[k].y );
 ////////////////////////////////////////////////////////////////////////
 
 
-double ShpPolygonRecord::lon(int k) const
+bool ShpFile::read_sb(SmartBuffer & buf, int n_bytes)
 
 {
 
-if ( (k < 0) || (k >= n_points) )  {
+int n_read;
+
+n_read = buf.read(fd, n_bytes);
+
+if ( n_read == n_bytes )  return ( true );
+
+if ( n_read == 0 )  {
+
+   At_Eof = true;
+
+   return ( false );
+
+}
+
+if ( n_read < 0 )  {   //  some kind of error
 
    mlog << Error
-        << "\n\n  ShpPolygonRecord::lon(int) const -> range check error\n\n";
+        << "\n\n  ShpFile::read_sb() -> read error on shp file \""
+        << Filename << "\"\n\n";
 
    exit ( 1 );
 
 }
 
-double t = points[k].x;
 
-return ( -t );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ShpPolygonRecord::start_index(int partno) const
-
-{
-
-if ( (partno < 0) || (partno >= n_parts) )  {
-
-   mlog << Error
-        << "\n\n  ShpPolygonRecord::start_index(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-
-}
-
-return ( parts[partno] );
+return ( false );
 
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-int ShpPolygonRecord::stop_index(int partno) const
-
-{
-
-if ( (partno < 0) || (partno >= n_parts) )  {
-
-   mlog << Error
-        << "\n\n  ShpPolygonRecord::stop_index(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-
-}
-
-if ( partno == (n_parts - 1) )  return ( n_points - 1 );
-
-return ( parts[partno + 1] - 1 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ShpPolygonRecord::toggle_longitudes()
-
-{
-
-int j;
-
-for (j=0; j<n_points; ++j)  {
-
-   points[j].x = -(points[j].x);
-
-}   //  for j
-
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
 
 
 

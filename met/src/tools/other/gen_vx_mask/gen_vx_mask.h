@@ -35,6 +35,7 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
 #include "shp_file.h"
+#include "shp_poly_record.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -98,7 +99,7 @@ static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
 
-static ShpPolygonRecord shape;
+static ShpPolyRecord shape;
 
 static int shape_number = 0;
 

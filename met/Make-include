@@ -1,4 +1,5 @@
 MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
+   -fPIC  \
 	     -I${top_builddir}/src/basic/vx_config \
 	     -I${top_builddir}/src/basic/vx_log \
 	     -I${top_builddir}/src/basic/vx_math \

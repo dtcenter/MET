@@ -67,6 +67,45 @@ extern void shuffle_8(void *);
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  the "handle_little" (resp. "handle_big") functions are meant to
+   //
+   //    turn 2, 4, or 8 byte quantities from little endian
+   //
+   //    (resp. big endian) to native endian
+   //
+
+#ifdef BIGENDIAN
+
+   inline void handle_little_2 (void * p)  { shuffle_2(p);  return; }
+   inline void handle_little_4 (void * p)  { shuffle_4(p);  return; }
+   inline void handle_little_8 (void * p)  { shuffle_8(p);  return; }
+
+   inline void handle_big_2    (void *)    { return; }
+   inline void handle_big_4    (void *)    { return; }
+   inline void handle_big_8    (void *)    { return; }
+
+   inline bool is_little_endian () { return ( false ); }
+   inline bool is_big_endian    () { return ( true  ); }
+
+#else
+
+   inline void handle_little_2 (void *)    { return; }
+   inline void handle_little_4 (void *)    { return; }
+   inline void handle_little_8 (void *)    { return; }
+
+   inline void handle_big_2    (void * p)  { shuffle_2(p);  return; }
+   inline void handle_big_4    (void * p)  { shuffle_4(p);  return; }
+   inline void handle_big_8    (void * p)  { shuffle_8(p);  return; }
+
+   inline bool is_little_endian () { return ( true  ); }
+   inline bool is_big_endian    () { return ( false ); }
+
+#endif
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 #endif   //  __CHECK_ENDIAN_H__
 

@@ -235,7 +235,7 @@ return ( false );
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void GridClosedPolyArray::set(const ShpPolygonRecord & r, const Grid & grid)
+void GridClosedPolyArray::set(const ShpPolyRecord & r, const Grid & grid)
 
 {
 

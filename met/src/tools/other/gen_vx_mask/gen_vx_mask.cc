@@ -65,7 +65,7 @@ static unsigned char buf [buf_size];
 ////////////////////////////////////////////////////////////////////////
 
 
-static void get_shapefile_outline(ShpPolygonRecord & shape);
+static void get_shapefile_outline(ShpPolyRecord & shape);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1507,27 +1507,22 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_shapefile_outline(ShpPolygonRecord & shape)
+void get_shapefile_outline(ShpPolyRecord & shape)
 
 {
 
 
-int fd = -1;
 int j;
-int bytes, n_read;
-int recnum;
 const char * const shape_filename = mask_filename;
-bool hit_eof = false;
-ShpFileHeader h;
-ShpRecordHeader rh;
-ShpPolygonRecord & pr = shape;
+ShpFile f;
+ShpPolyRecord & pr = shape;
 
 
    //
    //  open shapefile
    //
 
-if ( (fd = ::open(shape_filename, O_RDONLY)) < 0 )  {
+if ( ! (f.open(shape_filename)) )  {
 
    mlog << Error
         << program_name << ": unable to open shape file \""
@@ -1538,74 +1533,33 @@ if ( (fd = ::open(shape_filename, O_RDONLY)) < 0 )  {
 }
 
    //
-   //  read file header
+   //  make sure it's a polygon file, and not some other type
    //
 
-bytes = shp_header_bytes;
-
-if ( (n_read = read(fd, buf, bytes)) != bytes )  {
+if ( f.shape_type() != shape_type_polygon )  {
 
    mlog << Error
-        << program_name << ": trouble reading header from shape file \""
-        << shape_filename << "\"\n\n";
+        << program_name << ": shape file \""
+        << shape_filename << "\" is not a polygon file\n\n";
 
    exit ( 1 );
 
 }
 
-h.set(buf);
-
    //
    //  skip through un-needed records
    //
 
-recnum = 0;
-
-hit_eof = false;
-
 for (j=0; j<shape_number; ++j)  {
 
-      //
-      //  get record header
-      //
+   if ( f.at_eof() )  break;
 
-   bytes = shp_record_header_bytes;
-
-   n_read = read(fd, buf, bytes);
-
-   if ( n_read == 0 )  { hit_eof = true;  break; }
-
-   if ( n_read < 0 )  {
-
-      mlog << Error
-           << program_name << ": get_shapefile_outline() -> trouble reading record header for record "
-           << j << "\n\n";
-
-      exit ( 1 );
-
-   }
-
-   rh.set(buf);
-
-      //
-      //  skip record
-      //
-
-   bytes = rh.content_length_bytes;
-
-   if ( lseek(fd, bytes, SEEK_CUR) < 0 )  {
-
-      mlog << Error
-           << program_name << ": get_shapefile_outline() -> lseek error on record number " << j << "\n\n";
-
-      exit ( 1 );
-
-   }
+   f >> pr;
 
 }   //  for j
 
 
-if ( hit_eof )  {
+if ( f.at_eof() )  {
 
    mlog << Error
         << program_name << ": get_shapefile_outline() -> hit eof before reading specified record\n\n";
@@ -1619,86 +1573,14 @@ if ( hit_eof )  {
    //  get the terget record
    //
 
-
-      //
-      //  get record header
-      //
-
-bytes = shp_record_header_bytes;
-
-n_read = read(fd, buf, bytes);
-
-if ( n_read <= 0 )  {
-
-   mlog << Error
-        << program_name << ": get_shapefile_outline() -> trouble reading record header for record "
-        << j << "\n\n";
-
-   exit ( 1 );
-
-}
-
-rh.set(buf);
-
-      //
-      //  check buffer size
-      //
-
-if ( j == shape_number )  {
-
-   if ( rh.content_length_bytes > buf_size )  {
-
-      mlog << Error
-           << program_name << ": get_shapefile_outline() -> record too large ... increase buffer size to at least "
-           << (rh.content_length_bytes) << "\n\n";
-
-      exit ( 1 );
-
-   }
-
-}
-
-      //
-      //  get record data
-      //
-
-bytes = rh.content_length_bytes;
-
-n_read = read(fd, buf, bytes);
-
-if ( n_read != bytes )  {
-
-   mlog << Error
-        << program_name << ": get_shapefile_outline() -> read error on record number " << j << "\n\n";
-
-   exit ( 1 );
-
-}
-
-pr.set(buf);
-
-pr.toggle_longitudes();
-
-
-   //
-   //  make sure it's a polygon record, as opposed to some other type
-   //
-
-if ( pr.shape_type != shape_type_polygon )  {
-
-   mlog << Error
-        << program_name << ": get_shapefile_outline() -> bad type for specified record ... should be polygon, but is not.\n\n";
-
-   exit ( 1 );
-
-}
+f >> pr;
 
 
    //
    //  done
    //
 
-::close(fd);  fd = -1;
+pr.toggle_longitudes();
 
 return;
 

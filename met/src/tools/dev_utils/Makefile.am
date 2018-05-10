@@ -8,7 +8,7 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
-SUBDIRS	=shapefiles
+#SUBDIRS	=shapefiles
 
 # The programs
 
