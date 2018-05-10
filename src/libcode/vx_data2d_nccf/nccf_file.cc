@@ -1126,17 +1126,20 @@ void NcCfFile::read_netcdf_grid()
   // If the grid mapping isn't provided, see if we can intuit a projection
   // from the given dimensions
 
-  if (get_grid_from_dimensions())
-    return;
+  bool status = get_grid_from_dimensions();
 
-  if (get_grid_from_coordinates(data_var))
-    return;
+  if (!status) status = get_grid_from_coordinates(data_var);
 
-  // If we get here, we couldn't get the grid projection from the file
+  // Sanity check to make sure the x and y dimensions are set
 
-  mlog << Error << "\nNcCfFile::read_netcdf_grid() -> "
-       << "Couldn't figure out projection from information in netCDF file.\n\n";
-  exit(1);
+  if (!status || !_xDim || !_yDim)
+  {
+     mlog << Error << "\nNcCfFile::read_netcdf_grid() -> "
+          << "Couldn't figure out projection from information in netCDF file.\n\n";
+     exit(1);
+  }
+
+  return;
 
 }
 
@@ -2300,7 +2303,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     // will probably also need to reorder the data itself.
 
     LatLonData data;
-  
+
     data.name = latlon_proj_type;
     data.lat_ll = lat_values[0];
     data.lon_ll = -lon_values[0];
