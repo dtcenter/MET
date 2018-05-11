@@ -1130,9 +1130,12 @@ void NcCfFile::read_netcdf_grid()
 
   if (!status) status = get_grid_from_coordinates(data_var);
 
-  // Sanity check to make sure the x and y dimensions are set
+  // As a sanity check, make sure the x/y dimensions are both set or
+  // the x_dim_var_name and y_dim_var_name strings are both set.
 
-  if (!status || !_xDim || !_yDim)
+  if (!status ||
+      !((_xDim && _yDim) ||
+        (x_dim_var_name.nonempty() && y_dim_var_name.nonempty())))
   {
      mlog << Error << "\nNcCfFile::read_netcdf_grid() -> "
           << "Couldn't figure out projection from information in netCDF file.\n\n";
