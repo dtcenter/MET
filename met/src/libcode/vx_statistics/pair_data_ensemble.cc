@@ -145,6 +145,8 @@ void PairDataEnsemble::extend(int n) {
 
    PairBase::extend(n);
 
+   obs_error_entry.extend(n);
+
    for(i=0; i<n_ens; i++) e_na[i].extend(n);
 
    v_na.extend(n);
