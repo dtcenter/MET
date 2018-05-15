@@ -1840,7 +1840,7 @@ void process_grid_scores(int i_vx,
 
    // Climatology flags
    bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
-                    cmn_dp.ny() == obs_dp.ny());;
+                    cmn_dp.ny() == obs_dp.ny());
 
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
