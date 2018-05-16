@@ -517,6 +517,8 @@ regrid = {
 //       - The "GRIB1_code" entry specifies the GRIB1 code (wgrib kpds5 value).
 //       - The "GRIB1_center" entry specifies the originating center.
 //       - The "GRIB1_subcenter" entry specifies the originating subcenter.
+//       - The "GRIB2_mtab" entry specifies the master table number.
+//       - The "GRIB2_ltab" entry specifies the local table number.
 //       - The "GRIB2_disc" entry specifies the GRIB2 discipline code.
 //       - The "GRIB2_parm_cat" entry specifies the parameter category code.
 //       - The "GRIB2_parm" entry specifies the parameter code.
