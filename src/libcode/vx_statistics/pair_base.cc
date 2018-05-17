@@ -689,8 +689,11 @@ double PairBase::process_obs(VarInfo *vinfo, double v) {
 
    // Apply censor logic.
    for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+
+      // Break out after the first match.
       if(vinfo->censor_thresh()[i].check(new_v)) {
          new_v = vinfo->censor_val()[i];
+         break;
       }
    }
 
