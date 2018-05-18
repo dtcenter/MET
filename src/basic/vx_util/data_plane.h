@@ -61,7 +61,9 @@ class DataPlane {
          //
 
       void set_size(int Nx, int Ny);
+
       void set(double, int, int);
+
       void set_constant(double);
 
       void set_init(unixtime);
@@ -92,7 +94,6 @@ class DataPlane {
 
       void threshold(const SingleThresh &);
       void censor   (const ThreshArray &, const NumArray &);
-      void replace  (const SingleThresh &, const double);
 
       int  two_to_one(int x, int y) const;
       void one_to_two(int n, int &x, int &y) const;
