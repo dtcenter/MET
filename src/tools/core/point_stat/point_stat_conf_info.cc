@@ -1004,6 +1004,27 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int PointStatVxOpt::get_n_cnt_thresh() const {
+   return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
+          0 : fcnt_ta.n_elements());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatVxOpt::get_n_cat_thresh() const {
+   return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
+          0 : fcat_ta.n_elements());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int PointStatVxOpt::get_n_wind_thresh() const {
+   return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
+          0 : fwind_ta.n_elements());
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int PointStatVxOpt::get_n_fprob_thresh() const {
    return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
           0 : fcat_ta.n_elements());

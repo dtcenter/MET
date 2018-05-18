@@ -206,9 +206,6 @@ class GridStatVxOpt {
 
 inline int  GridStatVxOpt::get_n_mask()        const { return(mask_name.n_elements());         }
 inline int  GridStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);           }
-inline int  GridStatVxOpt::get_n_cnt_thresh()  const { return(fcnt_ta.n_elements());           }
-inline int  GridStatVxOpt::get_n_cat_thresh()  const { return(fcat_ta.n_elements());           }
-inline int  GridStatVxOpt::get_n_wind_thresh() const { return(fwind_ta.n_elements());          }
 inline int  GridStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());       }
 inline int  GridStatVxOpt::get_n_cdf_bin()     const { return(climo_cdf_ta.n_elements() - 1);  }
 inline int  GridStatVxOpt::get_n_nbrhd_wdth()  const { return(nbrhd_info.width.n_elements());  }
