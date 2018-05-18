@@ -290,31 +290,30 @@ void DataPlane::threshold(const SingleThresh &st) {
 
 void DataPlane::censor(const ThreshArray &censor_thresh,
                        const NumArray &censor_val) {
-   int i;
+   int i, j, count;
 
-   // Apply censor thresholds
-   for(i=0; i<censor_thresh.n_elements(); i++) {
-      mlog << Debug(3)
-           << "Applying censor threshold \"" << censor_thresh[i].get_str()
-           << "\" and replacing with a value of " << censor_val[i] << ".\n";
-      replace(censor_thresh[i], censor_val[i]);
+   mlog << Debug(3)
+        << "Applying censor thresholds \"" << censor_thresh.get_str(" ")
+        << "\" and replacing with values \"" << censor_val.serialize()
+        << "\".\n";
+
+   // Loop through the points and apply all the censor thresholds.
+   for(i=0,count=0; i<Nxy; i++) {
+
+      for(j=0; j<censor_thresh.n_elements(); j++) {\
+
+         // Break out after the first match.
+         if(censor_thresh[j].check(Data[i])) {
+            Data[i] = censor_val[j];
+            count++;
+            break;
+         }
+      }
    }
 
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void DataPlane::replace(const SingleThresh &st, const double new_v) {
-   int j;
-
-   //
-   // Apply the threshold and update with the replacement value.
-   //
-
-   for(j=0; j<Nxy; ++j) {
-      if( st.check(Data[j]) ) Data[j] = new_v;
-   }
+   mlog << Debug(3)
+        << "Censored values for " << count << " of " << Nxy
+        << " grid points.\n";
 
    return;
 }
