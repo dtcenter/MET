@@ -292,6 +292,9 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
                        const NumArray &censor_val) {
    int i, j, count;
 
+   // Check for no work to do
+   if(censor_thresh.n_elements() == 0) return;
+
    mlog << Debug(3)
         << "Applying censor thresholds \"" << censor_thresh.get_str(" ")
         << "\" and replacing with values \"" << censor_val.serialize()
