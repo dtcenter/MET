@@ -1383,7 +1383,7 @@ time_summary = {
   beg = "000000";
   end = "235959";
   step = 300;
-  width = 600;'
+  width = 600;
   // width = { beg = -300; end = 300; }
   grib_code = [ 11, 204, 211 ];
   obs_var   = [];

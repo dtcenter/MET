@@ -302,7 +302,7 @@ Version 7.1 BETA 4 Release Notes:
 --------------------------------
 
 - Incorporate recent bugfixes.
-  - When applying multiple censoring thresholds, only use first match.
+  - When applying multiple censoring thresholds, only use the first match.
   - When sizing output tables in Point-Stat and Grid-Stat for probabilities.
   - When allocating memory in Ensemble-Stat to make it run faster.
   - When applying interp12 logic in tc_pairs for ATCF ID's ending with "32".
