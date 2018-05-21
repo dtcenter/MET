@@ -1,4 +1,4 @@
-Model Evaluation Tools METv7.1 BETA 3 (May 2, 2018)
+Model Evaluation Tools METv7.1 BETA 4 (May 21, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -297,6 +297,20 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 7.1 BETA 4 Release Notes:
+--------------------------------
+
+- Incorporate recent bugfixes.
+  - When applying multiple censoring thresholds, only use first match.
+  - When sizing output tables in Point-Stat and Grid-Stat for probabilities.
+  - When allocating memory in Ensemble-Stat to make it run faster.
+  - When applying interp12 logic in tc_pairs for ATCF ID's ending with "32".
+- Enhance gen_vx_mask to resize data buffer as needed for shapefiles.
+- Generalize the time_summary.width config file option to an integer for
+  centered time windows (existing) or a dictionary with begin and end time
+  offsets for uncentered windows (new).
+- Update MRMS GRIB2 table.
 
 Version 7.1 BETA 3 Release Notes:
 --------------------------------
