@@ -176,6 +176,7 @@ static unixtime valid_beg_ut, valid_end_ut;
 
 // Number of PrepBufr messages to process from the command line
 static int nmsg = -1;
+static int nmsg_percent = -1;
 
 // Dump contents of PrepBufr file to ASCII files
 static bool dump_flag = false;
@@ -351,21 +352,26 @@ int main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Open the NetCDF file
-   if (!collect_metadata) open_netcdf();
-
-   // Process each PrepBufr file
-   for(i=0; i<pbfile.n_elements(); i++) {
-      process_pbfile_metadata(i);
-      if (!collect_metadata) process_pbfile(i);
-   }
-
-   // Write the NetCDF file
    if (collect_metadata) {
+      // Process each PrepBufr file
+      for(i=0; i<pbfile.n_elements(); i++) {
+         process_pbfile_metadata(i);
+      }
       display_bufr_variables(tableB_vars, tableB_descs,
                              bufr_hdr_name_arr, bufr_obs_name_arr);
+       
    }
    else {
+      // Open the NetCDF file
+      open_netcdf();
+
+      // Process each PrepBufr file
+      for(i=0; i<pbfile.n_elements(); i++) {
+         process_pbfile_metadata(i);
+         process_pbfile(i);
+      }
+   
+      // Write the NetCDF file
       write_netcdf_hdr_data();
    }
 
@@ -709,7 +715,7 @@ void open_netcdf() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_pbfile(int i_pb) {
-   int npbmsg, unit, yr, mon, day, hr, min, sec;
+   int npbmsg, npbmsg_total, unit, yr, mon, day, hr, min, sec;
    int i, i_msg, i_read, n_file_obs, i_ret, i_date, n_hdr_obs;
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_pb_rpt, rej_in_rpt, rej_itp, rej_nobs;
@@ -812,13 +818,17 @@ void process_pbfile(int i_pb) {
 
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_(&unit, &npbmsg);
+   npbmsg_total = npbmsg;
 
    // Use the number of records requested by the user if there
    // are enough present.
-   if(nmsg >= 0 && nmsg <= npbmsg) npbmsg = nmsg;
+   if(nmsg > 0 && nmsg < npbmsg) {
+      npbmsg = (nmsg_percent > 0 && nmsg_percent <= 100)
+            ? (npbmsg * nmsg_percent / 100) : nmsg;
+   }
 
    // Check for zero messages to process
-   if(npbmsg <= 0) {
+   if(npbmsg <= 0 || npbmsg_total <= 0) {
       mlog << Warning << "\n" << method_name << " -> "
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
@@ -840,9 +850,18 @@ void process_pbfile(int i_pb) {
    bool is_prepbufr = is_prepbufr_file(&event_names);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       end_t = clock();
-      cout << method_name << " " << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds for preparing" << endl;
+      cout << " PERF: " << method_name << " " << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds for preparing" << endl;
       start_t = clock();
    }
+
+   ConcatString log_message = " (out of ";
+   log_message.add(unixtime_to_string(npbmsg_total));
+   log_message.add(")");
+
+   mlog << Debug(2) << "Processing " << npbmsg
+        << (is_prepbufr ? " PrepBufr" : " Bufr") << " messages"
+        << ((npbmsg == npbmsg_total) ? "" : log_message)
+        << "...\n";
 
    if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
    
@@ -922,8 +941,6 @@ void process_pbfile(int i_pb) {
          mlog << Debug(2) << "Searching Time Window:\t\t" << start_time_str
               << " to " << end_time_str << "\n";
 
-         mlog << Debug(2) << "Processing " << npbmsg
-              << (is_prepbufr ? " PrepBufr" : " Bufr") << " messages...\n";
       }
       else if((file_ut != msg_ut) && is_prepbufr) {
          mlog << Error << "\n" << method_name << " -> "
@@ -1580,7 +1597,7 @@ void process_pbfile(int i_pb) {
    remove_temp_file(blk_file);
    if(mlog.verbosity_level() >= debug_level_for_performance) {
       method_end = clock();
-      cout << method_name << " " << (method_end-method_start)/double(CLOCKS_PER_SEC) << " seconds" << endl;
+      cout << " PERF: " << method_name << " " << (method_end-method_start)/double(CLOCKS_PER_SEC) << " seconds" << endl;
    }
 
    if(i_msg <= 0) {
@@ -1654,7 +1671,14 @@ void process_pbfile_metadata(int i_pb) {
    
    // Use the number of records requested by the user if there
    // are enough present.
-   if(nmsg >= 0 && nmsg <= npbmsg) npbmsg = nmsg;
+   if(nmsg >= 0 && nmsg <= npbmsg) {
+      if (nmsg_percent < 0 || nmsg_percent >= 100)
+         npbmsg = nmsg;
+      else
+         npbmsg = npbmsg * nmsg_percent / 100;
+      mlog << Debug(2) << method_name << "  processing "
+           << npbmsg << " records...\n";
+   }
 
    // Check for zero messages to process
    if(npbmsg <= 0) {
@@ -2424,7 +2448,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
    char description[BUFR_DESCRIPTION_LEN+1];
    char line_buf[(BUFR_DESCRIPTION_LEN+1)*2];
 
-   mlog << Debug(1) << "\n   Header variables:\n";
+   mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n_elements() << ") :\n";
    for(i=0; i<hdr_arr.n_elements(); i++) {
       if (all_vars.has(hdr_arr[i], index)) {
          strcpy(description, all_descs[index]);
@@ -2436,7 +2460,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
       mlog << Debug(1) << line_buf;
    }
 
-   mlog << Debug(1) << "\n   Observation variables:\n";
+   mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n_elements() << ") :\n";
    for(i=0; i<obs_arr.n_elements(); i++) {
       if (all_vars.has(obs_arr[i], index)) {
          strcpy(description, all_descs[index]);
@@ -2554,6 +2578,12 @@ void set_valid_end_time(const StringArray & a)
 void set_nmsg(const StringArray & a)
 {
    nmsg = atoi(a[0]);
+   int tmp_len = strlen(a[0]);
+   if (1 < tmp_len) {
+      if (a[0][tmp_len-1] == '%') {
+         nmsg_percent = nmsg;
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
