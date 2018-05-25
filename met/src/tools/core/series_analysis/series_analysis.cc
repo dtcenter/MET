@@ -598,6 +598,10 @@ void process_scores() {
    DataPlane fcst_dp, obs_dp, cmn_dp;
    bool cmn_flag;
 
+   // Number of points skipped due to valid data threshold
+   int n_skip_zero = 0;
+   int n_skip_pos  = 0;
+
    // Determine the block size
    nxny    = grid.nx() * grid.ny();
    n_reads = nint(ceil((double) nxny / conf_info.block_size));
@@ -702,6 +706,11 @@ void process_scores() {
                  << "[" << i+1 << " of " << conf_info.block_size
                  << "] Skipping point (" << x << ", " << y << ") with "
                  << f_na[i].n_elements() << " matched pairs.\n";
+
+            // Keep track of the number of points skipped
+            if(f_na[i].n_elements() == 0) n_skip_zero++;
+            else                          n_skip_pos++;
+
             continue;
          }
          else {
@@ -776,6 +785,26 @@ void process_scores() {
    if(f_na) { delete [] f_na; f_na = (NumArray *) 0; }
    if(o_na) { delete [] o_na; o_na = (NumArray *) 0; }
    if(c_na) { delete [] c_na; c_na = (NumArray *) 0; }
+
+   // Print summary counts
+   mlog << Debug(2)
+        << "Finished processing statistics for "
+        << nxny - n_skip_zero - n_skip_pos << " of " << nxny
+        << " grid points.\n"
+        << "Skipped " << n_skip_zero << " of " << nxny
+        << " points with no valid data.\n"
+        << "Skipped " << n_skip_pos << " of " << nxny
+        << " points that did not meet the valid data threshold.\n";
+
+   // Print config file suggestions about missing data
+   if(n_skip_pos > 0 && conf_info.vld_data_thresh == 1.0) {
+      mlog << Debug(2)
+           << "Some points skipped due to missing data:\n"
+           << "Consider decreasing \"vld_thresh\" in the config file "
+           << "to include more points.\n"
+           << "Consider requesting \"TOTAL\" from \"output_stats\" "
+           << "in the config file to see the valid data counts.\n";
+   }
 
    return;
 }
