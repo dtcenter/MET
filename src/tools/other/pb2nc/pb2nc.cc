@@ -1471,6 +1471,7 @@ void process_pbfile(int i_pb) {
 
                if (is_airnow) {
                   obs_arr[2]   = abs(bufr_obs_extra[lv][0] * 3600);  // hour to second
+                  obs_arr[3]   = 0;                                  // AIRNOW obs at surface 
                   quality_mark = bufr_obs_extra[lv][1];
                   // Convert a special number (1e+11) to NA at addObservation
                }
