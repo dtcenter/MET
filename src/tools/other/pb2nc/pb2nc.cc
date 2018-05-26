@@ -285,7 +285,7 @@ extern "C" {
    void dumppb_(const char *, int *, const char *, int *,
                 const char *, int *, int *);
    void dump_tbl_(const char *, int *, const char *, int *);
-
+   int  get_tmin_(int *, int *);
 }
 
 // Defined at write_netcdf.cc
@@ -872,6 +872,8 @@ void process_pbfile(int i_pb) {
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
    strcpy(bufr_hdr_names, bufr_hdrs.text());
 
+   for (int idx=0; idx<obs_arr_len; idx++) obs_arr[idx] = 0;
+   
    header_to_vector = IS_INVALID_NC(obs_vars.hdr_arr_var) || IS_INVALID_NC(obs_vars.hdr_lat_var);
    // Loop through the PrepBufr messages from the input file
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
@@ -899,6 +901,13 @@ void process_pbfile(int i_pb) {
       // from one PrepBufr message to the next
       if(file_ut == (unixtime) 0) {
          file_ut = msg_ut;
+         
+         // Add minutes by calling IUPVS01(unit, "MINU")
+         int cycle_minute = -1;
+         get_tmin_(&unit, &cycle_minute);
+         if (cycle_minute != -1) {
+            file_ut += cycle_minute * 60;
+         }
 
          unix_to_mdyhms(file_ut, mon, day, yr, hr, min, sec);
          sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",

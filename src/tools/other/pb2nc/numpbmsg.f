@@ -23,3 +23,19 @@ C*
         CALL UFBTAB  ( FID2, R8ARR, 1, 1, NMSG, ' ' )
 C*
         END
+
+        
+        SUBROUTINE GET_TMIN ( FID, TMIN )
+C*
+        INTEGER    FID, TMIN
+C*
+C-----------------------------------------------------------------------
+C*
+C*      Call UFBTAB to figure out how many messages the PrepBufr file
+C*      attached to FID contains
+C*
+        FID2 = -FID
+        TMIN = IUPVS01(FID,'MINU')
+C*
+        END
+        
