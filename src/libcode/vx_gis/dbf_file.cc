@@ -305,7 +305,7 @@ unsigned char * buf = 0;
 
 
 
-subrec = new DbfSubRecord [n_records];
+subrec = new DbfSubRecord [n_subrecs];
 
 buf = new unsigned char [record_length];
 
