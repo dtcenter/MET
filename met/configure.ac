@@ -924,6 +924,34 @@ else
 fi
 AC_SUBST([GRIB2_LIBS])
 
+
+########################################################################
+# Python
+
+AC_ARG_ENABLE(python,
+	  [AS_HELP_STRING([--enable-python], [Enable python embedding])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_PYTHON="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-python) ;;
+   esac],
+  [ENABLE_PYTHON="no"]
+)
+
+AM_CONDITIONAL([ENABLE_PYTHON], [test "x$ENABLE_PYTHON" = "xyes"])
+
+if test "x$ENABLE_PYTHON" = "xyes"; then
+    AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
+    AC_MSG_NOTICE([python embedding will be compiled])
+    CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
+    PYTHON_LIBS=""
+else
+    AC_MSG_NOTICE([python embedding will not be compiled])
+    PYTHON_LIBS=
+fi
+AC_SUBST([PYTHON_LIBS])
+
+########################################################################
+
 # Check for the MET_DEVELOPMENT environment variable
 
 AM_CONDITIONAL([ENABLE_DEVELOPMENT], [test -n "$MET_DEVELOPMENT"])
