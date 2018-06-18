@@ -106,7 +106,7 @@ This chapter contains a description of the Ensemble-Stat tool.
  spread, etc) from a set of several forecast model files to be used by the
  MET statistics tools.
  If observations are also included, ensemble statistics such as rank histograms,
- probability integral transform histograms, spread/skill variance, realtive
+ probability integral transform histograms, spread/skill variance, relative
  position and continuous ranked probability score are produced.
  A climatology file may also be provided, and will be used as a reference
  forecast in several of the output statistics.
@@ -136,14 +136,27 @@ name "sec:ES_Scientific-and-statistical"
 \end_layout
 
 \begin_layout Subsection
-Ensemble Relative Frequency
+Ensemble forecasts derived from a set of deterministic ensemble members
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:ES_Rel_Freq"
+name "subsec:ES_Forecast_Creation"
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Ensemble forecasts are often created as a set of deterministic forecasts.
+ The ensemble members are rarely used separately.
+ Instead, they can be combined in various ways to produce a forecast.
+ MET can combine the ensemble members into some type of summary forecast
+ according to user specificaitons.
+ Ensemble means are the most common, and can be paired with the ensemble
+ variance or spread.
+ Maximum, minimum and other summary values are also available, with details
+ in the practical information section.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -170,7 +183,7 @@ $5/10$=0.5
 \end_layout
 
 \begin_layout Subsection
-Ensemble Statistics 
+Ensemble statistics 
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:ES_Statistical-measures"
@@ -200,12 +213,58 @@ Rank histograms and probability integral transform (PIT) histograms are
 \begin_layout Standard
 
 \series medium
-spread/skill variance, realtive position and continuous ranked probability
- score
+Often, the goal of enesmble forecasting is to reproduce the distribution
+ of observations using a set of many forecasts.
+ In other words, the ensemble members represtent the set of all possible
+ outcomes.
+ When this is true, the spread of the ensemble is identical to the error
+ in the mean forecast.
+ Though this rarely occurs in practice, the spread / skill relationship
+ is still typically assessed for ensemble forecasts (Barker, 1991; Buizza,
+ 1997).
+ MET calcualtes the spread and skill in user defined categories according
+ to Eckel 
+\series default
+\emph on
+et al
+\series medium
+\emph default
+, 2012.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The relative position (RELP) is a count of the number of times each ensemble
+ member is closest to the observation.
+ For stochastic or randomly derived ensembles, this statistic is meaningless.
+ For specified ensemble members, however, it can assist users in determining
+ if any ensemble member is performing consistently better or worse than
+ the others.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+The continuous ranked probability score (CRPS) is the average the distance
+ between the forecast (ensemble) cumulative distribution function and the
+ observation cumulative distribution function.
+ It is an analog of the Brier score, but for continuous forecast and observation
+ fields.
+ (Gneiting 
+\series default
+\emph on
+et al
+\series medium
+\emph default
+, 2004).
+ 
 \end_layout
 
 \begin_layout Subsection
-Ensemble Observation Error
+Ensemble observation error
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:ES_Obs_Err"
