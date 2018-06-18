@@ -146,6 +146,29 @@ name "subsec:ES_Rel_Freq"
 
 \end_layout
 
+\begin_layout Standard
+The ensemble relative frequency is the simplest method for turning a set
+ of deterministic forecasts into something resembling a probability forecast.
+ MET will create the ensemble relative frequency as the proportion of ensemble
+ members forecasting some event.
+ For example, if 5 out of 10 ensemble members predict measureable precipitation
+ at a grid location, then the ensemble relative frequency of precipitation
+ will be 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+$5/10$=0.5
+\end_layout
+
+\end_inset
+
+.
+ If the ensemble relative frequency is calibrated (unlikely) then this could
+ be thought of as a probability of precipitation.
+\end_layout
+
 \begin_layout Subsection
 Ensemble Statistics 
 \begin_inset CommandInset label
@@ -155,6 +178,30 @@ name "subsec:ES_Statistical-measures"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+Rank histograms and probability integral transform (PIT) histograms are
+ used to determine if the distribution of ensemble values is the same as
+ the distribution of observed values for any forecast field (Hamill, 2001).
+ The rank histogram is a tally of the rank of the observed value when placed
+ in order with each of the ensemble values from the same location.
+ If the distributions are identical, then the rank of the observation will
+ be uniformly distributed.
+ In other words, it will fall among the ensemble members randomly in equal
+ likelihood.
+ The PIT histogram applies this same concept, but transforms the actual
+ rank into a probability to facilitate ensembles of differing sizes or with
+ missing members.
+\end_layout
+
+\begin_layout Standard
+
+\series medium
+spread/skill variance, realtive position and continuous ranked probability
+ score
 \end_layout
 
 \begin_layout Subsection
