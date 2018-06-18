@@ -1,4 +1,4 @@
-Model Evaluation Tools METv7.1 BETA 4 (May 21, 2018)
+Model Evaluation Tools METv7.1 BETA 5 (June 18, 2018)
 
 ================================================================================
 Model Evaluation Tools (MET) TERMS OF USE - IMPORTANT!
@@ -297,6 +297,16 @@ sub-directory, or the MET Online Tutorial:
 ================================================================================
 Release Notes
 ================================================================================
+
+Version 7.1 BETA 5 Release Notes:
+--------------------------------
+
+- Enhance PB2NC to read timestamps down to the minute.
+- Enhance PB2NC to specify the number of messages to be processed as an exact
+  value (-nmsg 25) or percentage (-nmsg 25%).
+- Explicitly set the level value of AIRNOW message types to 0.
+- Add debug messages to Series-Analysis to inform the user about missing data.
+- Fix bug in dump_dbf utility.
 
 Version 7.1 BETA 4 Release Notes:
 --------------------------------
