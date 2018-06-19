@@ -100,6 +100,7 @@ static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_defau
 static const char *program_name = "pb2nc";
 
 static const float fill_value   = -9999.f;
+static const int missing_cycle_minute = -1;
 
 // Constants used to interface to Fortran subroutines
 
@@ -898,9 +899,9 @@ void process_pbfile(int i_pb) {
       sprintf(time_str, "%.10i", i_date);
       msg_ut = yyyymmddhh_to_unix(time_str);
       // Add minutes by calling IUPVS01(unit, "MINU")
-      cycle_minute = -1;
+      cycle_minute = missing_cycle_minute;
       get_tmin_(&unit, &cycle_minute);
-      if (cycle_minute != -1) {
+      if (cycle_minute != missing_cycle_minute) {
          msg_ut += cycle_minute * 60;
       }
 
@@ -1061,7 +1062,7 @@ void process_pbfile(int i_pb) {
 
       // Compute the valid time and check if it is within the
       // specified valid range
-      hdr_vld_ut = file_ut + (unixtime) (hdr[3]*sec_per_hour);
+      hdr_vld_ut = file_ut + (unixtime)nint(hdr[3]*sec_per_hour);
       if (0 == min_msg_ut || min_msg_ut > hdr_vld_ut) {
          min_msg_ut = hdr_vld_ut;
          strcpy(min_time_str, time_str);
