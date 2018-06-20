@@ -53,6 +53,7 @@ SUBDIRS += vx_data2d_factory \
 
 if ENABLE_PYTHON
   SUBDIRS += vx_python_utils
+  SUBDIRS += vx_data2d_python
 endif
 
 MAINTAINERCLEANFILES 	= Makefile.in

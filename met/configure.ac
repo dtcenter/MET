@@ -1127,6 +1127,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_tc_util/Makefile
                  src/libcode/vx_summary/Makefile
                  src/libcode/vx_python_utils/Makefile
+                 src/libcode/vx_data2d_python/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile
                  src/tools/core/ensemble_stat/Makefile
