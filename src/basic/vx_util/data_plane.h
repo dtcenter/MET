@@ -62,7 +62,7 @@ class DataPlane {
 
       void set_size(int Nx, int Ny);
 
-      void set(double, int, int);
+      void set(double, int, int);   //  x, y
 
       void set_constant(double);
 
