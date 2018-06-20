@@ -1,4 +1,10 @@
-
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2018
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -11,6 +17,7 @@ using namespace std;
 
 #include <iostream>
 
+#include "vx_log.h"
 #include "concat_string.h"
 
 #include "python_dict.h"
@@ -35,7 +42,8 @@ for (j=0; j<depth; ++j)  tab << "|  ";
 
 if ( ! PyDict_Check (obj) )  {
 
-   cerr << "\n\n  dump_dict() -> not a dictionary!\n\n";
+   mlog << Error
+        << "\n\n  dump_dict() -> not a dictionary!\n\n";
 
    exit ( 1 );
 
@@ -65,7 +73,8 @@ while ( (status = PyDict_Next (obj, &pos, &key, &value)) != 0 )  {
 
    if ( ! PyString_Check(key) )  {
 
-      cerr << "\n\n  dump_dict() -> key is not a string!\n\n";
+      mlog << Error
+           << "\n\n  dump_dict() -> key is not a string!\n\n";
 
       exit ( 1 );
 
@@ -167,7 +176,8 @@ if ( PyDict_Check(value) )  {
       //  nope
       //
 
-cerr << "\n\n  dump_dict_value() -> can't determine type for dict value!\n\n";
+mlog << Error
+     << "\n\n  dump_dict_value() -> can't determine type for dict value!\n\n";
 
 exit ( 1 );
 

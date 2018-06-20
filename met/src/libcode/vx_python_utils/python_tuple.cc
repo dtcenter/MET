@@ -1,4 +1,10 @@
-
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2018
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -12,6 +18,7 @@ using namespace std;
 
 #include <iostream>
 
+#include "vx_log.h"
 
 #include "python_tuple.h"
 
@@ -28,7 +35,8 @@ dim = PyTuple_Size (tuple);
 
 if ( dim > max_tuple_data_dims )  {
 
-   cerr << "\n\n"
+   mlog << Error
+        << "\n\n"
         << "increase parameter \"max_tuple_data_dims\" to at least "
         << dim << "\n\n";
 
