@@ -1664,6 +1664,69 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
+map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
+      Dictionary *dict) {
+   map<ConcatString,ThreshArray> m;
+   SingleThresh st;
+   StringArray sa;
+   ThreshArray ta, ta_entry;
+   int i;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_filter_attr_map() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: filter_attr_name and filter_attr_thresh
+   sa = dict->lookup_string_array(conf_key_filter_attr_name);
+   ta = dict->lookup_thresh_array(conf_key_filter_attr_thresh);
+
+   // Check for equal number of names and thresholds
+   if(sa.n_elements() != ta.n_elements()) {
+      mlog << Error << "\nparse_conf_filter_attr_map() -> "
+           << "The \"" << conf_key_filter_attr_name << "\" and \""
+           << conf_key_filter_attr_thresh
+           << "\" arrays must have the same length.\n\n";
+      exit(1);
+   }
+
+   // Append area_thresh, if present
+   st = dict->lookup_thresh(conf_key_area_thresh, false);
+   if(dict->last_lookup_status()) {
+      sa.add("AREA");
+      ta.add(st);
+   }
+
+   // Append inten_perc_thresh, if present
+   st = dict->lookup_thresh(conf_key_inten_perc_thresh, false);
+   if(dict->last_lookup_status()) {
+      ConcatString cs;
+      cs << "INTENSITY_" << dict->lookup_int(conf_key_inten_perc_value);
+      sa.add(cs);
+      ta.add(st);
+   }
+
+   // Process each array entry
+   for(i=0; i<sa.n_elements(); i++) {
+
+      // Add threshold to existing map entry
+      if(m.count(sa[i]) >= 1) {
+         m[sa[i]].add(ta[i]);
+      }
+      // Add a new map entry
+      else {
+         ta_entry.clear();
+         ta_entry.add(ta[i]);
+         m[sa[i]] = ta_entry;
+      }
+   }
+
+   return(m);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void parse_conf_range_int(Dictionary *dict, int &beg, int &end) {
 
    if(!dict) {

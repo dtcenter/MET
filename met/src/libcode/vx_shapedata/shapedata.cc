@@ -44,6 +44,7 @@ using namespace std;
 #include <fcntl.h>
 
 #include "shapedata.h"
+#include "mode_columns.h"
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
@@ -272,6 +273,21 @@ double ShapeData::area() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+double ShapeData::area_thresh(const ShapeData *raw_ptr,
+                              const SingleThresh &obj_thresh) const {
+   int i, area;
+   const int Nxy = data.nx()*data.ny();
+
+   // Number of points inside the object that meet the threshold criteria
+   for(i=0, area=0; i<Nxy; i++) {
+      if(data.buf()[i] > 0 && obj_thresh.check(raw_ptr->data.buf()[i])) area++;
+   }
+
+   return(area);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void ShapeData::calc_length_width(double &l, double &w) const {
    int x, y;
    double xx, yy;
@@ -370,6 +386,129 @@ double ShapeData::complexity() const {
    u = (hull - shape)/hull;
 
    return(u);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
+                                       bool precip_flag) const {
+   int i, n;
+   double * val = (double *) 0;
+   double val_sum, v;
+   const int Nxy = data.nx()*data.ny();
+
+   if(perc < 0 || perc > 102) {
+      mlog << Error << "\nShapeData::intensity_percentile() -> "
+           << "the intensity percentile requested must be between 0 and 102.\n\n";
+      exit(1);
+   }
+
+   val = new double [Nxy];
+
+   // Compute the requested percentile of intensity
+   for(i=0, n=0, val_sum=0.0; i<Nxy; i++) {
+
+      // Process points for the current object
+      if(data.buf()[i] > 0) {
+
+         v = raw_ptr->data.buf()[i];
+
+         // Skip bad data and zero precip
+         if(::is_bad_data(v) || (precip_flag && is_eq(v, 0.0))) continue;
+
+         // Store current value
+         val[n] = v;
+         val_sum += v;
+         n++;
+      }
+   }
+
+   // Compute the mean of the intensities
+   if(perc == 101) {
+      v = val_sum/n;
+   }
+   // Compute the sum of the intensities
+   else if(perc == 102) {
+      v = val_sum;
+   }
+   // Compute a percentile of intensity
+   else {
+      sort(val, n);
+      v = percentile(val, n, (double) perc/100.0);
+   }
+
+   // Clean up
+   if(val) { delete [] val; val = (double *) 0; };
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ShapeData::get_attr(const ConcatString &attr_name,
+                           const ShapeData *raw_ptr,
+                           const SingleThresh &obj_thresh,
+                           const Grid *grid,
+                           bool precip_flag) const {
+   double v1, v2, v3, attr_val;
+
+   if(strcasecmp(attr_name, "CENTROID_X") == 0) {
+      centroid(attr_val, v2);
+   }
+   else if(strcasecmp(attr_name, "CENTROID_Y") == 0) {
+      centroid(v1, attr_val);
+   }
+   else if(strcasecmp(attr_name, "CENTROID_LAT") == 0) {
+      centroid(v1, v2);
+      grid->xy_to_latlon(v1, v2, attr_val, v3);
+   }
+   else if(strcasecmp(attr_name, "CENTROID_LON") == 0) {
+      centroid(v1, v2);
+      grid->xy_to_latlon(v1, v2, v3, attr_val);
+   }
+   else if(strcasecmp(attr_name, "AXIS_ANG") == 0) {
+      attr_val = angle_degrees();
+   }
+   else if(strcasecmp(attr_name, "LENGTH") == 0) {
+      attr_val = length();
+   }
+   else if(strcasecmp(attr_name, "WIDTH") == 0) {
+      attr_val = width();
+   }
+   else if(strcasecmp(attr_name, "ASPECT_RATIO") == 0) {
+      calc_length_width(v1, v2);
+      attr_val = v2/v1;
+   }
+   else if(strcasecmp(attr_name, "AREA") == 0) {
+      attr_val = area();
+   }
+   else if(strcasecmp(attr_name, "AREA_THRESH") == 0) {
+      attr_val = area_thresh(raw_ptr, obj_thresh);
+   }
+   else if(strcasecmp(attr_name, "CURVATURE") == 0) {
+      attr_val = curvature(v1, v2);
+   }
+   else if(strcasecmp(attr_name, "CURVATURE_X") == 0) {
+      v1 = curvature(attr_val, v2);
+   }
+   else if(strcasecmp(attr_name, "CURVATURE_Y") == 0) {
+      v1 = curvature(v1, attr_val);
+   }
+   else if(strcasecmp(attr_name, "COMPLEXITY") == 0) {
+      attr_val = complexity();
+   }
+   else if(strncasecmp(attr_name, "INTENSITY_", strlen("INTENSITY_")) == 0) {
+      StringArray sa = attr_name.split("_");
+      attr_val = intensity_percentile(raw_ptr, atoi(sa[1]), precip_flag);
+   }
+   else {
+      mlog << Warning << "\nShapeData::get_attr() -> "
+           << "Filtering requested for unsupported object attribute \""
+           << attr_name << "\".\n\n";
+      attr_val = bad_data_double;
+   }
+
+   return(attr_val);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1826,6 +1965,68 @@ void ShapeData::threshold(SingleThresh t) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
+                               const ShapeData *raw_ptr,
+                               const SingleThresh &obj_thresh,
+                               const Grid *grid,
+                               bool precip_flag) {
+   int i, j, n;
+   ShapeData sd_split, sd_object;
+   map<ConcatString,ThreshArray>::const_iterator it;
+   double attr_val;
+
+   bool * keep_object = new bool [1 + n];  // keep_object[0] is ignored
+
+   // Split the field to number the shapes
+   sd_split = split(*this, n);
+
+   // Apply attribute filtering logic to each object
+   for(i=1; i<=n; i++) {
+
+      // Select the current object
+      sd_object = select(sd_split, i);
+
+      // Loop over attribute filter map
+      for(it=attr_map.begin(); it!= attr_map.end(); it++) {
+
+         attr_val = sd_object.get_attr(it->first, raw_ptr, obj_thresh, grid,
+                                       precip_flag);
+
+         // Discard objects whose attributes do not meet the threshold criteria
+         for(j=0; j<it->second.n_elements(); j++) {
+
+            keep_object[i] = it->second[j].check(attr_val);
+
+            // Break out of the ThreshArray loop
+            if(!keep_object[i]) {
+               mlog << Debug(4)
+                    << "Discarding object since " << it->first << " of "
+                    << attr_val << " is not " << it->second[j].get_str()
+                    << ".\n";
+               break;
+            }
+         } // end for j
+
+         // Break out of the attribute map loop
+         if(!keep_object[i]) break;
+
+      } // end for it
+   } // end for i
+
+   // Zero out discarded shapes
+   int Nxy = data.nx()*data.ny();
+   for(i=0; i<Nxy; i++) {
+      if(!keep_object[nint(sd_split.data.buf()[i])]) data.buf()[i] = 0.0;
+   }
+
+   // Clean up
+   if(keep_object) { delete [] keep_object; keep_object = (bool *) 0; }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 void ShapeData::threshold_area(SingleThresh t)
 
@@ -1868,7 +2069,7 @@ void ShapeData::threshold_area(SingleThresh t)
       } // end for y
    } // end for x
 
-if ( area_object )  { delete [] area_object;  area_object = (double *) 0; }
+   if ( area_object )  { delete [] area_object;  area_object = (double *) 0; }
 
    return;
 }

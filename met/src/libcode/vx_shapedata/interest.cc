@@ -36,7 +36,7 @@ using namespace std;
 
 static void get_percentiles(DistributionPercentiles &,
                             const ShapeData &, const ShapeData &,
-                            const double, bool precip_flag);
+                            const int, bool);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -191,7 +191,7 @@ void SingleFeature::assign(const SingleFeature & s)
 ////////////////////////////////////////////////////////////////////////
 
 void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
-                        const ShapeData &mask, const double p,
+                        const ShapeData &mask, const int perc,
                         bool precip_flag)
 
 {
@@ -249,12 +249,12 @@ void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
    //
    // Compute the Intensity Percentiles
    //
-   get_percentiles(intensity_ptile, raw, mask, p, precip_flag);
+   get_percentiles(intensity_ptile, raw, mask, perc, precip_flag);
 
    //
    // User Percentile
    //
-   user_ptile = p;
+   user_ptile = (double) perc;
 
    //
    // Convex hull
@@ -575,7 +575,7 @@ ostream & operator<<(ostream & out, const PairFeature & p)
 
 void get_percentiles(DistributionPercentiles &ptile,
                      const ShapeData &raw, const ShapeData &mask,
-                     const double p, const bool precip_flag)
+                     const int perc, const bool precip_flag)
 
 {
    int i, x, y, count, n_values;
@@ -637,7 +637,6 @@ void get_percentiles(DistributionPercentiles &ptile,
    ptile.p50 = percentile(v, n_values, 0.50);
    ptile.p75 = percentile(v, n_values, 0.75);
    ptile.p90 = percentile(v, n_values, 0.90);
-   ptile.pth = percentile(v, n_values, (double) p/100.0);
 
    //
    // Compute the sum
@@ -645,6 +644,19 @@ void get_percentiles(DistributionPercentiles &ptile,
    ptile.sum = 0;
    for(i=0; i<n_values; i++) {
       ptile.sum += v[i];
+   }
+
+   //
+   // User-specified percentile
+   //
+   if(perc == 101) { // mean
+      ptile.pth = ptile.sum / n_values;
+   }
+   else if(perc == 102) { // sum
+      ptile.pth = ptile.sum;
+   }
+   else {
+      ptile.pth = percentile(v, n_values, (double) perc/100.0);
    }
 
    //

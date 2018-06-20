@@ -136,17 +136,21 @@ ModeFuzzyEngine & ModeFuzzyEngine::operator=(const ModeFuzzyEngine & eng) {
 
 void ModeFuzzyEngine::init_from_scratch() {
 
+   grid = (Grid *) 0;
+
    //
    // Reset all fcst and obs processing flags to initial state
    //
    need_fcst_conv       = true;
    need_fcst_thresh     = true;
+   need_fcst_filter     = true;
    need_fcst_split      = true;
    need_fcst_merge      = true;
    need_fcst_clus_split = true;
 
    need_obs_conv        = true;
    need_obs_thresh      = true;
+   need_obs_filter      = true;
    need_obs_split       = true;
    need_obs_merge       = true;
    need_obs_clus_split  = true;
@@ -194,13 +198,23 @@ void ModeFuzzyEngine::clear_features() {
     obs_cluster.clear();
 
     pair_single.clear();
-    pair_cluster.clear();
+   pair_cluster.clear();
 
    n_fcst = 0;
    n_obs  = 0;
    n_clus = 0;
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeFuzzyEngine::set_grid(const Grid *g) {
+
+   grid = g;
+
+   return;
+
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -218,6 +232,7 @@ void ModeFuzzyEngine::clear_colors() {
 
    return;
 }
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -279,6 +294,7 @@ void ModeFuzzyEngine::set_fcst(const ShapeData &fcst_wd) {
 
    need_fcst_conv       = true;
    need_fcst_thresh     = true;
+   need_fcst_filter     = true;
    need_fcst_split      = true;
    need_fcst_merge      = true;
    need_fcst_clus_split = true;
@@ -286,6 +302,7 @@ void ModeFuzzyEngine::set_fcst(const ShapeData &fcst_wd) {
 
    do_fcst_convolution();
    do_fcst_thresholding();
+   do_fcst_filtering();
    do_fcst_splitting();
 
    return;
@@ -299,6 +316,7 @@ void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
 
    need_obs_conv       = true;
    need_obs_thresh     = true;
+   need_obs_filter     = true;
    need_obs_split      = true;
    need_obs_merge      = true;
    need_obs_clus_split = true;
@@ -306,6 +324,7 @@ void ModeFuzzyEngine::set_obs(const ShapeData &obs_wd) {
 
    do_obs_convolution();
    do_obs_thresholding();
+   do_obs_filtering();
    do_obs_splitting();
 
    return;
@@ -323,6 +342,7 @@ void ModeFuzzyEngine::set_fcst_no_conv(const ShapeData &fcst_wd)
 
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
+   need_fcst_filter     = true;
    need_fcst_split      = true;
    need_fcst_merge      = true;
    need_fcst_clus_split = true;
@@ -330,6 +350,7 @@ void ModeFuzzyEngine::set_fcst_no_conv(const ShapeData &fcst_wd)
 
    // do_fcst_convolution();
    do_fcst_thresholding();
+   do_fcst_filtering();
    do_fcst_splitting();
 
    return;
@@ -345,6 +366,7 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
 
    need_obs_conv       = false;
    need_obs_thresh     = true;
+   need_obs_filter     = true;
    need_obs_split      = true;
    need_obs_merge      = true;
    need_obs_clus_split = true;
@@ -352,6 +374,7 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
 
    // do_obs_convolution();
    do_obs_thresholding();
+   do_obs_filtering();
    do_obs_splitting();
 
    return;
@@ -392,6 +415,7 @@ void ModeFuzzyEngine::do_fcst_convolution() {
 
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
+   need_fcst_filter     = true;
    need_fcst_split      = true;
    need_fcst_merge      = true;
    need_fcst_clus_split = true;
@@ -423,6 +447,7 @@ void ModeFuzzyEngine::do_obs_convolution() {
 
    need_obs_conv       = false;
    need_obs_thresh     = true;
+   need_obs_filter     = true;
    need_obs_split      = true;
    need_obs_merge      = true;
    need_obs_clus_split = true;
@@ -454,44 +479,8 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
         << " resulted in " << fcst_mask->n_objects()
         << " simple forecast objects.\n";
 
-   //
-   // Apply the area threshold
-   //
-   if(conf_info.fcst_area_thresh.get_type() != thresh_na) {
-
-      fcst_mask->threshold_area(conf_info.fcst_area_thresh);
-
-      mlog << Debug(3) << "Applying area threshold "
-           << conf_info.fcst_area_thresh.get_str()
-           << " resulted in " <<  fcst_mask->n_objects()
-           << " simple forecast objects.\n";
-   }
-   else {
-      mlog << Debug(3)
-           << "Skipping forecast object area threshold.\n";
-   }
-
-   //
-   // Apply the intensity threshold
-   //
-   if(conf_info.fcst_inten_perc_thresh.get_type() != thresh_na) {
-
-      fcst_mask->threshold_intensity(fcst_raw,
-                                     conf_info.fcst_inten_perc_value,
-                                     conf_info.fcst_inten_perc_thresh);
-
-      mlog << Debug(3) << "Applying intensity percentile threshold P"
-           << conf_info.fcst_inten_perc_value << " "
-           << conf_info.fcst_inten_perc_thresh.get_str()
-           << " resulted in " << fcst_mask->n_objects()
-           << " simple forecast objects.\n";
-   }
-   else {
-      mlog << Debug(3)
-           << "Skipping forecast object intensity percentile threshold.\n";
-   }
-
    need_fcst_thresh     = false;
+   need_fcst_filter     = true;
    need_fcst_split      = true;
    need_fcst_merge      = true;
    need_fcst_clus_split = true;
@@ -523,42 +512,79 @@ void ModeFuzzyEngine::do_obs_thresholding() {
         << " resulted in " << obs_mask->n_objects()
         << " simple observation objects.\n";
 
-   //
-   // Apply the area threshold
-   //
-   if(conf_info.obs_area_thresh.get_type() != thresh_na) {
-      obs_mask->threshold_area(conf_info.obs_area_thresh);
 
-      mlog << Debug(3) << "Applying area threshold "
-           << conf_info.obs_area_thresh.get_str()
+   need_obs_thresh     = false;
+   need_obs_filter     = true;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeFuzzyEngine::do_fcst_filtering() {
+
+   if(need_fcst_thresh) do_fcst_thresholding();
+
+   if(!need_fcst_filter) return;
+
+   //
+   // Apply object attribute filtering logic
+   //
+   if(conf_info.fcst_filter_attr_map.size() > 0) {
+
+      fcst_mask->threshold_attr(conf_info.fcst_filter_attr_map,
+                                fcst_raw, conf_info.fcst_conv_thresh, grid,
+                                conf_info.fcst_info->is_precipitation());
+
+      mlog << Debug(3) << "Applying object attribute filtering"
+           << " resulted in " <<  fcst_mask->n_objects()
+           << " simple forecast objects.\n";
+   }
+   else {
+      mlog << Debug(3)
+           << "No forecast object attribute filtering logic defined.\n";
+   }
+
+   need_fcst_filter     = false;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeFuzzyEngine::do_obs_filtering() {
+
+   if(need_obs_thresh) do_obs_thresholding();
+
+   if(!need_obs_filter) return;
+
+   //
+   // Apply object attribute filtering logic
+   //
+   if(conf_info.obs_filter_attr_map.size() > 0) {
+
+      obs_mask->threshold_attr(conf_info.obs_filter_attr_map,
+                               obs_raw, conf_info.obs_conv_thresh, grid,
+                               conf_info.obs_info->is_precipitation());
+
+      mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  obs_mask->n_objects()
            << " simple observation objects.\n";
    }
    else {
       mlog << Debug(3)
-           << "Skipping observation object area threshold.\n";
+           << "No observation object attribute filtering logic defined.\n";
    }
 
-   //
-   // Apply the intensity threshold
-   //
-   if(conf_info.obs_inten_perc_thresh.get_type() != thresh_na) {
-      obs_mask->threshold_intensity(obs_raw,
-                                    conf_info.obs_inten_perc_value,
-                                    conf_info.obs_inten_perc_thresh);
-
-      mlog << Debug(3) << "Applying intensity percentile threshold P"
-           << conf_info.obs_inten_perc_value << " "
-           << conf_info.obs_inten_perc_thresh.get_str()
-           << " resulted in " << obs_mask->n_objects()
-           << " simple observation objects.\n";
-   }
-   else {
-      mlog << Debug(3)
-           << "Skipping observation object intensity percentile threshold.\n";
-   }
-
-   need_obs_thresh     = false;
+   need_obs_filter     = false;
    need_obs_split      = true;
    need_obs_merge      = true;
    need_obs_clus_split = true;
@@ -571,7 +597,7 @@ void ModeFuzzyEngine::do_obs_thresholding() {
 
 void ModeFuzzyEngine::do_fcst_splitting() {
 
-   if(need_fcst_thresh) do_fcst_thresholding();
+   if(need_fcst_filter) do_fcst_filtering();
 
    if(!need_fcst_split) return;
 
@@ -589,7 +615,7 @@ void ModeFuzzyEngine::do_fcst_splitting() {
 
 void ModeFuzzyEngine::do_obs_splitting() {
 
-   if(need_obs_thresh) do_obs_thresholding();
+   if(need_obs_filter) do_obs_filtering();
 
    if(!need_obs_split) return;
 
@@ -624,7 +650,7 @@ void ModeFuzzyEngine::do_obs_merging() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
-                             const char *merge_config) {
+                                      const char *merge_config) {
 
    if(need_fcst_thresh) do_fcst_thresholding();
 
@@ -652,7 +678,7 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_obs_merging(const char *default_config,
-                            const char *merge_config) {
+                                     const char *merge_config) {
 
    if(need_obs_thresh) do_obs_thresholding();
 
@@ -1233,7 +1259,8 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const char *merge_config)
+void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
+                                           const char *merge_config)
 
 {
 
@@ -1253,6 +1280,11 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
            << "memory allocation error\n\n";
       exit(1);
    }
+
+   //
+   // Store the grid
+   //
+   fcst_engine->grid = grid;
 
    //
    // Specify the configuration for the forecast merging fuzzy engine
@@ -1275,17 +1307,14 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
    //
    // Copy over the forecast threshold values
    //
-   fcst_engine->conf_info.fcst_conv_thresh       = conf_info.fcst_conv_thresh;
-   fcst_engine->conf_info.obs_conv_thresh        = conf_info.fcst_conv_thresh;
+   fcst_engine->conf_info.fcst_conv_thresh     = conf_info.fcst_conv_thresh;
+   fcst_engine->conf_info.obs_conv_thresh      = conf_info.fcst_conv_thresh;
 
-   fcst_engine->conf_info.fcst_area_thresh       = conf_info.fcst_area_thresh;
-   fcst_engine->conf_info.obs_area_thresh        = conf_info.fcst_area_thresh;
+   fcst_engine->conf_info.fcst_filter_attr_map = conf_info.fcst_filter_attr_map;
+   fcst_engine->conf_info.obs_filter_attr_map  = conf_info.fcst_filter_attr_map;
 
-   fcst_engine->conf_info.fcst_inten_perc_thresh = conf_info.fcst_inten_perc_thresh;
-   fcst_engine->conf_info.obs_inten_perc_thresh  = conf_info.fcst_inten_perc_thresh;
-
-   fcst_engine->conf_info.fcst_merge_thresh      = conf_info.fcst_merge_thresh;
-   fcst_engine->conf_info.obs_merge_thresh       = conf_info.fcst_merge_thresh;
+   fcst_engine->conf_info.fcst_merge_thresh    = conf_info.fcst_merge_thresh;
+   fcst_engine->conf_info.obs_merge_thresh     = conf_info.fcst_merge_thresh;
 
    //
    // Copy the previously defined fuzzy engine fields
@@ -1396,7 +1425,7 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config, const cha
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
-                                 const char *merge_config) {
+                                          const char *merge_config) {
    int i, j;
    ShapeData obs_merge_split;
    ConcatString path;
@@ -1413,6 +1442,11 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
            << "memory allocation error\n\n";
       exit(1);
    }
+
+   //
+   // Store the grid
+   //
+   obs_engine->grid = grid;
 
    //
    // Specify the configuration for the observation merging fuzzy engine
@@ -1435,17 +1469,14 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    //
    // Copy over the observation threshold values
    //
-   obs_engine->conf_info.fcst_conv_thresh       = conf_info.obs_conv_thresh;
-   obs_engine->conf_info.obs_conv_thresh        = conf_info.obs_conv_thresh;
+   obs_engine->conf_info.fcst_conv_thresh     = conf_info.obs_conv_thresh;
+   obs_engine->conf_info.obs_conv_thresh      = conf_info.obs_conv_thresh;
 
-   obs_engine->conf_info.fcst_area_thresh       = conf_info.obs_area_thresh;
-   obs_engine->conf_info.obs_area_thresh        = conf_info.obs_area_thresh;
+   obs_engine->conf_info.fcst_filter_attr_map = conf_info.obs_filter_attr_map;
+   obs_engine->conf_info.obs_filter_attr_map  = conf_info.obs_filter_attr_map;
 
-   obs_engine->conf_info.fcst_inten_perc_thresh = conf_info.obs_inten_perc_thresh;
-   obs_engine->conf_info.obs_inten_perc_thresh  = conf_info.obs_inten_perc_thresh;
-
-   obs_engine->conf_info.fcst_merge_thresh      = conf_info.obs_merge_thresh;
-   obs_engine->conf_info.obs_merge_thresh       = conf_info.obs_merge_thresh;
+   obs_engine->conf_info.fcst_merge_thresh    = conf_info.obs_merge_thresh;
+   obs_engine->conf_info.obs_merge_thresh     = conf_info.obs_merge_thresh;
 
    //
    // Copy the previously defined fuzzy engine fields
@@ -2615,11 +2646,9 @@ void write_header_row(ModeFuzzyEngine &eng, AsciiTable &at, const int row)
    //
    // Write out the MODE header columns
    //
-for(i=0; i<n_mode_hdr_columns; i++) {
-
-   at.set_entry(row, i, mode_hdr_columns[i]);
-
-}
+   for(i=0; i<n_mode_hdr_columns; i++) {
+      at.set_entry(row, i, mode_hdr_columns[i]);
+   }
 
    //
    // Write out the MODE objects columns
@@ -2632,8 +2661,16 @@ for(i=0; i<n_mode_hdr_columns; i++) {
    // Over-ride the name of the INTENSITY_USER column
    //
    c = METHdrTable.header(met_version, "MODE", "OBJ")->col_offset("INTENSITY_USER");
-   snprintf(tmp_str, sizeof(tmp_str), "INTENSITY_%d",
-           nint(eng.conf_info.inten_perc_value));
+   if(nint(eng.conf_info.inten_perc_value) == 101) {
+      strcpy(tmp_str, "INTENSITY_MEAN");
+   }
+   else if(nint(eng.conf_info.inten_perc_value) == 102) {
+      strcpy(tmp_str, "INTENSITY_SUM");
+   }
+   else {
+      snprintf(tmp_str, sizeof(tmp_str), "INTENSITY_%d",
+               nint(eng.conf_info.inten_perc_value));
+   }
    at.set_entry(row, c, tmp_str);
 
    return;

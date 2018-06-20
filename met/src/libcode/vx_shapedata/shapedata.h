@@ -28,6 +28,8 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <map>
+
 #include "moments.h"
 #include "vx_util.h"
 #include "polyline.h"
@@ -125,10 +127,20 @@ class ShapeData {
       double  angle_degrees()                           const;
       double  curvature(double &xcurv, double &ycurv)   const;
       double  area()                                    const;
+      double  area_thresh(const ShapeData *,
+                          const SingleThresh &)         const;
       void    calc_length_width(double & l, double & w) const;
       double  length()                                  const;
       double  width()                                   const;
       double  complexity()                              const;
+      double  intensity_percentile(const ShapeData *,
+                                   int perc,
+                                   bool precip_flag)    const;
+      double  get_attr(const ConcatString &,
+                       const ShapeData *,
+                       const SingleThresh &,
+                       const Grid *,
+                       bool precip_flag)                const;
 
          //
          //  object polylines
@@ -153,6 +165,11 @@ class ShapeData {
 
       void threshold(double t);
       void threshold(SingleThresh);
+      void threshold_attr(const map<ConcatString,ThreshArray>&,
+                          const ShapeData *,
+                          const SingleThresh &,
+                          const Grid *,
+                          bool precip_flag);
       void threshold_area(SingleThresh);
       void threshold_intensity(const ShapeData *, int perc, SingleThresh);
 

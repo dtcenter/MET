@@ -98,14 +98,8 @@ void ModeConfInfo::clear()
    fcst_vld_thresh = bad_data_double;
    obs_vld_thresh = bad_data_double;
 
-   fcst_area_thresh.clear();
-   obs_area_thresh.clear();
-
-   fcst_inten_perc_value = bad_data_int;
-   obs_inten_perc_value = bad_data_int;
-
-   fcst_inten_perc_thresh.clear();
-   obs_inten_perc_thresh.clear();
+   fcst_filter_attr_map.clear();
+   obs_filter_attr_map.clear();
 
    fcst_merge_flag = MergeType_None;
    obs_merge_flag = MergeType_None;
@@ -343,20 +337,11 @@ PlotInfo plot_info;
    fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
    obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
 
-      // Conf: fcst.area_thresh and obs.area_thresh
+      // Conf: fcst.filter_attr_name and fcst.filter_attr_thresh
+      //        obs.filter_attr_name and  obs.filter_attr_thresh
 
-   fcst_area_thresh = fcst_dict->lookup_thresh(conf_key_area_thresh);
-   obs_area_thresh  = obs_dict->lookup_thresh(conf_key_area_thresh);
-
-      // Conf: fcst.inten_perc and obs.inten_perc
-
-   fcst_inten_perc_value = fcst_dict->lookup_int(conf_key_inten_perc_value);
-   obs_inten_perc_value  = obs_dict->lookup_int(conf_key_inten_perc_value);
-
-      // Conf: fcst.inten_perc_thresh and obs.inten_perc_thresh
-
-   fcst_inten_perc_thresh = fcst_dict->lookup_thresh(conf_key_inten_perc_thresh);
-   obs_inten_perc_thresh  = obs_dict->lookup_thresh(conf_key_inten_perc_thresh);
+   fcst_filter_attr_map = parse_conf_filter_attr_map(fcst_dict);
+    obs_filter_attr_map = parse_conf_filter_attr_map(obs_dict);
 
       // Conf: fcst.merge_flag and obs.merge_flag
 
@@ -451,12 +436,12 @@ PlotInfo plot_info;
    inten_perc_ratio_wt = dict->lookup_double(conf_key_inten_perc_ratio);
    inten_perc_value    = dict->lookup_int(conf_key_inten_perc_value);
 
-      // Check that intensity_percentile >= 0 and <= 100
+      // Check that intensity_percentile >= 0 and <= 102
 
-   if(inten_perc_value < 0 || inten_perc_value > 100) {
+   if(inten_perc_value < 0 || inten_perc_value > 102) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "inten_perc_value (" << inten_perc_value
-           << ") must be set between 0 and 100.\n\n";
+           << ") must be set between 0 and 102.\n\n";
       exit(1);
    }
 
