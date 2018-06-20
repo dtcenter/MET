@@ -138,11 +138,7 @@ process_command_line(argc, argv);
    // Process the forecast and observation files
    //
 
-//const ModeConfInfo & conf = mode_exec.engine.conf_info;
 ModeConfInfo & conf = mode_exec.engine.conf_info;
-
-
-// mode_exec.process_fcst_obs_files();
 
 mode_exec.setup_fcst_obs_data();
 

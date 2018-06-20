@@ -107,16 +107,16 @@ class ModeConfInfo {
       VarInfo *        fcst_info;              // allocated
       VarInfo *         obs_info;              // allocated
 
-      bool             quilt;                  //  default: false
+      bool             quilt;                  // default: false
 
-      IntArray         fcst_conv_radius_array; // list of convolution radii in grid squares
+      IntArray         fcst_conv_radius_array; // List of convolution radii in grid squares
       IntArray          obs_conv_radius_array;
 
       int              fcst_conv_radius;       // Convolution radius in grid squares
       int               obs_conv_radius;
 
-      ThreshArray      fcst_conv_thresh_array; // list of conv thresholds to use
-      ThreshArray       obs_conv_thresh_array; // list of conv thresholds to use
+      ThreshArray      fcst_conv_thresh_array; // List of conv thresholds to use
+      ThreshArray       obs_conv_thresh_array;
 
       SingleThresh     fcst_conv_thresh;       // Convolution threshold to define objects
       SingleThresh      obs_conv_thresh;
@@ -124,16 +124,10 @@ class ModeConfInfo {
       double           fcst_vld_thresh;        // Minimum ratio of valid data points in the convolution area
       double            obs_vld_thresh;
 
-      SingleThresh     fcst_area_thresh;       // Discard objects whose area doesn't meet threshold
-      SingleThresh      obs_area_thresh;
+      map<ConcatString,ThreshArray> fcst_filter_attr_map; // Discard objects that don't meet these attribute thresholds
+      map<ConcatString,ThreshArray>  obs_filter_attr_map;
 
-      int              fcst_inten_perc_value;  // Intensity percentile of interest
-      int               obs_inten_perc_value;
-
-      SingleThresh     fcst_inten_perc_thresh; // Discard objects whose percentile intensity doesn't meet threshold
-      SingleThresh      obs_inten_perc_thresh;
-
-      ThreshArray      fcst_merge_thresh_array;      // Lower convolution threshold used for double merging method
+      ThreshArray      fcst_merge_thresh_array; // Lower convolution threshold used for double merging method
       ThreshArray       obs_merge_thresh_array;
 
       SingleThresh      fcst_merge_thresh;      // Lower convolution threshold used for double merging method

@@ -1915,17 +1915,24 @@ quilt = false;
 //
 //    - The "vld_thresh" entry is described above.
 //
-//    - The "area_thresh" entry specifies a threshold in grid squares for the
-//      area of MODE objects.  Any objects not meeting this threshold are
-//      discarded.
+//    - The "filter_attr_name" and "filter_attr_thresh" entries are arrays of
+//      the same length which specify object filtering criteria. By default, no
+//      object filtering criteria is defined.
 //
-//    - The "inten_perc_value" entry specifies the intensity percentile value
-//      of interest between 0 and 100.  The percentile set by this entry will
-//      be output in addition to the standard intensity percentiles.
+//      The "filter_attr_name" entry is an array of strings specifying the MODE
+//      output header column names for the object attributes of interest, such
+//      as "AREA", "LENGTH", "WIDTH", and "INTENSITY_50". In addition,
+//      "ASPECT_RATIO" specifies the aspect ratio (width/length),
+//      "INTENSITY_101" specifies the  mean intensity value, and "INTENSITY_102"
+//      specifies the sum of the intensity values.
 //
-//    - The "inten_perc_thresh" entry specifies a threshold for the percentile
-//      intensity of each MODE object.  Any objects not meeting this threshold
-//      are discarded.
+//      The "filter_attr_thresh" entry is an array of thresholds for the
+//      object attributes.  Any simple objects not meeting all of these
+//      filtering criteria are discarded.
+//
+//      Note that the "area_thresh" and "inten_perc_thresh" entries form
+//      earlier versions of MODE are replaced by these options and are now
+//      deprecated.
 //
 //    - The "merge_thresh" entry specifies a lower convolution threshold used
 //      when the double-threshold merging method is applied.  The number of
@@ -1946,16 +1953,15 @@ fcst = {
       level = "A03";
    }
 
-   censor_thresh     = [];
-   censor_val        = [];
-   conv_radius       = 60.0/grid_res; // in grid squares
-   conv_thresh       = >=5.0;
-   vld_thresh        = 0.5;
-   area_thresh       = >=0.0;
-   inten_perc_value  = 100;
-   inten_perc_thresh = >=0.0;
-   merge_thresh      = >=1.25;
-   merge_flag        = THRESH;
+   censor_thresh      = [];
+   censor_val         = [];
+   conv_radius        = 60.0/grid_res; // in grid squares
+   conv_thresh        = >=5.0;
+   vld_thresh         = 0.5;
+   filter_attr_name   = [];
+   filter_attr_thresh = [];
+   merge_thresh       = >=1.25;
+   merge_flag         = THRESH;
 }
 
 //

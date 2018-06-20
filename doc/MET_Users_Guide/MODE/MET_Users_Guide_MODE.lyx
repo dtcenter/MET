@@ -1880,61 +1880,55 @@ fcst = {
 \begin_layout LyX-Code
 
 \series bold
-   censor_thresh     = [];
+   censor_thresh      = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   censor_val        = [];
+   censor_val         = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   conv_radius       = 60.0/grid_res; // in grid squares
+   conv_radius        = 60.0/grid_res; // in grid squares
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   conv_thresh       = >=5.0;
+   conv_thresh        = >=5.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   vld_thresh        = 0.5;
+   vld_thresh         = 0.5;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   area_thresh       = NA;
+   filter_attr_name   = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   inten_perc_value  = 100;
+   filter_attr_thresh = [];
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   inten_perc_thresh = NA;
+   merge_thresh       = >=1.25;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   merge_thresh      = >=1.25;
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   merge_flag        = THRESH;
+   merge_flag         = THRESH;
 \end_layout
 
 \begin_layout LyX-Code
@@ -2074,37 +2068,79 @@ vld_thresh
 \begin_layout Standard
 The 
 \series bold
-area_thresh
+filter_attr_name
 \series default
- entry specifies the area threshold values to be applied to the defined
- objects.
- The area of an object is simply a count of the number of grid squares that
- comprise it.
- A user may, for example, want to only consider objects that meet some minimum
- size criteria.
- By default, all objects are retained since no area threshold is applied.
+ and 
+\series bold
+filter_attr_thresh
+\series default
+ entries are arrays of the same length which specify object filtering criteria.
+ By default, no object filtering criteria is defined.
 \end_layout
 
 \begin_layout Standard
 The 
 \series bold
-inten_perc_value
+filter_attr_name
 \series default
- and 
+ entry is an array of strings specifying the MODE output header column names
+ for the object attributes of interest, such as 
 \series bold
-inten_perc_thresh
+AREA
 \series default
- entries specify the intensity threshold values to be applied to the defined
- objects.
- For each object defined, the intensity values within the object are sorted,
- and the requested intensity percentile value is computed.
- By default, the maximum value is computed since the intensity percentiles
- are set to 100.
- Any objects with an intensity percentile that does not meet the corresponding
- intensity percentile threshold specified will be discarded.
- A user may, for example, want to only consider objects that meet some maximum
- intensity criteria.
- By default, no intensity percentile threshold is applied.
+, 
+\series bold
+LENGTH
+\series default
+, 
+\series bold
+WIDTH
+\series default
+, and 
+\series bold
+INTENSITY_50
+\series default
+.
+ In addition, 
+\series bold
+ASPECT_RATIO
+\series default
+ specifies
+\series bold
+ 
+\series default
+the aspect ratio (width/length), 
+\series bold
+INTENSITY_101
+\series default
+ specifies the mean intensity value, and 
+\series bold
+INTENSITY_102
+\series default
+ specifies the sum of the intensity values.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+filter_attr_thresh
+\series default
+ entry is an array of thresholds for these object attributes.
+ Any simple objects not meeting all of the filtering criteria are discarded.
+\end_layout
+
+\begin_layout Standard
+Note that the 
+\series bold
+area_thresh 
+\series default
+and
+\series bold
+ inten_perc_thresh
+\series default
+ entries from earlier versions of MODE are replaced by these options and
+ are now deprecated.
+ 
 \end_layout
 
 \begin_layout Standard

@@ -69,7 +69,6 @@ static const Color unmatched_color(0, 0, 255);
    // Standard names for raw field parameters
    //
 
-// static const char grid_res_name               [] = "grid_res";
 static const char fcst_grib_code_name         [] = "fcst_grib_code";
 static const char obs_grib_code_name          [] = "obs_grib_code";
 static const char mask_missing_flag_name      [] = "mask_missing_flag";
@@ -176,6 +175,7 @@ class ModeFuzzyEngine {
       void clear_features();
       void clear_colors();
 
+      void set_grid(const Grid *);
       void set(const ShapeData &fcst_wd, const ShapeData &obs_wd);
 
       void set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd);
@@ -193,6 +193,9 @@ class ModeFuzzyEngine {
 
       void do_fcst_thresholding();
       void do_obs_thresholding();
+
+      void do_fcst_filtering();
+      void do_obs_filtering();
 
       void do_fcst_splitting();
       void do_obs_splitting();
@@ -272,6 +275,9 @@ class ModeFuzzyEngine {
       bool need_fcst_thresh;
       bool need_obs_thresh;
 
+      bool need_fcst_filter;
+      bool need_obs_filter;
+
       bool need_fcst_split;
       bool need_obs_split;
 
@@ -282,6 +288,8 @@ class ModeFuzzyEngine {
 
       bool need_fcst_clus_split;
       bool need_obs_clus_split;
+
+      const Grid * grid;             //  not allocated
 
       ShapeData * fcst_raw;          //  allocated
       ShapeData * fcst_thresh;       //  allocated

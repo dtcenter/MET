@@ -226,6 +226,10 @@ void ModeExecutive::setup_fcst_obs_data()
    grid = parse_vx_grid(engine.conf_info.fcst_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
+      // Store the grid
+
+   engine.set_grid(&grid);
+
       // Read the gridded data from the input forecast file
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.fcst_info), Fcst_sd.data)) )  {
