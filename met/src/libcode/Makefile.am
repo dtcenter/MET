@@ -51,4 +51,8 @@ SUBDIRS += vx_data2d_factory \
 	vx_regrid \
 	vx_solar
 
+if ENABLE_PYTHON
+  SUBDIRS += vx_python_utils
+endif
+
 MAINTAINERCLEANFILES 	= Makefile.in
