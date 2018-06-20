@@ -1,4 +1,10 @@
-
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2018
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -10,6 +16,8 @@ using namespace std;
 
 
 #include <iostream>
+
+#include "vx_log.h"
 
 #include "python_numarray.h"
 #include "python_tuple.h"
