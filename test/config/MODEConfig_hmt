@@ -55,14 +55,13 @@ fcst = {
       level = "(*,*)";
    }
 
-   conv_radius       = 2; // in grid squares
-   conv_thresh       = >=5.0;
-   vld_thresh        = 0.5;
-   area_thresh       = >=0.0;
-   inten_perc_value  = 100;
-   inten_perc_thresh = >=0.0;
-   merge_thresh      = >=3.5;
-   merge_flag        = ${MERGE_FLAG};
+   conv_radius        = 2; // in grid squares
+   conv_thresh        = >=5.0;
+   vld_thresh         = 0.5;
+   filter_attr_name   = [];
+   filter_attr_thresh = [];
+   merge_thresh       = >=3.5;
+   merge_flag         = ${MERGE_FLAG};
 }
 obs = fcst;
 obs = {

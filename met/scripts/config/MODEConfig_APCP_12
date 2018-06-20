@@ -56,16 +56,15 @@ fcst = {
       level = "(*,*)";
    }
 
-   censor_thresh     = [];
-   censor_val        = [];
-   conv_radius       = 5;
-   conv_thresh       = >=2.5;
-   vld_thresh        = 0.5;
-   area_thresh       = >=0.0;
-   inten_perc_value  = 100;
-   inten_perc_thresh = >=0.0;
-   merge_thresh      = >=1.25;
-   merge_flag        = THRESH;
+   censor_thresh      = [];
+   censor_val         = [];
+   conv_radius        = 5;
+   conv_thresh        = >=2.5;
+   vld_thresh         = 0.5;
+   filter_attr_name   = [];
+   filter_attr_thresh = [];
+   merge_thresh       = >=1.25;
+   merge_flag         = THRESH;
 }
 obs = fcst;
 
