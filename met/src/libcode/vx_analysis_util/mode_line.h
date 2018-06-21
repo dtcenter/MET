@@ -128,7 +128,7 @@ class ModeLine : public DataLine {
       double       angle_diff                 () const;
 
 
-      double       aspect_ratio_ratio         () const;
+      double       aspect_diff                () const;
       double       area_ratio                 () const;
       int          intersection_area          () const;
       int          union_area                 () const;

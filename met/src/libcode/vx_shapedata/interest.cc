@@ -347,7 +347,7 @@ void PairFeature::clear()
    boundary_dist              = 0.0;
    convex_hull_dist           = 0.0;
    angle_diff                 = 0.0;
-   aspect_ratio_ratio         = 0.0;
+   aspect_diff                = 0.0;
    area_ratio                 = 0.0;
    intersection_area          = 0.0;
    union_area                 = 0.0;
@@ -373,7 +373,7 @@ void PairFeature::assign(const PairFeature &p) {
    boundary_dist              = p.boundary_dist;
    convex_hull_dist           = p.convex_hull_dist;
    angle_diff                 = p.angle_diff;
-   aspect_ratio_ratio         = p.aspect_ratio_ratio;
+   aspect_diff                = p.aspect_diff;
    area_ratio                 = p.area_ratio;
    intersection_area          = p.intersection_area;
    union_area                 = p.union_area;
@@ -447,10 +447,9 @@ void PairFeature::set(const SingleFeature &fcst,
    angle_diff = angle_between(a1, a2);
 
    //
-   // Aspect ratio ratio
+   // Aspect ratio diff
    //
-   aspect_ratio_ratio = min( (Obs->aspect_ratio)/(Fcst->aspect_ratio),
-                             (Fcst->aspect_ratio)/(Obs->aspect_ratio) );
+   aspect_diff = fabs(Fcst->aspect_ratio - Obs->aspect_ratio);
 
    //
    // Area ratio
@@ -575,7 +574,7 @@ ostream & operator<<(ostream & out, const PairFeature & p)
    out << "Boundary Distance                 = " << (p.boundary_dist)              << "\n";
    out << "Convex Hull Distance              = " << (p.convex_hull_dist)           << "\n";
    out << "Angle Difference                  = " << (p.angle_diff)                 << "\n";
-   out << "Aspect Ratio Ratio                = " << (p.aspect_ratio_ratio)         << "\n";
+   out << "Aspect Difference                 = " << (p.aspect_diff)                << "\n";
    out << "Area Ratio                        = " << (p.area_ratio)                 << "\n";
    out << "Intersection Area                 = " << nint(p.intersection_area)      << "\n";
    out << "Union Area                        = " << nint(p.union_area)             << "\n";

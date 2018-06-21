@@ -2324,21 +2324,21 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
 
    ////////////////////////////////////////////////////////////////////
    //
-   // Aspect ratio ratio
+   // Aspect ratio difference
    //
    ////////////////////////////////////////////////////////////////////
 
-   attribute   = p.aspect_ratio_ratio;
-   interest    = (*mc.aspect_ratio_ratio_if)(attribute);
+   attribute   = p.aspect_diff;
+   interest    = (*mc.aspect_diff_if)(attribute);
    confidence  = 1.0;
-   weight      = mc.aspect_ratio_ratio_wt;
+   weight      = mc.aspect_diff_wt;
    term        = weight*interest*confidence;
    sum        += term;
    weight_sum += weight*confidence;
 
    if(out) {
-      (*out) << "Aspect Ratio Ratio:\n"
-             << "-------------------\n"
+      (*out) << "Aspect Ratio Difference:\n"
+             << "------------------------\n"
              << "   Value      = " << attribute  << "\n"
              << "   Interest   = " << interest   << "\n"
              << "   Confidence = " << confidence << "\n"
@@ -3110,8 +3110,8 @@ void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const in
    // Difference in angles in degrees
    at.set_entry(row, c++, eng.pair_single[n].angle_diff);
 
-   // Aspect ratio ratio
-   at.set_entry(row, c++, eng.pair_single[n].aspect_ratio_ratio);
+   // Difference in aspect ratio
+   at.set_entry(row, c++, eng.pair_single[n].aspect_diff);
 
    // Area ratio
    at.set_entry(row, c++, eng.pair_single[n].area_ratio);
@@ -3413,8 +3413,8 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
    // Difference in angles in degrees
    at.set_entry(row, c++, eng.pair_cluster[n].angle_diff);
 
-   // Aspect ratio ratio 
-   at.set_entry(row, c++, eng.pair_cluster[n].aspect_ratio_ratio);
+   // Difference in aspect ratio
+   at.set_entry(row, c++, eng.pair_cluster[n].aspect_diff);
 
    // Area ratio
    at.set_entry(row, c++, eng.pair_cluster[n].area_ratio);

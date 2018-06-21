@@ -152,7 +152,7 @@ class ModeConfInfo {
       double           boundary_dist_wt;
       double           convex_hull_dist_wt;
       double           angle_diff_wt;
-      double           aspect_ratio_ratio_wt;
+      double           aspect_diff_wt;
       double           area_ratio_wt;
       double           int_area_ratio_wt;
       double           curvature_ratio_wt;
@@ -165,7 +165,7 @@ class ModeConfInfo {
       PiecewiseLinear * boundary_dist_if;      // not allocated
       PiecewiseLinear * convex_hull_dist_if;
       PiecewiseLinear * angle_diff_if;
-      PiecewiseLinear * aspect_ratio_ratio_if;
+      PiecewiseLinear * aspect_diff_if;
       PiecewiseLinear * area_ratio_if;
       PiecewiseLinear * int_area_ratio_if;
       PiecewiseLinear * curvature_ratio_if;

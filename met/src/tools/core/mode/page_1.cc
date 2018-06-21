@@ -481,7 +481,7 @@ c = 0;
 
 t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Centroid/Boundary");
 t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Convex Hull/Angle");
-t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Aspect Ratio/Area");
+t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Aspect/Area");
 t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Int Area/Curvature");
 t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Complexity/Intensity");
 t2.write_xy1_to_cell(r++, c, dx, dy, 0.0, 0.0, "Total Interest Thresh");
@@ -515,10 +515,10 @@ t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
 nextline();
 
    //
-   // Aspect Ratio Ratio and Area Ratio Weights
+   // Aspect Ratio Difference and Area Ratio Weights
    //
 
-snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.aspect_ratio_ratio_wt);
+snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.aspect_diff_wt);
 t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
 
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.area_ratio_wt);
@@ -527,7 +527,7 @@ t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
 nextline();
 
    //
-   // Intesection Over Minimum Area Weights and Curvature Ratio Weights 
+   // Intesection Over Minimum Area Weights and Curvature Ratio Weights
    //
 
 snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.int_area_ratio_wt);

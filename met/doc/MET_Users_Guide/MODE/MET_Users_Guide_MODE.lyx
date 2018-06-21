@@ -2568,67 +2568,67 @@ weight = {
 \begin_layout LyX-Code
 
 \series bold
-   centroid_dist      = 2.0;
+   centroid_dist    = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   boundary_dist      = 4.0;
+   boundary_dist    = 4.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   convex_hull_dist   = 0.0;
+   convex_hull_dist = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   angle_diff         = 1.0;
+   angle_diff       = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   aspect_ratio_ratio = 0.0;
+   aspect_diff      = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   area_ratio         = 1.0;
+   area_ratio       = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   int_area_ratio     = 2.0;
+   int_area_ratio   = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   curvature_ratio    = 0.0;
+   curvature_ratio  = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   complexity_ratio   = 0.0;
+   complexity_ratio = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   inten_perc_ratio   = 0.0;
+   inten_perc_ratio = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   inten_perc_value   = 50;
+   inten_perc_value = 50;
 \end_layout
 
 \begin_layout LyX-Code
@@ -2662,11 +2662,19 @@ orientation angle difference
 \series default
 , the 
 \series bold
-object area ratio
+aspect ratio differene
 \series default
 , the 
 \series bold
+object area ratio
+\series default
+ (minimum area divided by maximum area), the 
+\series bold
 intersection divided by the minimum object area ratio
+\series default
+, the 
+\series bold
+curvature ratio
 \series default
 , the 
 \series bold
@@ -2747,6 +2755,12 @@ interest_function = {
 \begin_layout LyX-Code
 
 \series bold
+   aspect_diff        = (...);
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
    corner             = 0.8;
 \end_layout
 
@@ -2754,12 +2768,6 @@ interest_function = {
 
 \series bold
    ratio_if           = ( ( 0.0, 0.0 ) ( corner, 1.0 ) ( 1.0, 1.0 ) );
-\end_layout
-
-\begin_layout LyX-Code
-
-\series bold
-   aspect_ratio_ratio = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
@@ -6504,11 +6512,7 @@ Difference between the axis angles of two objects (in degrees)
 \begin_inset Text
 
 \begin_layout Plain Layout
-ASPECT_RATIO
-\begin_inset Newline newline
-\end_inset
-
-_RATIO
+ASPECT_DIFF
 \end_layout
 
 \end_inset
@@ -6517,8 +6521,8 @@ _RATIO
 \begin_inset Text
 
 \begin_layout Plain Layout
-Ratio of the aspect ratios of two objects defined as the lesser of the two
- divided by the greater of the two (unitless)
+Absolute value of the difference between the aspect ratios of two objects
+ (unitless)
 \end_layout
 
 \end_inset

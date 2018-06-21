@@ -105,17 +105,17 @@ static const char max_centroid_dist_name      [] = "max_centroid_dist";
 //
 // Standard names for fuzzy engine weights
 //
-static const char centroid_dist_weight_name     [] = "centroid_dist_weight";
-static const char boundary_dist_weight_name     [] = "boundary_dist_weight";
-static const char convex_hull_dist_weight_name  [] = "convex_hull_dist_weight";
-static const char angle_diff_weight_name        [] = "angle_diff_weight";
-static const char aspect_ratio_ratio_weight_name[] = "aspect_ratio_ratio_weight";
-static const char area_ratio_weight_name        [] = "area_ratio_weight";
-static const char int_area_ratio_weight_name    [] = "int_area_ratio_weight";
-static const char curvature_ratio_weight_name   [] = "curvature_ratio_weight";
-static const char complexity_ratio_weight_name  [] = "complexity_ratio_weight";
-static const char intensity_percentile_name     [] = "intensity_percentile";
-static const char intensity_ratio_weight_name   [] = "intensity_ratio_weight";
+static const char centroid_dist_weight_name   [] = "centroid_dist_weight";
+static const char boundary_dist_weight_name   [] = "boundary_dist_weight";
+static const char convex_hull_dist_weight_name[] = "convex_hull_dist_weight";
+static const char angle_diff_weight_name      [] = "angle_diff_weight";
+static const char aspect_diff_weight_name     [] = "aspect_diff_weight";
+static const char area_ratio_weight_name      [] = "area_ratio_weight";
+static const char int_area_ratio_weight_name  [] = "int_area_ratio_weight";
+static const char curvature_ratio_weight_name [] = "curvature_ratio_weight";
+static const char complexity_ratio_weight_name[] = "complexity_ratio_weight";
+static const char intensity_percentile_name   [] = "intensity_percentile";
+static const char intensity_ratio_weight_name [] = "intensity_ratio_weight";
 
 //
 // Standard names for interest functions
@@ -124,7 +124,7 @@ static const char centroid_dist_if_name       [] = "centroid_dist_if";
 static const char boundary_dist_if_name       [] = "boundary_dist_if";
 static const char convex_hull_dist_if_name    [] = "convex_hull_dist_if";
 static const char angle_diff_if_name          [] = "angle_diff_if";
-static const char aspect_ratio_ratio_if_name  [] = "aspect_ratio_ratio_if";
+static const char aspect_diff_if_name         [] = "aspect_diff_if";
 static const char ratio_if_name               [] = "ratio_if";
 static const char area_ratio_if_name          [] = "area_ratio_if";
 static const char int_area_ratio_if_name      [] = "int_area_ratio_if";
