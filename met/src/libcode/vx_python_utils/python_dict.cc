@@ -26,6 +26,152 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+int dict_lookup_int(PyObject * dict, const char * key)
+
+{
+
+int k;
+PyObject * a = 0;
+
+a = PyDict_GetItemString(dict, key);
+
+if ( ! a )  {
+
+   cerr << "\n\n  dict_lookup_int(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not found\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ! PyInt_Check(a) )  {
+
+   cerr << "\n\n  dict_lookup_int(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not an integer\n\n";
+
+   exit ( 1 );
+
+}
+
+k = (int) PyInt_AS_LONG(a);
+
+return ( k );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double dict_lookup_double(PyObject * dict, const char * key)
+
+{
+
+double t;
+PyObject * a = 0;
+
+a = PyDict_GetItemString(dict, key);
+
+if ( ! a )  {
+
+   cerr << "\n\n  dict_lookup_double(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not found\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ! PyFloat_Check(a) )  {
+
+   cerr << "\n\n  dict_lookup_double(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not a floating point number\n\n";
+
+   exit ( 1 );
+
+}
+
+t = PyFloat_AS_DOUBLE(a);
+
+return ( t );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString dict_lookup_string(PyObject * dict, const char * key)
+
+{
+
+ConcatString s;
+PyObject * a = 0;
+
+a = PyDict_GetItemString(dict, key);
+
+if ( ! a )  {
+
+   cerr << "\n\n  dict_lookup_string(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not found\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ! PyString_Check(a) )  {
+
+   cerr << "\n\n  dict_lookup_string(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not a character string\n\n";
+
+   exit ( 1 );
+
+}
+
+s = PyString_AS_STRING(a);
+
+return ( s );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PyObject * dict_lookup_dict(PyObject * dict, const char * key)
+
+{
+
+PyObject * a = 0;
+
+a = PyDict_GetItemString(dict, key);
+
+if ( ! a )  {
+
+   cerr << "\n\n  dict_lookup_dict(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not found\n\n";
+
+   exit ( 1 );
+
+}
+
+if ( ! PyDict_Check(a) )  {
+
+   cerr << "\n\n  dict_lookup_dict(PyObject * dict, const char * key) -> value for key \""
+        << key << "\" not a python dictionary\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void dump_dict(PyObject * obj, int depth)
 
 {

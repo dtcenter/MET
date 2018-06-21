@@ -25,6 +25,18 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  convenience functions for looking things up in a python dictionary
+   //
+
+extern  int           dict_lookup_int    (PyObject * dict, const char * key);
+extern  double        dict_lookup_double (PyObject * dict, const char * key);
+extern  ConcatString  dict_lookup_string (PyObject * dict, const char * key);
+extern  PyObject *    dict_lookup_dict   (PyObject * dict, const char * key);
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 extern void dump_dict(PyObject * obj, int depth);
 
