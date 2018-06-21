@@ -69,7 +69,7 @@ static const char * mode_obj_columns [] = {
    "BOUNDARY_DIST",              //  44
    "CONVEX_HULL_DIST",           //  45
    "ANGLE_DIFF",                 //  46
-   "ASPECT_RATIO_RATIO",         //  47
+   "ASPECT_DIFF",                //  47
    "AREA_RATIO",                 //  48
    "INTERSECTION_AREA",          //  49
    "UNION_AREA",                 //  50
@@ -87,15 +87,15 @@ static const int n_mode_pair_columns   = 14; // CENTROID_DIST thru INTEREST
 static const char * mode_cts_columns [] = {
 
    "FIELD",                      //  21
-   "TOTAL",                      //  22 
-   "FY_OY",                      //  23 
+   "TOTAL",                      //  22
+   "FY_OY",                      //  23
    "FY_ON",                      //  24
    "FN_OY",                      //  25
    "FN_ON",                      //  26
    "BASER",                      //  27
    "FMEAN",                      //  28
    "ACC",                        //  29
-   "FBIAS",                      //  30 
+   "FBIAS",                      //  30
    "PODY",                       //  31
    "PODN",                       //  32
    "POFD",                       //  33

@@ -114,30 +114,30 @@ void ModeConfInfo::clear()
    mask_poly_name.clear();
    mask_poly_flag = FieldType_None;
 
-   centroid_dist_wt      = bad_data_double;
-   boundary_dist_wt      = bad_data_double;
-   convex_hull_dist_wt   = bad_data_double;
-   angle_diff_wt         = bad_data_double;
-   aspect_ratio_ratio_wt = bad_data_double;
-   area_ratio_wt         = bad_data_double;
-   int_area_ratio_wt     = bad_data_double;
-   curvature_ratio_wt    = bad_data_double;
-   complexity_ratio_wt   = bad_data_double;
-   inten_perc_ratio_wt   = bad_data_double;
+   centroid_dist_wt    = bad_data_double;
+   boundary_dist_wt    = bad_data_double;
+   convex_hull_dist_wt = bad_data_double;
+   angle_diff_wt       = bad_data_double;
+   aspect_diff_wt      = bad_data_double;
+   area_ratio_wt       = bad_data_double;
+   int_area_ratio_wt   = bad_data_double;
+   curvature_ratio_wt  = bad_data_double;
+   complexity_ratio_wt = bad_data_double;
+   inten_perc_ratio_wt = bad_data_double;
 
 
    inten_perc_value = bad_data_int;
 
-   centroid_dist_if      = (PiecewiseLinear *) 0;
-   boundary_dist_if      = (PiecewiseLinear *) 0;
-   convex_hull_dist_if   = (PiecewiseLinear *) 0;
-   angle_diff_if         = (PiecewiseLinear *) 0;
-   aspect_ratio_ratio_if = (PiecewiseLinear *) 0;
-   area_ratio_if         = (PiecewiseLinear *) 0;
-   int_area_ratio_if     = (PiecewiseLinear *) 0;
-   curvature_ratio_if    = (PiecewiseLinear *) 0;
-   complexity_ratio_if   = (PiecewiseLinear *) 0;
-   inten_perc_ratio_if   = (PiecewiseLinear *) 0;
+   centroid_dist_if    = (PiecewiseLinear *) 0;
+   boundary_dist_if    = (PiecewiseLinear *) 0;
+   convex_hull_dist_if = (PiecewiseLinear *) 0;
+   angle_diff_if       = (PiecewiseLinear *) 0;
+   aspect_diff_if      = (PiecewiseLinear *) 0;
+   area_ratio_if       = (PiecewiseLinear *) 0;
+   int_area_ratio_if   = (PiecewiseLinear *) 0;
+   curvature_ratio_if  = (PiecewiseLinear *) 0;
+   complexity_ratio_if = (PiecewiseLinear *) 0;
+   inten_perc_ratio_if = (PiecewiseLinear *) 0;
 
    total_interest_thresh = bad_data_double;
 
@@ -429,17 +429,17 @@ PlotInfo plot_info;
 
       // Parse the weights
 
-   centroid_dist_wt      = dict->lookup_double(conf_key_centroid_dist);
-   boundary_dist_wt      = dict->lookup_double(conf_key_boundary_dist);
-   convex_hull_dist_wt   = dict->lookup_double(conf_key_convex_hull_dist);
-   angle_diff_wt         = dict->lookup_double(conf_key_angle_diff);
-   aspect_ratio_ratio_wt = dict->lookup_double(conf_key_aspect_ratio_ratio);
-   area_ratio_wt         = dict->lookup_double(conf_key_area_ratio);
-   int_area_ratio_wt     = dict->lookup_double(conf_key_int_area_ratio);
-   curvature_ratio_wt    = dict->lookup_double(conf_key_curvature_ratio);
-   complexity_ratio_wt   = dict->lookup_double(conf_key_complexity_ratio);
-   inten_perc_ratio_wt   = dict->lookup_double(conf_key_inten_perc_ratio);
-   inten_perc_value      = dict->lookup_int(conf_key_inten_perc_value);
+   centroid_dist_wt    = dict->lookup_double(conf_key_centroid_dist);
+   boundary_dist_wt    = dict->lookup_double(conf_key_boundary_dist);
+   convex_hull_dist_wt = dict->lookup_double(conf_key_convex_hull_dist);
+   angle_diff_wt       = dict->lookup_double(conf_key_angle_diff);
+   aspect_diff_wt      = dict->lookup_double(conf_key_aspect_diff);
+   area_ratio_wt       = dict->lookup_double(conf_key_area_ratio);
+   int_area_ratio_wt   = dict->lookup_double(conf_key_int_area_ratio);
+   curvature_ratio_wt  = dict->lookup_double(conf_key_curvature_ratio);
+   complexity_ratio_wt = dict->lookup_double(conf_key_complexity_ratio);
+   inten_perc_ratio_wt = dict->lookup_double(conf_key_inten_perc_ratio);
+   inten_perc_value    = dict->lookup_int(conf_key_inten_perc_value);
 
       // Check that intensity_percentile >= 0 and <= 102
 
@@ -452,11 +452,11 @@ PlotInfo plot_info;
 
       // Check that the fuzzy engine weights are non-negative
 
-   if(centroid_dist_wt      < 0 || boundary_dist_wt    < 0 ||
-      convex_hull_dist_wt   < 0 || angle_diff_wt       < 0 ||
-      aspect_ratio_ratio_wt < 0 || area_ratio_wt       < 0 ||
-      int_area_ratio_wt     < 0 || curvature_ratio_wt  < 0 ||
-      complexity_ratio_wt   < 0 || inten_perc_ratio_wt < 0) { 
+   if(centroid_dist_wt    < 0 || boundary_dist_wt    < 0 ||
+      convex_hull_dist_wt < 0 || angle_diff_wt       < 0 ||
+      aspect_diff_wt      < 0 || area_ratio_wt       < 0 ||
+      int_area_ratio_wt   < 0 || curvature_ratio_wt  < 0 ||
+      complexity_ratio_wt < 0 || inten_perc_ratio_wt < 0) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "All of the fuzzy engine weights must be >= 0.\n\n";
       exit(1);
@@ -465,11 +465,11 @@ PlotInfo plot_info;
       // Check that the sum of the weights is non-zero for matching
 
    if(match_flag != MatchType_None &&
-      is_eq(centroid_dist_wt      + boundary_dist_wt   +
-            convex_hull_dist_wt   + angle_diff_wt      +
-            aspect_ratio_ratio_wt + area_ratio_wt      +
-            int_area_ratio_wt     + curvature_ratio_wt +
-            complexity_ratio_wt   + inten_perc_ratio_wt, 0.0)) {
+      is_eq(centroid_dist_wt    + boundary_dist_wt   +
+            convex_hull_dist_wt + angle_diff_wt      +
+            aspect_diff_wt      + area_ratio_wt      +
+            int_area_ratio_wt   + curvature_ratio_wt +
+            complexity_ratio_wt + inten_perc_ratio_wt, 0.0)) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
            << "When matching is requested, the sum of the fuzzy engine "
            << "weights cannot be 0\n\n";
@@ -482,16 +482,16 @@ PlotInfo plot_info;
 
       // Parse the interest functions
 
-   centroid_dist_if      = dict->lookup_pwl(conf_key_centroid_dist);
-   boundary_dist_if      = dict->lookup_pwl(conf_key_boundary_dist);
-   convex_hull_dist_if   = dict->lookup_pwl(conf_key_convex_hull_dist);
-   angle_diff_if         = dict->lookup_pwl(conf_key_angle_diff);
-   aspect_ratio_ratio_if = dict->lookup_pwl(conf_key_aspect_ratio_ratio);
-   area_ratio_if         = dict->lookup_pwl(conf_key_area_ratio);
-   int_area_ratio_if     = dict->lookup_pwl(conf_key_int_area_ratio);
-   curvature_ratio_if    = dict->lookup_pwl(conf_key_curvature_ratio);
-   complexity_ratio_if   = dict->lookup_pwl(conf_key_complexity_ratio);
-   inten_perc_ratio_if   = dict->lookup_pwl(conf_key_inten_perc_ratio);
+   centroid_dist_if    = dict->lookup_pwl(conf_key_centroid_dist);
+   boundary_dist_if    = dict->lookup_pwl(conf_key_boundary_dist);
+   convex_hull_dist_if = dict->lookup_pwl(conf_key_convex_hull_dist);
+   angle_diff_if       = dict->lookup_pwl(conf_key_angle_diff);
+   aspect_diff_if      = dict->lookup_pwl(conf_key_aspect_diff);
+   area_ratio_if       = dict->lookup_pwl(conf_key_area_ratio);
+   int_area_ratio_if   = dict->lookup_pwl(conf_key_int_area_ratio);
+   curvature_ratio_if  = dict->lookup_pwl(conf_key_curvature_ratio);
+   complexity_ratio_if = dict->lookup_pwl(conf_key_complexity_ratio);
+   inten_perc_ratio_if = dict->lookup_pwl(conf_key_inten_perc_ratio);
 
       // Conf: total_interest_thresh
 

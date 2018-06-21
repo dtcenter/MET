@@ -1478,13 +1478,13 @@ return ( x );
 ////////////////////////////////////////////////////////////////////////
 
 
-double ModeLine::aspect_ratio_ratio() const
+double ModeLine::aspect_diff() const
 
 {
 
 double x;
 
-const char * c = get_item("ASPECT_RATIO_RATIO");
+const char * c = get_item("ASPECT_DIFF");
 
 x = atof(c);
 

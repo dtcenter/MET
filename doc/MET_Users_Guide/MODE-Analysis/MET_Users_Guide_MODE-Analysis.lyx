@@ -1996,13 +1996,13 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
--aspect_ratio_ratio_min value
+-aspect_diff_min value
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
--aspect_ratio_ratio_max value
+-aspect_diff_max value
 \end_layout
 
 \begin_layout Standard

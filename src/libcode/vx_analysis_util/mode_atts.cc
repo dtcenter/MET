@@ -363,11 +363,11 @@ angle_diff_min                      = 0.0;
 angle_diff_max_set                  = 0;
 angle_diff_max                      = 0.0;
 
-aspect_ratio_ratio_min_set          = 0;
-aspect_ratio_ratio_min              = 0.0;
+aspect_diff_min_set                 = 0;
+aspect_diff_min                     = 0.0;
 
-aspect_ratio_ratio_max_set          = 0;
-aspect_ratio_ratio_max              = 0.0;
+aspect_diff_max_set                 = 0;
+aspect_diff_max                     = 0.0;
 
 area_ratio_min_set                  = 0;
 area_ratio_min                      = 0.0;
@@ -673,11 +673,11 @@ angle_diff_min                      = A.angle_diff_min;
 angle_diff_max_set                  = A.angle_diff_max_set;
 angle_diff_max                      = A.angle_diff_max;
 
-aspect_ratio_ratio_min_set          = A.aspect_ratio_ratio_min_set;
-aspect_ratio_ratio_min              = A.aspect_ratio_ratio_min;
+aspect_diff_min_set                 = A.aspect_diff_min_set;
+aspect_diff_min                     = A.aspect_diff_min;
 
-aspect_ratio_ratio_max_set          = A.aspect_ratio_ratio_max_set;
-aspect_ratio_ratio_max              = A.aspect_ratio_ratio_max;
+aspect_diff_max_set                 = A.aspect_diff_max_set;
+aspect_diff_max                     = A.aspect_diff_max;
 
 area_ratio_min_set                  = A.area_ratio_min_set;
 area_ratio_min                      = A.area_ratio_min;
@@ -1262,8 +1262,8 @@ if ( convex_hull_dist_max_set )  out << prefix << "convex_hull_dist_max = " << c
 if ( angle_diff_min_set )  out << prefix << "angle_diff_min = " << angle_diff_min << "\n";
 if ( angle_diff_max_set )  out << prefix << "angle_diff_max = " << angle_diff_max << "\n";
 
-if ( aspect_ratio_ratio_min_set )  out << prefix << "aspect_ratio_ratio_min = " << aspect_ratio_ratio_min << "\n";
-if ( aspect_ratio_ratio_max_set )  out << prefix << "aspect_ratio_ratio_max = " << aspect_ratio_ratio_max << "\n";
+if ( aspect_diff_min_set )  out << prefix << "aspect_diff_min = " << aspect_diff_min << "\n";
+if ( aspect_diff_max_set )  out << prefix << "aspect_diff_max = " << aspect_diff_max << "\n";
 
 if ( area_ratio_min_set )  out << prefix << "area_ratio_min = " << area_ratio_min << "\n";
 if ( area_ratio_max_set )  out << prefix << "area_ratio_max = " << area_ratio_max << "\n";
@@ -1779,13 +1779,13 @@ if ( angle_diff_min_set || angle_diff_max_set )  {
 
 }
 
-if ( aspect_ratio_ratio_min_set || aspect_ratio_ratio_max_set )  {
+if ( aspect_diff_min_set || aspect_diff_max_set )  {
 
-   x = L.aspect_ratio_ratio();
+   x = L.aspect_diff();
 
-   if ( !is_bad_data( x ) && aspect_ratio_ratio_min_set && (x < aspect_ratio_ratio_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && aspect_diff_min_set && (x < aspect_diff_min) )   return ( 0 );
 
-   if ( !is_bad_data( x ) && aspect_ratio_ratio_max_set && (x > aspect_ratio_ratio_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && aspect_diff_max_set && (x > aspect_diff_max) )   return ( 0 );
 
 }
 
@@ -1996,8 +1996,8 @@ while ( j < (a.n_elements()) )  {
    else if ( strcmp(c, "-convex_hull_dist_max"          ) == 0 )  { set_convex_hull_dist_max          (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-angle_diff_min"                ) == 0 )  { set_angle_diff_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-angle_diff_max"                ) == 0 )  { set_angle_diff_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-aspect_ratio_ratio_min"        ) == 0 )  { set_aspect_ratio_ratio_min        (atof(a[j + 1]));  a.shift_down(j, 2); }
-   else if ( strcmp(c, "-aspect_ratio_ratio_max"        ) == 0 )  { set_aspect_ratio_ratio_max        (atof(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_diff_min"               ) == 0 )  { set_aspect_diff_min               (atof(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_diff_max"               ) == 0 )  { set_aspect_diff_max               (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-area_ratio_min"                ) == 0 )  { set_area_ratio_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-area_ratio_max"                ) == 0 )  { set_area_ratio_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-intersection_over_area_min"    ) == 0 )  { set_intersection_over_area_min    (atof(a[j + 1]));  a.shift_down(j, 2); }
@@ -2323,8 +2323,8 @@ if ( m.convex_hull_dist_max_set )            set_convex_hull_dist_max(m.convex_h
 if ( m.angle_diff_min_set )                  set_angle_diff_min(m.angle_diff_min);
 if ( m.angle_diff_max_set )                  set_angle_diff_max(m.angle_diff_max);
 
-if ( m.aspect_ratio_ratio_min_set )          set_aspect_ratio_ratio_min(m.aspect_ratio_ratio_min);
-if ( m.aspect_ratio_ratio_max_set )          set_aspect_ratio_ratio_max(m.aspect_ratio_ratio_max);
+if ( m.aspect_diff_min_set )                 set_aspect_diff_min(m.aspect_diff_min);
+if ( m.aspect_diff_max_set )                 set_aspect_diff_max(m.aspect_diff_max);
 
 if ( m.area_ratio_min_set )                  set_area_ratio_min(m.area_ratio_min);
 if ( m.area_ratio_max_set )                  set_area_ratio_max(m.area_ratio_max);
@@ -3648,13 +3648,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeAttributes::set_aspect_ratio_ratio_min(double x)
+void ModeAttributes::set_aspect_diff_min(double x)
 
 {
 
-aspect_ratio_ratio_min_set = 1;
+aspect_diff_min_set = 1;
 
-aspect_ratio_ratio_min = x;
+aspect_diff_min = x;
 
 return;
 
@@ -3664,13 +3664,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeAttributes::set_aspect_ratio_ratio_max(double x)
+void ModeAttributes::set_aspect_diff_max(double x)
 
 {
 
-aspect_ratio_ratio_max_set = 1;
+aspect_diff_max_set = 1;
 
-aspect_ratio_ratio_max = x;
+aspect_diff_max = x;
 
 return;
 
@@ -4163,8 +4163,8 @@ s << "   -convex_hull_dist_min           value\n";
 s << "   -convex_hull_dist_max           value\n\n";
 s << "   -angle_diff_min                 value\n";
 s << "   -angle_diff_max                 value\n\n";
-s << "   -aspect_ratio_ratio_min         value\n";
-s << "   -aspect_ratio_ratio_max         value\n\n";
+s << "   -aspect_diff_min                value\n";
+s << "   -aspect_diff_max                value\n\n";
 s << "   -area_ratio_min                 value\n";
 s << "   -area_ratio_max                 value\n\n";
 s << "   -intersection_over_area_min     value\n";
