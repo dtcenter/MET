@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \use_default_options true
 \maintain_unincluded_children false
@@ -9,16 +11,16 @@
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -182,7 +184,7 @@ mode_analysis
 mode_analysis usage
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:mode_analysis-usage"
+name "subsec:mode_analysis-usage"
 
 \end_inset
 
@@ -418,7 +420,7 @@ Specifying
  The column names are the same as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MODE-output"
+reference "subsec:MODE-output"
 
 \end_inset
 
@@ -499,7 +501,7 @@ This option gives the name of a configuration file to be read.
  The contents of the configuration file are described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:mode_analysis-configuration-file"
+reference "subsec:mode_analysis-configuration-file"
 
 \end_inset
 
@@ -1400,7 +1402,7 @@ Setting limits on various floating-point attributes.
  Please refer to Chapter 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MODE-output"
+reference "subsec:MODE-output"
 
 \end_inset
 
@@ -1994,6 +1996,32 @@ height "1pt"
 \begin_layout LyX-Code
 
 \series bold
+-aspect_ratio_ratio_min value
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+-aspect_ratio_ratio_max value
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
 -area_ratio_min value
 \end_layout
 
@@ -2027,6 +2055,32 @@ height "1pt"
 
 \series bold
 -intersection_over_area_max value
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0.5ex"
+width "100col%"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+-curvature_ratio_min value
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+-curvature_ratio_max value
 \end_layout
 
 \begin_layout Standard
@@ -2203,7 +2257,7 @@ mode_analysis
  configuration file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:mode_analysis-configuration-file"
+name "subsec:mode_analysis-configuration-file"
 
 \end_inset
 
@@ -2221,7 +2275,7 @@ the MODE-Analysis tools are the same as the MODE command line options described
  in Section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:mode_analysis-usage"
+reference "subsec:mode_analysis-usage"
 
 \end_inset
 
@@ -2248,7 +2302,7 @@ mode_analysis
  output
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:mode-Analysis-tool-output"
+name "subsec:mode-Analysis-tool-output"
 
 \end_inset
 

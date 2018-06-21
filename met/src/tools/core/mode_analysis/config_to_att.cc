@@ -340,6 +340,12 @@ if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_angle_diff_min, error_ou
 if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_angle_diff_max, error_out)) )
    atts.set_angle_diff_max(v_dbl);
 
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_aspect_ratio_ratio_min, error_out)) )
+   atts.set_aspect_ratio_ratio_min(v_dbl);
+
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_aspect_ratio_ratio_max, error_out)) )
+   atts.set_aspect_ratio_ratio_max(v_dbl);
+
 if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_area_ratio_min, error_out)) )
    atts.set_area_ratio_min(v_dbl);
 
@@ -351,6 +357,12 @@ if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intersection_over_area_m
 
 if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_intersection_over_area_max, error_out)) )
    atts.set_intersection_over_area_max(v_dbl);
+
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_ratio_min, error_out)) )
+   atts.set_curvature_ratio_min(v_dbl);
+
+if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_curvature_ratio_max, error_out)) )
+   atts.set_curvature_ratio_max(v_dbl);
 
 if ( !is_bad_data(v_dbl = config.lookup_double(conf_key_complexity_ratio_min, error_out)) )
    atts.set_complexity_ratio_min(v_dbl);

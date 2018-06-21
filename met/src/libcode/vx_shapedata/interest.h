@@ -120,11 +120,13 @@ class PairFeature {
       double boundary_dist;
       double convex_hull_dist;
       double angle_diff;
+      double aspect_ratio_ratio;
       double area_ratio;
       double intersection_area;
       double union_area;
       double symmetric_diff;
       double intersection_over_area;
+      double curvature_ratio;
       double complexity_ratio;
       double percentile_intensity_ratio;
 };

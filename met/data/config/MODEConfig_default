@@ -105,15 +105,17 @@ mask = {
 // Fuzzy engine weights
 //
 weight = {
-   centroid_dist    = 2.0;
-   boundary_dist    = 4.0;
-   convex_hull_dist = 0.0;
-   angle_diff       = 1.0;
-   area_ratio       = 1.0;
-   int_area_ratio   = 2.0;
-   complexity_ratio = 0.0;
-   inten_perc_ratio = 0.0;
-   inten_perc_value = 50;
+   centroid_dist      = 2.0;
+   boundary_dist      = 4.0;
+   convex_hull_dist   = 0.0;
+   angle_diff         = 1.0;
+   aspect_ratio_ratio = 0.0;
+   area_ratio         = 1.0;
+   int_area_ratio     = 2.0;
+   curvature_ratio    = 0.0;
+   complexity_ratio   = 0.0;
+   inten_perc_ratio   = 0.0;
+   inten_perc_value   = 50;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,6 +154,8 @@ interest_function = {
       (    1.0, 1.0 )
    );
 
+   aspect_ratio_ratio = ratio_if;
+
    area_ratio = ratio_if;
 
    int_area_ratio = (
@@ -160,6 +164,8 @@ interest_function = {
       ( 0.25, 1.00 )
       ( 1.00, 1.00 )
    );
+
+   curvature_ratio = ratio_if;
 
    complexity_ratio = ratio_if;
 

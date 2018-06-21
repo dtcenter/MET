@@ -363,6 +363,12 @@ angle_diff_min                      = 0.0;
 angle_diff_max_set                  = 0;
 angle_diff_max                      = 0.0;
 
+aspect_ratio_ratio_min_set          = 0;
+aspect_ratio_ratio_min              = 0.0;
+
+aspect_ratio_ratio_max_set          = 0;
+aspect_ratio_ratio_max              = 0.0;
+
 area_ratio_min_set                  = 0;
 area_ratio_min                      = 0.0;
 
@@ -374,6 +380,12 @@ intersection_over_area_min          = 0.0;
 
 intersection_over_area_max_set      = 0;
 intersection_over_area_max          = 0.0;
+
+curvature_ratio_min_set             = 0;
+curvature_ratio_min                 = 0.0;
+
+curvature_ratio_max_set             = 0;
+curvature_ratio_max                 = 0.0;
 
 complexity_ratio_min_set            = 0;
 complexity_ratio_min                = 0.0;
@@ -661,6 +673,12 @@ angle_diff_min                      = A.angle_diff_min;
 angle_diff_max_set                  = A.angle_diff_max_set;
 angle_diff_max                      = A.angle_diff_max;
 
+aspect_ratio_ratio_min_set          = A.aspect_ratio_ratio_min_set;
+aspect_ratio_ratio_min              = A.aspect_ratio_ratio_min;
+
+aspect_ratio_ratio_max_set          = A.aspect_ratio_ratio_max_set;
+aspect_ratio_ratio_max              = A.aspect_ratio_ratio_max;
+
 area_ratio_min_set                  = A.area_ratio_min_set;
 area_ratio_min                      = A.area_ratio_min;
 
@@ -672,6 +690,12 @@ intersection_over_area_min          = A.intersection_over_area_min;
 
 intersection_over_area_max_set      = A.intersection_over_area_max_set;
 intersection_over_area_max          = A.intersection_over_area_max;
+
+curvature_ratio_min_set             = A.curvature_ratio_min_set;
+curvature_ratio_min                 = A.curvature_ratio_min;
+
+curvature_ratio_max_set             = A.curvature_ratio_max_set;
+curvature_ratio_max                 = A.curvature_ratio_max;
 
 complexity_ratio_min_set            = A.complexity_ratio_min_set;
 complexity_ratio_min                = A.complexity_ratio_min;
@@ -1238,11 +1262,17 @@ if ( convex_hull_dist_max_set )  out << prefix << "convex_hull_dist_max = " << c
 if ( angle_diff_min_set )  out << prefix << "angle_diff_min = " << angle_diff_min << "\n";
 if ( angle_diff_max_set )  out << prefix << "angle_diff_max = " << angle_diff_max << "\n";
 
+if ( aspect_ratio_ratio_min_set )  out << prefix << "aspect_ratio_ratio_min = " << aspect_ratio_ratio_min << "\n";
+if ( aspect_ratio_ratio_max_set )  out << prefix << "aspect_ratio_ratio_max = " << aspect_ratio_ratio_max << "\n";
+
 if ( area_ratio_min_set )  out << prefix << "area_ratio_min = " << area_ratio_min << "\n";
 if ( area_ratio_max_set )  out << prefix << "area_ratio_max = " << area_ratio_max << "\n";
 
 if ( intersection_over_area_min_set )  out << prefix << "intersection_over_area_min = " << intersection_over_area_min << "\n";
 if ( intersection_over_area_max_set )  out << prefix << "intersection_over_area_max = " << intersection_over_area_max << "\n";
+
+if ( curvature_ratio_min_set )  out << prefix << "curvature_ratio_min = " << curvature_ratio_min << "\n";
+if ( curvature_ratio_max_set )  out << prefix << "curvature_ratio_max = " << curvature_ratio_max << "\n";
 
 if ( complexity_ratio_min_set )  out << prefix << "complexity_ratio_min = " << complexity_ratio_min << "\n";
 if ( complexity_ratio_max_set )  out << prefix << "complexity_ratio_max = " << complexity_ratio_max << "\n";
@@ -1749,6 +1779,16 @@ if ( angle_diff_min_set || angle_diff_max_set )  {
 
 }
 
+if ( aspect_ratio_ratio_min_set || aspect_ratio_ratio_max_set )  {
+
+   x = L.aspect_ratio_ratio();
+
+   if ( !is_bad_data( x ) && aspect_ratio_ratio_min_set && (x < aspect_ratio_ratio_min) )   return ( 0 );
+
+   if ( !is_bad_data( x ) && aspect_ratio_ratio_max_set && (x > aspect_ratio_ratio_max) )   return ( 0 );
+
+}
+
 if ( area_ratio_min_set || area_ratio_max_set )  {
 
    x = L.area_ratio();
@@ -1766,6 +1806,16 @@ if ( intersection_over_area_min_set || intersection_over_area_max_set )  {
    if ( !is_bad_data( x ) && intersection_over_area_min_set && (x < intersection_over_area_min) )   return ( 0 );
 
    if ( !is_bad_data( x ) && intersection_over_area_max_set && (x > intersection_over_area_max) )   return ( 0 );
+
+}
+
+if ( curvature_ratio_min_set || curvature_ratio_max_set )  {
+
+   x = L.curvature_ratio();
+
+   if ( !is_bad_data( x ) && curvature_ratio_min_set && (x < curvature_ratio_min) )   return ( 0 );
+
+   if ( !is_bad_data( x ) && curvature_ratio_max_set && (x > curvature_ratio_max) )   return ( 0 );
 
 }
 
@@ -1946,10 +1996,14 @@ while ( j < (a.n_elements()) )  {
    else if ( strcmp(c, "-convex_hull_dist_max"          ) == 0 )  { set_convex_hull_dist_max          (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-angle_diff_min"                ) == 0 )  { set_angle_diff_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-angle_diff_max"                ) == 0 )  { set_angle_diff_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_ratio_ratio_min"        ) == 0 )  { set_aspect_ratio_ratio_min        (atof(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-aspect_ratio_ratio_max"        ) == 0 )  { set_aspect_ratio_ratio_max        (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-area_ratio_min"                ) == 0 )  { set_area_ratio_min                (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-area_ratio_max"                ) == 0 )  { set_area_ratio_max                (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-intersection_over_area_min"    ) == 0 )  { set_intersection_over_area_min    (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-intersection_over_area_max"    ) == 0 )  { set_intersection_over_area_max    (atof(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_ratio_min"           ) == 0 )  { set_curvature_ratio_min           (atof(a[j + 1]));  a.shift_down(j, 2); }
+   else if ( strcmp(c, "-curvature_ratio_max"           ) == 0 )  { set_curvature_ratio_max           (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-complexity_ratio_min"          ) == 0 )  { set_complexity_ratio_min          (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-complexity_ratio_max"          ) == 0 )  { set_complexity_ratio_max          (atof(a[j + 1]));  a.shift_down(j, 2); }
    else if ( strcmp(c, "-percentile_intensity_ratio_min") == 0 )  { set_percentile_intensity_ratio_min(atof(a[j + 1]));  a.shift_down(j, 2); }
@@ -2269,11 +2323,17 @@ if ( m.convex_hull_dist_max_set )            set_convex_hull_dist_max(m.convex_h
 if ( m.angle_diff_min_set )                  set_angle_diff_min(m.angle_diff_min);
 if ( m.angle_diff_max_set )                  set_angle_diff_max(m.angle_diff_max);
 
+if ( m.aspect_ratio_ratio_min_set )          set_aspect_ratio_ratio_min(m.aspect_ratio_ratio_min);
+if ( m.aspect_ratio_ratio_max_set )          set_aspect_ratio_ratio_max(m.aspect_ratio_ratio_max);
+
 if ( m.area_ratio_min_set )                  set_area_ratio_min(m.area_ratio_min);
 if ( m.area_ratio_max_set )                  set_area_ratio_max(m.area_ratio_max);
 
 if ( m.intersection_over_area_min_set )      set_intersection_over_area_min(m.intersection_over_area_min);
 if ( m.intersection_over_area_max_set )      set_intersection_over_area_max(m.intersection_over_area_max);
+
+if ( m.curvature_ratio_min_set )             set_curvature_ratio_min(m.curvature_ratio_min);
+if ( m.curvature_ratio_max_set )             set_curvature_ratio_max(m.curvature_ratio_max);
 
 if ( m.complexity_ratio_min_set )            set_complexity_ratio_min(m.complexity_ratio_min);
 if ( m.complexity_ratio_max_set )            set_complexity_ratio_max(m.complexity_ratio_max);
@@ -3588,6 +3648,38 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ModeAttributes::set_aspect_ratio_ratio_min(double x)
+
+{
+
+aspect_ratio_ratio_min_set = 1;
+
+aspect_ratio_ratio_min = x;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeAttributes::set_aspect_ratio_ratio_max(double x)
+
+{
+
+aspect_ratio_ratio_max_set = 1;
+
+aspect_ratio_ratio_max = x;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ModeAttributes::set_area_ratio_min(double x)
 
 {
@@ -3647,6 +3739,39 @@ intersection_over_area_max = x;
 return;
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeAttributes::set_curvature_ratio_min(double x)
+
+{
+
+curvature_ratio_min_set = 1;
+
+curvature_ratio_min = x;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeAttributes::set_curvature_ratio_max(double x)
+
+{
+
+curvature_ratio_max_set = 1;
+
+curvature_ratio_max = x;
+
+return;
+
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -4038,10 +4163,14 @@ s << "   -convex_hull_dist_min           value\n";
 s << "   -convex_hull_dist_max           value\n\n";
 s << "   -angle_diff_min                 value\n";
 s << "   -angle_diff_max                 value\n\n";
+s << "   -aspect_ratio_ratio_min         value\n";
+s << "   -aspect_ratio_ratio_max         value\n\n";
 s << "   -area_ratio_min                 value\n";
 s << "   -area_ratio_max                 value\n\n";
 s << "   -intersection_over_area_min     value\n";
 s << "   -intersection_over_area_max     value\n\n";
+s << "   -curvature_ratio_min            value\n";
+s << "   -curvature_ratio_max            value\n\n";
 s << "   -complexity_ratio_min           value\n";
 s << "   -complexity_ratio_max           value\n\n";
 s << "   -percentile_intensity_ratio_min value\n";

@@ -2568,55 +2568,67 @@ weight = {
 \begin_layout LyX-Code
 
 \series bold
-   centroid_dist    = 2.0;
+   centroid_dist      = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   boundary_dist    = 4.0;
+   boundary_dist      = 4.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   convex_hull_dist = 0.0;
+   convex_hull_dist   = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   angle_diff       = 1.0;
+   angle_diff         = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   area_ratio       = 1.0;
+   aspect_ratio_ratio = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   int_area_ratio   = 2.0;
+   area_ratio         = 1.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   complexity_ratio = 0.0;
+   int_area_ratio     = 2.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   inten_perc_ratio = 0.0;
+   curvature_ratio    = 0.0;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   inten_perc_value = 50;
+   complexity_ratio   = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   inten_perc_ratio   = 0.0;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   inten_perc_value   = 50;
 \end_layout
 
 \begin_layout LyX-Code
@@ -2684,8 +2696,9 @@ inten_perc_ratio
 \series bold
 inten_perc_value
 \series default
- should be set between 0 and 100 to define which percentile of intensity
+ should be set between 0 and 102 to define which percentile of intensity
  should be compared for pairs of objects.
+ 101 and 102 specify the intensity mean and sum, respectively.
  By default, the 50th percentile, or median value, is chosen.
 \end_layout
 
@@ -2710,61 +2723,73 @@ interest_function = {
 \begin_layout LyX-Code
 
 \series bold
-   centroid_dist    = (...);
+   centroid_dist      = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   boundary_dist    = (...);
+   boundary_dist      = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   convex_hull_dist = (...);
+   convex_hull_dist   = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   angle_diff       = (...);
+   angle_diff         = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   corner           = 0.8;
+   corner             = 0.8;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   ratio_if         = ( ( 0.0, 0.0 ) ( corner, 1.0 ) ( 1.0, 1.0 ) );
+   ratio_if           = ( ( 0.0, 0.0 ) ( corner, 1.0 ) ( 1.0, 1.0 ) );
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   area_ratio       = ratio_if;
+   aspect_ratio_ratio = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   int_area_ratio   = (...);
+   area_ratio         = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   complexity_ratio = ratio_if;
+   int_area_ratio     = (...);
 \end_layout
 
 \begin_layout LyX-Code
 
 \series bold
-   inten_perc_ratio = ratio_if;
+   curvature_ratio    = ratio_if;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   complexity_ratio   = ratio_if;
+\end_layout
+
+\begin_layout LyX-Code
+
+\series bold
+   inten_perc_ratio   = ratio_if;
 \end_layout
 
 \begin_layout LyX-Code
@@ -6245,7 +6270,7 @@ name "MODE_object_attribute_output_part_2"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="15" columns="3">
+<lyxtabular version="3" rows="17" columns="3">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0.75in">
 <column alignment="left" valignment="top" width="1.5in">
@@ -6466,11 +6491,45 @@ Difference between the axis angles of two objects (in degrees)
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 47
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ASPECT_RATIO
+\begin_inset Newline newline
+\end_inset
+
+_RATIO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of the aspect ratios of two objects defined as the lesser of the two
+ divided by the greater of the two (unitless)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+48
 \end_layout
 
 \end_inset
@@ -6488,8 +6547,8 @@ AREA_RATIO
 \begin_inset Text
 
 \begin_layout Plain Layout
-Ratio of the areas of two objects defined as the lesser of the forecast
- area divided by the observation area or its reciprocal (unitless)
+Ratio of the areas of two objects defined as the lesser of the two divided
+ by the greater of the two (unitless)
 \end_layout
 
 \end_inset
@@ -6500,7 +6559,7 @@ Ratio of the areas of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-48
+49
 \end_layout
 
 \end_inset
@@ -6533,7 +6592,7 @@ Intersection area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-49
+50
 \end_layout
 
 \end_inset
@@ -6562,7 +6621,7 @@ Union area of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-50
+51
 \end_layout
 
 \end_inset
@@ -6591,7 +6650,7 @@ Symmetric difference of two objects (in grid squares)
 \begin_inset Text
 
 \begin_layout Plain Layout
-51
+52
 \end_layout
 
 \end_inset
@@ -6621,11 +6680,45 @@ Ratio of intersection area to the lesser of the forecast and observation
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+53
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CURVATURE
+\begin_inset Newline newline
+\end_inset
+
+_RATIO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ratio of the curvature of two objects defined as the lesser of the two divided
+ by the greater of the two (unitless)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-52
+54
 \end_layout
 
 \end_inset
@@ -6659,7 +6752,7 @@ Ratio of complexities of two objects defined as the lesser of the forecast
 \begin_inset Text
 
 \begin_layout Plain Layout
-53
+55
 \end_layout
 
 \end_inset
@@ -6698,7 +6791,7 @@ Ratio of the nth percentile (column 37) of intensity of the two objects
 \begin_inset Text
 
 \begin_layout Plain Layout
-54
+56
 \end_layout
 
 \end_inset
