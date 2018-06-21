@@ -2284,7 +2284,7 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
 
    if(out) {
       (*out) << "Convex Hull Distance:\n"
-             << "------------------\n"
+             << "---------------------\n"
              << "   Value      = " << attribute  << "\n"
              << "   Interest   = " << interest   << "\n"
              << "   Confidence = " << confidence << "\n"
@@ -2314,6 +2314,31 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    if(out) {
       (*out) << "Angle Difference:\n"
              << "-----------------\n"
+             << "   Value      = " << attribute  << "\n"
+             << "   Interest   = " << interest   << "\n"
+             << "   Confidence = " << confidence << "\n"
+             << "   Weight     = " << weight     << "\n"
+             << "   Term       = " << term       << "\n"
+             << "\n";
+   }
+
+   ////////////////////////////////////////////////////////////////////
+   //
+   // Aspect ratio ratio
+   //
+   ////////////////////////////////////////////////////////////////////
+
+   attribute   = p.aspect_ratio_ratio;
+   interest    = (*mc.aspect_ratio_ratio_if)(attribute);
+   confidence  = 1.0;
+   weight      = mc.aspect_ratio_ratio_wt;
+   term        = weight*interest*confidence;
+   sum        += term;
+   weight_sum += weight*confidence;
+
+   if(out) {
+      (*out) << "Aspect Ratio Ratio:\n"
+             << "-------------------\n"
              << "   Value      = " << attribute  << "\n"
              << "   Interest   = " << interest   << "\n"
              << "   Confidence = " << confidence << "\n"
@@ -2363,6 +2388,31 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
 
    if(out) {
       (*out) << "Intersection/Area Ratio:\n"
+             << "------------------------\n"
+             << "   Value      = " << attribute  << "\n"
+             << "   Interest   = " << interest   << "\n"
+             << "   Confidence = " << confidence << "\n"
+             << "   Weight     = " << weight     << "\n"
+             << "   Term       = " << term       << "\n"
+             << "\n";
+   }
+
+   ////////////////////////////////////////////////////////////////////
+   //
+   // Curvature ratio
+   //
+   ////////////////////////////////////////////////////////////////////
+
+   attribute   = p.curvature_ratio;
+   interest    = (*mc.curvature_ratio_if)(attribute);
+   confidence  = 1.0;
+   weight      = mc.curvature_ratio_wt;
+   term        = weight*interest*confidence;
+   sum        += term;
+   weight_sum += weight*confidence;
+
+   if(out) {
+      (*out) << "Curvature Ratio:\n"
              << "----------------\n"
              << "   Value      = " << attribute  << "\n"
              << "   Interest   = " << interest   << "\n"
@@ -2388,7 +2438,7 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
 
    if(out) {
       (*out) << "Complexity Ratio:\n"
-             << "-----------------------\n"
+             << "-----------------\n"
              << "   Value      = " << attribute  << "\n"
              << "   Interest   = " << interest   << "\n"
              << "   Confidence = " << confidence << "\n"
@@ -2414,7 +2464,7 @@ double total_interest_print(ModeConfInfo &mc, int dist_flag,
    if(out) {
       (*out) << "Percentile (" << mc.inten_perc_value
              << "th) Intensity Ratio:\n"
-             << "-----------------------\n"
+             << "--------------------\n"
              << "   Value      = " << attribute  << "\n"
              << "   Interest   = " << interest   << "\n"
              << "   Confidence = " << confidence << "\n"
@@ -3060,6 +3110,9 @@ void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const in
    // Difference in angles in degrees
    at.set_entry(row, c++, eng.pair_single[n].angle_diff);
 
+   // Aspect ratio ratio
+   at.set_entry(row, c++, eng.pair_single[n].aspect_ratio_ratio);
+
    // Area ratio
    at.set_entry(row, c++, eng.pair_single[n].area_ratio);
 
@@ -3078,6 +3131,10 @@ void write_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n_f, const in
    // Intersection over area
    at.set_entry(row, c++,
                 eng.pair_single[n].intersection_over_area);
+
+   // Curvature ratio
+   at.set_entry(row, c++,
+                eng.pair_single[n].curvature_ratio);
 
    // Complexity ratio
    at.set_entry(row, c++,
@@ -3356,6 +3413,9 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
    // Difference in angles in degrees
    at.set_entry(row, c++, eng.pair_cluster[n].angle_diff);
 
+   // Aspect ratio ratio 
+   at.set_entry(row, c++, eng.pair_cluster[n].aspect_ratio_ratio);
+
    // Area ratio
    at.set_entry(row, c++, eng.pair_cluster[n].area_ratio);
 
@@ -3374,6 +3434,10 @@ void write_cluster_pair(ModeFuzzyEngine &eng, const Grid & grid, const int n,
    // Intersection over area
    at.set_entry(row, c++,
                 eng.pair_cluster[n].intersection_over_area);
+
+   // Curvature ratio
+   at.set_entry(row, c++,
+                eng.pair_cluster[n].curvature_ratio);
 
    // Complexity ratio
    at.set_entry(row, c++,

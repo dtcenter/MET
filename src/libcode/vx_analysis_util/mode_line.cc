@@ -1478,6 +1478,24 @@ return ( x );
 ////////////////////////////////////////////////////////////////////////
 
 
+double ModeLine::aspect_ratio_ratio() const
+
+{
+
+double x;
+
+const char * c = get_item("ASPECT_RATIO_RATIO");
+
+x = atof(c);
+
+return ( x );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double ModeLine::area_ratio() const
 
 {
@@ -1557,6 +1575,24 @@ double ModeLine::intersection_over_area() const
 double x;
 
 const char * c = get_item("INTERSECTION_OVER_AREA");
+
+x = atof(c);
+
+return ( x );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double ModeLine::curvature_ratio() const
+
+{
+
+double x;
+
+const char * c = get_item("CURVATURE_RATIO");
 
 x = atof(c);
 

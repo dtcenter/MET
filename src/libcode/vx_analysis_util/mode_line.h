@@ -127,12 +127,15 @@ class ModeLine : public DataLine {
       double       convex_hull_dist           () const;
       double       angle_diff                 () const;
 
+
+      double       aspect_ratio_ratio         () const;
       double       area_ratio                 () const;
       int          intersection_area          () const;
       int          union_area                 () const;
       int          symmetric_diff             () const;
       double       intersection_over_area     () const;
 
+      double       curvature_ratio            () const;
       double       complexity_ratio           () const;
       double       percentile_intensity_ratio () const;
 

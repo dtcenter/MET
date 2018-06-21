@@ -325,6 +325,12 @@ class ModeAttributes {
       int angle_diff_max_set;
       double angle_diff_max;
 
+      int aspect_ratio_ratio_min_set;
+      double aspect_ratio_ratio_min;
+
+      int aspect_ratio_ratio_max_set;
+      double aspect_ratio_ratio_max;
+
       int area_ratio_min_set;
       double area_ratio_min;
 
@@ -336,6 +342,12 @@ class ModeAttributes {
 
       int intersection_over_area_max_set;
       double intersection_over_area_max;
+
+      int curvature_ratio_min_set;
+      double curvature_ratio_min;
+
+      int curvature_ratio_max_set;
+      double curvature_ratio_max;
 
       int complexity_ratio_min_set;
       double complexity_ratio_min;
@@ -516,11 +528,17 @@ class ModeAttributes {
       void set_angle_diff_min                 (double);
       void set_angle_diff_max                 (double);
 
+      void set_aspect_ratio_ratio_min         (double);
+      void set_aspect_ratio_ratio_max         (double);
+
       void set_area_ratio_min                 (double);
       void set_area_ratio_max                 (double);
 
       void set_intersection_over_area_min     (double);
       void set_intersection_over_area_max     (double);
+
+      void set_curvature_ratio_min            (double);
+      void set_curvature_ratio_max            (double);
 
       void set_complexity_ratio_min           (double);
       void set_complexity_ratio_max           (double);
