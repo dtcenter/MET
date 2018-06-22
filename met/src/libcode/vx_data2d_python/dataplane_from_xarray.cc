@@ -18,14 +18,40 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-DataPlane dataplane_from_xarray(PyObject * data_array, PyObject * atts_dict)
+static const char data_attr_name  [] = "data";
+static const char attrs_attr_name [] = "attrs";
+
+
+////////////////////////////////////////////////////////////////////////
+
+   //
+   //  we just grab the numpy array and the attributes dictionary
+   //
+   //    from the xarray DataArray object, and then hand them
+   //
+   //    off to dataplane_from_numpy_array
+   //
+
+DataPlane dataplane_from_xarray(PyObject * data_array)
 
 {
 
 DataPlane dp;
+PyObject * numpy_array = 0;
+PyObject * attrs_dict   = 0;
+
+
+numpy_array = PyObject_GetAttrString(data_array, data_attr_name);
+
+attrs_dict  = PyObject_GetAttrString(data_array, attrs_attr_name);
+
+
+   /////////////////////
+
+dp = dataplane_from_numpy_array(numpy_array, attrs_dict);
 
    //
-   //  place holder
+   //  done
    //
 
 return ( dp );
