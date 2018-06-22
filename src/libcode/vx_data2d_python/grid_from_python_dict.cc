@@ -341,7 +341,7 @@ return;
    //
    //  the fact that our destination is "const char *" rather than 
    //
-   //    "char *" is the only thing that makes this tricky
+   //    just "char *" is the only thing that makes this tricky
    //
 
 void set_string(const char * & dest, const ConcatString & src)
