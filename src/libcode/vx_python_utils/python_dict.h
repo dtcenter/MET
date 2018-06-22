@@ -16,6 +16,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "concat_string.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern "C" {
 
 #include "Python.h"
@@ -25,9 +31,11 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////
 
+
    //
    //  convenience functions for looking things up in a python dictionary
    //
+
 
 extern  int           dict_lookup_int    (PyObject * dict, const char * key);
 extern  double        dict_lookup_double (PyObject * dict, const char * key);
@@ -37,6 +45,9 @@ extern  PyObject *    dict_lookup_dict   (PyObject * dict, const char * key);
 
 ////////////////////////////////////////////////////////////////////////
 
+   //
+   //  dumping dictionary contents to the screen
+   //
 
 extern void dump_dict(PyObject * obj, int depth);
 
