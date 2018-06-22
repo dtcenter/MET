@@ -20,11 +20,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include "dataplane_from_numpy_array.h"   //  takes a NumPy array and an attributes dictionary
-
-#include "dataplane_from_xarray.h"        //  takes an xarray DataArray
-
-#include "grid_from_python_dict.h"
+#include "python_dict.h"
+#include "python_numarray.h"
+#include "python_tuple.h"
 
 
 ////////////////////////////////////////////////////////////////////////
