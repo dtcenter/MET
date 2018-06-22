@@ -61,8 +61,8 @@ fcst = {
    conv_radius        = 5;
    conv_thresh        = >=5.0;
    vld_thresh         = 0.5;
-   filter_attr_name   = [];
-   filter_attr_thresh = [];
+   filter_attr_name   = [ "AREA" ];
+   filter_attr_thresh = [ >=10   ];
    merge_thresh       = >=1.25;
    merge_flag         = NONE;
 }
