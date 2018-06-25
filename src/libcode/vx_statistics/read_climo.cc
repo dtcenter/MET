@@ -158,19 +158,42 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       // Compute the current month and day
       unix_to_mdyhms(cur_dpa[i].valid(), month, day, year, hour, minute, second);
 
+      // Check for matching month
+      if(month != vld_month) {
+         mlog << Debug(3)
+              << "Skipping climatology field whose month (" << month
+              << ") does not match the month of the forecast valid time ("
+              << vld_month << ") from file: " << climo_file << "\n"; 
+         continue;
+      }
+
       // Check for matching month and day
-      if(month != vld_month || (match_day && day != vld_day)) continue;
+      if(match_day && day != vld_day) {
+         mlog << Debug(3)
+              << "Skipping climatology field since \"" << conf_key_match_day
+              << "\" is TRUE but the month (" << month << ") and day (" << day
+              << ") do not match the month (" << vld_month << ") and day ("
+              << vld_day << ") of the forecast valid time from file: "
+              << climo_file << "\n";
+         continue;
+      }
 
       // Recompute the unixtime using the valid year, month, and day
       cur_ut = mdyhms_to_unix(vld_month, vld_day, vld_year, hour, minute, second);
 
       // Check the time step
-      if(labs(cur_ut - vld_ut) >= time_step) continue;
+      if(labs(cur_ut - vld_ut) >= time_step) { 
+         mlog << Debug(3) << "Skipping climatology field since time offset "
+              << "exceeds the specified \"" << conf_key_time_step << "\" ("
+              << labs(cur_ut - vld_ut) << " >= " << time_step << ") from file: "
+              << climo_file << "\n";
+         continue;
+      }       
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
          mlog << Debug(1)
-              << "Regridding climotology " << info->magic_str()
+              << "Regridding climatology " << info->magic_str()
               << " to the verification grid.\n";
          dp = met_regrid(cur_dpa[i], mtddf->grid(), vx_grid, regrid_info);
       }
