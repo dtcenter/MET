@@ -1522,6 +1522,20 @@ on selected in
 dist_type
 \series default
 .
+ The 
+\series bold
+GAMMA
+\series medium
+, 
+\series bold
+UNIFORM
+\series medium
+, and 
+\series bold
+BETA
+\series default
+ distributions are defined by two parameters, specified as a comma-separated
+ list (a,b), whereas all other distributions are defined by a single parameter.
 \end_layout
 
 \begin_layout Standard
