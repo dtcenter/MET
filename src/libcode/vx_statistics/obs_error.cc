@@ -26,8 +26,8 @@ using namespace std;
 static const char default_obs_error_dir[] = "MET_BASE/table_files";
 
 // Name of user-specified observation errror environment variable
-static const char met_obs_error_tables[] =
-   "MET_OBS_ERROR_TABLES";
+static const char met_obs_error_table[] =
+   "MET_OBS_ERROR_TABLE";
 
 static const int  n_obs_error_columns = 13;
 static const char wildcard_str []     = "ALL";
@@ -429,12 +429,12 @@ void ObsErrorTable::initialize() {
    char *ptr;
 
    //
-   // Use MET_OBS_ERROR_TABLES, if set
+   // Use MET_OBS_ERROR_TABLE, if set
    //
-   ptr = getenv(met_obs_error_tables);
-   if((ptr = getenv(met_obs_error_tables)) != NULL) {
+   ptr = getenv(met_obs_error_table);
+   if((ptr = getenv(met_obs_error_table)) != NULL) {
       path = ptr;
-      desc << "user-defined " << met_obs_error_tables;
+      desc << "user-defined " << met_obs_error_table;
    }
    //
    // Otherwise, read the default table file
