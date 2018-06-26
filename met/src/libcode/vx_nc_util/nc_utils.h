@@ -42,16 +42,22 @@ typedef signed char ncbyte; // from ncvalues.h
 //#define GET_NC_TYPE(ncObj)          ncObj.getType()
 //#define GET_NC_TYPE_P(ncObjPtr)     ncObjPtr->getType()
 
-#define GET_NC_TYPE_ID(ncObj)            ncObj.getType().getId()
-#define GET_NC_TYPE_ID_P(ncObjPtr)       ncObjPtr->getType().getId()
-#define GET_NC_TYPE_NAME(ncObj)          ncObj.getType().getName()
-#define GET_NC_TYPE_NAME_P(ncObjPtr)     ncObjPtr->getType().getName()
+#define GET_NC_TYPE_ID(ncObj)           ncObj.getType().getId()
+#define GET_NC_TYPE_ID_P(ncObjPtr)      ncObjPtr->getType().getId()
+#define GET_NC_TYPE_NAME(ncObj)         ncObj.getType().getName()
+#define GET_NC_TYPE_NAME_P(ncObjPtr)    ncObjPtr->getType().getName()
 
-#define GET_NC_DIM_COUNT(ncObj)          ncObj.getDimCount()
-#define GET_NC_DIM_COUNT_P(ncObjPtr)     ncObjPtr->getDimCount()
+#define GET_NC_DIM_COUNT(ncObj)         ncObj.getDimCount()
+#define GET_NC_DIM_COUNT_P(ncObjPtr)    ncObjPtr->getDimCount()
 
-#define GET_NC_VAR_COUNT(ncObj)          ncObj.getVarCount()
-#define GET_NC_VAR_COUNT_P(ncObjPtr)     ncObjPtr->getVarCount()
+#define GET_NC_VAR_COUNT(ncObj)         ncObj.getVarCount()
+#define GET_NC_VAR_COUNT_P(ncObjPtr)    ncObjPtr->getVarCount()
+
+#define GET_NC_VARS(ncObj)              ncObj.getVars()
+#define GET_NC_VARS_P(ncObjPtr)         ncObjPtr->getVars()
+
+////////////////////////////////////////////////////////////////////////
+
 
 #define DEF_DEFLATE_LEVEL   (0)
 
@@ -297,6 +303,7 @@ extern bool get_nc_data(NcVar *, char   *data);
 extern bool get_nc_data(NcVar *, float  *data);
 extern bool get_nc_data(NcVar *, double *data);
 extern bool get_nc_data(NcVar *, time_t *data);
+extern bool get_nc_data(NcVar *, ncbyte *data);
 
 extern bool get_nc_data(NcVar *, int    *data, const long *cur);
 extern bool get_nc_data(NcVar *, char   *data, const long *cur);
@@ -357,9 +364,12 @@ extern bool put_nc_data_with_dims(NcVar *, const double *data, const int len0,
 extern bool put_nc_data_with_dims(NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
 
-extern NcVar  get_var(NcFile *, const char * var_name);
-
+extern NcVar    get_var(NcFile *, const char * var_name);
 extern NcVar get_nc_var(NcFile *, const char * var_name);
+extern NcVar *copy_nc_var(NcFile *,  NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
+extern void  copy_nc_atts(NcFile *, NcFile *, const bool all_attrs=true);
+extern void  copy_nc_atts( NcVar *,  NcVar *, const bool all_attrs=true);
+extern void copy_nc_var_data(NcVar *, NcVar *);
 
 extern bool has_var(NcFile *, const char * var_name);
 //extern int get_var_count(NcFile *);
