@@ -1570,7 +1570,7 @@ if ( f.at_eof() )  {
 
 
    //
-   //  get the terget record
+   //  get the target record
    //
 
 f >> pr;
