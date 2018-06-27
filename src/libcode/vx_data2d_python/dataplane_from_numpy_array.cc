@@ -36,7 +36,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-DataPlane dataplane_from_numpy_array(PyObject * numpy_array, PyObject * attrs_dict)
+void dataplane_from_numpy_array(PyObject * numpy_array, PyObject * attrs_dict, DataPlane & dp_out, Grid & grid_out)
 
 {
 
@@ -44,7 +44,6 @@ int j;
 int dim, nrows, ncols, nx, ny, Nxy;
 int r, c, x, y;
 double value;
-DataPlane dp;
 int sizes [max_tuple_data_dims];
 void * p  = 0;
 double * pp = 0;
@@ -87,7 +86,7 @@ ny = nrows;
 
 Nxy = nx*ny;
 
-dp.set_size(nx, ny);
+dp_out.set_size(nx, ny);
 
    //
    //  get a pointer to the actual data
@@ -122,7 +121,7 @@ for (j=0; j<Nxy; ++j)  {
    // value = 0.0;
    value = pp[j];
 
-   dp.set(value, x, y);
+   dp_out.set(value, x, y);
 
 }   //  for j
 
@@ -140,7 +139,7 @@ s = dict_lookup_string(attrs_dict, "init");
 
 t = yyyymmdd_hhmmss_to_unix(s);
 
-dp.set_init(t);
+dp_out.set_init(t);
 
      ////////////////////
 
@@ -148,19 +147,19 @@ s = dict_lookup_string(attrs_dict, "valid");
 
 t = yyyymmdd_hhmmss_to_unix(s);
 
-dp.set_valid(t);
+dp_out.set_valid(t);
 
      ////////////////////
 
 j = dict_lookup_int(attrs_dict, "lead");
 
-dp.set_lead(t);
+dp_out.set_lead(t);
 
      ////////////////////
 
 j = dict_lookup_int(attrs_dict, "accum");
 
-dp.set_accum(t);
+dp_out.set_accum(t);
 
 
 
@@ -168,7 +167,7 @@ dp.set_accum(t);
    //  done
    //
 
-return ( dp );
+return;
 
 }
 

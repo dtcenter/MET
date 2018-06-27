@@ -21,6 +21,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "python_dataplane.h"             //  the main access point
+
 #include "dataplane_from_numpy_array.h"   //  takes a NumPy array and an attributes dictionary
 
 #include "dataplane_from_xarray.h"        //  takes an xarray DataArray
