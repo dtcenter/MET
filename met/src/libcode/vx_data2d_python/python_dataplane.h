@@ -9,15 +9,23 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MET_DATAPLANE_FROM_XARRAY_H__
-#define  __MET_DATAPLANE_FROM_XARRAY_H__
+#ifndef  __PYTHON_DATAPLANE__
+#define  __PYTHON_DATAPLANE__
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char xarray_dataarray_name [] = "met_data";
+
+static const char numpy_array_name      [] = "met_data";
+static const char numpy_dict_name       [] = "attrs";
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 #include "data_plane.h"
-#include "vx_grid.h"
 
 
 extern "C" {
@@ -30,13 +38,13 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & grid_out);
+extern void python_dataplane(const char * script_name, const bool use_xarray, DataPlane & dp_out, Grid & g_out);
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MET_DATAPLANE_FROM_XARRAY_H__  */
+#endif   /*  __PYTHON_DATAPLANE__  */
 
 
 ////////////////////////////////////////////////////////////////////////

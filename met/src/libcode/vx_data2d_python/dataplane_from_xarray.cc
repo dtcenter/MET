@@ -13,6 +13,7 @@
 
 #include "dataplane_from_numpy_array.h"
 #include "dataplane_from_xarray.h"
+#include "grid_from_python_dict.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,13 +33,13 @@ static const char attrs_attr_name [] = "attrs";
    //    off to dataplane_from_numpy_array
    //
 
-DataPlane dataplane_from_xarray(PyObject * data_array)
+void dataplane_from_xarray(PyObject * data_array, DataPlane & dp_out, Grid & grid_out)
 
 {
 
 DataPlane dp;
 PyObject * numpy_array = 0;
-PyObject * attrs_dict   = 0;
+PyObject * attrs_dict  = 0;
 
 
 numpy_array = PyObject_GetAttrString(data_array, data_attr_name);
@@ -48,13 +49,13 @@ attrs_dict  = PyObject_GetAttrString(data_array, attrs_attr_name);
 
    /////////////////////
 
-dp = dataplane_from_numpy_array(numpy_array, attrs_dict);
+dataplane_from_numpy_array(numpy_array, attrs_dict, dp_out, grid_out);
 
    //
    //  done
    //
 
-return ( dp );
+return;
 
 }
 
