@@ -257,8 +257,8 @@ static StringArray prepbufr_core_vars;
 static map<ConcatString, int> variableCountMap;
 static map<ConcatString, StringArray> variableTypeMap;
 
-static SummaryObs *summaryObs;
 static bool doSummary;
+static SummaryObs *summaryObs;
 static NetcdfObsVars obs_vars;
 
 ////////////////////////////////////////////////////////////////////////
@@ -2042,10 +2042,15 @@ void write_netcdf_hdr_data() {
       exit(1);
    }
 
-   // MAke sure all obs data is processed before handling header
+   // Make sure all obs data is processed before handling header
    if (doSummary) {
-      // Write out the header data and summary data
+      // Write out the summary data
       write_nc_observations(obs_vars, summaryObs->getSummaries(), false);
+      mlog << Debug(4) << "write_netcdf_hdr_data obs count: "
+           << (int)summaryObs->getObservations().size()
+           << "  summary count: " << (int)summaryObs->getSummaries().size()
+           << " header count: " << dim_count
+           << " summary header count: " << (dim_count-pb_hdr_count) << "\n";
    }
    
    int deflate_level = compress_level;
@@ -2059,9 +2064,11 @@ void write_netcdf_hdr_data() {
 
    // Write out the header data
    if (header_to_vector) {
+      // Write out the saved header data at vector
       write_nc_headers(obs_vars);
    }
    if (nc_data_buffer.hdr_data_idx > 0) {
+      // Write out the remaining header data
       write_nc_header(obs_vars);
    }
 
@@ -2168,6 +2175,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
       obs_qty.format("%d", quality_code);
    }
 
+   write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
    if (doSummary) {
       int var_index = obs_arr[1];
       string var_name = bufr_obs_name_arr[var_index];
@@ -2180,9 +2188,6 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
             obs_qty.text(),
             var_index, obs_arr[2], obs_arr[3], obs_arr[4],
             var_name);
-   }
-   else {
-      write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
    }
    return;
 }
