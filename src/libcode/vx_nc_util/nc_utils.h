@@ -21,7 +21,9 @@ using namespace std;
 
 #include <netcdf>
 using namespace netCDF;
+#ifndef ncbyte
 typedef signed char ncbyte; // from ncvalues.h
+#endif   /*  ncbyte  */
 
 #include "concat_string.h"
 #include "int_array.h"
