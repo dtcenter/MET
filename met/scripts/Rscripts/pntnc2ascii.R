@@ -21,7 +21,7 @@ if( 1 < length(listArgs) ){
 	for( i in seq(1, length(listArgs) - 1, by=2) ){
 		if       ( "-sid" == listArgs[i] ){
 			strSid = listArgs[i+1];
-		} else if( "-msg_typ" == listArgs[i] ){
+		} else if( "-msg_typ" == listArgs[i] || "-msg_type" == listArgs[i] ){
 			strMsg = listArgs[i+1];
 		} else if( "-obs_var"  == listArgs[i] ){
 			strObs = listArgs[i+1];
@@ -30,7 +30,9 @@ if( 1 < length(listArgs) ){
 			usage(); q(status=1);
 		}
 	}
+	#cat(" INFO: strSid: [", strSid, "]", " strSid: [", strMsg, "]", " strObs: [", strObs, "]\n", sep="");
 }
+
 
 # open the input NetCDF file
 strPntNc = listArgs[ length(listArgs) ];
@@ -49,16 +51,17 @@ if( 0 < length(ncPnt$var[["hdr_lat"]]) ) {
         elv    = ncvar_get(ncPnt, ncPnt$var[["hdr_elv"]])
     );
     if( strSid != "" ) {
-        sid_list = ncPnt$var[["hdr_sid_table"]];
+        sid_list = ncvar_get(ncPnt, ncPnt$var[["hdr_sid_table"]]);
         if( 0 < length(sid_list)){
             strSid = which(sid_list == strSid);
+            if (sid_list > 0) strSid = strSid - 1;
         }
-        #cat(strSid,"  int  \n")
     };
     if( strMsg != "") {
         msg_list = ncvar_get(ncPnt, ncPnt$var[["hdr_typ_table"]]);
         if (0 < length(msg_list)){
             strMsg = which(msg_list == strMsg);
+            if (strMsg > 0) strMsg = strMsg - 1;
         }
     };
 } else {
