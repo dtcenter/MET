@@ -1293,13 +1293,21 @@ bool get_nc_data(NcVar *var, float *data) {
          
          float add_offset = 0.;
          float scale_factor = 1.;
+         bool unsigned_value = false;
          NcVarAtt att_add_offset   = get_nc_att(var, "add_offset");
          NcVarAtt att_scale_factor = get_nc_att(var, "scale_factor");
+         NcVarAtt att_unsigned     = get_nc_att(var, "_Unsigned");
          NcVarAtt att_fill_value   = get_nc_att(var, "_FillValue");
          if (!IS_INVALID_NC(att_add_offset)) add_offset = get_att_value_float(&att_add_offset);
          if (!IS_INVALID_NC(att_scale_factor)) scale_factor = get_att_value_float(&att_scale_factor);
-         mlog << Debug(3) << "get_nc_data(NcVar *, float *): add_offset = " << add_offset
-              << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count << "\n";
+         if (!IS_INVALID_NC(att_unsigned)) {
+            ConcatString att_value;
+            get_att_value_chars(&att_unsigned, att_value);
+            unsigned_value = 0 == strcmp("true", att_value);
+         }
+         mlog << Debug(4) << "get_nc_data(NcVar *, float *): add_offset = " << add_offset
+              << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
+              << ", is_unsigned_value: " << unsigned_value << "\n";
 
          switch ( type_id )  {
             case NcType::nc_INT:
@@ -1334,50 +1342,65 @@ bool get_nc_data(NcVar *var, float *data) {
                   short fill_value = (short)bad_data_int;
                   short *packed_data = new short[cell_count];
                   
-                  if (!IS_INVALID_NC(att_fill_value)) fill_value = get_att_value_short(&att_fill_value);
-                  
+                  if (!IS_INVALID_NC(att_fill_value))
+                     fill_value = get_att_value_short(&att_fill_value);
+                 
                   var->getVar(packed_data);
-                  for (int idx=0; idx<cell_count; idx++) {
-                     if (fill_value == packed_data[idx])
-                        data[idx] = bad_data_float;
-                     else {
-                        data[idx] = (packed_data[idx] * scale_factor) + add_offset;
-                        unpacked_count++;
+                  
+                  if (unsigned_value) {
+                     int value, unsigned_fill_value;
+                     unsigned_fill_value = (unsigned short)fill_value;
+                     for (int idx=0; idx<cell_count; idx++) {
+                        value = (unsigned short)packed_data[idx];
+                        if (unsigned_fill_value == value)
+                           data[idx] = bad_data_float;
+                        else {
+                           data[idx] = (value * scale_factor) + add_offset;
+                           unpacked_count++;
+                        }
+                     }
+                  }
+                  else {
+                     for (int idx=0; idx<cell_count; idx++) {
+                        if (fill_value == packed_data[idx])
+                           data[idx] = bad_data_float;
+                        else {
+                           data[idx] = (packed_data[idx] * scale_factor) + add_offset;
+                           unpacked_count++;
+                        }
                      }
                   }
                   if(mlog.verbosity_level() > 4) {
                      int positive_cnt = 0;
                      int raw_positive_cnt = 0;
-                     short raw_min_value =  32767;
-                     short raw_max_value = -32768;
+                     int raw_min_value =  70000;
+                     int raw_max_value = -70000;
                      float min_value =  10e10;
                      float max_value = -10e10;
+                     int tmp_value;
                      for (int idx=0; idx<cell_count; idx++) {
-                        if (fill_value == packed_data[idx])
-                           data[idx] = bad_data_float;
-                        else {
-                           if(mlog.verbosity_level() > 6) {
-                              if (unpacked_count < 50)
-                                 mlog << Debug(7) << "  index " << idx << ": "
-                                      << packed_data[idx] << "\n";
-                           }
-                           if (raw_min_value > packed_data[idx]) raw_min_value = packed_data[idx];
-                           if (raw_max_value < packed_data[idx]) raw_max_value = packed_data[idx];
-                           if (packed_data[idx] > 0) raw_positive_cnt++;
+                        if (fill_value != packed_data[idx]) {
+                           tmp_value = (unsigned_value) ? (unsigned short)packed_data[idx] : packed_data[idx];
+                           //if(mlog.verbosity_level() > 6) {
+                           //   if (unpacked_count < 50)
+                           //      mlog << Debug(7) << "  index " << idx << ": "
+                           //           << tmp_value << "\n";
+                           //}
+                           if (raw_min_value > tmp_value) raw_min_value = tmp_value;
+                           if (raw_max_value < tmp_value) raw_max_value = tmp_value;
+                           if (tmp_value > 0) raw_positive_cnt++;
                            if (data[idx] > 0) positive_cnt++;
                            if (min_value > data[idx]) min_value = data[idx];
                            if (max_value < data[idx]) max_value = data[idx];
                         }
                      }
-                     mlog << Debug(5) << "  get_nc_data(): unpacked_count "
+                     mlog << Debug(5) << "get_nc_data(): unpacked_count "
                           << unpacked_count << " out of " << cell_count
                           << " FillValue(short) " << fill_value
-                          << " between (raw) " << raw_min_value << " and " << raw_max_value
-                          << " between (real)" << min_value << " and " << max_value << "\n";
-                     mlog << Debug(5) << "  get_nc_data(): raw_positive_cnt "
-                          << raw_positive_cnt << "\n";
-                     mlog << Debug(5) << "  get_nc_data(): positive_cnt "
-                          << positive_cnt << "\n";
+                          << ", Range: raw - " << raw_min_value << " and " << raw_max_value
+                          << " real -  " << min_value << " and " << max_value << "\n"
+                          << "               Count: raw_positive: "
+                          << raw_positive_cnt << " positive_cnt: " << positive_cnt << "\n";
                   }
                   delete [] packed_data;
                }
