@@ -19,6 +19,7 @@
 //   ----   ----      ----           -----------
 //   000    01-29-15  Halley Gotway  New
 //   001    03-23-17  Halley Gotway  Change -name to an array.
+//   002    06-25-17  Howard Soh     Support GOES-16
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -150,7 +151,7 @@ void process_command_line(int argc, char **argv) {
    // Add the options function calls
    cline.add(set_field,      "-field",      1);
    cline.add(set_method,     "-method",     1);  
-   cline.add(set_shape,   	 "-shape",  	  1);
+   cline.add(set_shape,      "-shape",      1);
    cline.add(set_width,      "-width",      1);
    cline.add(set_vld_thresh, "-vld_thresh", 1);
    cline.add(set_name,       "-name",       1);
@@ -414,8 +415,8 @@ void get_grid_mapping(const ConcatString coord_name,
    
    from_dp.set_size(from_lon_count, from_lat_count);
    to_dp.set_size(to_lon_count, to_lat_count);
+   
    if (data_size > 0) {
-       
       double x, y;
       float  lat, lon;
       int    idx_x, idx_y;
@@ -476,12 +477,12 @@ void get_grid_mapping(const ConcatString coord_name,
 }
 
 void process_data_only_file() {
-   DataPlane fr_dp, to_dp;
+   DataPlane to_dp;
    Grid fr_grid, to_grid;
    GrdFileType ftype;
    double dmin, dmax;
    ConcatString run_cs, vname;
-   static const char *method_name = "process_data_only_file()";
+   static const char *method_name = "process_data_only_file() ";
 
    // Initialize configuration object
    MetConfig config;
@@ -500,37 +501,37 @@ void process_data_only_file() {
    
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
-   int from_lat_count, from_lon_count;
+   int from_lat_count, from_lon_count, from_data_size;
    IntArray *cellMapping = new IntArray[(to_lat_count * to_lon_count)];
    get_grid_mapping(coord_name, to_grid, cellMapping, from_lat_count, from_lon_count);
+   from_data_size = from_lat_count * from_lon_count;
 
    GridTemplateFactory gtf;
    mlog << Debug(2) << "Interpolation options: "
         << "method = " << interpmthd_to_string(RGInfo.method)
-        << ", width = " << RGInfo.width
-        << ", shape = " << gtf.enum2String(RGInfo.shape)
+        //<< ", width = " << RGInfo.width
+        //<< ", shape = " << gtf.enum2String(RGInfo.shape)
         << ", vld_thresh = " << RGInfo.vld_thresh << "\n";
 
    // Build the run command string
-   //run_cs << "Regrid from " << fr_grid.serialize() << " to " << to_grid.serialize();
    run_cs << "Regrid from " << coord_name << " to " << to_grid.serialize();
 
    // Setup the VarInfo request object
    VarInfoFactory v_factory;
    VarInfo *vinfo = (VarInfo *)0;
-   //vinfo = v_factory.new_var_info(fr_mtddf->file_type());
    vinfo = v_factory.new_var_info(FileType_NcCF);
 
    // Open the output file
    open_nc(to_grid, run_cs);
    
    bool all_attrs = false;
-   NcFile *_nc_in = open_ncfile(InputFilename);
-   ncbyte *qc_data = new ncbyte[(from_lat_count * from_lon_count)];
-   float *from_data = new float[(from_lat_count * from_lon_count)];
+   NcFile   *_nc_in = open_ncfile(InputFilename);
+   ncbyte  *qc_data = new ncbyte[from_data_size];
+   float *from_data = new float[from_data_size];
+
+   memset(qc_data, -99, from_data_size*sizeof(ncbyte)); // -99 is arbitrary number as invliad QC value
 
    to_dp.set_size(to_lon_count, to_lat_count);
-   fr_dp.set_size(from_lon_count, from_lat_count);;
 
    int qc_filtered_count;
    NcVar var_qc;
@@ -540,6 +541,21 @@ void process_data_only_file() {
    bool has_qc_flags = (qc_flags.n_elements() > 0);
    for(int i=0; i<FieldSA.n_elements(); i++) {
 
+      // Regrid the data plane
+      int offset;
+      int to_offset;
+      int valid_count;
+      int censored_count;
+      int missing_count = 0;
+      int non_missing_count = 0;
+      float data_value;
+      float from_min_value =  10e10; 
+      float from_max_value = -10e10;
+      float qc_min_value =  10e10; 
+      float qc_max_value = -10e10;
+      IntArray cellArray;
+      NumArray dataArray;
+      
       // Initialize
       vinfo->clear();
 
@@ -559,85 +575,100 @@ void process_data_only_file() {
 
       get_nc_data(&var_data, (float *)from_data);
       
-      if(mlog.verbosity_level() >= 4) {
-         int missing_count =0;
-         int non_missing_count =0;
-         int min_idx = -1;
-         int max_idx = -1;
-         float min_value =  10e10; 
-         float max_value = -10e10;
-         for (int z=0; z<from_lat_count*from_lon_count; z++) {
-            if (!is_eq(bad_data_float, from_data[z])) {
-               non_missing_count++;
-               if (min_value > from_data[z]) {
-                  min_value = from_data[z];
-                  min_idx = z;
-               }
-               if (max_value < from_data[z]) {
-                  max_value = from_data[z];
-                  max_idx = z;
-               }
-           }
-           else missing_count++;
-         }
-         mlog << Debug(4) << method_name << "  missing_count: "
-              << missing_count << ", non_missing_count: " << non_missing_count
-              << " value range: " << min_value << " and " << max_value << "\n";
-      }
-
-      // Regrid the data plane
-      int to_offset;
-      float data_value;
-      float min_value, max_value, sum_value, mean_value;
-      IntArray cellArray;
-      NumArray dataArray;
+      censored_count = 0;
+      qc_filtered_count = 0;
       to_dp.erase();
       to_dp.set_constant(bad_data_double);
       
-      int offset;
-      int valid_count;
-      qc_filtered_count = 0;
       for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
          for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
             offset = to_dp.two_to_one(xIdx,yIdx);
             cellArray = cellMapping[offset];
             if (0 < cellArray.n_elements()) {
-               dataArray.clear();
                valid_count = 0;
+               dataArray.clear();
                for (int dIdx=0; dIdx<cellArray.n_elements(); dIdx++) {
                   data_value = from_data[cellArray[dIdx]];
-                  if (!is_eq(data_value, bad_data_float)) {
-                     if (!has_qc_var || !has_qc_flags
-                          || qc_flags.has(qc_data[cellArray[dIdx]])) {
-                        dataArray.add(data_value);
-                     }
-                     else {
-                        qc_filtered_count++;
-                     }
-                     valid_count++;
+                  if (is_eq(data_value, bad_data_float)) {
+                     missing_count++;
+                     continue;
                   }
+                  
+                  if(mlog.verbosity_level() >= 4) {
+                     if (from_min_value > data_value) from_min_value = data_value;
+                     if (from_max_value < data_value) from_max_value = data_value;
+                  }
+                  
+                  //Filter by QC flag
+                  if (!has_qc_var || !has_qc_flags
+                       || qc_flags.has(qc_data[cellArray[dIdx]])) {
+                     for(int i=0; i<vinfo->censor_thresh().n_elements(); i++) {
+                        // Break out after the first match.
+                        if(vinfo->censor_thresh()[i].check(data_value)) {
+                           //float saved_value = data_value;
+                           data_value = vinfo->censor_val()[i];
+                           censored_count++;
+                           //cout << "   DEBUG org value: " << saved_value << " to " << data_value << "\n";
+                           break;
+                        }
+                     }
+                     dataArray.add(data_value);
+                     if (mlog.verbosity_level() >= 4) {
+                        if (qc_min_value > data_value) qc_min_value = data_value;
+                        if (qc_max_value < data_value) qc_max_value = data_value;
+                     }
+                  }
+                  else {
+                     qc_filtered_count++;
+                  }
+                  valid_count++;
                }
                if (0 < dataArray.n_elements()) {
-                  //cellArray.sort_increasing()
-                  min_value = dataArray.min();
-                  max_value = dataArray.max();
-                  sum_value = dataArray.sum();
-                  mean_value = dataArray.sum() / cellArray.n_elements();
-                  to_dp.set(mean_value, xIdx, yIdx);
+                  int data_count = dataArray.n_elements();
+                  float new_value;
+                  if      (RGInfo.method == InterpMthd_Min) new_value = dataArray.min();
+                  else if (RGInfo.method == InterpMthd_Max) new_value = dataArray.max();
+                  else if (RGInfo.method == InterpMthd_Median) {
+                     cellArray.sort_increasing();
+                     new_value = dataArray[data_count/2];
+                     if (0 == data_count % 2) new_value = (new_value + dataArray[(data_count/2)+1])/2;
+                  }
+                  else {
+                     float sum_value = dataArray.sum();
+                     new_value = dataArray.sum() / data_count;
+                  }
+                  to_dp.set(new_value, xIdx, yIdx);
+                  if(mlog.verbosity_level() > 7) {
+                     if (300 < dataArray.n_elements()) {
+                        cout << " data from " << dataArray.n_elements() << ". max: "
+                             << dataArray.max() << ", min: " << dataArray.min()
+                             << " mean: " << dataArray.sum()/dataArray.n_elements() << "\n";
+                     }
+                  }
                }
             }
          }
       }
+      mlog << Debug(4) << method_name << " Count: missing: "
+           << missing_count << ", non_missing: " << non_missing_count
+           << " value range: [" << from_min_value << " - " << from_max_value
+           << "] QCed: [" << qc_min_value << " - " << qc_max_value << "]\n";
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
          to_dp.data_range(dmin, dmax);
+         
+         char censored_info[50];
+         if (censored_count > 0) {
+            sprintf (censored_info, " censored count: %d", censored_count);
+         }
+         else sprintf (censored_info, "");
          mlog << Debug(2)
               << "Range of regridded data (" << vinfo->name() << ") is "
               << dmin << " to " << dmax << ".\n";
          mlog << Debug(2)
               << "filtered by QC: " << qc_filtered_count
-              << ", has_qc_var: " << has_qc_var << ".\n";
+              << ", has_qc_var: " << has_qc_var << censored_info << ".\n";
       }
 
       // Select output variable name
@@ -766,30 +797,6 @@ void write_nc(const DataPlane &dp, const Grid &grid,
 
    write_nc_data(dp, grid, &data_var);
    
-//   // Allocate memory to store data values for each grid point
-//   float *data = new float [grid.nx()*grid.ny()];
-//
-//   // Store the data
-//   int grid_nx = grid.nx();
-//   int grid_ny = grid.ny();
-//   for(int x=0; x<grid_nx; x++) {
-//      for(int y=0; y<grid_ny; y++) {
-////cout << "  DEBUG HS x: " << x << ", y: " << y << " nx: " << grid_nx << ", ny: " << grid_ny << "\n";
-//         int n = DefaultTO.two_to_one(grid_nx, grid_ny, x, y);
-//         data[n] = (float) dp(x, y);
-//      } // end for y
-//   } // end for x
-//
-//   // Write out the data
-//   if(!put_nc_data_with_dims(&data_var, &data[0], grid.ny(), grid.nx())) {
-//      mlog << Error << "\nwrite_nc() -> "
-//           << "error writing data to the output file.\n\n";
-//      exit(1);
-//   }
-//
-//   // Clean up
-//   if(data) { delete [] data;  data = (float *)  0; }
-
    return;
 }
 
@@ -807,30 +814,6 @@ void write_nc_var(const DataPlane &dp, const Grid &grid,
 
    write_nc_data(dp, grid, &data_var);
    
-//   // Allocate memory to store data values for each grid point
-//   float *data = new float [grid.nx()*grid.ny()];
-//
-//   // Store the data
-//   int grid_nx = grid.nx();
-//   int grid_ny = grid.ny();
-//   for(int x=0; x<grid_nx; x++) {
-//      for(int y=0; y<grid_ny; y++) {
-////cout << "  DEBUG HS x: " << x << ", y: " << y << " nx: " << grid_nx << ", ny: " << grid_ny << "\n";
-//         int n = DefaultTO.two_to_one(grid_nx, grid_ny, x, y);
-//         data[n] = (float) dp(x, y);
-//      } // end for y
-//   } // end for x
-//
-//   // Write out the data
-//   if(!put_nc_data_with_dims(&data_var, &data[0], grid.ny(), grid.nx())) {
-//      mlog << Error << "\nwrite_nc() -> "
-//           << "error writing data to the output file.\n\n";
-//      exit(1);
-//   }
-//
-//   // Clean up
-//   if(data) { delete [] data;  data = (float *)  0; }
-
    return;
 }
 
@@ -849,7 +832,6 @@ int get_lon_count(NcFile *_nc) {
    if(!IS_INVALID_NC(dim_lon)) lon_count= get_dim_size(&dim_lon);
    return lon_count;
 }
-
    
 ////////////////////////////////////////////////////////////////////////
 
@@ -929,10 +911,9 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n"
 
         << "\t\t\"-coord corrd_file\" provides the lat/lon (optional).\n"
-        << "\t\t\"-qc qc_flags\" provides QC flags which is comma separated (0,1) to filter out (optional).\n"
-
-        << "\t[-coord filename]\n"
-        << "\t[-qc 0,1]\n"
+        << "\t\t\"-qc qc_flags\" provides comma separated QC flags, for example \"0,1\" (optional).\n"
+        << "\t\t\t\tOnly applied if -coord argument is given and QC variable exists\n"
+        
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
 
    exit(1);
@@ -1008,6 +989,10 @@ void set_compress(const StringArray & a) {
 
 void set_coord_name(const StringArray & a) {
    coord_name = a[0];
+   if (RGInfo.method == DefaultInterpMthd) {
+      RGInfo.width  = 0;
+      RGInfo.method = InterpMthd_UW_Mean;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1019,8 +1004,6 @@ void set_qc_flags(const StringArray & a) {
    sa.parse_css(a[0]);
    for (int idx=0; idx<sa.n_elements(); idx++) {
       qc_flag = atoi(sa[idx]);
-      cout << "   from " << sa[idx]<< "  to " << qc_flag << "\n";
-      if ( !qc_flags.has(qc_flag)) qc_flags.add(qc_flag);
+      if ( !qc_flags.has(qc_flag) ) qc_flags.add(qc_flag);
    }
-
 }
