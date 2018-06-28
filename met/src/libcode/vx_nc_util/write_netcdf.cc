@@ -70,6 +70,7 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
    f_out->putAtt("FileOrigins", attribute_str);
    f_out->putAtt("MET_version", met_version);
    f_out->putAtt("MET_tool", program_name);
+   //f_out->putAtt("Conventions", "CF-1.6");
    if(model_name) f_out->putAtt("model",  model_name);
    if(obtype)     f_out->putAtt("obtype", obtype);
    if(desc)       f_out->putAtt("desc",   desc);
@@ -186,10 +187,12 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lat_var, "long_name", "latitude");
    add_att(&lat_var, "units", "degrees_north");
    add_att(&lat_var, "standard_name", "latitude");
+   //add_att(&lat_var, "axis", "Y");
 
    add_att(&lon_var, "long_name", "longitude");
    add_att(&lon_var, "units", "degrees_east");
    add_att(&lon_var, "standard_name", "longitude");
+   //add_att(&lon_var, "axis", "X");
 
    // Allocate space for lat/lon values
    lat_data = new float [grid.nx()*grid.ny()];
@@ -1127,6 +1130,7 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
    string prev_header_type = "";
    string prev_station_id = "";
    ConcatString obs_qty;
+   int headerOffset = nc_data_buffer.cur_hdr_idx;
 
    //float obs_arr[obs_arr_len];
    const string method_name = "write_nc_observations()";
@@ -1183,6 +1187,8 @@ int write_nc_observations(const NetcdfObsVars &obs_vars,
       obs_arr[3] = obs->getHeight();
       obs_arr[4] = obs->getValue();
       obs_qty = (obs->getQualityFlag().length() == 0 ? na_str : obs->getQualityFlag().c_str());
+      if (!reset) obs_arr[0] += headerOffset;
+
       write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
       
       //if (nc_data_buffer.obs_data_idx >= nc_data_buffer.obs_buf_size) {
