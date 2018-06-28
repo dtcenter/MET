@@ -54,7 +54,7 @@ if( 0 < length(ncPnt$var[["hdr_lat"]]) ) {
         sid_list = ncvar_get(ncPnt, ncPnt$var[["hdr_sid_table"]]);
         if( 0 < length(sid_list)){
             strSid = which(sid_list == strSid);
-            if (sid_list > 0) strSid = strSid - 1;
+            if (strSid > 0) strSid = strSid - 1;
         }
     };
     if( strMsg != "") {
