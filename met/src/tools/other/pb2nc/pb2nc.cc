@@ -193,6 +193,8 @@ static StringArray bufr_target_variables;
 static ConcatString data_plane_filename;
 
 static int compress_level = -1;
+static bool save_summary_only = false;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -335,6 +337,7 @@ static void   set_target_variables(const StringArray & a);
 static void   set_logfile(const StringArray &);
 static void   set_verbosity(const StringArray &);
 static void   set_compress(const StringArray &);
+static void   set_summary_only(const StringArray &);
 
 static void   display_bufr_variables(const StringArray &, const StringArray &,
                                      const StringArray &, const StringArray &);
@@ -370,6 +373,11 @@ int main(int argc, char *argv[]) {
       for(i=0; i<pbfile.n_elements(); i++) {
          process_pbfile_metadata(i);
          process_pbfile(i);
+      }
+      
+      if (doSummary) {
+         TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
+         summaryObs->summarizeObs(summaryInfo);
       }
    
       // Write the NetCDF file
@@ -468,6 +476,8 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_logfile, "-log", 1);
    cline.add(set_verbosity, "-v", 1);
    cline.add(set_compress,  "-compress",  1);
+   // for testing. Ignored if time summary is not enabled
+   cline.add(set_summary_only, "-summary-only",  0);
 
    // Parse the command line
    cline.parse();
@@ -514,6 +524,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    doSummary = conf_info.getSummaryInfo().flag;
+   if (!doSummary) save_summary_only = false;
 
    return;
 }
@@ -988,7 +999,7 @@ void process_pbfile(int i_pb) {
             if (hr  > r8bfms) hr = 0;
             if (min > r8bfms) min = 0;
             if (sec > r8bfms || sec < 0) sec = 0;
-            file_ut = mdyhms_to_unix(mon, day, yr, hr, min, sec);
+            msg_ut = mdyhms_to_unix(mon, day, yr, hr, min, sec);
             sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
                     yr, mon, day, hr, min, sec);
             mlog << Debug(7) << "Bufr obs_time:\t" << time_str << "\n\n";
@@ -1062,7 +1073,7 @@ void process_pbfile(int i_pb) {
 
       // Compute the valid time and check if it is within the
       // specified valid range
-      hdr_vld_ut = file_ut + (unixtime)nint(hdr[3]*sec_per_hour);
+      hdr_vld_ut = msg_ut + (unixtime)nint(hdr[3]*sec_per_hour);
       if (0 == min_msg_ut || min_msg_ut > hdr_vld_ut) {
          min_msg_ut = hdr_vld_ut;
          strcpy(min_time_str, time_str);
@@ -1541,10 +1552,6 @@ void process_pbfile(int i_pb) {
 
    if (nc_data_buffer.obs_data_idx > 0) {
       write_nc_observation(obs_vars, nc_data_buffer);
-   }   
-   if (doSummary) {
-      TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
-      summaryObs->summarizeObs(summaryInfo);
    }
 
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
@@ -2024,9 +2031,15 @@ void write_netcdf_hdr_data() {
    bool is_prepbufr = is_prepbufr_file(&event_names);
    static const string method_name = "\nwrite_netcdf_hdr_data()";
 
-   dim_count = (long) nc_data_buffer.cur_hdr_idx;
-   pb_hdr_count = dim_count;
-   if (doSummary) dim_count += summaryObs->countSummaryHeaders();
+   pb_hdr_count = (long) nc_data_buffer.cur_hdr_idx;
+   dim_count = pb_hdr_count;
+   if (doSummary) {
+      int summmary_hdr_cnt = summaryObs->countSummaryHeaders();
+      if (save_summary_only)
+         dim_count = summmary_hdr_cnt;
+      else
+         dim_count += summmary_hdr_cnt;
+   }
 
    // Check for no messages retained
    if(dim_count <= 0) {
@@ -2045,7 +2058,9 @@ void write_netcdf_hdr_data() {
    // Make sure all obs data is processed before handling header
    if (doSummary) {
       // Write out the summary data
-      write_nc_observations(obs_vars, summaryObs->getSummaries(), false);
+      //write_nc_observations(obs_vars, summaryObs->getSummaries(), false);
+      if (save_summary_only) reset_header_buffer(pb_hdr_count, true);
+      write_nc_observations(obs_vars, summaryObs->getSummaries(), save_summary_only);
       mlog << Debug(4) << "write_netcdf_hdr_data obs count: "
            << (int)summaryObs->getObservations().size()
            << "  summary count: " << (int)summaryObs->getSummaries().size()
@@ -2175,7 +2190,8 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
       obs_qty.format("%d", quality_code);
    }
 
-   write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
+   if (!save_summary_only)
+       write_nc_observation(obs_vars, nc_data_buffer, obs_arr, obs_qty.text());
    if (doSummary) {
       int var_index = obs_arr[1];
       string var_name = bufr_obs_name_arr[var_index];
@@ -2656,4 +2672,8 @@ void set_compress(const StringArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void set_summary_only(const StringArray & a) {
+   save_summary_only = true;
+}
 
