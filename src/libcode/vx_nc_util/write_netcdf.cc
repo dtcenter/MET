@@ -908,7 +908,7 @@ void read_nc_dims_vars(NetcdfObsVars &obs_vars, NcFile *f_in) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void reset_header_buffer(int buf_size) {
+void reset_header_buffer(int buf_size, bool reset_all) {
    for (int i=0; i<buf_size; i++) {
       for (int j=0; j<HEADER_STR_LEN; j++) {
          nc_data_buffer.hdr_typ_str_buf[i][j] = bad_data_char;
@@ -926,6 +926,23 @@ void reset_header_buffer(int buf_size) {
       nc_data_buffer.hdr_lat_buf[i] = FILL_VALUE;
       nc_data_buffer.hdr_lon_buf[i] = FILL_VALUE;
       nc_data_buffer.hdr_elv_buf[i] = FILL_VALUE;
+   }
+   
+   if (reset_all) {
+      nc_data_buffer.cur_hdr_idx = 0;
+      
+      hdr_data.typ_array.clear();
+      hdr_data.sid_array.clear();
+      hdr_data.vld_array.clear();
+      hdr_data.typ_idx_array.clear();
+      hdr_data.sid_idx_array.clear();
+      hdr_data.vld_idx_array.clear();
+      hdr_data.lat_array.clear();
+      hdr_data.lon_array.clear();
+      hdr_data.elv_array.clear();
+      hdr_data.prpt_typ_array.clear();
+      hdr_data.irpt_typ_array.clear();
+      hdr_data.inst_typ_array.clear();
    }
 }
 

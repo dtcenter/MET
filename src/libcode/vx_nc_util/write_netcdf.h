@@ -110,7 +110,7 @@ extern void create_nc_other_vars (NetcdfObsVars &, NcFile *, const NcDataBuffer 
 extern void init_nc_dims_vars  (NetcdfObsVars &, bool use_var_id = true);
 extern void read_nc_dims_vars  (NetcdfObsVars &, NcFile *);
 
-extern void reset_header_buffer(int buf_size);
+extern void reset_header_buffer(int buf_size, bool reset_all=false);
 
 extern void write_nc_other_vars     (NetcdfObsVars &);
 extern void write_nc_headers        (const NetcdfObsVars &);
