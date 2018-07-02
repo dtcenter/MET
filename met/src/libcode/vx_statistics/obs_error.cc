@@ -571,7 +571,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
 ////////////////////////////////////////////////////////////////////////
 
 void ObsErrorInfo::clear() {
-   field = FieldType_None;
+   flag = false;
    entry.clear();
    rng_ptr = (gsl_rng *) 0;
 }
@@ -580,8 +580,8 @@ void ObsErrorInfo::clear() {
 
 void ObsErrorInfo::validate() {
 
-   // If set to NONE, no work to do
-   if(field == FieldType_None) return;
+   // Check for no work to do
+   if(!flag) return;
 
    // Validate the ObsErrorEntry object
    entry.validate();
@@ -615,11 +615,11 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
    // Conf: obs_error
    err_dict = dict->lookup_dictionary(conf_key_obs_error);
 
-   // Conf: field
-   info.field = int_to_fieldtype(err_dict->lookup_int(conf_key_field));
+   // Conf: flag
+   info.flag = err_dict->lookup_bool(conf_key_flag);
 
    // If set to NONE, no work to do
-   if(info.field == FieldType_None) return(info);
+   if(!info.flag) return(info);
 
    // Conf: dist_type - optional
    i = err_dict->lookup_int(conf_key_dist_type, false);
@@ -656,25 +656,28 @@ double add_obs_error(const gsl_rng *r, FieldType t,
    // Check for null pointer or bad input value
    if(!e || is_bad_data(v)) return(v);
 
-   // Instrument bias correction for observations
+   // Apply instrument bias correction to observation values
    if(t == FieldType_Obs) {
       if(!is_bad_data(e->bias_scale))  v_new *= e->bias_scale;
       if(!is_bad_data(e->bias_offset)) v_new += e->bias_offset;
    }
+   // Apply random perturbation to forecast values
+   else {
 
-   // Handle DistType_LogNormal transform
-   if(e->dist_type == DistType_LogNormal) {
-      if(v > 0.0) {
-         v_new  = log(v);
+      // Handle DistType_LogNormal transform
+      if(e->dist_type == DistType_LogNormal) {
+         if(v > 0.0) {
+            v_new  = log(v);
+            v_new += ran_draw(r, e->dist_type,
+                              e->dist_parm[0], e->dist_parm[1]);
+            v_new  = exp(v_new);
+         }
+      }
+      // Apply random perturbation
+      else if(e->dist_type != DistType_None) {
          v_new += ran_draw(r, e->dist_type,
                            e->dist_parm[0], e->dist_parm[1]);
-         v_new  = exp(v_new);
       }
-   }
-   // Apply random perturbation
-   else if(e->dist_type != DistType_None) {
-      v_new += ran_draw(r, e->dist_type,
-                        e->dist_parm[0], e->dist_parm[1]);
    }
 
    // Detailed debug information
@@ -688,19 +691,21 @@ double add_obs_error(const gsl_rng *r, FieldType t,
          cs << "Applying no observation error update for "
             << fieldtype_to_string(t) << " value " <<  v << ".\n";
       }
-      // List update information
+      // Print detailed update information
       else {
          cs << "Applying observation error update from "
             << fieldtype_to_string(t) << " value " << v << " to "
             << v_new << " for ";
          if(t == FieldType_Obs && !is_bad_data(e->bias_scale)) {
-            cs << "bias scale (" << e->bias_scale << "), ";
+            cs << "bias scale (" << e->bias_scale << ") ";
          }
          if(t == FieldType_Obs && !is_bad_data(e->bias_offset)) {
-            cs << "bias offset (" << e->bias_offset << "), ";
+            cs << "bias offset (" << e->bias_offset << ") ";
          }
-         cs << dist_to_string(e->dist_type, e->dist_parm)
-            << " perturbation.\n";
+         if(t == FieldType_Fcst && e->dist_type != DistType_None) {
+            cs << dist_to_string(e->dist_type, e->dist_parm)
+               << " perturbation.\n";
+         }
       }
       mlog << Debug(4) << cs;
    }

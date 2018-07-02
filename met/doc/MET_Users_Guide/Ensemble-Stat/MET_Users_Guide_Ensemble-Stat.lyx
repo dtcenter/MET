@@ -1358,7 +1358,7 @@ obs_error = {
 \begin_layout LyX-Code
 
 \series bold
-   field            = NONE;
+   flag             = FALSE;
 \end_layout
 
 \begin_layout LyX-Code
@@ -1423,44 +1423,21 @@ $MET_OBS_ERROR_TABLE
 \noindent
 The 
 \series bold
-field
+flag
 \series default
- entry may be set to 
+ entry toggles the observation error logic on (
 \series bold
-FCST
+TRUE
 \series default
-, 
+) and off (
 \series bold
-OBS
+FALSE
 \series default
-, 
-\series bold
-BOTH
-\series default
-, or 
-\series bold
-NONE
-\series default
-.
- Setting this entry to 
-\series bold
-NONE
-\series default
-, the default value, disables the observation error logic.
- 
-\series bold
-FCST
-\series default
- indicates that a random perturbation should be applied to the ensemble
- member values; 
-\series bold
-OBS
-\series default
- applies the random perturbation to the observation values; and 
-\series bold
-BOTH
-\series default
- applies the random perturbation to the ensemble members and the observations.
+).
+ When flag is TRUE, random observation error perturbations are applied to
+ the ensemble member values.
+ No perturbation is applied to the observation values but the bias scale
+ and offset values, if specified, are applied.
 \end_layout
 
 \begin_layout Standard

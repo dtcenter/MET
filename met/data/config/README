@@ -1514,11 +1514,10 @@ skip_const = FALSE;
 // but this may be overridden by setting the $MET_OBS_ERROR_TABLE environment
 // variable at runtime.
 //
-// The field entry may be set to FCST, OBS, BOTH, or NONE. Setting this entry to
-// NONE, the default value, disables the observation error logic. FCST indicates
-// that a random perturbation should be applied to the ensemble member values;
-// OBS applies the random perturbation to the observation values; and BOTH
-// applies the random perturbation to the ensemble members and the observations.
+// The flag entry toggles the observation error logic on (TRUE) and off (FALSE).
+// When flag is TRUE, random observation error perturbations are applied to the
+// ensemble member values.  No perturbation is applied to the observation values
+// but the bias scale and offset values, if specified, are applied.
 //
 // The dist_type entry may be set to NONE, NORMAL, LOGNORMAL, EXPONENTIAL,
 // CHISQUARED, GAMMA, UNIFORM, or BETA. The default value of NONE indicates that
@@ -1543,7 +1542,7 @@ skip_const = FALSE;
 // levels, and range of values.
 //
 obs_error = {
-   field            = NONE;    // FCST, OBS, BOTH, or NONE
+   flag             = FALSE;   // TRUE or FALSE
    dist_type        = NONE;    // Distribution type
    dist_parm        = [];      // Distribution parameters
    inst_bias_scale  = 1.0;     // Instrument bias scale adjustment

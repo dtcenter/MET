@@ -158,7 +158,7 @@ extern ObsErrorTable obs_error_table;
 //
 
 struct ObsErrorInfo {
-   FieldType     field; // Apply to FCST, OBS, BOTH, or NONE
+   bool          flag;  // TRUE or FALSE
    ObsErrorEntry entry; // Defines perturbation
 
    gsl_rng * rng_ptr;   // not allocated
