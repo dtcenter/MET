@@ -1495,8 +1495,8 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
 
    // Apply observation error logic bias correction, if requested
    if(obs_error_info->flag) {
-      obs_v_oerr = add_obs_error(obs_error_info->rng_ptr, FieldType_Obs,
-                                 oerr_ptr, obs_v);
+      obs_v_oerr = add_obs_error_bc(obs_error_info->rng_ptr,
+                                    FieldType_Obs, oerr_ptr, obs_v);
    }
    else {
       obs_v_oerr = obs_v;
@@ -1640,7 +1640,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
 
                   // Apply observation error perturbation, if requested
                   if(obs_error_info->flag) {
-                     fcst_v = add_obs_error(
+                     fcst_v = add_obs_error_inc(
                                  obs_error_info->rng_ptr, FieldType_Fcst,
                                  pd[i][j][k].obs_error_entry[l], fcst_v);
                   }

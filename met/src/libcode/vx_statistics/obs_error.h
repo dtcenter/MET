@@ -175,13 +175,21 @@ struct ObsErrorInfo {
 
 extern ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *);
 
-extern double       add_obs_error(const gsl_rng *, FieldType,
-                                  const ObsErrorEntry *, double);
-extern DataPlane    add_obs_error(const gsl_rng *, FieldType,
-                                  const ObsErrorEntry *,
-                                  const DataPlane &in_dp,
-                                  const DataPlane &obs_dp,
-                                  const char *, const char *);
+extern double       add_obs_error_inc(const gsl_rng *, FieldType,
+                                      const ObsErrorEntry *, double);
+extern DataPlane    add_obs_error_inc(const gsl_rng *, FieldType,
+                                      const ObsErrorEntry *,
+                                      const DataPlane &in_dp,
+                                      const DataPlane &obs_dp,
+                                      const char *, const char *);
+
+extern double       add_obs_error_bc(const gsl_rng *, FieldType,
+                                     const ObsErrorEntry *, double);
+extern DataPlane    add_obs_error_bc(const gsl_rng *, FieldType,
+                                     const ObsErrorEntry *,
+                                     const DataPlane &in_dp,
+                                     const DataPlane &obs_dp,
+                                     const char *, const char *);
 
 ////////////////////////////////////////////////////////////////////////
 
