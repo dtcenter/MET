@@ -345,33 +345,6 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       // Store the number of valid ensemble values
       v_na.add(n_vld);
 
-      // Compute the spread of the unperturbed ensemble members
-      spread = compute_stdev(esum_na[i], esumsq_na[i], v_na[i]);
-      spread_na.add(spread);
-      variance = spread * spread;
-
-      // Process the observation error information.
-      ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
-      if(e) {
-
-         // Compute perturbed ensemble mean and spread
-         cur_ens.compute_mean_stdev(mean, spread);
-         mn_oerr_na.add(mean);
-         spread_oerr_na.add(spread);
-
-         // Compute the spread plus observation error variance.
-         spread_plus_oerr_na.add(sqrt(variance +
-                                      dist_var(e->dist_type,
-                                               e->dist_parm[0],
-                                               e->dist_parm[1])));
-      }
-      // If no observation error specified, store bad data values.
-      else {
-         mn_oerr_na.add(bad_data_double);
-         spread_oerr_na.add(bad_data_double);
-         spread_plus_oerr_na.add(bad_data_double);
-      }
-
       // Skip points missing ensemble data
       if(n_vld != n_ens) {
          n_skip_vld++;
@@ -388,14 +361,46 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          skip_ba.add(false);
       }
 
-      // Store bad data values for current point
+      // Store bad data values if skipping this point
       if(skip_ba[i]) {
+         spread_na.add(bad_data_double);
+         mn_oerr_na.add(bad_data_double);
+         spread_oerr_na.add(bad_data_double);
+         spread_plus_oerr_na.add(bad_data_double);
          r_na.add(bad_data_int);
          crps_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
       }
+      // Otherwise, compute scores
       else {
+
+         // Compute the spread of the unperturbed ensemble members
+         spread = compute_stdev(esum_na[i], esumsq_na[i], v_na[i]);
+         spread_na.add(spread);
+         variance = spread * spread;
+
+         // Process the observation error information.
+         ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
+         if(e) {
+
+            // Compute perturbed ensemble mean and spread
+            cur_ens.compute_mean_stdev(mean, spread);
+            mn_oerr_na.add(mean);
+            spread_oerr_na.add(spread);
+
+            // Compute the spread plus observation error variance.
+            spread_plus_oerr_na.add(sqrt(variance +
+                                         dist_var(e->dist_type,
+                                                  e->dist_parm[0],
+                                                  e->dist_parm[1])));
+         }
+         // If no observation error specified, store bad data values.
+         else {
+            mn_oerr_na.add(bad_data_double);
+            spread_oerr_na.add(bad_data_double);
+            spread_plus_oerr_na.add(bad_data_double);
+         }
 
          // With no ties, the rank is the number below plus 1
          if(n_tie == 0) {
@@ -426,13 +431,13 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    } // end for i
 
    if(n_skip_vld > 0) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "Skipping " << n_skip_vld << " of " << o_na.n_elements()
            << " points due to missing ensemble values.\n";
    }
 
    if(skip_const) {
-      mlog << Debug(3)
+      mlog << Debug(2)
            << "Skipping " << n_skip_const << " of " << o_na.n_elements()
            << " points with constant value.\n";
    }
@@ -457,7 +462,9 @@ void PairDataEnsemble::compute_stats() {
    crps = crps_na.wmean(wgt_na);
 
    // Get the sum of the weights
-   w_sum = wgt_na.sum();
+   for(i=0, w_sum=0.0; i<wgt_na.n_elements(); i++) {
+      if(!skip_ba[i]) w_sum += wgt_na[i];
+   }
 
    // Check for bad data
    if(is_bad_data(crps) ||
@@ -471,6 +478,10 @@ void PairDataEnsemble::compute_stats() {
       // Compute the climatological CRPS
       ffbar = oobar = fobar = 0.0;
       for(i=0; i<n_obs; i++) {
+
+         if(skip_ba[i]) continue;
+
+         // Track running sums
          w      = wgt_na[i]/w_sum;
          ffbar += w * cmn_na[i] * cmn_na[i];
          oobar += w * o_na[i]   * o_na[i];
@@ -486,6 +497,8 @@ void PairDataEnsemble::compute_stats() {
    // Compute ME and RMSE values
    fbar = obar = ffbar = oobar = fobar = 0.0;
    for(i=0; i<n_obs; i++) {
+
+      if(skip_ba[i]) continue;
 
       // Track running sums
       w      = wgt_na[i]/w_sum;
@@ -505,6 +518,8 @@ void PairDataEnsemble::compute_stats() {
 
       fbar = obar = ffbar = oobar = fobar = 0.0;
       for(i=0; i<n_obs; i++) {
+
+         if(skip_ba[i]) continue;
 
          // Track running sums
          w      = wgt_na[i]/w_sum;
