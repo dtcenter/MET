@@ -28,7 +28,7 @@ obtype = "MC_PCP";
 // Verification grid
 //
 regrid = {
-   to_grid    = NONE;
+   to_grid    = FULL;
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
@@ -119,7 +119,7 @@ skip_const     = FALSE;
 // May be set separately in each "obs.field" entry
 //
 obs_error = {
-   field            = NONE;
+   flag             = FALSE;
    dist_type        = NONE;
    dist_parm        = [];
    inst_bias_scale  = 1.0;

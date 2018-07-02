@@ -726,7 +726,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    vx_pd.obs_error_info = &obs_error;
 
    // Initialize the global instance of obs_error_table
-   if(obs_error.field != FieldType_None && !obs_error_table.is_set()) {
+   if(obs_error.flag && !obs_error_table.is_set()) {
       obs_error_table.initialize();
    }
 

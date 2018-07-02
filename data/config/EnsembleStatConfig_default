@@ -98,7 +98,7 @@ skip_const     = FALSE;
 // May be set separately in each "obs.field" entry
 //
 obs_error = {
-   field            = NONE;    // FCST, OBS, BOTH, or NONE
+   flag             = FALSE;   // TRUE or FALSE
    dist_type        = NONE;    // Distribution type
    dist_parm        = [];      // Distribution parameters
    inst_bias_scale  = 1.0;     // Instrument bias scale adjustment

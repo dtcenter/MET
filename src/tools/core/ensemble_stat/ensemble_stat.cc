@@ -1449,7 +1449,7 @@ void process_grid_vx() {
       shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_name().text());
 
       // Set the ObsErrorEntry pointer
-      if(conf_info.vx_opt[i].obs_error.field != FieldType_None) {
+      if(conf_info.vx_opt[i].obs_error.flag) {
 
          // Use config file setting, if specified
          if(conf_info.vx_opt[i].obs_error.entry.dist_type != DistType_None) {
@@ -1628,11 +1628,10 @@ void process_grid_vx() {
          // Store a copy of the unperturbed observation field
          oraw_dp = obs_dp;
 
-         // Apply observation error perturbation, if requested
-         if(conf_info.vx_opt[i].obs_error.field == FieldType_Obs ||
-            conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
+         // Apply observation error bias correciton, if requested
+         if(conf_info.vx_opt[i].obs_error.flag) {
             mlog << Debug(3)
-                 << "Applying observation error perturbation to "
+                 << "Applying observation error bias correction to "
                  << "gridded observation data.\n";
             obs_dp = add_obs_error(conf_info.rng_ptr,
                                FieldType_Obs, oerr_ptr,
@@ -1641,7 +1640,7 @@ void process_grid_vx() {
                                conf_info.obtype);
          }
 
-         // Looop through the ensenmble members
+         // Looop through the ensemble members
          for(k=0; k<ens_file_list.n_elements(); k++) {
 
             // Smooth the forecast field, if requested
@@ -1654,8 +1653,7 @@ void process_grid_vx() {
             fraw_dp[k] = fcst_dp[k];
 
             // Apply observation error perturbation, if requested
-            if(conf_info.vx_opt[i].obs_error.field == FieldType_Fcst ||
-               conf_info.vx_opt[i].obs_error.field == FieldType_Both) {
+            if(conf_info.vx_opt[i].obs_error.flag) {
                mlog << Debug(3)
                     << "Applying observation error perturbation to "
                     << "ensemble member " << k+1 << ".\n";
@@ -1862,7 +1860,7 @@ void process_grid_scores(int i_vx,
          if(oerr_ptr) {
             e = oerr_ptr;
          }
-         else if(conf_info.vx_opt[i_vx].obs_error.field != FieldType_None) {
+         else if(conf_info.vx_opt[i_vx].obs_error.flag) {
             e = obs_error_table.lookup(
                    conf_info.vx_opt[i].vx_pd.obs_info->name(),
                    conf_info.obtype, oraw_dp(x,y));

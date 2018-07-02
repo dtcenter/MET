@@ -985,21 +985,21 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
    set_climo_info(vx_pd.climo_info);
    set_obs_info(vx_pd.obs_info);
 
-   desc          = vx_pd.desc;
+   desc           = vx_pd.desc;
 
-   fcst_ut       = vx_pd.fcst_ut;
-   beg_ut        = vx_pd.beg_ut;
-   end_ut        = vx_pd.end_ut;
-   sid_exc_filt  = vx_pd.sid_exc_filt;
-   obs_qty_filt  = vx_pd.obs_qty_filt;
+   fcst_ut        = vx_pd.fcst_ut;
+   beg_ut         = vx_pd.beg_ut;
+   end_ut         = vx_pd.end_ut;
+   sid_exc_filt   = vx_pd.sid_exc_filt;
+   obs_qty_filt   = vx_pd.obs_qty_filt;
    obs_error_info = vx_pd.obs_error_info;
 
-   interp_thresh = vx_pd.interp_thresh;
-   msg_typ_sfc   = vx_pd.msg_typ_sfc;
+   interp_thresh  = vx_pd.interp_thresh;
+   msg_typ_sfc    = vx_pd.msg_typ_sfc;
 
-   fcst_dpa      = vx_pd.fcst_dpa;
-   climo_mn_dpa  = vx_pd.climo_mn_dpa;
-   climo_sd_dpa  = vx_pd.climo_sd_dpa;
+   fcst_dpa       = vx_pd.fcst_dpa;
+   climo_mn_dpa   = vx_pd.climo_mn_dpa;
+   climo_sd_dpa   = vx_pd.climo_sd_dpa;
 
    set_pd_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
@@ -1478,7 +1478,7 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
                      obs_info->is_specific_humidity();
 
    // Store pointer to ObsErrorEntry
-   if(obs_error_info->field != FieldType_None) {
+   if(obs_error_info->flag) {
 
       // Use config file setting, if specified
       if(obs_error_info->entry.dist_type != DistType_None) {
@@ -1493,9 +1493,8 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
       }
    }
 
-   // Apply observation error perturbation
-   if(obs_error_info->field == FieldType_Obs ||
-      obs_error_info->field == FieldType_Both) {
+   // Apply observation error logic bias correction, if requested
+   if(obs_error_info->flag) {
       obs_v_oerr = add_obs_error(obs_error_info->rng_ptr, FieldType_Obs,
                                  oerr_ptr, obs_v);
    }
@@ -1639,9 +1638,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn) {
                   // Track unperturbed ensemble variance sums
                   pd[i][j][k].add_ens_var_sums(l, fcst_v);
 
-                  // Apply observation error logic to ensemble members
-                  if(obs_error_info->field == FieldType_Fcst ||
-                     obs_error_info->field == FieldType_Both) {
+                  // Apply observation error perturbation, if requested
+                  if(obs_error_info->flag) {
                      fcst_v = add_obs_error(
                                  obs_error_info->rng_ptr, FieldType_Fcst,
                                  pd[i][j][k].obs_error_entry[l], fcst_v);
