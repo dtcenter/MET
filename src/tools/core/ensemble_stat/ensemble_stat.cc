@@ -1633,11 +1633,10 @@ void process_grid_vx() {
             mlog << Debug(3)
                  << "Applying observation error bias correction to "
                  << "gridded observation data.\n";
-            obs_dp = add_obs_error(conf_info.rng_ptr,
-                               FieldType_Obs, oerr_ptr,
-                               oraw_dp, oraw_dp,
-                               conf_info.vx_opt[i].vx_pd.obs_info->name(),
-                               conf_info.obtype);
+            obs_dp = add_obs_error_bc(conf_info.rng_ptr,
+                        FieldType_Obs, oerr_ptr, oraw_dp, oraw_dp,
+                        conf_info.vx_opt[i].vx_pd.obs_info->name(),
+                        conf_info.obtype);
          }
 
          // Looop through the ensemble members
@@ -1657,9 +1656,8 @@ void process_grid_vx() {
                mlog << Debug(3)
                     << "Applying observation error perturbation to "
                     << "ensemble member " << k+1 << ".\n";
-               fcst_dp[k] = add_obs_error(conf_info.rng_ptr,
-                               FieldType_Fcst, oerr_ptr,
-                               fraw_dp[k], oraw_dp,
+               fcst_dp[k] = add_obs_error_inc(conf_info.rng_ptr,
+                               FieldType_Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
                                conf_info.vx_opt[i].vx_pd.obs_info->name(),
                                conf_info.obtype);
             }

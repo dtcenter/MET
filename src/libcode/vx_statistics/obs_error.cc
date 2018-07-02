@@ -649,65 +649,46 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double add_obs_error(const gsl_rng *r, FieldType t,
-                     const ObsErrorEntry *e, double v) {
+double add_obs_error_inc(const gsl_rng *r, FieldType t,
+                         const ObsErrorEntry *e, double v) {
    double v_new = v;
 
    // Check for null pointer or bad input value
    if(!e || is_bad_data(v)) return(v);
 
-   // Apply instrument bias correction to observation values
-   if(t == FieldType_Obs) {
-      if(!is_bad_data(e->bias_scale))  v_new *= e->bias_scale;
-      if(!is_bad_data(e->bias_offset)) v_new += e->bias_offset;
-   }
-   // Apply random perturbation to forecast values
-   else {
-
-      // Handle DistType_LogNormal transform
-      if(e->dist_type == DistType_LogNormal) {
-         if(v > 0.0) {
-            v_new  = log(v);
-            v_new += ran_draw(r, e->dist_type,
-                              e->dist_parm[0], e->dist_parm[1]);
-            v_new  = exp(v_new);
-         }
-      }
-      // Apply random perturbation
-      else if(e->dist_type != DistType_None) {
+   // Handle DistType_LogNormal transform
+   if(e->dist_type == DistType_LogNormal) {
+      if(v > 0.0) {
+         v_new  = log(v);
          v_new += ran_draw(r, e->dist_type,
                            e->dist_parm[0], e->dist_parm[1]);
+         v_new  = exp(v_new);
       }
+   }
+   // Apply random perturbation
+   else if(e->dist_type != DistType_None) {
+      v_new += ran_draw(r, e->dist_type,
+                        e->dist_parm[0], e->dist_parm[1]);
    }
 
    // Detailed debug information
    if(mlog.verbosity_level() >= 4) {
-      ConcatString cs;
 
       // Check for no updates
-      if(is_bad_data(e->bias_scale) &&
-         is_bad_data(e->bias_offset) &&
-         e->dist_type == DistType_None) {
-         cs << "Applying no observation error update for "
-            << fieldtype_to_string(t) << " value " <<  v << ".\n";
+      if(e->dist_type == DistType_None) {
+         mlog << Debug(4)
+              << "Applying no observation error update for "
+              << fieldtype_to_string(t) << " value " <<  v << ".\n";
       }
       // Print detailed update information
       else {
-         cs << "Applying observation error update from "
-            << fieldtype_to_string(t) << " value " << v << " to "
-            << v_new << " for ";
-         if(t == FieldType_Obs && !is_bad_data(e->bias_scale)) {
-            cs << "bias scale (" << e->bias_scale << ") ";
-         }
-         if(t == FieldType_Obs && !is_bad_data(e->bias_offset)) {
-            cs << "bias offset (" << e->bias_offset << ") ";
-         }
-         if(t == FieldType_Fcst && e->dist_type != DistType_None) {
-            cs << dist_to_string(e->dist_type, e->dist_parm)
-               << " perturbation.\n";
-         }
+         mlog << Debug(4)
+              << "Applying observation error update from "
+              << fieldtype_to_string(t) << " value " << v << " to "
+              << v_new << " for "
+              << dist_to_string(e->dist_type, e->dist_parm)
+              << " perturbation.\n";
       }
-      mlog << Debug(4) << cs;
    }
 
    return(v_new);
@@ -715,11 +696,11 @@ double add_obs_error(const gsl_rng *r, FieldType t,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane add_obs_error(const gsl_rng *r, FieldType t,
-                        const ObsErrorEntry *in_e,
-                        const DataPlane &in_dp,
-                        const DataPlane &obs_dp,
-                        const char *var_name, const char *obtype) {
+DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
+                            const ObsErrorEntry *in_e,
+                            const DataPlane &in_dp,
+                            const DataPlane &obs_dp,
+                            const char *var_name, const char *obtype) {
    int x, y;
    double v;
    DataPlane out_dp = in_dp;
@@ -727,7 +708,7 @@ DataPlane add_obs_error(const gsl_rng *r, FieldType t,
 
    // Check for matching dimensions
    if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
-      mlog << Error << "\nadd_obs_obs() -> "
+      mlog << Error << "\nadd_obs_error_inc() -> "
            << "the data dimensions must match (" << in_dp.nx()
            << ", " << in_dp.ny() << ") != (" << obs_dp.nx()
            << ", " << obs_dp.ny() << ")!\n\n";
@@ -747,7 +728,84 @@ DataPlane add_obs_error(const gsl_rng *r, FieldType t,
          v = in_dp.get(x, y);
 
          // Store perturbed value
-         out_dp.set(add_obs_error(r, t, e, v), x, y);
+         out_dp.set(add_obs_error_inc(r, t, e, v), x, y);
+      }
+   }
+
+   return(out_dp);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double add_obs_error_bc(const gsl_rng *r, FieldType t,
+                        const ObsErrorEntry *e, double v) {
+   double v_new = v;
+
+   // Check for null pointer or bad input value
+   if(!e || is_bad_data(v)) return(v);
+
+   // Apply instrument bias correction
+   if(!is_bad_data(e->bias_scale))  v_new *= e->bias_scale;
+   if(!is_bad_data(e->bias_offset)) v_new += e->bias_offset;
+
+   // Detailed debug information
+   if(mlog.verbosity_level() >= 4) {
+
+      // Check for no updates
+      if(is_bad_data(e->bias_scale) &&
+         is_bad_data(e->bias_offset)) {
+         mlog << Debug(4)
+              << "Applying no observation error bias correction to "
+              << fieldtype_to_string(t) << " value " <<  v << ".\n";
+      }
+      // Print detailed update information
+      else {
+         mlog << Debug(4)
+              << "Applying observation error bias correction from "
+              << fieldtype_to_string(t) << " value " << v << " to "
+              << v_new << " for bias scale (" << e->bias_scale
+              << ") and offset (" <<  e->bias_offset << ").\n";
+      }
+   }
+
+   return(v_new);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
+                           const ObsErrorEntry *in_e,
+                           const DataPlane &in_dp,
+                           const DataPlane &obs_dp,
+                           const char *var_name, const char *obtype) {
+   int x, y;
+   double v;
+   DataPlane out_dp = in_dp;
+   const ObsErrorEntry *e = (ObsErrorEntry *) 0;
+
+   // Check for matching dimensions
+   if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
+      mlog << Error << "\nadd_obs_error_bc() -> "
+           << "the data dimensions must match (" << in_dp.nx()
+           << ", " << in_dp.ny() << ") != (" << obs_dp.nx()
+           << ", " << obs_dp.ny() << ")!\n\n";
+      exit(1);
+   }
+
+   // Apply bias correction to each grid point
+   for(x=0; x<out_dp.nx(); x++) {
+      for(y=0; y<out_dp.ny(); y++) {
+
+         // For a NULL pointer, do a table lookup
+         e = (in_e ? in_e :
+              obs_error_table.lookup(var_name, obtype,
+                                     obs_dp.get(x,y)));
+
+         // Get current data value
+         v = in_dp.get(x, y);
+
+         // Store perturbed value
+         out_dp.set(add_obs_error_bc(r, t, e, v), x, y);
       }
    }
 
