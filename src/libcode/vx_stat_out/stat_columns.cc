@@ -3397,8 +3397,8 @@ void write_ecnt_cols(const PairDataEnsemble *pd_ptr,
    //    ME_OERR,      RMSE_OERR,    SPREAD_OERR,
    //    SPREAD_PLUS_OERR
    //
-   at.set_entry(r, c+0,  // Total Number of Ranked Observations
-      pd_ptr->n_obs);
+   at.set_entry(r, c+0,  // Total Number of Pairs 
+      pd_ptr->n_pair);
 
    at.set_entry(r, c+1,  // Number of ensemble members
       pd_ptr->n_ens);
