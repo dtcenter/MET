@@ -28,7 +28,7 @@ obtype = "MC_PCP";
 // Verification grid
 //
 regrid = {
-   to_grid    = FULL;
+   to_grid    = NONE;
    method     = NEAREST;
    width      = 1;
    vld_thresh = 0.5;
