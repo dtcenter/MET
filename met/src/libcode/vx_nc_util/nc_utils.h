@@ -234,7 +234,7 @@ extern bool get_nc_att(const NcVarAtt *, ConcatString &);
 extern bool get_nc_att(const NcVarAtt *, int          &, bool exit_on_error = true);
 extern bool get_nc_att(const NcVarAtt *, float        &, bool exit_on_error = true);
 extern bool get_nc_att(const NcVarAtt *, double       &, bool exit_on_error = true);
-extern bool get_nc_att(const NcVar *, const ConcatString &, ConcatString &);
+extern bool get_nc_att(const NcVar *, const ConcatString &, ConcatString &, bool exit_on_error = false);
 extern bool get_nc_att(const NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att(const NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
 //extern NcVarAtt *get_var_att(const NcVar *, const ConcatString &, bool exit_on_error = true);
@@ -369,6 +369,9 @@ extern bool put_nc_data_with_dims(NcVar *, const double *data, const long len0,
 extern NcVar    get_var(NcFile *, const char * var_name);
 extern NcVar get_nc_var(NcFile *, const char * var_name);
 extern NcVar *copy_nc_var(NcFile *,  NcVar *, const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
+//extern void   copy_nc_att(NcFile *, NcFile *, const char * attr_name);
+extern void   copy_nc_att(NcFile *, NcVar *, const char * attr_name);
+extern void   copy_nc_att( NcVar *,  NcVar *, const char * attr_name);
 extern void  copy_nc_atts(NcFile *, NcFile *, const bool all_attrs=true);
 extern void  copy_nc_atts( NcVar *,  NcVar *, const bool all_attrs=true);
 extern void copy_nc_var_data(NcVar *, NcVar *);
@@ -406,6 +409,7 @@ extern void get_nc_pb_hdr_data(NetcdfObsVars obs_vars, NcHeaderData *header_data
 extern NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 extern int get_data_size(NcVar *);
+extern unixtime get_reference_unixtime(ConcatString);
 
 ////////////////////////////////////////////////////////////////////////
 
