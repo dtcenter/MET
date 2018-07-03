@@ -1273,6 +1273,7 @@ bool get_nc_data(NcFile *nc, const char *var_name, float *data,
 
 bool get_nc_data(NcVar *var, float *data) {
    bool return_status = false;
+   static const char *method_name = "get_nc_data(NcVar *, float *) ";
 
    if (!var->isNull()) {
       //
@@ -1305,7 +1306,7 @@ bool get_nc_data(NcVar *var, float *data) {
             get_att_value_chars(&att_unsigned, att_value);
             unsigned_value = 0 == strcmp("true", att_value);
          }
-         mlog << Debug(4) << "get_nc_data(NcVar *, float *): add_offset = " << add_offset
+         mlog << Debug(4) << method_name << "add_offset = " << add_offset
               << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
               << ", is_unsigned_value: " << unsigned_value << "\n";
 
@@ -1331,9 +1332,9 @@ bool get_nc_data(NcVar *var, float *data) {
                      }
                   }
                   delete [] packed_data;
-                  mlog << Debug(4) << "  get_nc_data(): unpacked_count "
+                  mlog << Debug(4) << method_name << " unpacked_count "
                        << unpacked_count << " out of " << cell_count
-                       << " FillValue(int) " << fill_value
+                       << ". FillValue(int) " << fill_value
                        << " between " << min_value << " and " << max_value << "\n";
                }
                break;
@@ -1370,9 +1371,8 @@ bool get_nc_data(NcVar *var, float *data) {
                         }
                      }
                   }
-                  if(mlog.verbosity_level() > 4) {
+                  if(mlog.verbosity_level() > 6) {
                      int positive_cnt = 0;
-                     int raw_positive_cnt = 0;
                      int raw_min_value =  70000;
                      int raw_max_value = -70000;
                      float min_value =  10e10;
@@ -1380,27 +1380,23 @@ bool get_nc_data(NcVar *var, float *data) {
                      int tmp_value;
                      for (int idx=0; idx<cell_count; idx++) {
                         if (fill_value != packed_data[idx]) {
-                           tmp_value = (unsigned_value) ? (unsigned short)packed_data[idx] : packed_data[idx];
-                           //if(mlog.verbosity_level() > 6) {
-                           //   if (unpacked_count < 50)
-                           //      mlog << Debug(7) << "  index " << idx << ": "
-                           //           << tmp_value << "\n";
-                           //}
+                           tmp_value = packed_data[idx];
+                           if (unsigned_value) tmp_value = (unsigned short)packed_data[idx];
+                           
                            if (raw_min_value > tmp_value) raw_min_value = tmp_value;
                            if (raw_max_value < tmp_value) raw_max_value = tmp_value;
-                           if (tmp_value > 0) raw_positive_cnt++;
                            if (data[idx] > 0) positive_cnt++;
                            if (min_value > data[idx]) min_value = data[idx];
                            if (max_value < data[idx]) max_value = data[idx];
                         }
                      }
-                     mlog << Debug(5) << "get_nc_data(): unpacked_count "
+                     mlog << Debug(5) << method_name << "unpacked_count "
                           << unpacked_count << " out of " << cell_count
-                          << " FillValue(short) " << fill_value
-                          << ", Range: raw - " << raw_min_value << " and " << raw_max_value
-                          << " real -  " << min_value << " and " << max_value << "\n"
-                          << "               Count: raw_positive: "
-                          << raw_positive_cnt << " positive_cnt: " << positive_cnt << "\n";
+                          << ".\n     FillValue(short) " << fill_value
+                          << ", Positive count: " << positive_cnt
+                          << "\n     Scaled range: " << min_value << " and " << max_value
+                          //<< "   packed range: " << raw_min_value << " and " << raw_max_value;
+                          << "\n";
                   }
                   delete [] packed_data;
                }
@@ -2548,6 +2544,70 @@ void copy_nc_att_short(NcFile *nc_to, NcGroupAtt from_att) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void copy_nc_att_char(NcVar *var_to, NcGroupAtt from_att) {
+   size_t att_length = from_att.getAttLength();
+   char value[att_length];
+   from_att.getValues((void *)&value);
+   var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), att_length, (void *)value);
+}
+
+void copy_nc_att_double(NcVar *var_to, NcGroupAtt from_att) {
+   size_t att_length = from_att.getAttLength();
+   if (att_length == 1) {
+      double value;
+      from_att.getValues(&value);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), value);
+   }
+   else {
+      double values[att_length];
+      from_att.getValues(&values);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), att_length, values);
+   }
+}
+void copy_nc_att_float(NcVar *var_to, NcGroupAtt from_att) {
+   size_t att_length = from_att.getAttLength();
+   if (att_length == 1) {
+      float value;
+      from_att.getValues(&value);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), value);
+   }
+   else {
+      float values[att_length];
+      from_att.getValues(&values);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), att_length, values);
+   }
+}
+
+void copy_nc_att_int(NcVar *var_to, NcGroupAtt from_att) {
+   size_t att_length = from_att.getAttLength();
+   if (att_length == 1) {
+      int value;
+      from_att.getValues(&value);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), value);
+   }
+   else {
+      int values[att_length];
+      from_att.getValues(&values);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), att_length, values);
+   }
+}
+         
+void copy_nc_att_short(NcVar *var_to, NcGroupAtt from_att) {
+   size_t att_length = from_att.getAttLength();
+   if (att_length == 1) {
+      short value;
+      from_att.getValues(&value);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), value);
+   }
+   else {
+      short values[att_length];
+      from_att.getValues(&values);
+      var_to->putAtt(GET_NC_NAME(from_att), from_att.getType(), att_length, values);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void copy_nc_att_char(NcVar *var_to, NcVarAtt from_att) {
    size_t att_length = from_att.getAttLength();
    char value[att_length];
@@ -2610,7 +2670,6 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt from_att) {
    }
 }
 
-////////////////////////////////////////////////////////////////////////
 
 NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
@@ -2627,6 +2686,69 @@ NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
    copy_nc_atts(from_var, to_var, all_attrs);
    copy_nc_var_data(from_var, to_var);
    return to_var;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void copy_nc_att(NcFile *nc_from, NcVar *var_to, const char * attr_name) {
+   NcGroupAtt from_att = get_nc_att(nc_from, attr_name);
+   if (!IS_INVALID_NC(from_att)) {
+      int dataType = GET_NC_TYPE_ID(from_att);
+      switch (dataType) {
+      case NC_DOUBLE:
+         copy_nc_att_double(var_to, from_att);
+         break;
+      case NC_FLOAT:
+         copy_nc_att_float(var_to, from_att);
+         break;
+      case NC_SHORT:
+         copy_nc_att_short(var_to, from_att);
+         break;
+      case NC_INT:
+         copy_nc_att_int(var_to, from_att);
+         break;
+      case NC_CHAR:
+         copy_nc_att_char(var_to, from_att);
+         break;
+      default:
+         mlog << Error << "\ncopy_nc_var_att(NcFile, NcVar, attr_name) -> "
+              << "Does not copy this type \"" << dataType << "\" global NetCDF attribute.\n\n";
+         exit(1);
+         break;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void copy_nc_att(NcVar *var_from, NcVar *var_to, const char * attr_name) {
+   NcVarAtt from_att = get_nc_att(var_from, attr_name);
+   if (!IS_INVALID_NC(from_att)) {
+      int dataType = GET_NC_TYPE_ID(from_att);
+      switch (dataType) {
+      case NC_DOUBLE:
+         copy_nc_att_double(var_to, from_att);
+         break;
+      case NC_FLOAT:
+         copy_nc_att_float(var_to, from_att);
+         break;
+      case NC_SHORT:
+         copy_nc_att_short(var_to, from_att);
+         break;
+      case NC_INT:
+         copy_nc_att_int(var_to, from_att);
+         break;
+      case NC_CHAR:
+         copy_nc_att_char(var_to, from_att);
+         break;
+      default:
+         mlog << Error << "\ncopy_nc_var_atts() -> "
+              << "Does not copy this type \"" << dataType << "\" NetCDF attributes from \""
+              << GET_NC_TYPE_NAME_P(var_from) << "\").\n\n";
+         exit(1);
+         break;
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2676,6 +2798,8 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
             (  (itr->first != "scale_factor")
             && (itr->first != "add_offset")
             && (itr->first != "_FillValue")
+            && (itr->first != "_Unsigned")
+            && (itr->first != "valid_range")
             && (itr->first != "missing_value")
             && (itr->first != "grid_mapping")
             && (itr->first != "coordinates")
@@ -3126,3 +3250,39 @@ int get_data_size(NcVar *var) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+unixtime get_reference_unixtime(ConcatString time_str) {
+   unixtime ut;
+   int offset, array_count;
+   int year, month, day, hour, minute, second;
+   
+   StringArray time_units = time_str.split(" -:ZT");
+   offset = 0;
+   array_count = time_units.n_elements();
+   for (int idx=0; idx<array_count; idx++) {
+      if (0 != atoi(time_units[idx])) break;
+      //if (0 == strcmp(time_units[idx],"seconds")) {
+      offset++;
+   }
+   if ((array_count - offset) < 3) {
+      mlog << Error << "\nget_unixtime() -> "
+           << "trouble to parse time string \""
+           << time_str << "\"\n\n";
+      exit(1);
+   }
+
+   year  = atoi(time_units[offset++]);
+   month = atoi(time_units[offset++]);
+   day   = atoi(time_units[offset++]);
+   hour   = 0;
+   minute = 0;
+   second = 0;
+   if (offset < array_count) hour   = atoi(time_units[offset++]);
+   if (offset < array_count) minute = atoi(time_units[offset++]);
+   if (offset < array_count) second = nint(atof(time_units[offset++]));
+   ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+   return ut;
+}
+
+////////////////////////////////////////////////////////////////////////
+
