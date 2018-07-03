@@ -78,7 +78,7 @@ void SeriesAnalysisConfInfo::clear() {
    mask_grid_name.clear();
    mask_poly_file.clear();
    mask_poly_name.clear();
-   mask_dp.clear();
+   mask_area.clear();
    block_size = bad_data_int;
    vld_data_thresh = bad_data_double;
    rank_corr_flag = false;
@@ -387,15 +387,14 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
-   DataPlane mask_grid_dp, mask_poly_dp;
+   MaskPlane mask_grid, mask_poly;
    ConcatString name;
 
    mlog << Debug(2)
         << "Processing masking regions.\n";
 
    // Initialize the mask to all points on
-   mask_dp.set_size(grid.nx(), grid.ny());
-   mask_dp.set_constant(mask_on_value);
+   mask_area.set_size(grid.nx(), grid.ny(), true);
 
    // Conf: mask.grid
    mask_grid_file = conf.lookup_string(conf_key_mask_grid);
@@ -407,16 +406,16 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    if(mask_grid_file.length() > 0) {
       mlog << Debug(3)
            << "Processing grid mask: " << mask_grid_file << "\n";
-      parse_grid_mask(mask_grid_file, grid, mask_grid_dp, mask_grid_name);
-      apply_mask(mask_dp, mask_grid_dp);
+      parse_grid_mask(mask_grid_file, grid, mask_grid, mask_grid_name);
+      apply_mask(mask_area, mask_grid);
    }
 
    // Parse out the masking polyline
    if(mask_poly_file.length() > 0) {
       mlog << Debug(3)
            << "Processing poly mask: " << mask_poly_file << "\n";
-      parse_poly_mask(mask_poly_file, grid, mask_poly_dp, mask_poly_name);
-      apply_mask(mask_dp, mask_poly_dp);
+      parse_poly_mask(mask_poly_file, grid, mask_poly, mask_poly_name);
+      apply_mask(mask_area, mask_poly);
    }
 
    return;

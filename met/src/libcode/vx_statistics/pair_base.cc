@@ -58,8 +58,8 @@ void PairBase::init_from_scratch() {
 void PairBase::clear() {
 
    mask_name.clear();
-   mask_dp_ptr  = (DataPlane *)   0;  // Not allocated
-   mask_sid_ptr = (StringArray *) 0;  // Not allocated
+   mask_area_ptr = (MaskPlane *)   0;  // Not allocated
+   mask_sid_ptr  = (StringArray *) 0;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
@@ -131,9 +131,9 @@ void PairBase::set_mask_name(const char *c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_mask_dp_ptr(DataPlane *dp_ptr) {
+void PairBase::set_mask_area_ptr(MaskPlane *mp_ptr) {
 
-   mask_dp_ptr = dp_ptr;
+   mask_area_ptr = mp_ptr;
 
    return;
 }

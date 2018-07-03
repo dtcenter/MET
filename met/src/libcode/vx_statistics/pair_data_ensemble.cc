@@ -175,7 +175,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    clear();
 
    set_mask_name(pd.mask_name);
-   set_mask_dp_ptr(pd.mask_dp_ptr);
+   set_mask_area_ptr(pd.mask_area_ptr);
    set_msg_typ(pd.msg_typ);
    set_msg_typ_vals(pd.msg_typ_vals);
 
@@ -1221,14 +1221,14 @@ void VxPairDataEnsemble::set_msg_typ_vals(int i_msg_typ, const StringArray &sa) 
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_mask_dp(int i_mask, const char *name,
-                                     DataPlane *dp_ptr) {
+void VxPairDataEnsemble::set_mask_area(int i_mask, const char *name,
+                                       MaskPlane *mp_ptr) {
    int i, j;
 
    for(i=0; i<n_msg_typ; i++) {
       for(j=0; j<n_interp; j++) {
          pd[i][i_mask][j].set_mask_name(name);
-         pd[i][i_mask][j].set_mask_dp_ptr(dp_ptr);
+         pd[i][i_mask][j].set_mask_area_ptr(mp_ptr);
       }
    }
 
@@ -1517,8 +1517,8 @@ void VxPairDataEnsemble::add_obs(float *hdr_arr, int *hdr_typ_arr,
       for(j=0; j<n_mask; j++) {
 
          // Check for the obs falling within the masking region
-         if(pd[i][j][0].mask_dp_ptr != (DataPlane *) 0) {
-            if(!pd[i][j][0].mask_dp_ptr->s_is_on(x, y)) continue;
+         if(pd[i][j][0].mask_area_ptr != (MaskPlane *) 0) {
+            if(!pd[i][j][0].mask_area_ptr->s_is_on(x, y)) continue;
          }
          // Otherwise, check for the obs Station ID's presence in the
          // masking SID list

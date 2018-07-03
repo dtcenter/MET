@@ -64,13 +64,13 @@ class PairBase {
 
       // Masking area applied to the forecast and climo fields
       ConcatString  mask_name;
-      DataPlane     *mask_dp_ptr;  // Pointer to the masking data plane
-                                   // which is not allocated
-      StringArray   *mask_sid_ptr; // Pointer to masking station ID list
-                                   // which is not allocated
+      MaskPlane     *mask_area_ptr; // Pointer to the masking MaskPlane
+                                    // which is not allocated
+      StringArray   *mask_sid_ptr;  // Pointer to masking station ID list
+                                    // which is not allocated
 
-      ConcatString msg_typ;        // Name of the verifying message type
-      StringArray  msg_typ_vals;   // Message type values to be included
+      ConcatString msg_typ;         // Name of the verifying message type
+      StringArray  msg_typ_vals;    // Message type values to be included
 
       // Interpolation method and shape used
       InterpMthd interp_mthd;
@@ -112,7 +112,7 @@ class PairBase {
       void extend(int);    // Allocate memory for expected size
 
       void set_mask_name(const char *);
-      void set_mask_dp_ptr(DataPlane *);
+      void set_mask_area_ptr(MaskPlane *);
       void set_mask_sid_ptr(StringArray *);
 
       void set_msg_typ(const char *);

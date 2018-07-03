@@ -193,8 +193,8 @@ class EnsembleStatConfInfo {
       map<ConcatString,StringArray> msg_typ_group_map;
       StringArray                   msg_typ_sfc;
 
-      // Mapping of mask names to DataPlanes
-      map<ConcatString,DataPlane>   mask_dp_map;
+      // Mapping of mask names to MaskPlanes
+      map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
       map<ConcatString,StringArray> mask_sid_map;

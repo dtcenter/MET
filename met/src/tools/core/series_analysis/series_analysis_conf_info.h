@@ -68,7 +68,7 @@ class SeriesAnalysisConfInfo {
       ConcatString     mask_grid_name;     // Name of masking grid area
       ConcatString     mask_poly_file;     // Path for masking poly area
       ConcatString     mask_poly_name;     // Name of masking poly area
-      DataPlane        mask_dp;
+      MaskPlane        mask_area;
 
       int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point

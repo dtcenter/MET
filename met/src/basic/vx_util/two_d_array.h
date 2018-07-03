@@ -81,7 +81,9 @@ class TwoD_Array {
       int nx() const { return ( Nx ); }
       int ny() const { return ( Ny ); }
 
-      T * e() { return ( E ); }   //  careful with this
+      const T * data() const { return ( E ); }
+
+      T * buf() { return ( E ); }   //  careful with this
 
       T operator()(int, int) const;
 

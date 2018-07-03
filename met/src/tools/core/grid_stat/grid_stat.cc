@@ -577,7 +577,7 @@ void process_scores() {
    ConcatString cs;
 
    // Forecast and observation fields
-   DataPlane mask_dp;
+   MaskPlane mask_mp;
    DataPlane fcst_dp,        obs_dp;
    DataPlane fcst_dp_smooth, obs_dp_smooth;
    DataPlane fcst_dp_thresh, obs_dp_thresh;
@@ -774,26 +774,26 @@ void process_scores() {
          for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
             // Store the current mask
-            mask_dp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
+            mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
 
             // Turn off the mask for missing data values
-            mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
-            mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+            mask_bad_data(mask_mp, fcst_dp_smooth);
+            mask_bad_data(mask_mp, obs_dp_smooth);
             if(cmn_dp.nx() == fcst_dp_smooth.nx() &&
                cmn_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_dp, cmn_dp, 0.0);
+               mask_bad_data(mask_mp, cmn_dp);
             }
             if(csd_dp.nx() == fcst_dp_smooth.nx() &&
                csd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_dp, csd_dp, 0.0);
+               mask_bad_data(mask_mp, csd_dp);
             }
 
             // Apply the current mask to the current fields
-            apply_mask(fcst_dp_smooth, mask_dp, f_na);
-            apply_mask(obs_dp_smooth,  mask_dp, o_na);
-            apply_mask(cmn_dp,         mask_dp, cmn_na);
-            apply_mask(csd_dp,         mask_dp, csd_na);
-            apply_mask(wgt_dp,         mask_dp, w_na);
+            apply_mask(fcst_dp_smooth, mask_mp, f_na);
+            apply_mask(obs_dp_smooth,  mask_mp, o_na);
+            apply_mask(cmn_dp,         mask_mp, cmn_na);
+            apply_mask(csd_dp,         mask_mp, csd_na);
+            apply_mask(wgt_dp,         mask_mp, w_na);
 
             // Set the mask name
             shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
@@ -1023,10 +1023,10 @@ void process_scores() {
                }
 
                // Apply the current mask to the U-wind fields
-               apply_mask(fu_dp_smooth, mask_dp, fu_na);
-               apply_mask(ou_dp_smooth, mask_dp, ou_na);
-               apply_mask(cmnu_dp,      mask_dp, cmnu_na);
-               apply_mask(wgt_dp,       mask_dp, w_na);
+               apply_mask(fu_dp_smooth, mask_mp, fu_na);
+               apply_mask(ou_dp_smooth, mask_mp, ou_na);
+               apply_mask(cmnu_dp,      mask_mp, cmnu_na);
+               apply_mask(wgt_dp,       mask_mp, w_na);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na,
@@ -1207,20 +1207,20 @@ void process_scores() {
             for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
                // Store the current mask
-               mask_dp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
+               mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
 
                // Turn off the mask for missing data values
-               mask_bad_data(mask_dp, fgx_dp, 0.0);
-               mask_bad_data(mask_dp, fgy_dp, 0.0);
-               mask_bad_data(mask_dp, ogx_dp, 0.0);
-               mask_bad_data(mask_dp, ogy_dp, 0.0);
+               mask_bad_data(mask_mp, fgx_dp);
+               mask_bad_data(mask_mp, fgy_dp);
+               mask_bad_data(mask_mp, ogx_dp);
+               mask_bad_data(mask_mp, ogy_dp);
 
                // Apply the current mask to the current fields
-               apply_mask(fgx_dp, mask_dp, fgx_na);
-               apply_mask(fgy_dp, mask_dp, fgy_na);
-               apply_mask(ogx_dp, mask_dp, ogx_na);
-               apply_mask(ogy_dp, mask_dp, ogy_na);
-               apply_mask(wgt_dp, mask_dp, w_na);
+               apply_mask(fgx_dp, mask_mp, fgx_na);
+               apply_mask(fgy_dp, mask_mp, fgy_na);
+               apply_mask(ogx_dp, mask_mp, ogx_na);
+               apply_mask(ogy_dp, mask_mp, ogy_na);
+               apply_mask(wgt_dp, mask_mp, w_na);
 
                // Set the mask name
                shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
@@ -1355,29 +1355,29 @@ void process_scores() {
                for(m=0; m<conf_info.vx_opt[i].get_n_mask(); m++) {
 
                   // Store the current mask
-                  mask_dp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
+                  mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
 
                   // Turn off the mask for bad forecast or observation values
-                  mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
-                  mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+                  mask_bad_data(mask_mp, fcst_dp_smooth);
+                  mask_bad_data(mask_mp, obs_dp_smooth);
 
                   if(nbrhd->field == FieldType_Fcst ||
                      nbrhd->field == FieldType_Both) {
-                     mask_bad_data(mask_dp, fcst_dp_thresh, 0.0);
+                     mask_bad_data(mask_mp, fcst_dp_thresh);
                   }
 
                   if(nbrhd->field == FieldType_Obs ||
                      nbrhd->field == FieldType_Both) {
-                     mask_bad_data(mask_dp, obs_dp_thresh,  0.0);
+                     mask_bad_data(mask_mp, obs_dp_thresh);
                   }
 
                   // Apply the current mask to the fractional coverage
                   // and thresholded fields
-                  apply_mask(fcst_dp_smooth, mask_dp, f_na);
-                  apply_mask(fcst_dp_thresh, mask_dp, fthr_na);
-                  apply_mask(obs_dp_smooth,  mask_dp, o_na);
-                  apply_mask(obs_dp_thresh,  mask_dp, othr_na);
-                  apply_mask(wgt_dp,         mask_dp, w_na);
+                  apply_mask(fcst_dp_smooth, mask_mp, f_na);
+                  apply_mask(fcst_dp_thresh, mask_mp, fthr_na);
+                  apply_mask(obs_dp_smooth,  mask_mp, o_na);
+                  apply_mask(obs_dp_thresh,  mask_mp, othr_na);
+                  apply_mask(wgt_dp,         mask_mp, w_na);
 
                   mlog << Debug(2) << "Processing "
                        << conf_info.vx_opt[i].fcst_info->magic_str()
@@ -1512,26 +1512,26 @@ void process_scores() {
          for(k=0; k<conf_info.vx_opt[i].get_n_mask(); k++) {
 
             // Store the current mask
-            mask_dp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
+            mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
 
             // Turn off the mask for missing data values
-            mask_bad_data(mask_dp, fcst_dp_smooth, 0.0);
-            mask_bad_data(mask_dp, obs_dp_smooth,  0.0);
+            mask_bad_data(mask_mp, fcst_dp_smooth);
+            mask_bad_data(mask_mp, obs_dp_smooth);
             if(cmn_dp.nx() == fcst_dp_smooth.nx() &&
                cmn_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_dp, cmn_dp, 0.0);
+               mask_bad_data(mask_mp, cmn_dp);
             }
             if(csd_dp.nx() == fcst_dp_smooth.nx() &&
                csd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_dp, csd_dp, 0.0);
+               mask_bad_data(mask_mp, csd_dp);
             }
 
             // Apply the current mask to the current fields
-            apply_mask(fcst_dp_smooth, mask_dp, f_na);
-            apply_mask(obs_dp_smooth,  mask_dp, o_na);
-            apply_mask(cmn_dp,         mask_dp, cmn_na);
-            apply_mask(csd_dp,         mask_dp, csd_na);
-            apply_mask(wgt_dp,         mask_dp, w_na);
+            apply_mask(fcst_dp_smooth, mask_mp, f_na);
+            apply_mask(obs_dp_smooth,  mask_mp, o_na);
+            apply_mask(cmn_dp,         mask_mp, cmn_na);
+            apply_mask(csd_dp,         mask_mp, csd_na);
+            apply_mask(wgt_dp,         mask_mp, w_na);
 
             // Set the mask name
             shc.set_mask(conf_info.vx_opt[i].mask_name[k]);
@@ -1657,10 +1657,10 @@ void process_scores() {
                }
 
                // Apply the current mask to the U-wind fields
-               apply_mask(fu_dp_smooth, mask_dp, fu_na);
-               apply_mask(ou_dp_smooth, mask_dp, ou_na);
-               apply_mask(cmnu_dp,      mask_dp, cmnu_na);
-               apply_mask(wgt_dp,       mask_dp, w_na);
+               apply_mask(fu_dp_smooth, mask_mp, fu_na);
+               apply_mask(ou_dp_smooth, mask_mp, ou_na);
+               apply_mask(cmnu_dp,      mask_mp, cmnu_na);
+               apply_mask(wgt_dp,       mask_mp, w_na);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, fu_na, f_na, ou_na, o_na,
@@ -2413,7 +2413,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       add_att(&nc_var, "smoothing_neighborhood", interp_pnts);
 
       // Pointer to the current mask
-      DataPlane * mask_ptr =
+      MaskPlane * mask_ptr =
          &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i]];
 
       // Store the data
@@ -2570,7 +2570,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
       } // end obs_flag
 
       // Pointer to the current mask
-      DataPlane * mask_ptr =
+      MaskPlane * mask_ptr =
          &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i]];
 
       // Store the forecast and observation values

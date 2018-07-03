@@ -306,8 +306,6 @@ void process_mask_file(DataPlane &dp)
 
    }  //  else
 
-
-
    // For solar masking, parse the valid time from gridded data
 
    if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
