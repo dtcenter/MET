@@ -768,8 +768,7 @@ void process_pbfile(int i_pb) {
    bool apply_poly_mask = (conf_info.poly_mask.n_points() > 0);
 
    // List the PrepBufr file being processed
-   mlog << Debug(1) << "Processing Bufr File:\t" << pbfile[i_pb]
-        << "\n";
+   mlog << Debug(1) << "Processing Bufr File:\t" << pbfile[i_pb]<< "\n";
 
    // Initialize
    filtered_times.clear();
@@ -784,8 +783,7 @@ void process_pbfile(int i_pb) {
    blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
    blk_file = make_temp_file_name(blk_prefix, NULL);
 
-   mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file
-        << "\n";
+   mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
 
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
@@ -867,15 +865,15 @@ void process_pbfile(int i_pb) {
       start_t = clock();
    }
 
-   ConcatString log_message = " (out of ";
-   log_message.add(unixtime_to_string(npbmsg_total));
-   log_message.add(")");
-
-   mlog << Debug(2) << "Processing " << npbmsg
-        << (is_prepbufr ? " PrepBufr" : " Bufr") << " messages"
-        << ((npbmsg == npbmsg_total) ? "" : log_message)
-        << "...\n";
-
+   ConcatString log_message = (is_prepbufr ? " PrepBufr" : " Bufr");
+   log_message.add(" messages");
+   if (npbmsg != npbmsg_total) {
+      log_message.add(" (out of ");
+      log_message.add(unixtime_to_string(npbmsg_total));
+      log_message.add(")");
+   }
+   mlog << Debug(2) << "Processing " << npbmsg << log_message << "...\n";
+   
    if (use_small_buffer && mxr8lv_small < conf_info.end_level) use_small_buffer = false;
    
    int grib_code, bufr_var_index;
@@ -909,23 +907,14 @@ void process_pbfile(int i_pb) {
 
       sprintf(time_str, "%.10i", i_date);
       msg_ut = yyyymmddhh_to_unix(time_str);
-      // Add minutes by calling IUPVS01(unit, "MINU")
-      cycle_minute = missing_cycle_minute;
-      get_tmin_(&unit, &cycle_minute);
-      if (cycle_minute != missing_cycle_minute) {
-         msg_ut += cycle_minute * 60;
-      }
 
       // Check to make sure that the message time hasn't changed
       // from one PrepBufr message to the next
       if(file_ut == (unixtime) 0) {
          file_ut = msg_ut;
 
-         unix_to_mdyhms(file_ut, mon, day, yr, hr, min, sec);
-         sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-                 yr, mon, day, hr, min, sec);
          mlog << Debug(2) << (is_prepbufr ? "PrepBufr" : "Bufr")
-              << " Time Center:\t\t" << time_str << "\n";
+              << " Time Center:\t\t" << unix_to_yyyymmdd_hhmmss(file_ut) << "\n";
 
          // Check if valid_beg_ut and valid_end_ut were set on the
          // command line.  If so, use them.  If not, use beg_ds and
@@ -941,36 +930,38 @@ void process_pbfile(int i_pb) {
          }
 
          if(beg_ut != (unixtime) 0) {
-            unix_to_mdyhms(beg_ut, mon, day, yr, hr, min, sec);
-            sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-                     yr, mon, day, hr, min, sec);
+            unix_to_yyyymmdd_hhmmss(beg_ut, start_time_str);
          }
          else {
-            strcpy(time_str, "NO_BEG_TIME");
+            strcpy(start_time_str, "NO_BEG_TIME");
          }
 
          if(end_ut != (unixtime) 0) {
-            unix_to_mdyhms(end_ut, mon, day, yr, hr, min, sec);
-            sprintf(end_time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-                     yr, mon, day, hr, min, sec);
+            unix_to_yyyymmdd_hhmmss(end_ut, end_time_str);
          }
          else {
             strcpy(end_time_str, "NO_END_TIME");
          }
-         strcpy(start_time_str, time_str);
 
          mlog << Debug(2) << "Searching Time Window:\t\t" << start_time_str
               << " to " << end_time_str << "\n";
 
       }
-      else if((file_ut != msg_ut) && is_prepbufr) {
-         mlog << Error << "\n" << method_name << " -> "
+      else if(file_ut != msg_ut) {
+         mlog << Warning << "\n" << method_name << " -> "
               << "the observation time should remain the same for "
-              << "all " << (is_prepbufr ? "PrepBufr" : "Bufr") << " messages: " << msg_ut << " != "
-              << file_ut << "\n\n";
-         exit(1);
+              << "all " << (is_prepbufr ? "PrepBufr" : "Bufr") << " messages: "
+              << unix_to_yyyymmdd_hhmmss(msg_ut) << " != "
+              << unix_to_yyyymmdd_hhmmss(file_ut) << "\n\n";
       }
 
+      // Add minutes by calling IUPVS01(unit, "MINU")
+      cycle_minute = missing_cycle_minute;
+      get_tmin_(&unit, &cycle_minute);
+      if (cycle_minute != missing_cycle_minute) {
+         msg_ut += cycle_minute * 60;
+      }
+      
       if (!is_prepbufr) {
          int index;
          int length;
@@ -1000,9 +991,8 @@ void process_pbfile(int i_pb) {
             if (min > r8bfms) min = 0;
             if (sec > r8bfms || sec < 0) sec = 0;
             msg_ut = mdyhms_to_unix(mon, day, yr, hr, min, sec);
-            sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-                    yr, mon, day, hr, min, sec);
-            mlog << Debug(7) << "Bufr obs_time:\t" << time_str << "\n\n";
+            mlog << Debug(7) << "Bufr obs_time:\t" 
+                 << unix_to_yyyymmdd_hhmmss(msg_ut) << "\n\n";
             for (index=0; index<mxr8lv; index++) {
                bufr_pres_lv[index] = fill_value;
                bufr_msl_lv[index]  = fill_value;
@@ -1076,11 +1066,9 @@ void process_pbfile(int i_pb) {
       hdr_vld_ut = msg_ut + (unixtime)nint(hdr[3]*sec_per_hour);
       if (0 == min_msg_ut || min_msg_ut > hdr_vld_ut) {
          min_msg_ut = hdr_vld_ut;
-         strcpy(min_time_str, time_str);
       }
       if (max_msg_ut < hdr_vld_ut) {
          max_msg_ut = hdr_vld_ut;
-         strcpy(max_time_str, time_str);
       }
       if(!keep_valid_time(hdr_vld_ut, beg_ut, end_ut)) {
          if (!filtered_times.has(hdr_vld_ut)) {
@@ -1455,8 +1443,9 @@ void process_pbfile(int i_pb) {
                   variables_big_nlevels.add(var_name);
                }
             }
-            mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2 << ", vIdx: "
-                 << vIdx << ", obs_data_idx: " << nc_data_buffer.obs_data_idx << ", nlev: " << nlev << "\n";
+            mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
+                 << ", vIdx: " << vIdx << ", obs_data_idx: " 
+                 << nc_data_buffer.obs_data_idx << ", nlev: " << nlev << "\n";
             // Search through the vertical levels
             for(lv=0; lv<buf_nlev; lv++) {
 
@@ -1526,13 +1515,10 @@ void process_pbfile(int i_pb) {
       // store the header data and increment the PrepBufr record
       // counter
       if(n_hdr_obs > 0) {
-         unix_to_mdyhms(hdr_vld_ut, mon, day, yr, hr, min, sec);
-         sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-                 yr, mon, day, hr, min, sec);
+         unix_to_yyyymmdd_hhmmss(hdr_vld_ut, time_str);
          if (header_to_vector) {
             add_nc_header_all(modified_hdr_typ, hdr_sid, time_str,
                               hdr_lat, hdr_lon, hdr_elv);
-                              
          }
          else {
             write_nc_header(obs_vars, modified_hdr_typ, hdr_sid, time_str,
@@ -1592,17 +1578,14 @@ void process_pbfile(int i_pb) {
            << "\ttime range: " << start_time_str << " and " << end_time_str << ".\n";
    }
    else {
-      mlog << Debug(3) << "\tMin obs_time = " << min_time_str
-           << "\tMax obs_time = " << max_time_str << "\n";
+      mlog << Debug(3) << "\tMin obs_time = " << unix_to_yyyymmdd_hhmmss(min_msg_ut)
+           << "\tMax obs_time = " << unix_to_yyyymmdd_hhmmss(max_msg_ut) << "\n";
 
       int debug_level = 5;
       if(mlog.verbosity_level() >= debug_level) {
          for (kk=0; kk<filtered_times.n_elements();kk++) {
-            unix_to_mdyhms(filtered_times[kk], mon, day, yr, hr, min, sec);
-            sprintf(time_str, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-                        yr, mon, day, hr, min, sec);
-            mlog << Debug(debug_level) << "\t Filtered time: " << time_str
-                 << " (" << filtered_times[kk] << ")\n";
+            mlog << Debug(debug_level) << "\t Filtered time: "
+                 << unix_to_yyyymmdd_hhmmss(filtered_times[kk]) << "\n";
          }
          cout << endl;
       }
