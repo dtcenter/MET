@@ -868,9 +868,7 @@ void process_pbfile(int i_pb) {
    ConcatString log_message = (is_prepbufr ? " PrepBufr" : " Bufr");
    log_message.add(" messages");
    if (npbmsg != npbmsg_total) {
-      log_message.add(" (out of ");
-      log_message.add(unixtime_to_string(npbmsg_total));
-      log_message.add(")");
+      log_message << " (out of " << unixtime_to_string(npbmsg_total) << ")";
    }
    mlog << Debug(2) << "Processing " << npbmsg << log_message << "...\n";
    
@@ -879,6 +877,7 @@ void process_pbfile(int i_pb) {
    int grib_code, bufr_var_index;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
    
+   int bin_count = nint(npbmsg/20.0);
    int bufr_hdr_length = bufr_hdrs.length();
    char bufr_hdr_names[(bufr_hdr_length+1)*2];
    strcpy(bufr_hdr_names, bufr_hdrs.text());
@@ -890,7 +889,7 @@ void process_pbfile(int i_pb) {
    for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
       if(mlog.verbosity_level() > 0) {
-         if(nint(npbmsg/20.0) > 0 && (i_read+1)%nint(npbmsg/20.0) == 0) {
+         if(bin_count > 0 && (i_read+1)%bin_count == 0) {
             cout << nint((double) (i_read+1)/npbmsg*100.0) << "% " << flush;
             showed_progress = true;
             if(mlog.verbosity_level() >= debug_level_for_performance) {
@@ -1139,7 +1138,7 @@ void process_pbfile(int i_pb) {
 
       if (0 < message_type_map.count(hdr_typ)) {
          ConcatString mappedMessageType = message_type_map[hdr_typ];
-         mlog << Debug(5) << "\n" << method_name << " -> "
+         mlog << Debug(6) << "\n" << method_name << " -> "
               << "Switching report type \"" << hdr_typ
               << "\" to message type \"" << mappedMessageType << "\".\n";
          if (mappedMessageType.length() < HEADER_STR_LEN) {
@@ -1242,7 +1241,7 @@ void process_pbfile(int i_pb) {
                // Check for bad data
                if(is_bad_data(ev_temp)) {
 
-                  mlog << Debug(4)
+                  mlog << Debug(8)
                        << "For " << hdr_typ << ", station id " << hdr_sid
                        << ", pressure " << obs_arr[2] << " mb, and height "
                        << obs_arr[3] << " msl, skipping virtual temperature observation ("
@@ -1254,9 +1253,8 @@ void process_pbfile(int i_pb) {
 
                // Check for the event index changing
                else if(ev != ev_temp) {
-                  mlog << Debug(4)
-                       << "For " << hdr_typ << ", station id " << hdr_sid
-                       << ", pressure " << obs_arr[2] << " mb, and height "
+                  mlog << Debug(8) << "For " << hdr_typ << ", station id "
+                       << hdr_sid << ", pressure " << obs_arr[2] << " mb, and height "
                        << obs_arr[3] << " msl, selected sensible temperature ("
                        << evns[kk][ev_temp][lv][0]
                        << " C) from event index " << ev_temp
@@ -1534,7 +1532,15 @@ void process_pbfile(int i_pb) {
          rej_nobs++;
       }
    } // end for i_read
-   if(showed_progress && mlog.verbosity_level() > 0) cout << "\n";
+   if(showed_progress) {
+      log_message = "100% ";
+      if(mlog.verbosity_level() >= debug_level_for_performance) {
+         end_t = clock();
+         log_message << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds";
+         start_t = clock();
+      }
+      cout << log_message << "\n";
+   }
 
    if (nc_data_buffer.obs_data_idx > 0) {
       write_nc_observation(obs_vars, nc_data_buffer);
